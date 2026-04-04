@@ -24,7 +24,7 @@ interface PageErrorStateProps {
  *
  * @see docs/DESIGN-SYSTEM.md §4.14
  */
-export function PageErrorState({ title, message, action, className }: PageErrorStateProps) {
+export function PageErrorState({ title, message, action, onRetry, className }: PageErrorStateProps) {
   const { t } = useTranslation();
 
   return (
@@ -44,7 +44,15 @@ export function PageErrorState({ title, message, action, className }: PageErrorS
       <p className="text-xs text-muted max-w-sm mb-4">
         {message ?? t('common.errorDescription')}
       </p>
-      {action}
+      {action ?? (onRetry ? (
+        <button
+          type="button"
+          onClick={() => onRetry()}
+          className="text-xs font-medium text-accent hover:underline"
+        >
+          {t('common.retry')}
+        </button>
+      ) : null)}
     </div>
   );
 }

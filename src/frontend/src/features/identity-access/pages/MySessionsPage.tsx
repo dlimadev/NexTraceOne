@@ -8,6 +8,7 @@ import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { identityApi } from '../api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { PageErrorState } from '../../../components/PageErrorState';
 import type { ActiveSession } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -31,7 +32,7 @@ export function MySessionsPage() {
   const [revokeConfirmId, setRevokeConfirmId] = useState<string | null>(null);
 
   /** Consulta as sessões ativas do usuário autenticado. */
-  const { data: sessions, isLoading, isError } = useQuery({
+  const { data: sessions, isLoading, isError, refetch } = useQuery({
     queryKey: ['my-sessions', userId],
     queryFn: () => identityApi.listActiveSessions(userId),
     enabled: !!userId,
@@ -115,9 +116,7 @@ export function MySessionsPage() {
               <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
           ) : isError ? (
-            <div className="px-6 py-12 text-sm text-critical text-center">
-              {t('errors.fetchFailed')}
-            </div>
+            <PageErrorState message={t('errors.fetchFailed')} onRetry={refetch} />
           ) : !sessions?.length ? (
             <EmptyState
               icon={<Monitor size={24} />}

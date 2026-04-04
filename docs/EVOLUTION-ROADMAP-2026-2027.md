@@ -82,7 +82,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [ ] Rever 5 instâncias de null/false silencioso com logging estruturado (TenantRepository, RolePermissionRepository — intentional bootstrap patterns)
 
 ### 1.3 Segurança ⏱️ 5 dias
-- [ ] Mover password de dev (`ouro18`) para `dotnet user-secrets`
+- [x] Mover password de dev (`ouro18`) para `dotnet user-secrets` ✅ FIXED — password replaced with CHANGE_ME placeholder in appsettings.Development.json
 - [ ] Implementar PostgreSQL RLS policies como defesa em profundidade
 - [ ] Documentar procedimento de rotação de chaves (JWT + encryption)
 - [x] Configurar CORS por ambiente ✅ Already implemented with environment-aware validation, wildcard rejection, and explicit origins required for non-dev

@@ -23,14 +23,16 @@ public enum ContractProtocol
     AsyncApi = 3,
 
     /// <summary>
-    /// Protocol Buffers (.proto) — capacidade evolutiva para gRPC.
-    /// RESERVADO: sem parser, diff semântico ou UI implementados nesta versão.
+    /// Protocol Buffers (.proto) — contratos gRPC.
+    /// Suporta validação de integridade com contagem de messages, services e rpcs.
+    /// Detecção automática de versão de sintaxe (proto2/proto3).
     /// </summary>
     Protobuf = 4,
 
     /// <summary>
-    /// GraphQL SDL — capacidade evolutiva para APIs GraphQL.
-    /// RESERVADO: sem parser, diff semântico ou UI implementados nesta versão.
+    /// GraphQL SDL — contratos GraphQL.
+    /// Suporta validação de integridade com contagem de types, inputs, enums, interfaces
+    /// e campos de root types (Query, Mutation, Subscription).
     /// </summary>
     GraphQl = 5,
 

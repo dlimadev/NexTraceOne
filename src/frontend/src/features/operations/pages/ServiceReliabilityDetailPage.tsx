@@ -11,6 +11,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { reliabilityApi } from '../api/reliability';
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
@@ -35,7 +36,7 @@ export function ServiceReliabilityDetailPage() {
   const { serviceId } = useParams<{ serviceId: string }>();
   const { t } = useTranslation();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['reliability-detail', serviceId],
     queryFn: () => reliabilityApi.getServiceDetail(serviceId!),
     enabled: !!serviceId,
@@ -52,9 +53,10 @@ export function ServiceReliabilityDetailPage() {
         <NavLink to="/operations/reliability" className="flex items-center gap-1 text-sm text-accent hover:underline mb-4">
           <ArrowLeft size={14} /> {t('reliability.detail.backToOverview')}
         </NavLink>
-        <div className="text-center text-muted py-12">
-          {isNotFound ? t('reliability.detail.notFound') : t('reliability.loadError')}
-        </div>
+        <PageErrorState
+          message={isNotFound ? t('reliability.detail.notFound') : t('reliability.loadError')}
+          onRetry={!isNotFound ? refetch : undefined}
+        />
       </PageContainer>
     );
   }
