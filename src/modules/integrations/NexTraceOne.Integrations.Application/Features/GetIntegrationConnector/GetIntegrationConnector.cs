@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.Abstractions;
@@ -16,6 +17,15 @@ public static class GetIntegrationConnector
 {
     /// <summary>Query para obter detalhe de um conector pelo ID.</summary>
     public sealed record Query(string ConnectorId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetIntegrationConnector.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ConnectorId).NotEmpty().MaximumLength(200);
+        }
+    }
 
     /// <summary>Handler que retorna detalhe completo de um conector de integração.</summary>
     public sealed class Handler(

@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
@@ -14,6 +15,15 @@ public static class ListSnapshots
 {
     /// <summary>Query para listar snapshots temporais do grafo.</summary>
     public sealed record Query(int Limit = 50) : IQuery<Response>;
+
+    /// <summary>Validador da query ListSnapshots.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Limit).InclusiveBetween(1, 500);
+        }
+    }
 
     /// <summary>
     /// Handler que lista snapshots do grafo ordenados cronologicamente (mais recente primeiro).

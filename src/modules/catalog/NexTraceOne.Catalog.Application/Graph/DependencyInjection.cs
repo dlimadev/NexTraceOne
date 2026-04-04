@@ -8,6 +8,9 @@ using NexTraceOne.Catalog.Application.Graph.Features.DecommissionAsset;
 using NexTraceOne.Catalog.Application.Graph.Features.GetAssetDetail;
 using NexTraceOne.Catalog.Application.Graph.Features.GetImpactPropagation;
 using NexTraceOne.Catalog.Application.Graph.Features.GetNodeHealth;
+using NexTraceOne.Catalog.Application.Graph.Features.GetOwnershipAudit;
+using NexTraceOne.Catalog.Application.Graph.Features.GetServiceMaturityDashboard;
+using NexTraceOne.Catalog.Application.Graph.Features.GetServicesSummary;
 using NexTraceOne.Catalog.Application.Graph.Features.GetSubgraph;
 using NexTraceOne.Catalog.Application.Graph.Features.GetTemporalDiff;
 using NexTraceOne.Catalog.Application.Graph.Features.InferDependencyFromOtel;
@@ -20,6 +23,8 @@ using NexTraceOne.Catalog.Application.Graph.Features.UpdateAssetMetadata;
 using NexTraceOne.Catalog.Application.Graph.Features.ValidateDiscoveredDependency;
 using NexTraceOne.Catalog.Application.Graph.Features.AddServiceLink;
 using NexTraceOne.Catalog.Application.Graph.Features.ListServiceLinks;
+using NexTraceOne.Catalog.Application.Graph.Features.ListServices;
+using NexTraceOne.Catalog.Application.Graph.Features.ListSnapshots;
 using NexTraceOne.Catalog.Application.Graph.Features.RemoveServiceLink;
 using NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceLink;
 using NexTraceOne.Catalog.Application.Graph.Features.RunServiceDiscovery;
@@ -86,6 +91,13 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RegisterFromDiscovery.Command>, RegisterFromDiscovery.Validator>();
         services.AddTransient<IValidator<IgnoreDiscoveredService.Command>, IgnoreDiscoveredService.Validator>();
         services.AddTransient<IValidator<GetDiscoveryDashboard.Query>, GetDiscoveryDashboard.Validator>();
+
+        // ── Catalog Queries ──────────────────────────────────────────────
+        services.AddTransient<IValidator<ListSnapshots.Query>, ListSnapshots.Validator>();
+        services.AddTransient<IValidator<GetOwnershipAudit.Query>, GetOwnershipAudit.Validator>();
+        services.AddTransient<IValidator<ListServices.Query>, ListServices.Validator>();
+        services.AddTransient<IValidator<GetServicesSummary.Query>, GetServicesSummary.Validator>();
+        services.AddTransient<IValidator<GetServiceMaturityDashboard.Query>, GetServiceMaturityDashboard.Validator>();
 
         return services;
     }

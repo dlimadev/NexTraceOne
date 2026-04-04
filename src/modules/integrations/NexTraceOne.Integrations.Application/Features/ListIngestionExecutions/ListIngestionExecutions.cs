@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.Abstractions;
@@ -23,6 +24,17 @@ public static class ListIngestionExecutions
         DateTimeOffset? To = null,
         int Page = 1,
         int PageSize = 20) : IQuery<Response>;
+
+    /// <summary>Validador da query ListIngestionExecutions.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Result).MaximumLength(100).When(x => x.Result is not null);
+            RuleFor(x => x.Page).InclusiveBetween(1, 10000);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+        }
+    }
 
     /// <summary>Handler que retorna a lista paginada de execuções de ingestão.</summary>
     public sealed class Handler(
