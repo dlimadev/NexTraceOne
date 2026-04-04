@@ -96,6 +96,14 @@ Comandos de escrita sem validação (risco alto):
 - ~~`OllamaHttpClient.cs` (1)~~ ✅ FIXED — bare catch replaced with `_logger.LogWarning`
 - `AiDraftGeneratorService.cs` (1) — already had `_logger.LogError`, returns null as documented fallback
 
+~~**6 bare catch blocks restantes em código de segurança/parsing:**~~
+- ~~`OidcCallback.cs` — state malformado~~ ✅ FIXED — `Trace.TraceWarning` added
+- ~~`TotpVerifier.cs` — Base32 decode failure~~ ✅ FIXED — `Trace.TraceWarning` added
+- ~~`IdTokenDecoder.cs` — token malformado~~ ✅ FIXED — `Trace.TraceWarning` added
+- ~~`MfaChallengeTokenService.cs` — JWT validation failure~~ ✅ FIXED — `Trace.TraceWarning` added
+- ~~`BackgroundServiceSpecParser.cs` — YAML parse failure~~ ✅ FIXED — `Trace.TraceWarning` added
+- ~~`NotificationAuditService.cs` — PayloadJson malformado~~ ✅ FIXED — `Trace.TraceWarning` added
+
 ### 1.7 Pontos Positivos do Backend ✅
 
 - Zero `NotImplementedException` em todo o código
@@ -238,7 +246,7 @@ Causa raiz principal: **test wrapper não fornece todos os providers necessário
 - StartupValidation.cs (313 linhas) — falha no startup se configs missing
 - **~~⚠️ Password de dev (`ouro18`) em `appsettings.Development.json` com 24 connection strings~~** ✅ FIXED — replaced with `CHANGE_ME` placeholder, user-secrets documented
 - **❌ Sem guia de rotação de chaves (JWT, encryption)**
-- **❌ CORS config vazia por defeito**
+- **~~❌ CORS config vazia por defeito~~** ✅ FIXED — environment-aware CORS with wildcard rejection, explicit origins required for non-dev
 
 ---
 
@@ -263,7 +271,7 @@ Causa raiz principal: **test wrapper não fornece todos os providers necessário
 - **Handlers 100% stub:** 3 (static catalogs by design)
 - **Handlers parcialmente stub:** ~~5+~~ 0 (all resolved — Protobuf/GraphQL parsing implemented)
 - **Interfaces sem implementação:** ~~9~~ 5 (domain ports reserved for future subsystems)
-- **Catch blocks silenciosos:** ~~16+~~ 0 — all now have structured logging
+- **Catch blocks silenciosos:** ~~16+~~ 0 — all now have structured logging (including 6 security/parsing catches added last)
 
 ### Frontend
 - **Total páginas:** 113
