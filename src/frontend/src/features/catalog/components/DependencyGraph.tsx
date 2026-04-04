@@ -1,10 +1,12 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as echarts from 'echarts/core';
 import { GraphChart } from 'echarts/charts';
 import { TooltipComponent, LegendComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import type { GraphSeriesOption } from 'echarts/charts';
 import type { AssetGraph, ServiceNode, ApiNode } from '../../../types/index';
+import type { TFunction } from 'i18next';
 
 echarts.use([GraphChart, TooltipComponent, LegendComponent, CanvasRenderer]);
 
@@ -41,6 +43,7 @@ export function DependencyGraph({
 }: DependencyGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
+  const { t } = useTranslation();
 
   /** Constrói os nós e arestas a partir do AssetGraph. */
   const buildGraphData = useCallback((): { nodes: GraphNode[]; links: GraphLink[] } => {
@@ -62,7 +65,7 @@ export function DependencyGraph({
           shadowBlur: selectedNodeId === svc.serviceAssetId ? 14 : 0,
           shadowColor: selectedNodeId === svc.serviceAssetId ? COLORS.selectedRing : 'transparent',
         },
-        tooltip: { formatter: buildServiceTooltip(svc) },
+        tooltip: { formatter: buildServiceTooltip(svc, t) },
       });
     }
 
@@ -87,7 +90,7 @@ export function DependencyGraph({
           shadowBlur: selectedNodeId === api.apiAssetId ? 14 : 0,
           shadowColor: selectedNodeId === api.apiAssetId ? COLORS.selectedRing : 'transparent',
         },
-        tooltip: { formatter: buildApiTooltip(api) },
+        tooltip: { formatter: buildApiTooltip(api, t) },
       });
 
       // Aresta: API → serviço proprietário (linha fina de propriedade)
@@ -117,7 +120,7 @@ export function DependencyGraph({
     }
 
     return { nodes, links };
-  }, [graph, selectedNodeId]);
+  }, [graph, selectedNodeId, t]);
 
   /** Inicializa e/ou actualiza o gráfico ECharts. */
   useEffect(() => {
@@ -130,6 +133,9 @@ export function DependencyGraph({
     const chart = chartRef.current;
     const { nodes, links } = buildGraphData();
 
+    const serviceLabel = t('catalog.dependencyGraph.legendService');
+    const apiLabel = t('catalog.dependencyGraph.legendApi');
+
     chart.setOption(
       {
       tooltip: {
@@ -141,7 +147,7 @@ export function DependencyGraph({
       },
       legend: [
         {
-          data: ['Service', 'API'],
+          data: [serviceLabel, apiLabel],
           bottom: 12,
           textStyle: { color: '#94a3b8', fontSize: 11 },
         },
@@ -157,8 +163,8 @@ export function DependencyGraph({
           data: nodes,
           links,
           categories: [
-            { name: 'Service', itemStyle: { color: COLORS.service.fill } },
-            { name: 'API', itemStyle: { color: COLORS.api.fill } },
+            { name: serviceLabel, itemStyle: { color: COLORS.service.fill } },
+            { name: apiLabel, itemStyle: { color: COLORS.api.fill } },
           ],
           force: {
             repulsion: 260,
@@ -213,32 +219,32 @@ export function DependencyGraph({
       ref={containerRef}
       style={{ width: '100%', height: `${height}px` }}
       className="rounded-lg overflow-hidden bg-panel border border-edge"
-      aria-label="Service dependency graph"
+      aria-label={t('catalog.dependencyGraph.ariaLabel')}
     />
   );
 }
 
 // ── Helpers de tooltip ───────────────────────────────────────────────
 
-function buildServiceTooltip(svc: ServiceNode): string {
+function buildServiceTooltip(svc: ServiceNode, t: TFunction): string {
   return `
     <div style="font-weight:600;margin-bottom:6px;font-size:13px">${svc.name}</div>
     <div style="color:#94a3b8;font-size:11px;line-height:1.8">
-      Team: <span style="color:#e2e8f0">${svc.teamName}</span><br/>
-      Domain: <span style="color:#e2e8f0">${svc.domain}</span><br/>
-      Type: <span style="color:#e2e8f0">${svc.serviceType}</span><br/>
-      Lifecycle: <span style="color:#e2e8f0">${svc.lifecycleStatus}</span><br/>
-      Criticality: <span style="color:#e2e8f0">${svc.criticality}</span>
+      ${t('catalog.dependencyGraph.team')}: <span style="color:#e2e8f0">${svc.teamName}</span><br/>
+      ${t('catalog.dependencyGraph.domain')}: <span style="color:#e2e8f0">${svc.domain}</span><br/>
+      ${t('catalog.dependencyGraph.type')}: <span style="color:#e2e8f0">${svc.serviceType}</span><br/>
+      ${t('catalog.dependencyGraph.lifecycle')}: <span style="color:#e2e8f0">${svc.lifecycleStatus}</span><br/>
+      ${t('catalog.dependencyGraph.criticality')}: <span style="color:#e2e8f0">${svc.criticality}</span>
     </div>`;
 }
 
-function buildApiTooltip(api: ApiNode): string {
+function buildApiTooltip(api: ApiNode, t: TFunction): string {
   return `
     <div style="font-weight:600;margin-bottom:6px;font-size:13px">${api.name}</div>
     <div style="color:#94a3b8;font-size:11px;line-height:1.8">
-      Route: <span style="color:#e2e8f0;font-family:monospace">${api.routePattern}</span><br/>
-      Version: <span style="color:#e2e8f0">v${api.version}</span><br/>
-      Visibility: <span style="color:#e2e8f0">${api.visibility}</span><br/>
-      Consumers: <span style="color:#e2e8f0">${api.consumers?.length ?? 0}</span>
+      ${t('catalog.dependencyGraph.route')}: <span style="color:#e2e8f0;font-family:monospace">${api.routePattern}</span><br/>
+      ${t('catalog.dependencyGraph.version')}: <span style="color:#e2e8f0">v${api.version}</span><br/>
+      ${t('catalog.dependencyGraph.visibility')}: <span style="color:#e2e8f0">${api.visibility}</span><br/>
+      ${t('catalog.dependencyGraph.consumers')}: <span style="color:#e2e8f0">${api.consumers?.length ?? 0}</span>
     </div>`;
 }

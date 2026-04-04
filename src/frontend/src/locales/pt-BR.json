@@ -55,7 +55,8 @@
     "confirmDeleteDescription": "Esta ação não pode ser desfeita. Tem certeza de que deseja continuar?",
     "successSaved": "Alterações salvas com sucesso",
     "successCreated": "Criado com sucesso",
-    "successDeleted": "Excluído com sucesso"
+    "successDeleted": "Excluído com sucesso",
+    "removeItem": "Remover {{item}}"
   },
   "auth": {
     "signIn": "Entrar na sua conta",
@@ -2428,6 +2429,20 @@
         "reason": "Motivo",
         "reasonPlaceholder": "ex. Ferramenta interna, não é um serviço de negócio"
       }
+    },
+    "dependencyGraph": {
+      "legendService": "Serviço",
+      "legendApi": "API",
+      "ariaLabel": "Grafo de dependências de serviço",
+      "team": "Equipa",
+      "domain": "Domínio",
+      "type": "Tipo",
+      "lifecycle": "Ciclo de vida",
+      "criticality": "Criticidade",
+      "route": "Rota",
+      "version": "Versão",
+      "visibility": "Visibilidade",
+      "consumers": "Consumidores"
     }
   },
   "discovery": {

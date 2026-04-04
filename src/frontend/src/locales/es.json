@@ -55,7 +55,8 @@
     "confirmDeleteDescription": "Esta acción no se puede deshacer. ¿Está seguro de que desea continuar?",
     "successSaved": "Cambios guardados exitosamente",
     "successCreated": "Creado exitosamente",
-    "successDeleted": "Eliminado exitosamente"
+    "successDeleted": "Eliminado exitosamente",
+    "removeItem": "Eliminar {{item}}"
   },
   "auth": {
     "signIn": "Iniciar sesión en su cuenta",
@@ -2261,6 +2262,20 @@
         "reason": "Motivo",
         "reasonPlaceholder": "ej. Herramienta interna, no es un servicio de negocio"
       }
+    },
+    "dependencyGraph": {
+      "legendService": "Servicio",
+      "legendApi": "API",
+      "ariaLabel": "Grafo de dependencias de servicio",
+      "team": "Equipo",
+      "domain": "Dominio",
+      "type": "Tipo",
+      "lifecycle": "Ciclo de vida",
+      "criticality": "Criticidad",
+      "route": "Ruta",
+      "version": "Versión",
+      "visibility": "Visibilidad",
+      "consumers": "Consumidores"
     }
   },
   "discovery": {

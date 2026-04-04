@@ -55,7 +55,8 @@
     "confirmDeleteDescription": "This action cannot be undone. Are you sure you want to proceed?",
     "successSaved": "Changes saved successfully",
     "successCreated": "Created successfully",
-    "successDeleted": "Deleted successfully"
+    "successDeleted": "Deleted successfully",
+    "removeItem": "Remove {{item}}"
   },
   "auth": {
     "signIn": "Sign in to your account",
@@ -3365,6 +3366,20 @@
         "reason": "Reason",
         "reasonPlaceholder": "e.g. Internal tooling, not a business service"
       }
+    },
+    "dependencyGraph": {
+      "legendService": "Service",
+      "legendApi": "API",
+      "ariaLabel": "Service dependency graph",
+      "team": "Team",
+      "domain": "Domain",
+      "type": "Type",
+      "lifecycle": "Lifecycle",
+      "criticality": "Criticality",
+      "route": "Route",
+      "version": "Version",
+      "visibility": "Visibility",
+      "consumers": "Consumers"
     }
   },
   "discovery": {
