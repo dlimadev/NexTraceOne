@@ -10,6 +10,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import type { AccessReviewCampaign } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
  * Página de gestão de campanhas de revisão de acessos (Access Review) do módulo Identity.
@@ -32,14 +33,14 @@ export function AccessReviewPage() {
   const [decisionComments, setDecisionComments] = useState<Record<string, string>>({});
 
   /** Consulta as campanhas de revisão de acessos existentes. */
-  const { data: campaigns, isLoading: isLoadingCampaigns } = useQuery({
+  const { data: campaigns, isLoading: isLoadingCampaigns, isError: isErrorCampaigns } = useQuery({
     queryKey: ['access-reviews', tenantId],
     queryFn: () => identityApi.listAccessReviewCampaigns(),
     enabled: !!tenantId,
   });
 
   /** Consulta os detalhes de uma campanha específica com seus itens de revisão. */
-  const { data: campaignDetail, isLoading: isLoadingDetail } = useQuery({
+  const { data: campaignDetail, isLoading: isLoadingDetail, isError: isErrorDetail } = useQuery({
     queryKey: ['access-review-detail', selectedCampaignId],
     queryFn: () => identityApi.getAccessReviewCampaign(selectedCampaignId!),
     enabled: !!selectedCampaignId,
@@ -183,6 +184,8 @@ export function AccessReviewPage() {
                 <div className="flex items-center justify-center py-12">
                   <RefreshCw size={20} className="animate-spin text-muted" />
                 </div>
+              ) : isErrorCampaigns ? (
+                <PageErrorState message={t('common.errorLoading')} />
               ) : !campaigns?.length ? (
                 <p className="px-6 py-12 text-sm text-muted text-center">
                   {t('identity.accessReview.noCampaigns')}
@@ -237,6 +240,8 @@ export function AccessReviewPage() {
                 <div className="flex items-center justify-center py-12">
                   <RefreshCw size={20} className="animate-spin text-muted" />
                 </div>
+              ) : isErrorDetail ? (
+                <PageErrorState message={t('common.errorLoading')} />
               ) : !campaignDetail?.items?.length ? (
                 <p className="px-6 py-12 text-sm text-muted text-center">
                   {t('identity.accessReview.noItems')}

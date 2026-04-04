@@ -85,7 +85,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [ ] Mover password de dev (`ouro18`) para `dotnet user-secrets`
 - [ ] Implementar PostgreSQL RLS policies como defesa em profundidade
 - [ ] Documentar procedimento de rotação de chaves (JWT + encryption)
-- [ ] Configurar CORS por ambiente
+- [x] Configurar CORS por ambiente ✅ Already implemented with environment-aware validation, wildcard rejection, and explicit origins required for non-dev
 - [ ] Encriptar `AuditEvent.Payload` para campos sensíveis
 - [ ] Avaliar mover `TenantId` para `AuditableEntity<TId>` base
 
@@ -98,9 +98,9 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 ### 1.5 Eliminar Stubs Remanescentes ⏱️ 5 dias
 - [x] `GetAutomationAction` / `ListAutomationActions` — ✅ CORRECTED: static catalog by design (not stubs)
 - [x] `GetExecutiveDrillDown` — popular ReliabilityScore, ChangeSafety, ContractCoverage a partir dos módulos cross ✅ IReliabilityModule + IContractsModule wired
-- [ ] `GetAutomationValidation` — retornar checks reais baseados na workflow definition
-- [ ] `GetAutomationWorkflow` — popular Preconditions e ExecutionSteps da BD
-- [ ] `GetServiceFinOps` — popular EfficiencyIndicators do `ICostIntelligenceModule`
+- [x] `GetAutomationValidation` — retornar checks reais baseados na workflow definition ✅ Derives checks from workflow+validation state
+- [x] `GetAutomationWorkflow` — popular Preconditions e ExecutionSteps da BD ✅ Derives from workflow lifecycle state
+- [x] `GetServiceFinOps` — popular EfficiencyIndicators do `ICostIntelligenceModule` ✅ IReliabilityModule wired, EfficiencyIndicators populated
 
 ---
 
@@ -123,9 +123,9 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [ ] `NotificationCenterPage`, `NotificationAnalyticsPage`, `NotificationPreferencesPage` — conectar a Notifications API
 
 ### 2.4 Error States ⏱️ 2 dias
-- [ ] `ServiceDiscoveryPage` — adicionar error states para 8 useQuery
-- [ ] `DelegationPage` — adicionar error states para 5 useQuery
-- [ ] `AccessReviewPage` — adicionar error states para 6 useQuery
+- [x] `ServiceDiscoveryPage` — adicionar error states para 2 useQuery ✅ PageErrorState for dashboard + services
+- [x] `DelegationPage` — adicionar error states para 1 useQuery ✅ PageErrorState for delegations
+- [x] `AccessReviewPage` — adicionar error states para 2 useQuery ✅ PageErrorState for campaigns + detail
 
 ### 2.5 i18n Completeness ⏱️ 3-5 dias
 - [x] Completar 827 keys em PT-BR ✅ 0 keys em falta

@@ -233,8 +233,12 @@ public sealed class AutomationFeatureTests
         result.Value.ApproverInfo.Should().NotBeNull();
         result.Value.ApproverInfo!.ApprovedBy.Should().Be("tech-lead@nextraceone.io");
         result.Value.ApproverInfo.ApprovalStatus.Should().Be(AutomationApprovalStatus.Approved);
-        result.Value.Preconditions.Should().HaveCount(0);
-        result.Value.ExecutionSteps.Should().HaveCount(0);
+        result.Value.Preconditions.Should().NotBeEmpty();
+        result.Value.Preconditions.Select(p => p.Type).Should().Contain(PreconditionType.BlastRadiusConstraint);
+        result.Value.Preconditions.Select(p => p.Type).Should().Contain(PreconditionType.ApprovalPresence);
+        result.Value.Preconditions.Select(p => p.Type).Should().Contain(PreconditionType.ServiceHealthCheck);
+        result.Value.Preconditions.Select(p => p.Type).Should().Contain(PreconditionType.EnvironmentRestriction);
+        result.Value.ExecutionSteps.Should().NotBeEmpty();
         result.Value.AuditEntries.Should().NotBeEmpty();
     }
 
@@ -613,7 +617,9 @@ public sealed class AutomationFeatureTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Status.Should().Be(ValidationStatus.InProgress);
-        result.Value.Checks.Should().HaveCount(0);
+        result.Value.Checks.Should().NotBeEmpty();
+        result.Value.Checks.Should().Contain(c => c.CheckName == "Execution Outcome");
+        result.Value.Checks.Should().Contain(c => c.CheckName == "Validator Identity");
         result.Value.ObservedOutcome.Should().NotBeNullOrEmpty();
         result.Value.ValidatedBy.Should().Be("ops-engineer@nextraceone.io");
     }
