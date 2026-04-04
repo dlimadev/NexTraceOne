@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetEvidencePackage;
 
@@ -15,6 +16,15 @@ public static class GetEvidencePackage
     public sealed record Query(string PackageId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe de um pacote de evidência.</summary>
+    /// <summary>Valida os parâmetros da query de pacote de evidência.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackageId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler(
         IEvidencePackageRepository evidencePackageRepository) : IQueryHandler<Query, Response>
     {

@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetDomainFinOps;
 
@@ -16,6 +17,15 @@ public static class GetDomainFinOps
     public sealed record Query(string DomainId) : IQuery<Response>;
 
     /// <summary>Handler que retorna perfil de FinOps do domínio.</summary>
+    /// <summary>Valida os parâmetros da query de FinOps por domínio.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.DomainId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;

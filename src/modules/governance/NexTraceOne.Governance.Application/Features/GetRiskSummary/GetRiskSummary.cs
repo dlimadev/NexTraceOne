@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetRiskSummary;
 
@@ -21,6 +22,18 @@ public static class GetRiskSummary
     /// Handler que computa indicadores de risco enterprise a partir de dados persistidos de rollouts e waivers.
     /// Nesta etapa, risco é calculado por Governance Pack (não por serviço) para evitar métricas fake.
     /// </summary>
+    /// <summary>Valida os filtros opcionais da query de resumo de risco.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.DomainId).MaximumLength(200)
+                .When(x => x.DomainId is not null);
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,

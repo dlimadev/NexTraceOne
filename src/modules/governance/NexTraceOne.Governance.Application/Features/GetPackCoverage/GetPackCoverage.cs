@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetPackCoverage;
 
@@ -20,6 +21,15 @@ public static class GetPackCoverage
     /// Handler que calcula as métricas de cobertura do governance pack
     /// com base nos rollout records e compliance gaps persistidos.
     /// </summary>
+    /// <summary>Valida os parâmetros da query de cobertura de pack.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler(
         IGovernanceRolloutRecordRepository rolloutRepository,
         IGovernancePackVersionRepository versionRepository,

@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetRiskHeatmap;
 
@@ -21,6 +22,16 @@ public static class GetRiskHeatmap
     /// Handler que computa células do heatmap de risco a partir de dados reais de Governance Packs,
     /// Rollouts e Waivers. Cada categoria de pack gera uma célula com risk score real.
     /// </summary>
+    /// <summary>Valida os filtros opcionais da query de heatmap de risco.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Dimension).MaximumLength(100)
+                .When(x => x.Dimension is not null);
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,

@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetComplianceSummary;
 
@@ -21,6 +22,18 @@ public static class GetComplianceSummary
     /// Handler que computa indicadores de compliance enterprise a partir de dados persistidos no módulo Governance.
     /// Nesta etapa, compliance é derivado de adoção (rollouts) e exceções (waivers) por Governance Pack.
     /// </summary>
+    /// <summary>Valida os filtros opcionais da query de resumo de compliance.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.DomainId).MaximumLength(200)
+                .When(x => x.DomainId is not null);
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,

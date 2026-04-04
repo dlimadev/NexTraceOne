@@ -49,13 +49,14 @@ namespace NexTraceOne.Catalog.Infrastructure.Templates.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    EventType = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     Payload = table.Column<string>(type: "text", nullable: false),
-                    OccurredAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     ProcessedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Error = table.Column<string>(type: "text", nullable: true),
                     RetryCount = table.Column<int>(type: "integer", nullable: false),
-                    IsDeadLettered = table.Column<bool>(type: "boolean", nullable: false)
+                    LastError = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IdempotencyKey = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -77,6 +78,22 @@ namespace NexTraceOne.Catalog.Infrastructure.Templates.Persistence.Migrations
                 name: "IX_tpl_service_templates_type_lang",
                 table: "tpl_service_templates",
                 columns: new[] { "ServiceType", "Language" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tpl_outbox_messages_CreatedAt",
+                table: "tpl_outbox_messages",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tpl_outbox_messages_ProcessedAt",
+                table: "tpl_outbox_messages",
+                column: "ProcessedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tpl_outbox_messages_IdempotencyKey",
+                table: "tpl_outbox_messages",
+                column: "IdempotencyKey",
+                unique: true);
         }
 
         /// <inheritdoc />

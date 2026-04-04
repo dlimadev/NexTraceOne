@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetPlatformJobs;
 
@@ -20,6 +21,18 @@ public static class GetPlatformJobs
         int? PageSize = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna o catálogo real de background jobs via IPlatformJobStatusProvider.</summary>
+    /// <summary>Valida os filtros opcionais da query de jobs de plataforma.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.StatusFilter).MaximumLength(100)
+                .When(x => x.StatusFilter is not null);
+            RuleFor(x => x.Page).GreaterThanOrEqualTo(1).LessThanOrEqualTo(500)
+                .When(x => x.Page.HasValue);
+        }
+    }
+
     public sealed class Handler(IPlatformJobStatusProvider jobProvider) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)

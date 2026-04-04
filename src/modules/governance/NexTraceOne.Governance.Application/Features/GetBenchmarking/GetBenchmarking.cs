@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetBenchmarking;
 
@@ -18,6 +19,15 @@ public static class GetBenchmarking
         string Dimension) : IQuery<Response>;
 
     /// <summary>Handler que computa comparações de benchmarking contextualizadas.</summary>
+    /// <summary>Valida os parâmetros da query de benchmarking.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Dimension).NotEmpty().MaximumLength(100);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;

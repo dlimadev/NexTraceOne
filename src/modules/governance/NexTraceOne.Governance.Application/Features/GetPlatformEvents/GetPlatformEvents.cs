@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetPlatformEvents;
 
@@ -20,6 +21,20 @@ public static class GetPlatformEvents
         int? PageSize = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna eventos operacionais reais via IPlatformEventProvider.</summary>
+    /// <summary>Valida os filtros opcionais da query de eventos de plataforma.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.SeverityFilter).MaximumLength(100)
+                .When(x => x.SeverityFilter is not null);
+            RuleFor(x => x.SubsystemFilter).MaximumLength(100)
+                .When(x => x.SubsystemFilter is not null);
+            RuleFor(x => x.Page).GreaterThanOrEqualTo(1).LessThanOrEqualTo(500)
+                .When(x => x.Page.HasValue);
+        }
+    }
+
     public sealed class Handler(IPlatformEventProvider eventProvider) : IQueryHandler<Query, Response>
     {
         private const int MaxEventLoad = 200;

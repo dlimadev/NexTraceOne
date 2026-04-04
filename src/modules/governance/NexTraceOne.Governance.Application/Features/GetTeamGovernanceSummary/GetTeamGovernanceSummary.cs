@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetTeamGovernanceSummary;
 
@@ -16,6 +17,15 @@ public static class GetTeamGovernanceSummary
     public sealed record Query(string TeamId) : IQuery<Response>;
 
     /// <summary>Handler que retorna resumo de governança e maturidade da equipa.</summary>
+    /// <summary>Valida os parâmetros da query de resumo de governança por equipa.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler(
         ITeamRepository teamRepository,
         ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>

@@ -4,6 +4,7 @@ using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetExecutiveOverview;
 
@@ -24,6 +25,22 @@ public static class GetExecutiveOverview
     /// Handler que agrega indicadores executivos a partir de dados reais de Governance Packs,
     /// Rollouts, Waivers e métricas de incidentes cross-module via IIncidentModule.
     /// </summary>
+    /// <summary>Valida os filtros opcionais da query de visão executiva.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.DomainId).MaximumLength(200)
+                .When(x => x.DomainId is not null);
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.Range).MaximumLength(200)
+                .Must(r => r is null || r == "7d" || r == "30d" || r == "90d")
+                .When(x => x.Range is not null)
+                .WithMessage("Range must be one of: 7d, 30d, 90d");
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,

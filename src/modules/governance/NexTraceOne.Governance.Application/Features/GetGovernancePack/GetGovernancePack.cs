@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetGovernancePack;
 
@@ -16,6 +17,15 @@ public static class GetGovernancePack
     public sealed record Query(string PackId) : IQuery<Response>;
 
     /// <summary>Handler que retorna os detalhes completos de um governance pack.</summary>
+    /// <summary>Valida os parâmetros da query de governance pack.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernancePackVersionRepository versionRepository,

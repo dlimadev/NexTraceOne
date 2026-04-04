@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetPolicy;
 
@@ -19,6 +20,15 @@ public static class GetPolicy
     /// Nesta etapa, políticas enterprise são materializadas a partir de Governance Packs,
     /// incluindo rollouts, waivers e (quando existir) bindings de regras em versões do pack.
     /// </summary>
+    /// <summary>Valida os parâmetros da query de política.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PolicyId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernancePackVersionRepository versionRepository,

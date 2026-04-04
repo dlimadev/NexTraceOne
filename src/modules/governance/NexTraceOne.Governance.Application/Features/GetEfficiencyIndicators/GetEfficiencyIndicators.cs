@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetEfficiencyIndicators;
 
@@ -19,6 +20,18 @@ public static class GetEfficiencyIndicators
         string? TeamId = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna indicadores de eficiência operacional baseados em dados reais de custo.</summary>
+    /// <summary>Valida os filtros opcionais da query de indicadores de eficiência.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ServiceId).MaximumLength(200)
+                .When(x => x.ServiceId is not null);
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+        }
+    }
+
     public sealed class Handler(ICostIntelligenceModule costModule) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
