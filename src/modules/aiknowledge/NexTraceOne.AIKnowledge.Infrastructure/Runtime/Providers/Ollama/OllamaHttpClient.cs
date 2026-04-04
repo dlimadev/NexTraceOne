@@ -169,6 +169,19 @@ public sealed class OllamaHttpClient
             return false;
         }
     }
+
+    /// <summary>Gera embedding para um texto via Ollama /api/embeddings.</summary>
+    public async Task<(float[] Embedding, int Tokens)> GenerateEmbeddingAsync(
+        string model, string text, CancellationToken cancellationToken = default)
+    {
+        var request = new OllamaEmbeddingRequest { Model = model, Prompt = text };
+        var response = await _httpClient.PostAsJsonAsync("api/embeddings", request, JsonOptions, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<OllamaEmbeddingResponse>(JsonOptions, cancellationToken);
+        var embedding = result?.Embedding ?? Array.Empty<float>();
+        return (embedding.ToArray(), text.Length / 4); // approximate token count
+    }
 }
 
 // ── Ollama API DTOs ──
@@ -252,4 +265,19 @@ public sealed class OllamaModelDetails
 
     [JsonPropertyName("parameter_size")]
     public string ParameterSize { get; set; } = string.Empty;
+}
+
+public sealed class OllamaEmbeddingRequest
+{
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("prompt")]
+    public string Prompt { get; set; } = string.Empty;
+}
+
+public sealed class OllamaEmbeddingResponse
+{
+    [JsonPropertyName("embedding")]
+    public List<float> Embedding { get; set; } = [];
 }

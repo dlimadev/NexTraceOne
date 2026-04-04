@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -62,11 +62,16 @@ export function RunbookBuilderPage() {
   const [errors, setErrors] = useState<string[]>([]);
 
   // Fetch existing runbook for edit mode
-  const { isLoading, isError, refetch } = useQuery({
+  const { data: runbookData, isLoading, isError, refetch } = useQuery({
     queryKey: ['runbooks', 'detail', runbookId],
     queryFn: () => incidentsApi.getRunbookDetail(runbookId!),
     enabled: isEditing,
-    onSuccess: (data: RunbookDetailResponse) => {
+  });
+
+  // Populate form when data is loaded (replaces deprecated onSuccess)
+  useEffect(() => {
+    if (runbookData) {
+      const data = runbookData as RunbookDetailResponse;
       setForm({
         title: data.title ?? '',
         description: data.summary ?? '',
@@ -84,8 +89,8 @@ export function RunbookBuilderPage() {
           : [{ stepOrder: 1, title: '', description: '', isOptional: false }],
         prerequisites: data.preconditions ?? [],
       });
-    },
-  });
+    }
+  }, [runbookData]);
 
   const createMutation = useMutation({
     mutationFn: (data: RunbookFormState) =>

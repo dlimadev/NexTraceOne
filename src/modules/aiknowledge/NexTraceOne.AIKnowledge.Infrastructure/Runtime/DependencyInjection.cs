@@ -54,6 +54,8 @@ public static class DependencyInjection
         services.AddScoped<OllamaProvider>();
         services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<OllamaProvider>());
         services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<OllamaProvider>());
+        services.AddScoped<OllamaEmbeddingProvider>();
+        services.AddScoped<IEmbeddingProvider>(sp => sp.GetRequiredService<OllamaEmbeddingProvider>());
 
         // OpenAI provider — registered only when ApiKey is configured
         var openAiOptions = configuration.GetSection(OpenAiOptions.SectionName).Get<OpenAiOptions>();
@@ -68,6 +70,8 @@ public static class DependencyInjection
             services.AddScoped<OpenAiProvider>();
             services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<OpenAiProvider>());
             services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<OpenAiProvider>());
+            services.AddScoped<OpenAiEmbeddingProvider>();
+            services.AddScoped<IEmbeddingProvider>(sp => sp.GetRequiredService<OpenAiEmbeddingProvider>());
         }
 
         // Factory — scoped to resolve scoped providers

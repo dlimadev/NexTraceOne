@@ -89,7 +89,7 @@ export function TeamDetailPage() {
   });
 
   const team = data?.team;
-  const gov = data?.gov;
+  const gov = data?.gov ?? null;
 
   const tabs: { id: TabId; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'organization.teamDetail.tabs.overview', icon: <Users size={16} /> },

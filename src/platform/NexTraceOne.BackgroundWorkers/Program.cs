@@ -52,6 +52,7 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
@@ -128,6 +129,11 @@ builder.Services.AddHealthChecks()
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<LegacyAssetsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-telemetry-store",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<TelemetryStoreDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "identity-expiration-job",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
@@ -184,10 +190,11 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<CostIntelligenceDbCon
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IncidentDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<AutomationDbContext>>();
 
-// Integrations / Knowledge / ProductAnalytics
+// Integrations / Knowledge / ProductAnalytics / TelemetryStore
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<IntegrationsDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<KnowledgeDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<ProductAnalyticsDbContext>>();
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<TelemetryStoreDbContext>>();
 
 builder.Services.AddHostedService<IdentityExpirationJob>();
 builder.Services.AddHostedService<DriftDetectionJob>();

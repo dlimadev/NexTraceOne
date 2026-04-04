@@ -30,6 +30,9 @@ public sealed class OpenAiOptions
     /// <summary>Indica se o provider está habilitado (default: false — activo só quando ApiKey está configurado).</summary>
     public bool Enabled { get; set; }
 
+    /// <summary>Modelo de embeddings padrão (default: text-embedding-3-small).</summary>
+    public string EmbeddingModel { get; set; } = "text-embedding-3-small";
+
     /// <summary>Indica se a chave de API está configurada e o provider pode ser activado.</summary>
     public bool IsConfigured => Enabled && !string.IsNullOrWhiteSpace(ApiKey);
 }

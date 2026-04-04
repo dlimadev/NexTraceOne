@@ -102,7 +102,7 @@ export function DomainDetailPage() {
   });
 
   const domain = data?.domain;
-  const gov = data?.gov;
+  const gov = data?.gov ?? null;
 
   const tabs: { id: TabId; labelKey: string; icon: React.ReactNode }[] = [
     { id: 'overview', labelKey: 'organization.domainDetail.tabs.overview', icon: <Globe size={16} /> },

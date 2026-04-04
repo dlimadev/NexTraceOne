@@ -163,6 +163,29 @@ public sealed class OpenAiHttpClient
             return false;
         }
     }
+
+    /// <summary>Gera embeddings para uma lista de textos via OpenAI /v1/embeddings.</summary>
+    public async Task<(IReadOnlyList<float[]> Embeddings, int Tokens)> GenerateEmbeddingsAsync(
+        string model, IReadOnlyList<string> texts, CancellationToken cancellationToken = default)
+    {
+        var request = new OpenAiEmbeddingRequest { Model = model, Input = texts.ToList() };
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/v1/embeddings")
+        {
+            Content = JsonContent.Create(request, options: JsonOptions)
+        };
+        httpRequest.Headers.Authorization =
+            new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+
+        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<OpenAiEmbeddingResponse>(JsonOptions, cancellationToken);
+        var embeddings = result?.Data.Select(d => d.Embedding.ToArray()).ToList()
+            ?? new List<float[]>();
+
+        return (embeddings, result?.Usage?.TotalTokens ?? 0);
+    }
 }
 
 // ── OpenAI API DTOs ──
@@ -282,4 +305,33 @@ public sealed class OpenAiStreamDelta
 
     [JsonPropertyName("content")]
     public string? Content { get; set; }
+}
+
+// ── OpenAI Embedding DTOs ──
+
+public sealed class OpenAiEmbeddingRequest
+{
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("input")]
+    public List<string> Input { get; set; } = [];
+}
+
+public sealed class OpenAiEmbeddingResponse
+{
+    [JsonPropertyName("data")]
+    public List<OpenAiEmbeddingData> Data { get; set; } = [];
+
+    [JsonPropertyName("usage")]
+    public OpenAiUsage? Usage { get; set; }
+}
+
+public sealed class OpenAiEmbeddingData
+{
+    [JsonPropertyName("embedding")]
+    public List<float> Embedding { get; set; } = [];
+
+    [JsonPropertyName("index")]
+    public int Index { get; set; }
 }
