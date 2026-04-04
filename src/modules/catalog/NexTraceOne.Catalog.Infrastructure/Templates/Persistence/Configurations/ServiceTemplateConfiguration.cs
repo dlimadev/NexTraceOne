@@ -58,14 +58,14 @@ internal sealed class ServiceTemplateConfiguration : IEntityTypeConfiguration<Se
 
         builder.Property(t => t.Tags)
             .HasConversion(
-                tags => System.Text.Json.JsonSerializer.Serialize(tags, (System.Text.Json.JsonSerializerOptions?)null),
-                json => (IReadOnlyList<string>)(System.Text.Json.JsonSerializer.Deserialize<List<string>>(json, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()))
+                tags => System.Text.Json.JsonSerializer.Serialize(tags, (System.Text.Json.JsonSerializerOptions)null!),
+                json => (IReadOnlyList<string>)(System.Text.Json.JsonSerializer.Deserialize<List<string>>(json, (System.Text.Json.JsonSerializerOptions)null!) ?? new List<string>()))
             .HasColumnType("text");
 
         builder.Property(t => t.GovernancePolicyIds)
             .HasConversion(
-                ids => System.Text.Json.JsonSerializer.Serialize(ids, (System.Text.Json.JsonSerializerOptions?)null),
-                json => (IReadOnlyList<Guid>)(System.Text.Json.JsonSerializer.Deserialize<List<Guid>>(json, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<Guid>()))
+                ids => System.Text.Json.JsonSerializer.Serialize(ids, (System.Text.Json.JsonSerializerOptions)null!),
+                json => (IReadOnlyList<Guid>)(System.Text.Json.JsonSerializer.Deserialize<List<Guid>>(json, (System.Text.Json.JsonSerializerOptions)null!) ?? new List<Guid>()))
             .HasColumnType("text");
 
         builder.Property(t => t.BaseContractSpec)
