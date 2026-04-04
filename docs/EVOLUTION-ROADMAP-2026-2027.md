@@ -158,11 +158,11 @@ O NexTraceOne já tem o catálogo, contratos e governança. O próximo passo nat
 **Inspiração:** Cortex + ServiceNow Discovery
 
 O NexTraceOne já tem dependency topology básica. Evoluir para:
-- [ ] Auto-discovery de dependências a partir de traces OpenTelemetry
-- [ ] Mapa de dependências em tempo real (não apenas estático)
-- [ ] Blast radius visual baseado no grafo de dependências
-- [ ] Detecção automática de dependências circulares
-- [ ] Health propagation — se serviço A depende de B e B está degradado, A é marcado "at risk"
+- [x] Auto-discovery de dependências a partir de traces OpenTelemetry ✅ `InferDependencyFromOtel` feature existente
+- [x] Mapa de dependências em tempo real (não apenas estático) ✅ `GetSubgraph` + `GetImpactPropagation` já implementados
+- [x] Blast radius visual baseado no grafo de dependências ✅ `GetImpactPropagation` feature existente
+- [x] Detecção automática de dependências circulares ✅ `DetectCircularDependencies` — DFS tricolor + `GET /api/v1/catalog/graph/circular-dependencies` + 8 testes unitários
+- [x] Health propagation — se serviço A depende de B e B está degradado, A é marcado "at risk" ✅ `PropagateHealthStatus` — BFS + `GET /api/v1/catalog/graph/health-propagation/{rootServiceName}` + 10 testes unitários
 
 **Valor:** Blast radius real-time, não estimativas estáticas.
 
