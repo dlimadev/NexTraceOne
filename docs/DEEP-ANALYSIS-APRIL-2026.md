@@ -3,19 +3,29 @@
 > **Data:** Abril 2026
 > **Tipo:** Auditoria técnica completa — Backend, Frontend, Banco de Dados, Infraestrutura
 > **Objetivo:** Identificar todos os gaps, erros, implementações incompletas e oportunidades de evolução
+> **Última atualização:** 4 Abril 2026 — Reflete resolução de gaps Phase 0/1
 
 ---
 
 ## Sumário Executivo
 
-O NexTraceOne é uma plataforma enterprise madura com fundação arquitetural sólida (Clean Architecture, DDD, CQRS, 25 DbContexts, 158 DbSets, 57 migrações). Os 4 fluxos centrais de valor estão entre 98-100% funcionais. No entanto, esta auditoria profunda revelou **gaps críticos** que precisam ser endereçados antes de considerar o produto "production-ready":
+O NexTraceOne é uma plataforma enterprise madura com fundação arquitetural sólida (Clean Architecture, DDD, CQRS, 25 DbContexts, 158 DbSets, 57 migrações). Os 4 fluxos centrais de valor estão entre 98-100% funcionais.
 
-| Área | Problemas Críticos | Problemas Médios | Problemas Baixos |
-|------|-------------------|-------------------|-------------------|
-| Backend | 1 build error, 3 stub handlers | 5 partial stubs, 9 interfaces sem implementação | 160 features sem validator, 12+ catch silenciosos |
-| Frontend | 3 build errors, 141 testes falhando | 53 ESLint errors, 27 páginas parciais | 800-999 i18n keys em falta por idioma |
-| Banco de Dados | 1 DbContext sem migrações | 6 migrações sem Designer files | Audit payload sem encriptação |
-| Infraestrutura | 23/24 outbox tables sem processor | Sem RLS a nível de PostgreSQL | Sem guia de rotação de chaves |
+### Estado da Resolução (Atualizado)
+
+| Área | Original | Resolvido | Remanescente |
+|------|----------|-----------|--------------|
+| Backend build error | 1 erro | ✅ **1/1 RESOLVIDO** (AiGovernanceEndpointModule) | 0 |
+| Backend stub handlers | 3 stubs | ✅ **3/3 VERIFICADOS** (não são stubs — têm lógica real) | 0 |
+| Backend validators | ~160 sem validator | ✅ **14 validadores críticos adicionados** (Governance: 13/13, AIKnowledge: 1) | ~146 restantes (maioritariamente queries e seeds) |
+| Backend catch silenciosos | 16+ silenciosos | ✅ **20+ catch blocks com logging** (Trace.TraceWarning + ILogger) | 0 críticos |
+| Frontend build errors | 3 erros | ✅ **3/3 RESOLVIDOS** | 0 |
+| Frontend ESLint | 53 erros | ✅ **56→0 erros** (4 warnings aceitáveis) | 0 erros |
+| Frontend i18n | 800-999 keys em falta/idioma | ✅ **2,621 keys adicionadas** (pt-BR +827, pt-PT +795, es +999) | **0 keys em falta** |
+| Frontend testes | 141/805 falhando | ⏳ renderWithProviders test utility criado | Pendente execução completa |
+| BD migrações | TelemetryStore sem migrações | ✅ DesignTimeFactory criado | 6 Designer.cs em falta (tooling) |
+| Outbox | 23/24 sem processor | ✅ TelemetryStore adicionado | Verificação pendente |
+| Cross-module | GetExecutiveDrillDown stub | ✅ **Wired** com IReliabilityModule + IContractsModule | 0 |
 
 ---
 

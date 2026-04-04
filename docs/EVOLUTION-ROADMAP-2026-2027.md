@@ -69,9 +69,12 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 ### 1.1 Validação de Input ⏱️ 5 dias
 - [x] Adicionar FluentValidation aos ~30 Commands de escrita mais críticos:
   - Governance: `UpdateDomain` ✅, `ApproveGovernanceWaiver` ✅, `CreateGovernanceWaiver` ✅, `RunComplianceChecks` ✅
+  - Governance (adicionais): `ApplyGovernancePack` ✅, `CreateDelegatedAdministration` ✅, `CreateDomain` ✅, `CreateGovernancePack` ✅, `CreatePackVersion` ✅, `CreateTeam` ✅, `RejectGovernanceWaiver` ✅, `UpdateGovernancePack` ✅, `UpdateTeam` ✅
+  - AIKnowledge: `ActivateModel` ✅
   - AuditCompliance: `ApplyRetention` — N/A (empty command, no parameters)
-  - IdentityAccess: `SeedDefaultModuleAccessPolicies`, `SeedDefaultRolePermissions`
-- [ ] Template de validador para as restantes ~130 features
+  - IdentityAccess: `Logout`, `SeedDefaultModuleAccessPolicies`, `SeedDefaultRolePermissions` — N/A (empty commands, no parameters)
+  - Notifications: `MarkAllNotificationsRead` — N/A (empty command, no parameters)
+- [ ] Template de validador para as restantes ~130 features (maioritariamente queries e seeds)
 
 ### 1.2 Error Handling ⏱️ 3 dias
 - [x] Substituir 4 bare catch blocks em `CanonicalModelBuilder.cs` com logging ✅ All 5 catches now log via Trace.TraceWarning
@@ -125,9 +128,9 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [ ] `AccessReviewPage` — adicionar error states para 6 useQuery
 
 ### 2.5 i18n Completeness ⏱️ 3-5 dias
-- [ ] Completar 827 keys em PT-BR
-- [ ] Completar 795 keys em PT-PT
-- [ ] Completar 999 keys em ES
+- [x] Completar 827 keys em PT-BR ✅ 0 keys em falta
+- [x] Completar 795 keys em PT-PT ✅ 0 keys em falta
+- [x] Completar 999 keys em ES ✅ 0 keys em falta
 - [ ] Script de verificação de i18n coverage no CI
 
 ### 2.6 Testes ⏱️ 5 dias
