@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 
@@ -82,4 +83,19 @@ public interface IReleaseRepository
             DateTimeOffset? from,
             DateTimeOffset? to,
             CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lista releases históricas similares à release alvo para cálculo de padrão histórico.
+    /// Filtra por mesmo nome de serviço, ambiente e nível de mudança dentro de uma janela temporal.
+    /// Exclui a própria release-alvo do resultado.
+    /// </summary>
+    Task<IReadOnlyList<Release>> ListSimilarReleasesAsync(
+        ReleaseId excludeReleaseId,
+        string serviceName,
+        string environment,
+        ChangeLevel changeLevel,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxResults,
+        CancellationToken cancellationToken = default);
 }

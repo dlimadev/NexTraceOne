@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
@@ -141,6 +142,27 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
             .OrderBy(r => r.CreatedAt)
             .ToListAsync(cancellationToken);
     }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<Release>> ListSimilarReleasesAsync(
+        ReleaseId excludeReleaseId,
+        string serviceName,
+        string environment,
+        ChangeLevel changeLevel,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxResults,
+        CancellationToken cancellationToken = default)
+        => await context.Releases
+            .Where(r => r.Id != excludeReleaseId
+                && r.ServiceName == serviceName
+                && r.Environment == environment
+                && r.ChangeLevel == changeLevel
+                && r.CreatedAt >= from
+                && r.CreatedAt <= to)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(maxResults)
+            .ToListAsync(cancellationToken);
 
     private IQueryable<Release> ApplyFilters(
         string? serviceName, string? teamName, string? environment,

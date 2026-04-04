@@ -172,7 +172,7 @@ O NexTraceOne já tem dependency topology básica. Evoluir para:
 Evoluir o scoring existente com:
 - [ ] Feature flag awareness — integração com LaunchDarkly/Split.io/Unleash
 - [ ] Canary deployment tracking — percentagem de rollout como fator de confiança
-- [ ] Historical pattern matching — "mudanças similares no passado tiveram X% de falha"
+- [x] Historical pattern matching — "mudanças similares no passado tiveram X% de falha" ✅ Implementado: `GetHistoricalPatternInsight` feature + `GET /api/v1/changes/{id}/historical-pattern` endpoint + `HistoricalPattern` como 5º fator no `GetChangeAdvisory` + 12 testes unitários (278/278 passing)
 - [ ] Pre-production comparison automática (diff de métricas staging vs production)
 
 **Valor:** Confiança baseada em dados históricos, não apenas análise estática.

@@ -20,6 +20,7 @@ using RecordChangeDecisionFeature = NexTraceOne.ChangeGovernance.Application.Cha
 using GetChangeDecisionHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeDecisionHistory.GetChangeDecisionHistory;
 using GetDoraMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDoraMetrics.GetDoraMetrics;
 using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
+using GetHistoricalPatternInsightFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetHistoricalPatternInsight.GetHistoricalPatternInsight;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -229,6 +230,21 @@ internal static class ChangeConfidenceEndpoints
             var result = await sender.Send(command, cancellationToken);
             return result.ToCreatedResult("/api/v1/releases/{0}", localizer);
         }).RequirePermission("change-intelligence:write");
+
+        // ── Padrão histórico de mudanças similares (Change Confidence Score V2) ──
+
+        group.MapGet("/{changeId:guid}/historical-pattern", async (
+            Guid changeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int? lookbackDays = null) =>
+        {
+            var result = await sender.Send(
+                new GetHistoricalPatternInsightFeature.Query(changeId, lookbackDays),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
     }
 
     private sealed record ChangeFilterOptionsResponse(
