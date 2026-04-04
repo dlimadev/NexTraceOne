@@ -43,7 +43,8 @@ public static class SearchCatalog
     /// </summary>
     public sealed class Handler(
         IContractVersionRepository contractVersionRepository,
-        IServiceAssetRepository serviceAssetRepository) : IQueryHandler<Query, Response>
+        IServiceAssetRepository serviceAssetRepository,
+        IApiAssetRepository apiAssetRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -75,25 +76,24 @@ public static class SearchCatalog
                 pageSize: request.PageSize,
                 cancellationToken: cancellationToken);
 
-            // Look up ApiAsset metadata for enrichment (owner, service name)
+            // Batch-lookup ApiAsset metadata for enrichment (owner, service name)
             var apiAssetIds = contracts.Select(c => c.ApiAssetId).Distinct().ToList();
             var apiAssets = apiAssetIds.Count > 0
-                ? await serviceAssetRepository.SearchAsync(request.SearchTerm, cancellationToken)
-                : [];
+                ? await apiAssetRepository.ListByApiAssetIdsAsync(apiAssetIds, cancellationToken)
+                : new Dictionary<Guid, Domain.Graph.Entities.ApiAsset>();
 
-            // Build a lookup of ApiAssetId → service name/team for enrichment
-            var serviceNameByApi = new Dictionary<Guid, (string Name, string? Team)>();
-
-            // Map contract results
+            // Map contract results — enrich with Owner from ApiAsset→OwnerService
             var items = new List<SearchResultItem>();
             foreach (var cv in contracts)
             {
+                apiAssets.TryGetValue(cv.ApiAssetId, out var apiAsset);
+
                 items.Add(new SearchResultItem(
                     EntityId: cv.Id.Value,
                     EntityType: "Contract",
                     Name: $"{cv.Protocol} Contract v{cv.SemVer}",
                     Description: null,
-                    Owner: null,
+                    Owner: apiAsset?.OwnerService?.TeamName,
                     Status: cv.LifecycleState.ToString(),
                     Version: cv.SemVer,
                     RelevanceScore: 1.0,

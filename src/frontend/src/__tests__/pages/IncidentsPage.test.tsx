@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 import { IncidentsPage } from '../../features/operations/pages/IncidentsPage';
 
 vi.mock('../../features/operations/api/incidents', () => ({
@@ -79,17 +79,11 @@ const mockIncidentsList = {
 };
 
 function renderPage() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/operations/incidents']}>
-        <Routes>
-          <Route path="/operations/incidents" element={<IncidentsPage />} />
-        </Routes>
-      </MemoryRouter>
-    </QueryClientProvider>,
+  return renderWithProviders(
+    <Routes>
+      <Route path="/operations/incidents" element={<IncidentsPage />} />
+    </Routes>,
+    { routerProps: { initialEntries: ['/operations/incidents'] } },
   );
 }
 
@@ -135,7 +129,7 @@ describe('IncidentsPage', () => {
     vi.mocked(incidentsApi.getIncidentSummary).mockResolvedValue(mockSummary);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText(/no results/i)).toBeInTheDocument();
+      expect(screen.getByText(/no incidents found/i)).toBeInTheDocument();
     });
   });
 

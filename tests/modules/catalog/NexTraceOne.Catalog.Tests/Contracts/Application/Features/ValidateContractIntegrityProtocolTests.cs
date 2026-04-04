@@ -29,7 +29,54 @@ public sealed class ValidateContractIntegrityProtocolTests
         </definitions>
         """;
 
-    private const string ProtobufSpec = """syntax = "proto3"; message User { string id = 1; }""";
+    private const string ProtobufSpec =
+        """
+        syntax = "proto3";
+        
+        package user.v1;
+        
+        message User {
+          string id = 1;
+          string name = 2;
+        }
+        
+        message GetUserRequest {
+          string id = 1;
+        }
+        
+        service UserService {
+          rpc GetUser (GetUserRequest) returns (User);
+          rpc ListUsers (GetUserRequest) returns (stream User);
+        }
+        """;
+
+    private const string GraphQlSpec =
+        """
+        type User {
+          id: ID!
+          name: String!
+          email: String
+        }
+        
+        input CreateUserInput {
+          name: String!
+          email: String
+        }
+        
+        enum UserRole {
+          ADMIN
+          USER
+        }
+        
+        type Query {
+          user(id: ID!): User
+          users: [User!]!
+        }
+        
+        type Mutation {
+          createUser(input: CreateUserInput!): User
+        }
+        """;
 
     // ── OpenAPI ─────────────────────────────────────────────────
 
@@ -116,12 +163,12 @@ public sealed class ValidateContractIntegrityProtocolTests
         result.Value.ValidationError.Should().BeNull();
     }
 
-    // ── Protobuf (stub) ─────────────────────────────────────────
+    // ── Protobuf ───────────────────────────────────────────────
 
     [Fact]
-    public async Task ValidateContractIntegrity_Protobuf_ReturnsStubResult()
+    public async Task ValidateContractIntegrity_Protobuf_ReturnsMessageAndRpcCounts()
     {
-        var version = ContractVersion.Import(Guid.NewGuid(), "1.0.0", ProtobufSpec, "json", "upload", ContractProtocol.Protobuf).Value;
+        var version = ContractVersion.Import(Guid.NewGuid(), "1.0.0", ProtobufSpec, "proto", "upload", ContractProtocol.Protobuf).Value;
         var repository = Substitute.For<IContractVersionRepository>();
         repository.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>()).Returns(version);
         var sut = new ValidateContractIntegrityFeature.Handler(repository);
@@ -132,8 +179,30 @@ public sealed class ValidateContractIntegrityProtocolTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.IsValid.Should().BeTrue();
-        result.Value.PathCount.Should().Be(0);
-        result.Value.EndpointCount.Should().Be(0);
+        result.Value.PathCount.Should().Be(2, "there are 2 message definitions");
+        result.Value.EndpointCount.Should().Be(2, "there are 2 rpc definitions");
+        result.Value.SchemaVersion.Should().Be("proto3");
+        result.Value.ValidationError.Should().BeNull();
+    }
+
+    // ── GraphQL ─────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ValidateContractIntegrity_GraphQl_ReturnsTypeAndFieldCounts()
+    {
+        var version = ContractVersion.Import(Guid.NewGuid(), "1.0.0", GraphQlSpec, "graphql", "upload", ContractProtocol.GraphQl).Value;
+        var repository = Substitute.For<IContractVersionRepository>();
+        repository.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>()).Returns(version);
+        var sut = new ValidateContractIntegrityFeature.Handler(repository);
+
+        var result = await sut.Handle(
+            new ValidateContractIntegrityFeature.Query(version.Id.Value),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.IsValid.Should().BeTrue();
+        result.Value.PathCount.Should().BeGreaterThanOrEqualTo(4, "type User, input CreateUserInput, enum UserRole, type Query, type Mutation");
+        result.Value.EndpointCount.Should().BeGreaterThanOrEqualTo(2, "Query has user+users, Mutation has createUser");
         result.Value.ValidationError.Should().BeNull();
     }
 

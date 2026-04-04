@@ -14,6 +14,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { serviceCatalogApi, type DiscoveredServiceItem, type DiscoveryStatus } from '../api/serviceCatalog';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
  * Página de Service Discovery Automático.
@@ -32,12 +33,12 @@ export default function ServiceDiscoveryPage() {
   const [actionType, setActionType] = useState<'match' | 'register' | 'ignore' | null>(null);
 
   // ── Queries ──────────────────────────────────────────────────────
-  const { data: dashboard, isLoading: dashLoading } = useQuery({
+  const { data: dashboard, isLoading: dashLoading, isError: dashError } = useQuery({
     queryKey: ['discovery-dashboard'],
     queryFn: () => serviceCatalogApi.getDiscoveryDashboard(),
   });
 
-  const { data: services, isLoading: servicesLoading } = useQuery({
+  const { data: services, isLoading: servicesLoading, isError: servicesError } = useQuery({
     queryKey: ['discovered-services', statusFilter, envFilter, searchTerm],
     queryFn: () =>
       serviceCatalogApi.listDiscoveredServices({
@@ -136,8 +137,13 @@ export default function ServiceDiscoveryPage() {
         </button>
       </div>
 
+      {/* Dashboard Error */}
+      {dashError && (
+        <PageErrorState message={t('common.errorLoading')} />
+      )}
+
       {/* Dashboard Stats */}
-      {!dashLoading && dashboard && (
+      {!dashLoading && !dashError && dashboard && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           <StatCard label={t('catalog.discovery.stats.total', 'Total')} value={dashboard.totalDiscovered} />
           <StatCard label={t('catalog.discovery.stats.pending', 'Pending')} value={dashboard.pending} accent="warning" />
@@ -212,7 +218,14 @@ export default function ServiceDiscoveryPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-edge">
-            {servicesLoading && (
+            {servicesError && (
+              <tr>
+                <td colSpan={7}>
+                  <PageErrorState message={t('common.errorLoading')} />
+                </td>
+              </tr>
+            )}
+            {!servicesError && servicesLoading && (
               <tr>
                 <td colSpan={7} className="text-center py-12 text-muted">
                   <RefreshCw size={16} className="animate-spin inline mr-2" />
@@ -220,7 +233,7 @@ export default function ServiceDiscoveryPage() {
                 </td>
               </tr>
             )}
-            {!servicesLoading && services?.items.length === 0 && (
+            {!servicesError && !servicesLoading && services?.items.length === 0 && (
               <tr>
                 <td colSpan={7} className="text-center py-12 text-muted">
                   <Radar size={24} className="inline mr-2 text-muted/30" />

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Globe, Eye, EyeOff, AlertTriangle, Clock,
+  Globe, EyeOff, AlertTriangle, Clock,
   CheckCircle2, XCircle, RefreshCw, Plus,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';

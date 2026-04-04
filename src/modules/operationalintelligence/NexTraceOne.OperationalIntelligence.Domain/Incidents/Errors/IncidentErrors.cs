@@ -44,6 +44,27 @@ public static class IncidentErrors
             "Runbook '{0}' was not found.",
             runbookId);
 
+    /// <summary>Post-Incident Review não encontrado.</summary>
+    public static Error PirNotFound(string incidentId)
+        => Error.NotFound(
+            "Incidents.PIR.NotFound",
+            "Post-Incident Review for incident '{0}' was not found.",
+            incidentId);
+
+    /// <summary>Post-Incident Review já existe para este incidente.</summary>
+    public static Error PirAlreadyExists(string incidentId)
+        => Error.Conflict(
+            "Incidents.PIR.AlreadyExists",
+            "A Post-Incident Review already exists for incident '{0}'.",
+            incidentId);
+
+    /// <summary>Post-Incident Review já está concluído e não pode ser progredido.</summary>
+    public static Error PirAlreadyCompleted(string reviewId)
+        => Error.Conflict(
+            "Incidents.PIR.AlreadyCompleted",
+            "Post-Incident Review '{0}' is already completed.",
+            reviewId);
+
     /// <summary>Ação inválida para workflow de mitigação.</summary>
     public static Error InvalidWorkflowAction(string action)
         => Error.Validation(

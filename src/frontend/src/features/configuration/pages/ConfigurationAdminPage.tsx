@@ -9,7 +9,6 @@ import {
   Search,
   Filter,
   ChevronDown,
-  ChevronUp,
   Check,
   X,
   RefreshCw,
@@ -35,8 +34,6 @@ import {
 } from '../hooks/useConfiguration';
 import type {
   ConfigurationDefinitionDto,
-  ConfigurationEntryDto,
-  EffectiveConfigurationDto,
   ConfigurationScope,
   ConfigurationCategory,
   ConfigurationView,

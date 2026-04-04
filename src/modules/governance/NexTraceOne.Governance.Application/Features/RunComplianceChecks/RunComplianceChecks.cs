@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
@@ -17,6 +18,20 @@ public static class RunComplianceChecks
         string? ServiceId = null,
         string? TeamId = null,
         string? DomainId = null) : IQuery<Response>;
+
+    /// <summary>Valida os filtros opcionais da query de compliance checks.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ServiceId).MaximumLength(200)
+                .When(x => x.ServiceId is not null);
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.DomainId).MaximumLength(200)
+                .When(x => x.DomainId is not null);
+        }
+    }
 
     /// <summary>Handler que executa e retorna resultados de compliance checks reais.</summary>
     public sealed class Handler(

@@ -12,6 +12,7 @@ const PromotionPage = lazy(() => import('../features/change-governance/pages/Pro
 const ChangeCatalogPage = lazy(() => import('../features/change-governance/pages/ChangeCatalogPage').then(m => ({ default: m.ChangeCatalogPage })));
 const ChangeDetailPage = lazy(() => import('../features/change-governance/pages/ChangeDetailPage').then(m => ({ default: m.ChangeDetailPage })));
 const ReleaseCalendarPage = lazy(() => import('../features/change-governance/pages/ReleaseCalendarPage').then(m => ({ default: m.ReleaseCalendarPage })));
+const DoraMetricsPage = lazy(() => import('../features/change-governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
 
 export function ChangesRoutes() {
   return (
@@ -61,6 +62,14 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
             <ReleaseCalendarPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dora-metrics"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <DoraMetricsPage />
           </ProtectedRoute>
         }
       />

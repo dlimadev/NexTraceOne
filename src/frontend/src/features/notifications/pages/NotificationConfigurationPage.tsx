@@ -18,7 +18,7 @@ import {
   RefreshCw,
   Layers,
 } from 'lucide-react';
-import { Card, CardBody, CardHeader } from '../../../components/Card';
+import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -130,8 +130,6 @@ export function NotificationConfigurationPage() {
 
   const {
     data: effective,
-    isLoading: effectiveLoading,
-    refetch: refetchEffective,
   } = useEffectiveSettings(scope, scopeReferenceId || undefined);
 
   const setValueMutation = useSetConfigurationValue();

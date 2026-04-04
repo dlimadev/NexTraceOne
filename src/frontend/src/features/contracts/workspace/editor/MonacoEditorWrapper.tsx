@@ -16,6 +16,7 @@ import Editor, { loader, type OnMount, type OnChange } from '@monaco-editor/reac
 //    localmente para o @monaco-editor/react, eliminando completamente qualquer
 //    requisição HTTP ao loader.js ou CDN. Sem script injection, sem 404s.
 // ---------------------------------------------------------------------------
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (self as any).MonacoEnvironment = {
   getWorker(_: unknown, label: string): Worker {
     if (label === 'json') return new jsonWorker();

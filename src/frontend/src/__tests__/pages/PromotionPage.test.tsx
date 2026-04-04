@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 import { PromotionPage } from '../../features/change-governance/pages/PromotionPage';
 import type { PromotionRequest, PagedList } from '../../types';
 
@@ -16,6 +15,21 @@ vi.mock('../../features/change-governance/api', () => ({
   changeIntelligenceApi: {
     listRecentReleases: vi.fn(),
   },
+}));
+
+vi.mock('../../contexts/EnvironmentContext', () => ({
+  useEnvironment: vi.fn().mockReturnValue({
+    activeEnvironmentId: 'tenant-1-prod',
+    activeEnvironment: { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+    availableEnvironments: [
+      { id: 'tenant-1-dev', name: 'Development', profile: 'development', isProductionLike: false },
+      { id: 'tenant-1-stg', name: 'Staging', profile: 'staging', isProductionLike: false },
+      { id: 'tenant-1-prod', name: 'Production', profile: 'production', isProductionLike: true },
+    ],
+    isLoadingEnvironments: false,
+    selectEnvironment: vi.fn(),
+    clearEnvironment: vi.fn(),
+  }),
 }));
 
 import { promotionApi, changeIntelligenceApi } from '../../features/change-governance/api';
@@ -52,16 +66,7 @@ const mockRequests: PagedList<PromotionRequest> = {
 };
 
 function renderPromotion() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <PromotionPage />
-      </MemoryRouter>
-    </QueryClientProvider>
-  );
+  return renderWithProviders(<PromotionPage />);
 }
 
 describe('PromotionPage', () => {

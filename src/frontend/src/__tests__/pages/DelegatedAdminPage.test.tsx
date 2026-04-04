@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/governance/api/organizationGovernance', () => ({
   organizationGovernanceApi: {
     listDelegations: vi.fn(),
   },
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { organizationGovernanceApi } from '../../features/governance/api/organizationGovernance';
@@ -44,14 +40,14 @@ describe('DelegatedAdminPage', () => {
   });
 
   it('renders page heading', async () => {
-    render(<MemoryRouter><DelegatedAdminPage /></MemoryRouter>);
+    renderWithProviders(<DelegatedAdminPage />);
     await waitFor(() => {
       expect(screen.getByText('organization.delegatedAdmin.title')).toBeInTheDocument();
     });
   });
 
   it('renders data after loading', async () => {
-    render(<MemoryRouter><DelegatedAdminPage /></MemoryRouter>);
+    renderWithProviders(<DelegatedAdminPage />);
     await waitFor(() => {
       expect(screen.getByText('Alice Johnson')).toBeInTheDocument();
     });
@@ -59,18 +55,18 @@ describe('DelegatedAdminPage', () => {
 
   it('shows loading state while fetching', () => {
     vi.mocked(organizationGovernanceApi.listDelegations).mockReturnValue(new Promise(() => {}));
-    render(<MemoryRouter><DelegatedAdminPage /></MemoryRouter>);
+    renderWithProviders(<DelegatedAdminPage />);
     expect(screen.queryByText('Alice Johnson')).not.toBeInTheDocument();
   });
 
   it('does not render DemoBanner', async () => {
-    render(<MemoryRouter><DelegatedAdminPage /></MemoryRouter>);
+    renderWithProviders(<DelegatedAdminPage />);
     await waitFor(() => screen.getByText('Alice Johnson'));
     expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
   });
 
   it('calls listDelegations on mount', async () => {
-    render(<MemoryRouter><DelegatedAdminPage /></MemoryRouter>);
+    renderWithProviders(<DelegatedAdminPage />);
     await waitFor(() => expect(organizationGovernanceApi.listDelegations).toHaveBeenCalledTimes(1));
   });
 });

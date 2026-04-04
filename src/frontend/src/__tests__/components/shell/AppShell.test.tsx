@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { screen, fireEvent } from '@testing-library/react';
+import { Route, Routes } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { renderWithProviders } from '../../test-utils';
 import { AppShell } from '../../../components/shell/AppShell';
-import { ThemeProvider } from '../../../contexts/ThemeContext';
 
 // Mock incidents API used by useNavCounters
 vi.mock('../../../features/operations/api/incidents', () => ({
@@ -81,26 +80,16 @@ vi.mock('../../../components/CommandPalette', () => ({
     open ? <div data-testid="command-palette">Command Palette</div> : null,
 }));
 
-function createWrapper() {
-  return new QueryClient({ defaultOptions: { queries: { retry: false } } });
-}
-
 function renderShell(route = '/') {
-  const queryClient = createWrapper();
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-      <MemoryRouter initialEntries={[route]}>
-        <Routes>
-          <Route element={<AppShell />}>
-            <Route path="/" element={<div data-testid="dashboard">Dashboard</div>} />
-            <Route path="/services" element={<div data-testid="services">Services</div>} />
-            <Route path="/contracts" element={<div data-testid="contracts">Contracts</div>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
-      </ThemeProvider>
-    </QueryClientProvider>,
+  return renderWithProviders(
+    <Routes>
+      <Route element={<AppShell />}>
+        <Route path="/" element={<div data-testid="dashboard">Dashboard</div>} />
+        <Route path="/services" element={<div data-testid="services">Services</div>} />
+        <Route path="/contracts" element={<div data-testid="contracts">Contracts</div>} />
+      </Route>
+    </Routes>,
+    { routerProps: { initialEntries: [route] } },
   );
 }
 
@@ -133,13 +122,14 @@ describe('AppShell', () => {
   it('renders navigation items for permitted sections', () => {
     renderShell();
     expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0);
-    // Section headers are always visible even when collapsed
-    expect(screen.getByText('Services')).toBeInTheDocument();
+    // The sidebar icon rail renders items with title attributes
+    const sidebarNav = screen.getByRole('navigation', { name: /sidebar/i });
+    expect(sidebarNav).toBeInTheDocument();
   });
 
-  it('renders the user email in sidebar footer', () => {
+  it('renders the user display name in sidebar footer', () => {
     renderShell();
-    expect(screen.getAllByText('admin@nextraceone.io').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('admin').length).toBeGreaterThan(0);
   });
 
   it('opens command palette with Ctrl+K', () => {

@@ -15,7 +15,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { legacyAssetsApi } from '../api/legacyAssets';
-import type { LegacyAssetSummary, LegacyAssetFilters } from '../api/legacyAssets';
+import type { LegacyAssetFilters } from '../api/legacyAssets';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<string, string> = {

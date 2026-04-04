@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import {
   ArrowLeft, Info, List, Globe, History,
@@ -13,8 +14,9 @@ import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
-import type { GovernancePackDetail, EnforcementMode, GovernancePackStatus } from '../../../types';
+import type { EnforcementMode, GovernancePackStatus } from '../../../types';
 
 type TabKey = 'overview' | 'rules' | 'scopes' | 'versions' | 'simulation';
 
@@ -43,30 +45,13 @@ export function GovernancePackDetailPage() {
   const { t } = useTranslation();
   const { packId } = useParams<{ packId: string }>();
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [pack, setPack] = useState<GovernancePackDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.packDetail(packId!),
+    queryFn: () => organizationGovernanceApi.getGovernancePack(packId!),
+    enabled: !!packId,
+  });
 
-  useEffect(() => {
-    if (!packId) return;
-    let cancelled = false;
-
-    organizationGovernanceApi.getGovernancePack(packId)
-      .then((response) => {
-        if (!cancelled) {
-          setPack(response.pack);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [packId, t]);
+  const pack = data?.pack;
 
   const tabs: { key: TabKey; labelKey: string; icon: React.ReactNode }[] = [
     { key: 'overview', labelKey: 'governancePacks.detail.tabOverview', icon: <Info size={14} /> },
@@ -76,7 +61,7 @@ export function GovernancePackDetailPage() {
     { key: 'simulation', labelKey: 'governancePacks.detail.tabSimulation', icon: <Play size={14} /> },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <Link to="/governance/packs" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
@@ -88,14 +73,14 @@ export function GovernancePackDetailPage() {
     );
   }
 
-  if (error || !pack) {
+  if (isError || !pack) {
     return (
       <PageContainer>
         <Link to="/governance/packs" className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent transition-colors mb-4">
           <ArrowLeft size={14} />
           {t('governancePacks.detail.backToPacks')}
         </Link>
-        <PageErrorState message={error || t('governancePacks.detail.notFound')} />
+        <PageErrorState message={t('governancePacks.detail.notFound')} />
       </PageContainer>
     );
   }

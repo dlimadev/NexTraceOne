@@ -36,6 +36,9 @@ public sealed class IncidentDbContext(
     /// <summary>Correlações dinâmicas incidente↔mudança geradas pelo motor de correlação.</summary>
     public DbSet<IncidentChangeCorrelation> ChangeCorrelations => Set<IncidentChangeCorrelation>();
 
+    /// <summary>Post-Incident Reviews (PIR) formais.</summary>
+    public DbSet<PostIncidentReview> PostIncidentReviews => Set<PostIncidentReview>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IncidentDbContext).Assembly;

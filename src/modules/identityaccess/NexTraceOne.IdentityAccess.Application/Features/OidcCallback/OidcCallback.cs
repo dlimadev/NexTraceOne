@@ -267,6 +267,7 @@ public static class OidcCallback
             catch
             {
                 // State malformado — retorna destino seguro padrão
+                System.Diagnostics.Trace.TraceWarning("OidcCallback: Malformed state parameter during return URL extraction.");
             }
 
             return "/";

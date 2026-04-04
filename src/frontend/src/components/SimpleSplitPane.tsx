@@ -24,7 +24,7 @@ export const SimpleSplitPane: React.FC<SimpleSplitPaneProps> = ({
 
   function onPointerDown(e: React.PointerEvent) {
     draggingRef.current = true;
-    try { (e.target as Element).setPointerCapture(e.pointerId); } catch { }
+    try { (e.target as Element).setPointerCapture(e.pointerId); } catch { /* no-op */ }
   }
 
   function onSeparatorDoubleClick() {
@@ -50,7 +50,7 @@ export const SimpleSplitPane: React.FC<SimpleSplitPaneProps> = ({
 
   function onPointerUp(e: React.PointerEvent) {
     draggingRef.current = false;
-    try { (e.target as Element).releasePointerCapture(e.pointerId); } catch { }
+    try { (e.target as Element).releasePointerCapture(e.pointerId); } catch { /* no-op */ }
   }
 
   return (

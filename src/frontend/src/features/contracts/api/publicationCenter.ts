@@ -6,7 +6,6 @@
  */
 import client from '../../../api/client';
 import type {
-  ContractPublicationEntry,
   PublishContractToPortalResponse,
   WithdrawContractFromPortalResponse,
   ContractPublicationStatusResponse,

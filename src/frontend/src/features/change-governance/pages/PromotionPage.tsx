@@ -67,7 +67,7 @@ export function PromotionPage() {
     staleTime: 30_000,
   });
 
-  const availableReleases = releasesQuery.data?.items ?? [];
+  const availableReleases = useMemo(() => releasesQuery.data?.items ?? [], [releasesQuery.data?.items]);
 
   const createMutation = useMutation({
     mutationFn: promotionApi.createRequest,
@@ -89,7 +89,7 @@ export function PromotionPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['promotion'] }),
   });
 
-  const requests = data?.items ?? [];
+  const requests = useMemo(() => data?.items ?? [], [data?.items]);
   const pending = requests.filter((r) => r.status === 'Pending' || r.status === 'Approved');
 
   const environmentProfiles = useMemo(() => {
@@ -131,6 +131,7 @@ export function PromotionPage() {
       : (environmentOptions.find((env) => env !== source) ?? source);
 
     if (source !== form.sourceEnvironment || target !== form.targetEnvironment) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm((current) => ({ ...current, sourceEnvironment: source ?? '', targetEnvironment: target ?? '' }));
     }
   }, [environmentOptions, form.sourceEnvironment, form.targetEnvironment]);

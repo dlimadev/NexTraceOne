@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/identity-access/api', () => ({
   identityApi: {
     resetPassword: vi.fn(),
   },
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { ResetPasswordPage } from '../../features/identity-access/pages/ResetPasswordPage';
@@ -20,39 +16,31 @@ describe('ResetPasswordPage', () => {
   });
 
   it('renders invalid token state when no token in URL', () => {
-    render(
-      <MemoryRouter initialEntries={['/reset-password']}>
-        <ResetPasswordPage />
-      </MemoryRouter>
-    );
-    expect(screen.getByText('resetPassword.invalidToken')).toBeInTheDocument();
+    renderWithProviders(<ResetPasswordPage />, {
+      routerProps: { initialEntries: ['/reset-password'] },
+    });
+    expect(screen.getByText(/reset link is invalid/i)).toBeInTheDocument();
   });
 
   it('renders the reset password form when token is present', () => {
-    render(
-      <MemoryRouter initialEntries={['/reset-password?token=valid-token']}>
-        <ResetPasswordPage />
-      </MemoryRouter>
-    );
-    expect(screen.getByText('resetPassword.title')).toBeInTheDocument();
+    renderWithProviders(<ResetPasswordPage />, {
+      routerProps: { initialEntries: ['/reset-password?token=valid-token'] },
+    });
+    expect(screen.getByText('Reset your password')).toBeInTheDocument();
   });
 
   it('renders password input fields with valid token', () => {
-    render(
-      <MemoryRouter initialEntries={['/reset-password?token=valid-token']}>
-        <ResetPasswordPage />
-      </MemoryRouter>
-    );
+    renderWithProviders(<ResetPasswordPage />, {
+      routerProps: { initialEntries: ['/reset-password?token=valid-token'] },
+    });
     const passwordInputs = screen.getAllByLabelText(/password/i);
     expect(passwordInputs.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders request new link button for invalid token', () => {
-    render(
-      <MemoryRouter initialEntries={['/reset-password']}>
-        <ResetPasswordPage />
-      </MemoryRouter>
-    );
-    expect(screen.getByText('resetPassword.requestNewLink')).toBeInTheDocument();
+    renderWithProviders(<ResetPasswordPage />, {
+      routerProps: { initialEntries: ['/reset-password'] },
+    });
+    expect(screen.getByText('Request new link')).toBeInTheDocument();
   });
 });

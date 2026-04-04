@@ -41,7 +41,11 @@ public static class SwaggerSpecParser
                 }
             }
         }
-        catch (JsonException) { /* Spec inválida — retorna dicionário vazio para não bloquear o diff */ }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "SwaggerSpecParser: Failed to parse Swagger paths — {0}", ex.Message);
+        }
         return result;
     }
 
@@ -76,7 +80,11 @@ public static class SwaggerSpecParser
                 }
             }
         }
-        catch (JsonException) { /* Ignora erros de parse para retornar dicionário vazio */ }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "SwaggerSpecParser: Failed to parse Swagger parameters for {0} {1} — {2}", path, method, ex.Message);
+        }
         return result;
     }
 }

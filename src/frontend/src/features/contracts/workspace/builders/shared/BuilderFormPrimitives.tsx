@@ -4,6 +4,7 @@
  * para consistência visual e redução de duplicação.
  */
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 
 const INPUT_CLASS =
@@ -175,6 +176,7 @@ export function FieldTagInput({
   placeholder?: string;
 }) {
   const [input, setInput] = useState('');
+  const { t } = useTranslation();
 
   const addTag = useCallback(() => {
     const trimmed = input.trim();
@@ -197,7 +199,7 @@ export function FieldTagInput({
         {tags.map((tag) => (
           <span key={tag} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] rounded bg-accent/10 text-accent border border-accent/20">
             {tag}
-            <button onClick={() => removeTag(tag)} className="hover:text-danger transition-colors" aria-label={`Remove ${tag}`}>
+            <button onClick={() => removeTag(tag)} className="hover:text-danger transition-colors" aria-label={t('common.removeItem', { item: tag })}>
               <X size={8} />
             </button>
           </span>

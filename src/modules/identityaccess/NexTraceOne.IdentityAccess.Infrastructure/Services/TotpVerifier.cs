@@ -36,6 +36,7 @@ internal sealed class TotpVerifier : ITotpVerifier
         }
         catch
         {
+            System.Diagnostics.Trace.TraceWarning("TotpVerifier: Invalid Base32 secret format.");
             return false;
         }
 

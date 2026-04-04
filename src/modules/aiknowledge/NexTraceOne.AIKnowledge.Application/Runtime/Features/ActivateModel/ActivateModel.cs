@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using MediatR;
 
@@ -16,6 +17,14 @@ namespace NexTraceOne.AIKnowledge.Application.Runtime.Features.ActivateModel;
 public static class ActivateModel
 {
     public sealed record Command(Guid ModelId) : ICommand;
+
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ModelId).NotEmpty();
+        }
+    }
 
     public sealed class Handler(
         IAiModelRepository modelRepository) : ICommandHandler<Command>

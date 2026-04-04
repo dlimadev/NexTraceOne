@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -20,6 +21,19 @@ public static class CreatePackVersion
         string DefaultEnforcementMode,
         string? ChangeDescription,
         string CreatedBy) : ICommand<Response>;
+
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.Version).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.DefaultEnforcementMode).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.ChangeDescription).MaximumLength(2000)
+                .When(x => x.ChangeDescription is not null);
+            RuleFor(x => x.CreatedBy).NotEmpty().MaximumLength(100);
+        }
+    }
 
     /// <summary>Handler que cria uma nova versão real com persistência.</summary>
     public sealed class Handler(

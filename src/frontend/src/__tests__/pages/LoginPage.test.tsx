@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { renderWithProviders } from '../test-utils';
 import { LoginPage } from '../../features/identity-access/pages/LoginPage';
 import { AuthContext } from '../../contexts/AuthContext';
 
@@ -38,16 +38,12 @@ function makeAuthContext(overrides: Partial<{
 
 function renderLoginPage(authOverrides = {}) {
   const auth = makeAuthContext(authOverrides);
-  return {
-    auth,
-    ...render(
-      <AuthContext.Provider value={auth}>
-        <MemoryRouter>
-          <LoginPage />
-        </MemoryRouter>
-      </AuthContext.Provider>
-    ),
-  };
+  const result = renderWithProviders(
+    <AuthContext.Provider value={auth}>
+      <LoginPage />
+    </AuthContext.Provider>,
+  );
+  return { auth, ...result };
 }
 
 describe('LoginPage', () => {
@@ -60,9 +56,9 @@ describe('LoginPage', () => {
 
   it('exibe o título e subtítulo da plataforma', () => {
     renderLoginPage();
-    // Split layout has NexTraceOne in both left panel and mobile header
-    expect(screen.getAllByText('NexTraceOne').length).toBeGreaterThanOrEqual(1);
-    // Tagline appears in both mobile header and desktop left panel
+    // Split layout has NexTraceOne logo in left panel and mobile header
+    expect(screen.getAllByAltText('NexTraceOne').length).toBeGreaterThanOrEqual(1);
+    // Tagline appears in mobile header
     expect(screen.getAllByText(/sovereign/i).length).toBeGreaterThanOrEqual(1);
   });
 

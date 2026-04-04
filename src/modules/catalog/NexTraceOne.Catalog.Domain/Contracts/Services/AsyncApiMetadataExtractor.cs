@@ -44,8 +44,10 @@ public static class AsyncApiMetadataExtractor
 
             return new AsyncApiMetadata(title, asyncApiVersion, defaultContentType, channelsJson, messagesJson, serversJson);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            System.Diagnostics.Trace.TraceWarning(
+                "AsyncApiMetadataExtractor: Failed to extract metadata — {0}: {1}", ex.GetType().Name, ex.Message);
             return BuildDefault(fallbackTitle);
         }
     }
@@ -111,7 +113,12 @@ public static class AsyncApiMetadataExtractor
             }
             return JsonSerializer.Serialize(result);
         }
-        catch (Exception) { return "{}"; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "AsyncApiMetadataExtractor: Failed to extract messages JSON — {0}: {1}", ex.GetType().Name, ex.Message);
+            return "{}";
+        }
     }
 
     private static string ExtractServersJson(JsonElement root)
@@ -131,6 +138,11 @@ public static class AsyncApiMetadataExtractor
             }
             return JsonSerializer.Serialize(result);
         }
-        catch (Exception) { return "{}"; }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "AsyncApiMetadataExtractor: Failed to extract servers JSON — {0}: {1}", ex.GetType().Name, ex.Message);
+            return "{}";
+        }
     }
 }

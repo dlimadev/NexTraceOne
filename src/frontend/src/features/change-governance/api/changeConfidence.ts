@@ -74,4 +74,49 @@ export const changeConfidenceApi = {
   /** Obtém o histórico de decisões de uma mudança. */
   getDecisionHistory: (changeId: string) =>
     client.get<DecisionHistoryResponse>(`/changes/${changeId}/decisions`).then((r) => r.data),
+
+  /** Obtém métricas DORA calculadas a partir de dados reais de releases e incidentes. */
+  getDoraMetrics: (params?: { serviceName?: string; teamName?: string; environment?: string; days?: number }) =>
+    client.get<DoraMetricsResponse>('/changes/dora-metrics', { params }).then((r) => r.data),
 };
+
+// ── DORA Metrics Response Types ─────────────────────────────────────
+
+export type DoraClassification = 'Elite' | 'High' | 'Medium' | 'Low';
+
+export interface DeploymentFrequencyDto {
+  deploysPerDay: number;
+  totalDeploys: number;
+  classification: DoraClassification;
+}
+
+export interface LeadTimeDto {
+  averageHours: number;
+  classification: DoraClassification;
+}
+
+export interface ChangeFailureRateDto {
+  failurePercentage: number;
+  failedDeploys: number;
+  rolledBackDeploys: number;
+  totalDeploys: number;
+  classification: DoraClassification;
+}
+
+export interface TimeToRestoreDto {
+  averageHours: number;
+  classification: DoraClassification;
+}
+
+export interface DoraMetricsResponse {
+  deploymentFrequency: DeploymentFrequencyDto;
+  leadTimeForChanges: LeadTimeDto;
+  changeFailureRate: ChangeFailureRateDto;
+  timeToRestoreService: TimeToRestoreDto;
+  overallClassification: DoraClassification;
+  periodDays: number;
+  serviceName: string | null;
+  teamName: string | null;
+  environment: string | null;
+  generatedAt: string;
+}

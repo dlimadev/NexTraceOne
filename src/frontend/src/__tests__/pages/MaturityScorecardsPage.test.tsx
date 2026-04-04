@@ -1,15 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/governance/api/organizationGovernance', () => ({
   organizationGovernanceApi: {
     getMaturityScorecards: vi.fn(),
   },
-}));
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 import { organizationGovernanceApi } from '../../features/governance/api/organizationGovernance';
@@ -36,14 +32,14 @@ describe('MaturityScorecardsPage', () => {
   });
 
   it('renders page heading', async () => {
-    render(<MemoryRouter><MaturityScorecardsPage /></MemoryRouter>);
+    renderWithProviders(<MaturityScorecardsPage />);
     await waitFor(() => {
       expect(screen.getByText('governance.executive.scorecardsTitle')).toBeInTheDocument();
     });
   });
 
   it('renders data after loading', async () => {
-    render(<MemoryRouter><MaturityScorecardsPage /></MemoryRouter>);
+    renderWithProviders(<MaturityScorecardsPage />);
     await waitFor(() => {
       expect(screen.getByText('Order Squad')).toBeInTheDocument();
     });
@@ -51,18 +47,18 @@ describe('MaturityScorecardsPage', () => {
 
   it('shows loading state while fetching', () => {
     vi.mocked(organizationGovernanceApi.getMaturityScorecards).mockReturnValue(new Promise(() => {}));
-    render(<MemoryRouter><MaturityScorecardsPage /></MemoryRouter>);
+    renderWithProviders(<MaturityScorecardsPage />);
     expect(screen.queryByText('Order Squad')).not.toBeInTheDocument();
   });
 
   it('does not render DemoBanner', async () => {
-    render(<MemoryRouter><MaturityScorecardsPage /></MemoryRouter>);
+    renderWithProviders(<MaturityScorecardsPage />);
     await waitFor(() => screen.getByText('Order Squad'));
     expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
   });
 
   it('calls getMaturityScorecards on mount', async () => {
-    render(<MemoryRouter><MaturityScorecardsPage /></MemoryRouter>);
+    renderWithProviders(<MaturityScorecardsPage />);
     await waitFor(() => expect(organizationGovernanceApi.getMaturityScorecards).toHaveBeenCalledTimes(1));
   });
 });

@@ -343,7 +343,7 @@ export function AiAssistantPage() {
       } else {
         setSelectedConversationState(null);
       }
-    } catch (err) {
+    } catch {
       setConversationsError(t('aiHub.errorLoadingConversations'));
     } finally {
       if (requestId === conversationLoadRequestRef.current) {
@@ -482,7 +482,7 @@ export function AiAssistantPage() {
       setMessages([]);
       setSelectedConversationState(response.conversationId);
       await loadConversations(response.conversationId);
-    } catch (err) {
+    } catch {
       setConversationsError(t('common.errorLoading'));
     }
   };

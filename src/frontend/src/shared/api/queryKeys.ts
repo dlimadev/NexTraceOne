@@ -26,6 +26,7 @@ export const queryKeys = {
       list: (params?: Record<string, unknown>) => [...queryKeys.catalog.services.all(), 'list', params] as const,
       detail: (id: string) => [...queryKeys.catalog.services.all(), 'detail', id] as const,
       summary: () => [...queryKeys.catalog.services.all(), 'summary'] as const,
+      scorecard: (serviceName: string, environment: string) => [...queryKeys.catalog.services.all(), 'scorecard', serviceName, environment] as const,
     },
   },
 
@@ -43,6 +44,7 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => [...queryKeys.changes.all, 'list', params] as const,
     detail: (id: string) => [...queryKeys.changes.all, 'detail', id] as const,
     summary: () => [...queryKeys.changes.all, 'summary'] as const,
+    dora: (params?: Record<string, unknown>) => [...queryKeys.changes.all, 'dora', params] as const,
   },
 
   // ── Operations / Incidents ──
@@ -59,6 +61,14 @@ export const queryKeys = {
     reports: () => [...queryKeys.governance.all, 'reports'] as const,
     risk: () => [...queryKeys.governance.all, 'risk'] as const,
     compliance: () => [...queryKeys.governance.all, 'compliance'] as const,
+    waivers: () => [...queryKeys.governance.all, 'waivers'] as const,
+    teams: () => [...queryKeys.governance.all, 'teams'] as const,
+    teamDetail: (id: string) => [...queryKeys.governance.all, 'teams', id] as const,
+    delegations: () => [...queryKeys.governance.all, 'delegations'] as const,
+    domains: () => [...queryKeys.governance.all, 'domains'] as const,
+    domainDetail: (id: string) => [...queryKeys.governance.all, 'domains', id] as const,
+    packs: () => [...queryKeys.governance.all, 'packs'] as const,
+    packDetail: (id: string) => [...queryKeys.governance.all, 'packs', id] as const,
     finops: {
       all: () => [...queryKeys.governance.all, 'finops'] as const,
       summary: (params?: Record<string, unknown>) => [...queryKeys.governance.finops.all(), 'summary', params] as const,
@@ -74,6 +84,9 @@ export const queryKeys = {
     },
     executive: {
       all: () => [...queryKeys.governance.all, 'executive'] as const,
+      controls: () => [...queryKeys.governance.executive.all(), 'controls'] as const,
+      heatmap: (dimension: string) => [...queryKeys.governance.executive.all(), 'heatmap', dimension] as const,
+      scorecards: (dimension: string) => [...queryKeys.governance.executive.all(), 'scorecards', dimension] as const,
       drillDown: (entityType: string, entityId: string) => [...queryKeys.governance.executive.all(), 'drillDown', entityType, entityId] as const,
     },
   },
@@ -105,6 +118,8 @@ export const queryKeys = {
     all: ['ai'] as const,
     models: () => [...queryKeys.ai.all, 'models'] as const,
     policies: () => [...queryKeys.ai.all, 'policies'] as const,
+    conversations: () => [...queryKeys.ai.all, 'conversations'] as const,
+    agents: () => [...queryKeys.ai.all, 'agents'] as const,
   },
 
   // ── Identity ──

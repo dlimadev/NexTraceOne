@@ -17,6 +17,7 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api';
 import type { ChangeLevel, DeploymentState } from '../../../types';
 import { PageContainer, PageSection } from '../../../components/shell';
@@ -88,6 +89,7 @@ export function ReleasesPage() {
   useEffect(() => {
     if (!environmentOptions.length) return;
     if (!form.environment || !environmentOptions.includes(form.environment)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm((current) => ({ ...current, environment: environmentOptions[0] ?? '' }));
     }
   }, [environmentOptions, form.environment]);
@@ -305,9 +307,10 @@ export function ReleasesPage() {
               ) : releasesQuery.isError ? (
                 <PageErrorState message={t('releases.loadFailed')} />
               ) : !data?.items?.length ? (
-                <p className="px-6 py-12 text-sm text-muted text-center">
-                  {t('releases.noReleases')}
-                </p>
+                <EmptyState
+                  title={t('releases.empty', 'No releases found')}
+                  description={t('releases.emptyDescription', 'No releases match your current filters.')}
+                />
               ) : (
                 <table className="min-w-full text-sm">
                   <thead>

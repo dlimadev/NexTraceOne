@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetServiceFinOps;
 
@@ -19,10 +20,12 @@ public static class GetServiceFinOps
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;
+        private readonly IReliabilityModule _reliabilityModule;
 
-        public Handler(ICostIntelligenceModule costModule)
+        public Handler(ICostIntelligenceModule costModule, IReliabilityModule reliabilityModule)
         {
             _costModule = costModule;
+            _reliabilityModule = reliabilityModule;
         }
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
@@ -69,7 +72,22 @@ public static class GetServiceFinOps
                 }
                 : Array.Empty<OptimizationDto>();
 
-            var efficiency = ComputeEfficiency(record.TotalCost);
+            // Reliability data from cross-module IReliabilityModule
+            var environment = currentRecord.Environment ?? "production";
+            var serviceName = currentRecord.ServiceName;
+            var errorBudget = await _reliabilityModule.GetRemainingErrorBudgetAsync(serviceName, environment, cancellationToken);
+            var burnRate = await _reliabilityModule.GetCurrentBurnRateAsync(serviceName, environment, cancellationToken);
+            var reliabilityStatus = await _reliabilityModule.GetCurrentReliabilityStatusAsync(serviceName, environment, cancellationToken);
+
+            var reliabilityScore = errorBudget.HasValue ? Math.Round(errorBudget.Value * 100m, 1) : 0m;
+            var reliabilityTrend = burnRate.HasValue
+                ? burnRate.Value > 1.5m ? TrendDirection.Declining
+                : burnRate.Value < 0.5m ? TrendDirection.Improving
+                : TrendDirection.Stable
+                : TrendDirection.Stable;
+
+            // Efficiency indicators derived from cost and reliability data
+            var efficiencyIndicators = BuildEfficiencyIndicators(currentRecord.TotalCost, averageServiceCost, reliabilityScore, burnRate);
 
             var response = new Response(
                 ServiceId: record.ServiceId,
@@ -82,18 +100,55 @@ public static class GetServiceFinOps
                 Efficiency: ComputeEfficiency(currentRecord.TotalCost),
                 WasteSignals: wasteSignals,
                 TotalWaste: Math.Round(waste, 2),
-                EfficiencyIndicators: Array.Empty<EfficiencyIndicatorDto>(),
-                ReliabilityScore: 0m,
+                EfficiencyIndicators: efficiencyIndicators,
+                ReliabilityScore: reliabilityScore,
                 RecentIncidents: 0,
-                ReliabilityTrend: TrendDirection.Stable,
+                ReliabilityTrend: reliabilityTrend,
                 ChangeImpacts: Array.Empty<ChangeImpactDto>(),
                 Optimizations: optimizations,
                 TotalPotentialSavings: optimizations.Sum(o => o.PotentialSavings),
                 GeneratedAt: DateTimeOffset.UtcNow,
                 IsSimulated: false,
-                DataSource: "cost-intelligence");
+                DataSource: "cost-intelligence+reliability");
 
             return Result<Response>.Success(response);
+        }
+
+        private static List<EfficiencyIndicatorDto> BuildEfficiencyIndicators(
+            decimal currentCost, decimal averageCost, decimal reliabilityScore, decimal? burnRate)
+        {
+            var indicators = new List<EfficiencyIndicatorDto>();
+
+            // Cost-per-reliability indicator
+            var costEfficiencyRatio = reliabilityScore > 0 ? Math.Round(currentCost / reliabilityScore, 2) : 0m;
+            indicators.Add(new EfficiencyIndicatorDto(
+                Name: "Cost per Reliability Point",
+                Category: EfficiencyCategory.CostPerTransaction,
+                CurrentValue: costEfficiencyRatio,
+                TargetValue: averageCost > 0 && reliabilityScore > 0 ? Math.Round(averageCost / reliabilityScore, 2) : 0m,
+                Assessment: costEfficiencyRatio > 0 && reliabilityScore > 80m ? "Good" : costEfficiencyRatio > 0 ? "Needs Improvement" : "No Data"));
+
+            // Budget utilization indicator
+            var utilization = averageCost > 0 ? Math.Round(currentCost / averageCost * 100m, 1) : 100m;
+            indicators.Add(new EfficiencyIndicatorDto(
+                Name: "Budget Utilization",
+                Category: EfficiencyCategory.ResourceUtilization,
+                CurrentValue: utilization,
+                TargetValue: 100m,
+                Assessment: utilization <= 110m ? "On Track" : utilization <= 130m ? "Over Budget" : "Critical Overspend"));
+
+            // Burn rate indicator
+            if (burnRate.HasValue)
+            {
+                indicators.Add(new EfficiencyIndicatorDto(
+                    Name: "Error Budget Burn Rate",
+                    Category: EfficiencyCategory.ErrorRate,
+                    CurrentValue: Math.Round(burnRate.Value, 2),
+                    TargetValue: 1.0m,
+                    Assessment: burnRate.Value <= 1.0m ? "Healthy" : burnRate.Value <= 2.0m ? "Elevated" : "Critical"));
+            }
+
+            return indicators;
         }
 
         private static CostEfficiency ComputeEfficiency(decimal cost) => cost switch

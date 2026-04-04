@@ -53,7 +53,7 @@ public static class GetAutomationValidation
                     Status: ValidationStatus.Pending,
                     ObservedOutcome: null,
                     ValidatedBy: null,
-                    Checks: Array.Empty<ValidationCheckDto>(),
+                    Checks: DeriveChecksFromWorkflow(workflow, null),
                     RecordedAt: null));
             }
 
@@ -62,7 +62,7 @@ public static class GetAutomationValidation
                 Status: MapOutcomeToValidationStatus(validationRecord.Outcome),
                 ObservedOutcome: validationRecord.ObservedOutcome,
                 ValidatedBy: validationRecord.ValidatedBy,
-                Checks: Array.Empty<ValidationCheckDto>(),
+                Checks: DeriveChecksFromWorkflow(workflow, validationRecord),
                 RecordedAt: validationRecord.ValidatedAt);
 
             return Result<Response>.Success(response);
@@ -75,6 +75,53 @@ public static class GetAutomationValidation
             AutomationOutcome.Cancelled => ValidationStatus.Failed,
             _ => ValidationStatus.InProgress
         };
+
+        /// <summary>Derives validation checks from workflow and validation record state.</summary>
+        private static List<ValidationCheckDto> DeriveChecksFromWorkflow(
+            AutomationWorkflowRecord workflow,
+            AutomationValidationRecord? validationRecord)
+        {
+            var checks = new List<ValidationCheckDto>();
+
+            // Check 1: Workflow completed successfully
+            var isCompleted = workflow.Status is AutomationWorkflowStatus.Completed;
+            checks.Add(new ValidationCheckDto(
+                CheckName: "Workflow Completion",
+                IsPassed: isCompleted,
+                Details: isCompleted ? "Workflow completed execution" : $"Workflow status: {workflow.Status}"));
+
+            // Check 2: Approval was obtained (if required)
+            if (workflow.ApprovalStatus != AutomationApprovalStatus.NotRequired)
+            {
+                var approvalPassed = workflow.ApprovalStatus == AutomationApprovalStatus.Approved;
+                checks.Add(new ValidationCheckDto(
+                    CheckName: "Approval Obtained",
+                    IsPassed: approvalPassed,
+                    Details: approvalPassed
+                        ? $"Approved by {workflow.ApprovedBy} at {workflow.ApprovedAt:u}"
+                        : $"Approval status: {workflow.ApprovalStatus}"));
+            }
+
+            // Check 3: Outcome validation (from validation record)
+            if (validationRecord is not null)
+            {
+                var outcomePassed = validationRecord.Outcome == AutomationOutcome.Successful;
+                checks.Add(new ValidationCheckDto(
+                    CheckName: "Execution Outcome",
+                    IsPassed: outcomePassed,
+                    Details: validationRecord.ObservedOutcome ?? $"Outcome: {validationRecord.Outcome}"));
+
+                // Check 4: Validator identity
+                checks.Add(new ValidationCheckDto(
+                    CheckName: "Validator Identity",
+                    IsPassed: !string.IsNullOrEmpty(validationRecord.ValidatedBy),
+                    Details: !string.IsNullOrEmpty(validationRecord.ValidatedBy)
+                        ? $"Validated by {validationRecord.ValidatedBy}"
+                        : "No validator recorded"));
+            }
+
+            return checks;
+        }
     }
 
     /// <summary>Verificação individual de validação pós-execução.</summary>

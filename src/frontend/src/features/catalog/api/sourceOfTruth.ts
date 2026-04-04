@@ -23,4 +23,44 @@ export const sourceOfTruthApi = {
   /** Pesquisa unificada de descoberta no Source of Truth. */
   search: (params: { q: string; scope?: string; maxResults?: number }) =>
     client.get<SourceOfTruthSearchResponse>('/source-of-truth/search', { params }).then((r) => r.data),
+
+  /** Calcula o scorecard de maturidade cross-module de um serviço. */
+  getServiceScorecard: (serviceName: string, environment?: string) =>
+    client
+      .get<ServiceScorecardResponse>('/source-of-truth/services/scorecard', {
+        params: { serviceName, environment: environment ?? 'Production' },
+      })
+      .then((r) => r.data),
 };
+
+// ── Service Scorecard Types ─────────────────────────────────────────
+
+/** Dimensão individual do scorecard. */
+export interface ScorecardDimensionDto {
+  score: number;
+  justification: string;
+  weight: number;
+}
+
+/** Scores das 8 dimensões do scorecard. */
+export interface ScorecardDimensionScores {
+  ownership: ScorecardDimensionDto;
+  documentation: ScorecardDimensionDto;
+  contracts: ScorecardDimensionDto;
+  slos: ScorecardDimensionDto;
+  observability: ScorecardDimensionDto;
+  changeGovernance: ScorecardDimensionDto;
+  runbooks: ScorecardDimensionDto;
+  security: ScorecardDimensionDto;
+}
+
+/** Resposta completa do scorecard de maturidade cross-module. */
+export interface ServiceScorecardResponse {
+  serviceName: string;
+  teamName: string | null;
+  domain: string | null;
+  overallScore: number;
+  maturityLevel: string;
+  dimensions: ScorecardDimensionScores;
+  computedAt: string;
+}

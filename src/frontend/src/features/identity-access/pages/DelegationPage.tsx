@@ -10,6 +10,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import type { DelegationInfo } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
  * Página de gestão de delegações de permissões do módulo Identity.
@@ -36,7 +37,7 @@ export function DelegationPage() {
   });
 
   /** Consulta as delegações existentes. */
-  const { data: delegations, isLoading } = useQuery({
+  const { data: delegations, isLoading, isError } = useQuery({
     queryKey: ['delegations', tenantId],
     queryFn: () => identityApi.listDelegations(),
     enabled: !!tenantId,
@@ -188,6 +189,8 @@ export function DelegationPage() {
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={20} className="animate-spin text-muted" />
             </div>
+          ) : isError ? (
+            <PageErrorState message={t('common.errorLoading')} />
           ) : !delegations?.length ? (
             <p className="px-6 py-12 text-sm text-muted text-center">
               {t('identity.delegation.noDelegations')}

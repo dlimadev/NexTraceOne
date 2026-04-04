@@ -2,13 +2,10 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FileCode2,
-  GitBranch,
-  AlertTriangle,
   Ruler,
   FileText,
   Upload,
   Zap,
-  Target,
   BarChart3,
   ChevronDown,
   ChevronUp,
@@ -20,6 +17,7 @@ import {
   Lock,
   RefreshCw,
   Layers,
+  GitBranch,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -144,8 +142,6 @@ export function CatalogContractsConfigurationPage() {
 
   const {
     data: effective,
-    isLoading: effectiveLoading,
-    refetch: refetchEffective,
   } = useEffectiveSettings(scope, scopeReferenceId || undefined);
 
   const setValueMutation = useSetConfigurationValue();

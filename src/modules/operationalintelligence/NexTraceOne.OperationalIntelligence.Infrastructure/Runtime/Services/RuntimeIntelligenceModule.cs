@@ -20,6 +20,7 @@ internal sealed class RuntimeIntelligenceModule(
     private const decimal CriticalDriftPenalty = 0.70m;
     private const decimal BaselineMinWeight = 0.85m;
     private const decimal BaselineVariableWeight = 0.15m;
+    private const int MetricsMaxSamples = 50;
 
     /// <inheritdoc />
     public async Task<string?> GetCurrentHealthStatusAsync(
@@ -105,5 +106,37 @@ internal sealed class RuntimeIntelligenceModule(
         }
 
         return Math.Round(Math.Clamp(score, 0m, 1m), 2);
+    }
+
+    /// <inheritdoc />
+    public async Task<ServiceRuntimeMetrics?> GetServiceMetricsAsync(
+        string serviceName,
+        string environment,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug(
+            "Aggregating runtime metrics for service '{ServiceName}' in environment '{Environment}'",
+            serviceName,
+            environment);
+
+        var cutoff = DateTimeOffset.UtcNow.AddHours(-24);
+
+        var snapshots = await context.RuntimeSnapshots
+            .AsNoTracking()
+            .Where(s => s.ServiceName == serviceName
+                        && s.Environment == environment
+                        && s.CapturedAt >= cutoff)
+            .OrderByDescending(s => s.CapturedAt)
+            .Take(MetricsMaxSamples)
+            .Select(s => new { s.AvgLatencyMs, s.ErrorRate })
+            .ToListAsync(cancellationToken);
+
+        if (snapshots.Count == 0)
+            return null;
+
+        var avgLatency = (long)Math.Round(snapshots.Average(s => (double)s.AvgLatencyMs));
+        var avgErrorRate = Math.Round(snapshots.Average(s => s.ErrorRate), 4);
+
+        return new ServiceRuntimeMetrics(avgLatency, avgErrorRate, snapshots.Count);
     }
 }

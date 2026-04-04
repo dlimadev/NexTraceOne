@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
   Users, Search, Server, BarChart3, AlertTriangle, ArrowRight, Building2,
@@ -11,8 +12,9 @@ import { ModuleHeader } from '../../../components/ModuleHeader';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
-import type { TeamSummary } from '../../../types';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 const maturityBadgeVariant = (level: string): 'success' | 'info' | 'warning' | 'danger' => {
   switch (level) {
@@ -45,33 +47,14 @@ const statusBadgeVariant = (status: string): 'success' | 'warning' | 'danger' | 
 export function TeamsOverviewPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
-  const [teams, setTeams] = useState<TeamSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.teams(),
+    queryFn: () => organizationGovernanceApi.listTeams(),
+    staleTime: 30_000,
+  });
 
-    organizationGovernanceApi.listTeams()
-      .then((data) => {
-        if (!cancelled) {
-          setTeams(data.teams);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message || t('common.errorLoading'));
-          setLoading(false);
-        }
-      });
-
-    return () => { cancelled = true; };
-  }, [t]);
-
+  const teams = data?.teams ?? [];
   const totalServices = teams.reduce((sum, team) => sum + team.serviceCount, 0);
 
   const filtered = teams.filter(team => {
@@ -82,7 +65,7 @@ export function TeamsOverviewPage() {
       || team.parentOrganizationUnit?.toLowerCase().includes(q);
   });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.teams.title" subtitleKey="organization.teams.subtitle" />
@@ -91,11 +74,11 @@ export function TeamsOverviewPage() {
     );
   }
 
-  if (error) {
+  if (isError || !data) {
     return (
       <PageContainer>
         <ModuleHeader titleKey="organization.teams.title" subtitleKey="organization.teams.subtitle" />
-        <PageErrorState message={error} />
+        <PageErrorState message={t('common.errorLoading')} />
       </PageContainer>
     );
   }
@@ -137,7 +120,12 @@ export function TeamsOverviewPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filtered.length === 0 ? (
-              <div className="col-span-full p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+              <div className="col-span-full">
+                <EmptyState
+                  title={t('organization.teams.empty', 'No teams found')}
+                  description={t('organization.teams.emptyDescription', 'No teams match your search criteria.')}
+                />
+              </div>
             ) : (
               filtered.map(team => (
                 <Card key={team.teamId}>

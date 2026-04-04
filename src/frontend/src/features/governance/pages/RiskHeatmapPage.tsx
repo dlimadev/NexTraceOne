@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Grid3X3, AlertTriangle, ShieldAlert, FileWarning, BookOpen,
-  Loader2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
-import type { RiskHeatmapResponse, RiskLevel } from '../../../types';
+import type { RiskLevel } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 
 type HeatmapDimension = 'category' | 'domain' | 'team';
@@ -43,22 +46,12 @@ const riskBorderClass = (level: RiskLevel): string => {
 export function RiskHeatmapPage() {
   const { t } = useTranslation();
   const [dimension, setDimension] = useState<HeatmapDimension>('category');
-  const [data, setData] = useState<RiskHeatmapResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const dimensions: HeatmapDimension[] = ['category', 'domain', 'team'];
 
-  useEffect(() => {
-    let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronous setState before async fetch is intentional
-    setLoading(true);
-    setError(null);
-    organizationGovernanceApi.getRiskHeatmap(dimension)
-      .then((d) => { if (!cancelled) { setData(d); setLoading(false); } })
-      .catch((err) => { if (!cancelled) { setError(err.message || t('common.errorLoading')); setLoading(false); } });
-    return () => { cancelled = true; };
-  }, [dimension, t]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: queryKeys.governance.executive.heatmap(dimension),
+    queryFn: () => organizationGovernanceApi.getRiskHeatmap(dimension),
+  });
 
   return (
     <PageContainer>
@@ -84,21 +77,16 @@ export function RiskHeatmapPage() {
         ))}
       </div>
 
-      {loading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-accent" />
-        </div>
+      {isLoading && (
+        <PageLoadingState />
       )}
 
-      {!loading && (error || !data) && (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <AlertTriangle size={32} className="text-critical mb-2" />
-          <p className="text-sm text-muted">{error ?? t('common.errorLoading')}</p>
-        </div>
+      {!isLoading && (isError || !data) && (
+        <PageErrorState message={t('common.errorLoading')} />
       )}
 
       {/* Heatmap Grid */}
-      {!loading && data && (
+      {!isLoading && data && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {data.cells.map(cell => (
             <Card key={cell.groupId} className={`${riskBorderClass(cell.riskLevel)} border-l-4`}>

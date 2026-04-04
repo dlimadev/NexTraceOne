@@ -41,7 +41,11 @@ public static class OpenApiSpecParser
                 }
             }
         }
-        catch (JsonException) { /* Spec inválida — retorna dicionário vazio para não bloquear o diff */ }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "OpenApiSpecParser: Failed to parse OpenAPI paths — {0}", ex.Message);
+        }
         return result;
     }
 
@@ -75,7 +79,11 @@ public static class OpenApiSpecParser
                 }
             }
         }
-        catch (JsonException) { /* Ignora erros de parse para retornar dicionário vazio */ }
+        catch (JsonException ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "OpenApiSpecParser: Failed to parse OpenAPI parameters for {0} {1} — {2}", path, method, ex.Message);
+        }
         return result;
     }
 }

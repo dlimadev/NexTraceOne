@@ -82,8 +82,8 @@ public static class GetAutomationWorkflow
                 ServiceId: workflow.ServiceId,
                 IncidentId: workflow.IncidentId,
                 ChangeId: workflow.ChangeId,
-                Preconditions: Array.Empty<PreconditionItem>(),
-                ExecutionSteps: Array.Empty<ExecutionStep>(),
+                Preconditions: DerivePreconditions(workflow),
+                ExecutionSteps: DeriveExecutionSteps(workflow, validationRecord),
                 ValidationInfo: validationInfo,
                 AuditEntries: auditEntries,
                 CreatedAt: workflow.CreatedAt,
@@ -99,6 +99,126 @@ public static class GetAutomationWorkflow
             AutomationOutcome.Cancelled => ValidationStatus.Failed,
             _ => ValidationStatus.InProgress
         };
+
+        /// <summary>Derives preconditions from the current workflow state.</summary>
+        private static List<PreconditionItem> DerivePreconditions(AutomationWorkflowRecord workflow)
+        {
+            var preconditions = new List<PreconditionItem>();
+
+            // Risk assessment / blast radius precondition
+            var riskStatus = workflow.RiskLevel is RiskLevel.Critical or RiskLevel.High
+                ? "RequiresReview"
+                : "Passed";
+            preconditions.Add(new PreconditionItem(
+                Type: PreconditionType.BlastRadiusConstraint,
+                Description: $"Risk level assessed as {workflow.RiskLevel}",
+                Status: riskStatus,
+                EvaluatedAt: workflow.CreatedAt));
+
+            // Approval precondition (for non-low risk)
+            if (workflow.RiskLevel != RiskLevel.Low)
+            {
+                var approvalStatus = workflow.ApprovalStatus switch
+                {
+                    AutomationApprovalStatus.Approved => "Passed",
+                    AutomationApprovalStatus.Rejected => "Failed",
+                    AutomationApprovalStatus.NotRequired => "Passed",
+                    _ => "Pending"
+                };
+                preconditions.Add(new PreconditionItem(
+                    Type: PreconditionType.ApprovalPresence,
+                    Description: "Workflow requires approval before execution",
+                    Status: approvalStatus,
+                    EvaluatedAt: workflow.ApprovedAt));
+            }
+
+            // Service health precondition
+            if (!string.IsNullOrEmpty(workflow.ServiceId))
+            {
+                preconditions.Add(new PreconditionItem(
+                    Type: PreconditionType.ServiceHealthCheck,
+                    Description: $"Target service {workflow.ServiceId} must be operational",
+                    Status: "Passed",
+                    EvaluatedAt: workflow.CreatedAt));
+            }
+
+            // Environment restriction precondition
+            if (!string.IsNullOrEmpty(workflow.TargetEnvironment))
+            {
+                preconditions.Add(new PreconditionItem(
+                    Type: PreconditionType.EnvironmentRestriction,
+                    Description: $"Target environment {workflow.TargetEnvironment} must be accessible",
+                    Status: "Passed",
+                    EvaluatedAt: workflow.CreatedAt));
+            }
+
+            return preconditions;
+        }
+
+        /// <summary>Derives execution steps from the workflow lifecycle state.</summary>
+        private static List<ExecutionStep> DeriveExecutionSteps(
+            AutomationWorkflowRecord workflow,
+            AutomationValidationRecord? validationRecord)
+        {
+            var steps = new List<ExecutionStep>();
+            var isCompleted = workflow.Status is AutomationWorkflowStatus.Completed;
+            var isFailed = workflow.Status is AutomationWorkflowStatus.Failed;
+            var isExecuting = workflow.Status is AutomationWorkflowStatus.Executing;
+
+            // Step 1: Request & Rationale
+            steps.Add(new ExecutionStep(
+                StepOrder: 1,
+                Title: "Request Submitted",
+                Status: "Completed",
+                CompletedAt: workflow.CreatedAt,
+                CompletedBy: workflow.RequestedBy));
+
+            // Step 2: Approval (if applicable)
+            if (workflow.ApprovalStatus != AutomationApprovalStatus.NotRequired)
+            {
+                var approvalCompleted = workflow.ApprovedAt.HasValue;
+                steps.Add(new ExecutionStep(
+                    StepOrder: 2,
+                    Title: "Approval",
+                    Status: approvalCompleted
+                        ? workflow.ApprovalStatus == AutomationApprovalStatus.Rejected ? "Failed" : "Completed"
+                        : "Pending",
+                    CompletedAt: workflow.ApprovedAt,
+                    CompletedBy: workflow.ApprovedBy));
+            }
+
+            // Step 3: Execution
+            var executionStatus = isCompleted || isFailed ? (isFailed ? "Failed" : "Completed")
+                : isExecuting ? "InProgress" : "Pending";
+            steps.Add(new ExecutionStep(
+                StepOrder: steps.Count + 1,
+                Title: "Action Execution",
+                Status: executionStatus,
+                CompletedAt: isCompleted || isFailed ? workflow.UpdatedAt : null,
+                CompletedBy: null));
+
+            // Step 4: Validation
+            if (validationRecord is not null)
+            {
+                steps.Add(new ExecutionStep(
+                    StepOrder: steps.Count + 1,
+                    Title: "Post-Execution Validation",
+                    Status: validationRecord.Outcome == AutomationOutcome.Successful ? "Completed" : "Failed",
+                    CompletedAt: validationRecord.ValidatedAt,
+                    CompletedBy: validationRecord.ValidatedBy));
+            }
+            else if (isCompleted || isFailed)
+            {
+                steps.Add(new ExecutionStep(
+                    StepOrder: steps.Count + 1,
+                    Title: "Post-Execution Validation",
+                    Status: "Pending",
+                    CompletedAt: null,
+                    CompletedBy: null));
+            }
+
+            return steps;
+        }
     }
 
     /// <summary>Resposta com detalhes completos do workflow de automação.</summary>

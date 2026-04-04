@@ -15,7 +15,7 @@ describe('Card', () => {
 
   it('possui estilo de card padrão', () => {
     render(<Card data-testid="card">Texto</Card>);
-    expect(screen.getByTestId('card')).toHaveClass('bg-card', 'rounded-lg');
+    expect(screen.getByTestId('card')).toHaveClass('bg-card', 'rounded-2xl');
   });
 });
 
@@ -44,7 +44,7 @@ describe('CardBody', () => {
 
   it('possui padding padrão', () => {
     render(<CardBody data-testid="body">Conteúdo</CardBody>);
-    expect(screen.getByTestId('body')).toHaveClass('px-6', 'py-5');
+    expect(screen.getByTestId('body')).toHaveClass('px-5', 'py-5');
   });
 
   it('aplica className customizada substituindo padding', () => {

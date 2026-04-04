@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { screen, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test-utils';
 
 vi.mock('../../features/identity-access/api', () => ({
   identityApi: {
@@ -14,19 +13,10 @@ vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'u1' }, tenantId: 't1' }),
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
-
 import { MySessionsPage } from '../../features/identity-access/pages/MySessionsPage';
 
 function renderPage() {
-  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(
-    <QueryClientProvider client={qc}>
-      <MemoryRouter><MySessionsPage /></MemoryRouter>
-    </QueryClientProvider>
-  );
+  return renderWithProviders(<MySessionsPage />);
 }
 
 describe('MySessionsPage', () => {
@@ -34,13 +24,13 @@ describe('MySessionsPage', () => {
 
   it('renders page heading', () => {
     renderPage();
-    expect(screen.getByText('sessions.title')).toBeInTheDocument();
+    expect(screen.getAllByText('Active Sessions').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows empty state when no sessions', async () => {
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('sessions.empty')).toBeInTheDocument();
+      expect(screen.getByText(/no active sessions/i)).toBeInTheDocument();
     });
   });
 });

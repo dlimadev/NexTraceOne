@@ -71,6 +71,7 @@ public static class BackgroundServiceSpecParser
         }
         catch
         {
+            System.Diagnostics.Trace.TraceWarning("BackgroundServiceSpecParser: Failed to parse spec content — returning empty spec.");
             return EmptySpec();
         }
     }

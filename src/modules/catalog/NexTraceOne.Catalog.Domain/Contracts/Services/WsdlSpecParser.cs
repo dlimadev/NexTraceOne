@@ -64,7 +64,11 @@ public static class WsdlSpecParser
                 result[portTypeName] = operations;
             }
         }
-        catch (Exception) { /* XML inválido — retorna dicionário vazio para não bloquear o diff */ }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "WsdlSpecParser: Failed to extract WSDL operations — {0}: {1}", ex.GetType().Name, ex.Message);
+        }
         return result;
     }
 
@@ -119,7 +123,12 @@ public static class WsdlSpecParser
                 break;
             }
         }
-        catch (Exception) { /* XML inválido — retorna dicionário vazio para não bloquear o diff */ }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Trace.TraceWarning(
+                "WsdlSpecParser: Failed to extract WSDL message parts for operation '{0}' — {1}: {2}",
+                operationName, ex.GetType().Name, ex.Message);
+        }
         return result;
     }
 

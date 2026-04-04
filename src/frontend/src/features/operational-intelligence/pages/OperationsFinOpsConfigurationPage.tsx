@@ -137,8 +137,6 @@ export function OperationsFinOpsConfigurationPage() {
 
   const {
     data: effective,
-    isLoading: effectiveLoading,
-    refetch: refetchEffective,
   } = useEffectiveSettings(scope, scopeReferenceId || undefined);
 
   const setValueMutation = useSetConfigurationValue();

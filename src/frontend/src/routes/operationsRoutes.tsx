@@ -10,6 +10,7 @@ const IncidentsPage = lazy(() => import('../features/operations/pages/IncidentsP
 const IncidentDetailPage = lazy(() => import('../features/operations/pages/IncidentDetailPage').then(m => ({ default: m.IncidentDetailPage })));
 const IncidentTimelinePage = lazy(() => import('../features/operations/pages/IncidentTimelinePage').then(m => ({ default: m.IncidentTimelinePage })));
 const RunbooksPage = lazy(() => import('../features/operations/pages/RunbooksPage').then(m => ({ default: m.RunbooksPage })));
+const RunbookBuilderPage = lazy(() => import('../features/operations/pages/RunbookBuilderPage').then(m => ({ default: m.RunbookBuilderPage })));
 const TeamReliabilityPage = lazy(() => import('../features/operations/pages/TeamReliabilityPage').then(m => ({ default: m.TeamReliabilityPage })));
 const ServiceReliabilityDetailPage = lazy(() => import('../features/operations/pages/ServiceReliabilityDetailPage').then(m => ({ default: m.ServiceReliabilityDetailPage })));
 const ReliabilitySloManagementPage = lazy(() => import('../features/operations/pages/ReliabilitySloManagementPage').then(m => ({ default: m.ReliabilitySloManagementPage })));
@@ -51,6 +52,22 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
             <RunbooksPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/runbooks/create"
+        element={
+          <ProtectedRoute permission="operations:runbooks:write" redirectTo="/unauthorized">
+            <RunbookBuilderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/runbooks/:runbookId/edit"
+        element={
+          <ProtectedRoute permission="operations:runbooks:write" redirectTo="/unauthorized">
+            <RunbookBuilderPage />
           </ProtectedRoute>
         }
       />

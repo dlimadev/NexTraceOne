@@ -1,4 +1,6 @@
 
+using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -20,6 +22,17 @@ public static class RemoveOverride
         ConfigurationScope Scope,
         string? ScopeReferenceId,
         string? ChangeReason) : ICommand<bool>;
+
+    /// <summary>Validates the command parameters.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Key).NotEmpty().MaximumLength(256);
+            RuleFor(x => x.ScopeReferenceId).MaximumLength(256);
+            RuleFor(x => x.ChangeReason).MaximumLength(500);
+        }
+    }
 
     /// <summary>Handler that finds and removes the entry, then audits and invalidates cache.</summary>
     public sealed class Handler(

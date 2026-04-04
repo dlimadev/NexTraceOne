@@ -6,7 +6,6 @@ import {
   FileWarning,
   Package,
   BarChart3,
-  AlertTriangle,
   ClipboardCheck,
   ChevronDown,
   ChevronUp,
@@ -126,8 +125,6 @@ export function GovernanceConfigurationPage() {
 
   const {
     data: effective,
-    isLoading: effectiveLoading,
-    refetch: refetchEffective,
   } = useEffectiveSettings(scope, scopeReferenceId || undefined);
 
   const setValueMutation = useSetConfigurationValue();

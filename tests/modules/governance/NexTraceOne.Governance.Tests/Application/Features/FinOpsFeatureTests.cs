@@ -6,6 +6,7 @@ using NexTraceOne.Governance.Application.Features.GetServiceFinOps;
 using NexTraceOne.Governance.Application.Features.GetTeamFinOps;
 using NexTraceOne.Governance.Application.Features.GetWasteSignals;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
 using NSubstitute;
 using System.Linq;
 
@@ -51,6 +52,18 @@ public sealed class FinOpsFeatureTests
                     .Where(r => (r.Domain ?? string.Empty).Equals(domain, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             });
+        return mock;
+    }
+
+    private static IReliabilityModule CreateReliabilityMock()
+    {
+        var mock = Substitute.For<IReliabilityModule>();
+        mock.GetRemainingErrorBudgetAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(0.85m);
+        mock.GetCurrentBurnRateAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(0.7m);
+        mock.GetCurrentReliabilityStatusAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns("Healthy");
         return mock;
     }
 
@@ -133,7 +146,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetServiceFinOps_ShouldReturnServiceProfile()
     {
         // Arrange
-        var handler = new GetServiceFinOps.Handler(CreateMock());
+        var handler = new GetServiceFinOps.Handler(CreateMock(), CreateReliabilityMock());
         var query = new GetServiceFinOps.Query("svc-payment-api");
 
         // Act
@@ -144,7 +157,7 @@ public sealed class FinOpsFeatureTests
         result.Value.ServiceId.Should().Be("svc-payment-api");
         result.Value.MonthlyCost.Should().BeGreaterThan(0);
         result.Value.IsSimulated.Should().BeFalse();
-        result.Value.DataSource.Should().Be("cost-intelligence");
+        result.Value.DataSource.Should().Be("cost-intelligence+reliability");
         result.Value.TotalWaste.Should().BeGreaterThan(0);
         result.Value.Optimizations.Should().NotBeEmpty();
     }
@@ -157,10 +170,8 @@ public sealed class FinOpsFeatureTests
         mock.GetServiceCostAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((CostRecordSummary?)null);
 
-        var handler = new GetServiceFinOps.Handler(mock);
+        var handler = new GetServiceFinOps.Handler(mock, CreateReliabilityMock());
         var query = new GetServiceFinOps.Query("svc-nonexistent");
-
-        // Act
         var result = await handler.Handle(query, CancellationToken.None);
 
         // Assert

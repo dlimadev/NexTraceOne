@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -22,6 +23,24 @@ public static class CreateDelegatedAdministration
         string? DomainId,
         string Reason,
         DateTimeOffset? ExpiresAt) : ICommand<Response>;
+
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.GranteeUserId).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.GranteeDisplayName).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.Scope).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.TeamId).MaximumLength(50)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.DomainId).MaximumLength(50)
+                .When(x => x.DomainId is not null);
+            RuleFor(x => x.Reason).NotEmpty().MaximumLength(2000);
+            RuleFor(x => x.ExpiresAt).GreaterThan(DateTimeOffset.UtcNow)
+                .When(x => x.ExpiresAt is not null)
+                .WithMessage("ExpiresAt must be a future date when provided.");
+        }
+    }
 
     /// <summary>Handler que cria a delegação e retorna o ID gerado.</summary>
     public sealed class Handler(

@@ -76,6 +76,33 @@ public sealed class RunbookRecord : AuditableEntity<RunbookRecordId>
             LastReviewedAt = lastReviewedAt,
         };
     }
+
+    /// <summary>Atualiza os campos editáveis do runbook.</summary>
+    public void Update(
+        string title,
+        string description,
+        string? linkedService,
+        string? linkedIncidentType,
+        string? stepsJson,
+        string? prerequisitesJson,
+        string? postNotes,
+        string maintainedBy,
+        DateTimeOffset reviewedAt)
+    {
+        Guard.Against.NullOrWhiteSpace(title);
+        Guard.Against.NullOrWhiteSpace(description);
+        Guard.Against.NullOrWhiteSpace(maintainedBy);
+
+        Title = title;
+        Description = description;
+        LinkedService = linkedService;
+        LinkedIncidentType = linkedIncidentType;
+        StepsJson = stepsJson;
+        PrerequisitesJson = prerequisitesJson;
+        PostNotes = postNotes;
+        MaintainedBy = maintainedBy;
+        LastReviewedAt = reviewedAt;
+    }
 }
 
 /// <summary>Identificador fortemente tipado de RunbookRecord.</summary>
