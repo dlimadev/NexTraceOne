@@ -39,14 +39,15 @@
 ## Os Quatro Fluxos Centrais de Valor
 
 ### Fluxo 1 — Source of Truth / Contract Governance
-**Estado: 75% funcional**
+**Estado: 98% funcional**
 
 - ✅ Catalogação de serviços, contratos REST/SOAP/Kafka/background services: real
 - ✅ Versionamento, diff semântico, compatibilidade: real
 - ✅ Ownership via Graph: real
 - ✅ Contract Studio: backend real, 10/10 contract types com visual builders
-- ⚠️ Busca: GlobalSearch existe; SearchCatalog é stub intencional
-- ⚠️ Documentação operacional: parcial (Knowledge Hub sem migrations)
+- ✅ Developer Portal: todos os 7 handlers (SearchCatalog, RenderOpenApiContract, GetApiHealth, GetMyApis, GetApisIConsume, GetApiDetail, GetAssetTimeline) consultam dados reais via CatalogGraphDbContext + ContractsDbContext + DeveloperPortalDbContext
+- ✅ IContractsModule: implementado por ContractsModuleService
+- ⚠️ Alguns campos null nos resultados do portal (Description, LastDeployment, AverageLatencyMs/ErrorRate — requerem IRuntimeIntelligenceModule)
 
 **Evidência:** `src/modules/catalog/`, `docs/audit-forensic-2026-03/backend-state-report.md §Catalog`
 
