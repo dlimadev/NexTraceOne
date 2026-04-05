@@ -60,4 +60,13 @@ public static class CostIntelligenceErrors
     /// <summary>Registo de custo não encontrado pelo identificador informado.</summary>
     public static Error RecordNotFound(string recordId)
         => Error.NotFound("CostIntelligence.CostRecord.NotFound", "Cost record '{0}' was not found.", recordId);
+
+    public static Error InvalidConfidencePercent()
+        => Error.Validation("INVALID_CONFIDENCE_PERCENT", "Confidence percent must be between 0 and 100.");
+
+    public static Error ForecastNotFound(string serviceId)
+        => Error.NotFound("FORECAST_NOT_FOUND", $"No budget forecast found for service '{serviceId}'.");
+
+    public static Error InvalidRecommendationText()
+        => Error.Validation("INVALID_RECOMMENDATION_TEXT", "Recommendation text must not be empty and must not exceed 2000 characters.");
 }

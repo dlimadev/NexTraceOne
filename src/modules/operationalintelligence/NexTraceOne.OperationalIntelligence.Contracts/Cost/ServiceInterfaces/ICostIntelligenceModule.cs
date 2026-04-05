@@ -42,6 +42,17 @@ public interface ICostIntelligenceModule
     /// Lista registos de custo de um domínio específico, opcionalmente filtrados por período.
     /// </summary>
     Task<IReadOnlyList<CostRecordSummary>> GetCostsByDomainAsync(string domain, string? period = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém a previsão de orçamento mais recente para um serviço e ambiente.
+    /// Retorna null se nenhuma previsão foi calculada.
+    /// </summary>
+    Task<BudgetForecastSummary?> GetLatestBudgetForecastAsync(string serviceId, string environment, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lista recomendações de eficiência não reconhecidas para consumo por outros módulos.
+    /// </summary>
+    Task<IReadOnlyList<EfficiencyRecommendationSummary>> GetUnacknowledgedRecommendationsAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -58,3 +69,21 @@ public sealed record CostRecordSummary(
     string Currency,
     string Period,
     string Source);
+
+public sealed record BudgetForecastSummary(
+    Guid ForecastId,
+    string ServiceId,
+    string ForecastPeriod,
+    decimal ProjectedCost,
+    decimal? BudgetLimit,
+    bool IsOverBudgetProjected,
+    string Method,
+    DateTimeOffset ComputedAt);
+
+public sealed record EfficiencyRecommendationSummary(
+    Guid Id,
+    string ServiceId,
+    string ServiceName,
+    decimal DeviationPercent,
+    string RecommendationText,
+    string Priority);

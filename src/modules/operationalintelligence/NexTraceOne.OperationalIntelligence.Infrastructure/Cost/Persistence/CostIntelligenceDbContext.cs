@@ -37,6 +37,12 @@ public sealed class CostIntelligenceDbContext(
     /// <summary>Registos individuais de custo importados com atribuição a serviço/equipa/domínio.</summary>
     public DbSet<CostRecord> CostRecords => Set<CostRecord>();
 
+    /// <summary>Previsões de orçamento calculadas para serviços por período.</summary>
+    public DbSet<BudgetForecast> BudgetForecasts => Set<BudgetForecast>();
+
+    /// <summary>Recomendações de eficiência de custo geradas por análise comparativa.</summary>
+    public DbSet<EfficiencyRecommendation> EfficiencyRecommendations => Set<EfficiencyRecommendation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CostIntelligenceDbContext).Assembly;
