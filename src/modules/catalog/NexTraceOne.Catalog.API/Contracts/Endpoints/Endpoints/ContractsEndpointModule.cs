@@ -35,6 +35,11 @@ using EvaluateContractRulesFeature = NexTraceOne.Catalog.Application.Contracts.F
 using GetCompatibilityAssessmentFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment.GetCompatibilityAssessment;
 using RegisterContractDeploymentFeature = NexTraceOne.Catalog.Application.Contracts.Features.RegisterContractDeployment.RegisterContractDeployment;
 using GetContractDeploymentsFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractDeployments.GetContractDeployments;
+using SearchCanonicalEntitiesFeature = NexTraceOne.Catalog.Application.Contracts.Features.SearchCanonicalEntities.SearchCanonicalEntities;
+using ListCanonicalEntityVersionsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListCanonicalEntityVersions.ListCanonicalEntityVersions;
+using DiffCanonicalEntityVersionsFeature = NexTraceOne.Catalog.Application.Contracts.Features.DiffCanonicalEntityVersions.DiffCanonicalEntityVersions;
+using GetCanonicalEntityUsagesFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityUsages.GetCanonicalEntityUsages;
+using GetCanonicalEntityImpactFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpact.GetCanonicalEntityImpact;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -384,5 +389,70 @@ public sealed class ContractsEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:import");
+
+        // ── Canonical Entities ───────────────────────────────────────────
+
+        var canonicalGroup = app.MapGroup("/api/v1/catalog/canonical-entities");
+
+        canonicalGroup.MapGet("/search", async (
+            string? searchTerm,
+            string? domain,
+            string? category,
+            int? page,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new SearchCanonicalEntitiesFeature.Query(
+                searchTerm, domain, category, page ?? 1, pageSize ?? 20), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        canonicalGroup.MapGet("/{entityId:guid}/versions", async (
+            Guid entityId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListCanonicalEntityVersionsFeature.Query(entityId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        canonicalGroup.MapGet("/{entityId:guid}/versions/diff", async (
+            Guid entityId,
+            string fromVersion,
+            string toVersion,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new DiffCanonicalEntityVersionsFeature.Query(entityId, fromVersion, toVersion), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        canonicalGroup.MapGet("/{entityId:guid}/usages", async (
+            Guid entityId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetCanonicalEntityUsagesFeature.Query(entityId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        canonicalGroup.MapGet("/{entityId:guid}/impact", async (
+            Guid entityId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetCanonicalEntityImpactFeature.Query(entityId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
     }
 }

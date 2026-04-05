@@ -1948,6 +1948,7 @@
         "enumValues": "Enum Values",
         "example": "Example",
         "format": "Format",
+        "generateExample": "Generate Example",
         "generateSource": "Generate Source",
         "idempotencyKey": "Idempotency Key",
         "idempotencyPlaceholder": "X-Idempotency-Key",

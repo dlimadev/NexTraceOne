@@ -47,6 +47,9 @@ public sealed class ContractsDbContext(
     /// <summary>Entidades canónicas reutilizáveis (schemas/modelos padrão).</summary>
     public DbSet<CanonicalEntity> CanonicalEntities => Set<CanonicalEntity>();
 
+    /// <summary>Versões imutáveis de entidades canónicas para histórico e diff.</summary>
+    public DbSet<CanonicalEntityVersion> CanonicalEntityVersions => Set<CanonicalEntityVersion>();
+
     /// <summary>Scorecards de avaliação técnica de versões de contrato.</summary>
     public DbSet<ContractScorecard> ContractScorecards => Set<ContractScorecard>();
 

@@ -12,7 +12,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, Copy,
+  Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, Copy, Sparkles,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
@@ -21,6 +21,7 @@ import {
 import { SchemaPropertyEditor } from './shared/SchemaPropertyEditor';
 import { validateRestBuilder } from './shared/builderValidation';
 import { restBuilderToYaml } from './shared/builderSync';
+import { generateExampleFromSchema, formatExample } from './shared/ExampleGenerator';
 import type {
   RestBuilderState,
   RestEndpoint,
@@ -66,7 +67,7 @@ function createEndpoint(): RestEndpoint {
     deprecationNote: '',
     parameters: [],
     requestBody: null,
-    responses: [{ id: genId('res'), statusCode: '200', description: 'OK', contentType: 'application/json', schema: '', example: '' }],
+    responses: [{ id: genId('res'), statusCode: '200', description: 'OK', contentType: 'application/json', schema: '', example: '', properties: [] }],
     authScopes: [],
     rateLimit: '',
     idempotencyKey: '',
@@ -517,6 +518,16 @@ export function VisualRestBuilder({
                               <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={ep.requestBody.example}
                                 onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: v } })}
                                 rows={3} mono disabled={isReadOnly} />
+                              {!isReadOnly && ep.requestBody.properties && ep.requestBody.properties.length > 0 && (
+                                <button type="button" onClick={() => {
+                                  const example = generateExampleFromSchema(ep.requestBody!.properties!);
+                                  updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: formatExample(example) } });
+                                }}
+                                  className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                  <Sparkles size={9} />
+                                  {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                                </button>
+                              )}
                               {!isReadOnly && (
                                 <button type="button" onClick={() => updateEndpoint(ep.id, { requestBody: null })}
                                   className="text-[10px] text-danger hover:text-danger/80 transition-colors">
@@ -613,6 +624,17 @@ export function VisualRestBuilder({
                             <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={res.example}
                               onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, example: v }; updateEndpoint(ep.id, { responses: next }); }}
                               rows={2} mono disabled={isReadOnly} />
+                            {!isReadOnly && res.properties && res.properties.length > 0 && (
+                              <button type="button" onClick={() => {
+                                const example = generateExampleFromSchema(res.properties!);
+                                const next = [...ep.responses]; next[ri] = { ...res, example: formatExample(example) };
+                                updateEndpoint(ep.id, { responses: next });
+                              }}
+                                className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                <Sparkles size={9} />
+                                {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                              </button>
+                            )}
                             {!isReadOnly && (
                               <button type="button" onClick={() => updateEndpoint(ep.id, { responses: ep.responses.filter((_, j) => j !== ri) })}
                                 className="text-[10px] text-danger hover:text-danger/80 transition-colors">

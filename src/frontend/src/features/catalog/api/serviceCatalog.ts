@@ -73,8 +73,22 @@ export const serviceCatalogApi = {
       .then((r) => r.data),
 
   /** Registra um novo serviço no catálogo. */
-  registerService: (data: { name: string; team: string; description?: string }) =>
-    client.post<{ id: string }>('/catalog/services', data).then((r) => r.data),
+  registerService: (data: {
+    name: string;
+    domain: string;
+    team: string;
+    description?: string;
+    serviceType?: string;
+    criticality?: string;
+    exposureType?: string;
+    technicalOwner?: string;
+    businessOwner?: string;
+    documentationUrl?: string;
+    repositoryUrl?: string;
+  }) => {
+    const { team, ...rest } = data;
+    return client.post<{ id: string }>('/catalog/services', { ...rest, teamName: team }).then((r) => r.data);
+  },
 
   /** Registra um novo ativo de API. */
   registerApi: (data: {

@@ -39,5 +39,8 @@ public enum ContractType
     CicsCommarea = 8,
 
     /// <summary>Contrato de Webhook — notificações HTTP push para subscribers externos.</summary>
-    Webhook = 9
+    Webhook = 9,
+
+    /// <summary>Contrato gRPC / Protocol Buffers.</summary>
+    Grpc = 10
 }

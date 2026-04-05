@@ -48,6 +48,8 @@ public static class DependencyInjection
         services.AddScoped<IBackgroundServiceContractDetailRepository, BackgroundServiceContractDetailRepository>();
         services.AddScoped<IBackgroundServiceDraftMetadataRepository, BackgroundServiceDraftMetadataRepository>();
         services.AddScoped<IContractDeploymentRepository, ContractDeploymentRepository>();
+        services.AddScoped<ICanonicalEntityRepository, CanonicalEntityRepository>();
+        services.AddScoped<ICanonicalEntityVersionRepository, CanonicalEntityVersionRepository>();
 
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();

@@ -60,6 +60,9 @@ public sealed class CatalogGraphDbContext(
     /// <summary>Regras de matching automático para discovery.</summary>
     public DbSet<DiscoveryMatchRule> DiscoveryMatchRules => Set<DiscoveryMatchRule>();
 
+    /// <summary>Detalhes de framework/SDK associados a serviços do catálogo.</summary>
+    public DbSet<FrameworkAssetDetail> FrameworkAssetDetails => Set<FrameworkAssetDetail>();
+
     /// <summary>Scores de experiência do desenvolvedor por equipa e período.</summary>
     public DbSet<DxScore> DxScores => Set<DxScore>();
 

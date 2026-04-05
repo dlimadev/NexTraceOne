@@ -44,6 +44,10 @@ using GetServiceMaturityDashboardFeature = NexTraceOne.Catalog.Application.Graph
 using DetectCircularDependenciesFeature = NexTraceOne.Catalog.Application.Graph.Features.DetectCircularDependencies.DetectCircularDependencies;
 using PropagateHealthStatusFeature = NexTraceOne.Catalog.Application.Graph.Features.PropagateHealthStatus.PropagateHealthStatus;
 using GetOwnershipAuditFeature = NexTraceOne.Catalog.Application.Graph.Features.GetOwnershipAudit.GetOwnershipAudit;
+using RegisterFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterFrameworkDetail.RegisterFrameworkDetail;
+using UpdateFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateFrameworkDetail.UpdateFrameworkDetail;
+using GetFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.GetFrameworkDetail.GetFrameworkDetail;
+using PublishFrameworkVersionFeature = NexTraceOne.Catalog.Application.Graph.Features.PublishFrameworkVersion.PublishFrameworkVersion;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
@@ -521,5 +525,53 @@ public sealed class ServiceCatalogEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");
+
+        // ── Framework / SDK Details ──────────────────────────────────────
+
+        group.MapPost("/services/{serviceId:guid}/framework", async (
+            Guid serviceId,
+            RegisterFrameworkDetailFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceAssetId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToCreatedResult("/api/v1/catalog/services/{0}/framework", localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapPut("/services/{serviceId:guid}/framework", async (
+            Guid serviceId,
+            UpdateFrameworkDetailFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceAssetId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapGet("/services/{serviceId:guid}/framework", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetFrameworkDetailFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapPost("/services/{serviceId:guid}/framework/versions", async (
+            Guid serviceId,
+            PublishFrameworkVersionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceAssetId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
     }
 }
