@@ -10,6 +10,11 @@ namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence.Co
 
 internal sealed class PackageDependencyConfiguration : IEntityTypeConfiguration<PackageDependency>
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public void Configure(EntityTypeBuilder<PackageDependency> builder)
     {
         builder.ToTable("dep_package_dependencies");
@@ -28,8 +33,8 @@ internal sealed class PackageDependencyConfiguration : IEntityTypeConfiguration<
 
         builder.Property(d => d.Vulnerabilities)
             .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                json => (IReadOnlyList<PackageVulnerability>)(JsonSerializer.Deserialize<List<PackageVulnerability>>(json, (JsonSerializerOptions)null!) ?? new()))
+                v => JsonSerializer.Serialize(v, SerializerOptions),
+                json => (IReadOnlyList<PackageVulnerability>)(JsonSerializer.Deserialize<List<PackageVulnerability>>(json, SerializerOptions) ?? new()))
             .HasColumnType("text");
 
         builder.HasIndex(d => d.ProfileId).HasDatabaseName("IX_dep_dependencies_profile");

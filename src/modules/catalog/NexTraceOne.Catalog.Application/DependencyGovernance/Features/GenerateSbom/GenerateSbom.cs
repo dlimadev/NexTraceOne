@@ -15,6 +15,7 @@ namespace NexTraceOne.Catalog.Application.DependencyGovernance.Features.Generate
 /// </summary>
 public static class GenerateSbom
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = false };
     public sealed record Command(Guid ServiceId, SbomFormat Format = SbomFormat.CycloneDx) : ICommand<Response>;
 
     public sealed class Validator : AbstractValidator<Command>
@@ -66,7 +67,7 @@ public static class GenerateSbom
                 specVersion = "1.4",
                 serialNumber = $"urn:uuid:{Guid.NewGuid()}",
                 components
-            }, new JsonSerializerOptions { WriteIndented = false });
+            }, SerializerOptions);
         }
 
         private static string GenerateSpdx(
@@ -85,7 +86,7 @@ public static class GenerateSbom
                 spdxVersion = "SPDX-2.3",
                 documentNamespace = $"https://nextraceone/{serviceId}/{Guid.NewGuid()}",
                 packages
-            }, new JsonSerializerOptions { WriteIndented = false });
+            }, SerializerOptions);
         }
     }
 
