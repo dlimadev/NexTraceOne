@@ -16,6 +16,7 @@ using ValidateKnowledgeCaptureFeature = NexTraceOne.AIKnowledge.Application.Orch
 using GenerateTestScenariosFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateTestScenarios.GenerateTestScenarios;
 using GenerateRobotFrameworkDraftFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateRobotFrameworkDraft.GenerateRobotFrameworkDraft;
 using SummarizeReleaseForApprovalFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.SummarizeReleaseForApproval.SummarizeReleaseForApproval;
+using GenerateAiScaffoldFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateAiScaffold.GenerateAiScaffold;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -187,6 +188,31 @@ public sealed class AiOrchestrationEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:runtime:write");
 
+        // ── POST /api/v1/aiorchestration/generate/scaffold — AI Scaffold Generation ──
+        group.MapPost("/scaffold", async (
+            AiScaffoldRequest request,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new GenerateAiScaffoldFeature.Command(
+                TemplateId: request.TemplateId,
+                TemplateSlug: request.TemplateSlug,
+                ServiceName: request.ServiceName,
+                ServiceDescription: request.ServiceDescription,
+                TeamName: request.TeamName,
+                Domain: request.Domain,
+                LanguageOverride: request.LanguageOverride,
+                MainEntities: request.MainEntities,
+                AdditionalRequirements: request.AdditionalRequirements,
+                PreferredProvider: request.PreferredProvider);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:runtime:write")
+        .WithName("GenerateAiScaffold")
+        .WithSummary("Generate a complete AI-assisted service scaffold from a governed template");
+
         group.MapPost("/releases/{releaseId:guid}/approval-summary", async (
             Guid releaseId,
             SummarizeReleaseForApprovalRequest req,
@@ -206,6 +232,18 @@ public sealed class AiOrchestrationEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:runtime:write");
     }
+
+    private sealed record AiScaffoldRequest(
+        Guid? TemplateId,
+        string? TemplateSlug,
+        string ServiceName,
+        string ServiceDescription,
+        string? TeamName,
+        string? Domain,
+        string? LanguageOverride,
+        string? MainEntities,
+        string? AdditionalRequirements,
+        string? PreferredProvider);
 
     private sealed record SummarizeReleaseForApprovalRequest(
         string ReleaseName,

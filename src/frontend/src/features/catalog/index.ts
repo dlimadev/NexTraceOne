@@ -19,3 +19,8 @@ export { developerPortalApi } from './api/developerPortal';
 export { sourceOfTruthApi } from './api/sourceOfTruth';
 export { contractStudioApi } from './api/contractStudio';
 export { globalSearchApi } from './api/globalSearch';
+export { TemplateLibraryPage } from './pages/TemplateLibraryPage';
+export { TemplateDetailPage } from './pages/TemplateDetailPage';
+export { TemplateEditorPage } from './pages/TemplateEditorPage';
+export { AiScaffoldWizardPage } from './pages/AiScaffoldWizardPage';
+export { templatesApi } from './api/templates';

@@ -6280,5 +6280,159 @@
     },
     "subtitle": "Configure flujos de aprobación, SLAs, gates, rutas de promoción, ventanas de release y políticas de congelamiento",
     "title": "Workflows y Gobernanza de Promoción"
+  },
+  "templates": {
+    "library": {
+      "title": "Biblioteca de Plantillas",
+      "subtitle": "Plantillas de proyecto gobernadas para scaffolding de desarrollador con asistencia de IA",
+      "createTemplate": "Nueva Plantilla",
+      "searchPlaceholder": "Buscar plantillas...",
+      "hasContract": "Contrato base",
+      "hasManifest": "Manifiesto",
+      "viewDetails": "Ver Detalles",
+      "scaffold": "Scaffolding con IA",
+      "empty": "No se encontraron plantillas. Crea la primera para acelerar tu equipo.",
+      "createFirst": "Crear Primera Plantilla",
+      "stats": {
+        "total": "Total de plantillas",
+        "active": "Activas",
+        "dotnet": "Plantillas .NET",
+        "withContract": "Con contrato"
+      },
+      "filters": {
+        "allTypes": "Todos los tipos",
+        "allLanguages": "Todos los lenguajes",
+        "showInactive": "Mostrar inactivas"
+      }
+    },
+    "detail": {
+      "notFound": "Plantilla no encontrada.",
+      "backToLibrary": "Biblioteca de Plantillas",
+      "edit": "Editar",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "scaffoldWithAi": "Scaffolding con IA",
+      "active": "Activa",
+      "inactive": "Inactiva",
+      "ownership": "Ownership",
+      "defaultDomain": "Dominio predeterminado",
+      "defaultTeam": "Equipo predeterminado",
+      "repository": "Repositorio",
+      "repoUrl": "URL del repositorio",
+      "repoBranch": "Rama",
+      "tags": "Etiquetas",
+      "baseContract": "Contrato Base",
+      "scaffoldingManifest": "Manifiesto de Scaffolding",
+      "stats": "Uso & Cobertura",
+      "timesUsed": "veces utilizado",
+      "hasContract": "Contrato base incluido",
+      "noContract": "Sin contrato base",
+      "hasManifest": "Manifiesto de scaffolding definido",
+      "noManifest": "Sin manifiesto — la IA genera la estructura",
+      "audit": "Auditoría",
+      "createdAt": "Creado",
+      "updatedAt": "Última actualización",
+      "governancePolicies": "Políticas de Gobernanza"
+    },
+    "editor": {
+      "createTitle": "Nueva Plantilla de Servicio",
+      "editTitle": "Editar Plantilla",
+      "saveError": "Error al guardar la plantilla. Verifica los campos.",
+      "sections": {
+        "identity": "Identidad",
+        "classification": "Clasificación",
+        "ownership": "Ownership & Etiquetas",
+        "advanced": "Avanzado — Contrato & Scaffolding"
+      },
+      "fields": {
+        "slug": "Slug",
+        "displayName": "Nombre de Visualización",
+        "version": "Versión",
+        "description": "Descripción",
+        "serviceType": "Tipo de Servicio",
+        "language": "Lenguaje / Stack",
+        "defaultDomain": "Dominio Predeterminado",
+        "defaultTeam": "Equipo Predeterminado",
+        "tags": "Etiquetas",
+        "repoUrl": "URL del Repositorio Plantilla",
+        "repoBranch": "Rama",
+        "baseContractSpec": "Contrato Base",
+        "scaffoldingManifest": "Manifiesto de Scaffolding (JSON)"
+      },
+      "placeholders": {
+        "displayName": "Payment REST API — DDD .NET",
+        "description": "Plantilla para APIs REST siguiendo DDD con Clean Architecture...",
+        "domain": "pagos",
+        "team": "plataforma"
+      },
+      "hints": {
+        "slug": "Identificador único en kebab-case. No se puede cambiar tras la creación.",
+        "tags": "Etiquetas separadas por coma.",
+        "typeLanguageImmutable": "El tipo de servicio y lenguaje no se pueden cambiar tras la creación.",
+        "repoUrl": "Repositorio Git opcional.",
+        "baseContractSpec": "Contrato OpenAPI, AsyncAPI o WSDL incluido en cada servicio generado.",
+        "scaffoldingManifest": "Array JSON de objetos { path, content }. Usa {{ServiceName}}, {{Domain}}, {{TeamName}} como variables."
+      }
+    },
+    "scaffold": {
+      "title": "Generador de Scaffolding con IA",
+      "backToTemplate": "Volver a la Plantilla",
+      "next": "Siguiente",
+      "generate": "Generar con IA",
+      "retry": "Reintentar",
+      "generateError": "Error en la generación de IA",
+      "generateErrorGeneric": "Ocurrió un error inesperado.",
+      "steps": {
+        "template": "Plantilla",
+        "intent": "Intención",
+        "generate": "Generando",
+        "review": "Revisión"
+      },
+      "info": {
+        "baseContract": "Contrato Base",
+        "scaffoldManifest": "Manifiesto",
+        "defaultDomain": "Dominio",
+        "included": "Incluido",
+        "notIncluded": "No incluido",
+        "aiGeneratesStructure": "La IA genera la estructura"
+      },
+      "fields": {
+        "serviceName": "Nombre del Servicio",
+        "serviceDescription": "Descripción del Servicio",
+        "mainEntities": "Entidades / Rutas Principales",
+        "languageOverride": "Cambiar Lenguaje",
+        "teamName": "Equipo",
+        "domain": "Dominio",
+        "additionalRequirements": "Requisitos Adicionales"
+      },
+      "placeholders": {
+        "serviceDescription": "Describe qué hace este servicio.",
+        "additionalRequirements": "Ej: Usar patrón Result<T>, logging estructurado..."
+      },
+      "hints": {
+        "serviceName": "Kebab-case en minúsculas.",
+        "descriptionTip": "Cuanto más contexto proporciones, mejor será la generación de IA."
+      },
+      "options": {
+        "useTemplateDefault": "Usar predeterminado de la plantilla"
+      },
+      "generating": {
+        "title": "La IA está generando el scaffolding de tu proyecto...",
+        "subtitle": "Puede tardar 20-60 segundos.",
+        "step1": "Resolviendo plantilla y contexto de gobernanza",
+        "step2": "Analizando descripción y entidades",
+        "step3": "Generando estructura y código",
+        "step4": "Construyendo tests, DTOs y configuración"
+      },
+      "review": {
+        "files": "archivos generados",
+        "fallbackTitle": "Proveedor de IA no disponible — scaffolding mínimo generado",
+        "fallbackHint": "Configura un proveedor de IA en AI Hub para generación completa.",
+        "successTitle": "{{count}} archivos generados correctamente",
+        "successHint": "Servicio \"{{service}}\" generado con {{language}}.",
+        "regenerate": "Regenerar",
+        "downloadZip": "Descargar ZIP"
+      }
+    }
   }
 }
