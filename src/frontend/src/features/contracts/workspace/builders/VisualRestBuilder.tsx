@@ -66,7 +66,7 @@ function createEndpoint(): RestEndpoint {
     deprecationNote: '',
     parameters: [],
     requestBody: null,
-    responses: [{ id: genId('res'), statusCode: '200', description: 'OK', contentType: 'application/json', schema: '', example: '' }],
+    responses: [{ id: genId('res'), statusCode: '200', description: 'OK', contentType: 'application/json', schema: '', example: '', properties: [] }],
     authScopes: [],
     rateLimit: '',
     idempotencyKey: '',
