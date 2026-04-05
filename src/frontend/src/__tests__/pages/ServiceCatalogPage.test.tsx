@@ -127,13 +127,16 @@ describe('ServiceCatalogPage', () => {
       (btn) => btn.textContent?.includes('Register Service')
     )!;
     await userEvent.click(serviceBtn);
-    await userEvent.type(screen.getAllByRole('textbox')[0], 'new-service');
-    await userEvent.type(screen.getAllByRole('textbox')[1], 'Platform');
+    // Enhanced form: name, domain, team are the first 3 text inputs
+    const textInputs = screen.getAllByRole('textbox');
+    await userEvent.type(textInputs[0], 'new-service');   // name
+    await userEvent.type(textInputs[1], 'payments');       // domain
+    await userEvent.type(textInputs[2], 'Platform');       // team
     await userEvent.click(screen.getByRole('button', { name: /register$/i }));
     await waitFor(() => {
       expect(serviceCatalogApi.registerService).toHaveBeenCalled();
       const [firstArg] = vi.mocked(serviceCatalogApi.registerService).mock.calls[0];
-      expect(firstArg).toMatchObject({ name: 'new-service', team: 'Platform' });
+      expect(firstArg).toMatchObject({ name: 'new-service', team: 'Platform', domain: 'payments' });
     });
   });
 

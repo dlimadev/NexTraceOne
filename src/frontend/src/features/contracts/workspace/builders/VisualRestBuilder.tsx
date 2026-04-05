@@ -18,6 +18,7 @@ import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
   Field, FieldArea, FieldSelect, FieldCheckbox, FieldTagInput,
 } from './shared/BuilderFormPrimitives';
+import { SchemaPropertyEditor } from './shared/SchemaPropertyEditor';
 import { validateRestBuilder } from './shared/builderValidation';
 import { restBuilderToYaml } from './shared/builderSync';
 import type {
@@ -25,6 +26,8 @@ import type {
   RestEndpoint,
   RestParameter,
   RestResponse,
+  RestRequestBody,
+  SchemaProperty,
   PropertyConstraints,
   BuilderValidationResult,
   SyncResult,
@@ -76,7 +79,7 @@ function createParameter(): RestParameter {
 }
 
 function createResponse(): RestResponse {
-  return { id: genId('res'), statusCode: '200', description: '', contentType: 'application/json', schema: '', example: '' };
+  return { id: genId('res'), statusCode: '200', description: '', contentType: 'application/json', schema: '', example: '', properties: [] };
 }
 
 interface VisualRestBuilderProps {
@@ -458,9 +461,59 @@ export function VisualRestBuilder({
                                 <FieldCheckbox label={t('contracts.builder.rest.required', 'Required')} checked={ep.requestBody.required}
                                   onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, required: v } })} disabled={isReadOnly} />
                               </div>
-                              <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={ep.requestBody.schema}
-                                onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, schema: v } })}
-                                placeholder={t('contracts.builder.rest.schemaPlaceholder', '#/components/schemas/CreateUserRequest')} mono disabled={isReadOnly} />
+
+                              {/* Schema mode toggle: $ref vs Visual Properties */}
+                              <div className="flex items-center gap-2 py-1">
+                                <span className="text-[9px] font-semibold text-muted uppercase tracking-wider">
+                                  {t('contracts.builder.rest.schemaMode', 'Schema Mode')}:
+                                </span>
+                                <button type="button"
+                                  onClick={() => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, properties: undefined } })}
+                                  className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
+                                    (!ep.requestBody.properties || ep.requestBody.properties.length === 0) && ep.requestBody.schema
+                                      ? 'bg-accent/15 text-accent border border-accent/25'
+                                      : 'bg-muted/10 text-muted border border-edge hover:text-body'
+                                  }`}>
+                                  {t('contracts.builder.rest.modeRef', '$ref (Schema Reference)')}
+                                </button>
+                                <button type="button"
+                                  onClick={() => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, schema: '', properties: ep.requestBody!.properties ?? [] } })}
+                                  className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
+                                    ep.requestBody.properties && ep.requestBody.properties.length >= 0 && !ep.requestBody.schema
+                                      ? 'bg-accent/15 text-accent border border-accent/25'
+                                      : 'bg-muted/10 text-muted border border-edge hover:text-body'
+                                  }`}>
+                                  {t('contracts.builder.rest.modeVisualProps', '✦ Visual Properties')}
+                                </button>
+                              </div>
+
+                              {/* $ref mode */}
+                              {(!ep.requestBody.properties || (ep.requestBody.properties.length === 0 && ep.requestBody.schema)) && (
+                                <>
+                                  <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={ep.requestBody.schema}
+                                    onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, schema: v } })}
+                                    placeholder={t('contracts.builder.rest.schemaPlaceholder', '#/components/schemas/CreateUserRequest')} mono disabled={isReadOnly} />
+                                  <p className="text-[8px] text-muted/50">
+                                    {t('contracts.builder.rest.refModeHint', 'Reference a schema from Canonical Entities or define inline using Visual Properties mode')}
+                                  </p>
+                                </>
+                              )}
+
+                              {/* Visual properties mode */}
+                              {ep.requestBody.properties && (!ep.requestBody.schema || ep.requestBody.properties.length > 0) && (
+                                <div className="space-y-1">
+                                  <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider">
+                                    {t('contracts.builder.rest.bodyProperties', 'Request Body Properties')}
+                                  </label>
+                                  <SchemaPropertyEditor
+                                    properties={ep.requestBody.properties}
+                                    onChange={(props) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, properties: props } })}
+                                    isReadOnly={isReadOnly}
+                                    addLabel={t('contracts.builder.rest.addBodyProp', 'Add Property')}
+                                  />
+                                </div>
+                              )}
+
                               <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={ep.requestBody.example}
                                 onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: v } })}
                                 rows={3} mono disabled={isReadOnly} />
@@ -472,7 +525,7 @@ export function VisualRestBuilder({
                               )}
                             </div>
                           ) : (!isReadOnly && (
-                            <button type="button" onClick={() => updateEndpoint(ep.id, { requestBody: { contentType: 'application/json', schema: '', required: true, example: '' } })}
+                            <button type="button" onClick={() => updateEndpoint(ep.id, { requestBody: { contentType: 'application/json', schema: '', required: true, example: '', properties: [] } })}
                               className="text-[10px] text-accent hover:text-accent/80 transition-colors">
                               + {t('contracts.builder.rest.addBody', 'Add Request Body')}
                             </button>
@@ -500,9 +553,63 @@ export function VisualRestBuilder({
                                 onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, contentType: v }; updateEndpoint(ep.id, { responses: next }); }}
                                 placeholder={t('contracts.builder.rest.contentTypePlaceholder', 'application/json')} mono disabled={isReadOnly} />
                             </div>
-                            <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={res.schema}
-                              onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, schema: v }; updateEndpoint(ep.id, { responses: next }); }}
-                              placeholder={t('contracts.builder.rest.resSchemaPlaceholder', '#/components/schemas/User')} mono disabled={isReadOnly} />
+
+                            {/* Schema mode toggle for response */}
+                            <div className="flex items-center gap-2 py-1">
+                              <span className="text-[9px] font-semibold text-muted uppercase tracking-wider">
+                                {t('contracts.builder.rest.schemaMode', 'Schema Mode')}:
+                              </span>
+                              <button type="button"
+                                onClick={() => {
+                                  const next = [...ep.responses]; next[ri] = { ...res, properties: undefined };
+                                  updateEndpoint(ep.id, { responses: next });
+                                }}
+                                className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
+                                  (!res.properties || res.properties.length === 0) && res.schema
+                                    ? 'bg-accent/15 text-accent border border-accent/25'
+                                    : 'bg-muted/10 text-muted border border-edge hover:text-body'
+                                }`}>
+                                {t('contracts.builder.rest.modeRef', '$ref (Schema Reference)')}
+                              </button>
+                              <button type="button"
+                                onClick={() => {
+                                  const next = [...ep.responses]; next[ri] = { ...res, schema: '', properties: res.properties ?? [] };
+                                  updateEndpoint(ep.id, { responses: next });
+                                }}
+                                className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
+                                  res.properties && res.properties.length >= 0 && !res.schema
+                                    ? 'bg-accent/15 text-accent border border-accent/25'
+                                    : 'bg-muted/10 text-muted border border-edge hover:text-body'
+                                }`}>
+                                {t('contracts.builder.rest.modeVisualProps', '✦ Visual Properties')}
+                              </button>
+                            </div>
+
+                            {/* $ref mode */}
+                            {(!res.properties || (res.properties.length === 0 && res.schema)) && (
+                              <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={res.schema}
+                                onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, schema: v }; updateEndpoint(ep.id, { responses: next }); }}
+                                placeholder={t('contracts.builder.rest.resSchemaPlaceholder', '#/components/schemas/User')} mono disabled={isReadOnly} />
+                            )}
+
+                            {/* Visual properties mode */}
+                            {res.properties && (!res.schema || res.properties.length > 0) && (
+                              <div className="space-y-1">
+                                <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider">
+                                  {t('contracts.builder.rest.responseProperties', 'Response Properties')}
+                                </label>
+                                <SchemaPropertyEditor
+                                  properties={res.properties}
+                                  onChange={(props) => {
+                                    const next = [...ep.responses]; next[ri] = { ...res, properties: props };
+                                    updateEndpoint(ep.id, { responses: next });
+                                  }}
+                                  isReadOnly={isReadOnly}
+                                  addLabel={t('contracts.builder.rest.addResponseProp', 'Add Property')}
+                                />
+                              </div>
+                            )}
+
                             <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={res.example}
                               onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, example: v }; updateEndpoint(ep.id, { responses: next }); }}
                               rows={2} mono disabled={isReadOnly} />
