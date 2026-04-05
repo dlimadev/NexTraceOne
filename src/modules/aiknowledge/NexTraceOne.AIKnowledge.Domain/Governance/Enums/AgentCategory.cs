@@ -22,4 +22,5 @@ public enum AgentCategory
     EventDesign = 13,
     DocumentationAssistance = 14,
     SoapDesign = 15,
+    CodeGeneration = 16,
 }

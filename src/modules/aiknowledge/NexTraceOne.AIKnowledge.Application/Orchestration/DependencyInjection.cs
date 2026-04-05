@@ -6,6 +6,7 @@ using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotion
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AskCatalogQuestion;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.ClassifyChangeWithAI;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.CompareEnvironments;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateAiScaffold;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateRobotFrameworkDraft;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateTestScenarios;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAiConversationHistory;
@@ -39,6 +40,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GenerateTestScenarios.Command>, GenerateTestScenarios.Validator>();
         services.AddTransient<IValidator<GenerateRobotFrameworkDraft.Command>, GenerateRobotFrameworkDraft.Validator>();
         services.AddTransient<IValidator<SummarizeReleaseForApproval.Command>, SummarizeReleaseForApproval.Validator>();
+        services.AddTransient<IValidator<GenerateAiScaffold.Command>, GenerateAiScaffold.Validator>();
         return services;
     }
 }

@@ -43,6 +43,10 @@ export type Permission =
   // ── Engineering Graph / Service Catalog ──
   | 'catalog:assets:read'
   | 'catalog:assets:write'
+  // ── Service Templates ──
+  | 'catalog:templates:read'
+  | 'catalog:templates:write'
+  | 'catalog:templates:scaffold'
   // ── Contracts ──
   | 'contracts:read'
   | 'contracts:write'

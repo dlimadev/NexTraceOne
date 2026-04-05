@@ -210,8 +210,7 @@ public sealed class AiOrchestrationEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("ai:runtime:write")
-        .WithName("GenerateAiScaffold")
-        .WithSummary("Generate a complete AI-assisted service scaffold from a governed template");
+        .WithName("GenerateAiScaffold");
 
         group.MapPost("/releases/{releaseId:guid}/approval-summary", async (
             Guid releaseId,
