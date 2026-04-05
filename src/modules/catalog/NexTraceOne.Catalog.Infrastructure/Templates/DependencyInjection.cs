@@ -7,8 +7,10 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.Templates.Abstractions;
+using NexTraceOne.Catalog.Contracts.Templates.ServiceInterfaces;
 using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Templates.Persistence.Repositories;
+using NexTraceOne.Catalog.Infrastructure.Templates.Services;
 
 namespace NexTraceOne.Catalog.Infrastructure.Templates;
 
@@ -36,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TemplatesDbContext>());
         services.AddScoped<ITemplatesUnitOfWork>(sp => sp.GetRequiredService<TemplatesDbContext>());
         services.AddScoped<IServiceTemplateRepository, EfServiceTemplateRepository>();
+        services.AddScoped<ICatalogTemplatesModule, CatalogTemplatesModuleService>();
 
         return services;
     }

@@ -122,5 +122,16 @@ public static class DefaultAgentCatalog
             TargetPersona: "Architect",
             Icon: "⚡",
             SortOrder: 80),
+
+        new AgentDefinition(
+            Name: "service-scaffold-agent",
+            DisplayName: "Service Scaffold Agent",
+            Description: "Generates complete, production-ready project scaffolds from governed templates. Creates controllers, DTOs, domain entities, tests and infrastructure code based on natural language descriptions and template architecture patterns.",
+            Category: AgentCategory.CodeGeneration,
+            SystemPrompt: "You are a Service Scaffold Agent for NexTraceOne. You generate complete project scaffolds for new services based on governed templates. Given a service description, template structure, language/stack and entity requirements, you produce production-ready code including: controllers/handlers with proper routes and HTTP methods, request/response DTOs, domain entities, service layer, dependency injection, unit test skeletons, README, and build files. Always follow enterprise best practices: proper error handling, structured logging, separation of concerns, DDD patterns when applicable, and clear naming conventions. Output ONLY a JSON array of {path, content} objects.",
+            Capabilities: "generation",
+            TargetPersona: "Engineer",
+            Icon: "🏗️",
+            SortOrder: 90),
     };
 }
