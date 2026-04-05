@@ -219,8 +219,8 @@ Total: 147/147 compliance tests passing.
 - [x] **GitLab CI** ✅ (Rev. 15) — `GitLabCiPayloadNormalizer` normaliza pipeline events com extracção de variáveis `ENVIRONMENT`/`VERSION` → `POST /api/v1/integrations/webhooks/gitlab`
 - [x] **Azure DevOps** ✅ (Rev. 15) — `AzureDevOpsPayloadNormalizer` normaliza `release-deployment-completed-event` e `build-completed-event` → `POST /api/v1/integrations/webhooks/azuredevops`
 - [x] **`IngestCiCdWebhook` feature** ✅ (Rev. 15) — `ICiCdPayloadNormalizer` abstraction (open/closed para novos vendors); handler cria `IngestionExecution` para rastreabilidade completa; DI registado com 3 normalizers
-- [ ] **Jenkins** — plugin para change confidence check como stage
-- [ ] **ArgoCD/Flux** — controller para Kubernetes deployments
+- [x] **Jenkins** ✅ (Rev. 22) — `JenkinsPayloadNormalizer`: normaliza `build_phase` (FINALIZED+SUCCESS) + extracção de `ENVIRONMENT`/`VERSION`/`SERVICE_NAME` de `parameters` → `POST /api/v1/integrations/webhooks/jenkins`
+- [x] **ArgoCD/Flux** ✅ (Rev. 22) — `ArgoCdPayloadNormalizer`: normaliza sync/health events GitOps → `POST /api/v1/integrations/webhooks/argocd`; `CloudProvider.Edge` suporte para edge clusters via `IngestEdgeDeploymentEvent`
 
 **Valor:** Zero configuração manual de eventos de deploy. Os 3 principais vendors (GitHub, GitLab, Azure DevOps) já normalizam e alimentam o pipeline de Change Intelligence automaticamente.
 

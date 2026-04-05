@@ -304,12 +304,12 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 21)
+### Estado Atual (Abril 2026 — Rev. 22)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~99% COMPLETO** ✅
 **Phase 3 — 3.1 + 3.3 + 3.4 + 3.5 COMPLETOS** ✅
-**Phase 4.1 — CI/CD Integrations (GitHub, GitLab, Azure DevOps) — COMPLETO** ✅
+**Phase 4.1 — CI/CD Integrations Nativas (GitHub, GitLab, Azure DevOps, Jenkins, ArgoCD) — COMPLETO** ✅
 **Phase 4.3 — API Marketplace (API Keys, Approval Workflow, Usage Analytics, Rate Limiting) — COMPLETO** ✅
 **Phase 4.4 — Cost Intelligence V2 (Budget Forecasting, Efficiency Recommendations, Showback, Anomaly Detection, Cloud Cost Correlation) — COMPLETO** ✅
 **Phase 4.5 — Multi-Cluster & Multi-Cloud (ClusterRegistration, CloudProvider, ListClusters, GetMultiCloudView, UpdateHealthSnapshot, IngestEdgeEvents) — COMPLETO** ✅
@@ -340,7 +340,7 @@ Gaps resolvidos desde a análise inicial:
 - ~~TelemetryStore sem tabelas~~ → migration `W01_TelemetryStoreFoundation` + `TelemetryStoreDbContextModelSnapshot` — 7 tabelas (`ops_ts_*`) + outbox (`ops_telstore_outbox_messages`) + 15 índices ✅ (Rev. 13)
 - ~~Validação incompleta (Governance)~~ → 37 novos `AbstractValidator<Query>` adicionados a todas as features com parâmetros; DI actualizado com 50 registos `IValidator` (13 Commands + 37 Queries) ✅ (Rev. 13)
 - ~~Validação incompleta (AIKnowledge/IdentityAccess/Catalog/Integrations)~~ → 36 novos validators em AIKnowledge (25), Catalog Graph (5), Integrations (5), IdentityAccess (1); DI actualizado em todos os módulos ✅ (Rev. 14). Cobertura final: Governance 50/58, AIKnowledge 72/88, IdentityAccess 30/43, Catalog 130/133, Integrations 11/13 — gaps remanescentes são exclusivamente queries vazias ou seed commands sem parâmetros validáveis
-- ~~Phase 4.1 CI/CD Integrations (GitHub Actions, GitLab, Azure DevOps)~~ → `ICiCdPayloadNormalizer` abstraction + `GitHubActionsPayloadNormalizer` + `GitLabCiPayloadNormalizer` + `AzureDevOpsPayloadNormalizer` + `IngestCiCdWebhook` feature + `POST /api/v1/integrations/webhooks/{vendor}` + DI registado + 38 testes unitários ✅ (Rev. 15)
+- ~~**Phase 4.1 CI/CD Integrations (GitHub Actions, GitLab, Azure DevOps)**~~ ✅ FIXED (Rev. 15/22) — `ICiCdPayloadNormalizer` abstraction + `GitHubActionsPayloadNormalizer` + `GitLabCiPayloadNormalizer` + `AzureDevOpsPayloadNormalizer` + `JenkinsPayloadNormalizer` + `ArgoCdPayloadNormalizer` + `IngestCiCdWebhook` feature + `POST /api/v1/integrations/webhooks/{vendor}` + DI registado + 34 testes unitários ✅ (Rev. 22)
 - ~~Phase 4.3 API Marketplace~~ → `ApiKey` aggregate (SHA-256 hash, raw key apenas no Create) + `RateLimitPolicy` entity + 9 features (`CreateApiKey`, `RevokeApiKey`, `ListApiKeys`, `ValidateApiKey`, `ApproveSubscription`, `RejectSubscription`, `GetApiUsageAnalytics`, `SetRateLimitPolicy`, `GetRateLimitPolicy`) + 9 novos endpoints + migration `W01_AddApiKeysAndRateLimitPolicies` + 40 testes unitários ✅ (Rev. 16)
 
 ### Gaps Remanescentes (Phase 1-2)
@@ -361,7 +361,7 @@ Gaps resolvidos desde a análise inicial:
 
 ### Gaps Remanescentes (Phase 4)
 
-- **Phase 4.1 partial** — Jenkins plugin + ArgoCD/Flux controller (dependem de runtimes externos)
+- **Phase 4.1 remaining** — `[ ]` Jenkins + ArgoCD/Flux agora implementados como normalizers backend ✅ (Rev. 22) — dependência em plugins/controllers externos permanece como trabalho futuro
 - **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
 - ~~**Phase 4.3**~~ ✅ FIXED (Rev. 16) — API Marketplace core (API Keys, Approval Workflow, Usage Analytics, Rate Limiting). Pendente: sandbox environments completo
 - ~~**Phase 4.4**~~ ✅ FIXED (Rev. 17) — Cost Intelligence V2 (BudgetForecast entity + ForecastBudget/GetBudgetForecast + EfficiencyRecommendation entity + GenerateEfficiencyRecommendations/ListEfficiencyRecommendations + GetShowbackReport + CorrelateCloudCostWithChange + DetectCostAnomalies + 7 endpoints + 25 testes + migration W44)
@@ -378,7 +378,7 @@ Gaps resolvidos desde a análise inicial:
 - ~~**Phase 5.2 survey**~~ ✅ FIXED (Rev. 21) — Developer Survey & NPS: `DeveloperSurvey` entity (NpsScore 0-10, NpsCategory Promoter/Passive/Detractor, ToolSatisfaction/ProcessSatisfaction/PlatformSatisfaction, RespondentId, Period) + `SubmitDeveloperSurvey` command + `GetDeveloperNpsSummary` query (aggregate NPS, PromoterPercent, AvgSatisfaction) + `IDeveloperSurveyRepository` + `DeveloperExperienceDbContext` + EF config + migration `P52B_DeveloperSurveys` + 2 endpoints + DI + 26 testes
 - ~~**Phase 5.3 MVP**~~ ✅ FIXED (Rev. 21) — GraphQL Federation Gateway: HotChocolate 14.3.0 integrado + `CatalogQuery` (queries: `services`, `contracts`, `npsSummary`) + `ServiceType`/`ContractSummaryType`/`NpsSummaryType` schema types + `AddCatalogGraphQL()`/`MapCatalogGraphQL()` extension methods + endpoint `GET /api/v1/graphql` + 8 testes. Pending: schema stitching multi-módulo, subscriptions real-time, SDK externo.
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 21)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 22)
 
 | Módulo | Testes |
 |--------|--------|
@@ -387,6 +387,6 @@ Gaps resolvidos desde a análise inicial:
 | OperationalIntelligence (inclui Predictive + Observability Correlation + Phase 5.4 completo) | 608/608 ✅ |
 | AuditCompliance | 147/147 ✅ |
 | Catalog (inclui DxScore + DeveloperSurvey/NPS + GraphQL) | 960/963 ✅ (3 pre-existentes falhos em ContractEntities) |
-| Integrations (inclui CI/CD webhooks + Multi-Cluster) | 131/131 ✅ |
+| Integrations (inclui CI/CD webhooks 5 vendors + Multi-Cluster) | 166/166 ✅ |
 | Frontend (Vitest) | 915/915 ✅ |
-| Total backend | ~1.900+ testes |
+| Total backend | ~2.000+ testes |
