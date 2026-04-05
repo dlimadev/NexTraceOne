@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -16,6 +17,17 @@ public static class ListSecurityEvents
         string? EventType,
         int Page = 1,
         int PageSize = 50) : IQuery<Response>;
+
+    /// <summary>Validador da query ListSecurityEvents.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.EventType).MaximumLength(100).When(x => x.EventType is not null);
+            RuleFor(x => x.Page).InclusiveBetween(1, 10000);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+        }
+    }
 
     /// <summary>Handler que retorna os eventos críticos e contagem de pendentes de revisão.</summary>
     public sealed class Handler(

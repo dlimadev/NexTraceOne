@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetOnboardingContext;
 
@@ -13,6 +14,18 @@ public static class GetOnboardingContext
     public sealed record Query(string Persona) : IQuery<Response>;
 
     /// <summary>Handler que computa o contexto de onboarding por persona.</summary>
+    /// <summary>Valida os parâmetros da query de contexto de onboarding.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Persona).NotEmpty().MaximumLength(100)
+                .Must(p => new[] { "engineer", "tech_lead", "architect", "product", "executive", "platform_admin", "auditor" }
+                    .Contains(p, StringComparer.OrdinalIgnoreCase))
+                .WithMessage("Invalid persona");
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)

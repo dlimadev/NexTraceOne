@@ -35,6 +35,12 @@ public sealed class ReliabilityDbContext(
     /// <summary>Snapshots do burn rate do error budget por SLO e janela de tempo.</summary>
     public DbSet<BurnRateSnapshot> BurnRateSnapshots => Set<BurnRateSnapshot>();
 
+    /// <summary>Previsões de falha de serviço computadas pelo motor de Predictive Intelligence.</summary>
+    public DbSet<ServiceFailurePrediction> ServiceFailurePredictions => Set<ServiceFailurePrediction>();
+
+    /// <summary>Previsões de capacidade de recursos por serviço e ambiente.</summary>
+    public DbSet<CapacityForecast> CapacityForecasts => Set<CapacityForecast>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ReliabilityDbContext).Assembly;

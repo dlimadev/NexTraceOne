@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
@@ -17,6 +18,15 @@ public static class ListKnowledgeSourceWeights
 {
     /// <summary>Query de listagem de pesos de fontes de conhecimento.</summary>
     public sealed record Query(string? UseCaseType) : IQuery<Response>;
+
+    /// <summary>Validador da query ListKnowledgeSourceWeights.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.UseCaseType).MaximumLength(100).When(x => x.UseCaseType is not null);
+        }
+    }
 
     /// <summary>Handler que lista pesos de fontes por caso de uso.</summary>
     public sealed class Handler(

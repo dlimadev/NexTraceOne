@@ -7,8 +7,13 @@ using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.AlertCostAnomaly;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.AttributeCostToService;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ComputeCostTrend;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.CorrelateCloudCostWithChange;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.CreateServiceCostProfile;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.DetectCostAnomalies;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.EnrichCostRecordWithRelease;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ForecastBudget;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GenerateEfficiencyRecommendations;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetBudgetForecast;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRelease;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostByRoute;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostDelta;
@@ -17,9 +22,11 @@ using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecor
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByService;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByTeam;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostReport;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetShowbackReport;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ImportCostBatch;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.IngestCostSnapshot;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ListCostImportBatches;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Features.ListEfficiencyRecommendations;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Cost;
 
@@ -61,6 +68,15 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetCostRecordsByDomain.Query>, GetCostRecordsByDomain.Validator>();
         services.AddTransient<IValidator<GetCostRecordsByRelease.Query>, GetCostRecordsByRelease.Validator>();
         services.AddTransient<IValidator<EnrichCostRecordWithRelease.Command>, EnrichCostRecordWithRelease.Validator>();
+
+        // P4.4 — Cost Intelligence V2
+        services.AddTransient<IValidator<ForecastBudget.Command>, ForecastBudget.Validator>();
+        services.AddTransient<IValidator<GetBudgetForecast.Query>, GetBudgetForecast.Validator>();
+        services.AddTransient<IValidator<GenerateEfficiencyRecommendations.Command>, GenerateEfficiencyRecommendations.Validator>();
+        services.AddTransient<IValidator<ListEfficiencyRecommendations.Query>, ListEfficiencyRecommendations.Validator>();
+        services.AddTransient<IValidator<GetShowbackReport.Query>, GetShowbackReport.Validator>();
+        services.AddTransient<IValidator<CorrelateCloudCostWithChange.Query>, CorrelateCloudCostWithChange.Validator>();
+        services.AddTransient<IValidator<DetectCostAnomalies.Query>, DetectCostAnomalies.Validator>();
 
         return services;
     }

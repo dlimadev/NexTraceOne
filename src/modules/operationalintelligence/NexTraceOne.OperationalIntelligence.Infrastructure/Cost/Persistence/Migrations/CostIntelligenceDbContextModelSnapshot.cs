@@ -70,6 +70,64 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                     b.ToTable("ops_outbox_messages", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.BudgetForecast", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("BudgetLimit")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("ConfidencePercent")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ForecastNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ForecastPeriod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("IsOverBudgetProjected")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("ProjectedCost")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("ServiceId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComputedAt");
+
+                    b.HasIndex("ServiceId", "Environment");
+
+                    b.ToTable("ops_cost_budget_forecasts", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.CostAttribution", b =>
                 {
                     b.Property<Guid>("Id")
@@ -420,6 +478,65 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                         .IsUnique();
 
                     b.ToTable("ops_cost_trends", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.EfficiencyRecommendation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("DeviationPercent")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsAcknowledged")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("MedianPeerCost")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("RecommendationText")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<decimal>("ServiceCost")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("ServiceId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsAcknowledged");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("ops_cost_efficiency_recommendations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.ServiceCostProfile", b =>

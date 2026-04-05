@@ -28,6 +28,10 @@ internal sealed class SubscriptionConfiguration : IEntityTypeConfiguration<Subsc
         builder.Property(x => x.Channel).HasColumnType("integer").IsRequired();
         builder.Property(x => x.WebhookUrl).HasMaxLength(2000);
         builder.Property(x => x.IsActive).IsRequired();
+        builder.Property(x => x.Status).HasColumnType("integer").IsRequired();
+        builder.Property(x => x.ApprovedBy).HasMaxLength(500);
+        builder.Property(x => x.ApprovedAt).HasColumnType("timestamp with time zone");
+        builder.Property(x => x.RejectionReason).HasMaxLength(1000);
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.LastNotifiedAt).HasColumnType("timestamp with time zone");
 

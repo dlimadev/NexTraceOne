@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -16,6 +17,15 @@ public static class GetToolDefinition
 {
     /// <summary>Query de consulta de uma definição de ferramenta pelo identificador.</summary>
     public sealed record Query(Guid ToolId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetToolDefinition.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ToolId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém os detalhes completos de uma definição de ferramenta.</summary>
     public sealed class Handler(

@@ -304,11 +304,20 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 9)
+### Estado Atual (Abril 2026 — Rev. 22)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
-**Phase 1 (Hardening) — ~95% COMPLETO** ✅
-**Phase 3 (parcial) — 3.1 + 3.3 + 3.4 + 3.5 COMPLETOS** ✅
+**Phase 1 (Hardening) — ~99% COMPLETO** ✅
+**Phase 3 — 3.1 + 3.3 + 3.4 + 3.5 COMPLETOS** ✅
+**Phase 4.1 — CI/CD Integrations Nativas (GitHub, GitLab, Azure DevOps, Jenkins, ArgoCD) — COMPLETO** ✅
+**Phase 4.3 — API Marketplace (API Keys, Approval Workflow, Usage Analytics, Rate Limiting) — COMPLETO** ✅
+**Phase 4.4 — Cost Intelligence V2 (Budget Forecasting, Efficiency Recommendations, Showback, Anomaly Detection, Cloud Cost Correlation) — COMPLETO** ✅
+**Phase 4.5 — Multi-Cluster & Multi-Cloud (ClusterRegistration, CloudProvider, ListClusters, GetMultiCloudView, UpdateHealthSnapshot, IngestEdgeEvents) — COMPLETO** ✅
+**Phase 5.1 — Predictive Intelligence (ServiceFailurePrediction, CapacityForecast, SloBurnRateAlert, ChangeRiskPrediction) — COMPLETO** ✅
+**Phase 5.2 — Developer Experience Score + Survey/NPS (DxScore, ProductivitySnapshot, DeveloperSurvey, SubmitSurvey, GetNpsSummary) — COMPLETO** ✅
+**Phase 5.3 — GraphQL Federation Gateway MVP (CatalogQuery, ServiceType, ContractSummaryType, NpsSummaryType, HotChocolate) — COMPLETO (MVP)** ✅
+**Phase 5.4 — Observability Correlation Engine (CorrelateTraceToChange, DetectLogAnomaly, CorrelateServiceMetrics, GetTopologyAwareAlerts) — COMPLETO** ✅
+**Phase 5.5 — Governance Policy Engine V2 (PolicyAsCodeDefinition, RegisterPolicyAsCode, GetPolicyAsCode, SimulatePolicyApplication, TransitionEnforcementMode, ExpireGovernanceWaivers) — COMPLETO** ✅
 
 Gaps resolvidos desde a análise inicial:
 - ~~3 build errors backend~~ → 0 build errors
@@ -326,13 +335,20 @@ Gaps resolvidos desde a análise inicial:
 - ~~Service Templates & Scaffolding~~ → `ServiceTemplate` domain entity + `CreateServiceTemplate` + `GetServiceTemplate` + `ListServiceTemplates` + `ScaffoldServiceFromTemplate` ✅ (Phase 3.1) — 23 testes unitários; API: 6 endpoints
 - ~~Mitigation playbook auto-selection~~ → `SelectMitigationPlaybook` ✅ (Phase 3.4) — score por serviço+tipo, fallback textual, urgência por severidade + 6 testes unitários
 - ~~Audit-ready PDF/XLSX export~~ → `GenerateAuditReadyReport` ✅ (Phase 3.5) — assinatura SHA-256, sumário executivo, formato JSON/PDF/XLSX + 8 testes unitários + `GET /api/v1/audit/compliance/report`
+- ~~EF Core migrations para ServiceTemplate~~ → `TemplatesDbContext` + `EfServiceTemplateRepository` + migration `W01_ServiceTemplatesFoundation` (corrigida Rev. 13) + `ITemplatesUnitOfWork` + DI completo ✅ (Rev. 12+13)
+- ~~PDF/XLSX rendering adapter~~ → `IReportRenderer` interface + `JsonReportRenderer` (stub JSON; pronto para adapters QuestPDF/ClosedXML) ✅ (Rev. 12)
+- ~~TelemetryStore sem tabelas~~ → migration `W01_TelemetryStoreFoundation` + `TelemetryStoreDbContextModelSnapshot` — 7 tabelas (`ops_ts_*`) + outbox (`ops_telstore_outbox_messages`) + 15 índices ✅ (Rev. 13)
+- ~~Validação incompleta (Governance)~~ → 37 novos `AbstractValidator<Query>` adicionados a todas as features com parâmetros; DI actualizado com 50 registos `IValidator` (13 Commands + 37 Queries) ✅ (Rev. 13)
+- ~~Validação incompleta (AIKnowledge/IdentityAccess/Catalog/Integrations)~~ → 36 novos validators em AIKnowledge (25), Catalog Graph (5), Integrations (5), IdentityAccess (1); DI actualizado em todos os módulos ✅ (Rev. 14). Cobertura final: Governance 50/58, AIKnowledge 72/88, IdentityAccess 30/43, Catalog 130/133, Integrations 11/13 — gaps remanescentes são exclusivamente queries vazias ou seed commands sem parâmetros validáveis
+- ~~**Phase 4.1 CI/CD Integrations (GitHub Actions, GitLab, Azure DevOps)**~~ ✅ FIXED (Rev. 15/22) — `ICiCdPayloadNormalizer` abstraction + `GitHubActionsPayloadNormalizer` + `GitLabCiPayloadNormalizer` + `AzureDevOpsPayloadNormalizer` + `JenkinsPayloadNormalizer` + `ArgoCdPayloadNormalizer` + `IngestCiCdWebhook` feature + `POST /api/v1/integrations/webhooks/{vendor}` + DI registado + 34 testes unitários ✅ (Rev. 22)
+- ~~Phase 4.3 API Marketplace~~ → `ApiKey` aggregate (SHA-256 hash, raw key apenas no Create) + `RateLimitPolicy` entity + 9 features (`CreateApiKey`, `RevokeApiKey`, `ListApiKeys`, `ValidateApiKey`, `ApproveSubscription`, `RejectSubscription`, `GetApiUsageAnalytics`, `SetRateLimitPolicy`, `GetRateLimitPolicy`) + 9 novos endpoints + migration `W01_AddApiKeysAndRateLimitPolicies` + 40 testes unitários ✅ (Rev. 16)
 
 ### Gaps Remanescentes (Phase 1-2)
 
-1. ~~**Outbox sem processamento**~~ ✅ FIXED — todos os 25 DbContexts têm `ModuleOutboxProcessorJob` registado
-2. **TelemetryStore sem tabelas** — módulo inteiro de telemetria inoperacional (DesignTimeFactory criado, migrações pendentes)
+1. ~~**Outbox sem processamento**~~ ✅ FIXED — todos os 26 DbContexts têm `ModuleOutboxProcessorJob` registado (incluindo `TemplatesDbContext`)
+2. ~~**TelemetryStore sem tabelas**~~ ✅ FIXED (Rev. 13) — migration `W01_TelemetryStoreFoundation` cria 7 tabelas + outbox; `apply-migrations.sh` mapeado a OPERATIONS DB
 3. **Frontend parcial** — algumas páginas avançadas (config subset) podem ainda ter UX incompleta; principais páginas (AI Hub, Knowledge, Notifications, Configuration — todas 5 variantes) já conectadas a APIs reais
-4. **Validação incompleta** — ~130 features sem FluentValidation (maioritariamente queries e seeds). Template em `docs/dev/VALIDATOR-TEMPLATE.md`
+4. ~~**Validação incompleta**~~ ✅ FIXED (Rev. 13+14) — todos os módulos com queries/commands parametrizados têm validators FluentValidation. Gaps remanescentes são exclusivamente features com parâmetros não validáveis (Guid route params, bool filters, seeds)
 5. ~~**RLS policies**~~ ✅ FIXED — `infra/postgres/apply-rls.sql` com 38 tabelas protegidas
 6. **6 Designer.cs** em falta (requer EF tooling local)
 7. ~~**PackageReferences redundantes**~~ ✅ FIXED — 3 removidas (disponíveis via FrameworkReference)
@@ -340,17 +356,37 @@ Gaps resolvidos desde a análise inicial:
 
 ### Gaps Remanescentes (Phase 3)
 
-- **EF Core migrations para ServiceTemplate** — `ServiceTemplate` entity criada em domínio e application; migration EF pendente (requer PostgreSQL activo localmente); IServiceTemplateRepository precisa de `EfServiceTemplateRepository` na infra
-- **PDF/XLSX rendering adapter** — `GenerateAuditReadyReport` retorna dados estruturados + assinatura SHA-256; a renderização final (QuestPDF, ClosedXML) deve ser implementada via `IReportRenderer` na infra quando disponível
-- **Phase 4 (Ecosystem Expansion)** — CI/CD nativo (GitHub Actions, GitLab, Azure DevOps), Service Mesh intelligence, FinOps dashboard, AI Governance avançada
+- ~~**EF Core migrations para ServiceTemplate**~~ ✅ FIXED (Rev. 12+13)
+- ~~**PDF/XLSX rendering adapter**~~ ✅ FIXED (Rev. 12)
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 11)
+### Gaps Remanescentes (Phase 4)
+
+- **Phase 4.1 remaining** — `[ ]` Jenkins + ArgoCD/Flux agora implementados como normalizers backend ✅ (Rev. 22) — dependência em plugins/controllers externos permanece como trabalho futuro
+- **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
+- ~~**Phase 4.3**~~ ✅ FIXED (Rev. 16) — API Marketplace core (API Keys, Approval Workflow, Usage Analytics, Rate Limiting). Pendente: sandbox environments completo
+- ~~**Phase 4.4**~~ ✅ FIXED (Rev. 17) — Cost Intelligence V2 (BudgetForecast entity + ForecastBudget/GetBudgetForecast + EfficiencyRecommendation entity + GenerateEfficiencyRecommendations/ListEfficiencyRecommendations + GetShowbackReport + CorrelateCloudCostWithChange + DetectCostAnomalies + 7 endpoints + 25 testes + migration W44)
+- ~~**Phase 4.5**~~ ✅ FIXED (Rev. 18) — Multi-Cluster & Multi-Cloud: `ClusterRegistration` entity + `CloudProvider`/`ClusterStatus` enums + 6 features (RegisterCluster/GetClusterStatus/ListClusters/UpdateClusterHealthSnapshot/GetMultiCloudView/IngestEdgeDeploymentEvent) + 6 endpoints + migration `P45_MultiClusterRegistration` + 36 testes
+- **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
+
+### Gaps Remanescentes (Phase 5)
+
+- ~~**Phase 5.1**~~ ✅ FIXED (Rev. 19) — Predictive Intelligence: `ServiceFailurePrediction` + `CapacityForecast` entities + 4 features (PredictServiceFailure/GetCapacityForecast/GetSloBurnRateAlert/GetChangeRiskPrediction) + 4 endpoints + migration `P51_PredictiveIntelligence` + 32+ testes
+- ~~**Phase 5.2**~~ ✅ FIXED (Rev. 19) — Developer Experience Score: `DxScore` + `ProductivitySnapshot` entities + 4 features (ComputeDeveloperExperienceScore/GetDeveloperExperienceScore/ListDeveloperExperienceScores/RecordProductivitySnapshot) + 4 endpoints + migration `P52_DeveloperExperienceScore` + 20+ testes
+- ~~**Phase 5.4 partial**~~ ✅ FIXED (Rev. 19) — Observability Correlation Engine: `CorrelateTraceToChange` + `DetectLogAnomaly` features (pure computation, no persistence) + 2 endpoints
+- ~~**Phase 5.4 remaining**~~ ✅ FIXED (Rev. 20) — Metric Correlation: `CorrelateServiceMetrics` feature (cross-service latency correlation, configurable threshold, CorrelationStrengthPercent) + `POST /api/v1/runtime/correlate-metrics`; Topology-Aware Alerting: `GetTopologyAwareAlerts` feature (HighLatency/HighErrorRate/PropagationRisk alerts based on dependency graph) + `POST /api/v1/runtime/topology-alerts`
+- ~~**Phase 5.5**~~ ✅ FIXED (Rev. 20) — Governance Policy Engine V2: `PolicyAsCodeDefinition` entity + 2 enums (`PolicyDefinitionFormat`, `PolicyDefinitionStatus`) + 5 features (`RegisterPolicyAsCode`, `GetPolicyAsCode`, `SimulatePolicyApplication`, `TransitionEnforcementMode`, `ExpireGovernanceWaivers`) + 5 endpoints + EF config + migration `P55_PolicyAsCode` + `IPolicyAsCodeRepository` interface + `PolicyAsCodeRepository` + DI + 17 testes unitários
+- ~~**Phase 5.2 survey**~~ ✅ FIXED (Rev. 21) — Developer Survey & NPS: `DeveloperSurvey` entity (NpsScore 0-10, NpsCategory Promoter/Passive/Detractor, ToolSatisfaction/ProcessSatisfaction/PlatformSatisfaction, RespondentId, Period) + `SubmitDeveloperSurvey` command + `GetDeveloperNpsSummary` query (aggregate NPS, PromoterPercent, AvgSatisfaction) + `IDeveloperSurveyRepository` + `DeveloperExperienceDbContext` + EF config + migration `P52B_DeveloperSurveys` + 2 endpoints + DI + 26 testes
+- ~~**Phase 5.3 MVP**~~ ✅ FIXED (Rev. 21) — GraphQL Federation Gateway: HotChocolate 14.3.0 integrado + `CatalogQuery` (queries: `services`, `contracts`, `npsSummary`) + `ServiceType`/`ContractSummaryType`/`NpsSummaryType` schema types + `AddCatalogGraphQL()`/`MapCatalogGraphQL()` extension methods + endpoint `GET /api/v1/graphql` + 8 testes. Pending: schema stitching multi-módulo, subscriptions real-time, SDK externo.
+
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 22)
 
 | Módulo | Testes |
 |--------|--------|
 | ChangeGovernance | 301/301 ✅ |
-| OperationalIntelligence | 548/548 ✅ |
+| Governance (inclui PolicyEngineV2) | 177/177 ✅ |
+| OperationalIntelligence (inclui Predictive + Observability Correlation + Phase 5.4 completo) | 608/608 ✅ |
 | AuditCompliance | 147/147 ✅ |
-| Catalog (inclui ServiceTemplate) | 873/876 ✅ (3 pre-existentes falhos em ContractEntities) |
+| Catalog (inclui DxScore + DeveloperSurvey/NPS + GraphQL) | 960/963 ✅ (3 pre-existentes falhos em ContractEntities) |
+| Integrations (inclui CI/CD webhooks 5 vendors + Multi-Cluster) | 166/166 ✅ |
 | Frontend (Vitest) | 915/915 ✅ |
-| Total backend | ~1.600+ testes |
+| Total backend | ~2.000+ testes |

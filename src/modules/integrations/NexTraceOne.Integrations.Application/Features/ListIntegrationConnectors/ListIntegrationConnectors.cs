@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.Abstractions;
@@ -21,6 +22,20 @@ public static class ListIntegrationConnectors
         string? Search = null,
         int Page = 1,
         int PageSize = 20) : IQuery<Response>;
+
+    /// <summary>Validador da query ListIntegrationConnectors.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ConnectorType).MaximumLength(100).When(x => x.ConnectorType is not null);
+            RuleFor(x => x.Status).MaximumLength(100).When(x => x.Status is not null);
+            RuleFor(x => x.Environment).MaximumLength(100).When(x => x.Environment is not null);
+            RuleFor(x => x.Search).MaximumLength(100).When(x => x.Search is not null);
+            RuleFor(x => x.Page).InclusiveBetween(1, 10000);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+        }
+    }
 
     /// <summary>Handler que retorna a lista paginada de conectores de integração.</summary>
     public sealed class Handler(IIntegrationConnectorRepository connectorRepository) : IQueryHandler<Query, Response>

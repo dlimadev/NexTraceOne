@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -17,6 +18,15 @@ public static class ListBudgets
     public sealed record Query(
         string? Scope,
         bool? IsActive) : IQuery<Response>;
+
+    /// <summary>Validador da query ListBudgets.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Scope).MaximumLength(100).When(x => x.Scope is not null);
+        }
+    }
 
     /// <summary>Handler que lista budgets com filtros opcionais.</summary>
     public sealed class Handler(

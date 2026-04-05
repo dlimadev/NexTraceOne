@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetFinOpsTrends;
 
@@ -18,6 +19,16 @@ public static class GetFinOpsTrends
         string? FilterId = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna tendências de custo.</summary>
+    /// <summary>Valida os filtros opcionais da query de tendências FinOps.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.FilterId).MaximumLength(200)
+                .When(x => x.FilterId is not null);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;

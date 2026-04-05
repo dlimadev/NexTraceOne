@@ -17,6 +17,7 @@ using NexTraceOne.IdentityAccess.Application.Features.FederatedLogin;
 using NexTraceOne.IdentityAccess.Application.Features.GetAccessReviewCampaign;
 using NexTraceOne.IdentityAccess.Application.Features.GetUserProfile;
 using NexTraceOne.IdentityAccess.Application.Features.ListActiveSessions;
+using NexTraceOne.IdentityAccess.Application.Features.ListSecurityEvents;
 using NexTraceOne.IdentityAccess.Application.Features.ListTenantUsers;
 using NexTraceOne.IdentityAccess.Application.Features.LocalLogin;
 using NexTraceOne.IdentityAccess.Application.Features.OidcCallback;
@@ -86,6 +87,9 @@ public static class DependencyInjection
         services.AddTransient<IValidator<StartAccessReviewCampaign.Command>, StartAccessReviewCampaign.Validator>();
         services.AddTransient<IValidator<GetAccessReviewCampaign.Query>, GetAccessReviewCampaign.Validator>();
         services.AddTransient<IValidator<DecideAccessReviewItem.Command>, DecideAccessReviewItem.Validator>();
+
+        // Segurança
+        services.AddTransient<IValidator<ListSecurityEvents.Query>, ListSecurityEvents.Validator>();
 
         return services;
     }

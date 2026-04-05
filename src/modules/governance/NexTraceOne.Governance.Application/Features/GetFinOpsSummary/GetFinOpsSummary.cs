@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetFinOpsSummary;
 
@@ -20,6 +21,22 @@ public static class GetFinOpsSummary
         string? Range = null) : IQuery<Response>;
 
     /// <summary>Handler que computa resumo de FinOps contextual.</summary>
+    /// <summary>Valida os filtros opcionais da query de resumo FinOps.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.DomainId).MaximumLength(200)
+                .When(x => x.DomainId is not null);
+            RuleFor(x => x.ServiceId).MaximumLength(200)
+                .When(x => x.ServiceId is not null);
+            RuleFor(x => x.Range).MaximumLength(200)
+                .When(x => x.Range is not null);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;

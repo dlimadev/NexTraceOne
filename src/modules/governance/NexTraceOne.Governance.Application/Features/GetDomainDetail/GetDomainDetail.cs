@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetDomainDetail;
 
@@ -16,6 +17,15 @@ public static class GetDomainDetail
     public sealed record Query(string DomainId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe completo de um domínio com equipas, serviços e dependências.</summary>
+    /// <summary>Valida os parâmetros da query de detalhe de domínio.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.DomainId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler(
         IGovernanceDomainRepository domainRepository,
         ITeamDomainLinkRepository teamDomainLinkRepository,

@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.ListEvidencePackages;
 
@@ -17,6 +18,18 @@ public static class ListEvidencePackages
         string? Status = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna pacotes de evidência.</summary>
+    /// <summary>Valida os filtros opcionais da query de listagem de pacotes de evidência.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Scope).MaximumLength(200)
+                .When(x => x.Scope is not null);
+            RuleFor(x => x.Status).MaximumLength(200)
+                .When(x => x.Status is not null);
+        }
+    }
+
     public sealed class Handler(
         IEvidencePackageRepository evidencePackageRepository) : IQueryHandler<Query, Response>
     {

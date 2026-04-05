@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
@@ -28,6 +29,16 @@ public static class ListConversations
     public sealed record Query(
         string? UserId,
         int PageSize = 20) : IQuery<Response>;
+
+    /// <summary>Validador da query ListConversations.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.UserId).MaximumLength(200).When(x => x.UserId is not null);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
+        }
+    }
 
     /// <summary>Handler que lista resumos de conversas maduras do assistente.</summary>
     public sealed class Handler(

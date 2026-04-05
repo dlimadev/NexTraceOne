@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetServiceFinOps;
 
@@ -17,6 +18,15 @@ public static class GetServiceFinOps
     public sealed record Query(string ServiceId) : IQuery<Response>;
 
     /// <summary>Handler que retorna perfil de FinOps do serviço.</summary>
+    /// <summary>Valida os parâmetros da query de FinOps por serviço.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ServiceId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;

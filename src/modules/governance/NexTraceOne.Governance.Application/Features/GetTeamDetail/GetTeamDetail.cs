@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetTeamDetail;
 
@@ -16,6 +17,15 @@ public static class GetTeamDetail
     public sealed record Query(string TeamId) : IQuery<Response>;
 
     /// <summary>Handler que retorna detalhe completo de uma equipa com serviços, contratos e dependências.</summary>
+    /// <summary>Valida os parâmetros da query de detalhe de equipa.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler(
         ITeamRepository teamRepository,
         ICatalogGraphModule catalogGraph) : IQueryHandler<Query, Response>

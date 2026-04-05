@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetComplianceGaps;
 
@@ -19,6 +20,20 @@ public static class GetComplianceGaps
         string? ServiceId = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna gaps de compliance agrupados.</summary>
+    /// <summary>Valida os filtros opcionais da query de gaps de compliance.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.DomainId).MaximumLength(200)
+                .When(x => x.DomainId is not null);
+            RuleFor(x => x.ServiceId).MaximumLength(200)
+                .When(x => x.ServiceId is not null);
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,

@@ -51,6 +51,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Gaps de compliance persistidos.</summary>
     public DbSet<ComplianceGap> ComplianceGaps => Set<ComplianceGap>();
 
+    /// <summary>Definições de política como código (YAML/JSON) com gradual enforcement.</summary>
+    public DbSet<PolicyAsCodeDefinition> PolicyAsCodeDefinitions => Set<PolicyAsCodeDefinition>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

@@ -74,4 +74,38 @@ public static class DeveloperPortalErrors
     /// <summary>Versão de contrato não está num estado publicável (deve ser Approved ou Locked).</summary>
     public static Error ContractVersionNotPublishable(string contractVersionId, string lifecycleState) =>
         Error.Business("DeveloperPortal.Publication.NotPublishable", "Contract version '{0}' is in state '{1}' and cannot be published to the portal.", contractVersionId, lifecycleState);
+
+    // ── API Keys ─────────────────────────────────────────────────────────────
+
+    /// <summary>API Key não encontrada.</summary>
+    public static Error ApiKeyNotFound(string id) =>
+        Error.NotFound("API_KEY_NOT_FOUND", $"API key '{id}' not found.");
+
+    /// <summary>API Key já foi revogada.</summary>
+    public static Error ApiKeyAlreadyRevoked(string id) =>
+        Error.Business("API_KEY_ALREADY_REVOKED", $"API key '{id}' is already revoked.");
+
+    /// <summary>API Key expirada.</summary>
+    public static Error ApiKeyExpired(string id) =>
+        Error.Business("API_KEY_EXPIRED", $"API key '{id}' has expired.");
+
+    // ── Rate Limit ────────────────────────────────────────────────────────────
+
+    /// <summary>Política de rate limit não encontrada.</summary>
+    public static Error RateLimitPolicyNotFound(Guid apiAssetId) =>
+        Error.NotFound("RATE_LIMIT_NOT_FOUND", $"Rate limit policy for API '{apiAssetId}' not found.");
+
+    /// <summary>Valores de rate limit inconsistentes.</summary>
+    public static Error InvalidRateLimitValues() =>
+        Error.Validation("INVALID_RATE_LIMITS", "Rate limit values are inconsistent: requestsPerDay must be greater than requestsPerHour, which must be greater than requestsPerMinute.");
+
+    // ── Subscription Approval ─────────────────────────────────────────────────
+
+    /// <summary>Subscrição não está pendente de aprovação.</summary>
+    public static Error SubscriptionNotPendingApproval(string id) =>
+        Error.Business("SUBSCRIPTION_NOT_PENDING", $"Subscription '{id}' is not pending approval.");
+
+    /// <summary>Subscrição já foi rejeitada.</summary>
+    public static Error SubscriptionAlreadyRejected(string id) =>
+        Error.Business("SUBSCRIPTION_ALREADY_REJECTED", $"Subscription '{id}' is already rejected.");
 }

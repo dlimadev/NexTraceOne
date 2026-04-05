@@ -50,7 +50,7 @@ public sealed class DeveloperPortalApplicationTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.ApiName.Should().Be("Payments API");
-        result.Value.IsActive.Should().BeTrue();
+        result.Value.IsActive.Should().BeFalse();
         result.Value.CreatedAt.Should().Be(Now);
         repository.Received(1).Add(Arg.Any<Subscription>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());

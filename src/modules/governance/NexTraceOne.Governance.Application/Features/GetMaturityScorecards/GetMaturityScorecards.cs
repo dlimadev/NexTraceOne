@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetMaturityScorecards;
 
@@ -21,6 +22,16 @@ public static class GetMaturityScorecards
     /// Handler que computa scorecards de maturidade com base nos dados reais de Teams
     /// e na cobertura de Governance Pack rollouts filtrados por equipa.
     /// </summary>
+    /// <summary>Valida os filtros opcionais da query de scorecards de maturidade.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Dimension).MaximumLength(100)
+                .When(x => x.Dimension is not null);
+        }
+    }
+
     public sealed class Handler(
         ITeamRepository teamRepository,
         IGovernancePackRepository packRepository,

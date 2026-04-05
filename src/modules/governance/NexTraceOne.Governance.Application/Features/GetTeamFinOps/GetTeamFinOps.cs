@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetTeamFinOps;
 
@@ -16,6 +17,15 @@ public static class GetTeamFinOps
     public sealed record Query(string TeamId) : IQuery<Response>;
 
     /// <summary>Handler que retorna perfil de FinOps da equipa.</summary>
+    /// <summary>Valida os parâmetros da query de FinOps por equipa.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;

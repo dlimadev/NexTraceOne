@@ -1,3 +1,4 @@
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Integrations.Application.Abstractions;
@@ -15,6 +16,15 @@ public static class GetIngestionFreshness
 {
     /// <summary>Query para obter frescura das fontes de ingestão. Filtro opcional por domínio.</summary>
     public sealed record Query(string? DataDomain = null) : IQuery<Response>;
+
+    /// <summary>Validador da query GetIngestionFreshness.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.DataDomain).MaximumLength(100).When(x => x.DataDomain is not null);
+        }
+    }
 
     /// <summary>Handler que retorna o detalhe de frescura por fonte de ingestão.</summary>
     public sealed class Handler(

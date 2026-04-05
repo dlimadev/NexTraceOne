@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -18,6 +19,16 @@ public static class GetOwnershipAudit
     public sealed record Query(
         string? TeamName = null,
         string? Domain = null) : IQuery<Response>;
+
+    /// <summary>Validador da query GetOwnershipAudit.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamName).MaximumLength(200).When(x => x.TeamName is not null);
+            RuleFor(x => x.Domain).MaximumLength(200).When(x => x.Domain is not null);
+        }
+    }
 
     /// <summary>Handler que executa auditoria de ownership e completude dos serviços.</summary>
     public sealed class Handler(

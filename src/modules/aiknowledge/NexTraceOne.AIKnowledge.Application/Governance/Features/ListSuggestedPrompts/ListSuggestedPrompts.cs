@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -19,6 +20,16 @@ public static class ListSuggestedPrompts
     public sealed record Query(
         string? Persona,
         string? Category) : IQuery<Response>;
+
+    /// <summary>Validador da query ListSuggestedPrompts.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Persona).MaximumLength(100).When(x => x.Persona is not null);
+            RuleFor(x => x.Category).MaximumLength(100).When(x => x.Category is not null);
+        }
+    }
 
     /// <summary>Handler que retorna prompts sugeridos filtrados por persona e categoria.</summary>
     public sealed class Handler : IQueryHandler<Query, Response>

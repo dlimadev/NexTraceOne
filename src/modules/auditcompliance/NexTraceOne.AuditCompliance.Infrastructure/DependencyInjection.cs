@@ -46,6 +46,7 @@ public static class DependencyInjection
         services.AddScoped<IComplianceResultRepository, ComplianceResultRepository>();
         services.AddScoped<IRetentionPolicyRepository, RetentionPolicyRepository>();
         services.AddScoped<IAuditModule, AuditModuleService>();
+        services.AddScoped<IReportRenderer, JsonReportRenderer>();
         services.AddHostedService<AuditRetentionJob>();
 
         return services;

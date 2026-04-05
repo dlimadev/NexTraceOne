@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
@@ -14,6 +15,16 @@ public static class GetServicesSummary
 {
     /// <summary>Query de resumo agregado de serviços (por equipa ou domínio).</summary>
     public sealed record Query(string? TeamName, string? Domain) : IQuery<Response>;
+
+    /// <summary>Validador da query GetServicesSummary.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamName).MaximumLength(200).When(x => x.TeamName is not null);
+            RuleFor(x => x.Domain).MaximumLength(200).When(x => x.Domain is not null);
+        }
+    }
 
     /// <summary>Handler que calcula resumos agregados de serviços.</summary>
     public sealed class Handler(

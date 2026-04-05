@@ -5,6 +5,7 @@ using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterface
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetExecutiveDrillDown;
 
@@ -21,6 +22,16 @@ public static class GetExecutiveDrillDown
         string EntityId) : IQuery<Response>;
 
     /// <summary>Handler que computa drill-down executivo detalhado para uma entidade.</summary>
+    /// <summary>Valida os parâmetros da query de drill-down executivo.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.EntityType).NotEmpty().MaximumLength(100);
+            RuleFor(x => x.EntityId).NotEmpty().MaximumLength(100);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;

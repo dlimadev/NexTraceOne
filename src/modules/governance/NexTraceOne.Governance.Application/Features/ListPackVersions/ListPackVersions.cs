@@ -1,6 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.ListPackVersions;
 
@@ -15,6 +16,15 @@ public static class ListPackVersions
     public sealed record Query(string PackId) : IQuery<Response>;
 
     /// <summary>Handler que retorna o histórico de versões do governance pack.</summary>
+    /// <summary>Valida os parâmetros da query de listagem de versões de pack.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).NotEmpty().MaximumLength(200);
+        }
+    }
+
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)

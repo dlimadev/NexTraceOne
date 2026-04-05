@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -16,6 +17,15 @@ public static class GetPromptTemplate
 {
     /// <summary>Query de consulta de um template de prompt pelo identificador.</summary>
     public sealed record Query(Guid TemplateId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetPromptTemplate.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TemplateId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém os detalhes completos de um template de prompt.</summary>
     public sealed class Handler(

@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -17,6 +18,15 @@ public static class ListEvaluations
         Guid? ConversationId,
         Guid? AgentExecutionId,
         string? UserId) : IQuery<Response>;
+
+    /// <summary>Validador da query ListEvaluations.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.UserId).MaximumLength(200).When(x => x.UserId is not null);
+        }
+    }
 
     /// <summary>Handler que lista avaliações com filtros opcionais.</summary>
     public sealed class Handler(

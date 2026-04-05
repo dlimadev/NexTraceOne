@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -16,6 +17,15 @@ public static class GetGuardrail
 {
     /// <summary>Query de consulta de um guardrail pelo identificador.</summary>
     public sealed record Query(Guid GuardrailId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetGuardrail.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.GuardrailId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém os detalhes completos de um guardrail.</summary>
     public sealed class Handler(

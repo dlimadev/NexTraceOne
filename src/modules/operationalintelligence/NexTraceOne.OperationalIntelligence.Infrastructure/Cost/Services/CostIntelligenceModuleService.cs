@@ -175,4 +175,54 @@ internal sealed class CostIntelligenceModuleService(
                 r.Source))
             .ToListAsync(cancellationToken);
     }
+
+    /// <inheritdoc />
+    public async Task<BudgetForecastSummary?> GetLatestBudgetForecastAsync(
+        string serviceId,
+        string environment,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug(
+            "Fetching latest budget forecast for service '{ServiceId}' in environment '{Environment}'",
+            serviceId, environment);
+
+        var forecast = await context.BudgetForecasts
+            .AsNoTracking()
+            .Where(f => f.ServiceId == serviceId && f.Environment == environment)
+            .OrderByDescending(f => f.ComputedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (forecast is null)
+            return null;
+
+        return new BudgetForecastSummary(
+            forecast.Id.Value,
+            forecast.ServiceId,
+            forecast.ForecastPeriod,
+            forecast.ProjectedCost,
+            forecast.BudgetLimit,
+            forecast.IsOverBudgetProjected,
+            forecast.Method,
+            forecast.ComputedAt);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<EfficiencyRecommendationSummary>> GetUnacknowledgedRecommendationsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug("Fetching unacknowledged efficiency recommendations");
+
+        return await context.EfficiencyRecommendations
+            .AsNoTracking()
+            .Where(r => !r.IsAcknowledged)
+            .OrderByDescending(r => r.GeneratedAt)
+            .Select(r => new EfficiencyRecommendationSummary(
+                r.Id.Value,
+                r.ServiceId,
+                r.ServiceName,
+                r.DeviationPercent,
+                r.RecommendationText,
+                r.Priority))
+            .ToListAsync(cancellationToken);
+    }
 }

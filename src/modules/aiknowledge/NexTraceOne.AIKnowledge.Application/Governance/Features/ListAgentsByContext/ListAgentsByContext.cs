@@ -1,3 +1,5 @@
+using FluentValidation;
+
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -21,6 +23,15 @@ public static class ListAgentsByContext
     /// <summary>Query para listar agents recomendados para um contexto.</summary>
     /// <param name="ModuleContext">Contexto do módulo: rest-api, soap, kafka, testing.</param>
     public sealed record Query(string ModuleContext) : IQuery<Response>;
+
+    /// <summary>Validador da query ListAgentsByContext.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ModuleContext).NotEmpty().MaximumLength(100);
+        }
+    }
 
     /// <summary>Handler que resolve agents por contexto de módulo.</summary>
     public sealed class Handler(IAiAgentRepository agentRepository) : IQueryHandler<Query, Response>

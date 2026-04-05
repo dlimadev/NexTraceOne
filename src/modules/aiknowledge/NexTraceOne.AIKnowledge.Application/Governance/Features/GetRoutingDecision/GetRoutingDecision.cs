@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -17,6 +18,15 @@ public static class GetRoutingDecision
 {
     /// <summary>Query de obtenção de decisão de roteamento por ID.</summary>
     public sealed record Query(Guid DecisionId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetRoutingDecision.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.DecisionId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém decisão de roteamento com metadados completos.</summary>
     public sealed class Handler(

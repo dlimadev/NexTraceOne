@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IGovernanceAnalyticsRepository, GovernanceAnalyticsRepository>();
         services.AddScoped<IEvidencePackageRepository, EvidencePackageRepository>();
         services.AddScoped<IComplianceGapRepository, ComplianceGapRepository>();
+        services.AddScoped<IPolicyAsCodeRepository, PolicyAsCodeRepository>();
 
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();

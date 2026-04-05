@@ -1,3 +1,5 @@
+using FluentValidation;
+
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
@@ -15,6 +17,15 @@ public static class GetAgent
 {
     /// <summary>Query para obter um agent por ID.</summary>
     public sealed record Query(Guid AgentId) : IQuery<Response>;
+
+    /// <summary>Validador da query GetAgent.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.AgentId).NotEmpty();
+        }
+    }
 
     /// <summary>Handler que obtém detalhes de um agent.</summary>
     public sealed class Handler(

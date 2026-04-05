@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Errors;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -24,6 +25,16 @@ public static class ListMessages
     public sealed record Query(
         Guid ConversationId,
         int PageSize = 50) : IQuery<Response>;
+
+    /// <summary>Validador da query ListMessages.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ConversationId).NotEmpty();
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
+        }
+    }
 
     /// <summary>Handler que lista mensagens com metadados completos.</summary>
     public sealed class Handler(

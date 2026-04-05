@@ -326,3 +326,28 @@ public sealed record GovernanceOperationalEvent(
     string Subsystem,
     string Message,
     bool Resolved);
+
+/// <summary>
+/// Interface do repositório de PolicyAsCodeDefinition para o módulo Governance.
+/// Define operações CRUD e consultas para definições de política como código.
+/// </summary>
+public interface IPolicyAsCodeRepository
+{
+    /// <summary>Lista todas as definições de política, opcionalmente filtradas por status ou modo.</summary>
+    Task<IReadOnlyList<PolicyAsCodeDefinition>> ListAsync(
+        PolicyDefinitionStatus? status,
+        PolicyEnforcementMode? enforcementMode,
+        CancellationToken ct);
+
+    /// <summary>Obtém uma definição de política pelo seu identificador.</summary>
+    Task<PolicyAsCodeDefinition?> GetByIdAsync(PolicyAsCodeDefinitionId id, CancellationToken ct);
+
+    /// <summary>Obtém uma definição de política pelo nome técnico.</summary>
+    Task<PolicyAsCodeDefinition?> GetByNameAsync(string name, CancellationToken ct);
+
+    /// <summary>Adiciona uma nova definição de política.</summary>
+    Task AddAsync(PolicyAsCodeDefinition definition, CancellationToken ct);
+
+    /// <summary>Atualiza uma definição de política existente.</summary>
+    Task UpdateAsync(PolicyAsCodeDefinition definition, CancellationToken ct);
+}

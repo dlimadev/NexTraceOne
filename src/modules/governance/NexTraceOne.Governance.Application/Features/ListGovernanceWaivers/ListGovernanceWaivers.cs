@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.ListGovernanceWaivers;
 
@@ -18,6 +19,18 @@ public static class ListGovernanceWaivers
         string? Status = null) : IQuery<Response>;
 
     /// <summary>Handler que retorna o catálogo de waivers de governança.</summary>
+    /// <summary>Valida os filtros opcionais da query de waivers de governança.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.PackId).MaximumLength(200)
+                .When(x => x.PackId is not null);
+            RuleFor(x => x.Status).MaximumLength(200)
+                .When(x => x.Status is not null);
+        }
+    }
+
     public sealed class Handler(
         IGovernanceWaiverRepository waiverRepository,
         IGovernancePackRepository packRepository,

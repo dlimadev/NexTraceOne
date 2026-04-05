@@ -46,6 +46,8 @@ public static class DependencyInjection
         services.AddScoped<IPortalAnalyticsRepository, PortalAnalyticsRepository>();
         services.AddScoped<ISavedSearchRepository, SavedSearchRepository>();
         services.AddScoped<IContractPublicationEntryRepository, ContractPublicationEntryRepository>();
+        services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
+        services.AddScoped<IApiRateLimitPolicyRepository, RateLimitPolicyRepository>();
 
         // Contrato público cross-module — permite que outros módulos consultem
         // dados de subscrições sem acessar o DbContext do DeveloperPortal.

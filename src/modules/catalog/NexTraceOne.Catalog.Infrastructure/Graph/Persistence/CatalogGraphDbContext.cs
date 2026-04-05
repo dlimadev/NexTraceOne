@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Domain.DeveloperExperience.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 
@@ -58,6 +59,12 @@ public sealed class CatalogGraphDbContext(
 
     /// <summary>Regras de matching automático para discovery.</summary>
     public DbSet<DiscoveryMatchRule> DiscoveryMatchRules => Set<DiscoveryMatchRule>();
+
+    /// <summary>Scores de experiência do desenvolvedor por equipa e período.</summary>
+    public DbSet<DxScore> DxScores => Set<DxScore>();
+
+    /// <summary>Snapshots de produtividade de equipas para cálculo de DX Score.</summary>
+    public DbSet<ProductivitySnapshot> ProductivitySnapshots => Set<ProductivitySnapshot>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CatalogGraphDbContext).Assembly;

@@ -51,7 +51,7 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
 - [x] Fix 53 ESLint errors (imports não utilizados, `any` types, hooks deps) ✅ 56→0 errors
 
 ### 0.3 Database Critical ⏱️ 2 dias
-- [x] Gerar migração `InitialCreate` para `TelemetryStoreDbContext` (7 DbSets sem tabelas) — DesignTimeFactory created
+- [x] Gerar migração `W01_TelemetryStoreFoundation` para `TelemetryStoreDbContext` — 7 tabelas (`ops_ts_*`) + outbox + 15 índices + ModelSnapshot ✅ (Rev. 13)
 - [ ] Regenerar 6 Designer files em falta (EF tooling) — requer `dotnet ef dbcontext scaffold` com PostgreSQL activo; não executável em sandbox. Executar localmente com: `dotnet ef migrations add <Name> --project <InfraProject> --startup-project src/platform/NexTraceOne.ApiHost`
 - [x] Documentar processo de migração ✅ `scripts/db/apply-migrations.sh` com todos os 25 DbContexts mapeados
 
@@ -74,7 +74,8 @@ O NexTraceOne diferencia-se por ser a **única plataforma** que combina **todas 
   - AuditCompliance: `ApplyRetention` — N/A (empty command, no parameters)
   - IdentityAccess: `Logout`, `SeedDefaultModuleAccessPolicies`, `SeedDefaultRolePermissions` — N/A (empty commands, no parameters)
   - Notifications: `MarkAllNotificationsRead` — N/A (empty command, no parameters)
-- [x] Template de validador para as restantes ~130 features ✅ `docs/dev/VALIDATOR-TEMPLATE.md` criado com padrão completo para commands e queries, incluindo exemplos para string, guid, int, coleções, regras condicionais e testes unitários
+- [x] Governance Queries — 37 novos validators adicionados a todas as queries parametrizadas ✅ (Rev. 13): GetExecutiveDrillDown, GetEvidencePackage, GetCrossDomainDependencies, GetGovernancePack, GetComplianceGaps, ListGovernanceWaivers, GetDomainGovernanceSummary, GetControlsSummary, GetTeamGovernanceSummary, GetComplianceSummary, GetReportsSummary, GetExecutiveOverview, GetPlatformEvents, GetExecutiveTrends, ListGovernancePacks, GetRiskHeatmap, GetWasteSignals, GetFinOpsTrends, GetFinOpsSummary, GetPlatformJobs, GetBenchmarking, GetRiskSummary, GetEfficiencyIndicators, GetMaturityScorecards, GetPackApplicability, GetPackCoverage, GetDomainDetail, GetTeamDetail, GetTeamFinOps, GetDomainFinOps, GetServiceFinOps, GetCrossTeamDependencies, ListEvidencePackages, ListPackVersions, ListPolicies, GetPolicy, GetOnboardingContext — DI atualizado com 50 registos `IValidator`
+- [x] AIKnowledge/IdentityAccess/Catalog/Integrations — 36 novos validators adicionados ✅ (Rev. 14): AIKnowledge Governance (25): GetEvaluation, GetAgent, GetAgentExecution, GetConversation, GetGuardrail, GetIdeCapabilities, GetModel, GetPromptTemplate, GetRoutingDecision, GetToolDefinition, ListAgentsByContext, ListAuditEntries, ListBudgets, ListConversations, ListEvaluations, ListGuardrails, ListIdeCapabilityPolicies, ListIdeClients, ListKnowledgeSourceWeights, ListMessages, ListModels, ListPolicies, ListPromptTemplates, ListSuggestedPrompts, ListToolDefinitions; Catalog Graph (5): ListSnapshots, GetOwnershipAudit, ListServices, GetServicesSummary, GetServiceMaturityDashboard; Integrations (5): GetIntegrationConnector, ListIngestionExecutions, ListIngestionSources, GetIngestionFreshness, ListIntegrationConnectors; IdentityAccess (1): ListSecurityEvents — cobertura final: Governance 50/58, AIKnowledge 72/88, IdentityAccess 30/43, Catalog 130/133, Integrations 11/13 (gaps restantes = queries sem parâmetros validáveis)
 
 ### 1.2 Error Handling ⏱️ 3 dias
 - [x] Substituir 4 bare catch blocks em `CanonicalModelBuilder.cs` com logging ✅ All 5 catches now log via Trace.TraceWarning
@@ -151,6 +152,7 @@ O NexTraceOne já tem o catálogo, contratos e governança. O próximo passo nat
 - [x] Auto-geração de scaffolding de projeto (.NET, Node, Java) com contratos embedidos ✅ `ScaffoldServiceFromTemplate` — substituição de variáveis (`{{ServiceName}}`, `{{Domain}}`, etc.) + manifesto de ficheiros JSON + 23 testes unitários
 - [x] Pipeline de criação: template → repositório → contratos → ownership → registro no catálogo ✅ `ScaffoldServiceFromTemplate` retorna plano completo com GovernancePolicyIds, BaseContractSpec, Files e Variables
 - [x] Templates versionados e governados ✅ `ServiceTemplate.Slug` (kebab-case único) + `Version` + `IsActive` + `UsageCount` + `TenantId`
+- [x] **Infrastructure completa** ✅ `TemplatesDbContext` + `EfServiceTemplateRepository` + `ITemplatesUnitOfWork` + `ServiceTemplateConfiguration` + migration `W01_ServiceTemplatesFoundation` + outbox processor `tpl_outbox_messages` + DI registado em ApiHost e BackgroundWorkers (Rev. 12)
 
 API: `POST /api/v1/catalog/templates`, `GET /api/v1/catalog/templates`, `GET /api/v1/catalog/templates/{id}`, `GET /api/v1/catalog/templates/slug/{slug}`, `POST /api/v1/catalog/templates/{id}/scaffold`, `POST /api/v1/catalog/templates/slug/{slug}/scaffold`
 
@@ -202,6 +204,7 @@ O NexTraceOne já tem audit trail e governance packs. Evoluir para:
 - [x] **Evidence collection automática** ✅ `ExportComplianceEvidences` — pacote de evidências por framework/categoria/período + `GET /api/v1/audit/compliance/evidences/export` + 3 testes unitários
 - [x] **Compliance dashboard** ✅ `GetComplianceDashboard` — estado por categoria, critical gaps, score por tenant + `GET /api/v1/audit/compliance/dashboard` + 3 testes unitários
 - [x] **Audit-ready reports** ✅ `GenerateAuditReadyReport` — relatório enterprise com assinatura digital SHA-256, sumário executivo por módulo/ação, suporte JSON/PDF/XLSX, entregável a auditores externos + `GET /api/v1/audit/compliance/report` + 8 testes unitários
+- [x] **IReportRenderer** ✅ Interface `IReportRenderer` em Application.Abstractions + `JsonReportRenderer` (default) registado na infra — abstração pronta para adapters QuestPDF (PDF) e ClosedXML (XLSX) quando disponíveis (Rev. 12)
 
 Total: 147/147 compliance tests passing.
 
@@ -212,13 +215,14 @@ Total: 147/147 compliance tests passing.
 > **Objetivo:** Integrações nativas com ecossistema enterprise
 
 ### 4.1 CI/CD Integrations Nativas ⏱️ 10-15 dias
-- [ ] **GitHub Actions** — GitHub App para ingestão automática de deploy events, PRs, releases
-- [ ] **GitLab CI** — webhook receiver para pipeline events
-- [ ] **Azure DevOps** — service hook para release gates integrados com NexTraceOne
-- [ ] **Jenkins** — plugin para change confidence check como stage
-- [ ] **ArgoCD/Flux** — controller para Kubernetes deployments
+- [x] **GitHub Actions** ✅ (Rev. 15) — `GitHubActionsPayloadNormalizer` normaliza `deployment_status` e `workflow_run` webhooks → `POST /api/v1/integrations/webhooks/github` + `IngestionExecution` audit trail; 38 testes unitários
+- [x] **GitLab CI** ✅ (Rev. 15) — `GitLabCiPayloadNormalizer` normaliza pipeline events com extracção de variáveis `ENVIRONMENT`/`VERSION` → `POST /api/v1/integrations/webhooks/gitlab`
+- [x] **Azure DevOps** ✅ (Rev. 15) — `AzureDevOpsPayloadNormalizer` normaliza `release-deployment-completed-event` e `build-completed-event` → `POST /api/v1/integrations/webhooks/azuredevops`
+- [x] **`IngestCiCdWebhook` feature** ✅ (Rev. 15) — `ICiCdPayloadNormalizer` abstraction (open/closed para novos vendors); handler cria `IngestionExecution` para rastreabilidade completa; DI registado com 3 normalizers
+- [x] **Jenkins** ✅ (Rev. 22) — `JenkinsPayloadNormalizer`: normaliza `build_phase` (FINALIZED+SUCCESS) + extracção de `ENVIRONMENT`/`VERSION`/`SERVICE_NAME` de `parameters` → `POST /api/v1/integrations/webhooks/jenkins`
+- [x] **ArgoCD/Flux** ✅ (Rev. 22) — `ArgoCdPayloadNormalizer`: normaliza sync/health events GitOps → `POST /api/v1/integrations/webhooks/argocd`; `CloudProvider.Edge` suporte para edge clusters via `IngestEdgeDeploymentEvent`
 
-**Valor:** Zero configuração manual de eventos de deploy.
+**Valor:** Zero configuração manual de eventos de deploy. Os 3 principais vendors (GitHub, GitLab, Azure DevOps) já normalizam e alimentam o pipeline de Change Intelligence automaticamente.
 
 ### 4.2 IDE Extensions ⏱️ 8-10 dias
 - [ ] **VS Code Extension** — ver contratos, ownership, change confidence inline
@@ -231,11 +235,11 @@ Total: 147/147 compliance tests passing.
 **Inspiração:** SwaggerHub + RapidAPI + Backstage Marketplace
 
 Evoluir o Developer Portal existente para:
-- [ ] **Subscrição de APIs** com approval workflow
-- [ ] **API keys management** governado
-- [ ] **Usage analytics** por consumidor, API, versão
-- [ ] **Rate limiting policies** configuráveis por contrato
-- [ ] **Sandbox environments** para teste de contratos
+- [x] **Subscrição de APIs** com approval workflow ✅ (Rev. 16) — `ApproveSubscription` + `RejectSubscription` + `SubscriptionStatus` (PendingApproval/Active/Rejected/Cancelled) + `POST /api/v1/developerportal/subscriptions/{id}/approve|reject` + 6 testes
+- [x] **API keys management** governado ✅ (Rev. 16) — `ApiKey` aggregate (hash SHA-256, raw key retornado apenas uma vez) + `CreateApiKey` + `RevokeApiKey` + `ListApiKeys` + `ValidateApiKey` + 4 endpoints + 21 testes
+- [x] **Usage analytics** por consumidor, API, versão ✅ (Rev. 16) — `GetApiUsageAnalytics` com breakdown por API/consumer/activeKeys + `GET /api/v1/developerportal/usage/analytics` + 4 testes
+- [x] **Rate limiting policies** configuráveis por contrato ✅ (Rev. 16) — `RateLimitPolicy` entity (rpm/rph/rpd/burst) + `SetRateLimitPolicy` + `GetRateLimitPolicy` + `PUT|GET /api/v1/developerportal/ratelimit/{apiAssetId}` + 4 testes
+- [ ] **Sandbox environments** para teste de contratos (PlaygroundSession já existe; sandbox completo com mocking requer infra adicional)
 
 **Valor:** Marketplace interno governado, eliminando shadow APIs.
 
@@ -243,19 +247,19 @@ Evoluir o Developer Portal existente para:
 **Inspiração:** Kubecost + Vantage + Apptio
 
 Evoluir o FinOps existente para:
-- [ ] **Cloud cost correlation** — AWS/Azure cost por serviço correlacionado com mudanças
-- [ ] **Anomaly detection** — alertas de custo fora do padrão
-- [ ] **Budget forecasting** — projeção de custos baseada em tendência + mudanças planeadas
-- [ ] **Efficiency recommendations** — "serviço X gasta 40% mais que serviços similares"
-- [ ] **Showback reports** — custo por equipa, domínio, serviço para accountability
+- [x] **Cloud cost correlation** — AWS/Azure cost por serviço correlacionado com mudanças ✅ (Rev. 17) — `CorrelateCloudCostWithChange` feature + `GET /api/v1/cost/correlation/{changeId}`
+- [x] **Anomaly detection** — alertas de custo fora do padrão ✅ (Rev. 17) — `DetectCostAnomalies` feature (batch scan de todos os perfis) + `POST /api/v1/cost/anomaly-detection`
+- [x] **Budget forecasting** — projeção de custos baseada em tendência + mudanças planeadas ✅ (Rev. 17) — `BudgetForecast` entity + `ForecastBudget` + `GetBudgetForecast` + `POST|GET /api/v1/cost/forecasts`
+- [x] **Efficiency recommendations** — "serviço X gasta 40% mais que serviços similares" ✅ (Rev. 17) — `EfficiencyRecommendation` entity + `GenerateEfficiencyRecommendations` + `ListEfficiencyRecommendations` + `POST|GET /api/v1/cost/efficiency`
+- [x] **Showback reports** — custo por equipa, domínio, serviço para accountability ✅ (Rev. 17) — `GetShowbackReport` + `GET /api/v1/cost/showback` com breakdown by team/domain/service
 
 **Valor:** FinOps contextualizado por serviço, não apenas dashboards de custo cloud genéricos.
 
 ### 4.5 Multi-Cluster & Multi-Cloud ⏱️ 10-15 dias
-- [ ] **Kubernetes integration** — auto-discovery de serviços via CRDs/annotations
-- [ ] **Multi-cluster view** — estado de serviços across clusters
-- [ ] **Cloud-agnostic** — AWS, Azure, GCP, on-premises num único painel
-- [ ] **Edge deployment support** — telemetria de ambientes edge
+- [x] **Kubernetes integration** — `ClusterRegistration` entity com suporte a K8s version, API endpoint, node/service counts ✅ (Rev. 18) — `RegisterCluster` + `GET /api/v1/clusters` + `POST /api/v1/clusters`
+- [x] **Multi-cluster view** — `ListClusters` feature + `GetClusterStatus` feature ✅ (Rev. 18) — inventory completo com health aggregation, paginação, filtros por provider/status/isEdge
+- [x] **Cloud-agnostic** — `GetMultiCloudView` feature ✅ (Rev. 18) — `CloudProvider` enum (AWS/Azure/GCP/OnPremises/Edge/Other) + view agregada por provider com HealthPercent + `GET /api/v1/clusters/multi-cloud`
+- [x] **Edge deployment support** — `IngestEdgeDeploymentEvent` feature ✅ (Rev. 18) — `IsEdge` flag em ClusterRegistration + `POST /api/v1/clusters/{id}/edge-events` + `UpdateClusterHealthSnapshot`
 
 ---
 
@@ -264,37 +268,39 @@ Evoluir o FinOps existente para:
 > **Objetivo:** Funcionalidades que posicionam o NexTraceOne como líder de mercado
 
 ### 5.1 Predictive Intelligence ⏱️ 15-20 dias
-- [ ] **Failure prediction** — "baseado em padrões, este serviço tem 73% probabilidade de incidente nas próximas 24h"
-- [ ] **Capacity planning** — "com a tendência atual, serviço X atinge saturação em 2 semanas"
-- [ ] **Change risk prediction** — ML model treinado com histórico de mudanças vs incidentes
-- [ ] **SLO burn rate alerts** — "ao ritmo atual, SLO será violado em 4 horas"
+- [x] **Failure prediction** — `ServiceFailurePrediction` entity + `PredictServiceFailure` feature: weighted formula (error rate 40% + incident count + change frequency) → probability % + RiskLevel + CausalFactors + RecommendedAction ✅ (Rev. 19) — `POST /api/v1/predictions/service-failure`
+- [x] **Capacity planning** — `CapacityForecast` entity + `GetCapacityForecast` feature: growth rate → DaysToSaturation → SaturationRisk (Immediate/Near/Moderate/Low) ✅ (Rev. 19) — `POST /api/v1/predictions/capacity-forecast`
+- [x] **Change risk prediction** — `GetChangeRiskPrediction` feature: multi-factor scoring (history + blast radius + test evidence + timing + change type multiplier) → RiskScore 0-100 + recommendations ✅ (Rev. 19) — `GET /api/v1/predictions/change-risk/{changeId}`
+- [x] **SLO burn rate alerts** — `GetSloBurnRateAlert` feature: burn rate = error rate / error budget → time-to-exhaustion + Critical/Warning/OK classification ✅ (Rev. 19) — `GET /api/v1/predictions/slo-burn-rate`
 
 ### 5.2 Developer Experience Score ⏱️ 8-10 dias
 **Inspiração:** DX Core 4 + SPACE framework
 
-- [ ] **Developer survey automation** — questionários periódicos integrados na plataforma
-- [ ] **Productivity metrics** — cycle time, deployment frequency por developer/equipa
-- [ ] **Cognitive load measurement** — número de serviços, contratos, dependências por equipa
-- [ ] **Toil tracking** — tempo gasto em tarefas repetitivas vs desenvolvimento
-- [ ] **Developer NPS** — satisfação com ferramentas, processos, plataforma
+- [x] **Productivity metrics** — `ComputeDeveloperExperienceScore` feature: cycle time + deployment frequency + cognitive load + toil % → weighted OverallScore + Elite/High/Medium/Low level ✅ (Rev. 19) — `POST /api/v1/developer-experience/scores`
+- [x] **Cognitive load measurement** — `CognitivLoadScore` field (0-10) in `DxScore` entity: inverse-weighted contribution to OverallScore ✅ (Rev. 19)
+- [x] **Toil tracking** — `ToilPercentage` + `ManualStepsCount` fields in `ProductivitySnapshot` + `RecordProductivitySnapshot` feature ✅ (Rev. 19) — `POST /api/v1/developer-experience/snapshots`
+- [x] **Developer survey automation** — `DeveloperSurvey` entity + `SubmitDeveloperSurvey` feature: NPS 0-10, ToolSatisfaction/ProcessSatisfaction/PlatformSatisfaction, RespondentId (anonymized), NpsCategory (Promoter/Passive/Detractor) ✅ (Rev. 21) — `POST /api/v1/developer-experience/surveys`
+- [x] **Developer NPS** — `GetDeveloperNpsSummary` feature: aggregate NPS per team/period, PromoterPercent/PassivePercent/DetractorPercent, avg satisfaction scores ✅ (Rev. 21) — `GET /api/v1/developer-experience/surveys/nps-summary`
 
 ### 5.3 GraphQL Federation Gateway ⏱️ 10-15 dias
-- [ ] Gateway GraphQL federado que expõe o catálogo completo do NexTraceOne
-- [ ] Schema stitching automático entre módulos
-- [ ] Subscriptions para eventos real-time (mudanças, incidentes, deploys)
-- [ ] SDK para integração com ferramentas externas
+- [x] **Gateway GraphQL** — `CatalogQuery` HotChocolate query root: `services(filter, page, pageSize)`, `contracts(serviceId)`, `npsSummary(teamId, period)` endpoints ✅ (Rev. 21) — `GET /api/v1/graphql`
+- [x] **Schema types** — `ServiceType`, `ContractSummaryType`, `NpsSummaryType` POCOs with GraphQL descriptions ✅ (Rev. 21)
+- [x] **Extension wiring** — `AddCatalogGraphQL()` + `MapCatalogGraphQL()` extension methods for host registration ✅ (Rev. 21)
+- [ ] **Schema stitching automático** — federation entre módulos (requires multi-module HotChocolate federation setup)
+- [ ] **Subscriptions real-time** — mudanças, incidentes, deploys (requires WebSocket + event stream integration)
+- [ ] **SDK externo** — para integração com ferramentas externas (requires SDK packaging pipeline)
 
 ### 5.4 Observability Correlation Engine ⏱️ 15-20 dias
-- [ ] **Trace-to-change correlation** — ligar traces a mudanças específicas
-- [ ] **Log anomaly detection** — detecção de padrões anómalos em logs pós-deploy
-- [ ] **Metric correlation** — correlação automática entre métricas de diferentes serviços
-- [ ] **Topology-aware alerting** — alertas inteligentes baseados no grafo de dependências
+- [x] **Trace-to-change correlation** — `CorrelateTraceToChange` feature: timestamp-based correlation (±2h window) → CorrelationConfidence + CorrelationReason ✅ (Rev. 19) — `GET /api/v1/runtime/traces/{traceId}/change-correlation`
+- [x] **Log anomaly detection** — `DetectLogAnomaly` feature: error spike % vs baseline + post-change detection → AnomalyType (ErrorSpike/Regression/BaselineDeviation) ✅ (Rev. 19) — `POST /api/v1/runtime/log-anomaly`
+- [x] **Metric correlation** — `CorrelateServiceMetrics` feature: correlação temporal de latência entre pares de serviços (threshold configurável) → CorrelationStrengthPercent ✅ (Rev. 20) — `POST /api/v1/runtime/correlate-metrics`
+- [x] **Topology-aware alerting** — `GetTopologyAwareAlerts` feature: alertas HighLatency/HighErrorRate/PropagationRisk baseados no grafo de dependências ✅ (Rev. 20) — `POST /api/v1/runtime/topology-alerts`
 
 ### 5.5 Governance Policy Engine V2 ⏱️ 10-15 dias
-- [ ] **Policy as Code** — políticas definíveis em YAML/JSON, versionadas no repositório
-- [ ] **Policy simulation** — "se aplicar esta política, X serviços ficam non-compliant"
-- [ ] **Gradual enforcement** — policies em modo warning antes de blocking
-- [ ] **Exception management** — waivers com expiração automática e audit trail
+- [x] **Policy as Code** — `PolicyAsCodeDefinition` entity + `RegisterPolicyAsCode` feature: YAML/JSON policies, Draft→Active→Deprecated lifecycle ✅ (Rev. 20) — `POST /api/v1/governance/policy-as-code`
+- [x] **Policy simulation** — `SimulatePolicyApplication` feature: "se aplicar esta política, X serviços ficam non-compliant" + CompliancePercent ✅ (Rev. 20) — `POST /api/v1/governance/policy-as-code/{name}/simulate`
+- [x] **Gradual enforcement** — `TransitionEnforcementMode` feature: Advisory → SoftEnforce → HardEnforce (forward-only) ✅ (Rev. 20) — `POST /api/v1/governance/policy-as-code/{name}/transition`
+- [x] **Exception management** — `ExpireGovernanceWaivers` feature: revogação automática de waivers vencidos com audit trail completo ✅ (Rev. 20) — `POST /api/v1/governance/waivers/expire`
 
 ---
 

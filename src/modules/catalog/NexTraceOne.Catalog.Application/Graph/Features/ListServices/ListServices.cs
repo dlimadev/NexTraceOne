@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
@@ -22,6 +23,17 @@ public static class ListServices
         LifecycleStatus? LifecycleStatus,
         ExposureType? ExposureType,
         string? SearchTerm) : IQuery<Response>;
+
+    /// <summary>Validador da query ListServices.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamName).MaximumLength(200).When(x => x.TeamName is not null);
+            RuleFor(x => x.Domain).MaximumLength(200).When(x => x.Domain is not null);
+            RuleFor(x => x.SearchTerm).MaximumLength(200).When(x => x.SearchTerm is not null);
+        }
+    }
 
     /// <summary>Handler que lista serviços com filtros opcionais.</summary>
     public sealed class Handler(

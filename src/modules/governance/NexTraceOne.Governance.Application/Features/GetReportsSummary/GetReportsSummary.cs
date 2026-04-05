@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetReportsSummary;
 
@@ -24,6 +25,20 @@ public static class GetReportsSummary
     /// Rollouts e Waivers. Compliance score e risk level são derivados de dados persistidos.
     /// Métricas cross-module (serviços, incidentes, mudanças) retornam 0 — não disponíveis neste módulo.
     /// </summary>
+    /// <summary>Valida os filtros opcionais da query de resumo de relatórios.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TeamId).MaximumLength(200)
+                .When(x => x.TeamId is not null);
+            RuleFor(x => x.DomainId).MaximumLength(200)
+                .When(x => x.DomainId is not null);
+            RuleFor(x => x.Persona).MaximumLength(200)
+                .When(x => x.Persona is not null);
+        }
+    }
+
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,

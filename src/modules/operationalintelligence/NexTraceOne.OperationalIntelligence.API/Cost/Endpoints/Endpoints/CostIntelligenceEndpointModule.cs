@@ -22,6 +22,13 @@ using GetCostRecordsByTeamFeature = NexTraceOne.OperationalIntelligence.Applicat
 using GetCostRecordsByDomainFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByDomain.GetCostRecordsByDomain;
 using GetCostRecordsByReleaseFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCostRecordsByRelease.GetCostRecordsByRelease;
 using EnrichCostRecordWithReleaseFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.EnrichCostRecordWithRelease.EnrichCostRecordWithRelease;
+using ForecastBudgetFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ForecastBudget.ForecastBudget;
+using GetBudgetForecastFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetBudgetForecast.GetBudgetForecast;
+using GenerateEfficiencyRecommendationsFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GenerateEfficiencyRecommendations.GenerateEfficiencyRecommendations;
+using ListEfficiencyRecommendationsFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.ListEfficiencyRecommendations.ListEfficiencyRecommendations;
+using GetShowbackReportFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetShowbackReport.GetShowbackReport;
+using CorrelateCloudCostWithChangeFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.CorrelateCloudCostWithChange.CorrelateCloudCostWithChange;
+using DetectCostAnomaliesFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.DetectCostAnomalies.DetectCostAnomalies;
 
 namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 
@@ -278,5 +285,99 @@ public sealed class CostIntelligenceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:cost:write");
+
+        // ── P4.4 — Cost Intelligence V2 ───────────────────────────────────────
+
+        group.MapPost("/forecasts", async (
+            ForecastBudgetFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToCreatedResult("/api/v1/cost/forecasts/{0}", localizer);
+        })
+        .RequirePermission("operations:cost:write");
+
+        group.MapGet("/forecasts", async (
+            string serviceId,
+            string environment,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetBudgetForecastFeature.Query(serviceId, environment);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapPost("/efficiency-recommendations/generate", async (
+            GenerateEfficiencyRecommendationsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:write");
+
+        group.MapGet("/efficiency-recommendations", async (
+            string? serviceId,
+            string? environment,
+            bool unacknowledgedOnly,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new ListEfficiencyRecommendationsFeature.Query(serviceId, environment, unacknowledgedOnly);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapGet("/showback", async (
+            string? team,
+            string? domain,
+            string? serviceId,
+            string period,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetShowbackReportFeature.Query(team, domain, serviceId, period);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapGet("/correlate-change/{changeId:guid}", async (
+            Guid changeId,
+            string serviceId,
+            string environment,
+            string period,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new CorrelateCloudCostWithChangeFeature.Query(changeId, serviceId, environment, period);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapGet("/anomalies", async (
+            string? environment,
+            string period,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new DetectCostAnomaliesFeature.Query(environment, period);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
     }
 }

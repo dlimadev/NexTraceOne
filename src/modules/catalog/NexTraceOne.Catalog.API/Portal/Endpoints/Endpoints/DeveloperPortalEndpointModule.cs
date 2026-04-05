@@ -7,21 +7,30 @@ using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
+using ApproveSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.ApproveSubscription.ApproveSubscription;
+using CreateApiKeyFeature = NexTraceOne.Catalog.Application.Portal.Features.CreateApiKey.CreateApiKey;
 using CreateSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription.CreateSubscription;
 using DeleteSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription.DeleteSubscription;
 using GenerateCodeFeature = NexTraceOne.Catalog.Application.Portal.Features.GenerateCode.GenerateCode;
 using GetApiConsumersFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiConsumers.GetApiConsumers;
 using GetApiDetailFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail.GetApiDetail;
 using GetApiHealthFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiHealth.GetApiHealth;
+using GetApiUsageAnalyticsFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApiUsageAnalytics.GetApiUsageAnalytics;
 using GetApisIConsumeFeature = NexTraceOne.Catalog.Application.Portal.Features.GetApisIConsume.GetApisIConsume;
 using GetAssetTimelineFeature = NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline.GetAssetTimeline;
 using GetMyApisFeature = NexTraceOne.Catalog.Application.Portal.Features.GetMyApis.GetMyApis;
 using GetPlaygroundHistoryFeature = NexTraceOne.Catalog.Application.Portal.Features.GetPlaygroundHistory.GetPlaygroundHistory;
 using GetPortalAnalyticsFeature = NexTraceOne.Catalog.Application.Portal.Features.GetPortalAnalytics.GetPortalAnalytics;
+using GetRateLimitPolicyFeature = NexTraceOne.Catalog.Application.Portal.Features.GetRateLimitPolicy.GetRateLimitPolicy;
 using GetSubscriptionsFeature = NexTraceOne.Catalog.Application.Portal.Features.GetSubscriptions.GetSubscriptions;
+using ListApiKeysFeature = NexTraceOne.Catalog.Application.Portal.Features.ListApiKeys.ListApiKeys;
 using RecordAnalyticsEventFeature = NexTraceOne.Catalog.Application.Portal.Features.RecordAnalyticsEvent.RecordAnalyticsEvent;
+using RejectSubscriptionFeature = NexTraceOne.Catalog.Application.Portal.Features.RejectSubscription.RejectSubscription;
 using RenderOpenApiContractFeature = NexTraceOne.Catalog.Application.Portal.Features.RenderOpenApiContract.RenderOpenApiContract;
+using RevokeApiKeyFeature = NexTraceOne.Catalog.Application.Portal.Features.RevokeApiKey.RevokeApiKey;
 using SearchCatalogFeature = NexTraceOne.Catalog.Application.Portal.Features.SearchCatalog.SearchCatalog;
+using SetRateLimitPolicyFeature = NexTraceOne.Catalog.Application.Portal.Features.SetRateLimitPolicy.SetRateLimitPolicy;
+using ValidateApiKeyFeature = NexTraceOne.Catalog.Application.Portal.Features.ValidateApiKey.ValidateApiKey;
 
 namespace NexTraceOne.Catalog.API.Portal.Endpoints.Endpoints;
 
@@ -259,5 +268,135 @@ public sealed class DeveloperPortalEndpointModule
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("developer-portal:read");
+
+        // ── API Keys ──
+
+        // POST /api/v1/developerportal/api-keys — Criar nova API Key
+        group.MapPost("/api-keys", async (
+            CreateApiKeyFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:write");
+
+        // GET /api/v1/developerportal/api-keys — Listar API Keys do utilizador
+        group.MapGet("/api-keys", async (
+            ICurrentUser currentUser,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var ownerId = Guid.Parse(currentUser.Id);
+            var result = await sender.Send(
+                new ListApiKeysFeature.Query(ownerId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:read");
+
+        // DELETE /api/v1/developerportal/api-keys/{apiKeyId} — Revogar API Key
+        group.MapDelete("/api-keys/{apiKeyId:guid}", async (
+            Guid apiKeyId,
+            ICurrentUser currentUser,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var requesterId = Guid.Parse(currentUser.Id);
+            var result = await sender.Send(
+                new RevokeApiKeyFeature.Command(apiKeyId, requesterId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:write");
+
+        // POST /api/v1/developerportal/api-keys/validate — Validar API Key raw
+        group.MapPost("/api-keys/validate", async (
+            ValidateApiKeyFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:write");
+
+        // ── Subscription Approval ──
+
+        // POST /api/v1/developerportal/subscriptions/{subscriptionId}/approve — Aprovar subscrição
+        group.MapPost("/subscriptions/{subscriptionId:guid}/approve", async (
+            Guid subscriptionId,
+            ICurrentUser currentUser,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ApproveSubscriptionFeature.Command(subscriptionId, currentUser.Id),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:admin");
+
+        // POST /api/v1/developerportal/subscriptions/{subscriptionId}/reject — Rejeitar subscrição
+        group.MapPost("/subscriptions/{subscriptionId:guid}/reject", async (
+            Guid subscriptionId,
+            RejectSubscriptionRequestBody body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new RejectSubscriptionFeature.Command(subscriptionId, body.RejectionReason),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:admin");
+
+        // ── Usage Analytics ──
+
+        // GET /api/v1/developerportal/analytics/usage — Métricas de uso de API
+        group.MapGet("/analytics/usage", async (
+            Guid? apiAssetId,
+            Guid? consumerId,
+            string? apiVersion,
+            int daysBack,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetApiUsageAnalyticsFeature.Query(apiAssetId, consumerId, apiVersion, daysBack),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:read");
+
+        // ── Rate Limiting ──
+
+        // PUT /api/v1/developerportal/catalog/{apiAssetId}/rate-limit — Definir política de rate limit
+        group.MapPut("/catalog/{apiAssetId:guid}/rate-limit", async (
+            Guid apiAssetId,
+            SetRateLimitPolicyFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command with { ApiAssetId = apiAssetId }, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:admin");
+
+        // GET /api/v1/developerportal/catalog/{apiAssetId}/rate-limit — Obter política de rate limit
+        group.MapGet("/catalog/{apiAssetId:guid}/rate-limit", async (
+            Guid apiAssetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetRateLimitPolicyFeature.Query(apiAssetId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("developer-portal:read");
     }
+
+    private sealed record RejectSubscriptionRequestBody(string RejectionReason);
 }

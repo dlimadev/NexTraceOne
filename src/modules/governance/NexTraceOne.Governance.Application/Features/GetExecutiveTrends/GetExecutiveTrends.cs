@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
+using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetExecutiveTrends;
 
@@ -16,6 +17,15 @@ public static class GetExecutiveTrends
         string Category) : IQuery<Response>;
 
     /// <summary>Handler que computa séries temporais e insights para tendências executivas.</summary>
+    /// <summary>Valida os parâmetros da query de tendências executivas.</summary>
+    public sealed class Validator : AbstractValidator<Query>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Category).NotEmpty().MaximumLength(100);
+        }
+    }
+
     public sealed class Handler(IGovernanceAnalyticsRepository analyticsRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
