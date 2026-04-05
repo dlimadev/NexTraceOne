@@ -171,6 +171,16 @@ public static class ContractsErrors
     public static Error BackgroundServiceNameRequired()
         => Error.Validation("Contracts.BackgroundService.ServiceNameRequired", "Service name is required for background service contracts.");
 
+    // ── CanonicalEntity ─────────────────────────────────────────────
+
+    /// <summary>Entidade canónica não encontrada.</summary>
+    public static Error CanonicalEntityNotFound(string id)
+        => Error.NotFound("Contracts.CanonicalEntity.NotFound", "Canonical entity '{0}' was not found.", id);
+
+    /// <summary>Versão de entidade canónica não encontrada.</summary>
+    public static Error CanonicalEntityVersionNotFound(string version)
+        => Error.NotFound("Contracts.CanonicalEntityVersion.NotFound", "Canonical entity version '{0}' was not found.", version);
+
     // ── ContractExample ─────────────────────────────────────────────
 
     /// <summary>Exemplo de contrato não encontrado.</summary>
