@@ -304,13 +304,14 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 16)
+### Estado Atual (Abril 2026 — Rev. 17)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~99% COMPLETO** ✅
 **Phase 3 — 3.1 + 3.3 + 3.4 + 3.5 COMPLETOS** ✅
 **Phase 4.1 — CI/CD Integrations (GitHub, GitLab, Azure DevOps) — COMPLETO** ✅
 **Phase 4.3 — API Marketplace (API Keys, Approval Workflow, Usage Analytics, Rate Limiting) — COMPLETO** ✅
+**Phase 4.4 — Cost Intelligence V2 (Budget Forecasting, Efficiency Recommendations, Showback, Anomaly Detection, Cloud Cost Correlation) — COMPLETO** ✅
 
 Gaps resolvidos desde a análise inicial:
 - ~~3 build errors backend~~ → 0 build errors
@@ -357,17 +358,18 @@ Gaps resolvidos desde a análise inicial:
 - **Phase 4.1 partial** — Jenkins plugin + ArgoCD/Flux controller (dependem de runtimes externos)
 - **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
 - ~~**Phase 4.3**~~ ✅ FIXED (Rev. 16) — API Marketplace core (API Keys, Approval Workflow, Usage Analytics, Rate Limiting). Pendente: sandbox environments completo
-- **Phase 4.4** — Cost Intelligence V2 (cloud cost correlation, anomaly detection)
+- ~~**Phase 4.4**~~ ✅ FIXED (Rev. 17) — Cost Intelligence V2 (BudgetForecast entity + ForecastBudget/GetBudgetForecast + EfficiencyRecommendation entity + GenerateEfficiencyRecommendations/ListEfficiencyRecommendations + GetShowbackReport + CorrelateCloudCostWithChange + DetectCostAnomalies + 7 endpoints + 25 testes + migration W44)
+- **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
 - **Phase 4.5** — Multi-Cluster & Multi-Cloud
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 16)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 17)
 
 | Módulo | Testes |
 |--------|--------|
 | ChangeGovernance | 301/301 ✅ |
-| OperationalIntelligence | 548/548 ✅ |
+| OperationalIntelligence (inclui Cost Intelligence V2) | 573/573 ✅ |
 | AuditCompliance | 147/147 ✅ |
 | Catalog (inclui ServiceTemplate + API Marketplace) | 910/913 ✅ (3 pre-existentes falhos em ContractEntities) |
 | Integrations (inclui CI/CD webhooks) | 126/126 ✅ |
 | Frontend (Vitest) | 915/915 ✅ |
-| Total backend | ~1.700+ testes |
+| Total backend | ~1.725+ testes |

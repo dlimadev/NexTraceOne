@@ -247,11 +247,11 @@ Evoluir o Developer Portal existente para:
 **Inspiração:** Kubecost + Vantage + Apptio
 
 Evoluir o FinOps existente para:
-- [ ] **Cloud cost correlation** — AWS/Azure cost por serviço correlacionado com mudanças
-- [ ] **Anomaly detection** — alertas de custo fora do padrão
-- [ ] **Budget forecasting** — projeção de custos baseada em tendência + mudanças planeadas
-- [ ] **Efficiency recommendations** — "serviço X gasta 40% mais que serviços similares"
-- [ ] **Showback reports** — custo por equipa, domínio, serviço para accountability
+- [x] **Cloud cost correlation** — AWS/Azure cost por serviço correlacionado com mudanças ✅ (Rev. 17) — `CorrelateCloudCostWithChange` feature + `GET /api/v1/cost/correlation/{changeId}`
+- [x] **Anomaly detection** — alertas de custo fora do padrão ✅ (Rev. 17) — `DetectCostAnomalies` feature (batch scan de todos os perfis) + `POST /api/v1/cost/anomaly-detection`
+- [x] **Budget forecasting** — projeção de custos baseada em tendência + mudanças planeadas ✅ (Rev. 17) — `BudgetForecast` entity + `ForecastBudget` + `GetBudgetForecast` + `POST|GET /api/v1/cost/forecasts`
+- [x] **Efficiency recommendations** — "serviço X gasta 40% mais que serviços similares" ✅ (Rev. 17) — `EfficiencyRecommendation` entity + `GenerateEfficiencyRecommendations` + `ListEfficiencyRecommendations` + `POST|GET /api/v1/cost/efficiency`
+- [x] **Showback reports** — custo por equipa, domínio, serviço para accountability ✅ (Rev. 17) — `GetShowbackReport` + `GET /api/v1/cost/showback` com breakdown by team/domain/service
 
 **Valor:** FinOps contextualizado por serviço, não apenas dashboards de custo cloud genéricos.
 
