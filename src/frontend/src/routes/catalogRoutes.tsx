@@ -19,6 +19,10 @@ const MainframeSystemDetailPage = lazy(() => import('../features/legacy-assets/p
 const ServiceDiscoveryPage = lazy(() => import('../features/catalog/pages/ServiceDiscoveryPage'));
 const ServiceMaturityPage = lazy(() => import('../features/catalog/pages/ServiceMaturityPage'));
 const ServiceScorecardPage = lazy(() => import('../features/catalog/pages/ServiceScorecardPage').then(m => ({ default: m.ServiceScorecardPage })));
+const TemplateLibraryPage = lazy(() => import('../features/catalog/pages/TemplateLibraryPage').then(m => ({ default: m.TemplateLibraryPage })));
+const TemplateDetailPage = lazy(() => import('../features/catalog/pages/TemplateDetailPage').then(m => ({ default: m.TemplateDetailPage })));
+const TemplateEditorPage = lazy(() => import('../features/catalog/pages/TemplateEditorPage').then(m => ({ default: m.TemplateEditorPage })));
+const AiScaffoldWizardPage = lazy(() => import('../features/catalog/pages/AiScaffoldWizardPage').then(m => ({ default: m.AiScaffoldWizardPage })));
 
 export function CatalogRoutes() {
   return (
@@ -125,6 +129,47 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="developer-portal:read" redirectTo="/unauthorized">
             <DeveloperPortalPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Service Templates & AI Scaffold ── */}
+      <Route
+        path="/catalog/templates"
+        element={
+          <ProtectedRoute permission="catalog:templates:read" redirectTo="/unauthorized">
+            <TemplateLibraryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/templates/new"
+        element={
+          <ProtectedRoute permission="catalog:templates:write" redirectTo="/unauthorized">
+            <TemplateEditorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/templates/:id"
+        element={
+          <ProtectedRoute permission="catalog:templates:read" redirectTo="/unauthorized">
+            <TemplateDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/templates/:id/edit"
+        element={
+          <ProtectedRoute permission="catalog:templates:write" redirectTo="/unauthorized">
+            <TemplateEditorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/templates/:id/scaffold"
+        element={
+          <ProtectedRoute permission="catalog:templates:scaffold" redirectTo="/unauthorized">
+            <AiScaffoldWizardPage />
           </ProtectedRoute>
         }
       />

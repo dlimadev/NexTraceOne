@@ -6280,5 +6280,159 @@
     },
     "subtitle": "Configure fluxos de aprovação, SLAs, gates, caminhos de promoção, janelas de release e políticas de congelamento",
     "title": "Workflows & Governança de Promoção"
+  },
+  "templates": {
+    "library": {
+      "title": "Biblioteca de Templates",
+      "subtitle": "Templates de projeto governados para scaffolding de developer com assistência de IA",
+      "createTemplate": "Novo Template",
+      "searchPlaceholder": "Pesquisar templates...",
+      "hasContract": "Contrato base",
+      "hasManifest": "Manifesto",
+      "viewDetails": "Ver Detalhes",
+      "scaffold": "Scaffolding com IA",
+      "empty": "Nenhum template encontrado. Crie o primeiro template para acelerar sua equipa.",
+      "createFirst": "Criar Primeiro Template",
+      "stats": {
+        "total": "Total de templates",
+        "active": "Ativos",
+        "dotnet": "Templates .NET",
+        "withContract": "Com contrato"
+      },
+      "filters": {
+        "allTypes": "Todos os tipos",
+        "allLanguages": "Todas as linguagens",
+        "showInactive": "Exibir inativos"
+      }
+    },
+    "detail": {
+      "notFound": "Template não encontrado.",
+      "backToLibrary": "Biblioteca de Templates",
+      "edit": "Editar",
+      "activate": "Ativar",
+      "deactivate": "Desativar",
+      "scaffoldWithAi": "Scaffolding com IA",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "ownership": "Ownership",
+      "defaultDomain": "Domínio padrão",
+      "defaultTeam": "Equipa padrão",
+      "repository": "Repositório",
+      "repoUrl": "URL do repositório",
+      "repoBranch": "Branch",
+      "tags": "Tags",
+      "baseContract": "Contrato Base",
+      "scaffoldingManifest": "Manifesto de Scaffolding",
+      "stats": "Uso & Cobertura",
+      "timesUsed": "vezes utilizado",
+      "hasContract": "Contrato base incluído",
+      "noContract": "Sem contrato base",
+      "hasManifest": "Manifesto de scaffolding definido",
+      "noManifest": "Sem manifesto — IA gera a estrutura",
+      "audit": "Auditoria",
+      "createdAt": "Criado em",
+      "updatedAt": "Última atualização",
+      "governancePolicies": "Políticas de Governança"
+    },
+    "editor": {
+      "createTitle": "Novo Template de Serviço",
+      "editTitle": "Editar Template",
+      "saveError": "Falha ao salvar o template. Verifique os campos.",
+      "sections": {
+        "identity": "Identidade",
+        "classification": "Classificação",
+        "ownership": "Ownership & Tags",
+        "advanced": "Avançado — Contrato & Scaffolding"
+      },
+      "fields": {
+        "slug": "Slug",
+        "displayName": "Nome de Exibição",
+        "version": "Versão",
+        "description": "Descrição",
+        "serviceType": "Tipo de Serviço",
+        "language": "Linguagem / Stack",
+        "defaultDomain": "Domínio Padrão",
+        "defaultTeam": "Equipa Padrão",
+        "tags": "Tags",
+        "repoUrl": "URL do Repositório Template",
+        "repoBranch": "Branch",
+        "baseContractSpec": "Contrato Base",
+        "scaffoldingManifest": "Manifesto de Scaffolding (JSON)"
+      },
+      "placeholders": {
+        "displayName": "Payment REST API — DDD .NET",
+        "description": "Template para APIs REST seguindo DDD com Clean Architecture...",
+        "domain": "pagamentos",
+        "team": "plataforma"
+      },
+      "hints": {
+        "slug": "Identificador único em kebab-case. Não pode ser alterado após a criação.",
+        "tags": "Tags separadas por vírgula para facilitar a descoberta.",
+        "typeLanguageImmutable": "Tipo de serviço e linguagem não podem ser alterados após a criação.",
+        "repoUrl": "Repositório Git opcional usado como fonte para o scaffolding.",
+        "baseContractSpec": "Contrato OpenAPI, AsyncAPI ou WSDL incluído em cada serviço gerado.",
+        "scaffoldingManifest": "Array JSON de objetos { path, content }. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} como variáveis."
+      }
+    },
+    "scaffold": {
+      "title": "Gerador de Scaffolding com IA",
+      "backToTemplate": "Voltar ao Template",
+      "next": "Próximo",
+      "generate": "Gerar com IA",
+      "retry": "Tentar Novamente",
+      "generateError": "Geração de IA falhou",
+      "generateErrorGeneric": "Ocorreu um erro inesperado. O provedor de IA pode estar indisponível.",
+      "steps": {
+        "template": "Template",
+        "intent": "Intenção",
+        "generate": "Gerando",
+        "review": "Revisão"
+      },
+      "info": {
+        "baseContract": "Contrato Base",
+        "scaffoldManifest": "Manifesto",
+        "defaultDomain": "Domínio",
+        "included": "Incluído",
+        "notIncluded": "Não incluído",
+        "aiGeneratesStructure": "IA gera a estrutura"
+      },
+      "fields": {
+        "serviceName": "Nome do Serviço",
+        "serviceDescription": "Descrição do Serviço",
+        "mainEntities": "Entidades / Rotas Principais",
+        "languageOverride": "Substituir Linguagem",
+        "teamName": "Equipa",
+        "domain": "Domínio",
+        "additionalRequirements": "Requisitos Adicionais"
+      },
+      "placeholders": {
+        "serviceDescription": "Descreva o que este serviço faz. Ex: Gerencia pagamentos com cartão, estornos e histórico de transações.",
+        "additionalRequirements": "Ex: Usar padrão Result<T>, adicionar logging estruturado com Serilog, incluir anotações Swagger..."
+      },
+      "hints": {
+        "serviceName": "Kebab-case em minúsculas. Usado como nome do projeto e base do namespace.",
+        "descriptionTip": "Quanto mais contexto você fornecer, melhor será a geração da IA."
+      },
+      "options": {
+        "useTemplateDefault": "Usar padrão do template"
+      },
+      "generating": {
+        "title": "A IA está gerando o scaffolding do seu projeto...",
+        "subtitle": "Isso pode levar de 20 a 60 segundos dependendo da complexidade.",
+        "step1": "Resolvendo template e contexto de governança",
+        "step2": "Analisando descrição do serviço e entidades",
+        "step3": "Gerando estrutura do projeto e código",
+        "step4": "Construindo testes, DTOs e arquivos de configuração"
+      },
+      "review": {
+        "files": "arquivos gerados",
+        "fallbackTitle": "Provedor de IA indisponível — scaffolding mínimo gerado",
+        "fallbackHint": "Configure um provedor de IA no AI Hub para obter geração completa de código.",
+        "successTitle": "{{count}} arquivos gerados com sucesso",
+        "successHint": "Serviço \"{{service}}\" gerado com {{language}}. Revise os arquivos abaixo.",
+        "regenerate": "Regenerar",
+        "downloadZip": "Baixar ZIP"
+      }
+    }
   }
 }

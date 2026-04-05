@@ -167,4 +167,41 @@ public sealed class ServiceTemplate : AuditableEntity<ServiceTemplateId>
         RepositoryTemplateUrl = url;
         RepositoryTemplateBranch = branch;
     }
+
+    /// <summary>
+    /// Atualiza os metadados editáveis do template (display name, descrição, versão, tags,
+    /// políticas de governança, contrato base, domínio e equipa padrão).
+    /// O slug e o tipo de serviço/linguagem não são alteráveis após criação.
+    /// </summary>
+    public void Update(
+        string displayName,
+        string description,
+        string version,
+        string defaultDomain,
+        string defaultTeam,
+        IReadOnlyList<string>? tags,
+        IReadOnlyList<Guid>? governancePolicyIds,
+        string? baseContractSpec,
+        string? scaffoldingManifestJson,
+        string? repositoryTemplateUrl,
+        string? repositoryTemplateBranch)
+    {
+        Guard.Against.NullOrWhiteSpace(displayName);
+        Guard.Against.NullOrWhiteSpace(description);
+        Guard.Against.NullOrWhiteSpace(version);
+        Guard.Against.NullOrWhiteSpace(defaultDomain);
+        Guard.Against.NullOrWhiteSpace(defaultTeam);
+
+        DisplayName = displayName.Trim();
+        Description = description.Trim();
+        Version = version.Trim();
+        DefaultDomain = defaultDomain.Trim();
+        DefaultTeam = defaultTeam.Trim();
+        Tags = tags ?? Array.Empty<string>();
+        GovernancePolicyIds = governancePolicyIds ?? Array.Empty<Guid>();
+        BaseContractSpec = baseContractSpec;
+        ScaffoldingManifestJson = scaffoldingManifestJson;
+        RepositoryTemplateUrl = repositoryTemplateUrl;
+        RepositoryTemplateBranch = repositoryTemplateBranch;
+    }
 }

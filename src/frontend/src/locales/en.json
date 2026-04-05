@@ -6277,5 +6277,159 @@
     },
     "subtitle": "Configure approval workflows, SLAs, gates, promotion paths, release windows and freeze policies",
     "title": "Workflow & Promotion Governance"
+  },
+  "templates": {
+    "library": {
+      "title": "Template Library",
+      "subtitle": "Governed project templates for developer scaffolding with AI assistance",
+      "createTemplate": "New Template",
+      "searchPlaceholder": "Search templates...",
+      "hasContract": "Base contract",
+      "hasManifest": "Manifest",
+      "viewDetails": "View Details",
+      "scaffold": "Scaffold with AI",
+      "empty": "No templates found. Create the first template to accelerate your team.",
+      "createFirst": "Create First Template",
+      "stats": {
+        "total": "Total templates",
+        "active": "Active",
+        "dotnet": ".NET templates",
+        "withContract": "With contract"
+      },
+      "filters": {
+        "allTypes": "All types",
+        "allLanguages": "All languages",
+        "showInactive": "Show inactive"
+      }
+    },
+    "detail": {
+      "notFound": "Template not found.",
+      "backToLibrary": "Template Library",
+      "edit": "Edit",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "scaffoldWithAi": "Scaffold with AI",
+      "active": "Active",
+      "inactive": "Inactive",
+      "ownership": "Ownership",
+      "defaultDomain": "Default domain",
+      "defaultTeam": "Default team",
+      "repository": "Repository",
+      "repoUrl": "Repository URL",
+      "repoBranch": "Branch",
+      "tags": "Tags",
+      "baseContract": "Base Contract Spec",
+      "scaffoldingManifest": "Scaffolding Manifest",
+      "stats": "Usage & Coverage",
+      "timesUsed": "times scaffolded",
+      "hasContract": "Base contract included",
+      "noContract": "No base contract",
+      "hasManifest": "Scaffolding manifest defined",
+      "noManifest": "No manifest — AI generates structure",
+      "audit": "Audit",
+      "createdAt": "Created",
+      "updatedAt": "Last updated",
+      "governancePolicies": "Governance Policies"
+    },
+    "editor": {
+      "createTitle": "New Service Template",
+      "editTitle": "Edit Template",
+      "saveError": "Failed to save template. Please check your inputs.",
+      "sections": {
+        "identity": "Identity",
+        "classification": "Classification",
+        "ownership": "Ownership & Tags",
+        "advanced": "Advanced — Contract & Scaffolding"
+      },
+      "fields": {
+        "slug": "Slug",
+        "displayName": "Display Name",
+        "version": "Version",
+        "description": "Description",
+        "serviceType": "Service Type",
+        "language": "Language / Stack",
+        "defaultDomain": "Default Domain",
+        "defaultTeam": "Default Team",
+        "tags": "Tags",
+        "repoUrl": "Repository Template URL",
+        "repoBranch": "Branch",
+        "baseContractSpec": "Base Contract Spec",
+        "scaffoldingManifest": "Scaffolding Manifest (JSON)"
+      },
+      "placeholders": {
+        "displayName": "Payment REST API — DDD .NET",
+        "description": "Template for building REST APIs following DDD with Clean Architecture...",
+        "domain": "payments",
+        "team": "platform-team"
+      },
+      "hints": {
+        "slug": "Unique identifier in kebab-case. Cannot be changed after creation.",
+        "tags": "Comma-separated tags for discoverability.",
+        "typeLanguageImmutable": "Service type and language cannot be changed after creation.",
+        "repoUrl": "Optional Git repository used as source for the scaffolding.",
+        "baseContractSpec": "OpenAPI, AsyncAPI or WSDL contract included in every generated service.",
+        "scaffoldingManifest": "JSON array of { path, content } objects. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} as variables."
+      }
+    },
+    "scaffold": {
+      "title": "AI Scaffold Generator",
+      "backToTemplate": "Back to Template",
+      "next": "Next",
+      "generate": "Generate with AI",
+      "retry": "Try Again",
+      "generateError": "AI generation failed",
+      "generateErrorGeneric": "An unexpected error occurred. The AI provider may be unavailable.",
+      "steps": {
+        "template": "Template",
+        "intent": "Intent",
+        "generate": "Generating",
+        "review": "Review"
+      },
+      "info": {
+        "baseContract": "Base Contract",
+        "scaffoldManifest": "Scaffold Manifest",
+        "defaultDomain": "Domain",
+        "included": "Included",
+        "notIncluded": "Not included",
+        "aiGeneratesStructure": "AI generates structure"
+      },
+      "fields": {
+        "serviceName": "Service Name",
+        "serviceDescription": "Service Description",
+        "mainEntities": "Main Entities / Routes",
+        "languageOverride": "Language Override",
+        "teamName": "Team",
+        "domain": "Domain",
+        "additionalRequirements": "Additional Requirements"
+      },
+      "placeholders": {
+        "serviceDescription": "Describe what this service does. E.g.: Handles payment processing including credit card charges, refunds, and transaction history for the checkout flow.",
+        "additionalRequirements": "E.g.: Use Result<T> pattern, add Serilog structured logging, include Swagger annotations..."
+      },
+      "hints": {
+        "serviceName": "Lowercase kebab-case. Used as project name and namespace base.",
+        "descriptionTip": "The more context you provide, the better the AI generation will be."
+      },
+      "options": {
+        "useTemplateDefault": "Use template default"
+      },
+      "generating": {
+        "title": "AI is generating your project scaffold...",
+        "subtitle": "This may take 20-60 seconds depending on the complexity.",
+        "step1": "Resolving template and governance context",
+        "step2": "Analyzing service description and entities",
+        "step3": "Generating project structure and code",
+        "step4": "Building tests, DTOs and configuration files"
+      },
+      "review": {
+        "files": "files generated",
+        "fallbackTitle": "AI provider unavailable — minimal scaffold generated",
+        "fallbackHint": "Configure an AI provider in AI Hub to get full code generation.",
+        "successTitle": "{{count}} files generated successfully",
+        "successHint": "Service {{service}} scaffolded with {{language}}. Review the files below.",
+        "regenerate": "Regenerate",
+        "downloadZip": "Download ZIP"
+      }
+    }
   }
 }
