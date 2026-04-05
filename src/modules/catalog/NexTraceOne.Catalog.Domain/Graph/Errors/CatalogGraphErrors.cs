@@ -122,4 +122,18 @@ public static class CatalogGraphErrors
     /// <summary>Discovery run não encontrado.</summary>
     public static Error DiscoveryRunNotFound(Guid runId)
         => Error.NotFound("CatalogGraph.DiscoveryRun.NotFound", "Discovery run '{0}' was not found.", runId);
+
+    // ── Framework / SDK Details ────────────────────────────────────────────
+
+    /// <summary>Detalhe de framework não encontrado para o serviço.</summary>
+    public static Error FrameworkDetailNotFound(Guid serviceAssetId)
+        => Error.NotFound("CatalogGraph.FrameworkDetail.NotFound", "Framework detail for service '{0}' was not found.", serviceAssetId);
+
+    /// <summary>Detalhe de framework já existe para o serviço.</summary>
+    public static Error FrameworkDetailAlreadyExists(Guid serviceAssetId)
+        => Error.Conflict("CatalogGraph.FrameworkDetail.AlreadyExists", "Framework detail already exists for service '{0}'.", serviceAssetId);
+
+    /// <summary>Serviço não é do tipo Framework.</summary>
+    public static Error ServiceIsNotFrameworkType(Guid serviceAssetId)
+        => Error.Business("CatalogGraph.ServiceAsset.NotFrameworkType", "Service '{0}' is not of type Framework.", serviceAssetId);
 }

@@ -49,6 +49,9 @@ public static class DependencyInjection
         services.AddScoped<IServiceAssetRepository, ServiceAssetRepository>();
         services.AddScoped<IServiceLinkRepository, ServiceLinkRepository>();
 
+        // ── Repositório de Framework/SDK details ─────────────────────────
+        services.AddScoped<IFrameworkAssetDetailRepository, FrameworkAssetDetailRepository>();
+
         // ── Repositórios de discovery automático ─────────────────────────
         services.AddScoped<IDiscoveredServiceRepository, DiscoveredServiceRepository>();
         services.AddScoped<IDiscoveryRunRepository, DiscoveryRunRepository>();
