@@ -215,13 +215,14 @@ Total: 147/147 compliance tests passing.
 > **Objetivo:** Integrações nativas com ecossistema enterprise
 
 ### 4.1 CI/CD Integrations Nativas ⏱️ 10-15 dias
-- [ ] **GitHub Actions** — GitHub App para ingestão automática de deploy events, PRs, releases
-- [ ] **GitLab CI** — webhook receiver para pipeline events
-- [ ] **Azure DevOps** — service hook para release gates integrados com NexTraceOne
+- [x] **GitHub Actions** ✅ (Rev. 15) — `GitHubActionsPayloadNormalizer` normaliza `deployment_status` e `workflow_run` webhooks → `POST /api/v1/integrations/webhooks/github` + `IngestionExecution` audit trail; 38 testes unitários
+- [x] **GitLab CI** ✅ (Rev. 15) — `GitLabCiPayloadNormalizer` normaliza pipeline events com extracção de variáveis `ENVIRONMENT`/`VERSION` → `POST /api/v1/integrations/webhooks/gitlab`
+- [x] **Azure DevOps** ✅ (Rev. 15) — `AzureDevOpsPayloadNormalizer` normaliza `release-deployment-completed-event` e `build-completed-event` → `POST /api/v1/integrations/webhooks/azuredevops`
+- [x] **`IngestCiCdWebhook` feature** ✅ (Rev. 15) — `ICiCdPayloadNormalizer` abstraction (open/closed para novos vendors); handler cria `IngestionExecution` para rastreabilidade completa; DI registado com 3 normalizers
 - [ ] **Jenkins** — plugin para change confidence check como stage
 - [ ] **ArgoCD/Flux** — controller para Kubernetes deployments
 
-**Valor:** Zero configuração manual de eventos de deploy.
+**Valor:** Zero configuração manual de eventos de deploy. Os 3 principais vendors (GitHub, GitLab, Azure DevOps) já normalizam e alimentam o pipeline de Change Intelligence automaticamente.
 
 ### 4.2 IDE Extensions ⏱️ 8-10 dias
 - [ ] **VS Code Extension** — ver contratos, ownership, change confidence inline
