@@ -108,7 +108,7 @@ public static class DiffCanonicalEntityVersions
             }
             catch (JsonException)
             {
-                // Se o JSON não for válido, retorna vazio
+                // Invalid JSON returns empty field set
             }
 
             return fields;

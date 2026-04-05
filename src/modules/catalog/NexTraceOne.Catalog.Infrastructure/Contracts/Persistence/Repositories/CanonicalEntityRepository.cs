@@ -34,11 +34,11 @@ internal sealed class CanonicalEntityRepository(ContractsDbContext context)
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            var term = searchTerm.Trim().ToLower();
+            var term = searchTerm.Trim();
             query = query.Where(e =>
-                e.Name.ToLower().Contains(term) ||
-                e.Description.ToLower().Contains(term) ||
-                e.Owner.ToLower().Contains(term));
+                EF.Functions.ILike(e.Name, $"%{term}%") ||
+                EF.Functions.ILike(e.Description, $"%{term}%") ||
+                EF.Functions.ILike(e.Owner, $"%{term}%"));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
