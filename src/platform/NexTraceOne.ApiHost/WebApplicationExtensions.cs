@@ -313,6 +313,7 @@ public static class WebApplicationExtensions
     /// Executa o script SQL idempotente que cria/actualiza as políticas RLS
     /// para isolamento por tenant em todas as tabelas elegíveis.
     /// Só é executado quando existem migrações pendentes aplicadas nesta sessão.
+    /// Em ambientes containerizados, configura o caminho via NEXTRACE_RLS_SCRIPT_PATH.
     /// </summary>
     private static async Task ApplyRlsPoliciesAsync(
         IServiceScope scope,
@@ -320,28 +321,29 @@ public static class WebApplicationExtensions
     {
         const string rlsScriptRelativePath = "infra/postgres/apply-rls.sql";
 
-        // Resolve o caminho do script RLS relativamente à raiz do projeto.
-        // Em desenvolvimento, o ContentRootPath aponta para src/platform/NexTraceOne.ApiHost.
-        // Navegamos para a raiz do repositório.
-        var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
-        var solutionRoot = FindSolutionRootFrom(contentRoot);
+        // 1. Check explicit environment variable (works in containers and non-standard deployments).
+        var explicitPath = Environment.GetEnvironmentVariable("NEXTRACE_RLS_SCRIPT_PATH");
 
-        if (solutionRoot is null)
+        // 2. Fall back to solution root discovery (works in development).
+        string? rlsScriptPath;
+        if (!string.IsNullOrWhiteSpace(explicitPath))
         {
-            logger.LogWarning(
-                "Could not locate solution root from ContentRootPath '{ContentRoot}'. " +
-                "RLS policies will not be auto-applied. Run 'psql -f {Script}' manually.",
-                contentRoot, rlsScriptRelativePath);
-            return;
+            rlsScriptPath = explicitPath;
+        }
+        else
+        {
+            var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
+            var solutionRoot = FindSolutionRootFrom(contentRoot);
+            rlsScriptPath = solutionRoot is not null ? Path.Combine(solutionRoot, rlsScriptRelativePath) : null;
         }
 
-        var rlsScriptPath = Path.Combine(solutionRoot, rlsScriptRelativePath);
-        if (!File.Exists(rlsScriptPath))
+        if (rlsScriptPath is null || !File.Exists(rlsScriptPath))
         {
-            logger.LogWarning(
-                "RLS script not found at '{Path}'. " +
-                "RLS policies will not be auto-applied. Ensure the script exists or run it manually.",
-                rlsScriptPath);
+            logger.LogInformation(
+                "RLS script not found (path: '{Path}'). " +
+                "RLS policies will not be auto-applied. " +
+                "Set NEXTRACE_RLS_SCRIPT_PATH or run 'psql -f {Script}' manually after migrations.",
+                rlsScriptPath ?? "(unresolved)", rlsScriptRelativePath);
             return;
         }
 
@@ -355,7 +357,7 @@ public static class WebApplicationExtensions
 
             logger.LogInformation(
                 "RLS policies applied successfully from '{ScriptPath}'.",
-                rlsScriptRelativePath);
+                rlsScriptPath);
         }
         catch (Exception ex)
         {
@@ -364,7 +366,7 @@ public static class WebApplicationExtensions
                 "Failed to apply RLS policies from '{ScriptPath}'. " +
                 "The application will continue without RLS enforcement. " +
                 "Run the script manually: psql -f {Script}",
-                rlsScriptRelativePath, rlsScriptRelativePath);
+                rlsScriptPath, rlsScriptRelativePath);
         }
     }
 

@@ -35,7 +35,7 @@ services:
     volumes:
       - elasticsearch-certs:/usr/share/elasticsearch/config/certs
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf --cacert config/certs/ca.p12 -u elastic:${ELASTIC_PASSWORD} https://localhost:9200/_cluster/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf --cacert config/certs/ca.p12 https://localhost:9200/_cluster/health -u elastic:$$ELASTIC_PASSWORD || exit 1"]
     deploy:
       resources:
         limits:
