@@ -51,6 +51,12 @@ export function generateValueForProperty(prop: SchemaProperty): unknown {
   }
 }
 
+/**
+ * Gera um exemplo de string com base no formato e no nome da propriedade.
+ * Usa o constraint `format` (email, uuid, date-time, etc.) como prioridade.
+ * Quando sem formato, infere pelo nome da propriedade (e.g. "email", "city").
+ * Respeita constraints de minLength/maxLength no valor final.
+ */
 export function generateStringExample(prop: SchemaProperty): string {
   const format = prop.constraints?.format;
   if (format) {
@@ -104,12 +110,20 @@ export function generateStringExample(prop: SchemaProperty): string {
   return example;
 }
 
+/**
+ * Gera um inteiro representativo: ponto médio entre minimum e maximum.
+ * Sem constraints, usa o intervalo padrão 0–100 (retorna 50).
+ */
 export function generateIntegerExample(prop: SchemaProperty): number {
   const min = prop.constraints?.minimum ?? 0;
   const max = prop.constraints?.maximum ?? 100;
   return Math.max(min, Math.min(Math.floor((min + max) / 2), max));
 }
 
+/**
+ * Gera um número representativo: ponto médio arredondado a 2 casas decimais.
+ * Sem constraints, usa o intervalo padrão 0–100 (retorna 50).
+ */
 export function generateNumberExample(prop: SchemaProperty): number {
   const min = prop.constraints?.minimum ?? 0;
   const max = prop.constraints?.maximum ?? 100;
