@@ -29,7 +29,7 @@ public sealed class SubscriptionTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.ApiName.Should().Be("Payments API");
-        result.Value.IsActive.Should().BeTrue();
+        result.Value.IsActive.Should().BeFalse();
         result.Value.Channel.Should().Be(NotificationChannel.Email);
         result.Value.CreatedAt.Should().Be(Now);
         result.Value.LastNotifiedAt.Should().BeNull();
@@ -215,6 +215,8 @@ public sealed class SubscriptionTests
             webhookUrl: null,
             Now);
 
-        return result.Value;
+        var subscription = result.Value;
+        subscription.Approve("admin", Now);
+        return subscription;
     }
 }

@@ -50,6 +50,18 @@ public sealed class Subscription : AggregateRoot<SubscriptionId>
     /// <summary>Indica se a subscrição está ativa e a receber notificações.</summary>
     public bool IsActive { get; private set; }
 
+    /// <summary>Estado de aprovação da subscrição.</summary>
+    public SubscriptionStatus Status { get; private set; } = SubscriptionStatus.PendingApproval;
+
+    /// <summary>Utilizador que aprovou a subscrição.</summary>
+    public string? ApprovedBy { get; private set; }
+
+    /// <summary>Data/hora da aprovação.</summary>
+    public DateTimeOffset? ApprovedAt { get; private set; }
+
+    /// <summary>Motivo de rejeição quando aplicável.</summary>
+    public string? RejectionReason { get; private set; }
+
     /// <summary>Data/hora UTC de criação da subscrição.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
@@ -94,7 +106,7 @@ public sealed class Subscription : AggregateRoot<SubscriptionId>
             Level = level,
             Channel = channel,
             WebhookUrl = webhookUrl,
-            IsActive = true,
+            IsActive = false,
             CreatedAt = createdAt
         });
     }
@@ -147,6 +159,31 @@ public sealed class Subscription : AggregateRoot<SubscriptionId>
     public void MarkNotified(DateTimeOffset timestamp)
     {
         LastNotifiedAt = timestamp;
+    }
+
+    /// <summary>Aprova uma subscrição pendente, ativando-a.</summary>
+    public Result<Unit> Approve(string approvedBy, DateTimeOffset approvedAt)
+    {
+        if (Status != SubscriptionStatus.PendingApproval)
+            return DeveloperPortalErrors.SubscriptionNotPendingApproval(Id.Value.ToString());
+
+        Status = SubscriptionStatus.Active;
+        IsActive = true;
+        ApprovedBy = approvedBy;
+        ApprovedAt = approvedAt;
+        return Unit.Value;
+    }
+
+    /// <summary>Rejeita uma subscrição, impedindo o acesso.</summary>
+    public Result<Unit> Reject(string rejectionReason, DateTimeOffset rejectedAt)
+    {
+        if (Status == SubscriptionStatus.Rejected)
+            return DeveloperPortalErrors.SubscriptionAlreadyRejected(Id.Value.ToString());
+
+        Status = SubscriptionStatus.Rejected;
+        IsActive = false;
+        RejectionReason = rejectionReason;
+        return Unit.Value;
     }
 }
 

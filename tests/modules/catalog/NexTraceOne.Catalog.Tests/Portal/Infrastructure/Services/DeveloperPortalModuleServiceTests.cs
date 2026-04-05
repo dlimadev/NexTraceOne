@@ -216,8 +216,8 @@ public sealed class DeveloperPortalModuleServiceTests
 
         var subscription = result.Value;
 
-        if (!isActive)
-            subscription.Deactivate();
+        if (isActive)
+            subscription.Approve("admin", Now);
 
         return subscription;
     }

@@ -36,6 +36,12 @@ public sealed class DeveloperPortalDbContext(
     /// <summary>Entradas do Publication Center — governa a exposição de contratos no Developer Portal.</summary>
     public DbSet<ContractPublicationEntry> ContractPublications => Set<ContractPublicationEntry>();
 
+    /// <summary>API Keys para acesso programático ao Developer Portal.</summary>
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+
+    /// <summary>Políticas de rate limiting por API.</summary>
+    public DbSet<RateLimitPolicy> RateLimitPolicies => Set<RateLimitPolicy>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(DeveloperPortalDbContext).Assembly;

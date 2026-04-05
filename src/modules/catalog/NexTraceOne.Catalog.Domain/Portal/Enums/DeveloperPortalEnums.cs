@@ -42,6 +42,24 @@ public enum GenerationType
     DataModels = 3
 }
 
+/// <summary>Escopo de acesso de uma API Key no Developer Portal.</summary>
+public enum ApiKeyScope
+{
+    GlobalPortal = 0,
+    SingleApi = 1,
+    ReadOnly = 2,
+    AdminApi = 3
+}
+
+/// <summary>Estado de aprovação de uma subscrição de API.</summary>
+public enum SubscriptionStatus
+{
+    PendingApproval = 0,
+    Active = 1,
+    Rejected = 2,
+    Cancelled = 3
+}
+
 /// <summary>Tipo de evento de analytics registrado pelo portal do desenvolvedor.</summary>
 public enum PortalEventType
 {

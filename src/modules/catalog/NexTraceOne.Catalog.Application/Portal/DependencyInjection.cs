@@ -4,12 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Catalog.Application.Portal.Features.ApproveSubscription;
+using NexTraceOne.Catalog.Application.Portal.Features.CreateApiKey;
 using NexTraceOne.Catalog.Application.Portal.Features.CreateSubscription;
 using NexTraceOne.Catalog.Application.Portal.Features.DeleteSubscription;
 using NexTraceOne.Catalog.Application.Portal.Features.GenerateCode;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApiConsumers;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApiDetail;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApiHealth;
+using NexTraceOne.Catalog.Application.Portal.Features.GetApiUsageAnalytics;
 using NexTraceOne.Catalog.Application.Portal.Features.GetApisIConsume;
 using NexTraceOne.Catalog.Application.Portal.Features.GetAssetTimeline;
 using NexTraceOne.Catalog.Application.Portal.Features.GetContractPublicationStatus;
@@ -17,11 +20,17 @@ using NexTraceOne.Catalog.Application.Portal.Features.GetMyApis;
 using NexTraceOne.Catalog.Application.Portal.Features.GetPlaygroundHistory;
 using NexTraceOne.Catalog.Application.Portal.Features.GetPortalAnalytics;
 using NexTraceOne.Catalog.Application.Portal.Features.GetPublicationCenterEntries;
+using NexTraceOne.Catalog.Application.Portal.Features.GetRateLimitPolicy;
 using NexTraceOne.Catalog.Application.Portal.Features.GetSubscriptions;
+using NexTraceOne.Catalog.Application.Portal.Features.ListApiKeys;
 using NexTraceOne.Catalog.Application.Portal.Features.PublishContractToPortal;
 using NexTraceOne.Catalog.Application.Portal.Features.RecordAnalyticsEvent;
+using NexTraceOne.Catalog.Application.Portal.Features.RejectSubscription;
 using NexTraceOne.Catalog.Application.Portal.Features.RenderOpenApiContract;
+using NexTraceOne.Catalog.Application.Portal.Features.RevokeApiKey;
 using NexTraceOne.Catalog.Application.Portal.Features.SearchCatalog;
+using NexTraceOne.Catalog.Application.Portal.Features.SetRateLimitPolicy;
+using NexTraceOne.Catalog.Application.Portal.Features.ValidateApiKey;
 using NexTraceOne.Catalog.Application.Portal.Features.WithdrawContractFromPortal;
 
 namespace NexTraceOne.Catalog.Application.Portal;
@@ -65,6 +74,17 @@ public static class DependencyInjection
         services.AddTransient<IValidator<WithdrawContractFromPortal.Command>, WithdrawContractFromPortal.Validator>();
         services.AddTransient<IValidator<GetPublicationCenterEntries.Query>, GetPublicationCenterEntries.Validator>();
         services.AddTransient<IValidator<GetContractPublicationStatus.Query>, GetContractPublicationStatus.Validator>();
+
+        // API Marketplace — API Keys, Rate Limiting, Subscription Approval, Usage Analytics
+        services.AddTransient<IValidator<CreateApiKey.Command>, CreateApiKey.Validator>();
+        services.AddTransient<IValidator<RevokeApiKey.Command>, RevokeApiKey.Validator>();
+        services.AddTransient<IValidator<ListApiKeys.Query>, ListApiKeys.Validator>();
+        services.AddTransient<IValidator<ValidateApiKey.Command>, ValidateApiKey.Validator>();
+        services.AddTransient<IValidator<ApproveSubscription.Command>, ApproveSubscription.Validator>();
+        services.AddTransient<IValidator<RejectSubscription.Command>, RejectSubscription.Validator>();
+        services.AddTransient<IValidator<GetApiUsageAnalytics.Query>, GetApiUsageAnalytics.Validator>();
+        services.AddTransient<IValidator<SetRateLimitPolicy.Command>, SetRateLimitPolicy.Validator>();
+        services.AddTransient<IValidator<GetRateLimitPolicy.Query>, GetRateLimitPolicy.Validator>();
 
         return services;
     }
