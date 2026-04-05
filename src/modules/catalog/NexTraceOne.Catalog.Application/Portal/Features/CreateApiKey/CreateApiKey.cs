@@ -45,6 +45,7 @@ public static class CreateApiKey
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
+            // Generates a 32-byte (256-bit) cryptographically random key encoded as a 64-character hex string.
             var rawBytes = RandomNumberGenerator.GetBytes(32);
             var rawKey = Convert.ToHexString(rawBytes).ToLowerInvariant();
 
