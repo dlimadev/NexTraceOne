@@ -470,7 +470,7 @@ export function VisualRestBuilder({
                                 <button type="button"
                                   onClick={() => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, properties: undefined } })}
                                   className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
-                                    !ep.requestBody.properties || ep.requestBody.properties.length === 0 && ep.requestBody.schema
+                                    (!ep.requestBody.properties || ep.requestBody.properties.length === 0) && ep.requestBody.schema
                                       ? 'bg-accent/15 text-accent border border-accent/25'
                                       : 'bg-muted/10 text-muted border border-edge hover:text-body'
                                   }`}>
@@ -565,7 +565,7 @@ export function VisualRestBuilder({
                                   updateEndpoint(ep.id, { responses: next });
                                 }}
                                 className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
-                                  !res.properties || (res.properties.length === 0 && res.schema)
+                                  (!res.properties || res.properties.length === 0) && res.schema
                                     ? 'bg-accent/15 text-accent border border-accent/25'
                                     : 'bg-muted/10 text-muted border border-edge hover:text-body'
                                 }`}>

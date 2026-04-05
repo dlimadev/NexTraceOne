@@ -48,9 +48,9 @@ const TYPE_COLORS: Record<string, string> = {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-let _nextId = 1;
+let fallbackIdCounter = 1;
 function genPropId() {
-  return `prop-${crypto.randomUUID?.() ?? `fallback-${_nextId++}`}`;
+  return `prop-${crypto.randomUUID?.() ?? `fallback-${fallbackIdCounter++}`}`;
 }
 
 function createProperty(type: SchemaProperty['type'] = 'string'): SchemaProperty {
