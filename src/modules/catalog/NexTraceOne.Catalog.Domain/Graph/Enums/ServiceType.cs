@@ -68,5 +68,8 @@ public enum ServiceType
     MqQueueManager = 18,
 
     /// <summary>API z/OS Connect — exposição de transações mainframe via REST.</summary>
-    ZosConnectApi = 19
+    ZosConnectApi = 19,
+
+    /// <summary>Framework / SDK interno — biblioteca ou framework partilhado com desenvolvimento próprio.</summary>
+    Framework = 20
 }

@@ -7,6 +7,7 @@ using NexTraceOne.Catalog.Domain.Graph.Enums;
 using GetServiceDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceDetail.GetServiceDetail;
 using GetServicesSummaryFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServicesSummary.GetServicesSummary;
 using ListServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.ListServices.ListServices;
+using RegisterServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset.RegisterServiceAsset;
 using SearchServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.SearchServices.SearchServices;
 using UpdateServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceAsset.UpdateServiceAsset;
 using UpdateServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateServiceOwnership.UpdateServiceOwnership;
@@ -320,5 +321,152 @@ public sealed class ServiceCatalogApplicationTests
         var act = () => service.UpdateOwnership("", "tech.owner", "biz.owner");
 
         act.Should().Throw<ArgumentException>();
+    }
+
+    // ── RegisterServiceAsset ──────────────────────────────────────────────
+
+    [Fact]
+    public async Task RegisterServiceAsset_Should_CreateService_WithMinimalFields()
+    {
+        var repository = Substitute.For<IServiceAssetRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+
+        repository.GetByNameAsync("new-service", Arg.Any<CancellationToken>())
+            .Returns((ServiceAsset?)null);
+
+        var result = await sut.Handle(
+            new RegisterServiceAssetFeature.Command("new-service", "Finance", "Team Alpha"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Name.Should().Be("new-service");
+        result.Value.Domain.Should().Be("Finance");
+        result.Value.TeamName.Should().Be("Team Alpha");
+        result.Value.ServiceType.Should().Be("RestApi");
+        result.Value.Criticality.Should().Be("Medium");
+        result.Value.ExposureType.Should().Be("Internal");
+        result.Value.Description.Should().BeEmpty();
+        result.Value.TechnicalOwner.Should().BeEmpty();
+        result.Value.BusinessOwner.Should().BeEmpty();
+        result.Value.DocumentationUrl.Should().BeEmpty();
+        result.Value.RepositoryUrl.Should().BeEmpty();
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RegisterServiceAsset_Should_CreateService_WithAllFields()
+    {
+        var repository = Substitute.For<IServiceAssetRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+
+        repository.GetByNameAsync("full-service", Arg.Any<CancellationToken>())
+            .Returns((ServiceAsset?)null);
+
+        var result = await sut.Handle(
+            new RegisterServiceAssetFeature.Command(
+                "full-service",
+                "Finance",
+                "Team Alpha",
+                Description: "A full service",
+                ServiceType: "KafkaProducer",
+                Criticality: "Critical",
+                ExposureType: "External",
+                TechnicalOwner: "john.doe",
+                BusinessOwner: "jane.product",
+                DocumentationUrl: "https://docs.example.com",
+                RepositoryUrl: "https://github.com/example/svc"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Name.Should().Be("full-service");
+        result.Value.Domain.Should().Be("Finance");
+        result.Value.TeamName.Should().Be("Team Alpha");
+        result.Value.Description.Should().Be("A full service");
+        result.Value.ServiceType.Should().Be("KafkaProducer");
+        result.Value.Criticality.Should().Be("Critical");
+        result.Value.ExposureType.Should().Be("External");
+        result.Value.TechnicalOwner.Should().Be("john.doe");
+        result.Value.BusinessOwner.Should().Be("jane.product");
+        result.Value.DocumentationUrl.Should().Be("https://docs.example.com");
+        result.Value.RepositoryUrl.Should().Be("https://github.com/example/svc");
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RegisterServiceAsset_Should_ReturnError_When_ServiceAlreadyExists()
+    {
+        var repository = Substitute.For<IServiceAssetRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+
+        var existing = ServiceAsset.Create("existing-service", "Finance", "Team Alpha");
+        repository.GetByNameAsync("existing-service", Arg.Any<CancellationToken>())
+            .Returns(existing);
+
+        var result = await sut.Handle(
+            new RegisterServiceAssetFeature.Command("existing-service", "Finance", "Team Alpha"),
+            CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("CatalogGraph.ServiceAsset.AlreadyExists");
+        await unitOfWork.DidNotReceive().CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RegisterServiceAsset_Should_ParseEnumFieldsSafely()
+    {
+        var repository = Substitute.For<IServiceAssetRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+
+        repository.GetByNameAsync("safe-service", Arg.Any<CancellationToken>())
+            .Returns((ServiceAsset?)null);
+
+        var result = await sut.Handle(
+            new RegisterServiceAssetFeature.Command(
+                "safe-service",
+                "Finance",
+                "Team Alpha",
+                ServiceType: "InvalidEnumValue",
+                Criticality: "NotAValidCriticality",
+                ExposureType: "Unknown"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.ServiceType.Should().Be("RestApi");
+        result.Value.Criticality.Should().Be("Low");
+        result.Value.ExposureType.Should().Be("Internal");
+    }
+
+    [Fact]
+    public async Task RegisterServiceAsset_Should_ApplyDetailsAndOwnership_When_OptionalFieldsProvided()
+    {
+        var repository = Substitute.For<IServiceAssetRepository>();
+        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+
+        repository.GetByNameAsync("detail-service", Arg.Any<CancellationToken>())
+            .Returns((ServiceAsset?)null);
+
+        var result = await sut.Handle(
+            new RegisterServiceAssetFeature.Command(
+                "detail-service",
+                "Sales",
+                "Team Beta",
+                Description: "Handles sales",
+                ServiceType: "Framework",
+                TechnicalOwner: "tech.lead"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Description.Should().Be("Handles sales");
+        result.Value.ServiceType.Should().Be("Framework");
+        result.Value.TechnicalOwner.Should().Be("tech.lead");
+        result.Value.BusinessOwner.Should().BeEmpty();
+        result.Value.Criticality.Should().Be("Low");
+        result.Value.ExposureType.Should().Be("Internal");
+        repository.Received(1).Add(Arg.Any<ServiceAsset>());
     }
 }
