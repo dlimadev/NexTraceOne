@@ -1,3 +1,5 @@
+using MediatR;
+
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
@@ -65,7 +67,7 @@ public sealed class RateLimitPolicy : Entity<RateLimitPolicyId>
     }
 
     /// <summary>Atualiza configuração da política de rate limit.</summary>
-    public void Update(
+    public Result<Unit> Update(
         int requestsPerMinute,
         int requestsPerHour,
         int requestsPerDay,
@@ -74,6 +76,15 @@ public sealed class RateLimitPolicy : Entity<RateLimitPolicyId>
         string? notes,
         DateTimeOffset updatedAt)
     {
+        if (requestsPerMinute <= 0 || requestsPerMinute > 10000)
+            return DeveloperPortalErrors.InvalidRateLimitValues();
+        if (requestsPerHour <= requestsPerMinute)
+            return DeveloperPortalErrors.InvalidRateLimitValues();
+        if (requestsPerDay <= requestsPerHour)
+            return DeveloperPortalErrors.InvalidRateLimitValues();
+        if (burstLimit < 1)
+            return DeveloperPortalErrors.InvalidRateLimitValues();
+
         RequestsPerMinute = requestsPerMinute;
         RequestsPerHour = requestsPerHour;
         RequestsPerDay = requestsPerDay;
@@ -81,6 +92,7 @@ public sealed class RateLimitPolicy : Entity<RateLimitPolicyId>
         IsEnabled = isEnabled;
         Notes = notes;
         UpdatedAt = updatedAt;
+        return Unit.Value;
     }
 }
 

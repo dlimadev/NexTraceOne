@@ -74,6 +74,6 @@ public static class GetApiUsageAnalytics
         IReadOnlyList<ConsumerBreakdownDto> ConsumerBreakdown,
         int DaysBack);
 
-    public sealed record TopApiDto(Guid ApiAssetId, string ApiName, int RequestCount);
+    public sealed record TopApiDto(Guid ApiAssetId, string ApiAssetLabel, int RequestCount);
     public sealed record ConsumerBreakdownDto(Guid ConsumerId, string ConsumerService, int RequestCount);
 }

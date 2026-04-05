@@ -304,12 +304,13 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 15)
+### Estado Atual (Abril 2026 — Rev. 16)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~99% COMPLETO** ✅
 **Phase 3 — 3.1 + 3.3 + 3.4 + 3.5 COMPLETOS** ✅
 **Phase 4.1 — CI/CD Integrations (GitHub, GitLab, Azure DevOps) — COMPLETO** ✅
+**Phase 4.3 — API Marketplace (API Keys, Approval Workflow, Usage Analytics, Rate Limiting) — COMPLETO** ✅
 
 Gaps resolvidos desde a análise inicial:
 - ~~3 build errors backend~~ → 0 build errors
@@ -333,6 +334,7 @@ Gaps resolvidos desde a análise inicial:
 - ~~Validação incompleta (Governance)~~ → 37 novos `AbstractValidator<Query>` adicionados a todas as features com parâmetros; DI actualizado com 50 registos `IValidator` (13 Commands + 37 Queries) ✅ (Rev. 13)
 - ~~Validação incompleta (AIKnowledge/IdentityAccess/Catalog/Integrations)~~ → 36 novos validators em AIKnowledge (25), Catalog Graph (5), Integrations (5), IdentityAccess (1); DI actualizado em todos os módulos ✅ (Rev. 14). Cobertura final: Governance 50/58, AIKnowledge 72/88, IdentityAccess 30/43, Catalog 130/133, Integrations 11/13 — gaps remanescentes são exclusivamente queries vazias ou seed commands sem parâmetros validáveis
 - ~~Phase 4.1 CI/CD Integrations (GitHub Actions, GitLab, Azure DevOps)~~ → `ICiCdPayloadNormalizer` abstraction + `GitHubActionsPayloadNormalizer` + `GitLabCiPayloadNormalizer` + `AzureDevOpsPayloadNormalizer` + `IngestCiCdWebhook` feature + `POST /api/v1/integrations/webhooks/{vendor}` + DI registado + 38 testes unitários ✅ (Rev. 15)
+- ~~Phase 4.3 API Marketplace~~ → `ApiKey` aggregate (SHA-256 hash, raw key apenas no Create) + `RateLimitPolicy` entity + 9 features (`CreateApiKey`, `RevokeApiKey`, `ListApiKeys`, `ValidateApiKey`, `ApproveSubscription`, `RejectSubscription`, `GetApiUsageAnalytics`, `SetRateLimitPolicy`, `GetRateLimitPolicy`) + 9 novos endpoints + migration `W01_AddApiKeysAndRateLimitPolicies` + 40 testes unitários ✅ (Rev. 16)
 
 ### Gaps Remanescentes (Phase 1-2)
 
@@ -354,18 +356,18 @@ Gaps resolvidos desde a análise inicial:
 
 - **Phase 4.1 partial** — Jenkins plugin + ArgoCD/Flux controller (dependem de runtimes externos)
 - **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
-- **Phase 4.3** — API Marketplace (subscription workflow, API keys, usage analytics)
+- ~~**Phase 4.3**~~ ✅ FIXED (Rev. 16) — API Marketplace core (API Keys, Approval Workflow, Usage Analytics, Rate Limiting). Pendente: sandbox environments completo
 - **Phase 4.4** — Cost Intelligence V2 (cloud cost correlation, anomaly detection)
 - **Phase 4.5** — Multi-Cluster & Multi-Cloud
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 15)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 16)
 
 | Módulo | Testes |
 |--------|--------|
 | ChangeGovernance | 301/301 ✅ |
 | OperationalIntelligence | 548/548 ✅ |
 | AuditCompliance | 147/147 ✅ |
-| Catalog (inclui ServiceTemplate) | 873/876 ✅ (3 pre-existentes falhos em ContractEntities) |
+| Catalog (inclui ServiceTemplate + API Marketplace) | 910/913 ✅ (3 pre-existentes falhos em ContractEntities) |
 | Integrations (inclui CI/CD webhooks) | 126/126 ✅ |
 | Frontend (Vitest) | 915/915 ✅ |
-| Total backend | ~1.650+ testes |
+| Total backend | ~1.700+ testes |

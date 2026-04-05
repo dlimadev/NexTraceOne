@@ -235,11 +235,11 @@ Total: 147/147 compliance tests passing.
 **Inspiração:** SwaggerHub + RapidAPI + Backstage Marketplace
 
 Evoluir o Developer Portal existente para:
-- [ ] **Subscrição de APIs** com approval workflow
-- [ ] **API keys management** governado
-- [ ] **Usage analytics** por consumidor, API, versão
-- [ ] **Rate limiting policies** configuráveis por contrato
-- [ ] **Sandbox environments** para teste de contratos
+- [x] **Subscrição de APIs** com approval workflow ✅ (Rev. 16) — `ApproveSubscription` + `RejectSubscription` + `SubscriptionStatus` (PendingApproval/Active/Rejected/Cancelled) + `POST /api/v1/developerportal/subscriptions/{id}/approve|reject` + 6 testes
+- [x] **API keys management** governado ✅ (Rev. 16) — `ApiKey` aggregate (hash SHA-256, raw key retornado apenas uma vez) + `CreateApiKey` + `RevokeApiKey` + `ListApiKeys` + `ValidateApiKey` + 4 endpoints + 21 testes
+- [x] **Usage analytics** por consumidor, API, versão ✅ (Rev. 16) — `GetApiUsageAnalytics` com breakdown por API/consumer/activeKeys + `GET /api/v1/developerportal/usage/analytics` + 4 testes
+- [x] **Rate limiting policies** configuráveis por contrato ✅ (Rev. 16) — `RateLimitPolicy` entity (rpm/rph/rpd/burst) + `SetRateLimitPolicy` + `GetRateLimitPolicy` + `PUT|GET /api/v1/developerportal/ratelimit/{apiAssetId}` + 4 testes
+- [ ] **Sandbox environments** para teste de contratos (PlaygroundSession já existe; sandbox completo com mocking requer infra adicional)
 
 **Valor:** Marketplace interno governado, eliminando shadow APIs.
 

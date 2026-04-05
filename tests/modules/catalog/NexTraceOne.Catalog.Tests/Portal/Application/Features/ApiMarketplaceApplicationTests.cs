@@ -666,8 +666,9 @@ public sealed class ApiMarketplaceApplicationTests
         var policy = CreateRateLimitPolicy(Guid.NewGuid());
         var updatedAt = Now.AddHours(1);
 
-        policy.Update(20, 200, 2000, 40, false, "Updated notes", updatedAt);
+        var updateResult = policy.Update(20, 200, 2000, 40, false, "Updated notes", updatedAt);
 
+        updateResult.IsSuccess.Should().BeTrue();
         policy.RequestsPerMinute.Should().Be(20);
         policy.RequestsPerHour.Should().Be(200);
         policy.RequestsPerDay.Should().Be(2000);

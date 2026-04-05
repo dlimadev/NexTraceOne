@@ -46,7 +46,7 @@ public static class SetRateLimitPolicy
 
             if (existing is not null)
             {
-                existing.Update(
+                var updateResult = existing.Update(
                     request.RequestsPerMinute,
                     request.RequestsPerHour,
                     request.RequestsPerDay,
@@ -54,6 +54,10 @@ public static class SetRateLimitPolicy
                     request.IsEnabled,
                     request.Notes,
                     clock.UtcNow);
+
+                if (updateResult.IsFailure)
+                    return updateResult.Error;
+
                 repository.Update(existing);
             }
             else

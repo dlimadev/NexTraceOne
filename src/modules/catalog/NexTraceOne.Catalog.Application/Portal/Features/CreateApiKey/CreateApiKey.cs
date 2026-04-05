@@ -43,6 +43,8 @@ public static class CreateApiKey
         IUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
+        private const int KeyPrefixLength = 8;
+
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             // Generates a 32-byte (256-bit) cryptographically random key encoded as a 64-character hex string.
@@ -52,7 +54,7 @@ public static class CreateApiKey
             var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawKey));
             var keyHash = Convert.ToHexString(hashBytes).ToLowerInvariant();
 
-            var keyPrefix = rawKey[..8] + "...";
+            var keyPrefix = rawKey[..KeyPrefixLength] + "...";
 
             var createResult = ApiKey.Create(
                 request.OwnerId,
