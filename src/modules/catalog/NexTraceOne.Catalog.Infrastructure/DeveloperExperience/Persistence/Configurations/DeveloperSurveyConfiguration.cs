@@ -31,6 +31,6 @@ internal sealed class DeveloperSurveyConfiguration : IEntityTypeConfiguration<De
         builder.HasIndex(x => x.TeamId);
         builder.HasIndex(x => x.Period);
         builder.HasIndex(x => x.SubmittedAt);
-        builder.HasIndex(new[] { nameof(DeveloperSurvey.TeamId), nameof(DeveloperSurvey.Period) });
+        builder.HasIndex(x => new { x.TeamId, x.Period });
     }
 }

@@ -27,13 +27,7 @@ namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Mig
                     PlatformSatisfaction = table.Column<decimal>(type: "numeric(6,2)", precision: 6, scale: 2, nullable: false),
                     NpsCategory = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Comments = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
-                    SubmittedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                    SubmittedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
