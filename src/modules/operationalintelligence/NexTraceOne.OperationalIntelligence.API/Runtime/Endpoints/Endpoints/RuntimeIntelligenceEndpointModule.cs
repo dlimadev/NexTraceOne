@@ -17,7 +17,9 @@ using CompareReleaseRuntimeFeature = NexTraceOne.OperationalIntelligence.Applica
 using EstablishRuntimeBaselineFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline.EstablishRuntimeBaseline;
 using CompareEnvironmentsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareEnvironments.CompareEnvironments;
 using CorrelateTraceToChangeFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateTraceToChange.CorrelateTraceToChange;
+using CorrelateServiceMetricsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateServiceMetrics.CorrelateServiceMetrics;
 using DetectLogAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectLogAnomaly.DetectLogAnomaly;
+using GetTopologyAwareAlertsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTopologyAwareAlerts.GetTopologyAwareAlerts;
 
 namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints.Endpoints;
 
@@ -200,5 +202,28 @@ public sealed class RuntimeIntelligenceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:runtime:write");
+
+        // ── P5.4 — Metric Correlation + Topology-Aware Alerting ──
+        group.MapPost("/correlate-metrics", async (
+            CorrelateServiceMetricsFeature.Query query,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:read");
+
+        group.MapPost("/topology-alerts", async (
+            GetTopologyAwareAlertsFeature.Query query,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:read");
     }
 }

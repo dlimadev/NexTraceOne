@@ -304,7 +304,7 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 19)
+### Estado Atual (Abril 2026 — Rev. 20)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~99% COMPLETO** ✅
@@ -315,7 +315,8 @@ O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com 
 **Phase 4.5 — Multi-Cluster & Multi-Cloud (ClusterRegistration, CloudProvider, ListClusters, GetMultiCloudView, UpdateHealthSnapshot, IngestEdgeEvents) — COMPLETO** ✅
 **Phase 5.1 — Predictive Intelligence (ServiceFailurePrediction, CapacityForecast, SloBurnRateAlert, ChangeRiskPrediction) — COMPLETO** ✅
 **Phase 5.2 — Developer Experience Score (DxScore, ProductivitySnapshot, ComputeDxScore, ListDxScores, RecordSnapshot) — COMPLETO** ✅
-**Phase 5.4 partial — Observability Correlation Engine (CorrelateTraceToChange, DetectLogAnomaly) — COMPLETO** ✅
+**Phase 5.4 — Observability Correlation Engine (CorrelateTraceToChange, DetectLogAnomaly, CorrelateServiceMetrics, GetTopologyAwareAlerts) — COMPLETO** ✅
+**Phase 5.5 — Governance Policy Engine V2 (PolicyAsCodeDefinition, RegisterPolicyAsCode, GetPolicyAsCode, SimulatePolicyApplication, TransitionEnforcementMode, ExpireGovernanceWaivers) — COMPLETO** ✅
 
 Gaps resolvidos desde a análise inicial:
 - ~~3 build errors backend~~ → 0 build errors
@@ -371,17 +372,18 @@ Gaps resolvidos desde a análise inicial:
 - ~~**Phase 5.1**~~ ✅ FIXED (Rev. 19) — Predictive Intelligence: `ServiceFailurePrediction` + `CapacityForecast` entities + 4 features (PredictServiceFailure/GetCapacityForecast/GetSloBurnRateAlert/GetChangeRiskPrediction) + 4 endpoints + migration `P51_PredictiveIntelligence` + 32+ testes
 - ~~**Phase 5.2**~~ ✅ FIXED (Rev. 19) — Developer Experience Score: `DxScore` + `ProductivitySnapshot` entities + 4 features (ComputeDeveloperExperienceScore/GetDeveloperExperienceScore/ListDeveloperExperienceScores/RecordProductivitySnapshot) + 4 endpoints + migration `P52_DeveloperExperienceScore` + 20+ testes
 - ~~**Phase 5.4 partial**~~ ✅ FIXED (Rev. 19) — Observability Correlation Engine: `CorrelateTraceToChange` + `DetectLogAnomaly` features (pure computation, no persistence) + 2 endpoints
+- ~~**Phase 5.4 remaining**~~ ✅ FIXED (Rev. 20) — Metric Correlation: `CorrelateServiceMetrics` feature (cross-service latency correlation, configurable threshold, CorrelationStrengthPercent) + `POST /api/v1/runtime/correlate-metrics`; Topology-Aware Alerting: `GetTopologyAwareAlerts` feature (HighLatency/HighErrorRate/PropagationRisk alerts based on dependency graph) + `POST /api/v1/runtime/topology-alerts`
+- ~~**Phase 5.5**~~ ✅ FIXED (Rev. 20) — Governance Policy Engine V2: `PolicyAsCodeDefinition` entity + 2 enums (`PolicyDefinitionFormat`, `PolicyDefinitionStatus`) + 5 features (`RegisterPolicyAsCode`, `GetPolicyAsCode`, `SimulatePolicyApplication`, `TransitionEnforcementMode`, `ExpireGovernanceWaivers`) + 5 endpoints + EF config + migration `P55_PolicyAsCode` + `IPolicyAsCodeRepository` interface + `PolicyAsCodeRepository` + DI + 17 testes unitários
 - **Phase 5.2 survey** — Developer survey automation + Developer NPS (requerem subsistema de surveys/NPS)
 - **Phase 5.3** — GraphQL Federation Gateway (requer biblioteca HotChocolate/GraphQL.NET + schema stitching)
-- **Phase 5.4 remaining** — Metric correlation + Topology-aware alerting (requerem telemetria agregada)
-- **Phase 5.5** — Governance Policy Engine V2 (Policy as Code, simulation, waivers)
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 19)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 20)
 
 | Módulo | Testes |
 |--------|--------|
 | ChangeGovernance | 301/301 ✅ |
-| OperationalIntelligence (inclui Predictive + Observability Correlation) | 601/601 ✅ |
+| Governance (inclui PolicyEngineV2) | 177/177 ✅ |
+| OperationalIntelligence (inclui Predictive + Observability Correlation + Phase 5.4 completo) | 608/608 ✅ |
 | AuditCompliance | 147/147 ✅ |
 | Catalog (inclui DeveloperExperience Score) | 926/929 ✅ (3 pre-existentes falhos em ContractEntities) |
 | Integrations (inclui CI/CD webhooks + Multi-Cluster) | 131/131 ✅ |

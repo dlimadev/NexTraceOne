@@ -291,14 +291,14 @@ Evoluir o FinOps existente para:
 ### 5.4 Observability Correlation Engine ⏱️ 15-20 dias
 - [x] **Trace-to-change correlation** — `CorrelateTraceToChange` feature: timestamp-based correlation (±2h window) → CorrelationConfidence + CorrelationReason ✅ (Rev. 19) — `GET /api/v1/runtime/traces/{traceId}/change-correlation`
 - [x] **Log anomaly detection** — `DetectLogAnomaly` feature: error spike % vs baseline + post-change detection → AnomalyType (ErrorSpike/Regression/BaselineDeviation) ✅ (Rev. 19) — `POST /api/v1/runtime/log-anomaly`
-- [ ] **Metric correlation** — correlação automática entre métricas de diferentes serviços (requires telemetry aggregation)
-- [ ] **Topology-aware alerting** — alertas inteligentes baseados no grafo de dependências
+- [x] **Metric correlation** — `CorrelateServiceMetrics` feature: correlação temporal de latência entre pares de serviços (threshold configurável) → CorrelationStrengthPercent ✅ (Rev. 20) — `POST /api/v1/runtime/correlate-metrics`
+- [x] **Topology-aware alerting** — `GetTopologyAwareAlerts` feature: alertas HighLatency/HighErrorRate/PropagationRisk baseados no grafo de dependências ✅ (Rev. 20) — `POST /api/v1/runtime/topology-alerts`
 
 ### 5.5 Governance Policy Engine V2 ⏱️ 10-15 dias
-- [ ] **Policy as Code** — políticas definíveis em YAML/JSON, versionadas no repositório
-- [ ] **Policy simulation** — "se aplicar esta política, X serviços ficam non-compliant"
-- [ ] **Gradual enforcement** — policies em modo warning antes de blocking
-- [ ] **Exception management** — waivers com expiração automática e audit trail
+- [x] **Policy as Code** — `PolicyAsCodeDefinition` entity + `RegisterPolicyAsCode` feature: YAML/JSON policies, Draft→Active→Deprecated lifecycle ✅ (Rev. 20) — `POST /api/v1/governance/policy-as-code`
+- [x] **Policy simulation** — `SimulatePolicyApplication` feature: "se aplicar esta política, X serviços ficam non-compliant" + CompliancePercent ✅ (Rev. 20) — `POST /api/v1/governance/policy-as-code/{name}/simulate`
+- [x] **Gradual enforcement** — `TransitionEnforcementMode` feature: Advisory → SoftEnforce → HardEnforce (forward-only) ✅ (Rev. 20) — `POST /api/v1/governance/policy-as-code/{name}/transition`
+- [x] **Exception management** — `ExpireGovernanceWaivers` feature: revogação automática de waivers vencidos com audit trail completo ✅ (Rev. 20) — `POST /api/v1/governance/waivers/expire`
 
 ---
 

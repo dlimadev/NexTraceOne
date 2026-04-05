@@ -47,7 +47,12 @@ using NexTraceOne.Governance.Application.Features.ListGovernancePacks;
 using NexTraceOne.Governance.Application.Features.ListGovernanceWaivers;
 using NexTraceOne.Governance.Application.Features.ListPackVersions;
 using NexTraceOne.Governance.Application.Features.ListPolicies;
+using NexTraceOne.Governance.Application.Features.ExpireGovernanceWaivers;
+using NexTraceOne.Governance.Application.Features.GetPolicyAsCode;
+using NexTraceOne.Governance.Application.Features.RegisterPolicyAsCode;
 using NexTraceOne.Governance.Application.Features.RejectGovernanceWaiver;
+using NexTraceOne.Governance.Application.Features.SimulatePolicyApplication;
+using NexTraceOne.Governance.Application.Features.TransitionEnforcementMode;
 using NexTraceOne.Governance.Application.Features.RunComplianceChecks;
 using NexTraceOne.Governance.Application.Features.UpdateDomain;
 using NexTraceOne.Governance.Application.Features.UpdateGovernancePack;
@@ -122,6 +127,13 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListPolicies.Query>, ListPolicies.Validator>();
         services.AddTransient<IValidator<GetPolicy.Query>, GetPolicy.Validator>();
         services.AddTransient<IValidator<GetOnboardingContext.Query>, GetOnboardingContext.Validator>();
+
+        // P5.5 — Governance Policy Engine V2
+        services.AddTransient<IValidator<RegisterPolicyAsCode.Command>, RegisterPolicyAsCode.Validator>();
+        services.AddTransient<IValidator<GetPolicyAsCode.Query>, GetPolicyAsCode.Validator>();
+        services.AddTransient<IValidator<SimulatePolicyApplication.Command>, SimulatePolicyApplication.Validator>();
+        services.AddTransient<IValidator<TransitionEnforcementMode.Command>, TransitionEnforcementMode.Validator>();
+        services.AddTransient<IValidator<ExpireGovernanceWaivers.Command>, ExpireGovernanceWaivers.Validator>();
 
         return services;
     }

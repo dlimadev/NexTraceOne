@@ -10,9 +10,11 @@ using NexTraceOne.OperationalIntelligence.Application.Reliability;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareEnvironments;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ComputeObservabilityDebt;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateServiceMetrics;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateTraceToChange;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectLogAnomaly;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectRuntimeDrift;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTopologyAwareAlerts;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
@@ -55,6 +57,8 @@ public static class DependencyInjection
         // P5.4 — Observability Correlation Engine
         services.AddTransient<IValidator<CorrelateTraceToChange.Query>, CorrelateTraceToChange.Validator>();
         services.AddTransient<IValidator<DetectLogAnomaly.Command>, DetectLogAnomaly.Validator>();
+        services.AddTransient<IValidator<CorrelateServiceMetrics.Query>, CorrelateServiceMetrics.Validator>();
+        services.AddTransient<IValidator<GetTopologyAwareAlerts.Query>, GetTopologyAwareAlerts.Validator>();
 
         // ── Reliability (Team-owned Service Reliability) validators ──
         services.AddReliabilityApplication(configuration);
