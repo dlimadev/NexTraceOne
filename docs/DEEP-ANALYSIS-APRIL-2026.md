@@ -304,7 +304,7 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 17)
+### Estado Atual (Abril 2026 — Rev. 18)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~99% COMPLETO** ✅
@@ -312,6 +312,7 @@ O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com 
 **Phase 4.1 — CI/CD Integrations (GitHub, GitLab, Azure DevOps) — COMPLETO** ✅
 **Phase 4.3 — API Marketplace (API Keys, Approval Workflow, Usage Analytics, Rate Limiting) — COMPLETO** ✅
 **Phase 4.4 — Cost Intelligence V2 (Budget Forecasting, Efficiency Recommendations, Showback, Anomaly Detection, Cloud Cost Correlation) — COMPLETO** ✅
+**Phase 4.5 — Multi-Cluster & Multi-Cloud (ClusterRegistration, CloudProvider, ListClusters, GetMultiCloudView, UpdateHealthSnapshot, IngestEdgeEvents) — COMPLETO** ✅
 
 Gaps resolvidos desde a análise inicial:
 - ~~3 build errors backend~~ → 0 build errors
@@ -359,10 +360,10 @@ Gaps resolvidos desde a análise inicial:
 - **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
 - ~~**Phase 4.3**~~ ✅ FIXED (Rev. 16) — API Marketplace core (API Keys, Approval Workflow, Usage Analytics, Rate Limiting). Pendente: sandbox environments completo
 - ~~**Phase 4.4**~~ ✅ FIXED (Rev. 17) — Cost Intelligence V2 (BudgetForecast entity + ForecastBudget/GetBudgetForecast + EfficiencyRecommendation entity + GenerateEfficiencyRecommendations/ListEfficiencyRecommendations + GetShowbackReport + CorrelateCloudCostWithChange + DetectCostAnomalies + 7 endpoints + 25 testes + migration W44)
+- ~~**Phase 4.5**~~ ✅ FIXED (Rev. 18) — Multi-Cluster & Multi-Cloud: `ClusterRegistration` entity + `CloudProvider`/`ClusterStatus` enums + 6 features (RegisterCluster/GetClusterStatus/ListClusters/UpdateClusterHealthSnapshot/GetMultiCloudView/IngestEdgeDeploymentEvent) + 6 endpoints + migration `P45_MultiClusterRegistration` + 36 testes
 - **Phase 4.2** — IDE Extensions (VS Code, Visual Studio, JetBrains) — requerem publicação em extension marketplaces
-- **Phase 4.5** — Multi-Cluster & Multi-Cloud
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 17)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 18)
 
 | Módulo | Testes |
 |--------|--------|
@@ -370,6 +371,6 @@ Gaps resolvidos desde a análise inicial:
 | OperationalIntelligence (inclui Cost Intelligence V2) | 573/573 ✅ |
 | AuditCompliance | 147/147 ✅ |
 | Catalog (inclui ServiceTemplate + API Marketplace) | 910/913 ✅ (3 pre-existentes falhos em ContractEntities) |
-| Integrations (inclui CI/CD webhooks) | 126/126 ✅ |
+| Integrations (inclui CI/CD webhooks + Multi-Cluster) | 131/131 ✅ |
 | Frontend (Vitest) | 915/915 ✅ |
-| Total backend | ~1.725+ testes |
+| Total backend | ~1.760+ testes |

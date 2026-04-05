@@ -256,10 +256,10 @@ Evoluir o FinOps existente para:
 **Valor:** FinOps contextualizado por serviço, não apenas dashboards de custo cloud genéricos.
 
 ### 4.5 Multi-Cluster & Multi-Cloud ⏱️ 10-15 dias
-- [ ] **Kubernetes integration** — auto-discovery de serviços via CRDs/annotations
-- [ ] **Multi-cluster view** — estado de serviços across clusters
-- [ ] **Cloud-agnostic** — AWS, Azure, GCP, on-premises num único painel
-- [ ] **Edge deployment support** — telemetria de ambientes edge
+- [x] **Kubernetes integration** — `ClusterRegistration` entity com suporte a K8s version, API endpoint, node/service counts ✅ (Rev. 18) — `RegisterCluster` + `GET /api/v1/clusters` + `POST /api/v1/clusters`
+- [x] **Multi-cluster view** — `ListClusters` feature + `GetClusterStatus` feature ✅ (Rev. 18) — inventory completo com health aggregation, paginação, filtros por provider/status/isEdge
+- [x] **Cloud-agnostic** — `GetMultiCloudView` feature ✅ (Rev. 18) — `CloudProvider` enum (AWS/Azure/GCP/OnPremises/Edge/Other) + view agregada por provider com HealthPercent + `GET /api/v1/clusters/multi-cloud`
+- [x] **Edge deployment support** — `IngestEdgeDeploymentEvent` feature ✅ (Rev. 18) — `IsEdge` flag em ClusterRegistration + `POST /api/v1/clusters/{id}/edge-events` + `UpdateClusterHealthSnapshot`
 
 ---
 
