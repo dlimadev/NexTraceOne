@@ -18,6 +18,7 @@ import type {
   WorkserviceBuilderState,
   SharedSchemaBuilderState,
   SharedSchemaProperty,
+  SchemaProperty,
   WebhookBuilderState,
   LegacyContractBuilderState,
   SyncResult,
@@ -36,6 +37,7 @@ interface RestEndpointRequestBody {
   required?: boolean;
   contentType?: string;
   schema?: string;
+  properties?: SchemaProperty[];
 }
 
 interface RestEndpointResponse {
@@ -43,6 +45,7 @@ interface RestEndpointResponse {
   description?: string;
   contentType?: string;
   schema?: string;
+  properties?: SchemaProperty[];
 }
 
 interface RestEndpointShape {
@@ -141,6 +144,9 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
           yaml += `          ${ep.requestBody.contentType || 'application/json'}:\n`;
           if (ep.requestBody.schema) {
             yaml += `            schema:\n              $ref: "${esc(ep.requestBody.schema)}"\n`;
+          } else if (ep.requestBody.properties && ep.requestBody.properties.length > 0) {
+            yaml += `            schema:\n`;
+            yaml += emitInlineSchema(ep.requestBody.properties as SchemaProperty[], 14);
           }
         }
 
@@ -153,6 +159,11 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
               yaml += `          content:\n`;
               yaml += `            ${r.contentType || 'application/json'}:\n`;
               yaml += `              schema:\n                $ref: "${esc(r.schema)}"\n`;
+            } else if (r.properties && r.properties.length > 0) {
+              yaml += `          content:\n`;
+              yaml += `            ${r.contentType || 'application/json'}:\n`;
+              yaml += `              schema:\n`;
+              yaml += emitInlineSchema(r.properties as SchemaProperty[], 16);
             }
           }
         } else {
@@ -175,6 +186,113 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
   }
 
   return { success: true, content: yaml, warnings, unsupportedFeatures: unsupported };
+}
+
+// ── Inline Schema Emitter (SchemaProperty[] → OpenAPI YAML) ──────────────────
+
+function emitInlineSchema(properties: SchemaProperty[], baseIndent: number): string {
+  const indent = (n: number) => ' '.repeat(n);
+  let yaml = '';
+  yaml += `${indent(baseIndent)}type: object\n`;
+
+  const requiredProps = properties.filter((p) => p.required);
+  if (requiredProps.length > 0) {
+    yaml += `${indent(baseIndent)}required:\n`;
+    for (const p of requiredProps) {
+      yaml += `${indent(baseIndent + 2)}- ${p.name}\n`;
+    }
+  }
+
+  yaml += `${indent(baseIndent)}properties:\n`;
+  for (const prop of properties) {
+    yaml += emitSchemaPropertyYaml(prop, baseIndent + 2);
+  }
+  return yaml;
+}
+
+function emitSchemaPropertyYaml(prop: SchemaProperty, indentLevel: number): string {
+  const indent = (n: number) => ' '.repeat(n);
+  let yaml = '';
+
+  if (!prop.name) return yaml;
+
+  yaml += `${indent(indentLevel)}${prop.name}:\n`;
+
+  if (prop.type === '$ref' && prop.$ref) {
+    yaml += `${indent(indentLevel + 2)}$ref: "${esc(prop.$ref)}"\n`;
+    return yaml;
+  }
+
+  yaml += `${indent(indentLevel + 2)}type: ${prop.type}\n`;
+  if (prop.description) yaml += `${indent(indentLevel + 2)}description: "${esc(prop.description)}"\n`;
+
+  // Constraints
+  const c = prop.constraints;
+  if (c) {
+    if (c.format) yaml += `${indent(indentLevel + 2)}format: ${c.format}\n`;
+    if (c.minLength !== undefined) yaml += `${indent(indentLevel + 2)}minLength: ${c.minLength}\n`;
+    if (c.maxLength !== undefined) yaml += `${indent(indentLevel + 2)}maxLength: ${c.maxLength}\n`;
+    if (c.minimum !== undefined) yaml += `${indent(indentLevel + 2)}minimum: ${c.minimum}\n`;
+    if (c.maximum !== undefined) yaml += `${indent(indentLevel + 2)}maximum: ${c.maximum}\n`;
+    if (c.exclusiveMinimum) yaml += `${indent(indentLevel + 2)}exclusiveMinimum: true\n`;
+    if (c.exclusiveMaximum) yaml += `${indent(indentLevel + 2)}exclusiveMaximum: true\n`;
+    if (c.pattern) yaml += `${indent(indentLevel + 2)}pattern: "${esc(c.pattern)}"\n`;
+    if (c.defaultValue !== undefined) yaml += `${indent(indentLevel + 2)}default: ${c.defaultValue}\n`;
+    if (c.readOnly) yaml += `${indent(indentLevel + 2)}readOnly: true\n`;
+    if (c.writeOnly) yaml += `${indent(indentLevel + 2)}writeOnly: true\n`;
+    if (c.nullable) yaml += `${indent(indentLevel + 2)}nullable: true\n`;
+    if (c.example !== undefined) yaml += `${indent(indentLevel + 2)}example: ${c.example}\n`;
+    if (c.enumValues && c.enumValues.length > 0) {
+      yaml += `${indent(indentLevel + 2)}enum:\n`;
+      for (const v of c.enumValues) yaml += `${indent(indentLevel + 4)}- ${v}\n`;
+    }
+  }
+
+  // Nested object properties
+  if (prop.type === 'object' && prop.properties && prop.properties.length > 0) {
+    const requiredChildren = prop.properties.filter((p) => p.required);
+    if (requiredChildren.length > 0) {
+      yaml += `${indent(indentLevel + 2)}required:\n`;
+      for (const p of requiredChildren) {
+        yaml += `${indent(indentLevel + 4)}- ${p.name}\n`;
+      }
+    }
+    yaml += `${indent(indentLevel + 2)}properties:\n`;
+    for (const child of prop.properties) {
+      yaml += emitSchemaPropertyYaml(child, indentLevel + 4);
+    }
+  }
+
+  // Array items
+  if (prop.type === 'array' && prop.items) {
+    yaml += `${indent(indentLevel + 2)}items:\n`;
+    if (prop.items.type === '$ref' && prop.items.$ref) {
+      yaml += `${indent(indentLevel + 4)}$ref: "${esc(prop.items.$ref)}"\n`;
+    } else if (prop.items.type === 'object' && prop.items.properties && prop.items.properties.length > 0) {
+      yaml += `${indent(indentLevel + 4)}type: object\n`;
+      const reqItems = prop.items.properties.filter((p) => p.required);
+      if (reqItems.length > 0) {
+        yaml += `${indent(indentLevel + 4)}required:\n`;
+        for (const p of reqItems) yaml += `${indent(indentLevel + 6)}- ${p.name}\n`;
+      }
+      yaml += `${indent(indentLevel + 4)}properties:\n`;
+      for (const child of prop.items.properties) {
+        yaml += emitSchemaPropertyYaml(child, indentLevel + 6);
+      }
+    } else {
+      yaml += `${indent(indentLevel + 4)}type: ${prop.items.type}\n`;
+      const ic = prop.items.constraints;
+      if (ic) {
+        if (ic.format) yaml += `${indent(indentLevel + 4)}format: ${ic.format}\n`;
+        if (ic.minLength !== undefined) yaml += `${indent(indentLevel + 4)}minLength: ${ic.minLength}\n`;
+        if (ic.maxLength !== undefined) yaml += `${indent(indentLevel + 4)}maxLength: ${ic.maxLength}\n`;
+        if (ic.minimum !== undefined) yaml += `${indent(indentLevel + 4)}minimum: ${ic.minimum}\n`;
+        if (ic.maximum !== undefined) yaml += `${indent(indentLevel + 4)}maximum: ${ic.maximum}\n`;
+      }
+    }
+  }
+
+  return yaml;
 }
 
 // ── SOAP → WSDL-like XML ─────────────────────────────────────────────────────

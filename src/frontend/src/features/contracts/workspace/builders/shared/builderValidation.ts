@@ -12,6 +12,7 @@ import type {
   LegacyContractBuilderState,
   BuilderValidationResult,
   BuilderValidationError,
+  SchemaProperty,
 } from './builderTypes';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -165,9 +166,106 @@ export function validateRestBuilder(state: RestBuilderState): BuilderValidationR
         }
       }
     }
+
+    // Validar propriedades visuais do request body
+    if (ep.requestBody?.properties && ep.requestBody.properties.length > 0) {
+      validateSchemaProperties(ep.requestBody.properties, `endpoint.${ep.id}.requestBody`, epLabel, 'Request Body', errors);
+    }
+
+    // Validar propriedades visuais das respostas
+    for (const resp of ep.responses) {
+      if (resp.properties && resp.properties.length > 0) {
+        validateSchemaProperties(resp.properties, `endpoint.${ep.id}.response.${resp.id}`, epLabel, `Response ${resp.statusCode}`, errors);
+      }
+    }
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+/** Validates visual schema properties recursively. */
+function validateSchemaProperties(
+  properties: SchemaProperty[],
+  fieldPrefix: string,
+  endpointLabel: string,
+  sectionLabel: string,
+  errors: BuilderValidationError[],
+  depth = 0,
+): void {
+  const propNames = new Set<string>();
+
+  for (const prop of properties) {
+    // Property name required
+    if (!prop.name.trim()) {
+      errors.push({
+        field: `${fieldPrefix}.prop.${prop.id}.name`,
+        messageKey: 'contracts.builder.validation.propNameRequired',
+        fallback: `${sectionLabel} of ${endpointLabel}: property name is required`,
+      });
+    }
+
+    // Duplicate property name detection
+    if (prop.name.trim()) {
+      if (propNames.has(prop.name)) {
+        errors.push({
+          field: `${fieldPrefix}.prop.${prop.id}.duplicateName`,
+          messageKey: 'contracts.builder.validation.propNameDuplicate',
+          fallback: `${sectionLabel} of ${endpointLabel}: duplicate property name '${prop.name}'`,
+        });
+      }
+      propNames.add(prop.name);
+    }
+
+    // $ref must have target
+    if (prop.type === '$ref' && !prop.$ref?.trim()) {
+      errors.push({
+        field: `${fieldPrefix}.prop.${prop.id}.ref`,
+        messageKey: 'contracts.builder.validation.propRefRequired',
+        fallback: `${sectionLabel} of ${endpointLabel}: $ref target is required for property '${prop.name}'`,
+      });
+    }
+
+    // Constraint validation
+    if (prop.constraints) {
+      if (prop.constraints.minLength !== undefined && prop.constraints.maxLength !== undefined) {
+        if (prop.constraints.minLength > prop.constraints.maxLength) {
+          errors.push({
+            field: `${fieldPrefix}.prop.${prop.id}.constraints`,
+            messageKey: 'contracts.builder.validation.propMinGtMax',
+            fallback: `${sectionLabel} '${prop.name}': minLength cannot be greater than maxLength`,
+          });
+        }
+      }
+      if (prop.constraints.minimum !== undefined && prop.constraints.maximum !== undefined) {
+        if (prop.constraints.minimum > prop.constraints.maximum) {
+          errors.push({
+            field: `${fieldPrefix}.prop.${prop.id}.constraints`,
+            messageKey: 'contracts.builder.validation.propMinValueGtMax',
+            fallback: `${sectionLabel} '${prop.name}': minimum cannot be greater than maximum`,
+          });
+        }
+      }
+    }
+
+    // Recurse into nested objects (max depth 4)
+    if (prop.type === 'object' && prop.properties && prop.properties.length > 0 && depth < 4) {
+      validateSchemaProperties(prop.properties, `${fieldPrefix}.prop.${prop.id}`, endpointLabel, `${sectionLabel}.${prop.name}`, errors, depth + 1);
+    }
+
+    // Array items validation
+    if (prop.type === 'array' && prop.items) {
+      if (prop.items.type === '$ref' && !prop.items.$ref?.trim()) {
+        errors.push({
+          field: `${fieldPrefix}.prop.${prop.id}.items.ref`,
+          messageKey: 'contracts.builder.validation.propArrayRefRequired',
+          fallback: `${sectionLabel} '${prop.name}': array items $ref target is required`,
+        });
+      }
+      if (prop.items.type === 'object' && prop.items.properties && prop.items.properties.length > 0 && depth < 4) {
+        validateSchemaProperties(prop.items.properties, `${fieldPrefix}.prop.${prop.id}.items`, endpointLabel, `${sectionLabel}.${prop.name}[]`, errors, depth + 1);
+      }
+    }
+  }
 }
 
 // ── SOAP Validation ───────────────────────────────────────────────────────────
