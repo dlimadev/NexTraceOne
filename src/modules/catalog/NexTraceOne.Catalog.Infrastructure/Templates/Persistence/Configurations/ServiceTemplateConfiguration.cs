@@ -80,6 +80,9 @@ internal sealed class ServiceTemplateConfiguration : IEntityTypeConfiguration<Se
         builder.Property(t => t.RepositoryTemplateBranch)
             .HasMaxLength(200);
 
+        builder.Property(t => t.ArchitecturePatternJson)
+            .HasColumnType("text");
+
         builder.Property(t => t.IsActive)
             .IsRequired();
 

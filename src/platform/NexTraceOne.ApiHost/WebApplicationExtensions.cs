@@ -10,6 +10,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
 using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
 using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
@@ -108,6 +109,7 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<DeveloperExperienceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<LegacyAssetsDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<TemplatesDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<DependencyGovernanceDbContext>(migrationScope, pendingContexts);
 
             // Wave 3 — Change Governance & Operational Intelligence (includes sub-domain contexts)
             await MigrateContextAsync<ChangeIntelligenceDbContext>(migrationScope, pendingContexts);

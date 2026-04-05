@@ -133,5 +133,16 @@ public static class DefaultAgentCatalog
             TargetPersona: "Engineer",
             Icon: "🏗️",
             SortOrder: 90),
+
+        new AgentDefinition(
+            Name: "dependency-advisor",
+            DisplayName: "Dependency Advisor",
+            Description: "Analyzes service dependencies, identifies security vulnerabilities, license conflicts and outdated packages. Provides upgrade recommendations and SBOM insights.",
+            Category: AgentCategory.DependencyGovernance,
+            SystemPrompt: "You are a Dependency Advisor for NexTraceOne. You analyze service dependency profiles including package vulnerabilities (CVEs), license compliance, outdated packages and SBOM data. Help users understand their dependency health, prioritize vulnerability remediation, identify license conflicts and plan upgrade strategies. Always provide context from the dependency governance data when available.",
+            Capabilities: "chat,analysis",
+            TargetPersona: "Engineer",
+            Icon: "📦",
+            SortOrder: 95),
     };
 }

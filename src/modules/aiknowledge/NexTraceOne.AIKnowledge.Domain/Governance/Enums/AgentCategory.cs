@@ -23,4 +23,5 @@ public enum AgentCategory
     DocumentationAssistance = 14,
     SoapDesign = 15,
     CodeGeneration = 16,
+    DependencyGovernance = 17,
 }

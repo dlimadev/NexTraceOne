@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 using NexTraceOne.Catalog.Domain.Templates.Enums;
+using NexTraceOne.Catalog.Domain.Templates.ValueObjects;
 
 namespace NexTraceOne.Catalog.Domain.Templates.Entities;
 
@@ -85,6 +86,9 @@ public sealed class ServiceTemplate : AuditableEntity<ServiceTemplateId>
     /// <summary>Branch do repositório template a usar.</summary>
     public string? RepositoryTemplateBranch { get; private set; }
 
+    /// <summary>Manifesto de arquitetura V2 serializado como JSON.</summary>
+    public string? ArchitecturePatternJson { get; private set; }
+
     // ── Estado ────────────────────────────────────────────────────────
 
     /// <summary>Indica se o template está ativo e disponível para scaffolding.</summary>
@@ -166,6 +170,22 @@ public sealed class ServiceTemplate : AuditableEntity<ServiceTemplateId>
     {
         RepositoryTemplateUrl = url;
         RepositoryTemplateBranch = branch;
+    }
+
+    /// <summary>
+    /// Define o manifesto de arquitetura V2 do template.
+    /// Valida o JSON antes de persistir.
+    /// </summary>
+    public void SetArchitecturePattern(string? json)
+    {
+        if (json is null)
+        {
+            ArchitecturePatternJson = null;
+            return;
+        }
+        if (!TemplateManifestV2.IsValid(json))
+            throw new InvalidOperationException("O JSON do manifesto de arquitetura V2 é inválido.");
+        ArchitecturePatternJson = json;
     }
 
     /// <summary>

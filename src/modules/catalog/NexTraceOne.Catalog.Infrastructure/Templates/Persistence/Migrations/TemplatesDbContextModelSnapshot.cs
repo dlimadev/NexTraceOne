@@ -65,6 +65,9 @@ namespace NexTraceOne.Catalog.Infrastructure.Templates.Persistence.Migrations
                     b.Property<string>("BaseContractSpec")
                         .HasColumnType("text");
 
+                    b.Property<string>("ArchitecturePatternJson")
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
