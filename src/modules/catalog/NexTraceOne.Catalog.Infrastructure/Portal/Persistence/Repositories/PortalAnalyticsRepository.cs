@@ -56,8 +56,9 @@ internal sealed class PortalAnalyticsRepository(DeveloperPortalDbContext context
             .ToListAsync(ct);
 
         return groups
-            .Where(g => Guid.TryParse(g.ApiAssetIdStr, out _))
-            .Select(g => (Guid.Parse(g.ApiAssetIdStr), g.Count))
+            .Select(g => (Parsed: Guid.TryParse(g.ApiAssetIdStr, out var id) ? (Guid?)id : null, g.Count))
+            .Where(x => x.Parsed.HasValue)
+            .Select(x => (x.Parsed!.Value, x.Count))
             .ToList();
     }
 
