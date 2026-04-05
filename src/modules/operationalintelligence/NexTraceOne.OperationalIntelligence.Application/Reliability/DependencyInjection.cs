@@ -4,16 +4,20 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ComputeBurnRate;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ComputeErrorBudget;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetBurnRate;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetCapacityForecast;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetChangeRiskPrediction;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetDomainReliabilitySummary;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetErrorBudget;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityCoverage;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityDetail;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetServiceReliabilityTrend;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetSloBurnRateAlert;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilitySummary;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetTeamReliabilityTrend;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListServiceReliability;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListServiceSlos;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListSloSlas;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.PredictServiceFailure;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.RegisterSlaDefinition;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.RegisterSloDefinition;
 
@@ -52,6 +56,12 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ComputeBurnRate.Command>, ComputeBurnRate.Validator>();
         services.AddTransient<IValidator<ListServiceSlos.Query>, ListServiceSlos.Validator>();
         services.AddTransient<IValidator<ListSloSlas.Query>, ListSloSlas.Validator>();
+
+        // P5.1 — Predictive Intelligence
+        services.AddTransient<IValidator<PredictServiceFailure.Command>, PredictServiceFailure.Validator>();
+        services.AddTransient<IValidator<GetCapacityForecast.Command>, GetCapacityForecast.Validator>();
+        services.AddTransient<IValidator<GetSloBurnRateAlert.Query>, GetSloBurnRateAlert.Validator>();
+        services.AddTransient<IValidator<GetChangeRiskPrediction.Query>, GetChangeRiskPrediction.Validator>();
 
         return services;
     }

@@ -268,19 +268,19 @@ Evoluir o FinOps existente para:
 > **Objetivo:** Funcionalidades que posicionam o NexTraceOne como líder de mercado
 
 ### 5.1 Predictive Intelligence ⏱️ 15-20 dias
-- [ ] **Failure prediction** — "baseado em padrões, este serviço tem 73% probabilidade de incidente nas próximas 24h"
-- [ ] **Capacity planning** — "com a tendência atual, serviço X atinge saturação em 2 semanas"
-- [ ] **Change risk prediction** — ML model treinado com histórico de mudanças vs incidentes
-- [ ] **SLO burn rate alerts** — "ao ritmo atual, SLO será violado em 4 horas"
+- [x] **Failure prediction** — `ServiceFailurePrediction` entity + `PredictServiceFailure` feature: weighted formula (error rate 40% + incident count + change frequency) → probability % + RiskLevel + CausalFactors + RecommendedAction ✅ (Rev. 19) — `POST /api/v1/predictions/service-failure`
+- [x] **Capacity planning** — `CapacityForecast` entity + `GetCapacityForecast` feature: growth rate → DaysToSaturation → SaturationRisk (Immediate/Near/Moderate/Low) ✅ (Rev. 19) — `POST /api/v1/predictions/capacity-forecast`
+- [x] **Change risk prediction** — `GetChangeRiskPrediction` feature: multi-factor scoring (history + blast radius + test evidence + timing + change type multiplier) → RiskScore 0-100 + recommendations ✅ (Rev. 19) — `GET /api/v1/predictions/change-risk/{changeId}`
+- [x] **SLO burn rate alerts** — `GetSloBurnRateAlert` feature: burn rate = error rate / error budget → time-to-exhaustion + Critical/Warning/OK classification ✅ (Rev. 19) — `GET /api/v1/predictions/slo-burn-rate`
 
 ### 5.2 Developer Experience Score ⏱️ 8-10 dias
 **Inspiração:** DX Core 4 + SPACE framework
 
-- [ ] **Developer survey automation** — questionários periódicos integrados na plataforma
-- [ ] **Productivity metrics** — cycle time, deployment frequency por developer/equipa
-- [ ] **Cognitive load measurement** — número de serviços, contratos, dependências por equipa
-- [ ] **Toil tracking** — tempo gasto em tarefas repetitivas vs desenvolvimento
-- [ ] **Developer NPS** — satisfação com ferramentas, processos, plataforma
+- [x] **Productivity metrics** — `ComputeDeveloperExperienceScore` feature: cycle time + deployment frequency + cognitive load + toil % → weighted OverallScore + Elite/High/Medium/Low level ✅ (Rev. 19) — `POST /api/v1/developer-experience/scores`
+- [x] **Cognitive load measurement** — `CognitivLoadScore` field (0-10) in `DxScore` entity: inverse-weighted contribution to OverallScore ✅ (Rev. 19)
+- [x] **Toil tracking** — `ToilPercentage` + `ManualStepsCount` fields in `ProductivitySnapshot` + `RecordProductivitySnapshot` feature ✅ (Rev. 19) — `POST /api/v1/developer-experience/snapshots`
+- [ ] **Developer survey automation** — questionários periódicos integrados na plataforma (requires UI + survey engine)
+- [ ] **Developer NPS** — satisfação com ferramentas, processos, plataforma (requires survey/NPS subsystem)
 
 ### 5.3 GraphQL Federation Gateway ⏱️ 10-15 dias
 - [ ] Gateway GraphQL federado que expõe o catálogo completo do NexTraceOne
@@ -289,9 +289,9 @@ Evoluir o FinOps existente para:
 - [ ] SDK para integração com ferramentas externas
 
 ### 5.4 Observability Correlation Engine ⏱️ 15-20 dias
-- [ ] **Trace-to-change correlation** — ligar traces a mudanças específicas
-- [ ] **Log anomaly detection** — detecção de padrões anómalos em logs pós-deploy
-- [ ] **Metric correlation** — correlação automática entre métricas de diferentes serviços
+- [x] **Trace-to-change correlation** — `CorrelateTraceToChange` feature: timestamp-based correlation (±2h window) → CorrelationConfidence + CorrelationReason ✅ (Rev. 19) — `GET /api/v1/runtime/traces/{traceId}/change-correlation`
+- [x] **Log anomaly detection** — `DetectLogAnomaly` feature: error spike % vs baseline + post-change detection → AnomalyType (ErrorSpike/Regression/BaselineDeviation) ✅ (Rev. 19) — `POST /api/v1/runtime/log-anomaly`
+- [ ] **Metric correlation** — correlação automática entre métricas de diferentes serviços (requires telemetry aggregation)
 - [ ] **Topology-aware alerting** — alertas inteligentes baseados no grafo de dependências
 
 ### 5.5 Governance Policy Engine V2 ⏱️ 10-15 dias

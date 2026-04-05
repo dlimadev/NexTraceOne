@@ -16,6 +16,8 @@ using GetReleaseHealthTimelineFeature = NexTraceOne.OperationalIntelligence.Appl
 using CompareReleaseRuntimeFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime.CompareReleaseRuntime;
 using EstablishRuntimeBaselineFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline.EstablishRuntimeBaseline;
 using CompareEnvironmentsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareEnvironments.CompareEnvironments;
+using CorrelateTraceToChangeFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateTraceToChange.CorrelateTraceToChange;
+using DetectLogAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectLogAnomaly.DetectLogAnomaly;
 
 namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints.Endpoints;
 
@@ -162,6 +164,34 @@ public sealed class RuntimeIntelligenceEndpointModule
 
         group.MapPost("/compare-environments", async (
             CompareEnvironmentsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runtime:write");
+
+        // ── P5.4 — Observability Correlation Engine ───────────────────────────────
+
+        group.MapGet("/correlate-trace", async (
+            string traceId,
+            string serviceId,
+            string environment,
+            DateTimeOffset traceTimestamp,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new CorrelateTraceToChangeFeature.Query(traceId, serviceId, environment, traceTimestamp);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:read");
+
+        group.MapPost("/detect-log-anomaly", async (
+            DetectLogAnomalyFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken ct) =>

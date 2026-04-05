@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Events;
+using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
@@ -68,6 +69,10 @@ public static class DependencyInjection
 
         // ── Integração cross-module via Contracts ────────────────────────
         services.AddScoped<ICatalogGraphModule, CatalogGraphModuleService>();
+
+        // P5.2 — Developer Experience Score
+        services.AddScoped<IDxScoreRepository, DxScoreRepository>();
+        services.AddScoped<IProductivitySnapshotRepository, ProductivitySnapshotRepository>();
 
         return services;
     }

@@ -5,6 +5,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Services;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence.Repositories;
@@ -35,6 +36,9 @@ public static class DependencyInjection
         services.AddScoped<IReliabilityRuntimeSurface, ReliabilityRuntimeSurface>();
         services.AddScoped<IReliabilityIncidentSurface, ReliabilityIncidentSurface>();
 
+        // IUnitOfWork — resolve para ReliabilityDbContext (implementa IUnitOfWork diretamente)
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ReliabilityDbContext>());
+
         // P6.1 — SLO / SLA / ErrorBudget / BurnRate
         services.AddScoped<ISloDefinitionRepository, SloDefinitionRepository>();
         services.AddScoped<ISlaDefinitionRepository, SlaDefinitionRepository>();
@@ -43,6 +47,10 @@ public static class DependencyInjection
 
         // P6.2 — cálculo real de error budget e burn rate
         services.AddSingleton<IErrorBudgetCalculator, ErrorBudgetCalculator>();
+
+        // P5.1 — Predictive Intelligence: previsões de falha e capacidade
+        services.AddScoped<IServiceFailurePredictionRepository, ServiceFailurePredictionRepository>();
+        services.AddScoped<ICapacityForecastRepository, CapacityForecastRepository>();
 
         // P03.1 — contrato cross-module de Reliability
         services.AddScoped<IReliabilityModule, ReliabilityModuleService>();

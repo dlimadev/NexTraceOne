@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Catalog.Application.DeveloperExperience;
 using NexTraceOne.Catalog.Application.Graph.Features.CreateGraphSnapshot;
 using NexTraceOne.Catalog.Application.Graph.Features.CreateSavedView;
 using NexTraceOne.Catalog.Application.Graph.Features.DecommissionAsset;
@@ -98,6 +99,9 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListServices.Query>, ListServices.Validator>();
         services.AddTransient<IValidator<GetServicesSummary.Query>, GetServicesSummary.Validator>();
         services.AddTransient<IValidator<GetServiceMaturityDashboard.Query>, GetServiceMaturityDashboard.Validator>();
+
+        // P5.2 — Developer Experience Score
+        services.AddDeveloperExperienceApplication(configuration);
 
         return services;
     }
