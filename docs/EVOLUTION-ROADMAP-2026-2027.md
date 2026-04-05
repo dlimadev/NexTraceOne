@@ -279,14 +279,16 @@ Evoluir o FinOps existente para:
 - [x] **Productivity metrics** — `ComputeDeveloperExperienceScore` feature: cycle time + deployment frequency + cognitive load + toil % → weighted OverallScore + Elite/High/Medium/Low level ✅ (Rev. 19) — `POST /api/v1/developer-experience/scores`
 - [x] **Cognitive load measurement** — `CognitivLoadScore` field (0-10) in `DxScore` entity: inverse-weighted contribution to OverallScore ✅ (Rev. 19)
 - [x] **Toil tracking** — `ToilPercentage` + `ManualStepsCount` fields in `ProductivitySnapshot` + `RecordProductivitySnapshot` feature ✅ (Rev. 19) — `POST /api/v1/developer-experience/snapshots`
-- [ ] **Developer survey automation** — questionários periódicos integrados na plataforma (requires UI + survey engine)
-- [ ] **Developer NPS** — satisfação com ferramentas, processos, plataforma (requires survey/NPS subsystem)
+- [x] **Developer survey automation** — `DeveloperSurvey` entity + `SubmitDeveloperSurvey` feature: NPS 0-10, ToolSatisfaction/ProcessSatisfaction/PlatformSatisfaction, RespondentId (anonymized), NpsCategory (Promoter/Passive/Detractor) ✅ (Rev. 21) — `POST /api/v1/developer-experience/surveys`
+- [x] **Developer NPS** — `GetDeveloperNpsSummary` feature: aggregate NPS per team/period, PromoterPercent/PassivePercent/DetractorPercent, avg satisfaction scores ✅ (Rev. 21) — `GET /api/v1/developer-experience/surveys/nps-summary`
 
 ### 5.3 GraphQL Federation Gateway ⏱️ 10-15 dias
-- [ ] Gateway GraphQL federado que expõe o catálogo completo do NexTraceOne
-- [ ] Schema stitching automático entre módulos
-- [ ] Subscriptions para eventos real-time (mudanças, incidentes, deploys)
-- [ ] SDK para integração com ferramentas externas
+- [x] **Gateway GraphQL** — `CatalogQuery` HotChocolate query root: `services(filter, page, pageSize)`, `contracts(serviceId)`, `npsSummary(teamId, period)` endpoints ✅ (Rev. 21) — `GET /api/v1/graphql`
+- [x] **Schema types** — `ServiceType`, `ContractSummaryType`, `NpsSummaryType` POCOs with GraphQL descriptions ✅ (Rev. 21)
+- [x] **Extension wiring** — `AddCatalogGraphQL()` + `MapCatalogGraphQL()` extension methods for host registration ✅ (Rev. 21)
+- [ ] **Schema stitching automático** — federation entre módulos (requires multi-module HotChocolate federation setup)
+- [ ] **Subscriptions real-time** — mudanças, incidentes, deploys (requires WebSocket + event stream integration)
+- [ ] **SDK externo** — para integração com ferramentas externas (requires SDK packaging pipeline)
 
 ### 5.4 Observability Correlation Engine ⏱️ 15-20 dias
 - [x] **Trace-to-change correlation** — `CorrelateTraceToChange` feature: timestamp-based correlation (±2h window) → CorrelationConfidence + CorrelationReason ✅ (Rev. 19) — `GET /api/v1/runtime/traces/{traceId}/change-correlation`

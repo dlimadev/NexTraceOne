@@ -22,7 +22,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     Period = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     CycleTimeHours = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: false),
                     DeploymentFrequencyPerWeek = table.Column<decimal>(type: "numeric(10,4)", precision: 10, scale: 4, nullable: false),
-                    CognitivLoadScore = table.Column<decimal>(type: "numeric(6,4)", precision: 6, scale: 4, nullable: false),
+                    CognitiveLoadScore = table.Column<decimal>(type: "numeric(6,4)", precision: 6, scale: 4, nullable: false),
                     ToilPercentage = table.Column<decimal>(type: "numeric(8,4)", precision: 8, scale: 4, nullable: false),
                     OverallScore = table.Column<decimal>(type: "numeric(8,4)", precision: 8, scale: 4, nullable: false),
                     ScoreLevel = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),

@@ -18,7 +18,7 @@ public sealed class DxScore : Entity<DxScoreId>
     public string Period { get; private set; } = string.Empty;
     public decimal CycleTimeHours { get; private set; }
     public decimal DeploymentFrequencyPerWeek { get; private set; }
-    public decimal CognitivLoadScore { get; private set; }
+    public decimal CognitiveLoadScore { get; private set; }
     public decimal ToilPercentage { get; private set; }
     public decimal OverallScore { get; private set; }
     public string ScoreLevel { get; private set; } = string.Empty;
@@ -35,7 +35,7 @@ public sealed class DxScore : Entity<DxScoreId>
         string period,
         decimal cycleTimeHours,
         decimal deploymentFrequencyPerWeek,
-        decimal cognitivLoadScore,
+        decimal cognitiveLoadScore,
         decimal toilPercentage,
         string? notes,
         DateTimeOffset computedAt)
@@ -48,8 +48,8 @@ public sealed class DxScore : Entity<DxScoreId>
             return Error.Validation("INVALID_DX_PERIOD", "Valid periods: weekly, monthly, quarterly.");
         if (cycleTimeHours <= 0m)
             return Error.Validation("INVALID_CYCLE_TIME", "CycleTimeHours must be greater than 0.");
-        if (cognitivLoadScore < 0m || cognitivLoadScore > 10m)
-            return Error.Validation("INVALID_COGNITIVE_LOAD", "CognitivLoadScore must be between 0 and 10.");
+        if (cognitiveLoadScore < 0m || cognitiveLoadScore > 10m)
+            return Error.Validation("INVALID_COGNITIVE_LOAD", "CognitiveLoadScore must be between 0 and 10.");
         if (toilPercentage < 0m || toilPercentage > 100m)
             return Error.Validation("INVALID_TOIL", "ToilPercentage must be between 0 and 100.");
 
@@ -58,7 +58,7 @@ public sealed class DxScore : Entity<DxScoreId>
             : cycleTimeHours <= 24m ? 25m
             : cycleTimeHours <= 168m ? 15m
             : 5m;
-        var loadScore = (10m - cognitivLoadScore) * 2m;
+        var loadScore = (10m - cognitiveLoadScore) * 2m;
         var toilScore = (100m - toilPercentage) * 0.2m;
         var overallScore = Math.Min(deployScore + cycleScore + loadScore + toilScore, 100m);
         var scoreLevel = overallScore >= 80m ? "Elite"
@@ -75,7 +75,7 @@ public sealed class DxScore : Entity<DxScoreId>
             Period = period,
             CycleTimeHours = cycleTimeHours,
             DeploymentFrequencyPerWeek = deploymentFrequencyPerWeek,
-            CognitivLoadScore = cognitivLoadScore,
+            CognitiveLoadScore = cognitiveLoadScore,
             ToilPercentage = toilPercentage,
             OverallScore = overallScore,
             ScoreLevel = scoreLevel,

@@ -21,7 +21,7 @@ internal sealed class DxScoreConfiguration : IEntityTypeConfiguration<DxScore>
         builder.Property(x => x.Period).HasMaxLength(20).IsRequired();
         builder.Property(x => x.CycleTimeHours).HasPrecision(10, 4).IsRequired();
         builder.Property(x => x.DeploymentFrequencyPerWeek).HasPrecision(10, 4).IsRequired();
-        builder.Property(x => x.CognitivLoadScore).HasPrecision(6, 4).IsRequired();
+        builder.Property(x => x.CognitiveLoadScore).HasPrecision(6, 4).IsRequired();
         builder.Property(x => x.ToilPercentage).HasPrecision(8, 4).IsRequired();
         builder.Property(x => x.OverallScore).HasPrecision(8, 4).IsRequired();
         builder.Property(x => x.ScoreLevel).HasMaxLength(20).IsRequired();

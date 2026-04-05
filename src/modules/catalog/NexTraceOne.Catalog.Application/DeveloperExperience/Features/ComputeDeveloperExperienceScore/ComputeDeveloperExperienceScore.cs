@@ -19,7 +19,7 @@ public static class ComputeDeveloperExperienceScore
         string Period,
         decimal CycleTimeHours,
         decimal DeploymentFrequencyPerWeek,
-        decimal CognitivLoadScore,
+        decimal CognitiveLoadScore,
         decimal ToilPercentage,
         string? Notes) : ICommand<Response>;
 
@@ -34,7 +34,7 @@ public static class ComputeDeveloperExperienceScore
                 .WithMessage("Valid periods: weekly, monthly, quarterly.");
             RuleFor(x => x.CycleTimeHours).GreaterThan(0m);
             RuleFor(x => x.DeploymentFrequencyPerWeek).GreaterThanOrEqualTo(0m);
-            RuleFor(x => x.CognitivLoadScore).InclusiveBetween(0m, 10m);
+            RuleFor(x => x.CognitiveLoadScore).InclusiveBetween(0m, 10m);
             RuleFor(x => x.ToilPercentage).InclusiveBetween(0m, 100m);
         }
     }
@@ -53,7 +53,7 @@ public static class ComputeDeveloperExperienceScore
                 request.Period,
                 request.CycleTimeHours,
                 request.DeploymentFrequencyPerWeek,
-                request.CognitivLoadScore,
+                request.CognitiveLoadScore,
                 request.ToilPercentage,
                 request.Notes,
                 clock.UtcNow);

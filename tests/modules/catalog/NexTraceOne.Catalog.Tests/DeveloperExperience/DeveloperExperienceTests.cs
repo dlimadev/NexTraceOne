@@ -68,7 +68,7 @@ public sealed class DeveloperExperienceTests
     }
 
     [Fact]
-    public void DxScore_Create_WithExcessiveCognitivLoad_ShouldFail()
+    public void DxScore_Create_WithExcessiveCognitiveLoad_ShouldFail()
     {
         var result = DxScore.Create(
             "team-1", "Team 1", null, "monthly",

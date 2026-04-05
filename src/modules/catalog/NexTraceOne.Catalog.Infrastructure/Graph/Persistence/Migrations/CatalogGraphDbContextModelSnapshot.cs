@@ -794,7 +794,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("CognitivLoadScore")
+                    b.Property<decimal>("CognitiveLoadScore")
                         .HasPrecision(6, 4)
                         .HasColumnType("numeric(6,4)");
 

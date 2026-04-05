@@ -304,7 +304,7 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 20)
+### Estado Atual (Abril 2026 — Rev. 21)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
 **Phase 1 (Hardening) — ~99% COMPLETO** ✅
@@ -314,7 +314,8 @@ O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com 
 **Phase 4.4 — Cost Intelligence V2 (Budget Forecasting, Efficiency Recommendations, Showback, Anomaly Detection, Cloud Cost Correlation) — COMPLETO** ✅
 **Phase 4.5 — Multi-Cluster & Multi-Cloud (ClusterRegistration, CloudProvider, ListClusters, GetMultiCloudView, UpdateHealthSnapshot, IngestEdgeEvents) — COMPLETO** ✅
 **Phase 5.1 — Predictive Intelligence (ServiceFailurePrediction, CapacityForecast, SloBurnRateAlert, ChangeRiskPrediction) — COMPLETO** ✅
-**Phase 5.2 — Developer Experience Score (DxScore, ProductivitySnapshot, ComputeDxScore, ListDxScores, RecordSnapshot) — COMPLETO** ✅
+**Phase 5.2 — Developer Experience Score + Survey/NPS (DxScore, ProductivitySnapshot, DeveloperSurvey, SubmitSurvey, GetNpsSummary) — COMPLETO** ✅
+**Phase 5.3 — GraphQL Federation Gateway MVP (CatalogQuery, ServiceType, ContractSummaryType, NpsSummaryType, HotChocolate) — COMPLETO (MVP)** ✅
 **Phase 5.4 — Observability Correlation Engine (CorrelateTraceToChange, DetectLogAnomaly, CorrelateServiceMetrics, GetTopologyAwareAlerts) — COMPLETO** ✅
 **Phase 5.5 — Governance Policy Engine V2 (PolicyAsCodeDefinition, RegisterPolicyAsCode, GetPolicyAsCode, SimulatePolicyApplication, TransitionEnforcementMode, ExpireGovernanceWaivers) — COMPLETO** ✅
 
@@ -374,10 +375,10 @@ Gaps resolvidos desde a análise inicial:
 - ~~**Phase 5.4 partial**~~ ✅ FIXED (Rev. 19) — Observability Correlation Engine: `CorrelateTraceToChange` + `DetectLogAnomaly` features (pure computation, no persistence) + 2 endpoints
 - ~~**Phase 5.4 remaining**~~ ✅ FIXED (Rev. 20) — Metric Correlation: `CorrelateServiceMetrics` feature (cross-service latency correlation, configurable threshold, CorrelationStrengthPercent) + `POST /api/v1/runtime/correlate-metrics`; Topology-Aware Alerting: `GetTopologyAwareAlerts` feature (HighLatency/HighErrorRate/PropagationRisk alerts based on dependency graph) + `POST /api/v1/runtime/topology-alerts`
 - ~~**Phase 5.5**~~ ✅ FIXED (Rev. 20) — Governance Policy Engine V2: `PolicyAsCodeDefinition` entity + 2 enums (`PolicyDefinitionFormat`, `PolicyDefinitionStatus`) + 5 features (`RegisterPolicyAsCode`, `GetPolicyAsCode`, `SimulatePolicyApplication`, `TransitionEnforcementMode`, `ExpireGovernanceWaivers`) + 5 endpoints + EF config + migration `P55_PolicyAsCode` + `IPolicyAsCodeRepository` interface + `PolicyAsCodeRepository` + DI + 17 testes unitários
-- **Phase 5.2 survey** — Developer survey automation + Developer NPS (requerem subsistema de surveys/NPS)
-- **Phase 5.3** — GraphQL Federation Gateway (requer biblioteca HotChocolate/GraphQL.NET + schema stitching)
+- ~~**Phase 5.2 survey**~~ ✅ FIXED (Rev. 21) — Developer Survey & NPS: `DeveloperSurvey` entity (NpsScore 0-10, NpsCategory Promoter/Passive/Detractor, ToolSatisfaction/ProcessSatisfaction/PlatformSatisfaction, RespondentId, Period) + `SubmitDeveloperSurvey` command + `GetDeveloperNpsSummary` query (aggregate NPS, PromoterPercent, AvgSatisfaction) + `IDeveloperSurveyRepository` + `DeveloperExperienceDbContext` + EF config + migration `P52B_DeveloperSurveys` + 2 endpoints + DI + 26 testes
+- ~~**Phase 5.3 MVP**~~ ✅ FIXED (Rev. 21) — GraphQL Federation Gateway: HotChocolate 14.3.0 integrado + `CatalogQuery` (queries: `services`, `contracts`, `npsSummary`) + `ServiceType`/`ContractSummaryType`/`NpsSummaryType` schema types + `AddCatalogGraphQL()`/`MapCatalogGraphQL()` extension methods + endpoint `GET /api/v1/graphql` + 8 testes. Pending: schema stitching multi-módulo, subscriptions real-time, SDK externo.
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 20)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 21)
 
 | Módulo | Testes |
 |--------|--------|
@@ -385,7 +386,7 @@ Gaps resolvidos desde a análise inicial:
 | Governance (inclui PolicyEngineV2) | 177/177 ✅ |
 | OperationalIntelligence (inclui Predictive + Observability Correlation + Phase 5.4 completo) | 608/608 ✅ |
 | AuditCompliance | 147/147 ✅ |
-| Catalog (inclui DeveloperExperience Score) | 926/929 ✅ (3 pre-existentes falhos em ContractEntities) |
+| Catalog (inclui DxScore + DeveloperSurvey/NPS + GraphQL) | 960/963 ✅ (3 pre-existentes falhos em ContractEntities) |
 | Integrations (inclui CI/CD webhooks + Multi-Cluster) | 131/131 ✅ |
 | Frontend (Vitest) | 915/915 ✅ |
-| Total backend | ~1.800+ testes |
+| Total backend | ~1.900+ testes |
