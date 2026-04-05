@@ -294,13 +294,10 @@ test.describe('Promotion — create request flow', () => {
     // The form should appear
     await expect(page.getByText(/create promotion request/i)).toBeVisible({ timeout: 3_000 });
 
-    // Fill form fields — select a release from dropdown
+    // Fill form fields — select a release from dropdown (by known fixture value)
     const releaseSelect = page.locator('select').first();
     if (await releaseSelect.isVisible({ timeout: 2_000 }).catch(() => false)) {
-      const options = await releaseSelect.locator('option').allTextContents();
-      if (options.length > 1) {
-        await releaseSelect.selectOption({ index: 1 });
-      }
+      await releaseSelect.selectOption({ label: 'payments-service v2.2.0' });
     }
 
     // Click Create Request
