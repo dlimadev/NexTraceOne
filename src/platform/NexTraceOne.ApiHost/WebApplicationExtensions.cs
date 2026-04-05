@@ -10,7 +10,10 @@ using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
+using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
@@ -20,7 +23,11 @@ using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
+using NexTraceOne.Knowledge.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Automation.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
+using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using System.Diagnostics;
 
@@ -42,8 +49,7 @@ public static class WebApplicationExtensions
     /// Module isolation is enforced by table prefix per module (iam_, env_, cat_, etc.)
     /// and by independent DbContext per module (or sub-domain).
     ///
-    /// E14 Note: All legacy migrations have been removed. New baseline migrations
-    /// will be generated per module during E15. Until then, no migrations are applied.
+    /// All 27 DbContexts are registered across 7 waves ordered by dependency priority.
     /// </summary>
     public static async Task ApplyDatabaseMigrationsAsync(this WebApplication app)
     {
@@ -89,18 +95,21 @@ public static class WebApplicationExtensions
         try
         {
             logger.LogInformation(
-                "Applying pending database migrations (E15: new baselines will be generated per module)...");
+                "Applying pending database migrations for all 27 DbContexts...");
 
             // Wave 1 — Foundation (highest priority, all other modules depend on these)
             await MigrateContextAsync<ConfigurationDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<IdentityDbContext>(migrationScope, pendingContexts);
 
-            // Wave 2 — Catalog & Contracts
+            // Wave 2 — Catalog & Contracts (includes sub-domain contexts)
             await MigrateContextAsync<CatalogGraphDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<DeveloperPortalDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ContractsDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<DeveloperExperienceDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<LegacyAssetsDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<TemplatesDbContext>(migrationScope, pendingContexts);
 
-            // Wave 3 — Change Governance & Operational Intelligence
+            // Wave 3 — Change Governance & Operational Intelligence (includes sub-domain contexts)
             await MigrateContextAsync<ChangeIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<RulesetGovernanceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<WorkflowDbContext>(migrationScope, pendingContexts);
@@ -108,17 +117,21 @@ public static class WebApplicationExtensions
             await MigrateContextAsync<IncidentDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<RuntimeIntelligenceDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<CostIntelligenceDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<ReliabilityDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<AutomationDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<TelemetryStoreDbContext>(migrationScope, pendingContexts);
 
             // Wave 4 — Audit & Governance
             await MigrateContextAsync<AuditDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<GovernanceDbContext>(migrationScope, pendingContexts);
 
-            // Wave 5 — Integrations & Product Analytics (P2.5: added after bounded context extraction)
+            // Wave 5 — Integrations & Product Analytics
             await MigrateContextAsync<IntegrationsDbContext>(migrationScope, pendingContexts);
             await MigrateContextAsync<ProductAnalyticsDbContext>(migrationScope, pendingContexts);
 
-            // Wave 6 — Notifications & Messaging
+            // Wave 6 — Notifications, Messaging & Knowledge
             await MigrateContextAsync<NotificationsDbContext>(migrationScope, pendingContexts);
+            await MigrateContextAsync<KnowledgeDbContext>(migrationScope, pendingContexts);
 
             // Wave 7 — AI & Knowledge (highest complexity, lowest maturity)
             await MigrateContextAsync<AiGovernanceDbContext>(migrationScope, pendingContexts);
@@ -130,12 +143,14 @@ public static class WebApplicationExtensions
                 logger.LogInformation(
                     "Migrations applied successfully for: {Contexts}",
                     string.Join(", ", pendingContexts));
+
+                // Apply RLS policies after migrations (idempotent — safe to re-run).
+                await ApplyRlsPoliciesAsync(migrationScope, logger);
             }
             else
             {
                 logger.LogInformation(
-                    "No pending migrations found. " +
-                    "E15 will generate new baseline migrations for all modules.");
+                    "No pending migrations found. All 27 DbContexts are up-to-date.");
             }
         }
         catch (Exception ex)
@@ -291,5 +306,81 @@ public static class WebApplicationExtensions
 
         pendingContexts.Add($"{typeof(TContext).Name}({pending.Count})");
         await db.Database.MigrateAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Aplica políticas de Row-Level Security (RLS) após migrações.
+    /// Executa o script SQL idempotente que cria/actualiza as políticas RLS
+    /// para isolamento por tenant em todas as tabelas elegíveis.
+    /// Só é executado quando existem migrações pendentes aplicadas nesta sessão.
+    /// </summary>
+    private static async Task ApplyRlsPoliciesAsync(
+        IServiceScope scope,
+        ILogger logger)
+    {
+        const string rlsScriptRelativePath = "infra/postgres/apply-rls.sql";
+
+        // Resolve o caminho do script RLS relativamente à raiz do projeto.
+        // Em desenvolvimento, o ContentRootPath aponta para src/platform/NexTraceOne.ApiHost.
+        // Navegamos para a raiz do repositório.
+        var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
+        var solutionRoot = FindSolutionRootFrom(contentRoot);
+
+        if (solutionRoot is null)
+        {
+            logger.LogWarning(
+                "Could not locate solution root from ContentRootPath '{ContentRoot}'. " +
+                "RLS policies will not be auto-applied. Run 'psql -f {Script}' manually.",
+                contentRoot, rlsScriptRelativePath);
+            return;
+        }
+
+        var rlsScriptPath = Path.Combine(solutionRoot, rlsScriptRelativePath);
+        if (!File.Exists(rlsScriptPath))
+        {
+            logger.LogWarning(
+                "RLS script not found at '{Path}'. " +
+                "RLS policies will not be auto-applied. Ensure the script exists or run it manually.",
+                rlsScriptPath);
+            return;
+        }
+
+        try
+        {
+            var rlsSql = await File.ReadAllTextAsync(rlsScriptPath);
+
+            // Use the ConfigurationDbContext (Wave 1) to execute RLS — it shares the same database.
+            var db = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+            await db.Database.ExecuteSqlRawAsync(rlsSql);
+
+            logger.LogInformation(
+                "RLS policies applied successfully from '{ScriptPath}'.",
+                rlsScriptRelativePath);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Failed to apply RLS policies from '{ScriptPath}'. " +
+                "The application will continue without RLS enforcement. " +
+                "Run the script manually: psql -f {Script}",
+                rlsScriptRelativePath, rlsScriptRelativePath);
+        }
+    }
+
+    /// <summary>
+    /// Procura a raiz da solução (NexTraceOne.sln) a partir de um caminho.
+    /// </summary>
+    private static string? FindSolutionRootFrom(string startPath)
+    {
+        var dir = new DirectoryInfo(startPath);
+        while (dir is not null)
+        {
+            if (File.Exists(Path.Combine(dir.FullName, "NexTraceOne.sln")))
+                return dir.FullName;
+            dir = dir.Parent;
+        }
+
+        return null;
     }
 }

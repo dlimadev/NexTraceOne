@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
 using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 namespace NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -174,7 +175,7 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
     /// <summary>
     /// Aplica assinatura digital ao contrato após canonicalização.
     /// Requer que o contrato esteja no estado Locked ou Approved.
-    /// Valida que a assinatura corresponde ao conteúdo atual do contrato.
+    /// Valida que a assinatura corresponde ao conteúdo canonicalizado do contrato.
     /// </summary>
     public Result<Unit> Sign(ContractSignature signature)
     {
@@ -183,7 +184,8 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
         if (LifecycleState is not (ContractLifecycleState.Locked or ContractLifecycleState.Approved))
             return ContractsErrors.CannotSignInCurrentState(LifecycleState.ToString());
 
-        if (!signature.Verify(SpecContent))
+        var canonical = ContractCanonicalizer.Canonicalize(SpecContent, Format);
+        if (!signature.Verify(canonical))
             return ContractsErrors.SignatureVerificationFailed(Id.Value.ToString());
 
         Signature = signature;
