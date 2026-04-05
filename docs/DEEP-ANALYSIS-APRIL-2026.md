@@ -304,10 +304,10 @@ Script de verificação de cobertura i18n adicionado ao CI (`scripts/quality/che
 
 O NexTraceOne tem uma **fundação arquitetural de excelência enterprise** com Clean Architecture, DDD, CQRS, strongly-typed IDs, audit trail com blockchain, e observabilidade completa. Os 4 fluxos centrais de valor estão entre 98-100% implementados no backend.
 
-### Estado Atual (Abril 2026 — Rev. 13)
+### Estado Atual (Abril 2026 — Rev. 14)
 
 **Phase 0 (Estabilização) — 100% COMPLETO** ✅
-**Phase 1 (Hardening) — ~98% COMPLETO** ✅
+**Phase 1 (Hardening) — ~99% COMPLETO** ✅
 **Phase 3 (parcial) — 3.1 + 3.3 + 3.4 + 3.5 COMPLETOS** ✅
 
 Gaps resolvidos desde a análise inicial:
@@ -330,13 +330,14 @@ Gaps resolvidos desde a análise inicial:
 - ~~PDF/XLSX rendering adapter~~ → `IReportRenderer` interface + `JsonReportRenderer` (stub JSON; pronto para adapters QuestPDF/ClosedXML) ✅ (Rev. 12)
 - ~~TelemetryStore sem tabelas~~ → migration `W01_TelemetryStoreFoundation` + `TelemetryStoreDbContextModelSnapshot` — 7 tabelas (`ops_ts_*`) + outbox (`ops_telstore_outbox_messages`) + 15 índices ✅ (Rev. 13)
 - ~~Validação incompleta (Governance)~~ → 37 novos `AbstractValidator<Query>` adicionados a todas as features com parâmetros; DI actualizado com 50 registos `IValidator` (13 Commands + 37 Queries) ✅ (Rev. 13)
+- ~~Validação incompleta (AIKnowledge/IdentityAccess/Catalog/Integrations)~~ → 36 novos validators em AIKnowledge (25), Catalog Graph (5), Integrations (5), IdentityAccess (1); DI actualizado em todos os módulos ✅ (Rev. 14). Cobertura final: Governance 50/58, AIKnowledge 72/88, IdentityAccess 30/43, Catalog 130/133, Integrations 11/13 — gaps remanescentes são exclusivamente queries vazias ou seed commands sem parâmetros validáveis
 
 ### Gaps Remanescentes (Phase 1-2)
 
 1. ~~**Outbox sem processamento**~~ ✅ FIXED — todos os 26 DbContexts têm `ModuleOutboxProcessorJob` registado (incluindo `TemplatesDbContext`)
 2. ~~**TelemetryStore sem tabelas**~~ ✅ FIXED (Rev. 13) — migration `W01_TelemetryStoreFoundation` cria 7 tabelas + outbox; `apply-migrations.sh` mapeado a OPERATIONS DB
 3. **Frontend parcial** — algumas páginas avançadas (config subset) podem ainda ter UX incompleta; principais páginas (AI Hub, Knowledge, Notifications, Configuration — todas 5 variantes) já conectadas a APIs reais
-4. ~~**Validação incompleta (Governance)**~~ ✅ FIXED (Rev. 13) — 37 novos validators no módulo Governance + 50 registos no DI. Remaining: ~80 features em outros módulos (AIKnowledge, IdentityAccess, Catalog, Integrations) que ainda usam queries sem validator — templates disponíveis em `docs/dev/VALIDATOR-TEMPLATE.md`
+4. ~~**Validação incompleta**~~ ✅ FIXED (Rev. 13+14) — todos os módulos com queries/commands parametrizados têm validators FluentValidation. Gaps remanescentes são exclusivamente features com parâmetros não validáveis (Guid route params, bool filters, seeds)
 5. ~~**RLS policies**~~ ✅ FIXED — `infra/postgres/apply-rls.sql` com 38 tabelas protegidas
 6. **6 Designer.cs** em falta (requer EF tooling local)
 7. ~~**PackageReferences redundantes**~~ ✅ FIXED — 3 removidas (disponíveis via FrameworkReference)
@@ -348,7 +349,7 @@ Gaps resolvidos desde a análise inicial:
 - ~~**PDF/XLSX rendering adapter**~~ ✅ FIXED (Rev. 12)
 - **Phase 4 (Ecosystem Expansion)** — CI/CD nativo (GitHub Actions, GitLab, Azure DevOps), Service Mesh intelligence, FinOps dashboard, AI Governance avançada
 
-### Resumo de Contagens de Testes (Abril 2026 — Rev. 13)
+### Resumo de Contagens de Testes (Abril 2026 — Rev. 14)
 
 | Módulo | Testes |
 |--------|--------|
