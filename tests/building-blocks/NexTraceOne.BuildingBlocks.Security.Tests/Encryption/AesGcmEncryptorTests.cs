@@ -111,6 +111,8 @@ public sealed class AesGcmEncryptorTests : IDisposable
     public void Encrypt_WithoutConfiguredKey_Throws()
     {
         SetEncryptionKey(null);
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
+
         var act = () => AesGcmEncryptor.Encrypt("test");
 
         act.Should().Throw<InvalidOperationException>()

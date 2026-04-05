@@ -1,5 +1,6 @@
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
 using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
 
 namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Entities;
@@ -129,8 +130,10 @@ public sealed class ContractEntitiesTests
         contract.TransitionTo(ContractLifecycleState.InReview, DateTimeOffset.UtcNow);
         contract.TransitionTo(ContractLifecycleState.Approved, DateTimeOffset.UtcNow);
 
+        var canonical = ContractCanonicalizer.Canonicalize(
+            contract.SpecContent, contract.Format);
         var signature = ContractSignature.Create(
-            "canonical content", "admin", DateTimeOffset.UtcNow);
+            canonical, "admin", DateTimeOffset.UtcNow);
 
         var result = contract.Sign(signature);
         result.IsSuccess.Should().BeTrue();

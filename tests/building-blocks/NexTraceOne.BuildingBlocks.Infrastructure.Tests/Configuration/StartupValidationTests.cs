@@ -216,12 +216,12 @@ public sealed class StartupValidationTests
             .Select(c => c.Value ?? "")
             .ToList();
 
-        // Since E14: all connection strings point to the single 'nextraceone' database.
+        // All connection strings point to the single 'nextraceone' database (consolidated architecture).
         // The old 4-database pattern (nextraceone_identity/catalog/operations/ai) was removed.
         foreach (var value in allValues)
         {
             value.Should().Contain("nextraceone",
-                "all connection strings must reference the consolidated 'nextraceone' database (E14 architecture)");
+                "all connection strings must reference the consolidated 'nextraceone' database");
         }
     }
 

@@ -1,0 +1,109 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Docker Compose Production Override
+#
+# Security hardening for production deployments:
+#   - Elasticsearch security enabled (TLS, authentication, API keys)
+#   - Resource limits for all services
+#   - No development convenience ports exposed
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.production.yml up -d
+#
+# Prerequisites:
+#   - Generate Elasticsearch certificates before first run:
+#     docker compose -f docker-compose.yml -f docker-compose.production.yml \
+#       run --rm elasticsearch bin/elasticsearch-certutil ca --out /usr/share/elasticsearch/config/certs/ca.p12 --pass ""
+#     docker compose -f docker-compose.yml -f docker-compose.production.yml \
+#       run --rm elasticsearch bin/elasticsearch-certutil cert --ca /usr/share/elasticsearch/config/certs/ca.p12 \
+#       --out /usr/share/elasticsearch/config/certs/node.p12 --pass ""
+#   - Set ELASTIC_PASSWORD in .env
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ── Elasticsearch — security enabled ────────────────────────────────────────
+  elasticsearch:
+    environment:
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "true"
+      xpack.security.http.ssl.keystore.path: certs/node.p12
+      xpack.security.http.ssl.truststore.path: certs/node.p12
+      xpack.security.transport.ssl.enabled: "true"
+      xpack.security.transport.ssl.keystore.path: certs/node.p12
+      xpack.security.transport.ssl.truststore.path: certs/node.p12
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?ELASTIC_PASSWORD is required for production}
+    volumes:
+      - elasticsearch-certs:/usr/share/elasticsearch/config/certs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf --cacert config/certs/ca.p12 https://localhost:9200/_cluster/health -u elastic:$$ELASTIC_PASSWORD || exit 1"]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 1G
+
+  # ── PostgreSQL — resource limits ────────────────────────────────────────────
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+
+  # ── ApiHost — production TLS and resource limits ────────────────────────────
+  apihost:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      NEXTRACE_AUTO_MIGRATE: "false"
+      Telemetry__ObservabilityProvider__Elastic__Endpoint: "https://elasticsearch:9200"
+      Telemetry__ObservabilityProvider__Elastic__ApiKey: ${ELASTIC_API_KEY:-}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+
+  # ── Workers — production resource limits ────────────────────────────────────
+  workers:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Telemetry__ObservabilityProvider__Elastic__Endpoint: "https://elasticsearch:9200"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+
+  # ── Ingestion — production resource limits ──────────────────────────────────
+  ingestion:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Telemetry__ObservabilityProvider__Elastic__Endpoint: "https://elasticsearch:9200"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+
+  # ── Frontend — resource limits ──────────────────────────────────────────────
+  frontend:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+# ── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  elasticsearch-certs:
+    driver: local

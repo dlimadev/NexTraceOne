@@ -6,6 +6,10 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
+    <!-- Suppress MSB3277 assembly version conflicts caused by Npgsql.EntityFrameworkCore.PostgreSQL 10.0.1
+         transitively pulling Microsoft.EntityFrameworkCore.Relational 10.0.4 while we use EF Core 10.0.5.
+         .NET runtime handles binding to the higher version correctly at runtime. -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
     <LangVersion>latest</LangVersion>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

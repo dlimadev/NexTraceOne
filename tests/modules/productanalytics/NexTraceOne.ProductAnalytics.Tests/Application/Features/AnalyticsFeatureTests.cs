@@ -7,6 +7,7 @@ using NexTraceOne.ProductAnalytics.Application.Features.GetValueMilestones;
 using NexTraceOne.ProductAnalytics.Application.Features.GetAdoptionFunnel;
 using NexTraceOne.ProductAnalytics.Application.Features.GetFeatureHeatmap;
 using NexTraceOne.ProductAnalytics.Application.Features.RecordAnalyticsEvent;
+using NexTraceOne.ProductAnalytics.Application.Features.GetFrictionIndicators;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
@@ -444,5 +445,101 @@ public sealed class AnalyticsFeatureTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Cells.Should().HaveCount(2);
         result.Value.TotalUniqueUsers.Should().Be(40);
+    }
+
+    // ── GetFrictionIndicators ──
+
+    [Fact]
+    public async Task GetFrictionIndicators_DefaultQuery_ShouldReturnIndicators()
+    {
+        // Arrange
+        _analyticsRepository.CountAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(200L);
+        _analyticsRepository.CountByEventTypeAsync(
+            Arg.Any<AnalyticsEventType>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(30L);
+        _analyticsRepository.GetTopModulesAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 50, 10) });
+
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository);
+        var query = new GetFrictionIndicators.Query(null, null, null);
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Indicators.Should().NotBeEmpty();
+        result.Value.OverallFrictionScore.Should().BeGreaterThan(0);
+        result.Value.PeriodLabel.Should().NotBeNullOrWhiteSpace();
+        result.Value.IsSimulated.Should().BeFalse();
+        result.Value.DataSource.Should().Be("analytics");
+    }
+
+    [Fact]
+    public async Task GetFrictionIndicators_WithPersonaFilter_ShouldSucceed()
+    {
+        // Arrange
+        _analyticsRepository.CountAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(150L);
+        _analyticsRepository.CountByEventTypeAsync(
+            Arg.Any<AnalyticsEventType>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(20L);
+        _analyticsRepository.GetTopModulesAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ModuleUsageRow> { new(ProductModule.ContractStudio, 40, 8) });
+
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository);
+        var query = new GetFrictionIndicators.Query(Persona: "Engineer", Module: null, Range: "last_7d");
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Indicators.Should().NotBeEmpty();
+        result.Value.OverallFrictionScore.Should().BeGreaterThan(0);
+        result.Value.PeriodLabel.Should().Be("last_7d");
+        result.Value.IsSimulated.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task GetFrictionIndicators_WithModuleFilter_ShouldSucceed()
+    {
+        // Arrange — all indicators point to ServiceCatalog; filtering by ServiceCatalog keeps them
+        _analyticsRepository.CountAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(300L);
+        _analyticsRepository.CountByEventTypeAsync(
+            Arg.Any<AnalyticsEventType>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(40L);
+        _analyticsRepository.GetTopModulesAsync(
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 80, 15) });
+
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository);
+        var query = new GetFrictionIndicators.Query(Persona: null, Module: "ServiceCatalog", Range: null);
+
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Indicators.Should().NotBeEmpty();
+        result.Value.Indicators.Should().OnlyContain(i => i.Module == ProductModule.ServiceCatalog);
+        result.Value.PeriodLabel.Should().NotBeNullOrWhiteSpace();
+        result.Value.IsSimulated.Should().BeFalse();
     }
 }
