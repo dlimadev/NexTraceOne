@@ -13,14 +13,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Plus, Trash2, ChevronDown, ChevronRight, ArrowUp, ArrowDown,
-  Braces, Hash, Type, ToggleLeft, List, Link2, FileJson, BookOpen,
+  Braces, Hash, Type, ToggleLeft, List, Link2, FileJson, BookOpen, GitMerge,
 } from 'lucide-react';
 import type { SchemaProperty, PropertyConstraints } from './builderTypes';
 import { CanonicalEntityPicker } from './CanonicalEntityPicker';
+import { SchemaCompositionEditor } from './SchemaCompositionEditor';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const PROPERTY_TYPES = ['string', 'integer', 'number', 'boolean', 'array', 'object', '$ref'] as const;
+const PROPERTY_TYPES = ['string', 'integer', 'number', 'boolean', 'array', 'object', '$ref', 'oneOf', 'anyOf', 'allOf'] as const;
 
 const FORMAT_OPTIONS = [
   '', 'date', 'date-time', 'email', 'uri', 'uuid', 'hostname',
@@ -35,6 +36,9 @@ const TYPE_ICONS: Record<string, typeof Type> = {
   array: List,
   object: Braces,
   '$ref': Link2,
+  oneOf: GitMerge,
+  anyOf: GitMerge,
+  allOf: GitMerge,
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -45,6 +49,9 @@ const TYPE_COLORS: Record<string, string> = {
   array: 'text-accent',
   object: 'text-purple-400',
   '$ref': 'text-pink-400',
+  oneOf: 'text-orange-400',
+  anyOf: 'text-orange-400',
+  allOf: 'text-orange-400',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -64,6 +71,7 @@ function createProperty(type: SchemaProperty['type'] = 'string'): SchemaProperty
     constraints: {},
     properties: type === 'object' ? [] : undefined,
     items: type === 'array' ? { id: genPropId(), name: 'items', type: 'string', description: '', required: false, constraints: {} } : undefined,
+    compositionSchemas: ['oneOf', 'anyOf', 'allOf'].includes(type) ? [] : undefined,
   };
 }
 
@@ -144,8 +152,14 @@ export function SchemaPropertyEditor({
     } else if (newType !== 'array') patch.items = undefined;
     if (newType === '$ref') patch.$ref = patch.$ref ?? '';
     else patch.$ref = undefined;
+    if (['oneOf', 'anyOf', 'allOf'].includes(newType)) {
+      patch.compositionSchemas = prop.compositionSchemas ?? [];
+    } else {
+      patch.compositionSchemas = undefined;
+      patch.discriminator = undefined;
+    }
     // Reset constraints when type changes fundamentally
-    if ((newType === 'object' || newType === 'array' || newType === '$ref') && prop.type !== newType) {
+    if ((newType === 'object' || newType === 'array' || newType === '$ref' || ['oneOf', 'anyOf', 'allOf'].includes(newType)) && prop.type !== newType) {
       patch.constraints = {};
     }
     updateProperty(id, patch);
@@ -157,7 +171,8 @@ export function SchemaPropertyEditor({
     <div className="space-y-1" style={{ marginLeft: indentPx > 0 ? `${indentPx}px` : undefined }}>
       {properties.map((prop, idx) => {
         const isExpanded = expandedIds.has(prop.id);
-        const hasDetails = prop.type === 'object' || prop.type === 'array' || prop.type === '$ref';
+        const isComposition = prop.type === 'oneOf' || prop.type === 'anyOf' || prop.type === 'allOf';
+        const hasDetails = prop.type === 'object' || prop.type === 'array' || prop.type === '$ref' || isComposition;
         const IconComponent = TYPE_ICONS[prop.type] ?? FileJson;
         const typeColor = TYPE_COLORS[prop.type] ?? 'text-muted';
 
@@ -288,7 +303,7 @@ export function SchemaPropertyEditor({
                 )}
 
                 {/* Primitive type constraints */}
-                {!['object', 'array', '$ref'].includes(prop.type) && (
+                {!['object', 'array', '$ref', 'oneOf', 'anyOf', 'allOf'].includes(prop.type) && (
                   <PropertyConstraintsEditor
                     constraints={prop.constraints}
                     propertyType={prop.type}
@@ -385,6 +400,17 @@ export function SchemaPropertyEditor({
                   <p className="text-[9px] text-warning">
                     {t('contracts.builder.rest.maxDepthReached', 'Maximum nesting depth reached. Use $ref for deeper structures.')}
                   </p>
+                )}
+
+                {/* Schema composition (oneOf / anyOf / allOf) */}
+                {isComposition && (
+                  <SchemaCompositionEditor
+                    compositionType={prop.type as 'oneOf' | 'anyOf' | 'allOf'}
+                    schemas={prop.compositionSchemas ?? []}
+                    discriminator={prop.discriminator}
+                    onChange={(schemas, discriminator) => updateProperty(prop.id, { compositionSchemas: schemas, discriminator })}
+                    isReadOnly={isReadOnly}
+                  />
                 )}
               </div>
             )}

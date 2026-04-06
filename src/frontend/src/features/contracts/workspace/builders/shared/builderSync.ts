@@ -223,6 +223,44 @@ function emitSchemaPropertyYaml(prop: SchemaProperty, indentLevel: number): stri
     return yaml;
   }
 
+  // Composition types: oneOf, anyOf, allOf
+  if (prop.type === 'oneOf' || prop.type === 'anyOf' || prop.type === 'allOf') {
+    if (prop.description) yaml += `${indent(indentLevel + 2)}description: "${esc(prop.description)}"\n`;
+    yaml += `${indent(indentLevel + 2)}${prop.type}:\n`;
+    const variants = prop.compositionSchemas ?? [];
+    for (const variant of variants) {
+      if (variant.type === '$ref' && variant.$ref) {
+        yaml += `${indent(indentLevel + 4)}- $ref: "${esc(variant.$ref)}"\n`;
+      } else if (variant.type === 'object' && variant.properties && variant.properties.length > 0) {
+        yaml += `${indent(indentLevel + 4)}- type: object\n`;
+        if (variant.description) yaml += `${indent(indentLevel + 6)}description: "${esc(variant.description)}"\n`;
+        const reqChildren = variant.properties.filter((p) => p.required);
+        if (reqChildren.length > 0) {
+          yaml += `${indent(indentLevel + 6)}required:\n`;
+          for (const p of reqChildren) yaml += `${indent(indentLevel + 8)}- ${p.name}\n`;
+        }
+        yaml += `${indent(indentLevel + 6)}properties:\n`;
+        for (const child of variant.properties) {
+          yaml += emitSchemaPropertyYaml(child, indentLevel + 8);
+        }
+      } else {
+        yaml += `${indent(indentLevel + 4)}- type: ${variant.type}\n`;
+        if (variant.description) yaml += `${indent(indentLevel + 6)}description: "${esc(variant.description)}"\n`;
+      }
+    }
+    if (prop.discriminator?.propertyName) {
+      yaml += `${indent(indentLevel + 2)}discriminator:\n`;
+      yaml += `${indent(indentLevel + 4)}propertyName: ${prop.discriminator.propertyName}\n`;
+      if (prop.discriminator.mapping && Object.keys(prop.discriminator.mapping).length > 0) {
+        yaml += `${indent(indentLevel + 4)}mapping:\n`;
+        for (const [k, v] of Object.entries(prop.discriminator.mapping)) {
+          yaml += `${indent(indentLevel + 6)}${k}: "${esc(v)}"\n`;
+        }
+      }
+    }
+    return yaml;
+  }
+
   yaml += `${indent(indentLevel + 2)}type: ${prop.type}\n`;
   if (prop.description) yaml += `${indent(indentLevel + 2)}description: "${esc(prop.description)}"\n`;
 

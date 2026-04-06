@@ -25,11 +25,11 @@ export interface PropertyConstraints {
 
 // ── Schema Property ───────────────────────────────────────────────────────────
 
-/** Propriedade de schema com suporte a tipos complexos (objectos, listas, referências). */
+/** Propriedade de schema com suporte a tipos complexos (objectos, listas, referências e composição). */
 export interface SchemaProperty {
   id: string;
   name: string;
-  type: 'string' | 'integer' | 'number' | 'boolean' | 'array' | 'object' | '$ref';
+  type: 'string' | 'integer' | 'number' | 'boolean' | 'array' | 'object' | '$ref' | 'oneOf' | 'anyOf' | 'allOf';
   description: string;
   required: boolean;
   constraints: PropertyConstraints;
@@ -39,6 +39,10 @@ export interface SchemaProperty {
   properties?: SchemaProperty[];
   /** Tipo dos itens do array (quando type === 'array'). */
   items?: SchemaProperty;
+  /** Sub-schemas para composição (quando type === 'oneOf' | 'anyOf' | 'allOf'). */
+  compositionSchemas?: SchemaProperty[];
+  /** Discriminador para composição polimórfica (oneOf/anyOf). */
+  discriminator?: { propertyName: string; mapping?: Record<string, string> };
 }
 
 // ── REST API Builder ──────────────────────────────────────────────────────────

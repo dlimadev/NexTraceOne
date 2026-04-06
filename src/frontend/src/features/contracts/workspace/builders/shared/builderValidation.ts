@@ -265,6 +265,17 @@ function validateSchemaProperties(
         validateSchemaProperties(prop.items.properties, `${fieldPrefix}.prop.${prop.id}.items`, endpointLabel, `${sectionLabel}.${prop.name}[]`, errors, depth + 1);
       }
     }
+
+    // Composition type validation: must have at least one sub-schema
+    if (prop.type === 'oneOf' || prop.type === 'anyOf' || prop.type === 'allOf') {
+      if (!prop.compositionSchemas || prop.compositionSchemas.length === 0) {
+        errors.push({
+          field: `${fieldPrefix}.prop.${prop.id}.composition`,
+          messageKey: 'contracts.builder.validation.compositionRequiresVariants',
+          fallback: `${sectionLabel} '${prop.name}': ${prop.type} requires at least one sub-schema`,
+        });
+      }
+    }
   }
 }
 
