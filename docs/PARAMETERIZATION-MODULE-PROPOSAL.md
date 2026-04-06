@@ -2,8 +2,8 @@
 
 **Data:** 2026-04-06  
 **Autor:** Copilot AI (análise automatizada)  
-**Versão:** 1.0  
-**Estado:** Proposta para aprovação
+**Versão:** 2.0 (atualizada com ressalvas do Product Owner)  
+**Estado:** ✅ APROVADO — Em planeamento de implementação
 
 ---
 
@@ -841,49 +841,25 @@ Apesar da infraestrutura existente, a plataforma precisa de:
 
 ---
 
-## 14. MÓDULO: Knowledge — Base de Conhecimento
+## 14. MÓDULO: Knowledge → Operational Knowledge (RECLASSIFICADO)
 
-### 14.1 Governança de Conhecimento
+> ⚠️ **NOTA v2.0**: Este módulo foi reclassificado e proposto para refatoração. 
+> Os parâmetros originais foram substituídos por uma análise mais abrangente na **Secção 23** desta proposta.
+> A secção 23 inclui: análise de sobreposição com outros módulos, proposta de renomeação para "Operational Knowledge", 
+> novas categorias de documento, captura automática de conhecimento, pesquisa federada, e refatoração de frontend.
+> **Ver Secção 23 para os parâmetros atualizados deste módulo.**
 
-| Campo | Valor |
-|-------|-------|
-| **Chave** | `knowledge.document.review_required` |
-| **Nome** | Revisão Obrigatória de Documentos |
-| **Tipo** | Boolean |
-| **Escopos** | System, Tenant |
-| **Default** | `false` |
-| **Descrição** | Quando ativado, novos documentos de conhecimento requerem revisão e aprovação antes de ficarem visíveis para toda a organização. Garante qualidade e precisão do conhecimento partilhado. |
-| **Prioridade** | 🟡 Média |
+### 14.1 Parâmetros Mantidos (agora na Secção 23)
 
-| Campo | Valor |
-|-------|-------|
-| **Chave** | `knowledge.document.review_roles` |
-| **Nome** | Papéis Revisores de Documentos |
-| **Tipo** | Json |
-| **Escopos** | System, Tenant |
-| **Default** | `["TechLead", "Architect"]` |
-| **Descrição** | Define quais papéis podem aprovar documentos de conhecimento quando a revisão obrigatória está ativa. |
-| **Prioridade** | 🟡 Média |
-
-| Campo | Valor |
-|-------|-------|
-| **Chave** | `knowledge.document.staleness_alert_days` |
-| **Nome** | Alerta de Documentação Obsoleta (dias) |
-| **Tipo** | Integer |
-| **Escopos** | System, Tenant |
-| **Default** | `180` |
-| **Descrição** | Número de dias sem atualização após os quais um documento é marcado como potencialmente obsoleto e um alerta é enviado ao owner. Incentiva manutenção da base de conhecimento. |
-| **Prioridade** | 🟢 Baixa |
-
-| Campo | Valor |
-|-------|-------|
-| **Chave** | `knowledge.auto_documentation.enabled` |
-| **Nome** | Auto-Documentação Ativada |
-| **Tipo** | Boolean |
-| **Escopos** | System, Tenant |
-| **Default** | `true` |
-| **Descrição** | Quando ativado, o NexTraceOne gera automaticamente documentação técnica para serviços e contratos usando IA. A documentação gerada é marcada como "auto-generated" e pode ser editada manualmente. |
-| **Prioridade** | 🟡 Média |
+| Parâmetro Original | Status | Novo Parâmetro (Secção 23) |
+|--------------------|---------|-----------------------------|
+| `knowledge.document.review_required` | ✅ Mantido | `knowledge.operational_documents.enabled` |
+| `knowledge.document.review_roles` | ✅ Mantido | (Integrado em roles dinâmicos - Secção 24) |
+| `knowledge.document.staleness_alert_days` | ✅ Mantido | `knowledge.graph.max_depth` |
+| `knowledge.auto_documentation.enabled` | ✅ Mantido | `knowledge.auto_capture.enabled` |
+| (NOVO) | ➕ Adicionado | `knowledge.auto_capture.categories` |
+| (NOVO) | ➕ Adicionado | `knowledge.search.federated.enabled` |
+| (NOVO) | ➕ Adicionado | `knowledge.relations.auto_link.enabled` |
 
 ---
 
@@ -1155,25 +1131,28 @@ Os parâmetros abaixo foram inspirados em plataformas e frameworks de referênci
 
 ## 19. Resumo Quantitativo da Proposta
 
-| Módulo | Parâmetros Propostos | Prioridade Alta | Prioridade Média | Prioridade Baixa |
-|--------|---------------------|-----------------|-------------------|-------------------|
-| Service Catalog | 8 | 4 | 4 | 0 |
-| Contracts | 8 | 4 | 4 | 0 |
-| Change Governance (Release/Deploy) | 17 | 10 | 7 | 0 |
-| Promotion Governance | 4 | 2 | 2 | 0 |
-| Workflow Engine | 5 | 0 | 4 | 1 |
-| Incidents & Operations | 7 | 4 | 2 | 1 |
-| AI Hub | 6 | 2 | 4 | 0 |
-| Identity & Access | 6 | 2 | 4 | 0 |
-| Audit & Compliance | 3 | 2 | 1 | 0 |
-| Integrations | 3 | 1 | 2 | 0 |
-| FinOps | 5 | 1 | 2 | 2 |
-| Knowledge | 4 | 0 | 3 | 1 |
-| Reliability (SLO/SLA) | 3 | 2 | 1 | 0 |
-| Governance Transversal | 7 | 5 | 2 | 0 |
-| Product Analytics | 2 | 0 | 1 | 1 |
-| Best Practices (DORA/GitOps/OWASP/Chaos/FinOps) | 10 | 4 | 6 | 0 |
-| **TOTAL** | **98** | **43** | **49** | **6** |
+> ⚠️ **v2.0**: Tabela atualizada — ver Secção 28 para resumo completo incluindo adendas v2.0.
+
+| Módulo | Parâmetros v1.0 | v2.0 Adicionados | Total | Prioridade Alta | Prioridade Média | Prioridade Baixa |
+|--------|----------------|-----------------|-------|-----------------|-------------------|-------------------|
+| Service Catalog | 8 | 0 | 8 | 4 | 4 | 0 |
+| Contracts | 8 | 0 | 8 | 4 | 4 | 0 |
+| Change Governance (Release/Deploy) | 17 | 0 | 17 | 10 | 7 | 0 |
+| Promotion Governance | 4 | 0 | 4 | 2 | 2 | 0 |
+| Workflow Engine | 5 | 0 | 5 | 0 | 4 | 1 |
+| Incidents & Operations | 7 | 0 | 7 | 4 | 2 | 1 |
+| AI Hub | 6 | 0 | 6 | 2 | 4 | 0 |
+| Identity & Access | 6 | 3 | **9** | 3 | 5 | 1 |
+| Audit & Compliance | 3 | 0 | 3 | 2 | 1 | 0 |
+| Integrations | 3 | 0 | 3 | 1 | 2 | 0 |
+| FinOps | 5 | 0 | 5 | 1 | 2 | 2 |
+| ~~Knowledge~~ **Operational Knowledge** | ~~4~~ | 6 | **6** | 2 | 3 | 1 |
+| Reliability (SLO/SLA) | 3 | 0 | 3 | 2 | 1 | 0 |
+| Governance Transversal | 7 | 0 | 7 | 5 | 2 | 0 |
+| Product Analytics | 2 | 0 | 2 | 0 | 1 | 1 |
+| Best Practices (DORA/GitOps/OWASP/Chaos/FinOps) | 10 | 0 | 10 | 4 | 6 | 0 |
+| **Platform Customization** (NOVO v2.0) | 0 | **9** | **9** | 3 | 3 | 3 |
+| **TOTAL** | **98** | **18** | **112** | **49** | **53** | **10** |
 
 ---
 
@@ -1195,17 +1174,26 @@ A infraestrutura do módulo Configuration **já suporta** toda a mecânica neces
 
 ### 20.2 O que precisa ser construído
 
-1. **Seed dos novos 98 parâmetros** no `ConfigurationDefinitionSeeder`
-2. **Consumo dos parâmetros nos handlers existentes** — cada feature que hoje tem comportamento fixo deve consultar o parâmetro correspondente via `IConfigurationResolutionService`
-3. **Endpoint de validação externa** — novo endpoint `POST /api/v1/releases/{releaseId}/validate` que verifica aprovação interna + externa
-4. **Adaptadores de provider externo** — implementação dos adaptadores para Jenkins, GitLab, Azure DevOps, GitHub Actions, Webhook genérico
-5. **Gate de deploy** — novo endpoint `GET /api/v1/releases/{releaseId}/deploy-readiness` que o pipeline externo pode consultar
-6. **Workflows de aprovação para novas entidades** — estender o WorkflowEngine existente para suportar aprovação de criação de serviço, contrato, conector, agente de IA
-7. **Frontend de configuração por domínio** — melhorar as páginas existentes com UX orientada ao negócio (não exigir que admin entenda JSON ou chaves técnicas)
-8. **i18n** — adicionar keys de tradução para todos os 98 novos parâmetros em 4 idiomas (en, pt-BR, pt-PT, es)
-9. **Testes** — testes unitários para cada novo parâmetro e para a lógica condicional nos handlers
+> ⚠️ **v2.0**: Lista atualizada com itens adicionais. Ver Secção 29 para faseamento detalhado.
+
+1. **Seed dos novos 112 parâmetros** no `ConfigurationDefinitionSeeder` (com chaves i18n)
+2. **i18n para todos os parâmetros** — ficheiros de tradução em 4 idiomas (en, pt-BR, pt-PT, es)
+3. **Consumo dos parâmetros nos handlers existentes** — cada feature que hoje tem comportamento fixo deve consultar o parâmetro correspondente via `IConfigurationResolutionService` (100% funcional)
+4. **Endpoint de validação externa** — novo endpoint `POST /api/v1/releases/{releaseId}/validate` que verifica aprovação interna + externa
+5. **Adaptadores de provider externo** — implementação dos adaptadores para Jenkins, GitLab, Azure DevOps, GitHub Actions, Webhook genérico
+6. **Gate de deploy** — novo endpoint `GET /api/v1/releases/{releaseId}/deploy-readiness` que o pipeline externo pode consultar
+7. **Workflows de aprovação para novas entidades** — estender o WorkflowEngine existente para suportar aprovação de criação de serviço, contrato, conector, agente de IA
+8. **CRUD de Roles Customizados** — endpoints para criar, editar e remover roles por tenant (v2.0)
+9. **Componente `<RolePicker>`** — multi-select de roles para parâmetros que referenciam roles (v2.0)
+10. **User Preferences API** — endpoints para guardar preferências de sidebar, home, widgets por utilizador (v2.0)
+11. **Sidebar/Home customizável** — frontend para drag-and-drop de itens do sidebar e widgets do home (v2.0)
+12. **Refatoração Knowledge → Operational Knowledge** — reclassificação, novas categorias, pesquisa federada (v2.0)
+13. **Frontend de configuração por domínio** — melhorar as páginas existentes com UX orientada ao negócio
+14. **Testes** — testes unitários para cada parâmetro (enabled + disabled + scope inheritance)
 
 ### 20.3 Faseamento Sugerido
+
+> ⚠️ **v2.0**: Faseamento completo e atualizado na **Secção 29**. A secção abaixo é o faseamento original v1.0 para referência.
 
 #### Fase 1 — Fundação (Alta Prioridade, Impacto Imediato)
 - Seed dos 43 parâmetros de prioridade alta
@@ -1258,19 +1246,902 @@ Com este módulo de parametrização, o NexTraceOne diferencia-se de concorrente
 
 ---
 
-## 22. Decisão Pendente
+## 22. Decisão — ✅ APROVADO COM RESSALVAS
 
-Esta proposta apresenta **98 novos parâmetros** distribuídos por **16 domínios** do NexTraceOne. Cabe ao Product Owner decidir:
+> **Estado**: Proposta v1.0 aprovada pelo Product Owner em 2026-04-06 com as seguintes ressalvas, que foram endereçadas na v2.0:
 
-1. ✅ / ❌ Aprovar a proposta geral
-2. Selecionar quais fases implementar primeiro
-3. Priorizar parâmetros específicos
-4. Ajustar defaults conforme a visão do produto
-5. Definir se algum parâmetro deve ser removido ou adicionado
-6. Validar o faseamento proposto
+| # | Ressalva | Status | Secção |
+|---|----------|--------|--------|
+| 1 | Módulo Knowledge está confuso, precisa reclassificação | ✅ Endereçado | Secção 23 |
+| 2 | Roles/Perfis devem ser configuráveis pelo utilizador | ✅ Endereçado | Secção 24 |
+| 3 | Utilizador deve poder customizar a plataforma (dashboard, sidebar) | ✅ Endereçado | Secção 25 |
+| 4 | Seeds devem respeitar i18n (por idioma) | ✅ Endereçado | Secção 26 |
+| 5 | Parâmetros devem ser 100% funcionais (enforced no código) | ✅ Endereçado | Secção 27 |
 
-**Após aprovação, será criado um plano de implementação detalhado com estimativas, ficheiros impactados e critérios de aceite por parâmetro.**
+**Próximo passo**: Criar plano de implementação detalhado seguindo o faseamento da Secção 29.
 
 ---
 
-*Documento gerado automaticamente por análise profunda dos 11 módulos do NexTraceOne (387+ features, 345 configurações existentes, 60+ grupos de API) em 2026-04-06.*
+# ADENDA v2.0 — Ressalvas do Product Owner (Aprovação Condicional)
+
+> As secções abaixo foram adicionadas após aprovação condicional pelo Product Owner, que identificou as seguintes necessidades adicionais:
+> 1. Reclassificação e possível refatoração do módulo Knowledge
+> 2. Roles/Perfis devem ser configuráveis pelo utilizador, não hardcoded
+> 3. Customização da plataforma pelo utilizador (dashboards, sidebar, layout)
+> 4. Seeds com suporte a i18n (por idioma)
+> 5. Parâmetros devem ser 100% funcionais (não apenas seedados, mas enforced no código)
+
+---
+
+## 23. ANÁLISE DO MÓDULO KNOWLEDGE — Reclassificação e Refatoração
+
+### 23.1 Diagnóstico Atual
+
+O módulo Knowledge (`NexTraceOne.Knowledge`) é atualmente um módulo isolado que gere:
+- **KnowledgeDocument** — Documentos operacionais (runbooks, troubleshooting, post-mortems, procedimentos)
+- **OperationalNote** — Notas contextuais ligadas a serviços, incidentes, mudanças
+- **KnowledgeRelation** — Relações polimórficas entre documentos/notas e entidades de outros módulos
+
+### 23.2 Problema Identificado
+
+O Product Owner identificou corretamente que **quase tudo que é gerado no NexTraceOne é base de conhecimento**:
+
+| Módulo | Gera conhecimento? | Exemplos |
+|--------|-------------------|----------|
+| **Catalog** | ✅ Sim | Contratos API, scorecards, topologia, documentação de serviços |
+| **ChangeGovernance** | ✅ Sim | Evidence packs, post-release reviews, changelogs, decisões |
+| **OperationalIntelligence** | ✅ Sim | Post-incident reviews, root cause analysis, runbooks operacionais |
+| **AIKnowledge** | ✅ Sim | Conversas de IA, artefactos gerados, knowledge captures |
+| **AuditCompliance** | ✅ Sim | Relatórios de compliance, auditorias, evidências |
+| **Governance** | ✅ Sim | Políticas, waivers, compliance gaps, scorecards |
+| **Knowledge** | ✅ Sim | Documentos, notas operacionais, relações |
+
+**Conclusão**: O módulo Knowledge **sobrepõe-se conceptualmente** com funcionalidades de outros módulos. A sua razão de existir como módulo independente é questionável.
+
+### 23.3 Análise de Dependências do Módulo Knowledge
+
+**Quem consome o Knowledge:**
+1. **Catalog** — `IKnowledgeModule.CountDocumentsByServiceAsync()` (para Service Scorecard)
+2. **AIKnowledge** — `IKnowledgeSearchProvider.SearchAsync()` (para grounding de IA)
+3. **AIKnowledge** — `DocumentRetrievalService` (recupera documentos como contexto LLM)
+
+**O que é único do Knowledge:**
+- Documentos operacionais com lifecycle (Draft → Published → Archived → Deprecated)
+- Notas operacionais com severidade e contexto flexível
+- Relações polimórficas entre entidades de módulos diferentes
+- Full-text search transversal
+- Knowledge Graph visualization
+
+### 23.4 Proposta de Reclassificação
+
+**Recomendação: REFATORAR, não eliminar.**
+
+O Knowledge module deve ser **reclassificado e refatorado** da seguinte forma:
+
+#### Opção Recomendada: Transformar em "Operational Knowledge Layer"
+
+Em vez de ser um módulo ao mesmo nível dos outros, o Knowledge passa a ser uma **camada transversal** (cross-cutting concern), similar ao que o módulo Configuration é para configurações.
+
+**Estrutura proposta:**
+
+```
+NexTraceOne.Knowledge (renomear para NexTraceOne.OperationalKnowledge)
+├── Domain/
+│   ├── Entities/
+│   │   ├── OperationalDocument.cs      (renomeado de KnowledgeDocument)
+│   │   ├── OperationalNote.cs          (mantido)
+│   │   └── EntityRelation.cs           (renomeado de KnowledgeRelation, mais genérico)
+│   └── Enums/
+│       ├── DocumentCategory.cs         (estender: + ApiDocumentation, + ChangeLog, + ComplianceReport)
+│       └── RelationType.cs             (estender: + PolicyWaiver, + AuditCampaign, + Budget)
+├── Application/
+│   ├── Features/                       (manter features existentes)
+│   └── Abstractions/
+│       └── IOperationalKnowledgeService.cs  (interface enriquecida)
+└── Contracts/
+    └── OperationalKnowledgeContracts.cs     (contrato público para outros módulos)
+```
+
+**Mudanças chave:**
+1. **Renomear** `Knowledge` → `OperationalKnowledge` para distinguir de "knowledge" genérico
+2. **Enriquecer categorias** — as categorias de documento devem refletir todos os tipos de conhecimento do NexTraceOne
+3. **Auto-link** — outros módulos podem automaticamente criar documentos/notas no OperationalKnowledge quando geram conhecimento (ex: post-incident review → cria documento; compliance report → cria documento)
+4. **Search Federation** — o Knowledge search deve federar resultados de todos os módulos, não apenas dos seus documentos
+
+**Novas categorias de documento propostas:**
+
+| Categoria | Origem Típica | Descrição |
+|-----------|---------------|-----------|
+| General | Manual | Documentação geral |
+| Runbook | Manual / OperationalIntelligence | Procedimentos operacionais |
+| Troubleshooting | Manual / OperationalIntelligence | Guias de resolução de problemas |
+| Architecture | Manual / AIKnowledge | Documentação de arquitetura |
+| Procedure | Manual | Procedimentos padrão |
+| PostMortem | OperationalIntelligence | Análise pós-incidente |
+| Reference | Manual | Materiais de referência |
+| **ApiDocumentation** | **Catalog** (NOVO) | Documentação gerada de APIs/contratos |
+| **ChangeLog** | **ChangeGovernance** (NOVO) | Histórico de mudanças |
+| **ComplianceEvidence** | **AuditCompliance** (NOVO) | Evidências de compliance |
+| **DecisionRecord** | **AIKnowledge** (NOVO) | Architecture Decision Records |
+| **IncidentAnalysis** | **OperationalIntelligence** (NOVO) | Análise de incidentes |
+| **OperationalPlaybook** | **OperationalIntelligence** (NOVO) | Playbooks de operação |
+
+### 23.5 Frontend do Knowledge — Refatoração
+
+**Estado atual:** 5 páginas dedicadas em `/features/knowledge/`
+- KnowledgeHubPage, KnowledgeDocumentPage, OperationalNotesPage, KnowledgeGraphPage, AutoDocumentationPage
+
+**Proposta de refatoração frontend:**
+
+1. **KnowledgeHubPage** → Mantém como "Centro de Conhecimento Operacional" mas com filtros multi-origem
+2. **KnowledgeDocumentPage** → Mantém (visualização de documentos)
+3. **OperationalNotesPage** → Move como painel contextual nos módulos de origem (ex: notas de incidente ficam no detalhe do incidente)
+4. **KnowledgeGraphPage** → Mantém mas renomeia para "Mapa de Relações" e mostra relações entre TODOS os tipos de entidade
+5. **AutoDocumentationPage** → Move para dentro do detalhe de serviço no Catalog
+
+### 23.6 Parâmetros Relacionados ao Knowledge (Substituem Secção 14)
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `knowledge.operational_documents.enabled` |
+| **Nome** | Documentos Operacionais Ativados |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Controla se a funcionalidade de documentos operacionais está ativa. Quando desativado, o módulo de conhecimento operacional fica em modo read-only (documentos existentes são visíveis mas não é possível criar novos). |
+| **Prioridade** | 🟡 Média |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `knowledge.auto_capture.enabled` |
+| **Nome** | Captura Automática de Conhecimento |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, eventos operacionais significativos (post-incident reviews, compliance reports, architecture decisions, changelogs) são automaticamente capturados como documentos operacionais com a categoria correspondente. Permite construir base de conhecimento sem esforço manual. |
+| **Prioridade** | 🔴 Alta |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `knowledge.auto_capture.categories` |
+| **Nome** | Categorias de Captura Automática |
+| **Tipo** | Json |
+| **Escopos** | System, Tenant |
+| **Default** | `["PostMortem", "ComplianceEvidence", "DecisionRecord", "ChangeLog"]` |
+| **Descrição** | Define quais categorias de documento são automaticamente capturadas. A empresa pode desativar categorias específicas se não quiser que certos tipos de conhecimento sejam auto-capturados. |
+| **Prioridade** | 🟡 Média |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `knowledge.search.federated.enabled` |
+| **Nome** | Pesquisa Federada de Conhecimento |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, a pesquisa no Knowledge Hub retorna resultados de todos os módulos do NexTraceOne (contratos, incidentes, runbooks, policies), não apenas documentos explicitamente criados no Knowledge. Proporciona uma visão unificada de todo o conhecimento da organização. |
+| **Prioridade** | 🔴 Alta |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `knowledge.relations.auto_link.enabled` |
+| **Nome** | Linking Automático de Conhecimento |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, o sistema cria automaticamente relações entre entidades quando contexto relevante é detetado. Exemplo: um runbook que menciona um serviço é automaticamente ligado a esse serviço. |
+| **Prioridade** | 🟡 Média |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `knowledge.graph.max_depth` |
+| **Nome** | Profundidade Máxima do Grafo de Conhecimento |
+| **Tipo** | Integer |
+| **Escopos** | System, Tenant |
+| **Default** | `3` |
+| **Descrição** | Profundidade máxima de traversal no grafo de conhecimento. Valores maiores mostram mais relações mas podem ser mais lentos. Intervalo: 1-5. |
+| **Prioridade** | 🟢 Baixa |
+
+---
+
+## 24. ROLES E PERFIS CONFIGURÁVEIS PELO UTILIZADOR
+
+### 24.1 Problema Identificado
+
+Os perfis/roles hoje são parcialmente hardcoded:
+- **Backend**: 7 roles estáticos (`PlatformAdmin`, `TechLead`, `Developer`, `Viewer`, `Auditor`, `SecurityReview`, `ApprovalOnly`)
+- **Frontend**: 7 personas estáticas (`Engineer`, `TechLead`, `Architect`, `Product`, `Executive`, `PlatformAdmin`, `Auditor`)
+- **Parâmetros**: Usam nomes de roles hardcoded como `["TechLead", "Architect"]`
+
+Nos parâmetros de aprovação (ex: `catalog.service.creation.approval_roles`), os defaults referem roles como `["TechLead", "Architect", "ProductOwner"]` — mas estes devem ser **referências a roles cadastrados** pelo utilizador, não strings fixas.
+
+### 24.2 Proposta: Sistema de Roles Dinâmicos
+
+#### Backend
+
+O sistema já suporta parcialmente roles customizados:
+- `Role.IsSystem` distingue roles do sistema de roles customizados
+- `RolePermission` permite customização de permissões por tenant
+- `SeedDefaultRolePermissions` popula roles iniciais no banco
+
+**O que precisa ser construído:**
+
+1. **CRUD de Roles Customizados**
+   - `POST /api/v1/identity/roles` — Criar role customizado
+   - `PUT /api/v1/identity/roles/{roleId}` — Atualizar role
+   - `DELETE /api/v1/identity/roles/{roleId}` — Remover role (se não tiver utilizadores)
+   - `GET /api/v1/identity/roles` — Listar roles (com permissões)
+   - `POST /api/v1/identity/roles/{roleId}/permissions` — Atribuir permissões
+
+2. **Resolução Dinâmica de Roles nos Parâmetros**
+   - Em vez de `["TechLead", "Architect"]`, os parâmetros devem usar `["role:TechLead", "role:Architect"]` ou IDs de role
+   - O sistema deve validar que os roles referenciados existem quando o parâmetro é alterado
+   - Se um role é removido, parâmetros que o referenciam devem ser atualizados
+
+#### Frontend
+
+1. **Página de Gestão de Roles** (`/admin/roles`)
+   - Lista de roles existentes (sistema + customizados)
+   - Criação de novos roles com seleção de permissões
+   - Edição de permissões de roles existentes (customizados)
+   - Indicação visual de quais roles são do sistema (não editáveis na essência) vs customizados
+   - Preview de "o que este role pode fazer" com lista de módulos/ações
+
+2. **Seletor de Roles nos Parâmetros**
+   - Quando um parâmetro é do tipo "roles" (Json com array de roles), o editor deve mostrar um **multi-select com os roles disponíveis** em vez de um campo de texto JSON livre
+   - Validação em tempo real de roles selecionados
+
+### 24.3 Parâmetros Relacionados a Roles
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `identity.roles.custom_creation.enabled` |
+| **Nome** | Criação de Roles Customizados Ativada |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Controla se tenants podem criar roles customizados além dos 7 roles de sistema. Quando desativado, apenas os roles pré-definidos estão disponíveis. |
+| **Prioridade** | 🔴 Alta |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `identity.roles.max_custom_roles` |
+| **Nome** | Número Máximo de Roles Customizados |
+| **Tipo** | Integer |
+| **Escopos** | System, Tenant |
+| **Default** | `20` |
+| **Descrição** | Limita o número de roles customizados que um tenant pode criar. Previne proliferação excessiva de roles que dificulte a gestão. |
+| **Prioridade** | 🟡 Média |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `identity.roles.require_description` |
+| **Nome** | Exigir Descrição ao Criar Role |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, todos os roles customizados devem ter uma descrição que explique o propósito do role. Melhora a governança de acessos. |
+| **Prioridade** | 🟢 Baixa |
+
+### 24.4 Revisão de Todos os Parâmetros que Referenciam Roles
+
+**IMPORTANTE**: Todos os parâmetros propostos na v1.0 que usam roles fixos devem ser atualizados:
+
+| Parâmetro | Default v1.0 | Default v2.0 (corrigido) | Mudança |
+|-----------|-------------|-------------------------|---------|
+| `catalog.service.creation.approval_roles` | `["TechLead", "Architect", "PlatformAdmin"]` | `["TechLead", "Architect", "PlatformAdmin"]` | Valor é **referência a roles cadastrados**, não strings livres. UI deve mostrar role picker. |
+| `catalog.contract.creation.approval_roles` | `["Architect", "TechLead"]` | `["Architect", "TechLead"]` | Idem — role picker no frontend |
+| `catalog.contract.breaking_change.override_roles` | `["Architect", "PlatformAdmin"]` | `["Architect", "PlatformAdmin"]` | Idem |
+| `change.release.approval_roles` | `["TechLead", "Architect", "ProductOwner"]` | `["TechLead", "Architect"]` | Removido "ProductOwner" (não é role do sistema). Se a empresa quiser, cria role customizado. |
+| `governance.four_eyes_principle.actions` | (lista de ações) | (mantido) | Não referencia roles |
+| `governance.change_advisory_board.members` | `[]` | `[]` | Formato: `[{"type": "role", "value": "<roleId>"}, ...]` — UI com role/user picker |
+| `workflow.approvers.policy` | `"ByOwnership"` | `"ByOwnership"` | Mantido — ownership é dinâmico |
+| `workflow.escalation.target_roles` | `["PlatformAdmin", "Architect"]` | `["PlatformAdmin", "Architect"]` | Role picker |
+| `security.break_glass.require_dual_approval` | boolean | boolean | Não referencia roles diretamente |
+| `knowledge.document.review_roles` | `["TechLead", "Architect"]` | `["TechLead", "Architect"]` | Role picker |
+
+**Regra de implementação**: O frontend deve usar um componente **`<RolePicker>`** sempre que um parâmetro contém um array de roles. Este componente:
+- Lista todos os roles disponíveis (sistema + customizados do tenant)
+- Permite seleção múltipla
+- Valida que roles selecionados existem
+- Mostra preview de permissões por role
+
+---
+
+## 25. CUSTOMIZAÇÃO DA PLATAFORMA PELO UTILIZADOR
+
+### 25.1 Problema Identificado
+
+O Product Owner identificou que ter telas diferentes por persona pode não fazer sentido se já temos (ou devemos ter) dashboards customizados. O utilizador deve poder organizar a plataforma como quiser.
+
+### 25.2 Proposta: User Workspace Customization
+
+#### 25.2.1 Sidebar Customizável
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.sidebar.user_customization.enabled` |
+| **Nome** | Customização de Sidebar pelo Utilizador |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, cada utilizador pode reordenar, ocultar e fixar itens no sidebar de navegação. A ordem personalizada é salva no perfil do utilizador. Quando desativado, todos os utilizadores veem a mesma ordem (definida pelo persona/role). |
+| **Prioridade** | 🔴 Alta |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.sidebar.pinned_items.max` |
+| **Nome** | Número Máximo de Itens Fixados no Sidebar |
+| **Tipo** | Integer |
+| **Escopos** | System, Tenant |
+| **Default** | `10` |
+| **Descrição** | Limite de itens que um utilizador pode fixar como favoritos no topo do sidebar. |
+| **Prioridade** | 🟢 Baixa |
+
+#### 25.2.2 Home Dashboard Customizável
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.home.user_customization.enabled` |
+| **Nome** | Home Dashboard Customizável pelo Utilizador |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, cada utilizador pode customizar o seu home dashboard: adicionar, remover, reordenar e redimensionar widgets. Quando desativado, o home dashboard é determinado pelo persona/role do utilizador. |
+| **Prioridade** | 🔴 Alta |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.home.default_layout` |
+| **Nome** | Layout Padrão do Home Dashboard |
+| **Tipo** | String |
+| **Escopos** | System, Tenant, Role |
+| **Default** | `"two-column"` |
+| **Descrição** | Layout padrão para o home dashboard quando o utilizador ainda não customizou. Opções: "single-column", "two-column", "three-column", "grid". Pode ser diferente por role — ex: Executive com "single-column" focado, Engineer com "three-column" rico em dados. |
+| **Prioridade** | 🟡 Média |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.home.available_widgets` |
+| **Nome** | Widgets Disponíveis para o Home Dashboard |
+| **Tipo** | Json |
+| **Escopos** | System, Tenant, Role |
+| **Default** | `["team-services", "change-risk", "incident-overview", "slo-status", "pending-approvals", "recent-changes", "contract-health", "dora-metrics", "finops-summary", "ai-insights", "compliance-status", "reliability-trend"]` |
+| **Descrição** | Lista de widgets que podem ser adicionados ao home dashboard. A empresa pode restringir quais widgets estão disponíveis por role — ex: widgets de FinOps podem ser restritos a TechLead e acima. Cada widget é identificado por um ID e deve estar registado no catálogo de widgets. |
+| **Prioridade** | 🔴 Alta |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.home.max_widgets` |
+| **Nome** | Número Máximo de Widgets no Home |
+| **Tipo** | Integer |
+| **Escopos** | System, Tenant |
+| **Default** | `12` |
+| **Descrição** | Limite de widgets que um utilizador pode adicionar ao seu home dashboard. Previne dashboards excessivamente carregados. |
+| **Prioridade** | 🟢 Baixa |
+
+#### 25.2.3 Quick Actions Customizáveis
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.quick_actions.user_customization.enabled` |
+| **Nome** | Quick Actions Customizáveis pelo Utilizador |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, cada utilizador pode escolher quais quick actions aparecem no topo do dashboard e na command palette. Quando desativado, quick actions são determinados pelo persona. |
+| **Prioridade** | 🟡 Média |
+
+#### 25.2.4 Custom Dashboards (Evolução)
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.custom_dashboards.enabled` |
+| **Nome** | Dashboards Customizados Ativados |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, utilizadores podem criar dashboards completamente customizados além do home dashboard. Podem combinar widgets de diferentes módulos, configurar layouts e partilhar com a equipa. |
+| **Prioridade** | 🔴 Alta |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.custom_dashboards.sharing.enabled` |
+| **Nome** | Partilha de Dashboards Customizados |
+| **Tipo** | Boolean |
+| **Escopos** | System, Tenant |
+| **Default** | `true` |
+| **Descrição** | Quando ativado, dashboards customizados podem ser partilhados com outros utilizadores, equipas ou toda a organização. Quando desativado, dashboards são privados. |
+| **Prioridade** | 🟡 Média |
+
+| Campo | Valor |
+|-------|-------|
+| **Chave** | `platform.custom_dashboards.max_per_user` |
+| **Nome** | Número Máximo de Dashboards por Utilizador |
+| **Tipo** | Integer |
+| **Escopos** | System, Tenant |
+| **Default** | `10` |
+| **Descrição** | Limite de dashboards customizados que cada utilizador pode criar. |
+| **Prioridade** | 🟢 Baixa |
+
+### 25.3 Implementação Backend: User Preferences
+
+Para suportar a customização, é necessário um novo sub-domínio no IdentityAccess ou Configuration:
+
+**Novo endpoint proposto:**
+- `GET /api/v1/identity/me/preferences` — Obter preferências do utilizador atual
+- `PUT /api/v1/identity/me/preferences` — Atualizar preferências
+- `GET /api/v1/identity/me/preferences/{key}` — Obter preferência específica
+- `PUT /api/v1/identity/me/preferences/{key}` — Atualizar preferência específica
+
+**Chaves de preferência do utilizador:**
+```json
+{
+  "sidebar.order": ["home", "services", "changes", "contracts", "operations"],
+  "sidebar.pinned": ["services", "changes"],
+  "sidebar.hidden": ["analytics"],
+  "home.layout": "two-column",
+  "home.widgets": [
+    {"id": "team-services", "position": {"row": 0, "col": 0, "width": 1, "height": 1}},
+    {"id": "change-risk", "position": {"row": 0, "col": 1, "width": 1, "height": 1}}
+  ],
+  "quick_actions": ["create-service", "review-changes", "check-incidents"],
+  "theme": "system",
+  "language": "pt-BR"
+}
+```
+
+### 25.4 Relação Persona vs Customização
+
+A persona **não desaparece** — ela passa a ser o **default inicial** que o utilizador pode depois customizar:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Resolução de UX do Utilizador                            │
+│                                                          │
+│ 1. Verificar preferências do utilizador (se existirem)   │
+│    → Se sim, usar preferências customizadas              │
+│ 2. Se não, verificar configuração do Role/Persona        │
+│    → Usar defaults do persona config                     │
+│ 3. Se nenhum, usar defaults do sistema                   │
+│    → Layout padrão genérico                              │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 26. ESTRATÉGIA DE SEED COM i18n (POR IDIOMA)
+
+### 26.1 Problema Atual
+
+Atualmente, os seeds de `ConfigurationDefinition` usam textos em **inglês hardcoded** no `displayName` e `description`. O NexTraceOne suporta 4 idiomas (en, pt-BR, pt-PT, es) mas os labels das configurações aparecem sempre em inglês.
+
+### 26.2 Proposta: Seed Bilíngue com i18n Key Reference
+
+#### Abordagem Recomendada: Chaves i18n no Seed + Ficheiros de Tradução
+
+**No seed (backend):**
+```csharp
+ConfigurationDefinition.Create(
+    key: "catalog.service.creation.approval_required",
+    displayName: "config.catalog.service.creation.approval_required.label",  // ← chave i18n
+    description: "config.catalog.service.creation.approval_required.description",  // ← chave i18n
+    // ...
+)
+```
+
+**Nos ficheiros de locale (frontend):**
+
+**en.json:**
+```json
+{
+  "config": {
+    "catalog": {
+      "service": {
+        "creation": {
+          "approval_required": {
+            "label": "Service Creation Approval Required",
+            "description": "When enabled, creating new services requires approval before becoming active."
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**pt-BR.json:**
+```json
+{
+  "config": {
+    "catalog": {
+      "service": {
+        "creation": {
+          "approval_required": {
+            "label": "Aprovação Obrigatória para Criação de Serviço",
+            "description": "Quando ativado, a criação de novos serviços requer aprovação antes de ficarem ativos."
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**pt-PT.json:**
+```json
+{
+  "config": {
+    "catalog": {
+      "service": {
+        "creation": {
+          "approval_required": {
+            "label": "Aprovação Obrigatória para Criação de Serviço",
+            "description": "Quando ativado, a criação de novos serviços requer aprovação antes de ficarem ativos."
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**es.json:**
+```json
+{
+  "config": {
+    "catalog": {
+      "service": {
+        "creation": {
+          "approval_required": {
+            "label": "Aprobación Obligatoria para Creación de Servicio",
+            "description": "Cuando está activado, la creación de nuevos servicios requiere aprobación antes de estar activos."
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### 26.3 Resolução no Frontend
+
+```typescript
+// Componente de configuração
+function ConfigurationLabel({ definition }: { definition: ConfigurationDefinition }) {
+  const { t } = useTranslation();
+  
+  // Tenta resolver como chave i18n; se falhar, usa displayName como fallback
+  const label = t(definition.displayName, { defaultValue: definition.displayName });
+  const description = t(definition.description, { defaultValue: definition.description });
+  
+  return (
+    <div>
+      <h3>{label}</h3>
+      <p>{description}</p>
+    </div>
+  );
+}
+```
+
+### 26.4 Plano de Migração dos Seeds Existentes
+
+1. **Fase 1**: Manter seeds existentes (345) com texto em inglês (backward compatible)
+2. **Fase 2**: Novos seeds (98+) usam chaves i18n desde o início
+3. **Fase 3**: Migrar seeds existentes para chaves i18n (batch update)
+4. **Fase 4**: Gerar ficheiros de tradução para todos os 443+ seeds em 4 idiomas
+
+### 26.5 Ferramenta de Geração de i18n
+
+Para garantir consistência, propõe-se um script utilitário:
+
+```bash
+# Gera ficheiros i18n a partir do seeder
+dotnet run --project tools/NexTraceOne.Tools.I18nSeedGenerator -- \
+  --seeder-path src/modules/configuration/NexTraceOne.Configuration.Infrastructure/Seed/ConfigurationDefinitionSeeder.cs \
+  --output-dir src/frontend/src/locales/ \
+  --languages en,pt-BR,pt-PT,es
+```
+
+---
+
+## 27. ENFORCEMENT 100% FUNCIONAL — PLANO DE IMPLEMENTAÇÃO
+
+### 27.1 Princípio
+
+**Cada parâmetro deve ser 100% funcional.** Não basta criar o seed — o código que executa a funcionalidade DEVE consultar o parâmetro e aplicar o comportamento configurado.
+
+### 27.2 Padrão de Implementação
+
+Cada parâmetro segue o mesmo padrão de implementação:
+
+```
+1. SEED → ConfigurationDefinitionSeeder (definição + default)
+2. i18n → Ficheiros de locale (4 idiomas: en, pt-BR, pt-PT, es)
+3. HANDLER → Feature handler consulta IConfigurationResolutionService
+4. GATE → Lógica condicional baseada no valor do parâmetro
+5. FRONTEND → UI reflete o estado do parâmetro
+6. TEST → Testes unitários para ambos os estados (ativado/desativado)
+```
+
+### 27.3 Checklist de Implementação por Parâmetro
+
+Para CADA um dos 98+ parâmetros, a implementação deve incluir:
+
+#### Backend
+- [ ] **Seed**: `ConfigurationDefinition.Create(...)` no `ConfigurationDefinitionSeeder`
+- [ ] **i18n key**: `displayName` e `description` como chaves i18n (não texto hardcoded)
+- [ ] **Handler modification**: O handler que executa a funcionalidade deve:
+  ```csharp
+  // Injetar IConfigurationResolutionService
+  private readonly IConfigurationResolutionService _configService;
+  
+  // No handler:
+  var approvalRequired = await _configService.ResolveEffectiveValueAsync(
+      "catalog.service.creation.approval_required",
+      ConfigurationScope.Tenant,
+      tenantId.ToString(),
+      cancellationToken);
+  
+  if (approvalRequired?.EffectiveValue == "true")
+  {
+      // Fluxo com aprovação
+  }
+  else
+  {
+      // Fluxo direto (sem aprovação)
+  }
+  ```
+- [ ] **Validação**: Se o parâmetro tem validationRules, garantir que são verificadas ao guardar
+- [ ] **Auditoria**: Alterações ao parâmetro são registadas via `ConfigurationAuditEntry`
+
+#### Frontend
+- [ ] **i18n**: Chaves de tradução em 4 ficheiros de locale
+- [ ] **Config page**: Parâmetro visível na página de configuração do domínio correspondente
+- [ ] **UX reflection**: A UI muda de acordo com o valor do parâmetro (ex: se approval_required=false, o botão "Submit for Approval" não aparece)
+- [ ] **Role picker**: Se parâmetro contém roles, usar componente `<RolePicker>`
+
+#### Testes
+- [ ] **Test when enabled**: Teste unitário com parâmetro ativado
+- [ ] **Test when disabled**: Teste unitário com parâmetro desativado
+- [ ] **Test scope inheritance**: Teste de resolução hierárquica (Tenant override de System)
+- [ ] **Test edge cases**: Parâmetro inexistente, valor inválido, etc.
+
+### 27.4 Exemplo Completo: `catalog.service.creation.approval_required`
+
+#### 1. Seed
+```csharp
+// ConfigurationDefinitionSeeder.cs
+ConfigurationDefinition.Create(
+    key: "catalog.service.creation.approval_required",
+    displayName: "config.catalog.service.creation.approval_required.label",
+    category: ConfigurationCategory.Functional,
+    valueType: ConfigurationValueType.Boolean,
+    allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+    description: "config.catalog.service.creation.approval_required.description",
+    defaultValue: "false",
+    uiEditorType: "toggle",
+    sortOrder: 500)
+```
+
+#### 2. i18n (4 idiomas)
+```json
+// en.json
+"config.catalog.service.creation.approval_required.label": "Service Creation Approval Required",
+"config.catalog.service.creation.approval_required.description": "When enabled, new services require approval before becoming visible in the catalog. When disabled, services are created directly in active state."
+
+// pt-BR.json  
+"config.catalog.service.creation.approval_required.label": "Aprovação Obrigatória para Criação de Serviço",
+"config.catalog.service.creation.approval_required.description": "Quando ativado, novos serviços requerem aprovação antes de ficarem visíveis no catálogo. Quando desativado, serviços são criados diretamente em estado ativo."
+
+// pt-PT.json
+"config.catalog.service.creation.approval_required.label": "Aprovação Obrigatória para Criação de Serviço",  
+"config.catalog.service.creation.approval_required.description": "Quando ativado, novos serviços requerem aprovação antes de ficarem visíveis no catálogo. Quando desativado, serviços são criados diretamente em estado ativo."
+
+// es.json
+"config.catalog.service.creation.approval_required.label": "Aprobación Obligatoria para Creación de Servicio",
+"config.catalog.service.creation.approval_required.description": "Cuando está activado, los nuevos servicios requieren aprobación antes de ser visibles en el catálogo. Cuando está desactivado, los servicios se crean directamente en estado activo."
+```
+
+#### 3. Handler (Backend)
+```csharp
+// RegisterServiceAsset handler — ANTES (sem parametrização):
+public async Task<Result<Response>> Handle(Command request, CancellationToken ct)
+{
+    var asset = ServiceAsset.Create(request.Name, request.Domain, ...);
+    await repository.AddAsync(asset, ct);
+    return Result.Success(new Response(asset.Id));
+}
+
+// RegisterServiceAsset handler — DEPOIS (com parametrização):
+public async Task<Result<Response>> Handle(Command request, CancellationToken ct)
+{
+    var approvalRequired = await configService.ResolveEffectiveValueAsync(
+        "catalog.service.creation.approval_required",
+        ConfigurationScope.Tenant,
+        request.TenantId.ToString(),
+        ct);
+    
+    var asset = ServiceAsset.Create(request.Name, request.Domain, ...);
+    
+    if (approvalRequired?.EffectiveValue == "true")
+    {
+        asset.SetStatus(ServiceStatus.PendingApproval);
+        
+        // Criar workflow de aprovação
+        var approvalRoles = await configService.ResolveEffectiveValueAsync(
+            "catalog.service.creation.approval_roles", ...);
+        // Iniciar workflow com roles configurados
+    }
+    else
+    {
+        asset.SetStatus(ServiceStatus.Active);
+    }
+    
+    await repository.AddAsync(asset, ct);
+    return Result.Success(new Response(asset.Id));
+}
+```
+
+#### 4. Frontend
+```typescript
+// ServiceCreationForm.tsx — consulta parâmetro para ajustar UX
+const { data: approvalRequired } = useConfigValue('catalog.service.creation.approval_required');
+
+return (
+  <form>
+    {/* ... campos do formulário ... */}
+    <Button type="submit">
+      {approvalRequired === 'true' 
+        ? t('catalog.service.submitForApproval')  // "Submit for Approval"
+        : t('catalog.service.create')              // "Create Service"
+      }
+    </Button>
+    {approvalRequired === 'true' && (
+      <InfoBanner>{t('catalog.service.approvalInfo')}</InfoBanner>
+    )}
+  </form>
+);
+```
+
+#### 5. Testes
+```csharp
+[Fact]
+public async Task RegisterServiceAsset_WhenApprovalRequired_SetsStatusToPendingApproval()
+{
+    // Arrange: Configure parameter as "true"
+    configService.Setup(x => x.ResolveEffectiveValueAsync(
+        "catalog.service.creation.approval_required", ...))
+        .ReturnsAsync(new EffectiveConfigurationDto { EffectiveValue = "true" });
+    
+    // Act
+    var result = await handler.Handle(command, CancellationToken.None);
+    
+    // Assert
+    result.IsSuccess.Should().BeTrue();
+    var asset = await repository.GetByIdAsync(result.Value.Id);
+    asset.Status.Should().Be(ServiceStatus.PendingApproval);
+}
+
+[Fact]
+public async Task RegisterServiceAsset_WhenApprovalNotRequired_SetsStatusToActive()
+{
+    // Arrange: Configure parameter as "false"
+    configService.Setup(x => x.ResolveEffectiveValueAsync(
+        "catalog.service.creation.approval_required", ...))
+        .ReturnsAsync(new EffectiveConfigurationDto { EffectiveValue = "false" });
+    
+    // Act
+    var result = await handler.Handle(command, CancellationToken.None);
+    
+    // Assert
+    result.IsSuccess.Should().BeTrue();
+    var asset = await repository.GetByIdAsync(result.Value.Id);
+    asset.Status.Should().Be(ServiceStatus.Active);
+}
+```
+
+---
+
+## 28. RESUMO QUANTITATIVO ATUALIZADO (v2.0)
+
+| Módulo | Parâmetros v1.0 | Parâmetros Adicionados v2.0 | Total |
+|--------|----------------|----------------------------|-------|
+| Service Catalog | 8 | 0 | 8 |
+| Contracts | 8 | 0 | 8 |
+| Change Governance (Release/Deploy) | 17 | 0 | 17 |
+| Promotion Governance | 4 | 0 | 4 |
+| Workflow Engine | 5 | 0 | 5 |
+| Incidents & Operations | 7 | 0 | 7 |
+| AI Hub | 6 | 0 | 6 |
+| Identity & Access | 6 | 3 (roles dinâmicos) | 9 |
+| Audit & Compliance | 3 | 0 | 3 |
+| Integrations | 3 | 0 | 3 |
+| FinOps | 5 | 0 | 5 |
+| ~~Knowledge~~ Operational Knowledge | ~~4~~ | 6 (refatoração) | 6 |
+| Reliability (SLO/SLA) | 3 | 0 | 3 |
+| Governance Transversal | 7 | 0 | 7 |
+| Product Analytics | 2 | 0 | 2 |
+| Best Practices (DORA/GitOps/OWASP/Chaos/FinOps) | 10 | 0 | 10 |
+| **Platform Customization** (NOVO) | 0 | **9** | **9** |
+| **TOTAL** | **98** | **18** | **112** |
+
+---
+
+## 29. FASEAMENTO ATUALIZADO (v2.0)
+
+### Fase 0 — Infraestrutura de Parametrização (PRÉ-REQUISITO)
+- [ ] Migrar seed para usar chaves i18n (displayName e description)
+- [ ] Criar ficheiros de tradução para 4 idiomas (en, pt-BR, pt-PT, es) para TODOS os parâmetros
+- [ ] Implementar hook `useConfigValue()` no frontend para consulta de parâmetros
+- [ ] Implementar componente `<RolePicker>` para parâmetros que referenciam roles
+- [ ] Implementar componente `<ConfigToggle>` para parâmetros booleanos simples
+- [ ] Criar interface `IParameterizedHandler<T>` para padronizar handlers parametrizados
+- [ ] Script de geração de i18n a partir do seeder
+
+### Fase 1 — Fundação (Alta Prioridade, Impacto Imediato)
+- [ ] Seed dos 43 parâmetros de prioridade alta + 18 novos da v2.0
+- [ ] Implementar CRUD de roles customizados (backend + frontend)
+- [ ] Implementar gate de aprovação de release com validação externa (Jenkins/GitLab)
+- [ ] Implementar aprovação de criação de serviço (100% funcional com handler modificado)
+- [ ] Implementar bloqueio de deploy por breaking change
+- [ ] Implementar endpoint de deploy-readiness
+- [ ] Testes unitários para cada parâmetro (enabled/disabled)
+
+### Fase 2 — Governança Avançada + Customização de Plataforma
+- [ ] Implementar preferências de utilizador (sidebar, home, widgets)
+- [ ] Implementar sidebar customizável
+- [ ] Implementar home dashboard customizável com widgets drag-and-drop
+- [ ] Implementar princípio dos quatro olhos
+- [ ] Implementar Change Advisory Board
+- [ ] Implementar gates GitOps (PR approval, signed commits)
+- [ ] Implementar gates de segurança (scan obrigatório)
+- [ ] Implementar bloqueio por error budget
+
+### Fase 3 — IA, Knowledge & Conhecimento Operacional
+- [ ] Refatorar módulo Knowledge → OperationalKnowledge
+- [ ] Implementar captura automática de conhecimento (auto_capture)
+- [ ] Implementar pesquisa federada de conhecimento
+- [ ] Implementar aprovação de modelos externos
+- [ ] Implementar bloqueio de dados sensíveis para IA
+- [ ] Implementar aprovação de agentes customizados
+
+### Fase 4 — Otimização & Compliance
+- [ ] Implementar parâmetros de FinOps (enforcement, chargeback)
+- [ ] Implementar frameworks de compliance
+- [ ] Implementar auto-remediação de violações
+- [ ] Implementar chaos engineering governado
+
+### Fase 5 — Polish, Migração i18n & Analytics
+- [ ] Migrar seeds existentes (345) para chaves i18n
+- [ ] Parâmetros de analytics e persona tracking
+- [ ] UX avançada de configuração
+- [ ] Relatórios de utilização de parâmetros
+- [ ] Dashboard executivo de compliance de parametrização
+
+---
+
+## 30. ENTREGÁVEIS POR FASE
+
+### Fase 0 — Para cada parâmetro:
+| Entregável | Descrição |
+|------------|-----------|
+| `ConfigurationDefinitionSeeder.cs` | Seed com chave i18n |
+| `en.json` | Label + description em inglês |
+| `pt-BR.json` | Label + description em pt-BR |
+| `pt-PT.json` | Label + description em pt-PT |
+| `es.json` | Label + description em espanhol |
+
+### Fases 1-4 — Para cada parâmetro:
+| Entregável | Descrição |
+|------------|-----------|
+| Seed | ✅ Já criado na Fase 0 |
+| i18n | ✅ Já criado na Fase 0 |
+| Handler | Modificação do handler para consultar parâmetro |
+| Frontend | Ajuste da UI para refletir estado do parâmetro |
+| Testes (enabled) | Teste com parâmetro ativado |
+| Testes (disabled) | Teste com parâmetro desativado |
+| Testes (inheritance) | Teste de resolução por escopo |
+
+---
+
+*Documento atualizado em 2026-04-06 v2.0 — Inclui ressalvas do Product Owner sobre Knowledge module, roles configuráveis, customização de plataforma, i18n nos seeds e enforcement funcional.*
