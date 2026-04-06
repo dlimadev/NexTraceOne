@@ -6,6 +6,9 @@ using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AssessPromotion
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.AskCatalogQuestion;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.ClassifyChangeWithAI;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.CompareEnvironments;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.EvaluateArchitectureFitness;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.EvaluateDocumentationQuality;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateArchitectureDecisionRecord;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateAiScaffold;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateRobotFrameworkDraft;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateTestScenarios;
@@ -13,6 +16,7 @@ using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAiConversati
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.SuggestSemanticVersionWithAI;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.SummarizeReleaseForApproval;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.ValidateKnowledgeCapture;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.RecommendTemplateForService;
 using NexTraceOne.BuildingBlocks.Application;
 
 namespace NexTraceOne.AIKnowledge.Application.Orchestration;
@@ -41,6 +45,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GenerateRobotFrameworkDraft.Command>, GenerateRobotFrameworkDraft.Validator>();
         services.AddTransient<IValidator<SummarizeReleaseForApproval.Command>, SummarizeReleaseForApproval.Validator>();
         services.AddTransient<IValidator<GenerateAiScaffold.Command>, GenerateAiScaffold.Validator>();
+        services.AddTransient<IValidator<EvaluateArchitectureFitness.Command>, EvaluateArchitectureFitness.Validator>();
+        services.AddTransient<IValidator<EvaluateDocumentationQuality.Command>, EvaluateDocumentationQuality.Validator>();
+        services.AddTransient<IValidator<GenerateArchitectureDecisionRecord.Command>, GenerateArchitectureDecisionRecord.Validator>();
+        services.AddTransient<IValidator<RecommendTemplateForService.Command>, RecommendTemplateForService.Validator>();
         return services;
     }
 }

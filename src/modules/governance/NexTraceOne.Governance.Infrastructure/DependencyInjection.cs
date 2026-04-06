@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Application.SecurityGate.Ports;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Providers;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
@@ -50,6 +51,9 @@ public static class DependencyInjection
         services.AddScoped<IEvidencePackageRepository, EvidencePackageRepository>();
         services.AddScoped<IComplianceGapRepository, ComplianceGapRepository>();
         services.AddScoped<IPolicyAsCodeRepository, PolicyAsCodeRepository>();
+
+        // Security Gate
+        services.AddScoped<ISecurityScanRepository, SecurityScanRepository>();
 
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();

@@ -17,6 +17,10 @@ using GenerateTestScenariosFeature = NexTraceOne.AIKnowledge.Application.Orchest
 using GenerateRobotFrameworkDraftFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateRobotFrameworkDraft.GenerateRobotFrameworkDraft;
 using SummarizeReleaseForApprovalFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.SummarizeReleaseForApproval.SummarizeReleaseForApproval;
 using GenerateAiScaffoldFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateAiScaffold.GenerateAiScaffold;
+using EvaluateArchitectureFitnessFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.EvaluateArchitectureFitness.EvaluateArchitectureFitness;
+using EvaluateDocumentationQualityFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.EvaluateDocumentationQuality.EvaluateDocumentationQuality;
+using GenerateAdrFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateArchitectureDecisionRecord.GenerateArchitectureDecisionRecord;
+using RecommendTemplateFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.RecommendTemplateForService.RecommendTemplateForService;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -230,7 +234,106 @@ public sealed class AiOrchestrationEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:runtime:write");
+
+        // ── POST /api/v1/aiorchestration/generate/architecture-fitness — Phase 6 AI Quality Gates ──
+        group.MapPost("/architecture-fitness", async (
+            ArchitectureFitnessRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new EvaluateArchitectureFitnessFeature.Command(
+                req.TargetId,
+                req.ServiceName,
+                req.Files.Select(f => new EvaluateArchitectureFitnessFeature.CodeFile(f.FileName, f.Content)).ToList(),
+                req.PreferredProvider);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        // ── POST /api/v1/aiorchestration/generate/documentation-quality — Phase 6 AI Quality Gates ──
+        group.MapPost("/documentation-quality", async (
+            DocumentationQualityRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new EvaluateDocumentationQualityFeature.Command(
+                req.ServiceName,
+                req.Files.Select(f => new EvaluateDocumentationQualityFeature.DocumentFile(f.FileName, f.Content, f.FileType)).ToList(),
+                req.PreferredProvider);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        // ── POST /api/v1/aiorchestration/generate/adr — Phase 7 ADR Generator ──
+        group.MapPost("/adr", async (
+            AdrRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new GenerateAdrFeature.Command(
+                req.ServiceName,
+                req.DecisionContext,
+                req.ArchitectureStyle,
+                req.TechStack,
+                req.SelectedTemplate,
+                req.PreferredProvider);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        // ── POST /api/v1/aiorchestration/recommend-template — Phase 7 Smart Template Recommendations ──
+        group.MapPost("/recommend-template", async (
+            RecommendTemplateRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new RecommendTemplateFeature.Command(
+                req.ServiceDescription,
+                req.PreferredLanguage,
+                req.Domain,
+                req.TeamName,
+                req.AvailableTemplates.Select(t => new RecommendTemplateFeature.TemplateInfo(t.Slug, t.DisplayName, t.Description, t.ServiceType, t.PrimaryLanguage, t.Tags)).ToList(),
+                req.MaxRecommendations,
+                req.PreferredProvider);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
     }
+
+    private sealed record AdrRequest(
+        string ServiceName,
+        string DecisionContext,
+        string? ArchitectureStyle = null,
+        string? TechStack = null,
+        string? SelectedTemplate = null,
+        string? PreferredProvider = null);
+
+    private sealed record RecommendTemplateInfo(string Slug, string DisplayName, string Description, string ServiceType, string PrimaryLanguage, IReadOnlyList<string> Tags);
+    private sealed record RecommendTemplateRequest(
+        string ServiceDescription,
+        string? PreferredLanguage,
+        string? Domain,
+        string? TeamName,
+        IReadOnlyList<RecommendTemplateInfo> AvailableTemplates,
+        int MaxRecommendations = 3,
+        string? PreferredProvider = null);
+
+    private sealed record ArchitectureFitnessCodeFile(string FileName, string Content);
+    private sealed record ArchitectureFitnessRequest(
+        Guid? TargetId,
+        string ServiceName,
+        IReadOnlyList<ArchitectureFitnessCodeFile> Files,
+        string? PreferredProvider);
+
+    private sealed record DocumentationQualityFileEntry(string FileName, string Content, string FileType);
+    private sealed record DocumentationQualityRequest(
+        string ServiceName,
+        IReadOnlyList<DocumentationQualityFileEntry> Files,
+        string? PreferredProvider);
 
     private sealed record AiScaffoldRequest(
         Guid? TemplateId,

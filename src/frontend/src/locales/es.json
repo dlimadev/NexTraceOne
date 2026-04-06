@@ -5988,7 +5988,9 @@
     "users": "Usuarios",
     "valueTracking": "Seguimiento de Valor",
     "waivers": "Excepciones y Exenciones",
-    "workflow": "Workflow"
+    "workflow": "Workflow",
+    "contractPipeline": "Pipeline de Contrato",
+    "securityGate": "Security Gate"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -6435,5 +6437,77 @@
         "downloadZip": "Descargar ZIP"
       }
     }
+  },
+  "contractPipeline": {
+    "title": "Pipeline Contrato-a-Código",
+    "subtitle": "Genere stubs de servidor, mock servers, pruebas y SDK clients desde un contrato OpenAPI.",
+    "contractToCode": "Contrato → Código",
+    "configuration": "Configuración",
+    "serviceName": "Nombre del Servicio",
+    "serviceNamePlaceholder": "ej: UserService",
+    "targetLanguage": "Lenguaje Destino",
+    "artifacts": "Artefactos a Generar",
+    "runPipeline": "Ejecutar Pipeline",
+    "running": "Ejecutando...",
+    "runError": "El pipeline falló. Verifique el JSON del contrato e intente de nuevo.",
+    "contractJson": "Contrato OpenAPI (JSON)",
+    "contractJsonPlaceholder": "Pegue aquí su OpenAPI 3.0 JSON...",
+    "pipelineSuccess": "Pipeline completado: {{count}} tipo(s) de artefacto(s) generado(s).",
+    "duration": "Duración: {{ms}}ms",
+    "downloadAll": "Descargar Todo",
+    "emptyState": "Ingrese un contrato y configure los outputs, luego ejecute el pipeline.",
+    "files": "archivos",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "download": "Descargar",
+    "artifactTypes": {
+      "ServerStubs": "Server Stubs",
+      "MockServer": "Mock Server",
+      "PostmanCollection": "Postman Collection",
+      "ContractTests": "Contract Tests",
+      "ClientSdk": "Client SDK"
+    },
+    "steps": {
+      "contract": "Contract",
+      "pipeline": "Pipeline",
+      "server": "Server",
+      "mock": "Mock",
+      "tests": "Tests",
+      "sdk": "SDK"
+    }
+  },
+  "securityGate": {
+    "title": "Dashboard Security Gate",
+    "subtitle": "Análisis SAST del código generado — detecte vulnerabilidades antes de llegar a producción.",
+    "sastEngine": "Motor SAST Interno",
+    "tabs": {
+      "scan": "Analizar Código",
+      "dashboard": "Dashboard"
+    },
+    "filePath": "Ruta del Archivo",
+    "sourceCode": "Código Fuente",
+    "sourceCodePlaceholder": "Pegue código generado para analizar...",
+    "runScan": "Ejecutar Análisis SAST",
+    "scanning": "Analizando...",
+    "gatePassed": "Security gate aprobado — sin hallazgos críticos o altos.",
+    "gateFailed": "Security gate fallido — hallazgos críticos o altos detectados.",
+    "riskLevel": "Nivel de Riesgo",
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "searchFindings": "Buscar hallazgos...",
+    "allSeverities": "Todas las severidades",
+    "noMatchingFindings": "Ningún hallazgo coincide con los filtros actuales.",
+    "noFindings": "No se detectaron vulnerabilidades. ¡El código parece limpio!",
+    "emptyState": "Pegue código generado y ejecute el análisis SAST para detectar vulnerabilidades.",
+    "remediation": "Remediación",
+    "totalScans": "Total de Scans",
+    "passedScans": "Aprobados",
+    "criticalFindings": "Hallazgos Críticos",
+    "securityScore": "Score de Seguridad",
+    "topCategories": "Categorías con Más Vulnerabilidades",
+    "recentScans": "Scans Recientes",
+    "dashboardError": "Error al cargar datos del dashboard.",
+    "dashboardEmpty": "No hay scans de seguridad registrados. Ejecute un scan para comenzar a monitorizar."
   }
 }

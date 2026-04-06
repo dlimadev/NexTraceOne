@@ -23,6 +23,8 @@ const TemplateLibraryPage = lazy(() => import('../features/catalog/pages/Templat
 const TemplateDetailPage = lazy(() => import('../features/catalog/pages/TemplateDetailPage').then(m => ({ default: m.TemplateDetailPage })));
 const TemplateEditorPage = lazy(() => import('../features/catalog/pages/TemplateEditorPage').then(m => ({ default: m.TemplateEditorPage })));
 const AiScaffoldWizardPage = lazy(() => import('../features/catalog/pages/AiScaffoldWizardPage').then(m => ({ default: m.AiScaffoldWizardPage })));
+const ContractPipelinePage = lazy(() => import('../features/catalog/pages/ContractPipelinePage').then(m => ({ default: m.ContractPipelinePage })));
+const SecurityGateDashboardPage = lazy(() => import('../features/catalog/pages/SecurityGateDashboardPage').then(m => ({ default: m.SecurityGateDashboardPage })));
 
 export function CatalogRoutes() {
   return (
@@ -170,6 +172,23 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:templates:scaffold" redirectTo="/unauthorized">
             <AiScaffoldWizardPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Phase 5: Contract Pipeline & Security Gate ── */}
+      <Route
+        path="/catalog/contracts/pipeline"
+        element={
+          <ProtectedRoute permission="catalog:contracts:pipeline:read" redirectTo="/unauthorized">
+            <ContractPipelinePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/security-gate"
+        element={
+          <ProtectedRoute permission="governance:security:scan" redirectTo="/unauthorized">
+            <SecurityGateDashboardPage />
           </ProtectedRoute>
         }
       />

@@ -6035,7 +6035,9 @@
     "users": "Users",
     "valueTracking": "Value Tracking",
     "waivers": "Waivers & Exceptions",
-    "workflow": "Workflow"
+    "workflow": "Workflow",
+    "contractPipeline": "Contract Pipeline",
+    "securityGate": "Security Gate"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -6482,5 +6484,77 @@
         "downloadZip": "Download ZIP"
       }
     }
+  },
+  "contractPipeline": {
+    "title": "Contract-to-Code Pipeline",
+    "subtitle": "Generate server stubs, mock servers, tests and SDK clients from an OpenAPI contract.",
+    "contractToCode": "Contract → Code",
+    "configuration": "Configuration",
+    "serviceName": "Service Name",
+    "serviceNamePlaceholder": "e.g. UserService",
+    "targetLanguage": "Target Language",
+    "artifacts": "Artifacts to Generate",
+    "runPipeline": "Run Pipeline",
+    "running": "Running...",
+    "runError": "Pipeline failed. Check the contract JSON and try again.",
+    "contractJson": "OpenAPI Contract (JSON)",
+    "contractJsonPlaceholder": "Paste your OpenAPI 3.0 JSON here...",
+    "pipelineSuccess": "Pipeline completed: {{count}} artifact type(s) generated.",
+    "duration": "Duration: {{ms}}ms",
+    "downloadAll": "Download All",
+    "emptyState": "Enter a contract and configure outputs, then run the pipeline.",
+    "files": "files",
+    "copy": "Copy",
+    "copied": "Copied",
+    "download": "Download",
+    "artifactTypes": {
+      "ServerStubs": "Server Stubs",
+      "MockServer": "Mock Server",
+      "PostmanCollection": "Postman Collection",
+      "ContractTests": "Contract Tests",
+      "ClientSdk": "Client SDK"
+    },
+    "steps": {
+      "contract": "Contract",
+      "pipeline": "Pipeline",
+      "server": "Server",
+      "mock": "Mock",
+      "tests": "Tests",
+      "sdk": "SDK"
+    }
+  },
+  "securityGate": {
+    "title": "Security Gate Dashboard",
+    "subtitle": "SAST analysis of generated code — detect vulnerabilities before they reach production.",
+    "sastEngine": "Internal SAST Engine",
+    "tabs": {
+      "scan": "Scan Code",
+      "dashboard": "Dashboard"
+    },
+    "filePath": "File Path",
+    "sourceCode": "Source Code",
+    "sourceCodePlaceholder": "Paste generated code to analyze...",
+    "runScan": "Run SAST Scan",
+    "scanning": "Scanning...",
+    "gatePassed": "Security gate passed — no critical or high findings.",
+    "gateFailed": "Security gate failed — critical or high findings detected.",
+    "riskLevel": "Risk Level",
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "searchFindings": "Search findings...",
+    "allSeverities": "All severities",
+    "noMatchingFindings": "No findings match the current filters.",
+    "noFindings": "No security findings detected. Code looks clean!",
+    "emptyState": "Paste generated code and run the SAST scan to detect vulnerabilities.",
+    "remediation": "Remediation",
+    "totalScans": "Total Scans",
+    "passedScans": "Passed",
+    "criticalFindings": "Critical Findings",
+    "securityScore": "Security Score",
+    "topCategories": "Top Vulnerable Categories",
+    "recentScans": "Recent Scans",
+    "dashboardError": "Failed to load dashboard data.",
+    "dashboardEmpty": "No security scans recorded yet. Run a scan to start tracking security posture."
   }
 }

@@ -19,6 +19,7 @@ using NexTraceOne.Catalog.API.Contracts.Endpoints;
 using NexTraceOne.Catalog.API.Portal.Endpoints;
 using NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
 using NexTraceOne.Catalog.API.Templates;
+using NexTraceOne.Catalog.API.DependencyGovernance;
 using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
 using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
 using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
@@ -42,6 +43,7 @@ using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
 using NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Templates.Persistence;
+using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
@@ -86,7 +88,7 @@ builder.Services.AddContractsModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddCatalogLegacyAssetsModule(builder.Configuration);
 builder.Services.AddCatalogTemplatesModule(builder.Configuration);
-builder.Services.AddChangeIntelligenceModule(builder.Configuration);
+builder.Services.AddCatalogDependencyGovernanceModule(builder.Configuration);
 builder.Services.AddRulesetGovernanceModule(builder.Configuration);
 builder.Services.AddWorkflowModule(builder.Configuration);
 builder.Services.AddPromotionModule(builder.Configuration);
@@ -143,6 +145,11 @@ builder.Services.AddHealthChecks()
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<TemplatesDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-dependency-governance",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<DependencyGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "outbox-processor-telemetry-store",
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
@@ -190,6 +197,7 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<ContractsDbContext>>(
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<DeveloperPortalDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<LegacyAssetsDbContext>>();
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<TemplatesDbContext>>();
+builder.Services.AddHostedService<ModuleOutboxProcessorJob<DependencyGovernanceDbContext>>();
 
 // ChangeGovernance (database: nextraceone_catalog — shares with Catalog via separate schemas)
 builder.Services.AddHostedService<ModuleOutboxProcessorJob<ChangeIntelligenceDbContext>>();
