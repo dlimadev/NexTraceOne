@@ -9,6 +9,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
 using ListReleasesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases.ListReleases;
 using GetReleaseHistoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseHistory.GetReleaseHistory;
+using CheckDeployReadinessFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CheckDeployReadiness.CheckDeployReadiness;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -57,6 +58,19 @@ internal static class ReleaseQueryEndpoints
             int pageSize = 20) =>
         {
             var result = await sender.Send(new GetReleaseHistoryFeature.Query(apiAssetId, page, pageSize), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
+        group.MapGet("/{releaseId:guid}/deploy-readiness", async (
+            Guid releaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            string? environmentName = null) =>
+        {
+            var result = await sender.Send(
+                new CheckDeployReadinessFeature.Query(releaseId, environmentName),
+                cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
     }

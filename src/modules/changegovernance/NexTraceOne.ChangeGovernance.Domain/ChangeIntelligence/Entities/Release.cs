@@ -88,6 +88,32 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// </summary>
     public Guid? EnvironmentId { get; private set; }
 
+    // ── Fase 5: Deploy Readiness ──────────────────────────────────────────
+
+    /// <summary>
+    /// Nome legível da release. Preenchido opcionalmente na criação ou
+    /// derivado de ServiceName + Version quando não fornecido.
+    /// </summary>
+    public string ReleaseName { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Estado de aprovação da release (ex: "Approved", "Pending", "Rejected").
+    /// Nullable — releases que não passam por fluxo de aprovação ficam sem valor.
+    /// </summary>
+    public string? ApprovalStatus { get; private set; }
+
+    /// <summary>
+    /// Indica se a release contém breaking changes em contratos.
+    /// Utilizado pelo deploy-readiness check para bloquear promoção quando configurado.
+    /// </summary>
+    public bool HasBreakingChanges { get; private set; }
+
+    /// <summary>
+    /// Indica se a validação externa (CI/CD gate) foi concluída com sucesso.
+    /// Nullable — null significa que nenhuma validação externa foi registada.
+    /// </summary>
+    public bool? ExternalValidationPassed { get; private set; }
+
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
@@ -126,6 +152,7 @@ public sealed class Release : AggregateRoot<ReleaseId>
             Status = DeploymentStatus.Pending,
             ChangeLevel = ChangeLevel.Operational,
             ChangeScore = 0m,
+            ReleaseName = $"{serviceName} {version}",
             CreatedAt = createdAt
         };
     }
@@ -208,6 +235,32 @@ public sealed class Release : AggregateRoot<ReleaseId>
         TeamName = teamName;
         Domain = domain;
         Description = description;
+    }
+
+    /// <summary>Define o nome legível da release.</summary>
+    public void SetReleaseName(string releaseName)
+    {
+        Guard.Against.NullOrWhiteSpace(releaseName);
+        ReleaseName = releaseName;
+    }
+
+    /// <summary>Atualiza o estado de aprovação da release.</summary>
+    public void SetApprovalStatus(string approvalStatus)
+    {
+        Guard.Against.NullOrWhiteSpace(approvalStatus);
+        ApprovalStatus = approvalStatus;
+    }
+
+    /// <summary>Marca se a release contém breaking changes em contratos.</summary>
+    public void SetHasBreakingChanges(bool hasBreakingChanges)
+    {
+        HasBreakingChanges = hasBreakingChanges;
+    }
+
+    /// <summary>Regista o resultado da validação externa (CI/CD gate).</summary>
+    public void SetExternalValidationPassed(bool passed)
+    {
+        ExternalValidationPassed = passed;
     }
 
     /// <summary>
