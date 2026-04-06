@@ -260,6 +260,8 @@ export function VisualRestBuilder({
     navigator.clipboard.writeText(text).then(() => {
       setCopiedKeys((prev) => new Set(prev).add(key));
       setTimeout(() => setCopiedKeys((prev) => { const n = new Set(prev); n.delete(key); return n; }), 2000);
+    }).catch(() => {
+      // Clipboard permission denied or unavailable — fail silently
     });
   };
 
@@ -434,6 +436,7 @@ export function VisualRestBuilder({
           <div className="divide-y divide-edge">
             {state.endpoints.map((ep) => {
               const isExpanded = expandedId === ep.id;
+              const epWarnings = endpointWarnings(ep);
 
               return (
                 <div key={ep.id} className="group">
@@ -454,9 +457,9 @@ export function VisualRestBuilder({
                         {t('contracts.builder.rest.deprecated', 'Deprecated')}
                       </span>
                     )}
-                    {endpointWarnings(ep).length > 0 && (
-                      <span className="flex items-center gap-0.5 text-[9px] text-warning bg-warning/10 px-1.5 py-0.5 rounded" title={endpointWarnings(ep).map((w) => t(w.key, w.fallback)).join('; ')}>
-                        <AlertTriangle size={9} /> {endpointWarnings(ep).length}
+                    {epWarnings.length > 0 && (
+                      <span className="flex items-center gap-0.5 text-[9px] text-warning bg-warning/10 px-1.5 py-0.5 rounded" title={epWarnings.map((w) => t(w.key, w.fallback)).join('; ')}>
+                        <AlertTriangle size={9} /> {epWarnings.length}
                       </span>
                     )}
                     {ep.summary && <span className="text-[10px] text-muted truncate max-w-[180px]">{ep.summary}</span>}
@@ -486,12 +489,12 @@ export function VisualRestBuilder({
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-4">
 
                       {/* ── Cross-validation warnings ── */}
-                      {endpointWarnings(ep).length > 0 && (
+                      {epWarnings.length > 0 && (
                         <div className="flex items-start gap-2 px-3 py-2 text-[10px] rounded-md bg-warning/8 border border-warning/20 text-warning">
                           <AlertTriangle size={12} className="flex-shrink-0 mt-0.5" />
                           <ul className="space-y-0.5">
-                            {endpointWarnings(ep).map((w, wi) => (
-                              <li key={wi}>⚠ {t(w.key, w.fallback)}</li>
+                            {epWarnings.map((w) => (
+                              <li key={w.key}>⚠ {t(w.key, w.fallback)}</li>
                             ))}
                           </ul>
                         </div>
