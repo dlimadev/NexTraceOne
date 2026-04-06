@@ -53,6 +53,8 @@ using ComputeContractHealthDashboardFeature = NexTraceOne.Catalog.Application.Co
 using SuggestSchemaFromContextFeature = NexTraceOne.Catalog.Application.Contracts.Features.SuggestSchemaFromContext.SuggestSchemaFromContext;
 using InitiateContractDeprecationFeature = NexTraceOne.Catalog.Application.Contracts.Features.InitiateContractDeprecation.InitiateContractDeprecation;
 using GetDeprecationProgressFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDeprecationProgress.GetDeprecationProgress;
+using DetectContractDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.DetectContractDrift.DetectContractDrift;
+using GetContractHealthTimelineFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHealthTimeline.GetContractHealthTimeline;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -626,6 +628,34 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(
                 new GetDeprecationProgressFeature.Query(apiAssetId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Contract Drift & Health Timeline ────────────────────────────
+
+        group.MapPost("/{apiAssetId:guid}/drift", async (
+            Guid apiAssetId,
+            IReadOnlyList<DetectContractDriftFeature.ObservedTraceOperation> observedOperations,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new DetectContractDriftFeature.Query(apiAssetId, observedOperations ?? []),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/{apiAssetId:guid}/health/timeline", async (
+            Guid apiAssetId,
+            int? maxVersions,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetContractHealthTimelineFeature.Query(apiAssetId, maxVersions ?? 20),
+                cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
     }
