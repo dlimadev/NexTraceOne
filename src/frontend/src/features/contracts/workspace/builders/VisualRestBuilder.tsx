@@ -12,7 +12,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, Copy, Sparkles,
+  Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, AlertTriangle, Copy, Sparkles, Zap, ClipboardCopy, Check,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
@@ -53,6 +53,80 @@ const METHOD_COLORS: Record<string, string> = {
 function genId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
 }
+
+/**
+ * Gera um operationId sugerido a partir do método HTTP e path.
+ * Exemplos: POST /users → createUser, GET /users/{id} → getUserById
+ */
+export function generateOperationId(method: string, path: string): string {
+  const m = method.toUpperCase();
+
+  // Extract last meaningful path segment (ignore trailing slash)
+  const segments = path.replace(/\/$/, '').split('/').filter(Boolean);
+  const last = segments[segments.length - 1] ?? 'resource';
+  const hasIdParam = last.startsWith('{') && last.endsWith('}');
+  const resourceSegment = hasIdParam
+    ? segments[segments.length - 2] ?? 'resource'
+    : last;
+
+  // Capitalise the resource name, removing braces if present
+  const resource = resourceSegment.replace(/[{}]/g, '');
+  const capitalised = resource.charAt(0).toUpperCase() + resource.slice(1);
+
+  const suffix = hasIdParam ? 'ById' : '';
+
+  switch (m) {
+    case 'GET': return hasIdParam ? `get${capitalised}ById` : `list${capitalised}`;
+    case 'POST': return `create${capitalised}`;
+    case 'PUT': return `update${capitalised}${suffix}`;
+    case 'PATCH': return `patch${capitalised}${suffix}`;
+    case 'DELETE': return `delete${capitalised}${suffix}`;
+    case 'HEAD': return `head${capitalised}${suffix}`;
+    case 'OPTIONS': return `options${capitalised}${suffix}`;
+    default: return `${m.toLowerCase()}${capitalised}${suffix}`;
+  }
+}
+
+/** Cria as propriedades RFC 7807 Problem Details para um conjunto de campos. */
+function problemDetailsProps(fields: string[]): SchemaProperty[] {
+  const typeMap: Record<string, SchemaProperty['type']> = {
+    type: 'string',
+    title: 'string',
+    status: 'integer',
+    detail: 'string',
+    instance: 'string',
+  };
+  return fields.map((name) => ({
+    id: genId('pd'),
+    name,
+    type: typeMap[name] ?? 'string',
+    description: '',
+    required: false,
+    constraints: {},
+  }));
+}
+
+/** Resposta HTTP com schema RFC 7807. */
+function createProblemResponse(statusCode: string, description: string, fields: string[]): RestResponse {
+  return {
+    id: genId('res'),
+    statusCode,
+    description,
+    contentType: 'application/problem+json',
+    schema: '',
+    example: '',
+    properties: problemDetailsProps(fields),
+  };
+}
+
+/** Colecção de respostas de erro comuns RFC 7807. */
+const COMMON_ERROR_RESPONSES: RestResponse[] = [
+  createProblemResponse('400', 'Bad Request', ['type', 'title', 'status', 'detail', 'instance']),
+  createProblemResponse('401', 'Unauthorized', ['type', 'title', 'status']),
+  createProblemResponse('403', 'Forbidden', ['type', 'title', 'status']),
+  createProblemResponse('404', 'Not Found', ['type', 'title', 'status']),
+  createProblemResponse('500', 'Internal Server Error', ['type', 'title', 'status', 'detail']),
+];
 
 function createEndpoint(): RestEndpoint {
   return {
@@ -119,6 +193,10 @@ export function VisualRestBuilder({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<Record<string, string>>({});
   const [validation, setValidation] = useState<BuilderValidationResult | null>(null);
+  /** Estado de preview de exemplo por chave "epId.reqBody" ou "epId.res.resId". */
+  const [previewKeys, setPreviewKeys] = useState<Set<string>>(new Set());
+  /** Estado de "copiado!" por chave de preview. */
+  const [copiedKeys, setCopiedKeys] = useState<Set<string>>(new Set());
 
   const update = useCallback(
     (partial: Partial<RestBuilderState>) => {
@@ -167,6 +245,78 @@ export function VisualRestBuilder({
   const isSubExpanded = (epId: string, section: string) => expandedSection[`${epId}.${section}`] === section;
 
   const fieldError = (field: string) => validation?.errors.find((e) => e.field === field);
+
+  /** Alterna o painel de preview de um campo. */
+  const togglePreview = (key: string) => {
+    setPreviewKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  /** Copia texto para a área de transferência e mostra feedback temporário. */
+  const copyToClipboard = (key: string, text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedKeys((prev) => new Set(prev).add(key));
+      setTimeout(() => setCopiedKeys((prev) => { const n = new Set(prev); n.delete(key); return n; }), 2000);
+    }).catch(() => {
+      // Clipboard permission denied or unavailable — fail silently
+    });
+  };
+
+  /**
+   * Gera avisos de cross-validation inline para um endpoint.
+   * Retorna lista de pares [warningKey, fallbackMessage].
+   */
+  function endpointWarnings(ep: RestEndpoint): { key: string; fallback: string }[] {
+    const warns: { key: string; fallback: string }[] = [];
+
+    // GET/DELETE com requestBody
+    if (['GET', 'DELETE'].includes(ep.method) && ep.requestBody) {
+      warns.push({
+        key: 'contracts.builder.rest.warnBodyOnGet',
+        fallback: `${ep.method} requests should not have a request body`,
+      });
+    }
+
+    // POST/PUT/PATCH com body mas sem propriedades e sem schema ref
+    if (['POST', 'PUT', 'PATCH'].includes(ep.method) && ep.requestBody) {
+      const hasProps = (ep.requestBody.properties?.length ?? 0) > 0;
+      const hasSchema = !!ep.requestBody.schema.trim();
+      if (!hasProps && !hasSchema) {
+        warns.push({
+          key: 'contracts.builder.rest.warnEmptyBody',
+          fallback: 'Request body exists but has no schema or properties defined',
+        });
+      }
+    }
+
+    // Path params declarados vs path template
+    if (ep.path) {
+      const templateParams = ep.path.match(/\{([^}]+)\}/g)?.map((m) => m.slice(1, -1)) ?? [];
+      const declared = ep.parameters.filter((p) => p.in === 'path').map((p) => p.name);
+      for (const pn of templateParams) {
+        if (!declared.includes(pn)) {
+          warns.push({
+            key: 'contracts.builder.rest.warnMissingPathParam',
+            fallback: `Path parameter '{${pn}}' is used in path but not declared`,
+          });
+        }
+      }
+    }
+
+    // Nenhuma resposta 2xx
+    const has2xx = ep.responses.some((r) => String(r.statusCode).startsWith('2'));
+    if (ep.responses.length > 0 && !has2xx) {
+      warns.push({
+        key: 'contracts.builder.rest.warnNo2xx',
+        fallback: 'No 2xx success response defined',
+      });
+    }
+
+    return warns;
+  }
 
   return (
     <div className={`space-y-4 p-4 ${className}`}>
@@ -286,6 +436,7 @@ export function VisualRestBuilder({
           <div className="divide-y divide-edge">
             {state.endpoints.map((ep) => {
               const isExpanded = expandedId === ep.id;
+              const epWarnings = endpointWarnings(ep);
 
               return (
                 <div key={ep.id} className="group">
@@ -304,6 +455,11 @@ export function VisualRestBuilder({
                     {ep.deprecated && (
                       <span className="text-[9px] text-warning bg-warning/10 px-1.5 py-0.5 rounded">
                         {t('contracts.builder.rest.deprecated', 'Deprecated')}
+                      </span>
+                    )}
+                    {epWarnings.length > 0 && (
+                      <span className="flex items-center gap-0.5 text-[9px] text-warning bg-warning/10 px-1.5 py-0.5 rounded" title={epWarnings.map((w) => t(w.key, w.fallback)).join('; ')}>
+                        <AlertTriangle size={9} /> {epWarnings.length}
                       </span>
                     )}
                     {ep.summary && <span className="text-[10px] text-muted truncate max-w-[180px]">{ep.summary}</span>}
@@ -331,6 +487,19 @@ export function VisualRestBuilder({
                   {/* Expanded detail */}
                   {isExpanded && (
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-4">
+
+                      {/* ── Cross-validation warnings ── */}
+                      {epWarnings.length > 0 && (
+                        <div className="flex items-start gap-2 px-3 py-2 text-[10px] rounded-md bg-warning/8 border border-warning/20 text-warning">
+                          <AlertTriangle size={12} className="flex-shrink-0 mt-0.5" />
+                          <ul className="space-y-0.5">
+                            {epWarnings.map((w) => (
+                              <li key={w.key}>⚠ {t(w.key, w.fallback)}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
                       {/* Basic info */}
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <FieldSelect
@@ -349,14 +518,35 @@ export function VisualRestBuilder({
                           mono
                           disabled={isReadOnly}
                         />
-                        <Field
-                          label={t('contracts.builder.rest.operationId', 'Operation ID')}
-                          value={ep.operationId}
-                          onChange={(v) => updateEndpoint(ep.id, { operationId: v })}
-                          placeholder={t('contracts.builder.rest.operationIdPlaceholder', 'getUser')}
-                          mono
-                          disabled={isReadOnly}
-                        />
+                        {/* OperationId with auto-suggest button */}
+                        <div>
+                          <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider mb-1">
+                            {t('contracts.builder.rest.operationId', 'Operation ID')}
+                          </label>
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="text"
+                              value={ep.operationId}
+                              onChange={(e) => updateEndpoint(ep.id, { operationId: e.target.value })}
+                              placeholder={t('contracts.builder.rest.operationIdPlaceholder', 'getUser')}
+                              disabled={isReadOnly}
+                              className="flex-1 min-w-0 text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
+                            />
+                            {!isReadOnly && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const suggested = generateOperationId(ep.method, ep.path);
+                                  updateEndpoint(ep.id, { operationId: suggested });
+                                }}
+                                title={t('contracts.builder.rest.autoSuggest', 'Auto-suggest')}
+                                className="flex items-center gap-0.5 text-[9px] text-accent hover:text-accent/80 border border-accent/30 rounded px-1.5 py-1 transition-colors whitespace-nowrap"
+                              >
+                                <Zap size={9} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
 
                       <Field
@@ -519,14 +709,46 @@ export function VisualRestBuilder({
                                 onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: v } })}
                                 rows={3} mono disabled={isReadOnly} />
                               {!isReadOnly && ep.requestBody.properties && ep.requestBody.properties.length > 0 && (
-                                <button type="button" onClick={() => {
-                                  const example = generateExampleFromSchema(ep.requestBody!.properties!);
-                                  updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: formatExample(example) } });
-                                }}
-                                  className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
-                                  <Sparkles size={9} />
-                                  {t('contracts.builder.rest.generateExample', 'Generate Example')}
-                                </button>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <button type="button" onClick={() => {
+                                    const example = generateExampleFromSchema(ep.requestBody!.properties!);
+                                    updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: formatExample(example) } });
+                                  }}
+                                    className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                    <Sparkles size={9} />
+                                    {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                                  </button>
+                                  <button type="button" onClick={() => togglePreview(`${ep.id}.reqBody`)}
+                                    className="inline-flex items-center gap-1 text-[9px] text-muted hover:text-body transition-colors">
+                                    {previewKeys.has(`${ep.id}.reqBody`) ? '▾' : '▸'}
+                                    {t('contracts.builder.rest.previewExample', 'Preview Example')}
+                                  </button>
+                                </div>
+                              )}
+                              {/* Preview panel for request body */}
+                              {previewKeys.has(`${ep.id}.reqBody`) && ep.requestBody.properties && ep.requestBody.properties.length > 0 && (
+                                <div className="relative rounded border border-edge bg-base/50">
+                                  <div className="flex items-center justify-between px-2 py-1 border-b border-edge">
+                                    <span className="text-[8px] text-muted font-semibold uppercase tracking-wider">
+                                      {t('contracts.builder.rest.previewExample', 'Preview Example')}
+                                    </span>
+                                    <button type="button"
+                                      onClick={() => {
+                                        const ex = formatExample(generateExampleFromSchema(ep.requestBody!.properties!));
+                                        copyToClipboard(`${ep.id}.reqBody`, ex);
+                                      }}
+                                      className="inline-flex items-center gap-1 text-[8px] text-muted hover:text-body transition-colors"
+                                    >
+                                      {copiedKeys.has(`${ep.id}.reqBody`)
+                                        ? <><Check size={8} className="text-mint" /> {t('contracts.builder.rest.exampleCopied', 'Copied!')}</>
+                                        : <><ClipboardCopy size={8} /> {t('contracts.builder.rest.copyExample', 'Copy')}</>
+                                      }
+                                    </button>
+                                  </div>
+                                  <pre className="text-[9px] font-mono p-2 overflow-x-auto text-body/80 max-h-40">
+                                    {formatExample(generateExampleFromSchema(ep.requestBody.properties))}
+                                  </pre>
+                                </div>
                               )}
                               {!isReadOnly && (
                                 <button type="button" onClick={() => updateEndpoint(ep.id, { requestBody: null })}
@@ -625,15 +847,47 @@ export function VisualRestBuilder({
                               onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, example: v }; updateEndpoint(ep.id, { responses: next }); }}
                               rows={2} mono disabled={isReadOnly} />
                             {!isReadOnly && res.properties && res.properties.length > 0 && (
-                              <button type="button" onClick={() => {
-                                const example = generateExampleFromSchema(res.properties!);
-                                const next = [...ep.responses]; next[ri] = { ...res, example: formatExample(example) };
-                                updateEndpoint(ep.id, { responses: next });
-                              }}
-                                className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
-                                <Sparkles size={9} />
-                                {t('contracts.builder.rest.generateExample', 'Generate Example')}
-                              </button>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <button type="button" onClick={() => {
+                                  const example = generateExampleFromSchema(res.properties!);
+                                  const next = [...ep.responses]; next[ri] = { ...res, example: formatExample(example) };
+                                  updateEndpoint(ep.id, { responses: next });
+                                }}
+                                  className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                  <Sparkles size={9} />
+                                  {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                                </button>
+                                <button type="button" onClick={() => togglePreview(`${ep.id}.res.${res.id}`)}
+                                  className="inline-flex items-center gap-1 text-[9px] text-muted hover:text-body transition-colors">
+                                  {previewKeys.has(`${ep.id}.res.${res.id}`) ? '▾' : '▸'}
+                                  {t('contracts.builder.rest.previewExample', 'Preview Example')}
+                                </button>
+                              </div>
+                            )}
+                            {/* Preview panel for response */}
+                            {previewKeys.has(`${ep.id}.res.${res.id}`) && res.properties && res.properties.length > 0 && (
+                              <div className="relative rounded border border-edge bg-base/50">
+                                <div className="flex items-center justify-between px-2 py-1 border-b border-edge">
+                                  <span className="text-[8px] text-muted font-semibold uppercase tracking-wider">
+                                    {t('contracts.builder.rest.previewExample', 'Preview Example')}
+                                  </span>
+                                  <button type="button"
+                                    onClick={() => {
+                                      const ex = formatExample(generateExampleFromSchema(res.properties!));
+                                      copyToClipboard(`${ep.id}.res.${res.id}`, ex);
+                                    }}
+                                    className="inline-flex items-center gap-1 text-[8px] text-muted hover:text-body transition-colors"
+                                  >
+                                    {copiedKeys.has(`${ep.id}.res.${res.id}`)
+                                      ? <><Check size={8} className="text-mint" /> {t('contracts.builder.rest.exampleCopied', 'Copied!')}</>
+                                      : <><ClipboardCopy size={8} /> {t('contracts.builder.rest.copyExample', 'Copy')}</>
+                                    }
+                                  </button>
+                                </div>
+                                <pre className="text-[9px] font-mono p-2 overflow-x-auto text-body/80 max-h-40">
+                                  {formatExample(generateExampleFromSchema(res.properties))}
+                                </pre>
+                              </div>
                             )}
                             {!isReadOnly && (
                               <button type="button" onClick={() => updateEndpoint(ep.id, { responses: ep.responses.filter((_, j) => j !== ri) })}
@@ -644,10 +898,23 @@ export function VisualRestBuilder({
                           </div>
                         ))}
                         {!isReadOnly && (
-                          <button type="button" onClick={() => updateEndpoint(ep.id, { responses: [...ep.responses, createResponse()] })}
-                            className="text-[10px] text-accent hover:text-accent/80 transition-colors">
-                            + {t('contracts.builder.rest.addResponse', 'Add Response')}
-                          </button>
+                          <div className="flex items-center gap-3 flex-wrap pt-1">
+                            <button type="button" onClick={() => updateEndpoint(ep.id, { responses: [...ep.responses, createResponse()] })}
+                              className="text-[10px] text-accent hover:text-accent/80 transition-colors">
+                              + {t('contracts.builder.rest.addResponse', 'Add Response')}
+                            </button>
+                            <button type="button" onClick={() => {
+                              const existing = new Set(ep.responses.map((r) => r.statusCode));
+                              const toAdd = COMMON_ERROR_RESPONSES.filter((r) => !existing.has(r.statusCode));
+                              if (toAdd.length > 0) {
+                                updateEndpoint(ep.id, { responses: [...ep.responses, ...toAdd.map((r) => ({ ...r, id: genId('res') }))] });
+                              }
+                            }}
+                              className="inline-flex items-center gap-1 text-[10px] text-muted hover:text-body transition-colors border border-edge/50 rounded px-2 py-0.5">
+                              <Plus size={9} />
+                              {t('contracts.builder.rest.addCommonResponses', 'Add common error responses')}
+                            </button>
+                          </div>
                         )}
                       </CollapsibleSubSection>
 

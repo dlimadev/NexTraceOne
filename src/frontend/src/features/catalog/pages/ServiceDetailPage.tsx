@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Shield,
@@ -12,6 +12,7 @@ import {
   GitCommit,
   AlertTriangle,
   Server,
+  Plus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -82,6 +83,7 @@ export function ServiceDetailPage() {
   const { t } = useTranslation();
   const { serviceId } = useParams<{ serviceId: string}>();
   const { activeEnvironment } = useEnvironment();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<ServiceTab>('overview');
 
   const { data: service, isLoading, isError } = useQuery({
@@ -346,6 +348,14 @@ export function ServiceDetailPage() {
                         {serviceContracts.totalCount} {t('catalog.detail.contractsCount')}
                       </span>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
+                      className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
+                    >
+                      <Plus size={13} aria-hidden="true" />
+                      {t('catalog.services.addContract', 'Add Contract')}
+                    </button>
                   </div>
                 </CardHeader>
                 <CardBody className="p-0">

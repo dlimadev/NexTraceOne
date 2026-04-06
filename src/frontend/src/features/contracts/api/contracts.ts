@@ -366,4 +366,56 @@ export const contractsApi = {
    */
   getSubscribers: (apiAssetId: string) =>
     client.get<ContractSubscribersResponse>(`/developerportal/catalog/${apiAssetId}/consumers`).then((r) => r.data),
+
+  // ── Phase 5 — Mock, Guidelines, CDCT, Multi-Format Export ──────────
+
+  /** Gera configuração de mock a partir do spec de uma versão de contrato. */
+  getMockConfig: (contractVersionId: string) =>
+    client.get(`/contracts/versions/${contractVersionId}/mock-config`).then((r) => r.data),
+
+  /** Avalia directrizes de design API (score 0-100 + violações). */
+  evaluateDesignGuidelines: (contractVersionId: string) =>
+    client.get(`/contracts/versions/${contractVersionId}/design-guidelines`).then((r) => r.data),
+
+  /** Exporta contrato em formato específico (openapi-yaml, postman-v21, curl, etc.). */
+  exportMultiFormat: (contractVersionId: string, format: string) =>
+    client.get(`/contracts/versions/${contractVersionId}/export-format`, { params: { format } }).then((r) => r.data),
+
+  /** Regista expectativa de consumidor para CDCT. */
+  registerConsumerExpectation: (apiAssetId: string, data: { consumerServiceName: string; consumerDomain: string; expectedSubsetJson: string; notes?: string }) =>
+    client.post(`/contracts/${apiAssetId}/consumer-expectations`, data).then((r) => r.data),
+
+  /** Lista expectativas de consumidores registadas para um contrato. */
+  getConsumerExpectations: (apiAssetId: string) =>
+    client.get(`/contracts/${apiAssetId}/consumer-expectations`).then((r) => r.data),
+
+  /** Verifica compatibilidade provider/consumer (CDCT). */
+  verifyCdct: (apiAssetId: string, versionId: string) =>
+    client.get(`/contracts/${apiAssetId}/versions/${versionId}/cdct-verify`).then((r) => r.data),
+
+  // ── Phase 6 — Intelligence & Governance ───────────────────────────
+
+  /** Dashboard de saúde dos contratos com métricas agregadas. */
+  getHealthDashboard: (params?: { domain?: string; contractType?: string; page?: number; pageSize?: number }) =>
+    client.get(`/contracts/health-dashboard`, { params }).then((r) => r.data),
+
+  /** Changelog semântico enriquecido de um contrato. */
+  getSemanticChangelog: (apiAssetId: string, fromVersion?: string, toVersion?: string) =>
+    client.get(`/contracts/${apiAssetId}/semantic-changelog`, { params: { fromVersion, toVersion } }).then((r) => r.data),
+
+  /** Sugere schemas de request/response a partir do contexto do endpoint. */
+  suggestSchema: (method: string, path: string, domain?: string, serviceAssetId?: string) =>
+    client.get(`/contracts/suggest-schema`, { params: { method, path, domain, serviceAssetId } }).then((r) => r.data),
+
+  /** Inicia workflow de deprecação de contrato com sunset date. */
+  initiateDeprecation: (apiAssetId: string, data: { sunsetDate: string; replacementApiAssetId?: string; migrationGuide?: string; reason?: string }) =>
+    client.post(`/contracts/${apiAssetId}/deprecate`, data).then((r) => r.data),
+
+  /** Progresso da migração de um contrato deprecated. */
+  getDeprecationProgress: (apiAssetId: string) =>
+    client.get(`/contracts/${apiAssetId}/deprecation-progress`).then((r) => r.data),
+
+  /** Propaga impacto de mudança de entidade canónica para contratos referenciados. */
+  propagateCanonicalChange: (entityId: string, newVersion: string) =>
+    client.post(`/contracts/canonical/${entityId}/propagate`, { newVersion }).then((r) => r.data),
 };

@@ -1288,7 +1288,10 @@
       "total": "Total de Servicios"
     },
     "title": "Catálogo de Servicios",
-    "totalCount": "({{count}} total)"
+    "totalCount": "({{count}} total)",
+    "services": {
+      "addContract": "Añadir Contrato"
+    }
   },
   "catalogContractsConfig": {
     "actions": {
@@ -1999,7 +2002,26 @@
         "validate": "Validar",
         "version": "Versión",
         "versionPlaceholder": "1.0.0",
-        "writeOnly": "Write Solo"
+        "writeOnly": "Write Solo",
+        "compositionType": "Tipo de Composición",
+        "addVariant": "Agregar Variante",
+        "removeVariant": "Eliminar Variante",
+        "noVariants": "Sin variantes. Agregue al menos un sub-schema.",
+        "variantType": "Tipo",
+        "variantDescription": "Descripción de la variante...",
+        "discriminator": "Discriminador",
+        "discriminatorProperty": "Nombre de Propiedad",
+        "discriminatorHint": "La propiedad usada para distinguir entre variantes",
+        "autoSuggest": "Sugerencia automática",
+        "warnBodyOnGet": "Las solicitudes {{method}} no deben tener cuerpo",
+        "warnEmptyBody": "El cuerpo de la solicitud existe pero no tiene esquema ni propiedades definidas",
+        "warnMissingPathParam": "El parámetro de path '{{param}}' está en el path pero no fue declarado",
+        "warnNo2xx": "No se ha definido ninguna respuesta de éxito 2xx",
+        "addCommonResponses": "Agregar respuestas de error comunes",
+        "problemDetails": "Detalles del Problema (RFC 7807)",
+        "previewExample": "Vista previa del Ejemplo",
+        "copyExample": "Copiar",
+        "exampleCopied": "¡Copiado!"
       },
       "sharedSchema": {
         "addProperty": "Añadir Propiedad",
@@ -2159,6 +2181,15 @@
         "triggerType": "Disparador Tipo",
         "validate": "Validar",
         "webhookUrl": "Webhook Ruta"
+      },
+      "canonical": {
+        "picker": {
+          "title": "Explorar Entidades Canónicas",
+          "search": "Buscar entidades...",
+          "select": "Seleccionar",
+          "empty": "No se encontraron entidades canónicas",
+          "browse": "Explorar"
+        }
       }
     },
     "canonical": {
@@ -2433,6 +2464,18 @@
     "filterPlaceholder": "Ingrese UUID para ver historial de contratos",
     "fingerprint": "Fingerprint",
     "format": "Formato",
+    "healthDashboard": {
+      "title": "Panel de Salud de Contratos",
+      "subtitle": "Métricas agregadas de calidad y gobernanza de todos los contratos",
+      "healthScore": "Puntuación de Salud",
+      "totalContracts": "Total de Contratos",
+      "withExamples": "Con Ejemplos",
+      "withCanonical": "Con Entidades Canónicas",
+      "deprecated": "Versiones Obsoletas",
+      "topViolations": "Contratos con Más Violaciones",
+      "violations": "violaciones",
+      "noViolations": "Sin violaciones de reglas detectadas — ¡contratos saludables!"
+    },
     "governance": {
       "approvedCount": "Aprobado",
       "audit": {
@@ -5916,6 +5959,7 @@
     "compliance": "Cumplimiento",
     "contractCatalog": "Catálogo de Contratos",
     "contractGovernance": "Gobernanza de Contratos",
+    "contractHealthDashboard": "Panel de Salud de Contratos",
     "contractStudio": "Estudio de Contratos",
     "controls": "Controles Empresariales",
     "createContract": "Nuevo Contrato",

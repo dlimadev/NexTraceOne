@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Catalog.Application.Templates.Features.ActivateServiceTemplate;
 using NexTraceOne.Catalog.Application.Templates.Features.CreateServiceTemplate;
 using NexTraceOne.Catalog.Application.Templates.Features.DeactivateServiceTemplate;
+using NexTraceOne.Catalog.Application.Templates.Features.GenerateEnvironmentBlueprint;
 using NexTraceOne.Catalog.Application.Templates.Features.GetServiceTemplate;
 using NexTraceOne.Catalog.Application.Templates.Features.ListServiceTemplates;
 using NexTraceOne.Catalog.Application.Templates.Features.ScaffoldServiceFromTemplate;
@@ -147,6 +148,20 @@ public sealed class ServiceTemplateEndpointModule
         .RequirePermission("catalog:templates:scaffold")
         .WithName("ScaffoldServiceFromTemplateBySlug")
         .WithSummary("Generate scaffolding plan using template slug");
+
+        // ── POST /api/v1/catalog/templates/environment-blueprint — Gerar blueprint de ambiente (Phase 7.3) ──
+        group.MapPost("/environment-blueprint", async (
+            GenerateEnvironmentBlueprint.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("catalog:templates:scaffold")
+        .WithName("GenerateEnvironmentBlueprint")
+        .WithSummary("Generate Dockerfile, docker-compose, CI/CD pipeline and optional Helm chart for a service");
 
         // ── PUT /api/v1/catalog/templates/{id} — Atualização de template ──
         group.MapPut("/{id:guid}", async (

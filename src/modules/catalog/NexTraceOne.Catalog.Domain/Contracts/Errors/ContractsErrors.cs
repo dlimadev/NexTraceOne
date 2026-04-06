@@ -192,5 +192,15 @@ public static class ContractsErrors
     /// <summary>Revisão de contrato não encontrada.</summary>
     public static Error ReviewNotFound(string id)
         => Error.NotFound("Contracts.Review.NotFound", "Contract review '{0}' was not found.", id);
+
+    // ── ConsumerExpectation ─────────────────────────────────────────
+
+    /// <summary>Expectativa de consumidor não encontrada.</summary>
+    public static Error ConsumerExpectationNotFound(string id)
+        => Error.NotFound("Contracts.ConsumerExpectation.NotFound", "Consumer expectation '{0}' was not found.", id);
+
+    /// <summary>Formato de exportação não suportado.</summary>
+    public static Error UnsupportedExportFormat(string format)
+        => Error.Validation("Contracts.Export.UnsupportedFormat", "Export format '{0}' is not supported.", format);
 }
 

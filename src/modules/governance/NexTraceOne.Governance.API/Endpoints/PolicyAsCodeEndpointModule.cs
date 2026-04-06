@@ -10,6 +10,7 @@ using GetFeature = NexTraceOne.Governance.Application.Features.GetPolicyAsCode.G
 using SimulateFeature = NexTraceOne.Governance.Application.Features.SimulatePolicyApplication.SimulatePolicyApplication;
 using TransitionFeature = NexTraceOne.Governance.Application.Features.TransitionEnforcementMode.TransitionEnforcementMode;
 using ExpireFeature = NexTraceOne.Governance.Application.Features.ExpireGovernanceWaivers.ExpireGovernanceWaivers;
+using PreCommitFeature = NexTraceOne.Governance.Application.Features.RunPreCommitGovernanceCheck.RunPreCommitGovernanceCheck;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -69,6 +70,17 @@ public sealed class PolicyAsCodeEndpointModule
             var result = await sender.Send(command with { PolicyName = policyName }, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:policies:write");
+
+        // ── Verificação pré-commit de governança (Phase 7.6) ──
+        policyGroup.MapPost("/pre-commit-check", async (
+            PreCommitFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:policies:read");
 
         // ── Expirar waivers vencidos (job de manutenção) ──
         var waiverGroup = app.MapGroup("/api/v1/governance/waivers");

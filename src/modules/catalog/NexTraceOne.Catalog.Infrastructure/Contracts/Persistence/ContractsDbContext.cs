@@ -77,6 +77,9 @@ public sealed class ContractsDbContext(
     /// <summary>Deployments de versões de contrato por ambiente para rastreabilidade de mudanças.</summary>
     public DbSet<ContractDeployment> ContractDeployments => Set<ContractDeployment>();
 
+    /// <summary>Expectativas de consumidores para Consumer-Driven Contract Testing (CDCT).</summary>
+    public DbSet<ConsumerExpectation> ConsumerExpectations => Set<ConsumerExpectation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

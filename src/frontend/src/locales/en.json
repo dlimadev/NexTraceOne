@@ -1288,7 +1288,10 @@
       "total": "Total Services"
     },
     "title": "Service Catalog",
-    "totalCount": "({{count}} total)"
+    "totalCount": "({{count}} total)",
+    "services": {
+      "addContract": "Add Contract"
+    }
   },
   "catalogContractsConfig": {
     "actions": {
@@ -2021,7 +2024,26 @@
         "responseProperties": "Response Properties",
         "addResponseProp": "Add Property",
         "exclusiveMin": "Exclusive Min",
-        "exclusiveMax": "Exclusive Max"
+        "exclusiveMax": "Exclusive Max",
+        "compositionType": "Composition Type",
+        "addVariant": "Add Variant",
+        "removeVariant": "Remove Variant",
+        "noVariants": "No variants. Add at least one sub-schema.",
+        "variantType": "Type",
+        "variantDescription": "Variant description...",
+        "discriminator": "Discriminator",
+        "discriminatorProperty": "Property Name",
+        "discriminatorHint": "The property used to distinguish between variants",
+        "autoSuggest": "Auto-suggest",
+        "warnBodyOnGet": "{{method}} requests should not have a request body",
+        "warnEmptyBody": "Request body exists but has no schema or properties defined",
+        "warnMissingPathParam": "Path parameter '{{param}}' is used in path but not declared",
+        "warnNo2xx": "No 2xx success response defined",
+        "addCommonResponses": "Add common error responses",
+        "problemDetails": "Problem Details (RFC 7807)",
+        "previewExample": "Preview Example",
+        "copyExample": "Copy",
+        "exampleCopied": "Copied!"
       },
       "sharedSchema": {
         "addProperty": "Add Property",
@@ -2181,6 +2203,15 @@
         "triggerType": "Trigger Type",
         "validate": "Validate",
         "webhookUrl": "Webhook Path"
+      },
+      "canonical": {
+        "picker": {
+          "title": "Browse Canonical Entities",
+          "search": "Search entities...",
+          "select": "Select",
+          "empty": "No canonical entities found",
+          "browse": "Browse"
+        }
       }
     },
     "canonical": {
@@ -2455,6 +2486,18 @@
     "filterPlaceholder": "Enter UUID to view contract history",
     "fingerprint": "Fingerprint",
     "format": "Format",
+    "healthDashboard": {
+      "title": "Contract Health Dashboard",
+      "subtitle": "Aggregated quality and governance metrics across all contracts",
+      "healthScore": "Health Score",
+      "totalContracts": "Total Contracts",
+      "withExamples": "With Examples",
+      "withCanonical": "With Canonical Entities",
+      "deprecated": "Deprecated Versions",
+      "topViolations": "Contracts with Most Violations",
+      "violations": "violations",
+      "noViolations": "No rule violations detected — contracts are healthy!"
+    },
     "governance": {
       "approvedCount": "Approved",
       "audit": {
@@ -5963,6 +6006,7 @@
     "compliance": "Compliance",
     "contractCatalog": "Contract Catalog",
     "contractGovernance": "Contract Governance",
+    "contractHealthDashboard": "Contract Health Dashboard",
     "contractStudio": "Contract Studio",
     "controls": "Enterprise Controls",
     "createContract": "New Contract",

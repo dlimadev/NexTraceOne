@@ -13,13 +13,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Plus, Trash2, ChevronDown, ChevronRight, ArrowUp, ArrowDown,
-  Braces, Hash, Type, ToggleLeft, List, Link2, FileJson,
+  Braces, Hash, Type, ToggleLeft, List, Link2, FileJson, BookOpen, GitMerge,
 } from 'lucide-react';
 import type { SchemaProperty, PropertyConstraints } from './builderTypes';
+import { CanonicalEntityPicker } from './CanonicalEntityPicker';
+import { SchemaCompositionEditor } from './SchemaCompositionEditor';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const PROPERTY_TYPES = ['string', 'integer', 'number', 'boolean', 'array', 'object', '$ref'] as const;
+const PROPERTY_TYPES = ['string', 'integer', 'number', 'boolean', 'array', 'object', '$ref', 'oneOf', 'anyOf', 'allOf'] as const;
 
 const FORMAT_OPTIONS = [
   '', 'date', 'date-time', 'email', 'uri', 'uuid', 'hostname',
@@ -34,6 +36,9 @@ const TYPE_ICONS: Record<string, typeof Type> = {
   array: List,
   object: Braces,
   '$ref': Link2,
+  oneOf: GitMerge,
+  anyOf: GitMerge,
+  allOf: GitMerge,
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -44,6 +49,9 @@ const TYPE_COLORS: Record<string, string> = {
   array: 'text-accent',
   object: 'text-purple-400',
   '$ref': 'text-pink-400',
+  oneOf: 'text-orange-400',
+  anyOf: 'text-orange-400',
+  allOf: 'text-orange-400',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -63,6 +71,7 @@ function createProperty(type: SchemaProperty['type'] = 'string'): SchemaProperty
     constraints: {},
     properties: type === 'object' ? [] : undefined,
     items: type === 'array' ? { id: genPropId(), name: 'items', type: 'string', description: '', required: false, constraints: {} } : undefined,
+    compositionSchemas: ['oneOf', 'anyOf', 'allOf'].includes(type) ? [] : undefined,
   };
 }
 
@@ -92,6 +101,7 @@ export function SchemaPropertyEditor({
 }: SchemaPropertyEditorProps) {
   const { t } = useTranslation();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [pickerForPropId, setPickerForPropId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
@@ -119,7 +129,9 @@ export function SchemaPropertyEditor({
     const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= properties.length) return;
     const next = [...properties];
-    [next[index], next[newIndex]] = [next[newIndex], next[index]];
+    const tmp = next[index]!;
+    next[index] = next[newIndex]!;
+    next[newIndex] = tmp;
     onChange(next);
   };
 
@@ -140,8 +152,14 @@ export function SchemaPropertyEditor({
     } else if (newType !== 'array') patch.items = undefined;
     if (newType === '$ref') patch.$ref = patch.$ref ?? '';
     else patch.$ref = undefined;
+    if (['oneOf', 'anyOf', 'allOf'].includes(newType)) {
+      patch.compositionSchemas = prop.compositionSchemas ?? [];
+    } else {
+      patch.compositionSchemas = undefined;
+      patch.discriminator = undefined;
+    }
     // Reset constraints when type changes fundamentally
-    if ((newType === 'object' || newType === 'array' || newType === '$ref') && prop.type !== newType) {
+    if ((newType === 'object' || newType === 'array' || newType === '$ref' || ['oneOf', 'anyOf', 'allOf'].includes(newType)) && prop.type !== newType) {
       patch.constraints = {};
     }
     updateProperty(id, patch);
@@ -153,7 +171,8 @@ export function SchemaPropertyEditor({
     <div className="space-y-1" style={{ marginLeft: indentPx > 0 ? `${indentPx}px` : undefined }}>
       {properties.map((prop, idx) => {
         const isExpanded = expandedIds.has(prop.id);
-        const hasDetails = prop.type === 'object' || prop.type === 'array' || prop.type === '$ref';
+        const isComposition = prop.type === 'oneOf' || prop.type === 'anyOf' || prop.type === 'allOf';
+        const hasDetails = prop.type === 'object' || prop.type === 'array' || prop.type === '$ref' || isComposition;
         const IconComponent = TYPE_ICONS[prop.type] ?? FileJson;
         const typeColor = TYPE_COLORS[prop.type] ?? 'text-muted';
 
@@ -257,14 +276,26 @@ export function SchemaPropertyEditor({
                     <label className="block text-[9px] text-muted mb-0.5">
                       {t('contracts.builder.rest.refTarget', '$ref Target (Canonical Entity)')}
                     </label>
-                    <input
-                      type="text"
-                      value={prop.$ref ?? ''}
-                      onChange={(e) => updateProperty(prop.id, { $ref: e.target.value })}
-                      placeholder="#/components/schemas/Address"
-                      disabled={isReadOnly}
-                      className="w-full text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
-                    />
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        value={prop.$ref ?? ''}
+                        onChange={(e) => updateProperty(prop.id, { $ref: e.target.value })}
+                        placeholder="#/components/schemas/Address"
+                        disabled={isReadOnly}
+                        className="flex-1 text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
+                      />
+                      {!isReadOnly && (
+                        <button
+                          type="button"
+                          onClick={() => setPickerForPropId(prop.id)}
+                          className="flex items-center gap-1 text-[9px] font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2 py-1 transition-colors whitespace-nowrap"
+                        >
+                          <BookOpen size={10} />
+                          {t('contracts.builder.canonical.picker.browse', 'Browse')}
+                        </button>
+                      )}
+                    </div>
                     <p className="text-[8px] text-muted/50 mt-0.5">
                       {t('contracts.builder.rest.refHint', 'Reference a shared/canonical schema defined in the Canonical Entity Catalog')}
                     </p>
@@ -272,7 +303,7 @@ export function SchemaPropertyEditor({
                 )}
 
                 {/* Primitive type constraints */}
-                {!['object', 'array', '$ref'].includes(prop.type) && (
+                {!['object', 'array', '$ref', 'oneOf', 'anyOf', 'allOf'].includes(prop.type) && (
                   <PropertyConstraintsEditor
                     constraints={prop.constraints}
                     propertyType={prop.type}
@@ -370,6 +401,17 @@ export function SchemaPropertyEditor({
                     {t('contracts.builder.rest.maxDepthReached', 'Maximum nesting depth reached. Use $ref for deeper structures.')}
                   </p>
                 )}
+
+                {/* Schema composition (oneOf / anyOf / allOf) */}
+                {isComposition && (
+                  <SchemaCompositionEditor
+                    compositionType={prop.type as 'oneOf' | 'anyOf' | 'allOf'}
+                    schemas={prop.compositionSchemas ?? []}
+                    discriminator={prop.discriminator}
+                    onChange={(schemas, discriminator) => updateProperty(prop.id, { compositionSchemas: schemas, discriminator })}
+                    isReadOnly={isReadOnly}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -397,6 +439,15 @@ export function SchemaPropertyEditor({
             <Link2 size={9} /> {t('contracts.builder.rest.addRef', '$ref')}
           </button>
         </div>
+      )}
+      {pickerForPropId && (
+        <CanonicalEntityPicker
+          onSelect={(ref) => {
+            updateProperty(pickerForPropId, { $ref: ref });
+            setPickerForPropId(null);
+          }}
+          onClose={() => setPickerForPropId(null)}
+        />
       )}
     </div>
   );
