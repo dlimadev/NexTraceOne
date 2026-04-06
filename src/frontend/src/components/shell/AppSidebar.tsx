@@ -19,7 +19,7 @@ import {
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
   Network, Workflow, StickyNote, BookMarked, Radar,
-  CalendarDays, Award,
+  CalendarDays, Award, BrainCircuit,
 } from 'lucide-react';
 
 interface NavItem {
@@ -66,6 +66,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.sloManagement', to: '/operations/reliability/slos', icon: <ShieldCheck size={18} />, permission: 'operations:reliability:read', section: 'operations' },
   { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'operations' },
   { labelKey: 'sidebar.runtimeIntelligence', to: '/operations/runtime-comparison', icon: <BarChart3 size={18} />, permission: 'operations:runtime:read', section: 'operations' },
+  { labelKey: 'sidebar.predictiveIntelligence', to: '/operations/predictive-intelligence', icon: <BrainCircuit size={18} />, permission: 'operations:runtime:read', section: 'operations' },
   { labelKey: 'sidebar.aiAssistant', to: '/ai/assistant', icon: <Bot size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiAgents', to: '/ai/agents', icon: <Network size={18} />, permission: 'ai:assistant:read', section: 'aiHub' },
   { labelKey: 'sidebar.modelRegistry', to: '/ai/models', icon: <Database size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
@@ -88,6 +89,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.maturityScorecards', to: '/governance/maturity', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.benchmarking', to: '/governance/benchmarking', icon: <TrendingUp size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.securityGate', to: '/catalog/security-gate', icon: <ShieldCheck size={18} />, permission: 'governance:security:scan', section: 'governance' },
+  { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Activity size={18} />, permission: 'catalog:assets:read', section: 'services' },
+  { labelKey: 'sidebar.apiPolicyAsCode', to: '/governance/api-policy-as-code', icon: <FileCode size={18} />, permission: 'governance:policies:read', section: 'governance' },
   { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:teams:read', section: 'organization' },
   { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Globe size={18} />, permission: 'governance:domains:read', section: 'organization' },
   { labelKey: 'sidebar.delegatedAdmin', to: '/governance/delegated-admin', icon: <UserCheck size={18} />, permission: 'governance:admin:read', section: 'organization' },

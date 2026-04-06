@@ -35,6 +35,7 @@ const DoraMetricsPage = lazy(() => import('../features/governance/pages/DoraMetr
 const ServiceScorecardPage = lazy(() => import('../features/governance/pages/ServiceScorecardPage').then(m => ({ default: m.ServiceScorecardPage })));
 const CustomDashboardsPage = lazy(() => import('../features/governance/pages/CustomDashboardsPage').then(m => ({ default: m.CustomDashboardsPage })));
 const TechnicalDebtPage = lazy(() => import('../features/governance/pages/TechnicalDebtPage').then(m => ({ default: m.TechnicalDebtPage })));
+const ApiPolicyAsCodePage = lazy(() => import('../features/governance/pages/ApiPolicyAsCodePage').then(m => ({ default: m.ApiPolicyAsCodePage })));
 
 export function GovernanceRoutes() {
   return (
@@ -276,6 +277,14 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <TechnicalDebtPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/api-policy-as-code"
+        element={
+          <ProtectedRoute permission="governance:policies:read" redirectTo="/unauthorized">
+            <ApiPolicyAsCodePage />
           </ProtectedRoute>
         }
       />
