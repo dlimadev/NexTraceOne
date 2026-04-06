@@ -16,6 +16,7 @@ const AiAuditPage = lazy(() => import('../features/ai-hub/pages/AiAuditPage').th
 const AiAnalysisPage = lazy(() => import('../features/ai-hub/pages/AiAnalysisPage').then(m => ({ default: m.AiAnalysisPage })));
 const AiAgentsPage = lazy(() => import('../features/ai-hub/pages/AiAgentsPage').then(m => ({ default: m.AiAgentsPage })));
 const AgentDetailPage = lazy(() => import('../features/ai-hub/pages/AgentDetailPage').then(m => ({ default: m.AgentDetailPage })));
+const AgentMarketplacePage = lazy(() => import('../features/ai-hub/pages/AgentMarketplacePage').then(m => ({ default: m.AgentMarketplacePage })));
 const AiIntegrationsConfigurationPage = lazy(() => import('../features/ai-hub/pages/AiIntegrationsConfigurationPage').then(m => ({ default: m.AiIntegrationsConfigurationPage })));
 
 export function AiHubRoutes() {
@@ -90,6 +91,14 @@ export function AiHubRoutes() {
         element={
           <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
             <AgentDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/marketplace"
+        element={
+          <ProtectedRoute permission="ai:runtime:read" redirectTo="/unauthorized">
+            <AgentMarketplacePage />
           </ProtectedRoute>
         }
       />

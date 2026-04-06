@@ -22,6 +22,7 @@ using EvaluateDocumentationQualityFeature = NexTraceOne.AIKnowledge.Application.
 using GenerateAdrFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateArchitectureDecisionRecord.GenerateArchitectureDecisionRecord;
 using RecommendTemplateFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.RecommendTemplateForService.RecommendTemplateForService;
 using ReviewContractDraftFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.ReviewContractDraft.ReviewContractDraft;
+using GetAgentMarketplaceFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAgentMarketplace.GetAgentMarketplace;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -45,6 +46,7 @@ public sealed class AiOrchestrationEndpointModule
         MapConversationEndpoints(app);
         MapKnowledgeEndpoints(app);
         MapGenerationEndpoints(app);
+        MapMarketplaceEndpoints(app);
     }
 
     private static void MapCatalogEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
@@ -313,6 +315,26 @@ public sealed class AiOrchestrationEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:runtime:write");
+    }
+
+    private static void MapMarketplaceEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/aiorchestration");
+
+        group.MapGet("/marketplace", async (
+            string? category,
+            string? search,
+            bool? isOfficial,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
+        {
+            var query = new GetAgentMarketplaceFeature.Query(category, search, isOfficial, page, pageSize);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:read");
     }
 
     private sealed record AdrRequest(

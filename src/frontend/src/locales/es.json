@@ -6794,5 +6794,20 @@
       "incidentDistribution": "Distribución de Incidentes",
       "filterByTeam": "Filtrar por equipo..."
     }
+  },
+  "agentMarketplace": {
+    "title": "Marketplace de Agentes",
+    "subtitle": "Descubre y utiliza agentes de IA gobernados para operaciones, ingeniería y gobernanza",
+    "searchPlaceholder": "Buscar agentes por nombre o descripción...",
+    "filterAll": "Todos",
+    "filterOfficial": "Oficiales",
+    "noAgents": "No se encontraron agentes",
+    "noAgentsHint": "Intenta ajustar tu búsqueda o filtro de categoría.",
+    "useAgent": "Usar Agente",
+    "executions": "{{count}} ejecuciones",
+    "official": "Oficial",
+    "category": "Categoría",
+    "loading": "Cargando marketplace...",
+    "error": "Error al cargar el marketplace de agentes. Inténtalo de nuevo."
   }
 }

@@ -6791,5 +6791,20 @@
       "incidentDistribution": "Incident Distribution",
       "filterByTeam": "Filter by team..."
     }
+  },
+  "agentMarketplace": {
+    "title": "Agent Marketplace",
+    "subtitle": "Discover and use governed AI agents for operations, engineering and governance",
+    "searchPlaceholder": "Search agents by name or description...",
+    "filterAll": "All",
+    "filterOfficial": "Official",
+    "noAgents": "No agents found",
+    "noAgentsHint": "Try adjusting your search or category filter.",
+    "useAgent": "Use Agent",
+    "executions": "{{count}} executions",
+    "official": "Official",
+    "category": "Category",
+    "loading": "Loading marketplace...",
+    "error": "Failed to load the agent marketplace. Please try again."
   }
 }
