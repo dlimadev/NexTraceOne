@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
@@ -42,6 +43,11 @@ public static class RunPreCommitGovernanceCheck
     public sealed class Handler(IPolicyAsCodeRepository policyRepository)
         : ICommandHandler<Command, Response>
     {
+        private static readonly Regex s_kebabCasePattern =
+            new(@"^[a-z][a-z0-9\-]*[a-z0-9]$", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+
+        private static readonly Regex s_singleWordLowerPattern =
+            new(@"^[a-z]+$", RegexOptions.Compiled, TimeSpan.FromSeconds(1));
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -107,7 +113,7 @@ public static class RunPreCommitGovernanceCheck
             Command req, PolicyEnforcementMode mode)
         {
             // Verifica se o nome do serviço segue kebab-case
-            if (!System.Text.RegularExpressions.Regex.IsMatch(req.ServiceName, @"^[a-z][a-z0-9\-]*[a-z0-9]$"))
+            if (!s_kebabCasePattern.IsMatch(req.ServiceName))
             {
                 yield return new GovernanceViolation(
                     RuleId: "NAMING-001",
@@ -121,8 +127,7 @@ public static class RunPreCommitGovernanceCheck
             }
 
             // Verifica se o domínio segue kebab-case
-            if (!System.Text.RegularExpressions.Regex.IsMatch(req.Domain, @"^[a-z][a-z0-9\-]*[a-z0-9]$") &&
-                !System.Text.RegularExpressions.Regex.IsMatch(req.Domain, @"^[a-z]+$"))
+            if (!s_kebabCasePattern.IsMatch(req.Domain) && !s_singleWordLowerPattern.IsMatch(req.Domain))
             {
                 yield return new GovernanceViolation(
                     RuleId: "NAMING-002",

@@ -94,7 +94,7 @@ public static class GenerateMockConfiguration
             string operationId)
         {
             if (fields.Count == 0)
-                return $"{{\"id\": \"mock-{operationId.ToLowerInvariant().Replace(" ", "-")}\", \"status\": \"ok\"}}";
+                return $"{{\"id\": \"mock-{operationId.ToLowerInvariant().Replace(" ", "-", StringComparison.Ordinal)}\", \"status\": \"ok\"}}";
 
             var props = new Dictionary<string, object?>();
             foreach (var field in fields.Take(5))
