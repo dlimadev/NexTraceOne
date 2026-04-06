@@ -114,6 +114,9 @@ export type Permission =
   | 'governance:finops:read'
   | 'governance:admin:read'
   | 'governance:admin:write'
+  | 'governance:security:scan'
+  // ── Contract Pipeline (Phase 5) ──
+  | 'catalog:contracts:pipeline:read'
   // ── Product Analytics ──
   | 'analytics:read'
   | 'analytics:write'

@@ -37,6 +37,8 @@ using NexTraceOne.Catalog.Application.Portal.Features.RevokeApiKey;
 using NexTraceOne.Catalog.Application.Portal.Features.SearchCatalog;
 using NexTraceOne.Catalog.Application.Portal.Features.SetRateLimitPolicy;
 using NexTraceOne.Catalog.Application.Portal.Features.ValidateApiKey;
+using NexTraceOne.Catalog.Application.Portal.Features.AutoRegisterScaffoldedService;
+using NexTraceOne.Catalog.Application.Portal.Features.PushToRepository;
 using NexTraceOne.Catalog.Application.Portal.Features.WithdrawContractFromPortal;
 
 namespace NexTraceOne.Catalog.Application.Portal;
@@ -91,6 +93,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetApiUsageAnalytics.Query>, GetApiUsageAnalytics.Validator>();
         services.AddTransient<IValidator<SetRateLimitPolicy.Command>, SetRateLimitPolicy.Validator>();
         services.AddTransient<IValidator<GetRateLimitPolicy.Query>, GetRateLimitPolicy.Validator>();
+
+        // Phase 5 — Preview, Export & Catalog Registration
+        services.AddTransient<IValidator<AutoRegisterScaffoldedService.Command>, AutoRegisterScaffoldedService.Validator>();
+        services.AddTransient<IValidator<PushToRepository.Command>, PushToRepository.Validator>();
 
         // Contract-to-Code Pipeline
         services.AddTransient<IValidator<GenerateServerFromContract.Command>, GenerateServerFromContract.Validator>();

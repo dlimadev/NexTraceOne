@@ -207,5 +207,5 @@ public static class GenerateContractTests
 internal static class StringHelperExtensions
 {
     public static string ToTitleCase(this string s) =>
-        string.IsNullOrEmpty(s) ? s : char.ToUpperInvariant(s[0]) + s[1..].ToLowerInvariant();
+        string.IsNullOrEmpty(s) ? s : s.Length == 1 ? s.ToUpperInvariant() : char.ToUpperInvariant(s[0]) + s[1..].ToLowerInvariant();
 }
