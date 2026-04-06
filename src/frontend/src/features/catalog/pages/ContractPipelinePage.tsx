@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import {
   Zap,
   FileCode,
@@ -42,7 +42,6 @@ interface PipelineResult {
 }
 
 type TargetLanguage = 'dotnet' | 'nodejs' | 'java' | 'go' | 'python';
-type MockServerFormat = 'wiremock' | 'json-server' | 'mirage';
 
 // ── API ────────────────────────────────────────────────────────────────────────
 

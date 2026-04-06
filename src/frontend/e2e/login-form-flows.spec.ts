@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { mockAuthSession } from './helpers/auth';
 
 /**
  * E2E tests for Login form interactions, field validation, and business flows.

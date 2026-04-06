@@ -44,7 +44,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.GetByIdAsync(Arg.Any<EnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns((DomainEnvironment?)null);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var result = await resolver.ResolveAsync(TenantId, EnvironmentId);
@@ -64,7 +64,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.GetByIdAsync(Arg.Any<EnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(environment);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var result = await resolver.ResolveAsync(TenantId, EnvironmentId);
@@ -83,7 +83,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.GetByIdAsync(Arg.Any<EnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(environment);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var result = await resolver.ResolveAsync(TenantId, EnvironmentId);
@@ -105,7 +105,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.GetByIdAsync(Arg.Any<EnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(environment);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var result = await resolver.ResolveAsync(TenantId, environment.Id);
@@ -130,7 +130,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.GetByIdAsync(Arg.Any<EnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(environment);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var result = await resolver.ResolveAsync(wrongTenantId, environment.Id);
@@ -147,7 +147,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.ListByTenantAsync(Arg.Any<TenantId>(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<DomainEnvironment>().AsReadOnly());
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var results = await resolver.ListActiveContextsForTenantAsync(TenantId);
@@ -171,7 +171,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.ListByTenantAsync(Arg.Any<TenantId>(), Arg.Any<CancellationToken>())
             .Returns(allEnvironments);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var results = await resolver.ListActiveContextsForTenantAsync(TenantId);
@@ -196,7 +196,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.ListByTenantAsync(Arg.Any<TenantId>(), Arg.Any<CancellationToken>())
             .Returns(allEnvironments);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var results = await resolver.ListActiveContextsForTenantAsync(TenantId);
@@ -225,7 +225,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.ListByTenantAsync(Arg.Any<TenantId>(), Arg.Any<CancellationToken>())
             .Returns(allEnvironments);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
 
         // Act
         var results = await resolver.ListActiveContextsForTenantAsync(TenantId);
@@ -243,7 +243,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.GetByIdAsync(Arg.Any<EnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns((DomainEnvironment?)null);
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
         var cts = new CancellationTokenSource();
 
         // Act
@@ -261,7 +261,7 @@ public sealed class TenantEnvironmentContextResolverTests
         repository.ListByTenantAsync(Arg.Any<TenantId>(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<DomainEnvironment>().AsReadOnly());
 
-        var resolver = new TenantEnvironmentContextResolver(repository);
+        var resolver = new TenantEnvironmentContextResolver(repository, Microsoft.Extensions.Logging.Abstractions.NullLogger<TenantEnvironmentContextResolver>.Instance);
         var cts = new CancellationTokenSource();
 
         // Act

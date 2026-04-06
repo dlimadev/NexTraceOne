@@ -139,7 +139,7 @@ export function ChangeCatalogPage() {
   });
 
   const summary = summaryQuery.data;
-  const changes = changesQuery.data?.changes ?? [];
+  const changes = useMemo(() => changesQuery.data?.changes ?? [], [changesQuery.data?.changes]);
   const totalCount = changesQuery.data?.totalCount ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
