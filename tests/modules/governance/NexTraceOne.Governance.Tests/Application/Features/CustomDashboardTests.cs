@@ -1,3 +1,4 @@
+using System.Linq;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.CreateCustomDashboard;
 using NexTraceOne.Governance.Application.Features.GetCustomDashboard;

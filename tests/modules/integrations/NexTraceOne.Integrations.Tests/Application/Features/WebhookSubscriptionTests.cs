@@ -1,3 +1,4 @@
+using System.Linq;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Integrations.Application.Features.GetWebhookEventTypes;
