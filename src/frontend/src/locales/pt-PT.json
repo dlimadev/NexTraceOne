@@ -6617,5 +6617,80 @@
     "recentScans": "Scans Recentes",
     "dashboardError": "Erro ao carregar dados do dashboard.",
     "dashboardEmpty": "Sem scans de segurança registados. Execute um scan para começar a monitorizar."
+  },
+  "phase4": {
+    "contractDrift": {
+      "title": "Detecção de Desvio de Contrato",
+      "subtitle": "Compare o seu contrato publicado com o tráfego real observado",
+      "analyze": "Analisar Desvio",
+      "driftScore": "Score de Desvio",
+      "status": "Estado",
+      "ghostEndpoints": "Endpoints Fantasma",
+      "ghostEndpointsDesc": "Declarados no contrato mas nunca observados nos traces",
+      "undeclaredEndpoints": "Endpoints Não Declarados",
+      "undeclaredEndpointsDesc": "Observados nos traces mas não declarados no contrato",
+      "statusClean": "Limpo",
+      "statusMinor": "Menor",
+      "statusMajor": "Maior",
+      "statusCritical": "Crítico",
+      "noObservations": "Nenhuma observação de trace fornecida",
+      "method": "Método",
+      "path": "Caminho"
+    },
+    "healthTimeline": {
+      "title": "Linha do Tempo de Saúde",
+      "subtitle": "Evolução da saúde do contrato ao longo do tempo",
+      "version": "Versão",
+      "healthScore": "Score de Saúde",
+      "breakingChange": "Breaking Change",
+      "lifecycleState": "Estado do Ciclo de Vida",
+      "createdAt": "Criado em",
+      "noData": "Nenhuma versão encontrada para este contrato"
+    },
+    "maturityBenchmark": {
+      "title": "Benchmark de Maturidade de Serviços",
+      "subtitle": "Compare a maturidade entre equipas e domínios",
+      "teams": "Equipas",
+      "domains": "Domínios",
+      "rank": "Rank",
+      "teamName": "Equipa",
+      "domainName": "Domínio",
+      "serviceCount": "Serviços",
+      "avgMaturityScore": "Maturidade Média",
+      "noData": "Nenhum serviço encontrado para benchmark"
+    },
+    "contractReviewer": {
+      "title": "Revisor de Contrato com IA",
+      "subtitle": "Revisão automatizada por IA do seu rascunho de contrato",
+      "review": "Iniciar Revisão",
+      "reviewing": "A rever...",
+      "qualityScore": "Score de Qualidade",
+      "recommendation": "Recomendação",
+      "issues": "Problemas",
+      "suggestions": "Sugestões",
+      "severity": "Severidade",
+      "category": "Categoria",
+      "description": "Descrição",
+      "approve": "Aprovar",
+      "requestChanges": "Solicitar Alterações",
+      "reject": "Rejeitar",
+      "noIssues": "Nenhum problema encontrado",
+      "noSuggestions": "Nenhuma sugestão"
+    },
+    "impactCascade": {
+      "title": "Cascata de Impacto de Entidade Canónica",
+      "subtitle": "Análise em cascata multi-nível de mudanças em entidade canónica",
+      "totalContracts": "Total de Contratos Afetados",
+      "uniqueEntities": "Entidades Únicas na Cascata",
+      "riskLevel": "Nível de Risco",
+      "maxDepth": "Profundidade Máxima",
+      "entityName": "Entidade",
+      "depth": "Profundidade",
+      "affectedContracts": "Contratos Afetados",
+      "children": "Filhos",
+      "analyze": "Analisar Cascata",
+      "noChildren": "Sem impacto em cascata",
+      "depthLabel": "Profundidade {{depth}}"
+    }
   }
 }

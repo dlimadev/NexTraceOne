@@ -6620,5 +6620,80 @@
     "recentScans": "Scans Recientes",
     "dashboardError": "Error al cargar datos del dashboard.",
     "dashboardEmpty": "No hay scans de seguridad registrados. Ejecute un scan para comenzar a monitorizar."
+  },
+  "phase4": {
+    "contractDrift": {
+      "title": "Detección de Deriva de Contrato",
+      "subtitle": "Compare su contrato publicado con el tráfico real observado",
+      "analyze": "Analizar Deriva",
+      "driftScore": "Puntuación de Deriva",
+      "status": "Estado",
+      "ghostEndpoints": "Endpoints Fantasma",
+      "ghostEndpointsDesc": "Declarados en el contrato pero nunca observados en trazas",
+      "undeclaredEndpoints": "Endpoints No Declarados",
+      "undeclaredEndpointsDesc": "Observados en trazas pero no declarados en el contrato",
+      "statusClean": "Limpio",
+      "statusMinor": "Menor",
+      "statusMajor": "Mayor",
+      "statusCritical": "Crítico",
+      "noObservations": "No se proporcionaron observaciones de trazas",
+      "method": "Método",
+      "path": "Ruta"
+    },
+    "healthTimeline": {
+      "title": "Línea de Tiempo de Salud",
+      "subtitle": "Evolución de la salud del contrato a lo largo del tiempo",
+      "version": "Versión",
+      "healthScore": "Puntuación de Salud",
+      "breakingChange": "Cambio Disruptivo",
+      "lifecycleState": "Estado del Ciclo de Vida",
+      "createdAt": "Creado el",
+      "noData": "No se encontraron versiones para este contrato"
+    },
+    "maturityBenchmark": {
+      "title": "Benchmark de Madurez de Servicios",
+      "subtitle": "Compare la madurez entre equipos y dominios",
+      "teams": "Equipos",
+      "domains": "Dominios",
+      "rank": "Rango",
+      "teamName": "Equipo",
+      "domainName": "Dominio",
+      "serviceCount": "Servicios",
+      "avgMaturityScore": "Madurez Promedio",
+      "noData": "No se encontraron servicios para el benchmark"
+    },
+    "contractReviewer": {
+      "title": "Revisor de Contratos con IA",
+      "subtitle": "Revisión automatizada por IA de su borrador de contrato",
+      "review": "Iniciar Revisión",
+      "reviewing": "Revisando...",
+      "qualityScore": "Puntuación de Calidad",
+      "recommendation": "Recomendación",
+      "issues": "Problemas",
+      "suggestions": "Sugerencias",
+      "severity": "Severidad",
+      "category": "Categoría",
+      "description": "Descripción",
+      "approve": "Aprobar",
+      "requestChanges": "Solicitar Cambios",
+      "reject": "Rechazar",
+      "noIssues": "No se encontraron problemas",
+      "noSuggestions": "No hay sugerencias"
+    },
+    "impactCascade": {
+      "title": "Cascada de Impacto de Entidad Canónica",
+      "subtitle": "Análisis en cascada de múltiples niveles de cambios en entidad canónica",
+      "totalContracts": "Total de Contratos Afectados",
+      "uniqueEntities": "Entidades Únicas en la Cascada",
+      "riskLevel": "Nivel de Riesgo",
+      "maxDepth": "Profundidad Máxima",
+      "entityName": "Entidad",
+      "depth": "Profundidad",
+      "affectedContracts": "Contratos Afectados",
+      "children": "Hijos",
+      "analyze": "Analizar Cascada",
+      "noChildren": "Sin impacto en cascada",
+      "depthLabel": "Profundidad {{depth}}"
+    }
   }
 }

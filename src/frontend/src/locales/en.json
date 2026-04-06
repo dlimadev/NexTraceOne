@@ -6617,5 +6617,80 @@
     "recentScans": "Recent Scans",
     "dashboardError": "Failed to load dashboard data.",
     "dashboardEmpty": "No security scans recorded yet. Run a scan to start tracking security posture."
+  },
+  "phase4": {
+    "contractDrift": {
+      "title": "Contract Drift Detection",
+      "subtitle": "Compare your published contract against real observed traffic",
+      "analyze": "Analyze Drift",
+      "driftScore": "Drift Score",
+      "status": "Status",
+      "ghostEndpoints": "Ghost Endpoints",
+      "ghostEndpointsDesc": "Declared in contract but never observed in traces",
+      "undeclaredEndpoints": "Undeclared Endpoints",
+      "undeclaredEndpointsDesc": "Observed in traces but not declared in contract",
+      "statusClean": "Clean",
+      "statusMinor": "Minor",
+      "statusMajor": "Major",
+      "statusCritical": "Critical",
+      "noObservations": "No trace observations provided",
+      "method": "Method",
+      "path": "Path"
+    },
+    "healthTimeline": {
+      "title": "Health Score Timeline",
+      "subtitle": "Evolution of contract health over time",
+      "version": "Version",
+      "healthScore": "Health Score",
+      "breakingChange": "Breaking Change",
+      "lifecycleState": "Lifecycle State",
+      "createdAt": "Created At",
+      "noData": "No versions found for this contract"
+    },
+    "maturityBenchmark": {
+      "title": "Service Maturity Benchmark",
+      "subtitle": "Compare maturity across teams and domains",
+      "teams": "Teams",
+      "domains": "Domains",
+      "rank": "Rank",
+      "teamName": "Team",
+      "domainName": "Domain",
+      "serviceCount": "Services",
+      "avgMaturityScore": "Avg Maturity",
+      "noData": "No services found for benchmarking"
+    },
+    "contractReviewer": {
+      "title": "AI Contract Reviewer",
+      "subtitle": "Automated AI review of your contract draft",
+      "review": "Start Review",
+      "reviewing": "Reviewing...",
+      "qualityScore": "Quality Score",
+      "recommendation": "Recommendation",
+      "issues": "Issues",
+      "suggestions": "Suggestions",
+      "severity": "Severity",
+      "category": "Category",
+      "description": "Description",
+      "approve": "Approve",
+      "requestChanges": "Request Changes",
+      "reject": "Reject",
+      "noIssues": "No issues found",
+      "noSuggestions": "No suggestions"
+    },
+    "impactCascade": {
+      "title": "Canonical Entity Impact Cascade",
+      "subtitle": "Multi-level cascade analysis of canonical entity changes",
+      "totalContracts": "Total Contracts Affected",
+      "uniqueEntities": "Unique Entities in Cascade",
+      "riskLevel": "Risk Level",
+      "maxDepth": "Max Depth",
+      "entityName": "Entity",
+      "depth": "Depth",
+      "affectedContracts": "Affected Contracts",
+      "children": "Children",
+      "analyze": "Analyze Cascade",
+      "noChildren": "No cascading impact",
+      "depthLabel": "Depth {{depth}}"
+    }
   }
 }
