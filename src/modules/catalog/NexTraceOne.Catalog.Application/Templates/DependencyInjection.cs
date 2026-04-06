@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Catalog.Application.Templates.Features.CreateServiceTemplate;
+using NexTraceOne.Catalog.Application.Templates.Features.GenerateEnvironmentBlueprint;
 using NexTraceOne.Catalog.Application.Templates.Features.GetServiceTemplate;
 using NexTraceOne.Catalog.Application.Templates.Features.ListServiceTemplates;
 using NexTraceOne.Catalog.Application.Templates.Features.ScaffoldServiceFromTemplate;
@@ -30,6 +31,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetServiceTemplate.Query>, GetServiceTemplate.Validator>();
         services.AddTransient<IValidator<ListServiceTemplates.Query>, ListServiceTemplates.Validator>();
         services.AddTransient<IValidator<ScaffoldServiceFromTemplate.Command>, ScaffoldServiceFromTemplate.Validator>();
+        services.AddTransient<IValidator<GenerateEnvironmentBlueprint.Command>, GenerateEnvironmentBlueprint.Validator>();
 
         return services;
     }

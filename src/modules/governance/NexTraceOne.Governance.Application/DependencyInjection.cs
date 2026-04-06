@@ -65,6 +65,7 @@ using NexTraceOne.Governance.Application.Features.RunComplianceChecks;
 using NexTraceOne.Governance.Application.Features.UpdateDomain;
 using NexTraceOne.Governance.Application.Features.UpdateGovernancePack;
 using NexTraceOne.Governance.Application.Features.UpdateTeam;
+using NexTraceOne.Governance.Application.Features.RunPreCommitGovernanceCheck;
 
 namespace NexTraceOne.Governance.Application;
 
@@ -142,6 +143,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<SimulatePolicyApplication.Command>, SimulatePolicyApplication.Validator>();
         services.AddTransient<IValidator<TransitionEnforcementMode.Command>, TransitionEnforcementMode.Validator>();
         services.AddTransient<IValidator<ExpireGovernanceWaivers.Command>, ExpireGovernanceWaivers.Validator>();
+        services.AddTransient<IValidator<RunPreCommitGovernanceCheck.Command>, RunPreCommitGovernanceCheck.Validator>();
 
         // Security Gate Pipeline
         services.AddTransient<IValidator<ScanGeneratedCode.Command>, ScanGeneratedCode.Validator>();
