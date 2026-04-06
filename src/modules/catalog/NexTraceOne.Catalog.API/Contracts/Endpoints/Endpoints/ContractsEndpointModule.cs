@@ -55,6 +55,7 @@ using InitiateContractDeprecationFeature = NexTraceOne.Catalog.Application.Contr
 using GetDeprecationProgressFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDeprecationProgress.GetDeprecationProgress;
 using DetectContractDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.DetectContractDrift.DetectContractDrift;
 using GetContractHealthTimelineFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHealthTimeline.GetContractHealthTimeline;
+using GetCanonicalEntityImpactCascadeFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpactCascade.GetCanonicalEntityImpactCascade;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -467,6 +468,18 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(
                 new GetCanonicalEntityImpactFeature.Query(entityId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        canonicalGroup.MapGet("/{entityId:guid}/impact/cascade", async (
+            Guid entityId,
+            int? maxDepth,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetCanonicalEntityImpactCascadeFeature.Query(entityId, maxDepth ?? 2), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
 

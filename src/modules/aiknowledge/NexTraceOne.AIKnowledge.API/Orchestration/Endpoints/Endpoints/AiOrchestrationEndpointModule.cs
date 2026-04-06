@@ -21,6 +21,7 @@ using EvaluateArchitectureFitnessFeature = NexTraceOne.AIKnowledge.Application.O
 using EvaluateDocumentationQualityFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.EvaluateDocumentationQuality.EvaluateDocumentationQuality;
 using GenerateAdrFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GenerateArchitectureDecisionRecord.GenerateArchitectureDecisionRecord;
 using RecommendTemplateFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.RecommendTemplateForService.RecommendTemplateForService;
+using ReviewContractDraftFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.ReviewContractDraft.ReviewContractDraft;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -82,6 +83,16 @@ public sealed class AiOrchestrationEndpointModule
 
         group.MapPost("/suggest-version", async (
             SuggestSemanticVersionWithAIFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        group.MapPost("/review", async (
+            ReviewContractDraftFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>

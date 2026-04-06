@@ -15,6 +15,7 @@ using GetGateEvaluationFeature = NexTraceOne.ChangeGovernance.Application.Promot
 using GetPromotionStatusFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetPromotionStatus.GetPromotionStatus;
 using ListPromotionRequestsFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests.ListPromotionRequests;
 using OverrideGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.OverrideGateWithJustification.OverrideGateWithJustification;
+using EvaluateContractComplianceGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluateContractComplianceGate.EvaluateContractComplianceGate;
 
 namespace NexTraceOne.ChangeGovernance.API.Promotion.Endpoints.Endpoints;
 
@@ -139,5 +140,20 @@ public sealed class PromotionEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("promotion:gates:override");
+
+        group.MapGet("/requests/{id:guid}/contract-compliance", async (
+            Guid id,
+            string serviceName,
+            string targetEnvironmentName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new EvaluateContractComplianceGateFeature.Query(id, serviceName, targetEnvironmentName),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("promotion:requests:read");
     }
 }
