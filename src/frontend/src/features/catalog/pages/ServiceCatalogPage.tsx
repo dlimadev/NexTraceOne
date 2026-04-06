@@ -271,18 +271,18 @@ export function ServiceCatalogPage() {
                       <optgroup label={t('serviceCatalog.typeGroupModern', 'Modern Services')}>
                         <option value="RestApi">REST API</option>
                         <option value="GraphqlApi">GraphQL API</option>
-                        <option value="GrpcService">gRPC Service</option>
+                        <option value="GrpcService">{t('serviceCatalog.typeGrpcService', 'gRPC Service')}</option>
                         <option value="SoapService">SOAP Service</option>
                         <option value="KafkaProducer">Kafka Producer</option>
                         <option value="KafkaConsumer">Kafka Consumer</option>
                         <option value="BackgroundService">Background Service</option>
                         <option value="ScheduledProcess">Scheduled Process</option>
-                        <option value="Gateway">API Gateway</option>
+                        <option value="Gateway">{t('serviceCatalog.typeGateway', 'API Gateway')}</option>
                       </optgroup>
                       <optgroup label={t('serviceCatalog.typeGroupPlatform', 'Platform & Integration')}>
                         <option value="IntegrationComponent">Integration Component</option>
                         <option value="SharedPlatformService">Shared Platform Service</option>
-                        <option value="Framework">Framework / SDK</option>
+                        <option value="Framework">{t('serviceCatalog.typeFramework', 'Framework / SDK')}</option>
                         <option value="ThirdParty">Third-Party Service</option>
                         <option value="LegacySystem">Legacy System</option>
                       </optgroup>

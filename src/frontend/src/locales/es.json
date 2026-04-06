@@ -2021,7 +2021,29 @@
         "problemDetails": "Detalles del Problema (RFC 7807)",
         "previewExample": "Vista previa del Ejemplo",
         "copyExample": "Copiar",
-        "exampleCopied": "¡Copiado!"
+        "exampleCopied": "¡Copiado!",
+        "propNamePlaceholder": "nombreDePropiedad",
+        "propDescPlaceholder": "Descripción de esta propiedad...",
+        "refTarget": "Destino $ref (Entidad Canónica)",
+        "refHint": "Referencia un esquema compartido/canónico definido en el Catálogo de Entidades Canónicas",
+        "arrayItems": "Tipo de Elemento del Array",
+        "arrayItemsDesc": "Define el tipo de cada elemento en el array",
+        "nestedProperties": "Propiedades Anidadas",
+        "maxDepthReached": "Profundidad máxima de anidamiento alcanzada. Use $ref para estructuras más profundas.",
+        "addProperty": "Agregar Propiedad",
+        "addObject": "Objeto",
+        "addArray": "Array",
+        "addRef": "$ref",
+        "schemaMode": "Modo de Esquema",
+        "modeRef": "$ref (Referencia de Esquema)",
+        "modeVisualProps": "✦ Propiedades Visuales",
+        "refModeHint": "Referencia un esquema de Entidades Canónicas o define inline usando el modo Propiedades Visuales",
+        "bodyProperties": "Propiedades del Cuerpo de la Solicitud",
+        "addBodyProp": "Agregar Propiedad",
+        "responseProperties": "Propiedades de la Respuesta",
+        "addResponseProp": "Agregar Propiedad",
+        "exclusiveMin": "Mínimo Exclusivo",
+        "exclusiveMax": "Máximo Exclusivo"
       },
       "sharedSchema": {
         "addProperty": "Añadir Propiedad",
@@ -2108,7 +2130,14 @@
         "totalLengthMustBeNumber": "La longitud total debe ser un número positivo",
         "transactionIdRequired": "El ID de transacción es obligatorio para contratos CICS Commarea",
         "urlPatternRequired": "El patrón de URL es obligatorio",
-        "versionRequired": "La versión es obligatoria"
+        "versionRequired": "La versión es obligatoria",
+        "compositionRequiresVariants": "El tipo de composición requiere al menos una variante",
+        "propArrayRefRequired": "Los elementos del array deben definir un tipo o $ref",
+        "propMinGtMax": "minLength no puede ser mayor que maxLength",
+        "propMinValueGtMax": "minimum no puede ser mayor que maximum",
+        "propNameDuplicate": "Nombre de propiedad duplicado en este objeto",
+        "propNameRequired": "El nombre de la propiedad es obligatorio",
+        "propRefRequired": "El destino $ref es obligatorio para propiedades de referencia"
       },
       "webhook": {
         "addHeader": "Añadir Encabezado",
@@ -5819,7 +5848,38 @@
       "toSnapshot": "Snapshot de destino"
     },
     "title": "Catálogo de Servicios",
-    "trustLevel": "Nivel de Confianza"
+    "trustLevel": "Nivel de Confianza",
+    "basicInfo": "Información Básica",
+    "classification": "Clasificación",
+    "ownership": "Responsabilidad",
+    "references": "Referencias",
+    "domain": "Dominio",
+    "domainPlaceholder": "ej.: pagos, identidad, pedidos",
+    "namePlaceholder": "ej.: payment-service",
+    "teamPlaceholder": "ej.: platform-team",
+    "descriptionPlaceholder": "Describe el propósito y las responsabilidades de este servicio...",
+    "serviceType": "Tipo de Servicio",
+    "typeGroupModern": "Servicios Modernos",
+    "typeGroupPlatform": "Plataforma e Integración",
+    "typeGroupMainframe": "Mainframe",
+    "criticality": "Criticidad",
+    "criticalityLow": "Baja",
+    "criticalityMedium": "Media",
+    "criticalityHigh": "Alta",
+    "criticalityCritical": "Crítica",
+    "exposure": "Exposición",
+    "exposureInternal": "Interno",
+    "exposurePartner": "Socio",
+    "exposureExternal": "Externo / Público",
+    "technicalOwner": "Responsable Técnico",
+    "technicalOwnerPlaceholder": "ej.: juan.garcia@empresa.com",
+    "businessOwner": "Responsable de Negocio",
+    "businessOwnerPlaceholder": "ej.: Nombre del Product Manager",
+    "documentationUrl": "URL de Documentación",
+    "repositoryUrl": "URL del Repositorio",
+    "typeGrpcService": "Servicio gRPC",
+    "typeGateway": "API Gateway",
+    "typeFramework": "Framework / SDK"
   },
   "serviceMaturity": {
     "audit": {
@@ -6419,6 +6479,13 @@
         "repoUrl": "Repositorio Git opcional.",
         "baseContractSpec": "Contrato OpenAPI, AsyncAPI o WSDL incluido en cada servicio generado.",
         "scaffoldingManifest": "Array JSON de objetos { path, content }. Usa {{ServiceName}}, {{Domain}}, {{TeamName}} como variables."
+      },
+      "serviceTypes": {
+        "grpc": "gRPC"
+      },
+      "languages": {
+        "dotnet": ".NET",
+        "nodejs": "Node.js"
       }
     },
     "scaffold": {

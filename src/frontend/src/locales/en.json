@@ -2130,7 +2130,14 @@
         "totalLengthMustBeNumber": "Total length must be a positive number",
         "transactionIdRequired": "Transaction ID is required for CICS Commarea contracts",
         "urlPatternRequired": "URL pattern is required",
-        "versionRequired": "Version is required"
+        "versionRequired": "Version is required",
+        "compositionRequiresVariants": "Composition type requires at least one variant",
+        "propArrayRefRequired": "Array items must define a type or $ref",
+        "propMinGtMax": "minLength cannot be greater than maxLength",
+        "propMinValueGtMax": "minimum cannot be greater than maximum",
+        "propNameDuplicate": "Duplicate property name in this object",
+        "propNameRequired": "Property name is required",
+        "propRefRequired": "$ref target is required for reference properties"
       },
       "webhook": {
         "addHeader": "Add Header",
@@ -5866,7 +5873,10 @@
     "businessOwner": "Business Owner",
     "businessOwnerPlaceholder": "e.g., Product Manager Name",
     "documentationUrl": "Documentation URL",
-    "repositoryUrl": "Repository URL"
+    "repositoryUrl": "Repository URL",
+    "typeGrpcService": "gRPC Service",
+    "typeGateway": "API Gateway",
+    "typeFramework": "Framework / SDK"
   },
   "serviceMaturity": {
     "audit": {
@@ -6466,6 +6476,13 @@
         "repoUrl": "Optional Git repository used as source for the scaffolding.",
         "baseContractSpec": "OpenAPI, AsyncAPI or WSDL contract included in every generated service.",
         "scaffoldingManifest": "JSON array of { path, content } objects. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} as variables."
+      },
+      "serviceTypes": {
+        "grpc": "gRPC"
+      },
+      "languages": {
+        "dotnet": ".NET",
+        "nodejs": "Node.js"
       }
     },
     "scaffold": {
