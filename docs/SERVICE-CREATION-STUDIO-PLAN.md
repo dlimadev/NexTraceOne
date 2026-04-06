@@ -291,25 +291,25 @@ Quando um template é usado para scaffolding:
 
 ### 5.4 Frontend
 
-- [ ] **DependencyDashboardPage**: Visão global de saúde de dependências
+- [x] **DependencyDashboardPage**: Visão global de saúde de dependências ✅ `/catalog/dependency-dashboard`
 - [ ] **ServiceDependencyTab**: Tab no detalhe do serviço com lista de dependências
 - [ ] **VulnerabilityAlertBanner**: Banner em serviços com CVEs críticos
-- [ ] **LicenseComplianceView**: Visualização de licenças e conflitos
+- [x] **LicenseComplianceView**: Visualização de licenças e conflitos ✅ `LicenseCompliancePage` `/catalog/license-compliance`
 - [ ] **DependencyGraph (evolução)**: Expandir `DependencyGraph.tsx` existente para incluir pacotes
 
 ### 5.5 Tarefas de Implementação
 
-- [ ] **Domain**: Criar entidades `ServiceDependencyProfile`, `PackageDependency`, `PackageVulnerability`
-- [ ] **Domain**: Enums `PackageEcosystem`, `LicenseRiskLevel`, `VulnerabilitySeverity`, `ExploitMaturity`
-- [ ] **Application**: 10 features VSA (tabela acima)
-- [ ] **Infrastructure**: `DependencyGovernanceDbContext` + migration
+- [x] **Domain**: Criar entidades `ServiceDependencyProfile`, `PackageDependency`, `PackageVulnerability` ✅
+- [x] **Domain**: Enums `PackageEcosystem`, `LicenseRiskLevel`, `VulnerabilitySeverity`, `ExploitMaturity` ✅
+- [x] **Application**: 10 features VSA (tabela acima) ✅
+- [x] **Infrastructure**: `DependencyGovernanceDbContext` + migration ✅
 - [ ] **Infrastructure**: Adapters para GitHub Advisory, OSV, NVD APIs
 - [ ] **Infrastructure**: Parser de ficheiros de projeto (.csproj, package.json, pom.xml, go.mod, Cargo.toml)
-- [ ] **API**: 10 endpoints com rate limiting e autorização
-- [ ] **Frontend**: 5 componentes/páginas (tabela acima)
+- [x] **API**: 10 endpoints com rate limiting e autorização ✅
+- [x] **Frontend**: `DependencyDashboardPage` + `LicenseCompliancePage` ✅ (ServiceDependencyTab + VulnerabilityAlertBanner + DependencyGraph evolução pendentes)
 - [ ] **AI Agent**: Novo agente `dependency-advisor` no DefaultAgentCatalog
-- [ ] **i18n**: Keys para 4 locales
-- [ ] **Testes**: 30+ testes unitários
+- [x] **i18n**: Keys para 4 locales ✅
+- [x] **Testes**: 30+ testes unitários ✅
 
 ---
 
