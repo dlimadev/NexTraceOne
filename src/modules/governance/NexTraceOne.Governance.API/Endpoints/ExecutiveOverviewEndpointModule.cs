@@ -11,6 +11,10 @@ using GetMaturityScorecardsFeature = NexTraceOne.Governance.Application.Features
 using GetBenchmarkingFeature = NexTraceOne.Governance.Application.Features.GetBenchmarking.GetBenchmarking;
 using GetExecutiveTrendsFeature = NexTraceOne.Governance.Application.Features.GetExecutiveTrends.GetExecutiveTrends;
 using GetExecutiveDrillDownFeature = NexTraceOne.Governance.Application.Features.GetExecutiveDrillDown.GetExecutiveDrillDown;
+using ComputeDoraMetricsFeature = NexTraceOne.Governance.Application.Features.ComputeDoraMetrics.ComputeDoraMetrics;
+using GetDoraMetricsTrendFeature = NexTraceOne.Governance.Application.Features.GetDoraMetricsTrend.GetDoraMetricsTrend;
+using ComputeServiceScorecardFeature = NexTraceOne.Governance.Application.Features.ComputeServiceScorecard.ComputeServiceScorecard;
+using ListServiceScorecardsFeature = NexTraceOne.Governance.Application.Features.ListServiceScorecards.ListServiceScorecards;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -94,5 +98,73 @@ public sealed class ExecutiveOverviewEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");
+
+        // ── DORA Metrics ──────────────────────────────────────────────────────
+        group.MapGet("/dora-metrics", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string? serviceName,
+            string? teamName,
+            int periodDays = 30,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(
+                new ComputeDoraMetricsFeature.Query(serviceName, teamName, periodDays), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("governance:reports:read")
+        .WithName("ComputeDoraMetrics")
+        .WithSummary("Compute DORA metrics (Deployment Frequency, Lead Time, Change Failure Rate, MTTR)");
+
+        group.MapGet("/dora-metrics/trend", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string? serviceName,
+            int periodDays = 90,
+            int bucketDays = 7,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(
+                new GetDoraMetricsTrendFeature.Query(periodDays, bucketDays, serviceName), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("governance:reports:read")
+        .WithName("GetDoraMetricsTrend")
+        .WithSummary("Get DORA metrics trend over time as time-bucketed data points");
+
+        // ── Service Scorecards ────────────────────────────────────────────────
+        group.MapGet("/service-scorecards/{serviceName}", async (
+            string serviceName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            int periodDays = 30,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(
+                new ComputeServiceScorecardFeature.Query(serviceName, periodDays), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("governance:reports:read")
+        .WithName("ComputeServiceScorecard")
+        .WithSummary("Compute service scorecard across 8 maturity dimensions");
+
+        group.MapGet("/service-scorecards", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string? teamName,
+            string? domain,
+            string? maturityLevel,
+            int page = 1,
+            int pageSize = 20,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(
+                new ListServiceScorecardsFeature.Query(teamName, domain, maturityLevel, page, pageSize),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("governance:reports:read")
+        .WithName("ListServiceScorecards")
+        .WithSummary("List service scorecards for a team or domain, ordered by score");
     }
 }
