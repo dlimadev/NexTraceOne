@@ -18,7 +18,9 @@ const AutomationWorkflowsPage = lazy(() => import('../features/operations/pages/
 const AutomationAdminPage = lazy(() => import('../features/operations/pages/AutomationAdminPage').then(m => ({ default: m.AutomationAdminPage })));
 const AutomationWorkflowDetailPage = lazy(() => import('../features/operations/pages/AutomationWorkflowDetailPage').then(m => ({ default: m.AutomationWorkflowDetailPage })));
 const EnvironmentComparisonPage = lazy(() => import('../features/operations/pages/EnvironmentComparisonPage').then(m => ({ default: m.EnvironmentComparisonPage })));
-const PlatformOperationsPage = lazy(() => import('../features/operations/pages/PlatformOperationsPage').then(m => ({ default: m.PlatformOperationsPage })));
+const OnCallIntelligencePage = lazy(() => import('../features/operations/pages/OnCallIntelligencePage').then(m => ({ default: m.OnCallIntelligencePage })));
+const ChaosEngineeringPage = lazy(() => import('../features/operations/pages/ChaosEngineeringPage').then(m => ({ default: m.ChaosEngineeringPage })));
+const PredictiveIntelligencePage = lazy(() => import('../features/operations/pages/PredictiveIntelligencePage').then(m => ({ default: m.PredictiveIntelligencePage })));
 
 export function OperationsRoutes() {
   return (
@@ -124,6 +126,30 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:runtime:read" redirectTo="/unauthorized">
             <EnvironmentComparisonPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/on-call-intelligence"
+        element={
+          <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+            <OnCallIntelligencePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/chaos-engineering"
+        element={
+          <ProtectedRoute permission="operations:runtime:write" redirectTo="/unauthorized">
+            <ChaosEngineeringPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/predictive-intelligence"
+        element={
+          <ProtectedRoute permission="operations:runtime:read" redirectTo="/unauthorized">
+            <PredictiveIntelligencePage />
           </ProtectedRoute>
         }
       />

@@ -195,7 +195,7 @@ export function DependencyGraph({
         if (id) onSelectNode?.(id);
       }
     });
-  }, [buildGraphData, onSelectNode]);
+  }, [buildGraphData, onSelectNode, t]);
 
   // Resize reactivo via ResizeObserver
   useEffect(() => {

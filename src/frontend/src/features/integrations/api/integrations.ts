@@ -9,6 +9,43 @@ import type {
   IngestionFreshnessResponse,
 } from '../../../types';
 
+export interface WebhookEventTypeDto {
+  code: string;
+  category: string;
+  description: string;
+}
+
+export interface WebhookSubscriptionDto {
+  subscriptionId: string;
+  name: string;
+  targetUrl: string;
+  eventTypes: string[];
+  hasSecret: boolean;
+  isActive: boolean;
+  eventCount: number;
+  createdAt: string;
+  lastTriggeredAt: string | null;
+}
+
+export interface WebhookSubscriptionsListResponse {
+  items: WebhookSubscriptionDto[];
+  totalCount: number;
+}
+
+export interface WebhookEventTypesResponse {
+  eventTypes: WebhookEventTypeDto[];
+}
+
+export interface RegisterWebhookSubscriptionRequest {
+  tenantId: string;
+  name: string;
+  targetUrl: string;
+  eventTypes: string[];
+  secret?: string;
+  description?: string;
+  isActive?: boolean;
+}
+
 /** Cliente de API para Integration Hub & Ingestion. */
 export const integrationsApi = {
   listConnectors: (params?: {
@@ -59,4 +96,13 @@ export const integrationsApi = {
 
   getFreshness: (dataDomain?: string) =>
     client.get<IngestionFreshnessResponse>('/ingestion/freshness', { params: { dataDomain } }).then((r) => r.data),
+
+  getWebhookEventTypes: () =>
+    client.get<WebhookEventTypesResponse>('/integrations/webhooks/event-types').then((r) => r.data),
+
+  listWebhookSubscriptions: (params?: { tenantId?: string; isActive?: boolean; page?: number; pageSize?: number }) =>
+    client.get<WebhookSubscriptionsListResponse>('/integrations/webhooks/subscriptions', { params }).then((r) => r.data),
+
+  registerWebhookSubscription: (data: RegisterWebhookSubscriptionRequest) =>
+    client.post<WebhookSubscriptionDto>('/integrations/webhooks/subscriptions', data).then((r) => r.data),
 };

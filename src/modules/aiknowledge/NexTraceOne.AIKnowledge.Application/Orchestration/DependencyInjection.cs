@@ -16,6 +16,7 @@ using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAiConversati
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.SuggestSemanticVersionWithAI;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.SummarizeReleaseForApproval;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.ValidateKnowledgeCapture;
+using NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAgentMarketplace;
 using NexTraceOne.AIKnowledge.Application.Orchestration.Features.RecommendTemplateForService;
 using NexTraceOne.BuildingBlocks.Application;
 
@@ -49,6 +50,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<EvaluateDocumentationQuality.Command>, EvaluateDocumentationQuality.Validator>();
         services.AddTransient<IValidator<GenerateArchitectureDecisionRecord.Command>, GenerateArchitectureDecisionRecord.Validator>();
         services.AddTransient<IValidator<RecommendTemplateForService.Command>, RecommendTemplateForService.Validator>();
+        services.AddTransient<IValidator<GetAgentMarketplace.Query>, GetAgentMarketplace.Validator>();
         return services;
     }
 }

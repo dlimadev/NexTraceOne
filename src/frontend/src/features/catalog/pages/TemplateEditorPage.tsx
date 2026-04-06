@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +42,40 @@ const INPUT_CLASS =
 const SELECT_CLASS =
   'w-full rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm text-neutral-200 outline-none focus:border-blue-500';
 
+// ── Form state ────────────────────────────────────────────────────────────────
+
+interface TemplateFormState {
+  slug: string;
+  displayName: string;
+  description: string;
+  version: string;
+  serviceType: TemplateServiceType;
+  language: TemplateLanguage;
+  defaultDomain: string;
+  defaultTeam: string;
+  tagsInput: string;
+  baseContractSpec: string;
+  scaffoldingManifestJson: string;
+  repositoryTemplateUrl: string;
+  repositoryTemplateBranch: string;
+}
+
+const DEFAULT_FORM_STATE: TemplateFormState = {
+  slug: '',
+  displayName: '',
+  description: '',
+  version: '1.0.0',
+  serviceType: 'RestApi',
+  language: 'DotNet',
+  defaultDomain: '',
+  defaultTeam: '',
+  tagsInput: '',
+  baseContractSpec: '',
+  scaffoldingManifestJson: '',
+  repositoryTemplateUrl: '',
+  repositoryTemplateBranch: '',
+};
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export function TemplateEditorPage() {
@@ -51,22 +85,6 @@ export function TemplateEditorPage() {
   const queryClient = useQueryClient();
   const isEditing = !!id;
 
-  // Form state
-  const [slug, setSlug] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [description, setDescription] = useState('');
-  const [version, setVersion] = useState('1.0.0');
-  const [serviceType, setServiceType] = useState<TemplateServiceType>('RestApi');
-  const [language, setLanguage] = useState<TemplateLanguage>('DotNet');
-  const [defaultDomain, setDefaultDomain] = useState('');
-  const [defaultTeam, setDefaultTeam] = useState('');
-  const [tagsInput, setTagsInput] = useState('');
-  const [baseContractSpec, setBaseContractSpec] = useState('');
-  const [scaffoldingManifestJson, setScaffoldingManifestJson] = useState('');
-  const [repositoryTemplateUrl, setRepositoryTemplateUrl] = useState('');
-  const [repositoryTemplateBranch, setRepositoryTemplateBranch] = useState('');
-  const [error, setError] = useState<string | null>(null);
-
   // Load existing template when editing
   const { data: existing } = useQuery({
     queryKey: ['service-template', id],
@@ -74,23 +92,48 @@ export function TemplateEditorPage() {
     enabled: isEditing,
   });
 
-  useEffect(() => {
-    if (existing) {
-      setSlug(existing.slug);
-      setDisplayName(existing.displayName);
-      setDescription(existing.description);
-      setVersion(existing.version);
-      setServiceType(existing.serviceType);
-      setLanguage(existing.language);
-      setDefaultDomain(existing.defaultDomain);
-      setDefaultTeam(existing.defaultTeam);
-      setTagsInput(existing.tags.join(', '));
-      setBaseContractSpec(existing.baseContractSpec ?? '');
-      setScaffoldingManifestJson(existing.scaffoldingManifestJson ?? '');
-      setRepositoryTemplateUrl(existing.repositoryTemplateUrl ?? '');
-      setRepositoryTemplateBranch(existing.repositoryTemplateBranch ?? '');
-    }
+  // Derive initial form state from existing data (avoids setState-in-useEffect)
+  const initialState = useMemo<TemplateFormState>(() => {
+    if (!existing) return DEFAULT_FORM_STATE;
+    return {
+      slug: existing.slug,
+      displayName: existing.displayName,
+      description: existing.description,
+      version: existing.version,
+      serviceType: existing.serviceType,
+      language: existing.language,
+      defaultDomain: existing.defaultDomain,
+      defaultTeam: existing.defaultTeam,
+      tagsInput: existing.tags.join(', '),
+      baseContractSpec: existing.baseContractSpec ?? '',
+      scaffoldingManifestJson: existing.scaffoldingManifestJson ?? '',
+      repositoryTemplateUrl: existing.repositoryTemplateUrl ?? '',
+      repositoryTemplateBranch: existing.repositoryTemplateBranch ?? '',
+    };
   }, [existing]);
+
+  // Form state — single object, re-initialized when existing data loads
+  const [form, setForm] = useState<TemplateFormState>(DEFAULT_FORM_STATE);
+  const [formKey, setFormKey] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  // Sync form state when initial data arrives (key-based reset avoids setState-in-effect)
+  const currentKey = existing ? existing.slug : '__new__';
+  if (currentKey !== '__new__' && formKey === 0) {
+    setForm(initialState);
+    setFormKey(1);
+  }
+
+  const updateField = <K extends keyof TemplateFormState>(key: K, value: TemplateFormState[K]) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+  };
+
+  // Destructure for easier access in JSX
+  const {
+    slug, displayName, description, version, serviceType, language,
+    defaultDomain, defaultTeam, tagsInput, baseContractSpec,
+    scaffoldingManifestJson, repositoryTemplateUrl, repositoryTemplateBranch,
+  } = form;
 
   const createMutation = useMutation({
     mutationFn: (body: CreateTemplateRequest) => templatesApi.create(body),
@@ -201,7 +244,7 @@ export function TemplateEditorPage() {
                   className={INPUT_CLASS}
                   placeholder="payment-api"
                   value={slug}
-                  onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                  onChange={e => updateField('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                   required
                 />
               </FormField>
@@ -212,7 +255,7 @@ export function TemplateEditorPage() {
                 className={INPUT_CLASS}
                 placeholder={t('templates.editor.placeholders.displayName')}
                 value={displayName}
-                onChange={e => setDisplayName(e.target.value)}
+                onChange={e => updateField('displayName', e.target.value)}
                 required
               />
             </FormField>
@@ -222,7 +265,7 @@ export function TemplateEditorPage() {
                 className={INPUT_CLASS}
                 placeholder="1.0.0"
                 value={version}
-                onChange={e => setVersion(e.target.value)}
+                onChange={e => updateField('version', e.target.value)}
                 required
               />
             </FormField>
@@ -234,7 +277,7 @@ export function TemplateEditorPage() {
               rows={3}
               placeholder={t('templates.editor.placeholders.description')}
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={e => updateField('description', e.target.value)}
               required
             />
           </FormField>
@@ -248,7 +291,7 @@ export function TemplateEditorPage() {
               <select
                 className={SELECT_CLASS}
                 value={serviceType}
-                onChange={e => setServiceType(e.target.value as TemplateServiceType)}
+                onChange={e => updateField('serviceType', e.target.value as TemplateServiceType)}
                 disabled={isEditing}
               >
                 <option value="RestApi">REST API</option>
@@ -264,7 +307,7 @@ export function TemplateEditorPage() {
               <select
                 className={SELECT_CLASS}
                 value={language}
-                onChange={e => setLanguage(e.target.value as TemplateLanguage)}
+                onChange={e => updateField('language', e.target.value as TemplateLanguage)}
                 disabled={isEditing}
               >
                 <option value="DotNet">{t('templates.editor.languages.dotnet', '.NET')}</option>
@@ -291,7 +334,7 @@ export function TemplateEditorPage() {
                 className={INPUT_CLASS}
                 placeholder={t('templates.editor.placeholders.domain')}
                 value={defaultDomain}
-                onChange={e => setDefaultDomain(e.target.value)}
+                onChange={e => updateField('defaultDomain', e.target.value)}
                 required
               />
             </FormField>
@@ -301,7 +344,7 @@ export function TemplateEditorPage() {
                 className={INPUT_CLASS}
                 placeholder={t('templates.editor.placeholders.team')}
                 value={defaultTeam}
-                onChange={e => setDefaultTeam(e.target.value)}
+                onChange={e => updateField('defaultTeam', e.target.value)}
                 required
               />
             </FormField>
@@ -312,7 +355,7 @@ export function TemplateEditorPage() {
               className={INPUT_CLASS}
               placeholder="ddd, clean-architecture, payments"
               value={tagsInput}
-              onChange={e => setTagsInput(e.target.value)}
+              onChange={e => updateField('tagsInput', e.target.value)}
             />
           </FormField>
         </div>
@@ -327,7 +370,7 @@ export function TemplateEditorPage() {
                 className={INPUT_CLASS}
                 placeholder="https://github.com/org/template-name"
                 value={repositoryTemplateUrl}
-                onChange={e => setRepositoryTemplateUrl(e.target.value)}
+                onChange={e => updateField('repositoryTemplateUrl', e.target.value)}
               />
             </FormField>
 
@@ -336,7 +379,7 @@ export function TemplateEditorPage() {
                 className={INPUT_CLASS}
                 placeholder="main"
                 value={repositoryTemplateBranch}
-                onChange={e => setRepositoryTemplateBranch(e.target.value)}
+                onChange={e => updateField('repositoryTemplateBranch', e.target.value)}
               />
             </FormField>
           </div>
@@ -350,7 +393,7 @@ export function TemplateEditorPage() {
               rows={8}
               placeholder="openapi: 3.0.0&#10;info:&#10;  title: Payment API&#10;  version: 1.0.0&#10;paths: ..."
               value={baseContractSpec}
-              onChange={e => setBaseContractSpec(e.target.value)}
+              onChange={e => updateField('baseContractSpec', e.target.value)}
             />
           </FormField>
 
@@ -363,7 +406,7 @@ export function TemplateEditorPage() {
               rows={8}
               placeholder={'[\n  { "path": "src/Controllers/{{ServiceNamePascal}}Controller.cs", "content": "..." },\n  { "path": "README.md", "content": "# {{ServiceName}}" }\n]'}
               value={scaffoldingManifestJson}
-              onChange={e => setScaffoldingManifestJson(e.target.value)}
+              onChange={e => updateField('scaffoldingManifestJson', e.target.value)}
             />
           </FormField>
         </div>

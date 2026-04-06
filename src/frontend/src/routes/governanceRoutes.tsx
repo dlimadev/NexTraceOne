@@ -31,6 +31,11 @@ const GovernancePackDetailPage = lazy(() => import('../features/governance/pages
 const WaiversPage = lazy(() => import('../features/governance/pages/WaiversPage').then(m => ({ default: m.WaiversPage })));
 const DelegatedAdminPage = lazy(() => import('../features/governance/pages/DelegatedAdminPage').then(m => ({ default: m.DelegatedAdminPage })));
 const GovernanceConfigurationPage = lazy(() => import('../features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
+const DoraMetricsPage = lazy(() => import('../features/governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
+const ServiceScorecardPage = lazy(() => import('../features/governance/pages/ServiceScorecardPage').then(m => ({ default: m.ServiceScorecardPage })));
+const CustomDashboardsPage = lazy(() => import('../features/governance/pages/CustomDashboardsPage').then(m => ({ default: m.CustomDashboardsPage })));
+const TechnicalDebtPage = lazy(() => import('../features/governance/pages/TechnicalDebtPage').then(m => ({ default: m.TechnicalDebtPage })));
+const ApiPolicyAsCodePage = lazy(() => import('../features/governance/pages/ApiPolicyAsCodePage').then(m => ({ default: m.ApiPolicyAsCodePage })));
 
 export function GovernanceRoutes() {
   return (
@@ -232,6 +237,54 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <GovernanceConfigurationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/dora-metrics"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <DoraMetricsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/scorecards"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ServiceScorecardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/scorecards/:serviceName"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ServiceScorecardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/custom-dashboards"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <CustomDashboardsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/technical-debt"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <TechnicalDebtPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/api-policy-as-code"
+        element={
+          <ProtectedRoute permission="governance:policies:read" redirectTo="/unauthorized">
+            <ApiPolicyAsCodePage />
           </ProtectedRoute>
         }
       />

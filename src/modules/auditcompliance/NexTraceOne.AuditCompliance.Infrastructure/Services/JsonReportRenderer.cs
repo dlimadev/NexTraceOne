@@ -2,23 +2,18 @@ using System.Text;
 using System.Text.Json;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 
 /// <summary>
-/// Implementação padrão de IReportRenderer que serializa o relatório como JSON formatado.
+/// Implementação de IReportRenderer que serializa o relatório como JSON formatado.
 ///
-/// Estratégia multi-formato:
-///   - JSON → serialização JSON com indentação (provider padrão, sem dependências externas)
-///   - PDF  → stub que devolve JSON até QuestPDF ser integrado (IReportRenderer abstrai a transição)
-///   - XLSX → stub que devolve JSON até ClosedXML ser integrado (IReportRenderer abstrai a transição)
-///
-/// A interface IReportRenderer garante que quando os adapters de PDF/XLSX forem
-/// implementados, basta registar um novo IReportRenderer no DI sem alterar handlers.
+/// Usado como formato padrão e fallback quando o formato solicitado não é PDF/XLSX.
 ///
 /// Persona: Auditor, Executive.
 /// </summary>
-public sealed class JsonReportRenderer : IReportRenderer
+public sealed class JsonReportRenderer(IDateTimeProvider dateTimeProvider) : IReportRenderer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -32,18 +27,14 @@ public sealed class JsonReportRenderer : IReportRenderer
         string format,
         CancellationToken cancellationToken = default)
     {
-        // Todos os formatos recebem JSON estruturado enquanto adapters PDF/XLSX não existem.
-        // O campo Format na resposta identifica o formato solicitado para auditores.
+        // JSON é o formato padrão para auditoria.
         var json = JsonSerializer.Serialize(report, SerializerOptions);
         var bytes = Encoding.UTF8.GetBytes(json);
+        var now = dateTimeProvider.UtcNow;
 
-        var (contentType, fileName) = format.ToUpperInvariant() switch
-        {
-            "PDF"  => ("application/json", "audit-report.json"),   // placeholder até QuestPDF
-            "XLSX" => ("application/json", "audit-report.json"),   // placeholder até ClosedXML
-            _      => ("application/json", "audit-report.json")
-        };
-
-        return Task.FromResult(new RenderedReport(bytes, contentType, fileName));
+        return Task.FromResult(new RenderedReport(
+            bytes,
+            "application/json",
+            $"audit-report-{now:yyyyMMdd-HHmmss}.json"));
     }
 }

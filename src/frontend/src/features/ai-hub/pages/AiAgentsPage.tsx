@@ -529,7 +529,7 @@ export function AiAgentsPage() {
     staleTime: 5 * 60_000,
   });
 
-  const agents = agentsQuery.data?.items ?? [];
+  const agents = useMemo(() => agentsQuery.data?.items ?? [], [agentsQuery.data?.items]);
 
   const availableCategories = useMemo(() => {
     const fromEndpoint = agentCategoriesQuery.data?.items ?? [];

@@ -206,16 +206,10 @@ describe('SchemaPropertyEditor', () => {
     const onChange = vi.fn();
     render(<SchemaPropertyEditor properties={props} onChange={onChange} />);
 
-    // Find all ArrowUp buttons — second one should be enabled (move 'second' up)
-    const allButtons = screen.getAllByRole('button');
-    const arrowUpButtons = allButtons.filter(btn => {
-      const svg = btn.querySelector('svg');
-      return svg && btn.getAttribute('disabled') === null && btn.previousElementSibling === null;
-    });
-
     // Find the up arrow for the second property (the one that isn't disabled)
     // We look for buttons that are not disabled and are in the second property row
-    const upButtons = screen.getAllByRole('button').filter(btn => {
+    const allButtons = screen.getAllByRole('button');
+    const upButtons = allButtons.filter(btn => {
       const svg = btn.querySelector('svg');
       if (!svg) return false;
       // Up arrow buttons - check that it's not disabled and near text 'second'

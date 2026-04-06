@@ -703,31 +703,31 @@ Baseado na análise do produto, tendências de mercado (Platform Engineering, AI
 
 ### Wave 1 (Próximos 2-3 meses)
 
-- [ ] Service Scorecard Engine (fundação para todas as métricas)
-- [ ] DORA Metrics Dashboard (quick win com dados existentes)
-- [ ] Environment Drift Visual (materializa princípio core do produto)
+- [x] Service Scorecard Engine (fundação para todas as métricas) ✅ `ComputeServiceScorecard` + `ListServiceScorecards` + `ServiceScorecardPage`
+- [x] DORA Metrics Dashboard (quick win com dados existentes) ✅ `ComputeDoraMetrics` + `GetDoraMetricsTrend` + `DoraMetricsPage`
+- [x] Environment Drift Visual (materializa princípio core do produto) ✅ `DetectRuntimeDrift` + `GetDriftFindings` + `EnvironmentComparisonPage`
 
 ### Wave 2 (3-6 meses)
 
-- [ ] AI-Powered Root Cause Analysis
-- [ ] Contract Testing as a Service
-- [ ] FinOps Anomaly Detection
-- [ ] Knowledge Graph Visual
+- [x] AI-Powered Root Cause Analysis ✅ `GetRootCauseSuggestion` + `TriageIncident` + `SelectMitigationPlaybook`
+- [x] Contract Testing as a Service ✅ `RegisterConsumerExpectation` + `VerifyProviderCompatibility`
+- [x] FinOps Anomaly Detection ✅ `DetectCostAnomalies` + `AlertCostAnomaly` + `CorrelateCloudCostWithChange`
+- [x] Knowledge Graph Visual ✅ `GetKnowledgeGraphOverview` + `KnowledgeGraphPage`
 
 ### Wave 3 (6-9 meses)
 
-- [ ] Predictive Change Failure ML
-- [ ] API Policy as Code
-- [ ] Developer Experience Score
-- [ ] Self-Service Actions Portal
+- [x] Predictive Change Failure ML ✅ `PredictServiceFailure` + `GetChangeRiskPrediction` + `PredictiveIntelligencePage`
+- [x] API Policy as Code ✅ `RegisterPolicyAsCode` + `GetPolicyAsCode` + `SimulatePolicyApplication` + `ApiPolicyAsCodePage`
+- [x] Developer Experience Score ✅ `ComputeDeveloperExperienceScore` + `GetDeveloperExperienceScore` + `DeveloperExperienceScorePage`
+- [x] Self-Service Actions Portal ✅ `SelfServicePortalPage` (18 action tiles)
 
 ### Wave 4 (9-12 meses)
 
-- [ ] AI Agent Marketplace
-- [ ] Chaos Engineering Integration
-- [ ] Auto Documentation Generation
-- [ ] On-Call Intelligence
-- [ ] Custom Dashboards Builder
+- [x] AI Agent Marketplace ✅ `GetAgentMarketplace` + `AgentMarketplacePage`
+- [x] Chaos Engineering Integration ✅ `CreateChaosExperiment` + `ListChaosExperiments` + `ChaosEngineeringPage`
+- [x] Auto Documentation Generation ✅ `GenerateAutoDocumentation` + `AutoDocumentationPage`
+- [x] On-Call Intelligence ✅ `GetOnCallIntelligence` + `OnCallIntelligencePage`
+- [x] Custom Dashboards Builder ✅ `CreateCustomDashboard` + `ListCustomDashboards` + `CustomDashboardsPage`
 
 ---
 

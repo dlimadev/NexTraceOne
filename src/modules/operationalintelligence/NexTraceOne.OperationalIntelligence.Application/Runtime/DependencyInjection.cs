@@ -8,6 +8,8 @@ using NexTraceOne.OperationalIntelligence.Application.Automation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents;
 using NexTraceOne.OperationalIntelligence.Application.Reliability;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareEnvironments;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CreateChaosExperiment;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ListChaosExperiments;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareReleaseRuntime;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ComputeObservabilityDebt;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateServiceMetrics;
@@ -53,6 +55,10 @@ public static class DependencyInjection
         // P6.5 — Operational Consistency: baseline establishment + cross-environment comparison
         services.AddTransient<IValidator<EstablishRuntimeBaseline.Command>, EstablishRuntimeBaseline.Validator>();
         services.AddTransient<IValidator<CompareEnvironments.Command>, CompareEnvironments.Validator>();
+
+        // Chaos Engineering: experiment planning
+        services.AddTransient<IValidator<CreateChaosExperiment.Command>, CreateChaosExperiment.Validator>();
+        services.AddTransient<IValidator<ListChaosExperiments.Query>, ListChaosExperiments.Validator>();
 
         // P5.4 — Observability Correlation Engine
         services.AddTransient<IValidator<CorrelateTraceToChange.Query>, CorrelateTraceToChange.Validator>();

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 using NexTraceOne.IdentityAccess.Domain.ValueObjects;
@@ -9,7 +11,8 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Context;
 /// Resolve o contexto operacional completo validando que o ambiente pertence ao tenant.
 /// </summary>
 internal sealed class TenantEnvironmentContextResolver(
-    IEnvironmentRepository environmentRepository) : ITenantEnvironmentContextResolver
+    IEnvironmentRepository environmentRepository,
+    ILogger<TenantEnvironmentContextResolver> logger) : ITenantEnvironmentContextResolver
 {
     /// <inheritdoc />
     public async Task<TenantEnvironmentContext?> ResolveAsync(
@@ -20,15 +23,30 @@ internal sealed class TenantEnvironmentContextResolver(
         var environment = await environmentRepository.GetByIdAsync(environmentId, cancellationToken);
 
         if (environment is null)
+        {
+            logger.LogWarning(
+                "Environment context resolution failed: environment {EnvironmentId} not found for tenant {TenantId}",
+                environmentId, tenantId);
             return null;
+        }
 
         // Garantia de isolamento: o ambiente deve pertencer ao tenant ativo.
         if (environment.TenantId != tenantId)
+        {
+            logger.LogWarning(
+                "Environment context resolution failed: environment {EnvironmentId} belongs to tenant {OwnerTenantId}, not {RequestedTenantId} — potential tenant isolation violation",
+                environmentId, environment.TenantId, tenantId);
             return null;
+        }
 
         // Ambientes inativos não devem gerar contexto operacional válido.
         if (!environment.IsActive)
+        {
+            logger.LogWarning(
+                "Environment context resolution failed: environment {EnvironmentId} is inactive for tenant {TenantId}",
+                environmentId, tenantId);
             return null;
+        }
 
         return TenantEnvironmentContext.From(environment);
     }

@@ -67,11 +67,8 @@ test.describe('Change Governance — approve decision flow', () => {
   });
 
   test('clicking Approve sends approval decision to API', async ({ page }) => {
-    let decisionPayload: Record<string, unknown> | null = null;
-
     await page.route('**/api/v1/changes/chg-001/decision**', async (route) => {
       if (route.request().method() === 'POST') {
-        decisionPayload = JSON.parse(await route.request().postData() ?? '{}');
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -106,11 +103,8 @@ test.describe('Change Governance — approve decision flow', () => {
   });
 
   test('clicking Reject shows reason field and sends rejection', async ({ page }) => {
-    let decisionPayload: Record<string, unknown> | null = null;
-
     await page.route('**/api/v1/changes/chg-001/decision**', async (route) => {
       if (route.request().method() === 'POST') {
-        decisionPayload = JSON.parse(await route.request().postData() ?? '{}');
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -273,11 +267,8 @@ test.describe('Promotion — create request flow', () => {
   });
 
   test('opens form and submits promotion request', async ({ page }) => {
-    let promotionCreated = false;
-
     await page.route('**/api/v1/promotion/requests', async (route) => {
       if (route.request().method() === 'POST') {
-        promotionCreated = true;
         await route.fulfill({
           status: 201,
           contentType: 'application/json',

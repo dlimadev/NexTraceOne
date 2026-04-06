@@ -25,6 +25,10 @@ const TemplateEditorPage = lazy(() => import('../features/catalog/pages/Template
 const AiScaffoldWizardPage = lazy(() => import('../features/catalog/pages/AiScaffoldWizardPage').then(m => ({ default: m.AiScaffoldWizardPage })));
 const ContractPipelinePage = lazy(() => import('../features/catalog/pages/ContractPipelinePage').then(m => ({ default: m.ContractPipelinePage })));
 const SecurityGateDashboardPage = lazy(() => import('../features/catalog/pages/SecurityGateDashboardPage').then(m => ({ default: m.SecurityGateDashboardPage })));
+const SelfServicePortalPage = lazy(() => import('../features/catalog/pages/SelfServicePortalPage').then(m => ({ default: m.SelfServicePortalPage })));
+const DeveloperExperienceScorePage = lazy(() => import('../features/catalog/pages/DeveloperExperienceScorePage').then(m => ({ default: m.DeveloperExperienceScorePage })));
+const DependencyDashboardPage = lazy(() => import('../features/catalog/pages/DependencyDashboardPage').then(m => ({ default: m.DependencyDashboardPage })));
+const LicenseCompliancePage = lazy(() => import('../features/catalog/pages/LicenseCompliancePage').then(m => ({ default: m.LicenseCompliancePage })));
 
 export function CatalogRoutes() {
   return (
@@ -189,6 +193,38 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="governance:security:scan" redirectTo="/unauthorized">
             <SecurityGateDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/self-service"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <SelfServicePortalPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/developer-experience-score"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <DeveloperExperienceScorePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/dependency-dashboard"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <DependencyDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/license-compliance"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <LicenseCompliancePage />
           </ProtectedRoute>
         }
       />

@@ -7,10 +7,8 @@ namespace NexTraceOne.AuditCompliance.Application.Abstractions;
 ///   - Esta interface fica na Application Layer e permite que o handler produza
 ///     o relatório independente do formato final.
 ///   - A implementação concreta fica na Infrastructure Layer.
-///   - Em ambiente sem biblioteca de rendering externa (QuestPDF, ClosedXML),
-///     o provider padrão devolve JSON serializado.
-///   - Quando QuestPDF/ClosedXML estiverem disponíveis, novos adapters podem ser
-///     registados no DI sem alterar o handler.
+///   - Adapters disponíveis: PdfSharpCore (PDF, MIT), ClosedXML (XLSX, MIT).
+///   - Novos formatos podem ser registados no DI sem alterar o handler.
 ///
 /// Persona: Auditor, Executive.
 /// Valor: desacopla lógica de negócio (recolha + assinatura) de lógica de apresentação.

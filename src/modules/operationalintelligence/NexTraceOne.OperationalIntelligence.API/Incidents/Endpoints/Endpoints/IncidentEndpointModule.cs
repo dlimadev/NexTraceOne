@@ -25,6 +25,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RefreshIncidentCorrelation;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SelectMitigationPlaybook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.TriageIncident;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetOnCallIntelligence;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.API.Incidents.Endpoints.Endpoints;
@@ -346,6 +347,21 @@ public sealed class IncidentEndpointModule
         .RequirePermission("operations:incidents:read")
         .WithName("SelectMitigationPlaybook")
         .WithSummary("Auto-select the best mitigation playbook (runbook) for an incident based on triage context");
+
+        // ── GET /api/v1/incidents/on-call-intelligence — On-Call Intelligence ──
+        group.MapGet("/on-call-intelligence", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string teamId,
+            int periodDays = 30,
+            CancellationToken cancellationToken = default) =>
+        {
+            var result = await sender.Send(new GetOnCallIntelligence.Query(teamId, periodDays), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:incidents:read")
+        .WithName("GetOnCallIntelligence")
+        .WithSummary("On-call intelligence: incident distribution, fatigue indicators and recommendations for a team");
     }
 }
 
