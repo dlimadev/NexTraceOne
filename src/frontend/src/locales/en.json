@@ -1288,7 +1288,10 @@
       "total": "Total Services"
     },
     "title": "Service Catalog",
-    "totalCount": "({{count}} total)"
+    "totalCount": "({{count}} total)",
+    "services": {
+      "addContract": "Add Contract"
+    }
   },
   "catalogContractsConfig": {
     "actions": {
@@ -2181,6 +2184,15 @@
         "triggerType": "Trigger Type",
         "validate": "Validate",
         "webhookUrl": "Webhook Path"
+      },
+      "canonical": {
+        "picker": {
+          "title": "Browse Canonical Entities",
+          "search": "Search entities...",
+          "select": "Select",
+          "empty": "No canonical entities found",
+          "browse": "Browse"
+        }
       }
     },
     "canonical": {

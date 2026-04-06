@@ -1288,7 +1288,10 @@
       "total": "Total de Serviços"
     },
     "title": "Catálogo de Serviços",
-    "totalCount": "({{count}} total)"
+    "totalCount": "({{count}} total)",
+    "services": {
+      "addContract": "Adicionar Contrato"
+    }
   },
   "catalogContractsConfig": {
     "actions": {
@@ -2159,6 +2162,15 @@
         "triggerType": "Gatilho Tipo",
         "validate": "Validar",
         "webhookUrl": "Webhook Caminho"
+      },
+      "canonical": {
+        "picker": {
+          "title": "Procurar Entidades Canónicas",
+          "search": "Pesquisar entidades...",
+          "select": "Selecionar",
+          "empty": "Nenhuma entidade canónica encontrada",
+          "browse": "Procurar"
+        }
       }
     },
     "canonical": {

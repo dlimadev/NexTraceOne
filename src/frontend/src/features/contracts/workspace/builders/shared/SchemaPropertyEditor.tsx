@@ -13,9 +13,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Plus, Trash2, ChevronDown, ChevronRight, ArrowUp, ArrowDown,
-  Braces, Hash, Type, ToggleLeft, List, Link2, FileJson,
+  Braces, Hash, Type, ToggleLeft, List, Link2, FileJson, BookOpen,
 } from 'lucide-react';
 import type { SchemaProperty, PropertyConstraints } from './builderTypes';
+import { CanonicalEntityPicker } from './CanonicalEntityPicker';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -92,6 +93,7 @@ export function SchemaPropertyEditor({
 }: SchemaPropertyEditorProps) {
   const { t } = useTranslation();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [pickerForPropId, setPickerForPropId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
@@ -119,7 +121,9 @@ export function SchemaPropertyEditor({
     const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= properties.length) return;
     const next = [...properties];
-    [next[index], next[newIndex]] = [next[newIndex], next[index]];
+    const tmp = next[index]!;
+    next[index] = next[newIndex]!;
+    next[newIndex] = tmp;
     onChange(next);
   };
 
@@ -257,14 +261,26 @@ export function SchemaPropertyEditor({
                     <label className="block text-[9px] text-muted mb-0.5">
                       {t('contracts.builder.rest.refTarget', '$ref Target (Canonical Entity)')}
                     </label>
-                    <input
-                      type="text"
-                      value={prop.$ref ?? ''}
-                      onChange={(e) => updateProperty(prop.id, { $ref: e.target.value })}
-                      placeholder="#/components/schemas/Address"
-                      disabled={isReadOnly}
-                      className="w-full text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
-                    />
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        value={prop.$ref ?? ''}
+                        onChange={(e) => updateProperty(prop.id, { $ref: e.target.value })}
+                        placeholder="#/components/schemas/Address"
+                        disabled={isReadOnly}
+                        className="flex-1 text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
+                      />
+                      {!isReadOnly && (
+                        <button
+                          type="button"
+                          onClick={() => setPickerForPropId(prop.id)}
+                          className="flex items-center gap-1 text-[9px] font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2 py-1 transition-colors whitespace-nowrap"
+                        >
+                          <BookOpen size={10} />
+                          {t('contracts.builder.canonical.picker.browse', 'Browse')}
+                        </button>
+                      )}
+                    </div>
                     <p className="text-[8px] text-muted/50 mt-0.5">
                       {t('contracts.builder.rest.refHint', 'Reference a shared/canonical schema defined in the Canonical Entity Catalog')}
                     </p>
@@ -397,6 +413,15 @@ export function SchemaPropertyEditor({
             <Link2 size={9} /> {t('contracts.builder.rest.addRef', '$ref')}
           </button>
         </div>
+      )}
+      {pickerForPropId && (
+        <CanonicalEntityPicker
+          onSelect={(ref) => {
+            updateProperty(pickerForPropId, { $ref: ref });
+            setPickerForPropId(null);
+          }}
+          onClose={() => setPickerForPropId(null)}
+        />
       )}
     </div>
   );

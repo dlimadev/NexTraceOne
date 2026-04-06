@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
@@ -66,6 +66,7 @@ type Step = 'type' | 'mode' | 'details';
 export function CreateContractPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const currentActor = user?.email || user?.fullName || user?.id || 'system';
 
@@ -73,7 +74,12 @@ export function CreateContractPage() {
   const [selectedType, setSelectedType] = useState<ContractTypeValue | null>(null);
   const [selectedMode, setSelectedMode] = useState<CreationMode | null>(null);
   const [selectedProtocol, setSelectedProtocol] = useState<ContractProtocol | ''>('');
-  const [linkedServiceId, setLinkedServiceId] = useState('');
+  const [linkedServiceId, setLinkedServiceId] = useState(() => searchParams.get('serviceId') ?? '');
+
+  useEffect(() => {
+    const serviceId = searchParams.get('serviceId');
+    if (serviceId) setLinkedServiceId(serviceId);
+  }, [searchParams]);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
