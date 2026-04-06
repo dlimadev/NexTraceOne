@@ -9,6 +9,9 @@ public enum LifecycleStatus
     /// <summary>Serviço em planeamento — ainda não está em desenvolvimento ativo.</summary>
     Planning = 0,
 
+    /// <summary>Serviço aguardando aprovação — criado mas pendente de validação.</summary>
+    PendingApproval = 7,
+
     /// <summary>Serviço em desenvolvimento ativo.</summary>
     Development = 1,
 

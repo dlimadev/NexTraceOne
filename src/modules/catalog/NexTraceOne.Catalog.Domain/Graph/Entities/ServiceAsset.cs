@@ -125,6 +125,12 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
         BusinessOwner = businessOwner ?? string.Empty;
     }
 
+    /// <summary>Atualiza o estado do ciclo de vida do serviço.</summary>
+    public void UpdateLifecycleStatus(LifecycleStatus status)
+    {
+        LifecycleStatus = status;
+    }
+
     // ── Lifecycle ─────────────────────────────────────────────────────
 
     /// <summary>
@@ -141,6 +147,7 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
         var allowed = LifecycleStatus switch
         {
             LifecycleStatus.Planning => target == LifecycleStatus.Development,
+            LifecycleStatus.PendingApproval => target is LifecycleStatus.Planning or LifecycleStatus.Active or LifecycleStatus.Development,
             LifecycleStatus.Development => target == LifecycleStatus.Staging,
             LifecycleStatus.Staging => target is LifecycleStatus.Active or LifecycleStatus.Development,
             LifecycleStatus.Active => target == LifecycleStatus.Deprecating,
