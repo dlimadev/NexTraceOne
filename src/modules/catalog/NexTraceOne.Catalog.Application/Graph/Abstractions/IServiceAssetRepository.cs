@@ -12,6 +12,12 @@ public interface IServiceAssetRepository
     /// <summary>Obtém um ativo de serviço pelo identificador.</summary>
     Task<ServiceAsset?> GetByIdAsync(ServiceAssetId id, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Obtém um ativo de serviço pelo identificador para leitura de detalhe (AsNoTracking).
+    /// Recomendado para consultas de exibição de detalhe de serviço.
+    /// </summary>
+    Task<ServiceAsset?> GetDetailAsync(ServiceAssetId id, CancellationToken cancellationToken);
+
     /// <summary>Obtém um ativo de serviço pelo nome único.</summary>
     Task<ServiceAsset?> GetByNameAsync(string name, CancellationToken cancellationToken);
 

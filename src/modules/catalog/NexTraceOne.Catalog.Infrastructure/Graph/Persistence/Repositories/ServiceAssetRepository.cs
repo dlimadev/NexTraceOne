@@ -14,11 +14,21 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
     public override async Task<ServiceAsset?> GetByIdAsync(ServiceAssetId id, CancellationToken ct = default)
         => await _context.ServiceAssets.SingleOrDefaultAsync(svc => svc.Id == id, ct);
 
+    /// <summary>
+    /// Busca um ativo de serviço pelo Id com leitura somente (AsNoTracking).
+    /// Adequado para consultas de detalhe de serviço na UI ou relatórios.
+    /// ServiceAsset não possui coleções de navegação no modelo actual — retorna o agregado completo.
+    /// </summary>
+    public async Task<ServiceAsset?> GetDetailAsync(ServiceAssetId id, CancellationToken ct = default)
+        => await _context.ServiceAssets
+            .AsNoTracking()
+            .SingleOrDefaultAsync(svc => svc.Id == id, ct);
+
     public async Task<ServiceAsset?> GetByNameAsync(string name, CancellationToken cancellationToken)
         => await _context.ServiceAssets.SingleOrDefaultAsync(svc => svc.Name == name, cancellationToken);
 
     public async Task<IReadOnlyList<ServiceAsset>> ListAllAsync(CancellationToken cancellationToken)
-        => await _context.ServiceAssets.ToListAsync(cancellationToken);
+        => await _context.ServiceAssets.AsNoTracking().ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<ServiceAsset>> ListFilteredAsync(
         string? teamName,
@@ -30,7 +40,7 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
         string? searchTerm,
         CancellationToken cancellationToken)
     {
-        var query = _context.ServiceAssets.AsQueryable();
+        var query = _context.ServiceAssets.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(teamName))
             query = query.Where(s => s.TeamName == teamName);
@@ -73,6 +83,7 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
         var tsQuery = EF.Functions.PlainToTsQuery("simple", term);
 
         return await _context.ServiceAssets
+            .AsNoTracking()
             .Select(s => new
             {
                 Service = s,
@@ -92,12 +103,14 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
 
     public async Task<IReadOnlyList<ServiceAsset>> ListByTeamAsync(string teamName, CancellationToken cancellationToken)
         => await _context.ServiceAssets
+            .AsNoTracking()
             .Where(s => s.TeamName == teamName)
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<ServiceAsset>> ListByDomainAsync(string domain, CancellationToken cancellationToken)
         => await _context.ServiceAssets
+            .AsNoTracking()
             .Where(s => s.Domain == domain)
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);

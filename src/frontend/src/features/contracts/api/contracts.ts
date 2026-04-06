@@ -418,4 +418,26 @@ export const contractsApi = {
   /** Propaga impacto de mudança de entidade canónica para contratos referenciados. */
   propagateCanonicalChange: (entityId: string, newVersion: string) =>
     client.post(`/contracts/canonical/${entityId}/propagate`, { newVersion }).then((r) => r.data),
+
+  // ── Phase 4 — Innovation ───────────────────────────────────────────
+
+  /** Detecta desvio entre o contrato publicado e os traces OTel observados. */
+  detectContractDrift: (apiAssetId: string, observedOperations: Array<{ method: string; path: string }>) =>
+    client.post(`/contracts/${apiAssetId}/drift`, observedOperations).then((r) => r.data),
+
+  /** Linha do tempo de health score do contrato por versão. */
+  getContractHealthTimeline: (apiAssetId: string, maxVersions?: number) =>
+    client.get(`/contracts/${apiAssetId}/health/timeline`, { params: { maxVersions } }).then((r) => r.data),
+
+  /** Benchmark de maturidade entre equipas e domínios. */
+  getServiceMaturityBenchmark: (params?: { domain?: string; teamName?: string; topN?: number }) =>
+    client.get(`/services/maturity/benchmark`, { params }).then((r) => r.data),
+
+  /** Revisão de contrato assistida por IA. */
+  reviewContractDraft: (data: { tenantId: string; draftId: string; contractContent: string; contractType: string; serviceName: string; preferredProvider?: string }) =>
+    client.post(`/aiorchestration/contracts/review`, data).then((r) => r.data),
+
+  /** Análise em cascata de impacto de entidade canónica (multi-nível). */
+  getCanonicalEntityImpactCascade: (entityId: string, maxDepth?: number) =>
+    client.get(`/catalog/canonical-entities/${entityId}/impact/cascade`, { params: { maxDepth } }).then((r) => r.data),
 };

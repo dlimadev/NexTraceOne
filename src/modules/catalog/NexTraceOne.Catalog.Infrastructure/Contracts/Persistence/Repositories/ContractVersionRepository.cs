@@ -22,6 +22,18 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
             .Include(v => v.Artifacts)
             .SingleOrDefaultAsync(v => v.Id == id, ct);
 
+    /// <summary>
+    /// Busca uma versão de contrato pelo Id com todas as entidades relacionadas carregadas.
+    /// Usa AsNoTracking para leitura de detalhe — adequado para consultas de exibição e análise.
+    /// </summary>
+    public async Task<ContractVersion?> GetDetailAsync(ContractVersionId id, CancellationToken ct = default)
+        => await context.ContractVersions
+            .AsNoTracking()
+            .Include(v => v.Diffs)
+            .Include(v => v.RuleViolations)
+            .Include(v => v.Artifacts)
+            .SingleOrDefaultAsync(v => v.Id == id, ct);
+
     /// <summary>Busca uma versão de contrato pelo ativo de API e versão semântica.</summary>
     public async Task<ContractVersion?> GetByApiAssetAndSemVerAsync(Guid apiAssetId, string semVer, CancellationToken ct = default)
         => await context.ContractVersions
@@ -31,6 +43,7 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
     /// <summary>Lista todas as versões de contrato de um ativo de API, ordenadas por data de criação.</summary>
     public async Task<IReadOnlyList<ContractVersion>> ListByApiAssetAsync(Guid apiAssetId, CancellationToken ct = default)
         => await context.ContractVersions
+            .AsNoTracking()
             .Where(v => v.ApiAssetId == apiAssetId)
             .OrderBy(v => v.CreatedAt)
             .ToListAsync(ct);
@@ -38,6 +51,7 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
     /// <summary>Retorna a versão de contrato mais recente de um ativo de API.</summary>
     public async Task<ContractVersion?> GetLatestByApiAssetAsync(Guid apiAssetId, CancellationToken ct = default)
         => await context.ContractVersions
+            .AsNoTracking()
             .Where(v => v.ApiAssetId == apiAssetId)
             .OrderByDescending(v => v.CreatedAt)
             .FirstOrDefaultAsync(ct);
@@ -55,7 +69,7 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var query = context.ContractVersions.AsQueryable();
+        var query = context.ContractVersions.AsNoTracking().AsQueryable();
 
         if (protocol.HasValue)
             query = query.Where(v => v.Protocol == protocol.Value);
@@ -117,6 +131,7 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
         CancellationToken cancellationToken = default)
     {
         var latestVersions = (await context.ContractVersions
+                .AsNoTracking()
                 .ToListAsync(cancellationToken))
             .GroupBy(v => v.ApiAssetId)
             .Select(g => g.OrderByDescending(v => v.CreatedAt).First())
@@ -162,6 +177,7 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
             return [];
 
         var versions = await context.ContractVersions
+            .AsNoTracking()
             .Where(v => ids.Contains(v.ApiAssetId))
             .ToListAsync(cancellationToken);
 
@@ -178,6 +194,7 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
     public async Task<ContractSummaryData> GetSummaryAsync(CancellationToken cancellationToken = default)
     {
         var allVersions = await context.ContractVersions
+            .AsNoTracking()
             .Select(v => new { v.ApiAssetId, v.Protocol, v.LifecycleState })
             .ToListAsync(cancellationToken);
 

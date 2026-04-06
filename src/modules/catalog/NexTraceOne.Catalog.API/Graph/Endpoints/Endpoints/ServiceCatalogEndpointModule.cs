@@ -48,6 +48,7 @@ using RegisterFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Fea
 using UpdateFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.UpdateFrameworkDetail.UpdateFrameworkDetail;
 using GetFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.GetFrameworkDetail.GetFrameworkDetail;
 using PublishFrameworkVersionFeature = NexTraceOne.Catalog.Application.Graph.Features.PublishFrameworkVersion.PublishFrameworkVersion;
+using GetServiceMaturityBenchmarkFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceMaturityBenchmark.GetServiceMaturityBenchmark;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
@@ -573,5 +574,20 @@ public sealed class ServiceCatalogEndpointModule
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:write");
+
+        // ── Maturity Benchmark ───────────────────────────────────────────
+
+        group.MapGet("/maturity/benchmark", async (
+            string? domain,
+            string? teamName,
+            int? topN,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetServiceMaturityBenchmarkFeature.Query(domain, teamName, topN ?? 10);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
     }
 }

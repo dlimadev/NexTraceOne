@@ -1,5 +1,6 @@
 using FluentAssertions;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 
 using NSubstitute;
@@ -11,6 +12,10 @@ using NexTraceOne.Catalog.Domain.Graph.Entities;
 using ListContractsFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListContracts.ListContracts;
 using GetContractsSummaryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractsSummary.GetContractsSummary;
 using ListContractsByServiceFeature = NexTraceOne.Catalog.Application.Contracts.Features.ListContractsByService.ListContractsByService;
+using RejectDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft.RejectDraft;
+using ApproveDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft.ApproveDraft;
+using SubmitDraftForReviewFeature = NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForReview.SubmitDraftForReview;
+using GetDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDraft.GetDraft;
 
 namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
@@ -156,5 +161,226 @@ public sealed class ContractGovernanceApplicationTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Contracts.Should().BeEmpty();
         result.Value.TotalCount.Should().Be(0);
+    }
+}
+
+/// <summary>
+/// Testes das funcionalidades de ciclo de vida de draft: rejeição com motivo,
+/// re-submissão após rejeição, aprovação e verificação de transição de estado.
+/// </summary>
+public sealed class ContractDraftReviewCycleTests
+{
+    private static readonly DateTimeOffset FixedNow = new(2025, 06, 15, 10, 0, 0, TimeSpan.Zero);
+
+    private const string ValidSpec = """{"openapi":"3.1.0","info":{"title":"Test","version":"1.0.0"},"paths":{"/users":{"get":{"responses":{"200":{"description":"OK"}}}}}}""";
+
+    private static IContractsUnitOfWork CreateUnitOfWork() => Substitute.For<IContractsUnitOfWork>();
+
+    private static ContractDraft CreateDraftInReview()
+    {
+        var draft = ContractDraft.Create(
+            "Governance Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+        draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
+        draft.SubmitForReview(FixedNow);
+        return draft;
+    }
+
+    // ── RejectDraft com motivo ──────────────────────────────────────────
+
+    [Fact]
+    public async Task RejectDraft_WithReason_Should_ReturnToDraft_State()
+    {
+        var draft = CreateDraftInReview();
+        draft.Status.Should().Be(DraftStatus.InReview);
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var reviewRepo = Substitute.For<IContractReviewRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new RejectDraftFeature.Handler(draftRepo, reviewRepo, unitOfWork, dateTimeProvider);
+
+        var result = await sut.Handle(
+            new RejectDraftFeature.Command(draft.Id.Value, "reviewer@test.com", "Missing required fields"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        draft.Status.Should().Be(DraftStatus.Editing);
+        reviewRepo.Received(1).Add(Arg.Any<ContractReview>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RejectDraft_WithoutComment_Should_Succeed()
+    {
+        var draft = CreateDraftInReview();
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var reviewRepo = Substitute.For<IContractReviewRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new RejectDraftFeature.Handler(draftRepo, reviewRepo, unitOfWork, dateTimeProvider);
+
+        var result = await sut.Handle(
+            new RejectDraftFeature.Command(draft.Id.Value, "reviewer@test.com"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        draft.Status.Should().Be(DraftStatus.Editing);
+    }
+
+    [Fact]
+    public async Task RejectDraft_Should_ReturnNotFound_When_DraftDoesNotExist()
+    {
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var reviewRepo = Substitute.For<IContractReviewRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns((ContractDraft?)null);
+
+        var sut = new RejectDraftFeature.Handler(draftRepo, reviewRepo, unitOfWork, dateTimeProvider);
+
+        var result = await sut.Handle(
+            new RejectDraftFeature.Command(Guid.NewGuid(), "reviewer@test.com", "reason"),
+            CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Contracts.Draft.NotFound");
+    }
+
+    // ── Re-submissão após rejeição ─────────────────────────────────────
+
+    [Fact]
+    public async Task ResubmitAfterRejection_Should_TransitionToInReview()
+    {
+        var draft = CreateDraftInReview();
+        draft.Reject("reviewer@test.com", FixedNow);
+        draft.Status.Should().Be(DraftStatus.Editing);
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new SubmitDraftForReviewFeature.Handler(draftRepo, unitOfWork, dateTimeProvider);
+
+        var result = await sut.Handle(
+            new SubmitDraftForReviewFeature.Command(draft.Id.Value),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        draft.Status.Should().Be(DraftStatus.InReview);
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    // ── Aprovação e verificação de transição ───────────────────────────
+
+    [Fact]
+    public async Task ApproveDraft_Should_TransitionToApproved_State()
+    {
+        var draft = CreateDraftInReview();
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var reviewRepo = Substitute.For<IContractReviewRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new ApproveDraftFeature.Handler(draftRepo, reviewRepo, unitOfWork, dateTimeProvider);
+
+        var result = await sut.Handle(
+            new ApproveDraftFeature.Command(draft.Id.Value, "lead@test.com", "LGTM"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DraftId.Should().Be(draft.Id.Value);
+        draft.Status.Should().Be(DraftStatus.Approved);
+        reviewRepo.Received(1).Add(Arg.Any<ContractReview>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ApproveDraft_Should_ReturnError_When_DraftIsEditing()
+    {
+        var draft = ContractDraft.Create(
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+        draft.Status.Should().Be(DraftStatus.Editing);
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var reviewRepo = Substitute.For<IContractReviewRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new ApproveDraftFeature.Handler(draftRepo, reviewRepo, unitOfWork, dateTimeProvider);
+
+        var result = await sut.Handle(
+            new ApproveDraftFeature.Command(draft.Id.Value, "lead@test.com"),
+            CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("InvalidTransition");
+    }
+
+    // ── Obter draft não encontrado ──────────────────────────────────────
+
+    [Fact]
+    public async Task GetDraft_Should_ReturnNotFound_When_DraftDoesNotExist()
+    {
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns((ContractDraft?)null);
+
+        var sut = new GetDraftFeature.Handler(draftRepo);
+
+        var result = await sut.Handle(
+            new GetDraftFeature.Query(Guid.NewGuid()),
+            CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("Contracts.Draft.NotFound");
+    }
+
+    // ── Ciclo completo: submit → approve → state Published ─────────────
+
+    [Fact]
+    public void DraftLifecycle_Submit_Approve_MarkPublished_Should_Succeed()
+    {
+        var draft = ContractDraft.Create(
+            "Full Cycle Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+        draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
+
+        var submitResult = draft.SubmitForReview(FixedNow);
+        submitResult.IsSuccess.Should().BeTrue();
+        draft.Status.Should().Be(DraftStatus.InReview);
+
+        var approveResult = draft.Approve("reviewer@test.com", FixedNow);
+        approveResult.IsSuccess.Should().BeTrue();
+        draft.Status.Should().Be(DraftStatus.Approved);
+
+        var publishResult = draft.MarkAsPublished(FixedNow);
+        publishResult.IsSuccess.Should().BeTrue();
+        draft.Status.Should().Be(DraftStatus.Published);
     }
 }

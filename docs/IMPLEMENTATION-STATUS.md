@@ -1,7 +1,7 @@
 # NexTraceOne — Implementation Status
 
-> **Última atualização:** Março 2026
-> **Fonte:** Auditoria Forense Março 2026 — `docs/audit-forensic-2026-03/`
+> **Última atualização:** Abril 2026
+> **Fonte:** Auditoria Forense Março 2026 + SERVICES-CONTRACTS-DEEP-ANALYSIS Abril 2026 — `docs/audit-forensic-2026-03/`, `docs/SERVICES-CONTRACTS-DEEP-ANALYSIS-2026-04.md`
 > **Referência principal:** `docs/audit-forensic-2026-03/backend-state-report.md`
 > **Avaliação final:** `docs/audit-forensic-2026-03/final-project-state-assessment.md`
 
@@ -71,9 +71,14 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Semantic Diff | READY | `ComputeSemanticDiff`, `EvaluateCompatibility` reais |
 | Developer Portal | PARTIAL | `RecordAnalyticsEvent`, `CreateSubscription`, `ExecutePlayground` reais; `SearchCatalog` é stub |
 | Global Search | PARTIAL | `GlobalSearch` endpoint real (PostgreSQL FTS); `SearchCatalog` é stub intencional aguardando integração cross-module |
+| Contract Drift Detection (PA-25) | READY | `DetectContractDrift` — detecta desvios entre contrato publicado e traces OTel; ghost endpoints + endpoints não declarados; `GET /api/v1/catalog/contracts/{id}/drift` |
+| Contract Health Score Timeline (PA-27) | READY | `GetContractHealthTimeline` — evolução temporal do health score com correlação de changes; `GET /api/v1/catalog/contracts/{id}/health/timeline`; frontend `ContractHealthTimelinePage` |
+| Service Maturity Benchmark (PA-28) | READY | `GetServiceMaturityBenchmark` — comparação de maturidade entre serviços, equipas e domínios; `GET /api/v1/catalog/services/maturity-benchmark` |
+| Canonical Entity Impact Cascade (PA-30) | READY | `GetCanonicalEntityImpactCascade` — análise em cascata multi-nível (depth 1-3) de impacto; RiskLevel (None/Low/Medium/High/Critical); `GET /api/v1/catalog/canonical-entities/{id}/impact/cascade`; frontend `CanonicalEntityImpactCascadePage` |
 
 **DbContexts:** `ContractsDbContext`, `CatalogGraphDbContext`, `DeveloperPortalDbContext` (3 DbContexts, 4 migrações)
-**Status geral:** 84 features, 100% real; 10/10 contract types com visual builders
+**Status geral:** 90 features, 100% real; 10/10 contract types com visual builders; Phase 4 Innovation completa (6/6 PA items)
+**Testes:** 1160 testes unitários (0 falhas)
 **Evidência:** `src/modules/catalog/`
 
 ---
@@ -85,11 +90,13 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Releases / Change Intelligence | READY | BlastRadius, ChangeScores, FreezeWindows, RollbackAssessments — reais |
 | Workflow / Approvals | READY | Templates, instâncias, stages, approval decisions, evidence packs, SLA policies — reais |
 | Promotion / Gate Evaluations | READY | Environments, promotion requests, gates, gate evaluations — reais |
+| Contract Compliance Gate (PA-29) | READY | `EvaluateContractComplianceGate` — verifica se gate de conformidade de contratos está configurado para o ambiente alvo da promoção; `GET /api/v1/promotion/{id}/contract-compliance` |
 | Ruleset Governance | READY | Rulesets, bindings, lint results (Spectral) — reais |
 | Audit Trail / Decision Trail | READY | Trilha de decisão, timeline de mudança, correlation events — reais |
 
 **DbContexts:** `ChangeIntelligenceDbContext`, `WorkflowDbContext`, `PromotionDbContext`, `RulesetGovernanceDbContext` (4 DbContexts, 4 migrações)
 **Status geral:** READY — módulo mais maduro (95% funcional, fluxo flagship)
+**Testes:** 307 testes unitários (0 falhas)
 **Evidência:** `src/modules/changegovernance/`
 
 ---
@@ -140,9 +147,11 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | AI Orchestration | REAL | `AiOrchestrationDbContext` com migrações; `IAiOrchestrationModule` implementado por `AiOrchestrationModule` |
 | External AI | REAL | `IExternalAiModule` implementado por `ExternalAiModule`; `ExternalAiDbContext` com migrações |
 | Knowledge Source Weights | REAL | Pesos persistidos em `aik_source_weights`; `ListKnowledgeSourceWeights` consulta DB com fallback a defaults |
+| AI Contract Reviewer (PA-26) | READY | `ReviewContractDraft` — revisão automática de rascunhos por IA; QualityScore 0-100, issues por severidade/categoria, sugestões, recomendação (Approve/RequestChanges/Reject); `POST /api/v1/aiorchestration/contracts/review` |
 | AiAssistantPage (frontend) | REAL | Usa API real: `aiGovernanceApi.listConversations`, `sendMessage`, `getMessages` (7 chamadas API reais) |
 
 **DbContexts:** `AiGovernanceDbContext`, `AiOrchestrationDbContext`, `ExternalAiDbContext` — todos com migrações confirmadas.
+**Testes:** 819 testes unitários (0 falhas)
 **Evidência:** `src/modules/aiknowledge/`
 
 ---
@@ -266,7 +275,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Change Governance | READY | Sim (100% real, módulo flagship) |
 | Audit Compliance | READY | Sim (hash chain SHA-256) |
 | Operational Intelligence | READY | Sim — Incidents real, Automation 10/10 real, Reliability 15/15 real, IIncidentModule + IAutomationModule + IReliabilityModule implementados |
-| AI Knowledge | PARTIAL | LLM real E2E; grounding cross-module incompleto |
+| AI Knowledge | PARTIAL | LLM real E2E; grounding cross-module incompleto; PA-26 AI Contract Reviewer READY |
 | Governance | READY | Dados reais via repositórios e cross-module; FinOps real; 25/26 frontend pages conectadas; 158/158 testes passam |
 | Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
 | Notifications | PARTIAL | Pendente validação E2E |
@@ -276,5 +285,5 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 ---
 
-*Última atualização: Abril 2026 — Phase 7: Automation real data, documentation alignment*
+*Última atualização: Abril 2026 — SERVICES-CONTRACTS-DEEP-ANALYSIS Phase 4 completa (PA-25 a PA-30). Catalog 1160 testes, AIKnowledge 819 testes, ChangeGovernance 307 testes. Build 0 erros.*
 *Ver: `docs/ROADMAP.md`, `docs/CORE-FLOW-GAPS.md`*

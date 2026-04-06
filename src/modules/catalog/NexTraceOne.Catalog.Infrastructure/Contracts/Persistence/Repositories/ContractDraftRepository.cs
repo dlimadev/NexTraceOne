@@ -70,7 +70,7 @@ internal sealed class ContractDraftRepository(ContractsDbContext context)
         Guid? serviceId,
         string? author)
     {
-        var query = context.Drafts.AsQueryable();
+        var query = context.Drafts.AsNoTracking().AsQueryable();
 
         if (status.HasValue)
             query = query.Where(d => d.Status == status.Value);

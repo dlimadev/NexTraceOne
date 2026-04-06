@@ -2021,7 +2021,29 @@
         "problemDetails": "Detalhes do Problema (RFC 7807)",
         "previewExample": "Pré-visualizar Exemplo",
         "copyExample": "Copiar",
-        "exampleCopied": "Copiado!"
+        "exampleCopied": "Copiado!",
+        "propNamePlaceholder": "nomeDaPropriedade",
+        "propDescPlaceholder": "Descrição desta propriedade...",
+        "refTarget": "Destino $ref (Entidade Canónica)",
+        "refHint": "Referencie um schema partilhado/canónico definido no Catálogo de Entidades Canónicas",
+        "arrayItems": "Tipo de Item do Array",
+        "arrayItemsDesc": "Defina o tipo de cada item no array",
+        "nestedProperties": "Propriedades Aninhadas",
+        "maxDepthReached": "Profundidade máxima de aninhamento atingida. Use $ref para estruturas mais profundas.",
+        "addProperty": "Adicionar Propriedade",
+        "addObject": "Objeto",
+        "addArray": "Array",
+        "addRef": "$ref",
+        "schemaMode": "Modo de Schema",
+        "modeRef": "$ref (Referência de Schema)",
+        "modeVisualProps": "✦ Propriedades Visuais",
+        "refModeHint": "Referencie um schema de Entidades Canónicas ou defina inline usando o modo Propriedades Visuais",
+        "bodyProperties": "Propriedades do Corpo do Pedido",
+        "addBodyProp": "Adicionar Propriedade",
+        "responseProperties": "Propriedades da Resposta",
+        "addResponseProp": "Adicionar Propriedade",
+        "exclusiveMin": "Mínimo Exclusivo",
+        "exclusiveMax": "Máximo Exclusivo"
       },
       "sharedSchema": {
         "addProperty": "Adicionar Propriedade",
@@ -2108,7 +2130,14 @@
         "totalLengthMustBeNumber": "O comprimento total deve ser um número positivo",
         "transactionIdRequired": "O ID de transação é obrigatório para contratos CICS Commarea",
         "urlPatternRequired": "O padrão de URL é obrigatório",
-        "versionRequired": "A versão é obrigatória"
+        "versionRequired": "A versão é obrigatória",
+        "compositionRequiresVariants": "O tipo de composição requer pelo menos uma variante",
+        "propArrayRefRequired": "Os itens do array devem definir um tipo ou $ref",
+        "propMinGtMax": "minLength não pode ser maior que maxLength",
+        "propMinValueGtMax": "minimum não pode ser maior que maximum",
+        "propNameDuplicate": "Nome de propriedade duplicado neste objeto",
+        "propNameRequired": "O nome da propriedade é obrigatório",
+        "propRefRequired": "O destino $ref é obrigatório para propriedades de referência"
       },
       "webhook": {
         "addHeader": "Adicionar Cabeçalho",
@@ -5816,7 +5845,38 @@
       "toSnapshot": "Snapshot de destino"
     },
     "title": "Catálogo de Serviços",
-    "trustLevel": "Nível de Confiança"
+    "trustLevel": "Nível de Confiança",
+    "basicInfo": "Informações Básicas",
+    "classification": "Classificação",
+    "ownership": "Responsabilidade",
+    "references": "Referências",
+    "domain": "Domínio",
+    "domainPlaceholder": "ex.: pagamentos, identidade, encomendas",
+    "namePlaceholder": "ex.: payment-service",
+    "teamPlaceholder": "ex.: platform-team",
+    "descriptionPlaceholder": "Descreva o propósito e as responsabilidades deste serviço...",
+    "serviceType": "Tipo de Serviço",
+    "typeGroupModern": "Serviços Modernos",
+    "typeGroupPlatform": "Plataforma e Integração",
+    "typeGroupMainframe": "Mainframe",
+    "criticality": "Criticidade",
+    "criticalityLow": "Baixa",
+    "criticalityMedium": "Média",
+    "criticalityHigh": "Alta",
+    "criticalityCritical": "Crítica",
+    "exposure": "Exposição",
+    "exposureInternal": "Interno",
+    "exposurePartner": "Parceiro",
+    "exposureExternal": "Externo / Público",
+    "technicalOwner": "Responsável Técnico",
+    "technicalOwnerPlaceholder": "ex.: joao.silva@empresa.com",
+    "businessOwner": "Responsável de Negócio",
+    "businessOwnerPlaceholder": "ex.: Nome do Product Manager",
+    "documentationUrl": "URL da Documentação",
+    "repositoryUrl": "URL do Repositório",
+    "typeGrpcService": "Serviço gRPC",
+    "typeGateway": "API Gateway",
+    "typeFramework": "Framework / SDK"
   },
   "serviceMaturity": {
     "audit": {
@@ -6416,6 +6476,13 @@
         "repoUrl": "Repositório Git opcional.",
         "baseContractSpec": "Contrato OpenAPI, AsyncAPI ou WSDL incluído em cada serviço gerado.",
         "scaffoldingManifest": "Array JSON de objetos { path, content }. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} como variáveis."
+      },
+      "serviceTypes": {
+        "grpc": "gRPC"
+      },
+      "languages": {
+        "dotnet": ".NET",
+        "nodejs": "Node.js"
       }
     },
     "scaffold": {
@@ -6550,5 +6617,80 @@
     "recentScans": "Scans Recentes",
     "dashboardError": "Erro ao carregar dados do dashboard.",
     "dashboardEmpty": "Sem scans de segurança registados. Execute um scan para começar a monitorizar."
+  },
+  "phase4": {
+    "contractDrift": {
+      "title": "Detecção de Desvio de Contrato",
+      "subtitle": "Compare o seu contrato publicado com o tráfego real observado",
+      "analyze": "Analisar Desvio",
+      "driftScore": "Score de Desvio",
+      "status": "Estado",
+      "ghostEndpoints": "Endpoints Fantasma",
+      "ghostEndpointsDesc": "Declarados no contrato mas nunca observados nos traces",
+      "undeclaredEndpoints": "Endpoints Não Declarados",
+      "undeclaredEndpointsDesc": "Observados nos traces mas não declarados no contrato",
+      "statusClean": "Limpo",
+      "statusMinor": "Menor",
+      "statusMajor": "Maior",
+      "statusCritical": "Crítico",
+      "noObservations": "Nenhuma observação de trace fornecida",
+      "method": "Método",
+      "path": "Caminho"
+    },
+    "healthTimeline": {
+      "title": "Linha do Tempo de Saúde",
+      "subtitle": "Evolução da saúde do contrato ao longo do tempo",
+      "version": "Versão",
+      "healthScore": "Score de Saúde",
+      "breakingChange": "Breaking Change",
+      "lifecycleState": "Estado do Ciclo de Vida",
+      "createdAt": "Criado em",
+      "noData": "Nenhuma versão encontrada para este contrato"
+    },
+    "maturityBenchmark": {
+      "title": "Benchmark de Maturidade de Serviços",
+      "subtitle": "Compare a maturidade entre equipas e domínios",
+      "teams": "Equipas",
+      "domains": "Domínios",
+      "rank": "Rank",
+      "teamName": "Equipa",
+      "domainName": "Domínio",
+      "serviceCount": "Serviços",
+      "avgMaturityScore": "Maturidade Média",
+      "noData": "Nenhum serviço encontrado para benchmark"
+    },
+    "contractReviewer": {
+      "title": "Revisor de Contrato com IA",
+      "subtitle": "Revisão automatizada por IA do seu rascunho de contrato",
+      "review": "Iniciar Revisão",
+      "reviewing": "A rever...",
+      "qualityScore": "Score de Qualidade",
+      "recommendation": "Recomendação",
+      "issues": "Problemas",
+      "suggestions": "Sugestões",
+      "severity": "Severidade",
+      "category": "Categoria",
+      "description": "Descrição",
+      "approve": "Aprovar",
+      "requestChanges": "Solicitar Alterações",
+      "reject": "Rejeitar",
+      "noIssues": "Nenhum problema encontrado",
+      "noSuggestions": "Nenhuma sugestão"
+    },
+    "impactCascade": {
+      "title": "Cascata de Impacto de Entidade Canónica",
+      "subtitle": "Análise em cascata multi-nível de mudanças em entidade canónica",
+      "totalContracts": "Total de Contratos Afetados",
+      "uniqueEntities": "Entidades Únicas na Cascata",
+      "riskLevel": "Nível de Risco",
+      "maxDepth": "Profundidade Máxima",
+      "entityName": "Entidade",
+      "depth": "Profundidade",
+      "affectedContracts": "Contratos Afetados",
+      "children": "Filhos",
+      "analyze": "Analisar Cascata",
+      "noChildren": "Sem impacto em cascata",
+      "depthLabel": "Profundidade {{depth}}"
+    }
   }
 }

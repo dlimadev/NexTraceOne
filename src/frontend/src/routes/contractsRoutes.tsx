@@ -16,6 +16,8 @@ const ContractGovernancePage = lazy(() => import('../features/contracts/governan
 const ContractHealthDashboardPage = lazy(() => import('../features/contracts/governance/ContractHealthDashboardPage').then(m => ({ default: m.ContractHealthDashboardPage })));
 const ContractPortalPage = lazy(() => import('../features/contracts/portal/ContractPortalPage').then(m => ({ default: m.ContractPortalPage })));
 const PublicationCenterPage = lazy(() => import('../features/contracts/publication/PublicationCenterPage').then(m => ({ default: m.PublicationCenterPage })));
+const CanonicalEntityImpactCascadePage = lazy(() => import('../features/contracts/canonical/CanonicalEntityImpactCascadePage').then(m => ({ default: m.CanonicalEntityImpactCascadePage })));
+const ContractHealthTimelinePage = lazy(() => import('../features/contracts/governance/ContractHealthTimelinePage').then(m => ({ default: m.ContractHealthTimelinePage })));
 
 export function ContractsRoutes() {
   return (
@@ -75,6 +77,22 @@ export function ContractsRoutes() {
         element={
           <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
             <ContractHealthDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/health/timeline"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ContractHealthTimelinePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/canonical/impact-cascade"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <CanonicalEntityImpactCascadePage />
           </ProtectedRoute>
         }
       />

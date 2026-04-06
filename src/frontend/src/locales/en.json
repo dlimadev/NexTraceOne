@@ -2130,7 +2130,14 @@
         "totalLengthMustBeNumber": "Total length must be a positive number",
         "transactionIdRequired": "Transaction ID is required for CICS Commarea contracts",
         "urlPatternRequired": "URL pattern is required",
-        "versionRequired": "Version is required"
+        "versionRequired": "Version is required",
+        "compositionRequiresVariants": "Composition type requires at least one variant",
+        "propArrayRefRequired": "Array items must define a type or $ref",
+        "propMinGtMax": "minLength cannot be greater than maxLength",
+        "propMinValueGtMax": "minimum cannot be greater than maximum",
+        "propNameDuplicate": "Duplicate property name in this object",
+        "propNameRequired": "Property name is required",
+        "propRefRequired": "$ref target is required for reference properties"
       },
       "webhook": {
         "addHeader": "Add Header",
@@ -5866,7 +5873,10 @@
     "businessOwner": "Business Owner",
     "businessOwnerPlaceholder": "e.g., Product Manager Name",
     "documentationUrl": "Documentation URL",
-    "repositoryUrl": "Repository URL"
+    "repositoryUrl": "Repository URL",
+    "typeGrpcService": "gRPC Service",
+    "typeGateway": "API Gateway",
+    "typeFramework": "Framework / SDK"
   },
   "serviceMaturity": {
     "audit": {
@@ -6466,6 +6476,13 @@
         "repoUrl": "Optional Git repository used as source for the scaffolding.",
         "baseContractSpec": "OpenAPI, AsyncAPI or WSDL contract included in every generated service.",
         "scaffoldingManifest": "JSON array of { path, content } objects. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} as variables."
+      },
+      "serviceTypes": {
+        "grpc": "gRPC"
+      },
+      "languages": {
+        "dotnet": ".NET",
+        "nodejs": "Node.js"
       }
     },
     "scaffold": {
@@ -6600,5 +6617,80 @@
     "recentScans": "Recent Scans",
     "dashboardError": "Failed to load dashboard data.",
     "dashboardEmpty": "No security scans recorded yet. Run a scan to start tracking security posture."
+  },
+  "phase4": {
+    "contractDrift": {
+      "title": "Contract Drift Detection",
+      "subtitle": "Compare your published contract against real observed traffic",
+      "analyze": "Analyze Drift",
+      "driftScore": "Drift Score",
+      "status": "Status",
+      "ghostEndpoints": "Ghost Endpoints",
+      "ghostEndpointsDesc": "Declared in contract but never observed in traces",
+      "undeclaredEndpoints": "Undeclared Endpoints",
+      "undeclaredEndpointsDesc": "Observed in traces but not declared in contract",
+      "statusClean": "Clean",
+      "statusMinor": "Minor",
+      "statusMajor": "Major",
+      "statusCritical": "Critical",
+      "noObservations": "No trace observations provided",
+      "method": "Method",
+      "path": "Path"
+    },
+    "healthTimeline": {
+      "title": "Health Score Timeline",
+      "subtitle": "Evolution of contract health over time",
+      "version": "Version",
+      "healthScore": "Health Score",
+      "breakingChange": "Breaking Change",
+      "lifecycleState": "Lifecycle State",
+      "createdAt": "Created At",
+      "noData": "No versions found for this contract"
+    },
+    "maturityBenchmark": {
+      "title": "Service Maturity Benchmark",
+      "subtitle": "Compare maturity across teams and domains",
+      "teams": "Teams",
+      "domains": "Domains",
+      "rank": "Rank",
+      "teamName": "Team",
+      "domainName": "Domain",
+      "serviceCount": "Services",
+      "avgMaturityScore": "Avg Maturity",
+      "noData": "No services found for benchmarking"
+    },
+    "contractReviewer": {
+      "title": "AI Contract Reviewer",
+      "subtitle": "Automated AI review of your contract draft",
+      "review": "Start Review",
+      "reviewing": "Reviewing...",
+      "qualityScore": "Quality Score",
+      "recommendation": "Recommendation",
+      "issues": "Issues",
+      "suggestions": "Suggestions",
+      "severity": "Severity",
+      "category": "Category",
+      "description": "Description",
+      "approve": "Approve",
+      "requestChanges": "Request Changes",
+      "reject": "Reject",
+      "noIssues": "No issues found",
+      "noSuggestions": "No suggestions"
+    },
+    "impactCascade": {
+      "title": "Canonical Entity Impact Cascade",
+      "subtitle": "Multi-level cascade analysis of canonical entity changes",
+      "totalContracts": "Total Contracts Affected",
+      "uniqueEntities": "Unique Entities in Cascade",
+      "riskLevel": "Risk Level",
+      "maxDepth": "Max Depth",
+      "entityName": "Entity",
+      "depth": "Depth",
+      "affectedContracts": "Affected Contracts",
+      "children": "Children",
+      "analyze": "Analyze Cascade",
+      "noChildren": "No cascading impact",
+      "depthLabel": "Depth {{depth}}"
+    }
   }
 }

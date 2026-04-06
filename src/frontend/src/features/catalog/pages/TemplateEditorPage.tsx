@@ -254,7 +254,7 @@ export function TemplateEditorPage() {
                 <option value="RestApi">REST API</option>
                 <option value="EventDriven">Event Driven</option>
                 <option value="BackgroundWorker">Background Worker</option>
-                <option value="Grpc">gRPC</option>
+                <option value="Grpc">{t('templates.editor.serviceTypes.grpc', 'gRPC')}</option>
                 <option value="Soap">SOAP</option>
                 <option value="Generic">Generic</option>
               </select>
@@ -267,8 +267,8 @@ export function TemplateEditorPage() {
                 onChange={e => setLanguage(e.target.value as TemplateLanguage)}
                 disabled={isEditing}
               >
-                <option value="DotNet">.NET</option>
-                <option value="NodeJs">Node.js</option>
+                <option value="DotNet">{t('templates.editor.languages.dotnet', '.NET')}</option>
+                <option value="NodeJs">{t('templates.editor.languages.nodejs', 'Node.js')}</option>
                 <option value="Java">Java</option>
                 <option value="Go">Go</option>
                 <option value="Python">Python</option>
