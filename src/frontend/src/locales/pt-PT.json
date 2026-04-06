@@ -3726,7 +3726,46 @@
       "totalAssessed": "Packs avaliados"
     },
     "riskSubtitle": "Indicadores de risco derivados do ciclo de vida de packs, rollouts e waivers.",
-    "riskTitle": "Centro de Risco"
+    "riskTitle": "Centro de Risco",
+    "dora": {
+      "title": "Métricas DORA",
+      "subtitle": "DevOps Research & Assessment — Frequência de Deployment, Lead Time, Taxa de Falha, MTTR",
+      "loading": "A calcular métricas DORA...",
+      "error": "Falha ao calcular métricas DORA",
+      "period": "Período",
+      "overallRating": "Classificação Geral",
+      "openIncidents": "Incidentes Abertos",
+      "resolvedInPeriod": "Resolvidos no Período",
+      "recurrenceRate": "Taxa de Recorrência",
+      "metricsSection": "Métricas DORA",
+      "trendSummary": "Resumo de Tendência",
+      "trendDataPoints": "Pontos de Dados de Tendência",
+      "dfTrend": "Frequência de Deployment",
+      "mttrTrend": "MTTR",
+      "cfrTrend": "Taxa de Falha de Mudança",
+      "overallImproving": "As métricas gerais estão a melhorar — continue assim!",
+      "deployFreq": "Freq. Deploy",
+      "leadTime": "Lead Time",
+      "cfr": "CFR",
+      "mttr": "MTTR"
+    },
+    "scorecard": {
+      "title": "Scorecards de Serviço",
+      "subtitle": "Scorecard de maturidade em 8 dimensões: ownership, contratos, incidentes e mais",
+      "loading": "A carregar scorecards...",
+      "computing": "A calcular scorecard...",
+      "error": "Falha ao carregar scorecards",
+      "computeError": "Falha ao calcular scorecard",
+      "listTab": "Todos os Serviços",
+      "detailTab": "Detalhe do Serviço",
+      "filterByTeam": "Filtrar por equipa...",
+      "allLevels": "Todos os Níveis",
+      "avgScore": "Média: {{score}}",
+      "dimensions": "Dimensões",
+      "serviceNamePlaceholder": "Introduza o nome do serviço...",
+      "compute": "Calcular",
+      "enterServiceName": "Introduza o nome do serviço para calcular o scorecard"
+    }
   },
   "governanceConfig": {
     "actions": {
@@ -6691,6 +6730,65 @@
       "analyze": "Analisar Cascata",
       "noChildren": "Sem impacto em cascata",
       "depthLabel": "Profundidade {{depth}}"
+    }
+  },
+  "knowledge": {
+    "graph": {
+      "title": "Grafo de Conhecimento",
+      "subtitle": "Explore relações entre serviços, contratos, equipas e incidentes",
+      "loading": "A carregar grafo de conhecimento...",
+      "error": "Falha ao carregar grafo de conhecimento",
+      "totalNodes": "Total de Nós",
+      "totalEdges": "Total de Arestas",
+      "connectedComponents": "Componentes Ligados",
+      "maxDepth": "Profundidade Máxima",
+      "nodesSection": "Nós",
+      "edgesSection": "Arestas",
+      "noNodes": "Nenhum nó encontrado para esta profundidade",
+      "noEdges": "Nenhuma aresta encontrada"
+    },
+    "autoDoc": {
+      "title": "Auto Documentação",
+      "subtitle": "Documentação auto-gerada com IA para qualquer serviço",
+      "loading": "A carregar documentação...",
+      "error": "Falha ao carregar documentação",
+      "generating": "A gerar documentação...",
+      "serviceNamePlaceholder": "Introduza o nome do serviço...",
+      "generate": "Gerar",
+      "generatedAt": "Gerado {{date}}",
+      "docs": "{{count}} docs",
+      "runbooks": "{{count}} runbooks",
+      "sectionUnavailable": "Secção não disponível para este serviço",
+      "enterServiceName": "Introduza o nome do serviço para gerar documentação",
+      "sections": {
+        "Overview": "Visão Geral",
+        "Ownership": "Proprietário",
+        "Contracts": "Contratos",
+        "Dependencies": "Dependências",
+        "SLOs": "SLOs",
+        "Runbooks": "Runbooks",
+        "RecentChanges": "Alterações Recentes"
+      }
+    }
+  },
+  "operations": {
+    "onCall": {
+      "title": "Inteligência de On-Call",
+      "subtitle": "Analise padrões de plantão, fadiga de equipas e distribuição de incidentes",
+      "loading": "A carregar inteligência de on-call...",
+      "error": "Falha ao carregar dados de on-call",
+      "period": "Período",
+      "totalIncidents": "Total de Incidentes",
+      "avgPerWeek": "Média por Semana",
+      "peakHour": "Hora de Pico",
+      "peakDay": "Dia de Pico",
+      "fatigueAlert": "Fadiga elevada de on-call detetada: {{level}}",
+      "recommendations": "Recomendações",
+      "teamFatigue": "Fadiga das Equipas",
+      "avgResponse": "Resposta média: {{minutes}} min",
+      "lastWeekCount": "{{count}} incidentes na última semana",
+      "lastMonthCount": "{{count}} incidentes no último mês",
+      "incidentDistribution": "Distribuição de Incidentes"
     }
   }
 }

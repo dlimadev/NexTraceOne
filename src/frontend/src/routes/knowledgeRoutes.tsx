@@ -11,6 +11,12 @@ const KnowledgeDocumentPage = lazy(() =>
 const OperationalNotesPage = lazy(() =>
   import('../features/knowledge').then(m => ({ default: m.OperationalNotesPage }))
 );
+const KnowledgeGraphPage = lazy(() =>
+  import('../features/knowledge/pages/KnowledgeGraphPage').then(m => ({ default: m.KnowledgeGraphPage }))
+);
+const AutoDocumentationPage = lazy(() =>
+  import('../features/knowledge/pages/AutoDocumentationPage').then(m => ({ default: m.AutoDocumentationPage }))
+);
 
 export function KnowledgeRoutes() {
   return (
@@ -36,6 +42,30 @@ export function KnowledgeRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <OperationalNotesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/knowledge/graph"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <KnowledgeGraphPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/knowledge/auto-documentation"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <AutoDocumentationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/knowledge/auto-documentation/:serviceName"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <AutoDocumentationPage />
           </ProtectedRoute>
         }
       />

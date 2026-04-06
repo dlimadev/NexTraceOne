@@ -31,6 +31,8 @@ const GovernancePackDetailPage = lazy(() => import('../features/governance/pages
 const WaiversPage = lazy(() => import('../features/governance/pages/WaiversPage').then(m => ({ default: m.WaiversPage })));
 const DelegatedAdminPage = lazy(() => import('../features/governance/pages/DelegatedAdminPage').then(m => ({ default: m.DelegatedAdminPage })));
 const GovernanceConfigurationPage = lazy(() => import('../features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
+const DoraMetricsPage = lazy(() => import('../features/governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
+const ServiceScorecardPage = lazy(() => import('../features/governance/pages/ServiceScorecardPage').then(m => ({ default: m.ServiceScorecardPage })));
 
 export function GovernanceRoutes() {
   return (
@@ -232,6 +234,30 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <GovernanceConfigurationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/dora-metrics"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <DoraMetricsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/scorecards"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ServiceScorecardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/scorecards/:serviceName"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ServiceScorecardPage />
           </ProtectedRoute>
         }
       />
