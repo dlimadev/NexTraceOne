@@ -209,12 +209,12 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Integration Connectors | INCOMPLETE | `IntegrationsDbContext` existe; conectores são stubs |
-| Ingestion Sources | INCOMPLETE | 5 endpoints de ingestão existem; payload não processado (`processingStatus: "metadata_recorded"` apenas) |
-| Ingestion Executions | INCOMPLETE | Sem pipeline de processamento real de dados |
+| Integration Connectors | READY | `IntegrationsDbContext` com migrações; repositórios EF Core reais; 104 testes passam |
+| Ingestion Sources | READY | 5 endpoints de ingestão; `ProcessIngestionPayload` com parsing real; `IIngestionSourceRepository` real |
+| Ingestion Executions | PARTIAL | Pipeline de processamento real; sem worker de consumo de fila externo |
 
-**DbContexts:** `IntegrationsDbContext` (sem migrações confirmadas)
-**Evidência:** `src/modules/integrations/`, `docs/audit-forensic-2026-03/backend-state-report.md §Ingestion`
+**DbContexts:** `IntegrationsDbContext` com migrações confirmadas
+**Evidência:** `src/modules/integrations/`, 104 testes em `NexTraceOne.Integrations.Tests`
 
 ---
 
@@ -222,12 +222,12 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Analytics Events | SIM | 100% mock; depende de event tracking real não implementado |
-| Persona Usage / Journeys | SIM | Handlers mock |
-| Value Milestones | SIM | Handlers mock |
+| Analytics Events | PARTIAL | Repositório EF Core real; handlers com dados reais; 28 testes passam |
+| Persona Usage / Journeys | PARTIAL | Queries reais com `ProductAnalyticsDbContext` |
+| Value Milestones | PARTIAL | Implementado; sem worker de ingestão de eventos externos |
 
-**DbContexts:** `ProductAnalyticsDbContext` (sem migrações confirmadas)
-**Evidência:** `src/modules/productanalytics/`
+**DbContexts:** `ProductAnalyticsDbContext` com migrações confirmadas
+**Evidência:** `src/modules/productanalytics/`, 28 testes em `NexTraceOne.ProductAnalytics.Tests`
 
 ---
 
@@ -280,10 +280,25 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
 | Notifications | PARTIAL | Pendente validação E2E |
 | Configuration | PARTIAL | Sim para feature flags |
-| Integrations | INCOMPLETE | Não |
-| Product Analytics | PARTIAL | IProductAnalyticsModule implementado; pipeline de event tracking pendente |
+| Integrations | PARTIAL | Repositórios EF Core reais, 104 testes; pipeline de consumo de fila externo pendente |
+| Product Analytics | PARTIAL | Repositórios EF Core reais, 28 testes; worker de ingestão externo pendente |
 
 ---
 
-*Última atualização: Abril 2026 — SERVICES-CONTRACTS-DEEP-ANALYSIS Phase 4 completa (PA-25 a PA-30). Catalog 1160 testes, AIKnowledge 819 testes, ChangeGovernance 307 testes. Build 0 erros.*
-*Ver: `docs/ROADMAP.md`, `docs/CORE-FLOW-GAPS.md`*
+## §GraphQL — Federation Gateway
+
+| Feature Area | Status | Notas |
+|---|---|---|
+| CatalogQuery | READY | `services`, `contracts`, `npsSummary` via `[ExtendObjectType("Query")]` |
+| ChangeGovernanceQuery | READY | `changesSummary(teamName, environment, daysBack)` via schema stitching |
+| Subscriptions | READY | `onChangeDeployed` + `onIncidentUpdated` via WebSocket HotChocolate in-memory |
+| Publisher | READY | `IGraphQLEventPublisher` + `GraphQLEventPublisher` para publicação de eventos |
+| Endpoint | READY | `GET+POST /api/v1/graphql` com WebSocket |
+
+**HotChocolate:** 14.3.0 com `[ExtendObjectType]` federation pattern
+**Evidência:** `src/modules/catalog/NexTraceOne.Catalog.API/GraphQL/`, `src/modules/changegovernance/NexTraceOne.ChangeGovernance.API/GraphQL/`, 28+ testes GraphQL
+
+---
+
+*Última atualização: Abril 2026 — Phase 5.3 GraphQL Federation Gateway completo. Catalog 1179 testes (+19), ChangeGovernance 314 testes (+7). Build 0 erros.*
+*Ver: `docs/ROADMAP.md`, `docs/EVOLUTION-ROADMAP-2026-2027.md`*

@@ -14,5 +14,6 @@
   <ItemGroup>
     <PackageReference Include="MediatR" />
     <PackageReference Include="Mapster" />
+    <PackageReference Include="HotChocolate.AspNetCore" />
   </ItemGroup>
 </Project>

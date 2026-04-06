@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.ApiHost;
 using NexTraceOne.Catalog.API.Graph;
+using NexTraceOne.Catalog.API.GraphQL;
 using NexTraceOne.Governance.API;
 using NexTraceOne.Integrations.API.Endpoints;
 using NexTraceOne.ProductAnalytics.API;
@@ -30,6 +31,7 @@ using NexTraceOne.Catalog.API.Portal.Endpoints;
 using NexTraceOne.Catalog.API.Templates;
 using NexTraceOne.Catalog.API.DependencyGovernance;
 using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
+using NexTraceOne.ChangeGovernance.API.GraphQL;
 using NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
 using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
 using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
@@ -82,6 +84,8 @@ builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
 builder.Services.AddCatalogTemplatesModule(builder.Configuration);
 builder.Services.AddCatalogDependencyGovernanceModule(builder.Configuration);
+builder.Services.AddCatalogGraphQL(includeExceptionDetails: builder.Environment.IsDevelopment())
+    .AddChangeGovernanceQueryExtension();
 builder.Services.AddGovernanceModule(builder.Configuration);
 builder.Services.AddIntegrationsModule(builder.Configuration);
 builder.Services.AddProductAnalyticsModule(builder.Configuration);
@@ -262,6 +266,7 @@ app.UseCors();
 app.UseRateLimiter();
 app.UseSecurityHeaders();
 app.UseGlobalExceptionHandler();
+app.UseWebSockets();
 app.UseCookieSessionCsrfProtection();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
@@ -270,6 +275,7 @@ app.UseAuthorization();
 
 // ── Endpoints ──
 app.MapAllModuleEndpoints();
+app.MapCatalogGraphQL();
 
 if (app.Environment.IsDevelopment())
 {
