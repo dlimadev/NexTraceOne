@@ -40,6 +40,13 @@ using ListCanonicalEntityVersionsFeature = NexTraceOne.Catalog.Application.Contr
 using DiffCanonicalEntityVersionsFeature = NexTraceOne.Catalog.Application.Contracts.Features.DiffCanonicalEntityVersions.DiffCanonicalEntityVersions;
 using GetCanonicalEntityUsagesFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityUsages.GetCanonicalEntityUsages;
 using GetCanonicalEntityImpactFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpact.GetCanonicalEntityImpact;
+using PropagateCanonicalEntityChangeFeature = NexTraceOne.Catalog.Application.Contracts.Features.PropagateCanonicalEntityChange.PropagateCanonicalEntityChange;
+using GenerateMockConfigurationFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateMockConfiguration.GenerateMockConfiguration;
+using EvaluateDesignGuidelinesFeature = NexTraceOne.Catalog.Application.Contracts.Features.EvaluateDesignGuidelines.EvaluateDesignGuidelines;
+using ExportContractMultiFormatFeature = NexTraceOne.Catalog.Application.Contracts.Features.ExportContractMultiFormat.ExportContractMultiFormat;
+using RegisterConsumerExpectationFeature = NexTraceOne.Catalog.Application.Contracts.Features.RegisterConsumerExpectation.RegisterConsumerExpectation;
+using GetContractConsumerExpectationsFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractConsumerExpectations.GetContractConsumerExpectations;
+using VerifyProviderCompatibilityFeature = NexTraceOne.Catalog.Application.Contracts.Features.VerifyProviderCompatibility.VerifyProviderCompatibility;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -452,6 +459,89 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(
                 new GetCanonicalEntityImpactFeature.Query(entityId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        canonicalGroup.MapPost("/{entityId:guid}/propagate", async (
+            Guid entityId,
+            PropagateCanonicalEntityChangeFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updated = command with { CanonicalEntityId = entityId };
+            var result = await sender.Send(updated, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:write");
+
+        // ── Mock, Design Guidelines, Multi-Format Export ─────────────────
+
+        group.MapGet("/{versionId:guid}/mock-config", async (
+            Guid versionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GenerateMockConfigurationFeature.Query(versionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/{versionId:guid}/design-guidelines", async (
+            Guid versionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new EvaluateDesignGuidelinesFeature.Query(versionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/{versionId:guid}/export-format", async (
+            Guid versionId,
+            string format,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ExportContractMultiFormatFeature.Query(versionId, format ?? "openapi-yaml"), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Consumer Expectations (CDCT) ─────────────────────────────────
+
+        group.MapPost("/{apiAssetId:guid}/consumer-expectations", async (
+            Guid apiAssetId,
+            RegisterConsumerExpectationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updated = command with { ApiAssetId = apiAssetId };
+            var result = await sender.Send(updated, cancellationToken);
+            return result.ToCreatedResult("/api/v1/contracts/{0}/consumer-expectations", localizer);
+        }).RequirePermission("contracts:write");
+
+        group.MapGet("/{apiAssetId:guid}/consumer-expectations", async (
+            Guid apiAssetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetContractConsumerExpectationsFeature.Query(apiAssetId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/{apiAssetId:guid}/versions/{versionId:guid}/cdct-verify", async (
+            Guid apiAssetId,
+            Guid versionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new VerifyProviderCompatibilityFeature.Query(apiAssetId, versionId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
     }

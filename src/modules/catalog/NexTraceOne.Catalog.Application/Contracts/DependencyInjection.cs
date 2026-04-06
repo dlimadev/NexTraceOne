@@ -14,11 +14,15 @@ using NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateEventDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateSoapDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.EvaluateContractRules;
+using NexTraceOne.Catalog.Application.Contracts.Features.EvaluateDesignGuidelines;
 using NexTraceOne.Catalog.Application.Contracts.Features.ExportContract;
+using NexTraceOne.Catalog.Application.Contracts.Features.ExportContractMultiFormat;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateEvidencePack;
+using NexTraceOne.Catalog.Application.Contracts.Features.GenerateMockConfiguration;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetContractConsumerExpectations;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetBackgroundServiceContractDetail;
@@ -38,6 +42,9 @@ using NexTraceOne.Catalog.Application.Contracts.Features.SuggestSemanticVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent;
 using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata;
 using NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity;
+using NexTraceOne.Catalog.Application.Contracts.Features.PropagateCanonicalEntityChange;
+using NexTraceOne.Catalog.Application.Contracts.Features.RegisterConsumerExpectation;
+using NexTraceOne.Catalog.Application.Contracts.Features.VerifyProviderCompatibility;
 
 namespace NexTraceOne.Catalog.Application.Contracts;
 
@@ -101,6 +108,15 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RegisterBackgroundServiceContract.Command>, RegisterBackgroundServiceContract.Validator>();
         services.AddTransient<IValidator<CreateBackgroundServiceDraft.Command>, CreateBackgroundServiceDraft.Validator>();
         services.AddTransient<IValidator<GetBackgroundServiceContractDetail.Query>, GetBackgroundServiceContractDetail.Validator>();
+
+        // Phase 5/6 — Mock, Design Guidelines, Canonical Propagation, CDCT, Multi-Format Export
+        services.AddTransient<IValidator<GenerateMockConfiguration.Query>, GenerateMockConfiguration.Validator>();
+        services.AddTransient<IValidator<EvaluateDesignGuidelines.Query>, EvaluateDesignGuidelines.Validator>();
+        services.AddTransient<IValidator<PropagateCanonicalEntityChange.Command>, PropagateCanonicalEntityChange.Validator>();
+        services.AddTransient<IValidator<RegisterConsumerExpectation.Command>, RegisterConsumerExpectation.Validator>();
+        services.AddTransient<IValidator<GetContractConsumerExpectations.Query>, GetContractConsumerExpectations.Validator>();
+        services.AddTransient<IValidator<VerifyProviderCompatibility.Query>, VerifyProviderCompatibility.Validator>();
+        services.AddTransient<IValidator<ExportContractMultiFormat.Query>, ExportContractMultiFormat.Validator>();
 
         return services;
     }
