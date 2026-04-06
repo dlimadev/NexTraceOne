@@ -4049,7 +4049,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "json-editor",
             sortOrder: 6670),
 
-        // ── PARAMETERIZATION-MODULE v2.0 — 112 Governance Parameters ──────────────
+        // ── PARAMETERIZATION-MODULE v2.0 — 113 Governance Parameters ──────────────
 
         // ── Service Catalog ────────────────────────────────────────────────────────
         ConfigurationDefinition.Create(
