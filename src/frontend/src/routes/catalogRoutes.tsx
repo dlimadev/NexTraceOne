@@ -25,6 +25,7 @@ const TemplateEditorPage = lazy(() => import('../features/catalog/pages/Template
 const AiScaffoldWizardPage = lazy(() => import('../features/catalog/pages/AiScaffoldWizardPage').then(m => ({ default: m.AiScaffoldWizardPage })));
 const ContractPipelinePage = lazy(() => import('../features/catalog/pages/ContractPipelinePage').then(m => ({ default: m.ContractPipelinePage })));
 const SecurityGateDashboardPage = lazy(() => import('../features/catalog/pages/SecurityGateDashboardPage').then(m => ({ default: m.SecurityGateDashboardPage })));
+const SelfServicePortalPage = lazy(() => import('../features/catalog/pages/SelfServicePortalPage').then(m => ({ default: m.SelfServicePortalPage })));
 
 export function CatalogRoutes() {
   return (
@@ -189,6 +190,14 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="governance:security:scan" redirectTo="/unauthorized">
             <SecurityGateDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/catalog/self-service"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <SelfServicePortalPage />
           </ProtectedRoute>
         }
       />

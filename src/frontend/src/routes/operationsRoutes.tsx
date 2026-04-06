@@ -19,6 +19,7 @@ const AutomationAdminPage = lazy(() => import('../features/operations/pages/Auto
 const AutomationWorkflowDetailPage = lazy(() => import('../features/operations/pages/AutomationWorkflowDetailPage').then(m => ({ default: m.AutomationWorkflowDetailPage })));
 const EnvironmentComparisonPage = lazy(() => import('../features/operations/pages/EnvironmentComparisonPage').then(m => ({ default: m.EnvironmentComparisonPage })));
 const OnCallIntelligencePage = lazy(() => import('../features/operations/pages/OnCallIntelligencePage').then(m => ({ default: m.OnCallIntelligencePage })));
+const ChaosEngineeringPage = lazy(() => import('../features/operations/pages/ChaosEngineeringPage').then(m => ({ default: m.ChaosEngineeringPage })));
 
 export function OperationsRoutes() {
   return (
@@ -132,6 +133,14 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
             <OnCallIntelligencePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/chaos-engineering"
+        element={
+          <ProtectedRoute permission="operations:runtime:write" redirectTo="/unauthorized">
+            <ChaosEngineeringPage />
           </ProtectedRoute>
         }
       />

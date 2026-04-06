@@ -17,6 +17,8 @@ using CompareReleaseRuntimeFeature = NexTraceOne.OperationalIntelligence.Applica
 using EstablishRuntimeBaselineFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline.EstablishRuntimeBaseline;
 using CompareEnvironmentsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CompareEnvironments.CompareEnvironments;
 using CorrelateTraceToChangeFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateTraceToChange.CorrelateTraceToChange;
+using CreateChaosExperimentFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CreateChaosExperiment.CreateChaosExperiment;
+using ListChaosExperimentsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ListChaosExperiments.ListChaosExperiments;
 using CorrelateServiceMetricsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateServiceMetrics.CorrelateServiceMetrics;
 using DetectLogAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectLogAnomaly.DetectLogAnomaly;
 using GetTopologyAwareAlertsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTopologyAwareAlerts.GetTopologyAwareAlerts;
@@ -225,5 +227,33 @@ public sealed class RuntimeIntelligenceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:read");
+
+        // ── Chaos Engineering: experiment planning ────────────────────────────────
+
+        group.MapPost("/chaos/experiments", async (
+            CreateChaosExperimentFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runtime:write");
+
+        group.MapGet("/chaos/experiments", async (
+            string? serviceName,
+            string? environment,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 20) =>
+        {
+            var query = new ListChaosExperimentsFeature.Query(serviceName, environment, page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runtime:read");
     }
 }
