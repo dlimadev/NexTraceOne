@@ -2464,6 +2464,18 @@
     "filterPlaceholder": "Insira UUID para ver histórico de contratos",
     "fingerprint": "Fingerprint",
     "format": "Formato",
+    "healthDashboard": {
+      "title": "Dashboard de Saúde dos Contratos",
+      "subtitle": "Métricas agregadas de qualidade e governança de todos os contratos",
+      "healthScore": "Score de Saúde",
+      "totalContracts": "Total de Contratos",
+      "withExamples": "Com Exemplos",
+      "withCanonical": "Com Entidades Canónicas",
+      "deprecated": "Versões Deprecated",
+      "topViolations": "Contratos com Mais Violações",
+      "violations": "violações",
+      "noViolations": "Nenhuma violação de regras detectada — contratos saudáveis!"
+    },
     "governance": {
       "approvedCount": "Aprovado",
       "audit": {
@@ -5947,6 +5959,7 @@
     "compliance": "Conformidade",
     "contractCatalog": "Catálogo de Contratos",
     "contractGovernance": "Governança de Contratos",
+    "contractHealthDashboard": "Dashboard de Saúde dos Contratos",
     "contractStudio": "Estúdio de Contratos",
     "controls": "Controles Empresariais",
     "createContract": "Novo Contrato",

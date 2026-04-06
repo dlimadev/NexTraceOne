@@ -13,6 +13,7 @@ const ContractWorkspacePage = lazy(() => import('../features/contracts/workspace
 const SpectralRulesetManagerPage = lazy(() => import('../features/contracts/spectral/SpectralRulesetManagerPage').then(m => ({ default: m.SpectralRulesetManagerPage })));
 const CanonicalEntityCatalogPage = lazy(() => import('../features/contracts/canonical/CanonicalEntityCatalogPage').then(m => ({ default: m.CanonicalEntityCatalogPage })));
 const ContractGovernancePage = lazy(() => import('../features/contracts/governance/ContractGovernancePage').then(m => ({ default: m.ContractGovernancePage })));
+const ContractHealthDashboardPage = lazy(() => import('../features/contracts/governance/ContractHealthDashboardPage').then(m => ({ default: m.ContractHealthDashboardPage })));
 const ContractPortalPage = lazy(() => import('../features/contracts/portal/ContractPortalPage').then(m => ({ default: m.ContractPortalPage })));
 const PublicationCenterPage = lazy(() => import('../features/contracts/publication/PublicationCenterPage').then(m => ({ default: m.PublicationCenterPage })));
 
@@ -66,6 +67,14 @@ export function ContractsRoutes() {
         element={
           <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
             <CanonicalEntityCatalogPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/health"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ContractHealthDashboardPage />
           </ProtectedRoute>
         }
       />

@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample;
 using NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
+using NexTraceOne.Catalog.Application.Contracts.Features.ComputeContractHealthDashboard;
 using NexTraceOne.Catalog.Application.Contracts.Features.ComputeSemanticDiff;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateBackgroundServiceDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.CreateContractVersion;
@@ -21,13 +22,18 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateEvidencePack;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateMockConfiguration;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateScorecard;
+using NexTraceOne.Catalog.Application.Contracts.Features.GenerateSemanticChangelog;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetCompatibilityAssessment;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractConsumerExpectations;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractHistory;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetDeprecationProgress;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetBackgroundServiceContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetEventContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSoapContractDetail;
+using NexTraceOne.Catalog.Application.Contracts.Features.InferDependenciesFromContracts;
+using NexTraceOne.Catalog.Application.Contracts.Features.InitiateContractDeprecation;
+using NexTraceOne.Catalog.Application.Contracts.Features.SuggestSchemaFromContext;
 using NexTraceOne.Catalog.Application.Contracts.Features.ImportAsyncApiContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.ImportContract;
 using NexTraceOne.Catalog.Application.Contracts.Features.ImportWsdlContract;
@@ -117,6 +123,13 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetContractConsumerExpectations.Query>, GetContractConsumerExpectations.Validator>();
         services.AddTransient<IValidator<VerifyProviderCompatibility.Query>, VerifyProviderCompatibility.Validator>();
         services.AddTransient<IValidator<ExportContractMultiFormat.Query>, ExportContractMultiFormat.Validator>();
+
+        // Phase 6 — Intelligence & Governance
+        services.AddTransient<IValidator<InferDependenciesFromContracts.Command>, InferDependenciesFromContracts.Validator>();
+        services.AddTransient<IValidator<GenerateSemanticChangelog.Query>, GenerateSemanticChangelog.Validator>();
+        services.AddTransient<IValidator<SuggestSchemaFromContext.Query>, SuggestSchemaFromContext.Validator>();
+        services.AddTransient<IValidator<InitiateContractDeprecation.Command>, InitiateContractDeprecation.Validator>();
+        services.AddTransient<IValidator<GetDeprecationProgress.Query>, GetDeprecationProgress.Validator>();
 
         return services;
     }

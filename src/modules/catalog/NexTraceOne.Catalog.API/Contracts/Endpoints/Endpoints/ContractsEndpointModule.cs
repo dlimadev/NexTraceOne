@@ -47,6 +47,12 @@ using ExportContractMultiFormatFeature = NexTraceOne.Catalog.Application.Contrac
 using RegisterConsumerExpectationFeature = NexTraceOne.Catalog.Application.Contracts.Features.RegisterConsumerExpectation.RegisterConsumerExpectation;
 using GetContractConsumerExpectationsFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractConsumerExpectations.GetContractConsumerExpectations;
 using VerifyProviderCompatibilityFeature = NexTraceOne.Catalog.Application.Contracts.Features.VerifyProviderCompatibility.VerifyProviderCompatibility;
+using InferDependenciesFromContractsFeature = NexTraceOne.Catalog.Application.Contracts.Features.InferDependenciesFromContracts.InferDependenciesFromContracts;
+using GenerateSemanticChangelogFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateSemanticChangelog.GenerateSemanticChangelog;
+using ComputeContractHealthDashboardFeature = NexTraceOne.Catalog.Application.Contracts.Features.ComputeContractHealthDashboard.ComputeContractHealthDashboard;
+using SuggestSchemaFromContextFeature = NexTraceOne.Catalog.Application.Contracts.Features.SuggestSchemaFromContext.SuggestSchemaFromContext;
+using InitiateContractDeprecationFeature = NexTraceOne.Catalog.Application.Contracts.Features.InitiateContractDeprecation.InitiateContractDeprecation;
+using GetDeprecationProgressFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDeprecationProgress.GetDeprecationProgress;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -542,6 +548,84 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(
                 new VerifyProviderCompatibilityFeature.Query(apiAssetId, versionId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Phase 6 — Intelligence & Governance ──────────────────────────
+
+        group.MapPost("/{serviceId:guid}/infer-dependencies", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new InferDependenciesFromContractsFeature.Command(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/{apiAssetId:guid}/semantic-changelog", async (
+            Guid apiAssetId,
+            string? fromVersion,
+            string? toVersion,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GenerateSemanticChangelogFeature.Query(apiAssetId, fromVersion, toVersion), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/health-dashboard", async (
+            string? domain,
+            string? contractType,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ComputeContractHealthDashboardFeature.Query(domain, contractType, page <= 0 ? 1 : page, pageSize <= 0 ? 20 : pageSize),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapGet("/suggest-schema", async (
+            string method,
+            string path,
+            string? domain,
+            Guid? serviceAssetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new SuggestSchemaFromContextFeature.Query(method, path, domain, serviceAssetId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        group.MapPost("/{apiAssetId:guid}/deprecate", async (
+            Guid apiAssetId,
+            InitiateContractDeprecationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updated = command with { ApiAssetId = apiAssetId };
+            var result = await sender.Send(updated, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:write");
+
+        group.MapGet("/{apiAssetId:guid}/deprecation-progress", async (
+            Guid apiAssetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetDeprecationProgressFeature.Query(apiAssetId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
     }

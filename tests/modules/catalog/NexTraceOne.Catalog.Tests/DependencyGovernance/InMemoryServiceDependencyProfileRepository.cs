@@ -34,6 +34,15 @@ internal sealed class InMemoryServiceDependencyProfileRepository : IServiceDepen
         return Task.FromResult<IReadOnlyList<ServiceDependencyProfile>>(result);
     }
 
+    public Task<IReadOnlyList<ServiceDependencyProfile>> ListByPackageNameAsync(string packageName, CancellationToken ct)
+    {
+        var result = _profiles
+            .Where(p => p.Dependencies.Any(d =>
+                string.Equals(d.PackageName, packageName, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+        return Task.FromResult<IReadOnlyList<ServiceDependencyProfile>>(result);
+    }
+
     public Task AddAsync(ServiceDependencyProfile profile, CancellationToken ct)
     {
         _profiles.Add(profile);

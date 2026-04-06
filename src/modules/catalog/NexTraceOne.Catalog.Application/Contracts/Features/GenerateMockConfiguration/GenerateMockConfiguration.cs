@@ -132,7 +132,7 @@ public static class GenerateMockConfiguration
 
                         foreach (var responseProp in responses.EnumerateObject())
                         {
-                            if (!int.TryParse(responseProp.Key, out var statusCode)) continue;
+                            if (!int.TryParse(responseProp.Name, out var statusCode)) continue;
                             if (statusCode < 200 || statusCode >= 300) continue;
 
                             // Procura exemplo no content

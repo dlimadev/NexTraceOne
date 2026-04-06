@@ -166,8 +166,8 @@ public static class EvaluateDesignGuidelines
             if (!operation.TryGetProperty("responses", out var responses)) return false;
             foreach (var r in responses.EnumerateObject())
             {
-                if (int.TryParse(r.Key, out var code) && code >= 200 && code < 300) return true;
-                if (r.Key == "2XX" || r.Key == "default") return true;
+                if (int.TryParse(r.Name, out var code) && code >= 200 && code < 300) return true;
+                if (r.Name == "2XX" || r.Name == "default") return true;
             }
             return false;
         }
