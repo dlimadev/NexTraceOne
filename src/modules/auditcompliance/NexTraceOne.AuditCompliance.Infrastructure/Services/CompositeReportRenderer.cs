@@ -1,4 +1,5 @@
 using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 
@@ -12,11 +13,11 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 ///
 /// Persona: Auditor, Executive.
 /// </summary>
-public sealed class CompositeReportRenderer : IReportRenderer
+public sealed class CompositeReportRenderer(IDateTimeProvider dateTimeProvider) : IReportRenderer
 {
-    private readonly JsonReportRenderer _jsonRenderer = new();
-    private readonly PdfReportRenderer _pdfRenderer = new();
-    private readonly XlsxReportRenderer _xlsxRenderer = new();
+    private readonly JsonReportRenderer _jsonRenderer = new(dateTimeProvider);
+    private readonly PdfReportRenderer _pdfRenderer = new(dateTimeProvider);
+    private readonly XlsxReportRenderer _xlsxRenderer = new(dateTimeProvider);
 
     /// <inheritdoc />
     public Task<RenderedReport> RenderAsync(

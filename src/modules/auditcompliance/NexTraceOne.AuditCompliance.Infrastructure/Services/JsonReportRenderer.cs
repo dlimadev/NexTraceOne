@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 
@@ -12,7 +13,7 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 ///
 /// Persona: Auditor, Executive.
 /// </summary>
-public sealed class JsonReportRenderer : IReportRenderer
+public sealed class JsonReportRenderer(IDateTimeProvider dateTimeProvider) : IReportRenderer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -29,10 +30,11 @@ public sealed class JsonReportRenderer : IReportRenderer
         // JSON é o formato padrão para auditoria.
         var json = JsonSerializer.Serialize(report, SerializerOptions);
         var bytes = Encoding.UTF8.GetBytes(json);
+        var now = dateTimeProvider.UtcNow;
 
         return Task.FromResult(new RenderedReport(
             bytes,
             "application/json",
-            $"audit-report-{DateTime.UtcNow:yyyyMMdd-HHmmss}.json"));
+            $"audit-report-{now:yyyyMMdd-HHmmss}.json"));
     }
 }

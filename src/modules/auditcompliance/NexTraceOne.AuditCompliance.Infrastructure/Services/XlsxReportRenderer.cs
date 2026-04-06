@@ -3,6 +3,7 @@ using System.Text.Json;
 using ClosedXML.Excel;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 
@@ -15,7 +16,7 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 ///
 /// Persona: Auditor, Executive.
 /// </summary>
-public sealed class XlsxReportRenderer : IReportRenderer
+public sealed class XlsxReportRenderer(IDateTimeProvider dateTimeProvider) : IReportRenderer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -76,10 +77,12 @@ public sealed class XlsxReportRenderer : IReportRenderer
         workbook.SaveAs(stream);
         var bytes = stream.ToArray();
 
+        var now = dateTimeProvider.UtcNow;
+
         return Task.FromResult(new RenderedReport(
             bytes,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            $"audit-report-{DateTime.UtcNow:yyyyMMdd-HHmmss}.xlsx"));
+            $"audit-report-{now:yyyyMMdd-HHmmss}.xlsx"));
     }
 
     private static void FlattenObject(

@@ -1,6 +1,7 @@
 using System.Text.Json;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -16,7 +17,7 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 ///
 /// Persona: Auditor, Executive.
 /// </summary>
-public sealed class PdfReportRenderer : IReportRenderer
+public sealed class PdfReportRenderer(IDateTimeProvider dateTimeProvider) : IReportRenderer
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -33,7 +34,8 @@ public sealed class PdfReportRenderer : IReportRenderer
         QuestPDF.Settings.License = LicenseType.Community;
 
         var jsonElement = JsonSerializer.SerializeToElement(report, SerializerOptions);
-        var timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss UTC");
+        var now = dateTimeProvider.UtcNow;
+        var timestamp = now.ToString("yyyy-MM-dd HH:mm:ss UTC");
 
         var document = Document.Create(container =>
         {
@@ -80,7 +82,7 @@ public sealed class PdfReportRenderer : IReportRenderer
         return Task.FromResult(new RenderedReport(
             bytes,
             "application/pdf",
-            $"audit-report-{DateTime.UtcNow:yyyyMMdd-HHmmss}.pdf"));
+            $"audit-report-{now:yyyyMMdd-HHmmss}.pdf"));
     }
 
     /// <summary>
