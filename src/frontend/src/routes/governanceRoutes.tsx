@@ -33,6 +33,8 @@ const DelegatedAdminPage = lazy(() => import('../features/governance/pages/Deleg
 const GovernanceConfigurationPage = lazy(() => import('../features/governance/pages/GovernanceConfigurationPage').then(m => ({ default: m.GovernanceConfigurationPage })));
 const DoraMetricsPage = lazy(() => import('../features/governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
 const ServiceScorecardPage = lazy(() => import('../features/governance/pages/ServiceScorecardPage').then(m => ({ default: m.ServiceScorecardPage })));
+const CustomDashboardsPage = lazy(() => import('../features/governance/pages/CustomDashboardsPage').then(m => ({ default: m.CustomDashboardsPage })));
+const TechnicalDebtPage = lazy(() => import('../features/governance/pages/TechnicalDebtPage').then(m => ({ default: m.TechnicalDebtPage })));
 
 export function GovernanceRoutes() {
   return (
@@ -258,6 +260,22 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <ServiceScorecardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/custom-dashboards"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <CustomDashboardsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/technical-debt"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <TechnicalDebtPage />
           </ProtectedRoute>
         }
       />
