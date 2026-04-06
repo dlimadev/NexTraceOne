@@ -164,6 +164,97 @@ builder.Services.AddHealthChecks()
         failureStatus: HealthStatus.Unhealthy,
         tags: ["health"],
         args: [ModuleOutboxProcessorJob<ConfigurationDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    // Catalog module DbContexts
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-catalog-graph",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<CatalogGraphDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-contracts",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<ContractsDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-developer-portal",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<DeveloperPortalDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    // ChangeGovernance module DbContexts
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-change-intelligence",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<ChangeIntelligenceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-ruleset-governance",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<RulesetGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-workflow",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<WorkflowDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-promotion",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<PromotionDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    // AIKnowledge module DbContexts
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-ai-governance",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<AiGovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-external-ai",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<ExternalAiDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-ai-orchestration",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<AiOrchestrationDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    // Governance module
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-governance",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<GovernanceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    // AuditCompliance module
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-audit",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<AuditDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    // OperationalIntelligence module DbContexts
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-runtime-intelligence",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<RuntimeIntelligenceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-reliability",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<ReliabilityDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-cost-intelligence",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<CostIntelligenceDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-incidents",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<IncidentDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "outbox-processor-automation",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["health"],
+        args: [ModuleOutboxProcessorJob<AutomationDbContext>.HealthCheckName, TimeSpan.FromMinutes(2)])
     .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
         "identity-expiration-job",
         failureStatus: HealthStatus.Unhealthy,
