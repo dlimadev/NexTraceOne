@@ -22,6 +22,18 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
             .Include(v => v.Artifacts)
             .SingleOrDefaultAsync(v => v.Id == id, ct);
 
+    /// <summary>
+    /// Busca uma versão de contrato pelo Id com todas as entidades relacionadas carregadas.
+    /// Usa AsNoTracking para leitura de detalhe — adequado para consultas de exibição e análise.
+    /// </summary>
+    public async Task<ContractVersion?> GetDetailAsync(ContractVersionId id, CancellationToken ct = default)
+        => await context.ContractVersions
+            .AsNoTracking()
+            .Include(v => v.Diffs)
+            .Include(v => v.RuleViolations)
+            .Include(v => v.Artifacts)
+            .SingleOrDefaultAsync(v => v.Id == id, ct);
+
     /// <summary>Busca uma versão de contrato pelo ativo de API e versão semântica.</summary>
     public async Task<ContractVersion?> GetByApiAssetAndSemVerAsync(Guid apiAssetId, string semVer, CancellationToken ct = default)
         => await context.ContractVersions

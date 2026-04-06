@@ -25,16 +25,20 @@ public sealed class ContractPipelineEndpointModule
     {
         var group = app.MapGroup("/api/v1/catalog/contracts/pipeline");
 
-        // Gerar stubs de servidor
+        // Gerar stubs de servidor (funcionalidade em preview — requer implementação pelo developer)
         group.MapPost("/server", async (
             GenerateServerFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
+            httpContext.Response.Headers["X-Feature-Preview"] = "true";
             return result.ToHttpResult(localizer);
-        }).RequirePermission("catalog:contracts:pipeline:read");
+        })
+        .RequirePermission("catalog:contracts:pipeline:read")
+        .WithDescription("Gera stubs de servidor a partir de um contrato. PREVIEW: o código gerado contém stubs e TODOs que requerem implementação pelo developer. Não pronto para produção sem revisão.");
 
         // Gerar mock server
         group.MapPost("/mock-server", async (

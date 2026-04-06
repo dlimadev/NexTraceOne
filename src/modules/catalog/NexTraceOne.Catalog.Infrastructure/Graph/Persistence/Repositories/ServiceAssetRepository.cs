@@ -14,6 +14,16 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
     public override async Task<ServiceAsset?> GetByIdAsync(ServiceAssetId id, CancellationToken ct = default)
         => await _context.ServiceAssets.SingleOrDefaultAsync(svc => svc.Id == id, ct);
 
+    /// <summary>
+    /// Busca um ativo de serviço pelo Id com leitura somente (AsNoTracking).
+    /// Adequado para consultas de detalhe de serviço na UI ou relatórios.
+    /// ServiceAsset não possui coleções de navegação no modelo actual — retorna o agregado completo.
+    /// </summary>
+    public async Task<ServiceAsset?> GetDetailAsync(ServiceAssetId id, CancellationToken ct = default)
+        => await _context.ServiceAssets
+            .AsNoTracking()
+            .SingleOrDefaultAsync(svc => svc.Id == id, ct);
+
     public async Task<ServiceAsset?> GetByNameAsync(string name, CancellationToken cancellationToken)
         => await _context.ServiceAssets.SingleOrDefaultAsync(svc => svc.Name == name, cancellationToken);
 

@@ -14,6 +14,12 @@ public interface IContractVersionRepository
     /// <summary>Busca uma versão de contrato pelo seu identificador.</summary>
     Task<ContractVersion?> GetByIdAsync(ContractVersionId id, CancellationToken ct = default);
 
+    /// <summary>
+    /// Busca uma versão de contrato pelo Id com todas as entidades relacionadas carregadas (Diffs, Violations, Artifacts).
+    /// Usa AsNoTracking — recomendado para consultas de leitura de detalhe.
+    /// </summary>
+    Task<ContractVersion?> GetDetailAsync(ContractVersionId id, CancellationToken ct = default);
+
     /// <summary>Busca uma versão de contrato pelo ativo de API e versão semântica.</summary>
     Task<ContractVersion?> GetByApiAssetAndSemVerAsync(Guid apiAssetId, string semVer, CancellationToken ct = default);
 

@@ -582,4 +582,90 @@ public sealed class ContractStudioApplicationTests
         result.Value.Protocol.Should().Be("Wsdl");
         result.Value.ContractType.Should().Be("Soap");
     }
+
+    // ── Theory: multi-protocolo ─────────────────────────────────────────
+
+    [Theory]
+    [InlineData(ContractType.RestApi, ContractProtocol.OpenApi, "OpenApi", "RestApi")]
+    [InlineData(ContractType.Event, ContractProtocol.AsyncApi, "AsyncApi", "Event")]
+    [InlineData(ContractType.Soap, ContractProtocol.Wsdl, "Wsdl", "Soap")]
+    public async Task CreateDraft_Should_ReturnCorrectProtocol_ForMultipleProtocols(
+        ContractType contractType,
+        ContractProtocol protocol,
+        string expectedProtocol,
+        string expectedContractType)
+    {
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var unitOfWork = CreateUnitOfWork();
+        var dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        var sut = new CreateDraftFeature.Handler(draftRepo, unitOfWork, dateTimeProvider);
+
+        var result = await sut.Handle(
+            new CreateDraftFeature.Command($"Test {expectedProtocol} Contract", "engineer@test.com", contractType, protocol, null, null),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DraftId.Should().NotBeEmpty();
+        result.Value.Title.Should().Contain(expectedProtocol);
+        draftRepo.Received(1).Add(Arg.Is<ContractDraft>(d =>
+            d.ContractType == contractType && d.Protocol == protocol));
+    }
+
+    [Theory]
+    [InlineData(ContractType.RestApi, ContractProtocol.OpenApi)]
+    [InlineData(ContractType.Event, ContractProtocol.AsyncApi)]
+    [InlineData(ContractType.Soap, ContractProtocol.Wsdl)]
+    public async Task ExportDraft_Should_ReturnCorrectProtocol_ForMultipleProtocols(
+        ContractType contractType,
+        ContractProtocol protocol)
+    {
+        var draft = ContractDraft.Create(
+            $"Draft {protocol}", "author@test.com", contractType, protocol).Value;
+
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
+            .Returns(draft);
+
+        var sut = new ExportDraftFeature.Handler(draftRepo);
+
+        var result = await sut.Handle(
+            new ExportDraftFeature.Query(draft.Id.Value),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Protocol.Should().Be(protocol.ToString());
+        result.Value.ContractType.Should().Be(contractType.ToString());
+    }
+
+    [Theory]
+    [InlineData(ContractType.RestApi, ContractProtocol.OpenApi, "Generate a REST API")]
+    [InlineData(ContractType.Event, ContractProtocol.AsyncApi, "Generate a Kafka event contract")]
+    [InlineData(ContractType.Soap, ContractProtocol.Wsdl, "Generate a SOAP web service")]
+    public async Task GenerateDraftFromAi_Should_Succeed_ForMultipleProtocols(
+        ContractType contractType,
+        ContractProtocol protocol,
+        string prompt)
+    {
+        var draftRepo = Substitute.For<IContractDraftRepository>();
+        var unitOfWork = CreateUnitOfWork();
+
+        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork);
+
+        var result = await sut.Handle(
+            new GenerateDraftFromAiFeature.Command(
+                $"AI {protocol} Contract",
+                "engineer@test.com",
+                contractType,
+                protocol,
+                prompt),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.DraftId.Should().NotBeEmpty();
+        result.Value.GeneratedContent.Should().NotBeNullOrWhiteSpace();
+        draftRepo.Received(1).Add(Arg.Any<ContractDraft>());
+        await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
 }
