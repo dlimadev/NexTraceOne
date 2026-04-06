@@ -14,6 +14,9 @@ using GetIngestionHealthFeature = NexTraceOne.Integrations.Application.Features.
 using GetIngestionFreshnessFeature = NexTraceOne.Integrations.Application.Features.GetIngestionFreshness.GetIngestionFreshness;
 using RetryConnectorFeature = NexTraceOne.Integrations.Application.Features.RetryConnector.RetryConnector;
 using ReprocessExecutionFeature = NexTraceOne.Integrations.Application.Features.ReprocessExecution.ReprocessExecution;
+using RegisterWebhookSubscriptionFeature = NexTraceOne.Integrations.Application.Features.RegisterWebhookSubscription.RegisterWebhookSubscription;
+using ListWebhookSubscriptionsFeature = NexTraceOne.Integrations.Application.Features.ListWebhookSubscriptions.ListWebhookSubscriptions;
+using GetWebhookEventTypesFeature = NexTraceOne.Integrations.Application.Features.GetWebhookEventTypes.GetWebhookEventTypes;
 
 namespace NexTraceOne.Integrations.API.Endpoints;
 
@@ -151,5 +154,43 @@ public sealed class IntegrationHubEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("integrations:write");
+
+        // ── Webhook Subscriptions ──────────────────────────────────────────
+
+        var webhooks = integrations.MapGroup("/webhooks");
+
+        webhooks.MapPost("/subscriptions", async (
+            RegisterWebhookSubscriptionFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("integrations:webhooks:write");
+
+        webhooks.MapGet("/subscriptions", async (
+            string tenantId,
+            bool? isActive,
+            int? page,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ListWebhookSubscriptionsFeature.Query(
+                tenantId, isActive, page ?? 1, pageSize ?? 20);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("integrations:connectors:read");
+
+        webhooks.MapGet("/event-types", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetWebhookEventTypesFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("integrations:connectors:read");
     }
 }

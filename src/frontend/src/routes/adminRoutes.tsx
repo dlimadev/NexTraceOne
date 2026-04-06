@@ -37,6 +37,7 @@ const IntegrationHubPage = lazy(() => import('../features/integrations/pages/Int
 const ConnectorDetailPage = lazy(() => import('../features/integrations/pages/ConnectorDetailPage').then(m => ({ default: m.ConnectorDetailPage })));
 const IngestionExecutionsPage = lazy(() => import('../features/integrations/pages/IngestionExecutionsPage').then(m => ({ default: m.IngestionExecutionsPage })));
 const IngestionFreshnessPage = lazy(() => import('../features/integrations/pages/IngestionFreshnessPage').then(m => ({ default: m.IngestionFreshnessPage })));
+const WebhookSubscriptionsPage = lazy(() => import('../features/integrations/pages/WebhookSubscriptionsPage').then(m => ({ default: m.WebhookSubscriptionsPage })));
 
 // Product Analytics
 const ProductAnalyticsOverviewPage = lazy(() => import('../features/product-analytics/pages/ProductAnalyticsOverviewPage').then(m => ({ default: m.ProductAnalyticsOverviewPage })));
@@ -226,6 +227,14 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="integrations:read" redirectTo="/unauthorized">
             <IngestionFreshnessPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/integrations/webhooks"
+        element={
+          <ProtectedRoute permission="integrations:connectors:read" redirectTo="/unauthorized">
+            <WebhookSubscriptionsPage />
           </ProtectedRoute>
         }
       />

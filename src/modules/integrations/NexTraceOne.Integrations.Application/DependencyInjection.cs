@@ -8,6 +8,8 @@ using NexTraceOne.Integrations.Application.Features.GetIntegrationConnector;
 using NexTraceOne.Integrations.Application.Features.ListIngestionExecutions;
 using NexTraceOne.Integrations.Application.Features.ListIngestionSources;
 using NexTraceOne.Integrations.Application.Features.ListIntegrationConnectors;
+using NexTraceOne.Integrations.Application.Features.RegisterWebhookSubscription;
+using NexTraceOne.Integrations.Application.Features.ListWebhookSubscriptions;
 using NexTraceOne.Integrations.Application.Parsing;
 
 namespace NexTraceOne.Integrations.Application;
@@ -33,6 +35,8 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListIngestionSources.Query>, ListIngestionSources.Validator>();
         services.AddTransient<IValidator<GetIngestionFreshness.Query>, GetIngestionFreshness.Validator>();
         services.AddTransient<IValidator<ListIntegrationConnectors.Query>, ListIntegrationConnectors.Validator>();
+        services.AddTransient<IValidator<RegisterWebhookSubscription.Command>, RegisterWebhookSubscription.Validator>();
+        services.AddTransient<IValidator<ListWebhookSubscriptions.Query>, ListWebhookSubscriptions.Validator>();
 
         return services;
     }
