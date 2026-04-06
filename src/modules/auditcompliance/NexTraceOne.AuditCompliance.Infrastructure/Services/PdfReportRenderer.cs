@@ -69,7 +69,7 @@ public sealed class PdfReportRenderer(IDateTimeProvider dateTimeProvider) : IRep
         document.Info.Author = "NexTraceOne Audit Module";
         document.Info.Subject = $"Audit Report generated at {timestamp}";
 
-        var ctx = new RenderContext(document, timestamp);
+        using var ctx = new RenderContext(document, timestamp);
         ctx.EnsurePage();
 
         // ── Render content ──
@@ -95,7 +95,7 @@ public sealed class PdfReportRenderer(IDateTimeProvider dateTimeProvider) : IRep
     /// <summary>
     /// Contexto de renderização que mantém a posição Y corrente e cria novas páginas conforme necessário.
     /// </summary>
-    private sealed class RenderContext
+    private sealed class RenderContext : IDisposable
     {
         public PdfDocument Document { get; }
         public string Timestamp { get; }
@@ -112,6 +112,12 @@ public sealed class PdfReportRenderer(IDateTimeProvider dateTimeProvider) : IRep
         }
 
         public double ContentWidth => (CurrentPage?.Width.Point ?? 595) - 2 * PageMarginH;
+
+        public void Dispose()
+        {
+            Gfx?.Dispose();
+            Gfx = null;
+        }
 
         public void EnsurePage()
         {
