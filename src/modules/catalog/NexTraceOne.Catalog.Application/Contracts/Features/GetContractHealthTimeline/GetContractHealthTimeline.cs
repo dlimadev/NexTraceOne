@@ -125,7 +125,7 @@ public static class GetContractHealthTimeline
         private static int ExtractMajorVersion(string semVer)
         {
             var dot = semVer.IndexOf('.', StringComparison.Ordinal);
-            if (dot <= 0) return 0;
+            if (dot < 0) return 0;
             return int.TryParse(semVer[..dot], out var major) ? major : 0;
         }
     }
