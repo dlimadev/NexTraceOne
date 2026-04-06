@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -75,11 +75,6 @@ export function CreateContractPage() {
   const [selectedMode, setSelectedMode] = useState<CreationMode | null>(null);
   const [selectedProtocol, setSelectedProtocol] = useState<ContractProtocol | ''>('');
   const [linkedServiceId, setLinkedServiceId] = useState(() => searchParams.get('serviceId') ?? '');
-
-  useEffect(() => {
-    const serviceId = searchParams.get('serviceId');
-    if (serviceId) setLinkedServiceId(serviceId);
-  }, [searchParams]);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

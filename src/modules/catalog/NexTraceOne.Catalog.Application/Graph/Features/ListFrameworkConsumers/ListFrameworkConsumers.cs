@@ -51,29 +51,26 @@ public static class ListFrameworkConsumers
             var profiles = await dependencyProfileRepository.ListByPackageNameAsync(
                 frameworkDetail.PackageName, cancellationToken);
 
-            var consumers = new List<ConsumerItem>();
-            foreach (var profile in profiles)
-            {
-                if (profile.ServiceId == request.ServiceAssetId)
-                    continue;
+            var consumerServiceIds = profiles
+                .Where(p => p.ServiceId != request.ServiceAssetId)
+                .Select(p => p.ServiceId)
+                .Distinct()
+                .ToList();
 
-                var consumerAsset = await serviceAssetRepository.GetByIdAsync(
-                    ServiceAssetId.From(profile.ServiceId), cancellationToken);
+            if (consumerServiceIds.Count == 0)
+                return new Response(request.ServiceAssetId, frameworkDetail.PackageName, []);
 
-                if (consumerAsset is null)
-                    continue;
+            var allServiceAssets = await serviceAssetRepository.ListAllAsync(cancellationToken);
+            var assetLookup = allServiceAssets.ToDictionary(a => a.Id.Value);
 
-                consumers.Add(new ConsumerItem(
-                    consumerAsset.Id.Value,
-                    consumerAsset.Name,
-                    consumerAsset.Domain,
-                    consumerAsset.TeamName));
-            }
+            var consumers = consumerServiceIds
+                .Where(id => assetLookup.ContainsKey(id))
+                .Select(id => assetLookup[id])
+                .Select(a => new ConsumerItem(a.Id.Value, a.Name, a.Domain, a.TeamName))
+                .ToList()
+                .AsReadOnly();
 
-            return new Response(
-                request.ServiceAssetId,
-                frameworkDetail.PackageName,
-                consumers.AsReadOnly());
+            return new Response(request.ServiceAssetId, frameworkDetail.PackageName, consumers);
         }
     }
 
