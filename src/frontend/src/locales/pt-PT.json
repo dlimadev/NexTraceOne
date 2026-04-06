@@ -6788,7 +6788,8 @@
       "avgResponse": "Resposta média: {{minutes}} min",
       "lastWeekCount": "{{count}} incidentes na última semana",
       "lastMonthCount": "{{count}} incidentes no último mês",
-      "incidentDistribution": "Distribuição de Incidentes"
+      "incidentDistribution": "Distribuição de Incidentes",
+      "filterByTeam": "Filtrar por equipa..."
     }
   }
 }

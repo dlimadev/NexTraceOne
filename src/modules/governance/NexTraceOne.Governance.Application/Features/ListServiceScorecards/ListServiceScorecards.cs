@@ -99,7 +99,8 @@ public static class ListServiceScorecards
 
         private static int ComputeSimpleScore(string serviceName, string teamId)
         {
-            // Heurística reproduzível para demo — baseada no hash do nome
+            // TODO: Substituir por lógica real via ComputeServiceScorecard quando disponível.
+            // Neste MVP, usa-se uma heurística reproduzível baseada no hash do nome do serviço.
             var hash = Math.Abs(serviceName.GetHashCode() % 40);
             return 60 + hash;
         }

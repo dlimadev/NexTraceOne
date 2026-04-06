@@ -38,12 +38,14 @@ interface OnCallIntelligenceResponse {
   teamFatigue: OnCallFatigue[];
 }
 
-const useOnCallIntelligence = (periodDays: number) =>
+const useOnCallIntelligence = (periodDays: number, teamId?: string) =>
   useQuery({
-    queryKey: ['on-call-intelligence', periodDays],
+    queryKey: ['on-call-intelligence', periodDays, teamId],
     queryFn: () =>
       client
-        .get<OnCallIntelligenceResponse>('/incidents/on-call-intelligence', { params: { periodDays } })
+        .get<OnCallIntelligenceResponse>('/incidents/on-call-intelligence', {
+          params: { periodDays, teamId: teamId || undefined },
+        })
         .then((r) => r.data),
   });
 
@@ -57,7 +59,8 @@ const FATIGUE_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'second
 export function OnCallIntelligencePage() {
   const { t } = useTranslation();
   const [periodDays, setPeriodDays] = useState(30);
-  const { data, isLoading, isError, refetch } = useOnCallIntelligence(periodDays);
+  const [teamId, setTeamId] = useState('');
+  const { data, isLoading, isError, refetch } = useOnCallIntelligence(periodDays, teamId);
 
   if (isLoading) return <PageLoadingState message={t('operations.onCall.loading')} />;
   if (isError) return <PageErrorState message={t('operations.onCall.error')} onRetry={() => refetch()} />;
@@ -77,6 +80,13 @@ export function OnCallIntelligencePage() {
         icon={<Phone size={24} />}
         actions={
           <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={teamId}
+              onChange={(e) => setTeamId(e.target.value)}
+              placeholder={t('operations.onCall.filterByTeam')}
+              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-2 py-1 w-36"
+            />
             <label className="text-sm text-gray-600 dark:text-gray-400">
               {t('operations.onCall.period')}:
             </label>

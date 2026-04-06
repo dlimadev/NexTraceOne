@@ -6788,7 +6788,8 @@
       "avgResponse": "Avg response: {{minutes}} min",
       "lastWeekCount": "{{count}} incidents last week",
       "lastMonthCount": "{{count}} incidents last month",
-      "incidentDistribution": "Incident Distribution"
+      "incidentDistribution": "Incident Distribution",
+      "filterByTeam": "Filter by team..."
     }
   }
 }
