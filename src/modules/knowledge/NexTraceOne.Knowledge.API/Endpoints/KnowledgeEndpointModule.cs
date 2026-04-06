@@ -15,6 +15,8 @@ using GetKnowledgeDocumentByIdFeature = NexTraceOne.Knowledge.Application.Featur
 using ListOperationalNotesFeature = NexTraceOne.Knowledge.Application.Features.ListOperationalNotes.ListOperationalNotes;
 using UpdateKnowledgeDocumentFeature = NexTraceOne.Knowledge.Application.Features.UpdateKnowledgeDocument.UpdateKnowledgeDocument;
 using UpdateOperationalNoteFeature = NexTraceOne.Knowledge.Application.Features.UpdateOperationalNote.UpdateOperationalNote;
+using GetKnowledgeGraphOverviewFeature = NexTraceOne.Knowledge.Application.Features.GetKnowledgeGraphOverview.GetKnowledgeGraphOverview;
+using GenerateAutoDocumentationFeature = NexTraceOne.Knowledge.Application.Features.GenerateAutoDocumentation.GenerateAutoDocumentation;
 
 using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.Knowledge.Domain.Enums;
@@ -244,5 +246,42 @@ public sealed class KnowledgeEndpointModule
         })
         .WithTags("Knowledge")
         .WithSummary("Update operational note");
+
+        // ── GET /api/v1/knowledge/graph — Knowledge Graph Overview ──
+        knowledge.MapGet("/graph", async (
+            string? centerEntityType,
+            string? centerEntityId,
+            int? maxDepth,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetKnowledgeGraphOverviewFeature.Query(centerEntityType, centerEntityId, maxDepth ?? 2),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("Get knowledge graph overview — nodes, edges and connected components");
+
+        // ── GET /api/v1/knowledge/auto-documentation/{serviceName} ──
+        knowledge.MapGet("/auto-documentation/{serviceName}", async (
+            string serviceName,
+            string? sections,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var sectionList = string.IsNullOrWhiteSpace(sections)
+                ? null
+                : (IReadOnlyList<string>)sections.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            var result = await sender.Send(
+                new GenerateAutoDocumentationFeature.Query(serviceName, sectionList),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("Generate auto documentation for a service from Knowledge Hub data");
     }
 }
