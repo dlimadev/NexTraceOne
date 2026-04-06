@@ -283,11 +283,11 @@ Evoluir o FinOps existente para:
 - [x] **Developer NPS** — `GetDeveloperNpsSummary` feature: aggregate NPS per team/period, PromoterPercent/PassivePercent/DetractorPercent, avg satisfaction scores ✅ (Rev. 21) — `GET /api/v1/developer-experience/surveys/nps-summary`
 
 ### 5.3 GraphQL Federation Gateway ⏱️ 10-15 dias
-- [x] **Gateway GraphQL** — `CatalogQuery` HotChocolate query root: `services(filter, page, pageSize)`, `contracts(serviceId)`, `npsSummary(teamId, period)` endpoints ✅ (Rev. 21) — `GET /api/v1/graphql`
-- [x] **Schema types** — `ServiceType`, `ContractSummaryType`, `NpsSummaryType` POCOs with GraphQL descriptions ✅ (Rev. 21)
-- [x] **Extension wiring** — `AddCatalogGraphQL()` + `MapCatalogGraphQL()` extension methods for host registration ✅ (Rev. 21)
-- [ ] **Schema stitching automático** — federation entre módulos (requires multi-module HotChocolate federation setup)
-- [ ] **Subscriptions real-time** — mudanças, incidentes, deploys (requires WebSocket + event stream integration)
+- [x] **Gateway GraphQL** — `CatalogQuery` HotChocolate query root: `services(filter, page, pageSize)`, `contracts(serviceId)`, `npsSummary(teamId, period)` endpoints ✅ (implementado) — `GET+POST /api/v1/graphql`
+- [x] **Schema types** — `ServiceType`, `ContractSummaryType`, `NpsSummaryType` POCOs with GraphQL descriptions ✅ (implementado)
+- [x] **Extension wiring** — `AddCatalogGraphQL()` + `MapCatalogGraphQL()` + `[ExtendObjectType]` pattern for host registration ✅ (implementado)
+- [x] **Schema stitching automático** — `ChangeGovernanceQuery` via `AddChangeGovernanceQueryExtension()` stitch — `getChangesSummary(teamName, environment, daysBack)` ✅ (implementado)
+- [x] **Subscriptions real-time** — `CatalogSubscription` + `IGraphQLEventPublisher` — `onChangeDeployed` + `onIncidentUpdated` via WebSocket HotChocolate in-memory ✅ (implementado)
 - [ ] **SDK externo** — para integração com ferramentas externas (requires SDK packaging pipeline)
 
 ### 5.4 Observability Correlation Engine ⏱️ 15-20 dias
