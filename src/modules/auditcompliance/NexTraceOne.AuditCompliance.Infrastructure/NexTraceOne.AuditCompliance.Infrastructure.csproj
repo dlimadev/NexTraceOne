@@ -25,7 +25,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
-    <PackageReference Include="QuestPDF" />
+    <PackageReference Include="PdfSharpCore" />
     <PackageReference Include="ClosedXML" />
+    <!-- Pin transitive SixLabors.ImageSharp to safe version (2.1.11 Apache-2.0, fixes CVEs in 1.0.4) -->
+    <PackageReference Include="SixLabors.ImageSharp" />
   </ItemGroup>
 </Project>

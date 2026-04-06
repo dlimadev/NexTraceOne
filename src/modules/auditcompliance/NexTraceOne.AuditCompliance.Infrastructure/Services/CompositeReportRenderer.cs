@@ -8,8 +8,11 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Services;
 ///
 /// Estratégia multi-formato:
 ///   - JSON → JsonReportRenderer (serialização JSON com indentação)
-///   - PDF  → PdfReportRenderer (QuestPDF — layout enterprise)
-///   - XLSX → XlsxReportRenderer (ClosedXML — tabular com múltiplas sheets)
+///   - PDF  → PdfReportRenderer (PdfSharpCore — MIT license, layout enterprise)
+///   - XLSX → XlsxReportRenderer (ClosedXML — MIT license, tabular com múltiplas sheets)
+///
+/// Todas as bibliotecas de rendering utilizam licenças MIT, permitindo uso comercial
+/// irrestrito no NexTraceOne sem risco de licenciamento.
 ///
 /// Persona: Auditor, Executive.
 /// </summary>

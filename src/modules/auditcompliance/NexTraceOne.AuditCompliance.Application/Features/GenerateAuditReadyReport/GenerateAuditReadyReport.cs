@@ -26,7 +26,7 @@ namespace NexTraceOne.AuditCompliance.Application.Features.GenerateAuditReadyRep
 ///
 /// Nota sobre geração de PDF/XLSX: em ambiente sem biblioteca de rendering,
 /// a feature produz o payload de dados estruturados + metadados de assinatura.
-/// A renderização final ocorre via adapter (ex.: QuestPDF, ClosedXML) registado
+/// A renderização final ocorre via adapter (ex.: PdfSharpCore, ClosedXML) registado
 /// como IReportRenderer no módulo de infraestrutura. Esta feature é responsável
 /// pela lógica de domínio (recolha, assinatura, sumário) e independe do renderer.
 ///
