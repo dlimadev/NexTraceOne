@@ -28,6 +28,14 @@ using NexTraceOne.Governance.Application.Features.GetFinOpsSummary;
 using NexTraceOne.Governance.Application.Features.GetFinOpsTrends;
 using NexTraceOne.Governance.Application.Features.GetGovernancePack;
 using NexTraceOne.Governance.Application.Features.GetMaturityScorecards;
+using NexTraceOne.Governance.Application.SecurityGate.Features.AcknowledgeFinding;
+using NexTraceOne.Governance.Application.SecurityGate.Features.EvaluateSecurityGate;
+using NexTraceOne.Governance.Application.SecurityGate.Features.GenerateSecurityReport;
+using NexTraceOne.Governance.Application.SecurityGate.Features.GetSecurityDashboard;
+using NexTraceOne.Governance.Application.SecurityGate.Features.GetSecurityScanResult;
+using NexTraceOne.Governance.Application.SecurityGate.Features.ListSecurityFindings;
+using NexTraceOne.Governance.Application.SecurityGate.Features.ScanContractSecurity;
+using NexTraceOne.Governance.Application.SecurityGate.Features.ScanGeneratedCode;
 using NexTraceOne.Governance.Application.Features.GetOnboardingContext;
 using NexTraceOne.Governance.Application.Features.GetPackApplicability;
 using NexTraceOne.Governance.Application.Features.GetPackCoverage;
@@ -134,6 +142,16 @@ public static class DependencyInjection
         services.AddTransient<IValidator<SimulatePolicyApplication.Command>, SimulatePolicyApplication.Validator>();
         services.AddTransient<IValidator<TransitionEnforcementMode.Command>, TransitionEnforcementMode.Validator>();
         services.AddTransient<IValidator<ExpireGovernanceWaivers.Command>, ExpireGovernanceWaivers.Validator>();
+
+        // Security Gate Pipeline
+        services.AddTransient<IValidator<ScanGeneratedCode.Command>, ScanGeneratedCode.Validator>();
+        services.AddTransient<IValidator<ScanContractSecurity.Command>, ScanContractSecurity.Validator>();
+        services.AddTransient<IValidator<GetSecurityScanResult.Query>, GetSecurityScanResult.Validator>();
+        services.AddTransient<IValidator<ListSecurityFindings.Query>, ListSecurityFindings.Validator>();
+        services.AddTransient<IValidator<AcknowledgeFinding.Command>, AcknowledgeFinding.Validator>();
+        services.AddTransient<IValidator<GetSecurityDashboard.Query>, GetSecurityDashboard.Validator>();
+        services.AddTransient<IValidator<EvaluateSecurityGate.Command>, EvaluateSecurityGate.Validator>();
+        services.AddTransient<IValidator<GenerateSecurityReport.Query>, GenerateSecurityReport.Validator>();
 
         return services;
     }

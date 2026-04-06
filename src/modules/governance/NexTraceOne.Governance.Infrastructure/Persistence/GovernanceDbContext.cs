@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Governance.Domain.SecurityGate.Entities;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence;
 
@@ -53,6 +54,12 @@ public sealed class GovernanceDbContext(
 
     /// <summary>Definições de política como código (YAML/JSON) com gradual enforcement.</summary>
     public DbSet<PolicyAsCodeDefinition> PolicyAsCodeDefinitions => Set<PolicyAsCodeDefinition>();
+
+    /// <summary>Resultados de scans de segurança (SAST, contrato, template).</summary>
+    public DbSet<SecurityScanResult> SecurityScanResults => Set<SecurityScanResult>();
+
+    /// <summary>Achados individuais de scans de segurança.</summary>
+    public DbSet<SecurityFinding> SecurityFindings => Set<SecurityFinding>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
