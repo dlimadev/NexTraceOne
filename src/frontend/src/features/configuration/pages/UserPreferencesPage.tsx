@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Settings, Sidebar, LayoutDashboard, Save, CheckCircle, XCircle,
@@ -111,53 +111,51 @@ export function UserPreferencesPage() {
   const [defaultTeam, setDefaultTeam] = useState('');
   const [defaultService, setDefaultService] = useState('');
 
-  useEffect(() => {
-    if (data?.preferences) {
-      const sidebar = data.preferences.find(p => p.key === 'platform.sidebar.pinned_items');
-      const widgets = data.preferences.find(p => p.key === 'platform.home.active_widgets');
-      if (sidebar) {
-        try { setPinnedItems(JSON.parse(sidebar.value)); } catch { /* keep default */ }
-      }
-      if (widgets) {
-        try { setActiveWidgets(JSON.parse(widgets.value)); } catch { /* keep default */ }
-      }
-      const tz = data.preferences.find(p => p.key === 'user.timezone');
-      const df = data.preferences.find(p => p.key === 'user.date_format');
-      const tf = data.preferences.find(p => p.key === 'user.time_format');
-      const ipp = data.preferences.find(p => p.key === 'user.items_per_page');
-      const de = data.preferences.find(p => p.key === 'default.environment');
-      const dtPref = data.preferences.find(p => p.key === 'default.team');
-      const ds = data.preferences.find(p => p.key === 'default.service');
-      if (tz) setTimezone(tz.value);
-      if (df) setDateFormat(df.value);
-      if (tf) setTimeFormat(tf.value);
-      if (ipp) setItemsPerPage(ipp.value);
-      if (de) setDefaultEnv(de.value);
-      if (dtPref) setDefaultTeam(dtPref.value);
-      if (ds) setDefaultService(ds.value);
-      const qhe = data.preferences.find(p => p.key === 'notifications.quiet_hours.enabled');
-      const qhs = data.preferences.find(p => p.key === 'notifications.quiet_hours.start');
-      const qhend = data.preferences.find(p => p.key === 'notifications.quiet_hours.end');
-      const qhtz = data.preferences.find(p => p.key === 'notifications.quiet_hours.timezone');
-      const df2 = data.preferences.find(p => p.key === 'notifications.digest.frequency');
-      const dsec = data.preferences.find(p => p.key === 'notifications.digest.sections');
-      if (qhe) setQuietHoursEnabled(qhe.value === 'true');
-      if (qhs) setQuietHoursStart(qhs.value);
-      if (qhend) setQuietHoursEnd(qhend.value);
-      if (qhtz) setQuietHoursTimezone(qhtz.value);
-      if (df2) setDigestFrequency(df2.value);
-      if (dsec) { try { setDigestSections(JSON.parse(dsec.value)); } catch { /* keep default */ } }
-
-      const aiVerb = data.preferences.find(p => p.key === 'user.ai.response_verbosity');
-      const aiLang = data.preferences.find(p => p.key === 'user.ai.preferred_language');
-      const aiScope = data.preferences.find(p => p.key === 'user.ai.auto_context_scope');
-      const aiKnow = data.preferences.find(p => p.key === 'user.ai.knowledge_sources');
-      if (aiVerb) setAiVerbosity(aiVerb.value);
-      if (aiLang) setAiLanguage(aiLang.value);
-      if (aiScope) setAiContextScope(aiScope.value);
-      if (aiKnow) { try { setAiKnowledgeSources(JSON.parse(aiKnow.value)); } catch { /* keep default */ } }
-    }
-  }, [data]);
+  // Sync server preferences into local state once data arrives
+  const [prefsInitialized, setPrefsInitialized] = useState(false);
+  if (data?.preferences && !prefsInitialized) {
+    setPrefsInitialized(true);
+    const prefs = data.preferences;
+    const find = (k: string) => prefs.find(p => p.key === k)?.value;
+    const sidebar = find('platform.sidebar.pinned_items');
+    const widgets = find('platform.home.active_widgets');
+    if (sidebar) { try { setPinnedItems(JSON.parse(sidebar)); } catch { /* keep default */ } }
+    if (widgets) { try { setActiveWidgets(JSON.parse(widgets)); } catch { /* keep default */ } }
+    const tz = find('user.timezone');
+    const df = find('user.date_format');
+    const tf = find('user.time_format');
+    const ipp = find('user.items_per_page');
+    const de = find('default.environment');
+    const dtPref = find('default.team');
+    const ds = find('default.service');
+    if (tz) setTimezone(tz);
+    if (df) setDateFormat(df);
+    if (tf) setTimeFormat(tf);
+    if (ipp) setItemsPerPage(ipp);
+    if (de) setDefaultEnv(de);
+    if (dtPref) setDefaultTeam(dtPref);
+    if (ds) setDefaultService(ds);
+    const qhe = find('notifications.quiet_hours.enabled');
+    const qhs = find('notifications.quiet_hours.start');
+    const qhend = find('notifications.quiet_hours.end');
+    const qhtz = find('notifications.quiet_hours.timezone');
+    const df2 = find('notifications.digest.frequency');
+    const dsec = find('notifications.digest.sections');
+    if (qhe) setQuietHoursEnabled(qhe === 'true');
+    if (qhs) setQuietHoursStart(qhs);
+    if (qhend) setQuietHoursEnd(qhend);
+    if (qhtz) setQuietHoursTimezone(qhtz);
+    if (df2) setDigestFrequency(df2);
+    if (dsec) { try { setDigestSections(JSON.parse(dsec)); } catch { /* keep default */ } }
+    const aiVerb = find('user.ai.response_verbosity');
+    const aiLang = find('user.ai.preferred_language');
+    const aiScope = find('user.ai.auto_context_scope');
+    const aiKnow = find('user.ai.knowledge_sources');
+    if (aiVerb) setAiVerbosity(aiVerb);
+    if (aiLang) setAiLanguage(aiLang);
+    if (aiScope) setAiContextScope(aiScope);
+    if (aiKnow) { try { setAiKnowledgeSources(JSON.parse(aiKnow)); } catch { /* keep default */ } }
+  }
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -366,9 +364,6 @@ export function UserPreferencesPage() {
         </Card>
       </div>
 
-      {/* Save button */}
-      <div className="mt-6 flex items-center gap-3">
-
       {/* Quiet Hours */}
       <div className="mt-6">
         <Card>
@@ -551,7 +546,6 @@ export function UserPreferencesPage() {
                 <label className="block text-sm font-medium mb-2">{t('aiPreferences.knowledgeSources')}</label>
                 <div className="flex flex-wrap gap-2">
                   {AI_KNOWLEDGE_OPTIONS.map(src => {
-                    const key = src.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase()) as keyof typeof t;
                     return (
                       <button
                         key={src}

@@ -28,20 +28,6 @@ async function saveColumnPref(key: string, value: string): Promise<void> {
   if (!resp.ok) throw new Error('Failed to save');
 }
 
-export function useVisibleColumns(context: string, availableColumns: ColumnOption[]): string[] {
-  const prefKey = `table.columns.${context}`;
-  const { data } = useQuery({ queryKey: ['user-preferences'], queryFn: fetchPreferences, staleTime: 60000 });
-  const prefs: Array<{ key: string; value: string }> = data?.preferences ?? [];
-  const stored = prefs.find(p => p.key === prefKey)?.value;
-  if (!stored) return availableColumns.map(c => c.key);
-  try {
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : availableColumns.map(c => c.key);
-  } catch {
-    return availableColumns.map(c => c.key);
-  }
-}
-
 export function ColumnSelector({ context, availableColumns }: ColumnSelectorProps) {
   const { t } = useTranslation('columnSelector');
   const queryClient = useQueryClient();

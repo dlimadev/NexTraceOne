@@ -64,7 +64,6 @@ describe('Tabs', () => {
   it('navigates to next tab with ArrowRight', async () => {
     const onChange = vi.fn();
     render(<Tabs items={items} activeId="overview" onChange={onChange} />);
-    const tablist = screen.getByRole('tablist');
     const firstTab = screen.getByRole('tab', { name: 'Overview' });
     firstTab.focus();
     await userEvent.keyboard('{ArrowRight}');
