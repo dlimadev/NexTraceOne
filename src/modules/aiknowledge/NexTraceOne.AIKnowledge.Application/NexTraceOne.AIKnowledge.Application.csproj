@@ -11,6 +11,8 @@
     <ProjectReference Include="..\NexTraceOne.AIKnowledge.Domain\NexTraceOne.AIKnowledge.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\configuration\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />
+    <ProjectReference Include="..\..\configuration\NexTraceOne.Configuration.Contracts\NexTraceOne.Configuration.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
