@@ -57,7 +57,7 @@ O módulo de Licensing é um requisito estratégico do produto e não possui **n
 
 | Gap | Detalhe | Status |
 |-----|---------|--------|
-| GAP-SEED-01 | 6 de 7 ficheiros SQL de seed referenciados não existem como ficheiros separados (apenas seed_development.sql e seed_production.sql monolíticos) | ❌ Gap documental |
+| GAP-SEED-01 | 6 de 7 ficheiros SQL de seed referenciados não existem como ficheiros separados (apenas seed_development.sql e seed_production.sql monolíticos) | 🟠 Alta |
 | GAP-SEED-02 | Seed strategy tem falhas silenciosas — ficheiros SQL inexistentes geram warning mas continuam | 🟠 Alta |
 | GAP-SEED-03 | Production bootstrap strategy não documentada (admin inicial, primeiro tenant, config mínima) | 🟠 Alta |
 | GAP-SEED-04 | Seed strategy sem dados para staging environment | 🟡 Média |
@@ -407,8 +407,8 @@ Fase 1 (Docs) ──────────┐
 Fase 3 (Segurança) ─────┘
                                                     ↓
 Fase 5 (Integrações) ────────────────────────────────┘
-                                                    ↓
-Fase 6 (Licensing) ─── pode iniciar em paralelo após Fase 1
+
+Fase 6 (Licensing) ─── pode iniciar em paralelo com qualquer fase após Fase 1
 ```
 
 ### Métricas de Sucesso
