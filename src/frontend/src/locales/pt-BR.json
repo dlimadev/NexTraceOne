@@ -6197,7 +6197,9 @@
     "developerExperienceScore": "Pontuação de Experiência do Desenvolvedor",
     "apiPolicyAsCode": "API Policy as Code",
     "dependencyDashboard": "Painel de Dependências",
-    "licenseCompliance": "Conformidade de Licenças"
+    "licenseCompliance": "Conformidade de Licenças",
+    "parameterUsageReport": "Uso de Parâmetros",
+    "parameterCompliance": "Compliance de Parâmetros"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -8132,5 +8134,41 @@
     "workflow.timeout.approval_hours.label": "Aprovação Timeout (Hours)",
     "workflow.types.enabled.description": "Lista de ativado fluxo de trabalho tipos (e.g. ReleaseApproval, PromotionApproval, WaiverApproval, GovernanceReview, AccessRequest)",
     "workflow.types.enabled.label": "Ativado Fluxo de Trabalho Tipos"
+  },
+  "phase5": {
+    "usage": {
+      "title": "Relatório de Uso de Parâmetros",
+      "subtitle": "Visão geral da utilização de parâmetros de configuração na plataforma",
+      "refresh": "Atualizar",
+      "loading": "Carregando relatório de uso...",
+      "totalDefinitions": "Total de Definições",
+      "totalOverrides": "Total de Substituições",
+      "overrideCoverage": "Cobertura de Substituições",
+      "usingDefault": "Usando Padrão",
+      "mostOverridden": "Parâmetros Mais Substituídos",
+      "noOverrides": "Nenhuma substituição encontrada.",
+      "overrides": "substituições",
+      "scopeDistribution": "Substituições por Escopo",
+      "noScopes": "Sem dados de escopo disponíveis.",
+      "recentlyChanged": "Parâmetros Alterados Recentemente",
+      "noRecent": "Sem alterações recentes."
+    },
+    "compliance": {
+      "title": "Dashboard de Compliance de Parametrização",
+      "subtitle": "Visão executiva de governança e compliance de configuração",
+      "refresh": "Atualizar",
+      "loading": "Carregando resumo de compliance...",
+      "i18nCoverage": "Cobertura i18n",
+      "validationCoverage": "Cobertura de Validação",
+      "deprecated": "Parâmetros Depreciados",
+      "sensitive": "Parâmetros Sensíveis",
+      "byCategory": "Compliance por Categoria",
+      "params": "parâmetros",
+      "deprecatedShort": "dep.",
+      "editability": "Visão de Editabilidade",
+      "editable": "Editável",
+      "readOnly": "Somente Leitura",
+      "deprecatedList": "Parâmetros Depreciados"
+    }
   }
 }

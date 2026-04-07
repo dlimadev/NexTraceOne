@@ -109,6 +109,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:trail:read', section: 'admin' },
   { labelKey: 'sidebar.platformOperations', to: '/platform/operations', icon: <Server size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.parameterUsageReport', to: '/platform/configuration/analytics/usage', icon: <BarChart3 size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
+  { labelKey: 'sidebar.parameterCompliance', to: '/platform/configuration/analytics/compliance', icon: <ShieldCheck size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
   { labelKey: 'sidebar.userPreferences', to: '/user-preferences', icon: <Settings size={18} />, section: 'admin' },
 ];
 

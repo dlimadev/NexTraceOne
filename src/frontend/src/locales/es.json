@@ -6197,7 +6197,9 @@
     "developerExperienceScore": "Puntuación de Experiencia del Desarrollador",
     "apiPolicyAsCode": "API Policy as Code",
     "dependencyDashboard": "Panel de Dependencias",
-    "licenseCompliance": "Conformidad de Licencias"
+    "licenseCompliance": "Conformidad de Licencias",
+    "parameterUsageReport": "Uso de Parámetros",
+    "parameterCompliance": "Cumplimiento de Parámetros"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -8132,5 +8134,41 @@
     "workflow.timeout.approval_hours.label": "Aprobación Timeout (Hours)",
     "workflow.types.enabled.description": "Lista de activado flujo de trabajo tipos (e.g. ReleaseApproval, PromotionApproval, WaiverApproval, GovernanceReview, AccessRequest)",
     "workflow.types.enabled.label": "Activado Flujo de Trabajo Tipos"
+  },
+  "phase5": {
+    "usage": {
+      "title": "Informe de Uso de Parámetros",
+      "subtitle": "Resumen de la utilización de parámetros de configuración en la plataforma",
+      "refresh": "Actualizar",
+      "loading": "Cargando informe de uso...",
+      "totalDefinitions": "Total de Definiciones",
+      "totalOverrides": "Total de Sobreescrituras",
+      "overrideCoverage": "Cobertura de Sobreescrituras",
+      "usingDefault": "Usando Predeterminado",
+      "mostOverridden": "Parámetros Más Sobreescritos",
+      "noOverrides": "Sin sobreescrituras encontradas.",
+      "overrides": "sobreescrituras",
+      "scopeDistribution": "Sobreescrituras por Ámbito",
+      "noScopes": "Sin datos de ámbito disponibles.",
+      "recentlyChanged": "Parámetros Cambiados Recientemente",
+      "noRecent": "Sin cambios recientes."
+    },
+    "compliance": {
+      "title": "Panel de Cumplimiento de Parametrización",
+      "subtitle": "Vista ejecutiva de gobernanza y cumplimiento de configuración",
+      "refresh": "Actualizar",
+      "loading": "Cargando resumen de cumplimiento...",
+      "i18nCoverage": "Cobertura i18n",
+      "validationCoverage": "Cobertura de Validación",
+      "deprecated": "Parámetros Obsoletos",
+      "sensitive": "Parámetros Sensibles",
+      "byCategory": "Cumplimiento por Categoría",
+      "params": "parámetros",
+      "deprecatedShort": "obs.",
+      "editability": "Vista de Editabilidad",
+      "editable": "Editable",
+      "readOnly": "Solo Lectura",
+      "deprecatedList": "Parámetros Obsoletos"
+    }
   }
 }

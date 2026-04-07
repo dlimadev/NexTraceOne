@@ -6203,7 +6203,9 @@
     "developerExperienceScore": "Developer Experience Score",
     "apiPolicyAsCode": "API Policy as Code",
     "dependencyDashboard": "Dependency Dashboard",
-    "licenseCompliance": "License Compliance"
+    "licenseCompliance": "License Compliance",
+    "parameterUsageReport": "Parameter Usage",
+    "parameterCompliance": "Parameter Compliance"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -8138,5 +8140,41 @@
     "workflow.timeout.approval_hours.label": "Approval Timeout (Hours)",
     "workflow.types.enabled.description": "List of enabled workflow types (e.g. ReleaseApproval, PromotionApproval, WaiverApproval, GovernanceReview, AccessRequest)",
     "workflow.types.enabled.label": "Enabled Workflow Types"
+  },
+  "phase5": {
+    "usage": {
+      "title": "Parameter Usage Report",
+      "subtitle": "Overview of configuration parameter utilization across the platform",
+      "refresh": "Refresh",
+      "loading": "Loading usage report...",
+      "totalDefinitions": "Total Definitions",
+      "totalOverrides": "Total Overrides",
+      "overrideCoverage": "Override Coverage",
+      "usingDefault": "Using Default",
+      "mostOverridden": "Most Overridden Parameters",
+      "noOverrides": "No overrides found.",
+      "overrides": "overrides",
+      "scopeDistribution": "Overrides by Scope",
+      "noScopes": "No scope data available.",
+      "recentlyChanged": "Recently Changed Parameters",
+      "noRecent": "No recent changes."
+    },
+    "compliance": {
+      "title": "Parameterization Compliance Dashboard",
+      "subtitle": "Executive view of configuration governance and compliance",
+      "refresh": "Refresh",
+      "loading": "Loading compliance summary...",
+      "i18nCoverage": "i18n Coverage",
+      "validationCoverage": "Validation Coverage",
+      "deprecated": "Deprecated Parameters",
+      "sensitive": "Sensitive Parameters",
+      "byCategory": "Compliance by Category",
+      "params": "params",
+      "deprecatedShort": "dep.",
+      "editability": "Editability Overview",
+      "editable": "Editable",
+      "readOnly": "Read-Only",
+      "deprecatedList": "Deprecated Parameters"
+    }
   }
 }
