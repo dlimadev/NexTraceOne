@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Settings, Sidebar, LayoutDashboard, Save, CheckCircle, XCircle,
-  Clock, Globe, List,
+  Clock, Globe, List, BellOff, Rss,
 } from 'lucide-react';
 
 const TIMEZONES = [
@@ -91,6 +91,14 @@ export function UserPreferencesPage() {
   const [dateFormat, setDateFormat] = useState('yyyy-MM-dd');
   const [timeFormat, setTimeFormat] = useState('HH:mm:ss');
   const [itemsPerPage, setItemsPerPage] = useState('25');
+  const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
+  const [quietHoursStart, setQuietHoursStart] = useState('22:00');
+  const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
+  const [quietHoursTimezone, setQuietHoursTimezone] = useState('UTC');
+  const [digestFrequency, setDigestFrequency] = useState('daily');
+  const [digestSections, setDigestSections] = useState<string[]>(['changes', 'incidents', 'contracts', 'compliance']);
+
+  const DIGEST_SECTION_OPTIONS = ['changes', 'incidents', 'contracts', 'compliance', 'finops', 'ai-usage'];
   const [defaultEnv, setDefaultEnv] = useState('');
   const [defaultTeam, setDefaultTeam] = useState('');
   const [defaultService, setDefaultService] = useState('');
@@ -119,6 +127,18 @@ export function UserPreferencesPage() {
       if (de) setDefaultEnv(de.value);
       if (dtPref) setDefaultTeam(dtPref.value);
       if (ds) setDefaultService(ds.value);
+      const qhe = data.preferences.find(p => p.key === 'notifications.quiet_hours.enabled');
+      const qhs = data.preferences.find(p => p.key === 'notifications.quiet_hours.start');
+      const qhend = data.preferences.find(p => p.key === 'notifications.quiet_hours.end');
+      const qhtz = data.preferences.find(p => p.key === 'notifications.quiet_hours.timezone');
+      const df2 = data.preferences.find(p => p.key === 'notifications.digest.frequency');
+      const dsec = data.preferences.find(p => p.key === 'notifications.digest.sections');
+      if (qhe) setQuietHoursEnabled(qhe.value === 'true');
+      if (qhs) setQuietHoursStart(qhs.value);
+      if (qhend) setQuietHoursEnd(qhend.value);
+      if (qhtz) setQuietHoursTimezone(qhtz.value);
+      if (df2) setDigestFrequency(df2.value);
+      if (dsec) { try { setDigestSections(JSON.parse(dsec.value)); } catch { /* keep default */ } }
     }
   }, [data]);
 
@@ -133,6 +153,12 @@ export function UserPreferencesPage() {
       if (defaultEnv) await savePreference('default.environment', defaultEnv);
       if (defaultTeam) await savePreference('default.team', defaultTeam);
       if (defaultService) await savePreference('default.service', defaultService);
+      await savePreference('notifications.quiet_hours.enabled', String(quietHoursEnabled));
+      await savePreference('notifications.quiet_hours.start', quietHoursStart);
+      await savePreference('notifications.quiet_hours.end', quietHoursEnd);
+      await savePreference('notifications.quiet_hours.timezone', quietHoursTimezone);
+      await savePreference('notifications.digest.frequency', digestFrequency);
+      await savePreference('notifications.digest.sections', JSON.stringify(digestSections));
     },
     onSuccess: () => {
       setSaveStatus('saved');
@@ -315,6 +341,115 @@ export function UserPreferencesPage() {
               <option value="50">50</option>
               <option value="100">100</option>
             </select>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Save button */}
+      <div className="mt-6 flex items-center gap-3">
+
+      {/* Quiet Hours */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <BellOff size={18} />
+            <span>{t('quietHours.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <p className="text-sm text-muted mb-4">{t('quietHours.subtitle')}</p>
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={quietHoursEnabled}
+                  onChange={e => setQuietHoursEnabled(e.target.checked)}
+                  className="w-4 h-4 accent-blue-600"
+                />
+                <span className="text-sm">{t('quietHours.enabled')}</span>
+              </label>
+              {quietHoursEnabled && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pl-7">
+                  <div>
+                    <label className="block text-xs text-muted mb-1">{t('quietHours.start')}</label>
+                    <input
+                      type="time"
+                      value={quietHoursStart}
+                      onChange={e => setQuietHoursStart(e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted mb-1">{t('quietHours.end')}</label>
+                    <input
+                      type="time"
+                      value={quietHoursEnd}
+                      onChange={e => setQuietHoursEnd(e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted mb-1">{t('quietHours.timezone')}</label>
+                    <select
+                      value={quietHoursTimezone}
+                      onChange={e => setQuietHoursTimezone(e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                    >
+                      {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Digest Settings */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <Rss size={18} />
+            <span>{t('digestSettings.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('digestSettings.frequency')}</label>
+                <select
+                  value={digestFrequency}
+                  onChange={e => setDigestFrequency(e.target.value)}
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                >
+                  <option value="daily">{t('digestSettings.frequencyOptions.daily')}</option>
+                  <option value="weekly">{t('digestSettings.frequencyOptions.weekly')}</option>
+                  <option value="none">{t('digestSettings.frequencyOptions.none')}</option>
+                </select>
+              </div>
+              {digestFrequency !== 'none' && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('digestSettings.sections')}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {DIGEST_SECTION_OPTIONS.map(sec => (
+                      <button
+                        key={sec}
+                        onClick={() =>
+                          setDigestSections(prev =>
+                            prev.includes(sec) ? prev.filter(s => s !== sec) : [...prev, sec]
+                          )
+                        }
+                        className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                          digestSections.includes(sec)
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                        }`}
+                      >
+                        {sec}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </CardBody>
         </Card>
       </div>

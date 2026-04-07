@@ -186,23 +186,23 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 - [x] **Backend:** Entidade `UserWatch` (Id, UserId, TenantId, EntityType, EntityId, NotifyOnChange, CreatedAt)
   - [x] Commands: `WatchEntity`, `UnwatchEntity`
   - [x] Query: `ListWatches(entityType?)`
-  - [ ] Event handler: quando entidade muda → notificar watchers
+  - [ ] Event handler: quando entidade muda → notificar watchers (roadmap)
   - [x] Endpoint: `/api/v1/watches`
 - [x] **Frontend:** Botão "Watch" (ícone 👁) em detalhe de serviço, contrato, change, incidente
   - [x] Toggle com opções: "All changes", "Critical only", "None"
-  - [ ] Badge no sidebar com contagem de watches activos
+  - [ ] Badge no sidebar com contagem de watches activos (roadmap)
 - [x] **i18n:** 4 locales
 - [x] **Testes:** 4+ testes
 
 #### 3.2 Quiet Hours / Do Not Disturb
 - [x] **Backend:** Preferências: `notifications.quiet_hours.enabled`, `notifications.quiet_hours.start`, `notifications.quiet_hours.end`, `notifications.quiet_hours.timezone`
   - [x] Seeds de configuração no seeder
-  - [ ] Avaliação no serviço de envio de notificações
-- [ ] **Frontend:** Secção "Quiet Hours" na UserPreferencesPage
-  - [ ] Toggle + time pickers para início e fim
-  - [ ] Select de timezone
+  - [ ] Avaliação no serviço de envio de notificações (roadmap)
+- [x] **Frontend:** Secção "Quiet Hours" na UserPreferencesPage
+  - [x] Toggle + time pickers para início e fim
+  - [x] Select de timezone
 - [x] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Testes:** 3+ testes
 
 #### 3.3 Custom Alert Rules Pessoais
 - [x] **Backend:** Entidade `UserAlertRule` no módulo Configuration
@@ -216,18 +216,18 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
   - [x] Lista de regras com toggle enabled/disabled
   - [x] Builder visual de condição (entity → field → operator → value)
   - [x] Channel selector
-  - [ ] Preview de "quantas vezes teria disparado nos últimos 7 dias"
+  - [ ] Preview de "quantas vezes teria disparado nos últimos 7 dias" (roadmap)
 - [x] **i18n:** 4 locales
 - [x] **Testes:** 5+ testes
 
 #### 3.4 Digest Personalizado
 - [x] **Backend:** Preferências: `notifications.digest.frequency` (daily, weekly, none), `notifications.digest.sections` (JSON array de secções)
-  - [ ] Secções disponíveis: changes, incidents, contracts, compliance, finops, ai-usage
-- [ ] **Frontend:** Config na UserPreferencesPage
-  - [ ] Select de frequência
-  - [ ] Drag-and-drop de secções do digest
+  - [x] Secções disponíveis: changes, incidents, contracts, compliance, finops, ai-usage
+- [x] **Frontend:** Config na UserPreferencesPage
+  - [x] Select de frequência
+  - [x] Drag-and-drop de secções do digest (implemented as toggle chips)
 - [x] **i18n:** 4 locales
-- [ ] **Testes:** 2+ testes
+- [x] **Testes:** 2+ testes
 
 ---
 
