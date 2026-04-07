@@ -283,6 +283,7 @@
   --animate-slide-up: slide-up 240ms var(--ease-standard);
   --animate-slide-right: slide-right 240ms var(--ease-standard);
   --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+  --animate-progress-bar: progress-bar 500ms ease-out forwards;
 }
 
 /* ─── CSS Custom Properties (não-Tailwind) ───────────────────────────────────
@@ -347,6 +348,12 @@
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+@keyframes progress-bar {
+  0% { width: 0; opacity: 1; }
+  80% { width: 90%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
 }
 
 /* ─── Global Base ────────────────────────────────────────────────────────────── */

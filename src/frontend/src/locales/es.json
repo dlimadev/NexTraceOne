@@ -1713,7 +1713,13 @@
     "items": "Elementos",
     "name": "Nombre",
     "onePerLine": "uno por línea",
-    "type": "Tipo"
+    "type": "Tipo",
+    "skipToContent": "Saltar al contenido",
+    "steps": "Pasos",
+    "optional": "Opcional",
+    "step_completed": "completado",
+    "step_active": "activo",
+    "step_upcoming": "pendiente"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Cuando está activado, los usuarios pueden crear agentes de IA especializados personalizados.",
@@ -5346,7 +5352,8 @@
     "switchToDark": "Cambiar a modo oscuro",
     "switchToLight": "Cambiar a modo claro",
     "toggleLanguage": "Cambiar idioma",
-    "toggleTheme": "Alternar modo claro/oscuro"
+    "toggleTheme": "Alternar modo claro/oscuro",
+    "switchToAuto": "Cambiar a modo del sistema"
   },
   "identity": {
     "accessReview": {
@@ -7915,7 +7922,8 @@
     "dependencyDashboard": "Panel de Dependencias",
     "licenseCompliance": "Conformidad de Licencias",
     "parameterUsageReport": "Uso de Parámetros",
-    "parameterCompliance": "Cumplimiento de Parámetros"
+    "parameterCompliance": "Cumplimiento de Parámetros",
+    "navigation": "Navegación principal"
   },
   "sourceOfTruth": {
     "assetTypes": {

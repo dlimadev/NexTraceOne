@@ -4,7 +4,7 @@ import { cn } from '../lib/cn';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   /** Variante visual do card. */
-  variant?: 'default' | 'interactive' | 'elevated' | 'flat';
+  variant?: 'default' | 'interactive' | 'elevated' | 'flat' | 'glass';
   /** Exibe skeleton de loading sobre o conteúdo. */
   loading?: boolean;
   className?: string;
@@ -16,6 +16,7 @@ const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
     'bg-card rounded-2xl border border-edge shadow-surface overflow-hidden cursor-pointer hover:shadow-elevated hover:border-edge-strong transition-all duration-[var(--nto-motion-base)]',
   elevated: 'bg-card rounded-2xl border border-edge shadow-elevated overflow-hidden',
   flat: 'bg-card rounded-2xl overflow-hidden',
+  glass: 'backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-surface overflow-hidden',
 };
 
 /**
@@ -27,6 +28,7 @@ const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
  * - interactive: hover com elevação e cursor pointer
  * - elevated: sombra mais forte permanente
  * - flat: sem borda/sombra
+ * - glass: glassmorphism com backdrop-blur para overlays
  * - loading: exibe skeleton overlay
  */
 export function Card({ children, variant = 'default', loading, className, ...rest }: CardProps) {

@@ -84,7 +84,9 @@ describe('AppTopbarActions', () => {
 
   it('renders theme toggle button', () => {
     renderTopbarActions();
-    expect(screen.getByLabelText('Toggle dark/light mode')).toBeInTheDocument();
+    // Theme toggle cycles dark→light→auto. Button label reflects the next mode.
+    // In test env, preference defaults to 'auto', so label says "Switch to dark mode".
+    expect(screen.getByLabelText('Switch to dark mode')).toBeInTheDocument();
   });
 });
 

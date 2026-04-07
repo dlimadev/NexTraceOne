@@ -1713,7 +1713,13 @@
     "items": "Items",
     "name": "Name",
     "onePerLine": "one per line",
-    "type": "Type"
+    "type": "Type",
+    "skipToContent": "Skip to content",
+    "steps": "Steps",
+    "optional": "Optional",
+    "step_completed": "completed",
+    "step_active": "active",
+    "step_upcoming": "upcoming"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "When enabled, users can create custom specialized AI agents.",
@@ -5346,7 +5352,8 @@
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
     "toggleLanguage": "Toggle language",
-    "toggleTheme": "Toggle dark/light mode"
+    "toggleTheme": "Toggle dark/light mode",
+    "switchToAuto": "Switch to system mode"
   },
   "identity": {
     "accessReview": {
@@ -7915,7 +7922,8 @@
     "dependencyDashboard": "Dependency Dashboard",
     "licenseCompliance": "License Compliance",
     "parameterUsageReport": "Parameter Usage",
-    "parameterCompliance": "Parameter Compliance"
+    "parameterCompliance": "Parameter Compliance",
+    "navigation": "Main navigation"
   },
   "sourceOfTruth": {
     "assetTypes": {

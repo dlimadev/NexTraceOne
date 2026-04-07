@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe, Check, Sun, Moon } from 'lucide-react';
+import { Globe, Check, Sun, Moon, Monitor } from 'lucide-react';
 import { NotificationBell } from '../../features/notifications';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -21,17 +21,24 @@ export function AppTopbarActions() {
     setLangOpen(false);
   }, [i18n]);
 
+  const themeTitle = theme === 'dark'
+    ? t('header.switchToLight', 'Switch to light mode')
+    : theme === 'light'
+      ? t('header.switchToAuto', 'Switch to system mode')
+      : t('header.switchToDark', 'Switch to dark mode');
+
+  const ThemeIcon = theme === 'dark' ? Sun : theme === 'light' ? Monitor : Moon;
+
   return (
     <>
-      {/* Theme toggle */}
+      {/* Theme toggle — cycles dark→light→auto */}
       <button
         onClick={toggleTheme}
         className="p-2.5 rounded-lg text-muted hover:bg-hover hover:text-body transition-all duration-[var(--nto-motion-base)]"
-        title={theme === 'dark' ? t('header.switchToLight', 'Switch to light mode') : t('header.switchToDark', 'Switch to dark mode')}
-        aria-label={t('header.toggleTheme')}
-        aria-pressed={theme === 'dark'}
+        title={themeTitle}
+        aria-label={themeTitle}
       >
-        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        <ThemeIcon size={18} aria-hidden="true" />
       </button>
 
       {/* Language selector */}
