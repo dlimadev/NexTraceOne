@@ -1,8 +1,7 @@
 # NexTraceOne — Implementation Status
 
 > **Última atualização:** Abril 2026
-> **Fonte:** CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md (Abril 2026)
-> **Referência canónica:** `docs/CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md`
+> **Roadmap futuro:** [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)
 
 Este documento regista o estado de implementação de cada módulo do NexTraceOne.
 
@@ -302,5 +301,5 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 ---
 
-*Última atualização: Abril 2026 — Phase 5.3 GraphQL Federation Gateway completo. Catalog 1179 testes (+19), ChangeGovernance 314 testes (+7). Build 0 erros.*
-*Ver: `docs/ROADMAP.md`, `docs/EVOLUTION-ROADMAP-2026-2027.md`*
+*Última atualização: Abril 2026 — Todos os módulos READY. Build 0 erros.*
+*Ver: [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)*
