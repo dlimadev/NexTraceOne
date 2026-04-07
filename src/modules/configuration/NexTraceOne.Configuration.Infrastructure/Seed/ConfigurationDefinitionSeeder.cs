@@ -5517,5 +5517,64 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: """["changes","incidents","contracts","compliance"]""",
             uiEditorType: "json",
             sortOrder: 9450),
+
+        // ── Phase 7 — AI Customization (User-level) ───────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.response_verbosity",
+            displayName: "config.user.ai.response_verbosity.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.response_verbosity.description",
+            defaultValue: "standard",
+            uiEditorType: "select",
+            sortOrder: 9500),
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.preferred_language",
+            displayName: "config.user.ai.preferred_language.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.preferred_language.description",
+            defaultValue: "en",
+            uiEditorType: "text",
+            sortOrder: 9510),
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.auto_context_scope",
+            displayName: "config.user.ai.auto_context_scope.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.auto_context_scope.description",
+            defaultValue: "team",
+            uiEditorType: "select",
+            sortOrder: 9520),
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.knowledge_sources",
+            displayName: "config.user.ai.knowledge_sources.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.knowledge_sources.description",
+            defaultValue: """["contracts","services","changes","incidents","runbooks"]""",
+            uiEditorType: "json",
+            sortOrder: 9530),
+
+        // ── Phase 8 — Integrations & API (Tenant-level) ──────────────────
+
+        ConfigurationDefinition.Create(
+            key: "integration.field_mapping.enabled",
+            displayName: "config.integration.field_mapping.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integration.field_mapping.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9600),
     ];
 }

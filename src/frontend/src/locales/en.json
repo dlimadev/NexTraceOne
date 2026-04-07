@@ -8477,5 +8477,61 @@
     "enabled": "Active",
     "disabled": "Inactive",
     "lastSent": "Last Sent"
+  },
+  "aiPreferences": {
+    "title": "AI Preferences",
+    "verbosity": "Response Verbosity",
+    "verbosityOptions": {
+      "concise": "Concise",
+      "standard": "Standard",
+      "detailed": "Detailed"
+    },
+    "language": "Preferred Language",
+    "contextScope": "Auto Context Scope",
+    "scopeOptions": {
+      "service": "Service",
+      "team": "Team",
+      "all": "All"
+    },
+    "knowledgeSources": "Knowledge Sources",
+    "knowledgeSourceOptions": {
+      "contracts": "Contracts",
+      "services": "Services",
+      "changes": "Changes",
+      "incidents": "Incidents",
+      "runbooks": "Runbooks",
+      "knowledgeArticles": "Knowledge Articles",
+      "operationalNotes": "Operational Notes"
+    }
+  },
+  "savedPrompts": {
+    "title": "Saved Prompts",
+    "empty": "No saved prompts yet.",
+    "save": "Save Prompt",
+    "share": "Share",
+    "unshare": "Unshare",
+    "contextType": "Context"
+  },
+  "webhookTemplates": {
+    "title": "Webhook Templates",
+    "empty": "No webhook templates defined yet.",
+    "create": "Create Template",
+    "eventType": "Event Type",
+    "payload": "Payload Template",
+    "enabled": "Active",
+    "disabled": "Inactive"
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "empty": "No API keys yet.",
+    "create": "Create API Key",
+    "copyOnce": "Copy this key — it will not be shown again",
+    "revoke": "Revoke",
+    "scopes": "Scopes",
+    "expires": "Expires"
+  },
+  "integrationMappings": {
+    "title": "Integration Field Mappings",
+    "description": "Field mappings are configured per connector in the Integrations module."
   }
 }

@@ -8471,5 +8471,61 @@
     "enabled": "Activo",
     "disabled": "Inactivo",
     "lastSent": "Último Envío"
+  },
+  "aiPreferences": {
+    "title": "Preferencias de IA",
+    "verbosity": "Nivel de Detalle de Respuesta",
+    "verbosityOptions": {
+      "concise": "Conciso",
+      "standard": "Estándar",
+      "detailed": "Detallado"
+    },
+    "language": "Idioma Preferido",
+    "contextScope": "Ámbito de Contexto Automático",
+    "scopeOptions": {
+      "service": "Servicio",
+      "team": "Equipo",
+      "all": "Todos"
+    },
+    "knowledgeSources": "Fuentes de Conocimiento",
+    "knowledgeSourceOptions": {
+      "contracts": "Contratos",
+      "services": "Servicios",
+      "changes": "Cambios",
+      "incidents": "Incidentes",
+      "runbooks": "Runbooks",
+      "knowledgeArticles": "Artículos de Conocimiento",
+      "operationalNotes": "Notas Operacionales"
+    }
+  },
+  "savedPrompts": {
+    "title": "Prompts Guardados",
+    "empty": "Aún no hay prompts guardados.",
+    "save": "Guardar Prompt",
+    "share": "Compartir",
+    "unshare": "Dejar de Compartir",
+    "contextType": "Contexto"
+  },
+  "webhookTemplates": {
+    "title": "Plantillas de Webhook",
+    "empty": "No hay plantillas de webhook definidas aún.",
+    "create": "Crear Plantilla",
+    "eventType": "Tipo de Evento",
+    "payload": "Plantilla de Payload",
+    "enabled": "Activo",
+    "disabled": "Inactivo"
+  },
+  "apiKeys": {
+    "title": "Claves de API",
+    "empty": "Aún no hay claves de API.",
+    "create": "Crear Clave de API",
+    "copyOnce": "Copie esta clave — no se mostrará de nuevo",
+    "revoke": "Revocar",
+    "scopes": "Ámbitos",
+    "expires": "Caduca"
+  },
+  "integrationMappings": {
+    "title": "Mapeos de Campos de Integración",
+    "description": "Los mapeos de campos se configuran por conector en el módulo de Integraciones."
   }
 }

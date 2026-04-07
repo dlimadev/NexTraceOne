@@ -64,6 +64,12 @@ public static class DependencyInjection
         // In-memory repositories for Phase 6 (MVP1 — persistência PostgreSQL a adicionar futuramente)
         services.AddSingleton<IScheduledReportRepository, InMemoryScheduledReportRepository>();
 
+        // In-memory repositories for Phase 7 (MVP1 — persistência PostgreSQL a adicionar futuramente)
+        services.AddSingleton<ISavedPromptRepository, InMemorySavedPromptRepository>();
+
+        // In-memory repositories for Phase 8 (MVP1 — persistência PostgreSQL a adicionar futuramente)
+        services.AddSingleton<IWebhookTemplateRepository, InMemoryWebhookTemplateRepository>();
+
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();
 

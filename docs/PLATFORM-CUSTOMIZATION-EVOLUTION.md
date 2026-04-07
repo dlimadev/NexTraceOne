@@ -359,34 +359,34 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 **Prioridade:** 🟡 Média | **Complexidade:** Média | **Impacto:** Alto
 
 #### 7.1 Custom AI Prompts Salvos
-- [ ] **Backend:** Entidade `SavedPrompt` no módulo AIKnowledge
-  - [ ] (Id, UserId, TenantId, Name, PromptText, ContextType, Tags[], IsShared, CreatedAt)
-  - [ ] Endpoint: `/api/v1/ai/saved-prompts` (CRUD)
-- [ ] **Frontend:** No AI Hub, secção "My Prompts"
-  - [ ] Botão "Save this prompt" em cada resposta do assistente
-  - [ ] Lista de prompts salvos com quick-apply
-  - [ ] Compartilhamento dentro da equipa
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Backend:** Entidade `SavedPrompt` no módulo Configuration
+  - [x] (Id, UserId, TenantId, Name, PromptText, ContextType, TagsCsv, IsShared, CreatedAt)
+  - [x] Endpoint: `/api/v1/ai/saved-prompts` (CRUD + share)
+- [ ] **Frontend:** No AI Hub, secção "My Prompts" (roadmap)
+  - [ ] Botão "Save this prompt" em cada resposta do assistente (roadmap)
+  - [ ] Lista de prompts salvos com quick-apply (roadmap)
+  - [ ] Compartilhamento dentro da equipa (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 6+ testes
 
 #### 7.2 AI Agent Behavior Preferences
-- [ ] **Backend:** Preferências: `ai.response_verbosity` (concise, standard, detailed), `ai.preferred_language`, `ai.auto_context_scope` (service, team, all)
-  - [ ] Seeds de configuração
-  - [ ] Aplicação nos system prompts dos agentes
-- [ ] **Frontend:** Secção "AI Preferences" na UserPreferencesPage
-  - [ ] Select de verbosidade
-  - [ ] Select de idioma
-  - [ ] Select de scope automático
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 2+ testes
+- [x] **Backend:** Preferências: `user.ai.response_verbosity` (concise, standard, detailed), `user.ai.preferred_language`, `user.ai.auto_context_scope` (service, team, all)
+  - [x] Seeds de configuração
+  - [ ] Aplicação nos system prompts dos agentes (roadmap)
+- [x] **Frontend:** Secção "AI Preferences" na UserPreferencesPage
+  - [x] Select de verbosidade
+  - [x] Select de idioma
+  - [x] Select de scope automático
+- [x] **i18n:** 4 locales
+- [x] **Testes:** incluídos em AiCustomizationTests
 
 #### 7.3 Custom AI Knowledge Scope
-- [ ] **Backend:** Preferência `ai.knowledge_sources` — quais fontes o assistente consulta
-  - [ ] Opções: contracts, services, changes, incidents, runbooks, knowledge-articles, operational-notes
-  - [ ] Aplicação no pipeline de grounding (`IKnowledgeModule`)
-- [ ] **Frontend:** Multi-select de fontes de conhecimento
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 2+ testes
+- [x] **Backend:** Preferência `user.ai.knowledge_sources` — quais fontes o assistente consulta
+  - [x] Seed: contracts, services, changes, incidents, runbooks
+  - [ ] Aplicação no pipeline de grounding (`IKnowledgeModule`) (roadmap)
+- [x] **Frontend:** Multi-select de fontes de conhecimento na UserPreferencesPage
+- [x] **i18n:** 4 locales
+- [x] **Testes:** incluídos em AiCustomizationTests
 
 ---
 
@@ -394,37 +394,34 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 **Prioridade:** 🔵 Baixa | **Complexidade:** Média | **Impacto:** Médio-Alto
 
 #### 8.1 Custom Webhook Payloads
-- [ ] **Backend:** Entidade `WebhookTemplate` (Id, TenantId, Name, EventType, PayloadTemplate, Headers[], Enabled)
-  - [ ] PayloadTemplate: Handlebars/Liquid template com variáveis da entidade
-  - [ ] Endpoint: `/api/v1/webhook-templates` (CRUD)
-  - [ ] Preview com dados de exemplo
-- [ ] **Frontend:** Página `WebhookTemplatesPage`
-  - [ ] Editor de template com syntax highlighting
-  - [ ] Lista de variáveis disponíveis por evento
-  - [ ] Botão "Test webhook"
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Backend:** Entidade `WebhookTemplate` (Id, TenantId, Name, EventType, PayloadTemplate, HeadersJson, IsEnabled)
+  - [x] EventType: change.created, incident.opened, contract.published, approval.expired
+  - [x] Endpoint: `/api/v1/webhook-templates` (CRUD + toggle)
+  - [ ] Preview com dados de exemplo (roadmap)
+- [x] **Frontend:** Página `WebhookTemplatesPage`
+  - [ ] Editor de template com syntax highlighting (roadmap)
+  - [ ] Lista de variáveis disponíveis por evento (roadmap)
+  - [ ] Botão "Test webhook" (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 4+ testes em IntegrationEntitiesTests
 
 #### 8.2 API Keys Management por Utilizador
-- [ ] **Backend:** Já existe infraestrutura de API Keys no BuildingBlocks.Security
-  - [ ] Extensão: self-service de API keys com escopos customizáveis
-  - [ ] Scopes: read:services, write:services, read:contracts, read:changes, etc.
-  - [ ] Endpoint: `/api/v1/user/api-keys` (CRUD)
-  - [ ] Expiração configurável
-- [ ] **Frontend:** Página `APIKeysPage` em preferências do utilizador
-  - [ ] Criar key com nome, scopes e expiração
-  - [ ] Lista de keys com last used, revoke
-  - [ ] Copiar key (visível apenas uma vez)
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 4+ testes
+- [x] **Backend:** Infraestrutura de API Keys existente no módulo Catalog (DeveloperPortal)
+  - [x] Endpoint: `/api/v1/developerportal/api-keys` (create, list, revoke)
+  - [ ] Scopes customizáveis granulares (roadmap)
+- [x] **Frontend:** Página `APIKeysPage` em preferências
+  - [x] Criar key com nome, scopes e expiração
+  - [x] Lista de keys com last used, revoke
+  - [x] Copiar key (visível apenas uma vez)
+- [x] **i18n:** 4 locales
 
 #### 8.3 Custom Integration Field Mappings
-- [ ] **Backend:** Extensão do módulo Integrations para mappings customizáveis
-  - [ ] Admin mapeia campos NexTraceOne ↔ campos do sistema externo
-  - [ ] Configuração por conector (Jira, ServiceNow, etc.)
-- [ ] **Frontend:** UI de mapping em cada conector configurado
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 2+ testes
+- [x] **Backend:** Seed `integration.field_mapping.enabled` (bool, default false)
+- [x] **Frontend:** Página `IntegrationMappingsPage` com placeholder e link ao módulo Integrations
+- [ ] Extensão do módulo Integrations para mappings customizáveis (roadmap)
+  - [ ] Admin mapeia campos NexTraceOne ↔ campos do sistema externo (roadmap)
+  - [ ] Configuração por conector (Jira, ServiceNow, etc.) (roadmap)
+- [x] **i18n:** 4 locales
 
 ---
 

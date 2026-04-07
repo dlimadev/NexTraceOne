@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Settings, Sidebar, LayoutDashboard, Save, CheckCircle, XCircle,
-  Clock, Globe, List, BellOff, Rss,
+  Clock, Globe, List, BellOff, Rss, Bot,
 } from 'lucide-react';
 
 const TIMEZONES = [
@@ -99,6 +99,14 @@ export function UserPreferencesPage() {
   const [digestSections, setDigestSections] = useState<string[]>(['changes', 'incidents', 'contracts', 'compliance']);
 
   const DIGEST_SECTION_OPTIONS = ['changes', 'incidents', 'contracts', 'compliance', 'finops', 'ai-usage'];
+
+  // ── AI Preferences state ──────────────────────────────────────────────────
+  const [aiVerbosity, setAiVerbosity] = useState('standard');
+  const [aiLanguage, setAiLanguage] = useState('en');
+  const [aiContextScope, setAiContextScope] = useState('team');
+  const [aiKnowledgeSources, setAiKnowledgeSources] = useState<string[]>(['contracts', 'services', 'changes', 'incidents', 'runbooks']);
+
+  const AI_KNOWLEDGE_OPTIONS = ['contracts', 'services', 'changes', 'incidents', 'runbooks', 'knowledge-articles', 'operational-notes'];
   const [defaultEnv, setDefaultEnv] = useState('');
   const [defaultTeam, setDefaultTeam] = useState('');
   const [defaultService, setDefaultService] = useState('');
@@ -139,6 +147,15 @@ export function UserPreferencesPage() {
       if (qhtz) setQuietHoursTimezone(qhtz.value);
       if (df2) setDigestFrequency(df2.value);
       if (dsec) { try { setDigestSections(JSON.parse(dsec.value)); } catch { /* keep default */ } }
+
+      const aiVerb = data.preferences.find(p => p.key === 'user.ai.response_verbosity');
+      const aiLang = data.preferences.find(p => p.key === 'user.ai.preferred_language');
+      const aiScope = data.preferences.find(p => p.key === 'user.ai.auto_context_scope');
+      const aiKnow = data.preferences.find(p => p.key === 'user.ai.knowledge_sources');
+      if (aiVerb) setAiVerbosity(aiVerb.value);
+      if (aiLang) setAiLanguage(aiLang.value);
+      if (aiScope) setAiContextScope(aiScope.value);
+      if (aiKnow) { try { setAiKnowledgeSources(JSON.parse(aiKnow.value)); } catch { /* keep default */ } }
     }
   }, [data]);
 
@@ -159,6 +176,10 @@ export function UserPreferencesPage() {
       await savePreference('notifications.quiet_hours.timezone', quietHoursTimezone);
       await savePreference('notifications.digest.frequency', digestFrequency);
       await savePreference('notifications.digest.sections', JSON.stringify(digestSections));
+      await savePreference('user.ai.response_verbosity', aiVerbosity);
+      await savePreference('user.ai.preferred_language', aiLanguage);
+      await savePreference('user.ai.auto_context_scope', aiContextScope);
+      await savePreference('user.ai.knowledge_sources', JSON.stringify(aiKnowledgeSources));
     },
     onSuccess: () => {
       setSaveStatus('saved');
@@ -474,6 +495,87 @@ export function UserPreferencesPage() {
             <XCircle size={14} /> {t('userPreferences.error')}
           </span>
         )}
+      </div>
+
+      {/* AI Preferences */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <Bot size={18} />
+            <span>{t('aiPreferences.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-5">
+              {/* Response Verbosity */}
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('aiPreferences.verbosity')}</label>
+                <select
+                  value={aiVerbosity}
+                  onChange={e => setAiVerbosity(e.target.value)}
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                >
+                  <option value="concise">{t('aiPreferences.verbosityOptions.concise')}</option>
+                  <option value="standard">{t('aiPreferences.verbosityOptions.standard')}</option>
+                  <option value="detailed">{t('aiPreferences.verbosityOptions.detailed')}</option>
+                </select>
+              </div>
+
+              {/* Preferred Language */}
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('aiPreferences.language')}</label>
+                <input
+                  type="text"
+                  value={aiLanguage}
+                  onChange={e => setAiLanguage(e.target.value)}
+                  className="w-32 px-3 py-1.5 text-sm border rounded bg-transparent"
+                  placeholder="en"
+                />
+              </div>
+
+              {/* Auto Context Scope */}
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('aiPreferences.contextScope')}</label>
+                <select
+                  value={aiContextScope}
+                  onChange={e => setAiContextScope(e.target.value)}
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                >
+                  <option value="service">{t('aiPreferences.scopeOptions.service')}</option>
+                  <option value="team">{t('aiPreferences.scopeOptions.team')}</option>
+                  <option value="all">{t('aiPreferences.scopeOptions.all')}</option>
+                </select>
+              </div>
+
+              {/* Knowledge Sources */}
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('aiPreferences.knowledgeSources')}</label>
+                <div className="flex flex-wrap gap-2">
+                  {AI_KNOWLEDGE_OPTIONS.map(src => {
+                    const key = src.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase()) as keyof typeof t;
+                    return (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() =>
+                          setAiKnowledgeSources(prev =>
+                            prev.includes(src) ? prev.filter(s => s !== src) : [...prev, src]
+                          )
+                        }
+                        className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                          aiKnowledgeSources.includes(src)
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                        }`}
+                      >
+                        {t(`aiPreferences.knowledgeSourceOptions.${src === 'knowledge-articles' ? 'knowledgeArticles' : src === 'operational-notes' ? 'operationalNotes' : src}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
       </div>
     </PageContainer>
   );
