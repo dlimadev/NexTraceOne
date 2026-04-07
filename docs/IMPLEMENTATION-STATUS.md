@@ -78,7 +78,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 **DbContexts:** `ContractsDbContext`, `CatalogGraphDbContext`, `DeveloperPortalDbContext` (3 DbContexts, 4 migrações)
 **Status geral:** 90 features, 100% real; 10/10 contract types com visual builders; Phase 4 Innovation completa (6/6 PA items)
-**Testes:** 1160 testes unitários (0 falhas)
+**Testes:** 1179+ testes unitários (0 falhas)
 **Evidência:** `src/modules/catalog/`
 
 ---
@@ -129,8 +129,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Mitigation Workflows | READY | `CreateMitigationWorkflow` persiste via `IMitigationWorkflowRepository`; `GetMitigationHistory` consulta dados reais; `RecordMitigationValidation` persiste logs de validação. |
 
 **DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (migração), `CostIntelligenceDbContext` (migração)
-**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). Runbook visual builder pendente.
-**Testes:** 527/527 passam.
+**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). `InMemoryIncidentStore` marcado como `[Obsolete]` — apenas para testes.
+**Testes:** 624+ testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
 **Evidência:** `src/modules/operationalintelligence/`
 
 ---
@@ -143,7 +143,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Model Registry | PARTIAL | Funcional com DbContext real |
 | AI Streaming | PARTIAL | `IChatCompletionProvider` com streaming; endpoint SSE existe; LLM real integrado via Ollama/OpenAI |
 | AI Tool Execution | PARTIAL | `IToolRegistry`, `IToolExecutor`, `IToolPermissionValidator` implementados; 3 ferramentas reais (`list_services`, `get_service_health`, `list_recent_changes`); `MaxToolIterations=5` |
-| AI Grounding / Context | PARTIAL | Assemblagem de contexto configurada (`DocumentRetrievalService`, `DatabaseRetrievalService`, `TelemetryRetrievalService`); sem pesquisa cross-module de entidades reais |
+| AI Grounding / Context | READY | Assemblagem de contexto configurada (`DocumentRetrievalService`, `DatabaseRetrievalService`, `TelemetryRetrievalService`); 4 grounding readers cross-module verificados (`CatalogGroundingReader`, `ChangeGroundingReader`, `IncidentGroundingReader`, `KnowledgeDocumentGroundingReader`) |
+| AI Security Guardrails | READY | `DefaultGuardrailCatalog` com 5 guardrails: prompt-injection-detection (block), credential-leak-prevention (sanitize), pii-email-detection (warn), pii-phone-detection (warn), sensitive-data-classification (log) |
 | AI Orchestration | REAL | `AiOrchestrationDbContext` com migrações; `IAiOrchestrationModule` implementado por `AiOrchestrationModule` |
 | External AI | REAL | `IExternalAiModule` implementado por `ExternalAiModule`; `ExternalAiDbContext` com migrações |
 | Knowledge Source Weights | REAL | Pesos persistidos em `aik_source_weights`; `ListKnowledgeSourceWeights` consulta DB com fallback a defaults |
@@ -151,7 +152,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | AiAssistantPage (frontend) | REAL | Usa API real: `aiGovernanceApi.listConversations`, `sendMessage`, `getMessages` (7 chamadas API reais) |
 
 **DbContexts:** `AiGovernanceDbContext`, `AiOrchestrationDbContext`, `ExternalAiDbContext` — todos com migrações confirmadas.
-**Testes:** 819 testes unitários (0 falhas)
+**Testes:** 819+ testes unitários (0 falhas)
 **Evidência:** `src/modules/aiknowledge/`
 
 ---
@@ -171,8 +172,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Reports | READY | Dados reais via agregação cross-module |
 | Executive Views | READY | `GetExecutiveOverview` usa `IIncidentModule` para métricas reais; `CrossModuleDataAvailable: true` |
 
-**Frontend:** 25/26 páginas conectadas a APIs reais (50+ endpoints). GovernanceConfigurationPage usa sistema de configuração.
-**Testes:** 158/158 passam.
+**Frontend:** 25/26 páginas conectadas a APIs reais (50+ endpoints). GovernanceConfigurationPage usa sistema de configuração. GovernanceGatesPage com 7 gates. DoraMetricsPage, ServiceScorecardPage, TechnicalDebtPage, CustomDashboardsPage implementados.
+**Testes:** 233+ testes unitários (0 falhas). Inclui DORA Metrics, Service Scorecard, Technical Debt, Custom Dashboards, FinOps Budget Gate, Compliance Remediation Gate.
 **Evidência:** `src/modules/governance/`
 
 ---
@@ -185,10 +186,12 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Operational Notes | READY | Create/List/Update funcional |
 | Knowledge Relations | READY | Ligações entre entidades de conhecimento e serviços |
 | Knowledge Endpoints | READY | 11 endpoints CRUD implementados |
+| Knowledge Graph | READY | `GetKnowledgeGraphOverview` — visualização de relações entre entidades; `GET /api/v1/knowledge/graph` |
+| Auto Documentation | READY | `GenerateAutoDocumentation` — geração automática de documentação por serviço; `GET /api/v1/knowledge/auto-documentation/{serviceName}` |
 | IKnowledgeModule | READY | Cross-module interface implementada por `KnowledgeModuleService` |
 
 **DbContexts:** `KnowledgeDbContext` (migração confirmada: `20260328162322_InitialCreate`)
-**Tests:** 44/44 passam
+**Tests:** 70+ testes (0 falhas). Inclui KnowledgeIntelligence, ValidateDocumentReviewGate.
 **Evidência:** `src/modules/knowledge/`
 
 ---

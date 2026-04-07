@@ -110,9 +110,14 @@ This document is the canonical reference for the real operational state of each 
 - **AI Source health check** — verifica conectividade HTTP para fontes Document com URL; actualiza estado persistido
 
 ### Gaps (low)
-- ~~**Cross-module grounding**~~ ✅ VERIFIED — `DatabaseRetrievalService` queries Catalog (services), ChangeIntelligence (releases), OperationalIntelligence (incidents), and Knowledge (documents) via 4 dedicated grounding readers (`CatalogGroundingReader`, `ChangeGroundingReader`, `IncidentGroundingReader`, `KnowledgeDocumentGroundingReader`)
-- ~~**AI Source health check** — conectores para fontes Database e ExternalMemory retornavam estado persistido~~ ✅ FIXED — `PerformConnectivityCheckAsync` now supports Database (PostgreSQL connection test via Npgsql) and ExternalMemory (HTTP endpoint test)
+- **Correlation engine heuristics** — correlation uses basic timestamp+service matching; no ML/NLP-based correlation (functional for production use)
 - **Model selection routing** — classificação de caso de uso usa heurística de palavras-chave; NLP real não implementado
+
+### Security Controls (implemented)
+- ✅ **Prompt Injection Detection** — `DefaultGuardrailCatalog` guardrail `"prompt-injection-detection"` blocks messages containing "ignore previous instructions", "you are now", "pretend you are", "reveal your system" (severity: critical)
+- ✅ **Credential Leak Prevention** — guardrail `"credential-leak-prevention"` sanitizes API keys, passwords, bearer tokens, RSA keys, connection strings (severity: critical)
+- ✅ **PII Detection** — guardrails `"pii-email-detection"` (warn) and `"pii-phone-detection"` (warn) detect personal data
+- ✅ **Sensitive Data Classification** — guardrail `"sensitive-data-classification"` logs "confidential", "top secret", "restricted" (severity: high)
 
 ### Evidence
 - `src/modules/aiknowledge/` — `AiGovernanceDbContext`, `AiOrchestrationDbContext`, `ExternalAiDbContext` (todos com migrações confirmadas)

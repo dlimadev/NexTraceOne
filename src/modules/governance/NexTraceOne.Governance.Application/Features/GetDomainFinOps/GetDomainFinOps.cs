@@ -131,7 +131,7 @@ public static class GetDomainFinOps
                 .ToList();
     }
 
-    /// <summary>Perfil de FinOps agregado por domínio. IsSimulated=true indica dados demonstrativos.</summary>
+    /// <summary>Perfil de FinOps agregado por domínio. IsSimulated é sempre false — dados reais via ICostIntelligenceModule.</summary>
     public sealed record Response(
         string DomainId,
         string DomainName,

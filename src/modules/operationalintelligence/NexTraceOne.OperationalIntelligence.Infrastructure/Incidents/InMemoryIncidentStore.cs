@@ -19,7 +19,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 /// Implementação in-memory do IIncidentStore para utilização em testes unitários.
 /// Carrega os mesmos dados de seed que são usados na migração inicial, garantindo
 /// paridade funcional com o EfIncidentStore em cenários de teste.
+/// NÃO é registada em DI de produção — apenas EfIncidentStore é o provider ativo.
 /// </summary>
+[System.Obsolete("Test-only implementation. Production uses EfIncidentStore registered in DI. This class will be removed in a future version.")]
 internal sealed class InMemoryIncidentStore : IIncidentStore
 {
     private static readonly JsonSerializerOptions JsonOpts = new()
