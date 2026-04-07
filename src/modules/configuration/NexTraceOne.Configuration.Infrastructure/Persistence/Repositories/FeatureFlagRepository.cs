@@ -24,6 +24,7 @@ internal sealed class FeatureFlagRepository(ConfigurationDbContext context)
         CancellationToken cancellationToken)
         => await context.FeatureFlagDefinitions
             .OrderBy(d => d.Key)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
     public async Task AddDefinitionAsync(
@@ -57,6 +58,7 @@ internal sealed class FeatureFlagRepository(ConfigurationDbContext context)
         => await context.FeatureFlagEntries
             .Where(e => e.Key == key)
             .OrderBy(e => e.Scope)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
     public async Task AddEntryAsync(

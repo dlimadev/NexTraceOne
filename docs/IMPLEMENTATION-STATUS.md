@@ -35,8 +35,16 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 |---|---|---|
 | Feature Flags | READY | Database-driven, override por tenant, `ConfigurationDefinitionSeeder` com 458 seeds, 112 parâmetros em 17 domínios |
 | Settings por tenant/ambiente | READY | Presente e funcional, com governance gates e analytics endpoints |
+| User Saved Views & Bookmarks | READY | `UserSavedView`, `UserBookmark` — EF Core com RLS |
+| User Watch & Alert Rules | READY | `UserWatch`, `UserAlertRule` — EF Core com RLS |
+| Tags, Custom Fields & Taxonomy | READY | `EntityTag`, `ServiceCustomField`, `TaxonomyCategory/Value` — EF Core com RLS |
+| Automation, Checklists & Templates | READY | `AutomationRule`, `ChangeChecklist`, `ContractTemplate` — EF Core com RLS |
+| Scheduled Reports | READY | `ScheduledReport` — EF Core com RLS |
+| Saved Prompts | READY | `SavedPrompt` — EF Core com RLS |
+| Webhook Templates | READY | `WebhookTemplate` — EF Core com RLS |
 
-**DbContexts:** `ConfigurationDbContext` (migração confirmada)
+**DbContexts:** `ConfigurationDbContext` (3 migrações: Initial, UserSavedViews/Bookmarks, Phase3To8Tables)
+**Testes:** 451 unit tests (0 falhas)
 **Evidência:** `src/modules/configuration/`
 
 ---
@@ -280,7 +288,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Governance | READY | Dados reais via repositórios e cross-module; FinOps real; 25/26 frontend pages conectadas; 158/158 testes passam |
 | Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
 | Notifications | READY | Channels e templates funcionais |
-| Configuration | READY | 458 seeds, 112 parâmetros, 17 domínios, governance gates, analytics |
+| Configuration | READY | 458 seeds, 112 parâmetros, 17 domínios, governance gates, analytics, 14 EF Core entity types com RLS |
 | Integrations | READY | Repositórios EF Core reais, 104+ testes; metadata capture funcional; deep pipeline integration planeada |
 | Product Analytics | READY | Repositórios EF Core reais, 42+ testes; `AnalyticsEventTracker` no frontend |
 
