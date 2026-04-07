@@ -1105,7 +1105,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Role],
             description: "config.platform.homepage.default_route.description",
             defaultValue: "/",
-            validationRules: """{"pattern":"^/[a-z0-9/_-]*$"}""",
+            validationRules: """{"pattern":"^/[a-zA-Z0-9/_-]*$"}""",
             uiEditorType: "text",
             sortOrder: 1390),
 

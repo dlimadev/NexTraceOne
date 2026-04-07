@@ -23,7 +23,7 @@ export function AppFooter() {
       <div className="flex items-center justify-between gap-4">
         <p className="text-[11px] text-faded flex-1 text-center">{displayText}</p>
         {poweredByVisible && (
-          <span className="text-[10px] text-faded/60 shrink-0 select-none" aria-label="Powered by NexTraceOne">
+          <span className="text-[10px] text-faded/60 shrink-0 select-none">
             {t('footer.poweredBy')}
           </span>
         )}

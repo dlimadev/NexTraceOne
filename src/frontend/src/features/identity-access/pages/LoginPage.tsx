@@ -15,6 +15,8 @@ import { AuthDivider } from '../components/AuthDivider';
 import { AuthFeedback } from '../components/AuthFeedback';
 import { loginSchema, type LoginFormData } from '../schemas/auth';
 
+const DEFAULT_LOGO_ICON = '/brand/logo-icon.svg';
+
 /**
  * Página de login — Auth Shell enterprise inspirada no NexLink template.
  *
@@ -98,11 +100,11 @@ export function LoginPage() {
               className="h-12 w-auto max-w-[200px] object-contain"
               onError={(e) => {
                 // Fallback to default logo on broken URL
-                (e.target as HTMLImageElement).src = '/brand/logo-icon.svg';
+                (e.target as HTMLImageElement).src = DEFAULT_LOGO_ICON;
               }}
             />
           ) : (
-            <img src="/brand/logo-icon.svg" alt="NexTraceOne" className="h-12 w-auto" />
+            <img src={DEFAULT_LOGO_ICON} alt="NexTraceOne" className="h-12 w-auto" />
           )}
         </div>
 
