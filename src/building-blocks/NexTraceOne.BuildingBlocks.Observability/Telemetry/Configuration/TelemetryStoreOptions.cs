@@ -296,16 +296,16 @@ public sealed class CollectorOptions
     /// <summary>
     /// Endpoint gRPC do Collector OTLP (ex: "http://otel-collector:4317").
     /// Obrigatório em produção — configurar via appsettings.{Environment}.json ou variável de ambiente.
-    /// Em Development: default "http://localhost:4317".
-    /// Em Production/Staging: deve ser explicitamente configurado; vazio desabilita exportação OTLP.
+    /// Default vazio — cada ambiente deve configurar explicitamente
+    /// (Development usa "http://localhost:4317" via appsettings.Development.json).
     /// </summary>
     public string OtlpGrpcEndpoint { get; set; } = "";
 
     /// <summary>
     /// Endpoint HTTP do Collector OTLP (ex: "http://otel-collector:4318").
     /// Alternativa HTTP para ambientes que não suportam gRPC.
-    /// Em Development: default "http://localhost:4318".
-    /// Em Production/Staging: deve ser explicitamente configurado; vazio desabilita exportação OTLP HTTP.
+    /// Default vazio — cada ambiente deve configurar explicitamente
+    /// (Development usa "http://localhost:4318" via appsettings.Development.json).
     /// </summary>
     public string OtlpHttpEndpoint { get; set; } = "";
 

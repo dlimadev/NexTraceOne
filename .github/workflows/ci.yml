@@ -344,13 +344,16 @@ jobs:
           echo "## NuGet Vulnerability Audit" >> $GITHUB_STEP_SUMMARY
           dotnet restore NexTraceOne.sln
           # --vulnerable flag lists packages with known vulnerabilities
-          AUDIT_OUTPUT=$(dotnet list NexTraceOne.sln package --vulnerable --include-transitive 2>&1 || true)
+          set +e
+          AUDIT_OUTPUT=$(dotnet list NexTraceOne.sln package --vulnerable --include-transitive 2>&1)
+          AUDIT_EXIT=$?
+          set -e
           echo "$AUDIT_OUTPUT"
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "$AUDIT_OUTPUT" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          # Fail on critical/high severity vulnerabilities
-          if echo "$AUDIT_OUTPUT" | grep -qi "Critical\|High"; then
+          # Fail on critical/high severity vulnerabilities (check output for severity markers)
+          if echo "$AUDIT_OUTPUT" | grep -qE "(Critical|High)\s"; then
             echo "❌ Critical or high severity vulnerabilities found" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
@@ -368,13 +371,16 @@ jobs:
         run: |
           echo "## npm Vulnerability Audit" >> $GITHUB_STEP_SUMMARY
           npm ci
-          AUDIT_OUTPUT=$(npm audit --omit=dev 2>&1 || true)
+          # Run audit once, capture output and exit code
+          set +e
+          AUDIT_OUTPUT=$(npm audit --omit=dev --audit-level=critical 2>&1)
+          AUDIT_EXIT=$?
+          set -e
           echo "$AUDIT_OUTPUT"
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "$AUDIT_OUTPUT" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          # Fail only on critical severity
-          if npm audit --omit=dev --audit-level=critical 2>&1 | grep -q "critical"; then
+          if [ $AUDIT_EXIT -ne 0 ]; then
             echo "❌ Critical npm vulnerabilities found" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
