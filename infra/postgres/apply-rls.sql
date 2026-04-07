@@ -410,9 +410,107 @@ CREATE POLICY tenant_isolation ON cfg_configuration_entries
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- cfg_user_watches — user watch lists per tenant
+ALTER TABLE cfg_user_watches ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_user_watches;
+CREATE POLICY tenant_isolation ON cfg_user_watches
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_user_alert_rules — user alert rules per tenant
+ALTER TABLE cfg_user_alert_rules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_user_alert_rules;
+CREATE POLICY tenant_isolation ON cfg_user_alert_rules
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_entity_tags — entity tags per tenant
+ALTER TABLE cfg_entity_tags ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_entity_tags;
+CREATE POLICY tenant_isolation ON cfg_entity_tags
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_service_custom_fields — custom fields per tenant
+ALTER TABLE cfg_service_custom_fields ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_service_custom_fields;
+CREATE POLICY tenant_isolation ON cfg_service_custom_fields
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_taxonomy_categories — taxonomy categories per tenant
+ALTER TABLE cfg_taxonomy_categories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_taxonomy_categories;
+CREATE POLICY tenant_isolation ON cfg_taxonomy_categories
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_taxonomy_values — taxonomy values per tenant
+ALTER TABLE cfg_taxonomy_values ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_taxonomy_values;
+CREATE POLICY tenant_isolation ON cfg_taxonomy_values
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_automation_rules — automation rules per tenant
+ALTER TABLE cfg_automation_rules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_automation_rules;
+CREATE POLICY tenant_isolation ON cfg_automation_rules
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_change_checklists — change checklists per tenant
+ALTER TABLE cfg_change_checklists ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_change_checklists;
+CREATE POLICY tenant_isolation ON cfg_change_checklists
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_contract_templates — contract templates per tenant
+ALTER TABLE cfg_contract_templates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_contract_templates;
+CREATE POLICY tenant_isolation ON cfg_contract_templates
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_scheduled_reports — scheduled reports per tenant
+ALTER TABLE cfg_scheduled_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_scheduled_reports;
+CREATE POLICY tenant_isolation ON cfg_scheduled_reports
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_saved_prompts — saved prompts per tenant
+ALTER TABLE cfg_saved_prompts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_saved_prompts;
+CREATE POLICY tenant_isolation ON cfg_saved_prompts
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_webhook_templates — webhook templates per tenant
+ALTER TABLE cfg_webhook_templates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_webhook_templates;
+CREATE POLICY tenant_isolation ON cfg_webhook_templates
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_user_saved_views — user saved views per tenant
+ALTER TABLE cfg_user_saved_views ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_user_saved_views;
+CREATE POLICY tenant_isolation ON cfg_user_saved_views
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cfg_user_bookmarks — user bookmarks per tenant
+ALTER TABLE cfg_user_bookmarks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_user_bookmarks;
+CREATE POLICY tenant_isolation ON cfg_user_bookmarks
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 38 tables covering all major tenant-aware data domains.
+--   RLS enabled on 52 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

@@ -35,6 +35,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./infra/postgres/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
+      - ./infra/postgres/apply-rls.sql:/rls/apply-rls.sql:ro
     ports:
       - "5432:5432"
     healthcheck:
