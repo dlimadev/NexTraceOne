@@ -26,8 +26,12 @@ public static class SetUserPreference
         public Validator()
         {
             RuleFor(x => x.Key).NotEmpty().MaximumLength(256)
-                .Must(k => k.StartsWith("platform.", StringComparison.OrdinalIgnoreCase))
-                .WithMessage("User preferences must start with 'platform.' prefix");
+                .Must(k => k.StartsWith("platform.", StringComparison.OrdinalIgnoreCase)
+                         || k.StartsWith("user.", StringComparison.OrdinalIgnoreCase)
+                         || k.StartsWith("default.", StringComparison.OrdinalIgnoreCase)
+                         || k.StartsWith("table.", StringComparison.OrdinalIgnoreCase)
+                         || k.StartsWith("ui.", StringComparison.OrdinalIgnoreCase))
+                .WithMessage("User preferences must start with a recognized prefix (platform., user., default., table., ui.)");
             RuleFor(x => x.Value).NotEmpty().MaximumLength(4000);
         }
     }

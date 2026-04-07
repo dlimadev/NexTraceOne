@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Activity,
   Zap,
@@ -17,6 +17,18 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from './Card';
 import type { HomeWidget } from '../auth/persona';
+
+/**
+ * Tipo de ação de drill-down configurável por widget.
+ * - navigate: navega para uma rota filtrada
+ * - detail: abre painel de detalhe
+ * - new-tab: abre URL em nova aba
+ */
+export type DrillDownAction =
+  | { type: 'navigate'; to: string }
+  | { type: 'detail'; entityId: string }
+  | { type: 'new-tab'; url: string }
+  | null;
 
 /**
  * Metadados visuais e de navegação para cada tipo de widget.
@@ -53,11 +65,22 @@ const widgetMeta: Record<HomeWidget['type'], WidgetMetadata> = {
  *
  * Renderiza um card com ícone, título i18n e descrição contextual.
  * Inclui link de navegação para o módulo relevante.
+ * Suporta drillDownAction para navegação filtrada, detalhe ou nova aba.
  * O conteúdo real será populado quando os endpoints específicos forem ligados.
  */
-export function HomeWidgetCard({ widget }: { widget: HomeWidget }) {
+export function HomeWidgetCard({ widget, drillDownAction }: { widget: HomeWidget; drillDownAction?: DrillDownAction }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const meta = widgetMeta[widget.type] ?? widgetMeta.services;
+
+  function handleDrillDown() {
+    if (!drillDownAction) return;
+    if (drillDownAction.type === 'navigate') {
+      navigate(drillDownAction.to);
+    } else if (drillDownAction.type === 'new-tab') {
+      window.open(drillDownAction.url, '_blank', 'noopener,noreferrer');
+    }
+  }
 
   return (
     <Card>
@@ -75,12 +98,21 @@ export function HomeWidgetCard({ widget }: { widget: HomeWidget }) {
           <p className="text-xs text-muted max-w-xs mb-3 leading-relaxed">
             {t(meta.descKey)}
           </p>
-          <Link
-            to={meta.route}
-            className="inline-flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 transition-colors font-medium"
-          >
-            {t('common.explore')} <ArrowRight size={12} />
-          </Link>
+          {drillDownAction && drillDownAction.type !== 'detail' ? (
+            <button
+              onClick={handleDrillDown}
+              className="inline-flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 transition-colors font-medium"
+            >
+              {t('common.explore')} <ArrowRight size={12} />
+            </button>
+          ) : (
+            <Link
+              to={meta.route}
+              className="inline-flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 transition-colors font-medium"
+            >
+              {t('common.explore')} <ArrowRight size={12} />
+            </Link>
+          )}
         </div>
       </CardBody>
     </Card>

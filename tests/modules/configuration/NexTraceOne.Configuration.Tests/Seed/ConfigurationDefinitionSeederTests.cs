@@ -41,10 +41,6 @@ public sealed class ConfigurationDefinitionSeederTests
         ConfigurationDefinition.Create("environment.is_production", "Environment Is Production", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.Environment], defaultValue: "false", isInheritable: false, uiEditorType: "toggle", sortOrder: 1210),
         ConfigurationDefinition.Create("environment.criticality", "Environment Criticality", ConfigurationCategory.Functional, ConfigurationValueType.String, [ConfigurationScope.Environment, ConfigurationScope.System], defaultValue: "medium", validationRules: """{"enum":["low","medium","high","critical"]}""", uiEditorType: "select", sortOrder: 1220),
 
-        // Block F — Branding
-        ConfigurationDefinition.Create("branding.logo_url", "Branding Logo URL", ConfigurationCategory.Functional, ConfigurationValueType.String, [ConfigurationScope.System, ConfigurationScope.Tenant], uiEditorType: "text", sortOrder: 1300),
-        ConfigurationDefinition.Create("branding.accent_color", "Branding Accent Color", ConfigurationCategory.Functional, ConfigurationValueType.String, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "#3B82F6", validationRules: """{"pattern":"^#[0-9a-fA-F]{6}$"}""", uiEditorType: "text", sortOrder: 1320),
-
         // Block G — Feature Flags
         ConfigurationDefinition.Create("feature.module.catalog.enabled", "Feature: Service Catalog", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "true", uiEditorType: "toggle", sortOrder: 1400),
         ConfigurationDefinition.Create("feature.module.contracts.enabled", "Feature: Contract Governance", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "true", uiEditorType: "toggle", sortOrder: 1410),
@@ -90,20 +86,6 @@ public sealed class ConfigurationDefinitionSeederTests
 
         envDefs.Should().NotBeEmpty();
         envDefs.Should().OnlyContain(d => d.AllowedScopes.Contains(ConfigurationScope.Environment));
-    }
-
-    // ── Branding definitions ───────────────────────────────────────────
-
-    [Fact]
-    public void BuildDefaultDefinitions_ShouldContainBrandingDefinitions()
-    {
-        var definitions = BuildPhase1Definitions();
-        var brandingDefs = definitions.Where(d => d.Key.StartsWith("branding.")).ToList();
-
-        brandingDefs.Should().NotBeEmpty();
-        brandingDefs.Should().OnlyContain(d =>
-            d.AllowedScopes.Contains(ConfigurationScope.System) ||
-            d.AllowedScopes.Contains(ConfigurationScope.Tenant));
     }
 
     // ── Feature flag definitions ───────────────────────────────────────

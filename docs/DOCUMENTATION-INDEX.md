@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-07
+> **Última actualização:** 2026-04-07 — PLATFORM-CUSTOMIZATION-EVOLUTION Fases 1-8 COMPLETO; FUTURE-ROADMAP 6.1 e 6.2 IMPLEMENTADO
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -11,7 +11,8 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
-| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** |
+| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** — 6.1 Unit Tests ✅, 6.2 E2E Tests ✅ |
+| [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](PLATFORM-CUSTOMIZATION-EVOLUTION.md) | **Plano de evolução de customização da plataforma** — Fases 1-8 ✅ COMPLETO |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`MODULES-AND-PAGES.md`](MODULES-AND-PAGES.md) | Módulos e páginas do produto |

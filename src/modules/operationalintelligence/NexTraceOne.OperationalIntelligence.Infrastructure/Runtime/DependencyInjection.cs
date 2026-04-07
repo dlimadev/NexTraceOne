@@ -11,6 +11,7 @@ using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Automation;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Repositories;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services;
@@ -45,6 +46,8 @@ public static class DependencyInjection
         services.AddScoped<IDriftFindingRepository, DriftFindingRepository>();
         services.AddScoped<IObservabilityProfileRepository, ObservabilityProfileRepository>();
         services.AddScoped<IRuntimeIntelligenceModule, RuntimeIntelligenceModule>();
+
+        services.AddSingleton<ICustomChartRepository, InMemoryCustomChartRepository>();
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);
