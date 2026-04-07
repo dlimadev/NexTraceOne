@@ -9,6 +9,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Configuration.Infrastructure.Repositories;
 using NexTraceOne.Configuration.Infrastructure.Seed;
 using NexTraceOne.Configuration.Infrastructure.Services;
 
@@ -45,6 +46,10 @@ public static class DependencyInjection
         services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
         services.AddScoped<IUserSavedViewRepository, UserSavedViewRepository>();
         services.AddScoped<IUserBookmarkRepository, UserBookmarkRepository>();
+
+        // In-memory repositories for Phase 3 (MVP1 — persistência PostgreSQL a adicionar futuramente)
+        services.AddSingleton<IUserWatchRepository, InMemoryUserWatchRepository>();
+        services.AddSingleton<IUserAlertRuleRepository, InMemoryUserAlertRuleRepository>();
 
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();

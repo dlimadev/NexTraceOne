@@ -183,50 +183,50 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 **Prioridade:** 🟡 Média-Alta | **Complexidade:** Média | **Impacto:** Alto
 
 #### 3.1 Watch Lists (Seguir Entidades)
-- [ ] **Backend:** Entidade `UserWatch` (Id, UserId, TenantId, EntityType, EntityId, NotifyOnChange, CreatedAt)
-  - [ ] Commands: `WatchEntity`, `UnwatchEntity`
-  - [ ] Query: `ListWatches(entityType?)`
+- [x] **Backend:** Entidade `UserWatch` (Id, UserId, TenantId, EntityType, EntityId, NotifyOnChange, CreatedAt)
+  - [x] Commands: `WatchEntity`, `UnwatchEntity`
+  - [x] Query: `ListWatches(entityType?)`
   - [ ] Event handler: quando entidade muda → notificar watchers
-  - [ ] Endpoint: `/api/v1/watches`
-- [ ] **Frontend:** Botão "Watch" (ícone 👁) em detalhe de serviço, contrato, change, incidente
-  - [ ] Toggle com opções: "All changes", "Critical only", "None"
+  - [x] Endpoint: `/api/v1/watches`
+- [x] **Frontend:** Botão "Watch" (ícone 👁) em detalhe de serviço, contrato, change, incidente
+  - [x] Toggle com opções: "All changes", "Critical only", "None"
   - [ ] Badge no sidebar com contagem de watches activos
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 4+ testes
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 4+ testes
 
 #### 3.2 Quiet Hours / Do Not Disturb
-- [ ] **Backend:** Preferências: `notifications.quiet_hours.enabled`, `notifications.quiet_hours.start`, `notifications.quiet_hours.end`, `notifications.quiet_hours.timezone`
-  - [ ] Seeds de configuração no seeder
+- [x] **Backend:** Preferências: `notifications.quiet_hours.enabled`, `notifications.quiet_hours.start`, `notifications.quiet_hours.end`, `notifications.quiet_hours.timezone`
+  - [x] Seeds de configuração no seeder
   - [ ] Avaliação no serviço de envio de notificações
 - [ ] **Frontend:** Secção "Quiet Hours" na UserPreferencesPage
   - [ ] Toggle + time pickers para início e fim
   - [ ] Select de timezone
-- [ ] **i18n:** 4 locales
+- [x] **i18n:** 4 locales
 - [ ] **Testes:** 3+ testes
 
 #### 3.3 Custom Alert Rules Pessoais
-- [ ] **Backend:** Entidade `UserAlertRule` no módulo Configuration
-  - [ ] (Id, UserId, TenantId, Name, Condition, Channel, Enabled, CreatedAt)
-  - [ ] Conditions: {"entity":"service", "field":"risk_level", "operator":">=", "value":"high"}
-  - [ ] Channels: in-app, email, webhook (conforme parametrização do tenant)
-  - [ ] Commands: `CreateAlertRule`, `UpdateAlertRule`, `DeleteAlertRule`, `ToggleAlertRule`
-  - [ ] Query: `ListAlertRules`
-  - [ ] Endpoint: `/api/v1/alert-rules`
-- [ ] **Frontend:** Página `PersonalAlertRulesPage`
-  - [ ] Lista de regras com toggle enabled/disabled
-  - [ ] Builder visual de condição (entity → field → operator → value)
-  - [ ] Channel selector
+- [x] **Backend:** Entidade `UserAlertRule` no módulo Configuration
+  - [x] (Id, UserId, TenantId, Name, Condition, Channel, Enabled, CreatedAt)
+  - [x] Conditions: {"entity":"service", "field":"risk_level", "operator":">=", "value":"high"}
+  - [x] Channels: in-app, email, webhook (conforme parametrização do tenant)
+  - [x] Commands: `CreateAlertRule`, `UpdateAlertRule`, `DeleteAlertRule`, `ToggleAlertRule`
+  - [x] Query: `ListAlertRules`
+  - [x] Endpoint: `/api/v1/alert-rules`
+- [x] **Frontend:** Página `PersonalAlertRulesPage`
+  - [x] Lista de regras com toggle enabled/disabled
+  - [x] Builder visual de condição (entity → field → operator → value)
+  - [x] Channel selector
   - [ ] Preview de "quantas vezes teria disparado nos últimos 7 dias"
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 5+ testes
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 5+ testes
 
 #### 3.4 Digest Personalizado
-- [ ] **Backend:** Preferências: `notifications.digest.frequency` (daily, weekly, none), `notifications.digest.sections` (JSON array de secções)
+- [x] **Backend:** Preferências: `notifications.digest.frequency` (daily, weekly, none), `notifications.digest.sections` (JSON array de secções)
   - [ ] Secções disponíveis: changes, incidents, contracts, compliance, finops, ai-usage
 - [ ] **Frontend:** Config na UserPreferencesPage
   - [ ] Select de frequência
   - [ ] Drag-and-drop de secções do digest
-- [ ] **i18n:** 4 locales
+- [x] **i18n:** 4 locales
 - [ ] **Testes:** 2+ testes
 
 ---

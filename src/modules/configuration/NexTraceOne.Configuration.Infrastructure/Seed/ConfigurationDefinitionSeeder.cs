@@ -5447,5 +5447,75 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "",
             uiEditorType: "markdown",
             sortOrder: 9350),
+
+        // ── Phase 3: Quiet Hours ──────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.enabled",
+            displayName: "config.notifications.quiet_hours.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9400),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.start",
+            displayName: "config.notifications.quiet_hours.start.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.start.description",
+            defaultValue: "22:00",
+            uiEditorType: "time",
+            sortOrder: 9410),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.end",
+            displayName: "config.notifications.quiet_hours.end.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.end.description",
+            defaultValue: "08:00",
+            uiEditorType: "time",
+            sortOrder: 9420),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.timezone",
+            displayName: "config.notifications.quiet_hours.timezone.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.timezone.description",
+            defaultValue: "UTC",
+            uiEditorType: "timezone-select",
+            sortOrder: 9430),
+
+        // ── Phase 3: Digest ───────────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "notifications.digest.frequency",
+            displayName: "config.notifications.digest.frequency.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.digest.frequency.description",
+            defaultValue: "daily",
+            uiEditorType: "select",
+            sortOrder: 9440),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.digest.sections",
+            displayName: "config.notifications.digest.sections.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.digest.sections.description",
+            defaultValue: """["changes","incidents","contracts","compliance"]""",
+            uiEditorType: "json",
+            sortOrder: 9450),
     ];
 }

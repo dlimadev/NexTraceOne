@@ -8339,5 +8339,60 @@
       "confirm": "Clone"
     },
     "success": "Dashboard cloned successfully"
+  },
+  "watch": {
+    "watch": "Watch",
+    "watching": "Watching",
+    "unwatch": "Stop watching",
+    "level": {
+      "all": "All changes",
+      "critical": "Critical only",
+      "none": "No notifications"
+    }
+  },
+  "quietHours": {
+    "title": "Quiet Hours",
+    "subtitle": "Pause notifications during specified hours",
+    "enabled": "Enable quiet hours",
+    "start": "Start time",
+    "end": "End time",
+    "timezone": "Timezone",
+    "saved": "Quiet hours saved"
+  },
+  "digestSettings": {
+    "title": "Digest Settings",
+    "frequency": "Digest frequency",
+    "frequencyOptions": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "none": "Disabled"
+    },
+    "sections": "Included sections"
+  },
+  "alertRules": {
+    "title": "Personal Alert Rules",
+    "subtitle": "Get notified when specific conditions are met",
+    "newRule": "New Rule",
+    "enable": "Enable rule",
+    "disable": "Disable rule",
+    "delete": "Delete rule",
+    "empty": {
+      "title": "No alert rules",
+      "description": "Create a personal alert rule to be notified about important events",
+      "cta": "Create your first rule"
+    },
+    "builder": {
+      "title": "Create Alert Rule",
+      "name": "Rule name",
+      "namePlaceholder": "e.g. High risk service detected",
+      "entity": "Entity",
+      "field": "Field",
+      "selectField": "Select field",
+      "operator": "Operator",
+      "selectOperator": "Select operator",
+      "value": "Value",
+      "channel": "Notification channel",
+      "save": "Create Rule"
+    }
   }
 }

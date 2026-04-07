@@ -8333,5 +8333,60 @@
       "confirm": "Clonar"
     },
     "success": "Dashboard clonado com sucesso"
+  },
+  "watch": {
+    "watch": "Seguir",
+    "watching": "Seguindo",
+    "unwatch": "Deixar de seguir",
+    "level": {
+      "all": "Todas as mudanças",
+      "critical": "Apenas crítico",
+      "none": "Sem notificações"
+    }
+  },
+  "quietHours": {
+    "title": "Horário Silencioso",
+    "subtitle": "Pausar notificações durante horários específicos",
+    "enabled": "Habilitar horário silencioso",
+    "start": "Início",
+    "end": "Fim",
+    "timezone": "Fuso horário",
+    "saved": "Horário silencioso salvo"
+  },
+  "digestSettings": {
+    "title": "Configurações de Digest",
+    "frequency": "Frequência do digest",
+    "frequencyOptions": {
+      "daily": "Diário",
+      "weekly": "Semanal",
+      "none": "Desabilitado"
+    },
+    "sections": "Seções incluídas"
+  },
+  "alertRules": {
+    "title": "Regras de Alerta Pessoais",
+    "subtitle": "Seja notificado quando condições específicas forem atendidas",
+    "newRule": "Nova Regra",
+    "enable": "Habilitar regra",
+    "disable": "Desabilitar regra",
+    "delete": "Excluir regra",
+    "empty": {
+      "title": "Sem regras de alerta",
+      "description": "Crie uma regra de alerta pessoal para ser notificado sobre eventos importantes",
+      "cta": "Criar primeira regra"
+    },
+    "builder": {
+      "title": "Criar Regra de Alerta",
+      "name": "Nome da regra",
+      "namePlaceholder": "ex: Serviço de alto risco detectado",
+      "entity": "Entidade",
+      "field": "Campo",
+      "selectField": "Selecionar campo",
+      "operator": "Operador",
+      "selectOperator": "Selecionar operador",
+      "value": "Valor",
+      "channel": "Canal de notificação",
+      "save": "Criar Regra"
+    }
   }
 }
