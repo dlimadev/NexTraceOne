@@ -2,52 +2,40 @@
 
 > **Última actualização:** 2026-04-07
 
-Este índice distingue documentação **activa** de documentação **arquivada/histórica** e serve como ponto de entrada único para navegar o repositório.
+Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
 ---
 
-## 1. Documentação Principal (Activa)
+## 1. Documentação Principal
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`README.md`](../README.md) | Introdução ao repositório |
-| [`CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md`](CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md) | **Documento canónico** — estado de todos os gaps e plano de ação |
+| [`README.md`](README.md) | Introdução e navegação |
+| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
-| [`PRODUCT-SCOPE.md`](PRODUCT-SCOPE.md) | Escopo do produto |
-| [`ROADMAP.md`](ROADMAP.md) | Roadmap por ondas e sprints |
-| [`EVOLUTION-ROADMAP-2026-2027.md`](EVOLUTION-ROADMAP-2026-2027.md) | Roadmap de evolução 2026-2027 |
 | [`MODULES-AND-PAGES.md`](MODULES-AND-PAGES.md) | Módulos e páginas do produto |
+| [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
+
+---
+
+## 2. Arquitectura
+
+| Ficheiro | Descrição |
+|---------|-----------|
 | [`ARCHITECTURE-OVERVIEW.md`](ARCHITECTURE-OVERVIEW.md) | Visão geral da arquitectura |
 | [`DOMAIN-BOUNDARIES.md`](DOMAIN-BOUNDARIES.md) | Fronteiras de domínio |
 | [`DATA-ARCHITECTURE.md`](DATA-ARCHITECTURE.md) | Arquitectura de dados |
 | [`SECURITY-ARCHITECTURE.md`](SECURITY-ARCHITECTURE.md) | Arquitectura de segurança |
 | [`FRONTEND-ARCHITECTURE.md`](FRONTEND-ARCHITECTURE.md) | Arquitectura frontend |
-| [`BACKEND-MODULE-GUIDELINES.md`](BACKEND-MODULE-GUIDELINES.md) | Guidelines de backend |
-| [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md) | Design system |
-| [`I18N-STRATEGY.md`](I18N-STRATEGY.md) | Estratégia de internacionalização |
-| [`OBSERVABILITY-STRATEGY.md`](OBSERVABILITY-STRATEGY.md) | Estratégia de observabilidade |
-| [`SOURCE-OF-TRUTH-STRATEGY.md`](SOURCE-OF-TRUTH-STRATEGY.md) | Estratégia Source of Truth |
-| [`CONTRACT-STUDIO-VISION.md`](CONTRACT-STUDIO-VISION.md) | Visão do Contract Studio |
-| [`CHANGE-CONFIDENCE.md`](CHANGE-CONFIDENCE.md) | Change Confidence |
-| [`AI-ARCHITECTURE.md`](AI-ARCHITECTURE.md) | Arquitectura AI |
-| [`AI-GOVERNANCE.md`](AI-GOVERNANCE.md) | Governança AI |
-| [`AI-ASSISTED-OPERATIONS.md`](AI-ASSISTED-OPERATIONS.md) | Operações assistidas por AI |
-| [`AI-DEVELOPER-EXPERIENCE.md`](AI-DEVELOPER-EXPERIENCE.md) | Developer Experience AI |
-| [`INTEGRATIONS-ARCHITECTURE.md`](INTEGRATIONS-ARCHITECTURE.md) | Arquitectura de integrações |
 | [`DEPLOYMENT-ARCHITECTURE.md`](DEPLOYMENT-ARCHITECTURE.md) | Arquitectura de deployment |
-| [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
-| [`PERSONA-MATRIX.md`](PERSONA-MATRIX.md) | Matriz de personas |
-| [`PERSONA-UX-MAPPING.md`](PERSONA-UX-MAPPING.md) | Mapeamento UX por persona |
-| [`UX-PRINCIPLES.md`](UX-PRINCIPLES.md) | Princípios UX |
-| [`BRAND-IDENTITY.md`](BRAND-IDENTITY.md) | Identidade visual |
-| [`ENVIRONMENT-VARIABLES.md`](ENVIRONMENT-VARIABLES.md) | Variáveis de ambiente |
-| [`LOCAL-SETUP.md`](LOCAL-SETUP.md) | Setup local de desenvolvimento |
-| [`GUIDELINE.md`](GUIDELINE.md) | Guidelines gerais |
+| [`INTEGRATIONS-ARCHITECTURE.md`](INTEGRATIONS-ARCHITECTURE.md) | Arquitectura de integrações |
+| [`SOURCE-OF-TRUTH-STRATEGY.md`](SOURCE-OF-TRUTH-STRATEGY.md) | Estratégia Source of Truth |
+| [`OBSERVABILITY-STRATEGY.md`](OBSERVABILITY-STRATEGY.md) | Estratégia de observabilidade |
 
 ---
 
-## 2. ADRs (Architecture Decision Records) — `docs/adr/`
+## 3. ADRs (Architecture Decision Records) — `docs/adr/`
 
 | Ficheiro | Decisão |
 |---------|---------|
@@ -60,30 +48,55 @@ Este índice distingue documentação **activa** de documentação **arquivada/h
 
 ---
 
-## 3. Planos de Acção e Análises Completas
-
-| Ficheiro | Descrição | Estado |
-|---------|-----------|--------|
-| [`SERVICES-CONTRACTS-ACTION-PLAN.md`](SERVICES-CONTRACTS-ACTION-PLAN.md) | Plano de acção para serviços e contratos (197/197 tarefas) | ✅ Completo |
-| [`PARAMETERIZATION-MODULE-PROPOSAL.md`](PARAMETERIZATION-MODULE-PROPOSAL.md) | Proposta e execução do módulo de parametrização (6 fases) | ✅ Completo |
-| [`SERVICE-CREATION-STUDIO-PLAN.md`](SERVICE-CREATION-STUDIO-PLAN.md) | Plano do Service Creation Studio | ✅ Completo |
-| [`SERVICE-CONTRACT-GOVERNANCE.md`](SERVICE-CONTRACT-GOVERNANCE.md) | Governança de serviços e contratos | Activo |
-
----
-
-## 4. Deployment e Operações — `docs/deployment/`
+## 4. AI
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`deployment/PRODUCTION-BOOTSTRAP.md`](deployment/PRODUCTION-BOOTSTRAP.md) | **Guia de bootstrap para produção** |
-| [`deployment/CI-CD-PIPELINES.md`](deployment/CI-CD-PIPELINES.md) | Pipelines CI/CD |
-| [`deployment/DOCKER-AND-COMPOSE.md`](deployment/DOCKER-AND-COMPOSE.md) | Docker e Docker Compose |
-| [`deployment/ENVIRONMENT-CONFIGURATION.md`](deployment/ENVIRONMENT-CONFIGURATION.md) | Configuração de ambientes |
-| [`deployment/MIGRATION-STRATEGY.md`](deployment/MIGRATION-STRATEGY.md) | Estratégia de migrações |
+| [`AI-ARCHITECTURE.md`](AI-ARCHITECTURE.md) | Arquitectura AI |
+| [`AI-GOVERNANCE.md`](AI-GOVERNANCE.md) | Governança AI |
+| [`AI-ASSISTED-OPERATIONS.md`](AI-ASSISTED-OPERATIONS.md) | Operações assistidas por AI |
+| [`AI-DEVELOPER-EXPERIENCE.md`](AI-DEVELOPER-EXPERIENCE.md) | Developer Experience AI |
 
 ---
 
-## 5. Segurança — `docs/security/`
+## 5. Contratos e Change Intelligence
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`CONTRACT-STUDIO-VISION.md`](CONTRACT-STUDIO-VISION.md) | Visão do Contract Studio |
+| [`SERVICE-CONTRACT-GOVERNANCE.md`](SERVICE-CONTRACT-GOVERNANCE.md) | Governança de serviços e contratos |
+| [`CHANGE-CONFIDENCE.md`](CHANGE-CONFIDENCE.md) | Change Confidence |
+
+---
+
+## 6. Frontend & UX
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md) | Design system |
+| [`DESIGN.md`](DESIGN.md) | UX e design visual |
+| [`BRAND-IDENTITY.md`](BRAND-IDENTITY.md) | Identidade visual |
+| [`UX-PRINCIPLES.md`](UX-PRINCIPLES.md) | Princípios UX |
+| [`PERSONA-MATRIX.md`](PERSONA-MATRIX.md) | Matriz de personas |
+| [`PERSONA-UX-MAPPING.md`](PERSONA-UX-MAPPING.md) | Mapeamento UX por persona |
+| [`I18N-STRATEGY.md`](I18N-STRATEGY.md) | Estratégia de internacionalização |
+
+---
+
+## 7. Engineering & Development
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`BACKEND-MODULE-GUIDELINES.md`](BACKEND-MODULE-GUIDELINES.md) | Guidelines de backend |
+| [`GUIDELINE.md`](GUIDELINE.md) | Guidelines gerais |
+| [`LOCAL-SETUP.md`](LOCAL-SETUP.md) | Setup local de desenvolvimento |
+| [`ENVIRONMENT-VARIABLES.md`](ENVIRONMENT-VARIABLES.md) | Variáveis de ambiente |
+| [`dev-setup/user-secrets-guide.md`](dev-setup/user-secrets-guide.md) | Guia de user secrets |
+| [`dev/VALIDATOR-TEMPLATE.md`](dev/VALIDATOR-TEMPLATE.md) | Template de validator |
+
+---
+
+## 8. Segurança — `docs/security/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
@@ -92,17 +105,36 @@ Este índice distingue documentação **activa** de documentação **arquivada/h
 | [`security/KEY-ROTATION.md`](security/KEY-ROTATION.md) | Rotação de chaves |
 | [`security/PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md`](security/PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md) | Checklist baseline produção |
 | [`security/PHASE-1-SECRETS-BASELINE.md`](security/PHASE-1-SECRETS-BASELINE.md) | Baseline de segredos |
+| [`security/REQUIRED-ENVIRONMENT-CONFIGURATION.md`](security/REQUIRED-ENVIRONMENT-CONFIGURATION.md) | Configuração de ambiente obrigatória |
 | [`security/application-hardening-checklist.md`](security/application-hardening-checklist.md) | Checklist de hardening |
+| [`security/application-onprem-hardening-notes.md`](security/application-onprem-hardening-notes.md) | Notas de hardening on-prem |
+| [`security/application-privacy-lgpd-gdpr-notes.md`](security/application-privacy-lgpd-gdpr-notes.md) | Notas de privacidade LGPD/GDPR |
+| [`security/application-security-review.md`](security/application-security-review.md) | Revisão de segurança |
+| [`security/security-backend-infra-integration-notes.md`](security/security-backend-infra-integration-notes.md) | Notas de integração infra backend |
 
 ---
 
-## 6. Runbooks — `docs/runbooks/`
+## 9. Deployment e Operações — `docs/deployment/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`deployment/PRODUCTION-BOOTSTRAP.md`](deployment/PRODUCTION-BOOTSTRAP.md) | **Guia de bootstrap para produção** |
+| [`deployment/CI-CD-PIPELINES.md`](deployment/CI-CD-PIPELINES.md) | Pipelines CI/CD |
+| [`deployment/DOCKER-AND-COMPOSE.md`](deployment/DOCKER-AND-COMPOSE.md) | Docker e Docker Compose |
+| [`deployment/ENVIRONMENT-CONFIGURATION.md`](deployment/ENVIRONMENT-CONFIGURATION.md) | Configuração de ambientes |
+| [`deployment/MIGRATION-STRATEGY.md`](deployment/MIGRATION-STRATEGY.md) | Estratégia de migrações |
+| [`deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md`](deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md) | Delivery e deployment |
+
+---
+
+## 10. Runbooks — `docs/runbooks/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`runbooks/PRODUCTION-DEPLOY-RUNBOOK.md`](runbooks/PRODUCTION-DEPLOY-RUNBOOK.md) | Deploy em produção |
 | [`runbooks/STAGING-DEPLOY-RUNBOOK.md`](runbooks/STAGING-DEPLOY-RUNBOOK.md) | Deploy em staging |
 | [`runbooks/INCIDENT-RESPONSE-PLAYBOOK.md`](runbooks/INCIDENT-RESPONSE-PLAYBOOK.md) | Playbook de resposta a incidentes |
+| [`runbooks/DRIFT-AND-ENVIRONMENT-ANALYSIS-RUNBOOK.md`](runbooks/DRIFT-AND-ENVIRONMENT-ANALYSIS-RUNBOOK.md) | Análise de drift e ambientes |
 | [`runbooks/ROLLBACK-RUNBOOK.md`](runbooks/ROLLBACK-RUNBOOK.md) | Rollback |
 | [`runbooks/BACKUP-OPERATIONS-RUNBOOK.md`](runbooks/BACKUP-OPERATIONS-RUNBOOK.md) | Operações de backup |
 | [`runbooks/RESTORE-OPERATIONS-RUNBOOK.md`](runbooks/RESTORE-OPERATIONS-RUNBOOK.md) | Operações de restore |
@@ -114,23 +146,37 @@ Este índice distingue documentação **activa** de documentação **arquivada/h
 
 ---
 
-## 7. Observabilidade — `docs/observability/`
+## 11. Observabilidade — `docs/observability/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
+| [`observability/README.md`](observability/README.md) | Índice de observabilidade |
 | [`observability/architecture-overview.md`](observability/architecture-overview.md) | Visão geral da arquitectura |
 | [`observability/DRIFT-DETECTION-PIPELINE.md`](observability/DRIFT-DETECTION-PIPELINE.md) | Pipeline de detecção de drift |
 | [`observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md`](observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md) | Comparação de ambientes |
 | [`observability/INGESTION-API-ROLE-AND-FLOW.md`](observability/INGESTION-API-ROLE-AND-FLOW.md) | API de ingestão |
+| [`observability/PHASE-6-OBSERVABILITY-COMPLETION.md`](observability/PHASE-6-OBSERVABILITY-COMPLETION.md) | Conclusão de observabilidade |
 | [`observability/pipeline-validation-report.md`](observability/pipeline-validation-report.md) | Relatório de validação do pipeline |
 | [`observability/troubleshooting.md`](observability/troubleshooting.md) | Troubleshooting |
+| [`observability/configuration/`](observability/configuration/) | Configuração de observabilidade |
+| [`observability/collection/`](observability/collection/) | Colecção (IIS/CLR, Kafka, K8s) |
+| [`observability/providers/`](observability/providers/) | Providers (ClickHouse, Elastic) |
 
 ---
 
-## 8. User Guide — `docs/user-guide/`
+## 12. Telemetria — `docs/telemetry/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
+| [`telemetry/TELEMETRY-ARCHITECTURE.md`](telemetry/TELEMETRY-ARCHITECTURE.md) | Arquitectura de telemetria |
+
+---
+
+## 13. User Guide — `docs/user-guide/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`user-guide/README.md`](user-guide/README.md) | Índice do user guide |
 | [`user-guide/getting-started.md`](user-guide/getting-started.md) | Getting started |
 | [`user-guide/service-catalog.md`](user-guide/service-catalog.md) | Service Catalog |
 | [`user-guide/change-governance.md`](user-guide/change-governance.md) | Change Governance |
@@ -141,45 +187,12 @@ Este índice distingue documentação **activa** de documentação **arquivada/h
 
 ---
 
-## 9. Legacy / Mainframe — `docs/legacy/`
-
-Plano de desenvolvimento para suporte a core systems legacy/mainframe.
+## 14. Legacy / Mainframe — `docs/legacy/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`LEGACY-MAINFRAME-WAVES.md`](LEGACY-MAINFRAME-WAVES.md) | **Documento mestre** — visão geral das 13 ondas |
 | [`legacy/WAVE-00-STRATEGY.md`](legacy/WAVE-00-STRATEGY.md) – [`legacy/WAVE-12-SECURITY-READINESS.md`](legacy/WAVE-12-SECURITY-READINESS.md) | Ondas 0–12 |
-
----
-
-## 10. Documentação Arquivada / Histórica
-
-> ⚠️ **Documentação arquivada não deve ser usada como referência operacional.**
-
-| Ficheiro | Motivo |
-|---------|--------|
-| [`DEEP-ANALYSIS-APRIL-2026.md`](DEEP-ANALYSIS-APRIL-2026.md) | Supersedido por CONSOLIDATED-GAP-ANALYSIS |
-| [`SERVICES-CONTRACTS-DEEP-ANALYSIS-2026-04.md`](SERVICES-CONTRACTS-DEEP-ANALYSIS-2026-04.md) | Supersedido por ACTION-PLAN |
-| [`CORE-FLOW-GAPS.md`](CORE-FLOW-GAPS.md) | Supersedido por CONSOLIDATED-GAP-ANALYSIS |
-| [`FEATURE-ANALYSIS-AND-INNOVATION.md`](FEATURE-ANALYSIS-AND-INNOVATION.md) | Completo (15/15 ondas) |
-| `analysis-output/` | Removido — conteúdo consolidado |
-
----
-
-## 11. Tecnologias Removidas / Não Usadas
-
-As seguintes tecnologias foram consideradas e explicitamente **não adoptadas**:
-
-| Tecnologia | Estado | Alternativa Adoptada |
-|-----------|--------|---------------------|
-| Redis | ❌ Não usado | PostgreSQL (sem cache distribuído no MVP) |
-| OpenSearch | ❌ Não usado | PostgreSQL Full-Text Search |
-| Temporal (workflow engine) | ❌ Não usado | Quartz.NET + PostgreSQL |
-| Grafana/Loki/Tempo | ❌ Removido do scope | ClickHouse como store analítico |
-| Licensing/Entitlements | ❌ Removido do scope (P12.1) | — |
-| Self-Hosted Enterprise | ❌ Removido do scope (P12.2) | — |
-
-> Referências a estas tecnologias em documentação arquivada são históricas e não devem ser confundidas com a stack actual.
 
 ---
 

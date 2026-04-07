@@ -1,8 +1,7 @@
-# NexTraceOne — Documentation Index
+# NexTraceOne — Documentation
 
 > **Source of Truth** for service governance, contract governance, change intelligence, operational reliability, and AI-assisted operations.
 
-This file is the canonical entry point to the NexTraceOne documentation tree.
 For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 
 ---
@@ -11,8 +10,8 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 
 | Document | Description |
 |---|---|
-| [CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md](./CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md) | **Canonical** — Gap analysis and action plan (48 resolved, 10 remaining) |
-| [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md) | Implementation status per module |
+| [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md) | **Roadmap** — Planned features and future evolution |
+| [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md) | Implementation status per module (~98% complete) |
 | [PRODUCT-VISION.md](./PRODUCT-VISION.md) | Official product vision and positioning |
 
 ---
@@ -22,12 +21,9 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 | Document | Description |
 |---|---|
 | [PRODUCT-VISION.md](./PRODUCT-VISION.md) | Official product vision and positioning |
-| [PRODUCT-SCOPE.md](./PRODUCT-SCOPE.md) | Product scope and boundaries |
 | [PLATFORM-CAPABILITIES.md](./PLATFORM-CAPABILITIES.md) | Platform capability overview |
 | [MODULES-AND-PAGES.md](./MODULES-AND-PAGES.md) | Module and page inventory |
 | [DOMAIN-BOUNDARIES.md](./DOMAIN-BOUNDARIES.md) | DDD domain boundaries |
-| [EVOLUTION-ROADMAP-2026-2027.md](./EVOLUTION-ROADMAP-2026-2027.md) | Evolution roadmap 2026-2027 |
-| [ROADMAP.md](./ROADMAP.md) | Roadmap by waves and sprints |
 
 ---
 
@@ -62,7 +58,6 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 | [CONTRACT-STUDIO-VISION.md](./CONTRACT-STUDIO-VISION.md) | Contract Studio vision and capabilities |
 | [SERVICE-CONTRACT-GOVERNANCE.md](./SERVICE-CONTRACT-GOVERNANCE.md) | Service and contract governance |
 | [CHANGE-CONFIDENCE.md](./CHANGE-CONFIDENCE.md) | Change confidence strategy |
-| [SERVICES-CONTRACTS-ACTION-PLAN.md](./SERVICES-CONTRACTS-ACTION-PLAN.md) | Services & contracts action plan (✅ 197/197 complete) |
 
 ---
 
@@ -104,15 +99,6 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 | [telemetry/](./telemetry/) | Telemetry architecture |
 | [runbooks/](./runbooks/) | Operational runbooks (deploy, rollback, backup, incidents) |
 | [deployment/](./deployment/) | Deployment docs (CI/CD, Docker, migration, production bootstrap) |
-
----
-
-## Configuration & Governance
-
-| Document | Description |
-|---|---|
-| [PARAMETERIZATION-MODULE-PROPOSAL.md](./PARAMETERIZATION-MODULE-PROPOSAL.md) | Parameterization module (✅ 6/6 phases complete) |
-| [SERVICE-CREATION-STUDIO-PLAN.md](./SERVICE-CREATION-STUDIO-PLAN.md) | Service Creation Studio plan |
 
 ---
 
