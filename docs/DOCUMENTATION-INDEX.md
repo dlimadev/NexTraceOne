@@ -1,171 +1,199 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-03-27 (P12.3 — Documentation Consolidation)
+> **Última actualização:** 2026-04-07
 
-Este índice distingue documentação **activa** de documentação **arquivada** e serve como ponto de entrada único para navegar o repositório.
+Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
 ---
 
-## 1. Documentação Raiz (Activa)
+## 1. Documentação Principal
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`README.md`](../README.md) | Introdução ao repositório |
-| [`PRODUCT-SCOPE.md`](PRODUCT-SCOPE.md) | Escopo do produto por onda |
-| [`ROADMAP.md`](ROADMAP.md) | Roadmap por ondas e sprints |
+| [`README.md`](README.md) | Introdução e navegação |
+| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** |
+| [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
+| [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`MODULES-AND-PAGES.md`](MODULES-AND-PAGES.md) | Módulos e páginas do produto |
-| [`CONTRACT-STUDIO-VISION.md`](CONTRACT-STUDIO-VISION.md) | Visão do Contract Studio |
-| [`BACKEND-MODULE-GUIDELINES.md`](BACKEND-MODULE-GUIDELINES.md) | Guidelines de backend |
-| [`SECURITY.md`](SECURITY.md) | Modelo de segurança |
-| [`SOLUTION-GAP-ANALYSIS.md`](SOLUTION-GAP-ANALYSIS.md) | Análise de gaps da solução |
-| [`EXECUTION-BASELINE-PR1-PR16.md`](EXECUTION-BASELINE-PR1-PR16.md) | Baseline de execução |
-| [`REBASELINE.md`](REBASELINE.md) | Inventário do estado actual |
-| [`DEPLOYMENT-ARCHITECTURE.md`](DEPLOYMENT-ARCHITECTURE.md) | Arquitectura de deployment |
+| [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
 
 ---
 
-## 2. Architecture (docs/architecture/)
+## 2. Arquitectura
 
-### ADRs (Architecture Decision Records)
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`ARCHITECTURE-OVERVIEW.md`](ARCHITECTURE-OVERVIEW.md) | Visão geral da arquitectura |
+| [`DOMAIN-BOUNDARIES.md`](DOMAIN-BOUNDARIES.md) | Fronteiras de domínio |
+| [`DATA-ARCHITECTURE.md`](DATA-ARCHITECTURE.md) | Arquitectura de dados |
+| [`SECURITY-ARCHITECTURE.md`](SECURITY-ARCHITECTURE.md) | Arquitectura de segurança |
+| [`FRONTEND-ARCHITECTURE.md`](FRONTEND-ARCHITECTURE.md) | Arquitectura frontend |
+| [`DEPLOYMENT-ARCHITECTURE.md`](DEPLOYMENT-ARCHITECTURE.md) | Arquitectura de deployment |
+| [`INTEGRATIONS-ARCHITECTURE.md`](INTEGRATIONS-ARCHITECTURE.md) | Arquitectura de integrações |
+| [`SOURCE-OF-TRUTH-STRATEGY.md`](SOURCE-OF-TRUTH-STRATEGY.md) | Estratégia Source of Truth |
+| [`OBSERVABILITY-STRATEGY.md`](OBSERVABILITY-STRATEGY.md) | Estratégia de observabilidade |
+
+---
+
+## 3. ADRs (Architecture Decision Records) — `docs/adr/`
+
 | Ficheiro | Decisão |
 |---------|---------|
-| [`adr/ADR-001-database-strategy.md`](architecture/adr/ADR-001-database-strategy.md) | Estratégia de base de dados |
-| [`adr/ADR-002-migration-policy.md`](architecture/adr/ADR-002-migration-policy.md) | Política de migrações |
-| [`adr/ADR-003-event-bus-limitations.md`](architecture/adr/ADR-003-event-bus-limitations.md) | Limitações do event bus |
-| [`adr/ADR-004-simulated-data-policy.md`](architecture/adr/ADR-004-simulated-data-policy.md) | Política de dados simulados |
-| [`adr/ADR-005-ai-runtime-foundation.md`](architecture/adr/ADR-005-ai-runtime-foundation.md) | Fundação do runtime AI |
-| [`adr/ADR-006-agent-runtime-foundation.md`](architecture/adr/ADR-006-agent-runtime-foundation.md) | Fundação do runtime de agentes |
+| [`adr/001-modular-monolith.md`](adr/001-modular-monolith.md) | Modular Monolith |
+| [`adr/002-single-database-per-tenant.md`](adr/002-single-database-per-tenant.md) | Single database per tenant |
+| [`adr/003-elasticsearch-observability.md`](adr/003-elasticsearch-observability.md) | Elasticsearch para observabilidade |
+| [`adr/004-local-ai-first.md`](adr/004-local-ai-first.md) | Local AI first |
+| [`adr/005-react-frontend-stack.md`](adr/005-react-frontend-stack.md) | React frontend stack |
+| [`adr/006-graphql-protobuf-roadmap.md`](adr/006-graphql-protobuf-roadmap.md) | GraphQL/Protobuf roadmap |
 
-### Estado Actual da Arquitectura
+---
+
+## 4. AI
+
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`database-table-prefixes.md`](architecture/database-table-prefixes.md) | Prefixos de tabela por módulo |
-| [`module-boundary-matrix.md`](architecture/module-boundary-matrix.md) | Matriz de fronteiras de módulo |
-| [`final-data-placement-matrix.md`](architecture/final-data-placement-matrix.md) | Placement final de dados |
-| [`clickhouse-baseline-strategy.md`](architecture/clickhouse-baseline-strategy.md) | Estratégia ClickHouse |
-| [`architecture-decisions-final.md`](architecture/architecture-decisions-final.md) | Decisões arquitecturais finais |
-
-### Relatórios de Fase Activos (P-series)
-Relatórios de execução das fases P1–P12. Ver `docs/architecture/p*.md` e `docs/architecture/p*-*.md`.
+| [`AI-ARCHITECTURE.md`](AI-ARCHITECTURE.md) | Arquitectura AI |
+| [`AI-GOVERNANCE.md`](AI-GOVERNANCE.md) | Governança AI |
+| [`AI-ASSISTED-OPERATIONS.md`](AI-ASSISTED-OPERATIONS.md) | Operações assistidas por AI |
+| [`AI-DEVELOPER-EXPERIENCE.md`](AI-DEVELOPER-EXPERIENCE.md) | Developer Experience AI |
 
 ---
 
-## 3. Revisão Modular (docs/11-review-modular/)
+## 5. Contratos e Change Intelligence
 
-### 00-governance — Documentos Canónicos (12 docs)
-| Documento | Tema |
-|-----------|------|
-| [`modular-review-summary.md`](11-review-modular/00-governance/modular-review-summary.md) | **Sumário geral** — ponto de entrada |
-| [`final-consolidation-and-master-plan.md`](11-review-modular/00-governance/final-consolidation-and-master-plan.md) | Plano mestre e consolidação |
-| [`review-status-overview.md`](11-review-modular/00-governance/review-status-overview.md) | Estado geral da revisão |
-| [`product-maturity-summary.md`](11-review-modular/00-governance/product-maturity-summary.md) | Maturidade do produto |
-| [`backend-structural-audit.md`](11-review-modular/00-governance/backend-structural-audit.md) | Canonical: estado backend |
-| [`frontend-structural-audit.md`](11-review-modular/00-governance/frontend-structural-audit.md) | Canonical: estado frontend |
-| [`database-structural-audit.md`](11-review-modular/00-governance/database-structural-audit.md) | Canonical: estado database |
-| [`security-cross-layer-gap-report.md`](11-review-modular/00-governance/security-cross-layer-gap-report.md) | Canonical: estado segurança |
-| [`ai-and-agents-structural-audit.md`](11-review-modular/00-governance/ai-and-agents-structural-audit.md) | Canonical: estado IA |
-| [`documentation-and-onboarding-audit.md`](11-review-modular/00-governance/documentation-and-onboarding-audit.md) | Canonical: estado documentação |
-| [`module-consolidation-report.md`](11-review-modular/00-governance/module-consolidation-report.md) | Consolidação modular |
-
-> ⚠️ Os 73 relatórios de detalhe individuais foram arquivados em `docs/archive/review-modular-governance-detail/`.
-
-### Módulos 01–13 (por bounded context)
-| Módulo | Caminho |
-|--------|---------|
-| 01 Identity Access | [`01-identity-access/`](11-review-modular/01-identity-access/) |
-| 02 Environment Management | [`02-environment-management/`](11-review-modular/02-environment-management/) |
-| 03 Catalog | [`03-catalog/`](11-review-modular/03-catalog/) |
-| 04 Contracts | [`04-contracts/`](11-review-modular/04-contracts/) |
-| 05 Change Governance | [`05-change-governance/`](11-review-modular/05-change-governance/) |
-| 06 Operational Intelligence | [`06-operational-intelligence/`](11-review-modular/06-operational-intelligence/) |
-| 07 AI Knowledge | [`07-ai-knowledge/`](11-review-modular/07-ai-knowledge/) |
-| 08 Governance | [`08-governance/`](11-review-modular/08-governance/) |
-| 09 Configuration | [`09-configuration/`](11-review-modular/09-configuration/) |
-| 10 Audit Compliance | [`10-audit-compliance/`](11-review-modular/10-audit-compliance/) |
-| 11 Notifications | [`11-notifications/`](11-review-modular/11-notifications/) |
-| 12 Integrations | [`12-integrations/`](11-review-modular/12-integrations/) |
-| 13 Product Analytics | [`13-product-analytics/`](11-review-modular/13-product-analytics/) |
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`CONTRACT-STUDIO-VISION.md`](CONTRACT-STUDIO-VISION.md) | Visão do Contract Studio |
+| [`SERVICE-CONTRACT-GOVERNANCE.md`](SERVICE-CONTRACT-GOVERNANCE.md) | Governança de serviços e contratos |
+| [`CHANGE-CONFIDENCE.md`](CHANGE-CONFIDENCE.md) | Change Confidence |
 
 ---
 
-## 4. Auditorias Activas (docs/audits/)
+## 6. Frontend & UX
 
-| Directório | Descrição |
-|-----------|-----------|
-| [`audits/2026-03-25/`](audits/2026-03-25/) | Auditoria de estado de Março 2026 — fonte de verdade para estado actual |
-
-**Documentos chave da auditoria 2026-03-25:**
-- `documentation-state-report.md` — Estado da documentação
-- `final-project-state-assessment.md` — Avaliação final do projecto
-- `licensing-selfhosted-readiness-report.md` — Readiness relatório (histórico)
-- `prioritized-remediation-roadmap.md` — Roadmap de remediação priorizado
-- `remove-archive-consolidate-report.md` — Recomendações de arquivo/consolidação
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md) | Design system |
+| [`DESIGN.md`](DESIGN.md) | UX e design visual |
+| [`BRAND-IDENTITY.md`](BRAND-IDENTITY.md) | Identidade visual |
+| [`UX-PRINCIPLES.md`](UX-PRINCIPLES.md) | Princípios UX |
+| [`PERSONA-MATRIX.md`](PERSONA-MATRIX.md) | Matriz de personas |
+| [`PERSONA-UX-MAPPING.md`](PERSONA-UX-MAPPING.md) | Mapeamento UX por persona |
+| [`I18N-STRATEGY.md`](I18N-STRATEGY.md) | Estratégia de internacionalização |
 
 ---
 
-## 5. Legacy / Mainframe — Ondas de Desenvolvimento (docs/legacy/)
+## 7. Engineering & Development
 
-Plano de desenvolvimento para suporte completo a core systems legacy/mainframe.
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`BACKEND-MODULE-GUIDELINES.md`](BACKEND-MODULE-GUIDELINES.md) | Guidelines de backend |
+| [`GUIDELINE.md`](GUIDELINE.md) | Guidelines gerais |
+| [`LOCAL-SETUP.md`](LOCAL-SETUP.md) | Setup local de desenvolvimento |
+| [`ENVIRONMENT-VARIABLES.md`](ENVIRONMENT-VARIABLES.md) | Variáveis de ambiente |
+| [`dev-setup/user-secrets-guide.md`](dev-setup/user-secrets-guide.md) | Guia de user secrets |
+| [`dev/VALIDATOR-TEMPLATE.md`](dev/VALIDATOR-TEMPLATE.md) | Template de validator |
+
+---
+
+## 8. Segurança — `docs/security/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`SECURITY.md`](SECURITY.md) | Modelo de segurança |
+| [`security/BACKEND-ENDPOINT-AUTH-AUDIT.md`](security/BACKEND-ENDPOINT-AUTH-AUDIT.md) | Auditoria de autenticação de endpoints |
+| [`security/KEY-ROTATION.md`](security/KEY-ROTATION.md) | Rotação de chaves |
+| [`security/PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md`](security/PHASE-1-PRODUCTION-BASELINE-CHECKLIST.md) | Checklist baseline produção |
+| [`security/PHASE-1-SECRETS-BASELINE.md`](security/PHASE-1-SECRETS-BASELINE.md) | Baseline de segredos |
+| [`security/REQUIRED-ENVIRONMENT-CONFIGURATION.md`](security/REQUIRED-ENVIRONMENT-CONFIGURATION.md) | Configuração de ambiente obrigatória |
+| [`security/application-hardening-checklist.md`](security/application-hardening-checklist.md) | Checklist de hardening |
+| [`security/application-onprem-hardening-notes.md`](security/application-onprem-hardening-notes.md) | Notas de hardening on-prem |
+| [`security/application-privacy-lgpd-gdpr-notes.md`](security/application-privacy-lgpd-gdpr-notes.md) | Notas de privacidade LGPD/GDPR |
+| [`security/application-security-review.md`](security/application-security-review.md) | Revisão de segurança |
+| [`security/security-backend-infra-integration-notes.md`](security/security-backend-infra-integration-notes.md) | Notas de integração infra backend |
+
+---
+
+## 9. Deployment e Operações — `docs/deployment/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`deployment/PRODUCTION-BOOTSTRAP.md`](deployment/PRODUCTION-BOOTSTRAP.md) | **Guia de bootstrap para produção** |
+| [`deployment/CI-CD-PIPELINES.md`](deployment/CI-CD-PIPELINES.md) | Pipelines CI/CD |
+| [`deployment/DOCKER-AND-COMPOSE.md`](deployment/DOCKER-AND-COMPOSE.md) | Docker e Docker Compose |
+| [`deployment/ENVIRONMENT-CONFIGURATION.md`](deployment/ENVIRONMENT-CONFIGURATION.md) | Configuração de ambientes |
+| [`deployment/MIGRATION-STRATEGY.md`](deployment/MIGRATION-STRATEGY.md) | Estratégia de migrações |
+| [`deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md`](deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md) | Delivery e deployment |
+
+---
+
+## 10. Runbooks — `docs/runbooks/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`runbooks/PRODUCTION-DEPLOY-RUNBOOK.md`](runbooks/PRODUCTION-DEPLOY-RUNBOOK.md) | Deploy em produção |
+| [`runbooks/STAGING-DEPLOY-RUNBOOK.md`](runbooks/STAGING-DEPLOY-RUNBOOK.md) | Deploy em staging |
+| [`runbooks/INCIDENT-RESPONSE-PLAYBOOK.md`](runbooks/INCIDENT-RESPONSE-PLAYBOOK.md) | Playbook de resposta a incidentes |
+| [`runbooks/DRIFT-AND-ENVIRONMENT-ANALYSIS-RUNBOOK.md`](runbooks/DRIFT-AND-ENVIRONMENT-ANALYSIS-RUNBOOK.md) | Análise de drift e ambientes |
+| [`runbooks/ROLLBACK-RUNBOOK.md`](runbooks/ROLLBACK-RUNBOOK.md) | Rollback |
+| [`runbooks/BACKUP-OPERATIONS-RUNBOOK.md`](runbooks/BACKUP-OPERATIONS-RUNBOOK.md) | Operações de backup |
+| [`runbooks/RESTORE-OPERATIONS-RUNBOOK.md`](runbooks/RESTORE-OPERATIONS-RUNBOOK.md) | Operações de restore |
+| [`runbooks/MIGRATION-FAILURE-RUNBOOK.md`](runbooks/MIGRATION-FAILURE-RUNBOOK.md) | Falha de migração |
+| [`runbooks/POST-DEPLOY-VALIDATION.md`](runbooks/POST-DEPLOY-VALIDATION.md) | Validação pós-deploy |
+| [`runbooks/AI-PROVIDER-DEGRADATION-RUNBOOK.md`](runbooks/AI-PROVIDER-DEGRADATION-RUNBOOK.md) | Degradação de provider AI |
+| [`runbooks/PRODUCTION-SECRETS-PROVISIONING.md`](runbooks/PRODUCTION-SECRETS-PROVISIONING.md) | Provisioning de segredos |
+| [`runbooks/contracts-operations.md`](runbooks/contracts-operations.md) | Operações de contratos |
+
+---
+
+## 11. Observabilidade — `docs/observability/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`observability/README.md`](observability/README.md) | Índice de observabilidade |
+| [`observability/architecture-overview.md`](observability/architecture-overview.md) | Visão geral da arquitectura |
+| [`observability/DRIFT-DETECTION-PIPELINE.md`](observability/DRIFT-DETECTION-PIPELINE.md) | Pipeline de detecção de drift |
+| [`observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md`](observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md) | Comparação de ambientes |
+| [`observability/INGESTION-API-ROLE-AND-FLOW.md`](observability/INGESTION-API-ROLE-AND-FLOW.md) | API de ingestão |
+| [`observability/PHASE-6-OBSERVABILITY-COMPLETION.md`](observability/PHASE-6-OBSERVABILITY-COMPLETION.md) | Conclusão de observabilidade |
+| [`observability/pipeline-validation-report.md`](observability/pipeline-validation-report.md) | Relatório de validação do pipeline |
+| [`observability/troubleshooting.md`](observability/troubleshooting.md) | Troubleshooting |
+| [`observability/configuration/`](observability/configuration/) | Configuração de observabilidade |
+| [`observability/collection/`](observability/collection/) | Colecção (IIS/CLR, Kafka, K8s) |
+| [`observability/providers/`](observability/providers/) | Providers (ClickHouse, Elastic) |
+
+---
+
+## 12. Telemetria — `docs/telemetry/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`telemetry/TELEMETRY-ARCHITECTURE.md`](telemetry/TELEMETRY-ARCHITECTURE.md) | Arquitectura de telemetria |
+
+---
+
+## 13. User Guide — `docs/user-guide/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`user-guide/README.md`](user-guide/README.md) | Índice do user guide |
+| [`user-guide/getting-started.md`](user-guide/getting-started.md) | Getting started |
+| [`user-guide/service-catalog.md`](user-guide/service-catalog.md) | Service Catalog |
+| [`user-guide/change-governance.md`](user-guide/change-governance.md) | Change Governance |
+| [`user-guide/governance-reports.md`](user-guide/governance-reports.md) | Governance Reports |
+| [`user-guide/operations.md`](user-guide/operations.md) | Operations |
+| [`user-guide/ai-hub.md`](user-guide/ai-hub.md) | AI Hub |
+| [`user-guide/troubleshooting.md`](user-guide/troubleshooting.md) | Troubleshooting |
+
+---
+
+## 14. Legacy / Mainframe — `docs/legacy/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`LEGACY-MAINFRAME-WAVES.md`](LEGACY-MAINFRAME-WAVES.md) | **Documento mestre** — visão geral das 13 ondas |
-| [`legacy/WAVE-00-STRATEGY.md`](legacy/WAVE-00-STRATEGY.md) | Onda 0 — Estratégia e baseline (enums, feature flags) |
-| [`legacy/WAVE-01-CATALOG-FOUNDATION.md`](legacy/WAVE-01-CATALOG-FOUNDATION.md) | Onda 1 — Foundation de domínio e catálogo legacy |
-| [`legacy/WAVE-02-TELEMETRY-INGESTION.md`](legacy/WAVE-02-TELEMETRY-INGESTION.md) | Onda 2 — Ingestão de telemetria legacy |
-| [`legacy/WAVE-03-NORMALIZATION-CORRELATION.md`](legacy/WAVE-03-NORMALIZATION-CORRELATION.md) | Onda 3 — Normalização e correlação |
-| [`legacy/WAVE-04-CONTRACT-GOVERNANCE.md`](legacy/WAVE-04-CONTRACT-GOVERNANCE.md) | Onda 4 — Legacy contract governance |
-| [`legacy/WAVE-05-HYBRID-GRAPH.md`](legacy/WAVE-05-HYBRID-GRAPH.md) | Onda 5 — Hybrid dependency graph |
-| [`legacy/WAVE-06-CHANGE-INTELLIGENCE.md`](legacy/WAVE-06-CHANGE-INTELLIGENCE.md) | Onda 6 — Core change intelligence legacy |
-| [`legacy/WAVE-07-BATCH-INTELLIGENCE.md`](legacy/WAVE-07-BATCH-INTELLIGENCE.md) | Onda 7 — Batch intelligence |
-| [`legacy/WAVE-08-MESSAGING-INTELLIGENCE.md`](legacy/WAVE-08-MESSAGING-INTELLIGENCE.md) | Onda 8 — Messaging intelligence (IBM MQ) |
-| [`legacy/WAVE-09-AI-ASSISTIVE.md`](legacy/WAVE-09-AI-ASSISTIVE.md) | Onda 9 — IA assistiva para legacy |
-| [`legacy/WAVE-10-WORKFLOW-POLICIES.md`](legacy/WAVE-10-WORKFLOW-POLICIES.md) | Onda 10 — Workflow, aprovação e políticas |
-| [`legacy/WAVE-11-FRONTEND-ENTERPRISE.md`](legacy/WAVE-11-FRONTEND-ENTERPRISE.md) | Onda 11 — Frontend enterprise (polish) |
-| [`legacy/WAVE-12-SECURITY-READINESS.md`](legacy/WAVE-12-SECURITY-READINESS.md) | Onda 12 — Segurança, readiness e operação |
+| [`legacy/WAVE-00-STRATEGY.md`](legacy/WAVE-00-STRATEGY.md) – [`legacy/WAVE-12-SECURITY-READINESS.md`](legacy/WAVE-12-SECURITY-READINESS.md) | Ondas 0–12 |
 
 ---
 
-## 6. Observabilidade (docs/observability/)
-
-Documentação da stack de observabilidade activa do NexTraceOne.
-Ver [`observability/`](observability/) para providers, collectors e configuração.
-
-**Stack activa:**
-- ClickHouse (provider analítico)
-- OpenTelemetry Collector (Kubernetes/Docker)
-- CLR Profiler (para apps .NET em IIS — observabilidade de apps de cliente, não do NexTraceOne)
-
----
-
-## 7. Documentação Arquivada (docs/archive/)
-
-| Directório | Conteúdo | Motivo |
-|-----------|---------|--------|
-| [`archive/architecture-phases/`](archive/architecture-phases/) | Phases 0–9 | Fases de evolução concluídas |
-| [`archive/legacy-seeds/`](archive/legacy-seeds/) | Scripts SQL legados | Prefixos de tabela incorrectos |
-| [`archive/ai-audits/`](archive/ai-audits/) | Auditoria AI de Março 2026 | Substituída por estado mais recente |
-| [`archive/review-modular-governance-detail/`](archive/review-modular-governance-detail/) | 73 relatórios de detalhe | Consolidados em 12 docs canónicos |
-
-> ⚠️ **Documentação arquivada não deve ser usada como referência operacional.**
-
----
-
-## 8. Tecnologias Removidas / Não Usadas
-
-As seguintes tecnologias foram consideradas e explicitamente **não adoptadas**:
-
-| Tecnologia | Estado | Alternativa Adoptada |
-|-----------|--------|---------------------|
-| Redis | ❌ Não usado | PostgreSQL (sem cache distribuído no MVP) |
-| OpenSearch | ❌ Não usado | PostgreSQL Full-Text Search |
-| Temporal (workflow engine) | ❌ Não usado | Quartz.NET + PostgreSQL |
-| Grafana/Loki/Tempo | ❌ Removido do scope | ClickHouse como store analítico |
-| Licensing/Entitlements | ❌ Removido do scope (P12.1) | — |
-| Self-Hosted Enterprise | ❌ Removido do scope (P12.2) | — |
-
-> Referências a estas tecnologias em documentação arquivada são históricas e não devem ser confundidas com a stack actual.
-
----
-
-*Última consolidação: P12.3 (2026-03-27)*
+*Última consolidação: 2026-04-07*

@@ -138,7 +138,11 @@ public static class GetFinOpsSummary
         }
     }
 
-    /// <summary>Resposta do resumo de FinOps. IsSimulated=true indica dados demonstrativos.</summary>
+    /// <summary>
+    /// Resposta do resumo de FinOps.
+    /// IsSimulated é sempre false — dados são reais via ICostIntelligenceModule cross-module.
+    /// O parâmetro existe para futura extensão caso se adicionem cenários de simulação/projeção.
+    /// </summary>
     public sealed record Response(
         decimal TotalMonthlyCost,
         decimal TotalWaste,

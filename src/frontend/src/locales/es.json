@@ -3598,7 +3598,8 @@
       },
       "totalAssessed": "Packs evaluados",
       "waiverApproval": "Aprobación de waivers",
-      "waivers": "Waivers"
+      "waivers": "Waivers",
+      "emptyDescription": "Ningún elemento de cumplimiento coincide con los criterios de búsqueda."
     },
     "complianceSubtitle": "Cumplimiento empresarial derivado de la adopción de packs (rollouts) y excepciones (waivers).",
     "complianceTitle": "Cumplimiento",
@@ -3694,7 +3695,8 @@
       "title": "Catálogo de Políticas",
       "totalPolicies": "Total de políticas",
       "totalViolations": "Waivers activos",
-      "violations": "Waivers"
+      "violations": "Waivers",
+      "emptyDescription": "Ninguna política coincide con los criterios de búsqueda."
     },
     "risk": {
       "critical": "Crítico",
@@ -3727,7 +3729,9 @@
       "medium": "Medio",
       "searchPlaceholder": "Buscar packs…",
       "serviceRiskList": "Indicadores de riesgo por pack",
-      "totalAssessed": "Packs evaluados"
+      "totalAssessed": "Packs evaluados",
+      "empty": "Sin datos de riesgo disponibles",
+      "emptyDescription": "Sin datos de riesgo disponibles para los filtros actuales."
     },
     "riskSubtitle": "Indicadores de riesgo derivados del ciclo de vida de packs, rollouts y waivers.",
     "riskTitle": "Centro de Riesgo",
@@ -3751,7 +3755,9 @@
       "deployFreq": "Frec. Deploy",
       "leadTime": "Lead Time",
       "cfr": "CFR",
-      "mttr": "MTTR"
+      "mttr": "MTTR",
+      "empty": "Sin datos DORA disponibles",
+      "emptyDescription": "Sin puntos de tendencia disponibles para el período seleccionado."
     },
     "scorecard": {
       "title": "Scorecards de Servicio",
@@ -3768,7 +3774,9 @@
       "dimensions": "Dimensiones",
       "serviceNamePlaceholder": "Ingrese el nombre del servicio...",
       "compute": "Calcular",
-      "enterServiceName": "Ingrese un nombre de servicio para calcular su scorecard"
+      "enterServiceName": "Ingrese un nombre de servicio para calcular su scorecard",
+      "empty": "Sin datos de scorecard",
+      "emptyDescription": "Sin datos de scorecard disponibles para este servicio."
     },
     "customDashboards": {
       "title": "Paneles Personalizados",
@@ -3827,7 +3835,30 @@
       "createSuccess": "Elemento de deuda registrado con éxito.",
       "createError": "Error al registrar el elemento de deuda. Inténtalo de nuevo.",
       "loading": "Cargando deuda técnica...",
-      "error": "Error al cargar los datos de deuda técnica."
+      "error": "Error al cargar los datos de deuda técnica.",
+      "empty": "Sin elementos de deuda técnica",
+      "emptyDescription": "No se han registrado elementos de deuda técnica."
+    },
+    "evidence": {
+      "emptyDescription": "Ningún paquete de evidencia coincide con los criterios de búsqueda."
+    },
+    "riskCenter": {
+      "empty": "Ningún elemento de riesgo encontrado",
+      "emptyDescription": "Ningún elemento de riesgo coincide con los criterios de búsqueda."
+    },
+    "dashboards": {
+      "empty": "Sin dashboards personalizados",
+      "emptyDescription": "Cree su primer dashboard personalizado para comenzar."
+    },
+    "executive": {
+      "emptyFocusAreas": "Sin áreas de enfoque",
+      "emptyFocusAreasDescription": "No se identificaron áreas de enfoque en este momento.",
+      "emptyDomains": "Sin datos de dominio",
+      "emptyDomainsDescription": "Sin datos de rendimiento por dominio disponibles."
+    },
+    "benchmarking": {
+      "empty": "Sin datos de benchmarking",
+      "emptyDescription": "Sin datos de comparación disponibles para benchmarking."
     }
   },
   "governanceConfig": {
@@ -5978,7 +6009,25 @@
     "repositoryUrl": "URL del Repositorio",
     "typeGrpcService": "Servicio gRPC",
     "typeGateway": "API Gateway",
-    "typeFramework": "Framework / SDK"
+    "typeFramework": "Framework / SDK",
+    "typeRestApi": "REST API",
+    "typeGraphqlApi": "GraphQL API",
+    "typeSoapService": "Servicio SOAP",
+    "typeKafkaProducer": "Productor Kafka",
+    "typeKafkaConsumer": "Consumidor Kafka",
+    "typeBackgroundService": "Servicio en Background",
+    "typeScheduledProcess": "Proceso Programado",
+    "typeIntegrationComponent": "Componente de Integración",
+    "typeSharedPlatformService": "Servicio de Plataforma Compartido",
+    "typeThirdParty": "Servicio de Terceros",
+    "typeLegacySystem": "Sistema Legado",
+    "typeCobolProgram": "Programa COBOL",
+    "typeCicsTransaction": "Transacción CICS",
+    "typeImsTransaction": "Transacción IMS",
+    "typeBatchJob": "Job Batch",
+    "typeMainframeSystem": "Sistema Mainframe",
+    "typeMqQueueManager": "MQ Queue Manager",
+    "typeZosConnectApi": "z/OS Connect API"
   },
   "serviceMaturity": {
     "audit": {
@@ -6589,11 +6638,20 @@
         "scaffoldingManifest": "Array JSON de objetos { path, content }. Usa {{ServiceName}}, {{Domain}}, {{TeamName}} como variables."
       },
       "serviceTypes": {
-        "grpc": "gRPC"
+        "grpc": "gRPC",
+        "restApi": "REST API",
+        "eventDriven": "Orientado a Eventos",
+        "backgroundWorker": "Worker en Background",
+        "soap": "SOAP",
+        "generic": "Genérico"
       },
       "languages": {
         "dotnet": ".NET",
-        "nodejs": "Node.js"
+        "nodejs": "Node.js",
+        "java": "Java",
+        "go": "Go",
+        "python": "Python",
+        "agnostic": "Agnóstico"
       }
     },
     "scaffold": {
@@ -7578,6 +7636,9 @@
     "governance.gates.errorBudget.remainingPct": "Budget restante %",
     "governance.gates.errorBudget.serviceName": "Nombre del servicio",
     "governance.gates.errorBudget.title": "Puerta de Error Budget",
+    "governance.gates.errors.cabFailed": "Error al evaluar puerta CAB",
+    "governance.gates.errors.errorBudgetFailed": "Error al evaluar puerta de Error Budget",
+    "governance.gates.errors.fourEyesFailed": "Error al evaluar puerta de Four Eyes",
     "governance.gates.evaluate": "Evaluar",
     "governance.gates.finops.description": "Evaluar si los gastos están dentro de los límites presupuestarios",
     "governance.gates.finops.overBudget": "Presupuesto superado",

@@ -16,6 +16,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { globalSearchApi } from '../api/globalSearch';
 import type { SearchResultItem } from '../api/globalSearch';
 import { PageContainer } from '../../../components/shell';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 
 /** Intervalo de debounce para pesquisa (ms). */
@@ -167,9 +168,7 @@ export function GlobalSearchPage() {
 
       {/* ── Erro ── */}
       {isError && (
-        <div className="flex items-center justify-center py-16">
-          <p className="text-sm text-critical">{t('common.error')}</p>
-        </div>
+        <PageErrorState />
       )}
 
       {/* ── Sem resultados ── */}

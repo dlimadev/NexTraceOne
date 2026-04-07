@@ -19,6 +19,7 @@ import {
   BarChart2,
 } from 'lucide-react';
 import { templatesApi } from '../api/templates';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 // ── Info row ──────────────────────────────────────────────────────────────────
 
@@ -62,7 +63,7 @@ export function TemplateDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: template, isLoading } = useQuery({
+  const { data: template, isLoading, isError } = useQuery({
     queryKey: ['service-template', id],
     queryFn: () => templatesApi.getById(id!),
     enabled: !!id,
@@ -84,6 +85,14 @@ export function TemplateDetailPage() {
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="h-32 animate-pulse rounded-lg border border-neutral-800 bg-neutral-900" />
         ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-4 p-6">
+        <PageErrorState />
       </div>
     );
   }

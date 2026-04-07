@@ -3595,7 +3595,8 @@
       },
       "totalAssessed": "Packs avaliados",
       "waiverApproval": "Aprovação de waivers",
-      "waivers": "Waivers"
+      "waivers": "Waivers",
+      "emptyDescription": "Nenhum item de conformidade corresponde aos critérios de pesquisa."
     },
     "complianceSubtitle": "Conformidade enterprise derivada de adoção de packs (rollouts) e exceções (waivers).",
     "complianceTitle": "Conformidade",
@@ -3691,7 +3692,8 @@
       "title": "Catálogo de Políticas",
       "totalPolicies": "Total de políticas",
       "totalViolations": "Waivers ativos",
-      "violations": "Waivers"
+      "violations": "Waivers",
+      "emptyDescription": "Nenhuma política corresponde aos critérios de pesquisa."
     },
     "risk": {
       "critical": "Crítico",
@@ -3724,7 +3726,9 @@
       "medium": "Médio",
       "searchPlaceholder": "Pesquisar packs…",
       "serviceRiskList": "Indicadores de risco por pack",
-      "totalAssessed": "Packs avaliados"
+      "totalAssessed": "Packs avaliados",
+      "empty": "Sem dados de risco disponíveis",
+      "emptyDescription": "Sem dados de risco disponíveis para os filtros atuais."
     },
     "riskSubtitle": "Indicadores de risco derivados do ciclo de vida de packs, rollouts e waivers.",
     "riskTitle": "Centro de Risco",
@@ -3748,7 +3752,9 @@
       "deployFreq": "Freq. Deploy",
       "leadTime": "Lead Time",
       "cfr": "CFR",
-      "mttr": "MTTR"
+      "mttr": "MTTR",
+      "empty": "Sem dados DORA disponíveis",
+      "emptyDescription": "Sem pontos de tendência disponíveis para o período selecionado."
     },
     "scorecard": {
       "title": "Scorecards de Serviço",
@@ -3765,7 +3771,9 @@
       "dimensions": "Dimensões",
       "serviceNamePlaceholder": "Introduza o nome do serviço...",
       "compute": "Calcular",
-      "enterServiceName": "Introduza o nome do serviço para calcular o scorecard"
+      "enterServiceName": "Introduza o nome do serviço para calcular o scorecard",
+      "empty": "Sem dados de scorecard",
+      "emptyDescription": "Sem dados de scorecard disponíveis para este serviço."
     },
     "customDashboards": {
       "title": "Dashboards Personalizados",
@@ -3824,7 +3832,30 @@
       "createSuccess": "Item de dívida registado com sucesso.",
       "createError": "Falha ao registar o item de dívida. Tente novamente.",
       "loading": "A carregar dívida técnica...",
-      "error": "Falha ao carregar dados de dívida técnica."
+      "error": "Falha ao carregar dados de dívida técnica.",
+      "empty": "Sem itens de dívida técnica",
+      "emptyDescription": "Nenhum item de dívida técnica foi registado."
+    },
+    "evidence": {
+      "emptyDescription": "Nenhum pacote de evidências corresponde aos critérios de pesquisa."
+    },
+    "riskCenter": {
+      "empty": "Nenhum item de risco encontrado",
+      "emptyDescription": "Nenhum item de risco corresponde aos critérios de pesquisa."
+    },
+    "dashboards": {
+      "empty": "Sem dashboards personalizados",
+      "emptyDescription": "Crie o seu primeiro dashboard personalizado para começar."
+    },
+    "executive": {
+      "emptyFocusAreas": "Sem áreas de foco",
+      "emptyFocusAreasDescription": "Nenhuma área de foco identificada neste momento.",
+      "emptyDomains": "Sem dados de domínio",
+      "emptyDomainsDescription": "Sem dados de desempenho por domínio disponíveis."
+    },
+    "benchmarking": {
+      "empty": "Sem dados de benchmarking",
+      "emptyDescription": "Sem dados de comparação disponíveis para benchmarking."
     }
   },
   "governanceConfig": {
@@ -5975,7 +6006,25 @@
     "repositoryUrl": "URL do Repositório",
     "typeGrpcService": "Serviço gRPC",
     "typeGateway": "API Gateway",
-    "typeFramework": "Framework / SDK"
+    "typeFramework": "Framework / SDK",
+    "typeRestApi": "REST API",
+    "typeGraphqlApi": "GraphQL API",
+    "typeSoapService": "Serviço SOAP",
+    "typeKafkaProducer": "Produtor Kafka",
+    "typeKafkaConsumer": "Consumidor Kafka",
+    "typeBackgroundService": "Serviço em Background",
+    "typeScheduledProcess": "Processo Agendado",
+    "typeIntegrationComponent": "Componente de Integração",
+    "typeSharedPlatformService": "Serviço de Plataforma Partilhado",
+    "typeThirdParty": "Serviço de Terceiros",
+    "typeLegacySystem": "Sistema Legado",
+    "typeCobolProgram": "Programa COBOL",
+    "typeCicsTransaction": "Transação CICS",
+    "typeImsTransaction": "Transação IMS",
+    "typeBatchJob": "Job Batch",
+    "typeMainframeSystem": "Sistema Mainframe",
+    "typeMqQueueManager": "MQ Queue Manager",
+    "typeZosConnectApi": "z/OS Connect API"
   },
   "serviceMaturity": {
     "audit": {
@@ -6586,11 +6635,20 @@
         "scaffoldingManifest": "Array JSON de objetos { path, content }. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} como variáveis."
       },
       "serviceTypes": {
-        "grpc": "gRPC"
+        "grpc": "gRPC",
+        "restApi": "REST API",
+        "eventDriven": "Orientado a Eventos",
+        "backgroundWorker": "Worker em Background",
+        "soap": "SOAP",
+        "generic": "Genérico"
       },
       "languages": {
         "dotnet": ".NET",
-        "nodejs": "Node.js"
+        "nodejs": "Node.js",
+        "java": "Java",
+        "go": "Go",
+        "python": "Python",
+        "agnostic": "Agnóstico"
       }
     },
     "scaffold": {
@@ -7575,6 +7633,9 @@
     "governance.gates.errorBudget.remainingPct": "Budget restante %",
     "governance.gates.errorBudget.serviceName": "Nome do serviço",
     "governance.gates.errorBudget.title": "Gate de Error Budget",
+    "governance.gates.errors.cabFailed": "Falha ao avaliar gate CAB",
+    "governance.gates.errors.errorBudgetFailed": "Falha ao avaliar gate de Error Budget",
+    "governance.gates.errors.fourEyesFailed": "Falha ao avaliar gate de Four Eyes",
     "governance.gates.evaluate": "Avaliar",
     "governance.gates.finops.description": "Avaliar se gastos estão dentro dos limites orçamentais",
     "governance.gates.finops.overBudget": "Orçamento ultrapassado",

@@ -42,7 +42,6 @@ export { EmptyState } from '../../components/EmptyState';
 export { ErrorState } from '../../components/ErrorState';
 export { Loader } from '../../components/Loader';
 export { Tooltip } from '../../components/Tooltip';
-export { DemoBanner } from '../../components/DemoBanner';
 
 // ── Theme ───────────────────────────────────────────────────────────────────
 export { ThemeToggle } from './ThemeToggle';

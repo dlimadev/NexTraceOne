@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, StatsGrid, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -191,6 +192,13 @@ export function ServiceScorecardPage() {
                 </Badge>
               </div>
 
+              {listQuery.data.items.length === 0 ? (
+                <EmptyState
+                  title={t('governance.scorecard.empty', 'No scorecards available')}
+                  description={t('governance.scorecard.emptyDescription', 'Service scorecards will appear here once services are assessed.')}
+                  size="compact"
+                />
+              ) : (
               <div className="space-y-2">
                 {listQuery.data.items.map((item) => (
                   <Card
@@ -221,6 +229,7 @@ export function ServiceScorecardPage() {
                   </Card>
                 ))}
               </div>
+              )}
 
               {/* Pagination */}
               {listQuery.data.totalCount > listQuery.data.pageSize && (

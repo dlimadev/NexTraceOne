@@ -108,7 +108,7 @@ public static class GetBenchmarking
         };
     }
 
-    /// <summary>Resposta de benchmarking. IsSimulated=true indica dados demonstrativos.</summary>
+    /// <summary>Resposta de benchmarking. IsSimulated é sempre false — dados reais via ICostIntelligenceModule.</summary>
     public sealed record Response(
         string Dimension,
         IReadOnlyList<BenchmarkComparisonDto> Comparisons,

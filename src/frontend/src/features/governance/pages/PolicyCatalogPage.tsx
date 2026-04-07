@@ -13,6 +13,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
 
@@ -171,7 +172,11 @@ export function PolicyCatalogPage() {
         <CardBody className="p-0">
           <div className="divide-y divide-edge">
             {filtered.length === 0 ? (
-              <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+              <EmptyState
+                title={t('common.noResults', 'No results found')}
+                description={t('governance.policies.emptyDescription', 'No policies match your search criteria.')}
+                size="compact"
+              />
             ) : (
               filtered.map(pol => (
                 <div key={pol.policyId} className="flex items-start gap-4 px-4 py-3 hover:bg-hover transition-colors">

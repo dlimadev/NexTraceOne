@@ -22,24 +22,46 @@ export function GovernanceGatesPage() {
   const [fourEyesResult, setFourEyesResult] = useState<FourEyesResult | null>(null);
   const [cabResult, setCabResult] = useState<CabResult | null>(null);
   const [errorBudgetResult, setErrorBudgetResult] = useState<ErrorBudgetResult | null>(null);
+  const [gateError, setGateError] = useState<string | null>(null);
 
   const evaluateFourEyes = async (actionCode: string, requestedBy: string, approvedBy?: string) => {
-    const params = new URLSearchParams({ actionCode, requestedBy });
-    if (approvedBy) params.set('approvedBy', approvedBy);
-    const resp = await fetch(`/api/v1/governance/gates/four-eyes?${params}`);
-    if (resp.ok) setFourEyesResult(await resp.json());
+    setGateError(null);
+    try {
+      const params = new URLSearchParams({ actionCode, requestedBy });
+      if (approvedBy) params.set('approvedBy', approvedBy);
+      const resp = await fetch(`/api/v1/governance/gates/four-eyes?${params}`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      setFourEyesResult(await resp.json());
+    } catch (err) {
+      console.error('Four Eyes gate evaluation failed:', err);
+      setGateError(t('governance.gates.errors.fourEyesFailed', 'Failed to evaluate Four Eyes gate'));
+    }
   };
 
   const evaluateCab = async (serviceName: string, environment: string, criticality: string, blastRadius: string) => {
-    const params = new URLSearchParams({ serviceName, environment, criticality, blastRadius });
-    const resp = await fetch(`/api/v1/governance/gates/cab?${params}`);
-    if (resp.ok) setCabResult(await resp.json());
+    setGateError(null);
+    try {
+      const params = new URLSearchParams({ serviceName, environment, criticality, blastRadius });
+      const resp = await fetch(`/api/v1/governance/gates/cab?${params}`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      setCabResult(await resp.json());
+    } catch (err) {
+      console.error('CAB gate evaluation failed:', err);
+      setGateError(t('governance.gates.errors.cabFailed', 'Failed to evaluate CAB gate'));
+    }
   };
 
   const evaluateErrorBudget = async (serviceName: string, environment: string, errorBudgetRemainingPct: string) => {
-    const params = new URLSearchParams({ serviceName, environment, errorBudgetRemainingPct });
-    const resp = await fetch(`/api/v1/governance/gates/error-budget?${params}`);
-    if (resp.ok) setErrorBudgetResult(await resp.json());
+    setGateError(null);
+    try {
+      const params = new URLSearchParams({ serviceName, environment, errorBudgetRemainingPct });
+      const resp = await fetch(`/api/v1/governance/gates/error-budget?${params}`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      setErrorBudgetResult(await resp.json());
+    } catch (err) {
+      console.error('Error Budget gate evaluation failed:', err);
+      setGateError(t('governance.gates.errors.errorBudgetFailed', 'Failed to evaluate Error Budget gate'));
+    }
   };
 
   return (
@@ -49,6 +71,13 @@ export function GovernanceGatesPage() {
         subtitle={t('governance.gates.subtitle', 'Evaluate governance gates before critical actions')}
         icon={<ShieldCheck size={24} />}
       />
+
+      {gateError && (
+        <div className="mt-4 p-3 rounded bg-critical/10 border border-critical/30 flex items-center gap-2">
+          <AlertTriangle size={16} className="text-critical shrink-0" />
+          <span className="text-sm text-critical">{gateError}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Four Eyes Principle */}

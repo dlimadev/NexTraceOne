@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -292,16 +293,11 @@ export function CustomDashboardsPage() {
         title={`${t('governance.customDashboards.title')} (${data?.totalCount ?? 0})`}
       >
         {data?.items.length === 0 ? (
-          <Card>
-            <CardBody>
-              <p className="text-center text-gray-500 dark:text-gray-400 py-6">
-                {t('governance.customDashboards.noDashboards')}
-              </p>
-              <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-                {t('governance.customDashboards.noDashboardsHint')}
-              </p>
-            </CardBody>
-          </Card>
+          <EmptyState
+            title={t('governance.customDashboards.empty', 'No dashboards yet')}
+            description={t('governance.customDashboards.emptyDescription', 'Create a custom dashboard using the form above to get started.')}
+            size="compact"
+          />
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data?.items.map((dashboard) => (

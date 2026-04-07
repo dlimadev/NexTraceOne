@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Zap, AlertTriangle, ChevronDown, ChevronRight, ShieldCheck } from 'lucide-react';
+import { EmptyState } from '../../../components/EmptyState';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -304,7 +305,12 @@ export function ChaosEngineeringPage() {
         {isListLoading ? (
           <PageLoadingState message="..." />
         ) : !experimentsData?.items?.length ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('chaosEngineering.noExperiments')}</p>
+          <EmptyState
+            icon={<Zap size={20} />}
+            title={t('chaosEngineering.noExperiments', 'No experiments found')}
+            description={t('chaosEngineering.noExperimentsHint', 'Create an experiment above to get started.')}
+            size="compact"
+          />
         ) : (
           <div className="space-y-3">
             {experimentsData.items.map((experiment) => (

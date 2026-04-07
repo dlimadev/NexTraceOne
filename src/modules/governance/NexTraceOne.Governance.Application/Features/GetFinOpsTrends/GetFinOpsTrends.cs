@@ -107,7 +107,7 @@ public static class GetFinOpsTrends
         }
     }
 
-    /// <summary>Resposta com tendências de custo. IsSimulated=true indica dados demonstrativos.</summary>
+    /// <summary>Resposta com tendências de custo. IsSimulated é sempre false — dados reais via ICostIntelligenceModule.</summary>
     public sealed record Response(
         CostDimension Dimension,
         IReadOnlyList<TrendSeriesDto> Series,

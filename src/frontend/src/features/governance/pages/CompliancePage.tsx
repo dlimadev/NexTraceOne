@@ -11,6 +11,7 @@ import { PageContainer, PageSection, ContentGrid } from '../../../components/she
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import type { ComplianceSummaryResponse, ComplianceStatusType, CompliancePackRowDto } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
@@ -173,7 +174,11 @@ export function CompliancePage() {
           <CardBody className="p-0">
             <div className="divide-y divide-edge">
               {filteredGaps.length === 0 ? (
-                <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+                <EmptyState
+                  title={t('common.noResults', 'No results found')}
+                  description={t('governance.compliance.emptyDescription', 'No compliance items match your search criteria.')}
+                  size="compact"
+                />
               ) : (
                 filteredGaps.map((gap: CompliancePackRowDto) => (
                   <div key={gap.packId} className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors">

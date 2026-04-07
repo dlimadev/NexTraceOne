@@ -326,6 +326,66 @@ jobs:
           path: src/frontend/playwright-report/
           retention-days: 7
 
+  # ── security-audit ────────────────────────────────────────────────────────────
+  security-audit:
+    name: Dependency Vulnerability Audit
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: NuGet vulnerability audit
+        run: |
+          echo "## NuGet Vulnerability Audit" >> $GITHUB_STEP_SUMMARY
+          dotnet restore NexTraceOne.sln
+          # --vulnerable flag lists packages with known vulnerabilities
+          set +e
+          AUDIT_OUTPUT=$(dotnet list NexTraceOne.sln package --vulnerable --include-transitive 2>&1)
+          AUDIT_EXIT=$?
+          set -e
+          echo "$AUDIT_OUTPUT"
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$AUDIT_OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          # Fail on critical/high severity vulnerabilities (check output for severity markers)
+          if echo "$AUDIT_OUTPUT" | grep -qE "(Critical|High)\s"; then
+            echo "❌ Critical or high severity vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          echo "✅ No critical/high NuGet vulnerabilities" >> $GITHUB_STEP_SUMMARY
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: npm audit
+        working-directory: src/frontend
+        run: |
+          echo "## npm Vulnerability Audit" >> $GITHUB_STEP_SUMMARY
+          npm ci
+          # Run audit once, capture output and exit code
+          set +e
+          AUDIT_OUTPUT=$(npm audit --omit=dev --audit-level=critical 2>&1)
+          AUDIT_EXIT=$?
+          set -e
+          echo "$AUDIT_OUTPUT"
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$AUDIT_OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ $AUDIT_EXIT -ne 0 ]; then
+            echo "❌ Critical npm vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          echo "✅ No critical npm vulnerabilities" >> $GITHUB_STEP_SUMMARY
+
   # ── ci-status ─────────────────────────────────────────────────────────────
   # Single required status check that gates PR merges to main/develop.
   # Aggregates all CI jobs into one check for branch protection rules.
@@ -341,6 +401,7 @@ jobs:
       - build-frontend
       - test-frontend
       - e2e-smoke
+      - security-audit
     steps:
       - name: Check job results
         run: |
@@ -351,6 +412,7 @@ jobs:
           echo "build-frontend: ${{ needs.build-frontend.result }}"
           echo "test-frontend: ${{ needs.test-frontend.result }}"
           echo "e2e-smoke: ${{ needs.e2e-smoke.result }}"
+          echo "security-audit: ${{ needs.security-audit.result }}"
 
           # e2e-smoke is skipped on push events — only fail CI if it actually ran and failed
           if [[ "${{ needs.validate.result }}" == "failure" || \
@@ -359,6 +421,7 @@ jobs:
                 "${{ needs.test-backend-integration.result }}" == "failure" || \
                 "${{ needs.build-frontend.result }}" == "failure" || \
                 "${{ needs.test-frontend.result }}" == "failure" || \
+                "${{ needs.security-audit.result }}" == "failure" || \
                 ( "${{ github.event_name }}" == "pull_request" && "${{ needs.e2e-smoke.result }}" == "failure" ) ]]; then
             echo "❌ One or more required jobs failed"
             exit 1

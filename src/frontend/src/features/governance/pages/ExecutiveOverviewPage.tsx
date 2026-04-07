@@ -12,6 +12,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import type {
   RiskLevel,
   GovernanceTrendDirection,
@@ -360,6 +361,13 @@ export function ExecutiveOverviewPage() {
             </h2>
           </CardHeader>
           <CardBody className="p-0">
+            {d.criticalFocusAreas.length === 0 ? (
+              <EmptyState
+                title={t('governance.executive.focusAreasEmpty', 'No critical focus areas')}
+                description={t('governance.executive.focusAreasEmptyDescription', 'There are currently no critical focus areas requiring attention.')}
+                size="compact"
+              />
+            ) : (
             <div className="divide-y divide-edge">
               {d.criticalFocusAreas.map((area, idx) => (
                 <div key={idx} className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors">
@@ -378,6 +386,7 @@ export function ExecutiveOverviewPage() {
                 </div>
               ))}
             </div>
+            )}
           </CardBody>
         </Card>
 
@@ -390,6 +399,13 @@ export function ExecutiveOverviewPage() {
             </h2>
           </CardHeader>
           <CardBody className="p-0">
+            {d.topDomainsRequiringAttention.length === 0 ? (
+              <EmptyState
+                title={t('governance.executive.domainsEmpty', 'No domains requiring attention')}
+                description={t('governance.executive.domainsEmptyDescription', 'All domains are currently within acceptable risk thresholds.')}
+                size="compact"
+              />
+            ) : (
             <div className="divide-y divide-edge">
               {d.topDomainsRequiringAttention.map(domain => (
                 <div key={domain.domainId} className="flex items-center gap-4 px-4 py-3 hover:bg-hover transition-colors">
@@ -405,6 +421,7 @@ export function ExecutiveOverviewPage() {
                 </div>
               ))}
             </div>
+            )}
           </CardBody>
         </Card>
       </PageSection>

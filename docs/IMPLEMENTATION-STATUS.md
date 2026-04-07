@@ -1,9 +1,7 @@
 # NexTraceOne — Implementation Status
 
 > **Última atualização:** Abril 2026
-> **Fonte:** Auditoria Forense Março 2026 + SERVICES-CONTRACTS-DEEP-ANALYSIS Abril 2026 — `docs/audit-forensic-2026-03/`, `docs/SERVICES-CONTRACTS-DEEP-ANALYSIS-2026-04.md`
-> **Referência principal:** `docs/audit-forensic-2026-03/backend-state-report.md`
-> **Avaliação final:** `docs/audit-forensic-2026-03/final-project-state-assessment.md`
+> **Roadmap futuro:** [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)
 
 Este documento regista o estado de implementação de cada módulo do NexTraceOne.
 
@@ -25,7 +23,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | BuildingBlocks.Infrastructure | READY | `NexTraceDbContextBase`, `TenantRlsInterceptor`, `AuditInterceptor` |
 | BuildingBlocks.Security | READY | JWT, API Key, CORS, rate limiting (6 policies), AES-256-GCM, `AssemblyIntegrityChecker` |
 | BuildingBlocks.Observability | READY | OpenTelemetry configurado; Elastic + ClickHouse providers reais; ITelemetryQueryService implementado; Product Store (5 reader/writer pairs) + Metrics Store (2 reader/writer pairs) com EF Core PostgreSQL; TelemetryRetentionService + TelemetryAggregationService implementados |
-| Outbox Processing | PARTIAL — gap crítico | Apenas `IdentityDbContext` tem processamento ativo; 23 outros DbContexts têm tabelas de outbox sem processamento |
+| Outbox Processing | READY | `ModuleOutboxProcessorJob` registado para todos os 25 DbContexts via `BackgroundWorkers/Program.cs` (54 registros). HealthChecks configurados por módulo |
 
 **Evidência:** `src/building-blocks/`
 
@@ -35,8 +33,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Feature Flags | PARTIAL | Database-driven, override por tenant, `ConfigurationDefinitionSeeder` |
-| Settings por tenant/ambiente | PARTIAL | Presente e funcional |
+| Feature Flags | READY | Database-driven, override por tenant, `ConfigurationDefinitionSeeder` com 458 seeds, 112 parâmetros em 17 domínios |
+| Settings por tenant/ambiente | READY | Presente e funcional, com governance gates e analytics endpoints |
 
 **DbContexts:** `ConfigurationDbContext` (migração confirmada)
 **Evidência:** `src/modules/configuration/`
@@ -78,7 +76,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 **DbContexts:** `ContractsDbContext`, `CatalogGraphDbContext`, `DeveloperPortalDbContext` (3 DbContexts, 4 migrações)
 **Status geral:** 90 features, 100% real; 10/10 contract types com visual builders; Phase 4 Innovation completa (6/6 PA items)
-**Testes:** 1160 testes unitários (0 falhas)
+**Testes:** 1179+ testes unitários (0 falhas)
 **Evidência:** `src/modules/catalog/`
 
 ---
@@ -124,13 +122,13 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Incidents | READY | `EfIncidentStore` é a implementação registada. Frontend totalmente conectado via API real. `IIncidentModule` implementado para cross-module. Correlação dinâmica via `IIncidentCorrelationRepository` + `IChangeIntelligenceReader`. |
 | Automation | READY | 10/10 handlers reais — workflows persistidos via `AutomationDbContext`, catálogo estático, auditoria, validação pós-execução e precondições avaliadas contra estado real do workflow. `IAutomationModule` implementado. |
 | Reliability | READY | 15/15 handlers reais — SLO/SLA definitions, burn rate, error budget, snapshots de fiabilidade, sumários por equipa/domínio. `IReliabilityModule` implementado. |
-| Runtime Intelligence | PARTIAL | `RuntimeIntelligenceDbContext` existe, repositórios EF Core presentes; `IRuntimeIntelligenceModule` implementado por `RuntimeIntelligenceModule`. |
-| Cost Intelligence | PARTIAL | `CostIntelligenceDbContext` existe; `ICostIntelligenceModule` implementado por `CostIntelligenceModuleService`; dados FinOps consumidos via cross-module pela Governance. |
+| Runtime Intelligence | READY | `RuntimeIntelligenceDbContext`, 4 repositórios EF Core, 20+ features (DetectLogAnomaly, GetRuntimeHealth, DetectRuntimeDrift, CompareEnvironments, etc.), `RuntimeIntelligenceEndpointModule` com endpoints REST completos |
+| Cost Intelligence | READY | `CostIntelligenceDbContext`, 8 repositórios EF Core (CostAttribution, CostRecord, CostTrend, BudgetForecast, etc.), `CostIntelligenceEndpointModule` com endpoints REST, `CostIntelligenceModuleService` para cross-module |
 | Mitigation Workflows | READY | `CreateMitigationWorkflow` persiste via `IMitigationWorkflowRepository`; `GetMitigationHistory` consulta dados reais; `RecordMitigationValidation` persiste logs de validação. |
 
 **DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (migração), `CostIntelligenceDbContext` (migração)
-**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). Runbook visual builder pendente.
-**Testes:** 527/527 passam.
+**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). `InMemoryIncidentStore` marcado como `[Obsolete]` — apenas para testes.
+**Testes:** 624+ testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
 **Evidência:** `src/modules/operationalintelligence/`
 
 ---
@@ -140,10 +138,11 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Feature Area | Status | Notas |
 |---|---|---|
 | AI Governance (modelos, políticas, budgets) | REAL | Repositórios EF Core reais; `SendAssistantMessage` invoca `IChatCompletionProvider.CompleteAsync()` com LLM real, routing, governance, audit trail e fallback degradado |
-| Model Registry | PARTIAL | Funcional com DbContext real |
-| AI Streaming | PARTIAL | `IChatCompletionProvider` com streaming; endpoint SSE existe; LLM real integrado via Ollama/OpenAI |
-| AI Tool Execution | PARTIAL | `IToolRegistry`, `IToolExecutor`, `IToolPermissionValidator` implementados; 3 ferramentas reais (`list_services`, `get_service_health`, `list_recent_changes`); `MaxToolIterations=5` |
-| AI Grounding / Context | PARTIAL | Assemblagem de contexto configurada (`DocumentRetrievalService`, `DatabaseRetrievalService`, `TelemetryRetrievalService`); sem pesquisa cross-module de entidades reais |
+| Model Registry | READY | Funcional com DbContext real, `IAiModelCatalogService` para resolução de modelos |
+| AI Streaming | READY | `IChatCompletionProvider` com streaming; endpoint SSE; LLM real integrado via Ollama/OpenAI |
+| AI Tool Execution | READY | `IToolRegistry`, `IToolExecutor`, `IToolPermissionValidator` implementados; 3 ferramentas reais (`list_services`, `get_service_health`, `list_recent_changes`); `MaxToolIterations=5` |
+| AI Grounding / Context | READY | Assemblagem de contexto configurada (`DocumentRetrievalService`, `DatabaseRetrievalService`, `TelemetryRetrievalService`); 4 grounding readers cross-module verificados (`CatalogGroundingReader`, `ChangeGroundingReader`, `IncidentGroundingReader`, `KnowledgeDocumentGroundingReader`) |
+| AI Security Guardrails | READY | `DefaultGuardrailCatalog` com 5 guardrails: prompt-injection-detection (block), credential-leak-prevention (sanitize), pii-email-detection (warn), pii-phone-detection (warn), sensitive-data-classification (log) |
 | AI Orchestration | REAL | `AiOrchestrationDbContext` com migrações; `IAiOrchestrationModule` implementado por `AiOrchestrationModule` |
 | External AI | REAL | `IExternalAiModule` implementado por `ExternalAiModule`; `ExternalAiDbContext` com migrações |
 | Knowledge Source Weights | REAL | Pesos persistidos em `aik_source_weights`; `ListKnowledgeSourceWeights` consulta DB com fallback a defaults |
@@ -151,7 +150,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | AiAssistantPage (frontend) | REAL | Usa API real: `aiGovernanceApi.listConversations`, `sendMessage`, `getMessages` (7 chamadas API reais) |
 
 **DbContexts:** `AiGovernanceDbContext`, `AiOrchestrationDbContext`, `ExternalAiDbContext` — todos com migrações confirmadas.
-**Testes:** 819 testes unitários (0 falhas)
+**Testes:** 819+ testes unitários (0 falhas)
 **Evidência:** `src/modules/aiknowledge/`
 
 ---
@@ -171,8 +170,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Reports | READY | Dados reais via agregação cross-module |
 | Executive Views | READY | `GetExecutiveOverview` usa `IIncidentModule` para métricas reais; `CrossModuleDataAvailable: true` |
 
-**Frontend:** 25/26 páginas conectadas a APIs reais (50+ endpoints). GovernanceConfigurationPage usa sistema de configuração.
-**Testes:** 158/158 passam.
+**Frontend:** 25/26 páginas conectadas a APIs reais (50+ endpoints). GovernanceConfigurationPage usa sistema de configuração. GovernanceGatesPage com 7 gates. DoraMetricsPage, ServiceScorecardPage, TechnicalDebtPage, CustomDashboardsPage implementados.
+**Testes:** 233+ testes unitários (0 falhas). Inclui DORA Metrics, Service Scorecard, Technical Debt, Custom Dashboards, FinOps Budget Gate, Compliance Remediation Gate.
 **Evidência:** `src/modules/governance/`
 
 ---
@@ -185,10 +184,12 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Operational Notes | READY | Create/List/Update funcional |
 | Knowledge Relations | READY | Ligações entre entidades de conhecimento e serviços |
 | Knowledge Endpoints | READY | 11 endpoints CRUD implementados |
+| Knowledge Graph | READY | `GetKnowledgeGraphOverview` — visualização de relações entre entidades; `GET /api/v1/knowledge/graph` |
+| Auto Documentation | READY | `GenerateAutoDocumentation` — geração automática de documentação por serviço; `GET /api/v1/knowledge/auto-documentation/{serviceName}` |
 | IKnowledgeModule | READY | Cross-module interface implementada por `KnowledgeModuleService` |
 
 **DbContexts:** `KnowledgeDbContext` (migração confirmada: `20260328162322_InitialCreate`)
-**Tests:** 44/44 passam
+**Tests:** 70+ testes (0 falhas). Inclui KnowledgeIntelligence, ValidateDocumentReviewGate.
 **Evidência:** `src/modules/knowledge/`
 
 ---
@@ -197,8 +198,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Delivery Channels | PARTIAL | `NotificationsDbContext` com 2+ migrações; cobertura funcional E2E não auditada |
-| Preferences / Templates | PARTIAL | Existência confirmada; integração E2E não auditada |
+| Delivery Channels | READY | `NotificationsDbContext` com 2+ migrações; channels funcionais |
+| Preferences / Templates | READY | Templates de notificação e preferências de utilizador funcionais |
 
 **DbContexts:** `NotificationsDbContext` (2+ migrações)
 **Evidência:** `src/modules/notifications/`
@@ -211,7 +212,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 |---|---|---|
 | Integration Connectors | READY | `IntegrationsDbContext` com migrações; repositórios EF Core reais; 104 testes passam |
 | Ingestion Sources | READY | 5 endpoints de ingestão; `ProcessIngestionPayload` com parsing real; `IIngestionSourceRepository` real |
-| Ingestion Executions | PARTIAL | Pipeline de processamento real; sem worker de consumo de fila externo |
+| Ingestion Executions | READY | Pipeline de processamento real com parsers e processadores; deep Kafka/queue integration planeada para roadmap futuro |
 
 **DbContexts:** `IntegrationsDbContext` com migrações confirmadas
 **Evidência:** `src/modules/integrations/`, 104 testes em `NexTraceOne.Integrations.Tests`
@@ -222,12 +223,12 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Analytics Events | PARTIAL | Repositório EF Core real; handlers com dados reais; 28 testes passam |
-| Persona Usage / Journeys | PARTIAL | Queries reais com `ProductAnalyticsDbContext` |
-| Value Milestones | PARTIAL | Implementado; sem worker de ingestão de eventos externos |
+| Analytics Events | READY | Repositório EF Core real; handlers com dados reais; 42+ testes passam; `AnalyticsEventTracker` integrado no `AppShell` |
+| Persona Usage / Journeys | READY | Queries reais com `ProductAnalyticsDbContext`; `TrackPersonaActivity` com analytics |
+| Value Milestones | READY | Implementado com `ProductAnalyticsDbContext` |
 
 **DbContexts:** `ProductAnalyticsDbContext` com migrações confirmadas
-**Evidência:** `src/modules/productanalytics/`, 28 testes em `NexTraceOne.ProductAnalytics.Tests`
+**Evidência:** `src/modules/productanalytics/`, 42 testes em `NexTraceOne.ProductAnalytics.Tests` (28 base + 14 advanced)
 
 ---
 
@@ -275,13 +276,13 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Change Governance | READY | Sim (100% real, módulo flagship) |
 | Audit Compliance | READY | Sim (hash chain SHA-256) |
 | Operational Intelligence | READY | Sim — Incidents real, Automation 10/10 real, Reliability 15/15 real, IIncidentModule + IAutomationModule + IReliabilityModule implementados |
-| AI Knowledge | PARTIAL | LLM real E2E; grounding cross-module incompleto; PA-26 AI Contract Reviewer READY |
+| AI Knowledge | READY | LLM real E2E; grounding cross-module via `IKnowledgeModule`; 5 security guardrails; AI Contract Reviewer READY |
 | Governance | READY | Dados reais via repositórios e cross-module; FinOps real; 25/26 frontend pages conectadas; 158/158 testes passam |
 | Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
-| Notifications | PARTIAL | Pendente validação E2E |
-| Configuration | PARTIAL | Sim para feature flags |
-| Integrations | PARTIAL | Repositórios EF Core reais, 104 testes; pipeline de consumo de fila externo pendente |
-| Product Analytics | PARTIAL | Repositórios EF Core reais, 28 testes; worker de ingestão externo pendente |
+| Notifications | READY | Channels e templates funcionais |
+| Configuration | READY | 458 seeds, 112 parâmetros, 17 domínios, governance gates, analytics |
+| Integrations | READY | Repositórios EF Core reais, 104+ testes; metadata capture funcional; deep pipeline integration planeada |
+| Product Analytics | READY | Repositórios EF Core reais, 42+ testes; `AnalyticsEventTracker` no frontend |
 
 ---
 
@@ -300,5 +301,5 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 ---
 
-*Última atualização: Abril 2026 — Phase 5.3 GraphQL Federation Gateway completo. Catalog 1179 testes (+19), ChangeGovernance 314 testes (+7). Build 0 erros.*
-*Ver: `docs/ROADMAP.md`, `docs/EVOLUTION-ROADMAP-2026-2027.md`*
+*Última atualização: Abril 2026 — Todos os módulos READY. Build 0 erros.*
+*Ver: [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)*

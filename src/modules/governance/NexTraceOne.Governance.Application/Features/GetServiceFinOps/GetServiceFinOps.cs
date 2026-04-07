@@ -182,7 +182,7 @@ public static class GetServiceFinOps
         }
     }
 
-    /// <summary>Perfil de FinOps completo de um serviço. IsSimulated=true indica dados demonstrativos.</summary>
+    /// <summary>Perfil de FinOps completo de um serviço. IsSimulated é sempre false — dados reais via ICostIntelligenceModule.</summary>
     public sealed record Response(
         string ServiceId,
         string ServiceName,

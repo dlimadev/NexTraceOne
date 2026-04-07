@@ -11,6 +11,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 
@@ -86,7 +87,14 @@ export function RiskHeatmapPage() {
       )}
 
       {/* Heatmap Grid */}
-      {!isLoading && data && (
+      {!isLoading && data && data.cells.length === 0 && (
+        <EmptyState
+          title={t('governance.riskHeatmap.empty', 'No risk data available')}
+          description={t('governance.riskHeatmap.emptyDescription', 'Risk heatmap cells will appear here once governance packs are assessed.')}
+          size="compact"
+        />
+      )}
+      {!isLoading && data && data.cells.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {data.cells.map(cell => (
             <Card key={cell.groupId} className={`${riskBorderClass(cell.riskLevel)} border-l-4`}>

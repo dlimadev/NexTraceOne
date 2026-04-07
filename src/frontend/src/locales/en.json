@@ -3595,7 +3595,8 @@
       },
       "totalAssessed": "Packs assessed",
       "waiverApproval": "Waiver approval",
-      "waivers": "Waivers"
+      "waivers": "Waivers",
+      "emptyDescription": "No compliance items match your search criteria."
     },
     "complianceSubtitle": "Enterprise compliance derived from governance pack adoption (rollouts) and exceptions (waivers).",
     "complianceTitle": "Compliance",
@@ -3691,7 +3692,8 @@
       "title": "Policy Catalog",
       "totalPolicies": "Total policies",
       "totalViolations": "Active waivers",
-      "violations": "Waivers"
+      "violations": "Waivers",
+      "emptyDescription": "No policies match your search criteria."
     },
     "risk": {
       "critical": "Critical",
@@ -3724,7 +3726,9 @@
       "medium": "Medium",
       "searchPlaceholder": "Search packs…",
       "serviceRiskList": "Pack risk indicators",
-      "totalAssessed": "Packs assessed"
+      "totalAssessed": "Packs assessed",
+      "empty": "No risk data available",
+      "emptyDescription": "No risk data available for the current filters."
     },
     "riskSubtitle": "Risk indicators derived from governance pack lifecycle, rollouts and waivers.",
     "riskTitle": "Risk Center",
@@ -3748,7 +3752,9 @@
       "deployFreq": "Deploy Freq.",
       "leadTime": "Lead Time",
       "cfr": "CFR",
-      "mttr": "MTTR"
+      "mttr": "MTTR",
+      "empty": "No DORA metrics data available",
+      "emptyDescription": "No trend data points available for the selected period."
     },
     "scorecard": {
       "title": "Service Scorecards",
@@ -3765,7 +3771,9 @@
       "dimensions": "Dimensions",
       "serviceNamePlaceholder": "Enter service name...",
       "compute": "Compute",
-      "enterServiceName": "Enter a service name to compute its scorecard"
+      "enterServiceName": "Enter a service name to compute its scorecard",
+      "empty": "No scorecard data",
+      "emptyDescription": "No scorecard data available for this service."
     },
     "customDashboards": {
       "title": "Custom Dashboards",
@@ -3833,7 +3841,30 @@
       "createSuccess": "Debt item recorded successfully.",
       "createError": "Failed to record debt item. Please try again.",
       "loading": "Loading technical debt...",
-      "error": "Failed to load technical debt data."
+      "error": "Failed to load technical debt data.",
+      "empty": "No technical debt items",
+      "emptyDescription": "No technical debt items have been recorded yet."
+    },
+    "evidence": {
+      "emptyDescription": "No evidence packages match your search criteria."
+    },
+    "riskCenter": {
+      "empty": "No risk items found",
+      "emptyDescription": "No risk items match your search criteria."
+    },
+    "dashboards": {
+      "empty": "No custom dashboards",
+      "emptyDescription": "Create your first custom dashboard to get started."
+    },
+    "executive": {
+      "emptyFocusAreas": "No focus areas",
+      "emptyFocusAreasDescription": "No focus areas identified at this time.",
+      "emptyDomains": "No domain data",
+      "emptyDomainsDescription": "No domain performance data available."
+    },
+    "benchmarking": {
+      "empty": "No benchmarking data",
+      "emptyDescription": "No comparison data available for benchmarking."
     }
   },
   "governanceConfig": {
@@ -5984,7 +6015,25 @@
     "repositoryUrl": "Repository URL",
     "typeGrpcService": "gRPC Service",
     "typeGateway": "API Gateway",
-    "typeFramework": "Framework / SDK"
+    "typeFramework": "Framework / SDK",
+    "typeRestApi": "REST API",
+    "typeGraphqlApi": "GraphQL API",
+    "typeSoapService": "SOAP Service",
+    "typeKafkaProducer": "Kafka Producer",
+    "typeKafkaConsumer": "Kafka Consumer",
+    "typeBackgroundService": "Background Service",
+    "typeScheduledProcess": "Scheduled Process",
+    "typeIntegrationComponent": "Integration Component",
+    "typeSharedPlatformService": "Shared Platform Service",
+    "typeThirdParty": "Third-Party Service",
+    "typeLegacySystem": "Legacy System",
+    "typeCobolProgram": "COBOL Program",
+    "typeCicsTransaction": "CICS Transaction",
+    "typeImsTransaction": "IMS Transaction",
+    "typeBatchJob": "Batch Job",
+    "typeMainframeSystem": "Mainframe System",
+    "typeMqQueueManager": "MQ Queue Manager",
+    "typeZosConnectApi": "z/OS Connect API"
   },
   "serviceMaturity": {
     "audit": {
@@ -6595,11 +6644,20 @@
         "scaffoldingManifest": "JSON array of { path, content } objects. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} as variables."
       },
       "serviceTypes": {
-        "grpc": "gRPC"
+        "grpc": "gRPC",
+        "restApi": "REST API",
+        "eventDriven": "Event Driven",
+        "backgroundWorker": "Background Worker",
+        "soap": "SOAP",
+        "generic": "Generic"
       },
       "languages": {
         "dotnet": ".NET",
-        "nodejs": "Node.js"
+        "nodejs": "Node.js",
+        "java": "Java",
+        "go": "Go",
+        "python": "Python",
+        "agnostic": "Agnostic"
       }
     },
     "scaffold": {
@@ -7584,6 +7642,9 @@
     "governance.gates.errorBudget.remainingPct": "Budget remaining %",
     "governance.gates.errorBudget.serviceName": "Service name",
     "governance.gates.errorBudget.title": "Error Budget Gate",
+    "governance.gates.errors.cabFailed": "Failed to evaluate CAB gate",
+    "governance.gates.errors.errorBudgetFailed": "Failed to evaluate Error Budget gate",
+    "governance.gates.errors.fourEyesFailed": "Failed to evaluate Four Eyes gate",
     "governance.gates.evaluate": "Evaluate",
     "governance.gates.finops.description": "Evaluate if spending is within budget thresholds",
     "governance.gates.finops.overBudget": "Budget exceeded",
