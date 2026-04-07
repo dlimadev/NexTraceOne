@@ -6,7 +6,7 @@ import {
   AlertTriangle,
   ArrowDown,
   ArrowUp,
-  BarChart3,
+  GitCompareArrows,
   CheckCircle2,
   Clock,
   Info,
@@ -322,7 +322,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
       {!submitted && (
         <PageSection>
           <div className="flex flex-col items-center justify-center py-16 text-center gap-3 text-text-muted">
-            <BarChart3 size={40} className="opacity-30" />
+            <GitCompareArrows size={40} className="opacity-30" />
             <p className="text-sm">{t('environmentComparison.emptyState')}</p>
           </div>
         </PageSection>

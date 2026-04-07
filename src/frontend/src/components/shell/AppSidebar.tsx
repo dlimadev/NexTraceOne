@@ -382,7 +382,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                     )
                   }
                 >
-                  <span className="shrink-0">{item.icon}</span>
+                  <span className="shrink-0" aria-hidden="true">{item.icon}</span>
                   <span className="truncate flex-1">{t(item.labelKey)}</span>
                   {item.preview && (
                     <span className="ml-auto shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none bg-warning/15 text-warning border border-warning/25">

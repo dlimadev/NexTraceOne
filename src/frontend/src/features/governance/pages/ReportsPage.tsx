@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  BarChart3, FileText, AlertTriangle,
+  Award, FileText, AlertTriangle,
   ShieldCheck, TrendingUp, TrendingDown, Minus,
   Activity, ClipboardCheck, Download, Package,
   CheckCircle, XCircle, Clock,
@@ -155,7 +155,7 @@ export function ReportsPage() {
         <Card>
           <CardHeader>
             <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-              <BarChart3 size={16} className="text-accent" />
+              <Award size={16} className="text-accent" />
               {t('governance.reports.rolloutCoverage')}
             </h2>
           </CardHeader>
@@ -218,7 +218,7 @@ export function ReportsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <StatCard title={t('governance.reports.complianceScore')} value={`${data.complianceScore}%`} icon={<ShieldCheck size={18} />} color="text-success" />
                   <StatCard title={t('governance.reports.riskLevel')} value={t(`governance.risk.level.${data.overallRiskLevel}`)} icon={<AlertTriangle size={18} />} color="text-warning" />
-                  <StatCard title={t('governance.reports.maturityLevel')} value={t(`governance.maturity.${data.overallMaturity}`)} icon={<BarChart3 size={18} />} color="text-accent" />
+                  <StatCard title={t('governance.reports.maturityLevel')} value={t(`governance.maturity.${data.overallMaturity}`)} icon={<Award size={18} />} color="text-accent" />
                 </div>
               </div>
             )}

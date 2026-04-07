@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   DollarSign, AlertTriangle,
   Layers,
-  Target, BarChart3,
+  Target, Gauge,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { StatCard } from '../../../components/StatCard';
@@ -58,7 +58,7 @@ export function ExecutiveFinOpsPage() {
         <StatCard
           title={t('governance.finops.overallEfficiency')}
           value={t(`governance.finops.efficiency.${d.overallEfficiency}`)}
-          icon={<BarChart3 size={20} />}
+          icon={<Gauge size={20} />}
           color="text-warning"
         />
         <StatCard title={t('governance.finops.potentialSavings')} value={fmt(totalPotentialSavings)} icon={<Target size={20} />} color="text-success" />

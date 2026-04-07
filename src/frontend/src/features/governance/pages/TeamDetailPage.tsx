@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import {
   Users, Server, FileText, Shield, GitBranch,
   ArrowRight, TrendingUp, Minus, AlertTriangle, Activity,
-  CheckCircle, Building2, Calendar, ArrowLeft, BarChart3,
+  CheckCircle, Building2, Calendar, ArrowLeft, TrendingUp,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -344,7 +344,7 @@ function GovernanceTab({ gov, t, formatPct }: { gov: GovernanceSummary | null; t
       <Card>
         <CardHeader>
           <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-            <BarChart3 size={16} className="text-accent" />
+            <TrendingUp size={16} className="text-accent" />
             {t('organization.teamDetail.dimensions.dimension')}
           </h2>
         </CardHeader>
