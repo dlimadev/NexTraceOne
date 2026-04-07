@@ -12,6 +12,26 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "gov_compliance_gaps",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ServiceId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ServiceName = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    Team = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Domain = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    Severity = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    ViolatedPolicyIds = table.Column<string>(type: "jsonb", nullable: false),
+                    ViolationCount = table.Column<int>(type: "integer", nullable: false),
+                    DetectedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gov_compliance_gaps", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "gov_delegated_administrations",
                 columns: table => new
                 {
@@ -50,6 +70,26 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_gov_domains", x => x.Id);
                     table.CheckConstraint("CK_gov_domains_criticality", "\"Criticality\" IN ('Low', 'Medium', 'High', 'Critical')");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "gov_evidence_packages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    Scope = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    SealedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gov_evidence_packages", x => x.Id);
+                    table.CheckConstraint("CK_gov_evidence_packages_status", "\"Status\" IN ('Draft', 'Sealed', 'Exported')");
                 });
 
             migrationBuilder.CreateTable(
@@ -112,6 +152,35 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "gov_policy_as_code",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    DisplayName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    Version = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Format = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    DefinitionContent = table.Column<string>(type: "text", nullable: false),
+                    EnforcementMode = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Status = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    SimulatedAffectedServices = table.Column<int>(type: "integer", nullable: true),
+                    SimulatedNonCompliantServices = table.Column<int>(type: "integer", nullable: true),
+                    LastSimulatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    RegisteredBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gov_policy_as_code", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "gov_rollout_records",
                 columns: table => new
                 {
@@ -129,6 +198,35 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_gov_rollout_records", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "gov_security_scan_results",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TargetType = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    TargetId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ScannedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    ScanProvider = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    OverallRisk = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    PassedGate = table.Column<bool>(type: "boolean", nullable: false),
+                    Summary_TotalFindings = table.Column<int>(type: "integer", nullable: false),
+                    Summary_CriticalCount = table.Column<int>(type: "integer", nullable: false),
+                    Summary_HighCount = table.Column<int>(type: "integer", nullable: false),
+                    Summary_MediumCount = table.Column<int>(type: "integer", nullable: false),
+                    Summary_LowCount = table.Column<int>(type: "integer", nullable: false),
+                    Summary_InfoCount = table.Column<int>(type: "integer", nullable: false),
+                    Summary_TopCategories = table.Column<string>(type: "jsonb", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gov_security_scan_results", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,6 +265,31 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "gov_evidence_items",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PackageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Title = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    SourceModule = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    ReferenceId = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    RecordedBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    RecordedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gov_evidence_items", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_gov_evidence_items_gov_evidence_packages_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "gov_evidence_packages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "gov_waivers",
                 columns: table => new
                 {
@@ -196,6 +319,60 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "gov_security_findings",
+                columns: table => new
+                {
+                    FindingId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ScanResultId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RuleId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Category = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Severity = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    FilePath = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    LineNumber = table.Column<int>(type: "integer", nullable: true),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Remediation = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    CweId = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    OwaspCategory = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    IsAiGenerated = table.Column<bool>(type: "boolean", nullable: false),
+                    Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gov_security_findings", x => x.FindingId);
+                    table.ForeignKey(
+                        name: "FK_gov_security_findings_gov_security_scan_results_ScanResultId",
+                        column: x => x.ScanResultId,
+                        principalTable: "gov_security_scan_results",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_compliance_gaps_DetectedAt",
+                table: "gov_compliance_gaps",
+                column: "DetectedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_compliance_gaps_Domain",
+                table: "gov_compliance_gaps",
+                column: "Domain");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_compliance_gaps_ServiceId",
+                table: "gov_compliance_gaps",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_compliance_gaps_Severity",
+                table: "gov_compliance_gaps",
+                column: "Severity");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_compliance_gaps_Team",
+                table: "gov_compliance_gaps",
+                column: "Team");
 
             migrationBuilder.CreateIndex(
                 name: "IX_gov_delegated_administrations_DomainId",
@@ -242,6 +419,31 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 table: "gov_domains",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_evidence_items_PackageId",
+                table: "gov_evidence_items",
+                column: "PackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_evidence_items_RecordedAt",
+                table: "gov_evidence_items",
+                column: "RecordedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_evidence_items_Type",
+                table: "gov_evidence_items",
+                column: "Type");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_evidence_packages_Scope",
+                table: "gov_evidence_packages",
+                column: "Scope");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_evidence_packages_Status",
+                table: "gov_evidence_packages",
+                column: "Status");
 
             migrationBuilder.CreateIndex(
                 name: "IX_gov_outbox_messages_CreatedAt",
@@ -292,6 +494,27 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 column: "Status");
 
             migrationBuilder.CreateIndex(
+                name: "IX_gov_policy_as_code_EnforcementMode",
+                table: "gov_policy_as_code",
+                column: "EnforcementMode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_policy_as_code_Name",
+                table: "gov_policy_as_code",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_policy_as_code_Status",
+                table: "gov_policy_as_code",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_policy_as_code_TenantId",
+                table: "gov_policy_as_code",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_gov_rollout_records_CompletedAt",
                 table: "gov_rollout_records",
                 column: "CompletedAt");
@@ -320,6 +543,16 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 name: "IX_gov_rollout_records_VersionId",
                 table: "gov_rollout_records",
                 column: "VersionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_security_findings_ScanResultId",
+                table: "gov_security_findings",
+                column: "ScanResultId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gov_security_findings_Severity",
+                table: "gov_security_findings",
+                column: "Severity");
 
             migrationBuilder.CreateIndex(
                 name: "IX_gov_team_domain_links_DomainId",
@@ -388,10 +621,16 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "gov_compliance_gaps");
+
+            migrationBuilder.DropTable(
                 name: "gov_delegated_administrations");
 
             migrationBuilder.DropTable(
                 name: "gov_domains");
+
+            migrationBuilder.DropTable(
+                name: "gov_evidence_items");
 
             migrationBuilder.DropTable(
                 name: "gov_outbox_messages");
@@ -400,7 +639,13 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                 name: "gov_pack_versions");
 
             migrationBuilder.DropTable(
+                name: "gov_policy_as_code");
+
+            migrationBuilder.DropTable(
                 name: "gov_rollout_records");
+
+            migrationBuilder.DropTable(
+                name: "gov_security_findings");
 
             migrationBuilder.DropTable(
                 name: "gov_team_domain_links");
@@ -410,6 +655,12 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "gov_waivers");
+
+            migrationBuilder.DropTable(
+                name: "gov_evidence_packages");
+
+            migrationBuilder.DropTable(
+                name: "gov_security_scan_results");
 
             migrationBuilder.DropTable(
                 name: "gov_packs");

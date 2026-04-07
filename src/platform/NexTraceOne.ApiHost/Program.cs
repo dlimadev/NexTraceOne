@@ -25,6 +25,7 @@ using NexTraceOne.AIKnowledge.API.Orchestration.Endpoints;
 using NexTraceOne.AIKnowledge.API.Runtime.Endpoints;
 using NexTraceOne.AuditCompliance.API.Endpoints;
 using NexTraceOne.Catalog.API.Contracts.Endpoints;
+using NexTraceOne.Catalog.API.DeveloperExperience.Endpoints;
 using NexTraceOne.Catalog.API.Graph.Endpoints;
 using NexTraceOne.Catalog.API.LegacyAssets.Endpoints;
 using NexTraceOne.Catalog.API.Portal.Endpoints;
@@ -82,6 +83,7 @@ builder.Services.AddWorkflowModule(builder.Configuration);
 builder.Services.AddPromotionModule(builder.Configuration);
 builder.Services.AddAuditModule(builder.Configuration);
 builder.Services.AddDeveloperPortalModule(builder.Configuration);
+builder.Services.AddDeveloperExperienceModule(builder.Configuration);
 builder.Services.AddCatalogTemplatesModule(builder.Configuration);
 builder.Services.AddCatalogDependencyGovernanceModule(builder.Configuration);
 builder.Services.AddCatalogGraphQL(includeExceptionDetails: builder.Environment.IsDevelopment())

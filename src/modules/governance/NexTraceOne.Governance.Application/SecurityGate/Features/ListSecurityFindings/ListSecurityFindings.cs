@@ -41,7 +41,7 @@ public static class ListSecurityFindings
                 request.Status, request.PageSize, request.PageNumber, cancellationToken);
 
             var items = findings.Select(f => new FindingItemDto(
-                f.FindingId, f.ScanResultId, f.RuleId,
+                f.FindingId, f.ScanResultId.Value, f.RuleId,
                 f.Category.ToString(), f.Severity.ToString(),
                 f.FilePath, f.LineNumber, f.Description, f.CweId, f.Status.ToString())).ToList();
 

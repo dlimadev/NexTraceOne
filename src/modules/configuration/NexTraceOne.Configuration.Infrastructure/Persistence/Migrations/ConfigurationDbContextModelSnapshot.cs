@@ -531,114 +531,6 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationAuditEntry", b =>
-                {
-                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationEntry", null)
-                        .WithMany()
-                        .HasForeignKey("EntryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationDefinition", b =>
-                {
-                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationModule", null)
-                        .WithMany()
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.SetNull);
-                });
-
-            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationEntry", b =>
-                {
-                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationDefinition", null)
-                        .WithMany()
-                        .HasForeignKey("DefinitionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagDefinition", b =>
-                {
-                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationModule", null)
-                        .WithMany()
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.SetNull);
-                });
-
-            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagEntry", b =>
-                {
-                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.FeatureFlagDefinition", null)
-                        .WithMany()
-                        .HasForeignKey("DefinitionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.UserSavedView", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Context")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("FiltersJson")
-                        .IsRequired()
-                        .HasMaxLength(8000)
-                        .HasColumnType("character varying(8000)");
-
-                    b.Property<bool>("IsShared")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("SortOrder")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId", "Context");
-
-                    b.HasIndex("IsShared")
-                        .HasFilter("\"IsShared\" = true");
-
-                    b.HasIndex("UserId", "TenantId", "Context", "Name")
-                        .IsUnique();
-
-                    b.ToTable("cfg_user_saved_views");
-                });
-
             modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.UserBookmark", b =>
                 {
                     b.Property<Guid>("Id")
@@ -685,7 +577,115 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId", "TenantId", "EntityType", "EntityId")
                         .IsUnique();
 
-                    b.ToTable("cfg_user_bookmarks");
+                    b.ToTable("cfg_user_bookmarks", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.UserSavedView", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Context")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("FiltersJson")
+                        .IsRequired()
+                        .HasMaxLength(8000)
+                        .HasColumnType("character varying(8000)");
+
+                    b.Property<bool>("IsShared")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsShared")
+                        .HasFilter("\"IsShared\" = true");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "Context");
+
+                    b.HasIndex("UserId", "TenantId", "Context", "Name")
+                        .IsUnique();
+
+                    b.ToTable("cfg_user_saved_views", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationAuditEntry", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationEntry", null)
+                        .WithMany()
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationDefinition", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationModule", null)
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ConfigurationEntry", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("DefinitionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagDefinition", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.ConfigurationModule", null)
+                        .WithMany()
+                        .HasForeignKey("ModuleId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.FeatureFlagEntry", b =>
+                {
+                    b.HasOne("NexTraceOne.Configuration.Domain.Entities.FeatureFlagDefinition", null)
+                        .WithMany()
+                        .HasForeignKey("DefinitionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

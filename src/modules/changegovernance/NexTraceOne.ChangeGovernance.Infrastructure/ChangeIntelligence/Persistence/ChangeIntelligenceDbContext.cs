@@ -48,6 +48,12 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Avaliações de viabilidade de rollback persistidas no módulo ChangeIntelligence.</summary>
     public DbSet<RollbackAssessment> RollbackAssessments => Set<RollbackAssessment>();
 
+    /// <summary>Estados de feature flags de releases persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ReleaseFeatureFlagState> FeatureFlagStates => Set<ReleaseFeatureFlagState>();
+
+    /// <summary>Registos de canary rollout de releases persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<CanaryRollout> CanaryRollouts => Set<CanaryRollout>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

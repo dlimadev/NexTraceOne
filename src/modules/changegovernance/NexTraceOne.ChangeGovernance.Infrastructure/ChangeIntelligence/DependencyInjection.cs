@@ -51,6 +51,8 @@ public static class DependencyInjection
         services.AddScoped<IObservationWindowRepository, ObservationWindowRepository>();
         services.AddScoped<IPostReleaseReviewRepository, PostReleaseReviewRepository>();
         services.AddScoped<IRollbackAssessmentRepository, RollbackAssessmentRepository>();
+        services.AddScoped<IFeatureFlagStateRepository, FeatureFlagStateRepository>();
+        services.AddScoped<ICanaryRolloutRepository, CanaryRolloutRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
 

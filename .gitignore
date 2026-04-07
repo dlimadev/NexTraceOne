@@ -19,9 +19,21 @@ logs/
 node_modules/
 obj/
 sign.pfx
+
+# Frontend build and test artifacts
 src/frontend/.vite/
 src/frontend/dist/
+src/frontend/dist-ssr/
+src/frontend/obj/
 src/frontend/node_modules/
+src/frontend/coverage/
+src/frontend/playwright-report/
+src/frontend/test-results/
+src/frontend/blob-report/
+
+# Backend publish artifacts
+src/**/publish/
+tests/**/publish/
 
 # Sensitive configuration — never commit real credentials
 appsettings.Development.json

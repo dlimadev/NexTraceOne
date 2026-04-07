@@ -19,6 +19,7 @@ internal sealed class UserSavedViewConfiguration : IEntityTypeConfiguration<User
         builder.Property(x => x.Description).HasMaxLength(1000);
         builder.Property(x => x.FiltersJson).HasMaxLength(8000).IsRequired();
         builder.Property(x => x.SortOrder).HasDefaultValue(0);
+        builder.Property(x => x.IsShared).HasDefaultValue(false);
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.UpdatedAt).HasColumnType("timestamp with time zone");
 

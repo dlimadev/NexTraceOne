@@ -13,7 +13,7 @@ public sealed class PackageDependency
     private PackageDependency() { }
 
     public Guid Id { get; private set; }
-    public Guid ProfileId { get; private set; }
+    public ServiceDependencyProfileId ProfileId { get; private set; } = null!;
     public string PackageName { get; private set; } = string.Empty;
     public string Version { get; private set; } = string.Empty;
     public PackageEcosystem Ecosystem { get; private set; }
@@ -41,7 +41,7 @@ public sealed class PackageDependency
         return new PackageDependency
         {
             Id = Guid.NewGuid(),
-            ProfileId = profileId,
+            ProfileId = new ServiceDependencyProfileId(profileId),
             PackageName = packageName.Trim(),
             Version = version.Trim(),
             Ecosystem = ecosystem,

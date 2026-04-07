@@ -30,4 +30,8 @@
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DependencyGovernance\Persistence\Migrations\" />
+    <Folder Include="Templates\Persistence\Migrations\" />
+  </ItemGroup>
 </Project>
