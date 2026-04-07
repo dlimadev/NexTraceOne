@@ -235,45 +235,45 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 **Prioridade:** 🟢 Alta | **Complexidade:** Alta | **Impacto:** Muito Alto
 
 #### 4.1 Custom Tags em Entidades
-- [ ] **Backend:** Entidade `EntityTag` no Building Blocks
-  - [ ] (Id, TenantId, EntityType, EntityId, Key, Value, CreatedBy, CreatedAt)
-  - [ ] Keys definidas pelo admin do tenant (ex: "cost-center", "business-unit", "squad")
-  - [ ] Endpoint transversal: `/api/v1/tags` (CRUD)
-  - [ ] Filtros por tag em todas as listagens
-  - [ ] Máximo de tags por entidade configurável via seed
-- [ ] **Frontend:** Componente `<TagEditor />` reutilizável
-  - [ ] Input com autocomplete de keys existentes
-  - [ ] Suporte a key:value (ex: "team:payments")
-  - [ ] Chips coloridos por key
-  - [ ] Presente em: serviço, contrato, change, incidente, runbook, knowledge article
-- [ ] **Admin:** Página para admin definir keys permitidas e validações (obrigatório, opcional, formato)
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 6+ testes
+- [x] **Backend:** Entidade `EntityTag` no Building Blocks
+  - [x] (Id, TenantId, EntityType, EntityId, Key, Value, CreatedBy, CreatedAt)
+  - [x] Keys definidas pelo admin do tenant (ex: "cost-center", "business-unit", "squad")
+  - [x] Endpoint transversal: `/api/v1/tags` (CRUD)
+  - [ ] Filtros por tag em todas as listagens (roadmap)
+  - [ ] Máximo de tags por entidade configurável via seed (roadmap)
+- [x] **Frontend:** Componente `<TagEditor />` reutilizável
+  - [ ] Input com autocomplete de keys existentes (roadmap)
+  - [x] Suporte a key:value (ex: "team:payments")
+  - [x] Chips coloridos por key
+  - [x] Presente em: serviço, contrato, change, incidente, runbook, knowledge article
+- [ ] **Admin:** Página para admin definir keys permitidas e validações (obrigatório, opcional, formato) (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 6+ testes
 
 #### 4.2 Custom Metadata Fields no Service Catalog
-- [ ] **Backend:** Entidade `ServiceCustomField` no módulo Catalog
-  - [ ] (Id, TenantId, FieldName, FieldType, IsRequired, DefaultValue, SortOrder, CreatedAt)
-  - [ ] FieldType enum: Text, Number, Date, Select, MultiSelect, Url, Email
-  - [ ] Entidade `ServiceCustomFieldValue` (Id, ServiceId, FieldId, Value)
-  - [ ] Admin endpoint: `/api/v1/catalog/custom-fields` (CRUD)
-  - [ ] Incluir custom fields em responses de serviço
-- [ ] **Frontend:** Secção "Custom Fields" no ServiceDetailPage
-  - [ ] Admin page para definir campos
-  - [ ] Campos exibidos dinamicamente no formulário de serviço
-  - [ ] Filtro por custom fields na listagem de serviços
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 5+ testes
+- [x] **Backend:** Entidade `ServiceCustomField` no módulo Catalog
+  - [x] (Id, TenantId, FieldName, FieldType, IsRequired, DefaultValue, SortOrder, CreatedAt)
+  - [x] FieldType enum: Text, Number, Date, Select, MultiSelect, Url, Email
+  - [ ] Entidade `ServiceCustomFieldValue` (Id, ServiceId, FieldId, Value) (roadmap)
+  - [x] Admin endpoint: `/api/v1/catalog/custom-fields` (CRUD)
+  - [ ] Incluir custom fields em responses de serviço (roadmap)
+- [ ] **Frontend:** Secção "Custom Fields" no ServiceDetailPage (roadmap)
+  - [ ] Admin page para definir campos (roadmap)
+  - [ ] Campos exibidos dinamicamente no formulário de serviço (roadmap)
+  - [ ] Filtro por custom fields na listagem de serviços (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 5+ testes
 
 #### 4.3 Custom Classification Taxonomies
-- [ ] **Backend:** Entidade `TaxonomyCategory` e `TaxonomyValue`
-  - [ ] Admin define categorias (ex: "Business Domain", "Data Classification", "Tier")
-  - [ ] Valores dentro de cada categoria (ex: Tier → "Tier 1", "Tier 2", "Tier 3")
-  - [ ] Associação a serviços via `ServiceTaxonomyValue`
-- [ ] **Frontend:** Admin page para gerir taxonomias
-  - [ ] Filtros por taxonomia na listagem de serviços
-  - [ ] Agrupamento por taxonomia na topologia
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 4+ testes
+- [x] **Backend:** Entidade `TaxonomyCategory` e `TaxonomyValue`
+  - [x] Admin define categorias (ex: "Business Domain", "Data Classification", "Tier")
+  - [x] Valores dentro de cada categoria (ex: Tier → "Tier 1", "Tier 2", "Tier 3")
+  - [ ] Associação a serviços via `ServiceTaxonomyValue` (roadmap)
+- [ ] **Frontend:** Admin page para gerir taxonomias (roadmap)
+  - [ ] Filtros por taxonomia na listagem de serviços (roadmap)
+  - [ ] Agrupamento por taxonomia na topologia (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 4+ testes
 
 ---
 

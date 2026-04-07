@@ -51,6 +51,11 @@ public static class DependencyInjection
         services.AddSingleton<IUserWatchRepository, InMemoryUserWatchRepository>();
         services.AddSingleton<IUserAlertRuleRepository, InMemoryUserAlertRuleRepository>();
 
+        // In-memory repositories for Phase 4 (MVP1 — persistência PostgreSQL a adicionar futuramente)
+        services.AddSingleton<IEntityTagRepository, InMemoryEntityTagRepository>();
+        services.AddSingleton<IServiceCustomFieldRepository, InMemoryServiceCustomFieldRepository>();
+        services.AddSingleton<ITaxonomyRepository, InMemoryTaxonomyRepository>();
+
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();
 
