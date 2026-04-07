@@ -15,12 +15,14 @@ internal sealed class EntityTagRepository(ConfigurationDbContext context) : IEnt
             .Where(t => t.TenantId == tenantId
                 && t.EntityType == entityType
                 && t.EntityId == entityId)
+            .OrderBy(t => t.Key)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<EntityTag>> ListByKeyAsync(string tenantId, string key, CancellationToken cancellationToken)
         => await context.EntityTags
             .Where(t => t.TenantId == tenantId && t.Key == key)
+            .OrderBy(t => t.EntityType).ThenBy(t => t.EntityId)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
