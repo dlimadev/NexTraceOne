@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../../../contexts/AuthContext';
 import { BarChart2, Plus, Trash2, Save } from 'lucide-react';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -111,9 +112,9 @@ const initialBuilder: BuilderState = {
 /** Página de criação e gestão de gráficos customizados. */
 export function CustomChartBuilderPage() {
   const { t } = useTranslation();
-  // TODO: replace with auth context values (tenantId from tenant resolution, userId from claims)
-  const tenantId = 'default';
-  const userId = 'current';
+  const { user, tenantId: authTenantId } = useAuth();
+  const tenantId = authTenantId ?? 'default';
+  const userId = user?.id ?? 'current';
 
   const { data, isLoading, isError } = useListCharts(userId, tenantId);
   const createChart = useCreateChart();
