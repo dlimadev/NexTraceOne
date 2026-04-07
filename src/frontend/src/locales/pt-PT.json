@@ -5356,7 +5356,8 @@
     "switchToLight": "Mudar para modo claro",
     "toggleLanguage": "Alternar idioma",
     "toggleTheme": "Alternar modo claro/escuro",
-    "switchToAuto": "Mudar para modo do sistema"
+    "switchToAuto": "Mudar para modo do sistema",
+    "selectLanguage": "Selecionar Idioma"
   },
   "identity": {
     "accessReview": {

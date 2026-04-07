@@ -5356,7 +5356,8 @@
     "switchToLight": "Switch to light mode",
     "toggleLanguage": "Toggle language",
     "toggleTheme": "Toggle dark/light mode",
-    "switchToAuto": "Switch to system mode"
+    "switchToAuto": "Switch to system mode",
+    "selectLanguage": "Select Language"
   },
   "identity": {
     "accessReview": {
