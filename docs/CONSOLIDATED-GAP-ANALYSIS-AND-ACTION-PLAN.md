@@ -69,7 +69,7 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 | GAP-CTR-01 | GraphQL Contracts — enum existe mas sem implementação real | ❌ Não implementado (PLANNED) |
 | GAP-CTR-02 | Protobuf Contracts — enum existe mas sem implementação real | ❌ Não implementado (PLANNED) |
 | GAP-CTR-03 | Contract Drift Detection — `DetectContractDrift` implementado com detecção de ghost endpoints + endpoints não declarados; `GET /api/v1/catalog/contracts/{id}/drift` | ✅ Implementado |
-| GAP-CTR-04 | 57 chaves de validação i18n em falta em todos os locales (builder validation messages) | ❌ Não implementado |
+| GAP-CTR-04 | 56 chaves de validação i18n para builders — todas presentes em 4 locales (en, pt-PT, pt-BR, es) | ✅ Implementado |
 | GAP-CTR-05 | Service Type Options hardcoded em `ServiceCatalogPage.tsx` (API Gateway, Framework/SDK) | 🟡 Média |
 | GAP-CTR-06 | Template Options hardcoded em `TemplateEditorPage.tsx` (gRPC, .NET, Node.js) | 🟡 Média |
 | GAP-CTR-07 | Full-Text Search Index (GIN index necessário) para catálogo | 🟡 Média |

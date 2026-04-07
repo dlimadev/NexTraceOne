@@ -269,31 +269,31 @@ export function ServiceCatalogPage() {
                       onChange={(e) => setServiceForm((f) => ({ ...f, serviceType: e.target.value }))}
                       className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                       <optgroup label={t('serviceCatalog.typeGroupModern', 'Modern Services')}>
-                        <option value="RestApi">REST API</option>
-                        <option value="GraphqlApi">GraphQL API</option>
+                        <option value="RestApi">{t('serviceCatalog.typeRestApi', 'REST API')}</option>
+                        <option value="GraphqlApi">{t('serviceCatalog.typeGraphqlApi', 'GraphQL API')}</option>
                         <option value="GrpcService">{t('serviceCatalog.typeGrpcService', 'gRPC Service')}</option>
-                        <option value="SoapService">SOAP Service</option>
-                        <option value="KafkaProducer">Kafka Producer</option>
-                        <option value="KafkaConsumer">Kafka Consumer</option>
-                        <option value="BackgroundService">Background Service</option>
-                        <option value="ScheduledProcess">Scheduled Process</option>
+                        <option value="SoapService">{t('serviceCatalog.typeSoapService', 'SOAP Service')}</option>
+                        <option value="KafkaProducer">{t('serviceCatalog.typeKafkaProducer', 'Kafka Producer')}</option>
+                        <option value="KafkaConsumer">{t('serviceCatalog.typeKafkaConsumer', 'Kafka Consumer')}</option>
+                        <option value="BackgroundService">{t('serviceCatalog.typeBackgroundService', 'Background Service')}</option>
+                        <option value="ScheduledProcess">{t('serviceCatalog.typeScheduledProcess', 'Scheduled Process')}</option>
                         <option value="Gateway">{t('serviceCatalog.typeGateway', 'API Gateway')}</option>
                       </optgroup>
                       <optgroup label={t('serviceCatalog.typeGroupPlatform', 'Platform & Integration')}>
-                        <option value="IntegrationComponent">Integration Component</option>
-                        <option value="SharedPlatformService">Shared Platform Service</option>
+                        <option value="IntegrationComponent">{t('serviceCatalog.typeIntegrationComponent', 'Integration Component')}</option>
+                        <option value="SharedPlatformService">{t('serviceCatalog.typeSharedPlatformService', 'Shared Platform Service')}</option>
                         <option value="Framework">{t('serviceCatalog.typeFramework', 'Framework / SDK')}</option>
-                        <option value="ThirdParty">Third-Party Service</option>
-                        <option value="LegacySystem">Legacy System</option>
+                        <option value="ThirdParty">{t('serviceCatalog.typeThirdParty', 'Third-Party Service')}</option>
+                        <option value="LegacySystem">{t('serviceCatalog.typeLegacySystem', 'Legacy System')}</option>
                       </optgroup>
                       <optgroup label={t('serviceCatalog.typeGroupMainframe', 'Mainframe')}>
-                        <option value="CobolProgram">COBOL Program</option>
-                        <option value="CicsTransaction">CICS Transaction</option>
-                        <option value="ImsTransaction">IMS Transaction</option>
-                        <option value="BatchJob">Batch Job</option>
-                        <option value="MainframeSystem">Mainframe System</option>
-                        <option value="MqQueueManager">MQ Queue Manager</option>
-                        <option value="ZosConnectApi">z/OS Connect API</option>
+                        <option value="CobolProgram">{t('serviceCatalog.typeCobolProgram', 'COBOL Program')}</option>
+                        <option value="CicsTransaction">{t('serviceCatalog.typeCicsTransaction', 'CICS Transaction')}</option>
+                        <option value="ImsTransaction">{t('serviceCatalog.typeImsTransaction', 'IMS Transaction')}</option>
+                        <option value="BatchJob">{t('serviceCatalog.typeBatchJob', 'Batch Job')}</option>
+                        <option value="MainframeSystem">{t('serviceCatalog.typeMainframeSystem', 'Mainframe System')}</option>
+                        <option value="MqQueueManager">{t('serviceCatalog.typeMqQueueManager', 'MQ Queue Manager')}</option>
+                        <option value="ZosConnectApi">{t('serviceCatalog.typeZosConnectApi', 'z/OS Connect API')}</option>
                       </optgroup>
                     </select>
                   </div>
