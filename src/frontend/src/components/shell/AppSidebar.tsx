@@ -93,6 +93,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.dependencyDashboard', to: '/catalog/dependency-dashboard', icon: <Shield size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.licenseCompliance', to: '/catalog/license-compliance', icon: <CheckSquare size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.apiPolicyAsCode', to: '/governance/api-policy-as-code', icon: <FileCode size={18} />, permission: 'governance:policies:read', section: 'governance' },
+  { labelKey: 'sidebar.governanceGates', to: '/governance/gates', icon: <ShieldCheck size={18} />, permission: 'governance:gates:read', section: 'governance' },
   { labelKey: 'sidebar.teams', to: '/governance/teams', icon: <Users size={18} />, permission: 'governance:teams:read', section: 'organization' },
   { labelKey: 'sidebar.domains', to: '/governance/domains', icon: <Globe size={18} />, permission: 'governance:domains:read', section: 'organization' },
   { labelKey: 'sidebar.delegatedAdmin', to: '/governance/delegated-admin', icon: <UserCheck size={18} />, permission: 'governance:admin:read', section: 'organization' },
@@ -108,6 +109,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:trail:read', section: 'admin' },
   { labelKey: 'sidebar.platformOperations', to: '/platform/operations', icon: <Server size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.userPreferences', to: '/user-preferences', icon: <Settings size={18} />, section: 'admin' },
 ];
 
 const sectionLabels: Record<NavSection, string> = {

@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using FourEyesFeature = NexTraceOne.Governance.Application.Features.EvaluateFourEyesPrinciple.EvaluateFourEyesPrinciple;
 using CabFeature = NexTraceOne.Governance.Application.Features.EvaluateChangeAdvisoryBoard.EvaluateChangeAdvisoryBoard;
+using ErrorBudgetFeature = NexTraceOne.Governance.Application.Features.EvaluateErrorBudgetGate.EvaluateErrorBudgetGate;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -47,6 +48,20 @@ public sealed class GovernanceGatesEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new CabFeature.Query(serviceName, environment, criticality, blastRadius);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:gates:read");
+
+        // Error Budget gate evaluation
+        group.MapGet("/error-budget", async (
+            string serviceName,
+            string environment,
+            decimal errorBudgetRemainingPct,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ErrorBudgetFeature.Query(serviceName, environment, errorBudgetRemainingPct);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:gates:read");

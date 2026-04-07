@@ -7409,6 +7409,16 @@
         "roles.crud.created": "Role created successfully",
         "roles.crud.updated": "Role updated successfully",
         "roles.crud.deleted": "Role deleted successfully",
-        "roles.crud.confirmDelete": "Are you sure you want to delete this role?"
+        "roles.crud.confirmDelete": "Are you sure you want to delete this role?",
+        "sidebar.governanceGates": "Governance Gates",
+        "sidebar.userPreferences": "User Preferences",
+        "governance.gates.title": "Governance Gates",
+        "governance.gates.subtitle": "Evaluate governance gates before critical actions",
+        "governance.gates.evaluate": "Evaluate",
+        "governance.gates.errorBudget.title": "Error Budget Gate",
+        "governance.gates.errorBudget.description": "Evaluate if error budget allows deployment",
+        "governance.gates.errorBudget.serviceName": "Service name",
+        "governance.gates.errorBudget.environment": "Environment",
+        "governance.gates.errorBudget.remainingPct": "Budget remaining %"
     }
 }

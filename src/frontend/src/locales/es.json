@@ -7403,6 +7403,16 @@
         "roles.crud.created": "Rol creado correctamente",
         "roles.crud.updated": "Rol actualizado correctamente",
         "roles.crud.deleted": "Rol eliminado correctamente",
-        "roles.crud.confirmDelete": "¿Está seguro de que desea eliminar este rol?"
+        "roles.crud.confirmDelete": "¿Está seguro de que desea eliminar este rol?",
+        "sidebar.governanceGates": "Puertas de Gobernanza",
+        "sidebar.userPreferences": "Preferencias del Usuario",
+        "governance.gates.title": "Puertas de Gobernanza",
+        "governance.gates.subtitle": "Evaluar puertas de gobernanza antes de acciones críticas",
+        "governance.gates.evaluate": "Evaluar",
+        "governance.gates.errorBudget.title": "Puerta de Error Budget",
+        "governance.gates.errorBudget.description": "Evaluar si el error budget permite despliegue",
+        "governance.gates.errorBudget.serviceName": "Nombre del servicio",
+        "governance.gates.errorBudget.environment": "Ambiente",
+        "governance.gates.errorBudget.remainingPct": "Budget restante %"
     }
 }

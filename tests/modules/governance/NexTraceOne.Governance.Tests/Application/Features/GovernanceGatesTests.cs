@@ -7,6 +7,7 @@ using NexTraceOne.Configuration.Domain.Enums;
 
 using FourEyesFeature = NexTraceOne.Governance.Application.Features.EvaluateFourEyesPrinciple.EvaluateFourEyesPrinciple;
 using CabFeature = NexTraceOne.Governance.Application.Features.EvaluateChangeAdvisoryBoard.EvaluateChangeAdvisoryBoard;
+using ErrorBudgetFeature = NexTraceOne.Governance.Application.Features.EvaluateErrorBudgetGate.EvaluateErrorBudgetGate;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 
@@ -170,5 +171,54 @@ public sealed class GovernanceGatesTests
         result.IsSuccess.Should().BeTrue();
         result.Value.CabRequired.Should().BeFalse();
         result.Value.IsApproved.Should().BeTrue();
+    }
+
+    // ── Error Budget Gate ───────────────────────────────────
+
+    [Fact]
+    public async Task ErrorBudget_Should_Not_Block_When_Disabled()
+    {
+        var (config, dt) = CreateMocks();
+        config.ResolveEffectiveValueAsync("reliability.error_budget.auto_block_deploys", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(CreateConfig("reliability.error_budget.auto_block_deploys", "false"));
+
+        var sut = new ErrorBudgetFeature.Handler(config, dt);
+        var result = await sut.Handle(new ErrorBudgetFeature.Query("order-service", "production", 5m), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.IsBlocked.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ErrorBudget_Should_Block_When_Below_Threshold()
+    {
+        var (config, dt) = CreateMocks();
+        config.ResolveEffectiveValueAsync("reliability.error_budget.auto_block_deploys", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(CreateConfig("reliability.error_budget.auto_block_deploys", "true"));
+        config.ResolveEffectiveValueAsync("reliability.error_budget.block_threshold_pct", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(CreateConfig("reliability.error_budget.block_threshold_pct", "10"));
+
+        var sut = new ErrorBudgetFeature.Handler(config, dt);
+        var result = await sut.Handle(new ErrorBudgetFeature.Query("order-service", "production", 5m), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.IsBlocked.Should().BeTrue();
+        result.Value.BlockThresholdPct.Should().Be(10m);
+    }
+
+    [Fact]
+    public async Task ErrorBudget_Should_Allow_When_Above_Threshold()
+    {
+        var (config, dt) = CreateMocks();
+        config.ResolveEffectiveValueAsync("reliability.error_budget.auto_block_deploys", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(CreateConfig("reliability.error_budget.auto_block_deploys", "true"));
+        config.ResolveEffectiveValueAsync("reliability.error_budget.block_threshold_pct", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(CreateConfig("reliability.error_budget.block_threshold_pct", "10"));
+
+        var sut = new ErrorBudgetFeature.Handler(config, dt);
+        var result = await sut.Handle(new ErrorBudgetFeature.Query("order-service", "production", 25m), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.IsBlocked.Should().BeFalse();
     }
 }
