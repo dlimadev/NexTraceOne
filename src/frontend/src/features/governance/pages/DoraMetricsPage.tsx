@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, StatsGrid, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -237,42 +238,50 @@ export function DoraMetricsPage() {
       )}
 
       {/* Trend data points */}
-      {trendData && trendData.dataPoints.length > 0 && (
+      {trendData && (
         <PageSection title={t('governance.dora.trendDataPoints')}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="py-2 px-3 text-left text-xs text-gray-500">{t('governance.dora.period')}</th>
-                  <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.deployFreq')}</th>
-                  <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.leadTime')}</th>
-                  <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.cfr')}</th>
-                  <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.mttr')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trendData.dataPoints.map((point, idx) => (
-                  <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/20">
-                    <td className="py-2 px-3 text-gray-700 dark:text-gray-300">
-                      {new Date(point.periodStart).toLocaleDateString()}
-                    </td>
-                    <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
-                      {point.deploymentFrequency}
-                    </td>
-                    <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
-                      {point.leadTimeHours}h
-                    </td>
-                    <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
-                      {point.changeFailureRatePct}%
-                    </td>
-                    <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
-                      {point.mttrHours}h
-                    </td>
+          {trendData.dataPoints.length === 0 ? (
+            <EmptyState
+              title={t('governance.dora.trendEmpty', 'No trend data points')}
+              description={t('governance.dora.trendEmptyDescription', 'Trend data points will appear here once enough deployment data is collected.')}
+              size="compact"
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="py-2 px-3 text-left text-xs text-gray-500">{t('governance.dora.period')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.deployFreq')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.leadTime')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.cfr')}</th>
+                    <th className="py-2 px-3 text-right text-xs text-gray-500">{t('governance.dora.mttr')}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {trendData.dataPoints.map((point, idx) => (
+                    <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/20">
+                      <td className="py-2 px-3 text-gray-700 dark:text-gray-300">
+                        {new Date(point.periodStart).toLocaleDateString()}
+                      </td>
+                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                        {point.deploymentFrequency}
+                      </td>
+                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                        {point.leadTimeHours}h
+                      </td>
+                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                        {point.changeFailureRatePct}%
+                      </td>
+                      <td className="py-2 px-3 text-right text-gray-700 dark:text-gray-300">
+                        {point.mttrHours}h
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </PageSection>
       )}
     </PageContainer>

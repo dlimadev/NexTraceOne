@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -220,16 +221,11 @@ export function TechnicalDebtPage() {
         title={`${t('governance.technicalDebt.title')} (${data?.debtItems.length ?? 0})`}
       >
         {data?.debtItems.length === 0 ? (
-          <Card>
-            <CardBody>
-              <p className="text-center text-gray-500 dark:text-gray-400 py-6">
-                {t('governance.technicalDebt.noDebt')}
-              </p>
-              <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-                {t('governance.technicalDebt.noDebtHint')}
-              </p>
-            </CardBody>
-          </Card>
+          <EmptyState
+            title={t('governance.technicalDebt.empty', 'No technical debt recorded')}
+            description={t('governance.technicalDebt.emptyDescription', 'Record technical debt items using the form below to track and prioritize remediation.')}
+            size="compact"
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

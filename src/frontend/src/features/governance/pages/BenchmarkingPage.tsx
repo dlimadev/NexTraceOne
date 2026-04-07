@@ -12,6 +12,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import { executiveApi } from '../api/executive';
 import type {
   CostEfficiencyType,
@@ -85,6 +86,13 @@ export function BenchmarkingPage() {
       </div>
 
       {/* Comparisons */}
+      {d.comparisons.length === 0 ? (
+        <EmptyState
+          title={t('governance.benchmarking.empty', 'No benchmarking data available')}
+          description={t('governance.benchmarking.emptyDescription', 'Benchmarking comparisons will appear here once enough governance data is collected.')}
+          size="compact"
+        />
+      ) : (
       <div className="space-y-6">
         {d.comparisons.map(comp => (
           <Card key={comp.groupId}>
@@ -174,6 +182,7 @@ export function BenchmarkingPage() {
           </Card>
         ))}
       </div>
+      )}
     </PageContainer>
   );
 }

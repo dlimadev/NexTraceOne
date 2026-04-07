@@ -12,6 +12,7 @@ import { PageContainer, PageSection, ContentGrid } from '../../../components/she
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { EmptyState } from '../../../components/EmptyState';
 import type { RiskSummaryResponse, RiskLevel } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
@@ -131,7 +132,11 @@ export function RiskCenterPage() {
           <CardBody className="p-0">
             <div className="divide-y divide-edge">
               {filtered.length === 0 ? (
-                <div className="p-8 text-center text-muted text-sm">{t('common.noResults')}</div>
+                <EmptyState
+                  title={t('governance.riskCenter.empty', 'No risk indicators found')}
+                  description={t('governance.riskCenter.emptyDescription', 'No risk indicators match your current filters. Try adjusting your search or filter criteria.')}
+                  size="compact"
+                />
               ) : (
                 filtered.map(ind => (
                   <div key={ind.packId} className="px-4 py-3 hover:bg-hover transition-colors">
