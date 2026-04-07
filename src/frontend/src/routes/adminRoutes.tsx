@@ -31,6 +31,7 @@ const AdvancedConfigurationConsolePage = lazy(() => import('../features/configur
 const UserPreferencesPage = lazy(() => import('../features/configuration/pages/UserPreferencesPage').then(m => ({ default: m.UserPreferencesPage })));
 const ParameterUsageReportPage = lazy(() => import('../features/configuration/pages/ParameterUsageReportPage').then(m => ({ default: m.ParameterUsageReportPage })));
 const ParameterComplianceDashboardPage = lazy(() => import('../features/configuration/pages/ParameterComplianceDashboardPage').then(m => ({ default: m.ParameterComplianceDashboardPage })));
+const BrandingAdminPage = lazy(() => import('../features/configuration/pages/BrandingAdminPage').then(m => ({ default: m.BrandingAdminPage })));
 const WorkflowConfigurationPage = lazy(() => import('../features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
 const CatalogContractsConfigurationPage = lazy(() => import('../features/catalog/pages/CatalogContractsConfigurationPage').then(m => ({ default: m.CatalogContractsConfigurationPage })));
 const OperationsFinOpsConfigurationPage = lazy(() => import('../features/operational-intelligence/pages/OperationsFinOpsConfigurationPage').then(m => ({ default: m.OperationsFinOpsConfigurationPage })));
@@ -212,6 +213,14 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="configuration:analytics:read" redirectTo="/unauthorized">
             <ParameterComplianceDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/platform/branding"
+        element={
+          <ProtectedRoute permission="configuration:admin" redirectTo="/unauthorized">
+            <BrandingAdminPage />
           </ProtectedRoute>
         }
       />

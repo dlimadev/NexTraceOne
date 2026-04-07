@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { EnvironmentProvider } from './contexts/EnvironmentContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { BrandingProvider } from './contexts/BrandingContext';
 import { ToastProvider } from './components/Toast';
 import { AppShell } from './components/shell/AppShell';
 
@@ -47,6 +48,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+      <BrandingProvider>
       <AuthProvider>
         <EnvironmentProvider>
           <PersonaProvider>
@@ -88,6 +90,7 @@ export default function App() {
           </PersonaProvider>
         </EnvironmentProvider>
       </AuthProvider>
+      </BrandingProvider>
       </ThemeProvider>
       {/* PHASE-0 guardrail: ReactQueryDevtools must only render in DEV.
           The import.meta.env.DEV flag is evaluated at build time by Vite —

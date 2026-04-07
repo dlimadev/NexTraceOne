@@ -6251,7 +6251,8 @@
     "dependencyDashboard": "Panel de Dependencias",
     "licenseCompliance": "Conformidad de Licencias",
     "parameterUsageReport": "Uso de Parámetros",
-    "parameterCompliance": "Cumplimiento de Parámetros"
+    "parameterCompliance": "Cumplimiento de Parámetros",
+    "branding": "Marca e Identidad"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -8233,6 +8234,34 @@
       "editable": "Editable",
       "readOnly": "Solo Lectura",
       "deprecatedList": "Parámetros Obsoletos"
+    }
+  },
+  "footer": {
+    "default": "Powered by {{name}} — Plataforma de Confianza Operacional"
+  },
+  "branding": {
+    "admin": {
+      "title": "Marca e Identidad",
+      "description": "Personalice la identidad visual de la plataforma, logotipos, colores y contenido",
+      "identity": {
+        "title": "Identidad de la Instancia"
+      },
+      "visual": {
+        "title": "Personalización Visual"
+      },
+      "content": {
+        "title": "Contenido y Mensajes"
+      },
+      "preview": {
+        "title": "Vista Previa",
+        "light": "Modo Claro",
+        "dark": "Modo Oscuro",
+        "primaryButton": "Acción Principal",
+        "secondaryButton": "Secundario"
+      },
+      "save": "Guardar Marca",
+      "saved": "Marca guardada exitosamente",
+      "error": "Error al guardar marca"
     }
   }
 }
