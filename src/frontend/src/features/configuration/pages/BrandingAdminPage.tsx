@@ -49,16 +49,14 @@ const BRANDING_FIELDS: BrandingField[] = [
 const BRANDING_KEYS = BRANDING_FIELDS.map((f) => f.key);
 
 async function fetchBrandingSettings(): Promise<EffectiveConfigurationDto[]> {
-  const results: EffectiveConfigurationDto[] = [];
-  for (const key of BRANDING_KEYS) {
-    try {
-      const result = await configurationApi.getEffectiveSettings('System', null, key);
-      results.push(...result);
-    } catch {
-      // Key may not exist yet
-    }
-  }
-  return results;
+  const settled = await Promise.allSettled(
+    BRANDING_KEYS.map((key) =>
+      configurationApi.getEffectiveSettings('System', null, key),
+    ),
+  );
+  return settled.flatMap((r) =>
+    r.status === 'fulfilled' ? r.value : [],
+  );
 }
 
 export function BrandingAdminPage() {
@@ -86,16 +84,15 @@ export function BrandingAdminPage() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      for (const key of BRANDING_KEYS) {
-        const value = values[key];
-        if (value !== undefined) {
-          await configurationApi.setConfigurationValue(key, {
-            value,
+      await Promise.all(
+        BRANDING_KEYS.filter((key) => values[key] !== undefined).map((key) =>
+          configurationApi.setConfigurationValue(key, {
+            value: values[key],
             scope: 'System',
             changeReason: 'Branding update via admin page',
-          });
-        }
-      }
+          }),
+        ),
+      );
     },
     onSuccess: () => {
       setSaveStatus('saved');

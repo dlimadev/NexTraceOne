@@ -216,9 +216,7 @@ export function UserPreferencesPage() {
         ['notifications.user.digest_frequency_hours', String(digestFrequency)],
         ['notifications.user.categories_subscribed', JSON.stringify(subscribedCategories)],
       ];
-      for (const [key, value] of prefs) {
-        await savePreference(key, value);
-      }
+      await Promise.all(prefs.map(([key, value]) => savePreference(key, value)));
       // Apply language change
       if (selectedLanguage !== i18n.language) {
         await i18n.changeLanguage(selectedLanguage);

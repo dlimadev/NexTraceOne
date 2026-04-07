@@ -118,20 +118,14 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery({
     queryKey: ['branding-settings'],
     queryFn: async () => {
-      const results: EffectiveConfigurationDto[] = [];
-      for (const key of BRANDING_KEYS) {
-        try {
-          const result = await configurationApi.getEffectiveSettings(
-            'System',
-            null,
-            key,
-          );
-          results.push(...result);
-        } catch {
-          // Branding keys may not be available yet — graceful degradation
-        }
-      }
-      return results;
+      const settled = await Promise.allSettled(
+        BRANDING_KEYS.map((key) =>
+          configurationApi.getEffectiveSettings('System', null, key),
+        ),
+      );
+      return settled.flatMap((r) =>
+        r.status === 'fulfilled' ? r.value : [],
+      );
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
