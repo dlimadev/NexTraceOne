@@ -1,3 +1,5 @@
+> **⚠️ ARCHIVED — April 2026**: Este documento foi supersedido por `docs/CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md`. Todos os core flows estão 100% funcionais. Mantido como referência histórica.
+
 # Core Flow Gaps — NexTraceOne
 **Last updated: April 2026 — aligned to deep analysis audit**
 

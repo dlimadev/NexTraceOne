@@ -1,3 +1,5 @@
+> **⚠️ ARCHIVED — April 2026**: Este documento foi supersedido por `docs/CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md`. Mantido como referência histórica.
+
 # Análise Profunda do Estado Real do NexTraceOne
 
 > **Data:** Abril 2026

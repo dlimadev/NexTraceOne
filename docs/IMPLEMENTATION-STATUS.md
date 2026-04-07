@@ -25,7 +25,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | BuildingBlocks.Infrastructure | READY | `NexTraceDbContextBase`, `TenantRlsInterceptor`, `AuditInterceptor` |
 | BuildingBlocks.Security | READY | JWT, API Key, CORS, rate limiting (6 policies), AES-256-GCM, `AssemblyIntegrityChecker` |
 | BuildingBlocks.Observability | READY | OpenTelemetry configurado; Elastic + ClickHouse providers reais; ITelemetryQueryService implementado; Product Store (5 reader/writer pairs) + Metrics Store (2 reader/writer pairs) com EF Core PostgreSQL; TelemetryRetentionService + TelemetryAggregationService implementados |
-| Outbox Processing | PARTIAL — gap crítico | Apenas `IdentityDbContext` tem processamento ativo; 23 outros DbContexts têm tabelas de outbox sem processamento |
+| Outbox Processing | READY | `ModuleOutboxProcessorJob` registado para todos os 25 DbContexts via `BackgroundWorkers/Program.cs` (54 registros). HealthChecks configurados por módulo |
 
 **Evidência:** `src/building-blocks/`
 
@@ -35,8 +35,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Feature Flags | PARTIAL | Database-driven, override por tenant, `ConfigurationDefinitionSeeder` |
-| Settings por tenant/ambiente | PARTIAL | Presente e funcional |
+| Feature Flags | READY | Database-driven, override por tenant, `ConfigurationDefinitionSeeder` com 458 seeds, 112 parâmetros em 17 domínios |
+| Settings por tenant/ambiente | READY | Presente e funcional, com governance gates e analytics endpoints |
 
 **DbContexts:** `ConfigurationDbContext` (migração confirmada)
 **Evidência:** `src/modules/configuration/`

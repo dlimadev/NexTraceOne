@@ -1,3 +1,5 @@
+> **⚠️ ARCHIVED — April 2026**: Este documento foi supersedido por `docs/SERVICES-CONTRACTS-ACTION-PLAN.md` (plano completo) e `docs/CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md` (estado global). Mantido como referência histórica.
+
 # Análise Detalhada: Módulo de Serviços e Contratos
 ## NexTraceOne — Abril 2026
 
