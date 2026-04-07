@@ -1,3 +1,5 @@
+> **⚠️ ARCHIVED — April 2026**: Este documento foi gerado como análise pontual de gaps. Muitos dos gaps aqui listados já foram resolvidos. Para o estado atual, consultar `docs/CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md` e `docs/IMPLEMENTATION-STATUS.md`.
+
 # Governance — Gaps, Erros e Pendências
 
 ## 1. Estado resumido do módulo

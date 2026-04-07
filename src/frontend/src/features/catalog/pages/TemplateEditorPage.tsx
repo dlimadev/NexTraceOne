@@ -303,12 +303,12 @@ export function TemplateEditorPage() {
                 onChange={e => updateField('serviceType', e.target.value as TemplateServiceType)}
                 disabled={isEditing}
               >
-                <option value="RestApi">REST API</option>
-                <option value="EventDriven">Event Driven</option>
-                <option value="BackgroundWorker">Background Worker</option>
+                <option value="RestApi">{t('templates.editor.serviceTypes.restApi', 'REST API')}</option>
+                <option value="EventDriven">{t('templates.editor.serviceTypes.eventDriven', 'Event Driven')}</option>
+                <option value="BackgroundWorker">{t('templates.editor.serviceTypes.backgroundWorker', 'Background Worker')}</option>
                 <option value="Grpc">{t('templates.editor.serviceTypes.grpc', 'gRPC')}</option>
-                <option value="Soap">SOAP</option>
-                <option value="Generic">Generic</option>
+                <option value="Soap">{t('templates.editor.serviceTypes.soap', 'SOAP')}</option>
+                <option value="Generic">{t('templates.editor.serviceTypes.generic', 'Generic')}</option>
               </select>
             </FormField>
 
@@ -321,10 +321,10 @@ export function TemplateEditorPage() {
               >
                 <option value="DotNet">{t('templates.editor.languages.dotnet', '.NET')}</option>
                 <option value="NodeJs">{t('templates.editor.languages.nodejs', 'Node.js')}</option>
-                <option value="Java">Java</option>
-                <option value="Go">Go</option>
-                <option value="Python">Python</option>
-                <option value="Agnostic">Agnostic</option>
+                <option value="Java">{t('templates.editor.languages.java', 'Java')}</option>
+                <option value="Go">{t('templates.editor.languages.go', 'Go')}</option>
+                <option value="Python">{t('templates.editor.languages.python', 'Python')}</option>
+                <option value="Agnostic">{t('templates.editor.languages.agnostic', 'Agnostic')}</option>
               </select>
             </FormField>
           </div>

@@ -6638,11 +6638,20 @@
         "scaffoldingManifest": "Array JSON de objetos { path, content }. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} como variáveis."
       },
       "serviceTypes": {
-        "grpc": "gRPC"
+        "grpc": "gRPC",
+        "restApi": "REST API",
+        "eventDriven": "Orientado a Eventos",
+        "backgroundWorker": "Worker em Background",
+        "soap": "SOAP",
+        "generic": "Genérico"
       },
       "languages": {
         "dotnet": ".NET",
-        "nodejs": "Node.js"
+        "nodejs": "Node.js",
+        "java": "Java",
+        "go": "Go",
+        "python": "Python",
+        "agnostic": "Agnóstico"
       }
     },
     "scaffold": {

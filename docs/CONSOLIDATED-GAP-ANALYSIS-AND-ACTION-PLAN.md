@@ -54,7 +54,7 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 | GAP-DOC-01 | `docs/IMPLEMENTATION-STATUS.md` — contagens de testes atualizadas, módulos AI Grounding/Guardrails corrigidos, Knowledge Graph/AutoDoc adicionados | ✅ Corrigido |
 | GAP-DOC-02 | `docs/CORE-FLOW-GAPS.md` — guardrails de segurança AI documentados (já implementados), grounding cross-module verificado | ✅ Corrigido |
 | GAP-DOC-03 | Documentação de deployment incompleta — bootstrap, connection strings, seed strategy, OTEL endpoint não documentados | 🟠 Alta |
-| GAP-DOC-04 | Falta disclaimer "ARCHIVED — outdated" em relatórios de Março 2026 referenciados como verdade atual | 🟢 Baixa |
+| GAP-DOC-04 | 22 ficheiros em `analysis-output/` marcados com disclaimer "ARCHIVED" — referência atual é `CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md` | ✅ Corrigido |
 | GAP-DOC-05 | XML doc comments em Governance FinOps DTOs — 6 handlers corrigidos para refletir `IsSimulated: false` (dados reais) | ✅ Corrigido |
 
 ---
@@ -70,8 +70,8 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 | GAP-CTR-02 | Protobuf Contracts — enum existe mas sem implementação real | ❌ Não implementado (PLANNED) |
 | GAP-CTR-03 | Contract Drift Detection — `DetectContractDrift` implementado com detecção de ghost endpoints + endpoints não declarados; `GET /api/v1/catalog/contracts/{id}/drift` | ✅ Implementado |
 | GAP-CTR-04 | 56 chaves de validação i18n para builders — todas presentes em 4 locales (en, pt-PT, pt-BR, es) | ✅ Implementado |
-| GAP-CTR-05 | Service Type Options hardcoded em `ServiceCatalogPage.tsx` (API Gateway, Framework/SDK) | 🟡 Média |
-| GAP-CTR-06 | Template Options hardcoded em `TemplateEditorPage.tsx` (gRPC, .NET, Node.js) | 🟡 Média |
+| GAP-CTR-05 | Service Type options em `ServiceCatalogPage.tsx` — todas as 22 opções agora usam i18n keys via `t()` | ✅ Corrigido |
+| GAP-CTR-06 | Template options em `TemplateEditorPage.tsx` — todas as 12 opções agora usam i18n keys via `t()` | ✅ Corrigido |
 | GAP-CTR-07 | Full-Text Search Index (GIN index necessário) para catálogo | 🟡 Média |
 | GAP-CTR-08 | `.AsNoTracking()` — implementado ao nível do repositório (EfDeveloperSurveyRepository, ServiceAssetRepository, ProductivitySnapshotRepository, DxScoreRepository, etc.) | ✅ Implementado (repository layer) |
 | GAP-CTR-09 | Frontend Unit Tests — 0 testes para VisualRestBuilder, VisualSoapBuilder, VisualEventBuilder, ServiceRegistrationWizard, ContractHealthDashboard | 🟠 Alta |
@@ -240,7 +240,7 @@ O plano está organizado em **6 fases**, priorizadas por impacto no produto e de
 |---|------|-----------------|--------|
 | 1.1 | ~~Atualizar `docs/IMPLEMENTATION-STATUS.md` — corrigir as 9+ afirmações incorretas, refletir estado real~~ | GAP-DOC-01 | ✅ Concluído |
 | 1.2 | ~~Atualizar `docs/CORE-FLOW-GAPS.md` — documentar guardrails AI, corrigir status grounding~~ | GAP-DOC-02 | ✅ Concluído |
-| 1.3 | Adicionar disclaimer "ARCHIVED" em documentação desatualizada de Março 2026 | GAP-DOC-04 | ⬜ Pendente |
+| 1.3 | ~~Adicionar disclaimer "ARCHIVED" em documentação desatualizada~~ — 22 ficheiros em analysis-output/ marcados | GAP-DOC-04 | ✅ Concluído |
 | 1.4 | ~~Corrigir XML doc comments FinOps DTOs (`IsSimulated` discrepancy)~~ | GAP-DOC-05 | ✅ Concluído |
 | 1.5 | Documentar production bootstrap strategy (admin inicial, primeiro tenant, config mínima) | GAP-SEED-03 | ⬜ Pendente |
 | 1.6 | Documentar deployment completo (connection strings, OTEL endpoints, seeds) | GAP-DOC-03 | ⬜ Pendente |
@@ -263,9 +263,9 @@ O plano está organizado em **6 fases**, priorizadas por impacto no produto e de
 | 2.3 | Implementar persona awareness na DashboardPage (engineer, tech lead, exec, admin) | GAP-FE-04 | ⬜ Pendente |
 | 2.4 | ~~Remover `DemoBanner.tsx` + test file — dead code eliminado~~ | GAP-FE-05 | ✅ Concluído |
 | 2.5 | ~~Remover duplicação de `ProductAnalyticsOverviewPage.tsx` wrapper~~ | GAP-FE-06 | ✅ Concluído |
-| 2.6 | Adicionar 57 chaves de validação i18n em falta para contract builders | GAP-CTR-04 | ⬜ Pendente |
-| 2.7 | Substituir hardcoded options por parametrização: ServiceType no `ServiceCatalogPage.tsx` | GAP-CTR-05 | ⬜ Pendente |
-| 2.8 | Substituir hardcoded options por parametrização: Templates no `TemplateEditorPage.tsx` | GAP-CTR-06 | ⬜ Pendente |
+| 2.6 | ~~56 chaves de validação i18n para builders — verificadas como presentes em 4 locales~~ | GAP-CTR-04 | ✅ Já implementado |
+| 2.7 | ~~Substituir hardcoded options por i18n: ServiceType no `ServiceCatalogPage.tsx` — 18 keys adicionadas~~ | GAP-CTR-05 | ✅ Concluído |
+| 2.8 | ~~Substituir hardcoded options por i18n: Templates no `TemplateEditorPage.tsx` — 9 keys adicionadas~~ | GAP-CTR-06 | ✅ Concluído |
 
 **Entregável:** Frontend consistente com error handling e UX completa.
 
