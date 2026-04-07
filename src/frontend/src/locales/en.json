@@ -785,7 +785,8 @@
     "tagline": "Sovereign Engineering Governance Platform",
     "trustCompliant": "Enterprise compliant",
     "trustEncrypted": "Encrypted in transit",
-    "welcomeTitle": "Welcome to NexTraceOne"
+    "welcomeTitle": "Welcome to NexTraceOne",
+    "logoAlt": "Organization logo"
   },
   "authorization": {
     "accessDenied": "Access Denied",
@@ -8319,7 +8320,69 @@
     "userPreferences.home.widget_knowledgeActivity": "Knowledge Activity",
     "userPreferences.home.widget_aiUsage": "AI Usage",
     "userPreferences.home.widget_securityFindings": "Security Findings",
-    "userPreferences.home.widget_releaseCalendar": "Release Calendar"
+    "userPreferences.home.widget_releaseCalendar": "Release Calendar",
+    "branding": {
+      "login_logo_url": {
+        "label": "Login Page Logo",
+        "description": "Custom logo displayed on the login card. Falls back to the default NexTraceOne icon if not set."
+      },
+      "login_heading": {
+        "label": "Login Heading",
+        "description": "Custom heading displayed on the login card (e.g. 'Welcome to Your Platform')."
+      },
+      "login_subheading": {
+        "label": "Login Subheading",
+        "description": "Custom subheading text displayed below the login heading."
+      },
+      "login_background_url": {
+        "label": "Login Background Image",
+        "description": "Background image URL for the login page left panel."
+      },
+      "login_sso_button_text": {
+        "label": "SSO Button Text",
+        "description": "Custom text for the SSO sign-in button (e.g. 'Sign in with Corporate SSO')."
+      },
+      "login_help_text": {
+        "label": "Login Help Text",
+        "description": "Custom help text displayed below the login form."
+      },
+      "powered_by_visible": {
+        "label": "Show 'Powered by NexTraceOne'",
+        "description": "When enabled, displays the 'Powered by NexTraceOne' watermark in the application footer."
+      }
+    },
+    "platform": {
+      "custom_links": {
+        "enabled": {
+          "label": "Custom Navigation Links",
+          "description": "When enabled, allows custom navigation links to appear in the platform."
+        },
+        "items": {
+          "label": "Custom Link Items",
+          "description": "JSON array of custom navigation links. Each item should have 'label', 'url', and optionally 'icon' and 'target'."
+        },
+        "max_items": {
+          "label": "Maximum Custom Links",
+          "description": "Maximum number of custom navigation links allowed."
+        }
+      },
+      "homepage": {
+        "default_route": {
+          "label": "Default Homepage Route",
+          "description": "The default route users see after login (e.g. '/dashboard', '/catalog')."
+        }
+      },
+      "help": {
+        "url": {
+          "label": "Help Documentation URL",
+          "description": "URL for the platform help documentation or knowledge base."
+        },
+        "enabled": {
+          "label": "Help Link Visible",
+          "description": "When enabled, displays a help link in the platform navigation."
+        }
+      }
+    }
   },
   "phase5": {
     "usage": {
@@ -8358,7 +8421,8 @@
     }
   },
   "footer": {
-    "default": "Powered by {{name}} — Operational Confidence Platform"
+    "default": "Powered by {{name}} — Operational Confidence Platform",
+    "poweredBy": "Powered by NexTraceOne"
   },
   "branding": {
     "admin": {
@@ -8378,11 +8442,28 @@
         "light": "Light Mode",
         "dark": "Dark Mode",
         "primaryButton": "Primary Action",
-        "secondaryButton": "Secondary"
+        "secondaryButton": "Secondary",
+        "loginTitle": "Login Preview"
       },
       "save": "Save Branding",
       "saved": "Branding saved successfully",
-      "error": "Failed to save branding"
+      "error": "Failed to save branding",
+      "login": {
+        "title": "Login Page",
+        "description": "Customize the login page appearance. The NexTraceOne identity is always preserved on the left panel."
+      },
+      "protection": {
+        "title": "Identity Protection",
+        "description": "Control the visibility of the NexTraceOne brand identity. The 'Powered by NexTraceOne' watermark helps maintain product recognition."
+      },
+      "links": {
+        "title": "Navigation & Help Links",
+        "description": "Configure custom navigation links and help resources for your users."
+      },
+      "identityNotice": {
+        "title": "Identity Protection Active",
+        "description": "Customization allows you to adapt the platform to your organization's branding. The NexTraceOne product identity is preserved through the 'Powered by NexTraceOne' watermark and the login page left panel."
+      }
     }
   }
 }

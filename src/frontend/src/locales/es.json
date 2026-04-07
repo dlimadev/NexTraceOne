@@ -785,7 +785,8 @@
     "tagline": "Plataforma Soberana de Gobernanza de Ingeniería",
     "trustCompliant": "Conforme para empresas",
     "trustEncrypted": "Cifrado en tránsito",
-    "welcomeTitle": "Bienvenido a NexTraceOne"
+    "welcomeTitle": "Bienvenido a NexTraceOne",
+    "logoAlt": "Logo de la organización"
   },
   "authorization": {
     "accessDenied": "Acceso Denegado",
@@ -8198,7 +8199,69 @@
     "workflow.timeout.approval_hours.description": "Hours before an individual aprobación step times out",
     "workflow.timeout.approval_hours.label": "Aprobación Timeout (Hours)",
     "workflow.types.enabled.description": "Lista de activado flujo de trabajo tipos (e.g. ReleaseApproval, PromotionApproval, WaiverApproval, GovernanceReview, AccessRequest)",
-    "workflow.types.enabled.label": "Activado Flujo de Trabajo Tipos"
+    "workflow.types.enabled.label": "Activado Flujo de Trabajo Tipos",
+    "branding": {
+      "login_logo_url": {
+        "label": "Logo de la Página de Login",
+        "description": "Logo personalizado mostrado en la tarjeta de login. Usa el ícono predeterminado de NexTraceOne si no se define."
+      },
+      "login_heading": {
+        "label": "Título del Login",
+        "description": "Título personalizado mostrado en la tarjeta de login (ej: 'Bienvenido a Su Plataforma')."
+      },
+      "login_subheading": {
+        "label": "Subtítulo del Login",
+        "description": "Texto de subtítulo personalizado mostrado debajo del título de login."
+      },
+      "login_background_url": {
+        "label": "Imagen de Fondo del Login",
+        "description": "URL de la imagen de fondo para el panel izquierdo de la página de login."
+      },
+      "login_sso_button_text": {
+        "label": "Texto del Botón SSO",
+        "description": "Texto personalizado para el botón de inicio de sesión SSO (ej: 'Iniciar sesión con SSO Corporativo')."
+      },
+      "login_help_text": {
+        "label": "Texto de Ayuda del Login",
+        "description": "Texto de ayuda personalizado mostrado debajo del formulario de login."
+      },
+      "powered_by_visible": {
+        "label": "Mostrar 'Powered by NexTraceOne'",
+        "description": "Cuando está activado, muestra la marca de agua 'Powered by NexTraceOne' en el pie de la aplicación."
+      }
+    },
+    "platform": {
+      "custom_links": {
+        "enabled": {
+          "label": "Enlaces de Navegación Personalizados",
+          "description": "Cuando está activado, permite que enlaces de navegación personalizados aparezcan en la plataforma."
+        },
+        "items": {
+          "label": "Elementos de Enlace Personalizado",
+          "description": "Array JSON de enlaces de navegación personalizados. Cada elemento debe tener 'label', 'url', y opcionalmente 'icon' y 'target'."
+        },
+        "max_items": {
+          "label": "Máximo de Enlaces Personalizados",
+          "description": "Número máximo de enlaces de navegación personalizados permitidos."
+        }
+      },
+      "homepage": {
+        "default_route": {
+          "label": "Ruta Predeterminada de la Homepage",
+          "description": "La ruta predeterminada que los usuarios ven después del login (ej: '/dashboard', '/catalog')."
+        }
+      },
+      "help": {
+        "url": {
+          "label": "URL de la Documentación de Ayuda",
+          "description": "URL para la documentación de ayuda o base de conocimiento de la plataforma."
+        },
+        "enabled": {
+          "label": "Enlace de Ayuda Visible",
+          "description": "Cuando está activado, muestra un enlace de ayuda en la navegación de la plataforma."
+        }
+      }
+    }
   },
   "phase5": {
     "usage": {
@@ -8237,7 +8300,8 @@
     }
   },
   "footer": {
-    "default": "Powered by {{name}} — Plataforma de Confianza Operacional"
+    "default": "Powered by {{name}} — Plataforma de Confianza Operacional",
+    "poweredBy": "Powered by NexTraceOne"
   },
   "branding": {
     "admin": {
@@ -8257,11 +8321,28 @@
         "light": "Modo Claro",
         "dark": "Modo Oscuro",
         "primaryButton": "Acción Principal",
-        "secondaryButton": "Secundario"
+        "secondaryButton": "Secundario",
+        "loginTitle": "Vista Previa del Login"
       },
       "save": "Guardar Marca",
       "saved": "Marca guardada exitosamente",
-      "error": "Error al guardar marca"
+      "error": "Error al guardar marca",
+      "login": {
+        "title": "Página de Inicio de Sesión",
+        "description": "Personalice la apariencia de la página de inicio de sesión. La identidad de NexTraceOne siempre se preserva en el panel izquierdo."
+      },
+      "protection": {
+        "title": "Protección de Identidad",
+        "description": "Controle la visibilidad de la marca NexTraceOne. La marca de agua 'Powered by NexTraceOne' ayuda a mantener el reconocimiento del producto."
+      },
+      "links": {
+        "title": "Enlaces de Navegación y Ayuda",
+        "description": "Configure enlaces de navegación personalizados y recursos de ayuda para sus usuarios."
+      },
+      "identityNotice": {
+        "title": "Protección de Identidad Activa",
+        "description": "La personalización le permite adaptar la plataforma a la marca de su organización. La identidad del producto NexTraceOne se preserva a través de la marca de agua 'Powered by NexTraceOne' y el panel izquierdo de la página de inicio de sesión."
+      }
     }
   }
 }

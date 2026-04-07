@@ -785,7 +785,8 @@
     "tagline": "Plataforma Soberana de Governança de Engenharia",
     "trustCompliant": "Compatível com empresas",
     "trustEncrypted": "Criptografado em trânsito",
-    "welcomeTitle": "Bem-vindo ao NexTraceOne"
+    "welcomeTitle": "Bem-vindo ao NexTraceOne",
+    "logoAlt": "Logo da organização"
   },
   "authorization": {
     "accessDenied": "Acesso Negado",
@@ -8303,7 +8304,69 @@
     "userPreferences.home.widget_knowledgeActivity": "Atividade de Conhecimento",
     "userPreferences.home.widget_aiUsage": "Uso de IA",
     "userPreferences.home.widget_securityFindings": "Descobertas de Segurança",
-    "userPreferences.home.widget_releaseCalendar": "Calendário de Releases"
+    "userPreferences.home.widget_releaseCalendar": "Calendário de Releases",
+    "branding": {
+      "login_logo_url": {
+        "label": "Logo da Página de Login",
+        "description": "Logo personalizado exibido no card de login. Usa o ícone padrão do NexTraceOne se não definido."
+      },
+      "login_heading": {
+        "label": "Título do Login",
+        "description": "Título personalizado exibido no card de login (ex: 'Bem-vindo à Sua Plataforma')."
+      },
+      "login_subheading": {
+        "label": "Subtítulo do Login",
+        "description": "Texto de subtítulo personalizado exibido abaixo do título de login."
+      },
+      "login_background_url": {
+        "label": "Imagem de Fundo do Login",
+        "description": "URL da imagem de fundo para o painel esquerdo da página de login."
+      },
+      "login_sso_button_text": {
+        "label": "Texto do Botão SSO",
+        "description": "Texto personalizado para o botão de login SSO (ex: 'Entrar com SSO Corporativo')."
+      },
+      "login_help_text": {
+        "label": "Texto de Ajuda do Login",
+        "description": "Texto de ajuda personalizado exibido abaixo do formulário de login."
+      },
+      "powered_by_visible": {
+        "label": "Mostrar 'Powered by NexTraceOne'",
+        "description": "Quando ativado, exibe a marca d'água 'Powered by NexTraceOne' no rodapé da aplicação."
+      }
+    },
+    "platform": {
+      "custom_links": {
+        "enabled": {
+          "label": "Links de Navegação Personalizados",
+          "description": "Quando ativado, permite que links de navegação personalizados apareçam na plataforma."
+        },
+        "items": {
+          "label": "Itens de Link Personalizado",
+          "description": "Array JSON de links de navegação personalizados. Cada item deve ter 'label', 'url', e opcionalmente 'icon' e 'target'."
+        },
+        "max_items": {
+          "label": "Máximo de Links Personalizados",
+          "description": "Número máximo de links de navegação personalizados permitidos."
+        }
+      },
+      "homepage": {
+        "default_route": {
+          "label": "Rota Padrão da Homepage",
+          "description": "A rota padrão que os usuários veem após o login (ex: '/dashboard', '/catalog')."
+        }
+      },
+      "help": {
+        "url": {
+          "label": "URL da Documentação de Ajuda",
+          "description": "URL para a documentação de ajuda ou base de conhecimento da plataforma."
+        },
+        "enabled": {
+          "label": "Link de Ajuda Visível",
+          "description": "Quando ativado, exibe um link de ajuda na navegação da plataforma."
+        }
+      }
+    }
   },
   "phase5": {
     "usage": {
@@ -8342,7 +8405,8 @@
     }
   },
   "footer": {
-    "default": "Powered by {{name}} — Plataforma de Confiança Operacional"
+    "default": "Powered by {{name}} — Plataforma de Confiança Operacional",
+    "poweredBy": "Powered by NexTraceOne"
   },
   "branding": {
     "admin": {
@@ -8362,11 +8426,28 @@
         "light": "Modo Claro",
         "dark": "Modo Escuro",
         "primaryButton": "Ação Principal",
-        "secondaryButton": "Secundário"
+        "secondaryButton": "Secundário",
+        "loginTitle": "Preview do Login"
       },
       "save": "Salvar Marca",
       "saved": "Marca salva com sucesso",
-      "error": "Falha ao salvar marca"
+      "error": "Falha ao salvar marca",
+      "login": {
+        "title": "Página de Login",
+        "description": "Personalize a aparência da página de login. A identidade do NexTraceOne é sempre preservada no painel esquerdo."
+      },
+      "protection": {
+        "title": "Proteção de Identidade",
+        "description": "Controle a visibilidade da marca NexTraceOne. A marca d'água 'Powered by NexTraceOne' ajuda a manter o reconhecimento do produto."
+      },
+      "links": {
+        "title": "Links de Navegação & Ajuda",
+        "description": "Configure links de navegação personalizados e recursos de ajuda para seus usuários."
+      },
+      "identityNotice": {
+        "title": "Proteção de Identidade Ativa",
+        "description": "A personalização permite adaptar a plataforma à marca da sua organização. A identidade do produto NexTraceOne é preservada através da marca d'água 'Powered by NexTraceOne' e do painel esquerdo da página de login."
+      }
     }
   }
 }

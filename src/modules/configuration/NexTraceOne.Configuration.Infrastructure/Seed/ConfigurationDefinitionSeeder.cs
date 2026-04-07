@@ -985,6 +985,151 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "text",
             sortOrder: 1350),
 
+        // ── Login Page Branding ──
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_logo_url",
+            displayName: "config.branding.login_logo_url.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_logo_url.description",
+            uiEditorType: "text",
+            sortOrder: 1360),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_heading",
+            displayName: "config.branding.login_heading.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_heading.description",
+            uiEditorType: "text",
+            sortOrder: 1361),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_subheading",
+            displayName: "config.branding.login_subheading.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_subheading.description",
+            uiEditorType: "text",
+            sortOrder: 1362),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_background_url",
+            displayName: "config.branding.login_background_url.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_background_url.description",
+            uiEditorType: "text",
+            sortOrder: 1363),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_sso_button_text",
+            displayName: "config.branding.login_sso_button_text.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_sso_button_text.description",
+            uiEditorType: "text",
+            sortOrder: 1364),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_help_text",
+            displayName: "config.branding.login_help_text.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_help_text.description",
+            uiEditorType: "text",
+            sortOrder: 1365),
+
+        // ── Identity Protection ──
+
+        ConfigurationDefinition.Create(
+            key: "branding.powered_by_visible",
+            displayName: "config.branding.powered_by_visible.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.branding.powered_by_visible.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1370),
+
+        // ── Custom Navigation Links ──
+
+        ConfigurationDefinition.Create(
+            key: "platform.custom_links.enabled",
+            displayName: "config.platform.custom_links.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.custom_links.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 1380),
+
+        ConfigurationDefinition.Create(
+            key: "platform.custom_links.items",
+            displayName: "config.platform.custom_links.items.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.custom_links.items.description",
+            defaultValue: "[]",
+            uiEditorType: "json-editor",
+            sortOrder: 1381),
+
+        ConfigurationDefinition.Create(
+            key: "platform.custom_links.max_items",
+            displayName: "config.platform.custom_links.max_items.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.platform.custom_links.max_items.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 1382),
+
+        // ── Default Homepage ──
+
+        ConfigurationDefinition.Create(
+            key: "platform.homepage.default_route",
+            displayName: "config.platform.homepage.default_route.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Role],
+            description: "config.platform.homepage.default_route.description",
+            defaultValue: "/",
+            validationRules: """{"pattern":"^/[a-z0-9/_-]*$"}""",
+            uiEditorType: "text",
+            sortOrder: 1390),
+
+        ConfigurationDefinition.Create(
+            key: "platform.help.url",
+            displayName: "config.platform.help.url.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.help.url.description",
+            uiEditorType: "text",
+            sortOrder: 1391),
+
+        ConfigurationDefinition.Create(
+            key: "platform.help.enabled",
+            displayName: "config.platform.help.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.help.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1392),
+
         // ── BLOCK G — Feature Flags ───────────────────────────────────────
 
         ConfigurationDefinition.Create(

@@ -28,6 +28,20 @@ interface BrandingValues {
   footerText: string;
   /** Instance name */
   instanceName: string;
+  /** Custom logo for the login page (overrides the default NexTraceOne logo in the auth card) */
+  loginLogoUrl: string;
+  /** Custom heading for the login page */
+  loginHeading: string;
+  /** Custom subheading for the login page */
+  loginSubheading: string;
+  /** Custom background image for the login page left panel */
+  loginBackgroundUrl: string;
+  /** Custom SSO button text */
+  loginSsoButtonText: string;
+  /** Custom help text shown below the login form */
+  loginHelpText: string;
+  /** Whether the "Powered by NexTraceOne" watermark is visible */
+  poweredByVisible: boolean;
   /** Whether branding data has been loaded */
   isLoaded: boolean;
 }
@@ -40,6 +54,13 @@ const DEFAULT_BRANDING: BrandingValues = {
   welcomeMessage: '',
   footerText: '',
   instanceName: 'NexTraceOne',
+  loginLogoUrl: '',
+  loginHeading: '',
+  loginSubheading: '',
+  loginBackgroundUrl: '',
+  loginSsoButtonText: '',
+  loginHelpText: '',
+  poweredByVisible: true,
   isLoaded: false,
 };
 
@@ -52,6 +73,13 @@ const BRANDING_KEYS = [
   'branding.favicon_url',
   'branding.welcome_message',
   'branding.footer_text',
+  'branding.login_logo_url',
+  'branding.login_heading',
+  'branding.login_subheading',
+  'branding.login_background_url',
+  'branding.login_sso_button_text',
+  'branding.login_help_text',
+  'branding.powered_by_visible',
   'instance.name',
 ];
 
@@ -143,6 +171,13 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
       welcomeMessage: extractValue(settings, 'branding.welcome_message'),
       footerText: extractValue(settings, 'branding.footer_text'),
       instanceName: extractValue(settings, 'instance.name') || 'NexTraceOne',
+      loginLogoUrl: extractValue(settings, 'branding.login_logo_url'),
+      loginHeading: extractValue(settings, 'branding.login_heading'),
+      loginSubheading: extractValue(settings, 'branding.login_subheading'),
+      loginBackgroundUrl: extractValue(settings, 'branding.login_background_url'),
+      loginSsoButtonText: extractValue(settings, 'branding.login_sso_button_text'),
+      loginHelpText: extractValue(settings, 'branding.login_help_text'),
+      poweredByVisible: extractValue(settings, 'branding.powered_by_visible') !== 'false',
       isLoaded: true,
     };
   }, [settings]);

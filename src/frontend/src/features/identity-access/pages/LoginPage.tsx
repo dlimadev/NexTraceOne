@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ShieldCheck, Mail } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useBranding } from '../../../contexts/BrandingContext';
 import { Button, TextField, PasswordInput, Checkbox } from '../../../shared/ui';
 import { identityApi } from '../api';
 import { resolveApiError } from '../../../utils/apiErrors';
@@ -21,12 +22,24 @@ import { loginSchema, type LoginFormData } from '../schemas/auth';
  * Logo centrado no card, heading "Welcome to NexTraceOne", campos de
  * email/password, remember me, forgot password, botão de login, SSO abaixo.
  * Pill theme toggle no canto superior direito (via AuthShell).
+ *
+ * Agora suporta customização via branding parameters:
+ * - branding.login_logo_url — logo custom na auth card
+ * - branding.login_heading — heading custom
+ * - branding.login_subheading — subheading custom
+ * - branding.login_sso_button_text — texto do botão SSO
+ * - branding.login_help_text — texto de ajuda abaixo do form
+ * A identidade visual do NexTraceOne é preservada no painel esquerdo.
  */
 export function LoginPage() {
   const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const {
+    loginLogoUrl, loginHeading, loginSubheading,
+    loginSsoButtonText, loginHelpText,
+  } = useBranding();
 
   const [ssoLoading, setSsoLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -76,15 +89,31 @@ export function LoginPage() {
   return (
     <AuthShell>
       <AuthCard>
-        {/* Logo centrado — globe icon */}
+        {/* Logo centrado — custom login logo ou default globe icon */}
         <div className="flex justify-center mb-6">
-          <img src="/brand/logo-icon.svg" alt="NexTraceOne" className="h-12 w-auto" />
+          {loginLogoUrl ? (
+            <img
+              src={loginLogoUrl}
+              alt={t('auth.logoAlt', 'Logo')}
+              className="h-12 w-auto max-w-[200px] object-contain"
+              onError={(e) => {
+                // Fallback to default logo on broken URL
+                (e.target as HTMLImageElement).src = '/brand/logo-icon.svg';
+              }}
+            />
+          ) : (
+            <img src="/brand/logo-icon.svg" alt="NexTraceOne" className="h-12 w-auto" />
+          )}
         </div>
 
-        {/* Heading — "Welcome to NexTraceOne" */}
+        {/* Heading — custom or default "Welcome to NexTraceOne" */}
         <div className="text-center mb-8">
-          <h2 className="text-xl font-semibold text-heading mb-1">{t('auth.welcomeTitle')}</h2>
-          <p className="text-sm text-muted">{t('auth.signInSubtitle')}</p>
+          <h2 className="text-xl font-semibold text-heading mb-1">
+            {loginHeading || t('auth.welcomeTitle')}
+          </h2>
+          <p className="text-sm text-muted">
+            {loginSubheading || t('auth.signInSubtitle')}
+          </p>
         </div>
 
         {serverError && <AuthFeedback variant="error" message={serverError} className="mb-6" />}
@@ -142,16 +171,24 @@ export function LoginPage() {
           onClick={handleSsoLogin}
         >
           <ShieldCheck size={18} />
-          {ssoLoading ? t('auth.ssoRedirecting') : t('auth.ssoSignIn')}
+          {ssoLoading
+            ? t('auth.ssoRedirecting')
+            : (loginSsoButtonText || t('auth.ssoSignIn'))}
         </Button>
         <p className="text-xs text-muted text-center mt-2.5">{t('auth.ssoDescription')}</p>
 
-        {/* Help link */}
+        {/* Help link — custom or default */}
         <p className="text-center text-xs text-faded mt-6">
-          {t('auth.needHelp')}{' '}
-          <button type="button" className="text-cyan hover:text-cyan-hover cursor-pointer transition-colors bg-transparent border-none p-0 text-xs">
-            {t('auth.contactSupport')}
-          </button>
+          {loginHelpText ? (
+            <span>{loginHelpText}</span>
+          ) : (
+            <>
+              {t('auth.needHelp')}{' '}
+              <button type="button" className="text-cyan hover:text-cyan-hover cursor-pointer transition-colors bg-transparent border-none p-0 text-xs">
+                {t('auth.contactSupport')}
+              </button>
+            </>
+          )}
         </p>
       </AuthCard>
 
