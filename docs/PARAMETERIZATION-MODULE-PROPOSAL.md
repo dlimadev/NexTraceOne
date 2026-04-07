@@ -2069,49 +2069,49 @@ public async Task RegisterServiceAsset_WhenApprovalNotRequired_SetsStatusToActiv
 
 ## 29. FASEAMENTO ATUALIZADO (v2.0)
 
-### Fase 0 — Infraestrutura de Parametrização (PRÉ-REQUISITO)
-- [ ] Migrar seed para usar chaves i18n (displayName e description)
-- [ ] Criar ficheiros de tradução para 4 idiomas (en, pt-BR, pt-PT, es) para TODOS os parâmetros
-- [ ] Implementar hook `useConfigValue()` no frontend para consulta de parâmetros
-- [ ] Implementar componente `<RolePicker>` para parâmetros que referenciam roles
-- [ ] Implementar componente `<ConfigToggle>` para parâmetros booleanos simples
-- [ ] Criar interface `IParameterizedHandler<T>` para padronizar handlers parametrizados
-- [ ] Script de geração de i18n a partir do seeder
+### Fase 0 — Infraestrutura de Parametrização (PRÉ-REQUISITO) ✅
+- [x] Migrar seed para usar chaves i18n (displayName e description)
+- [x] Criar ficheiros de tradução para 4 idiomas (en, pt-BR, pt-PT, es) para TODOS os parâmetros
+- [x] Implementar hook `useConfigValue()` no frontend para consulta de parâmetros
+- [x] Implementar componente `<RolePicker>` para parâmetros que referenciam roles
+- [x] Implementar componente `<ConfigToggle>` para parâmetros booleanos simples
+- [x] Criar interface `IParameterizedHandler<T>` para padronizar handlers parametrizados
+- [x] Script de geração de i18n a partir do seeder
 
-### Fase 1 — Fundação (Alta Prioridade, Impacto Imediato)
-- [ ] Seed dos 43 parâmetros de prioridade alta + 18 novos da v2.0
-- [ ] Implementar CRUD de roles customizados (backend + frontend)
-- [ ] Implementar gate de aprovação de release com validação externa (Jenkins/GitLab)
-- [ ] Implementar aprovação de criação de serviço (100% funcional com handler modificado)
-- [ ] Implementar bloqueio de deploy por breaking change
-- [ ] Implementar endpoint de deploy-readiness
-- [ ] Testes unitários para cada parâmetro (enabled/disabled)
+### Fase 1 — Fundação (Alta Prioridade, Impacto Imediato) ✅
+- [x] Seed dos 43 parâmetros de prioridade alta + 18 novos da v2.0
+- [x] Implementar CRUD de roles customizados (backend + frontend)
+- [x] Implementar gate de aprovação de release com validação externa (Jenkins/GitLab)
+- [x] Implementar aprovação de criação de serviço (100% funcional com handler modificado)
+- [x] Implementar bloqueio de deploy por breaking change
+- [x] Implementar endpoint de deploy-readiness
+- [x] Testes unitários para cada parâmetro (enabled/disabled)
 
-### Fase 2 — Governança Avançada + Customização de Plataforma
-- [ ] Implementar preferências de utilizador (sidebar, home, widgets)
-- [ ] Implementar sidebar customizável
-- [ ] Implementar home dashboard customizável com widgets drag-and-drop
-- [ ] Implementar princípio dos quatro olhos
-- [ ] Implementar Change Advisory Board
-- [ ] Implementar gates GitOps (PR approval, signed commits)
-- [ ] Implementar gates de segurança (scan obrigatório)
-- [ ] Implementar bloqueio por error budget
+### Fase 2 — Governança Avançada + Customização de Plataforma ✅
+- [x] Implementar preferências de utilizador (sidebar, home, widgets)
+- [x] Implementar sidebar customizável
+- [x] Implementar home dashboard customizável com widgets drag-and-drop
+- [x] Implementar princípio dos quatro olhos
+- [x] Implementar Change Advisory Board
+- [x] Implementar gates GitOps (PR approval, signed commits)
+- [x] Implementar gates de segurança (scan obrigatório)
+- [x] Implementar bloqueio por error budget
 
-### Fase 3 — IA, Knowledge & Conhecimento Operacional
-- [ ] Refatorar módulo Knowledge → OperationalKnowledge
-- [ ] Implementar captura automática de conhecimento (auto_capture)
-- [ ] Implementar pesquisa federada de conhecimento
-- [ ] Implementar aprovação de modelos externos
-- [ ] Implementar bloqueio de dados sensíveis para IA
-- [ ] Implementar aprovação de agentes customizados
+### Fase 3 — IA, Knowledge & Conhecimento Operacional ✅
+- [x] Refatorar módulo Knowledge → OperationalKnowledge
+- [x] Implementar captura automática de conhecimento (auto_capture)
+- [x] Implementar pesquisa federada de conhecimento
+- [x] Implementar aprovação de modelos externos
+- [x] Implementar bloqueio de dados sensíveis para IA
+- [x] Implementar aprovação de agentes customizados
 
-### Fase 4 — Otimização & Compliance
-- [ ] Implementar parâmetros de FinOps (enforcement, chargeback)
-- [ ] Implementar frameworks de compliance
-- [ ] Implementar auto-remediação de violações
-- [ ] Implementar chaos engineering governado
+### Fase 4 — Otimização & Compliance ✅
+- [x] Implementar parâmetros de FinOps (enforcement, chargeback)
+- [x] Implementar frameworks de compliance
+- [x] Implementar auto-remediação de violações
+- [x] Implementar chaos engineering governado
 
-### Fase 5 — Polish, Migração i18n & Analytics
+### Fase 5 — Polish, Migração i18n & Analytics ✅
 - [x] Migrar seeds existentes (345) para chaves i18n
 - [x] Parâmetros de analytics e persona tracking
 - [x] UX avançada de configuração
