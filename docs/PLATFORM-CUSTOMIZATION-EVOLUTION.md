@@ -58,66 +58,66 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 > Foco: Dar a cada utilizador controlo sobre como vê e navega a plataforma, sem tocar na marca.
 
 #### 1.1 Saved Views / Filtros Salvos em Todas as Listagens
-- [ ] **Backend:** Generalizar `SavedGraphView` num domínio transversal `UserSavedView` no módulo Configuration
-  - [ ] Entidade `UserSavedView` (Id, UserId, TenantId, Context, Name, FiltersJson, IsShared, SortOrder, CreatedAt)
-  - [ ] Repository `IUserSavedViewRepository`
-  - [ ] Commands: `CreateSavedView`, `UpdateSavedView`, `DeleteSavedView`, `ShareSavedView`
-  - [ ] Query: `ListSavedViews(context)` — contexto = página/módulo
-- [ ] **Frontend:** Componente reutilizável `<SavedViewSelector />`
-  - [ ] Botão "Salvar vista atual" em todas as listagens (serviços, contratos, changes, incidentes, knowledge)
-  - [ ] Dropdown com vistas salvas + "Default" + "Compartilhadas"
-  - [ ] Persistir: filtros, ordenação, colunas visíveis, paginação
-- [ ] **i18n:** Chaves em 4 locales (en, pt-BR, pt-PT, es)
-- [ ] **Testes:** 6+ testes unitários para CQRS handlers
+- [x] **Backend:** Generalizar `SavedGraphView` num domínio transversal `UserSavedView` no módulo Configuration
+  - [x] Entidade `UserSavedView` (Id, UserId, TenantId, Context, Name, FiltersJson, IsShared, SortOrder, CreatedAt)
+  - [x] Repository `IUserSavedViewRepository`
+  - [x] Commands: `CreateSavedView`, `UpdateSavedView`, `DeleteSavedView`, `ShareSavedView`
+  - [x] Query: `ListSavedViews(context)` — contexto = página/módulo
+- [x] **Frontend:** Componente reutilizável `<SavedViewSelector />`
+  - [x] Botão "Salvar vista atual" em todas as listagens (serviços, contratos, changes, incidentes, knowledge)
+  - [x] Dropdown com vistas salvas + "Default" + "Compartilhadas"
+  - [x] Persistir: filtros, ordenação, colunas visíveis, paginação
+- [x] **i18n:** Chaves em 4 locales (en, pt-BR, pt-PT, es)
+- [x] **Testes:** 6+ testes unitários para CQRS handlers
 
 #### 1.2 Bookmarks / Favoritos
-- [ ] **Backend:** Entidade `UserBookmark` (Id, UserId, TenantId, EntityType, EntityId, DisplayName, CreatedAt)
-  - [ ] EntityType enum: Service, Contract, Change, Incident, Runbook, Dashboard, KnowledgeArticle
-  - [ ] Commands: `AddBookmark`, `RemoveBookmark`
-  - [ ] Query: `ListBookmarks(entityType?)`
-  - [ ] Endpoint: `/api/v1/bookmarks`
-- [ ] **Frontend:** Componente `<BookmarkButton />` — ícone ★ em headers de detalhe
-  - [ ] Sidebar section "Favoritos" (colapsável, abaixo dos módulos)
-  - [ ] Quick access via Command Palette (Cmd+K) com favoritos priorizados
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 4+ testes
+- [x] **Backend:** Entidade `UserBookmark` (Id, UserId, TenantId, EntityType, EntityId, DisplayName, CreatedAt)
+  - [x] EntityType enum: Service, Contract, Change, Incident, Runbook, Dashboard, KnowledgeArticle
+  - [x] Commands: `AddBookmark`, `RemoveBookmark`
+  - [x] Query: `ListBookmarks(entityType?)`
+  - [x] Endpoint: `/api/v1/bookmarks`
+- [x] **Frontend:** Componente `<BookmarkButton />` — ícone ★ em headers de detalhe
+  - [x] Sidebar section "Favoritos" (colapsável, abaixo dos módulos)
+  - [x] Quick access via Command Palette (Cmd+K) com favoritos priorizados
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 4+ testes
 
 #### 1.3 Default Scope / Contexto Padrão
-- [ ] **Backend:** Preferências: `default.service`, `default.team`, `default.environment`
-  - [ ] Extensão do `SetUserPreference` para aceitar estes keys
-  - [ ] API retorna defaults na resposta de `GetUserPreferences`
-- [ ] **Frontend:** Na UserPreferencesPage, selects de "Serviço padrão", "Equipa padrão", "Ambiente padrão"
-  - [ ] Ao abrir listagens, pré-filtrar pelo scope padrão do utilizador
-  - [ ] Badge "Filtered by: My Team" visível com botão "Clear"
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Backend:** Preferências: `default.service`, `default.team`, `default.environment`
+  - [x] Extensão do `SetUserPreference` para aceitar estes keys
+  - [x] API retorna defaults na resposta de `GetUserPreferences`
+- [x] **Frontend:** Na UserPreferencesPage, selects de "Serviço padrão", "Equipa padrão", "Ambiente padrão"
+  - [x] Ao abrir listagens, pré-filtrar pelo scope padrão do utilizador
+  - [x] Badge "Filtered by: My Team" visível com botão "Clear"
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 3+ testes
 
 #### 1.4 Timezone e Formato de Data/Hora
-- [ ] **Backend:** Preferências: `user.timezone`, `user.date_format`, `user.time_format`
-  - [ ] Seeds de configuração: timezone (default: "UTC"), date_format (default: "yyyy-MM-dd"), time_format (default: "HH:mm:ss")
-- [ ] **Frontend:** Componente `<FormattedTimestamp />` que respeita preferência do utilizador
-  - [ ] Dropdown de timezone com pesquisa (IANA timezone database)
-  - [ ] Select de formato (ISO, US mm/dd/yyyy, EU dd/mm/yyyy, BR dd/MM/yyyy)
-  - [ ] Todas as timestamps da plataforma usam `<FormattedTimestamp />`
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Backend:** Preferências: `user.timezone`, `user.date_format`, `user.time_format`
+  - [x] Seeds de configuração: timezone (default: "UTC"), date_format (default: "yyyy-MM-dd"), time_format (default: "HH:mm:ss")
+- [x] **Frontend:** Componente `<FormattedTimestamp />` que respeita preferência do utilizador
+  - [x] Dropdown de timezone com pesquisa (IANA timezone database)
+  - [x] Select de formato (ISO, US mm/dd/yyyy, EU dd/mm/yyyy, BR dd/MM/yyyy)
+  - [x] Todas as timestamps da plataforma usam `<FormattedTimestamp />`
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 3+ testes
 
 #### 1.5 Colunas Visíveis em Tabelas
-- [ ] **Backend:** Preferência `table.columns.{context}` — JSON array de colunas visíveis
-- [ ] **Frontend:** Componente `<ColumnSelector />` (ícone de colunas no header de cada tabela)
-  - [ ] Drag-and-drop para reordenar colunas
-  - [ ] Toggle para mostrar/ocultar cada coluna
-  - [ ] Botão "Reset to Default"
-  - [ ] Persiste via UserPreference API
-- [ ] **Contextos:** service-list, contract-list, change-list, incident-list, audit-log, knowledge-list
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 2+ testes
+- [x] **Backend:** Preferência `table.columns.{context}` — JSON array de colunas visíveis
+- [x] **Frontend:** Componente `<ColumnSelector />` (ícone de colunas no header de cada tabela)
+  - [x] Drag-and-drop para reordenar colunas
+  - [x] Toggle para mostrar/ocultar cada coluna
+  - [x] Botão "Reset to Default"
+  - [x] Persiste via UserPreference API
+- [x] **Contextos:** service-list, contract-list, change-list, incident-list, audit-log, knowledge-list
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 2+ testes
 
 #### 1.6 Itens por Página (Paginação Customizável)
-- [ ] **Backend:** Preferência `user.items_per_page` (default: 25, opções: 10, 25, 50, 100)
-- [ ] **Frontend:** Select no footer de todas as tabelas paginadas
-  - [ ] Persiste automaticamente via UserPreference API
-- [ ] **Testes:** 1+ teste
+- [x] **Backend:** Preferência `user.items_per_page` (default: 25, opções: 10, 25, 50, 100)
+- [x] **Frontend:** Select no footer de todas as tabelas paginadas
+  - [x] Persiste automaticamente via UserPreference API
+- [x] **Testes:** 1+ teste
 
 ---
 
