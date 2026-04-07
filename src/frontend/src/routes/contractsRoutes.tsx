@@ -18,6 +18,8 @@ const ContractPortalPage = lazy(() => import('../features/contracts/portal/Contr
 const PublicationCenterPage = lazy(() => import('../features/contracts/publication/PublicationCenterPage').then(m => ({ default: m.PublicationCenterPage })));
 const CanonicalEntityImpactCascadePage = lazy(() => import('../features/contracts/canonical/CanonicalEntityImpactCascadePage').then(m => ({ default: m.CanonicalEntityImpactCascadePage })));
 const ContractHealthTimelinePage = lazy(() => import('../features/contracts/governance/ContractHealthTimelinePage').then(m => ({ default: m.ContractHealthTimelinePage })));
+const ContractPlaygroundPage = lazy(() => import('../features/contracts/playground/ContractPlaygroundPage').then(m => ({ default: m.ContractPlaygroundPage })));
+const ConsumerDrivenContractPage = lazy(() => import('../features/contracts/cdct/ConsumerDrivenContractPage').then(m => ({ default: m.ConsumerDrivenContractPage })));
 
 export function ContractsRoutes() {
   return (
@@ -101,6 +103,22 @@ export function ContractsRoutes() {
         element={
           <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
             <PublicationCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/playground"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ContractPlaygroundPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/cdct"
+        element={
+          <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
+            <ConsumerDrivenContractPage />
           </ProtectedRoute>
         }
       />

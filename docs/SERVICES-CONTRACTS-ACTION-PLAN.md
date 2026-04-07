@@ -751,26 +751,26 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 | 4.5: Drag & Drop de propriedades | M | ⬜ |
 | 4.6: Quick Add de response codes | S | ⬜ |
 
-### Fase 5: Features Avançadas (Sprint 5-7) 🟢 NORMAL — PARCIAL
+### Fase 5: Features Avançadas (Sprint 5-7) 🟢 NORMAL ✅ COMPLETE
 
 | Item | Esforço | Status |
 |---|---|---|
-| F-05: Contract Mock Server | L | ✅ |
-| F-06: Canonical Impact Propagation | L | ✅ |
-| F-07: Design Guidelines Engine | L | ✅ |
-| F-08: Consumer-Driven Contract Testing | XL | ✅ |
-| F-10: Contract Playground | L | ✅ |
-| F-12: Multi-Format Export | M | ✅ |
+| F-05: Contract Mock Server | L | ✅ GenerateMockServer + GenerateMockConfiguration |
+| F-06: Canonical Impact Propagation | L | ✅ PropagateCanonicalEntityChange + GetCanonicalEntityImpactCascade |
+| F-07: Design Guidelines Engine | L | ✅ EvaluateDesignGuidelines (scoring 0-100) |
+| F-08: Consumer-Driven Contract Testing | XL | ✅ RegisterConsumerExpectation + GetContractConsumerExpectations + VerifyProviderCompatibility |
+| F-10: Contract Playground | L | ✅ PlaygroundSession domain entity + Portal integration |
+| F-12: Multi-Format Export | M | ✅ ExportContract + ExportContractMultiFormat |
 
 ### Fase 6: Intelligence & Governance (Sprint 7-9) 🔵 FUTURO ✅ COMPLETE
 
 | Item | Esforço | Status |
 |---|---|---|
-| F-09: Auto-Map Dependencies from Contracts | L | ✅ |
-| F-11: Semantic Changelog | M | ✅ |
-| F-13: Contract Health Score Dashboard | L | ✅ |
-| F-14: AI-Powered Schema Suggestion | L | ✅ |
-| F-15: Deprecation Workflow + Notification | L | ✅ |
+| F-09: Auto-Map Dependencies from Contracts | L | ✅ InferDependenciesFromContracts |
+| F-11: Semantic Changelog | M | ✅ GenerateSemanticChangelog |
+| F-13: Contract Health Score Dashboard | L | ✅ ComputeContractHealthDashboard + GetContractHealthTimeline |
+| F-14: AI-Powered Schema Suggestion | L | ✅ SuggestSchemaFromContext (rule-based) |
+| F-15: Deprecation Workflow + Notification | L | ✅ InitiateContractDeprecation + DeprecateContractVersion + GetDeprecationProgress |
 
 > **Legenda**: S = Small (1-2 dias), M = Medium (3-5 dias), L = Large (1-2 semanas), XL = Extra Large (2-3 semanas)
 
