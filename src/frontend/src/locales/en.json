@@ -5440,7 +5440,18 @@
     "quotaExceededTitle": "Quota exceeded",
     "successTitle": "Success",
     "welcomeSubtitle": "The source of truth for services, contracts, changes and operational knowledge",
-    "welcomeTitle": "Welcome to NexTraceOne"
+    "welcomeTitle": "Welcome to NexTraceOne",
+    "userPreferences.timezone.title": "Timezone & Date Format",
+    "userPreferences.timezone.timezone": "Timezone",
+    "userPreferences.timezone.dateFormat": "Date Format",
+    "userPreferences.timezone.timeFormat": "Time Format",
+    "userPreferences.defaultScope.title": "Default Scope",
+    "userPreferences.defaultScope.description": "When set, lists will pre-filter to your default context",
+    "userPreferences.defaultScope.environment": "Default Environment",
+    "userPreferences.defaultScope.team": "Default Team",
+    "userPreferences.defaultScope.service": "Default Service",
+    "userPreferences.itemsPerPage.title": "Items Per Page",
+    "userPreferences.itemsPerPage.description": "Number of items shown per page in all lists"
   },
   "promotion": {
     "allRequests": "All Promotion Requests",
@@ -8224,5 +8235,42 @@
       "readOnly": "Read-Only",
       "deprecatedList": "Deprecated Parameters"
     }
+  },
+  "bookmarks": {
+    "add": "Add bookmark",
+    "remove": "Remove bookmark",
+    "title": "Bookmarks",
+    "empty": "No bookmarks yet",
+    "entityType": {
+      "Service": "Service",
+      "Contract": "Contract",
+      "Change": "Change",
+      "Incident": "Incident",
+      "Runbook": "Runbook",
+      "Dashboard": "Dashboard",
+      "KnowledgeArticle": "Knowledge Article"
+    }
+  },
+  "savedViews": {
+    "title": "Saved Views",
+    "default": "Default",
+    "shared": "Shared",
+    "save": "Save current view",
+    "delete": "Delete view",
+    "empty": "No saved views",
+    "saveModal": {
+      "title": "Save View",
+      "name": "View name",
+      "namePlaceholder": "My team services",
+      "share": "Share with team",
+      "confirm": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "columnSelector": {
+    "title": "Columns",
+    "reset": "Reset to default",
+    "columns": "Visible columns",
+    "noColumns": "No columns configured"
   }
 }

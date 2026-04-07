@@ -5431,7 +5431,18 @@
     "quotaExceededTitle": "Quota excedida",
     "successTitle": "Sucesso",
     "welcomeSubtitle": "A fonte de verdade para serviços, contratos, alterações e conhecimento operacional",
-    "welcomeTitle": "Bem-vindo ao NexTraceOne"
+    "welcomeTitle": "Bem-vindo ao NexTraceOne",
+    "userPreferences.timezone.title": "Fuso Horário e Formato de Data",
+    "userPreferences.timezone.timezone": "Fuso Horário",
+    "userPreferences.timezone.dateFormat": "Formato de Data",
+    "userPreferences.timezone.timeFormat": "Formato de Hora",
+    "userPreferences.defaultScope.title": "Âmbito Predefinido",
+    "userPreferences.defaultScope.description": "Quando definido, as listas serão pré-filtradas com o seu contexto predefinido",
+    "userPreferences.defaultScope.environment": "Ambiente Predefinido",
+    "userPreferences.defaultScope.team": "Equipa Predefinida",
+    "userPreferences.defaultScope.service": "Serviço Predefinido",
+    "userPreferences.itemsPerPage.title": "Itens por Página",
+    "userPreferences.itemsPerPage.description": "Número de itens apresentados por página em todas as listas"
   },
   "promotion": {
     "allRequests": "Todos os Pedidos de Promoção",
@@ -8215,5 +8226,42 @@
       "readOnly": "Apenas Leitura",
       "deprecatedList": "Parâmetros Depreciados"
     }
+  },
+  "bookmarks": {
+    "add": "Adicionar favorito",
+    "remove": "Remover favorito",
+    "title": "Favoritos",
+    "empty": "Sem favoritos ainda",
+    "entityType": {
+      "Service": "Serviço",
+      "Contract": "Contrato",
+      "Change": "Mudança",
+      "Incident": "Incidente",
+      "Runbook": "Runbook",
+      "Dashboard": "Painel",
+      "KnowledgeArticle": "Artigo de Conhecimento"
+    }
+  },
+  "savedViews": {
+    "title": "Vistas Guardadas",
+    "default": "Predefinição",
+    "shared": "Partilhadas",
+    "save": "Guardar vista atual",
+    "delete": "Eliminar vista",
+    "empty": "Sem vistas guardadas",
+    "saveModal": {
+      "title": "Guardar Vista",
+      "name": "Nome da vista",
+      "namePlaceholder": "Os meus serviços de equipa",
+      "share": "Partilhar com equipa",
+      "confirm": "Guardar",
+      "cancel": "Cancelar"
+    }
+  },
+  "columnSelector": {
+    "title": "Colunas",
+    "reset": "Repor predefinição",
+    "columns": "Colunas visíveis",
+    "noColumns": "Nenhuma coluna configurada"
   }
 }

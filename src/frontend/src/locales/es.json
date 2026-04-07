@@ -5434,7 +5434,18 @@
     "quotaExceededTitle": "Cuota excedida",
     "successTitle": "Éxito",
     "welcomeSubtitle": "La fuente de verdad para servicios, contratos, cambios y conocimiento operacional",
-    "welcomeTitle": "Bienvenido a NexTraceOne"
+    "welcomeTitle": "Bienvenido a NexTraceOne",
+    "userPreferences.timezone.title": "Zona Horaria y Formato de Fecha",
+    "userPreferences.timezone.timezone": "Zona Horaria",
+    "userPreferences.timezone.dateFormat": "Formato de Fecha",
+    "userPreferences.timezone.timeFormat": "Formato de Hora",
+    "userPreferences.defaultScope.title": "Ámbito Predeterminado",
+    "userPreferences.defaultScope.description": "Cuando se establece, las listas se pre-filtrarán con su contexto predeterminado",
+    "userPreferences.defaultScope.environment": "Entorno Predeterminado",
+    "userPreferences.defaultScope.team": "Equipo Predeterminado",
+    "userPreferences.defaultScope.service": "Servicio Predeterminado",
+    "userPreferences.itemsPerPage.title": "Elementos por Página",
+    "userPreferences.itemsPerPage.description": "Número de elementos mostrados por página en todas las listas"
   },
   "promotion": {
     "allRequests": "Todas las Solicitudes de Promoción",
@@ -8218,5 +8229,42 @@
       "readOnly": "Solo Lectura",
       "deprecatedList": "Parámetros Obsoletos"
     }
+  },
+  "bookmarks": {
+    "add": "Agregar marcador",
+    "remove": "Eliminar marcador",
+    "title": "Marcadores",
+    "empty": "Sin marcadores aún",
+    "entityType": {
+      "Service": "Servicio",
+      "Contract": "Contrato",
+      "Change": "Cambio",
+      "Incident": "Incidente",
+      "Runbook": "Runbook",
+      "Dashboard": "Panel",
+      "KnowledgeArticle": "Artículo de Conocimiento"
+    }
+  },
+  "savedViews": {
+    "title": "Vistas Guardadas",
+    "default": "Predeterminado",
+    "shared": "Compartidas",
+    "save": "Guardar vista actual",
+    "delete": "Eliminar vista",
+    "empty": "Sin vistas guardadas",
+    "saveModal": {
+      "title": "Guardar Vista",
+      "name": "Nombre de la vista",
+      "namePlaceholder": "Mis servicios de equipo",
+      "share": "Compartir con el equipo",
+      "confirm": "Guardar",
+      "cancel": "Cancelar"
+    }
+  },
+  "columnSelector": {
+    "title": "Columnas",
+    "reset": "Restablecer predeterminado",
+    "columns": "Columnas visibles",
+    "noColumns": "No hay columnas configuradas"
   }
 }

@@ -5434,7 +5434,18 @@
     "quotaExceededTitle": "Quota excedida",
     "successTitle": "Sucesso",
     "welcomeSubtitle": "A fonte de verdade para serviços, contratos, alterações e conhecimento operacional",
-    "welcomeTitle": "Bem-vindo ao NexTraceOne"
+    "welcomeTitle": "Bem-vindo ao NexTraceOne",
+    "userPreferences.timezone.title": "Fuso Horário e Formato de Data",
+    "userPreferences.timezone.timezone": "Fuso Horário",
+    "userPreferences.timezone.dateFormat": "Formato de Data",
+    "userPreferences.timezone.timeFormat": "Formato de Hora",
+    "userPreferences.defaultScope.title": "Escopo Padrão",
+    "userPreferences.defaultScope.description": "Quando definido, as listas serão pré-filtradas com o seu contexto padrão",
+    "userPreferences.defaultScope.environment": "Ambiente Padrão",
+    "userPreferences.defaultScope.team": "Equipa Padrão",
+    "userPreferences.defaultScope.service": "Serviço Padrão",
+    "userPreferences.itemsPerPage.title": "Itens por Página",
+    "userPreferences.itemsPerPage.description": "Número de itens exibidos por página em todas as listas"
   },
   "promotion": {
     "allRequests": "Todas as Solicitações de Promoção",
@@ -8218,5 +8229,42 @@
       "readOnly": "Somente Leitura",
       "deprecatedList": "Parâmetros Depreciados"
     }
+  },
+  "bookmarks": {
+    "add": "Adicionar favorito",
+    "remove": "Remover favorito",
+    "title": "Favoritos",
+    "empty": "Sem favoritos ainda",
+    "entityType": {
+      "Service": "Serviço",
+      "Contract": "Contrato",
+      "Change": "Mudança",
+      "Incident": "Incidente",
+      "Runbook": "Runbook",
+      "Dashboard": "Painel",
+      "KnowledgeArticle": "Artigo de Conhecimento"
+    }
+  },
+  "savedViews": {
+    "title": "Vistas Guardadas",
+    "default": "Padrão",
+    "shared": "Compartilhadas",
+    "save": "Salvar vista atual",
+    "delete": "Excluir vista",
+    "empty": "Sem vistas guardadas",
+    "saveModal": {
+      "title": "Salvar Vista",
+      "name": "Nome da vista",
+      "namePlaceholder": "Meus serviços de equipa",
+      "share": "Compartilhar com equipa",
+      "confirm": "Salvar",
+      "cancel": "Cancelar"
+    }
+  },
+  "columnSelector": {
+    "title": "Colunas",
+    "reset": "Restaurar padrão",
+    "columns": "Colunas visíveis",
+    "noColumns": "Nenhuma coluna configurada"
   }
 }
