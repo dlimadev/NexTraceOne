@@ -70,7 +70,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [resolvedTheme]);
 
   // Force re-render when system preference changes while 'auto' is active
-  const [, forceUpdate] = useState(0);
+  const [, triggerRerender] = useState(0);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -78,7 +78,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const handler = () => {
       // Only trigger re-render when in auto mode (so resolve() picks up new system pref)
       if (preference === 'auto' || !getStoredTheme()) {
-        forceUpdate(c => c + 1);
+        triggerRerender(c => c + 1);
       }
     };
     mq.addEventListener('change', handler);

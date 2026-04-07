@@ -21,11 +21,12 @@ export function AppTopbarActions() {
     setLangOpen(false);
   }, [i18n]);
 
-  const themeTitle = theme === 'dark'
-    ? t('header.switchToLight', 'Switch to light mode')
-    : theme === 'light'
-      ? t('header.switchToAuto', 'Switch to system mode')
-      : t('header.switchToDark', 'Switch to dark mode');
+  const themeTitleKeys: Record<string, string> = {
+    dark: 'header.switchToLight',
+    light: 'header.switchToAuto',
+    auto: 'header.switchToDark',
+  };
+  const themeTitle = t(themeTitleKeys[theme] ?? 'header.switchToDark', 'Switch to dark mode');
 
   const ThemeIcon = theme === 'dark' ? Sun : theme === 'light' ? Monitor : Moon;
 
