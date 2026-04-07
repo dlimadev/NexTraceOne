@@ -1705,7 +1705,15 @@
     "view": "Ver",
     "viewAll": "Ver todo",
     "vs": "vs",
-    "yes": "Sí"
+    "yes": "Sí",
+    "commaSeparated": "separado por comas",
+    "default": "Por defecto",
+    "description": "Descripción",
+    "environment": "Entorno",
+    "items": "Elementos",
+    "name": "Nombre",
+    "onePerLine": "uno por línea",
+    "type": "Tipo"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Cuando está activado, los usuarios pueden crear agentes de IA especializados personalizados.",
@@ -8425,5 +8433,43 @@
     },
     "subtitle": "Configure flujos de aprobación, SLAs, gates, rutas de promoción, ventanas de release y políticas de congelamiento",
     "title": "Workflows y Gobernanza de Promoción"
+  },
+  "workflows": {
+    "title": "Workflows & Automatización",
+    "checklists": {
+      "title": "Listas de Verificación de Cambios",
+      "empty": "No hay listas de verificación definidas aún.",
+      "create": "Crear Lista",
+      "required": "Requerida",
+      "optional": "Opcional"
+    },
+    "automationRules": {
+      "title": "Reglas de Automatización",
+      "empty": "No hay reglas de automatización definidas aún.",
+      "create": "Crear Regla",
+      "trigger": "Disparador",
+      "conditions": "Condiciones",
+      "actions": "Acciones",
+      "enabled": "Activa",
+      "disabled": "Inactiva"
+    },
+    "contractTemplates": {
+      "title": "Plantillas de Contrato",
+      "empty": "No hay plantillas de contrato definidas aún.",
+      "create": "Crear Plantilla",
+      "type": "Tipo",
+      "all": "Todos"
+    }
+  },
+  "scheduledReports": {
+    "title": "Informes Programados",
+    "empty": "No hay informes programados configurados aún.",
+    "create": "Crear Informe",
+    "schedule": "Programación",
+    "format": "Formato",
+    "recipients": "Destinatarios",
+    "enabled": "Activo",
+    "disabled": "Inactivo",
+    "lastSent": "Último Envío"
   }
 }

@@ -1705,7 +1705,15 @@
     "view": "View",
     "viewAll": "View all",
     "vs": "vs",
-    "yes": "Yes"
+    "yes": "Yes",
+    "commaSeparated": "comma-separated",
+    "default": "Default",
+    "description": "Description",
+    "environment": "Environment",
+    "items": "Items",
+    "name": "Name",
+    "onePerLine": "one per line",
+    "type": "Type"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "When enabled, users can create custom specialized AI agents.",
@@ -8431,5 +8439,43 @@
     },
     "subtitle": "Configure approval workflows, SLAs, gates, promotion paths, release windows and freeze policies",
     "title": "Workflow & Promotion Governance"
+  },
+  "workflows": {
+    "title": "Workflows & Automation",
+    "checklists": {
+      "title": "Change Checklists",
+      "empty": "No checklists defined yet.",
+      "create": "Create Checklist",
+      "required": "Required",
+      "optional": "Optional"
+    },
+    "automationRules": {
+      "title": "Automation Rules",
+      "empty": "No automation rules defined yet.",
+      "create": "Create Rule",
+      "trigger": "Trigger",
+      "conditions": "Conditions",
+      "actions": "Actions",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "contractTemplates": {
+      "title": "Contract Templates",
+      "empty": "No contract templates defined yet.",
+      "create": "Create Template",
+      "type": "Type",
+      "all": "All"
+    }
+  },
+  "scheduledReports": {
+    "title": "Scheduled Reports",
+    "empty": "No scheduled reports configured yet.",
+    "create": "Create Report",
+    "schedule": "Schedule",
+    "format": "Format",
+    "recipients": "Recipients",
+    "enabled": "Active",
+    "disabled": "Inactive",
+    "lastSent": "Last Sent"
   }
 }

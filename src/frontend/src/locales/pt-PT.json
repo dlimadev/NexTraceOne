@@ -1705,7 +1705,15 @@
     "view": "Ver",
     "viewAll": "Ver tudo",
     "vs": "vs",
-    "yes": "Sim"
+    "yes": "Sim",
+    "commaSeparated": "separado por vírgulas",
+    "default": "Predefinido",
+    "description": "Descrição",
+    "environment": "Ambiente",
+    "items": "Itens",
+    "name": "Nome",
+    "onePerLine": "um por linha",
+    "type": "Tipo"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Quando ativado, utilizadores podem criar agentes de IA especializados customizados.",
@@ -8422,5 +8430,43 @@
     },
     "subtitle": "Configure fluxos de aprovação, SLAs, gates, caminhos de promoção, janelas de release e políticas de congelamento",
     "title": "Workflows & Governança de Promoção"
+  },
+  "workflows": {
+    "title": "Workflows & Automação",
+    "checklists": {
+      "title": "Checklists de Mudança",
+      "empty": "Nenhuma checklist definida ainda.",
+      "create": "Criar Checklist",
+      "required": "Obrigatória",
+      "optional": "Opcional"
+    },
+    "automationRules": {
+      "title": "Regras de Automação",
+      "empty": "Nenhuma regra de automação definida ainda.",
+      "create": "Criar Regra",
+      "trigger": "Gatilho",
+      "conditions": "Condições",
+      "actions": "Ações",
+      "enabled": "Activa",
+      "disabled": "Inactiva"
+    },
+    "contractTemplates": {
+      "title": "Templates de Contrato",
+      "empty": "Nenhum template de contrato definido ainda.",
+      "create": "Criar Template",
+      "type": "Tipo",
+      "all": "Todos"
+    }
+  },
+  "scheduledReports": {
+    "title": "Relatórios Agendados",
+    "empty": "Nenhum relatório agendado configurado ainda.",
+    "create": "Criar Relatório",
+    "schedule": "Agendamento",
+    "format": "Formato",
+    "recipients": "Destinatários",
+    "enabled": "Activo",
+    "disabled": "Inactivo",
+    "lastSent": "Último Envio"
   }
 }

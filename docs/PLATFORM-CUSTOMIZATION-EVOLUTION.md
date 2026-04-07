@@ -281,41 +281,41 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 **Prioridade:** 🟡 Média | **Complexidade:** Alta | **Impacto:** Alto
 
 #### 5.1 Custom Checklists por Tipo de Mudança
-- [ ] **Backend:** Extensão do modelo de Change para incluir checklists customizáveis
-  - [ ] Entidade `ChangeChecklist` (Id, TenantId, ChangeTypeId, Name, Items[], IsRequired)
-  - [ ] Items: array de strings com checkbox
-  - [ ] Admin define checklists por tipo de mudança + criticidade + ambiente
-  - [ ] Validação: change não pode avançar sem checklist completa (quando required)
-- [ ] **Frontend:** Componente `<CustomChecklist />` no ChangeDetailPage
-  - [ ] Admin page para definir checklists
-  - [ ] Toggle de obrigatoriedade por gate
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 4+ testes
+- [x] **Backend:** Extensão do modelo de Change para incluir checklists customizáveis
+  - [x] Entidade `ChangeChecklist` (Id, TenantId, ChangeTypeId, Name, Items[], IsRequired)
+  - [x] Items: array de strings com checkbox
+  - [x] Admin define checklists por tipo de mudança + criticidade + ambiente
+  - [x] Validação: change não pode avançar sem checklist completa (quando required)
+- [x] **Frontend:** Componente `<CustomChecklist />` no ChangeDetailPage
+  - [x] Admin page para definir checklists
+  - [x] Toggle de obrigatoriedade por gate
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 4+ testes
 
 #### 5.2 Automation Rules (If-Then)
-- [ ] **Backend:** Entidade `AutomationRule` no módulo Governance
-  - [ ] (Id, TenantId, Name, Trigger, Conditions[], Actions[], Enabled, CreatedBy, CreatedAt)
-  - [ ] Triggers: on_change_created, on_incident_opened, on_contract_published, on_approval_expired
-  - [ ] Conditions: field matches (severity, service, environment, tag)
-  - [ ] Actions: send_notification, assign_reviewer, add_tag, require_evidence, create_incident
-  - [ ] Endpoint: `/api/v1/automation-rules` (CRUD)
-  - [ ] Avaliação em event handlers existentes
-- [ ] **Frontend:** Página `AutomationRulesPage`
-  - [ ] Builder visual: "When [trigger] and [conditions] then [action]"
-  - [ ] Lista de regras com toggle
-  - [ ] Execution log (últimas 100 execuções)
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 6+ testes
+- [x] **Backend:** Entidade `AutomationRule` no módulo Governance
+  - [x] (Id, TenantId, Name, Trigger, Conditions[], Actions[], Enabled, CreatedBy, CreatedAt)
+  - [x] Triggers: on_change_created, on_incident_opened, on_contract_published, on_approval_expired
+  - [x] Conditions: field matches (severity, service, environment, tag)
+  - [x] Actions: send_notification, assign_reviewer, add_tag, require_evidence, create_incident
+  - [x] Endpoint: `/api/v1/automation-rules` (CRUD)
+  - [ ] Avaliação em event handlers existentes (roadmap)
+- [x] **Frontend:** Página `AutomationRulesPage`
+  - [x] Builder visual: "When [trigger] and [conditions] then [action]"
+  - [x] Lista de regras com toggle
+  - [ ] Execution log (últimas 100 execuções) (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 6+ testes
 
 #### 5.3 Custom Contract Templates por Organização
-- [ ] **Backend:** Entidade `ContractTemplate` (Id, TenantId, Name, ContractType, TemplateJson, CreatedBy, CreatedAt)
-  - [ ] Admin define templates de contrato (REST, SOAP, Event) com estrutura pré-preenchida
-  - [ ] Endpoint: `/api/v1/contract-templates` (CRUD)
-- [ ] **Frontend:** Na criação de contrato, step "Choose template"
-  - [ ] Lista de templates do tenant + templates padrão NexTraceOne
-  - [ ] Preview do template antes de aplicar
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Backend:** Entidade `ContractTemplate` (Id, TenantId, Name, ContractType, TemplateJson, CreatedBy, CreatedAt)
+  - [x] Admin define templates de contrato (REST, SOAP, Event) com estrutura pré-preenchida
+  - [x] Endpoint: `/api/v1/contract-templates` (CRUD)
+- [x] **Frontend:** Na criação de contrato, step "Choose template"
+  - [x] Lista de templates do tenant + templates padrão NexTraceOne
+  - [ ] Preview do template antes de aplicar (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 3+ testes
 
 ---
 
@@ -323,18 +323,18 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 **Prioridade:** 🟡 Média | **Complexidade:** Média | **Impacto:** Alto
 
 #### 6.1 Scheduled Reports
-- [ ] **Backend:** Entidade `ScheduledReport` no módulo Governance
-  - [ ] (Id, TenantId, UserId, Name, ReportType, Filters, Schedule, Recipients[], Format, Enabled, LastSentAt)
-  - [ ] Schedule: cron expression ou presets (daily, weekly, monthly)
-  - [ ] Formats: PDF, CSV, JSON
-  - [ ] Job Quartz.NET para execução programada
-  - [ ] Endpoint: `/api/v1/scheduled-reports` (CRUD)
-- [ ] **Frontend:** Página `ScheduledReportsPage`
-  - [ ] Criar/editar schedule
-  - [ ] Preview do relatório
-  - [ ] Histórico de envios
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 4+ testes
+- [x] **Backend:** Entidade `ScheduledReport` no módulo Governance
+  - [x] (Id, TenantId, UserId, Name, ReportType, Filters, Schedule, Recipients[], Format, Enabled, LastSentAt)
+  - [x] Schedule: cron expression ou presets (daily, weekly, monthly)
+  - [x] Formats: PDF, CSV, JSON
+  - [ ] Job Quartz.NET para execução programada (roadmap)
+  - [x] Endpoint: `/api/v1/scheduled-reports` (CRUD)
+- [x] **Frontend:** Página `ScheduledReportsPage`
+  - [x] Criar/editar schedule
+  - [ ] Preview do relatório (roadmap)
+  - [ ] Histórico de envios (roadmap)
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 4+ testes
 
 #### 6.2 Export Configurável
 - [ ] **Backend:** Endpoint genérico `/api/v1/export` com parâmetros de formato e colunas
