@@ -4379,7 +4379,10 @@
     "subtitle": "Source of truth for services, contracts, changes and operational knowledge",
     "title": "Dashboard",
     "totalContracts": "Total Contracts",
-    "trendHealthy": "Healthy"
+    "trendHealthy": "Healthy",
+    "vsLastPeriod": "Vs last period: {{value}}",
+    "contractDistribution": "Contract distribution",
+    "viewReport": "Report"
   },
   "dashboardClone": {
     "button": "Clone Dashboard",

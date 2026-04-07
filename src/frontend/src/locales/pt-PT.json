@@ -4379,7 +4379,10 @@
     "subtitle": "Fonte de verdade para serviços, contratos, mudanças e conhecimento operacional",
     "title": "Painel",
     "totalContracts": "Total de Contratos",
-    "trendHealthy": "Saudável"
+    "trendHealthy": "Saudável",
+    "vsLastPeriod": "Vs período anterior: {{value}}",
+    "contractDistribution": "Distribuição de contratos",
+    "viewReport": "Relatório"
   },
   "dashboardClone": {
     "button": "Clonar Dashboard",

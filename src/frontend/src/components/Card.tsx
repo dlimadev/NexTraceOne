@@ -4,7 +4,7 @@ import { cn } from '../lib/cn';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   /** Variante visual do card. */
-  variant?: 'default' | 'interactive' | 'elevated' | 'flat' | 'glass';
+  variant?: 'default' | 'interactive' | 'elevated' | 'flat' | 'glass' | 'gradient';
   /** Exibe skeleton de loading sobre o conteúdo. */
   loading?: boolean;
   className?: string;
@@ -17,6 +17,7 @@ const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
   elevated: 'bg-card rounded-2xl border border-edge shadow-elevated overflow-hidden',
   flat: 'bg-card rounded-2xl overflow-hidden',
   glass: 'backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10 shadow-surface overflow-hidden',
+  gradient: 'rounded-2xl border-0 shadow-elevated overflow-hidden text-white bg-gradient-to-br from-accent via-blue to-cyan',
 };
 
 /**
@@ -29,6 +30,7 @@ const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
  * - elevated: sombra mais forte permanente
  * - flat: sem borda/sombra
  * - glass: glassmorphism com backdrop-blur para overlays
+ * - gradient: fundo gradiente com texto branco (inspirado pelo template)
  * - loading: exibe skeleton overlay
  */
 export function Card({ children, variant = 'default', loading, className, ...rest }: CardProps) {
@@ -57,4 +59,16 @@ export function CardHeader({ children, className, ...rest }: HTMLAttributes<HTML
 
 export function CardBody({ children, className, ...rest }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
   return <div className={cn('px-5 py-5', className)} {...rest}>{children}</div>;
+}
+
+/**
+ * CardFooter — rodapé semântico para legendas, ações e contexto.
+ * Inspirado pelo padrão .card-footer do template NexLink.
+ */
+export function CardFooter({ children, className, ...rest }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
+  return (
+    <div className={cn('px-5 py-3 border-t border-edge/60 bg-elevated/30', className)} {...rest}>
+      {children}
+    </div>
+  );
 }
