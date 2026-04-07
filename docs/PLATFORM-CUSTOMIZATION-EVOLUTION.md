@@ -125,57 +125,57 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 **Prioridade:** 🟢 Alta | **Complexidade:** Média-Alta | **Impacto:** Muito Alto
 
 #### 2.1 Dashboard Templates por Persona
-- [ ] **Backend:** Seed de templates pré-definidos no `ConfigurationDefinitionSeeder`
-  - [ ] `platform.home.template.engineer` — widgets: team-services, recent-changes, active-incidents, dora-metrics
-  - [ ] `platform.home.template.tech_lead` — widgets: team-services, change-risk, pending-approvals, slo-status, dora-metrics
-  - [ ] `platform.home.template.architect` — widgets: contract-health, dependency-map, compliance-status, reliability-trend
-  - [ ] `platform.home.template.executive` — widgets: finops-summary, compliance-status, incident-overview, dora-metrics
-  - [ ] `platform.home.template.platform_admin` — widgets: ai-usage, security-findings, audit-activity, system-health
-- [ ] **Frontend:** Modal "Choose Dashboard Template" no onboarding e em Settings
-  - [ ] Preview visual de cada template (miniatura)
-  - [ ] "Start from template" → pode modificar depois
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Backend:** Seed de templates pré-definidos no `ConfigurationDefinitionSeeder`
+  - [x] `platform.home.template.engineer` — widgets: team-services, recent-changes, active-incidents, dora-metrics
+  - [x] `platform.home.template.tech_lead` — widgets: team-services, change-risk, pending-approvals, slo-status, dora-metrics
+  - [x] `platform.home.template.architect` — widgets: contract-health, dependency-map, compliance-status, reliability-trend
+  - [x] `platform.home.template.executive` — widgets: finops-summary, compliance-status, incident-overview, dora-metrics
+  - [x] `platform.home.template.platform_admin` — widgets: ai-usage, security-findings, audit-activity, system-health
+- [x] **Frontend:** Modal "Choose Dashboard Template" no onboarding e em Settings
+  - [x] Preview visual de cada template (miniatura)
+  - [x] "Start from template" → pode modificar depois
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 3+ testes
 
 #### 2.2 Custom Charts (Query Builder Visual)
-- [ ] **Backend:** Feature `CreateCustomChart` no módulo OperationalIntelligence
-  - [ ] Entidade `CustomChart` (Id, UserId, TenantId, Name, ChartType, MetricQuery, TimeRange, Filters, CreatedAt)
-  - [ ] ChartType enum: Line, Bar, Area, Pie, Gauge, Table, Sparkline
-  - [ ] MetricQuery: JSON com source, metric, aggregation, groupBy, filters
-  - [ ] API: `/api/v1/custom-charts` (CRUD)
-  - [ ] API: `/api/v1/custom-charts/{id}/data` (execução da query)
-- [ ] **Frontend:** Página `CustomChartBuilderPage`
-  - [ ] Step 1: Escolher métrica (changes, incidents, contracts, services, SLOs, FinOps)
-  - [ ] Step 2: Escolher tipo de gráfico
-  - [ ] Step 3: Definir filtros e agrupamento
-  - [ ] Step 4: Preview do resultado
-  - [ ] Step 5: Salvar e adicionar ao dashboard
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 5+ testes
+- [x] **Backend:** Feature `CreateCustomChart` no módulo OperationalIntelligence
+  - [x] Entidade `CustomChart` (Id, UserId, TenantId, Name, ChartType, MetricQuery, TimeRange, Filters, CreatedAt)
+  - [x] ChartType enum: Line, Bar, Area, Pie, Gauge, Table, Sparkline
+  - [x] MetricQuery: JSON com source, metric, aggregation, groupBy, filters
+  - [x] API: `/api/v1/custom-charts` (CRUD)
+  - [x] API: `/api/v1/custom-charts/{id}/data` (execução da query)
+- [x] **Frontend:** Página `CustomChartBuilderPage`
+  - [x] Step 1: Escolher métrica (changes, incidents, contracts, services, SLOs, FinOps)
+  - [x] Step 2: Escolher tipo de gráfico
+  - [x] Step 3: Definir filtros e agrupamento
+  - [x] Step 4: Preview do resultado
+  - [x] Step 5: Salvar e adicionar ao dashboard
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 5+ testes
 
 #### 2.3 Widget de Notas Pessoais (Markdown)
-- [ ] **Backend:** Preferência `home.widget.notes.content` — texto markdown do utilizador
-- [ ] **Frontend:** Widget "My Notes" no dashboard
-  - [ ] Editor markdown inline (toggle edit/view)
-  - [ ] Auto-save com debounce (2s)
-  - [ ] Limite de 5000 caracteres
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 2+ testes
+- [x] **Backend:** Preferência `home.widget.notes.content` — texto markdown do utilizador
+- [x] **Frontend:** Widget "My Notes" no dashboard
+  - [x] Editor markdown inline (toggle edit/view)
+  - [x] Auto-save com debounce (2s)
+  - [x] Limite de 5000 caracteres
+- [x] **i18n:** 4 locales
+- [x] **Testes:** 2+ testes
 
 #### 2.4 Dashboard Cloning
-- [ ] **Backend:** Command `CloneDashboard(sourceId)` — copia widgets e layout
-- [ ] **Frontend:** Botão "Clone this dashboard" em dashboards compartilhados
-  - [ ] Modal com nome do novo dashboard
-  - [ ] Cópia independente (alterações não afetam o original)
-- [ ] **Testes:** 2+ testes
+- [x] **Backend:** Command `CloneDashboard(sourceId)` — copia widgets e layout
+- [x] **Frontend:** Botão "Clone this dashboard" em dashboards compartilhados
+  - [x] Modal com nome do novo dashboard
+  - [x] Cópia independente (alterações não afetam o original)
+- [x] **Testes:** 2+ testes
 
 #### 2.5 Drill-Down Configurável por Widget
-- [ ] **Frontend:** Cada widget tem config de "Click action":
-  - [ ] Navegar para listagem filtrada
-  - [ ] Abrir painel de detalhe
-  - [ ] Abrir em nova tab
-  - [ ] Config persistida como parte do widget JSON
-- [ ] **Testes:** 2+ testes
+- [x] **Frontend:** Cada widget tem config de "Click action":
+  - [x] Navegar para listagem filtrada
+  - [x] Abrir painel de detalhe
+  - [x] Abrir em nova tab
+  - [x] Config persistida como parte do widget JSON
+- [x] **Testes:** 2+ testes
 
 ---
 

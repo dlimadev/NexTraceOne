@@ -5381,5 +5381,71 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: """["title","service","severity","status","assignee","createdAt"]""",
             uiEditorType: "json",
             sortOrder: 9230),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.engineer",
+            displayName: "config.platform.home.template.engineer.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.engineer.description",
+            defaultValue: """["team-services","recent-changes","active-incidents","dora-metrics"]""",
+            uiEditorType: "json",
+            sortOrder: 9300),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.tech_lead",
+            displayName: "config.platform.home.template.tech_lead.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.tech_lead.description",
+            defaultValue: """["team-services","change-risk","pending-approvals","slo-status","dora-metrics"]""",
+            uiEditorType: "json",
+            sortOrder: 9310),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.architect",
+            displayName: "config.platform.home.template.architect.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.architect.description",
+            defaultValue: """["contract-health","dependency-map","compliance-status","reliability-trend"]""",
+            uiEditorType: "json",
+            sortOrder: 9320),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.executive",
+            displayName: "config.platform.home.template.executive.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.executive.description",
+            defaultValue: """["finops-summary","compliance-status","incident-overview","dora-metrics"]""",
+            uiEditorType: "json",
+            sortOrder: 9330),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.platform_admin",
+            displayName: "config.platform.home.template.platform_admin.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.platform_admin.description",
+            defaultValue: """["ai-usage","security-findings","audit-activity","system-health"]""",
+            uiEditorType: "json",
+            sortOrder: 9340),
+
+        ConfigurationDefinition.Create(
+            key: "home.widget.notes.content",
+            displayName: "config.home.widget.notes.content.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.home.widget.notes.content.description",
+            defaultValue: "",
+            uiEditorType: "markdown",
+            sortOrder: 9350),
     ];
 }

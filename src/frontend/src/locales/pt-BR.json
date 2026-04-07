@@ -8266,5 +8266,72 @@
     "reset": "Restaurar padrão",
     "columns": "Colunas visíveis",
     "noColumns": "Nenhuma coluna configurada"
+  },
+  "dashboardTemplates": {
+    "modal": {
+      "title": "Escolher Template de Dashboard",
+      "subtitle": "Comece com um template específico por persona e personalize conforme necessário."
+    },
+    "engineer": {
+      "title": "Engenheiro",
+      "description": "Serviços da equipe, mudanças recentes, incidentes ativos, DORA metrics"
+    },
+    "techLead": {
+      "title": "Tech Lead",
+      "description": "Serviços da equipe, risco de mudança, aprovações pendentes, SLO status"
+    },
+    "architect": {
+      "title": "Arquiteto",
+      "description": "Saúde dos contratos, mapa de dependências, status de conformidade, tendência de confiabilidade"
+    },
+    "executive": {
+      "title": "Executivo",
+      "description": "Resumo FinOps, status de conformidade, visão geral de incidentes, DORA metrics"
+    },
+    "platformAdmin": {
+      "title": "Admin de Plataforma",
+      "description": "Uso de IA, achados de segurança, atividade de auditoria, saúde do sistema"
+    }
+  },
+  "customCharts": {
+    "title": "Gráficos Personalizados",
+    "subtitle": "Crie visualizações personalizadas para suas métricas e KPIs",
+    "newChart": "Novo Gráfico",
+    "timeRange": "Intervalo de tempo",
+    "empty": {
+      "title": "Nenhum gráfico personalizado",
+      "description": "Crie um gráfico personalizado para visualizar as métricas da plataforma",
+      "cta": "Criar primeiro gráfico"
+    },
+    "builder": {
+      "title": "Construtor de Gráficos",
+      "step": "Etapa {{step}} de {{total}}",
+      "chooseMetric": "Escolha uma fonte de métrica",
+      "chooseChartType": "Escolha um tipo de gráfico",
+      "defineFilters": "Defina filtros e agrupamentos",
+      "groupBy": "Agrupar por",
+      "groupByPlaceholder": "ex: ambiente, equipe, serviço",
+      "timeRange": "Intervalo de tempo",
+      "preview": "Pré-visualização",
+      "saveName": "Nomeie seu gráfico",
+      "namePlaceholder": "ex: Mudanças por Ambiente",
+      "save": "Salvar Gráfico"
+    }
+  },
+  "notesWidget": {
+    "title": "Minhas Notas",
+    "edit": "Editar",
+    "preview": "Visualizar",
+    "placeholder": "Escreva suas notas pessoais aqui... (markdown suportado)",
+    "empty": "Nenhuma nota ainda. Clique no ícone de editar para começar."
+  },
+  "dashboardClone": {
+    "button": "Clonar Dashboard",
+    "modal": {
+      "title": "Clonar Dashboard",
+      "namePlaceholder": "ex: Meu Dashboard de Equipe (cópia)",
+      "confirm": "Clonar"
+    },
+    "success": "Dashboard clonado com sucesso"
   }
 }

@@ -8272,5 +8272,72 @@
     "reset": "Reset to default",
     "columns": "Visible columns",
     "noColumns": "No columns configured"
+  },
+  "dashboardTemplates": {
+    "modal": {
+      "title": "Choose Dashboard Template",
+      "subtitle": "Start from a persona-specific template and customize it to your needs."
+    },
+    "engineer": {
+      "title": "Engineer",
+      "description": "Team services, recent changes, active incidents, DORA metrics"
+    },
+    "techLead": {
+      "title": "Tech Lead",
+      "description": "Team services, change risk, pending approvals, SLO status"
+    },
+    "architect": {
+      "title": "Architect",
+      "description": "Contract health, dependency map, compliance status, reliability trend"
+    },
+    "executive": {
+      "title": "Executive",
+      "description": "FinOps summary, compliance status, incident overview, DORA metrics"
+    },
+    "platformAdmin": {
+      "title": "Platform Admin",
+      "description": "AI usage, security findings, audit activity, system health"
+    }
+  },
+  "customCharts": {
+    "title": "Custom Charts",
+    "subtitle": "Build custom visualizations for your metrics and KPIs",
+    "newChart": "New Chart",
+    "timeRange": "Time range",
+    "empty": {
+      "title": "No custom charts",
+      "description": "Create a custom chart to visualize your platform metrics",
+      "cta": "Create your first chart"
+    },
+    "builder": {
+      "title": "Chart Builder",
+      "step": "Step {{step}} of {{total}}",
+      "chooseMetric": "Choose a metric source",
+      "chooseChartType": "Choose a chart type",
+      "defineFilters": "Define filters and grouping",
+      "groupBy": "Group by",
+      "groupByPlaceholder": "e.g. environment, team, service",
+      "timeRange": "Time range",
+      "preview": "Preview",
+      "saveName": "Name your chart",
+      "namePlaceholder": "e.g. Changes by Environment",
+      "save": "Save Chart"
+    }
+  },
+  "notesWidget": {
+    "title": "My Notes",
+    "edit": "Edit",
+    "preview": "Preview",
+    "placeholder": "Write your personal notes here... (markdown supported)",
+    "empty": "No notes yet. Click the edit icon to start writing."
+  },
+  "dashboardClone": {
+    "button": "Clone Dashboard",
+    "modal": {
+      "title": "Clone Dashboard",
+      "namePlaceholder": "e.g. My Team Dashboard (copy)",
+      "confirm": "Clone"
+    },
+    "success": "Dashboard cloned successfully"
   }
 }
