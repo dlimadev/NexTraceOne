@@ -24,6 +24,7 @@ import {
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageContainer } from '../../../components/shell';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { CardListSkeleton } from '../../../components/CardListSkeleton';
 import { useToast } from '../../../components/Toast';
 import { aiGovernanceApi } from '../api/aiGovernance';
@@ -559,6 +560,10 @@ export function AiAgentsPage() {
 
   const officialAgents = filteredAgents.filter(a => a.ownershipType === 'System');
   const customAgents = filteredAgents.filter(a => a.ownershipType !== 'System');
+
+  if (agentsQuery.isError) {
+    return <PageContainer><PageErrorState /></PageContainer>;
+  }
 
   return (
     <PageContainer>

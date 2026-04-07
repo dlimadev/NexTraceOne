@@ -6,6 +6,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { PageHeader } from '../../../components/PageHeader';
 
 /**
@@ -42,12 +43,17 @@ export function ParameterUsageReportPage() {
   const { t } = useTranslation();
   const [report, setReport] = useState<UsageReport | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const fetchReport = async () => {
     setLoading(true);
+    setError(false);
     try {
       const resp = await fetch('/api/v1/configuration/analytics/usage');
       if (resp.ok) setReport(await resp.json());
+      else setError(true);
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -78,7 +84,11 @@ export function ParameterUsageReportPage() {
         </div>
       )}
 
-      {!loading && report && (
+      {!loading && error && (
+        <PageErrorState />
+      )}
+
+      {!loading && !error && report && (
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">

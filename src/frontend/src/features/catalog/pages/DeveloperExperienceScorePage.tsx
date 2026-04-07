@@ -5,6 +5,7 @@ import { Activity } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
@@ -136,7 +137,7 @@ export function DeveloperExperienceScorePage() {
   const [filterTeamId, setFilterTeamId] = useState('');
   const [lastResult, setLastResult] = useState<ScoreResponse | null>(null);
 
-  const { data: scoresData, isLoading: isListLoading, refetch } = useQuery({
+  const { data: scoresData, isLoading: isListLoading, isError, refetch } = useQuery({
     queryKey: ['developer-experience-scores', filterTeamId],
     queryFn: () =>
       client
@@ -298,7 +299,9 @@ export function DeveloperExperienceScorePage() {
           />
         </div>
 
-        {isListLoading ? (
+        {isError ? (
+          <PageErrorState />
+        ) : isListLoading ? (
           <PageLoadingState message="..." />
         ) : !scoresData?.items?.length ? (
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('developerExperienceScore.noScores')}</p>

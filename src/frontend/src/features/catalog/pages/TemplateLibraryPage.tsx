@@ -20,6 +20,7 @@ import {
   type TemplateLanguage,
   type TemplateServiceType,
 } from '../api/templates';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 // ── Helper maps ───────────────────────────────────────────────────────────────
 
@@ -210,7 +211,7 @@ export function TemplateLibraryPage() {
   const [language, setLanguage] = useState<TemplateLanguage | ''>('');
   const [showInactive, setShowInactive] = useState(false);
 
-  const { data: templates = [], isLoading } = useQuery({
+  const { data: templates = [], isLoading, isError } = useQuery({
     queryKey: ['service-templates', { search, serviceType, language, showInactive }],
     queryFn: () =>
       templatesApi.list({
@@ -316,7 +317,9 @@ export function TemplateLibraryPage() {
       </div>
 
       {/* Grid */}
-      {isLoading ? (
+      {isError ? (
+        <PageErrorState />
+      ) : isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div

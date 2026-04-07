@@ -10,6 +10,7 @@ import {
   type CreateTemplateRequest,
   type UpdateTemplateRequest,
 } from '../api/templates';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 // ── Form field ────────────────────────────────────────────────────────────────
 
@@ -86,7 +87,7 @@ export function TemplateEditorPage() {
   const isEditing = !!id;
 
   // Load existing template when editing
-  const { data: existing } = useQuery({
+  const { data: existing, isError: isLoadError } = useQuery({
     queryKey: ['service-template', id],
     queryFn: () => templatesApi.getById(id!),
     enabled: isEditing,
@@ -203,6 +204,14 @@ export function TemplateEditorPage() {
       });
     }
   };
+
+  if (isLoadError) {
+    return (
+      <div className="flex flex-col gap-5 p-6">
+        <PageErrorState />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5 p-6">
