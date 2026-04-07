@@ -8527,5 +8527,19 @@
   "integrationMappings": {
     "title": "Mapeos de Campos de Integración",
     "description": "Los mapeos de campos se configuran por conector en el módulo de Integraciones."
+  },
+  "export": {
+    "title": "Exportar Datos",
+    "description": "Elija el formato y las columnas para la exportación.",
+    "format": "Formato",
+    "columns": "Columnas",
+    "columnsSelected": "{{count}} de {{total}} columnas seleccionadas",
+    "download": "Descargar",
+    "exporting": "Exportando...",
+    "saveAsTemplate": "Guardar como Plantilla",
+    "savedTemplates": "Plantillas Guardadas",
+    "templateName": "Nombre de la Plantilla",
+    "noTemplates": "No hay plantillas guardadas.",
+    "templateSaved": "Plantilla guardada correctamente."
   }
 }

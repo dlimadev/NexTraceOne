@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BarChart3, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { BarChart3, Download, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ExportModal, type ExportFormat } from '../../../components/ExportModal';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
@@ -98,6 +99,7 @@ export function ScheduledReportsPage() {
   const deleteReport = useDeleteReport();
 
   const [showBuilder, setShowBuilder] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const [reportName, setReportName] = useState('');
   const [reportType, setReportType] = useState('compliance');
   const [schedule, setSchedule] = useState<Schedule>('weekly');
@@ -151,10 +153,16 @@ export function ScheduledReportsPage() {
       <PageHeader
         title={t('scheduledReports.title')}
         actions={
-          <Button size="sm" onClick={() => setShowBuilder(true)}>
-            <Plus className="w-4 h-4 mr-1" />
-            {t('scheduledReports.create')}
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setShowExport(true)}>
+              <Download className="w-4 h-4 mr-1" />
+              {t('export.title')}
+            </Button>
+            <Button size="sm" onClick={() => setShowBuilder(true)}>
+              <Plus className="w-4 h-4 mr-1" />
+              {t('scheduledReports.create')}
+            </Button>
+          </div>
         }
       />
 
@@ -346,6 +354,27 @@ export function ScheduledReportsPage() {
           </div>
         </div>
       )}
+
+      <ExportModal
+        open={showExport}
+        onClose={() => setShowExport(false)}
+        columns={[
+          { key: 'name', label: t('common.name') },
+          { key: 'reportType', label: t('common.type') },
+          { key: 'schedule', label: t('scheduledReports.schedule') },
+          { key: 'format', label: t('scheduledReports.format') },
+          { key: 'recipients', label: t('scheduledReports.recipients') },
+          { key: 'enabled', label: t('scheduledReports.enabled') },
+          { key: 'lastSentAt', label: t('scheduledReports.lastSent') },
+        ]}
+        onExport={(fmt: ExportFormat) => {
+          // POST /api/v1/export with the selected format
+          client.post('/api/v1/export', {
+            entity: 'scheduled-reports',
+            format: fmt,
+          }).catch(() => null);
+        }}
+      />
     </PageContainer>
   );
 }

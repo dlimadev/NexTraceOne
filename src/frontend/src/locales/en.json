@@ -8533,5 +8533,19 @@
   "integrationMappings": {
     "title": "Integration Field Mappings",
     "description": "Field mappings are configured per connector in the Integrations module."
+  },
+  "export": {
+    "title": "Export Data",
+    "description": "Choose export format and columns.",
+    "format": "Format",
+    "columns": "Columns",
+    "columnsSelected": "{{count}} of {{total}} columns selected",
+    "download": "Download",
+    "exporting": "Exporting...",
+    "saveAsTemplate": "Save as Template",
+    "savedTemplates": "Saved Templates",
+    "templateName": "Template Name",
+    "noTemplates": "No saved templates.",
+    "templateSaved": "Template saved successfully."
   }
 }

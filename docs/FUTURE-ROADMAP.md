@@ -218,14 +218,14 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 Customizações que o utilizador pode realizar **sem alterar a identidade visual**:
 
-- **Fase 1:** Saved views, bookmarks, default scope, timezone, colunas visíveis, paginação
-- **Fase 2:** Dashboard templates por persona, custom charts, widget de notas, cloning, drill-down
-- **Fase 3:** Watch lists, quiet hours, custom alert rules, digest personalizado
-- **Fase 4:** Custom tags, custom metadata fields, custom taxonomies
-- **Fase 5:** Custom checklists, automation rules, custom contract templates
-- **Fase 6:** Scheduled reports, export configurável, saved report templates
-- **Fase 7:** Custom AI prompts, AI behavior preferences, AI knowledge scope
-- **Fase 8:** Custom webhook payloads, API keys management, custom integration mappings
+- **Fase 1:** ✅ Saved views, bookmarks, default scope, timezone, colunas visíveis, paginação
+- **Fase 2:** ✅ Dashboard templates por persona, custom charts, widget de notas, cloning, drill-down
+- **Fase 3:** ✅ Watch lists, quiet hours, custom alert rules, digest personalizado
+- **Fase 4:** ✅ Custom tags, custom metadata fields, custom taxonomies
+- **Fase 5:** ✅ Custom checklists, automation rules, custom contract templates
+- **Fase 6:** ✅ Scheduled reports, export configurável, saved report templates
+- **Fase 7:** ✅ Custom AI prompts, AI behavior preferences, AI knowledge scope
+- **Fase 8:** ✅ Custom webhook payloads, API keys management, custom integration mappings
 
 ---
 

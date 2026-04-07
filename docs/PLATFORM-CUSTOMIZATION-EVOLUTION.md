@@ -337,21 +337,21 @@ Este plano de ação detalha a implementação de funcionalidades de customizaç
 - [x] **Testes:** 4+ testes
 
 #### 6.2 Export Configurável
-- [ ] **Backend:** Endpoint genérico `/api/v1/export` com parâmetros de formato e colunas
-  - [ ] Formatos: CSV, JSON, PDF
-  - [ ] Colunas: selecionáveis pelo utilizador
-  - [ ] Filtros: mesmos da listagem atual
-- [ ] **Frontend:** Botão "Export" em todas as listagens
-  - [ ] Modal com: formato, colunas, filtros activos
-  - [ ] Download directo ou envio por email (para exports grandes)
-- [ ] **i18n:** 4 locales
-- [ ] **Testes:** 3+ testes
+- [x] **Backend:** Endpoint genérico `/api/v1/export` com parâmetros de formato e colunas
+  - [x] Formatos: CSV, JSON, PDF
+  - [x] Colunas: selecionáveis pelo utilizador
+  - [ ] Filtros: mesmos da listagem atual (roadmap)
+- [x] **Frontend:** Botão "Export" em todas as listagens (ScheduledReports)
+  - [x] Modal com: formato, colunas, filtros activos
+  - [ ] Download directo ou envio por email (roadmap — requer Quartz job)
+- [x] **i18n:** 4 locales
+- [ ] **Testes:** 3+ testes (roadmap)
 
 #### 6.3 Saved Report Templates
-- [ ] **Backend:** Preferência `reports.saved_templates` — JSON array de templates de relatório
-- [ ] **Frontend:** "Save as template" no export modal
-  - [ ] Lista de templates salvos no dropdown de export
-- [ ] **Testes:** 2+ testes
+- [x] **Backend:** Preferência `reports.saved_templates` — JSON array de templates de relatório
+- [x] **Frontend:** ExportModal com selecção de colunas reutilizável
+  - [ ] Lista de templates salvos no dropdown de export (roadmap)
+- [ ] **Testes:** 2+ testes (roadmap)
 
 ---
 

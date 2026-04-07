@@ -5564,6 +5564,30 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "json",
             sortOrder: 9530),
 
+        // ── Phase 6 — Reports Seeds ──────────────────
+
+        ConfigurationDefinition.Create(
+            key: "reports.saved_templates",
+            displayName: "config.reports.saved_templates.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.reports.saved_templates.description",
+            defaultValue: "[]",
+            uiEditorType: "json",
+            sortOrder: 9540),
+
+        ConfigurationDefinition.Create(
+            key: "reports.export.default_format",
+            displayName: "config.reports.export.default_format.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User, ConfigurationScope.Tenant],
+            description: "config.reports.export.default_format.description",
+            defaultValue: "csv",
+            uiEditorType: "select",
+            sortOrder: 9545),
+
         // ── Phase 8 — Integrations & API (Tenant-level) ──────────────────
 
         ConfigurationDefinition.Create(
