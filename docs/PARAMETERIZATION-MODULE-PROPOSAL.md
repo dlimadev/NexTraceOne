@@ -2112,11 +2112,11 @@ public async Task RegisterServiceAsset_WhenApprovalNotRequired_SetsStatusToActiv
 - [ ] Implementar chaos engineering governado
 
 ### Fase 5 — Polish, Migração i18n & Analytics
-- [ ] Migrar seeds existentes (345) para chaves i18n
-- [ ] Parâmetros de analytics e persona tracking
-- [ ] UX avançada de configuração
-- [ ] Relatórios de utilização de parâmetros
-- [ ] Dashboard executivo de compliance de parametrização
+- [x] Migrar seeds existentes (345) para chaves i18n
+- [x] Parâmetros de analytics e persona tracking
+- [x] UX avançada de configuração
+- [x] Relatórios de utilização de parâmetros
+- [x] Dashboard executivo de compliance de parametrização
 
 ---
 
