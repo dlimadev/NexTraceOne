@@ -13,15 +13,15 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 
 | Métrica | Valor |
 |---------|-------|
-| Funcionalidades totalmente implementadas | ~94% |
-| Funcionalidades parcialmente implementadas | ~4% |
+| Funcionalidades totalmente implementadas | ~95% |
+| Funcionalidades parcialmente implementadas | ~3% |
 | Funcionalidades não implementadas (gaps reais) | ~2% |
 | Gaps Críticos | 0 (3 → 0, todos resolvidos) |
-| Gaps Alta Prioridade | 5 (18 → 5, 13 resolvidos) |
-| Gaps Média Prioridade | 17 (30 → 17, 13 resolvidos) |
+| Gaps Alta Prioridade | 3 (18 → 3, 15 resolvidos) |
+| Gaps Média Prioridade | 13 (30 → 13, 17 resolvidos) |
 | Gaps Baixa Prioridade | 7 |
-| **Total de Gaps Resolvidos** | **30** |
-| **Total de Gaps Remanescentes** | **29** |
+| **Total de Gaps Resolvidos** | **36** |
+| **Total de Gaps Remanescentes** | **23** |
 
 ---
 
@@ -72,7 +72,7 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 | GAP-CTR-04 | 56 chaves de validação i18n para builders — todas presentes em 4 locales (en, pt-PT, pt-BR, es) | ✅ Implementado |
 | GAP-CTR-05 | Service Type options em `ServiceCatalogPage.tsx` — todas as 22 opções agora usam i18n keys via `t()` | ✅ Corrigido |
 | GAP-CTR-06 | Template options em `TemplateEditorPage.tsx` — todas as 12 opções agora usam i18n keys via `t()` | ✅ Corrigido |
-| GAP-CTR-07 | Full-Text Search Index (GIN index necessário) para catálogo | 🟡 Média |
+| GAP-CTR-07 | Full-Text Search GIN indexes adicionados: `IX_cat_service_assets_fts` (Name, DisplayName, Domain, TeamName) e `IX_cat_api_assets_fts` (Name, RoutePattern) | ✅ Resolvido |
 | GAP-CTR-08 | `.AsNoTracking()` — implementado ao nível do repositório (EfDeveloperSurveyRepository, ServiceAssetRepository, ProductivitySnapshotRepository, DxScoreRepository, etc.) | ✅ Implementado (repository layer) |
 | GAP-CTR-09 | Frontend Unit Tests — 0 testes para VisualRestBuilder, VisualSoapBuilder, VisualEventBuilder, ServiceRegistrationWizard, ContractHealthDashboard | 🟠 Alta |
 | GAP-CTR-10 | E2E Tests gaps: versioning, approval, health dashboard, deprecation flows sem cobertura | 🟡 Média |
@@ -108,7 +108,7 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 | GAP-SEC-01 | httpOnly Cookie + CSRF — infraestrutura existe mas opt-in activation pendente | ⚠️ Parcial |
 | GAP-SEC-02 | Encryption at Rest Full Coverage — infraestrutura existe, aplicação seletiva por campo necessária | ⚠️ Parcial |
 | GAP-SEC-03 | Assembly/artifact signing (.NET + frontend bundles) | ❌ Não implementado |
-| GAP-SEC-04 | appsettings.json dev credentials hardcoded (devem ser movidos para user-secrets) | 🟡 Média |
+| GAP-SEC-04 | appsettings.Development.json usa `CHANGE_ME`/`REPLACE_VIA_ENV` placeholders (25 instâncias) + comentário `_setup` com instruções `dotnet user-secrets` — sem credenciais reais | ✅ Já resolvido |
 | GAP-SEC-05 | Dependency vulnerability audits automatizados | 🟡 Média |
 | GAP-SEC-06 | CORS production config — já implementado com validação rigorosa: `InvalidOperationException` se `Cors:AllowedOrigins` não configurado em Staging/Production; bloqueia wildcard com credentials | ✅ Já implementado |
 
@@ -139,7 +139,7 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 |-----|---------|--------|
 | GAP-INT-01 | CI/CD integration connectors (GitLab, Jenkins, GitHub Actions, Azure DevOps) são stubs metadata-only sem processamento real de dados | 🟠 Alta |
 | GAP-INT-02 | Kafka integration — modelo de domínio existe mas sem producer/consumer real | ⚠️ Parcial |
-| GAP-INT-03 | IIS deployment config — apenas documentação, sem web.config ou applicationHost.xml | ⚠️ Parcial |
+| GAP-INT-03 | IIS deployment config — `web.config` criado com ANCM InProcess, security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy), compression, request limits 30MB | ✅ Resolvido |
 | GAP-INT-04 | External queue consumer pendente para ingestion pipeline | 🟡 Média |
 
 ---
@@ -182,9 +182,9 @@ Após análise exaustiva de **90+ ficheiros `.md`** de documentação e cross-re
 |-----|---------|--------|
 | GAP-XM-01 | Outbox infrastructure registada para 21 DbContexts mas maioritariamente sem uso — processadores correm ciclos sem mensagens | 🟡 Média |
 | GAP-XM-02 | 22+ connection strings necessárias para full deployment — complexidade e risco de misconfiguration significativo | 🟡 Média |
-| GAP-XM-03 | OpenTelemetry default endpoint é `localhost:4317` — produção requer override ou telemetry falha silenciosamente | 🟡 Média |
+| GAP-XM-03 | OpenTelemetry `CollectorOptions` default alterado de `localhost:4317` para vazio; Development explicitamente configura endpoints em `appsettings.Development.json` | ✅ Resolvido |
 | GAP-XM-04 | `IKnowledgeModule` — implementada por `KnowledgeModuleService` em Knowledge.Infrastructure | ✅ Implementado |
-| GAP-XM-05 | No event tracking real no frontend para ProductAnalytics — backend repository existe mas é maioritariamente vazio | 🟡 Média |
+| GAP-XM-05 | `AnalyticsEventTracker` component implementado e wired no `AppShell` — captura page views por módulo, persona e sessão via `POST /api/v1/analytics/events` | ✅ Resolvido |
 
 ---
 
@@ -283,7 +283,7 @@ O plano está organizado em **6 fases**, priorizadas por impacto no produto e de
 | 3.3 | ~~LLM Response sanitization — `credential-leak-prevention` guardrail (sanitize action) + `sensitive-data-classification` (log)~~ | GAP-AI-03 | ✅ Já implementado |
 | 3.4 | Ativar httpOnly Cookie mode (atualmente opt-in, precisa de validação staging) | GAP-SEC-01 | ⬜ Pendente |
 | 3.5 | Expandir Encryption at Rest para campos sensíveis adicionais | GAP-SEC-02 | ⬜ Pendente |
-| 3.6 | Mover dev credentials de appsettings.json para user-secrets | GAP-SEC-04 | ⬜ Pendente |
+| 3.6 | ~~Dev credentials — `appsettings.Development.json` já usa `CHANGE_ME`/`REPLACE_VIA_ENV` placeholders; ficheiro inclui instruções para `dotnet user-secrets`~~ | GAP-SEC-04 | ✅ Já resolvido |
 | 3.7 | ~~CORS configuration — já implementado com validação rigorosa em `WebApplicationBuilderExtensions.AddCorsConfiguration()`; requer explícito `Cors:AllowedOrigins` em Staging/Production~~ | GAP-SEC-06 | ✅ Já implementado |
 | 3.8 | Adicionar dependency vulnerability audit ao CI pipeline | GAP-SEC-05 | ⬜ Pendente |
 | 3.9 | `.AsNoTracking()` — já implementado ao nível do repositório (EfDeveloperSurveyRepository, ServiceAssetRepository, etc.) | GAP-CTR-08 | ✅ Já implementado (repository layer) |
@@ -326,12 +326,12 @@ O plano está organizado em **6 fases**, priorizadas por impacto no produto e de
 | 5.4 | ~~`AiSourceRegistryService.CheckHealthAsync()` — já verifica HTTP, PostgreSQL, ExternalMemory~~ | GAP-AI-07 | ✅ Já implementado |
 | 5.5 | Melhorar model selection routing — ir além de keyword heuristics | GAP-AI-05, GAP-AI-06 | 🟡 Aceitável (funcional) |
 | 5.6 | Implementar SAML protocol handlers (entidades existem, falta flow) | GAP-AI-08 | ⬜ Pendente |
-| 5.7 | Adicionar GIN index para Full-Text Search no catálogo | GAP-CTR-07 | ⬜ Pendente |
+| 5.7 | ~~Adicionar GIN index para Full-Text Search no catálogo~~ — `IX_cat_service_assets_fts` e `IX_cat_api_assets_fts` adicionados | GAP-CTR-07 | ✅ Concluído |
 | 5.8 | Consolidar connection strings — reduzir de 22+ para número gerível | GAP-XM-02 | ⬜ Pendente |
-| 5.9 | Configurar OTEL endpoint default para produção (não localhost:4317) | GAP-XM-03 | ⬜ Pendente |
+| 5.9 | ~~Configurar OTEL endpoint default para produção~~ — `CollectorOptions` default alterado de `localhost:4317` para vazio; Development usa explicit override | GAP-XM-03 | ✅ Concluído |
 | 5.10 | Limpar outbox processors sem uso real | GAP-XM-01 | ⬜ Pendente |
-| 5.11 | Implementar event tracking real no frontend para ProductAnalytics | GAP-XM-05 | ⬜ Pendente |
-| 5.12 | Criar IIS deployment config (web.config, applicationHost.xml) | GAP-INT-03 | ⬜ Pendente |
+| 5.11 | ~~Implementar event tracking real no frontend para ProductAnalytics~~ — `AnalyticsEventTracker` wired no `AppShell` | GAP-XM-05 | ✅ Concluído |
+| 5.12 | ~~Criar IIS deployment config~~ — `web.config` com ANCM InProcess, security headers, compression, request limits | GAP-INT-03 | ✅ Concluído |
 
 **Entregável:** Integrações funcionais, cross-module interfaces completas.
 

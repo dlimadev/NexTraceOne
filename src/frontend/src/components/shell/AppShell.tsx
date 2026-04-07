@@ -7,6 +7,7 @@ import { AppTopbar } from './AppTopbar';
 import { AppContentFrame } from './AppContentFrame';
 import { MobileDrawer } from './MobileDrawer';
 import { EnvironmentBanner } from './EnvironmentBanner';
+import { AnalyticsEventTracker } from '../../features/product-analytics';
 import { cn } from '../../lib/cn';
 
 export function AppShell() {
@@ -91,6 +92,7 @@ export function AppShell() {
       </div>
 
       <CommandPalette open={paletteOpen} onClose={closePalette} />
+      <AnalyticsEventTracker />
     </div>
   );
 }

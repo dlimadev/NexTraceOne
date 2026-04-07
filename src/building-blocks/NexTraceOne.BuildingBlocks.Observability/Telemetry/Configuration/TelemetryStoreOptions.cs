@@ -295,15 +295,19 @@ public sealed class CollectorOptions
 {
     /// <summary>
     /// Endpoint gRPC do Collector OTLP (ex: "http://otel-collector:4317").
-    /// Obrigatório — configurar via appsettings.{Environment}.json ou variável de ambiente.
+    /// Obrigatório em produção — configurar via appsettings.{Environment}.json ou variável de ambiente.
+    /// Em Development: default "http://localhost:4317".
+    /// Em Production/Staging: deve ser explicitamente configurado; vazio desabilita exportação OTLP.
     /// </summary>
-    public string OtlpGrpcEndpoint { get; set; } = "http://localhost:4317";
+    public string OtlpGrpcEndpoint { get; set; } = "";
 
     /// <summary>
     /// Endpoint HTTP do Collector OTLP (ex: "http://otel-collector:4318").
     /// Alternativa HTTP para ambientes que não suportam gRPC.
+    /// Em Development: default "http://localhost:4318".
+    /// Em Production/Staging: deve ser explicitamente configurado; vazio desabilita exportação OTLP HTTP.
     /// </summary>
-    public string OtlpHttpEndpoint { get; set; } = "http://localhost:4318";
+    public string OtlpHttpEndpoint { get; set; } = "";
 
     /// <summary>
     /// Habilita o receiver Prometheus no Collector para scraping de métricas.
