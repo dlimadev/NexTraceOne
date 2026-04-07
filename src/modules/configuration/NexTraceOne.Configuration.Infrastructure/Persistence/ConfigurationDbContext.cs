@@ -49,6 +49,12 @@ public sealed class ConfigurationDbContext(
     /// </summary>
     public DbSet<FeatureFlagEntry> FeatureFlagEntries => Set<FeatureFlagEntry>();
 
+    /// <summary>Vistas guardadas pelo utilizador por contexto de lista.</summary>
+    public DbSet<UserSavedView> UserSavedViews => Set<UserSavedView>();
+
+    /// <summary>Favoritos de entidades da plataforma por utilizador.</summary>
+    public DbSet<UserBookmark> UserBookmarks => Set<UserBookmark>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ConfigurationDbContext).Assembly;
 

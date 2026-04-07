@@ -5257,5 +5257,129 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "text",
             sortOrder: 9090),
+
+        // ── User Profile Preferences (Phase 1) ──────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "user.timezone",
+            displayName: "config.user.timezone.label",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.timezone.description",
+            defaultValue: "UTC",
+            uiEditorType: "select",
+            sortOrder: 9000),
+
+        ConfigurationDefinition.Create(
+            key: "user.date_format",
+            displayName: "config.user.date_format.label",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.date_format.description",
+            defaultValue: "yyyy-MM-dd",
+            validationRules: """{"enum":["yyyy-MM-dd","MM/dd/yyyy","dd/MM/yyyy","dd.MM.yyyy"]}""",
+            uiEditorType: "select",
+            sortOrder: 9010),
+
+        ConfigurationDefinition.Create(
+            key: "user.time_format",
+            displayName: "config.user.time_format.label",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.time_format.description",
+            defaultValue: "HH:mm:ss",
+            validationRules: """{"enum":["HH:mm:ss","hh:mm:ss a","HH:mm"]}""",
+            uiEditorType: "select",
+            sortOrder: 9020),
+
+        ConfigurationDefinition.Create(
+            key: "user.items_per_page",
+            displayName: "config.user.items_per_page.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.items_per_page.description",
+            defaultValue: "25",
+            validationRules: """{"enum":[10,25,50,100]}""",
+            uiEditorType: "select",
+            sortOrder: 9030),
+
+        // ── Default Scope Preferences ────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "default.environment",
+            displayName: "config.default.environment.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.default.environment.description",
+            uiEditorType: "select",
+            sortOrder: 9100),
+
+        ConfigurationDefinition.Create(
+            key: "default.team",
+            displayName: "config.default.team.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.default.team.description",
+            uiEditorType: "select",
+            sortOrder: 9110),
+
+        ConfigurationDefinition.Create(
+            key: "default.service",
+            displayName: "config.default.service.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.default.service.description",
+            uiEditorType: "select",
+            sortOrder: 9120),
+
+        // ── Table Column Preferences ─────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "table.columns.catalog.services",
+            displayName: "config.table.columns.catalog.services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.catalog.services.description",
+            defaultValue: """["name","team","type","status","criticality"]""",
+            uiEditorType: "json",
+            sortOrder: 9200),
+
+        ConfigurationDefinition.Create(
+            key: "table.columns.changes.list",
+            displayName: "config.table.columns.changes.list.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.changes.list.description",
+            defaultValue: """["title","service","environment","status","risk","createdAt"]""",
+            uiEditorType: "json",
+            sortOrder: 9210),
+
+        ConfigurationDefinition.Create(
+            key: "table.columns.contracts.list",
+            displayName: "config.table.columns.contracts.list.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.contracts.list.description",
+            defaultValue: """["name","service","type","version","status"]""",
+            uiEditorType: "json",
+            sortOrder: 9220),
+
+        ConfigurationDefinition.Create(
+            key: "table.columns.incidents.list",
+            displayName: "config.table.columns.incidents.list.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.incidents.list.description",
+            defaultValue: """["title","service","severity","status","assignee","createdAt"]""",
+            uiEditorType: "json",
+            sortOrder: 9230),
     ];
 }

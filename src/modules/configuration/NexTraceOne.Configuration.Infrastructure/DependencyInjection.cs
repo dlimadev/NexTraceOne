@@ -43,6 +43,8 @@ public static class DependencyInjection
         services.AddScoped<IConfigurationEntryRepository, ConfigurationEntryRepository>();
         services.AddScoped<IConfigurationAuditRepository, ConfigurationAuditRepository>();
         services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+        services.AddScoped<IUserSavedViewRepository, UserSavedViewRepository>();
+        services.AddScoped<IUserBookmarkRepository, UserBookmarkRepository>();
 
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();
