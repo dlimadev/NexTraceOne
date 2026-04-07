@@ -225,12 +225,12 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Analytics Events | PARTIAL | Repositório EF Core real; handlers com dados reais; 28 testes passam |
+| Analytics Events | PARTIAL | Repositório EF Core real; handlers com dados reais; 42 testes passam |
 | Persona Usage / Journeys | PARTIAL | Queries reais com `ProductAnalyticsDbContext` |
 | Value Milestones | PARTIAL | Implementado; sem worker de ingestão de eventos externos |
 
 **DbContexts:** `ProductAnalyticsDbContext` com migrações confirmadas
-**Evidência:** `src/modules/productanalytics/`, 28 testes em `NexTraceOne.ProductAnalytics.Tests`
+**Evidência:** `src/modules/productanalytics/`, 42 testes em `NexTraceOne.ProductAnalytics.Tests` (28 base + 14 advanced)
 
 ---
 
