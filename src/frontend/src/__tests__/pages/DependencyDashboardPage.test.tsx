@@ -56,7 +56,7 @@ describe('DependencyDashboardPage', () => {
 
   it('shows health score section', () => {
     renderWithProviders(<DependencyDashboardPage />);
-    expect(screen.getByText('dependencyDashboard.serviceHealth')).toBeDefined();
+    expect(screen.getAllByText('dependencyDashboard.serviceHealth').length).toBeGreaterThan(0);
     expect(screen.getAllByText('dependencyDashboard.serviceId').length).toBeGreaterThan(0);
   });
 });
