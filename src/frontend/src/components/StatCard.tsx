@@ -88,8 +88,11 @@ export function StatCard({
               <div className="relative group/menu shrink-0">
                 <button
                   className="p-1 -mt-1 -mr-1 rounded-md text-muted hover:text-heading hover:bg-hover transition-colors opacity-0 group-hover:opacity-100"
-                  aria-label="Actions"
-                  onClick={(e) => e.preventDefault()}
+                  aria-label="More options"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
                 >
                   <MoreVertical size={14} />
                 </button>
