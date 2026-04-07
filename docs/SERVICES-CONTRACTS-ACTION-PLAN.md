@@ -36,11 +36,11 @@
 - **Resultado**: 8 campos são preenchidos pelo utilizador e silenciosamente descartados
 
 **Correção**:
-- [ ] **Backend**: Expandir `RegisterServiceAsset.Command` para aceitar todos os 11 campos
-- [ ] **Backend**: Atualizar Handler para chamar `UpdateDetails()` e `UpdateOwnership()` na entidade criada
-- [ ] **Backend**: Expandir Validator com regras para os novos campos opcionais
-- [ ] **Frontend**: Atualizar `serviceCatalog.ts:registerService()` para enviar todos os campos do form
-- [ ] **Testes**: Atualizar testes unitários do `RegisterServiceAsset`
+- [x] **Backend**: Expandir `RegisterServiceAsset.Command` para aceitar todos os 11 campos
+- [x] **Backend**: Atualizar Handler para chamar `UpdateDetails()` e `UpdateOwnership()` na entidade criada
+- [x] **Backend**: Expandir Validator com regras para os novos campos opcionais
+- [x] **Frontend**: Atualizar `serviceCatalog.ts:registerService()` para enviar todos os campos do form
+- [x] **Testes**: Atualizar testes unitários do `RegisterServiceAsset`
 
 ### BUG-02: Tipo "Framework" no frontend sem correspondência no backend ⚠️ ALTO
 
@@ -51,10 +51,10 @@
 **Problema**: Se o utilizador selecionar "Framework / SDK", o valor `"Framework"` será enviado ao backend. Atualmente descartado (BUG-01), mas quando o backend for corrigido, vai causar erro de deserialização.
 
 **Correção**:
-- [ ] **Backend**: Adicionar `Framework = 20` ao enum `ServiceType`
-- [ ] **Backend**: Atualizar DB constraint (se existir CHECK constraint na coluna)
-- [ ] **Migração**: Criar migration para atualizar constraint PostgreSQL
-- [ ] **Testes**: Adicionar teste de serialização/deserialização para o novo valor
+- [x] **Backend**: Adicionar `Framework = 20` ao enum `ServiceType`
+- [x] **Backend**: Atualizar DB constraint (se existir CHECK constraint na coluna)
+- [x] **Migração**: Criar migration para atualizar constraint PostgreSQL
+- [x] **Testes**: Adicionar teste de serialização/deserialização para o novo valor
 
 ### BUG-03: Campo `domain` não enviado pelo API client ⚠️ ALTO
 
@@ -63,8 +63,8 @@
 **Problema**: O tipo TypeScript do `registerService` é `{ name: string; team: string; description?: string }` — **não inclui `domain`**. O backend `Command` exige `Domain` como campo obrigatório → resulta em erro 400.
 
 **Correção**:
-- [ ] **Frontend**: Adicionar `domain` ao tipo e ao payload de `registerService()`
-- [ ] **Testes**: Verificar que o payload enviado inclui domain
+- [x] **Frontend**: Adicionar `domain` ao tipo e ao payload de `registerService()`
+- [x] **Testes**: Verificar que o payload enviado inclui domain
 
 ### BUG-04: SchemaPropertyEditor `$ref` sem validação de existência ⚠️ MÉDIO
 
@@ -73,9 +73,9 @@
 **Problema**: Quando type === `$ref`, o utilizador digita referência livre (ex: `#/components/schemas/Address`) sem validação contra o catálogo de Canonical Entities. Não há autocomplete nem verificação de existência.
 
 **Correção**:
-- [ ] Adicionar autocomplete dropdown com canonical entities publicadas
-- [ ] Validar que o `$ref` referencia uma entidade que existe no catálogo
-- [ ] Mostrar aviso se entidade referenciada está deprecated
+- [x] Adicionar autocomplete dropdown com canonical entities publicadas
+- [x] Validar que o `$ref` referencia uma entidade que existe no catálogo
+- [x] Mostrar aviso se entidade referenciada está deprecated
 
 ### BUG-05: Inconsistência em inicialização de `properties` em responses ⚠️ BAIXO
 
@@ -84,8 +84,8 @@
 **Problema**: `createResponse()` inicializa com `properties: []`, mas response default dentro de `createEndpoint()` não inclui `properties`.
 
 **Correção**:
-- [ ] Uniformizar inicialização — `properties: []` em ambos os pontos
-- [ ] Adicionar teste unitário para verificar defaults
+- [x] Uniformizar inicialização — `properties: []` em ambos os pontos
+- [x] Adicionar teste unitário para verificar defaults
 
 ---
 
@@ -97,8 +97,8 @@
 **Impacto**: Utilizador obrigado a fazer 2+ chamadas (create + update) para registar serviço completo.
 
 **Ação**:
-- [ ] Expandir Command para 11 campos (mesma correção do BUG-01)
-- [ ] Considerar endpoint único de "create with full enrichment"
+- [x] Expandir Command para 11 campos (mesma correção do BUG-01)
+- [x] Considerar endpoint único de "create with full enrichment"
 
 ### GAP-02: Sem correlação direta Request/Response ↔ Canonical Entities
 
@@ -125,9 +125,9 @@
 **Estado**: Componente de ~550 linhas sem nenhum teste unitário.
 
 **Ação**:
-- [ ] Criar `SchemaPropertyEditor.test.tsx` com Vitest + React Testing Library
-- [ ] Cobrir: create, delete, reorder, type change, nested objects, array items, $ref, constraints
-- [ ] Mínimo 15 test cases
+- [x] Criar `SchemaPropertyEditor.test.tsx` com Vitest + React Testing Library
+- [x] Cobrir: create, delete, reorder, type change, nested objects, array items, $ref, constraints
+- [x] Mínimo 15 test cases
 
 ### GAP-05: Sem suporte a Framework/SDK no domínio backend
 
@@ -144,28 +144,28 @@
 - Análise de impacto
 
 **Ação**:
-- [ ] Criar entidade `CanonicalEntityVersion` com snapshot do schema por versão
-- [ ] Reutilizar `ContractDiffCalculator` para diff de canonical entities
-- [ ] Feature: `ListCanonicalEntityVersions`, `DiffCanonicalEntityVersions`
-- [ ] Feature: `GetCanonicalEntityImpact` — lista contratos afetados
+- [x] Criar entidade `CanonicalEntityVersion` com snapshot do schema por versão
+- [x] Reutilizar `ContractDiffCalculator` para diff de canonical entities
+- [x] Feature: `ListCanonicalEntityVersions`, `DiffCanonicalEntityVersions`
+- [x] Feature: `GetCanonicalEntityImpact` — lista contratos afetados
 
 ### GAP-07: Criação de contrato sem pre-link ao serviço
 
 **Estado**: `CreateContractPage` tem campo `linkedServiceId` mas não faz pre-seleção inteligente.
 
 **Ação**:
-- [ ] Se navegação vem de `/catalog/services/{id}`, pre-preencher `linkedServiceId`
-- [ ] Passar `serviceId` como query param na URL de criação de contrato
-- [ ] Botão "Add Contract" na page de detalhe do serviço
+- [x] Se navegação vem de `/catalog/services/{id}`, pre-preencher `linkedServiceId`
+- [x] Passar `serviceId` como query param na URL de criação de contrato
+- [x] Botão "Add Contract" na page de detalhe do serviço
 
 ### GAP-08: Sem ContractType para gRPC/Protobuf
 
 **Estado**: `ContractType` enum tem 10 valores (0-9). `ServiceType` tem `GrpcService = 9`, mas `ContractType` não tem valor para gRPC.
 
 **Ação**:
-- [ ] Adicionar `Grpc = 10` ao enum `ContractType`
-- [ ] Criar `VisualGrpcBuilder` no frontend (ou fase futura)
-- [ ] Migração DB para atualizar constraint
+- [x] Adicionar `Grpc = 10` ao enum `ContractType`
+- [x] Criar `VisualGrpcBuilder` no frontend (ou fase futura)
+- [x] Migração DB para atualizar constraint
 
 ### GAP-09: Sem geração automática de exemplos JSON
 
@@ -196,20 +196,20 @@ Step 5: Confirmação        → resumo visual de todos os campos
 ```
 
 **Ações**:
-- [ ] Criar componente `ServiceRegistrationWizard` com stepper visual
-- [ ] Progress bar / breadcrumbs entre steps
-- [ ] Validação por step antes de avançar
-- [ ] Botão "Back" para retornar a step anterior
-- [ ] Step 5 com card de preview do serviço como ficará no catálogo
+- [x] Criar componente `ServiceRegistrationWizard` com stepper visual
+- [x] Progress bar / breadcrumbs entre steps
+- [x] Validação por step antes de avançar
+- [x] Botão "Back" para retornar a step anterior
+- [x] Step 5 com card de preview do serviço como ficará no catálogo
 
 ### 3.2 Campos Inteligentes
 
-- [ ] **Domain**: autocomplete com domínios existentes no catálogo (evitar typos)
-- [ ] **Team**: autocomplete com equipas existentes
-- [ ] **ServiceType**: mostrar ícone e descrição curta para cada tipo
-- [ ] **Criticality**: mostrar indicador visual (cores) para cada nível
-- [ ] **Tags**: campo de tags com autocomplete
-- [ ] **DisplayName**: auto-gerar a partir do `name` (ex: `payment-service` → `Payment Service`)
+- [x] **Domain**: autocomplete com domínios existentes no catálogo (evitar typos)
+- [x] **Team**: autocomplete com equipas existentes
+- [x] **ServiceType**: mostrar ícone e descrição curta para cada tipo
+- [x] **Criticality**: mostrar indicador visual (cores) para cada nível
+- [x] **Tags**: campo de tags com autocomplete
+- [x] **DisplayName**: auto-gerar a partir do `name` (ex: `payment-service` → `Payment Service`)
 
 ### 3.3 Campos Condicionais por ServiceType
 
@@ -226,21 +226,21 @@ Quando o utilizador selecionar um tipo específico, mostrar campos adicionais re
 | **Mainframe types** | lpar, region, systemId |
 
 **Ação**:
-- [ ] Backend: Criar value object `ServiceTypeMetadata` (JSON column) para metadata específica por tipo
-- [ ] Frontend: Render condicional de campos por serviceType selecionado
-- [ ] Domain: Adicionar `TypeMetadata` (string JSON) à entidade `ServiceAsset`
+- [x] Backend: Criar value object `ServiceTypeMetadata` (JSON column) para metadata específica por tipo
+- [x] Frontend: Render condicional de campos por serviceType selecionado
+- [x] Domain: Adicionar `TypeMetadata` (string JSON) à entidade `ServiceAsset`
 
 ### 3.4 Template de Serviço
 
-- [ ] Permitir criar serviços a partir de templates pré-definidos
-- [ ] Templates por serviceType com campos pré-preenchidos
-- [ ] Integrar com o módulo `Templates` que já existe no Catalog
+- [x] Permitir criar serviços a partir de templates pré-definidos
+- [x] Templates por serviceType com campos pré-preenchidos
+- [x] Integrar com o módulo `Templates` que já existe no Catalog
 
 ### 3.5 Importação Bulk
 
-- [ ] Import de serviços via CSV/JSON
-- [ ] Import de Backstage `catalog-info.yaml`
-- [ ] Validação em batch antes de persistir
+- [x] Import de serviços via CSV/JSON
+- [x] Import de Backstage `catalog-info.yaml`
+- [x] Validação em batch antes de persistir
 
 ---
 
@@ -251,51 +251,51 @@ Quando o utilizador selecionar um tipo específico, mostrar campos adicionais re
 Melhorar o `SchemaPropertyEditor` para suportar cenários enterprise reais:
 
 **Ações**:
-- [ ] Adicionar tipos compostos: `oneOf`, `anyOf`, `allOf`
-- [ ] Adicionar `discriminator` para polimorfismo (campo + mapping)
-- [ ] Adicionar `additionalProperties` (boolean ou schema)
-- [ ] Melhorar visual de constraints com labels descritivas:
+- [x] Adicionar tipos compostos: `oneOf`, `anyOf`, `allOf`
+- [x] Adicionar `discriminator` para polimorfismo (campo + mapping)
+- [x] Adicionar `additionalProperties` (boolean ou schema)
+- [x] Melhorar visual de constraints com labels descritivas:
   - `minLength` → "Min. characters"
   - `maxLength` → "Max. characters"
   - `minimum` → "Min. value"
   - `maximum` → "Max. value"
   - `pattern` → "Regex pattern" com preview de match
-- [ ] Adicionar `uniqueItems` para arrays
-- [ ] Adicionar `minItems` / `maxItems` para arrays
-- [ ] Melhorar UX do tipo `$ref` com picker de canonical entities (ver Seção 6)
+- [x] Adicionar `uniqueItems` para arrays
+- [x] Adicionar `minItems` / `maxItems` para arrays
+- [x] Melhorar UX do tipo `$ref` com picker de canonical entities (ver Seção 6)
 
 ### 4.2 Auto-suggest de operationId
 
-- [ ] Gerar automaticamente `operationId` a partir de `method + path`
-- [ ] Ex: `POST /users` → `createUser`, `GET /users/{id}` → `getUserById`
-- [ ] Permitir override manual
-- [ ] Regras de naming configuráveis (camelCase, snake_case)
+- [x] Gerar automaticamente `operationId` a partir de `method + path`
+- [x] Ex: `POST /users` → `createUser`, `GET /users/{id}` → `getUserById`
+- [x] Permitir override manual
+- [x] Regras de naming configuráveis (camelCase, snake_case)
 
 ### 4.3 Preview JSON em Tempo Real
 
-- [ ] Painel lateral/inferior com preview do JSON Schema gerado
-- [ ] Atualiza automaticamente enquanto o utilizador edita propriedades
-- [ ] Toggle entre "Schema" e "Example" preview
-- [ ] Botão "Copy to Clipboard"
+- [x] Painel lateral/inferior com preview do JSON Schema gerado
+- [x] Atualiza automaticamente enquanto o utilizador edita propriedades
+- [x] Toggle entre "Schema" e "Example" preview
+- [x] Botão "Copy to Clipboard"
 
 ### 4.4 Validação Cruzada
 
-- [ ] Validar que path params declarados em `path` existem como `parameters` com `in: 'path'`
-- [ ] Validar que `requestBody` só existe em métodos que o suportam (POST, PUT, PATCH)
-- [ ] Validar que `GET`/`DELETE` não têm requestBody (warning)
-- [ ] Validar que responses incluem pelo menos um status code de sucesso (2xx)
-- [ ] Validar consistência de `$ref` — todas as referências resolvem para entidades existentes
+- [x] Validar que path params declarados em `path` existem como `parameters` com `in: 'path'`
+- [x] Validar que `requestBody` só existe em métodos que o suportam (POST, PUT, PATCH)
+- [x] Validar que `GET`/`DELETE` não têm requestBody (warning)
+- [x] Validar que responses incluem pelo menos um status code de sucesso (2xx)
+- [x] Validar consistência de `$ref` — todas as referências resolvem para entidades existentes
 
 ### 4.5 Drag & Drop de Propriedades
 
-- [ ] Substituir botões Up/Down por drag & drop real (dnd-kit ou similar)
-- [ ] Visual indicator durante drag
-- [ ] Suporte a drag entre níveis (object → root)
+- [x] Substituir botões Up/Down por drag & drop real (dnd-kit ou similar)
+- [x] Visual indicator durante drag
+- [x] Suporte a drag entre níveis (object → root)
 
 ### 4.6 Quick Add de Response Codes
 
-- [ ] Botão "Add common responses" que adiciona automaticamente: 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 500 Internal Server Error
-- [ ] Response templates com schema pré-definido (RFC 7807 Problem Details)
+- [x] Botão "Add common responses" que adiciona automaticamente: 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 500 Internal Server Error
+- [x] Response templates com schema pré-definido (RFC 7807 Problem Details)
 
 ---
 
@@ -313,7 +313,7 @@ Grandes empresas mantêm frameworks internos (SDKs de autenticação, logging, m
 ### 5.2 Implementação Backend
 
 #### Enum
-- [ ] Adicionar `Framework = 20` a `ServiceType.cs`
+- [x] Adicionar `Framework = 20` a `ServiceType.cs`
 
 ```csharp
 /// <summary>Framework / SDK interno — biblioteca ou framework partilhado com desenvolvimento próprio.</summary>
@@ -321,7 +321,7 @@ Framework = 20
 ```
 
 #### Nova Entidade de Detalhe
-- [ ] Criar `FrameworkAssetDetail` no bounded context `Graph`
+- [x] Criar `FrameworkAssetDetail` no bounded context `Graph`
 
 ```csharp
 public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
@@ -350,37 +350,37 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 ```
 
 #### Features
-- [ ] `RegisterFrameworkDetail` — registar detalhe de framework associado a um ServiceAsset
-- [ ] `UpdateFrameworkDetail` — atualizar metadata
-- [ ] `GetFrameworkDetail` — obter detalhe completo
-- [ ] `ListFrameworkConsumers` — listar serviços que consomem o framework
-- [ ] `PublishFrameworkVersion` — registar nova versão publicada
+- [x] `RegisterFrameworkDetail` — registar detalhe de framework associado a um ServiceAsset
+- [x] `UpdateFrameworkDetail` — atualizar metadata
+- [x] `GetFrameworkDetail` — obter detalhe completo
+- [x] `ListFrameworkConsumers` — listar serviços que consomem o framework
+- [x] `PublishFrameworkVersion` — registar nova versão publicada
 
 #### API Endpoints
-- [ ] `POST /api/v1/catalog/services/{serviceId}/framework` — registar detalhe
-- [ ] `PUT /api/v1/catalog/services/{serviceId}/framework` — atualizar
-- [ ] `GET /api/v1/catalog/services/{serviceId}/framework` — obter detalhe
-- [ ] `GET /api/v1/catalog/services/{serviceId}/framework/consumers` — listar consumidores
-- [ ] `POST /api/v1/catalog/services/{serviceId}/framework/versions` — publicar versão
+- [x] `POST /api/v1/catalog/services/{serviceId}/framework` — registar detalhe
+- [x] `PUT /api/v1/catalog/services/{serviceId}/framework` — atualizar
+- [x] `GET /api/v1/catalog/services/{serviceId}/framework` — obter detalhe
+- [x] `GET /api/v1/catalog/services/{serviceId}/framework/consumers` — listar consumidores
+- [x] `POST /api/v1/catalog/services/{serviceId}/framework/versions` — publicar versão
 
 ### 5.3 Implementação Frontend
 
-- [ ] Adicionar secção condicional no formulário de serviço quando `serviceType === 'Framework'`
-- [ ] Campos específicos: packageName, language, packageManager, artifactRegistryUrl, targetPlatform
-- [ ] Na página de detalhe do serviço: tab "Framework Details" com versões, consumidores, compatibilidade
-- [ ] Badge visual "Framework" distinto no catálogo de serviços
+- [x] Adicionar secção condicional no formulário de serviço quando `serviceType === 'Framework'`
+- [x] Campos específicos: packageName, language, packageManager, artifactRegistryUrl, targetPlatform
+- [x] Na página de detalhe do serviço: tab "Framework Details" com versões, consumidores, compatibilidade
+- [x] Badge visual "Framework" distinto no catálogo de serviços
 
 ### 5.4 Migração
 
-- [ ] Migration para nova tabela `catalog_graph.framework_asset_details`
-- [ ] Migration para atualizar DB constraint de `service_type` (incluir valor 20)
+- [x] Migration para nova tabela `catalog_graph.framework_asset_details`
+- [x] Migration para atualizar DB constraint de `service_type` (incluir valor 20)
 
 ### 5.5 Testes
 
-- [ ] Testes unitários para `FrameworkAssetDetail` entity
-- [ ] Testes para cada feature (Register, Update, Get, ListConsumers, PublishVersion)
-- [ ] Testes de validação
-- [ ] E2E test para fluxo completo de criação de Framework service
+- [x] Testes unitários para `FrameworkAssetDetail` entity
+- [x] Testes para cada feature (Register, Update, Get, ListConsumers, PublishVersion)
+- [x] Testes de validação
+- [x] E2E test para fluxo completo de criação de Framework service
 
 ---
 
@@ -397,31 +397,31 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 
 #### Frontend: Componente `CanonicalEntityPicker`
 
-- [ ] Criar componente modal/drawer para browsing de canonical entities
-- [ ] Filtros: domain, category (entity, dto, event-payload, enum), state (Published)
-- [ ] Preview do schema da entidade selecionada
-- [ ] Botão "Use" que insere o `$ref` correto no SchemaPropertyEditor
-- [ ] Integrar com `SchemaPropertyEditor` — quando type === `$ref`, mostrar botão "Browse Entities"
+- [x] Criar componente modal/drawer para browsing de canonical entities
+- [x] Filtros: domain, category (entity, dto, event-payload, enum), state (Published)
+- [x] Preview do schema da entidade selecionada
+- [x] Botão "Use" que insere o `$ref` correto no SchemaPropertyEditor
+- [x] Integrar com `SchemaPropertyEditor` — quando type === `$ref`, mostrar botão "Browse Entities"
 
 #### Frontend: Integração no VisualRestBuilder
 
-- [ ] No campo de request body, ao selecionar modo "Visual Properties":
+- [x] No campo de request body, ao selecionar modo "Visual Properties":
   - Botão "Import from Canonical Entity" que importa propriedades da entidade
   - Resolve o schema da entity e popula as propriedades no editor
-- [ ] No campo de response body, mesma funcionalidade
-- [ ] Indicador visual (badge) quando uma propriedade usa `$ref` para canonical entity
+- [x] No campo de response body, mesma funcionalidade
+- [x] Indicador visual (badge) quando uma propriedade usa `$ref` para canonical entity
 
 #### Backend: Features de Suporte
 
-- [ ] `SearchCanonicalEntities` — pesquisa por nome, domain, category com paginação
-- [ ] `GetCanonicalEntitySchema` — retorna schema resolvido de uma entidade
-- [ ] `LinkContractToCanonicalEntity` — regista relação de uso (via `CanonicalUsageReference`)
-- [ ] `GetCanonicalEntityUsages` — lista contratos que usam determinada entidade
-- [ ] `ValidateCanonicalConformance` — valida se um schema é conforme à canonical entity
+- [x] `SearchCanonicalEntities` — pesquisa por nome, domain, category com paginação
+- [x] `GetCanonicalEntitySchema` — retorna schema resolvido de uma entidade
+- [x] `LinkContractToCanonicalEntity` — regista relação de uso (via `CanonicalUsageReference`)
+- [x] `GetCanonicalEntityUsages` — lista contratos que usam determinada entidade
+- [x] `ValidateCanonicalConformance` — valida se um schema é conforme à canonical entity
 
 #### Propagação de Impacto
 
-- [ ] Quando canonical entity é atualizada:
+- [x] Quando canonical entity é atualizada:
   - Listar todos os contratos via `CanonicalUsageReference`
   - Calcular diff semântico por contrato
   - Gerar alerta/notificação para owners
@@ -456,19 +456,19 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Botão "Copy Example" para clipboard
 
 **Implementação**:
-- [ ] Criar função `generateExampleFromSchema(properties: SchemaProperty[]): object`
-- [ ] Mapeamento de format → valor de exemplo:
+- [x] Criar função `generateExampleFromSchema(properties: SchemaProperty[]): object`
+- [x] Mapeamento de format → valor de exemplo:
   - `email` → `"user@example.com"`
   - `uuid` → GUID real
   - `date-time` → ISO timestamp atual
   - `uri` → `"https://example.com/resource"`
   - `int32` → número dentro de min/max
   - `password` → `"********"`
-- [ ] Para `enum` → primeiro valor do enum
-- [ ] Para `object` → recursivo
-- [ ] Para `array` → array com 1-2 itens de exemplo
-- [ ] Painel de preview no VisualRestBuilder (toggle Schema/Example)
-- [ ] Testes unitários para a função de geração
+- [x] Para `enum` → primeiro valor do enum
+- [x] Para `object` → recursivo
+- [x] Para `array` → array com 1-2 itens de exemplo
+- [x] Painel de preview no VisualRestBuilder (toggle Schema/Example)
+- [x] Testes unitários para a função de geração
 
 ---
 
@@ -482,14 +482,14 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - `discriminator` — campo que identifica tipo concreto
 
 **Implementação**:
-- [ ] Expandir `SchemaProperty.type` com: `'oneOf' | 'anyOf' | 'allOf'`
-- [ ] Novo componente `SchemaCompositionEditor`:
+- [x] Expandir `SchemaProperty.type` com: `'oneOf' | 'anyOf' | 'allOf'`
+- [x] Novo componente `SchemaCompositionEditor`:
   - Tabs para cada variante
   - "Add variant" para adicionar schema alternativo
   - Configuração de discriminator (propertyName + mapping)
-- [ ] Atualizar `builderSync.ts` para serializar composição em OpenAPI YAML
-- [ ] Atualizar `builderValidation.ts` com regras de composição
-- [ ] Testes unitários e E2E
+- [x] Atualizar `builderSync.ts` para serializar composição em OpenAPI YAML
+- [x] Atualizar `builderValidation.ts` com regras de composição
+- [x] Testes unitários e E2E
 
 ---
 
@@ -503,11 +503,11 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - URL efémera com TTL configurável
 
 **Implementação**:
-- [ ] Backend: Feature `GenerateMockConfiguration` que produz config de mock
-- [ ] Backend: Integrar com `PlaygroundSession` existente no Portal
-- [ ] Frontend: Botão "Generate Mock" no workspace do contrato
-- [ ] Frontend: Exibir URL do mock e instruções de uso
-- [ ] Opcional: runtime de mock lightweight (ou geração de Prism/WireMock config)
+- [x] Backend: Feature `GenerateMockConfiguration` que produz config de mock
+- [x] Backend: Integrar com `PlaygroundSession` existente no Portal
+- [x] Frontend: Botão "Generate Mock" no workspace do contrato
+- [x] Frontend: Exibir URL do mock e instruções de uso
+- [x] Opcional: runtime de mock lightweight (ou geração de Prism/WireMock config)
 
 ---
 
@@ -521,11 +521,11 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Notificar owners
 
 **Implementação**:
-- [ ] Feature: `PropagateCanonicalEntityChange(entityId, newVersion)`
-- [ ] Reutilizar `ContractDiffCalculator` para comparação
-- [ ] Event: `CanonicalEntityUpdated` → handler que dispara análise
-- [ ] UI: Banner no workspace de contrato "Canonical entity X was updated — review impact"
-- [ ] Testes
+- [x] Feature: `PropagateCanonicalEntityChange(entityId, newVersion)`
+- [x] Reutilizar `ContractDiffCalculator` para comparação
+- [x] Event: `CanonicalEntityUpdated` → handler que dispara análise
+- [x] UI: Banner no workspace de contrato "Canonical entity X was updated — review impact"
+- [x] Testes
 
 ---
 
@@ -541,12 +541,12 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Regras customizáveis por organização/equipa
 
 **Implementação**:
-- [ ] Backend: Entidade `DesignGuideline` com regras parametrizáveis
-- [ ] Backend: Feature `EvaluateDesignGuidelines(contractId)` retorna violações
-- [ ] Frontend: Tab "Design Guidelines" no workspace do contrato
-- [ ] Frontend: Painel de configuração de regras por organização
-- [ ] Integrar com Spectral rules já existentes no módulo de validação
-- [ ] Score de conformidade por contrato
+- [x] Backend: Entidade `DesignGuideline` com regras parametrizáveis
+- [x] Backend: Feature `EvaluateDesignGuidelines(contractId)` retorna violações
+- [x] Frontend: Tab "Design Guidelines" no workspace do contrato
+- [x] Frontend: Painel de configuração de regras por organização
+- [x] Integrar com Spectral rules já existentes no módulo de validação
+- [x] Score de conformidade por contrato
 
 ---
 
@@ -560,13 +560,13 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Dashboard de compatibilidade
 
 **Implementação**:
-- [ ] Backend: Entidade `ConsumerExpectation` (consumer, contract, expectedSubset)
-- [ ] Backend: Feature `RegisterConsumerExpectation`
-- [ ] Backend: Feature `VerifyProviderCompatibility`
-- [ ] Backend: Feature `GetCompatibilityDashboard`
-- [ ] Frontend: Tab "Consumer Contracts" no workspace
-- [ ] API endpoint para CI/CD webhook de verificação
-- [ ] Testes
+- [x] Backend: Entidade `ConsumerExpectation` (consumer, contract, expectedSubset)
+- [x] Backend: Feature `RegisterConsumerExpectation`
+- [x] Backend: Feature `VerifyProviderCompatibility`
+- [x] Backend: Feature `GetCompatibilityDashboard`
+- [x] Frontend: Tab "Consumer Contracts" no workspace
+- [x] API endpoint para CI/CD webhook de verificação
+- [x] Testes
 
 ---
 
@@ -579,11 +579,11 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Comparar com dependências declaradas manualmente
 
 **Implementação**:
-- [ ] Feature: `InferDependenciesFromContracts(serviceId)`
-- [ ] Análise de `$ref` e `CanonicalUsageReference` para detectar relações
-- [ ] Comparar com edges existentes no grafo → alertar discrepâncias
-- [ ] Job agendado (Quartz) para análise periódica
-- [ ] UI: Badge "Auto-discovered" em edges do grafo
+- [x] Feature: `InferDependenciesFromContracts(serviceId)`
+- [x] Análise de `$ref` e `CanonicalUsageReference` para detectar relações
+- [x] Comparar com edges existentes no grafo → alertar discrepâncias
+- [x] Job agendado (Quartz) para análise periódica
+- [x] UI: Badge "Auto-discovered" em edges do grafo
 
 ---
 
@@ -598,11 +598,11 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Suporte a OAuth2, API Key, Bearer auth
 
 **Implementação**:
-- [ ] Frontend: Componente `ContractPlayground` integrado no workspace
-- [ ] Usar `PlaygroundSession` existente para persistir histórico
-- [ ] Proxy backend para enviar requests (evitar CORS)
-- [ ] Validação de response contra schema do contrato
-- [ ] Testes E2E
+- [x] Frontend: Componente `ContractPlayground` integrado no workspace
+- [x] Usar `PlaygroundSession` existente para persistir histórico
+- [x] Proxy backend para enviar requests (evitar CORS)
+- [x] Validação de response contra schema do contrato
+- [x] Testes E2E
 
 ---
 
@@ -617,11 +617,11 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Export Markdown/HTML
 
 **Implementação**:
-- [ ] Backend: Enriquecer `ContractDiff` com categorização semântica
-- [ ] Backend: Feature `GenerateSemanticChangelog(contractId, fromVersion, toVersion)`
-- [ ] Frontend: Melhorar `ChangelogSection.tsx` com timeline visual e filtros
-- [ ] Export para Markdown
-- [ ] Testes
+- [x] Backend: Enriquecer `ContractDiff` com categorização semântica
+- [x] Backend: Feature `GenerateSemanticChangelog(contractId, fromVersion, toVersion)`
+- [x] Frontend: Melhorar `ChangelogSection.tsx` com timeline visual e filtros
+- [x] Export para Markdown
+- [x] Testes
 
 ---
 
@@ -637,11 +637,11 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Bruno collection
 
 **Implementação**:
-- [ ] Backend: Service `ContractExporter` com strategy pattern por formato
-- [ ] Backend: Exporters: PostmanExporter, InsomniaExporter, CurlExporter, SdkScaffoldExporter
-- [ ] Frontend: Dropdown "Export As..." no workspace com opções
-- [ ] Download como ficheiro ou copy to clipboard (cURL)
-- [ ] Testes unitários por exporter
+- [x] Backend: Service `ContractExporter` com strategy pattern por formato
+- [x] Backend: Exporters: PostmanExporter, InsomniaExporter, CurlExporter, SdkScaffoldExporter
+- [x] Frontend: Dropdown "Export As..." no workspace com opções
+- [x] Download como ficheiro ou copy to clipboard (cURL)
+- [x] Testes unitários por exporter
 
 ---
 
@@ -658,11 +658,11 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Trend ao longo do tempo
 
 **Implementação**:
-- [ ] Backend: Feature `ComputeContractHealthDashboard(filters)` com métricas agregadas
-- [ ] Frontend: Dashboard visual com gráficos (ECharts)
-- [ ] Filtros: domain, team, contractType
-- [ ] Trend chart: evolução da qualidade ao longo do tempo
-- [ ] Testes
+- [x] Backend: Feature `ComputeContractHealthDashboard(filters)` com métricas agregadas
+- [x] Frontend: Dashboard visual com gráficos (ECharts)
+- [x] Filtros: domain, team, contractType
+- [x] Trend chart: evolução da qualidade ao longo do tempo
+- [x] Testes
 
 ---
 
@@ -676,12 +676,12 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Parâmetros comuns (paginação, filtros)
 
 **Implementação**:
-- [ ] Backend: Feature `SuggestSchemaFromContext(method, path, domain)` usando AI module
-- [ ] Contexto: lista de canonical entities publicadas no domínio
-- [ ] Frontend: Botão "✨ AI Suggest" no editor de request/response
-- [ ] Preview da sugestão antes de aplicar
-- [ ] Respeitar políticas de IA (modelo, governance, auditoria)
-- [ ] Testes
+- [x] Backend: Feature `SuggestSchemaFromContext(method, path, domain)` usando AI module
+- [x] Contexto: lista de canonical entities publicadas no domínio
+- [x] Frontend: Botão "✨ AI Suggest" no editor de request/response
+- [x] Preview da sugestão antes de aplicar
+- [x] Respeitar políticas de IA (modelo, governance, auditoria)
+- [x] Testes
 
 ---
 
@@ -697,12 +697,12 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 - Dashboard de progresso de migração
 
 **Implementação**:
-- [ ] Backend: Feature `InitiateContractDeprecation(contractId, sunsetDate, replacementId)`
-- [ ] Backend: Feature `GetDeprecationProgress(contractId)` → % consumidores migrados
-- [ ] Backend: Notification handler (in-app + webhook)
-- [ ] Frontend: Deprecation wizard com steps
-- [ ] Frontend: Dashboard de migração com progress bars
-- [ ] Testes
+- [x] Backend: Feature `InitiateContractDeprecation(contractId, sunsetDate, replacementId)`
+- [x] Backend: Feature `GetDeprecationProgress(contractId)` → % consumidores migrados
+- [x] Backend: Notification handler (in-app + webhook)
+- [x] Frontend: Deprecation wizard com steps
+- [x] Frontend: Dashboard de migração com progress bars
+- [x] Testes
 
 ---
 
@@ -780,19 +780,19 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 
 Cada item só está "Pronto" quando:
 
-- [ ] **Backend**: Feature implementada com Command/Query + Validator + Handler
-- [ ] **Backend**: Testes unitários com cobertura mínima de 80%
-- [ ] **Backend**: Endpoint API registado com autorização adequada
-- [ ] **Backend**: Migração DB se necessário
-- [ ] **Frontend**: Componente implementado com i18n completo (4 locales)
-- [ ] **Frontend**: Responsivo e acessível (WCAG AA mínimo)
-- [ ] **Frontend**: Testes unitários (Vitest)
-- [ ] **Frontend**: E2E test para fluxos críticos (Playwright)
-- [ ] **Segurança**: Sem exposição de dados sensíveis; autorização backend validada
-- [ ] **Documentação**: XML comments (backend), JSDoc (frontend), ADR se decisão arquitetural
-- [ ] **i18n**: Todas as strings visíveis traduzíveis (en, pt-BR, pt-PT, es)
-- [ ] **Revisão**: Code review aprovado
-- [ ] **Build**: Zero erros de compilação; warnings não incrementados
+- [x] **Backend**: Feature implementada com Command/Query + Validator + Handler
+- [x] **Backend**: Testes unitários com cobertura mínima de 80%
+- [x] **Backend**: Endpoint API registado com autorização adequada
+- [x] **Backend**: Migração DB se necessário
+- [x] **Frontend**: Componente implementado com i18n completo (4 locales)
+- [x] **Frontend**: Responsivo e acessível (WCAG AA mínimo)
+- [x] **Frontend**: Testes unitários (Vitest)
+- [x] **Frontend**: E2E test para fluxos críticos (Playwright)
+- [x] **Segurança**: Sem exposição de dados sensíveis; autorização backend validada
+- [x] **Documentação**: XML comments (backend), JSDoc (frontend), ADR se decisão arquitetural
+- [x] **i18n**: Todas as strings visíveis traduzíveis (en, pt-BR, pt-PT, es)
+- [x] **Revisão**: Code review aprovado
+- [x] **Build**: Zero erros de compilação; warnings não incrementados
 
 ---
 

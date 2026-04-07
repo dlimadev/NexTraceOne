@@ -1868,9 +1868,9 @@ Cada parâmetro segue o mesmo padrão de implementação:
 Para CADA um dos 98+ parâmetros, a implementação deve incluir:
 
 #### Backend
-- [ ] **Seed**: `ConfigurationDefinition.Create(...)` no `ConfigurationDefinitionSeeder`
-- [ ] **i18n key**: `displayName` e `description` como chaves i18n (não texto hardcoded)
-- [ ] **Handler modification**: O handler que executa a funcionalidade deve:
+- [x] **Seed**: `ConfigurationDefinition.Create(...)` no `ConfigurationDefinitionSeeder`
+- [x] **i18n key**: `displayName` e `description` como chaves i18n (não texto hardcoded)
+- [x] **Handler modification**: O handler que executa a funcionalidade deve:
   ```csharp
   // Injetar IConfigurationResolutionService
   private readonly IConfigurationResolutionService _configService;
@@ -1891,20 +1891,20 @@ Para CADA um dos 98+ parâmetros, a implementação deve incluir:
       // Fluxo direto (sem aprovação)
   }
   ```
-- [ ] **Validação**: Se o parâmetro tem validationRules, garantir que são verificadas ao guardar
-- [ ] **Auditoria**: Alterações ao parâmetro são registadas via `ConfigurationAuditEntry`
+- [x] **Validação**: Se o parâmetro tem validationRules, garantir que são verificadas ao guardar
+- [x] **Auditoria**: Alterações ao parâmetro são registadas via `ConfigurationAuditEntry`
 
 #### Frontend
-- [ ] **i18n**: Chaves de tradução em 4 ficheiros de locale
-- [ ] **Config page**: Parâmetro visível na página de configuração do domínio correspondente
-- [ ] **UX reflection**: A UI muda de acordo com o valor do parâmetro (ex: se approval_required=false, o botão "Submit for Approval" não aparece)
-- [ ] **Role picker**: Se parâmetro contém roles, usar componente `<RolePicker>`
+- [x] **i18n**: Chaves de tradução em 4 ficheiros de locale
+- [x] **Config page**: Parâmetro visível na página de configuração do domínio correspondente
+- [x] **UX reflection**: A UI muda de acordo com o valor do parâmetro (ex: se approval_required=false, o botão "Submit for Approval" não aparece)
+- [x] **Role picker**: Se parâmetro contém roles, usar componente `<RolePicker>`
 
 #### Testes
-- [ ] **Test when enabled**: Teste unitário com parâmetro ativado
-- [ ] **Test when disabled**: Teste unitário com parâmetro desativado
-- [ ] **Test scope inheritance**: Teste de resolução hierárquica (Tenant override de System)
-- [ ] **Test edge cases**: Parâmetro inexistente, valor inválido, etc.
+- [x] **Test when enabled**: Teste unitário com parâmetro ativado
+- [x] **Test when disabled**: Teste unitário com parâmetro desativado
+- [x] **Test scope inheritance**: Teste de resolução hierárquica (Tenant override de System)
+- [x] **Test edge cases**: Parâmetro inexistente, valor inválido, etc.
 
 ### 27.4 Exemplo Completo: `catalog.service.creation.approval_required`
 
