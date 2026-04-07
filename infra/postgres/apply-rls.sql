@@ -402,13 +402,8 @@ CREATE POLICY tenant_isolation ON int_ingestion_sources
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
 -- ── Configuration module (cfg_ prefix) ───────────────────────────────────────
-
--- cfg_configuration_entries — configuration values per tenant/scope
-ALTER TABLE cfg_configuration_entries ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS tenant_isolation ON cfg_configuration_entries;
-CREATE POLICY tenant_isolation ON cfg_configuration_entries
-    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
-    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+-- Note: cfg_entries, cfg_definitions, cfg_modules use scope-based isolation
+-- (not tenant_id column), so RLS is not applicable to those tables.
 
 -- cfg_user_watches — user watch lists per tenant
 ALTER TABLE cfg_user_watches ENABLE ROW LEVEL SECURITY;
