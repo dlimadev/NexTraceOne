@@ -13,7 +13,7 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 | [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md) | **Roadmap** — Planned features and future evolution |
 | [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md) | Implementation status per module (~98% complete) |
 | [PRODUCT-VISION.md](./PRODUCT-VISION.md) | Official product vision and positioning |
-| [NEXTRACEONE-PRESENTATION.md](./NEXTRACEONE-PRESENTATION.md) | Presentation-ready overview of the product based on the current codebase |
+| [NEXTRACEONE-PRESENTATION.md](./NEXTRACEONE-PRESENTATION.md) | **Formal presentation** — What it is, problems solved, differentiation, why companies should adopt it |
 
 ---
 
@@ -22,7 +22,7 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 | Document | Description |
 |---|---|
 | [PRODUCT-VISION.md](./PRODUCT-VISION.md) | Official product vision and positioning |
-| [NEXTRACEONE-PRESENTATION.md](./NEXTRACEONE-PRESENTATION.md) | Executive and commercial presentation narrative based on the codebase |
+| [NEXTRACEONE-PRESENTATION.md](./NEXTRACEONE-PRESENTATION.md) | Formal commercial and institutional presentation document |
 | [PLATFORM-CAPABILITIES.md](./PLATFORM-CAPABILITIES.md) | Platform capability overview |
 | [MODULES-AND-PAGES.md](./MODULES-AND-PAGES.md) | Module and page inventory |
 | [DOMAIN-BOUNDARIES.md](./DOMAIN-BOUNDARIES.md) | DDD domain boundaries |
