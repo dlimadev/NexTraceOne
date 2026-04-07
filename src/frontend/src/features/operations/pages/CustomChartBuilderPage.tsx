@@ -111,6 +111,7 @@ const initialBuilder: BuilderState = {
 /** Página de criação e gestão de gráficos customizados. */
 export function CustomChartBuilderPage() {
   const { t } = useTranslation();
+  // TODO: replace with auth context values (tenantId from tenant resolution, userId from claims)
   const tenantId = 'default';
   const userId = 'current';
 

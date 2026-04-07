@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import client from '../api/client';
 
 const MAX_CHARS = 5000;
+const AUTO_SAVE_DELAY_MS = 2000;
 
 function useNotesContent(userId: string) {
   return useQuery({
@@ -57,7 +58,7 @@ export function NotesWidget({ userId = 'current' }: Props) {
       if (value.length > MAX_CHARS) return;
       setContent(value);
       if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => saveNotes(value), 2000);
+      timerRef.current = setTimeout(() => saveNotes(value), AUTO_SAVE_DELAY_MS);
     },
     [saveNotes],
   );
