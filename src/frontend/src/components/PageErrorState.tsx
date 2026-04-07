@@ -12,6 +12,10 @@ interface PageErrorStateProps {
   action?: ReactNode;
   /** Atalho: callback de retry — renderiza um botão de retry padronizado quando `action` não for fornecido. */
   onRetry?: () => unknown;
+  /** Ícone customizado (padrão: AlertTriangle). */
+  icon?: ReactNode;
+  /** Variante: default (full-page) ou compact (inline, menor padding). */
+  variant?: 'default' | 'compact';
   className?: string;
 }
 
@@ -20,28 +24,48 @@ interface PageErrorStateProps {
  *
  * Combina feedback visual semântico (ícone + cor critical) com
  * mensagem i18n e ação de recuperação opcional.
- * Substituí os vários padrões inline ad-hoc usados nos módulos core.
+ *
+ * Variantes:
+ * - default: uso em páginas inteiras (padding generoso, ícone grande)
+ * - compact: uso inline em cards/secções (padding reduzido, ícone pequeno)
+ *
+ * Substitui tanto o antigo ErrorState como os vários padrões inline ad-hoc.
  *
  * @see docs/DESIGN-SYSTEM.md §4.14
  */
-export function PageErrorState({ title, message, action, onRetry, className }: PageErrorStateProps) {
+export function PageErrorState({
+  title,
+  message,
+  action,
+  onRetry,
+  icon,
+  variant = 'default',
+  className,
+}: PageErrorStateProps) {
   const { t } = useTranslation();
+  const isCompact = variant === 'compact';
 
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center text-center py-12 px-6 animate-fade-in',
+        'flex flex-col items-center justify-center text-center animate-fade-in',
+        isCompact ? 'py-6 px-4' : 'py-12 px-6',
         className,
       )}
       role="alert"
     >
-      <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-critical/15 border border-critical/25 text-critical mb-3">
-        <AlertTriangle size={22} />
+      <div
+        className={cn(
+          'flex items-center justify-center rounded-lg bg-critical/15 border border-critical/25 text-critical',
+          isCompact ? 'w-10 h-10 mb-2' : 'w-12 h-12 mb-3',
+        )}
+      >
+        {icon ?? <AlertTriangle size={isCompact ? 18 : 22} />}
       </div>
-      <h3 className="text-sm font-semibold text-heading mb-1">
+      <h3 className={cn('font-semibold text-heading mb-1', isCompact ? 'text-xs' : 'text-sm')}>
         {title ?? t('common.error')}
       </h3>
-      <p className="text-xs text-muted max-w-sm mb-4">
+      <p className={cn('text-muted mb-4', isCompact ? 'text-xs max-w-xs' : 'text-xs max-w-sm')}>
         {message ?? t('common.errorDescription')}
       </p>
       {action ?? (onRetry ? (

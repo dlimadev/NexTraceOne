@@ -5094,7 +5094,16 @@
       "noDashboardsHint": "Usa el formulario de arriba para crear tu primer panel personalizado.",
       "viewDashboard": "Ver Panel",
       "widgetCount": "Número de widgets",
-      "widgets": "widgets",
+      "widgets": {
+        "changeConfidence": "Confianza en Cambios",
+        "costTrend": "Tendencia de Costos",
+        "doraMetrics": "Métricas DORA",
+        "incidentSummary": "Resumen de Incidentes",
+        "knowledgeGraph": "Grafo de Conocimiento",
+        "onCallStatus": "Estado On-Call",
+        "reliabilitySlo": "SLO de Fiabilidad",
+        "serviceScorecard": "Scorecard de Servicio"
+      },
       "singleColumn": "Columna Única",
       "twoColumn": "Dos Columnas",
       "threeColumn": "Tres Columnas",
@@ -8541,5 +8550,19 @@
     "templateName": "Nombre de la Plantilla",
     "noTemplates": "No hay plantillas guardadas.",
     "templateSaved": "Plantilla guardada correctamente."
+  },
+  "pagination": {
+    "pageOf": "Página {{page}} de {{totalPages}}",
+    "showing": "Mostrando {{from}} a {{to}} de {{total}}",
+    "itemsPerPage": "Elementos por página",
+    "previous": "Página anterior",
+    "next": "Página siguiente",
+    "first": "Primera página",
+    "last": "Última página",
+    "navigation": "Paginación"
+  },
+  "brand": {
+    "name": "NexTraceOne",
+    "tagline": "Operational Confidence"
   }
 }
