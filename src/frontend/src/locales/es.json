@@ -1713,7 +1713,13 @@
     "items": "Elementos",
     "name": "Nombre",
     "onePerLine": "uno por línea",
-    "type": "Tipo"
+    "type": "Tipo",
+    "skipToContent": "Saltar al contenido",
+    "steps": "Pasos",
+    "optional": "Opcional",
+    "step_completed": "completado",
+    "step_active": "activo",
+    "step_upcoming": "pendiente"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Cuando está activado, los usuarios pueden crear agentes de IA especializados personalizados.",
@@ -4350,7 +4356,6 @@
     "changeOverview": "Confianza en Cambios",
     "changePending": "Pendiente Revisión",
     "changeRejected": "Rechazado",
-    "consumerRelations": "Relaciones de Consumo",
     "contractApproved": "Aprobado",
     "contractDeprecated": "Depreciado",
     "contractDrafts": "Borradores",
@@ -4368,15 +4373,16 @@
     "noIncidents": "Sin incidentes registrados",
     "noServices": "Ningún servicio registrado aún",
     "openIncidents": "Incidentes Abiertos",
-    "pendingApprovals": "Aprobaciones Pendientes",
     "recentChanges": "Cambios Recientes",
     "recentServices": "Servicios Recientes",
     "registeredApis": "APIs Registradas",
-    "registeredApisTitle": "APIs Registradas",
     "subtitle": "Fuente de verdad para servicios, contratos, cambios y conocimiento operacional",
     "title": "Panel",
     "totalContracts": "Total de Contratos",
-    "trendHealthy": "Saludable"
+    "trendHealthy": "Saludable",
+    "vsLastPeriod": "Vs período anterior: {{value}}",
+    "contractDistribution": "Distribución de contratos",
+    "viewReport": "Informe"
   },
   "dashboardClone": {
     "button": "Clonar Dashboard",
@@ -5349,7 +5355,9 @@
     "switchToDark": "Cambiar a modo oscuro",
     "switchToLight": "Cambiar a modo claro",
     "toggleLanguage": "Cambiar idioma",
-    "toggleTheme": "Alternar modo claro/oscuro"
+    "toggleTheme": "Alternar modo claro/oscuro",
+    "switchToAuto": "Cambiar a modo del sistema",
+    "selectLanguage": "Seleccionar Idioma"
   },
   "identity": {
     "accessReview": {
@@ -7918,7 +7926,8 @@
     "dependencyDashboard": "Panel de Dependencias",
     "licenseCompliance": "Conformidad de Licencias",
     "parameterUsageReport": "Uso de Parámetros",
-    "parameterCompliance": "Cumplimiento de Parámetros"
+    "parameterCompliance": "Cumplimiento de Parámetros",
+    "navigation": "Navegación principal"
   },
   "sourceOfTruth": {
     "assetTypes": {

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useId, type ReactNode, type KeyboardEvent } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '../lib/cn';
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
@@ -32,8 +32,6 @@ interface DropdownMenuProps {
   align?: 'left' | 'right';
   className?: string;
 }
-
-const FOCUSABLE = '[role="menuitem"]:not([aria-disabled="true"])';
 
 /**
  * DropdownMenu enterprise com suporte completo a teclado.

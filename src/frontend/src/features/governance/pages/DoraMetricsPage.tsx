@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { Activity, TrendingUp, TrendingDown, BarChart3, RefreshCw, Minus } from 'lucide-react';
+import { Activity, TrendingDown, RefreshCw, Minus } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';

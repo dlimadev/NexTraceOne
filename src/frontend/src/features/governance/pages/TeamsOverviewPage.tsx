@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
-  Users, Search, Server, BarChart3, AlertTriangle, ArrowRight, Building2,
+  Users, Search, Server, Award, AlertTriangle, ArrowRight, Building2,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -95,7 +95,7 @@ export function TeamsOverviewPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard title={t('organization.teams.totalTeams')} value={teams.length} icon={<Users size={20} />} color="text-accent" />
           <StatCard title={t('organization.teams.totalServices')} value={totalServices} icon={<Server size={20} />} color="text-info" />
-          <StatCard title={t('organization.teams.avgMaturity')} value={t('organization.teams.maturityLevel.Defined')} icon={<BarChart3 size={20} />} color="text-success" />
+          <StatCard title={t('organization.teams.avgMaturity')} value={t('organization.teams.maturityLevel.Defined')} icon={<Award size={20} />} color="text-success" />
           <StatCard title={t('organization.teams.activeIncidents')} value="—" icon={<AlertTriangle size={20} />} color="text-critical" />
         </div>
       </PageSection>

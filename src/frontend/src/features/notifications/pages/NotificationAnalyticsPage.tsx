@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
-  BarChart3,
+  PieChart,
   Bell,
   Clock3,
   Mail,
@@ -168,7 +168,7 @@ export function NotificationAnalyticsPage() {
           <StatCard
             title={t('notifications.analytics.generated')}
             value={data.platform.totalGenerated}
-            icon={<BarChart3 size={20} />}
+            icon={<PieChart size={20} />}
             color="text-accent"
           />
           <StatCard
@@ -221,7 +221,7 @@ export function NotificationAnalyticsPage() {
           <StatCard
             title={t('notifications.analytics.grouped')}
             value={data.quality.totalGrouped}
-            icon={<BarChart3 size={20} />}
+            icon={<PieChart size={20} />}
             color="text-info"
           />
           <StatCard

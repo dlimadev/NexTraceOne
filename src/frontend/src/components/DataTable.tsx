@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useId, type ReactNode, type KeyboardEvent } from 'react';
-import { ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { EmptyState } from './EmptyState';
 

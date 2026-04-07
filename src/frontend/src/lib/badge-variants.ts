@@ -8,8 +8,6 @@
  * @see docs/DESIGN-SYSTEM.md §4.9
  */
 
-import type { ReactNode } from 'react';
-
 export type BadgeVariant = 'default' | 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 
 /**

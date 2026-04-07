@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Edit3, Eye, FileText } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -48,10 +48,15 @@ export function NotesWidget({ userId = 'current' }: Props) {
   const [content, setContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-  useEffect(() => {
-    if (savedContent !== undefined) setContent(savedContent);
-  }, [savedContent]);
+  // Initialize content from server data once (avoids ref access during render)
+  if (savedContent !== undefined && !initialized) {
+    setInitialized(true);
+    if (content !== savedContent) {
+      setContent(savedContent);
+    }
+  }
 
   const handleChange = useCallback(
     (value: string) => {

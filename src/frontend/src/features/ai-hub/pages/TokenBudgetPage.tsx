@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Coins, Search, AlertCircle, TrendingUp, BarChart3,
+  Coins, Search, AlertCircle, TrendingUp, Activity,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -106,7 +106,7 @@ export function TokenBudgetPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard title={t('aiHub.budgetTotalStat')} value={budgets.length} icon={<Coins size={20} />} color="text-accent" />
-        <StatCard title={t('aiHub.budgetActiveStat')} value={totalActive} icon={<BarChart3 size={20} />} color="text-success" />
+        <StatCard title={t('aiHub.budgetActiveStat')} value={totalActive} icon={<Activity size={20} />} color="text-success" />
         <StatCard title={t('aiHub.budgetExceededStat')} value={quotaExceeded} icon={<AlertCircle size={20} />} color="text-critical" />
         <StatCard title={t('aiHub.budgetTokensUsedStat')} value={totalTokensUsed.toLocaleString()} icon={<TrendingUp size={20} />} color="text-info" />
       </div>
