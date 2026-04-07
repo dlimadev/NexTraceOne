@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Search, Bot, Sparkles, Play, Star } from 'lucide-react';
+import { EmptyState } from '../../../components/EmptyState';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageContainer } from '../../../components/shell';
@@ -185,15 +186,11 @@ export function AgentMarketplacePage() {
       )}
 
       {!isLoading && !isError && data && data.items.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Bot className="w-12 h-12 text-neutral-300 dark:text-neutral-600 mb-4" />
-          <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-            {t('agentMarketplace.noAgents')}
-          </p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-            {t('agentMarketplace.noAgentsHint')}
-          </p>
-        </div>
+        <EmptyState
+          icon={<Bot className="w-5 h-5" />}
+          title={t('agentMarketplace.noAgents', 'No agents available')}
+          description={t('agentMarketplace.noAgentsHint', 'Agents will appear here once published to the marketplace.')}
+        />
       )}
 
       {!isLoading && !isError && data && data.items.length > 0 && (

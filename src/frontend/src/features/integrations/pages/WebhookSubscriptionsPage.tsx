@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Webhook, Plus, Shield, ShieldOff, CheckCircle, XCircle, Tag, Clock,
 } from 'lucide-react';
+import { EmptyState } from '../../../components/EmptyState';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer, PageSection } from '../../../components/shell';
@@ -316,15 +317,11 @@ export function WebhookSubscriptionsPage() {
       {/* Subscriptions List */}
       <PageSection>
         {subscriptions.length === 0 ? (
-          <Card>
-            <CardBody>
-              <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
-                <Webhook size={32} className="text-muted" />
-                <p className="text-sm font-medium text-primary">{t('webhookSubscriptions.noWebhooks')}</p>
-                <p className="text-xs text-muted max-w-sm">{t('webhookSubscriptions.noWebhooksHint')}</p>
-              </div>
-            </CardBody>
-          </Card>
+          <EmptyState
+            icon={<Webhook size={20} />}
+            title={t('webhookSubscriptions.noWebhooks', 'No webhook subscriptions')}
+            description={t('webhookSubscriptions.noWebhooksHint', 'Create a subscription to start receiving webhook events.')}
+          />
         ) : (
           <div className="space-y-3">
             {subscriptions.map(sub => (

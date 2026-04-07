@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { EmptyState } from '../../../components/EmptyState';
 import {
   Bot,
   Plus,
@@ -630,11 +631,11 @@ export function AiAgentsPage() {
 
         {/* Empty */}
         {!agentsQuery.isLoading && !agentsQuery.isError && filteredAgents.length === 0 && (
-          <div className="text-center py-16">
-            <Inbox size={40} className="text-muted mx-auto mb-3" />
-            <p className="text-lg text-heading mb-1">{t('agents.emptyTitle')}</p>
-            <p className="text-sm text-muted">{t('agents.emptyDescription')}</p>
-          </div>
+          <EmptyState
+            icon={<Inbox size={20} />}
+            title={t('agents.emptyTitle', 'No agents found')}
+            description={t('agents.emptyDescription', 'Try adjusting your filters or create a new agent.')}
+          />
         )}
 
         {/* Official Agents */}

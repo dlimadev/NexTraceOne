@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Network, Search, Layers, Circle } from 'lucide-react';
+import { EmptyState } from '../../../components/EmptyState';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -86,9 +87,12 @@ export function KnowledgeGraphPage() {
 
       <PageSection title={t('knowledge.graph.nodesSection')}>
         {!data?.nodes?.length ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            {t('knowledge.graph.noNodes')}
-          </div>
+          <EmptyState
+            icon={<Circle size={18} />}
+            title={t('knowledge.graph.noNodes', 'No nodes found')}
+            description={t('knowledge.graph.noNodesHint', 'Nodes will appear here once knowledge data is ingested.')}
+            size="compact"
+          />
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {data.nodes.map((node) => (
@@ -112,9 +116,12 @@ export function KnowledgeGraphPage() {
 
       <PageSection title={t('knowledge.graph.edgesSection')}>
         {!data?.edges?.length ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            {t('knowledge.graph.noEdges')}
-          </div>
+          <EmptyState
+            icon={<Layers size={18} />}
+            title={t('knowledge.graph.noEdges', 'No relationships found')}
+            description={t('knowledge.graph.noEdgesHint', 'Relationships will appear here once connected knowledge is available.')}
+            size="compact"
+          />
         ) : (
           <div className="space-y-2">
             {data.edges.map((edge, idx) => (

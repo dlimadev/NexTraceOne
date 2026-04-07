@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { EmptyState } from '../../../components/EmptyState';
 import {
   Plus,
   Search,
@@ -329,17 +330,20 @@ export function TemplateLibraryPage() {
           ))}
         </div>
       ) : templates.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-neutral-700 py-16">
-          <Layers className="h-10 w-10 text-neutral-600" />
-          <p className="text-sm text-neutral-400">{t('templates.library.empty')}</p>
-          <button
-            className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
-            onClick={() => navigate('/catalog/templates/new')}
-          >
-            <Plus className="h-4 w-4" />
-            {t('templates.library.createFirst')}
-          </button>
-        </div>
+        <EmptyState
+          icon={<Layers className="h-5 w-5" />}
+          title={t('templates.library.empty', 'No templates found')}
+          description={t('templates.library.emptyHint', 'Create your first template to get started.')}
+          action={
+            <button
+              className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
+              onClick={() => navigate('/catalog/templates/new')}
+            >
+              <Plus className="h-4 w-4" />
+              {t('templates.library.createFirst')}
+            </button>
+          }
+        />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map(template => (
