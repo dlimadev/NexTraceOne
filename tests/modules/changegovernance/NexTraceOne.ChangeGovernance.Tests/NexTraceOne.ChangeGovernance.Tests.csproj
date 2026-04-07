@@ -9,6 +9,9 @@
     <ProjectReference Include="..\..\..\..\src\modules\changegovernance\NexTraceOne.ChangeGovernance.Infrastructure\NexTraceOne.ChangeGovernance.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\changegovernance\NexTraceOne.ChangeGovernance.API\NexTraceOne.ChangeGovernance.API.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\changegovernance\NexTraceOne.ChangeGovernance.Contracts\NexTraceOne.ChangeGovernance.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\configuration\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\configuration\NexTraceOne.Configuration.Contracts\NexTraceOne.Configuration.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\configuration\NexTraceOne.Configuration.Domain\NexTraceOne.Configuration.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

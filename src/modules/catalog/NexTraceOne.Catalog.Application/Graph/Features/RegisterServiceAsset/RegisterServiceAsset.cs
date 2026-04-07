@@ -7,6 +7,8 @@ using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 
 namespace NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset;
 
@@ -54,6 +56,7 @@ public static class RegisterServiceAsset
     /// <summary>Handler que regista um novo serviço no catálogo.</summary>
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
+        IConfigurationResolutionService configurationService,
         IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -104,6 +107,20 @@ public static class RegisterServiceAsset
                     request.BusinessOwner ?? string.Empty);
             }
 
+            // ── PARAMETERIZATION: approval gate ──────────────────────────────
+            var approvalConfig = await configurationService.ResolveEffectiveValueAsync(
+                "catalog.service.creation.approval_required",
+                ConfigurationScope.Tenant,
+                null,
+                cancellationToken);
+
+            var requiresApproval = approvalConfig?.EffectiveValue == "true";
+
+            if (requiresApproval)
+            {
+                serviceAsset.UpdateLifecycleStatus(LifecycleStatus.PendingApproval);
+            }
+
             serviceAssetRepository.Add(serviceAsset);
 
             await unitOfWork.CommitAsync(cancellationToken);
@@ -122,7 +139,8 @@ public static class RegisterServiceAsset
                 serviceAsset.TechnicalOwner,
                 serviceAsset.BusinessOwner,
                 serviceAsset.DocumentationUrl,
-                serviceAsset.RepositoryUrl);
+                serviceAsset.RepositoryUrl,
+                requiresApproval);
         }
 
         /// <summary>Parse seguro de string para enum — retorna o valor default do enum se a conversão falhar.</summary>
@@ -145,5 +163,6 @@ public static class RegisterServiceAsset
         string TechnicalOwner,
         string BusinessOwner,
         string DocumentationUrl,
-        string RepositoryUrl);
+        string RepositoryUrl,
+        bool IsPendingApproval = false);
 }

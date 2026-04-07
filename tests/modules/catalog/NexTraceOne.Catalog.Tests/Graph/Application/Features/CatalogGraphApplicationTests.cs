@@ -3,6 +3,7 @@ using NSubstitute;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Configuration.Application.Abstractions;
 using RegisterApiAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterApiAsset.RegisterApiAsset;
 using RegisterServiceAssetFeature = NexTraceOne.Catalog.Application.Graph.Features.RegisterServiceAsset.RegisterServiceAsset;
 using MapConsumerRelationshipFeature = NexTraceOne.Catalog.Application.Graph.Features.MapConsumerRelationship.MapConsumerRelationship;
@@ -21,8 +22,9 @@ public sealed class CatalogGraphApplicationTests
     public async Task RegisterServiceAsset_Should_ReturnResponse_When_ServiceIsNew()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
+        var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>()).Returns((ServiceAsset?)null);
 
@@ -42,8 +44,9 @@ public sealed class CatalogGraphApplicationTests
     {
         var existing = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
         var repository = Substitute.For<IServiceAssetRepository>();
+        var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>()).Returns(existing);
 

@@ -56,6 +56,16 @@ public sealed class Role : Entity<RoleId>
             IsSystem = false
         };
 
+    /// <summary>Atualiza nome e descrição de um papel customizado. Papéis de sistema não podem ser editados.</summary>
+    public void Update(string name, string description)
+    {
+        if (IsSystem)
+            throw new InvalidOperationException("System roles cannot be modified.");
+
+        Name = Guard.Against.NullOrWhiteSpace(name);
+        Description = Guard.Against.NullOrWhiteSpace(description);
+    }
+
     /// <summary>
     /// Retorna as permissões padrão de um papel conhecido.
     /// Delega para <see cref="RolePermissionCatalog"/>, que é a fonte única de verdade

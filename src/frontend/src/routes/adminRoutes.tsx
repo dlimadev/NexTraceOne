@@ -28,6 +28,9 @@ const NotificationConfigurationPage = lazy(() => import('../features/notificatio
 // Configuration Admin
 const ConfigurationAdminPage = lazy(() => import('../features/configuration/pages/ConfigurationAdminPage').then(m => ({ default: m.ConfigurationAdminPage })));
 const AdvancedConfigurationConsolePage = lazy(() => import('../features/configuration/pages/AdvancedConfigurationConsolePage').then(m => ({ default: m.AdvancedConfigurationConsolePage })));
+const UserPreferencesPage = lazy(() => import('../features/configuration/pages/UserPreferencesPage').then(m => ({ default: m.UserPreferencesPage })));
+const ParameterUsageReportPage = lazy(() => import('../features/configuration/pages/ParameterUsageReportPage').then(m => ({ default: m.ParameterUsageReportPage })));
+const ParameterComplianceDashboardPage = lazy(() => import('../features/configuration/pages/ParameterComplianceDashboardPage').then(m => ({ default: m.ParameterComplianceDashboardPage })));
 const WorkflowConfigurationPage = lazy(() => import('../features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
 const CatalogContractsConfigurationPage = lazy(() => import('../features/catalog/pages/CatalogContractsConfigurationPage').then(m => ({ default: m.CatalogContractsConfigurationPage })));
 const OperationsFinOpsConfigurationPage = lazy(() => import('../features/operational-intelligence/pages/OperationsFinOpsConfigurationPage').then(m => ({ default: m.OperationsFinOpsConfigurationPage })));
@@ -196,6 +199,22 @@ export function AdminRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/platform/configuration/analytics/usage"
+        element={
+          <ProtectedRoute permission="configuration:analytics:read" redirectTo="/unauthorized">
+            <ParameterUsageReportPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/platform/configuration/analytics/compliance"
+        element={
+          <ProtectedRoute permission="configuration:analytics:read" redirectTo="/unauthorized">
+            <ParameterComplianceDashboardPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ── Integrations ── */}
       <Route
@@ -302,6 +321,12 @@ export function AdminRoutes() {
           <ProtectedRoute permission="analytics:read" redirectTo="/unauthorized">
             <TimeToValuePage />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user-preferences"
+        element={
+          <UserPreferencesPage />
         }
       />
     </>

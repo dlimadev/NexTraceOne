@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
+using NexTraceOne.Configuration.Application.Abstractions;
 using GetServiceDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceDetail.GetServiceDetail;
 using GetServicesSummaryFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServicesSummary.GetServicesSummary;
 using ListServicesFeature = NexTraceOne.Catalog.Application.Graph.Features.ListServices.ListServices;
@@ -329,8 +330,9 @@ public sealed class ServiceCatalogApplicationTests
     public async Task RegisterServiceAsset_Should_CreateService_WithMinimalFields()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
+        var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("new-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -358,8 +360,9 @@ public sealed class ServiceCatalogApplicationTests
     public async Task RegisterServiceAsset_Should_CreateService_WithAllFields()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
+        var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("full-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -398,8 +401,9 @@ public sealed class ServiceCatalogApplicationTests
     public async Task RegisterServiceAsset_Should_ReturnError_When_ServiceAlreadyExists()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
+        var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         var existing = ServiceAsset.Create("existing-service", "Finance", "Team Alpha");
         repository.GetByNameAsync("existing-service", Arg.Any<CancellationToken>())
@@ -418,8 +422,9 @@ public sealed class ServiceCatalogApplicationTests
     public async Task RegisterServiceAsset_Should_ParseEnumFieldsSafely()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
+        var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("safe-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -444,8 +449,9 @@ public sealed class ServiceCatalogApplicationTests
     public async Task RegisterServiceAsset_Should_ApplyDetailsAndOwnership_When_OptionalFieldsProvided()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
+        var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<IUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("detail-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);

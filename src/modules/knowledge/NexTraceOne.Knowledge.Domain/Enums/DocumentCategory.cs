@@ -1,7 +1,9 @@
 namespace NexTraceOne.Knowledge.Domain.Enums;
 
 /// <summary>
-/// Categoria do documento de conhecimento no Knowledge Hub.
+/// Categoria do documento de conhecimento no Knowledge Hub (Operational Knowledge).
+/// Expandido conforme PARAMETERIZATION-MODULE-PROPOSAL Phase 3 para suportar
+/// classificação mais rica de conhecimento operacional e técnico.
 /// </summary>
 public enum DocumentCategory
 {
@@ -24,5 +26,23 @@ public enum DocumentCategory
     PostMortem,
 
     /// <summary>FAQ ou referência rápida.</summary>
-    Reference
+    Reference,
+
+    /// <summary>Documentação de API (REST, SOAP, eventos).</summary>
+    ApiDocumentation,
+
+    /// <summary>Registo de alterações (changelog) de serviço ou contrato.</summary>
+    ChangeLog,
+
+    /// <summary>Evidência de conformidade (compliance evidence).</summary>
+    ComplianceEvidence,
+
+    /// <summary>Registo de decisão técnica ou arquitetural (ADR).</summary>
+    DecisionRecord,
+
+    /// <summary>Análise detalhada de incidente com causa raiz e mitigação.</summary>
+    IncidentAnalysis,
+
+    /// <summary>Playbook operacional com passos de resposta.</summary>
+    OperationalPlaybook
 }

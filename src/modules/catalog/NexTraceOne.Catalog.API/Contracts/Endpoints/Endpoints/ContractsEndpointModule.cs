@@ -56,6 +56,7 @@ using GetDeprecationProgressFeature = NexTraceOne.Catalog.Application.Contracts.
 using DetectContractDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.DetectContractDrift.DetectContractDrift;
 using GetContractHealthTimelineFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHealthTimeline.GetContractHealthTimeline;
 using GetCanonicalEntityImpactCascadeFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpactCascade.GetCanonicalEntityImpactCascade;
+using ValidatePublicationReadinessFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractPublicationReadiness.ValidateContractPublicationReadiness;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -668,6 +669,20 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(
                 new GetContractHealthTimelineFeature.Query(apiAssetId, maxVersions ?? 20),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // ── Publication Readiness (Parameterization v2.0) ──────────────
+
+        group.MapGet("/{contractVersionId:guid}/publication-readiness", async (
+            Guid contractVersionId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ValidatePublicationReadinessFeature.Query(contractVersionId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");

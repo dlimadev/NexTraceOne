@@ -8,6 +8,8 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\changegovernance\NexTraceOne.ChangeGovernance.Contracts\NexTraceOne.ChangeGovernance.Contracts.csproj" />
+    <ProjectReference Include="..\..\configuration\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />
+    <ProjectReference Include="..\..\configuration\NexTraceOne.Configuration.Contracts\NexTraceOne.Configuration.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.Governance.Domain\NexTraceOne.Governance.Domain.csproj" />
     <ProjectReference Include="..\..\operationalintelligence\NexTraceOne.OperationalIntelligence.Contracts\NexTraceOne.OperationalIntelligence.Contracts.csproj" />
   </ItemGroup>

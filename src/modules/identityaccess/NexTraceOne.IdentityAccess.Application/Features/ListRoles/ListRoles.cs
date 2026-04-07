@@ -15,7 +15,7 @@ public static class ListRoles
     /// <summary>Query para listar papéis do sistema.</summary>
     public sealed record Query : IQuery<IReadOnlyList<RoleResponse>>;
 
-    /// <summary>Handler que retorna todos os papéis pré-definidos.</summary>
+    /// <summary>Handler que retorna todos os papéis (sistema + customizados).</summary>
     public sealed class Handler(
         IRoleRepository roleRepository,
         IPermissionResolver permissionResolver) : IQueryHandler<Query, IReadOnlyList<RoleResponse>>
@@ -24,7 +24,7 @@ public static class ListRoles
         {
             Guard.Against.Null(request);
 
-            var roles = await roleRepository.GetSystemRolesAsync(cancellationToken);
+            var roles = await roleRepository.GetAllAsync(cancellationToken);
 
             var result = new List<RoleResponse>(roles.Count);
             foreach (var r in roles)
