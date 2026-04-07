@@ -2018,6 +2018,7 @@
         "warnMissingPathParam": "El parámetro de path '{{param}}' está en el path pero no fue declarado",
         "warnNo2xx": "No se ha definido ninguna respuesta de éxito 2xx",
         "addCommonResponses": "Agregar respuestas de error comunes",
+        "quickAdd": "Agregar rápido:",
         "problemDetails": "Detalles del Problema (RFC 7807)",
         "previewExample": "Vista previa del Ejemplo",
         "copyExample": "Copiar",

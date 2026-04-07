@@ -748,8 +748,8 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 | 4.2: Auto-suggest operationId | S | ✅ |
 | 4.3: Preview JSON em tempo real | M | ✅ |
 | 4.4: Validação cruzada | M | ✅ |
-| 4.5: Drag & Drop de propriedades | M | ⬜ |
-| 4.6: Quick Add de response codes | S | ⬜ |
+| 4.5: Drag & Drop de propriedades | M | ✅ |
+| 4.6: Quick Add de response codes | S | ✅ |
 
 ### Fase 5: Features Avançadas (Sprint 5-7) 🟢 NORMAL ✅ COMPLETE
 

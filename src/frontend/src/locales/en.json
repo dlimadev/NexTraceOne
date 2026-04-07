@@ -2040,6 +2040,7 @@
         "warnMissingPathParam": "Path parameter '{{param}}' is used in path but not declared",
         "warnNo2xx": "No 2xx success response defined",
         "addCommonResponses": "Add common error responses",
+        "quickAdd": "Quick add:",
         "problemDetails": "Problem Details (RFC 7807)",
         "previewExample": "Preview Example",
         "copyExample": "Copy",

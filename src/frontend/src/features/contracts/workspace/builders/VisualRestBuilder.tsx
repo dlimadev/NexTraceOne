@@ -881,6 +881,50 @@ export function VisualRestBuilder({
                               <Plus size={9} />
                               {t('contracts.builder.rest.addCommonResponses', 'Add common error responses')}
                             </button>
+                            {/* Quick-add individual response codes */}
+                            {(() => {
+                              const existing = new Set(ep.responses.map((r) => r.statusCode));
+                              const quickCodes = [
+                                { code: '201', desc: 'Created', contentType: 'application/json' },
+                                { code: '204', desc: 'No Content', contentType: '' },
+                                { code: '301', desc: 'Moved Permanently', contentType: '' },
+                                { code: '302', desc: 'Found', contentType: '' },
+                                { code: '304', desc: 'Not Modified', contentType: '' },
+                                { code: '409', desc: 'Conflict', contentType: 'application/problem+json' },
+                                { code: '422', desc: 'Unprocessable Entity', contentType: 'application/problem+json' },
+                                { code: '429', desc: 'Too Many Requests', contentType: 'application/problem+json' },
+                                { code: '503', desc: 'Service Unavailable', contentType: 'application/problem+json' },
+                              ].filter((q) => !existing.has(q.code));
+                              if (quickCodes.length === 0) return null;
+                              return (
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  <span className="text-[9px] text-muted">
+                                    {t('contracts.builder.rest.quickAdd', 'Quick add:')}
+                                  </span>
+                                  {quickCodes.slice(0, 5).map((q) => (
+                                    <button
+                                      key={q.code}
+                                      type="button"
+                                      onClick={() => {
+                                        const newRes: RestResponse = {
+                                          id: genId('res'),
+                                          statusCode: q.code,
+                                          description: q.desc,
+                                          contentType: q.contentType || 'application/json',
+                                          schema: '',
+                                          example: '',
+                                          properties: [],
+                                        };
+                                        updateEndpoint(ep.id, { responses: [...ep.responses, newRes] });
+                                      }}
+                                      className="text-[9px] font-mono text-muted/70 hover:text-accent border border-edge/40 rounded px-1.5 py-0.5 transition-colors hover:border-accent/30"
+                                    >
+                                      {q.code}
+                                    </button>
+                                  ))}
+                                </div>
+                              );
+                            })()}
                           </div>
                         )}
                       </CollapsibleSubSection>

@@ -9,10 +9,10 @@
  * - Referências a entidades canónicas ($ref)
  * - Drag-friendly reorder (via botões up/down)
  */
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Plus, Trash2, ChevronDown, ChevronRight, ArrowUp, ArrowDown,
+  Plus, Trash2, ChevronDown, ChevronRight, ArrowUp, ArrowDown, GripVertical,
   Braces, Hash, Type, ToggleLeft, List, Link2, FileJson, BookOpen, GitMerge,
 } from 'lucide-react';
 import type { SchemaProperty, PropertyConstraints } from './builderTypes';
@@ -167,6 +167,41 @@ export function SchemaPropertyEditor({
 
   const indentPx = depth * 16;
 
+  // ── HTML5 Drag & Drop for property reorder ──
+  const dragIndexRef = useRef<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = useCallback((index: number) => {
+    dragIndexRef.current = index;
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverIndex(index);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    const fromIndex = dragIndexRef.current;
+    if (fromIndex === null || fromIndex === dropIndex) {
+      setDragOverIndex(null);
+      dragIndexRef.current = null;
+      return;
+    }
+    const next = [...properties];
+    const [moved] = next.splice(fromIndex, 1);
+    if (moved) next.splice(dropIndex, 0, moved);
+    onChange(next);
+    setDragOverIndex(null);
+    dragIndexRef.current = null;
+  }, [properties, onChange]);
+
+  const handleDragEnd = useCallback(() => {
+    setDragOverIndex(null);
+    dragIndexRef.current = null;
+  }, []);
+
   return (
     <div className="space-y-1" style={{ marginLeft: indentPx > 0 ? `${indentPx}px` : undefined }}>
       {properties.map((prop, idx) => {
@@ -177,9 +212,25 @@ export function SchemaPropertyEditor({
         const typeColor = TYPE_COLORS[prop.type] ?? 'text-muted';
 
         return (
-          <div key={prop.id} className="border border-edge rounded-md bg-surface/50">
+          <div
+            key={prop.id}
+            className={`border border-edge rounded-md bg-surface/50 transition-all ${
+              dragOverIndex === idx ? 'border-accent/50 bg-accent/5' : ''
+            }`}
+            draggable={!isReadOnly}
+            onDragStart={() => handleDragStart(idx)}
+            onDragOver={(e) => handleDragOver(e, idx)}
+            onDrop={(e) => handleDrop(e, idx)}
+            onDragEnd={handleDragEnd}
+          >
             {/* ── Property header row ── */}
             <div className="flex items-center gap-1.5 px-2 py-1.5">
+              {/* Drag handle */}
+              {!isReadOnly && (
+                <span className="text-muted/30 hover:text-muted cursor-grab active:cursor-grabbing flex-shrink-0">
+                  <GripVertical size={10} />
+                </span>
+              )}
               {/* Expand/collapse for complex types */}
               {hasDetails ? (
                 <button type="button" onClick={() => toggleExpand(prop.id)}
