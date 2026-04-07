@@ -35,7 +35,7 @@ export function AppSidebarItem({ to, icon, labelKey, collapsed = false, preview 
             'relative flex items-center justify-center w-11 h-10 mx-auto rounded-lg mb-0.5',
             'transition-all duration-[var(--nto-motion-base)]',
             isActive
-              ? 'bg-blue/20 text-cyan shadow-[inset_0_0_0_1px_rgba(18,196,232,0.25)]'
+              ? 'bg-blue/20 text-cyan shadow-glow-cyan'
               : preview
                 ? 'text-muted/50 hover:bg-hover hover:text-muted'
                 : 'text-muted hover:bg-hover hover:text-body',

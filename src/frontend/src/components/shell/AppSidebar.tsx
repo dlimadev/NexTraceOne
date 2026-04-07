@@ -253,7 +253,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
         <div className="flex items-center justify-center h-[70px] shrink-0 border-b border-edge">
           <img
             src="/logo.svg"
-            alt="NexTraceOne"
+            alt={t('brand.name')}
             className="w-10 h-10 object-contain"
           />
         </div>
@@ -285,7 +285,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                       'relative flex items-center justify-center w-[48px] h-[44px] mx-auto rounded-xl mb-1',
                       'transition-all duration-200',
                       isActive
-                        ? 'bg-blue/15 text-blue shadow-[inset_0_0_0_1px_rgba(59,130,246,0.2)]'
+                        ? 'bg-blue/15 text-blue shadow-glow-blue'
                         : isHighlighted
                           ? 'text-cyan hover:bg-hover hover:text-cyan'
                           : 'text-muted hover:bg-hover hover:text-body',
@@ -343,7 +343,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
       >
         {/* Brand header + collapse toggle */}
         <div className="flex items-center justify-between h-[70px] px-5 shrink-0 border-b border-edge">
-          <span className="text-base font-semibold text-heading truncate">NexTraceOne</span>
+          <span className="text-base font-semibold text-heading truncate">{t('brand.name')}</span>
           {onToggleCollapse && !mobile && (
             <button
               onClick={onToggleCollapse}

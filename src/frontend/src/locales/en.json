@@ -8547,5 +8547,19 @@
     "templateName": "Template Name",
     "noTemplates": "No saved templates.",
     "templateSaved": "Template saved successfully."
+  },
+  "pagination": {
+    "pageOf": "Page {{page}} of {{totalPages}}",
+    "showing": "Showing {{from}} to {{to}} of {{total}}",
+    "itemsPerPage": "Items per page",
+    "previous": "Previous page",
+    "next": "Next page",
+    "first": "First page",
+    "last": "Last page",
+    "navigation": "Pagination"
+  },
+  "brand": {
+    "name": "NexTraceOne",
+    "tagline": "Operational Confidence"
   }
 }

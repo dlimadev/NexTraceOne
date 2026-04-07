@@ -539,6 +539,12 @@ body {
   text-transform: uppercase;
 }
 
+.type-micro {
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 /* ─── Skeleton Shimmer ─────────────────────────────────────────────────────── */
 
 .skeleton {
