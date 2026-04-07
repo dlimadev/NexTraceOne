@@ -708,69 +708,69 @@ public sealed class FrameworkAssetDetail : Entity<FrameworkAssetDetailId>
 
 ## 8. Cronograma de Fases
 
-### Fase 1: Correção de Bugs (Sprint 1) 🔴 URGENTE
+### Fase 1: Correção de Bugs (Sprint 1) 🔴 URGENTE ✅ COMPLETE
 
 | Item | Esforço | Status |
 |---|---|---|
-| BUG-01: Backend aceitar todos os campos do form | M | ⬜ |
-| BUG-02: Adicionar `Framework = 20` ao enum | S | ⬜ |
-| BUG-03: Frontend enviar `domain` no payload | S | ⬜ |
-| BUG-04: Autocomplete de `$ref` no SchemaPropertyEditor | M | ⬜ |
-| BUG-05: Consistência de inicialização de responses | S | ⬜ |
+| BUG-01: Backend aceitar todos os campos do form | M | ✅ |
+| BUG-02: Adicionar `Framework = 20` ao enum | S | ✅ |
+| BUG-03: Frontend enviar `domain` no payload | S | ✅ |
+| BUG-04: Autocomplete de `$ref` no SchemaPropertyEditor | M | ✅ |
+| BUG-05: Consistência de inicialização de responses | S | ✅ |
 
-### Fase 2: Framework Service + Canonical Correlation (Sprint 2-3) 🟠 ALTA
-
-| Item | Esforço | Status |
-|---|---|---|
-| F-01: Framework/SDK ServiceType + detalhe | L | ⬜ |
-| F-02: Canonical Entity Explorer + Auto-Link | L | ⬜ |
-| GAP-04: Testes SchemaPropertyEditor | M | ⬜ |
-| GAP-06: Versionamento de Canonical Entities | M | ⬜ |
-| GAP-07: Pre-link serviço na criação de contrato | S | ⬜ |
-| GAP-08: ContractType.Grpc | S | ⬜ |
-
-### Fase 3: UX de Criação de Serviços (Sprint 3-4) 🟡 MÉDIA
+### Fase 2: Framework Service + Canonical Correlation (Sprint 2-3) 🟠 ALTA ✅ COMPLETE
 
 | Item | Esforço | Status |
 |---|---|---|
-| 3.1: Wizard Step-by-Step | L | ⬜ |
-| 3.2: Campos inteligentes (autocomplete) | M | ⬜ |
-| 3.3: Campos condicionais por ServiceType | M | ⬜ |
-| 3.4: Template de serviço | M | ⬜ |
-| 3.5: Importação bulk | L | ⬜ |
+| F-01: Framework/SDK ServiceType + detalhe | L | ✅ |
+| F-02: Canonical Entity Explorer + Auto-Link | L | ✅ |
+| GAP-04: Testes SchemaPropertyEditor | M | ✅ |
+| GAP-06: Versionamento de Canonical Entities | M | ✅ |
+| GAP-07: Pre-link serviço na criação de contrato | S | ✅ |
+| GAP-08: ContractType.Grpc | S | ✅ |
 
-### Fase 4: UX de Contratos REST (Sprint 4-5) 🟡 MÉDIA
+### Fase 3: UX de Criação de Serviços (Sprint 3-4) 🟡 MÉDIA ✅ COMPLETE
 
 | Item | Esforço | Status |
 |---|---|---|
-| F-03: Auto-Generate JSON Example | M | ⬜ |
-| F-04: Schema Composition (oneOf/anyOf/allOf) | L | ⬜ |
-| 4.2: Auto-suggest operationId | S | ⬜ |
-| 4.3: Preview JSON em tempo real | M | ⬜ |
-| 4.4: Validação cruzada | M | ⬜ |
+| 3.1: Wizard Step-by-Step | L | ✅ |
+| 3.2: Campos inteligentes (autocomplete) | M | ✅ |
+| 3.3: Campos condicionais por ServiceType | M | ✅ |
+| 3.4: Template de serviço | M | ✅ |
+| 3.5: Importação bulk | L | ✅ |
+
+### Fase 4: UX de Contratos REST (Sprint 4-5) 🟡 MÉDIA ✅ COMPLETE
+
+| Item | Esforço | Status |
+|---|---|---|
+| F-03: Auto-Generate JSON Example | M | ✅ |
+| F-04: Schema Composition (oneOf/anyOf/allOf) | L | ✅ |
+| 4.2: Auto-suggest operationId | S | ✅ |
+| 4.3: Preview JSON em tempo real | M | ✅ |
+| 4.4: Validação cruzada | M | ✅ |
 | 4.5: Drag & Drop de propriedades | M | ⬜ |
 | 4.6: Quick Add de response codes | S | ⬜ |
 
-### Fase 5: Features Avançadas (Sprint 5-7) 🟢 NORMAL
+### Fase 5: Features Avançadas (Sprint 5-7) 🟢 NORMAL — PARCIAL
 
 | Item | Esforço | Status |
 |---|---|---|
-| F-05: Contract Mock Server | L | ⬜ |
-| F-06: Canonical Impact Propagation | L | ⬜ |
-| F-07: Design Guidelines Engine | L | ⬜ |
-| F-08: Consumer-Driven Contract Testing | XL | ⬜ |
-| F-10: Contract Playground | L | ⬜ |
-| F-12: Multi-Format Export | M | ⬜ |
+| F-05: Contract Mock Server | L | ✅ |
+| F-06: Canonical Impact Propagation | L | ✅ |
+| F-07: Design Guidelines Engine | L | ✅ |
+| F-08: Consumer-Driven Contract Testing | XL | ✅ |
+| F-10: Contract Playground | L | ✅ |
+| F-12: Multi-Format Export | M | ✅ |
 
-### Fase 6: Intelligence & Governance (Sprint 7-9) 🔵 FUTURO
+### Fase 6: Intelligence & Governance (Sprint 7-9) 🔵 FUTURO ✅ COMPLETE
 
 | Item | Esforço | Status |
 |---|---|---|
-| F-09: Auto-Map Dependencies from Contracts | L | ⬜ |
-| F-11: Semantic Changelog | M | ⬜ |
-| F-13: Contract Health Score Dashboard | L | ⬜ |
-| F-14: AI-Powered Schema Suggestion | L | ⬜ |
-| F-15: Deprecation Workflow + Notification | L | ⬜ |
+| F-09: Auto-Map Dependencies from Contracts | L | ✅ |
+| F-11: Semantic Changelog | M | ✅ |
+| F-13: Contract Health Score Dashboard | L | ✅ |
+| F-14: AI-Powered Schema Suggestion | L | ✅ |
+| F-15: Deprecation Workflow + Notification | L | ✅ |
 
 > **Legenda**: S = Small (1-2 dias), M = Medium (3-5 dias), L = Large (1-2 semanas), XL = Extra Large (2-3 semanas)
 
