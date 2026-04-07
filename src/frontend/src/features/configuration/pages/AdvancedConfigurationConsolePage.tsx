@@ -71,7 +71,7 @@ interface DomainMeta {
 
 const DOMAINS: DomainMeta[] = [
   { key: 'all', prefixes: [], icon: <Layers className="w-4 h-4" /> },
-  { key: 'instance', prefixes: ['instance.', 'tenant.', 'environment.', 'branding.', 'featureFlags.'], icon: <Settings className="w-4 h-4" /> },
+  { key: 'instance', prefixes: ['instance.', 'tenant.', 'environment.', 'featureFlags.'], icon: <Settings className="w-4 h-4" /> },
   { key: 'notifications', prefixes: ['notifications.'], icon: <Activity className="w-4 h-4" /> },
   { key: 'workflows', prefixes: ['workflow.', 'promotion.'], icon: <ArrowRight className="w-4 h-4" /> },
   { key: 'governance', prefixes: ['governance.'], icon: <Shield className="w-4 h-4" /> },

@@ -1613,10 +1613,6 @@
       "production": "Production",
       "sensitive": "Sensitive"
     },
-    "branding": {
-      "subtitle": "Customize the visual identity and default experience for the platform and tenants.",
-      "title": "Branding & Defaults"
-    },
     "category": {
       "bootstrap": "Bootstrap",
       "functional": "Functional",
@@ -1694,7 +1690,7 @@
       "tenant": "Tenant",
       "user": "User"
     },
-    "subtitle": "Manage instance, tenant, and environment settings. Configure branding, feature flags, and structural policies.",
+    "subtitle": "Manage instance, tenant, and environment settings. Configure feature flags and structural policies.",
     "table": {
       "actions": "Actions",
       "active": "Active",
@@ -7323,18 +7319,6 @@
     "benchmarking.score.weights.label": "Benchmarking Score Weights",
     "benchmarking.thresholds.by_environment.description": "Override benchmarking thresholds per environment",
     "benchmarking.thresholds.by_environment.label": "Benchmarking Thresholds by Environment",
-    "branding.accent_color.description": "Primary accent color in hex format",
-    "branding.accent_color.label": "Branding Accent Color",
-    "branding.favicon_url.description": "URL for the custom favicon",
-    "branding.favicon_url.label": "Branding Favicon URL",
-    "branding.footer_text.description": "Custom footer text displayed on all pages",
-    "branding.footer_text.label": "Branding Footer Text",
-    "branding.logo_dark_url.description": "URL for the organization logo (dark variant)",
-    "branding.logo_dark_url.label": "Branding Logo Dark URL",
-    "branding.logo_url.description": "URL for the organization logo (light variant)",
-    "branding.logo_url.label": "Branding Logo URL",
-    "branding.welcome_message.description": "Custom welcome message displayed on the dashboard",
-    "branding.welcome_message.label": "Branding Welcome Message",
     "catalog.api.rate_limiting.default_policy.description": "Default rate limiting policy for published APIs.",
     "catalog.api.rate_limiting.default_policy.label": "Default API Rate Limiting Policy",
     "catalog.contract.api_types_enabled.description": "API classification types enabled (Public, Internal, Partner, ThirdParty)",

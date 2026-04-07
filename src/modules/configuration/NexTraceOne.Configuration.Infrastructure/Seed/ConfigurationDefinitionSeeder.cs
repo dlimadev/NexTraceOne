@@ -922,68 +922,10 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             sortOrder: 1250),
 
         // ── BLOCK F — Branding & Experience Defaults ──────────────────────
-
-        ConfigurationDefinition.Create(
-            key: "branding.logo_url",
-            displayName: "config.branding.logo_url.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.logo_url.description",
-            uiEditorType: "text",
-            sortOrder: 1300),
-
-        ConfigurationDefinition.Create(
-            key: "branding.logo_dark_url",
-            displayName: "config.branding.logo_dark_url.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.logo_dark_url.description",
-            uiEditorType: "text",
-            sortOrder: 1310),
-
-        ConfigurationDefinition.Create(
-            key: "branding.accent_color",
-            displayName: "config.branding.accent_color.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.accent_color.description",
-            defaultValue: "#3B82F6",
-            validationRules: """{"pattern":"^#[0-9a-fA-F]{6}$"}""",
-            uiEditorType: "text",
-            sortOrder: 1320),
-
-        ConfigurationDefinition.Create(
-            key: "branding.favicon_url",
-            displayName: "config.branding.favicon_url.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.favicon_url.description",
-            uiEditorType: "text",
-            sortOrder: 1330),
-
-        ConfigurationDefinition.Create(
-            key: "branding.welcome_message",
-            displayName: "config.branding.welcome_message.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.welcome_message.description",
-            uiEditorType: "text",
-            sortOrder: 1340),
-
-        ConfigurationDefinition.Create(
-            key: "branding.footer_text",
-            displayName: "config.branding.footer_text.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.footer_text.description",
-            uiEditorType: "text",
-            sortOrder: 1350),
+        // REMOVED: All branding.* parameters (logo_url, logo_dark_url, accent_color,
+        // favicon_url, welcome_message, footer_text) were removed to preserve the
+        // NexTraceOne visual identity. The platform's brand (logo, colors, layout)
+        // must not be customizable by users or tenants.
 
         // ── BLOCK G — Feature Flags ───────────────────────────────────────
 

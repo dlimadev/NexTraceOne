@@ -1613,10 +1613,6 @@
       "production": "Produção",
       "sensitive": "Sensível"
     },
-    "branding": {
-      "subtitle": "Personalize a identidade visual e a experiência padrão da plataforma e dos tenants.",
-      "title": "Identidade Visual e Padrões"
-    },
     "category": {
       "bootstrap": "Bootstrap",
       "functional": "Funcional",
@@ -1694,7 +1690,7 @@
       "tenant": "Tenant",
       "user": "Usuário"
     },
-    "subtitle": "Gerencie configurações de instância, tenant e ambiente. Configure identidade visual, feature flags e políticas estruturais.",
+    "subtitle": "Gerencie configurações de instância, tenant e ambiente. Configure feature flags e políticas estruturais.",
     "table": {
       "actions": "Ações",
       "active": "Ativo",
@@ -7317,18 +7313,6 @@
     "benchmarking.score.weights.label": "Benchmarking Score Weights",
     "benchmarking.thresholds.by_environment.description": "Substituição benchmarking thresholds por ambiente",
     "benchmarking.thresholds.by_environment.label": "Benchmarking Thresholds by Ambiente",
-    "branding.accent_color.description": "Primary accent color em hex format",
-    "branding.accent_color.label": "Branding Accent Color",
-    "branding.favicon_url.description": "URL para the custom favicon",
-    "branding.favicon_url.label": "Branding Favicon URL",
-    "branding.footer_text.description": "Custom footer text displayed on all pages",
-    "branding.footer_text.label": "Branding Footer Text",
-    "branding.logo_dark_url.description": "URL para the organization logo (dark variant)",
-    "branding.logo_dark_url.label": "Branding Logo Dark URL",
-    "branding.logo_url.description": "URL para the organization logo (light variant)",
-    "branding.logo_url.label": "Branding Logo URL",
-    "branding.welcome_message.description": "Custom welcome message displayed on the dashboard",
-    "branding.welcome_message.label": "Branding Welcome Message",
     "catalog.api.rate_limiting.default_policy.description": "Política padrão de rate limiting para APIs publicadas.",
     "catalog.api.rate_limiting.default_policy.label": "Política Padrão de Rate Limiting de API",
     "catalog.contract.api_types_enabled.description": "API classification tipos ativado (Public, Interno, Partner, ThirdParty)",
