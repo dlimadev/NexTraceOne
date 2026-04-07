@@ -212,9 +212,27 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ---
 
+## 14. Evolução de Customização da Plataforma
+
+> Plano detalhado em [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
+
+Customizações que o utilizador pode realizar **sem alterar a identidade visual**:
+
+- **Fase 1:** Saved views, bookmarks, default scope, timezone, colunas visíveis, paginação
+- **Fase 2:** Dashboard templates por persona, custom charts, widget de notas, cloning, drill-down
+- **Fase 3:** Watch lists, quiet hours, custom alert rules, digest personalizado
+- **Fase 4:** Custom tags, custom metadata fields, custom taxonomies
+- **Fase 5:** Custom checklists, automation rules, custom contract templates
+- **Fase 6:** Scheduled reports, export configurável, saved report templates
+- **Fase 7:** Custom AI prompts, AI behavior preferences, AI knowledge scope
+- **Fase 8:** Custom webhook payloads, API keys management, custom integration mappings
+
+---
+
 ## Notas
 
 1. **Este documento substitui:** ROADMAP.md, EVOLUTION-ROADMAP-2026-2027.md, CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md, SERVICE-CREATION-STUDIO-PLAN.md
 2. **Documentos de referência mantidos:** PRODUCT-VISION.md, ARCHITECTURE-OVERVIEW.md, docs/adr/, docs/legacy/, docs/security/, docs/deployment/, docs/runbooks/, docs/observability/, docs/user-guide/
 3. **Licensing module** foi removido da solução e não consta neste roadmap
 4. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura
+5. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
