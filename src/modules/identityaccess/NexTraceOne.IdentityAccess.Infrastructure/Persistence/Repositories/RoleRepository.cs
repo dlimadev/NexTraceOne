@@ -21,6 +21,10 @@ internal sealed class RoleRepository(IdentityDbContext context)
         => await context.Roles.Where(x => x.IsSystem).OrderBy(x => x.Name).ToListAsync(cancellationToken);
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Role>> GetAllAsync(CancellationToken cancellationToken)
+        => await context.Roles.OrderBy(x => x.IsSystem).ThenBy(x => x.Name).ToListAsync(cancellationToken);
+
+    /// <inheritdoc />
     public async Task<IReadOnlyDictionary<RoleId, Role>> GetByIdsAsync(
         IReadOnlyCollection<RoleId> ids,
         CancellationToken cancellationToken)
@@ -30,5 +34,16 @@ internal sealed class RoleRepository(IdentityDbContext context)
             .ToListAsync(cancellationToken);
 
         return roles.ToDictionary(r => r.Id, r => r);
+    }
+
+    /// <inheritdoc />
+    public async Task AddAsync(Role role, CancellationToken cancellationToken)
+        => await context.Roles.AddAsync(role, cancellationToken);
+
+    /// <inheritdoc />
+    public Task RemoveAsync(Role role, CancellationToken cancellationToken)
+    {
+        context.Roles.Remove(role);
+        return Task.CompletedTask;
     }
 }

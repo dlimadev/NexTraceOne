@@ -10,6 +10,9 @@ using ListRolesFeature = NexTraceOne.IdentityAccess.Application.Features.ListRol
 using ListPermissionsFeature = NexTraceOne.IdentityAccess.Application.Features.ListPermissions.ListPermissions;
 using SeedDefaultsFeature = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions.SeedDefaultRolePermissions;
 using SeedModulePoliciesFeature = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultModuleAccessPolicies.SeedDefaultModuleAccessPolicies;
+using CreateRoleFeature = NexTraceOne.IdentityAccess.Application.Features.CreateRole.CreateRole;
+using UpdateRoleFeature = NexTraceOne.IdentityAccess.Application.Features.UpdateRole.UpdateRole;
+using DeleteRoleFeature = NexTraceOne.IdentityAccess.Application.Features.DeleteRole.DeleteRole;
 
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
@@ -61,5 +64,42 @@ internal static class RolePermissionEndpoints
             var result = await sender.Send(new SeedModulePoliciesFeature.Command(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");
+
+        // ── CRUD Roles ───────────────────────────────────────────
+
+        group.MapPost("/roles", async (
+            CreateRoleFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:roles:write");
+
+        group.MapPut("/roles/{roleId:guid}", async (
+            Guid roleId,
+            UpdateRoleRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new UpdateRoleFeature.Command(roleId, body.Name, body.Description), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:roles:write");
+
+        group.MapDelete("/roles/{roleId:guid}", async (
+            Guid roleId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DeleteRoleFeature.Command(roleId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:roles:write");
     }
+
+    /// <summary>Corpo do pedido de atualização de role (sem o Id que vem na URL).</summary>
+    internal sealed record UpdateRoleRequest(string Name, string Description);
 }
