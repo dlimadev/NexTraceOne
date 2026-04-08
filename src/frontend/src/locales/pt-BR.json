@@ -485,7 +485,12 @@
     "typing": "Analisando contexto",
     "usingModel": "Usando modelo",
     "welcomeMessage": "Bem-vindo! Sou o Assistente IA do NexTraceOne. Posso ajudá-lo a investigar problemas de produção, analisar contratos, correlacionar incidentes e fornecer insights operacionais fundamentados na Source of Truth da sua organização. O que gostaria de explorar?",
-    "you": "Você"
+    "you": "Você",
+    "copilot.title": "NexTrace IA",
+    "copilot.greeting": "Olá, {{name}}",
+    "copilot.subtitle": "Posso ajudar com serviços, contratos, incidentes, mudanças e conhecimento operacional. Pergunte-me qualquer coisa.",
+    "copilot.inputPlaceholder": "Pergunte-me sobre seus serviços, contratos ou operações…",
+    "copilot.toggleHistory": "Alternar histórico de conversas"
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Alterações Recentes",
@@ -858,7 +863,8 @@
     "tagline": "Plataforma Soberana de Governança de Engenharia",
     "trustCompliant": "Compatível com empresas",
     "trustEncrypted": "Criptografado em trânsito",
-    "welcomeTitle": "Bem-vindo ao NexTraceOne"
+    "welcomeTitle": "Bem-vindo ao NexTraceOne",
+    "logout": "Sair"
   },
   "authorization": {
     "accessDenied": "Acesso Negado",
@@ -6696,7 +6702,16 @@
       }
     },
     "quickActions": "Ações Rápidas",
-    "widgetComingSoon": "Dados estarão disponíveis quando ligados aos serviços do backend"
+    "widgetComingSoon": "Dados estarão disponíveis quando ligados aos serviços do backend",
+    "AiUser": {
+      "label": "Utilizador IA",
+      "homeSubtitle": "Seu assistente operacional com IA",
+      "ai": {
+        "prompt1": "Quais serviços estão com problemas agora?",
+        "prompt2": "Mostre mudanças recentes com alto raio de impacto",
+        "prompt3": "Resuma os incidentes abertos e seu impacto"
+      }
+    }
   },
   "phase4": {
     "contractDrift": {

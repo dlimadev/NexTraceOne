@@ -6,7 +6,7 @@ import { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
-const AiAssistantPage = lazy(() => import('../features/ai-hub/pages/AiAssistantPage').then(m => ({ default: m.AiAssistantPage })));
+const AiCopilotPage = lazy(() => import('../features/ai-hub/pages/AiCopilotPage').then(m => ({ default: m.AiCopilotPage })));
 const ModelRegistryPage = lazy(() => import('../features/ai-hub/pages/ModelRegistryPage').then(m => ({ default: m.ModelRegistryPage })));
 const AiPoliciesPage = lazy(() => import('../features/ai-hub/pages/AiPoliciesPage').then(m => ({ default: m.AiPoliciesPage })));
 const AiRoutingPage = lazy(() => import('../features/ai-hub/pages/AiRoutingPage').then(m => ({ default: m.AiRoutingPage })));
@@ -26,7 +26,7 @@ export function AiHubRoutes() {
         path="/ai/assistant"
         element={
           <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
-            <AiAssistantPage />
+            <AiCopilotPage />
           </ProtectedRoute>
         }
       />

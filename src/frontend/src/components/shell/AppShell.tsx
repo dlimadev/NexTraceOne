@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePersona } from '../../contexts/PersonaContext';
 import { CommandPalette } from '../CommandPalette';
 import { AppSidebar } from './AppSidebar';
 import { AppTopbar } from './AppTopbar';
@@ -15,6 +16,8 @@ import { cn } from '../../lib/cn';
 export function AppShell() {
   const { isAuthenticated, isLoadingUser } = useAuth();
   const { t } = useTranslation();
+  const { persona } = usePersona();
+  const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -58,6 +61,27 @@ export function AppShell() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // ── AiUser persona: redirect to /ai/assistant and render minimal shell ──
+  // For AiUser, there is no sidebar or topbar — only the AI chat page is accessible.
+  if (persona === 'AiUser') {
+    // Redirect any non-AI route to /ai/assistant
+    if (!location.pathname.startsWith('/ai/assistant')) {
+      return <Navigate to="/ai/assistant" replace />;
+    }
+
+    return (
+      <div className="flex h-screen bg-canvas overflow-hidden" data-testid="ai-only-shell">
+        <RouteProgressBar />
+        <div className="flex-1 flex flex-col min-h-0 min-w-0">
+          <main id="main-content" className="flex-1 overflow-hidden">
+            <Outlet />
+          </main>
+        </div>
+        <AnalyticsEventTracker />
+      </div>
+    );
   }
 
   return (

@@ -485,7 +485,12 @@
     "typing": "Analyzing context",
     "usingModel": "Using model",
     "welcomeMessage": "Welcome! I'm the NexTraceOne AI Assistant. I can help you investigate production issues, analyze contracts, correlate incidents, and provide operational insights grounded in your organization's Source of Truth. What would you like to explore?",
-    "you": "You"
+    "you": "You",
+    "copilot.title": "NexTrace AI",
+    "copilot.greeting": "Hello, {{name}}",
+    "copilot.subtitle": "I can help you with services, contracts, incidents, changes and operational knowledge. Ask me anything.",
+    "copilot.inputPlaceholder": "Ask me anything about your services, contracts, or operations…",
+    "copilot.toggleHistory": "Toggle conversation history"
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Recent Changes",
@@ -858,7 +863,8 @@
     "tagline": "Sovereign Engineering Governance Platform",
     "trustCompliant": "Enterprise compliant",
     "trustEncrypted": "Encrypted in transit",
-    "welcomeTitle": "Welcome to NexTraceOne"
+    "welcomeTitle": "Welcome to NexTraceOne",
+    "logout": "Logout"
   },
   "authorization": {
     "accessDenied": "Access Denied",
@@ -6696,7 +6702,16 @@
       }
     },
     "quickActions": "Quick Actions",
-    "widgetComingSoon": "Data will be available when connected to backend services"
+    "widgetComingSoon": "Data will be available when connected to backend services",
+    "AiUser": {
+      "label": "AI User",
+      "homeSubtitle": "Your AI-powered operational assistant",
+      "ai": {
+        "prompt1": "What services are experiencing issues right now?",
+        "prompt2": "Show me recent changes with high blast radius",
+        "prompt3": "Summarize open incidents and their impact"
+      }
+    }
   },
   "phase4": {
     "contractDrift": {
