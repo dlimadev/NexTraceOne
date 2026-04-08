@@ -130,13 +130,13 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Incidents | READY | `EfIncidentStore` é a implementação registada. Frontend totalmente conectado via API real. `IIncidentModule` implementado para cross-module. Correlação dinâmica via `IIncidentCorrelationRepository` + `IChangeIntelligenceReader`. |
 | Automation | READY | 10/10 handlers reais — workflows persistidos via `AutomationDbContext`, catálogo estático, auditoria, validação pós-execução e precondições avaliadas contra estado real do workflow. `IAutomationModule` implementado. |
 | Reliability | READY | 15/15 handlers reais — SLO/SLA definitions, burn rate, error budget, snapshots de fiabilidade, sumários por equipa/domínio. `IReliabilityModule` implementado. |
-| Runtime Intelligence | READY | `RuntimeIntelligenceDbContext`, 4 repositórios EF Core, 20+ features (DetectLogAnomaly, GetRuntimeHealth, DetectRuntimeDrift, CompareEnvironments, etc.), `RuntimeIntelligenceEndpointModule` com endpoints REST completos |
+| Runtime Intelligence | READY | `RuntimeIntelligenceDbContext`, 5 repositórios EF Core (RuntimeSnapshot, RuntimeBaseline, DriftFinding, ObservabilityProfile, CustomChart), 20+ features, `RuntimeIntelligenceEndpointModule` com endpoints REST completos |
 | Cost Intelligence | READY | `CostIntelligenceDbContext`, 8 repositórios EF Core (CostAttribution, CostRecord, CostTrend, BudgetForecast, etc.), `CostIntelligenceEndpointModule` com endpoints REST, `CostIntelligenceModuleService` para cross-module |
 | Mitigation Workflows | READY | `CreateMitigationWorkflow` persiste via `IMitigationWorkflowRepository`; `GetMitigationHistory` consulta dados reais; `RecordMitigationValidation` persiste logs de validação. |
 
 **DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (migração), `CostIntelligenceDbContext` (migração)
-**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). `InMemoryIncidentStore` marcado como `[Obsolete]` — apenas para testes.
-**Testes:** 624+ testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
+**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). `InMemoryIncidentStore` marcado como `[Obsolete]` — apenas para testes. `InMemoryCustomChartRepository` marcado como `[Obsolete]` — produção usa `CustomChartRepository` (EF Core).
+**Testes:** 631 testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
 **Evidência:** `src/modules/operationalintelligence/`
 
 ---
