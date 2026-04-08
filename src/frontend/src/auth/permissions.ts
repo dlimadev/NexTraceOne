@@ -24,7 +24,8 @@ export type AppRole =
   | 'Viewer'
   | 'Auditor'
   | 'SecurityReview'
-  | 'ApprovalOnly';
+  | 'ApprovalOnly'
+  | 'AiUser';
 
 // Permissões granulares por módulo — códigos idênticos ao RolePermissionCatalog do backend.
 // Manter sincronizado com: IdentityAccess.Domain/Entities/RolePermissionCatalog.cs

@@ -1,0 +1,90 @@
+{
+  "index_patterns": ["nextraceone-traces-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.refresh_interval": "5s",
+      "index.codec": "best_compression",
+      "index.mapping.total_fields.limit": 2000
+    },
+    "mappings": {
+      "dynamic": "true",
+      "dynamic_templates": [
+        {
+          "resource_attributes": {
+            "path_match": "resource.*",
+            "mapping": { "type": "keyword", "ignore_above": 512 }
+          }
+        },
+        {
+          "span_attributes": {
+            "path_match": "attributes.*",
+            "mapping": { "type": "keyword", "ignore_above": 1024 }
+          }
+        }
+      ],
+      "properties": {
+        "trace_id": { "type": "keyword" },
+        "span_id": { "type": "keyword" },
+        "parent_span_id": { "type": "keyword" },
+        "name": { "type": "keyword" },
+        "kind": { "type": "keyword" },
+        "start_time": { "type": "date" },
+        "end_time": { "type": "date" },
+        "duration_ms": { "type": "double" },
+        "status": {
+          "properties": {
+            "code": { "type": "keyword" },
+            "message": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 512 } } }
+          }
+        },
+        "resource": {
+          "properties": {
+            "service.name": { "type": "keyword" },
+            "service.namespace": { "type": "keyword" },
+            "service.version": { "type": "keyword" },
+            "host.name": { "type": "keyword" },
+            "container.name": { "type": "keyword" },
+            "environment": { "type": "keyword" },
+            "deployment.environment": { "type": "keyword" }
+          }
+        },
+        "service_name": { "type": "keyword" },
+        "attributes": {
+          "properties": {
+            "http.method": { "type": "keyword" },
+            "http.route": { "type": "keyword" },
+            "http.status_code": { "type": "integer" },
+            "http.url": { "type": "keyword", "ignore_above": 2048 },
+            "db.system": { "type": "keyword" },
+            "db.statement": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 512 } } },
+            "db.name": { "type": "keyword" },
+            "rpc.system": { "type": "keyword" },
+            "rpc.service": { "type": "keyword" },
+            "rpc.method": { "type": "keyword" },
+            "messaging.system": { "type": "keyword" },
+            "messaging.destination": { "type": "keyword" },
+            "nexttrace.tenant_id": { "type": "keyword" },
+            "nexttrace.environment_id": { "type": "keyword" },
+            "nexttrace.correlation_id": { "type": "keyword" },
+            "nexttrace.service_origin": { "type": "keyword" },
+            "nexttrace.user_id": { "type": "keyword" }
+          }
+        },
+        "events": {
+          "type": "nested",
+          "properties": {
+            "name": { "type": "keyword" },
+            "timestamp": { "type": "date" },
+            "attributes": { "type": "object", "enabled": true }
+          }
+        }
+      }
+    }
+  },
+  "priority": 200,
+  "_meta": {
+    "description": "Index template for NexTraceOne distributed traces (OTel spans). Optimized for trace search, service topology discovery and change correlation."
+  }
+}

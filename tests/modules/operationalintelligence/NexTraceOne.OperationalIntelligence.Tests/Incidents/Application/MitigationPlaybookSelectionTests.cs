@@ -3,7 +3,7 @@ using FluentAssertions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SelectMitigationPlaybook;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 
 using NSubstitute;
 

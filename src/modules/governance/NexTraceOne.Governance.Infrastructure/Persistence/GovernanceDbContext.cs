@@ -61,6 +61,12 @@ public sealed class GovernanceDbContext(
     /// <summary>Achados individuais de scans de segurança.</summary>
     public DbSet<SecurityFinding> SecurityFindings => Set<SecurityFinding>();
 
+    /// <summary>Dashboards customizados por persona e tenant.</summary>
+    public DbSet<CustomDashboard> CustomDashboards => Set<CustomDashboard>();
+
+    /// <summary>Itens de dívida técnica registados por serviço.</summary>
+    public DbSet<TechnicalDebtItem> TechnicalDebtItems => Set<TechnicalDebtItem>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

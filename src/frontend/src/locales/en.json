@@ -485,7 +485,12 @@
     "typing": "Analyzing context",
     "usingModel": "Using model",
     "welcomeMessage": "Welcome! I'm the NexTraceOne AI Assistant. I can help you investigate production issues, analyze contracts, correlate incidents, and provide operational insights grounded in your organization's Source of Truth. What would you like to explore?",
-    "you": "You"
+    "you": "You",
+    "copilot.title": "NexTrace AI",
+    "copilot.greeting": "Hello, {{name}}",
+    "copilot.subtitle": "I can help you with services, contracts, incidents, changes and operational knowledge. Ask me anything.",
+    "copilot.inputPlaceholder": "Ask me anything about your services, contracts, or operations…",
+    "copilot.toggleHistory": "Toggle conversation history"
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Recent Changes",
@@ -858,7 +863,8 @@
     "tagline": "Sovereign Engineering Governance Platform",
     "trustCompliant": "Enterprise compliant",
     "trustEncrypted": "Encrypted in transit",
-    "welcomeTitle": "Welcome to NexTraceOne"
+    "welcomeTitle": "Welcome to NexTraceOne",
+    "logout": "Logout"
   },
   "authorization": {
     "accessDenied": "Access Denied",
@@ -6696,7 +6702,16 @@
       }
     },
     "quickActions": "Quick Actions",
-    "widgetComingSoon": "Data will be available when connected to backend services"
+    "widgetComingSoon": "Data will be available when connected to backend services",
+    "AiUser": {
+      "label": "AI User",
+      "homeSubtitle": "Your AI-powered operational assistant",
+      "ai": {
+        "prompt1": "What services are experiencing issues right now?",
+        "prompt2": "Show me recent changes with high blast radius",
+        "prompt3": "Summarize open incidents and their impact"
+      }
+    }
   },
   "phase4": {
     "contractDrift": {
@@ -8573,5 +8588,118 @@
   "brand": {
     "name": "NexTraceOne",
     "tagline": "Operational Confidence"
+  },
+  "telemetryExplorer": {
+    "title": "Telemetry Explorer",
+    "subtitle": "Search and analyze logs, traces and metrics from your services",
+    "traces": {
+      "title": "Trace Explorer",
+      "subtitle": "Distributed trace search with span hierarchy and correlation",
+      "searchPlaceholder": "Search by trace ID, service or operation...",
+      "traceId": "Trace ID",
+      "service": "Service",
+      "operation": "Operation",
+      "duration": "Duration",
+      "durationMs": "{{value}}ms",
+      "status": "Status",
+      "spanCount": "Spans",
+      "startTime": "Start Time",
+      "hasErrors": "Has Errors",
+      "errorsOnly": "Errors Only",
+      "minDuration": "Min Duration (ms)",
+      "noTraces": "No traces found",
+      "noTracesDescription": "Adjust your filters or time range to find traces.",
+      "detail": {
+        "title": "Trace Detail",
+        "services": "Services",
+        "totalDuration": "Total Duration",
+        "spans": "Spans",
+        "spanDetail": "Span Detail",
+        "spanId": "Span ID",
+        "parentSpan": "Parent Span",
+        "operationName": "Operation",
+        "serviceName": "Service",
+        "statusCode": "Status Code",
+        "statusMessage": "Status Message",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "duration": "Duration",
+        "attributes": "Attributes",
+        "resourceAttributes": "Resource Attributes",
+        "spanAttributes": "Span Attributes",
+        "events": "Events",
+        "noEvents": "No events in this span",
+        "rootSpan": "Root Span",
+        "childSpan": "Child Span",
+        "waterfall": "Waterfall",
+        "timeline": "Timeline"
+      }
+    },
+    "logs": {
+      "title": "Log Explorer",
+      "subtitle": "Search and filter structured logs with trace correlation",
+      "searchPlaceholder": "Search in log messages...",
+      "level": "Level",
+      "message": "Message",
+      "service": "Service",
+      "timestamp": "Timestamp",
+      "traceId": "Trace ID",
+      "spanId": "Span ID",
+      "correlationId": "Correlation ID",
+      "host": "Host",
+      "container": "Container",
+      "exception": "Exception",
+      "allLevels": "All Levels",
+      "noLogs": "No logs found",
+      "noLogsDescription": "Adjust your filters or time range to find logs.",
+      "viewTrace": "View Trace",
+      "expandException": "Show Exception"
+    },
+    "filters": {
+      "environment": "Environment",
+      "service": "Service",
+      "timeRange": "Time Range",
+      "from": "From",
+      "until": "Until",
+      "last15m": "Last 15 min",
+      "last1h": "Last 1 hour",
+      "last6h": "Last 6 hours",
+      "last24h": "Last 24 hours",
+      "last7d": "Last 7 days",
+      "custom": "Custom",
+      "apply": "Apply Filters",
+      "reset": "Reset",
+      "limit": "Results Limit"
+    },
+    "errors": {
+      "title": "Top Errors",
+      "errorMessage": "Error Message",
+      "count": "Count",
+      "lastSeen": "Last Seen",
+      "service": "Service"
+    },
+    "latency": {
+      "title": "Latency Comparison",
+      "p50": "P50",
+      "p95": "P95",
+      "p99": "P99",
+      "drift": "Drift %"
+    },
+    "correlate": {
+      "title": "Signal Correlation",
+      "subtitle": "Correlated logs and spans for a given trace",
+      "relatedLogs": "Related Logs",
+      "relatedSpans": "Related Spans"
+    },
+    "health": {
+      "title": "Telemetry Health",
+      "provider": "Provider",
+      "status": "Status",
+      "healthy": "Healthy",
+      "unhealthy": "Unhealthy"
+    },
+    "loading": "Loading telemetry data...",
+    "error": "Failed to load telemetry data. Please check the observability provider status.",
+    "providerUnavailable": "Observability provider is not available. Ensure Elasticsearch or ClickHouse is running."
   }
 }

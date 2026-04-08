@@ -41,6 +41,7 @@ public static class ModuleAccessPolicyCatalog
             Role.Auditor => AuditorPolicies,
             Role.SecurityReview => SecurityReviewPolicies,
             Role.ApprovalOnly => ApprovalOnlyPolicies,
+            Role.AiUser => AiUserPolicies,
             _ => []
         };
 
@@ -225,5 +226,13 @@ public static class ModuleAccessPolicyCatalog
         new("Audit", "Trail", "Read", true),
         new("Notifications", "Inbox", "*", true),
         new("Notifications", "Preferences", "Read", true)
+    ];
+
+    // ── AiUser: restrito ao assistente de IA ─────────────────────────────
+
+    private static readonly IReadOnlyList<PolicyEntry> AiUserPolicies =
+    [
+        new("AI", "Assistant", "Read", true),
+        new("AI", "Assistant", "Write", true)
     ];
 }

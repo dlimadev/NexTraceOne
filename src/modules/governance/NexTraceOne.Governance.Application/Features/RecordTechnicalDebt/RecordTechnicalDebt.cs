@@ -2,12 +2,14 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.RecordTechnicalDebt;
 
 /// <summary>
 /// Feature: RecordTechnicalDebt — regista um item de dívida técnica para um serviço.
-/// Computa automaticamente o score de risco com base na severidade declarada.
+/// Persiste na base de dados e computa automaticamente o score de risco.
 ///
 /// Owner: módulo Governance.
 /// Pilar: Service Governance — tracking de dívida técnica com scoring e correlação com incidentes.
@@ -22,7 +24,8 @@ public static class RecordTechnicalDebt
         string Description,
         string Severity,
         int EstimatedEffortDays,
-        string? Tags) : ICommand<Response>;
+        string? Tags,
+        string TenantId = "default") : ICommand<Response>;
 
     /// <summary>Validação do comando de registo de dívida técnica.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -48,34 +51,40 @@ public static class RecordTechnicalDebt
         }
     }
 
-    /// <summary>Handler que gera o identificador e computa o score de dívida técnica.</summary>
-    public sealed class Handler(IDateTimeProvider clock) : ICommandHandler<Command, Response>
+    /// <summary>Handler que cria e persiste um novo item de dívida técnica.</summary>
+    public sealed class Handler(
+        ITechnicalDebtRepository repository,
+        IUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var debtId = Guid.NewGuid();
-            var debtScore = ComputeDebtScore(request.Severity);
             var now = clock.UtcNow;
 
-            return Task.FromResult(Result<Response>.Success(new Response(
-                DebtId: debtId,
-                ServiceName: request.ServiceName,
-                DebtType: request.DebtType,
-                Title: request.Title,
-                Severity: request.Severity,
-                EstimatedEffortDays: request.EstimatedEffortDays,
-                DebtScore: debtScore,
-                CreatedAt: now)));
-        }
+            var item = TechnicalDebtItem.Create(
+                serviceName: request.ServiceName,
+                debtType: request.DebtType,
+                title: request.Title,
+                description: request.Description,
+                severity: request.Severity,
+                estimatedEffortDays: request.EstimatedEffortDays,
+                tags: request.Tags,
+                tenantId: request.TenantId,
+                now: now);
 
-        private static int ComputeDebtScore(string severity) => severity switch
-        {
-            "critical" => 40,
-            "high" => 25,
-            "medium" => 10,
-            "low" => 5,
-            _ => 0
-        };
+            await repository.AddAsync(item, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return Result<Response>.Success(new Response(
+                DebtId: item.Id.Value,
+                ServiceName: item.ServiceName,
+                DebtType: item.DebtType,
+                Title: item.Title,
+                Severity: item.Severity,
+                EstimatedEffortDays: item.EstimatedEffortDays,
+                DebtScore: item.DebtScore,
+                CreatedAt: item.CreatedAt));
+        }
     }
 
     /// <summary>Resposta com o identificador do item registado e o score computado.</summary>

@@ -1,13 +1,14 @@
 using FluentValidation;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetCustomDashboard;
 
 /// <summary>
 /// Feature: GetCustomDashboard — retorna o detalhe de um dashboard customizado por ID.
-/// Nesta etapa, retorna uma estrutura de demonstração para validar o contrato da API.
+/// Consulta a base de dados real via ICustomDashboardRepository.
 ///
 /// Owner: módulo Governance.
 /// Pilar: Governance — Source of Truth para dashboards de governance por persona.
@@ -28,27 +29,31 @@ public static class GetCustomDashboard
         }
     }
 
-    /// <summary>Handler que retorna a estrutura de demonstração de um dashboard.</summary>
-    public sealed class Handler(IDateTimeProvider clock) : IQueryHandler<Query, Response>
+    /// <summary>Handler que obtém um dashboard da base de dados.</summary>
+    public sealed class Handler(ICustomDashboardRepository repository) : IQueryHandler<Query, Response>
     {
-        private static readonly IReadOnlyList<string> DemoWidgetIds =
-            ["dora-metrics", "incident-summary", "service-scorecard", "cost-trend", "change-confidence", "reliability-slo"];
-
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var now = clock.UtcNow;
+            var dashboard = await repository.GetByIdAsync(
+                new CustomDashboardId(request.DashboardId), cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(new Response(
-                DashboardId: request.DashboardId,
-                Name: "Team Health Overview",
-                Description: "Comprehensive view of team health, reliability and change confidence.",
-                Layout: "two-column",
-                Persona: "TechLead",
-                WidgetIds: DemoWidgetIds,
-                WidgetCount: DemoWidgetIds.Count,
-                CreatedAt: now.AddDays(-30),
-                LastModifiedAt: now.AddDays(-2),
-                IsShared: true)));
+            if (dashboard is null)
+                return Error.NotFound(
+                    "CustomDashboard.NotFound",
+                    "Custom dashboard with ID '{0}' was not found.",
+                    request.DashboardId);
+
+            return Result<Response>.Success(new Response(
+                DashboardId: dashboard.Id.Value,
+                Name: dashboard.Name,
+                Description: dashboard.Description,
+                Layout: dashboard.Layout,
+                Persona: dashboard.Persona,
+                WidgetIds: dashboard.WidgetIds,
+                WidgetCount: dashboard.WidgetIds.Count,
+                CreatedAt: dashboard.CreatedAt,
+                LastModifiedAt: dashboard.UpdatedAt,
+                IsShared: dashboard.IsShared));
         }
     }
 

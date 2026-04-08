@@ -27,6 +27,12 @@ public interface ICatalogGraphModule
     /// <summary>Lista contratos associados a uma equipa.</summary>
     Task<IReadOnlyList<TeamContractInfo>> ListContractsByTeamAsync(string teamName, CancellationToken cancellationToken);
 
+    /// <summary>Lista todos os serviços registados no catálogo.</summary>
+    Task<IReadOnlyList<TeamServiceInfo>> ListAllServicesAsync(CancellationToken cancellationToken);
+
+    /// <summary>Lista serviços associados a um domínio.</summary>
+    Task<IReadOnlyList<TeamServiceInfo>> ListServicesByDomainAsync(string domain, CancellationToken cancellationToken);
+
     /// <summary>Lista dependências cross-team de uma equipa.</summary>
     Task<IReadOnlyList<CrossTeamDependencyInfo>> ListCrossTeamDependenciesAsync(string teamName, CancellationToken cancellationToken);
 }

@@ -320,6 +320,9 @@ public static class RolePermissionCatalog
                 "notifications:inbox:read",
                 "notifications:inbox:write",
                 "notifications:preferences:read"],
+            Role.AiUser => [
+                "ai:assistant:read",
+                "ai:assistant:write"],
             _ => []
         };
 }

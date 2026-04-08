@@ -193,7 +193,14 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 ## 13. EF Core Designer Files
 
 ### 13.1 Regenerar Designer Files
-- **Estado:** 6 Designer files em falta (requerem `dotnet ef` com PostgreSQL ativo)
+- **Estado:** 13 Designer files em falta (requerem `dotnet ef` com PostgreSQL ativo)
+- **Módulos afectados:**
+  - AuditCompliance (1): `P7_4_AuditCorrelationId`
+  - IdentityAccess (1): `AddTenantOrganizationFields`
+  - Catalog (3): `P52B_DeveloperSurveys`, `W04_LegacyContractGovernance`, `AddCatalogSearchGinIndexes`, `P52_DeveloperExperienceScore`
+  - Configuration (1): `AddPhase3To8ConfigurationTables`
+  - OperationalIntelligence (4): `P51_PredictiveIntelligence`, `W01_TelemetryStoreFoundation`, `AddCustomCharts`, `AddChaosExperiments`
+  - AIKnowledge (2): `P05_Innovation`, `P04_BackendEnhancements`
 - **Comando:** `dotnet ef migrations add <Name> --project <InfraProject> --startup-project src/platform/NexTraceOne.ApiHost`
 - **Nota:** Requer ambiente local com PostgreSQL; não executável em sandbox CI
 

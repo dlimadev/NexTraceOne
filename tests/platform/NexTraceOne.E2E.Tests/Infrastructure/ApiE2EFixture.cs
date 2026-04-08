@@ -359,8 +359,7 @@ public sealed class ApiE2EFixture : IAsyncLifetime
     {
         try
         {
-            _container = new PostgreSqlBuilder()
-                .WithImage("postgres:16-alpine")
+            _container = new PostgreSqlBuilder("postgres:16-alpine")
                 .WithDatabase("postgres")
                 .WithUsername("postgres")
                 .WithPassword("postgres")
