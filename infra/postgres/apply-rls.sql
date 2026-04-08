@@ -390,6 +390,13 @@ CREATE POLICY tenant_isolation ON aik_policies
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- aik_gov_feedbacks — AI feedback loop entries per tenant
+ALTER TABLE aik_gov_feedbacks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON aik_gov_feedbacks;
+CREATE POLICY tenant_isolation ON aik_gov_feedbacks
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ── Product Analytics module (pan_ prefix) ────────────────────────────────────
 
 -- pan_analytics_events — analytics events per tenant
