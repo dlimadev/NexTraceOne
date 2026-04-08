@@ -4,7 +4,7 @@
 > **Referência:** [BRAINSTORMING-INNOVATIVE-IDEAS.md](./BRAINSTORMING-INNOVATIVE-IDEAS.md)  
 > **Arquitetura:** Modular Monolith — .NET 10 + React 18 + PostgreSQL 16  
 > **Módulos existentes:** Catalog, ChangeGovernance, OperationalIntelligence, AIKnowledge, Governance, Configuration, IdentityAccess, AuditCompliance, Integrations, Knowledge, Notifications, ProductAnalytics  
-> **Última actualização:** 2026-04-08 — Wave A em progresso: Ideias 1 e 2 implementadas (backend + testes)
+> **Última actualização:** 2026-04-08 — Wave A+B em progresso: Ideias 1, 2 (Wave A) e 3, 29 (Wave B) implementadas (backend + testes)
 
 ---
 
@@ -297,10 +297,11 @@ ContractComplianceResult (entidade)
 
 ---
 
-### Ideia 3 — AI-Powered Incident Narrator
+### ✅ Ideia 3 — AI-Powered Incident Narrator
 
 **Módulo:** OperationalIntelligence + AIKnowledge  
-**Complexidade:** 🟠 Média-Alta
+**Complexidade:** 🟠 Média-Alta  
+**Estado:** ✅ Backend implementado — 31 testes passando
 
 #### Backend
 
@@ -379,10 +380,11 @@ ContractComplianceResult (entidade)
 
 ---
 
-### Ideia 29 — AI Knowledge Feedback Loop
+### ✅ Ideia 29 — AI Knowledge Feedback Loop
 
 **Módulo:** AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 40 testes passando
 
 #### Entidades de Domínio
 

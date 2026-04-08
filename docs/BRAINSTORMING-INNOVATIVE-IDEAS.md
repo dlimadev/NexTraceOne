@@ -3,7 +3,7 @@
 > **Data:** Abril 2026  
 > **Estado:** 🟢 Ideias aprovadas — plano de desenvolvimento em [DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md](./DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md)  
 > **Referência:** [PRODUCT-VISION.md](./PRODUCT-VISION.md), [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)  
-> **Última actualização:** 2026-04-08 — Implementação Wave A iniciada (Ideias 1 e 2 concluídas)
+> **Última actualização:** 2026-04-08 — Implementação Wave A+B (Ideias 1, 2, 3, 29 concluídas)
 
 ---
 
@@ -63,10 +63,11 @@ A timeline é interativa e permite drill-down em cada ponto que alterou o score.
 
 ---
 
-### 💡 Ideia 3 — AI-Powered Incident Narrator
+### ✅ Ideia 3 — AI-Powered Incident Narrator
 
 **Pilar:** AI-assisted Operations  
 **Persona:** Engineer, Tech Lead  
+**Estado:** ✅ Implementado (Wave B) — Entidade `IncidentNarrative` com 7 secções, enum `NarrativeStatus` (Draft/Published/Stale), handlers `GenerateIncidentNarrative`, `GetIncidentNarrative`, `RefreshIncidentNarrative`, 31 testes, RLS configurado.
 
 Quando um incidente é registado, um agente de IA gera automaticamente uma **narrativa em linguagem natural** que explica:
 
@@ -573,10 +574,11 @@ Permite responder:
 
 ---
 
-### 💡 Ideia 29 — AI Knowledge Feedback Loop
+### ✅ Ideia 29 — AI Knowledge Feedback Loop
 
 **Pilar:** AI Governance + Source of Truth  
 **Persona:** Todas  
+**Estado:** ✅ Implementado (Wave B) — Entidade `AiFeedback` com `FeedbackRating` (Positive/Negative/Neutral), handlers `SubmitAiFeedback`, `GetFeedbackMetrics`, `ListNegativeFeedback`, 40 testes, RLS configurado.
 
 Sistema de feedback loop que melhora a IA continuamente:
 
