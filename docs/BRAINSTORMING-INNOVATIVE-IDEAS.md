@@ -2,7 +2,8 @@
 
 > **Data:** Abril 2026  
 > **Estado:** 🟢 Ideias aprovadas — plano de desenvolvimento em [DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md](./DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md)  
-> **Referência:** [PRODUCT-VISION.md](./PRODUCT-VISION.md), [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)
+> **Referência:** [PRODUCT-VISION.md](./PRODUCT-VISION.md), [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)  
+> **Última actualização:** 2026-04-08 — Implementação Wave A iniciada (Ideias 1 e 2 concluídas)
 
 ---
 
@@ -20,10 +21,11 @@ Estas ideias representam **evolução diferenciadora** — funcionalidades que p
 
 ---
 
-### 💡 Ideia 1 — Contract Health Score em Tempo Real
+### ✅ Ideia 1 — Contract Health Score em Tempo Real
 
 **Pilar:** Contract Governance  
 **Persona:** Tech Lead, Architect  
+**Estado:** ✅ Implementado (Wave A) — Entidade `ContractHealthScore` com 6 dimensões, handlers `RecalculateContractHealthScore`, `GetContractHealthScore`, `ListContractsWithHealthBelowThreshold`, 44 testes, RLS configurado.
 
 Criar um **score de saúde contínuo** para cada contrato, combinando:
 
@@ -40,10 +42,11 @@ O score é recalculado automaticamente e aparece como badge no catálogo, nas de
 
 ---
 
-### 💡 Ideia 2 — Change Confidence Timeline
+### ✅ Ideia 2 — Change Confidence Timeline
 
 **Pilar:** Change Intelligence  
 **Persona:** Tech Lead, Engineer  
+**Estado:** ✅ Implementado (Wave A) — Entidade `ChangeConfidenceEvent` (append-only), enum `ConfidenceEventType` (12 tipos), handlers `RecordConfidenceEvent`, `GetChangeConfidenceTimeline`, 34 testes, RLS configurado.
 
 Criar uma **timeline visual** que mostra a evolução da confiança de uma mudança ao longo do tempo:
 

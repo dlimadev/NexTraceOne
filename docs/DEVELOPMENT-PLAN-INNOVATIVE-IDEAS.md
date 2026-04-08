@@ -3,7 +3,8 @@
 > **Data:** Abril 2026  
 > **Referência:** [BRAINSTORMING-INNOVATIVE-IDEAS.md](./BRAINSTORMING-INNOVATIVE-IDEAS.md)  
 > **Arquitetura:** Modular Monolith — .NET 10 + React 18 + PostgreSQL 16  
-> **Módulos existentes:** Catalog, ChangeGovernance, OperationalIntelligence, AIKnowledge, Governance, Configuration, IdentityAccess, AuditCompliance, Integrations, Knowledge, Notifications, ProductAnalytics
+> **Módulos existentes:** Catalog, ChangeGovernance, OperationalIntelligence, AIKnowledge, Governance, Configuration, IdentityAccess, AuditCompliance, Integrations, Knowledge, Notifications, ProductAnalytics  
+> **Última actualização:** 2026-04-08 — Wave A em progresso: Ideias 1 e 2 implementadas (backend + testes)
 
 ---
 
@@ -42,10 +43,11 @@ Este documento detalha o **plano de desenvolvimento** para cada uma das 29 ideia
 
 ---
 
-### Ideia 1 — Contract Health Score em Tempo Real
+### ✅ Ideia 1 — Contract Health Score em Tempo Real
 
 **Módulo:** Catalog (Contract subdomain)  
-**Complexidade:** 🟠 Média-Alta
+**Complexidade:** 🟠 Média-Alta  
+**Estado:** ✅ Backend implementado — 44 testes passando
 
 #### Entidades de Domínio
 
@@ -94,10 +96,11 @@ ContractHealthScore (entidade)
 
 ---
 
-### Ideia 2 — Change Confidence Timeline
+### ✅ Ideia 2 — Change Confidence Timeline
 
 **Módulo:** ChangeGovernance  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 34 testes passando
 
 #### Entidades de Domínio
 

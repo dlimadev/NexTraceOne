@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-08 — DEVELOPMENT-PLAN-INNOVATIVE-IDEAS adicionado; Ideia 23 removida do brainstorming
+> **Última actualização:** 2026-04-08 — Implementação Wave A iniciada: Ideias 1 e 2 concluídas (backend + 78 testes)
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
