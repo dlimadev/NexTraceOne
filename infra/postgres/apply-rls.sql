@@ -268,6 +268,13 @@ CREATE POLICY tenant_isolation ON ops_incidents
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- ops_incident_narratives — AI-generated incident narratives per tenant
+ALTER TABLE ops_incident_narratives ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_incident_narratives;
+CREATE POLICY tenant_isolation ON ops_incident_narratives
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ops_runbooks — operational runbooks per tenant
 ALTER TABLE ops_runbooks ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS tenant_isolation ON ops_runbooks;

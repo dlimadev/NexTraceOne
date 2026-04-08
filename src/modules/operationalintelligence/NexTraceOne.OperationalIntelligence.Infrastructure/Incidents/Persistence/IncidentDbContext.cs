@@ -39,6 +39,9 @@ public sealed class IncidentDbContext(
     /// <summary>Post-Incident Reviews (PIR) formais.</summary>
     public DbSet<PostIncidentReview> PostIncidentReviews => Set<PostIncidentReview>();
 
+    /// <summary>Narrativas de incidentes geradas por IA.</summary>
+    public DbSet<IncidentNarrative> IncidentNarratives => Set<IncidentNarrative>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IncidentDbContext).Assembly;

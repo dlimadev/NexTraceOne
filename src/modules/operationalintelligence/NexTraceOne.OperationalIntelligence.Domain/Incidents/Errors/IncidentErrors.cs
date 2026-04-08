@@ -71,4 +71,18 @@ public static class IncidentErrors
             "Incidents.Workflow.InvalidAction",
             "Action '{0}' is not a valid workflow action.",
             action);
+
+    /// <summary>Narrativa de incidente não encontrada.</summary>
+    public static Error NarrativeNotFound(string incidentId)
+        => Error.NotFound(
+            "Incidents.Narrative.NotFound",
+            "No narrative exists for incident '{0}'.",
+            incidentId);
+
+    /// <summary>Narrativa de incidente já existe para este incidente.</summary>
+    public static Error NarrativeAlreadyExists(string incidentId)
+        => Error.Conflict(
+            "Incidents.Narrative.AlreadyExists",
+            "A narrative already exists for incident '{0}'.",
+            incidentId);
 }
