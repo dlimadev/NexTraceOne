@@ -1,0 +1,73 @@
+{
+  "index_patterns": ["nextraceone-metrics-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.refresh_interval": "10s",
+      "index.codec": "best_compression",
+      "index.mapping.total_fields.limit": 3000
+    },
+    "mappings": {
+      "dynamic": "true",
+      "dynamic_templates": [
+        {
+          "resource_attributes": {
+            "path_match": "resource.*",
+            "mapping": { "type": "keyword", "ignore_above": 512 }
+          }
+        },
+        {
+          "metric_labels": {
+            "path_match": "labels.*",
+            "mapping": { "type": "keyword", "ignore_above": 256 }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "metric_name": { "type": "keyword" },
+        "metric_type": { "type": "keyword" },
+        "value": { "type": "double" },
+        "service_name": { "type": "keyword" },
+        "environment": { "type": "keyword" },
+        "resource": {
+          "properties": {
+            "service.name": { "type": "keyword" },
+            "service.namespace": { "type": "keyword" },
+            "service.version": { "type": "keyword" },
+            "host.name": { "type": "keyword" },
+            "container.name": { "type": "keyword" },
+            "environment": { "type": "keyword" },
+            "deployment.environment": { "type": "keyword" }
+          }
+        },
+        "labels": {
+          "properties": {
+            "http.method": { "type": "keyword" },
+            "http.route": { "type": "keyword" },
+            "http.status_code": { "type": "keyword" },
+            "db.system": { "type": "keyword" },
+            "rpc.system": { "type": "keyword" },
+            "rpc.service": { "type": "keyword" },
+            "rpc.method": { "type": "keyword" }
+          }
+        },
+        "histogram": {
+          "properties": {
+            "bucket_counts": { "type": "long" },
+            "explicit_bounds": { "type": "double" },
+            "sum": { "type": "double" },
+            "count": { "type": "long" },
+            "min": { "type": "double" },
+            "max": { "type": "double" }
+          }
+        }
+      }
+    }
+  },
+  "priority": 200,
+  "_meta": {
+    "description": "Index template for NexTraceOne metrics (OTLP + SpanMetrics). Optimized for aggregation queries and time-series analysis."
+  }
+}
