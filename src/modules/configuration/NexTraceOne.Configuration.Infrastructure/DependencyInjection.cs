@@ -9,7 +9,6 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence.Repositories;
-using NexTraceOne.Configuration.Infrastructure.Repositories;
 using NexTraceOne.Configuration.Infrastructure.Seed;
 using NexTraceOne.Configuration.Infrastructure.Services;
 
@@ -47,28 +46,28 @@ public static class DependencyInjection
         services.AddScoped<IUserSavedViewRepository, UserSavedViewRepository>();
         services.AddScoped<IUserBookmarkRepository, UserBookmarkRepository>();
 
-        // In-memory repositories for Phase 3 (MVP1 — persistência PostgreSQL a adicionar futuramente)
-        services.AddSingleton<IUserWatchRepository, InMemoryUserWatchRepository>();
-        services.AddSingleton<IUserAlertRuleRepository, InMemoryUserAlertRuleRepository>();
+        // Phase 3: Watch Lists & Alert Rules — PostgreSQL persistence
+        services.AddScoped<IUserWatchRepository, UserWatchRepository>();
+        services.AddScoped<IUserAlertRuleRepository, UserAlertRuleRepository>();
 
-        // In-memory repositories for Phase 4 (MVP1 — persistência PostgreSQL a adicionar futuramente)
-        services.AddSingleton<IEntityTagRepository, InMemoryEntityTagRepository>();
-        services.AddSingleton<IServiceCustomFieldRepository, InMemoryServiceCustomFieldRepository>();
-        services.AddSingleton<ITaxonomyRepository, InMemoryTaxonomyRepository>();
+        // Phase 4: Tags, Custom Fields & Taxonomies — PostgreSQL persistence
+        services.AddScoped<IEntityTagRepository, EntityTagRepository>();
+        services.AddScoped<IServiceCustomFieldRepository, ServiceCustomFieldRepository>();
+        services.AddScoped<ITaxonomyRepository, TaxonomyRepository>();
 
-        // In-memory repositories for Phase 5 (MVP1 — persistência PostgreSQL a adicionar futuramente)
-        services.AddSingleton<IAutomationRuleRepository, InMemoryAutomationRuleRepository>();
-        services.AddSingleton<IChangeChecklistRepository, InMemoryChangeChecklistRepository>();
-        services.AddSingleton<IContractTemplateRepository, InMemoryContractTemplateRepository>();
+        // Phase 5: Automation, Checklists & Contract Templates — PostgreSQL persistence
+        services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
+        services.AddScoped<IChangeChecklistRepository, ChangeChecklistRepository>();
+        services.AddScoped<IContractTemplateRepository, ContractTemplateRepository>();
 
-        // In-memory repositories for Phase 6 (MVP1 — persistência PostgreSQL a adicionar futuramente)
-        services.AddSingleton<IScheduledReportRepository, InMemoryScheduledReportRepository>();
+        // Phase 6: Scheduled Reports — PostgreSQL persistence
+        services.AddScoped<IScheduledReportRepository, ScheduledReportRepository>();
 
-        // In-memory repositories for Phase 7 (MVP1 — persistência PostgreSQL a adicionar futuramente)
-        services.AddSingleton<ISavedPromptRepository, InMemorySavedPromptRepository>();
+        // Phase 7: Saved Prompts — PostgreSQL persistence
+        services.AddScoped<ISavedPromptRepository, SavedPromptRepository>();
 
-        // In-memory repositories for Phase 8 (MVP1 — persistência PostgreSQL a adicionar futuramente)
-        services.AddSingleton<IWebhookTemplateRepository, InMemoryWebhookTemplateRepository>();
+        // Phase 8: Webhook Templates — PostgreSQL persistence
+        services.AddScoped<IWebhookTemplateRepository, WebhookTemplateRepository>();
 
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();

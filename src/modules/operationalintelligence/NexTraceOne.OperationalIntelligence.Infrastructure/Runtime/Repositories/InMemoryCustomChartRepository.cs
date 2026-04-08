@@ -5,9 +5,11 @@ using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Repositories;
 
 /// <summary>
-/// Implementação em memória do repositório de gráficos customizados.
-/// Para uso no MVP1 até integração com base de dados persistente.
+/// Implementação in-memory do repositório de gráficos customizados.
+/// NÃO é registada em DI de produção — apenas CustomChartRepository (EF Core) é o provider ativo.
+/// Mantida temporariamente para referência em testes. Será removida em versão futura.
 /// </summary>
+[System.Obsolete("Production uses EF Core CustomChartRepository registered in DI. This class will be removed in a future version.")]
 public sealed class InMemoryCustomChartRepository : ICustomChartRepository
 {
     private readonly ConcurrentDictionary<Guid, CustomChart> _store = new();

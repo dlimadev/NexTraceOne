@@ -15,7 +15,7 @@ internal sealed class ConfigurationDefinitionRepository(ConfigurationDbContext c
         => await context.Definitions.SingleOrDefaultAsync(d => d.Key == key, cancellationToken);
 
     public async Task<IReadOnlyList<ConfigurationDefinition>> GetAllAsync(CancellationToken cancellationToken)
-        => await context.Definitions.OrderBy(d => d.SortOrder).ThenBy(d => d.Key).ToListAsync(cancellationToken);
+        => await context.Definitions.OrderBy(d => d.SortOrder).ThenBy(d => d.Key).AsNoTracking().ToListAsync(cancellationToken);
 
     public async Task AddAsync(ConfigurationDefinition definition, CancellationToken cancellationToken)
         => await context.Definitions.AddAsync(definition, cancellationToken);

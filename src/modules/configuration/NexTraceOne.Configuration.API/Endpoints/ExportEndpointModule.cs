@@ -8,7 +8,9 @@ using NexTraceOne.BuildingBlocks.Application.Localization;
 namespace NexTraceOne.Configuration.API.Endpoints;
 
 /// <summary>
-/// Endpoint de exportação genérica de dados.
+/// [PREVIEW] Endpoint de exportação genérica de dados.
+/// Aceita pedidos de exportação e retorna status "queued".
+/// A geração real de ficheiros CSV/JSON/PDF está prevista como evolução futura via Quartz job.
 /// Suporta formatos CSV, JSON e PDF com selecção de colunas e filtros.
 /// </summary>
 public sealed class ExportEndpointModule

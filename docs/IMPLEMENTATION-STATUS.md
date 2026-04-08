@@ -35,8 +35,16 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 |---|---|---|
 | Feature Flags | READY | Database-driven, override por tenant, `ConfigurationDefinitionSeeder` com 458 seeds, 112 parâmetros em 17 domínios |
 | Settings por tenant/ambiente | READY | Presente e funcional, com governance gates e analytics endpoints |
+| User Saved Views & Bookmarks | READY | `UserSavedView`, `UserBookmark` — EF Core com RLS |
+| User Watch & Alert Rules | READY | `UserWatch`, `UserAlertRule` — EF Core com RLS |
+| Tags, Custom Fields & Taxonomy | READY | `EntityTag`, `ServiceCustomField`, `TaxonomyCategory/Value` — EF Core com RLS |
+| Automation, Checklists & Templates | READY | `AutomationRule`, `ChangeChecklist`, `ContractTemplate` — EF Core com RLS |
+| Scheduled Reports | READY | `ScheduledReport` — EF Core com RLS |
+| Saved Prompts | READY | `SavedPrompt` — EF Core com RLS |
+| Webhook Templates | READY | `WebhookTemplate` — EF Core com RLS |
 
-**DbContexts:** `ConfigurationDbContext` (migração confirmada)
+**DbContexts:** `ConfigurationDbContext` (3 migrações: Initial, UserSavedViews/Bookmarks, Phase3To8Tables)
+**Testes:** 451 unit tests (0 falhas)
 **Evidência:** `src/modules/configuration/`
 
 ---
@@ -122,13 +130,13 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Incidents | READY | `EfIncidentStore` é a implementação registada. Frontend totalmente conectado via API real. `IIncidentModule` implementado para cross-module. Correlação dinâmica via `IIncidentCorrelationRepository` + `IChangeIntelligenceReader`. |
 | Automation | READY | 10/10 handlers reais — workflows persistidos via `AutomationDbContext`, catálogo estático, auditoria, validação pós-execução e precondições avaliadas contra estado real do workflow. `IAutomationModule` implementado. |
 | Reliability | READY | 15/15 handlers reais — SLO/SLA definitions, burn rate, error budget, snapshots de fiabilidade, sumários por equipa/domínio. `IReliabilityModule` implementado. |
-| Runtime Intelligence | READY | `RuntimeIntelligenceDbContext`, 4 repositórios EF Core, 20+ features (DetectLogAnomaly, GetRuntimeHealth, DetectRuntimeDrift, CompareEnvironments, etc.), `RuntimeIntelligenceEndpointModule` com endpoints REST completos |
+| Runtime Intelligence | READY | `RuntimeIntelligenceDbContext`, 5 repositórios EF Core (RuntimeSnapshot, RuntimeBaseline, DriftFinding, ObservabilityProfile, CustomChart), 20+ features, `RuntimeIntelligenceEndpointModule` com endpoints REST completos |
 | Cost Intelligence | READY | `CostIntelligenceDbContext`, 8 repositórios EF Core (CostAttribution, CostRecord, CostTrend, BudgetForecast, etc.), `CostIntelligenceEndpointModule` com endpoints REST, `CostIntelligenceModuleService` para cross-module |
 | Mitigation Workflows | READY | `CreateMitigationWorkflow` persiste via `IMitigationWorkflowRepository`; `GetMitigationHistory` consulta dados reais; `RecordMitigationValidation` persiste logs de validação. |
 
 **DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (migração), `CostIntelligenceDbContext` (migração)
-**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). `InMemoryIncidentStore` marcado como `[Obsolete]` — apenas para testes.
-**Testes:** 624+ testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
+**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). `InMemoryIncidentStore` marcado como `[Obsolete]` — apenas para testes. `InMemoryCustomChartRepository` marcado como `[Obsolete]` — produção usa `CustomChartRepository` (EF Core).
+**Testes:** 631 testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
 **Evidência:** `src/modules/operationalintelligence/`
 
 ---
@@ -280,7 +288,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Governance | READY | Dados reais via repositórios e cross-module; FinOps real; 25/26 frontend pages conectadas; 158/158 testes passam |
 | Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
 | Notifications | READY | Channels e templates funcionais |
-| Configuration | READY | 458 seeds, 112 parâmetros, 17 domínios, governance gates, analytics |
+| Configuration | READY | 458 seeds, 112 parâmetros, 17 domínios, governance gates, analytics, 14 EF Core entity types com RLS |
 | Integrations | READY | Repositórios EF Core reais, 104+ testes; metadata capture funcional; deep pipeline integration planeada |
 | Product Analytics | READY | Repositórios EF Core reais, 42+ testes; `AnalyticsEventTracker` no frontend |
 

@@ -22,5 +22,6 @@ internal sealed class ConfigurationAuditRepository(ConfigurationDbContext contex
             .Where(a => a.Key == key)
             .OrderByDescending(a => a.ChangedAt)
             .Take(limit)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 }

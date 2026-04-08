@@ -31,12 +31,14 @@ internal sealed class ConfigurationEntryRepository(ConfigurationDbContext contex
         => await context.Entries
             .Where(e => e.Scope == scope && e.ScopeReferenceId == scopeReferenceId)
             .OrderBy(e => e.Key)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<ConfigurationEntry>> GetAllByKeyAsync(string key, CancellationToken cancellationToken)
         => await context.Entries
             .Where(e => e.Key == key)
             .OrderBy(e => e.Scope)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(ConfigurationEntry entry, CancellationToken cancellationToken)

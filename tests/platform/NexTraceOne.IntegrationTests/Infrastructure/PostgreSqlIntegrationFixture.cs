@@ -41,8 +41,7 @@ namespace NexTraceOne.IntegrationTests.Infrastructure;
 /// </summary>
 public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("postgres:16-alpine")
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:16-alpine")
         .WithDatabase("postgres")
         .WithUsername("postgres")
         .WithPassword("postgres")
