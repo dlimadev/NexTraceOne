@@ -18,6 +18,12 @@ namespace NexTraceOne.BuildingBlocks.Observability.Logging;
 /// </summary>
 public sealed class NexTraceLogEnricher : ILogEventEnricher
 {
+    /// <summary>TraceId de um Activity sem trace (all zeros).</summary>
+    private const string EmptyTraceId = "00000000000000000000000000000000";
+
+    /// <summary>SpanId de um Activity sem span (all zeros).</summary>
+    private const string EmptySpanId = "0000000000000000";
+
     /// <summary>Enriquece cada evento de log com contexto de tracing e plataforma.</summary>
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
@@ -26,14 +32,14 @@ public sealed class NexTraceLogEnricher : ILogEventEnricher
         if (activity is not null)
         {
             var traceId = activity.TraceId.ToString();
-            if (traceId != "00000000000000000000000000000000")
+            if (traceId != EmptyTraceId)
             {
                 logEvent.AddPropertyIfAbsent(
                     propertyFactory.CreateProperty("TraceId", traceId));
             }
 
             var spanId = activity.SpanId.ToString();
-            if (spanId != "0000000000000000")
+            if (spanId != EmptySpanId)
             {
                 logEvent.AddPropertyIfAbsent(
                     propertyFactory.CreateProperty("SpanId", spanId));

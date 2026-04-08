@@ -36,6 +36,11 @@ public static class SerilogConfiguration
             // OTLP export: envia logs estruturados ao OpenTelemetry Collector
             // para que sejam armazenados no mesmo provider de observabilidade
             // (Elasticsearch ou ClickHouse) junto com traces e métricas.
+            //
+            // Precedência de endpoint (1º encontrado ganha):
+            //   1. OTEL_EXPORTER_OTLP_ENDPOINT — variável de ambiente padrão OTel
+            //   2. Telemetry:Collector:OtlpGrpcEndpoint — configuração do NexTraceOne
+            //   3. OpenTelemetry:Endpoint — fallback genérico em appsettings
             var otlpEndpoint = System.Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
                 ?? configuration["Telemetry:Collector:OtlpGrpcEndpoint"]
                 ?? configuration["OpenTelemetry:Endpoint"];

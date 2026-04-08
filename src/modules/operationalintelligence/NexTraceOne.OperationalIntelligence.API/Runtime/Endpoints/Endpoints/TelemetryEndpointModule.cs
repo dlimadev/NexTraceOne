@@ -26,6 +26,15 @@ namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints.Endpoints;
 /// </summary>
 public sealed class TelemetryEndpointModule
 {
+    /// <summary>Limite máximo de resultados para pesquisa de logs (custo proporcional ao volume).</summary>
+    private const int MaxLogResults = 1000;
+
+    /// <summary>Limite máximo de resultados para pesquisa de traces (cada trace contém múltiplos spans).</summary>
+    private const int MaxTraceResults = 500;
+
+    /// <summary>Limite máximo de top errors retornados.</summary>
+    private const int MaxTopErrors = 100;
+
     /// <summary>Registra endpoints de telemetria no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
@@ -45,7 +54,7 @@ public sealed class TelemetryEndpointModule
             string? traceId = null,
             int limit = 100) =>
         {
-            if (limit is < 1 or > 1000) limit = 100;
+            if (limit is < 1 or > MaxLogResults) limit = 100;
 
             var filter = new LogQueryFilter
             {
@@ -78,7 +87,7 @@ public sealed class TelemetryEndpointModule
             bool? hasErrors = null,
             int limit = 50) =>
         {
-            if (limit is < 1 or > 500) limit = 50;
+            if (limit is < 1 or > MaxTraceResults) limit = 50;
 
             var filter = new TraceQueryFilter
             {
@@ -146,7 +155,7 @@ public sealed class TelemetryEndpointModule
             CancellationToken ct,
             int top = 10) =>
         {
-            if (top is < 1 or > 100) top = 10;
+            if (top is < 1 or > MaxTopErrors) top = 10;
 
             var errors = await queryService.GetTopErrorsByEnvironmentAsync(
                 environment, from, until, top, ct);
