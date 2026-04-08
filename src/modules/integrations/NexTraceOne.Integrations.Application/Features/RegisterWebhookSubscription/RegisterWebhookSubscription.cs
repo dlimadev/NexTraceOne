@@ -103,7 +103,7 @@ public static class RegisterWebhookSubscription
             var hash = System.Security.Cryptography.Rfc2898DeriveBytes.Pbkdf2(
                 System.Text.Encoding.UTF8.GetBytes(secret),
                 salt,
-                iterations: 100_000,
+                iterations: 600_000,
                 System.Security.Cryptography.HashAlgorithmName.SHA256,
                 outputLength: 32);
             // Store as salt:hash in base64
