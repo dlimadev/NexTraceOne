@@ -2,7 +2,6 @@ using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ListChaosExperiments;
 
@@ -34,16 +33,16 @@ public static class ListChaosExperiments
 
     /// <summary>
     /// Handler que retorna uma lista demonstrativa de experimentos de chaos.
-    /// Arquitetura preparada para substituir pela consulta real ao repositório.
+    /// TODO: Criar repositório dedicado IChaosExperimentRepository quando a persistência
+    /// de chaos experiments for implementada. Não utilizar IDriftFindingRepository para este fim.
     /// </summary>
-    public sealed class Handler(IDriftFindingRepository repository) : IQueryHandler<Query, Response>
+    public sealed class Handler : IQueryHandler<Query, Response>
     {
         private static readonly DateTimeOffset DemoTime = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
 
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             // Demonstração estática — futuro: repositório de chaos experiments dedicado
-            _ = repository;
 
             var items = BuildDemoItems(request.ServiceName, request.Environment);
             return Task.FromResult(Result<Response>.Success(new Response(items, items.Count)));

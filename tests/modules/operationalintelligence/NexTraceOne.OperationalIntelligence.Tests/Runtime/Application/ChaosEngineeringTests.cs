@@ -167,8 +167,7 @@ public sealed class ChaosEngineeringTests
     [Fact]
     public async Task ListChaosExperiments_NoFilter_ReturnsStaticDemoList()
     {
-        var repository = Substitute.For<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IDriftFindingRepository>();
-        var handler = new ListChaosExperiments.Handler(repository);
+        var handler = new ListChaosExperiments.Handler();
         var query = new ListChaosExperiments.Query(null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);
