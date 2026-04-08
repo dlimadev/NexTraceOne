@@ -293,4 +293,60 @@ public sealed class DoraAndScorecardTests
         var result = validator.Validate(new ListServiceScorecards.Query("team-z", MaturityLevel: "Gold"));
         result.IsValid.Should().BeTrue();
     }
+
+    [Fact]
+    public async Task ListServiceScorecards_WithDomainFilter_UsesListServicesByDomain()
+    {
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "order-service", "Commerce", "High", "Direct"),
+            new("id-2", "cart-service", "Commerce", "Medium", "Direct"),
+            new("id-3", "checkout-service", "Commerce", "High", "Direct"),
+        };
+        _catalog.ListServicesByDomainAsync("Commerce", Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query(Domain: "Commerce"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Count.Should().Be(3);
+        result.Value.Items.Should().AllSatisfy(item => item.ServiceName.Should().NotStartWith("service-"));
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_NoFilter_UsesListAllServices()
+    {
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "api-gateway", "Platform", "High", "Direct"),
+        };
+        _catalog.ListAllServicesAsync(Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query(), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().AllSatisfy(item => item.ServiceName.Should().NotStartWith("service-"));
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_WithDomainFilter_OrderedByScore()
+    {
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "svc-x", "D1", "High", "Direct"),
+            new("id-2", "svc-y", "D1", "Low", "Direct"),
+        };
+        _catalog.ListServicesByDomainAsync("D1", Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query(Domain: "D1"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        var scores = result.Value.Items.Select(s => s.FinalScore).ToList();
+        scores.Should().BeInDescendingOrder();
+    }
 }

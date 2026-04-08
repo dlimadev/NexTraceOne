@@ -2,6 +2,7 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.DTOs;
 using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.ListServiceScorecards;
@@ -54,29 +55,29 @@ public static class ListServiceScorecards
             var now = clock.UtcNow;
             var scorecards = new List<ServiceScorecardSummary>();
 
-            // Lista serviços da equipa se teamName fornecido
+            IReadOnlyList<TeamServiceInfo> services;
+
             if (request.TeamName is { Length: > 0 })
             {
-                var services = await catalogModule.ListServicesByTeamAsync(request.TeamName, cancellationToken);
-                foreach (var svc in services)
-                {
-                    var score = ComputeSimpleScore(svc.Name, svc.Domain);
-                    var level = ScoreToLevel(score);
-
-                    if (request.MaturityLevel is null || level == request.MaturityLevel)
-                        scorecards.Add(new ServiceScorecardSummary(svc.Name, svc.Domain, score, level, now));
-                }
+                services = await catalogModule.ListServicesByTeamAsync(request.TeamName, cancellationToken);
+            }
+            else if (request.Domain is { Length: > 0 })
+            {
+                services = await catalogModule.ListServicesByDomainAsync(request.Domain, cancellationToken);
             }
             else
             {
-                // Modo fallback: retorna summary placeholder quando sem filtro de equipa
-                var teamCount = await catalogModule.CountServicesByDomainAsync(request.Domain ?? "", cancellationToken);
-                for (int i = 0; i < Math.Min(teamCount, request.PageSize); i++)
-                {
-                    var score = 60 + (i % 40);
-                    var level = ScoreToLevel(score);
-                    scorecards.Add(new ServiceScorecardSummary($"service-{i + 1}", request.Domain ?? "unknown", score, level, now));
-                }
+                // Sem filtro: lista todos os serviços do catálogo
+                services = await catalogModule.ListAllServicesAsync(cancellationToken);
+            }
+
+            foreach (var svc in services)
+            {
+                var score = ComputeSimpleScore(svc.Name, svc.Domain);
+                var level = ScoreToLevel(score);
+
+                if (request.MaturityLevel is null || level == request.MaturityLevel)
+                    scorecards.Add(new ServiceScorecardSummary(svc.Name, svc.Domain, score, level, now));
             }
 
             var sorted = scorecards.OrderByDescending(s => s.FinalScore).ToList();
