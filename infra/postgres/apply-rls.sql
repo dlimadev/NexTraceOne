@@ -540,9 +540,16 @@ CREATE POLICY tenant_isolation ON ops_chaos_experiments
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- cat_contract_health_scores — contract health scores per tenant
+ALTER TABLE cat_contract_health_scores ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_health_scores;
+CREATE POLICY tenant_isolation ON cat_contract_health_scores
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 56 tables covering all major tenant-aware data domains.
+--   RLS enabled on 57 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.
