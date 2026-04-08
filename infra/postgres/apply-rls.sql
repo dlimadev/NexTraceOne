@@ -503,9 +503,18 @@ CREATE POLICY tenant_isolation ON cfg_user_bookmarks
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- ── Operational Intelligence: Runtime ────────────────────────────────────────
+
+-- ops_custom_charts — user-defined custom charts per tenant
+ALTER TABLE ops_custom_charts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_custom_charts;
+CREATE POLICY tenant_isolation ON ops_custom_charts
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 52 tables covering all major tenant-aware data domains.
+--   RLS enabled on 53 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

@@ -31,6 +31,9 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Perfis de maturidade de observabilidade por serviço.</summary>
     public DbSet<ObservabilityProfile> ObservabilityProfiles => Set<ObservabilityProfile>();
 
+    /// <summary>Gráficos customizados criados pelos utilizadores.</summary>
+    public DbSet<CustomChart> CustomCharts => Set<CustomChart>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;
