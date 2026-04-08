@@ -1,14 +1,16 @@
 using FluentValidation;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.Runtime.Enums;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.ListChaosExperiments;
 
 /// <summary>
-/// Feature: ListChaosExperiments — lista experimentos de chaos engineering disponíveis.
-/// Retorna uma lista demonstrativa de experimentos enquanto a persistência dedicada não está implementada.
-/// O IDriftFindingRepository é injetado para representar a intenção arquitetural de consulta futura.
+/// Feature: ListChaosExperiments — lista experimentos de chaos engineering persistidos.
+/// Consulta dados reais via IChaosExperimentRepository com filtros por serviço, ambiente e estado.
 ///
 /// Estrutura VSA: Query + Validator + Handler + Response em um único arquivo.
 /// </summary>
@@ -32,59 +34,36 @@ public static class ListChaosExperiments
     }
 
     /// <summary>
-    /// Handler que retorna uma lista demonstrativa de experimentos de chaos.
-    /// TODO: Criar repositório dedicado IChaosExperimentRepository quando a persistência
-    /// de chaos experiments for implementada. Não utilizar IDriftFindingRepository para este fim.
+    /// Handler que lista experimentos de chaos engineering persistidos,
+    /// filtrados por tenant, serviço e ambiente.
     /// </summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IChaosExperimentRepository repository,
+        ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
     {
-        private static readonly DateTimeOffset DemoTime = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
-
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // Demonstração estática — futuro: repositório de chaos experiments dedicado
+            var experiments = await repository.ListAsync(
+                currentTenant.Id.ToString(),
+                request.ServiceName,
+                request.Environment,
+                status: null,
+                cancellationToken);
 
-            var items = BuildDemoItems(request.ServiceName, request.Environment);
-            return Task.FromResult(Result<Response>.Success(new Response(items, items.Count)));
-        }
-
-        private static IReadOnlyList<ChaosExperimentSummary> BuildDemoItems(
-            string? serviceName,
-            string? environment)
-        {
-            var all = new[]
-            {
-                new ChaosExperimentSummary(
-                    Guid.Parse("11111111-0000-0000-0000-000000000001"),
-                    serviceName ?? "payment-service",
-                    environment ?? "Production",
-                    "latency-injection",
-                    "Low",
-                    "Completed",
-                    DemoTime.AddDays(-2)),
-                new ChaosExperimentSummary(
-                    Guid.Parse("22222222-0000-0000-0000-000000000002"),
-                    serviceName ?? "order-service",
-                    environment ?? "Staging",
-                    "pod-kill",
-                    "High",
-                    "Planned",
-                    DemoTime.AddDays(-1)),
-                new ChaosExperimentSummary(
-                    Guid.Parse("33333333-0000-0000-0000-000000000003"),
-                    serviceName ?? "notification-service",
-                    environment ?? "Development",
-                    "memory-stress",
-                    "Medium",
-                    "Running",
-                    DemoTime),
-            };
-
-            return all
-                .Where(e =>
-                    (serviceName is null || string.Equals(e.ServiceName, serviceName, StringComparison.OrdinalIgnoreCase))
-                    && (environment is null || string.Equals(e.Environment, environment, StringComparison.OrdinalIgnoreCase)))
+            var paged = experiments
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(e => new ChaosExperimentSummary(
+                    e.Id.Value,
+                    e.ServiceName,
+                    e.Environment,
+                    e.ExperimentType,
+                    e.RiskLevel,
+                    e.Status.ToString(),
+                    e.CreatedAt))
                 .ToList();
+
+            return Result<Response>.Success(new Response(paged, experiments.Count));
         }
     }
 
