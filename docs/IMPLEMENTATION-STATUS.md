@@ -135,7 +135,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Mitigation Workflows | READY | `CreateMitigationWorkflow` persiste via `IMitigationWorkflowRepository`; `GetMitigationHistory` consulta dados reais; `RecordMitigationValidation` persiste logs de validação. |
 
 **DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (migração), `CostIntelligenceDbContext` (migração)
-**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching). `InMemoryIncidentStore` marcado como `[Obsolete]` — apenas para testes. `InMemoryCustomChartRepository` marcado como `[Obsolete]` — produção usa `CustomChartRepository` (EF Core).
+**Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching).
 **Testes:** 631 testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
 **Evidência:** `src/modules/operationalintelligence/`
 
@@ -218,12 +218,14 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Feature Area | Status | Notas |
 |---|---|---|
-| Integration Connectors | READY | `IntegrationsDbContext` com migrações; repositórios EF Core reais; 104 testes passam |
+| Integration Connectors | READY | `IntegrationsDbContext` com migrações; repositórios EF Core reais; 109 testes passam |
 | Ingestion Sources | READY | 5 endpoints de ingestão; `ProcessIngestionPayload` com parsing real; `IIngestionSourceRepository` real |
 | Ingestion Executions | READY | Pipeline de processamento real com parsers e processadores; deep Kafka/queue integration planeada para roadmap futuro |
+| Webhook Subscriptions | READY | `WebhookSubscription` domain entity com typed ID; `IWebhookSubscriptionRepository` EF Core; `RegisterWebhookSubscription` persiste via UnitOfWork; `ListWebhookSubscriptions` consulta repositório real; RLS para `int_webhook_subscriptions` |
 
-**DbContexts:** `IntegrationsDbContext` com migrações confirmadas
-**Evidência:** `src/modules/integrations/`, 104 testes em `NexTraceOne.Integrations.Tests`
+**DbContexts:** `IntegrationsDbContext` com 3 migrações (InitialCreate, AddParsedPayloadFields, AddWebhookSubscriptions)
+**Testes:** 109 testes unitários (0 falhas)
+**Evidência:** `src/modules/integrations/`
 
 ---
 
@@ -289,7 +291,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Knowledge | READY | Sim — CRUD completo, 44/44 testes passam, IKnowledgeModule implementado |
 | Notifications | READY | Channels e templates funcionais |
 | Configuration | READY | 458 seeds, 112 parâmetros, 17 domínios, governance gates, analytics, 14 EF Core entity types com RLS |
-| Integrations | READY | Repositórios EF Core reais, 104+ testes; metadata capture funcional; deep pipeline integration planeada |
+| Integrations | READY | Repositórios EF Core reais, 109 testes; webhook subscriptions persistidas; metadata capture funcional; deep pipeline integration planeada |
 | Product Analytics | READY | Repositórios EF Core reais, 42+ testes; `AnalyticsEventTracker` no frontend |
 
 ---

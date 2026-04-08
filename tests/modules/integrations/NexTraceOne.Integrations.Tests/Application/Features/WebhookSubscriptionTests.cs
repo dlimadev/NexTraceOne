@@ -51,7 +51,15 @@ public sealed class WebhookSubscriptionTests
         result.Value.HasSecret.Should().BeTrue();
         result.Value.IsActive.Should().BeTrue();
         result.Value.EventCount.Should().Be(2);
-        await _repository.Received(1).AddAsync(Arg.Any<WebhookSubscription>(), Arg.Any<CancellationToken>());
+        await _repository.Received(1).AddAsync(
+            Arg.Is<WebhookSubscription>(s =>
+                s.TenantId == "tenant-1" &&
+                s.Name == "Incident Alerts" &&
+                s.TargetUrl == "https://hooks.example.com/incidents" &&
+                s.EventTypes.Count == 2 &&
+                s.SecretHash != null &&
+                s.IsActive),
+            Arg.Any<CancellationToken>());
         await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 

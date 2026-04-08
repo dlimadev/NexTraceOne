@@ -99,9 +99,15 @@ public static class RegisterWebhookSubscription
 
         private static string ComputeSecretHash(string secret)
         {
-            var bytes = System.Text.Encoding.UTF8.GetBytes(secret);
-            var hash = System.Security.Cryptography.SHA256.HashData(bytes);
-            return Convert.ToBase64String(hash);
+            var salt = System.Security.Cryptography.RandomNumberGenerator.GetBytes(16);
+            var hash = System.Security.Cryptography.Rfc2898DeriveBytes.Pbkdf2(
+                System.Text.Encoding.UTF8.GetBytes(secret),
+                salt,
+                iterations: 100_000,
+                System.Security.Cryptography.HashAlgorithmName.SHA256,
+                outputLength: 32);
+            // Store as salt:hash in base64
+            return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
         }
     }
 
