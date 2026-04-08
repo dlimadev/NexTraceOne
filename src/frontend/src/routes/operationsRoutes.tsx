@@ -22,6 +22,8 @@ const OnCallIntelligencePage = lazy(() => import('../features/operations/pages/O
 const ChaosEngineeringPage = lazy(() => import('../features/operations/pages/ChaosEngineeringPage').then(m => ({ default: m.ChaosEngineeringPage })));
 const PredictiveIntelligencePage = lazy(() => import('../features/operations/pages/PredictiveIntelligencePage').then(m => ({ default: m.PredictiveIntelligencePage })));
 const PlatformOperationsPage = lazy(() => import('../features/operations/pages/PlatformOperationsPage').then(m => ({ default: m.PlatformOperationsPage })));
+const TraceExplorerPage = lazy(() => import('../features/operations/pages/TraceExplorerPage').then(m => ({ default: m.TraceExplorerPage })));
+const LogExplorerPage = lazy(() => import('../features/operations/pages/LogExplorerPage').then(m => ({ default: m.LogExplorerPage })));
 
 export function OperationsRoutes() {
   return (
@@ -159,6 +161,22 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <PlatformOperationsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/telemetry/traces"
+        element={
+          <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
+            <TraceExplorerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/telemetry/logs"
+        element={
+          <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
+            <LogExplorerPage />
           </ProtectedRoute>
         }
       />

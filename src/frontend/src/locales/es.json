@@ -8573,5 +8573,118 @@
   "brand": {
     "name": "NexTraceOne",
     "tagline": "Operational Confidence"
+  },
+  "telemetryExplorer": {
+    "title": "Explorador de Telemetría",
+    "subtitle": "Busque y analice logs, traces y métricas de sus servicios",
+    "traces": {
+      "title": "Explorador de Traces",
+      "subtitle": "Búsqueda de traces distribuidos con jerarquía de spans y correlación",
+      "searchPlaceholder": "Buscar por trace ID, servicio u operación...",
+      "traceId": "Trace ID",
+      "service": "Servicio",
+      "operation": "Operación",
+      "duration": "Duración",
+      "durationMs": "{{value}}ms",
+      "status": "Estado",
+      "spanCount": "Spans",
+      "startTime": "Hora de Inicio",
+      "hasErrors": "Con Errores",
+      "errorsOnly": "Solo Errores",
+      "minDuration": "Duración Mínima (ms)",
+      "noTraces": "No se encontraron traces",
+      "noTracesDescription": "Ajuste los filtros o el rango de tiempo para encontrar traces.",
+      "detail": {
+        "title": "Detalle del Trace",
+        "services": "Servicios",
+        "totalDuration": "Duración Total",
+        "spans": "Spans",
+        "spanDetail": "Detalle del Span",
+        "spanId": "Span ID",
+        "parentSpan": "Span Padre",
+        "operationName": "Operación",
+        "serviceName": "Servicio",
+        "statusCode": "Código de Estado",
+        "statusMessage": "Mensaje de Estado",
+        "startTime": "Hora de Inicio",
+        "endTime": "Hora de Fin",
+        "duration": "Duración",
+        "attributes": "Atributos",
+        "resourceAttributes": "Atributos de Recurso",
+        "spanAttributes": "Atributos del Span",
+        "events": "Eventos",
+        "noEvents": "Sin eventos en este span",
+        "rootSpan": "Span Raíz",
+        "childSpan": "Span Hijo",
+        "waterfall": "Cascada",
+        "timeline": "Línea de Tiempo"
+      }
+    },
+    "logs": {
+      "title": "Explorador de Logs",
+      "subtitle": "Busque y filtre logs estructurados con correlación de traces",
+      "searchPlaceholder": "Buscar en mensajes de log...",
+      "level": "Nivel",
+      "message": "Mensaje",
+      "service": "Servicio",
+      "timestamp": "Timestamp",
+      "traceId": "Trace ID",
+      "spanId": "Span ID",
+      "correlationId": "ID de Correlación",
+      "host": "Host",
+      "container": "Container",
+      "exception": "Excepción",
+      "allLevels": "Todos los Niveles",
+      "noLogs": "No se encontraron logs",
+      "noLogsDescription": "Ajuste los filtros o el rango de tiempo para encontrar logs.",
+      "viewTrace": "Ver Trace",
+      "expandException": "Mostrar Excepción"
+    },
+    "filters": {
+      "environment": "Ambiente",
+      "service": "Servicio",
+      "timeRange": "Rango de Tiempo",
+      "from": "Desde",
+      "until": "Hasta",
+      "last15m": "Últimos 15 min",
+      "last1h": "Última 1 hora",
+      "last6h": "Últimas 6 horas",
+      "last24h": "Últimas 24 horas",
+      "last7d": "Últimos 7 días",
+      "custom": "Personalizado",
+      "apply": "Aplicar Filtros",
+      "reset": "Limpiar",
+      "limit": "Límite de Resultados"
+    },
+    "errors": {
+      "title": "Principales Errores",
+      "errorMessage": "Mensaje de Error",
+      "count": "Conteo",
+      "lastSeen": "Última Ocurrencia",
+      "service": "Servicio"
+    },
+    "latency": {
+      "title": "Comparación de Latencia",
+      "p50": "P50",
+      "p95": "P95",
+      "p99": "P99",
+      "drift": "Desviación %"
+    },
+    "correlate": {
+      "title": "Correlación de Señales",
+      "subtitle": "Logs y spans correlacionados para un trace dado",
+      "relatedLogs": "Logs Relacionados",
+      "relatedSpans": "Spans Relacionados"
+    },
+    "health": {
+      "title": "Salud de Telemetría",
+      "provider": "Proveedor",
+      "status": "Estado",
+      "healthy": "Saludable",
+      "unhealthy": "No Disponible"
+    },
+    "loading": "Cargando datos de telemetría...",
+    "error": "Error al cargar datos de telemetría. Verifique el estado del proveedor de observabilidad.",
+    "providerUnavailable": "El proveedor de observabilidad no está disponible. Asegúrese de que Elasticsearch o ClickHouse esté en ejecución."
   }
 }

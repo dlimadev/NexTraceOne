@@ -1,0 +1,85 @@
+{
+  "index_patterns": ["nextraceone-logs-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.refresh_interval": "5s",
+      "index.codec": "best_compression",
+      "index.mapping.total_fields.limit": 2000
+    },
+    "mappings": {
+      "dynamic": "true",
+      "dynamic_templates": [
+        {
+          "resource_attributes": {
+            "path_match": "resource.*",
+            "mapping": { "type": "keyword", "ignore_above": 512 }
+          }
+        },
+        {
+          "log_attributes": {
+            "path_match": "attributes.*",
+            "mapping": { "type": "keyword", "ignore_above": 1024 }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "observed_timestamp": { "type": "date" },
+        "body": {
+          "type": "text",
+          "fields": {
+            "keyword": { "type": "keyword", "ignore_above": 512 }
+          }
+        },
+        "severity_text": { "type": "keyword" },
+        "severity_number": { "type": "integer" },
+        "trace_id": { "type": "keyword" },
+        "span_id": { "type": "keyword" },
+        "correlation_id": { "type": "keyword" },
+        "service_name": { "type": "keyword" },
+        "application_name": { "type": "keyword" },
+        "module_name": { "type": "keyword" },
+        "host_name": { "type": "keyword" },
+        "exception": {
+          "type": "text",
+          "fields": {
+            "keyword": { "type": "keyword", "ignore_above": 1024 }
+          }
+        },
+        "resource": {
+          "properties": {
+            "service.name": { "type": "keyword" },
+            "service.namespace": { "type": "keyword" },
+            "service.version": { "type": "keyword" },
+            "host.name": { "type": "keyword" },
+            "container.name": { "type": "keyword" },
+            "environment": { "type": "keyword" },
+            "deployment.environment": { "type": "keyword" }
+          }
+        },
+        "attributes": {
+          "properties": {
+            "nexttrace.tenant_id": { "type": "keyword" },
+            "nexttrace.environment_id": { "type": "keyword" },
+            "nexttrace.correlation_id": { "type": "keyword" },
+            "nexttrace.service_origin": { "type": "keyword" },
+            "nexttrace.user_id": { "type": "keyword" },
+            "TraceId": { "type": "keyword" },
+            "SpanId": { "type": "keyword" },
+            "TenantId": { "type": "keyword" },
+            "EnvironmentId": { "type": "keyword" },
+            "CorrelationId": { "type": "keyword" },
+            "ServiceOrigin": { "type": "keyword" },
+            "UserId": { "type": "keyword" }
+          }
+        }
+      }
+    }
+  },
+  "priority": 200,
+  "_meta": {
+    "description": "Index template for NexTraceOne structured logs. Optimized for log search, trace correlation and incident investigation."
+  }
+}
