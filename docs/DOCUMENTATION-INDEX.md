@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-07 — PLATFORM-CUSTOMIZATION-EVOLUTION Fases 1-8 COMPLETO; FUTURE-ROADMAP 6.1 e 6.2 IMPLEMENTADO
+> **Última actualização:** 2026-04-08 — AI-MODELS-ANALYSIS e BRAINSTORMING-INNOVATIVE-IDEAS adicionados
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -12,6 +12,7 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
 | [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** — 6.1 Unit Tests ✅, 6.2 E2E Tests ✅ |
+| [`BRAINSTORMING-INNOVATIVE-IDEAS.md`](BRAINSTORMING-INNOVATIVE-IDEAS.md) | **30 ideias inovadoras** — brainstorming em aberto |
 | [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](PLATFORM-CUSTOMIZATION-EVOLUTION.md) | **Plano de evolução de customização da plataforma** — Fases 1-8 ✅ COMPLETO |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
@@ -58,6 +59,7 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`AI-GOVERNANCE.md`](AI-GOVERNANCE.md) | Governança AI |
 | [`AI-ASSISTED-OPERATIONS.md`](AI-ASSISTED-OPERATIONS.md) | Operações assistidas por AI |
 | [`AI-DEVELOPER-EXPERIENCE.md`](AI-DEVELOPER-EXPERIENCE.md) | Developer Experience AI |
+| [`AI-MODELS-ANALYSIS.md`](AI-MODELS-ANALYSIS.md) | **Análise de modelos de IA** — recomendações, requisitos de servidor, licenciamento |
 
 ---
 
