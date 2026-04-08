@@ -276,7 +276,7 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
 
   useEffect(() => {
     const conversationFromUrl = searchParams.get(conversationSearchParam);
-    setSelectedConversation(current => current === conversationFromUrl ? current : conversationFromUrl);
+    setSelectedConversation(conversationFromUrl);
   }, [searchParams]);
 
   // ── Load conversations from backend ───────────────────────────────────
@@ -417,8 +417,8 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
           setSelectedModelId(defaultModel.modelId);
         }
       })
-      .catch(() => {
-        // Available models not loaded
+      .catch((err: unknown) => {
+        console.warn('[AiCopilotPage] Failed to load available models:', err);
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only run on mount
   }, []);

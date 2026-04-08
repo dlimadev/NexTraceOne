@@ -66,8 +66,8 @@ export function AppShell() {
   // ── AiUser persona: redirect to /ai/assistant and render minimal shell ──
   // For AiUser, there is no sidebar or topbar — only the AI chat page is accessible.
   if (persona === 'AiUser') {
-    // Redirect any non-AI route to /ai/assistant
-    if (!location.pathname.startsWith('/ai/assistant')) {
+    // Redirect any non-AI route to /ai/assistant (preserving query params)
+    if (location.pathname !== '/ai/assistant') {
       return <Navigate to="/ai/assistant" replace />;
     }
 
