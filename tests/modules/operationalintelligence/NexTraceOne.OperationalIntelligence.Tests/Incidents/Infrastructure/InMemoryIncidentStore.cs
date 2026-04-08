@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.Json;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentCorrelation;
@@ -13,15 +14,13 @@ using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 
-namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 
 /// <summary>
-/// Implementação in-memory do IIncidentStore para utilização em testes unitários.
+/// Test-only in-memory IIncidentStore. Moved from Infrastructure to test project.
 /// Carrega os mesmos dados de seed que são usados na migração inicial, garantindo
 /// paridade funcional com o EfIncidentStore em cenários de teste.
-/// NÃO é registada em DI de produção — apenas EfIncidentStore é o provider ativo.
 /// </summary>
-[System.Obsolete("Test-only implementation. Production uses EfIncidentStore registered in DI. This class will be removed in a future version.")]
 internal sealed class InMemoryIncidentStore : IIncidentStore
 {
     private static readonly JsonSerializerOptions JsonOpts = new()

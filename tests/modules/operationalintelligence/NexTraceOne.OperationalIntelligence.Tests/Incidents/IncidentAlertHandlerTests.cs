@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Observability.Alerting.Models;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents;
 

@@ -415,6 +415,13 @@ CREATE POLICY tenant_isolation ON int_ingestion_sources
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- int_webhook_subscriptions — webhook subscriptions per tenant
+ALTER TABLE int_webhook_subscriptions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON int_webhook_subscriptions;
+CREATE POLICY tenant_isolation ON int_webhook_subscriptions
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ── Configuration module (cfg_ prefix) ───────────────────────────────────────
 -- Note: cfg_entries, cfg_definitions, cfg_modules use scope-based isolation
 -- (not tenant_id column), so RLS is not applicable to those tables.

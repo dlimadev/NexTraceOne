@@ -43,6 +43,9 @@ public static class DependencyInjection
         services.AddScoped<IIngestionSourceRepository, IngestionSourceRepository>();
         services.AddScoped<IIngestionExecutionRepository, IngestionExecutionRepository>();
 
+        // Repositories — Webhook Subscriptions
+        services.AddScoped<IWebhookSubscriptionRepository, WebhookSubscriptionRepository>();
+
         // Legacy Telemetry — Elastic writer (padrão)
         services.Configure<ElasticLegacyWriterOptions>(
             configuration.GetSection(ElasticLegacyWriterOptions.SectionName));

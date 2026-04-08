@@ -1,13 +1,14 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Integrations.Application.Abstractions;
 
 namespace NexTraceOne.Integrations.Application.Features.ListWebhookSubscriptions;
 
 /// <summary>
 /// Feature: ListWebhookSubscriptions — lista subscrições de webhook outbound de um tenant.
 /// Retorna subscrições paginadas com suporte a filtro por estado activo/inactivo.
-/// Handler nativo do módulo Integrations.
+/// Consulta dados reais via IWebhookSubscriptionRepository.
 /// Ownership: módulo Integrations.
 /// </summary>
 public static class ListWebhookSubscriptions
@@ -30,60 +31,29 @@ public static class ListWebhookSubscriptions
         }
     }
 
-    /// <summary>Handler que retorna a lista paginada de subscrições de webhook.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que retorna a lista paginada de subscrições de webhook via repositório real.</summary>
+    public sealed class Handler(IWebhookSubscriptionRepository repository) : IQueryHandler<Query, Response>
     {
-        private static readonly DateTimeOffset _baseDate = new DateTimeOffset(2025, 1, 10, 8, 0, 0, TimeSpan.Zero);
-
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var allItems = new List<WebhookSubscriptionDto>
-            {
-                new(
-                    SubscriptionId: Guid.Parse("a1b2c3d4-0001-0000-0000-000000000001"),
-                    Name: "Incident Alerts — PagerDuty",
-                    TargetUrl: "https://events.pagerduty.com/integration/v1/alerts",
-                    EventTypes: new[] { "incident.created", "incident.resolved" },
-                    HasSecret: true,
-                    IsActive: true,
-                    EventCount: 2,
-                    CreatedAt: _baseDate,
-                    LastTriggeredAt: _baseDate.AddDays(5)),
+            var (subscriptions, totalCount) = await repository.ListAsync(
+                request.IsActive,
+                request.Page,
+                request.PageSize,
+                cancellationToken);
 
-                new(
-                    SubscriptionId: Guid.Parse("a1b2c3d4-0002-0000-0000-000000000002"),
-                    Name: "Deploy Events — Slack",
-                    TargetUrl: "https://hooks.slack.com/services/T00/B00/xxxx",
-                    EventTypes: new[] { "change.deployed", "change.promoted", "contract.published" },
-                    HasSecret: false,
-                    IsActive: true,
-                    EventCount: 3,
-                    CreatedAt: _baseDate.AddDays(-3),
-                    LastTriggeredAt: _baseDate.AddDays(2)),
+            var items = subscriptions.Select(s => new WebhookSubscriptionDto(
+                SubscriptionId: s.Id.Value,
+                Name: s.Name,
+                TargetUrl: s.TargetUrl,
+                EventTypes: s.EventTypes,
+                HasSecret: s.SecretHash is not null,
+                IsActive: s.IsActive,
+                EventCount: s.EventTypes.Count,
+                CreatedAt: s.CreatedAt,
+                LastTriggeredAt: s.LastTriggeredAt)).ToList();
 
-                new(
-                    SubscriptionId: Guid.Parse("a1b2c3d4-0003-0000-0000-000000000003"),
-                    Name: "Contract & Service Events — MS Teams",
-                    TargetUrl: "https://myorg.webhook.office.com/webhookb2/xxxx",
-                    EventTypes: new[] { "contract.deprecated", "service.registered", "alert.triggered" },
-                    HasSecret: true,
-                    IsActive: false,
-                    EventCount: 3,
-                    CreatedAt: _baseDate.AddDays(-10),
-                    LastTriggeredAt: null),
-            };
-
-            var filtered = request.IsActive.HasValue
-                ? allItems.Where(x => x.IsActive == request.IsActive.Value).ToList()
-                : allItems;
-
-            var totalCount = filtered.Count;
-            var items = filtered
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
-
-            return Task.FromResult(Result<Response>.Success(new Response(items, totalCount)));
+            return Result<Response>.Success(new Response(items, totalCount));
         }
     }
 

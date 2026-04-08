@@ -4,7 +4,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.FindSim
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentImpactAssessment;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRootCauseSuggestion;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.TriageIncident;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 
 using System.Linq;
 
