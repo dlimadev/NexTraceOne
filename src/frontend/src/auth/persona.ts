@@ -23,7 +23,8 @@ export type Persona =
   | 'Product'
   | 'Executive'
   | 'PlatformAdmin'
-  | 'Auditor';
+  | 'Auditor'
+  | 'AiUser';
 
 /**
  * Mapeia o roleName do backend para a persona do produto.
@@ -42,6 +43,7 @@ export function derivePersona(roleName: string): Persona {
     Auditor: 'Auditor',
     SecurityReview: 'Auditor',
     ApprovalOnly: 'TechLead',
+    AiUser: 'AiUser',
   };
   return mapping[roleName as AppRole] ?? 'Engineer';
 }
@@ -277,6 +279,20 @@ const auditorConfig: PersonaConfig = {
   maxSidebarItems: 8,
 };
 
+const aiUserConfig: PersonaConfig = {
+  sectionOrder: ['aiHub'],
+  highlightedSections: ['aiHub'],
+  homeSubtitleKey: 'persona.AiUser.homeSubtitle',
+  homeWidgets: [],
+  quickActions: [],
+  aiContextScopes: ['services', 'contracts', 'incidents', 'changes', 'runbooks'],
+  aiSuggestedPromptKeys: [
+    'persona.AiUser.ai.prompt1',
+    'persona.AiUser.ai.prompt2',
+    'persona.AiUser.ai.prompt3',
+  ],
+};
+
 /**
  * Registry central de configuração por persona.
  * Extensível para novas personas sem alterar a lógica dos componentes consumidores.
@@ -289,4 +305,5 @@ export const personaConfigs: Record<Persona, PersonaConfig> = {
   Executive: executiveConfig,
   PlatformAdmin: platformAdminConfig,
   Auditor: auditorConfig,
+  AiUser: aiUserConfig,
 };

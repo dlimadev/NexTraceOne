@@ -7,8 +7,8 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Configurations;
 
 /// <summary>
 /// Configuração EF Core para a entidade Role.
-/// Seed data inclui os 7 papéis de sistema do MVP1: PlatformAdmin, TechLead,
-/// Developer, Viewer, Auditor, SecurityReview, ApprovalOnly.
+/// Seed data inclui os 8 papéis de sistema do MVP1: PlatformAdmin, TechLead,
+/// Developer, Viewer, Auditor, SecurityReview, ApprovalOnly, AiUser.
 /// </summary>
 internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
 {
@@ -30,6 +30,7 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
             Role.CreateSystem(RoleId.From(new Guid("1E91A557-FADE-46DF-B248-0F5F5899C004")), Role.Viewer, "Read-only access across modules"),
             Role.CreateSystem(RoleId.From(new Guid("1E91A557-FADE-46DF-B248-0F5F5899C005")), Role.Auditor, "Audit and compliance access"),
             Role.CreateSystem(RoleId.From(new Guid("1E91A557-FADE-46DF-B248-0F5F5899C006")), Role.SecurityReview, "Security review and session management"),
-            Role.CreateSystem(RoleId.From(new Guid("1E91A557-FADE-46DF-B248-0F5F5899C007")), Role.ApprovalOnly, "Restricted to workflow approvals only"));
+            Role.CreateSystem(RoleId.From(new Guid("1E91A557-FADE-46DF-B248-0F5F5899C007")), Role.ApprovalOnly, "Restricted to workflow approvals only"),
+            Role.CreateSystem(RoleId.From(new Guid("1E91A557-FADE-46DF-B248-0F5F5899C008")), Role.AiUser, "Restricted to AI assistant access only"));
     }
 }

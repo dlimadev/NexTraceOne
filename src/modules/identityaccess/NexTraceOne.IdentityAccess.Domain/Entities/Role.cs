@@ -24,6 +24,8 @@ public sealed class Role : Entity<RoleId>
     public const string SecurityReview = "SecurityReview";
     /// <summary>Nome do papel restrito apenas a aprovações de workflow.</summary>
     public const string ApprovalOnly = "ApprovalOnly";
+    /// <summary>Nome do papel restrito apenas ao assistente de IA.</summary>
+    public const string AiUser = "AiUser";
 
     private Role() { }
 
