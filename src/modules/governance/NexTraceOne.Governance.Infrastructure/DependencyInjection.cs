@@ -55,6 +55,10 @@ public static class DependencyInjection
         // Security Gate
         services.AddScoped<ISecurityScanRepository, SecurityScanRepository>();
 
+        // Custom Dashboards & Technical Debt
+        services.AddScoped<ICustomDashboardRepository, CustomDashboardRepository>();
+        services.AddScoped<ITechnicalDebtRepository, TechnicalDebtRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();

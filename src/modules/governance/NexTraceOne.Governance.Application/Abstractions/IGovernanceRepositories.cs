@@ -351,3 +351,48 @@ public interface IPolicyAsCodeRepository
     /// <summary>Atualiza uma definição de política existente.</summary>
     Task UpdateAsync(PolicyAsCodeDefinition definition, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de Custom Dashboards para o módulo Governance.
+/// Define operações CRUD e consultas para dashboards customizados por persona.
+/// </summary>
+public interface ICustomDashboardRepository
+{
+    /// <summary>Lista dashboards do tenant, opcionalmente filtrados por persona.</summary>
+    Task<IReadOnlyList<CustomDashboard>> ListAsync(string? persona, CancellationToken ct);
+
+    /// <summary>Obtém um dashboard pelo seu identificador.</summary>
+    Task<CustomDashboard?> GetByIdAsync(CustomDashboardId id, CancellationToken ct);
+
+    /// <summary>Conta o número total de dashboards do tenant, opcionalmente por persona.</summary>
+    Task<int> CountAsync(string? persona, CancellationToken ct);
+
+    /// <summary>Adiciona um novo dashboard ao repositório.</summary>
+    Task AddAsync(CustomDashboard dashboard, CancellationToken ct);
+
+    /// <summary>Atualiza um dashboard existente.</summary>
+    Task UpdateAsync(CustomDashboard dashboard, CancellationToken ct);
+}
+
+/// <summary>
+/// Interface do repositório de Technical Debt Items para o módulo Governance.
+/// Define operações CRUD e consultas para itens de dívida técnica.
+/// </summary>
+public interface ITechnicalDebtRepository
+{
+    /// <summary>Lista itens de dívida técnica, opcionalmente filtrados por serviço ou equipa.</summary>
+    Task<IReadOnlyList<TechnicalDebtItem>> ListAsync(
+        string? serviceName,
+        string? debtType,
+        int topN,
+        CancellationToken ct);
+
+    /// <summary>Obtém um item de dívida técnica pelo seu identificador.</summary>
+    Task<TechnicalDebtItem?> GetByIdAsync(TechnicalDebtItemId id, CancellationToken ct);
+
+    /// <summary>Adiciona um novo item de dívida técnica ao repositório.</summary>
+    Task AddAsync(TechnicalDebtItem item, CancellationToken ct);
+
+    /// <summary>Atualiza um item de dívida técnica existente.</summary>
+    Task UpdateAsync(TechnicalDebtItem item, CancellationToken ct);
+}

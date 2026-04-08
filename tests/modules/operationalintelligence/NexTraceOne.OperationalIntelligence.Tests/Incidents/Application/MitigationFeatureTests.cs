@@ -9,7 +9,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordM
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.UpdateMitigationWorkflowAction;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 

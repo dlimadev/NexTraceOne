@@ -1,11 +1,13 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 
 namespace NexTraceOne.Governance.Application.Features.GetTechnicalDebtSummary;
 
 /// <summary>
 /// Feature: GetTechnicalDebtSummary — retorna resumo agregado de dívida técnica por serviço ou equipa.
+/// Consulta a base de dados real via ITechnicalDebtRepository.
 /// Inclui scoring total, breakdown por tipo e recomendação de ação prioritária.
 ///
 /// Owner: módulo Governance.
@@ -28,63 +30,31 @@ public static class GetTechnicalDebtSummary
         }
     }
 
-    /// <summary>Handler que retorna dados de demonstração representativos de dívida técnica acumulada.</summary>
-    public sealed class Handler : IQueryHandler<Query, Response>
+    /// <summary>Handler que consulta itens de dívida técnica da base de dados e agrega resultados.</summary>
+    public sealed class Handler(ITechnicalDebtRepository repository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var serviceName = string.IsNullOrWhiteSpace(request.ServiceName)
-                ? "order-service"
-                : request.ServiceName;
+            var items = await repository.ListAsync(
+                request.ServiceName,
+                debtType: null,
+                topN: request.TopN,
+                cancellationToken);
 
-            var items = new List<DebtItemDto>
-            {
-                new(
-                    DebtId: new Guid("22222222-0000-0000-0000-000000000001"),
-                    ServiceName: serviceName,
-                    DebtType: "architecture",
-                    Title: "Monolithic domain boundaries need decomposition",
-                    Severity: "high",
-                    EstimatedEffortDays: 15,
-                    DebtScore: 25),
-                new(
-                    DebtId: new Guid("22222222-0000-0000-0000-000000000002"),
-                    ServiceName: serviceName,
-                    DebtType: "security",
-                    Title: "Outdated JWT validation library",
-                    Severity: "critical",
-                    EstimatedEffortDays: 3,
-                    DebtScore: 40),
-                new(
-                    DebtId: new Guid("22222222-0000-0000-0000-000000000003"),
-                    ServiceName: "payment-service",
-                    DebtType: "code-quality",
-                    Title: "Missing unit tests on payment processor",
-                    Severity: "medium",
-                    EstimatedEffortDays: 5,
-                    DebtScore: 10),
-                new(
-                    DebtId: new Guid("22222222-0000-0000-0000-000000000004"),
-                    ServiceName: "notification-service",
-                    DebtType: "dependency",
-                    Title: "Legacy email client with no maintenance",
-                    Severity: "high",
-                    EstimatedEffortDays: 8,
-                    DebtScore: 25),
-                new(
-                    DebtId: new Guid("22222222-0000-0000-0000-000000000005"),
-                    ServiceName: serviceName,
-                    DebtType: "testing",
-                    Title: "Integration tests not covering async flows",
-                    Severity: "medium",
-                    EstimatedEffortDays: 6,
-                    DebtScore: 10),
-            };
+            var debtItems = items
+                .Select(i => new DebtItemDto(
+                    DebtId: i.Id.Value,
+                    ServiceName: i.ServiceName,
+                    DebtType: i.DebtType,
+                    Title: i.Title,
+                    Severity: i.Severity,
+                    EstimatedEffortDays: i.EstimatedEffortDays,
+                    DebtScore: i.DebtScore))
+                .ToList();
 
-            var topItems = items.Take(request.TopN).ToList();
-            var totalScore = topItems.Sum(i => i.DebtScore);
+            var totalScore = debtItems.Sum(i => i.DebtScore);
 
-            var byType = topItems
+            var byType = debtItems
                 .GroupBy(i => i.DebtType)
                 .Select(g => new DebtByTypeDto(
                     DebtType: g.Key,
@@ -93,24 +63,25 @@ public static class GetTechnicalDebtSummary
                 .OrderByDescending(x => x.TotalScore)
                 .ToList();
 
-            var highestRiskService = topItems
+            var highestRiskService = debtItems
                 .GroupBy(i => i.ServiceName)
                 .OrderByDescending(g => g.Sum(i => i.DebtScore))
-                .FirstOrDefault()?.Key ?? serviceName;
+                .FirstOrDefault()?.Key ?? request.ServiceName ?? "N/A";
 
             var recommendedAction = totalScore switch
             {
                 >= 80 => "Prioritize security and architecture debt immediately to reduce production risk.",
                 >= 40 => "Address high-severity items before next release cycle.",
-                _ => "Continue tracking and schedule effort in upcoming sprints."
+                > 0 => "Continue tracking and schedule effort in upcoming sprints.",
+                _ => "No technical debt items found. Keep monitoring."
             };
 
-            return Task.FromResult(Result<Response>.Success(new Response(
+            return Result<Response>.Success(new Response(
                 TotalDebtScore: totalScore,
-                DebtItems: topItems,
+                DebtItems: debtItems,
                 ByType: byType,
                 HighestRiskService: highestRiskService,
-                RecommendedAction: recommendedAction)));
+                RecommendedAction: recommendedAction));
         }
     }
 

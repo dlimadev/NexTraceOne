@@ -83,6 +83,36 @@ internal sealed class CatalogGraphModuleService(
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<TeamServiceInfo>> ListAllServicesAsync(CancellationToken cancellationToken)
+    {
+        var services = await serviceAssetRepository.ListAllAsync(cancellationToken);
+
+        return services
+            .Select(svc => new TeamServiceInfo(
+                svc.Id.Value.ToString(),
+                svc.Name,
+                svc.Domain,
+                svc.Criticality.ToString(),
+                svc.ExposureType.ToString()))
+            .ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<TeamServiceInfo>> ListServicesByDomainAsync(string domain, CancellationToken cancellationToken)
+    {
+        var services = await serviceAssetRepository.ListByDomainAsync(domain, cancellationToken);
+
+        return services
+            .Select(svc => new TeamServiceInfo(
+                svc.Id.Value.ToString(),
+                svc.Name,
+                svc.Domain,
+                svc.Criticality.ToString(),
+                svc.ExposureType.ToString()))
+            .ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<CrossTeamDependencyInfo>> ListCrossTeamDependenciesAsync(string teamName, CancellationToken cancellationToken)
     {
         var services = await serviceAssetRepository.ListByTeamAsync(teamName, cancellationToken);

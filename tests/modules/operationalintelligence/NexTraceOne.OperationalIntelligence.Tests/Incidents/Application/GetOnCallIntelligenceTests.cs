@@ -1,7 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetOnCallIntelligence;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;
 

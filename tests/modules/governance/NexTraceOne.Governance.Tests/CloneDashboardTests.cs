@@ -1,38 +1,61 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.CloneDashboard;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Tests;
 
 public sealed class CloneDashboardTests
 {
-    private sealed class FixedClock : IDateTimeProvider
+    private static readonly DateTimeOffset FixedNow = new(2026, 4, 7, 12, 0, 0, TimeSpan.Zero);
+
+    private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly ICustomDashboardRepository _repository = Substitute.For<ICustomDashboardRepository>();
+    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+
+    public CloneDashboardTests()
     {
-        public DateTimeOffset UtcNow => new DateTimeOffset(2026, 4, 7, 12, 0, 0, TimeSpan.Zero);
-        public DateOnly UtcToday => DateOnly.FromDateTime(UtcNow.UtcDateTime);
+        _clock.UtcNow.Returns(FixedNow);
+        _unitOfWork.CommitAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(1));
     }
 
     [Fact]
     public async Task Handle_WithValidCommand_ShouldReturnClone()
     {
-        var handler = new CloneDashboard.Handler(new FixedClock());
-        var command = new CloneDashboard.Command(Guid.NewGuid(), "My Clone", "tenant1", "user1");
+        var sourceId = Guid.NewGuid();
+        var source = CustomDashboard.Create(
+            "Original", "desc", "grid", "Engineer",
+            ["widget-1", "widget-2"], "tenant1", "user1", FixedNow.AddDays(-10));
+
+        _repository.GetByIdAsync(Arg.Any<CustomDashboardId>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<CustomDashboard?>(source));
+
+        var handler = new CloneDashboard.Handler(_repository, _unitOfWork, _clock);
+        var command = new CloneDashboard.Command(sourceId, "My Clone", "tenant1", "user1");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        Assert.True(result.IsSuccess);
-        Assert.Equal("My Clone", result.Value.Name);
-        Assert.NotEqual(Guid.Empty, result.Value.CloneId);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Name.Should().Be("My Clone");
+        result.Value.CloneId.Should().NotBe(Guid.Empty);
+        result.Value.SourceDashboardId.Should().Be(sourceId);
+
+        await _repository.Received(1).AddAsync(Arg.Any<CustomDashboard>(), Arg.Any<CancellationToken>());
+        await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task Handle_ShouldPreserveSourceDashboardId()
+    public async Task Handle_SourceNotFound_ShouldReturnNotFoundError()
     {
-        var handler = new CloneDashboard.Handler(new FixedClock());
-        var sourceId = Guid.NewGuid();
-        var command = new CloneDashboard.Command(sourceId, "Clone", "tenant1", "user1");
+        _repository.GetByIdAsync(Arg.Any<CustomDashboardId>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<CustomDashboard?>(null));
+
+        var handler = new CloneDashboard.Handler(_repository, _unitOfWork, _clock);
+        var command = new CloneDashboard.Command(Guid.NewGuid(), "Clone", "tenant1", "user1");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        Assert.Equal(sourceId, result.Value.SourceDashboardId);
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be("CustomDashboard.NotFound");
     }
 }

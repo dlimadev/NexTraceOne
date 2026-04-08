@@ -1,21 +1,27 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.RecordTechnicalDebt;
 using NexTraceOne.Governance.Application.Features.GetTechnicalDebtSummary;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Tests.Application.Features;
 
 /// <summary>
 /// Testes unitários para as features de Technical Debt tracking.
+/// Os handlers agora usam repositórios reais — testes usam mocks via NSubstitute.
 /// </summary>
 public sealed class TechnicalDebtTests
 {
     private static readonly DateTimeOffset FixedNow = new(2026, 4, 6, 12, 0, 0, TimeSpan.Zero);
 
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly ITechnicalDebtRepository _repository = Substitute.For<ITechnicalDebtRepository>();
+    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
 
     public TechnicalDebtTests()
     {
         _clock.UtcNow.Returns(FixedNow);
+        _unitOfWork.CommitAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(1));
     }
 
     // ── RecordTechnicalDebt ───────────────────────────────────────────────
@@ -23,7 +29,7 @@ public sealed class TechnicalDebtTests
     [Fact]
     public async Task RecordTechnicalDebt_ValidCommand_ReturnsValidResponseWithComputedScore()
     {
-        var handler = new RecordTechnicalDebt.Handler(_clock);
+        var handler = new RecordTechnicalDebt.Handler(_repository, _unitOfWork, _clock);
         var command = new RecordTechnicalDebt.Command(
             ServiceName: "order-service",
             DebtType: "architecture",
@@ -42,12 +48,16 @@ public sealed class TechnicalDebtTests
         result.Value.Severity.Should().Be("high");
         result.Value.EstimatedEffortDays.Should().Be(10);
         result.Value.CreatedAt.Should().Be(FixedNow);
+        result.Value.DebtScore.Should().Be(25);
+
+        await _repository.Received(1).AddAsync(Arg.Any<TechnicalDebtItem>(), Arg.Any<CancellationToken>());
+        await _unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task RecordTechnicalDebt_CriticalSeverity_HasDebtScoreOf40()
     {
-        var handler = new RecordTechnicalDebt.Handler(_clock);
+        var handler = new RecordTechnicalDebt.Handler(_repository, _unitOfWork, _clock);
         var command = new RecordTechnicalDebt.Command(
             ServiceName: "auth-service",
             DebtType: "security",
@@ -120,18 +130,19 @@ public sealed class TechnicalDebtTests
     // ── GetTechnicalDebtSummary ───────────────────────────────────────────
 
     [Fact]
-    public async Task GetTechnicalDebtSummary_DefaultQuery_ReturnsDemoDataWithPositiveTotalScore()
+    public async Task GetTechnicalDebtSummary_EmptyRepository_ReturnsEmptySummary()
     {
-        var handler = new GetTechnicalDebtSummary.Handler();
+        _repository.ListAsync(Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<TechnicalDebtItem>>([]));
+
+        var handler = new GetTechnicalDebtSummary.Handler(_repository);
         var query = new GetTechnicalDebtSummary.Query();
 
         var result = await handler.Handle(query, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.TotalDebtScore.Should().BeGreaterThan(0);
-        result.Value.DebtItems.Count.Should().BeGreaterThan(0);
-        result.Value.ByType.Count.Should().BeGreaterThan(0);
-        result.Value.HighestRiskService.Should().NotBeNullOrEmpty();
-        result.Value.RecommendedAction.Should().NotBeNullOrEmpty();
+        result.Value.TotalDebtScore.Should().Be(0);
+        result.Value.DebtItems.Count.Should().Be(0);
+        result.Value.RecommendedAction.Should().Contain("No technical debt");
     }
 }

@@ -34,6 +34,9 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Gráficos customizados criados pelos utilizadores.</summary>
     public DbSet<CustomChart> CustomCharts => Set<CustomChart>();
 
+    /// <summary>Experimentos de chaos engineering planeados e executados.</summary>
+    public DbSet<ChaosExperiment> ChaosExperiments => Set<ChaosExperiment>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;

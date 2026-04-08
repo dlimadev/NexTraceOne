@@ -2,15 +2,17 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.CreateCustomDashboard;
 
 /// <summary>
-/// Feature: CreateCustomDashboard — cria um dashboard customizado para uma persona específica.
-/// Permite que utilizadores configurem layouts e widgets de acordo com o seu papel funcional.
+/// Feature: CreateCustomDashboard — cria um dashboard customizado persistido.
+/// Cada dashboard é associado a um tenant, utilizador e persona.
 ///
 /// Owner: módulo Governance.
-/// Pilar: Governance — Builder visual para personas criarem dashboards customizados.
+/// Pilar: Governance — Source of Truth para dashboards de governance por persona.
 /// </summary>
 public static class CreateCustomDashboard
 {
@@ -52,21 +54,36 @@ public static class CreateCustomDashboard
         }
     }
 
-    /// <summary>Handler que gera a identidade do dashboard e retorna os metadados iniciais.</summary>
-    public sealed class Handler(IDateTimeProvider clock) : ICommandHandler<Command, Response>
+    /// <summary>Handler que cria e persiste um novo dashboard customizado.</summary>
+    public sealed class Handler(
+        ICustomDashboardRepository repository,
+        IUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var dashboardId = Guid.NewGuid();
             var now = clock.UtcNow;
 
-            return Task.FromResult(Result<Response>.Success(new Response(
-                DashboardId: dashboardId,
-                Name: request.Name,
-                Layout: request.Layout,
-                WidgetCount: request.WidgetIds.Count,
-                Persona: request.Persona,
-                CreatedAt: now)));
+            var dashboard = CustomDashboard.Create(
+                name: request.Name,
+                description: request.Description,
+                layout: request.Layout,
+                persona: request.Persona,
+                widgetIds: request.WidgetIds,
+                tenantId: request.TenantId,
+                userId: request.UserId,
+                now: now);
+
+            await repository.AddAsync(dashboard, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return Result<Response>.Success(new Response(
+                DashboardId: dashboard.Id.Value,
+                Name: dashboard.Name,
+                Layout: dashboard.Layout,
+                WidgetCount: dashboard.WidgetIds.Count,
+                Persona: dashboard.Persona,
+                CreatedAt: dashboard.CreatedAt));
         }
     }
 

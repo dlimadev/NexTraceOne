@@ -31,6 +31,9 @@ public sealed class IntegrationsDbContext(
     /// <summary>Execuções de ingestão de dados (extraído em P2.2).</summary>
     public DbSet<IngestionExecution> IngestionExecutions => Set<IngestionExecution>();
 
+    /// <summary>Subscrições de webhook outbound por tenant.</summary>
+    public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IntegrationsDbContext).Assembly;
 

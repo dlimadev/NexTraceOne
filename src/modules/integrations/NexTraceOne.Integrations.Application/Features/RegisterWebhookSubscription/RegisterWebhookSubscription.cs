@@ -2,6 +2,8 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Integrations.Application.Abstractions;
+using NexTraceOne.Integrations.Domain.Entities;
 
 namespace NexTraceOne.Integrations.Application.Features.RegisterWebhookSubscription;
 
@@ -9,7 +11,7 @@ namespace NexTraceOne.Integrations.Application.Features.RegisterWebhookSubscript
 /// Feature: RegisterWebhookSubscription — regista uma nova subscrição de webhook outbound.
 /// Permite que tenants configurem endpoints externos para receber notificações quando eventos
 /// relevantes ocorrem no NexTraceOne (incidents, changes, contracts, services, alerts).
-/// Handler nativo do módulo Integrations.
+/// Persiste via IWebhookSubscriptionRepository + IUnitOfWork.
 /// Ownership: módulo Integrations.
 /// </summary>
 public static class RegisterWebhookSubscription
@@ -59,25 +61,53 @@ public static class RegisterWebhookSubscription
         }
     }
 
-    /// <summary>Handler que regista uma nova subscrição de webhook outbound.</summary>
-    public sealed class Handler(IDateTimeProvider clock) : ICommandHandler<Command, Response>
+    /// <summary>Handler que regista uma nova subscrição de webhook outbound com persistência real.</summary>
+    public sealed class Handler(
+        IWebhookSubscriptionRepository repository,
+        IUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var subscriptionId = Guid.NewGuid();
             var hasSecret = !string.IsNullOrWhiteSpace(request.Secret);
 
-            var response = new Response(
-                SubscriptionId: subscriptionId,
-                Name: request.Name,
-                TargetUrl: request.TargetUrl,
-                EventTypes: request.EventTypes,
-                HasSecret: hasSecret,
-                IsActive: request.IsActive,
-                EventCount: request.EventTypes.Count,
-                CreatedAt: clock.UtcNow);
+            var subscription = WebhookSubscription.Create(
+                tenantId: request.TenantId,
+                name: request.Name,
+                targetUrl: request.TargetUrl,
+                eventTypes: request.EventTypes,
+                secretHash: hasSecret ? ComputeSecretHash(request.Secret!) : null,
+                description: request.Description,
+                isActive: request.IsActive,
+                utcNow: clock.UtcNow);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            await repository.AddAsync(subscription, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            var response = new Response(
+                SubscriptionId: subscription.Id.Value,
+                Name: subscription.Name,
+                TargetUrl: subscription.TargetUrl,
+                EventTypes: subscription.EventTypes,
+                HasSecret: hasSecret,
+                IsActive: subscription.IsActive,
+                EventCount: subscription.EventTypes.Count,
+                CreatedAt: subscription.CreatedAt);
+
+            return Result<Response>.Success(response);
+        }
+
+        private static string ComputeSecretHash(string secret)
+        {
+            var salt = System.Security.Cryptography.RandomNumberGenerator.GetBytes(16);
+            var hash = System.Security.Cryptography.Rfc2898DeriveBytes.Pbkdf2(
+                System.Text.Encoding.UTF8.GetBytes(secret),
+                salt,
+                iterations: 600_000,
+                System.Security.Cryptography.HashAlgorithmName.SHA256,
+                outputLength: 32);
+            // Store as salt:hash in base64
+            return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
         }
     }
 

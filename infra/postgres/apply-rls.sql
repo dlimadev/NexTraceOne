@@ -215,6 +215,20 @@ CREATE POLICY tenant_isolation ON gov_delegated_administrations
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- gov_custom_dashboards — custom dashboards per tenant
+ALTER TABLE gov_custom_dashboards ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_custom_dashboards;
+CREATE POLICY tenant_isolation ON gov_custom_dashboards
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
+-- gov_technical_debt_items — technical debt items per tenant
+ALTER TABLE gov_technical_debt_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_technical_debt_items;
+CREATE POLICY tenant_isolation ON gov_technical_debt_items
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ── Change Governance module (chg_ prefix) ────────────────────────────────────
 
 -- chg_change_records — change records per tenant
@@ -401,6 +415,13 @@ CREATE POLICY tenant_isolation ON int_ingestion_sources
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- int_webhook_subscriptions — webhook subscriptions per tenant
+ALTER TABLE int_webhook_subscriptions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON int_webhook_subscriptions;
+CREATE POLICY tenant_isolation ON int_webhook_subscriptions
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ── Configuration module (cfg_ prefix) ───────────────────────────────────────
 -- Note: cfg_entries, cfg_definitions, cfg_modules use scope-based isolation
 -- (not tenant_id column), so RLS is not applicable to those tables.
@@ -512,9 +533,16 @@ CREATE POLICY tenant_isolation ON ops_custom_charts
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- ops_chaos_experiments — chaos engineering experiments per tenant
+ALTER TABLE ops_chaos_experiments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_chaos_experiments;
+CREATE POLICY tenant_isolation ON ops_chaos_experiments
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 53 tables covering all major tenant-aware data domains.
+--   RLS enabled on 56 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

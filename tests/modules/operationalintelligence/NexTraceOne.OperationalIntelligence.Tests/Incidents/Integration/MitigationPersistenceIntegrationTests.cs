@@ -7,6 +7,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateM
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetMitigationHistory;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.RecordMitigationValidation;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
+using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persistence;
 

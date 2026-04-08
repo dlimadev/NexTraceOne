@@ -47,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<IRuntimeIntelligenceModule, RuntimeIntelligenceModule>();
 
         services.AddScoped<ICustomChartRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.CustomChartRepository>();
+        services.AddScoped<IChaosExperimentRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.ChaosExperimentRepository>();
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);

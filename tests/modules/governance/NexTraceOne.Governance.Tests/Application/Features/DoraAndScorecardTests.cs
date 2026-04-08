@@ -233,7 +233,7 @@ public sealed class DoraAndScorecardTests
         _catalog.ListServicesByTeamAsync("team-commerce", Arg.Any<CancellationToken>())
             .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
 
-        var handler = new ListServiceScorecards.Handler(_catalog, _clock);
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
         var result = await handler.Handle(new ListServiceScorecards.Query("team-commerce"), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -252,7 +252,7 @@ public sealed class DoraAndScorecardTests
         _catalog.ListServicesByTeamAsync("team-x", Arg.Any<CancellationToken>())
             .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
 
-        var handler = new ListServiceScorecards.Handler(_catalog, _clock);
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
         var result = await handler.Handle(new ListServiceScorecards.Query("team-x"), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -270,12 +270,12 @@ public sealed class DoraAndScorecardTests
         _catalog.ListServicesByTeamAsync("team-y", Arg.Any<CancellationToken>())
             .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
 
-        var handler = new ListServiceScorecards.Handler(_catalog, _clock);
-        var result = await handler.Handle(new ListServiceScorecards.Query("team-y", MaturityLevel: "Gold"), CancellationToken.None);
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query("team-y", MaturityLevel: "Silver"), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         foreach (var item in result.Value.Items)
-            item.MaturityLevel.Should().Be("Gold");
+            item.MaturityLevel.Should().Be("Silver");
     }
 
     [Fact]
@@ -292,5 +292,135 @@ public sealed class DoraAndScorecardTests
         var validator = new ListServiceScorecards.Validator();
         var result = validator.Validate(new ListServiceScorecards.Query("team-z", MaturityLevel: "Gold"));
         result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_WithDomainFilter_UsesListServicesByDomain()
+    {
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "order-service", "Commerce", "High", "Direct"),
+            new("id-2", "cart-service", "Commerce", "Medium", "Direct"),
+            new("id-3", "checkout-service", "Commerce", "High", "Direct"),
+        };
+        _catalog.ListServicesByDomainAsync("Commerce", Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query(Domain: "Commerce"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Count.Should().Be(3);
+        result.Value.Items.Should().AllSatisfy(item => item.ServiceName.Should().NotStartWith("service-"));
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_NoFilter_UsesListAllServices()
+    {
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "api-gateway", "Platform", "High", "Direct"),
+        };
+        _catalog.ListAllServicesAsync(Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query(), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().AllSatisfy(item => item.ServiceName.Should().NotStartWith("service-"));
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_WithDomainFilter_OrderedByScore()
+    {
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "svc-x", "D1", "High", "Direct"),
+            new("id-2", "svc-y", "D1", "Low", "Direct"),
+        };
+        _catalog.ListServicesByDomainAsync("D1", Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query(Domain: "D1"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        var scores = result.Value.Items.Select(s => s.FinalScore).ToList();
+        scores.Should().BeInDescendingOrder();
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_UsesRealIncidentMetrics_ForScoring()
+    {
+        // High incidents → lower scores for incident-related dimensions
+        _incidents.CountOpenIncidentsAsync(Arg.Any<CancellationToken>()).Returns(12);
+        _incidents.GetRecurrenceRateAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(55m);
+        _incidents.GetAverageResolutionHoursAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(36m);
+
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "critical-svc", "Production", "High", "Direct"),
+        };
+        _catalog.ListServicesByTeamAsync("ops-team", Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query("ops-team"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().ContainSingle();
+        // With high incidents (12 open, 55% recurrence, 36h MTTR), score should be lower
+        result.Value.Items[0].FinalScore.Should().BeLessThan(70);
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_ZeroIncidents_HighScores()
+    {
+        _incidents.CountOpenIncidentsAsync(Arg.Any<CancellationToken>()).Returns(0);
+        _incidents.GetRecurrenceRateAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(0m);
+        _incidents.GetAverageResolutionHoursAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(0m);
+
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "stable-service", "Platform", "High", "Direct"),
+        };
+        _catalog.ListServicesByTeamAsync("stable-team", Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query("stable-team"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().ContainSingle();
+        // With zero incidents, score should be high (Gold tier)
+        result.Value.Items[0].FinalScore.Should().BeGreaterThanOrEqualTo(85);
+        result.Value.Items[0].MaturityLevel.Should().BeOneOf("Gold", "Silver");
+    }
+
+    [Fact]
+    public async Task ListServiceScorecards_DifferentCriticality_DifferentScores()
+    {
+        _incidents.CountOpenIncidentsAsync(Arg.Any<CancellationToken>()).Returns(1);
+        _incidents.GetRecurrenceRateAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(5m);
+        _incidents.GetAverageResolutionHoursAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(2m);
+
+        var services = new List<TeamServiceInfo>
+        {
+            new("id-1", "high-crit-svc", "D1", "High", "Direct"),
+            new("id-2", "low-crit-svc", "D1", "Low", "Shared"),
+        };
+        _catalog.ListServicesByTeamAsync("mixed-team", Arg.Any<CancellationToken>())
+            .Returns(services.AsReadOnly() as IReadOnlyList<TeamServiceInfo>);
+
+        var handler = new ListServiceScorecards.Handler(_catalog, _incidents, _clock);
+        var result = await handler.Handle(new ListServiceScorecards.Query("mixed-team"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Count.Should().Be(2);
+        // High criticality + Direct ownership → higher score than Low + Shared
+        var highCrit = result.Value.Items.First(i => i.ServiceName == "high-crit-svc");
+        var lowCrit = result.Value.Items.First(i => i.ServiceName == "low-crit-svc");
+        highCrit.FinalScore.Should().BeGreaterThan(lowCrit.FinalScore);
     }
 }
