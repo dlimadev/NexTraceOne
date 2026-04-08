@@ -16,6 +16,7 @@ internal sealed class CustomChartRepository(RuntimeIntelligenceDbContext context
     /// <summary>Busca um gráfico customizado pelo seu identificador, filtrando por tenant.</summary>
     public async Task<CustomChart?> GetByIdAsync(CustomChartId id, string tenantId, CancellationToken cancellationToken)
         => await context.CustomCharts
+            .AsNoTracking()
             .SingleOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId, cancellationToken);
 
     /// <summary>Lista gráficos customizados de um utilizador no tenant, ordenados por data de criação descendente.</summary>
