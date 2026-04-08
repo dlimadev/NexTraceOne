@@ -2,6 +2,8 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.CloneDashboard;
 
@@ -28,18 +30,33 @@ public static class CloneDashboard
         }
     }
 
-    public sealed class Handler(IDateTimeProvider clock) : ICommandHandler<Command, Response>
+    public sealed class Handler(
+        ICustomDashboardRepository repository,
+        IUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var cloneId = Guid.NewGuid();
-            var now = clock.UtcNow;
+            var source = await repository.GetByIdAsync(
+                new CustomDashboardId(request.SourceDashboardId), cancellationToken);
 
-            return Task.FromResult(Result<Response>.Success(new Response(
-                CloneId: cloneId,
-                Name: request.NewName,
+            if (source is null)
+                return Error.NotFound(
+                    "CustomDashboard.NotFound",
+                    "Source dashboard with ID '{0}' was not found.",
+                    request.SourceDashboardId);
+
+            var now = clock.UtcNow;
+            var clone = source.Clone(request.NewName, request.UserId, now);
+
+            await repository.AddAsync(clone, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return Result<Response>.Success(new Response(
+                CloneId: clone.Id.Value,
+                Name: clone.Name,
                 SourceDashboardId: request.SourceDashboardId,
-                CreatedAt: now)));
+                CreatedAt: clone.CreatedAt));
         }
     }
 

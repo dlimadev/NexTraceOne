@@ -497,3 +497,81 @@ internal sealed class PolicyAsCodeRepository(GovernanceDbContext context) : IPol
         return Task.CompletedTask;
     }
 }
+
+/// <summary>
+/// Implementação do repositório de Custom Dashboards usando EF Core.
+/// </summary>
+internal sealed class CustomDashboardRepository(GovernanceDbContext context) : ICustomDashboardRepository
+{
+    public async Task<IReadOnlyList<CustomDashboard>> ListAsync(string? persona, CancellationToken ct)
+    {
+        var query = context.CustomDashboards.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(persona))
+            query = query.Where(d => d.Persona == persona);
+
+        return await query.OrderByDescending(d => d.UpdatedAt).AsNoTracking().ToListAsync(ct);
+    }
+
+    public async Task<CustomDashboard?> GetByIdAsync(CustomDashboardId id, CancellationToken ct)
+        => await context.CustomDashboards.SingleOrDefaultAsync(d => d.Id == id, ct);
+
+    public async Task<int> CountAsync(string? persona, CancellationToken ct)
+    {
+        var query = context.CustomDashboards.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(persona))
+            query = query.Where(d => d.Persona == persona);
+
+        return await query.CountAsync(ct);
+    }
+
+    public async Task AddAsync(CustomDashboard dashboard, CancellationToken ct)
+        => await context.CustomDashboards.AddAsync(dashboard, ct);
+
+    public Task UpdateAsync(CustomDashboard dashboard, CancellationToken ct)
+    {
+        context.CustomDashboards.Update(dashboard);
+        return Task.CompletedTask;
+    }
+}
+
+/// <summary>
+/// Implementação do repositório de Technical Debt Items usando EF Core.
+/// </summary>
+internal sealed class TechnicalDebtRepository(GovernanceDbContext context) : ITechnicalDebtRepository
+{
+    public async Task<IReadOnlyList<TechnicalDebtItem>> ListAsync(
+        string? serviceName,
+        string? debtType,
+        int topN,
+        CancellationToken ct)
+    {
+        var query = context.TechnicalDebtItems.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(serviceName))
+            query = query.Where(d => d.ServiceName == serviceName);
+
+        if (!string.IsNullOrWhiteSpace(debtType))
+            query = query.Where(d => d.DebtType == debtType);
+
+        return await query
+            .OrderByDescending(d => d.DebtScore)
+            .ThenByDescending(d => d.CreatedAt)
+            .Take(topN)
+            .AsNoTracking()
+            .ToListAsync(ct);
+    }
+
+    public async Task<TechnicalDebtItem?> GetByIdAsync(TechnicalDebtItemId id, CancellationToken ct)
+        => await context.TechnicalDebtItems.SingleOrDefaultAsync(d => d.Id == id, ct);
+
+    public async Task AddAsync(TechnicalDebtItem item, CancellationToken ct)
+        => await context.TechnicalDebtItems.AddAsync(item, ct);
+
+    public Task UpdateAsync(TechnicalDebtItem item, CancellationToken ct)
+    {
+        context.TechnicalDebtItems.Update(item);
+        return Task.CompletedTask;
+    }
+}

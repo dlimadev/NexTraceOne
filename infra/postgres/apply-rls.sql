@@ -215,6 +215,20 @@ CREATE POLICY tenant_isolation ON gov_delegated_administrations
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- gov_custom_dashboards — custom dashboards per tenant
+ALTER TABLE gov_custom_dashboards ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_custom_dashboards;
+CREATE POLICY tenant_isolation ON gov_custom_dashboards
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
+-- gov_technical_debt_items — technical debt items per tenant
+ALTER TABLE gov_technical_debt_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_technical_debt_items;
+CREATE POLICY tenant_isolation ON gov_technical_debt_items
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ── Change Governance module (chg_ prefix) ────────────────────────────────────
 
 -- chg_change_records — change records per tenant
@@ -514,7 +528,7 @@ CREATE POLICY tenant_isolation ON ops_custom_charts
 
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 53 tables covering all major tenant-aware data domains.
+--   RLS enabled on 55 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

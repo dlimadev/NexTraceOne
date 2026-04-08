@@ -99,10 +99,13 @@ public static class ListServiceScorecards
 
         private static int ComputeSimpleScore(string serviceName, string teamId)
         {
+            // Heurística determinística para MVP — consistente entre plataformas.
             // TODO: Substituir por lógica real via ComputeServiceScorecard quando disponível.
-            // Neste MVP, usa-se uma heurística reproduzível baseada no hash do nome do serviço.
-            var hash = Math.Abs(serviceName.GetHashCode() % 40);
-            return 60 + hash;
+            var hash = 0;
+            foreach (var c in serviceName)
+                hash = unchecked(hash * 31 + c);
+
+            return 60 + Math.Abs(hash % 40);
         }
 
         private static string ScoreToLevel(int score) => score switch
