@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-08 — AI-MODELS-ANALYSIS e BRAINSTORMING-INNOVATIVE-IDEAS adicionados
+> **Última actualização:** 2026-04-08 — DEVELOPMENT-PLAN-INNOVATIVE-IDEAS adicionado; Ideia 23 removida do brainstorming
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -12,7 +12,8 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
 | [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** — 6.1 Unit Tests ✅, 6.2 E2E Tests ✅ |
-| [`BRAINSTORMING-INNOVATIVE-IDEAS.md`](BRAINSTORMING-INNOVATIVE-IDEAS.md) | **30 ideias inovadoras** — brainstorming em aberto |
+| [`BRAINSTORMING-INNOVATIVE-IDEAS.md`](BRAINSTORMING-INNOVATIVE-IDEAS.md) | **29 ideias inovadoras** — aprovadas |
+| [`DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md`](DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md) | **Plano de desenvolvimento** — 29 ideias em 7 Waves |
 | [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](PLATFORM-CUSTOMIZATION-EVOLUTION.md) | **Plano de evolução de customização da plataforma** — Fases 1-8 ✅ COMPLETO |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |

@@ -1,7 +1,7 @@
-# NexTraceOne — Brainstorming: 30 Ideias Inovadoras para Elevar o Produto
+# NexTraceOne — Brainstorming: 29 Ideias Inovadoras para Elevar o Produto
 
 > **Data:** Abril 2026  
-> **Estado:** 🟡 Em aberto — brainstorming não fechado  
+> **Estado:** 🟢 Ideias aprovadas — plano de desenvolvimento em [DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md](./DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md)  
 > **Referência:** [PRODUCT-VISION.md](./PRODUCT-VISION.md), [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)
 
 ---
@@ -400,7 +400,7 @@ Builder visual para criar playbooks operacionais que:
 
 ---
 
-## Ideias 21–30: Segunda Rodada (Novas)
+## Ideias 21–29: Segunda Rodada (Novas)
 
 ---
 
@@ -448,25 +448,7 @@ Funciona como **quality gate de contratos** similar ao SonarQube para código, m
 
 ---
 
-### 💡 Ideia 23 — Multi-Tenant Benchmark & Insights (para o próprio NexTraceOne)
-
-**Pilar:** Operational Intelligence + Product Analytics  
-**Persona:** Platform Admin, Executive  
-
-Analytics sobre como a organização usa o NexTraceOne comparado com benchmarks anónimos:
-
-- "A sua organização tem 47 serviços — a mediana de organizações do mesmo porte é 62"
-- "A cobertura de contratos dos seus serviços é 78% — acima da média de 65%"
-- "O tempo médio de resolução de incidentes é 2.3h — a referência é 1.8h"
-- "92% das suas mudanças passam por approval — a média é 74%"
-
-**Dados são completamente anónimos e opt-in.** Cada organização decide se contribui para o benchmark.
-
-**Diferencial:** Self-awareness operacional com referência do mercado — transforma o NexTraceOne de ferramenta em advisor.
-
----
-
-### 💡 Ideia 24 — Dependency License Compliance Radar
+### 💡 Ideia 23 — Dependency License Compliance Radar
 
 **Pilar:** Governance + Contract Governance  
 **Persona:** Architect, Auditor  
@@ -484,7 +466,7 @@ Radar contínuo que analisa todas as dependências de todos os serviços e:
 
 ---
 
-### 💡 Ideia 25 — AI-Powered Onboarding Companion
+### 💡 Ideia 24 — AI-Powered Onboarding Companion
 
 **Pilar:** AI Governance + Developer Acceleration  
 **Persona:** Engineer (novo na equipa)  
@@ -504,7 +486,7 @@ Todo o contexto vem do NexTraceOne — catálogo, contratos, knowledge base, own
 
 ---
 
-### 💡 Ideia 26 — Service Maturity Model Tracker
+### 💡 Ideia 25 — Service Maturity Model Tracker
 
 **Pilar:** Service Governance + Operational Reliability  
 **Persona:** Tech Lead, Architect, Executive  
@@ -525,7 +507,7 @@ O tracker mostra evolução temporal de cada serviço, permite filtrar por equip
 
 ---
 
-### 💡 Ideia 27 — Cross-Team Contract Negotiation Workspace
+### 💡 Ideia 26 — Cross-Team Contract Negotiation Workspace
 
 **Pilar:** Contract Governance + Source of Truth  
 **Persona:** Engineer, Tech Lead, Architect  
@@ -546,7 +528,7 @@ Funciona como **"Pull Request de contratos"** — com workflow governado.
 
 ---
 
-### 💡 Ideia 28 — Chaos Engineering Integration Hub
+### 💡 Ideia 27 — Chaos Engineering Integration Hub
 
 **Pilar:** Operational Reliability  
 **Persona:** Engineer, Platform Admin  
@@ -566,7 +548,7 @@ Hub que conecta o NexTraceOne com ferramentas de chaos engineering:
 
 ---
 
-### 💡 Ideia 29 — Operational Cost Attribution Engine
+### 💡 Ideia 28 — Operational Cost Attribution Engine
 
 **Pilar:** FinOps contextual  
 **Persona:** Executive, Platform Admin  
@@ -588,7 +570,7 @@ Permite responder:
 
 ---
 
-### 💡 Ideia 30 — AI Knowledge Feedback Loop
+### 💡 Ideia 29 — AI Knowledge Feedback Loop
 
 **Pilar:** AI Governance + Source of Truth  
 **Persona:** Todas  
@@ -612,20 +594,19 @@ Sistema de feedback loop que melhora a IA continuamente:
 | Prioridade | Ideias | Justificativa |
 |------------|--------|---------------|
 | 🔴 **Alta** | 1, 2, 5, 9, 14 | Reforçam pillars core: Contract + Change Governance |
-| 🟠 **Média-Alta** | 3, 6, 8, 22, 26 | Elevam operação e observabilidade com IA |
-| 🟡 **Média** | 4, 7, 10, 12, 16, 21, 25, 27 | Diferenciais competitivos fortes |
-| 🟢 **Exploratória** | 11, 13, 15, 17, 18, 19, 20, 23, 24, 28, 29, 30 | Inovação de longo prazo |
+| 🟠 **Média-Alta** | 3, 6, 8, 22, 25 | Elevam operação e observabilidade com IA |
+| 🟡 **Média** | 4, 7, 10, 12, 16, 21, 24, 26 | Diferenciais competitivos fortes |
+| 🟢 **Exploratória** | 11, 13, 15, 17, 18, 19, 20, 23, 27, 28, 29 | Inovação de longo prazo |
 
 ---
 
 ## Próximos Passos
 
-1. **Revisão:** Discutir cada ideia em sessão de brainstorming
+1. **Plano de desenvolvimento:** Ver [DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md](./DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md)
 2. **Priorização:** Reordenar com base em valor de negócio × esforço
 3. **Validação:** Confirmar viabilidade técnica das top 10
 4. **Roadmap:** Incorporar ideias aprovadas no FUTURE-ROADMAP.md
-5. **Novas ideias:** Este documento permanece aberto para novas contribuições
 
 ---
 
-> **Estado:** 🟡 Brainstorming em aberto — contribuições são bem-vindas.
+> **Estado:** 🟢 29 ideias aprovadas — Ideia 23 original (Multi-Tenant Benchmark) removida por decisão de produto.
