@@ -232,5 +232,11 @@ public static class ContractsErrors
     /// <summary>Análise de evolução de schema não encontrada.</summary>
     public static Error SchemaEvolutionAdviceNotFound(string id)
         => Error.NotFound("Contracts.SchemaEvolutionAdvice.NotFound", "Schema evolution advice '{0}' was not found.", id);
+
+    // ── SemanticDiffResult ──────────────────────────────────────────
+
+    /// <summary>Resultado de diff semântico não encontrado.</summary>
+    public static Error SemanticDiffResultNotFound(string id)
+        => Error.NotFound("Contracts.SemanticDiffResult.NotFound", "Semantic diff result '{0}' was not found.", id);
 }
 

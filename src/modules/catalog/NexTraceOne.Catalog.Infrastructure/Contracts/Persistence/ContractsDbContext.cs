@@ -95,6 +95,9 @@ public sealed class ContractsDbContext(
     /// <summary>Análises de evolução de schema entre versões de contratos (API Assets).</summary>
     public DbSet<SchemaEvolutionAdvice> SchemaEvolutionAdvices => Set<SchemaEvolutionAdvice>();
 
+    /// <summary>Resultados de diff semântico assistido por IA entre versões de contrato.</summary>
+    public DbSet<SemanticDiffResult> SemanticDiffResults => Set<SemanticDiffResult>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
