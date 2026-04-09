@@ -210,5 +210,11 @@ public static class ContractsErrors
     /// <summary>Formato de exportação não suportado.</summary>
     public static Error UnsupportedExportFormat(string format)
         => Error.Validation("Contracts.Export.UnsupportedFormat", "Export format '{0}' is not supported.", format);
+
+    // ── PipelineExecution ───────────────────────────────────────────
+
+    /// <summary>Execução de pipeline não encontrada.</summary>
+    public static Error PipelineExecutionNotFound(string id)
+        => Error.NotFound("Contracts.PipelineExecution.NotFound", "Pipeline execution '{0}' was not found.", id);
 }
 

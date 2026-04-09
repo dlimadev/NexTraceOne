@@ -83,6 +83,9 @@ public sealed class ContractsDbContext(
     /// <summary>Scores de saúde contínuos de contratos (API Assets).</summary>
     public DbSet<ContractHealthScore> ContractHealthScores => Set<ContractHealthScore>();
 
+    /// <summary>Execuções de pipeline de geração de código a partir de contratos.</summary>
+    public DbSet<PipelineExecution> PipelineExecutions => Set<PipelineExecution>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
