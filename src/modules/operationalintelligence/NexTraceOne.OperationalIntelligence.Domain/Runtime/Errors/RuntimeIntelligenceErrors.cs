@@ -127,4 +127,11 @@ public static class RuntimeIntelligenceErrors
             "RuntimeIntelligence.OperationalPlaybook.NotActive",
             "Playbook '{0}' is not active. Only active playbooks can be executed.",
             id);
+
+    /// <summary>Transição de estado inválida para a execução de playbook.</summary>
+    public static Error PlaybookExecutionInvalidTransition(string id, string from, string to)
+        => Error.Validation(
+            "RuntimeIntelligence.PlaybookExecution.InvalidTransition",
+            "Cannot transition playbook execution '{0}' from '{1}' to '{2}'.",
+            id, from, to);
 }

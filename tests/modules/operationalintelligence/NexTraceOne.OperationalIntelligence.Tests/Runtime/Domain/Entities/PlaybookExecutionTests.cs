@@ -137,7 +137,7 @@ public sealed class PlaybookExecutionTests
         var result = execution.Complete(null, null, null, FixedNow.AddHours(2));
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Contain("PlaybookExecution.NotFound");
+        result.Error.Code.Should().Contain("InvalidTransition");
     }
 
     // ── Fail ─────────────────────────────────────────────────────────────

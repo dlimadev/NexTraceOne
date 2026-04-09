@@ -100,7 +100,8 @@ public sealed class PlaybookExecution : AuditableEntity<PlaybookExecutionId>
     public Result<Unit> Complete(string? stepResults, string? evidence, string? notes, DateTimeOffset completedAt)
     {
         if (Status != PlaybookExecutionStatus.InProgress)
-            return RuntimeIntelligenceErrors.PlaybookExecutionNotFound(Id.Value.ToString());
+            return RuntimeIntelligenceErrors.PlaybookExecutionInvalidTransition(
+                Id.Value.ToString(), Status.ToString(), PlaybookExecutionStatus.Completed.ToString());
 
         Status = PlaybookExecutionStatus.Completed;
         StepResults = stepResults;
@@ -117,7 +118,8 @@ public sealed class PlaybookExecution : AuditableEntity<PlaybookExecutionId>
     public Result<Unit> Fail(string? stepResults, string? evidence, string? errorNotes, DateTimeOffset failedAt)
     {
         if (Status != PlaybookExecutionStatus.InProgress)
-            return RuntimeIntelligenceErrors.PlaybookExecutionNotFound(Id.Value.ToString());
+            return RuntimeIntelligenceErrors.PlaybookExecutionInvalidTransition(
+                Id.Value.ToString(), Status.ToString(), PlaybookExecutionStatus.Failed.ToString());
 
         Status = PlaybookExecutionStatus.Failed;
         StepResults = stepResults;
@@ -134,7 +136,8 @@ public sealed class PlaybookExecution : AuditableEntity<PlaybookExecutionId>
     public Result<Unit> Abort(string? notes, DateTimeOffset abortedAt)
     {
         if (Status != PlaybookExecutionStatus.InProgress)
-            return RuntimeIntelligenceErrors.PlaybookExecutionNotFound(Id.Value.ToString());
+            return RuntimeIntelligenceErrors.PlaybookExecutionInvalidTransition(
+                Id.Value.ToString(), Status.ToString(), PlaybookExecutionStatus.Aborted.ToString());
 
         Status = PlaybookExecutionStatus.Aborted;
         Notes = notes;
