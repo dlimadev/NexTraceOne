@@ -134,4 +134,25 @@ public static class RuntimeIntelligenceErrors
             "RuntimeIntelligence.PlaybookExecution.InvalidTransition",
             "Cannot transition playbook execution '{0}' from '{1}' to '{2}'.",
             id, from, to);
+
+    /// <summary>Relatório de resiliência não encontrado pelo identificador informado.</summary>
+    public static Error ResilienceReportNotFound(string id)
+        => Error.NotFound(
+            "RuntimeIntelligence.ResilienceReport.NotFound",
+            "Resilience report '{0}' was not found.",
+            id);
+
+    /// <summary>Relatório de resiliência já foi revisado anteriormente.</summary>
+    public static Error ResilienceReportAlreadyReviewed(string id)
+        => Error.Conflict(
+            "RuntimeIntelligence.ResilienceReport.AlreadyReviewed",
+            "Resilience report '{0}' has already been reviewed.",
+            id);
+
+    /// <summary>Relatório de resiliência já está arquivado.</summary>
+    public static Error ResilienceReportAlreadyArchived(string id)
+        => Error.Conflict(
+            "RuntimeIntelligence.ResilienceReport.AlreadyArchived",
+            "Resilience report '{0}' is already archived.",
+            id);
 }

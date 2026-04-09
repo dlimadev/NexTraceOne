@@ -49,6 +49,9 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Registos de execução de playbooks operacionais.</summary>
     public DbSet<PlaybookExecution> PlaybookExecutions => Set<PlaybookExecution>();
 
+    /// <summary>Relatórios de resiliência gerados após experimentos de chaos.</summary>
+    public DbSet<ResilienceReport> ResilienceReports => Set<ResilienceReport>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;
