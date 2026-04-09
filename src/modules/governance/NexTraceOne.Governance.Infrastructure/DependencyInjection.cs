@@ -68,6 +68,9 @@ public static class DependencyInjection
         // Change Cost Impact (FinOps por mudança)
         services.AddScoped<IChangeCostImpactRepository, ChangeCostImpactRepository>();
 
+        // Executive Briefings
+        services.AddScoped<IExecutiveBriefingRepository, ExecutiveBriefingRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();

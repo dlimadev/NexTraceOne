@@ -76,6 +76,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Impactos de custo por mudança (FinOps por mudança).</summary>
     public DbSet<ChangeCostImpact> ChangeCostImpacts => Set<ChangeCostImpact>();
 
+    /// <summary>Briefings executivos gerados por IA.</summary>
+    public DbSet<ExecutiveBriefing> ExecutiveBriefings => Set<ExecutiveBriefing>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

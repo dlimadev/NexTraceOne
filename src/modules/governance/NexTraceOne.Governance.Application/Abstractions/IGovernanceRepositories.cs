@@ -465,3 +465,25 @@ public interface IChangeCostImpactRepository
     /// <summary>Adiciona um novo registo de impacto de custo.</summary>
     Task AddAsync(ChangeCostImpact impact, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de ExecutiveBriefing para o módulo Governance.
+/// Define operações CRUD e consultas para briefings executivos gerados por IA.
+/// </summary>
+public interface IExecutiveBriefingRepository
+{
+    /// <summary>Obtém um briefing pelo seu identificador.</summary>
+    Task<ExecutiveBriefing?> GetByIdAsync(ExecutiveBriefingId id, CancellationToken ct);
+
+    /// <summary>Lista briefings, opcionalmente filtrados por frequência e/ou status.</summary>
+    Task<IReadOnlyList<ExecutiveBriefing>> ListAsync(
+        BriefingFrequency? frequency,
+        BriefingStatus? status,
+        CancellationToken ct);
+
+    /// <summary>Adiciona um novo briefing ao repositório.</summary>
+    Task AddAsync(ExecutiveBriefing briefing, CancellationToken ct);
+
+    /// <summary>Atualiza um briefing existente.</summary>
+    Task UpdateAsync(ExecutiveBriefing briefing, CancellationToken ct);
+}
