@@ -102,13 +102,13 @@ public sealed class EnvironmentDriftReport : AuditableEntity<EnvironmentDriftRep
         Guard.Against.NullOrWhiteSpace(analyzedDimensions);
 
         if (string.Equals(sourceEnvironment, targetEnvironment, StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException("Source and target environments must be different.");
+            throw new ArgumentException("Source and target environments must be different.", nameof(sourceEnvironment));
 
         if (totalDriftItems < 0)
-            throw new ArgumentException("Total drift items cannot be negative.");
+            throw new ArgumentException("Total drift items cannot be negative.", nameof(totalDriftItems));
 
         if (criticalDriftItems < 0 || criticalDriftItems > totalDriftItems)
-            throw new ArgumentException("Critical drift items must be between 0 and total drift items.");
+            throw new ArgumentException("Critical drift items must be between 0 and total drift items.", nameof(criticalDriftItems));
 
         return new EnvironmentDriftReport
         {
