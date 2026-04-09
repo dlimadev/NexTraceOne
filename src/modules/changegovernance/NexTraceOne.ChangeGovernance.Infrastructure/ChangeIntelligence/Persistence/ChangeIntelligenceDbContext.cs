@@ -57,6 +57,9 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Eventos de confiança de mudanças (append-only) persistidos no módulo ChangeIntelligence.</summary>
     public DbSet<ChangeConfidenceEvent> ChangeConfidenceEvents => Set<ChangeConfidenceEvent>();
 
+    /// <summary>Release notes geradas por IA persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<ReleaseNotes> ReleaseNotes => Set<ReleaseNotes>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

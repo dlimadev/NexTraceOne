@@ -568,6 +568,13 @@ CREATE POLICY tenant_isolation ON chg_change_confidence_events
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- chg_release_notes — AI-generated release notes per tenant
+ALTER TABLE chg_release_notes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON chg_release_notes;
+CREATE POLICY tenant_isolation ON chg_release_notes
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
 --   RLS enabled on 58 tables covering all major tenant-aware data domains.

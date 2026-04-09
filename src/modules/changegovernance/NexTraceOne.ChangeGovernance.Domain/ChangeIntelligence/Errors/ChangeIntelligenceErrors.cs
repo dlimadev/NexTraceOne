@@ -48,4 +48,12 @@ public static class ChangeIntelligenceErrors
     /// <summary>Baseline não encontrado para a release informada. Necessário para post-change verification.</summary>
     public static Error BaselineNotFound(string releaseId)
         => Error.NotFound("ChangeIntelligence.ReleaseBaseline.NotFound", "Baseline for release '{0}' was not found. Record a baseline before submitting observation metrics.", releaseId);
+
+    /// <summary>Release notes não encontradas para a release informada.</summary>
+    public static Error ReleaseNotesNotFound(string releaseId)
+        => Error.NotFound("ChangeIntelligence.ReleaseNotes.NotFound", "Release notes for release '{0}' were not found.", releaseId);
+
+    /// <summary>Já existem release notes para esta release.</summary>
+    public static Error ReleaseNotesAlreadyExist(string releaseId)
+        => Error.Conflict("ChangeIntelligence.ReleaseNotes.AlreadyExist", "Release notes already exist for release '{0}'.", releaseId);
 }
