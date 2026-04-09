@@ -50,6 +50,9 @@ public sealed class AiGovernanceDbContext(
     // ── Phase 6: Feedback Loop ──────────────────────────────────
     public DbSet<AiFeedback> Feedbacks => Set<AiFeedback>();
 
+    // ── Phase 7: Onboarding Companion ───────────────────────────
+    public DbSet<OnboardingSession> OnboardingSessions => Set<OnboardingSession>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 
