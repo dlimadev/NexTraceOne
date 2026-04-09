@@ -39,7 +39,7 @@ public sealed class PipelineExecution : AuditableEntity<PipelineExecutionId>
     /// <summary>Framework alvo da geração (e.g. "aspnet", "express").</summary>
     public string? TargetFramework { get; private set; }
 
-    /// <summary>Estado actual da execução do pipeline.</summary>
+    /// <summary>Estado atual da execução do pipeline.</summary>
     public PipelineExecutionStatus Status { get; private set; }
 
     /// <summary>Número total de estágios solicitados.</summary>

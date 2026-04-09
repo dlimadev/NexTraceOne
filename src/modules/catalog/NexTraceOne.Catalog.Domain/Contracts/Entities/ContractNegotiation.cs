@@ -30,7 +30,7 @@ public sealed class ContractNegotiation : AuditableEntity<ContractNegotiationId>
     /// <summary>Descrição detalhada da proposta de negociação.</summary>
     public string Description { get; private set; } = string.Empty;
 
-    /// <summary>Estado actual da negociação.</summary>
+    /// <summary>Estado atual da negociação.</summary>
     public NegotiationStatus Status { get; private set; }
 
     /// <summary>Prazo opcional para conclusão da negociação.</summary>
