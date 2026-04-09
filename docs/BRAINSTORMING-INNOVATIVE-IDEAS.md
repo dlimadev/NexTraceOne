@@ -257,10 +257,11 @@ Gera alertas preventivos com contexto e sugestões de ação.
 
 ---
 
-### 💡 Ideia 13 — Team Health Dashboard
+### ✅ Ideia 13 — Team Health Dashboard
 
 **Pilar:** Service Governance  
 **Persona:** Tech Lead, Executive  
+**Estado:** ✅ Implementado (Wave F) — Entidade `TeamHealthSnapshot` com 7 dimensões (ServiceCount, ContractHealth, IncidentFrequency, MTTR, TechDebt, DocCoverage, PolicyCompliance), scoring individual e overall (0-100), recompute com histórico, handlers `ComputeTeamHealth`, `GetTeamHealthSnapshot`, `ListTeamHealthSnapshots`, testes, RLS configurado.  
 
 Dashboard que mostra a "saúde" de cada equipa com base em:
 
@@ -301,10 +302,11 @@ Tudo governado e auditado pelo NexTraceOne.
 
 ---
 
-### 💡 Ideia 15 — FinOps por Mudança
+### ✅ Ideia 15 — FinOps por Mudança
 
 **Pilar:** FinOps contextual  
 **Persona:** Tech Lead, Executive  
+**Estado:** ✅ Implementado (Wave F) — Entidade `ChangeCostImpact` com cálculo automático de delta (baseline vs actual), percentagem, direcção (Increase/Decrease/Neutral), suporte a múltiplos providers (AWS/Azure/GCP), handlers `RecordChangeCostImpact`, `GetChangeCostImpact`, `ListCostliestChanges`, testes, RLS configurado.  
 
 Correlacionar custo operacional com mudanças específicas:
 
@@ -354,10 +356,11 @@ Agente especializado que aconselha sobre evolução segura de schemas:
 
 ---
 
-### 💡 Ideia 18 — Executive Briefing Generator
+### ✅ Ideia 18 — Executive Briefing Generator
 
 **Pilar:** Governance  
 **Persona:** Executive, Product  
+**Estado:** ✅ Implementado (Wave F) — Entidade `ExecutiveBriefing` com 7 secções JSONB (PlatformStatus, TopIncidents, TeamPerformance, HighRiskChanges, ComplianceStatus, CostTrends, ActiveRisks), ciclo de vida (Draft→Published→Archived), frequência configurável (Daily/Weekly/Monthly/OnDemand), handlers `GenerateExecutiveBriefing`, `GetExecutiveBriefing`, `ListExecutiveBriefings`, `PublishExecutiveBriefing`, testes, RLS configurado.  
 
 Geração automática de briefings executivos periódicos:
 
@@ -566,10 +569,11 @@ Hub que conecta o NexTraceOne com ferramentas de chaos engineering:
 
 ---
 
-### 💡 Ideia 28 — Operational Cost Attribution Engine
+### ✅ Ideia 28 — Operational Cost Attribution Engine
 
 **Pilar:** FinOps contextual  
 **Persona:** Executive, Platform Admin  
+**Estado:** ✅ Implementado (Wave F) — Entidade `CostAttribution` com 5 dimensões (Service, Team, Domain, Contract, Change), breakdown por tipo de custo (Compute, Storage, Network, Other), validação de totalização, suporte multi-currency, métodos de atribuição configuráveis, handlers `ComputeCostAttribution`, `GetCostAttribution`, `ListCostAttributions`, testes, RLS configurado.  
 
 Motor de atribuição de custo que distribui custos de infra para:
 

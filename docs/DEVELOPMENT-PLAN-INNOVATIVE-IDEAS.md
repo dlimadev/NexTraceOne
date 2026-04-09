@@ -997,17 +997,19 @@ PlaybookExecution (entidade)
 
 ---
 
-## Wave F — Executive & FinOps
+## Wave F — Executive & FinOps ✅
 
 > **Prioridade:** 🟢 Exploratória  
-> **Justificativa:** Funcionalidades de alto valor para personas executivas e gestão de custo
+> **Justificativa:** Funcionalidades de alto valor para personas executivas e gestão de custo  
+> **Estado:** ✅ Completa — Todas as 4 ideias implementadas com entidades de domínio, handlers VSA, repositórios, EF configs, testes unitários e RLS configurado.
 
 ---
 
-### Ideia 13 — Team Health Dashboard
+### Ideia 13 — Team Health Dashboard ✅
 
 **Módulo:** Governance  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `TeamHealthSnapshot` com 7 dimensões de saúde, scoring individual e overall (0-100), recompute, 3 handlers VSA, 25+ testes.
 
 #### Backend
 
@@ -1029,10 +1031,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 15 — FinOps por Mudança
+### Ideia 15 — FinOps por Mudança ✅
 
 **Módulo:** Governance (FinOps subdomain) + ChangeGovernance  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `ChangeCostImpact` com cálculo automático de delta/percentagem/direcção, suporte multi-provider, 3 handlers VSA, 24+ testes.
 
 #### Backend
 
@@ -1054,10 +1057,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 18 — Executive Briefing Generator
+### Ideia 18 — Executive Briefing Generator ✅
 
 **Módulo:** Governance + AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `ExecutiveBriefing` com 7 secções JSONB, ciclo de vida (Draft→Published→Archived), frequência configurável, 4 handlers VSA, 26+ testes.
 
 #### Backend
 
@@ -1081,10 +1085,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 28 — Operational Cost Attribution Engine
+### Ideia 28 — Operational Cost Attribution Engine ✅
 
 **Módulo:** Governance (FinOps)  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `CostAttribution` com 5 dimensões, breakdown por tipo de custo, validação de totalização, multi-currency, 3 handlers VSA, 23+ testes.
 
 #### Backend
 

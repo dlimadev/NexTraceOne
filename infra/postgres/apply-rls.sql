@@ -684,9 +684,39 @@ CREATE POLICY tenant_isolation ON ops_resilience_reports
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- ── Wave F: Executive & FinOps (gov_ prefix) ────────────────────────────────
+
+-- gov_team_health_snapshots — Team health dashboard snapshots per tenant
+ALTER TABLE gov_team_health_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_team_health_snapshots;
+CREATE POLICY tenant_isolation ON gov_team_health_snapshots
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_change_cost_impacts — FinOps cost impact per change per tenant
+ALTER TABLE gov_change_cost_impacts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_change_cost_impacts;
+CREATE POLICY tenant_isolation ON gov_change_cost_impacts
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_executive_briefings — Executive briefings per tenant
+ALTER TABLE gov_executive_briefings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_executive_briefings;
+CREATE POLICY tenant_isolation ON gov_executive_briefings
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_cost_attributions — Operational cost attribution per tenant
+ALTER TABLE gov_cost_attributions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_cost_attributions;
+CREATE POLICY tenant_isolation ON gov_cost_attributions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 86 tables covering all major tenant-aware data domains.
+--   RLS enabled on 90 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.
