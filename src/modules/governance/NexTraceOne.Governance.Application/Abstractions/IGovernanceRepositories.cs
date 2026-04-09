@@ -1,5 +1,6 @@
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
+using NexTraceOne.Governance.Domain.SecurityGate.Entities;
 
 namespace NexTraceOne.Governance.Application.Abstractions;
 
@@ -395,4 +396,28 @@ public interface ITechnicalDebtRepository
 
     /// <summary>Atualiza um item de dívida técnica existente.</summary>
     Task UpdateAsync(TechnicalDebtItem item, CancellationToken ct);
+}
+
+/// <summary>
+/// Interface do repositório de ServiceMaturityAssessment para o módulo Governance.
+/// Define operações CRUD e consultas para avaliações de maturidade de serviços.
+/// </summary>
+public interface IServiceMaturityAssessmentRepository
+{
+    /// <summary>Obtém uma avaliação pelo identificador.</summary>
+    Task<ServiceMaturityAssessment?> GetByIdAsync(ServiceMaturityAssessmentId id, CancellationToken ct);
+
+    /// <summary>Obtém a avaliação mais recente de um serviço.</summary>
+    Task<ServiceMaturityAssessment?> GetByServiceIdAsync(Guid serviceId, CancellationToken ct);
+
+    /// <summary>Lista avaliações, opcionalmente filtradas por nível de maturidade.</summary>
+    Task<IReadOnlyList<ServiceMaturityAssessment>> ListAsync(
+        ServiceMaturityLevel? level,
+        CancellationToken ct);
+
+    /// <summary>Adiciona uma nova avaliação.</summary>
+    Task AddAsync(ServiceMaturityAssessment assessment, CancellationToken ct);
+
+    /// <summary>Atualiza uma avaliação existente.</summary>
+    Task UpdateAsync(ServiceMaturityAssessment assessment, CancellationToken ct);
 }

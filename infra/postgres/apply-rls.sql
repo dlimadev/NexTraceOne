@@ -268,6 +268,13 @@ CREATE POLICY tenant_isolation ON ops_incidents
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- ops_incident_narratives — AI-generated incident narratives per tenant
+ALTER TABLE ops_incident_narratives ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_incident_narratives;
+CREATE POLICY tenant_isolation ON ops_incident_narratives
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ops_runbooks — operational runbooks per tenant
 ALTER TABLE ops_runbooks ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS tenant_isolation ON ops_runbooks;
@@ -387,6 +394,13 @@ CREATE POLICY tenant_isolation ON aik_agents
 ALTER TABLE aik_policies ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS tenant_isolation ON aik_policies;
 CREATE POLICY tenant_isolation ON aik_policies
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
+-- aik_gov_feedbacks — AI feedback loop entries per tenant
+ALTER TABLE aik_gov_feedbacks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON aik_gov_feedbacks;
+CREATE POLICY tenant_isolation ON aik_gov_feedbacks
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
@@ -540,9 +554,51 @@ CREATE POLICY tenant_isolation ON ops_chaos_experiments
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- cat_contract_health_scores — contract health scores per tenant
+ALTER TABLE cat_contract_health_scores ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_health_scores;
+CREATE POLICY tenant_isolation ON cat_contract_health_scores
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- chg_change_confidence_events — change confidence timeline events per tenant
+ALTER TABLE chg_change_confidence_events ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON chg_change_confidence_events;
+CREATE POLICY tenant_isolation ON chg_change_confidence_events
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- chg_release_notes — AI-generated release notes per tenant
+ALTER TABLE chg_release_notes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON chg_release_notes;
+CREATE POLICY tenant_isolation ON chg_release_notes
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ops_anomaly_narratives — AI-generated anomaly narratives per tenant
+ALTER TABLE ops_anomaly_narratives ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_anomaly_narratives;
+CREATE POLICY tenant_isolation ON ops_anomaly_narratives
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ops_environment_drift_reports — Environment drift reports per tenant
+ALTER TABLE ops_environment_drift_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_environment_drift_reports;
+CREATE POLICY tenant_isolation ON ops_environment_drift_reports
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_service_maturity_assessments — Service maturity assessments per tenant
+ALTER TABLE gov_service_maturity_assessments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_service_maturity_assessments;
+CREATE POLICY tenant_isolation ON gov_service_maturity_assessments
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 56 tables covering all major tenant-aware data domains.
+--   RLS enabled on 74 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

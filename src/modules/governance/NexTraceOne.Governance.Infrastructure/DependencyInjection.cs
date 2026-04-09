@@ -59,6 +59,9 @@ public static class DependencyInjection
         services.AddScoped<ICustomDashboardRepository, CustomDashboardRepository>();
         services.AddScoped<ITechnicalDebtRepository, TechnicalDebtRepository>();
 
+        // Service Maturity Assessments
+        services.AddScoped<IServiceMaturityAssessmentRepository, ServiceMaturityAssessmentRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();

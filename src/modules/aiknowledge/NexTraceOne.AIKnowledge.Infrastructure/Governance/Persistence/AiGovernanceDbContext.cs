@@ -47,6 +47,9 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AiGuardrail> Guardrails => Set<AiGuardrail>();
     public DbSet<AiEvaluation> Evaluations => Set<AiEvaluation>();
 
+    // ── Phase 6: Feedback Loop ──────────────────────────────────
+    public DbSet<AiFeedback> Feedbacks => Set<AiFeedback>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

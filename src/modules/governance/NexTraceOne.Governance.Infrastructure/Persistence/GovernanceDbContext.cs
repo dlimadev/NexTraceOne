@@ -67,6 +67,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Itens de dívida técnica registados por serviço.</summary>
     public DbSet<TechnicalDebtItem> TechnicalDebtItems => Set<TechnicalDebtItem>();
 
+    /// <summary>Avaliações de maturidade de serviços.</summary>
+    public DbSet<ServiceMaturityAssessment> ServiceMaturityAssessments => Set<ServiceMaturityAssessment>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

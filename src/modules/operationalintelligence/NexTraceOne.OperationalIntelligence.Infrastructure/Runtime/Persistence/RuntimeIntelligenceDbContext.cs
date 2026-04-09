@@ -37,6 +37,12 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Experimentos de chaos engineering planeados e executados.</summary>
     public DbSet<ChaosExperiment> ChaosExperiments => Set<ChaosExperiment>();
 
+    /// <summary>Narrativas de anomalia geradas por IA a partir de drift findings.</summary>
+    public DbSet<AnomalyNarrative> AnomalyNarratives => Set<AnomalyNarrative>();
+
+    /// <summary>Relatórios de drift entre ambientes.</summary>
+    public DbSet<EnvironmentDriftReport> EnvironmentDriftReports => Set<EnvironmentDriftReport>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;

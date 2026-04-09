@@ -73,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<IPromptTemplateRepository, PromptTemplateRepository>();
         services.AddScoped<IAiGuardrailRepository, AiGuardrailRepository>();
         services.AddScoped<IAiEvaluationRepository, AiEvaluationRepository>();
+        services.AddScoped<IAiFeedbackRepository, AiFeedbackRepository>();
         services.AddScoped<IAiModelAuthorizationService, AiModelAuthorizationService>();
         services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
 

@@ -64,4 +64,39 @@ public static class RuntimeIntelligenceErrors
             "RuntimeIntelligence.Tolerance.Invalid",
             "Tolerance percentage ({0}) must be greater than zero.",
             tolerance);
+
+    /// <summary>Narrativa de anomalia não encontrada para o drift finding informado.</summary>
+    public static Error AnomalyNarrativeNotFound(string driftFindingId)
+        => Error.NotFound(
+            "RuntimeIntelligence.AnomalyNarrative.NotFound",
+            "Anomaly narrative for drift finding '{0}' was not found.",
+            driftFindingId);
+
+    /// <summary>Já existe uma narrativa de anomalia para o drift finding informado.</summary>
+    public static Error AnomalyNarrativeAlreadyExists(string driftFindingId)
+        => Error.Conflict(
+            "RuntimeIntelligence.AnomalyNarrative.AlreadyExists",
+            "An anomaly narrative already exists for drift finding '{0}'.",
+            driftFindingId);
+
+    /// <summary>Relatório de drift entre ambientes não encontrado.</summary>
+    public static Error DriftReportNotFound(string reportId)
+        => Error.NotFound(
+            "RuntimeIntelligence.EnvironmentDriftReport.NotFound",
+            "Environment drift report '{0}' was not found.",
+            reportId);
+
+    /// <summary>Relatório de drift já foi revisado anteriormente.</summary>
+    public static Error DriftReportAlreadyReviewed(string reportId)
+        => Error.Conflict(
+            "RuntimeIntelligence.EnvironmentDriftReport.AlreadyReviewed",
+            "Environment drift report '{0}' has already been reviewed.",
+            reportId);
+
+    /// <summary>Relatório de drift já está marcado como stale.</summary>
+    public static Error DriftReportAlreadyStale(string reportId)
+        => Error.Conflict(
+            "RuntimeIntelligence.EnvironmentDriftReport.AlreadyStale",
+            "Environment drift report '{0}' is already marked as stale.",
+            reportId);
 }

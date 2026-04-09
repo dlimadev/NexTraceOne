@@ -80,6 +80,9 @@ public sealed class ContractsDbContext(
     /// <summary>Expectativas de consumidores para Consumer-Driven Contract Testing (CDCT).</summary>
     public DbSet<ConsumerExpectation> ConsumerExpectations => Set<ConsumerExpectation>();
 
+    /// <summary>Scores de saúde contínuos de contratos (API Assets).</summary>
+    public DbSet<ContractHealthScore> ContractHealthScores => Set<ContractHealthScore>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

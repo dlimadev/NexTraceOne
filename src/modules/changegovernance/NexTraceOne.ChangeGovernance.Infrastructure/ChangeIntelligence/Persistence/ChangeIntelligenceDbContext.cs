@@ -54,6 +54,12 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Registos de canary rollout de releases persistidos no módulo ChangeIntelligence.</summary>
     public DbSet<CanaryRollout> CanaryRollouts => Set<CanaryRollout>();
 
+    /// <summary>Eventos de confiança de mudanças (append-only) persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ChangeConfidenceEvent> ChangeConfidenceEvents => Set<ChangeConfidenceEvent>();
+
+    /// <summary>Release notes geradas por IA persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<ReleaseNotes> ReleaseNotes => Set<ReleaseNotes>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

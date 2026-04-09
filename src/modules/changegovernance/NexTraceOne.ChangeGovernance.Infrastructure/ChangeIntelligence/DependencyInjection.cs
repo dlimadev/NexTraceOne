@@ -53,6 +53,8 @@ public static class DependencyInjection
         services.AddScoped<IRollbackAssessmentRepository, RollbackAssessmentRepository>();
         services.AddScoped<IFeatureFlagStateRepository, FeatureFlagStateRepository>();
         services.AddScoped<ICanaryRolloutRepository, CanaryRolloutRepository>();
+        services.AddScoped<IChangeConfidenceEventRepository, ChangeConfidenceEventRepository>();
+        services.AddScoped<IReleaseNotesRepository, ReleaseNotesRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
 

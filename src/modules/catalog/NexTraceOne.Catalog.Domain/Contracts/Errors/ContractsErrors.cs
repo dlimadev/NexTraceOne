@@ -199,6 +199,14 @@ public static class ContractsErrors
     public static Error ConsumerExpectationNotFound(string id)
         => Error.NotFound("Contracts.ConsumerExpectation.NotFound", "Consumer expectation '{0}' was not found.", id);
 
+    /// <summary>Score de saúde de contrato não encontrado para o API Asset informado.</summary>
+    public static Error ContractHealthScoreNotFound(string apiAssetId)
+        => Error.NotFound("Contracts.HealthScore.NotFound", "Contract health score not found for API asset '{0}'.", apiAssetId);
+
+    /// <summary>Nenhuma versão de contrato encontrada para calcular o score de saúde.</summary>
+    public static Error NoVersionsForHealthScore(string apiAssetId)
+        => Error.NotFound("Contracts.HealthScore.NoVersions", "No contract versions found for API asset '{0}' to compute health score.", apiAssetId);
+
     /// <summary>Formato de exportação não suportado.</summary>
     public static Error UnsupportedExportFormat(string format)
         => Error.Validation("Contracts.Export.UnsupportedFormat", "Export format '{0}' is not supported.", format);
