@@ -33,6 +33,9 @@ public sealed class KnowledgeDbContext(
     /// <summary>Relações entre objectos de conhecimento e outros contextos do sistema.</summary>
     public DbSet<KnowledgeRelation> KnowledgeRelations => Set<KnowledgeRelation>();
 
+    /// <summary>Snapshots do knowledge graph operacional.</summary>
+    public DbSet<KnowledgeGraphSnapshot> KnowledgeGraphSnapshots => Set<KnowledgeGraphSnapshot>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(KnowledgeDbContext).Assembly;
 
