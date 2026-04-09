@@ -99,4 +99,32 @@ public static class RuntimeIntelligenceErrors
             "RuntimeIntelligence.EnvironmentDriftReport.AlreadyStale",
             "Environment drift report '{0}' is already marked as stale.",
             reportId);
+
+    /// <summary>Playbook operacional não encontrado pelo identificador informado.</summary>
+    public static Error PlaybookNotFound(string id)
+        => Error.NotFound(
+            "RuntimeIntelligence.OperationalPlaybook.NotFound",
+            "Operational playbook '{0}' was not found.",
+            id);
+
+    /// <summary>Transição de estado inválida para o playbook operacional.</summary>
+    public static Error PlaybookInvalidTransition(string id, string from, string to)
+        => Error.Validation(
+            "RuntimeIntelligence.OperationalPlaybook.InvalidTransition",
+            "Cannot transition playbook '{0}' from '{1}' to '{2}'.",
+            id, from, to);
+
+    /// <summary>Execução de playbook não encontrada pelo identificador informado.</summary>
+    public static Error PlaybookExecutionNotFound(string id)
+        => Error.NotFound(
+            "RuntimeIntelligence.PlaybookExecution.NotFound",
+            "Playbook execution '{0}' was not found.",
+            id);
+
+    /// <summary>Playbook não está ativo — apenas playbooks ativos podem ser executados.</summary>
+    public static Error PlaybookNotActive(string id)
+        => Error.Validation(
+            "RuntimeIntelligence.OperationalPlaybook.NotActive",
+            "Playbook '{0}' is not active. Only active playbooks can be executed.",
+            id);
 }

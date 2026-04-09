@@ -43,6 +43,12 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Relatórios de drift entre ambientes.</summary>
     public DbSet<EnvironmentDriftReport> EnvironmentDriftReports => Set<EnvironmentDriftReport>();
 
+    /// <summary>Playbooks operacionais estruturados e versionáveis.</summary>
+    public DbSet<OperationalPlaybook> OperationalPlaybooks => Set<OperationalPlaybook>();
+
+    /// <summary>Registos de execução de playbooks operacionais.</summary>
+    public DbSet<PlaybookExecution> PlaybookExecutions => Set<PlaybookExecution>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;
