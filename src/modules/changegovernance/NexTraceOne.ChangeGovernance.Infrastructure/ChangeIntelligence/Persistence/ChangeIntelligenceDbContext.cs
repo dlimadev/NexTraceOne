@@ -60,6 +60,12 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Release notes geradas por IA persistidas no módulo ChangeIntelligence.</summary>
     public DbSet<ReleaseNotes> ReleaseNotes => Set<ReleaseNotes>();
 
+    /// <summary>Gates de promoção configuráveis persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<PromotionGate> PromotionGates => Set<PromotionGate>();
+
+    /// <summary>Avaliações de gates de promoção persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<PromotionGateEvaluation> PromotionGateEvaluations => Set<PromotionGateEvaluation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;
