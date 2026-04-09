@@ -596,9 +596,23 @@ CREATE POLICY tenant_isolation ON gov_service_maturity_assessments
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- knw_knowledge_graph_snapshots — Knowledge graph snapshots per tenant
+ALTER TABLE knw_knowledge_graph_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON knw_knowledge_graph_snapshots;
+CREATE POLICY tenant_isolation ON knw_knowledge_graph_snapshots
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ops_reliability_incident_prediction_patterns — Incident prediction patterns per tenant
+ALTER TABLE ops_reliability_incident_prediction_patterns ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_reliability_incident_prediction_patterns;
+CREATE POLICY tenant_isolation ON ops_reliability_incident_prediction_patterns
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 74 tables covering all major tenant-aware data domains.
+--   RLS enabled on 76 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

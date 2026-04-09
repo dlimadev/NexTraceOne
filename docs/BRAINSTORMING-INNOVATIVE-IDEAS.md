@@ -123,10 +123,11 @@ Vai além do diff textual — entende a semântica da mudança.
 
 ---
 
-### 💡 Ideia 6 — Operational Knowledge Graph
+### ✅ Ideia 6 — Operational Knowledge Graph
 
 **Pilar:** Source of Truth  
 **Persona:** Todas  
+**Estado:** ✅ Implementado (Wave C) — Entidade `KnowledgeGraphSnapshot` com métricas de grafo (TotalNodes, TotalEdges, ConnectedComponents, IsolatedNodes, CoverageScore), distribuições JSONB por tipo de nó/aresta, entidades top conectadas, entidades órfãs, recomendações. Enum `KnowledgeGraphSnapshotStatus` (Generated/Reviewed/Stale). Handlers `BuildKnowledgeGraphSnapshot`, `GetKnowledgeGraphSnapshot`, `ListKnowledgeGraphSnapshots`. 25 testes, RLS configurado. Complementa o `GetKnowledgeGraphOverview` dinâmico existente com snapshots persistidos para tracking histórico.
 
 Construir um **knowledge graph** que conecta todas as entidades do NexTraceOne:
 
@@ -237,10 +238,11 @@ Um "marketplace" interno onde equipas podem:
 
 ---
 
-### 💡 Ideia 12 — Predictive Incident Prevention
+### ✅ Ideia 12 — Predictive Incident Prevention
 
 **Pilar:** Operational Intelligence  
 **Persona:** Tech Lead, Platform Admin  
+**Estado:** ✅ Implementado (Wave C) — Entidade `IncidentPredictionPattern` com 6 tipos de padrão (DeployTiming, ContractChange, ServiceCorrelation, DeployFrequency, ChangeRegression, MetricDegradation), métricas de confiança (ConfidencePercent, OccurrenceCount, SampleSize), evidências e condições de trigger (JSONB), recomendações de prevenção. Enum `PredictionPatternStatus` (Detected/Confirmed/Dismissed/Stale), `PredictionPatternType`, `PredictionSeverity`. Severidade auto-computada por confiança (≥80→Critical, ≥60→High, ≥40→Medium, <40→Low). Handlers `AnalyzePredictivePatterns`, `GetIncidentPredictionPattern`, `ListIncidentPredictionPatterns`. 32 testes, RLS configurado.
 
 Sistema que analisa padrões históricos para prever incidentes:
 

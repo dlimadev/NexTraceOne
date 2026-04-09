@@ -4,7 +4,7 @@
 > **Referência:** [BRAINSTORMING-INNOVATIVE-IDEAS.md](./BRAINSTORMING-INNOVATIVE-IDEAS.md)  
 > **Arquitetura:** Modular Monolith — .NET 10 + React 18 + PostgreSQL 16  
 > **Módulos existentes:** Catalog, ChangeGovernance, OperationalIntelligence, AIKnowledge, Governance, Configuration, IdentityAccess, AuditCompliance, Integrations, Knowledge, Notifications, ProductAnalytics  
-> **Última actualização:** 2026-04-09 — Wave A+B completa + Wave C parcial: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 8, 25 (Wave C) implementadas (backend + testes)
+> **Última actualização:** 2026-04-09 — Wave A+B completa + Wave C completa: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 6, 8, 12, 25 (Wave C) implementadas (backend + testes)
 
 ---
 
@@ -482,22 +482,49 @@ AiKnowledgeEntry (entidade — evolução)
 
 ---
 
-### Ideia 6 — Operational Knowledge Graph
+### ✅ Ideia 6 — Operational Knowledge Graph
 
-**Módulo:** Knowledge + Cross-module  
-**Complexidade:** 🔴 Alta
+**Módulo:** Knowledge  
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 25 testes passando
+
+#### Entidades de Domínio
+
+```
+KnowledgeGraphSnapshot (entidade)
+  - KnowledgeGraphSnapshotId (strongly typed ID)
+  - TotalNodes, TotalEdges, ConnectedComponents, IsolatedNodes
+  - CoverageScore (0-100)
+  - NodeTypeDistribution (JSONB)
+  - EdgeTypeDistribution (JSONB)
+  - TopConnectedEntities (JSONB)
+  - OrphanEntities (JSONB)
+  - Recommendations (JSONB)
+  - Status: Generated → Reviewed | Stale
+  - TenantId
+
+KnowledgeGraphSnapshotStatus (enum)
+  - Generated, Reviewed, Stale
+```
 
 #### Backend
 
-| Componente | Descrição |
-|-----------|-----------|
-| **Entidade** | `KnowledgeGraphNode`, `KnowledgeGraphEdge` — representação genérica |
-| **Builder** | `KnowledgeGraphBuilder` — constrói graph a partir de todas as entidades |
-| **Cross-module** | Consulta: Catalog (serviços, contratos, dependências), ChangeGovernance (mudanças, deploys), OI (incidentes), Knowledge (runbooks, docs) |
-| **Query** | `GetGraphNeighborhood` — subgraph centrado numa entidade |
-| **Query** | `SearchGraph` — pesquisa por entidade/relação |
-| **AI Integration** | Graph como fonte de contexto para grounding |
-| **Background Job** | `KnowledgeGraphRebuildJob` — reconstrói periodicamente |
+| Componente | Descrição | Estado |
+|-----------|-----------|-------|
+| **Entidade** | `KnowledgeGraphSnapshot` — snapshot persistido do graph | ✅ |
+| **Enum** | `KnowledgeGraphSnapshotStatus` | ✅ |
+| **Repositório** | `IKnowledgeGraphSnapshotRepository` / `KnowledgeGraphSnapshotRepository` | ✅ |
+| **Command** | `BuildKnowledgeGraphSnapshot` — gera snapshot com métricas | ✅ |
+| **Query** | `GetKnowledgeGraphSnapshot` — obtém snapshot por ID | ✅ |
+| **Query** | `ListKnowledgeGraphSnapshots` — lista snapshots com filtro por status | ✅ |
+| **EF Config** | `KnowledgeGraphSnapshotConfiguration` — tabela `knw_knowledge_graph_snapshots` | ✅ |
+| **DbContext** | `KnowledgeDbContext` atualizado com `DbSet<KnowledgeGraphSnapshot>` | ✅ |
+| **DI** | Repositório registado no container | ✅ |
+| **RLS** | Tenant isolation em `knw_knowledge_graph_snapshots` | ✅ |
+| **Testes** | 25 testes (domain + application) | ✅ |
+
+#### Nota
+Complementa o `GetKnowledgeGraphOverview` dinâmico existente com snapshots persistidos para tracking histórico de evolução da conectividade e cobertura.
 
 #### Frontend
 
@@ -566,21 +593,49 @@ EnvironmentDriftReport (entidade)
 
 ---
 
-### Ideia 12 — Predictive Incident Prevention
+### ✅ Ideia 12 — Predictive Incident Prevention
 
-**Módulo:** OperationalIntelligence + AIKnowledge  
-**Complexidade:** 🔴 Alta
+**Módulo:** OperationalIntelligence (Reliability subdomain)  
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 32 testes passando
+
+#### Entidades de Domínio
+
+```
+IncidentPredictionPattern (entidade)
+  - IncidentPredictionPatternId (strongly typed ID)
+  - PatternName, Description
+  - PatternType: DeployTiming | ContractChange | ServiceCorrelation | DeployFrequency | ChangeRegression | MetricDegradation
+  - ServiceId, ServiceName (opcionais)
+  - Environment
+  - ConfidencePercent (0-100), OccurrenceCount, SampleSize
+  - Evidence (JSONB), TriggerConditions (JSONB)
+  - PreventionRecommendations (JSONB)
+  - Severity: Low | Medium | High | Critical (auto-computada por confiança)
+  - Status: Detected → Confirmed | Dismissed | Stale
+  - DetectedAt, ValidatedAt, ValidationComment
+  - TenantId
+
+PredictionPatternType (enum) — 6 tipos
+PredictionPatternStatus (enum) — 4 estados
+PredictionSeverity (enum) — 4 níveis
+```
 
 #### Backend
 
-| Componente | Descrição |
-|-----------|-----------|
-| **Feature** | `AnalyzePredictivePatterns` — analisa histórico para identificar padrões |
-| **AI Integration** | ML/NLP para correlação temporal: deploy × dia × serviço × incidente |
-| **Rules Engine** | Pattern matching: "3 de 5 deploys na sexta geraram incidente" |
-| **Alert** | `PredictiveIncidentAlert` — alerta preventivo com contexto |
-| **Storage** | `PredictivePattern` entidade com evidence histórica |
-| **Background Job** | `PredictiveAnalysisJob` — execução diária |
+| Componente | Descrição | Estado |
+|-----------|-----------|-------|
+| **Entidade** | `IncidentPredictionPattern` — padrão preditivo baseado em dados históricos | ✅ |
+| **Enums** | `PredictionPatternType`, `PredictionPatternStatus`, `PredictionSeverity` | ✅ |
+| **Repositório** | `IIncidentPredictionPatternRepository` / `IncidentPredictionPatternRepository` | ✅ |
+| **Command** | `AnalyzePredictivePatterns` — regista padrão preditivo com severidade auto-computada | ✅ |
+| **Query** | `GetIncidentPredictionPattern` — obtém padrão por ID | ✅ |
+| **Query** | `ListIncidentPredictionPatterns` — lista com filtros (environment, status, type) | ✅ |
+| **EF Config** | `IncidentPredictionPatternConfiguration` — tabela `ops_reliability_incident_prediction_patterns` | ✅ |
+| **DbContext** | `ReliabilityDbContext` atualizado com `DbSet<IncidentPredictionPattern>` | ✅ |
+| **DI** | Repositório registado no container | ✅ |
+| **RLS** | Tenant isolation em `ops_reliability_incident_prediction_patterns` | ✅ |
+| **Testes** | 32 testes (domain + application) | ✅ |
 
 #### Frontend
 

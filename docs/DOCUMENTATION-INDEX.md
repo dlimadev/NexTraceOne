@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-09 — Wave C parcial: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 8, 25 (Wave C) concluídas (backend + 266 testes)
+> **Última actualização:** 2026-04-09 — Wave C completa: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 6, 8, 12, 25 (Wave C) concluídas (backend + 323 testes novos)
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
