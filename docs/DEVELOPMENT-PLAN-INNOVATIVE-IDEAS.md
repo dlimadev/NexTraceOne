@@ -703,17 +703,19 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-## Wave D — Developer Experience
+## Wave D — Developer Experience ✅
 
 > **Prioridade:** 🟡 Média  
-> **Justificativa:** Acelera developers e melhora colaboração entre equipas
+> **Justificativa:** Acelera developers e melhora colaboração entre equipas  
+> **Estado:** ✅ Completa — Todas as 4 ideias implementadas com entidades de domínio, handlers VSA, repositórios, EF configs, testes unitários e RLS configurado.
 
 ---
 
-### Ideia 14 — Contract-to-Code Pipeline Automatizado
+### Ideia 14 — Contract-to-Code Pipeline Automatizado ✅
 
 **Módulo:** Catalog + AIKnowledge  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `PipelineExecution` com 6 estágios, estado de execução (Pending→Running→Completed/Failed/PartiallyCompleted), JSONB para stages/results/artifacts, handlers VSA, 21+ testes.
 
 #### Backend
 
@@ -741,10 +743,11 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-### Ideia 19 — AI Pair Programming Governado
+### Ideia 19 — AI Pair Programming Governado ✅
 
 **Módulo:** AIKnowledge + Integrations (IDE Extensions)  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `IdeQuerySession` com 6 tipos de query, 4 estados, tracking de tokens (prompt/completion/total), JSONB para contexto e governance checks, handlers VSA, 68+ testes.
 
 #### Backend
 
@@ -769,10 +772,11 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-### Ideia 24 — AI-Powered Onboarding Companion
+### Ideia 24 — AI-Powered Onboarding Companion ✅
 
 **Módulo:** AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `OnboardingSession` com 4 níveis de experiência, tracking de progresso (checklist, serviços, contratos, runbooks, interações IA), handlers VSA, 48+ testes.
 
 #### Backend
 
@@ -797,10 +801,11 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-### Ideia 26 — Cross-Team Contract Negotiation Workspace
+### Ideia 26 — Cross-Team Contract Negotiation Workspace ✅
 
 **Módulo:** Catalog (Contract)  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidades `ContractNegotiation` + `NegotiationComment` com máquina de estados (Draft→InReview→Negotiating→Approved/Rejected), inline comments, handlers VSA, 45+ testes.
 
 #### Entidades de Domínio
 

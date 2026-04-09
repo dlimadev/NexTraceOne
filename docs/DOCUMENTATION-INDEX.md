@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-09 — Wave C completa: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 6, 8, 12, 25 (Wave C) concluídas (backend + 323 testes novos)
+> **Última actualização:** 2026-04-09 — Wave D completa: Ideias 14, 19, 24, 26 (Wave D — Developer Experience) concluídas. Total: 14 ideias implementadas (Waves A+B+C+D). RLS actualizado para 81 tabelas.
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -12,8 +12,8 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
 | [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** — 6.1 Unit Tests ✅, 6.2 E2E Tests ✅ |
-| [`BRAINSTORMING-INNOVATIVE-IDEAS.md`](BRAINSTORMING-INNOVATIVE-IDEAS.md) | **29 ideias inovadoras** — aprovadas |
-| [`DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md`](DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md) | **Plano de desenvolvimento** — 29 ideias em 7 Waves |
+| [`BRAINSTORMING-INNOVATIVE-IDEAS.md`](BRAINSTORMING-INNOVATIVE-IDEAS.md) | **29 ideias inovadoras** — 14 implementadas (Waves A–D ✅) |
+| [`DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md`](DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md) | **Plano de desenvolvimento** — 29 ideias em 7 Waves (A–D ✅, E–G pendentes) |
 | [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](PLATFORM-CUSTOMIZATION-EVOLUTION.md) | **Plano de evolução de customização da plataforma** — Fases 1-8 ✅ COMPLETO |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |

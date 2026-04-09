@@ -610,9 +610,46 @@ CREATE POLICY tenant_isolation ON ops_reliability_incident_prediction_patterns
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- ── Wave D: Developer Experience (cat_ and ai_ prefixes) ─────────────────────
+
+-- cat_pipeline_executions — Contract-to-code pipeline executions per tenant
+ALTER TABLE cat_pipeline_executions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_pipeline_executions;
+CREATE POLICY tenant_isolation ON cat_pipeline_executions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_contract_negotiations — Cross-team contract negotiations per tenant
+ALTER TABLE cat_contract_negotiations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_negotiations;
+CREATE POLICY tenant_isolation ON cat_contract_negotiations
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_negotiation_comments — Negotiation comments per tenant
+ALTER TABLE cat_negotiation_comments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_negotiation_comments;
+CREATE POLICY tenant_isolation ON cat_negotiation_comments
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ai_onboarding_sessions — AI-powered onboarding sessions per tenant
+ALTER TABLE ai_onboarding_sessions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ai_onboarding_sessions;
+CREATE POLICY tenant_isolation ON ai_onboarding_sessions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ai_ide_query_sessions — IDE pair programming query sessions per tenant
+ALTER TABLE ai_ide_query_sessions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ai_ide_query_sessions;
+CREATE POLICY tenant_isolation ON ai_ide_query_sessions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 76 tables covering all major tenant-aware data domains.
+--   RLS enabled on 81 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

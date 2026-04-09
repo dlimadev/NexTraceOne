@@ -277,10 +277,11 @@ Permite comparação entre equipas (sem ranking público) e evolução temporal.
 
 ---
 
-### 💡 Ideia 14 — Contract-to-Code Pipeline Automatizado
+### ✅ Ideia 14 — Contract-to-Code Pipeline Automatizado
 
 **Pilar:** Contract Governance + AI  
 **Persona:** Engineer  
+**Estado:** ✅ Implementado (Wave D) — Entidade `PipelineExecution` com 6 estágios (ServerStubs, ClientSdk, MockServer, PostmanCollection, ContractTests, FitnessValidation), enum `PipelineExecutionStatus` (Pending/Running/Completed/Failed/PartiallyCompleted), handlers `ExecuteContractPipeline`, `GetPipelineExecution`, `ListPipelineExecutions`, testes, RLS configurado.
 
 Pipeline que, a partir de um contrato OpenAPI/AsyncAPI/WSDL:
 
@@ -372,10 +373,11 @@ Formato: sumário executivo + detalhes sob demanda + gráficos.
 
 ---
 
-### 💡 Ideia 19 — AI Pair Programming Governado
+### ✅ Ideia 19 — AI Pair Programming Governado
 
 **Pilar:** AI Governance + Developer Acceleration  
 **Persona:** Engineer  
+**Estado:** ✅ Implementado (Wave D) — Entidade `IdeQuerySession` com 6 tipos de query (ContractSuggestion, BreakingChangeAlert, OwnershipLookup, TestGeneration, GeneralQuery, CodeGeneration), enum `IdeQuerySessionStatus` (Processing/Responded/Blocked/Failed), tracking de tokens (prompt/completion/total), handlers `SubmitIdeQuery`, `GetIdeQuerySession`, `ListIdeQuerySessions`, testes, RLS configurado.
 
 Experiência de pair programming com IA dentro do IDE (VS Code / Visual Studio):
 
@@ -475,10 +477,11 @@ Radar contínuo que analisa todas as dependências de todos os serviços e:
 
 ---
 
-### 💡 Ideia 24 — AI-Powered Onboarding Companion
+### ✅ Ideia 24 — AI-Powered Onboarding Companion
 
 **Pilar:** AI Governance + Developer Acceleration  
 **Persona:** Engineer (novo na equipa)  
+**Estado:** ✅ Implementado (Wave D) — Entidade `OnboardingSession` com 4 níveis de experiência (Junior/Mid/Senior/Expert), enum `OnboardingSessionStatus` (Active/Completed/Abandoned), tracking de progresso (checklist, serviços explorados, contratos revistos, runbooks lidos, interações IA), handlers `StartOnboardingSession`, `GetOnboardingSession`, `ListOnboardingSessions`, testes, RLS configurado.
 
 Agente de IA especializado em onboarding que:
 
@@ -517,10 +520,11 @@ O tracker mostra evolução temporal de cada serviço, permite filtrar por equip
 
 ---
 
-### 💡 Ideia 26 — Cross-Team Contract Negotiation Workspace
+### ✅ Ideia 26 — Cross-Team Contract Negotiation Workspace
 
 **Pilar:** Contract Governance + Source of Truth  
 **Persona:** Engineer, Tech Lead, Architect  
+**Estado:** ✅ Implementado (Wave D) — Entidades `ContractNegotiation` + `NegotiationComment` com máquina de estados (Draft→InReview→Negotiating→Approved/Rejected), inline comments com LineReference, handlers `CreateContractNegotiation`, `AddNegotiationComment`, `GetContractNegotiation`, `ListContractNegotiations`, testes, RLS configurado.
 
 Workspace colaborativo para negociação de contratos entre equipas:
 
