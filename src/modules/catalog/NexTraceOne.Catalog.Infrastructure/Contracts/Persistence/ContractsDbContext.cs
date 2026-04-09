@@ -92,6 +92,9 @@ public sealed class ContractsDbContext(
     /// <summary>Comentários em negociações de contratos para revisão colaborativa.</summary>
     public DbSet<NegotiationComment> NegotiationComments => Set<NegotiationComment>();
 
+    /// <summary>Análises de evolução de schema entre versões de contratos (API Assets).</summary>
+    public DbSet<SchemaEvolutionAdvice> SchemaEvolutionAdvices => Set<SchemaEvolutionAdvice>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

@@ -226,5 +226,11 @@ public static class ContractsErrors
     /// <summary>Transição de estado de negociação inválida.</summary>
     public static Error NegotiationInvalidStatusTransition(string from, string to)
         => Error.Business("Contracts.Negotiation.InvalidTransition", "Cannot transition negotiation from '{0}' to '{1}'.", from, to);
+
+    // ── SchemaEvolutionAdvice ────────────────────────────────────────
+
+    /// <summary>Análise de evolução de schema não encontrada.</summary>
+    public static Error SchemaEvolutionAdviceNotFound(string id)
+        => Error.NotFound("Contracts.SchemaEvolutionAdvice.NotFound", "Schema evolution advice '{0}' was not found.", id);
 }
 
