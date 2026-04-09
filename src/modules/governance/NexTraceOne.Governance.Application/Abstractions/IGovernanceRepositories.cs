@@ -487,3 +487,30 @@ public interface IExecutiveBriefingRepository
     /// <summary>Atualiza um briefing existente.</summary>
     Task UpdateAsync(ExecutiveBriefing briefing, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de CostAttribution para o módulo Governance.
+/// Define operações CRUD e consultas para atribuição de custo operacional por dimensão.
+/// </summary>
+public interface ICostAttributionRepository
+{
+    /// <summary>Obtém uma atribuição de custo pelo seu identificador.</summary>
+    Task<CostAttribution?> GetByIdAsync(CostAttributionId id, CancellationToken ct);
+
+    /// <summary>Lista atribuições de custo por dimensão, opcionalmente filtradas por período.</summary>
+    Task<IReadOnlyList<CostAttribution>> ListByDimensionAsync(
+        CostAttributionDimension dimension,
+        DateTimeOffset? periodStart,
+        DateTimeOffset? periodEnd,
+        CancellationToken ct);
+
+    /// <summary>Obtém os N registos com maior custo total para uma dimensão, opcionalmente até uma data limite.</summary>
+    Task<IReadOnlyList<CostAttribution>> GetTopByDimensionAsync(
+        CostAttributionDimension dimension,
+        int top,
+        DateTimeOffset? periodEnd,
+        CancellationToken ct);
+
+    /// <summary>Adiciona uma nova atribuição de custo ao repositório.</summary>
+    Task AddAsync(CostAttribution attribution, CancellationToken ct);
+}

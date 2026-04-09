@@ -71,6 +71,9 @@ public static class DependencyInjection
         // Executive Briefings
         services.AddScoped<IExecutiveBriefingRepository, ExecutiveBriefingRepository>();
 
+        // Cost Attributions (FinOps contextual)
+        services.AddScoped<ICostAttributionRepository, CostAttributionRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();

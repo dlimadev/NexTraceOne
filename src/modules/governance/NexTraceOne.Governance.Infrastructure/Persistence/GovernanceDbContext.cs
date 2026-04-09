@@ -79,6 +79,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Briefings executivos gerados por IA.</summary>
     public DbSet<ExecutiveBriefing> ExecutiveBriefings => Set<ExecutiveBriefing>();
 
+    /// <summary>Atribuições de custo operacional por dimensão (FinOps contextual).</summary>
+    public DbSet<CostAttribution> CostAttributions => Set<CostAttribution>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 
