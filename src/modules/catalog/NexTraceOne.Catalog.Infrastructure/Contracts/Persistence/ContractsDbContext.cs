@@ -86,6 +86,12 @@ public sealed class ContractsDbContext(
     /// <summary>Execuções de pipeline de geração de código a partir de contratos.</summary>
     public DbSet<PipelineExecution> PipelineExecutions => Set<PipelineExecution>();
 
+    /// <summary>Negociações cross-team de contratos para aprovação colaborativa.</summary>
+    public DbSet<ContractNegotiation> ContractNegotiations => Set<ContractNegotiation>();
+
+    /// <summary>Comentários em negociações de contratos para revisão colaborativa.</summary>
+    public DbSet<NegotiationComment> NegotiationComments => Set<NegotiationComment>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
