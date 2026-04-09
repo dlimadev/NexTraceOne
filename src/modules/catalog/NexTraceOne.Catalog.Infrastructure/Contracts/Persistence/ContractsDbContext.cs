@@ -98,6 +98,12 @@ public sealed class ContractsDbContext(
     /// <summary>Resultados de diff semântico assistido por IA entre versões de contrato.</summary>
     public DbSet<SemanticDiffResult> SemanticDiffResults => Set<SemanticDiffResult>();
 
+    /// <summary>Gates de compliance contratual configuráveis por organização, equipa ou ambiente.</summary>
+    public DbSet<ContractComplianceGate> ContractComplianceGates => Set<ContractComplianceGate>();
+
+    /// <summary>Resultados de avaliação de compliance contratual contra gates configurados.</summary>
+    public DbSet<ContractComplianceResult> ContractComplianceResults => Set<ContractComplianceResult>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
