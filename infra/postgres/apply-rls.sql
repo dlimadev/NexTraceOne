@@ -584,7 +584,7 @@ CREATE POLICY tenant_isolation ON ops_anomaly_narratives
 
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 58 tables covering all major tenant-aware data domains.
+--   RLS enabled on 72 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

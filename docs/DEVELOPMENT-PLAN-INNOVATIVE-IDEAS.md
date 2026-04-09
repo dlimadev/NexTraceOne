@@ -4,7 +4,7 @@
 > **Referência:** [BRAINSTORMING-INNOVATIVE-IDEAS.md](./BRAINSTORMING-INNOVATIVE-IDEAS.md)  
 > **Arquitetura:** Modular Monolith — .NET 10 + React 18 + PostgreSQL 16  
 > **Módulos existentes:** Catalog, ChangeGovernance, OperationalIntelligence, AIKnowledge, Governance, Configuration, IdentityAccess, AuditCompliance, Integrations, Knowledge, Notifications, ProductAnalytics  
-> **Última actualização:** 2026-04-08 — Wave A+B em progresso: Ideias 1, 2 (Wave A) e 3, 29 (Wave B) implementadas (backend + testes)
+> **Última actualização:** 2026-04-09 — Wave A+B completa: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B) implementadas (backend + testes)
 
 ---
 
@@ -327,10 +327,32 @@ ContractComplianceResult (entidade)
 
 ---
 
-### Ideia 10 — AI-Generated Release Notes
+### ✅ Ideia 10 — AI-Generated Release Notes
 
 **Módulo:** ChangeGovernance + AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 29 testes passando
+
+#### Entidades de Domínio
+
+```
+ReleaseNotes (entidade)
+├── ReleaseId (FK)
+├── TechnicalSummary (string)
+├── ExecutiveSummary (string?)
+├── NewEndpointsSection (string?)
+├── BreakingChangesSection (string?)
+├── AffectedServicesSection (string?)
+├── ConfidenceMetricsSection (string?)
+├── EvidenceLinksSection (string?)
+├── ModelUsed (string)
+├── TokensUsed (int)
+├── Status (ReleaseNotesStatus: Draft/Published/Archived)
+├── TenantId (Guid?)
+├── GeneratedAt
+├── LastRegeneratedAt
+└── RegenerationCount
+```
 
 #### Backend
 
@@ -353,10 +375,32 @@ ContractComplianceResult (entidade)
 
 ---
 
-### Ideia 16 — Observability Anomaly Narratives
+### ✅ Ideia 16 — Observability Anomaly Narratives
 
 **Módulo:** OperationalIntelligence + AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 31 testes passando
+
+#### Entidades de Domínio
+
+```
+AnomalyNarrative (entidade)
+├── DriftFindingId (FK)
+├── NarrativeText (string)
+├── SymptomsSection (string?)
+├── BaselineComparisonSection (string?)
+├── ProbableCauseSection (string?)
+├── CorrelatedChangesSection (string?)
+├── RecommendedActionsSection (string?)
+├── SeverityJustificationSection (string?)
+├── ModelUsed (string)
+├── TokensUsed (int)
+├── Status (AnomalyNarrativeStatus: Draft/Published/Stale)
+├── TenantId (Guid?)
+├── GeneratedAt
+├── LastRefreshedAt
+└── RefreshCount
+```
 
 #### Backend
 

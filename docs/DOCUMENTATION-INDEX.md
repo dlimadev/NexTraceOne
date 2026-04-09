@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-08 — Implementação Wave A+B: Ideias 1, 2 (Wave A) e 3, 29 (Wave B) concluídas (backend + 145 testes)
+> **Última actualização:** 2026-04-09 — Wave B completa: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B) concluídas (backend + 205 testes)
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 

@@ -3,7 +3,7 @@
 > **Data:** Abril 2026  
 > **Estado:** 🟢 Ideias aprovadas — plano de desenvolvimento em [DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md](./DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md)  
 > **Referência:** [PRODUCT-VISION.md](./PRODUCT-VISION.md), [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)  
-> **Última actualização:** 2026-04-08 — Implementação Wave A+B (Ideias 1, 2, 3, 29 concluídas)
+> **Última actualização:** 2026-04-09 — Wave B completa (Ideias 1, 2, 3, 10, 16, 29 concluídas)
 
 ---
 
@@ -198,10 +198,11 @@ A decisão de promover/bloquear é transparente — o utilizador vê exatamente 
 
 ---
 
-### 💡 Ideia 10 — AI-Generated Release Notes
+### ✅ Ideia 10 — AI-Generated Release Notes
 
 **Pilar:** AI-assisted Operations  
 **Persona:** Product, Tech Lead  
+**Estado:** ✅ Implementado (Wave B) — Entidade `ReleaseNotes` com 7 secções (TechnicalSummary, ExecutiveSummary, NewEndpoints, BreakingChanges, AffectedServices, ConfidenceMetrics, EvidenceLinks), enum `ReleaseNotesStatus` (Draft/Published/Archived), handlers `GenerateReleaseNotes`, `GetReleaseNotes`, `RegenerateReleaseNotes`, 29 testes, RLS configurado.
 
 Para cada release, a IA gera automaticamente:
 
@@ -312,10 +313,11 @@ Combina dados de custo cloud com timeline de mudanças do NexTraceOne.
 
 ---
 
-### 💡 Ideia 16 — Observability Anomaly Narratives
+### ✅ Ideia 16 — Observability Anomaly Narratives
 
 **Pilar:** Operational Intelligence  
 **Persona:** Engineer  
+**Estado:** ✅ Implementado (Wave B) — Entidade `AnomalyNarrative` com 6 secções (Symptoms, BaselineComparison, ProbableCause, CorrelatedChanges, RecommendedActions, SeverityJustification), enum `AnomalyNarrativeStatus` (Draft/Published/Stale), handlers `GenerateAnomalyNarrative`, `GetAnomalyNarrative`, `RefreshAnomalyNarrative`, 31 testes, RLS configurado.
 
 Quando uma anomalia é detectada na telemetria:
 
