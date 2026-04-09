@@ -421,3 +421,25 @@ public interface IServiceMaturityAssessmentRepository
     /// <summary>Atualiza uma avaliação existente.</summary>
     Task UpdateAsync(ServiceMaturityAssessment assessment, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de TeamHealthSnapshot para o módulo Governance.
+/// Define operações CRUD e consultas para snapshots de saúde de equipas.
+/// </summary>
+public interface ITeamHealthSnapshotRepository
+{
+    /// <summary>Obtém um snapshot pelo identificador.</summary>
+    Task<TeamHealthSnapshot?> GetByIdAsync(TeamHealthSnapshotId id, CancellationToken ct);
+
+    /// <summary>Obtém o snapshot mais recente de uma equipa.</summary>
+    Task<TeamHealthSnapshot?> GetByTeamIdAsync(Guid teamId, CancellationToken ct);
+
+    /// <summary>Lista snapshots, opcionalmente filtrados por score mínimo.</summary>
+    Task<IReadOnlyList<TeamHealthSnapshot>> ListAsync(int? minOverallScore, CancellationToken ct);
+
+    /// <summary>Adiciona um novo snapshot.</summary>
+    Task AddAsync(TeamHealthSnapshot snapshot, CancellationToken ct);
+
+    /// <summary>Atualiza um snapshot existente.</summary>
+    Task UpdateAsync(TeamHealthSnapshot snapshot, CancellationToken ct);
+}
