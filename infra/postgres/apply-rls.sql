@@ -589,9 +589,16 @@ CREATE POLICY tenant_isolation ON ops_environment_drift_reports
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- gov_service_maturity_assessments — Service maturity assessments per tenant
+ALTER TABLE gov_service_maturity_assessments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_service_maturity_assessments;
+CREATE POLICY tenant_isolation ON gov_service_maturity_assessments
+    USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 73 tables covering all major tenant-aware data domains.
+--   RLS enabled on 74 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.
