@@ -55,6 +55,9 @@ public static class DependencyInjection
         // Ideia 12 — Predictive Incident Prevention: padrões preditivos de incidentes
         services.AddScoped<IIncidentPredictionPatternRepository, IncidentPredictionPatternRepository>();
 
+        // Ideia 7 — Self-Healing Recommendations
+        services.AddScoped<IHealingRecommendationRepository, HealingRecommendationRepository>();
+
         // P03.1 — contrato cross-module de Reliability
         services.AddScoped<IReliabilityModule, ReliabilityModuleService>();
 

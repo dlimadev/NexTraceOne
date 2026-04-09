@@ -20,6 +20,10 @@ using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListS
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.PredictServiceFailure;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.RegisterSlaDefinition;
 using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.RegisterSloDefinition;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GenerateHealingRecommendation;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.GetHealingRecommendation;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ListHealingRecommendations;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Features.ApproveHealingRecommendation;
 
 namespace NexTraceOne.OperationalIntelligence.Application.Reliability;
 
@@ -62,6 +66,12 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetCapacityForecast.Command>, GetCapacityForecast.Validator>();
         services.AddTransient<IValidator<GetSloBurnRateAlert.Query>, GetSloBurnRateAlert.Validator>();
         services.AddTransient<IValidator<GetChangeRiskPrediction.Query>, GetChangeRiskPrediction.Validator>();
+
+        // Ideia 7 — Self-Healing Recommendations
+        services.AddTransient<IValidator<GenerateHealingRecommendation.Command>, GenerateHealingRecommendation.Validator>();
+        services.AddTransient<IValidator<GetHealingRecommendation.Query>, GetHealingRecommendation.Validator>();
+        services.AddTransient<IValidator<ListHealingRecommendations.Query>, ListHealingRecommendations.Validator>();
+        services.AddTransient<IValidator<ApproveHealingRecommendation.Command>, ApproveHealingRecommendation.Validator>();
 
         return services;
     }
