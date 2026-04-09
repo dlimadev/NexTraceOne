@@ -3,7 +3,7 @@
 > **Data:** Abril 2026  
 > **Estado:** 🟢 Ideias aprovadas — plano de desenvolvimento em [DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md](./DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md)  
 > **Referência:** [PRODUCT-VISION.md](./PRODUCT-VISION.md), [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)  
-> **Última actualização:** 2026-04-09 — Wave B completa (Ideias 1, 2, 3, 10, 16, 29 concluídas)
+> **Última actualização:** 2026-04-09 — Wave C em progresso (Ideias 1, 2, 3, 10, 16, 29 Wave A+B concluídas; Ideias 8, 25 Wave C concluídas)
 
 ---
 
@@ -158,10 +158,11 @@ Quando um incidente ocorre e a causa é identificada (manual ou por IA), o siste
 
 ---
 
-### 💡 Ideia 8 — Environment Drift Detective
+### ✅ Ideia 8 — Environment Drift Detective
 
 **Pilar:** Operational Consistency  
 **Persona:** Platform Admin, Tech Lead  
+**Estado:** ✅ Implementado (Wave C) — Entidade `EnvironmentDriftReport` com 5 dimensões (ServiceVersions, Configurations, ContractVersions, Dependencies, Policies), enum `DriftReportStatus` (Generated/Reviewed/Stale), handlers `DetectEnvironmentDrift`, `GetEnvironmentDriftReport`, `ListEnvironmentDriftReports`, 34 testes, RLS configurado.
 
 Agente de IA que compara continuamente ambientes (dev vs staging vs prod):
 
@@ -492,10 +493,11 @@ Todo o contexto vem do NexTraceOne — catálogo, contratos, knowledge base, own
 
 ---
 
-### 💡 Ideia 25 — Service Maturity Model Tracker
+### ✅ Ideia 25 — Service Maturity Model Tracker
 
 **Pilar:** Service Governance + Operational Reliability  
 **Persona:** Tech Lead, Architect, Executive  
+**Estado:** ✅ Implementado (Wave C) — Entidade `ServiceMaturityAssessment` com 11 critérios (OwnershipDefined, ContractsPublished, DocumentationExists, PoliciesApplied, ApprovalWorkflowActive, TelemetryActive, BaselinesEstablished, AlertsConfigured, RunbooksAvailable, RollbackTested, ChaosValidated), enum `ServiceMaturityLevel` (Basic/Documented/Governed/Observed/Resilient), handlers `AssessServiceMaturity`, `GetServiceMaturity`, `ListServicesByMaturityLevel`, 27 testes, RLS configurado.
 
 Framework de maturidade de serviços com níveis definidos:
 

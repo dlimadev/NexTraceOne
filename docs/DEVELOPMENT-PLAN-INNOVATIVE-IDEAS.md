@@ -4,7 +4,7 @@
 > **Referência:** [BRAINSTORMING-INNOVATIVE-IDEAS.md](./BRAINSTORMING-INNOVATIVE-IDEAS.md)  
 > **Arquitetura:** Modular Monolith — .NET 10 + React 18 + PostgreSQL 16  
 > **Módulos existentes:** Catalog, ChangeGovernance, OperationalIntelligence, AIKnowledge, Governance, Configuration, IdentityAccess, AuditCompliance, Integrations, Knowledge, Notifications, ProductAnalytics  
-> **Última actualização:** 2026-04-09 — Wave A+B completa: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B) implementadas (backend + testes)
+> **Última actualização:** 2026-04-09 — Wave A+B completa + Wave C parcial: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 8, 25 (Wave C) implementadas (backend + testes)
 
 ---
 
@@ -513,21 +513,45 @@ AiKnowledgeEntry (entidade — evolução)
 
 ---
 
-### Ideia 8 — Environment Drift Detective
+### ✅ Ideia 8 — Environment Drift Detective
 
 **Módulo:** OperationalIntelligence  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 34 testes passando
+
+#### Entidades de Domínio
+
+```
+EnvironmentDriftReport (entidade)
+├── SourceEnvironment (string)
+├── TargetEnvironment (string)
+├── AnalyzedDimensions (JSONB)
+├── ServiceVersionDrifts (JSONB, nullable)
+├── ConfigurationDrifts (JSONB, nullable)
+├── ContractVersionDrifts (JSONB, nullable)
+├── DependencyDrifts (JSONB, nullable)
+├── PolicyDrifts (JSONB, nullable)
+├── Recommendations (JSONB, nullable)
+├── TotalDriftItems (int)
+├── CriticalDriftItems (int)
+├── OverallSeverity (DriftSeverity)
+├── Status (DriftReportStatus: Generated/Reviewed/Stale)
+├── GeneratedAt (DateTimeOffset)
+├── ReviewedAt (DateTimeOffset, nullable)
+├── ReviewComment (string, nullable)
+└── TenantId (Guid?)
+```
 
 #### Backend
 
 | Componente | Descrição |
 |-----------|-----------|
-| **Feature** | `DetectEnvironmentDrift` — compara ambientes |
-| **AI Agent** | Novo agent `drift-detective` ou extensão do `service-analyst` |
-| **Dimensions** | ServiceVersions, Configurations, ContractVersions, Dependencies, Policies |
-| **Report** | `DriftReport` — severidade + recomendações |
-| **Background Job** | `EnvironmentDriftDetectionJob` — execução periódica |
-| **Storage** | Reutiliza `DriftFinding` existente com novos `DriftType` enums |
+| **Entidade** | `EnvironmentDriftReport` — AuditableEntity com 5 dimensões de análise |
+| **Command** | `DetectEnvironmentDrift` — gera relatório multi-dimensional, marca anteriores como Stale |
+| **Query** | `GetEnvironmentDriftReport` — obtém relatório por ID |
+| **Query** | `ListEnvironmentDriftReports` — lista com filtros por ambiente e status |
+| **Enum** | `DriftReportStatus` — Generated, Reviewed, Stale |
+| **Migration** | Nova tabela `ops_environment_drift_reports` |
 
 #### Frontend
 
@@ -571,38 +595,47 @@ AiKnowledgeEntry (entidade — evolução)
 
 ---
 
-### Ideia 25 — Service Maturity Model Tracker
+### ✅ Ideia 25 — Service Maturity Model Tracker
 
 **Módulo:** Governance  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 27 testes passando
 
 #### Entidades de Domínio
 
 ```
 ServiceMaturityAssessment (entidade)
-├── ServiceId (FK)
-├── CurrentLevel (1-5)
-├── LevelDetails (JSONB) — checklist por nível
-├── AssessedAt
-├── AssessedBy (auto ou manual)
-├── TenantId
-
-ServiceMaturityCriteria (config)
-├── Level (1-5)
-├── CriteriaName
-├── IsRequired (bool)
-├── AutoEvaluable (bool) — pode ser verificado automaticamente
+├── ServiceId (Guid FK)
+├── ServiceName (string)
+├── CurrentLevel (ServiceMaturityLevel 1-5)
+├── OwnershipDefined (bool) — Nível 1
+├── ContractsPublished (bool) — Nível 2
+├── DocumentationExists (bool) — Nível 2
+├── PoliciesApplied (bool) — Nível 3
+├── ApprovalWorkflowActive (bool) — Nível 3
+├── TelemetryActive (bool) — Nível 4
+├── BaselinesEstablished (bool) — Nível 4
+├── AlertsConfigured (bool) — Nível 4
+├── RunbooksAvailable (bool) — Nível 5
+├── RollbackTested (bool) — Nível 5
+├── ChaosValidated (bool) — Nível 5
+├── AssessedAt (DateTimeOffset)
+├── AssessedBy (string)
+├── LastReassessedAt (DateTimeOffset?)
+├── ReassessmentCount (int)
+└── TenantId (Guid?)
 ```
 
 #### Backend
 
 | Componente | Descrição |
 |-----------|-----------|
-| **Command** | `AssessServiceMaturity` — avalia nível atual |
-| **Query** | `GetServiceMaturity`, `ListServicesByMaturityLevel` |
-| **Auto-eval** | Verifica automaticamente: ownership? contratos? telemetria? runbooks? |
-| **Cross-module** | Catalog (ownership, contratos), OI (telemetria, chaos), Knowledge (runbooks) |
-| **Background Job** | `ServiceMaturityReassessmentJob` — reavalia periodicamente |
+| **Entidade** | `ServiceMaturityAssessment` — Entity com 11 critérios booleanos e nível auto-derivado |
+| **Command** | `AssessServiceMaturity` — cria ou reavalia assessment com critérios |
+| **Query** | `GetServiceMaturity` — obtém assessment por serviceId |
+| **Query** | `ListServicesByMaturityLevel` — lista com filtro opcional por nível |
+| **Enum** | `ServiceMaturityLevel` — Basic(1), Documented(2), Governed(3), Observed(4), Resilient(5) |
+| **Migration** | Nova tabela `gov_service_maturity_assessments` |
 
 #### Frontend
 
