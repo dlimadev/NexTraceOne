@@ -582,9 +582,16 @@ CREATE POLICY tenant_isolation ON ops_anomaly_narratives
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- ops_environment_drift_reports — Environment drift reports per tenant
+ALTER TABLE ops_environment_drift_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_environment_drift_reports;
+CREATE POLICY tenant_isolation ON ops_environment_drift_reports
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 72 tables covering all major tenant-aware data domains.
+--   RLS enabled on 73 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.
