@@ -575,6 +575,13 @@ CREATE POLICY tenant_isolation ON chg_release_notes
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- ops_anomaly_narratives — AI-generated anomaly narratives per tenant
+ALTER TABLE ops_anomaly_narratives ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_anomaly_narratives;
+CREATE POLICY tenant_isolation ON ops_anomaly_narratives
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
 --   RLS enabled on 58 tables covering all major tenant-aware data domains.

@@ -64,4 +64,18 @@ public static class RuntimeIntelligenceErrors
             "RuntimeIntelligence.Tolerance.Invalid",
             "Tolerance percentage ({0}) must be greater than zero.",
             tolerance);
+
+    /// <summary>Narrativa de anomalia não encontrada para o drift finding informado.</summary>
+    public static Error AnomalyNarrativeNotFound(string driftFindingId)
+        => Error.NotFound(
+            "RuntimeIntelligence.AnomalyNarrative.NotFound",
+            "Anomaly narrative for drift finding '{0}' was not found.",
+            driftFindingId);
+
+    /// <summary>Já existe uma narrativa de anomalia para o drift finding informado.</summary>
+    public static Error AnomalyNarrativeAlreadyExists(string driftFindingId)
+        => Error.Conflict(
+            "RuntimeIntelligence.AnomalyNarrative.AlreadyExists",
+            "An anomaly narrative already exists for drift finding '{0}'.",
+            driftFindingId);
 }
