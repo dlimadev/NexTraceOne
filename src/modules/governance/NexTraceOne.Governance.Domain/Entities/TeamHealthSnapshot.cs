@@ -17,6 +17,9 @@ public sealed record TeamHealthSnapshotId(Guid Value) : TypedIdBase(Value);
 /// </summary>
 public sealed class TeamHealthSnapshot : Entity<TeamHealthSnapshotId>
 {
+    /// <summary>Número de dimensões de saúde avaliadas.</summary>
+    private const int DimensionCount = 7;
+
     /// <summary>Identificador da equipa avaliada (FK lógica).</summary>
     public Guid TeamId { get; private init; }
 
@@ -176,7 +179,7 @@ public sealed class TeamHealthSnapshot : Entity<TeamHealthSnapshotId>
                   + DocCoverageScore
                   + PolicyComplianceScore;
 
-        return (int)Math.Round(sum / 7.0, MidpointRounding.AwayFromZero);
+        return (int)Math.Round(sum / (double)DimensionCount, MidpointRounding.AwayFromZero);
     }
 
     private static void ValidateScore(int score, string paramName)
