@@ -443,3 +443,25 @@ public interface ITeamHealthSnapshotRepository
     /// <summary>Atualiza um snapshot existente.</summary>
     Task UpdateAsync(TeamHealthSnapshot snapshot, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de ChangeCostImpact para o módulo Governance.
+/// Define operações CRUD e consultas para impacto de custo por mudança (FinOps).
+/// </summary>
+public interface IChangeCostImpactRepository
+{
+    /// <summary>Obtém um registo de impacto de custo pelo identificador.</summary>
+    Task<ChangeCostImpact?> GetByIdAsync(ChangeCostImpactId id, CancellationToken ct);
+
+    /// <summary>Obtém o registo de impacto de custo associado a uma release.</summary>
+    Task<ChangeCostImpact?> GetByReleaseIdAsync(Guid releaseId, CancellationToken ct);
+
+    /// <summary>Lista os N impactos de custo mais significativos (por delta absoluto).</summary>
+    Task<IReadOnlyList<ChangeCostImpact>> ListCostliestAsync(int top, CancellationToken ct);
+
+    /// <summary>Lista impactos de custo de um serviço específico.</summary>
+    Task<IReadOnlyList<ChangeCostImpact>> ListByServiceAsync(string serviceName, CancellationToken ct);
+
+    /// <summary>Adiciona um novo registo de impacto de custo.</summary>
+    Task AddAsync(ChangeCostImpact impact, CancellationToken ct);
+}

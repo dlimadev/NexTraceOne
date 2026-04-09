@@ -73,6 +73,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Snapshots de saúde de equipas (Team Health Dashboard).</summary>
     public DbSet<TeamHealthSnapshot> TeamHealthSnapshots => Set<TeamHealthSnapshot>();
 
+    /// <summary>Impactos de custo por mudança (FinOps por mudança).</summary>
+    public DbSet<ChangeCostImpact> ChangeCostImpacts => Set<ChangeCostImpact>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

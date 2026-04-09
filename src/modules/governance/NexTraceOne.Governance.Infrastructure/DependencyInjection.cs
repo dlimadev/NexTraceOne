@@ -65,6 +65,9 @@ public static class DependencyInjection
         // Team Health Snapshots
         services.AddScoped<ITeamHealthSnapshotRepository, TeamHealthSnapshotRepository>();
 
+        // Change Cost Impact (FinOps por mudança)
+        services.AddScoped<IChangeCostImpactRepository, ChangeCostImpactRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();
