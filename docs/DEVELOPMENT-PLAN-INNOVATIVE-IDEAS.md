@@ -4,7 +4,7 @@
 > **Referência:** [BRAINSTORMING-INNOVATIVE-IDEAS.md](./BRAINSTORMING-INNOVATIVE-IDEAS.md)  
 > **Arquitetura:** Modular Monolith — .NET 10 + React 18 + PostgreSQL 16  
 > **Módulos existentes:** Catalog, ChangeGovernance, OperationalIntelligence, AIKnowledge, Governance, Configuration, IdentityAccess, AuditCompliance, Integrations, Knowledge, Notifications, ProductAnalytics  
-> **Última actualização:** 2026-04-09 — Wave A+B completa + Wave C parcial: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 8, 25 (Wave C) implementadas (backend + testes)
+> **Última actualização:** 2026-04-09 — Wave A+B completa + Wave C completa: Ideias 1, 2 (Wave A), 3, 10, 16, 29 (Wave B), 6, 8, 12, 25 (Wave C) implementadas (backend + testes)
 
 ---
 
@@ -482,22 +482,49 @@ AiKnowledgeEntry (entidade — evolução)
 
 ---
 
-### Ideia 6 — Operational Knowledge Graph
+### ✅ Ideia 6 — Operational Knowledge Graph
 
-**Módulo:** Knowledge + Cross-module  
-**Complexidade:** 🔴 Alta
+**Módulo:** Knowledge  
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 25 testes passando
+
+#### Entidades de Domínio
+
+```
+KnowledgeGraphSnapshot (entidade)
+  - KnowledgeGraphSnapshotId (strongly typed ID)
+  - TotalNodes, TotalEdges, ConnectedComponents, IsolatedNodes
+  - CoverageScore (0-100)
+  - NodeTypeDistribution (JSONB)
+  - EdgeTypeDistribution (JSONB)
+  - TopConnectedEntities (JSONB)
+  - OrphanEntities (JSONB)
+  - Recommendations (JSONB)
+  - Status: Generated → Reviewed | Stale
+  - TenantId
+
+KnowledgeGraphSnapshotStatus (enum)
+  - Generated, Reviewed, Stale
+```
 
 #### Backend
 
-| Componente | Descrição |
-|-----------|-----------|
-| **Entidade** | `KnowledgeGraphNode`, `KnowledgeGraphEdge` — representação genérica |
-| **Builder** | `KnowledgeGraphBuilder` — constrói graph a partir de todas as entidades |
-| **Cross-module** | Consulta: Catalog (serviços, contratos, dependências), ChangeGovernance (mudanças, deploys), OI (incidentes), Knowledge (runbooks, docs) |
-| **Query** | `GetGraphNeighborhood` — subgraph centrado numa entidade |
-| **Query** | `SearchGraph` — pesquisa por entidade/relação |
-| **AI Integration** | Graph como fonte de contexto para grounding |
-| **Background Job** | `KnowledgeGraphRebuildJob` — reconstrói periodicamente |
+| Componente | Descrição | Estado |
+|-----------|-----------|-------|
+| **Entidade** | `KnowledgeGraphSnapshot` — snapshot persistido do graph | ✅ |
+| **Enum** | `KnowledgeGraphSnapshotStatus` | ✅ |
+| **Repositório** | `IKnowledgeGraphSnapshotRepository` / `KnowledgeGraphSnapshotRepository` | ✅ |
+| **Command** | `BuildKnowledgeGraphSnapshot` — gera snapshot com métricas | ✅ |
+| **Query** | `GetKnowledgeGraphSnapshot` — obtém snapshot por ID | ✅ |
+| **Query** | `ListKnowledgeGraphSnapshots` — lista snapshots com filtro por status | ✅ |
+| **EF Config** | `KnowledgeGraphSnapshotConfiguration` — tabela `knw_knowledge_graph_snapshots` | ✅ |
+| **DbContext** | `KnowledgeDbContext` atualizado com `DbSet<KnowledgeGraphSnapshot>` | ✅ |
+| **DI** | Repositório registado no container | ✅ |
+| **RLS** | Tenant isolation em `knw_knowledge_graph_snapshots` | ✅ |
+| **Testes** | 25 testes (domain + application) | ✅ |
+
+#### Nota
+Complementa o `GetKnowledgeGraphOverview` dinâmico existente com snapshots persistidos para tracking histórico de evolução da conectividade e cobertura.
 
 #### Frontend
 
@@ -566,21 +593,49 @@ EnvironmentDriftReport (entidade)
 
 ---
 
-### Ideia 12 — Predictive Incident Prevention
+### ✅ Ideia 12 — Predictive Incident Prevention
 
-**Módulo:** OperationalIntelligence + AIKnowledge  
-**Complexidade:** 🔴 Alta
+**Módulo:** OperationalIntelligence (Reliability subdomain)  
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Backend implementado — 32 testes passando
+
+#### Entidades de Domínio
+
+```
+IncidentPredictionPattern (entidade)
+  - IncidentPredictionPatternId (strongly typed ID)
+  - PatternName, Description
+  - PatternType: DeployTiming | ContractChange | ServiceCorrelation | DeployFrequency | ChangeRegression | MetricDegradation
+  - ServiceId, ServiceName (opcionais)
+  - Environment
+  - ConfidencePercent (0-100), OccurrenceCount, SampleSize
+  - Evidence (JSONB), TriggerConditions (JSONB)
+  - PreventionRecommendations (JSONB)
+  - Severity: Low | Medium | High | Critical (auto-computada por confiança)
+  - Status: Detected → Confirmed | Dismissed | Stale
+  - DetectedAt, ValidatedAt, ValidationComment
+  - TenantId
+
+PredictionPatternType (enum) — 6 tipos
+PredictionPatternStatus (enum) — 4 estados
+PredictionSeverity (enum) — 4 níveis
+```
 
 #### Backend
 
-| Componente | Descrição |
-|-----------|-----------|
-| **Feature** | `AnalyzePredictivePatterns` — analisa histórico para identificar padrões |
-| **AI Integration** | ML/NLP para correlação temporal: deploy × dia × serviço × incidente |
-| **Rules Engine** | Pattern matching: "3 de 5 deploys na sexta geraram incidente" |
-| **Alert** | `PredictiveIncidentAlert` — alerta preventivo com contexto |
-| **Storage** | `PredictivePattern` entidade com evidence histórica |
-| **Background Job** | `PredictiveAnalysisJob` — execução diária |
+| Componente | Descrição | Estado |
+|-----------|-----------|-------|
+| **Entidade** | `IncidentPredictionPattern` — padrão preditivo baseado em dados históricos | ✅ |
+| **Enums** | `PredictionPatternType`, `PredictionPatternStatus`, `PredictionSeverity` | ✅ |
+| **Repositório** | `IIncidentPredictionPatternRepository` / `IncidentPredictionPatternRepository` | ✅ |
+| **Command** | `AnalyzePredictivePatterns` — regista padrão preditivo com severidade auto-computada | ✅ |
+| **Query** | `GetIncidentPredictionPattern` — obtém padrão por ID | ✅ |
+| **Query** | `ListIncidentPredictionPatterns` — lista com filtros (environment, status, type) | ✅ |
+| **EF Config** | `IncidentPredictionPatternConfiguration` — tabela `ops_reliability_incident_prediction_patterns` | ✅ |
+| **DbContext** | `ReliabilityDbContext` atualizado com `DbSet<IncidentPredictionPattern>` | ✅ |
+| **DI** | Repositório registado no container | ✅ |
+| **RLS** | Tenant isolation em `ops_reliability_incident_prediction_patterns` | ✅ |
+| **Testes** | 32 testes (domain + application) | ✅ |
 
 #### Frontend
 
@@ -648,17 +703,19 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-## Wave D — Developer Experience
+## Wave D — Developer Experience ✅
 
 > **Prioridade:** 🟡 Média  
-> **Justificativa:** Acelera developers e melhora colaboração entre equipas
+> **Justificativa:** Acelera developers e melhora colaboração entre equipas  
+> **Estado:** ✅ Completa — Todas as 4 ideias implementadas com entidades de domínio, handlers VSA, repositórios, EF configs, testes unitários e RLS configurado.
 
 ---
 
-### Ideia 14 — Contract-to-Code Pipeline Automatizado
+### Ideia 14 — Contract-to-Code Pipeline Automatizado ✅
 
 **Módulo:** Catalog + AIKnowledge  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `PipelineExecution` com 6 estágios, estado de execução (Pending→Running→Completed/Failed/PartiallyCompleted), JSONB para stages/results/artifacts, handlers VSA, 21+ testes.
 
 #### Backend
 
@@ -686,10 +743,11 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-### Ideia 19 — AI Pair Programming Governado
+### Ideia 19 — AI Pair Programming Governado ✅
 
 **Módulo:** AIKnowledge + Integrations (IDE Extensions)  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `IdeQuerySession` com 6 tipos de query, 4 estados, tracking de tokens (prompt/completion/total), JSONB para contexto e governance checks, handlers VSA, 68+ testes.
 
 #### Backend
 
@@ -714,10 +772,11 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-### Ideia 24 — AI-Powered Onboarding Companion
+### Ideia 24 — AI-Powered Onboarding Companion ✅
 
 **Módulo:** AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `OnboardingSession` com 4 níveis de experiência, tracking de progresso (checklist, serviços, contratos, runbooks, interações IA), handlers VSA, 48+ testes.
 
 #### Backend
 
@@ -742,10 +801,11 @@ ServiceMaturityAssessment (entidade)
 
 ---
 
-### Ideia 26 — Cross-Team Contract Negotiation Workspace
+### Ideia 26 — Cross-Team Contract Negotiation Workspace ✅
 
 **Módulo:** Catalog (Contract)  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidades `ContractNegotiation` + `NegotiationComment` com máquina de estados (Draft→InReview→Negotiating→Approved/Rejected), inline comments, handlers VSA, 45+ testes.
 
 #### Entidades de Domínio
 
@@ -791,17 +851,19 @@ NegotiationComment (entidade)
 
 ---
 
-## Wave E — Governance & Reliability
+## Wave E — Governance & Reliability ✅
 
 > **Prioridade:** 🟡 Média  
-> **Justificativa:** Robustece operação com self-healing, schema governance e chaos engineering
+> **Justificativa:** Robustece operação com self-healing, schema governance e chaos engineering  
+> **Estado:** ✅ Completa — Todas as 4 ideias implementadas com entidades de domínio, handlers VSA, repositórios, EF configs, testes unitários e RLS configurado.
 
 ---
 
-### Ideia 7 — Self-Healing Recommendations
+### Ideia 7 — Self-Healing Recommendations ✅
 
 **Módulo:** OperationalIntelligence  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `HealingRecommendation` com 6 tipos de ação, máquina de estados completa (Proposed→Approved→Executing→Completed/Failed, Proposed→Rejected), scoring de confiança, handlers VSA, 26+ testes.
 
 #### Backend
 
@@ -824,10 +886,11 @@ NegotiationComment (entidade)
 
 ---
 
-### Ideia 17 — Schema Evolution Advisor
+### Ideia 17 — Schema Evolution Advisor ✅
 
 **Módulo:** Catalog (Contract) + AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `SchemaEvolutionAdvice` com 4 níveis de compatibilidade, 5 estratégias de migração, scoring de compatibilidade (0-100), tracking de consumidores afetados, handlers VSA, 15+ testes.
 
 #### Backend
 
@@ -849,10 +912,11 @@ NegotiationComment (entidade)
 
 ---
 
-### Ideia 20 — Operational Playbook Builder
+### Ideia 20 — Operational Playbook Builder ✅
 
 **Módulo:** OperationalIntelligence (ou Knowledge)  
-**Complexidade:** 🟠 Média-Alta
+**Complexidade:** 🟠 Média-Alta  
+**Estado:** ✅ Implementado — Entidades `OperationalPlaybook` + `PlaybookExecution` com ciclos de vida completos, versionamento, linking com serviços/runbooks, execução com evidências, handlers VSA, 37+ testes.
 
 #### Entidades de Domínio
 
@@ -900,10 +964,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 27 — Chaos Engineering Integration Hub
+### Ideia 27 — Chaos Engineering Integration Hub ✅
 
 **Módulo:** OperationalIntelligence  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `ResilienceReport` com scoring (0-100), comparação blast radius teórico vs real, tracking de latência/error rate/recovery time, ciclo de vida (Generated→Reviewed→Archived), handlers VSA, 26+ testes.
 
 #### Backend
 
@@ -932,17 +997,19 @@ PlaybookExecution (entidade)
 
 ---
 
-## Wave F — Executive & FinOps
+## Wave F — Executive & FinOps ✅
 
 > **Prioridade:** 🟢 Exploratória  
-> **Justificativa:** Funcionalidades de alto valor para personas executivas e gestão de custo
+> **Justificativa:** Funcionalidades de alto valor para personas executivas e gestão de custo  
+> **Estado:** ✅ Completa — Todas as 4 ideias implementadas com entidades de domínio, handlers VSA, repositórios, EF configs, testes unitários e RLS configurado.
 
 ---
 
-### Ideia 13 — Team Health Dashboard
+### Ideia 13 — Team Health Dashboard ✅
 
 **Módulo:** Governance  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `TeamHealthSnapshot` com 7 dimensões de saúde, scoring individual e overall (0-100), recompute, 3 handlers VSA, 25+ testes.
 
 #### Backend
 
@@ -964,10 +1031,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 15 — FinOps por Mudança
+### Ideia 15 — FinOps por Mudança ✅
 
 **Módulo:** Governance (FinOps subdomain) + ChangeGovernance  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `ChangeCostImpact` com cálculo automático de delta/percentagem/direcção, suporte multi-provider, 3 handlers VSA, 24+ testes.
 
 #### Backend
 
@@ -989,10 +1057,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 18 — Executive Briefing Generator
+### Ideia 18 — Executive Briefing Generator ✅
 
 **Módulo:** Governance + AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `ExecutiveBriefing` com 7 secções JSONB, ciclo de vida (Draft→Published→Archived), frequência configurável, 4 handlers VSA, 26+ testes.
 
 #### Backend
 
@@ -1016,10 +1085,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 28 — Operational Cost Attribution Engine
+### Ideia 28 — Operational Cost Attribution Engine ✅
 
 **Módulo:** Governance (FinOps)  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `CostAttribution` com 5 dimensões, breakdown por tipo de custo, validação de totalização, multi-currency, 3 handlers VSA, 23+ testes.
 
 #### Backend
 

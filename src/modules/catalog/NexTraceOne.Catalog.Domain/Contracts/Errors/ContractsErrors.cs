@@ -210,5 +210,27 @@ public static class ContractsErrors
     /// <summary>Formato de exportação não suportado.</summary>
     public static Error UnsupportedExportFormat(string format)
         => Error.Validation("Contracts.Export.UnsupportedFormat", "Export format '{0}' is not supported.", format);
+
+    // ── PipelineExecution ───────────────────────────────────────────
+
+    /// <summary>Execução de pipeline não encontrada.</summary>
+    public static Error PipelineExecutionNotFound(string id)
+        => Error.NotFound("Contracts.PipelineExecution.NotFound", "Pipeline execution '{0}' was not found.", id);
+
+    // ── ContractNegotiation ─────────────────────────────────────────
+
+    /// <summary>Negociação de contrato não encontrada.</summary>
+    public static Error ContractNegotiationNotFound(string id)
+        => Error.NotFound("Contracts.Negotiation.NotFound", "Contract negotiation '{0}' was not found.", id);
+
+    /// <summary>Transição de estado de negociação inválida.</summary>
+    public static Error NegotiationInvalidStatusTransition(string from, string to)
+        => Error.Business("Contracts.Negotiation.InvalidTransition", "Cannot transition negotiation from '{0}' to '{1}'.", from, to);
+
+    // ── SchemaEvolutionAdvice ────────────────────────────────────────
+
+    /// <summary>Análise de evolução de schema não encontrada.</summary>
+    public static Error SchemaEvolutionAdviceNotFound(string id)
+        => Error.NotFound("Contracts.SchemaEvolutionAdvice.NotFound", "Schema evolution advice '{0}' was not found.", id);
 }
 

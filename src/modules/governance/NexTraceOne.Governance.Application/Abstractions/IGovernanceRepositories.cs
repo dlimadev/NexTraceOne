@@ -421,3 +421,96 @@ public interface IServiceMaturityAssessmentRepository
     /// <summary>Atualiza uma avaliação existente.</summary>
     Task UpdateAsync(ServiceMaturityAssessment assessment, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de TeamHealthSnapshot para o módulo Governance.
+/// Define operações CRUD e consultas para snapshots de saúde de equipas.
+/// </summary>
+public interface ITeamHealthSnapshotRepository
+{
+    /// <summary>Obtém um snapshot pelo identificador.</summary>
+    Task<TeamHealthSnapshot?> GetByIdAsync(TeamHealthSnapshotId id, CancellationToken ct);
+
+    /// <summary>Obtém o snapshot mais recente de uma equipa.</summary>
+    Task<TeamHealthSnapshot?> GetByTeamIdAsync(Guid teamId, CancellationToken ct);
+
+    /// <summary>Lista snapshots, opcionalmente filtrados por score mínimo.</summary>
+    Task<IReadOnlyList<TeamHealthSnapshot>> ListAsync(int? minOverallScore, CancellationToken ct);
+
+    /// <summary>Adiciona um novo snapshot.</summary>
+    Task AddAsync(TeamHealthSnapshot snapshot, CancellationToken ct);
+
+    /// <summary>Atualiza um snapshot existente.</summary>
+    Task UpdateAsync(TeamHealthSnapshot snapshot, CancellationToken ct);
+}
+
+/// <summary>
+/// Interface do repositório de ChangeCostImpact para o módulo Governance.
+/// Define operações CRUD e consultas para impacto de custo por mudança (FinOps).
+/// </summary>
+public interface IChangeCostImpactRepository
+{
+    /// <summary>Obtém um registo de impacto de custo pelo identificador.</summary>
+    Task<ChangeCostImpact?> GetByIdAsync(ChangeCostImpactId id, CancellationToken ct);
+
+    /// <summary>Obtém o registo de impacto de custo associado a uma release.</summary>
+    Task<ChangeCostImpact?> GetByReleaseIdAsync(Guid releaseId, CancellationToken ct);
+
+    /// <summary>Lista os N impactos de custo mais significativos (por delta absoluto).</summary>
+    Task<IReadOnlyList<ChangeCostImpact>> ListCostliestAsync(int top, CancellationToken ct);
+
+    /// <summary>Lista impactos de custo de um serviço específico.</summary>
+    Task<IReadOnlyList<ChangeCostImpact>> ListByServiceAsync(string serviceName, CancellationToken ct);
+
+    /// <summary>Adiciona um novo registo de impacto de custo.</summary>
+    Task AddAsync(ChangeCostImpact impact, CancellationToken ct);
+}
+
+/// <summary>
+/// Interface do repositório de ExecutiveBriefing para o módulo Governance.
+/// Define operações CRUD e consultas para briefings executivos gerados por IA.
+/// </summary>
+public interface IExecutiveBriefingRepository
+{
+    /// <summary>Obtém um briefing pelo seu identificador.</summary>
+    Task<ExecutiveBriefing?> GetByIdAsync(ExecutiveBriefingId id, CancellationToken ct);
+
+    /// <summary>Lista briefings, opcionalmente filtrados por frequência e/ou status.</summary>
+    Task<IReadOnlyList<ExecutiveBriefing>> ListAsync(
+        BriefingFrequency? frequency,
+        BriefingStatus? status,
+        CancellationToken ct);
+
+    /// <summary>Adiciona um novo briefing ao repositório.</summary>
+    Task AddAsync(ExecutiveBriefing briefing, CancellationToken ct);
+
+    /// <summary>Atualiza um briefing existente.</summary>
+    Task UpdateAsync(ExecutiveBriefing briefing, CancellationToken ct);
+}
+
+/// <summary>
+/// Interface do repositório de CostAttribution para o módulo Governance.
+/// Define operações CRUD e consultas para atribuição de custo operacional por dimensão.
+/// </summary>
+public interface ICostAttributionRepository
+{
+    /// <summary>Obtém uma atribuição de custo pelo seu identificador.</summary>
+    Task<CostAttribution?> GetByIdAsync(CostAttributionId id, CancellationToken ct);
+
+    /// <summary>Lista atribuições de custo por dimensão, opcionalmente filtradas por período.</summary>
+    Task<IReadOnlyList<CostAttribution>> ListByDimensionAsync(
+        CostAttributionDimension dimension,
+        DateTimeOffset? periodStart,
+        DateTimeOffset? periodEnd,
+        CancellationToken ct);
+
+    /// <summary>Obtém os N registos com maior custo total para uma dimensão, opcionalmente até uma data limite.</summary>
+    Task<IReadOnlyList<CostAttribution>> GetTopByDimensionAsync(
+        CostAttributionDimension dimension,
+        int top,
+        DateTimeOffset? periodEnd,
+        CancellationToken ct);
+
+    /// <summary>Adiciona uma nova atribuição de custo ao repositório.</summary>
+    Task AddAsync(CostAttribution attribution, CancellationToken ct);
+}

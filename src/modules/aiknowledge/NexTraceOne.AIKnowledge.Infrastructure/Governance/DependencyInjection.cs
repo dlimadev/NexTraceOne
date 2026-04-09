@@ -74,6 +74,8 @@ public static class DependencyInjection
         services.AddScoped<IAiGuardrailRepository, AiGuardrailRepository>();
         services.AddScoped<IAiEvaluationRepository, AiEvaluationRepository>();
         services.AddScoped<IAiFeedbackRepository, AiFeedbackRepository>();
+        services.AddScoped<IOnboardingSessionRepository, OnboardingSessionRepository>();
+        services.AddScoped<IIdeQuerySessionRepository, IdeQuerySessionRepository>();
         services.AddScoped<IAiModelAuthorizationService, AiModelAuthorizationService>();
         services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
 

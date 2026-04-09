@@ -70,6 +70,18 @@ public sealed class GovernanceDbContext(
     /// <summary>Avaliações de maturidade de serviços.</summary>
     public DbSet<ServiceMaturityAssessment> ServiceMaturityAssessments => Set<ServiceMaturityAssessment>();
 
+    /// <summary>Snapshots de saúde de equipas (Team Health Dashboard).</summary>
+    public DbSet<TeamHealthSnapshot> TeamHealthSnapshots => Set<TeamHealthSnapshot>();
+
+    /// <summary>Impactos de custo por mudança (FinOps por mudança).</summary>
+    public DbSet<ChangeCostImpact> ChangeCostImpacts => Set<ChangeCostImpact>();
+
+    /// <summary>Briefings executivos gerados por IA.</summary>
+    public DbSet<ExecutiveBriefing> ExecutiveBriefings => Set<ExecutiveBriefing>();
+
+    /// <summary>Atribuições de custo operacional por dimensão (FinOps contextual).</summary>
+    public DbSet<CostAttribution> CostAttributions => Set<CostAttribution>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

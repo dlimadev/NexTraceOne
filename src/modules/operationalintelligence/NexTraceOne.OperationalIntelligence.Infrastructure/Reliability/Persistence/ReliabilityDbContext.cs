@@ -41,6 +41,12 @@ public sealed class ReliabilityDbContext(
     /// <summary>Previsões de capacidade de recursos por serviço e ambiente.</summary>
     public DbSet<CapacityForecast> CapacityForecasts => Set<CapacityForecast>();
 
+    /// <summary>Padrões preditivos de incidentes identificados por análise histórica.</summary>
+    public DbSet<IncidentPredictionPattern> IncidentPredictionPatterns => Set<IncidentPredictionPattern>();
+
+    /// <summary>Recomendações de self-healing geradas a partir de causas raiz identificadas.</summary>
+    public DbSet<HealingRecommendation> HealingRecommendations => Set<HealingRecommendation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ReliabilityDbContext).Assembly;

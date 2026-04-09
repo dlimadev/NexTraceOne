@@ -62,6 +62,18 @@ public static class DependencyInjection
         // Service Maturity Assessments
         services.AddScoped<IServiceMaturityAssessmentRepository, ServiceMaturityAssessmentRepository>();
 
+        // Team Health Snapshots
+        services.AddScoped<ITeamHealthSnapshotRepository, TeamHealthSnapshotRepository>();
+
+        // Change Cost Impact (FinOps por mudança)
+        services.AddScoped<IChangeCostImpactRepository, ChangeCostImpactRepository>();
+
+        // Executive Briefings
+        services.AddScoped<IExecutiveBriefingRepository, ExecutiveBriefingRepository>();
+
+        // Cost Attributions (FinOps contextual)
+        services.AddScoped<ICostAttributionRepository, CostAttributionRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();

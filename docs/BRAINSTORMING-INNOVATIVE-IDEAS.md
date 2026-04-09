@@ -123,10 +123,11 @@ Vai além do diff textual — entende a semântica da mudança.
 
 ---
 
-### 💡 Ideia 6 — Operational Knowledge Graph
+### ✅ Ideia 6 — Operational Knowledge Graph
 
 **Pilar:** Source of Truth  
 **Persona:** Todas  
+**Estado:** ✅ Implementado (Wave C) — Entidade `KnowledgeGraphSnapshot` com métricas de grafo (TotalNodes, TotalEdges, ConnectedComponents, IsolatedNodes, CoverageScore), distribuições JSONB por tipo de nó/aresta, entidades top conectadas, entidades órfãs, recomendações. Enum `KnowledgeGraphSnapshotStatus` (Generated/Reviewed/Stale). Handlers `BuildKnowledgeGraphSnapshot`, `GetKnowledgeGraphSnapshot`, `ListKnowledgeGraphSnapshots`. 25 testes, RLS configurado. Complementa o `GetKnowledgeGraphOverview` dinâmico existente com snapshots persistidos para tracking histórico.
 
 Construir um **knowledge graph** que conecta todas as entidades do NexTraceOne:
 
@@ -141,10 +142,11 @@ O graph é navegável visualmente e serve como fonte de contexto para a IA.
 
 ---
 
-### 💡 Ideia 7 — Self-Healing Recommendations
+### ✅ Ideia 7 — Self-Healing Recommendations
 
 **Pilar:** Operational Reliability  
 **Persona:** Engineer, Platform Admin  
+**Estado:** ✅ Implementado (Wave E) — Entidade `HealingRecommendation` com 6 tipos de ação (Restart, Scale, Rollback, ConfigChange, CircuitBreakerToggle, CacheClear), máquina de estados (Proposed→Approved→Executing→Completed/Failed, Proposed→Rejected), scoring de confiança (0-100), handlers `GenerateHealingRecommendation`, `GetHealingRecommendation`, `ListHealingRecommendations`, `ApproveHealingRecommendation`, testes, RLS configurado.
 
 Quando um incidente ocorre e a causa é identificada (manual ou por IA), o sistema:
 
@@ -237,10 +239,11 @@ Um "marketplace" interno onde equipas podem:
 
 ---
 
-### 💡 Ideia 12 — Predictive Incident Prevention
+### ✅ Ideia 12 — Predictive Incident Prevention
 
 **Pilar:** Operational Intelligence  
 **Persona:** Tech Lead, Platform Admin  
+**Estado:** ✅ Implementado (Wave C) — Entidade `IncidentPredictionPattern` com 6 tipos de padrão (DeployTiming, ContractChange, ServiceCorrelation, DeployFrequency, ChangeRegression, MetricDegradation), métricas de confiança (ConfidencePercent, OccurrenceCount, SampleSize), evidências e condições de trigger (JSONB), recomendações de prevenção. Enum `PredictionPatternStatus` (Detected/Confirmed/Dismissed/Stale), `PredictionPatternType`, `PredictionSeverity`. Severidade auto-computada por confiança (≥80→Critical, ≥60→High, ≥40→Medium, <40→Low). Handlers `AnalyzePredictivePatterns`, `GetIncidentPredictionPattern`, `ListIncidentPredictionPatterns`. 32 testes, RLS configurado.
 
 Sistema que analisa padrões históricos para prever incidentes:
 
@@ -254,10 +257,11 @@ Gera alertas preventivos com contexto e sugestões de ação.
 
 ---
 
-### 💡 Ideia 13 — Team Health Dashboard
+### ✅ Ideia 13 — Team Health Dashboard
 
 **Pilar:** Service Governance  
 **Persona:** Tech Lead, Executive  
+**Estado:** ✅ Implementado (Wave F) — Entidade `TeamHealthSnapshot` com 7 dimensões (ServiceCount, ContractHealth, IncidentFrequency, MTTR, TechDebt, DocCoverage, PolicyCompliance), scoring individual e overall (0-100), recompute com histórico, handlers `ComputeTeamHealth`, `GetTeamHealthSnapshot`, `ListTeamHealthSnapshots`, testes, RLS configurado.  
 
 Dashboard que mostra a "saúde" de cada equipa com base em:
 
@@ -275,10 +279,11 @@ Permite comparação entre equipas (sem ranking público) e evolução temporal.
 
 ---
 
-### 💡 Ideia 14 — Contract-to-Code Pipeline Automatizado
+### ✅ Ideia 14 — Contract-to-Code Pipeline Automatizado
 
 **Pilar:** Contract Governance + AI  
 **Persona:** Engineer  
+**Estado:** ✅ Implementado (Wave D) — Entidade `PipelineExecution` com 6 estágios (ServerStubs, ClientSdk, MockServer, PostmanCollection, ContractTests, FitnessValidation), enum `PipelineExecutionStatus` (Pending/Running/Completed/Failed/PartiallyCompleted), handlers `ExecuteContractPipeline`, `GetPipelineExecution`, `ListPipelineExecutions`, testes, RLS configurado.
 
 Pipeline que, a partir de um contrato OpenAPI/AsyncAPI/WSDL:
 
@@ -297,10 +302,11 @@ Tudo governado e auditado pelo NexTraceOne.
 
 ---
 
-### 💡 Ideia 15 — FinOps por Mudança
+### ✅ Ideia 15 — FinOps por Mudança
 
 **Pilar:** FinOps contextual  
 **Persona:** Tech Lead, Executive  
+**Estado:** ✅ Implementado (Wave F) — Entidade `ChangeCostImpact` com cálculo automático de delta (baseline vs actual), percentagem, direcção (Increase/Decrease/Neutral), suporte a múltiplos providers (AWS/Azure/GCP), handlers `RecordChangeCostImpact`, `GetChangeCostImpact`, `ListCostliestChanges`, testes, RLS configurado.  
 
 Correlacionar custo operacional com mudanças específicas:
 
@@ -332,10 +338,11 @@ Quando uma anomalia é detectada na telemetria:
 
 ---
 
-### 💡 Ideia 17 — Schema Evolution Advisor
+### ✅ Ideia 17 — Schema Evolution Advisor
 
 **Pilar:** Contract Governance  
 **Persona:** Architect, Engineer  
+**Estado:** ✅ Implementado (Wave E) — Entidade `SchemaEvolutionAdvice` com 4 níveis de compatibilidade (FullyCompatible, BackwardCompatible, ForwardCompatible, BreakingChange), 5 estratégias de migração (DualWrite, Versioning, Transformation, FieldDeprecation, LazyMigration), scoring de compatibilidade (0-100), tracking de consumidores afetados, handlers `AnalyzeSchemaEvolution`, `GetSchemaEvolutionAdvice`, `ListSchemaEvolutionAdvices`, testes, RLS configurado.
 
 Agente especializado que aconselha sobre evolução segura de schemas:
 
@@ -349,10 +356,11 @@ Agente especializado que aconselha sobre evolução segura de schemas:
 
 ---
 
-### 💡 Ideia 18 — Executive Briefing Generator
+### ✅ Ideia 18 — Executive Briefing Generator
 
 **Pilar:** Governance  
 **Persona:** Executive, Product  
+**Estado:** ✅ Implementado (Wave F) — Entidade `ExecutiveBriefing` com 7 secções JSONB (PlatformStatus, TopIncidents, TeamPerformance, HighRiskChanges, ComplianceStatus, CostTrends, ActiveRisks), ciclo de vida (Draft→Published→Archived), frequência configurável (Daily/Weekly/Monthly/OnDemand), handlers `GenerateExecutiveBriefing`, `GetExecutiveBriefing`, `ListExecutiveBriefings`, `PublishExecutiveBriefing`, testes, RLS configurado.  
 
 Geração automática de briefings executivos periódicos:
 
@@ -370,10 +378,11 @@ Formato: sumário executivo + detalhes sob demanda + gráficos.
 
 ---
 
-### 💡 Ideia 19 — AI Pair Programming Governado
+### ✅ Ideia 19 — AI Pair Programming Governado
 
 **Pilar:** AI Governance + Developer Acceleration  
 **Persona:** Engineer  
+**Estado:** ✅ Implementado (Wave D) — Entidade `IdeQuerySession` com 6 tipos de query (ContractSuggestion, BreakingChangeAlert, OwnershipLookup, TestGeneration, GeneralQuery, CodeGeneration), enum `IdeQuerySessionStatus` (Processing/Responded/Blocked/Failed), tracking de tokens (prompt/completion/total), handlers `SubmitIdeQuery`, `GetIdeQuerySession`, `ListIdeQuerySessions`, testes, RLS configurado.
 
 Experiência de pair programming com IA dentro do IDE (VS Code / Visual Studio):
 
@@ -389,10 +398,11 @@ Tudo governado: token budget, auditoria, política de modelo.
 
 ---
 
-### 💡 Ideia 20 — Operational Playbook Builder
+### ✅ Ideia 20 — Operational Playbook Builder
 
 **Pilar:** Operational Consistency  
 **Persona:** Tech Lead, Engineer  
+**Estado:** ✅ Implementado (Wave E) — Entidades `OperationalPlaybook` + `PlaybookExecution` com ciclo de vida completo (Draft→Active→Deprecated), execução com tracking passo-a-passo e evidências (InProgress→Completed/Failed/Aborted), versionamento, linking com serviços e runbooks, handlers `CreateOperationalPlaybook`, `GetOperationalPlaybook`, `ListOperationalPlaybooks`, `ExecutePlaybook`, testes, RLS configurado.
 
 Builder visual para criar playbooks operacionais que:
 
@@ -473,10 +483,11 @@ Radar contínuo que analisa todas as dependências de todos os serviços e:
 
 ---
 
-### 💡 Ideia 24 — AI-Powered Onboarding Companion
+### ✅ Ideia 24 — AI-Powered Onboarding Companion
 
 **Pilar:** AI Governance + Developer Acceleration  
 **Persona:** Engineer (novo na equipa)  
+**Estado:** ✅ Implementado (Wave D) — Entidade `OnboardingSession` com 4 níveis de experiência (Junior/Mid/Senior/Expert), enum `OnboardingSessionStatus` (Active/Completed/Abandoned), tracking de progresso (checklist, serviços explorados, contratos revistos, runbooks lidos, interações IA), handlers `StartOnboardingSession`, `GetOnboardingSession`, `ListOnboardingSessions`, testes, RLS configurado.
 
 Agente de IA especializado em onboarding que:
 
@@ -515,10 +526,11 @@ O tracker mostra evolução temporal de cada serviço, permite filtrar por equip
 
 ---
 
-### 💡 Ideia 26 — Cross-Team Contract Negotiation Workspace
+### ✅ Ideia 26 — Cross-Team Contract Negotiation Workspace
 
 **Pilar:** Contract Governance + Source of Truth  
 **Persona:** Engineer, Tech Lead, Architect  
+**Estado:** ✅ Implementado (Wave D) — Entidades `ContractNegotiation` + `NegotiationComment` com máquina de estados (Draft→InReview→Negotiating→Approved/Rejected), inline comments com LineReference, handlers `CreateContractNegotiation`, `AddNegotiationComment`, `GetContractNegotiation`, `ListContractNegotiations`, testes, RLS configurado.
 
 Workspace colaborativo para negociação de contratos entre equipas:
 
@@ -536,10 +548,11 @@ Funciona como **"Pull Request de contratos"** — com workflow governado.
 
 ---
 
-### 💡 Ideia 27 — Chaos Engineering Integration Hub
+### ✅ Ideia 27 — Chaos Engineering Integration Hub
 
 **Pilar:** Operational Reliability  
 **Persona:** Engineer, Platform Admin  
+**Estado:** ✅ Implementado (Wave E) — Entidade `ResilienceReport` com scoring de resiliência (0-100), comparação blast radius teórico vs real, tracking de impacto em latência e error rate, tempo de recuperação, ciclo de vida (Generated→Reviewed→Archived), handlers `GenerateResilienceReport`, `GetResilienceReport`, `ListResilienceReports`, testes, RLS configurado. Estende `ChaosExperiment` existente.
 
 Hub que conecta o NexTraceOne com ferramentas de chaos engineering:
 
@@ -556,10 +569,11 @@ Hub que conecta o NexTraceOne com ferramentas de chaos engineering:
 
 ---
 
-### 💡 Ideia 28 — Operational Cost Attribution Engine
+### ✅ Ideia 28 — Operational Cost Attribution Engine
 
 **Pilar:** FinOps contextual  
 **Persona:** Executive, Platform Admin  
+**Estado:** ✅ Implementado (Wave F) — Entidade `CostAttribution` com 5 dimensões (Service, Team, Domain, Contract, Change), breakdown por tipo de custo (Compute, Storage, Network, Other), validação de totalização, suporte multi-currency, métodos de atribuição configuráveis, handlers `ComputeCostAttribution`, `GetCostAttribution`, `ListCostAttributions`, testes, RLS configurado.  
 
 Motor de atribuição de custo que distribui custos de infra para:
 

@@ -83,6 +83,18 @@ public sealed class ContractsDbContext(
     /// <summary>Scores de saúde contínuos de contratos (API Assets).</summary>
     public DbSet<ContractHealthScore> ContractHealthScores => Set<ContractHealthScore>();
 
+    /// <summary>Execuções de pipeline de geração de código a partir de contratos.</summary>
+    public DbSet<PipelineExecution> PipelineExecutions => Set<PipelineExecution>();
+
+    /// <summary>Negociações cross-team de contratos para aprovação colaborativa.</summary>
+    public DbSet<ContractNegotiation> ContractNegotiations => Set<ContractNegotiation>();
+
+    /// <summary>Comentários em negociações de contratos para revisão colaborativa.</summary>
+    public DbSet<NegotiationComment> NegotiationComments => Set<NegotiationComment>();
+
+    /// <summary>Análises de evolução de schema entre versões de contratos (API Assets).</summary>
+    public DbSet<SchemaEvolutionAdvice> SchemaEvolutionAdvices => Set<SchemaEvolutionAdvice>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

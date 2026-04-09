@@ -596,9 +596,127 @@ CREATE POLICY tenant_isolation ON gov_service_maturity_assessments
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- knw_knowledge_graph_snapshots — Knowledge graph snapshots per tenant
+ALTER TABLE knw_knowledge_graph_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON knw_knowledge_graph_snapshots;
+CREATE POLICY tenant_isolation ON knw_knowledge_graph_snapshots
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ops_reliability_incident_prediction_patterns — Incident prediction patterns per tenant
+ALTER TABLE ops_reliability_incident_prediction_patterns ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_reliability_incident_prediction_patterns;
+CREATE POLICY tenant_isolation ON ops_reliability_incident_prediction_patterns
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ── Wave D: Developer Experience (cat_ and ai_ prefixes) ─────────────────────
+
+-- cat_pipeline_executions — Contract-to-code pipeline executions per tenant
+ALTER TABLE cat_pipeline_executions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_pipeline_executions;
+CREATE POLICY tenant_isolation ON cat_pipeline_executions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_contract_negotiations — Cross-team contract negotiations per tenant
+ALTER TABLE cat_contract_negotiations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_negotiations;
+CREATE POLICY tenant_isolation ON cat_contract_negotiations
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_negotiation_comments — Negotiation comments per tenant
+ALTER TABLE cat_negotiation_comments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_negotiation_comments;
+CREATE POLICY tenant_isolation ON cat_negotiation_comments
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ai_onboarding_sessions — AI-powered onboarding sessions per tenant
+ALTER TABLE ai_onboarding_sessions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ai_onboarding_sessions;
+CREATE POLICY tenant_isolation ON ai_onboarding_sessions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ai_ide_query_sessions — IDE pair programming query sessions per tenant
+ALTER TABLE ai_ide_query_sessions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ai_ide_query_sessions;
+CREATE POLICY tenant_isolation ON ai_ide_query_sessions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ── Wave E: Governance & Reliability (ops_ and cat_ prefixes) ────────────────
+
+-- ops_reliability_healing_recommendations — Self-healing recommendations per tenant
+ALTER TABLE ops_reliability_healing_recommendations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_reliability_healing_recommendations;
+CREATE POLICY tenant_isolation ON ops_reliability_healing_recommendations
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_schema_evolution_advices — Schema evolution advisor reports per tenant
+ALTER TABLE cat_schema_evolution_advices ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_schema_evolution_advices;
+CREATE POLICY tenant_isolation ON cat_schema_evolution_advices
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ops_operational_playbooks — Operational playbook definitions per tenant
+ALTER TABLE ops_operational_playbooks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_operational_playbooks;
+CREATE POLICY tenant_isolation ON ops_operational_playbooks
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ops_playbook_executions — Playbook execution records per tenant
+ALTER TABLE ops_playbook_executions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_playbook_executions;
+CREATE POLICY tenant_isolation ON ops_playbook_executions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ops_resilience_reports — Chaos engineering resilience reports per tenant
+ALTER TABLE ops_resilience_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ops_resilience_reports;
+CREATE POLICY tenant_isolation ON ops_resilience_reports
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- ── Wave F: Executive & FinOps (gov_ prefix) ────────────────────────────────
+
+-- gov_team_health_snapshots — Team health dashboard snapshots per tenant
+ALTER TABLE gov_team_health_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_team_health_snapshots;
+CREATE POLICY tenant_isolation ON gov_team_health_snapshots
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_change_cost_impacts — FinOps cost impact per change per tenant
+ALTER TABLE gov_change_cost_impacts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_change_cost_impacts;
+CREATE POLICY tenant_isolation ON gov_change_cost_impacts
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_executive_briefings — Executive briefings per tenant
+ALTER TABLE gov_executive_briefings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_executive_briefings;
+CREATE POLICY tenant_isolation ON gov_executive_briefings
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_cost_attributions — Operational cost attribution per tenant
+ALTER TABLE gov_cost_attributions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_cost_attributions;
+CREATE POLICY tenant_isolation ON gov_cost_attributions
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 74 tables covering all major tenant-aware data domains.
+--   RLS enabled on 90 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

@@ -17,7 +17,7 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -150,6 +150,90 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_knw_documents_status", "\"Status\" IN ('Draft','Published','Archived','Deprecated')");
                         });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Knowledge.Domain.Entities.KnowledgeGraphSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ConnectedComponents")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CoverageScore")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EdgeTypeDistribution")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("IsolatedNodes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NodeTypeDistribution")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("OrphanEntities")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Recommendations")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ReviewComment")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TopConnectedEntities")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("TotalEdges")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalNodes")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneratedAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_knw_knowledge_graph_snapshots_tenant_id");
+
+                    b.ToTable("knw_knowledge_graph_snapshots", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Knowledge.Domain.Entities.KnowledgeRelation", b =>
