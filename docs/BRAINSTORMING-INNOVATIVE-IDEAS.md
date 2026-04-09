@@ -142,10 +142,11 @@ O graph é navegável visualmente e serve como fonte de contexto para a IA.
 
 ---
 
-### 💡 Ideia 7 — Self-Healing Recommendations
+### ✅ Ideia 7 — Self-Healing Recommendations
 
 **Pilar:** Operational Reliability  
 **Persona:** Engineer, Platform Admin  
+**Estado:** ✅ Implementado (Wave E) — Entidade `HealingRecommendation` com 6 tipos de ação (Restart, Scale, Rollback, ConfigChange, CircuitBreakerToggle, CacheClear), máquina de estados (Proposed→Approved→Executing→Completed/Failed, Proposed→Rejected), scoring de confiança (0-100), handlers `GenerateHealingRecommendation`, `GetHealingRecommendation`, `ListHealingRecommendations`, `ApproveHealingRecommendation`, testes, RLS configurado.
 
 Quando um incidente ocorre e a causa é identificada (manual ou por IA), o sistema:
 
@@ -335,10 +336,11 @@ Quando uma anomalia é detectada na telemetria:
 
 ---
 
-### 💡 Ideia 17 — Schema Evolution Advisor
+### ✅ Ideia 17 — Schema Evolution Advisor
 
 **Pilar:** Contract Governance  
 **Persona:** Architect, Engineer  
+**Estado:** ✅ Implementado (Wave E) — Entidade `SchemaEvolutionAdvice` com 4 níveis de compatibilidade (FullyCompatible, BackwardCompatible, ForwardCompatible, BreakingChange), 5 estratégias de migração (DualWrite, Versioning, Transformation, FieldDeprecation, LazyMigration), scoring de compatibilidade (0-100), tracking de consumidores afetados, handlers `AnalyzeSchemaEvolution`, `GetSchemaEvolutionAdvice`, `ListSchemaEvolutionAdvices`, testes, RLS configurado.
 
 Agente especializado que aconselha sobre evolução segura de schemas:
 
@@ -393,10 +395,11 @@ Tudo governado: token budget, auditoria, política de modelo.
 
 ---
 
-### 💡 Ideia 20 — Operational Playbook Builder
+### ✅ Ideia 20 — Operational Playbook Builder
 
 **Pilar:** Operational Consistency  
 **Persona:** Tech Lead, Engineer  
+**Estado:** ✅ Implementado (Wave E) — Entidades `OperationalPlaybook` + `PlaybookExecution` com ciclo de vida completo (Draft→Active→Deprecated), execução com tracking passo-a-passo e evidências (InProgress→Completed/Failed/Aborted), versionamento, linking com serviços e runbooks, handlers `CreateOperationalPlaybook`, `GetOperationalPlaybook`, `ListOperationalPlaybooks`, `ExecutePlaybook`, testes, RLS configurado.
 
 Builder visual para criar playbooks operacionais que:
 
@@ -542,10 +545,11 @@ Funciona como **"Pull Request de contratos"** — com workflow governado.
 
 ---
 
-### 💡 Ideia 27 — Chaos Engineering Integration Hub
+### ✅ Ideia 27 — Chaos Engineering Integration Hub
 
 **Pilar:** Operational Reliability  
 **Persona:** Engineer, Platform Admin  
+**Estado:** ✅ Implementado (Wave E) — Entidade `ResilienceReport` com scoring de resiliência (0-100), comparação blast radius teórico vs real, tracking de impacto em latência e error rate, tempo de recuperação, ciclo de vida (Generated→Reviewed→Archived), handlers `GenerateResilienceReport`, `GetResilienceReport`, `ListResilienceReports`, testes, RLS configurado. Estende `ChaosExperiment` existente.
 
 Hub que conecta o NexTraceOne com ferramentas de chaos engineering:
 

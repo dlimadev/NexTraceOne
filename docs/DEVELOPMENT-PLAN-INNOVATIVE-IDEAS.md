@@ -851,17 +851,19 @@ NegotiationComment (entidade)
 
 ---
 
-## Wave E — Governance & Reliability
+## Wave E — Governance & Reliability ✅
 
 > **Prioridade:** 🟡 Média  
-> **Justificativa:** Robustece operação com self-healing, schema governance e chaos engineering
+> **Justificativa:** Robustece operação com self-healing, schema governance e chaos engineering  
+> **Estado:** ✅ Completa — Todas as 4 ideias implementadas com entidades de domínio, handlers VSA, repositórios, EF configs, testes unitários e RLS configurado.
 
 ---
 
-### Ideia 7 — Self-Healing Recommendations
+### Ideia 7 — Self-Healing Recommendations ✅
 
 **Módulo:** OperationalIntelligence  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `HealingRecommendation` com 6 tipos de ação, máquina de estados completa (Proposed→Approved→Executing→Completed/Failed, Proposed→Rejected), scoring de confiança, handlers VSA, 26+ testes.
 
 #### Backend
 
@@ -884,10 +886,11 @@ NegotiationComment (entidade)
 
 ---
 
-### Ideia 17 — Schema Evolution Advisor
+### Ideia 17 — Schema Evolution Advisor ✅
 
 **Módulo:** Catalog (Contract) + AIKnowledge  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — Entidade `SchemaEvolutionAdvice` com 4 níveis de compatibilidade, 5 estratégias de migração, scoring de compatibilidade (0-100), tracking de consumidores afetados, handlers VSA, 15+ testes.
 
 #### Backend
 
@@ -909,10 +912,11 @@ NegotiationComment (entidade)
 
 ---
 
-### Ideia 20 — Operational Playbook Builder
+### Ideia 20 — Operational Playbook Builder ✅
 
 **Módulo:** OperationalIntelligence (ou Knowledge)  
-**Complexidade:** 🟠 Média-Alta
+**Complexidade:** 🟠 Média-Alta  
+**Estado:** ✅ Implementado — Entidades `OperationalPlaybook` + `PlaybookExecution` com ciclos de vida completos, versionamento, linking com serviços/runbooks, execução com evidências, handlers VSA, 37+ testes.
 
 #### Entidades de Domínio
 
@@ -960,10 +964,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 27 — Chaos Engineering Integration Hub
+### Ideia 27 — Chaos Engineering Integration Hub ✅
 
 **Módulo:** OperationalIntelligence  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — Entidade `ResilienceReport` com scoring (0-100), comparação blast radius teórico vs real, tracking de latência/error rate/recovery time, ciclo de vida (Generated→Reviewed→Archived), handlers VSA, 26+ testes.
 
 #### Backend
 
