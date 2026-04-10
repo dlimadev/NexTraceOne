@@ -51,7 +51,9 @@
 | 10 | AuditCompliance | 1 | 6 | 1 | 22 | **172** ✅ |
 | 11 | Configuration | 1 | 20 | 17 | 60 | **451** ✅ |
 | 12 | ProductAnalytics | 1 | 1 | 1 | 9 | **42** ✅ |
-| | **TOTAIS** | **28** | **263** | **114** | **834** | **5.907** ✅ |
+| | **Subtotal Módulos** | **28** | **263** | **114** | **834** | **5.907** ✅ |
+| | **+ Building Blocks** | **5** | — | — | — | **395** ✅ |
+| | **TOTAL GERAL** | **33** | **263** | **114** | **834** | **6.302** ✅ |
 
 > ¹ Tabelas excluindo outbox messages (28 tabelas de outbox não contabilizadas).  
 > ² Features contadas por ficheiros com `IRequest<>` (Commands + Queries).
@@ -1459,7 +1461,7 @@ Embora todos os 6.302 testes passem, a cobertura por feature (Application layer)
 | Testes | ✅ | 982 testes, cobertura 81%+ das features |
 
 **Bugs Encontrados**: 0  
-**Gaps Identificados**: RLS em 31 tabelas (pior cobertura: 11%) — **prioridade máxima para correção**
+**Gaps Identificados**: RLS em 27 tabelas (cobertura: 22%) — prioridade alta para correção
 
 ---
 
