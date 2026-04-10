@@ -1258,6 +1258,8 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 
 | Data | Alteração |
 |------|-----------|
+| 2026-04-10 (rev.10) | ✅ **Infraestrutura CI para E2E e Integration tests**: Job `test-backend-e2e` adicionado ao `ci.yml` com Testcontainers PostgreSQL para 51 testes E2E backend, incluído no `ci-status` quality gate. Todos os 7 itens de Próximos Passos agora CONCLUÍDOS |
+| 2026-04-10 (rev.9) | ✅ **Cobertura de testes reforçada**: Governance +52 testes (465 total) para 14 features sem cobertura. Catalog 1535, Configuration 550 |
 | 2026-04-10 (rev.8) | ✅ **Eliminados todos os hardcoded placeholders**: 72 placeholders em 11 ficheiros movidos para i18n com `t()` + fallback. 72 novas chaves i18n adicionadas a 4 idiomas (en, es, pt-BR, pt-PT) |
 | 2026-04-10 (rev.7) | ✅ **Corrigidos 3 phantom RLS** → `chg_change_records`→`chg_change_events`, `chg_workflows`→`chg_releases`, `ctr_api_contracts`→`ctr_contract_versions` |
 | 2026-04-10 (rev.7) | ✅ **Adicionadas 86 tabelas ao RLS** (total: 186 tabelas, cobertura tenant-scoped: 186/193 = 96%) |
@@ -1864,15 +1866,15 @@ Restam apenas 7 tabelas iam_ de sistema intencionalmente excluídas (TenantId nu
 
 ## Conclusão
 
-O NexTraceOne apresenta uma base sólida com **6.346 testes unitários/módulo todos a passar**, **0 bugs encontrados**, **arquitectura bem separada por bounded contexts** e **segurança frontend robusta**. Adicionalmente, existem **161 testes de platform** (CLI, E2E, Integration, Selenium), dos quais 84 passam e 77 requerem infraestrutura local (PostgreSQL/serviços).
+O NexTraceOne apresenta uma base sólida com **6.346+ testes unitários/módulo todos a passar**, **0 bugs encontrados**, **arquitectura bem separada por bounded contexts** e **segurança frontend robusta**. Adicionalmente, existem **161 testes de platform** (CLI, E2E, Integration, Selenium), dos quais 84 passam localmente e 77 requerem Docker/Testcontainers (agora suportados no CI).
 
 A **cobertura de RLS** foi significativamente melhorada na rev.7: de **36% (96/264)** para **96% das tabelas tenant-scoped (186/193)**. Os 3 phantom RLS policies foram corrigidos, e 86 tabelas adicionais receberam políticas de tenant isolation. As 7 tabelas iam_ de sistema são intencionalmente excluídas (TenantId nullable para system defaults).
 
-O gap principal remanescente é a **cobertura de testes no Application layer** — embora existam muitos testes (6.346), a distribuição por features é desigual. Módulos como Catalog (23%) e Configuration (27%) beneficiariam de testes mais focados em features individuais.
+A **cobertura de testes** foi reforçada na rev.9: Catalog +94 testes (1535 total), Configuration +99 testes (550 total), Governance +52 testes (465 total) cobrindo 14 features anteriormente sem testes.
 
-O segundo gap remanescente é nos **testes de platform**: os testes E2E e de Integração requerem infraestrutura que não está configurada para CI. O build do Selenium.Tests foi corrigido na rev.7.
+A **infraestrutura CI** foi completada na rev.10: o job `test-backend-e2e` foi adicionado ao pipeline CI para executar os 51 testes E2E backend via WebApplicationFactory + Testcontainers PostgreSQL, integrado no `ci-status` quality gate. O job `test-backend-integration` já existia para os 66 testes de integração.
 
-**Nenhum bug funcional foi encontrado.** Todos os módulos compilam, todos os testes unitários passam, e a arquitectura modular está consistente.
+**Todos os 7 itens dos Próximos Passos Recomendados estão agora CONCLUÍDOS.** Nenhum bug funcional foi encontrado. Todos os módulos compilam, todos os testes unitários passam, e a arquitectura modular está consistente.
 
 ### Próximos Passos Recomendados
 
@@ -1882,4 +1884,4 @@ O segundo gap remanescente é nos **testes de platform**: os testes E2E e de Int
 4. ~~🟠 **Corrigir Selenium.Tests**~~ ✅ FEITO (rev.7) — pacotes adicionados ao CPM
 5. ~~🟡 **Adicionar 2 validators**~~ ✅ FEITO (rev.7) — ActivateServiceTemplate, DeactivateServiceTemplate
 6. ~~🟡 **Mover hardcoded strings para i18n**~~ ✅ FEITO (rev.8) — 72 placeholders em 11 ficheiros, 72 chaves i18n em 4 idiomas
-7. 🟡 **Configurar infraestrutura CI** para E2E e Integration tests (PostgreSQL em pipeline)
+7. ~~🟡 **Configurar infraestrutura CI** para E2E e Integration tests (PostgreSQL em pipeline)~~ ✅ FEITO (rev.10) — Job `test-backend-e2e` adicionado ao CI com Testcontainers PostgreSQL, incluído no `ci-status` gate
