@@ -714,9 +714,81 @@ CREATE POLICY tenant_isolation ON gov_cost_attributions
     USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
     WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
 
+-- ── Wave G: Visualization & Marketplace (Ideas 4, 5, 9, 11, 21, 22, 23) ─────
+
+-- cat_semantic_diff_results — Semantic diff results per tenant (Idea 5)
+ALTER TABLE cat_semantic_diff_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_semantic_diff_results;
+CREATE POLICY tenant_isolation ON cat_semantic_diff_results
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_contract_compliance_gates — Contract compliance gates per tenant (Idea 22)
+ALTER TABLE cat_contract_compliance_gates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_compliance_gates;
+CREATE POLICY tenant_isolation ON cat_contract_compliance_gates
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_contract_compliance_results — Compliance evaluation results per tenant (Idea 22)
+ALTER TABLE cat_contract_compliance_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_compliance_results;
+CREATE POLICY tenant_isolation ON cat_contract_compliance_results
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- chg_blast_radius_reports — Blast radius visualization reports per tenant (Idea 4)
+ALTER TABLE chg_blast_radius_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON chg_blast_radius_reports;
+CREATE POLICY tenant_isolation ON chg_blast_radius_reports
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- chg_promotion_gates — Smart promotion gates per tenant (Idea 9)
+ALTER TABLE chg_promotion_gates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON chg_promotion_gates;
+CREATE POLICY tenant_isolation ON chg_promotion_gates
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- chg_promotion_gate_evaluations — Gate evaluation results per tenant (Idea 9)
+ALTER TABLE chg_promotion_gate_evaluations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON chg_promotion_gate_evaluations;
+CREATE POLICY tenant_isolation ON chg_promotion_gate_evaluations
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_contract_listings — Contract marketplace listings per tenant (Idea 11)
+ALTER TABLE cat_contract_listings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_listings;
+CREATE POLICY tenant_isolation ON cat_contract_listings
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_contract_reviews — Contract marketplace reviews per tenant (Idea 11)
+ALTER TABLE cat_contract_reviews ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_contract_reviews;
+CREATE POLICY tenant_isolation ON cat_contract_reviews
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- cat_impact_simulations — Dependency impact simulations per tenant (Idea 21)
+ALTER TABLE cat_impact_simulations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cat_impact_simulations;
+CREATE POLICY tenant_isolation ON cat_impact_simulations
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
+-- gov_license_compliance_reports — License compliance reports per tenant (Idea 23)
+ALTER TABLE gov_license_compliance_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON gov_license_compliance_reports;
+CREATE POLICY tenant_isolation ON gov_license_compliance_reports
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text)
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id()::text);
+
 -- ════════════════════════════════════════════════════════════════════════════════
 -- SUMMARY:
---   RLS enabled on 90 tables covering all major tenant-aware data domains.
+--   RLS enabled on 100 tables covering all major tenant-aware data domains.
 --   Remaining tables (system-level: iam_tenants, iam_roles, iam_permissions,
 --   system cfg definitions, aud_chain_links) intentionally excluded — they store
 --   global/system data not scoped to a single tenant.

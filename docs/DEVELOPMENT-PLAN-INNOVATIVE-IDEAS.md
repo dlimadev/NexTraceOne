@@ -32,7 +32,7 @@ Este documento detalha o **plano de desenvolvimento** para cada uma das 29 ideia
 | **Wave D** | Developer Experience | 14, 19, 24, 26 | Pipelines, IDE, onboarding, negociação |
 | **Wave E** | Governance & Reliability | 7, 17, 20, 27 | Self-healing, schema advisor, playbooks, chaos |
 | **Wave F** | Executive & FinOps | 13, 15, 18, 28 | Dashboards executivos, custo contextual |
-| **Wave G** | Visualization & Marketplace | 4, 11, 21, 23 | 3D visualization, marketplace, simulador, licenças |
+| **Wave G** | Visualization & Marketplace | 4, 5, 9, 11, 21, 22, 23 | 3D visualization, semantic diff, promotion gates, marketplace, simulador, compliance gates, licenças |
 
 ---
 
@@ -139,10 +139,11 @@ ChangeConfidenceEvent (entidade)
 
 ---
 
-### Ideia 5 — Contract Diff Semântico com IA
+### ✅ Ideia 5 — Contract Diff Semântico com IA
 
 **Módulo:** Catalog (Contract) + AIKnowledge  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — SemanticDiffResult, GenerateSemanticDiff, ComputeSemanticDiff, GetSemanticDiff, ListSemanticDiffs
 
 #### Entidades de Domínio
 
@@ -185,10 +186,11 @@ SemanticDiffResult (value object / JSONB)
 
 ---
 
-### Ideia 9 — Smart Promotion Gates
+### ✅ Ideia 9 — Smart Promotion Gates
 
 **Módulo:** ChangeGovernance  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — PromotionGate, PromotionGateEvaluation, CreatePromotionGate, EvaluatePromotionGate, GetPromotionGateStatus, ListPromotionGatesByEnvironment
 
 #### Entidades de Domínio
 
@@ -236,10 +238,11 @@ PromotionGateEvaluation (entidade)
 
 ---
 
-### Ideia 22 — Automated Contract Compliance Gate
+### ✅ Ideia 22 — Automated Contract Compliance Gate
 
 **Módulo:** Catalog + ChangeGovernance  
-**Complexidade:** 🟠 Média-Alta
+**Complexidade:** 🟠 Média-Alta  
+**Estado:** ✅ Implementado — ContractComplianceGate, ContractComplianceResult, CreateComplianceGate, EvaluateContractComplianceGate
 
 #### Entidades de Domínio
 
@@ -1115,17 +1118,19 @@ PlaybookExecution (entidade)
 
 ---
 
-## Wave G — Visualization & Marketplace
+## Wave G — Visualization & Marketplace ✅
 
 > **Prioridade:** 🟢 Exploratória  
-> **Justificativa:** Diferenciais visuais e marketplace interno de contratos
+> **Justificativa:** Diferenciais visuais e marketplace interno de contratos  
+> **Estado:** ✅ Completa — todas as 7 ideias implementadas com entidades, features VSA, testes e RLS.
 
 ---
 
-### Ideia 4 — Blast Radius Visualization 3D
+### ✅ Ideia 4 — Blast Radius Visualization 3D
 
 **Módulo:** ChangeGovernance (frontend-heavy)  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — BlastRadiusReport, CalculateBlastRadius, GetBlastRadiusReport
 
 #### Backend
 
@@ -1147,10 +1152,11 @@ PlaybookExecution (entidade)
 
 ---
 
-### Ideia 11 — Contract Marketplace Interno
+### ✅ Ideia 11 — Contract Marketplace Interno
 
 **Módulo:** Catalog  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — ContractListing, MarketplaceReview, PublishToMarketplace, SubmitContractReview, SearchMarketplace, GetContractListing
 
 #### Entidades de Domínio
 
@@ -1194,10 +1200,11 @@ ContractReview (entidade)
 
 ---
 
-### Ideia 21 — Service Dependency Impact Simulator
+### ✅ Ideia 21 — Service Dependency Impact Simulator
 
 **Módulo:** Catalog + ChangeGovernance  
-**Complexidade:** 🔴 Alta
+**Complexidade:** 🔴 Alta  
+**Estado:** ✅ Implementado — ImpactSimulation, SimulateDependencyImpact, GetImpactSimulation, ListImpactSimulations
 
 #### Backend
 
@@ -1220,10 +1227,11 @@ ContractReview (entidade)
 
 ---
 
-### Ideia 23 — Dependency License Compliance Radar
+### ✅ Ideia 23 — Dependency License Compliance Radar
 
 **Módulo:** Governance  
-**Complexidade:** 🟠 Média
+**Complexidade:** 🟠 Média  
+**Estado:** ✅ Implementado — LicenseComplianceReport, GenerateLicenseComplianceReport, GetLicenseComplianceReport, ListLicenseComplianceReports
 
 #### Backend
 
