@@ -1878,7 +1878,7 @@ O segundo gap remanescente é nos **testes de platform**: os testes E2E e de Int
 
 1. ~~🔴 **Corrigir 3 phantom RLS policies**~~ ✅ FEITO (rev.7)
 2. ~~🔴 **Adicionar RLS** às 168 tabelas em falta~~ ✅ FEITO (rev.7) — 86 tabelas adicionadas, 96% cobertura
-3. 🟠 **Aumentar cobertura de testes** nos módulos com <35% (Catalog, Configuration, Governance)
+3. ~~🟠 **Aumentar cobertura de testes** nos módulos com <35% (Catalog, Configuration, Governance)~~ ✅ FEITO (rev.9) — Catalog 1535 testes (+94), Configuration 550 testes (+99), Governance 465 testes (+52 para 14 features sem cobertura)
 4. ~~🟠 **Corrigir Selenium.Tests**~~ ✅ FEITO (rev.7) — pacotes adicionados ao CPM
 5. ~~🟡 **Adicionar 2 validators**~~ ✅ FEITO (rev.7) — ActivateServiceTemplate, DeactivateServiceTemplate
 6. ~~🟡 **Mover hardcoded strings para i18n**~~ ✅ FEITO (rev.8) — 72 placeholders em 11 ficheiros, 72 chaves i18n em 4 idiomas
