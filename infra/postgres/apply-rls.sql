@@ -1206,6 +1206,27 @@ CREATE POLICY tenant_isolation ON ctr_spectral_rulesets
     USING  (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id())
     WITH CHECK (get_current_tenant_id() IS NULL OR tenant_id = get_current_tenant_id());
 
+-- ctr_contract_verifications — contract verifications per tenant
+ALTER TABLE ctr_contract_verifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_verifications;
+CREATE POLICY tenant_isolation ON ctr_contract_verifications
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+-- ctr_contract_changelogs — contract changelogs per tenant
+ALTER TABLE ctr_contract_changelogs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON ctr_contract_changelogs;
+CREATE POLICY tenant_isolation ON ctr_contract_changelogs
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
+-- cfg_contract_compliance_policies — contract compliance policies per tenant
+ALTER TABLE cfg_contract_compliance_policies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON cfg_contract_compliance_policies;
+CREATE POLICY tenant_isolation ON cfg_contract_compliance_policies
+    USING  (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id())
+    WITH CHECK (get_current_tenant_id() IS NULL OR "TenantId" = get_current_tenant_id());
+
 
 -- ── Governance module — additional gov_ tables ────────────────────────────
 
