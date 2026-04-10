@@ -12,6 +12,7 @@ var rootCommand = new RootCommand("NexTraceOne CLI — Sovereign Change Intellig
 
 rootCommand.Add(ValidateCommand.Create());
 rootCommand.Add(CatalogCommand.Create());
+rootCommand.Add(ContractCommand.Create());
 
 // Show banner only when invoked with no arguments
 if (args.Length == 0)
