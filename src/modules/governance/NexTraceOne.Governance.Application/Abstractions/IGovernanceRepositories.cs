@@ -514,3 +514,26 @@ public interface ICostAttributionRepository
     /// <summary>Adiciona uma nova atribuição de custo ao repositório.</summary>
     Task AddAsync(CostAttribution attribution, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de LicenseComplianceReport para o módulo Governance.
+/// Define operações CRUD e consultas para relatórios de compliance de licenças de dependências.
+/// </summary>
+public interface ILicenseComplianceReportRepository
+{
+    /// <summary>Obtém um relatório de compliance de licenças pelo seu identificador.</summary>
+    Task<LicenseComplianceReport?> GetByIdAsync(LicenseComplianceReportId id, CancellationToken ct);
+
+    /// <summary>Lista relatórios de compliance por escopo, opcionalmente filtrados por scope key.</summary>
+    Task<IReadOnlyList<LicenseComplianceReport>> ListByScopeAsync(
+        LicenseComplianceScope scope,
+        string? scopeKey,
+        CancellationToken ct);
+
+    /// <summary>Obtém o relatório mais recente para um scope key específico.</summary>
+    Task<LicenseComplianceReport?> GetLatestByScopeKeyAsync(
+        string scopeKey, CancellationToken ct);
+
+    /// <summary>Adiciona um novo relatório de compliance ao repositório.</summary>
+    Task AddAsync(LicenseComplianceReport report, CancellationToken ct);
+}

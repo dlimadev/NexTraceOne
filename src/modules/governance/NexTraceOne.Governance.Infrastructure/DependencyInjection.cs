@@ -74,6 +74,9 @@ public static class DependencyInjection
         // Cost Attributions (FinOps contextual)
         services.AddScoped<ICostAttributionRepository, CostAttributionRepository>();
 
+        // License Compliance Reports
+        services.AddScoped<ILicenseComplianceReportRepository, LicenseComplianceReportRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();
