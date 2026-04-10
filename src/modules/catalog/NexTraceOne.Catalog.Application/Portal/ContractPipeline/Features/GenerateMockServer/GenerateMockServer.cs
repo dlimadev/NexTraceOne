@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using Ardalis.GuardClauses;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Shared;
@@ -31,7 +32,7 @@ public static class GenerateMockServer
     }
 
     /// <summary>Handler que gera ficheiros de mock server.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         private static readonly JsonSerializerOptions s_options = new() { WriteIndented = true };
 
@@ -50,7 +51,7 @@ public static class GenerateMockServer
                 Instructions: instructions)));
         }
 
-        private static (IReadOnlyList<GeneratedFile> Files, string Instructions) GenerateWireMock(Guid id, string contractJson)
+        private (IReadOnlyList<GeneratedFile> Files, string Instructions) GenerateWireMock(Guid id, string contractJson)
         {
             var files = new List<GeneratedFile>();
             try
@@ -75,13 +76,13 @@ public static class GenerateMockServer
                     }
                 }
             }
-            catch (JsonException) { /* returns empty stubs */ }
+            catch (JsonException ex) { logger.LogWarning(ex, "Failed to parse contract JSON for WireMock stub generation. ContractVersionId={ContractVersionId}", id); }
 
             var instructions = "Start WireMock with: java -jar wiremock-standalone.jar --port 8080 --root-dir .";
             return (files, instructions);
         }
 
-        private static (IReadOnlyList<GeneratedFile> Files, string Instructions) GenerateJsonServer(Guid id, string contractJson)
+        private (IReadOnlyList<GeneratedFile> Files, string Instructions) GenerateJsonServer(Guid id, string contractJson)
         {
             var db = new Dictionary<string, object>();
             var routes = new Dictionary<string, string>();
@@ -104,7 +105,7 @@ public static class GenerateMockServer
                     }
                 }
             }
-            catch (JsonException) { /* returns minimal files */ }
+            catch (JsonException ex) { logger.LogWarning(ex, "Failed to parse contract JSON for json-server generation. ContractVersionId={ContractVersionId}", id); }
 
             var files = new List<GeneratedFile>
             {

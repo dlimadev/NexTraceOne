@@ -4,6 +4,8 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -38,7 +40,7 @@ public static class GenerateMockConfiguration
     /// Handler que extrai rotas e exemplos de resposta da spec e gera configuração de mock.
     /// Usa CanonicalModelBuilder para normalizar a spec; para specs malformadas gera mock básico.
     /// </summary>
-    public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
+    public sealed class Handler(IContractVersionRepository repository, ILogger<Handler> logger) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -79,8 +81,9 @@ public static class GenerateMockConfiguration
                 if (routes.Count == 0)
                     routes.Add(new MockRoute("/api/v1/resource", "GET", 200, "{\"message\": \"mock response\"}", "application/json"));
             }
-            catch
+            catch (Exception ex)
             {
+                logger.LogWarning(ex, "Failed to parse spec for contract version {ContractVersionId}; falling back to default mock route", request.ContractVersionId);
                 contractTitle = $"Contract {version.SemVer}";
                 routes.Add(new MockRoute("/api/v1/resource", "GET", 200, "{\"message\": \"mock response\"}", "application/json"));
             }
@@ -111,7 +114,7 @@ public static class GenerateMockConfiguration
             return JsonSerializer.Serialize(props, new JsonSerializerOptions { WriteIndented = false });
         }
 
-        private static void TryEnrichRoutesFromSpec(string specContent, List<MockRoute> routes)
+        private void TryEnrichRoutesFromSpec(string specContent, List<MockRoute> routes)
         {
             try
             {
@@ -147,10 +150,10 @@ public static class GenerateMockConfiguration
                     }
                 }
             }
-            catch { /* Ignorar erros de parsing */ }
+            catch (Exception ex) { logger.LogWarning(ex, "Failed to enrich mock routes from spec JSON"); }
         }
 
-        private static string? ExtractExampleFromResponse(JsonElement response)
+        private string? ExtractExampleFromResponse(JsonElement response)
         {
             try
             {
@@ -172,7 +175,7 @@ public static class GenerateMockConfiguration
                         return ex.GetRawText();
                 }
             }
-            catch { /* Ignorar */ }
+            catch (Exception ex) { logger.LogWarning(ex, "Failed to extract example from response element"); }
             return null;
         }
 

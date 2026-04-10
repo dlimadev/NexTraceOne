@@ -9,9 +9,8 @@ namespace NexTraceOne.Configuration.API.Endpoints;
 
 /// <summary>
 /// [PREVIEW] Endpoint de exportação genérica de dados.
-/// Aceita pedidos de exportação e retorna status "queued".
-/// A geração real de ficheiros CSV/JSON/PDF está prevista como evolução futura via Quartz job.
-/// Suporta formatos CSV, JSON e PDF com selecção de colunas e filtros.
+/// Retorna status "not_implemented" até a geração real de ficheiros via Quartz job estar disponível.
+/// A implementação completa incluirá geração de ficheiros CSV/JSON/PDF com suporte a streaming.
 /// </summary>
 public sealed class ExportEndpointModule
 {
@@ -24,6 +23,7 @@ public sealed class ExportEndpointModule
         group.MapPost("/", async (
             ExportRequest request,
             IErrorLocalizer localizer,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
             if (string.IsNullOrWhiteSpace(request.Entity))
@@ -34,17 +34,18 @@ public sealed class ExportEndpointModule
             if (!supportedFormats.Contains(format))
                 return Results.BadRequest(new { error = $"Format must be one of: {string.Join(", ", supportedFormats)}." });
 
-            // Return a stub response confirming the export parameters.
-            // Real export generation (streaming CSV/JSON/PDF bytes) is a Quartz job roadmap item.
-            var response = new ExportResponse(
-                Entity: request.Entity,
-                Format: format,
-                Columns: request.Columns ?? [],
-                FiltersJson: request.FiltersJson ?? "{}",
-                Status: "queued",
-                Message: $"Export of '{request.Entity}' as {format.ToUpperInvariant()} queued. Download will be available shortly.");
-
-            return Results.Accepted("/api/v1/export/status", response);
+            // Sinalizar explicitamente que a funcionalidade ainda não está implementada.
+            // A geração real de ficheiros via Quartz job está no roadmap.
+            httpContext.Response.Headers["X-Feature-Preview"] = "true";
+            return Results.Json(new
+            {
+                status = "not_implemented",
+                isPreview = true,
+                entity = request.Entity,
+                format,
+                message = $"Export of '{request.Entity}' as {format.ToUpperInvariant()} is not yet available. " +
+                          "This feature is planned for a future release."
+            }, statusCode: StatusCodes.Status501NotImplemented);
         });
     }
 
@@ -53,12 +54,4 @@ public sealed class ExportEndpointModule
         string? Format,
         string[]? Columns,
         string? FiltersJson);
-
-    private sealed record ExportResponse(
-        string Entity,
-        string Format,
-        string[] Columns,
-        string FiltersJson,
-        string Status,
-        string Message);
 }

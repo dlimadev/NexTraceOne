@@ -84,6 +84,7 @@ internal static class EnvironmentEndpoints
         }).RequirePermission("env:environments:write");
 
         // Designa um ambiente como produção principal do tenant — requer permissão administrativa
+        // específica para operações em produção, distinta de operações em ambientes não-produtivos.
         envGroup.MapPatch("/{environmentId:guid}/primary-production", async (
             Guid environmentId,
             ISender sender,
@@ -92,7 +93,7 @@ internal static class EnvironmentEndpoints
         {
             var result = await sender.Send(new SetPrimaryProductionFeature.Command(environmentId), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("env:environments:admin");
+        }).RequirePermission("env:environments:production:admin");
 
         // Concede acesso a um ambiente para um utilizador — requer permissão administrativa de acesso
         envGroup.MapPost("/access", async (

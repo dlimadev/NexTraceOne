@@ -46,6 +46,26 @@ public sealed class RunbookEndpointModule
         .WithName("ListRunbooks")
         .WithSummary("List runbooks with optional filters");
 
+        // ── GET /api/v1/runbooks/suggest — Sugerir runbooks para um incidente ──
+        // NOTA: Mapeado ANTES da rota paramétrica /{runbookId} para evitar que
+        // "suggest" seja capturado como runbookId pela rota genérica.
+        group.MapGet("/suggest", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string? serviceId,
+            string? incidentType,
+            string? incidentTitle,
+            int maxResults = 5,
+            CancellationToken cancellationToken = default) =>
+        {
+            var query = new SuggestRunbooksForIncident.Query(serviceId, incidentType, incidentTitle, maxResults);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runbooks:read")
+        .WithName("SuggestRunbooksForIncident")
+        .WithSummary("Suggest relevant runbooks for an incident based on service, type and title matching");
+
         // ── GET /api/v1/runbooks/{runbookId} — Detalhe do runbook ──
         group.MapGet("/{runbookId}", async (
             ISender sender,
@@ -90,23 +110,5 @@ public sealed class RunbookEndpointModule
         .RequirePermission("operations:runbooks:write")
         .WithName("UpdateRunbook")
         .WithSummary("Update an existing operational runbook");
-
-        // ── GET /api/v1/runbooks/suggest — Sugerir runbooks para um incidente ──
-        group.MapGet("/suggest", async (
-            ISender sender,
-            IErrorLocalizer localizer,
-            string? serviceId,
-            string? incidentType,
-            string? incidentTitle,
-            int maxResults = 5,
-            CancellationToken cancellationToken = default) =>
-        {
-            var query = new SuggestRunbooksForIncident.Query(serviceId, incidentType, incidentTitle, maxResults);
-            var result = await sender.Send(query, cancellationToken);
-            return result.ToHttpResult(localizer);
-        })
-        .RequirePermission("operations:runbooks:read")
-        .WithName("SuggestRunbooksForIncident")
-        .WithSummary("Suggest relevant runbooks for an incident based on service, type and title matching");
     }
 }

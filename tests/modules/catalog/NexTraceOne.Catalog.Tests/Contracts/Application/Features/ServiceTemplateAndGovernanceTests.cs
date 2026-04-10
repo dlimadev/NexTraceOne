@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging.Abstractions;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -324,7 +326,7 @@ public sealed class ServiceTemplateAndGovernanceTests
     [Fact]
     public async Task GenerateMockServer_Should_ReturnFiles_When_CommandIsValid()
     {
-        var sut = new GenerateMockServerFeature.Handler();
+        var sut = new GenerateMockServerFeature.Handler(NullLogger<GenerateMockServerFeature.Handler>.Instance);
 
         var result = await sut.Handle(
             new GenerateMockServerFeature.Command(

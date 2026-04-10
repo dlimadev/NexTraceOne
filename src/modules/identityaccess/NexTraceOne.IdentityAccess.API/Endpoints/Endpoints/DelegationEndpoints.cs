@@ -26,7 +26,7 @@ internal static class DelegationEndpoints
     {
         var delGroup = group.MapGroup("/delegations");
 
-        // Qualquer usuário autenticado pode criar delegação — o handler valida que o
+        // Requer permissão explícita para criar delegação — o handler valida adicionalmente que o
         // delegante possui as permissões que deseja delegar (ScopeExceedsGrantor).
         delGroup.MapPost("/", async (
             CreateDelegationFeature.Command command,
@@ -36,7 +36,7 @@ internal static class DelegationEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:delegations:manage");
 
         delGroup.MapPost("/{delegationId:guid}/revoke", async (
             Guid delegationId,
