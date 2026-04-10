@@ -98,6 +98,12 @@ public sealed class ContractsDbContext(
     /// <summary>Resultados de diff semântico assistido por IA entre versões de contrato.</summary>
     public DbSet<SemanticDiffResult> SemanticDiffResults => Set<SemanticDiffResult>();
 
+    /// <summary>Listagens de contratos publicados no marketplace interno.</summary>
+    public DbSet<ContractListing> ContractListings => Set<ContractListing>();
+
+    /// <summary>Avaliações de contratos publicados no marketplace interno.</summary>
+    public DbSet<MarketplaceReview> MarketplaceReviews => Set<MarketplaceReview>();
+
     /// <summary>Gates de compliance contratual configuráveis por organização, equipa ou ambiente.</summary>
     public DbSet<ContractComplianceGate> ContractComplianceGates => Set<ContractComplianceGate>();
 
