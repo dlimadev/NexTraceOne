@@ -48,6 +48,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             else
             {
                 await dbContext.Definitions.AddAsync(definition, cancellationToken);
+                existingKeys.Add(definition.Key);
                 added++;
             }
         }

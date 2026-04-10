@@ -17,7 +17,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -146,6 +146,64 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                     b.ToTable("ops_burn_rate_snapshots", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.CapacityForecast", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("CurrentUtilizationPercent")
+                        .HasPrecision(8, 4)
+                        .HasColumnType("numeric(8,4)");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("EstimatedDaysToSaturation")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("GrowthRatePercentPerDay")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ResourceType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("SaturationRisk")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ServiceId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Environment");
+
+                    b.HasIndex("SaturationRisk");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("ops_reliability_capacity_forecasts", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.ErrorBudgetSnapshot", b =>
                 {
                     b.Property<Guid>("Id")
@@ -221,6 +279,231 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                     b.HasIndex("TenantId", "SloDefinitionId", "ComputedAt");
 
                     b.ToTable("ops_error_budget_snapshots", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.HealingRecommendation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ActionDetails")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ApprovedByUserId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("ConfidenceScore")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("EstimatedImpact")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("EvidenceTrail")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("ExecutionCompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExecutionResult")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("ExecutionStartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("HistoricalSuccessRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<Guid?>("IncidentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RelatedRunbookIds")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("RootCauseDescription")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceName");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_ops_reliability_healing_recommendations_tenant_id");
+
+                    b.HasIndex("ServiceName", "Status", "GeneratedAt");
+
+                    b.ToTable("ops_reliability_healing_recommendations", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.IncidentPredictionPattern", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ConfidencePercent")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset>("DetectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Evidence")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("OccurrenceCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PatternName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("PatternType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("PreventionRecommendations")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("SampleSize")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ServiceId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TriggerConditions")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("ValidatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ValidationComment")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Environment");
+
+                    b.HasIndex("PatternType");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_ops_reliability_incident_prediction_patterns_tenant_id");
+
+                    b.HasIndex("ServiceId", "Environment", "DetectedAt");
+
+                    b.ToTable("ops_reliability_incident_prediction_patterns", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.ReliabilitySnapshot", b =>
@@ -300,6 +583,62 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                         {
                             t.HasCheckConstraint("CK_ops_reliability_snapshots_trend", "\"TrendDirection\" >= 0 AND \"TrendDirection\" <= 2");
                         });
+                });
+
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.ServiceFailurePrediction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CausalFactors")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("FailureProbabilityPercent")
+                        .HasPrecision(8, 4)
+                        .HasColumnType("numeric(8,4)");
+
+                    b.Property<string>("PredictionHorizon")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("RecommendedAction")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RiskLevel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ServiceId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Environment");
+
+                    b.HasIndex("RiskLevel");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("ops_reliability_failure_predictions", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.SlaDefinition", b =>
@@ -486,120 +825,6 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                         .IsRequired();
 
                     b.Navigation("SloDefinition");
-                });
-
-            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.CapacityForecast", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("ComputedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("CurrentUtilizationPercent")
-                        .HasPrecision(8, 4)
-                        .HasColumnType("numeric(8,4)");
-
-                    b.Property<string>("Environment")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int?>("EstimatedDaysToSaturation")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("GrowthRatePercentPerDay")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("numeric(10,4)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("ResourceType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("SaturationRisk")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("ServiceId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Environment");
-
-                    b.HasIndex("SaturationRisk");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("ops_reliability_capacity_forecasts", (string)null);
-                });
-
-            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities.ServiceFailurePrediction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CausalFactors")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<DateTimeOffset>("ComputedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Environment")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<decimal>("FailureProbabilityPercent")
-                        .HasPrecision(8, 4)
-                        .HasColumnType("numeric(8,4)");
-
-                    b.Property<string>("PredictionHorizon")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("RecommendedAction")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("RiskLevel")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("ServiceId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Environment");
-
-                    b.HasIndex("RiskLevel");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("ops_reliability_failure_predictions", (string)null);
                 });
 #pragma warning restore 612, 618
         }

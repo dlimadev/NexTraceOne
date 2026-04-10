@@ -29,12 +29,13 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
         ?? configuration["Security:Jwt:Audience"]
         ?? "NexTraceOne.Clients";
 
-    private readonly string _signingKey = configuration["Jwt:Secret"]
-        ?? configuration["Security:Jwt:SigningKey"]
-        ?? throw new InvalidOperationException(
-            "JWT signing key is not configured. Set 'Jwt:Secret' via environment variable (Jwt__Secret), " +
-            "dotnet user-secrets, or a secrets manager. " +
-            "A signing key is mandatory in all environments.");
+    private readonly string _signingKey = ValidateSigningKey(
+        configuration["Jwt:Secret"]
+            ?? configuration["Security:Jwt:SigningKey"]
+            ?? throw new InvalidOperationException(
+                "JWT signing key is not configured. Set 'Jwt:Secret' via environment variable (Jwt__Secret), " +
+                "dotnet user-secrets, or a secrets manager. " +
+                "A signing key is mandatory in all environments."));
 
     private readonly int _accessTokenLifetimeMinutes = int.TryParse(
             configuration["Jwt:AccessTokenExpirationMinutes"]
@@ -105,4 +106,16 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
     /// <inheritdoc />
     public string GenerateRefreshToken()
         => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+    private static string ValidateSigningKey(string key)
+    {
+        var keyBytes = Encoding.UTF8.GetByteCount(key);
+        if (keyBytes < 16)
+            throw new InvalidOperationException(
+                $"JWT signing key is too short ({keyBytes * 8} bits). " +
+                "HS256 requires at least 128 bits (16 bytes). " +
+                "Recommended minimum is 256 bits (32 bytes). " +
+                "Set a longer 'Jwt:Secret' via user-secrets or environment variable.");
+        return key;
+    }
 }

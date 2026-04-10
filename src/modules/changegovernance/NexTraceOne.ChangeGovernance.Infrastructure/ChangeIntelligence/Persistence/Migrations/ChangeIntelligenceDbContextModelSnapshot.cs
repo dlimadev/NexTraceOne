@@ -17,7 +17,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -173,6 +173,50 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                             t.HasCheckConstraint("CK_chg_canary_rollouts_total_instances", "\"TotalInstances\" >= 0");
                         });
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeConfidenceEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ConfidenceAfter")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ConfidenceBefore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OccurredAt");
+
+                    b.HasIndex("ReleaseId");
+
+                    b.ToTable("chg_change_confidence_events", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeEvent", b =>
@@ -530,6 +574,122 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.ToTable("chg_post_release_reviews", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.PromotionGate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("BlockOnFailure")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("EnvironmentFrom")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("EnvironmentTo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("Rules")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("EnvironmentFrom", "EnvironmentTo");
+
+                    b.ToTable("chg_promotion_gates", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.PromotionGateEvaluation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ChangeId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("EvaluatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EvaluatedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("GateId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Result")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("RuleResults")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangeId");
+
+                    b.HasIndex("EvaluatedAt");
+
+                    b.HasIndex("GateId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("chg_promotion_gate_evaluations", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.Release", b =>
                 {
                     b.Property<Guid>("Id")
@@ -755,6 +915,88 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ReleaseId");
 
                     b.ToTable("chg_feature_flag_states", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ReleaseNotes", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AffectedServicesSection")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BreakingChangesSection")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConfidenceMetricsSection")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvidenceLinksSection")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExecutiveSummary")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LastRegeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModelUsed")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NewEndpointsSection")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RegenerationCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TechnicalSummary")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TokensUsed")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneratedAt");
+
+                    b.HasIndex("ReleaseId")
+                        .IsUnique();
+
+                    b.ToTable("chg_release_notes", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.RollbackAssessment", b =>

@@ -17,7 +17,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -68,6 +68,87 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("gov_outbox_messages", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.ChangeCostImpact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ActualCostPerDay")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("BaselineCostPerDay")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("ChangeDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal>("CostDelta")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("CostDeltaPercentage")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("CostDetails")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CostProvider")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Direction")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("MeasurementWindowEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("MeasurementWindowStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CostDelta");
+
+                    b.HasIndex("RecordedAt");
+
+                    b.HasIndex("ReleaseId");
+
+                    b.HasIndex("ServiceName");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_change_cost_impacts", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.ComplianceGap", b =>
@@ -128,6 +209,161 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("Team");
 
                     b.ToTable("gov_compliance_gaps", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.CostAttribution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AttributionMethod")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("ComputeCost")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CostBreakdown")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("DataSources")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Dimension")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("DimensionKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("DimensionLabel")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<decimal>("NetworkCost")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("OtherCost")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<DateTimeOffset>("PeriodEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("PeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<decimal>("StorageCost")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Dimension");
+
+                    b.HasIndex("DimensionKey");
+
+                    b.HasIndex("PeriodEnd");
+
+                    b.HasIndex("PeriodStart");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TotalCost");
+
+                    b.HasIndex("Dimension", "PeriodStart", "PeriodEnd");
+
+                    b.ToTable("gov_cost_attributions", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.CustomDashboard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsShared")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Layout")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Persona")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WidgetIds")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("Persona");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_custom_dashboards", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DelegatedAdministration", b =>
@@ -296,6 +532,94 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_gov_evidence_packages_status", "\"Status\" IN ('Draft', 'Sealed', 'Exported')");
                         });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.ExecutiveBriefing", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ActiveRisksSection")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("ArchivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ComplianceStatusSection")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("CostTrendsSection")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ExecutiveSummary")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Frequency")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("GeneratedByAgent")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("HighRiskChangesSection")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("PeriodEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("PeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PlatformStatusSection")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TeamPerformanceSection")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("TopIncidentsSection")
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Frequency");
+
+                    b.HasIndex("GeneratedAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_executive_briefings", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.GovernanceDomain", b =>
@@ -599,6 +923,87 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.LicenseComplianceReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("CompliancePercent")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CompliantCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Conflicts")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("LicenseDetails")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("NonCompliantCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("OverallRiskLevel")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Recommendations")
+                        .HasColumnType("jsonb");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTimeOffset>("ScannedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ScopeKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ScopeLabel")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<int>("TotalDependencies")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WarningCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompliancePercent");
+
+                    b.HasIndex("OverallRiskLevel");
+
+                    b.HasIndex("ScannedAt");
+
+                    b.HasIndex("Scope");
+
+                    b.HasIndex("ScopeKey");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("Scope", "ScopeKey", "ScannedAt");
+
+                    b.ToTable("gov_license_compliance_reports", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.PolicyAsCodeDefinition", b =>
                 {
                     b.Property<Guid>("Id")
@@ -692,6 +1097,96 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.ToTable("gov_policy_as_code", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.ServiceMaturityAssessment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AlertsConfigured")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ApprovalWorkflowActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("AssessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AssessedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("BaselinesEstablished")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ChaosValidated")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ContractsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CurrentLevel")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("DocumentationExists")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LastReassessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("OwnershipDefined")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("PoliciesApplied")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ReassessmentCount")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("RollbackTested")
+                        .HasColumnType("boolean");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<bool>("RunbooksAvailable")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("TelemetryActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssessedAt");
+
+                    b.HasIndex("CurrentLevel");
+
+                    b.HasIndex("ServiceId")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_service_maturity_assessments", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -778,6 +1273,152 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("gov_team_domain_links", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.TeamHealthSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("AssessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ContractHealthScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("DimensionDetails")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("DocCoverageScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IncidentFrequencyScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MttrScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OverallScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PolicyComplianceScore")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<int>("ServiceCountScore")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TeamName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("TechDebtScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssessedAt");
+
+                    b.HasIndex("OverallScore");
+
+                    b.HasIndex("TeamId")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_team_health_snapshots", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.TechnicalDebtItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DebtScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("DebtType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("EstimatedEffortDays")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Tags")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("DebtType");
+
+                    b.HasIndex("ServiceName");
+
+                    b.HasIndex("Severity");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_technical_debt_items", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_gov_technical_debt_items_debt_type", "\"DebtType\" IN ('architecture', 'code-quality', 'security', 'dependency', 'documentation', 'testing', 'performance', 'infrastructure')");
+
+                            t.HasCheckConstraint("CK_gov_technical_debt_items_severity", "\"Severity\" IN ('critical', 'high', 'medium', 'low')");
+                        });
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.SecurityGate.Entities.SecurityFinding", b =>

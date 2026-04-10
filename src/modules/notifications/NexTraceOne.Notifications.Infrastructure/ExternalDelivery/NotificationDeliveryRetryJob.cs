@@ -33,7 +33,15 @@ internal sealed class NotificationDeliveryRetryJob(
         // Aguardar antes do primeiro ciclo para deixar a aplicação inicializar
         using var initScope = serviceScopeFactory.CreateScope();
         var initOpts = initScope.ServiceProvider.GetRequiredService<IOptions<DeliveryRetryOptions>>().Value;
-        await Task.Delay(TimeSpan.FromSeconds(initOpts.RetryJobStartupDelaySeconds), stoppingToken);
+
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(initOpts.RetryJobStartupDelaySeconds), stoppingToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -56,7 +64,14 @@ internal sealed class NotificationDeliveryRetryJob(
             var opts = scope.ServiceProvider.GetRequiredService<IOptions<DeliveryRetryOptions>>().Value;
             intervalSeconds = opts.RetryJobIntervalSeconds;
 
-            await Task.Delay(TimeSpan.FromSeconds(intervalSeconds), stoppingToken);
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(intervalSeconds), stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
         }
 
         logger.LogInformation("NotificationDeliveryRetryJob stopped.");
