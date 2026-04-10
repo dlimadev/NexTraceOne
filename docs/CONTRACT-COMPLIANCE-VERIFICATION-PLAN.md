@@ -1,8 +1,8 @@
 # Plano de Verificação de Conformidade de Contratos — NexTraceOne
 
-> **Versão:** 1.0  
+> **Versão:** 2.0 (análise expandida)  
 > **Data:** 2026-04-10  
-> **Módulos impactados:** Catalog, ChangeGovernance, Configuration, Integrations, CLI  
+> **Módulos impactados:** Catalog, ChangeGovernance, Configuration, Integrations, CLI, Frontend  
 > **Pilares reforçados:** Contract Governance, Change Intelligence, Source of Truth, Operational Consistency
 
 ---
@@ -1693,5 +1693,589 @@ A implementação inicial cobriu **~60% do plano total** em termos de backend/CL
 
 ---
 
+## 21. Análise de Duplicação e Reutilização de Lógica
+
+### 21.1 Problema Identificado: Diff Duplicado
+
+O `VerifyContractCompliance` handler (310 linhas) implementa a sua **própria lógica de diff** baseada em string parsing simplificado, quando o módulo Catalog já possui um ecossistema completo de diff semântico:
+
+| Capacidade | VerifyContractCompliance | ComputeSemanticDiff |
+|------------|:------------------------:|:-------------------:|
+| Parser de spec | String parsing JSON simples (regex-like) | `ContractDiffCalculator` com delegação por protocolo |
+| Protocolos suportados | Apenas JSON OpenAPI (formato indentado) | OpenAPI, Swagger, AsyncAPI, WSDL |
+| Classificação de mudanças | Apenas removidos vs novos (2 categorias) | Breaking, Non-Breaking, Additive (3 categorias com `ChangeEntry`) |
+| Sugestão de versão | ❌ Não implementado | ✅ Bump semântico baseado em `ChangeLevel` |
+| Publicação de evento de breaking change | ❌ Não implementado | ✅ `BreakingChangeDetectedIntegrationEvent` |
+| Persistência do diff | JSON serializado ad-hoc | `ContractDiff` entity com `SemanticDiffResult` |
+
+### 21.2 Código do Diff Simplificado em VerifyContractCompliance
+
+```
+ExtractOperations(specContent)
+  → parsing linha a linha por "\"/path\":" e "\"method\":"
+  → retorna List<OperationInfo(Method, Path)>
+  → Set comparison para removedEndpoints vs newEndpoints
+  → breakingCount = removedEndpoints.Count
+  → nonBreakingCount = submittedOps.Count - additiveCount (pode ser negativo → clamp a 0)
+```
+
+**Problemas específicos:**
+
+1. **Parser frágil** — O `ExtractOperations` faz parsing por strings literais (`"\"/..."`, `"\"get\":"`) em vez de usar um parser JSON/YAML. Falha com:
+   - YAML specs (sem aspas)
+   - Specs com indentação não-standard
+   - Paths com caracteres especiais escapados
+   - OpenAPI com `$ref` ou `allOf`/`oneOf`
+
+2. **NonBreakingChanges incorreto** — O cálculo `nonBreakingCount = submittedOps.Count - additiveCount` conta endpoints comuns como "non-breaking", mas não verifica se os schemas/responses dos endpoints comuns foram alterados. Endpoints inalterados são contados como "non-breaking changes".
+
+3. **Sem reutilização de `ContractDiffCalculator`** — O domain service `ContractDiffCalculator` existe, suporta múltiplos protocolos e é usado pelo `ComputeSemanticDiff`. O `VerifyContractCompliance` deveria delegar a este serviço em vez de reimplementar.
+
+### 21.3 Features Existentes Relacionadas (Inventário)
+
+O módulo Catalog possui **6 features** de diff/breaking/changelog que deveriam ser orquestradas pelo `VerifyContractCompliance`:
+
+| Feature | Linhas | Responsabilidade | Relação com Verificação |
+|---------|:------:|------------------|------------------------|
+| `ComputeSemanticDiff` | 151 | Diff multi-protocolo com `ContractDiffCalculator` | Deveria ser a base do diff na verificação |
+| `ClassifyBreakingChange` | 66 | Classificação formal de breaking changes | Deveria classificar as mudanças detetadas |
+| `GenerateSemanticChangelog` | 145 | Changelog textual a partir de diff | Deveria alimentar geração de changelog |
+| `GenerateSemanticDiff` | — | Geração e persistência de diff | Persistência formal do resultado |
+| `DetectContractDrift` | 156 | Drift spec vs runtime traces | Usa o mesmo pattern de `ExtractOperations` |
+| `EvaluateContractCompliance` | — | Avaliação de compliance gates | Complementar ao `VerifyContractCompliance` |
+
+### 21.4 Recomendação: Refatoração para Reutilização
+
+```
+VerifyContractCompliance (refatorado)
+  ├── 1. Buscar latestVersion (existing)
+  ├── 2. Delegar diff a ContractDiffCalculator.ComputeDiff()  ← REUTILIZAR
+  ├── 3. Mapear DiffResult para VerificationStatus            ← NOVO
+  ├── 4. Consultar GetEffectiveCompliancePolicy                ← CROSS-MODULE
+  ├── 5. Aplicar política para determinar Pass/Warn/Block      ← NOVO
+  ├── 6. Persistir ContractVerification                        ← EXISTING
+  ├── 7. Gerar ContractChangelog (se configurado na política)  ← INTEGRAÇÃO
+  └── 8. Publicar IntegrationEvent                             ← PENDENTE
+```
+
+**Esforço estimado:** Médio (1-2 dias). A lógica central já existe em `ContractDiffCalculator`; trata-se de substituir ~50 linhas de parsing ad-hoc por chamada ao serviço existente.
+
+---
+
+## 22. Análise Detalhada do EvaluateContractComplianceGate
+
+### 22.1 Estado Atual: Stub Funcional
+
+O `EvaluateContractComplianceGate` (90 linhas) no módulo ChangeGovernance é funcional mas limitado:
+
+```csharp
+// Linha 73-74 do handler:
+var hasGate = contractGate is not null;
+// ...
+ContractComplianceGatePassed: true,  // ← SEMPRE true
+```
+
+**O gate nunca falha.** O campo `ContractComplianceGatePassed` está hardcoded como `true`, independentemente de:
+- Existir verificação de compliance recente
+- Haver breaking changes detetadas
+- O changelog estar aprovado
+- As expectativas de consumidores terem sido verificadas
+
+### 22.2 Gap Funcional
+
+O plano (Secção 4.6.1) especifica que o gate deveria verificar:
+
+| Verificação | Estado | Handler |
+|-------------|:------:|---------|
+| Última verificação de conformidade | ❌ Não verificado | Deveria consultar `ContractVerification` recente para o serviço |
+| Política efetiva para o ambiente | ❌ Não verificado | Deveria chamar `GetEffectiveCompliancePolicy` |
+| Changelog aprovado | ❌ Não verificado | Deveria consultar `ContractChangelog` pendentes |
+| CDCT (Consumer-Driven) | ❌ Não verificado | Deveria verificar `ConsumerExpectation` |
+| Contrato em estado Approved/Locked | ❌ Não verificado | Deveria verificar `ContractVersion.LifecycleState` |
+
+### 22.3 Dependências Cross-Module Necessárias
+
+Para que o gate funcione completamente, precisa de dados de **3 módulos distintos**:
+
+```
+ChangeGovernance.EvaluateContractComplianceGate
+  ├── Catalog: ContractVerification (última verificação)
+  ├── Catalog: ContractChangelog (changelog pendente/aprovado)
+  ├── Catalog: ContractVersion (estado do ciclo de vida)
+  ├── Catalog: ConsumerExpectation (CDCT)
+  └── Configuration: ContractCompliancePolicy (política efetiva)
+```
+
+**Solução recomendada (respeita bounded contexts):**
+
+1. **Contratos de integração** — Criar interfaces no `Contracts` (shared kernel) do Catalog:
+   - `IContractComplianceQueryService.GetLatestVerificationAsync(apiAssetId, serviceName, ct)`
+   - `IContractComplianceQueryService.HasPendingChangelogAsync(apiAssetId, ct)`
+   - `IContractComplianceQueryService.GetContractLifecycleStateAsync(apiAssetId, ct)`
+
+2. **Cross-module query via MediatR** — O ChangeGovernance despacha queries MediatR que são resolvidas pelo Catalog:
+   - `GetLatestContractVerificationQuery` → resolvido no Catalog
+   - `GetPendingChangelogsQuery` → resolvido no Catalog
+
+3. **Integration event** — O Catalog publica `ContractVerificationPassedIntegrationEvent` / `ContractVerificationFailedIntegrationEvent`, e o ChangeGovernance reage.
+
+### 22.4 Fluxo de Avaliação Correto
+
+```
+EvaluateContractComplianceGate (corrigido)
+  │
+  ├── 1. Verificar se gate "ContractCompliance" está configurado para o ambiente
+  │       → Se não → SKIP (pass trivialmente)
+  │
+  ├── 2. Buscar política efetiva (via Configuration)
+  │       → GetEffectiveCompliancePolicy(serviceId, teamId, envName)
+  │       → Se não há política → comportamento Passive (pass)
+  │
+  ├── 3. Buscar última verificação de compliance para o serviço
+  │       → Se não há verificação recente → depende de OnMissingContract na política
+  │       → Se última verificação é Block → depende de OnBreakingChange na política
+  │       → Se última verificação é Pass/Warn → continua
+  │
+  ├── 4. Verificar changelog (se RequireChangelogApproval = true)
+  │       → Se há changelog pendente de aprovação → Block
+  │
+  ├── 5. Verificar CDCT (se EnforceCdct = true)
+  │       → Se há expectativas violadas → depende de CdctFailureAction na política
+  │
+  └── 6. Verificar estado do contrato (se OnContractNotApproved != Ignore)
+          → Se contrato não está Approved/Locked → depende da política
+```
+
+---
+
+## 23. Análise de Consistência do Frontend
+
+### 23.1 Estado Atual das Rotas de Contratos
+
+O frontend possui **14 rotas de contratos** definidas em `contractsRoutes.tsx`:
+
+| Rota | Página | Temática |
+|------|--------|----------|
+| `/contracts` | `ContractCatalogPage` | Catálogo de contratos |
+| `/contracts/new` | `CreateContractPage` | Criação de contrato |
+| `/contracts/studio/:draftId` | `DraftStudioPage` | Editor de draft |
+| `/contracts/governance` | `ContractGovernancePage` | Governance de contratos |
+| `/contracts/spectral` | `SpectralRulesetManagerPage` | Gestão de regras Spectral |
+| `/contracts/canonical` | `CanonicalEntityCatalogPage` | Entidades canónicas |
+| `/contracts/health` | `ContractHealthDashboardPage` | Saúde dos contratos |
+| `/contracts/health/timeline` | `ContractHealthTimelinePage` | Timeline de saúde |
+| `/contracts/canonical/impact-cascade` | `CanonicalEntityImpactCascadePage` | Cascata de impacto |
+| `/contracts/publication` | `PublicationCenterPage` | Centro de publicação |
+| `/contracts/playground` | `ContractPlaygroundPage` | Playground de contratos |
+| `/contracts/cdct` | `ConsumerDrivenContractPage` | CDCT |
+| `/contracts/portal/:contractVersionId` | `ContractPortalPage` | Portal do contrato |
+| `/contracts/:contractVersionId` | `ContractWorkspacePage` | Workspace do contrato |
+
+### 23.2 Rotas Planeadas (Secção 4.7.1) vs Implementadas
+
+| Rota Planeada | Página | Estado |
+|---------------|--------|:------:|
+| `/contracts/governance/compliance` | `ContractComplianceDashboard` | ❌ Não implementada |
+| `/contracts/governance/verifications` | `ContractVerificationHistory` | ❌ Não implementada |
+| `/contracts/governance/verifications/:id` | `ContractVerificationDetail` | ❌ Não implementada |
+| `/contracts/:contractVersionId/changelog` | `ContractChangelogPage` | ❌ Não implementada |
+| `/settings/contract-compliance` | `ContractCompliancePoliciesPage` | ❌ Não implementada |
+| `/settings/contract-compliance/new` | `ContractCompliancePolicyFormPage` | ❌ Não implementada |
+
+### 23.3 Componentes Frontend Existentes Relevantes
+
+Dos **22 componentes de contrato** existentes no frontend, os seguintes são diretamente relevantes para a feature de compliance:
+
+| Componente | Path | Pode ser reutilizado? |
+|------------|------|:---------------------:|
+| `ComplianceScoreCard` | `contracts/shared/components/ComplianceScoreCard.tsx` | ✅ Sim — card de score de compliance |
+| `ComplianceSection` | `contracts/workspace/sections/ComplianceSection.tsx` | ✅ Sim — secção de compliance no workspace |
+| `ContractGovernancePage` | `contracts/governance/ContractGovernancePage.tsx` | ✅ Sim — pode hospedar sub-rotas de compliance |
+| `ContractHealthDashboardPage` | `contracts/governance/ContractHealthDashboardPage.tsx` | 🟡 Parcial — padrão para dashboard de compliance |
+| `ConsumerDrivenContractPage` | `contracts/cdct/ConsumerDrivenContractPage.tsx` | 🟡 Parcial — complementar ao CDCT |
+
+### 23.4 Chaves i18n de Compliance
+
+Verificação de chaves i18n existentes para compliance:
+- **Resultado:** 0 chaves `contracts.compliance.*` encontradas nos ficheiros de locale
+- **Impacto:** Todas as 30+ chaves planeadas na Secção 4.7.3 precisam de ser adicionadas aos 4 locales (en, es, pt-BR, pt-PT)
+
+### 23.5 Recomendação de Abordagem Frontend
+
+1. **Fase 1:** Adicionar sub-rotas em `ContractGovernancePage` para compliance (dashboard + history)
+2. **Fase 2:** Criar `ContractVerificationDetail` como página independente
+3. **Fase 3:** Integrar changelog na página existente `ContractWorkspacePage` como nova tab
+4. **Fase 4:** Criar páginas de configuração de políticas em `settings/`
+5. **Reutilizar:** `ComplianceScoreCard`, `ComplianceSection` e padrão visual do `ContractHealthDashboardPage`
+
+---
+
+## 24. Análise da Qualidade do CLI ContractCommand
+
+### 24.1 Estrutura do Comando (531 linhas)
+
+O `ContractCommand.cs` implementa 4 subcomandos num único ficheiro:
+
+| Subcomando | Responsabilidade | Estado |
+|------------|------------------|:------:|
+| `nex contract verify` | Verificação de compliance via API | ✅ Implementado |
+| `nex contract diff` | Diff entre spec local e versão no NexTraceOne | ✅ Implementado |
+| `nex contract changelog` | Gerar changelog a partir de diff | ✅ Implementado |
+| `nex contract sync` | Sincronizar spec com NexTraceOne | ✅ Implementado |
+
+### 24.2 Problemas de Qualidade Identificados
+
+| # | Problema | Severidade | Descrição | Localização |
+|---|---------|:----------:|-----------|-------------|
+| Q1 | **Format branch morto** | 🟠 Médio | `RenderResult` sempre retorna JSON; o branch `text` nunca é atingido porque `RenderVerificationText` é definido mas o `RenderResult` faz `JsonSerializer.Serialize` incondicional | `RenderResult()` |
+| Q2 | **Sem testes** | 🟠 Médio | 531 linhas, 4 subcomandos, 0 testes unitários | — |
+| Q3 | **Ficheiro monolítico** | 🟡 Baixo | Todos os 4 subcomandos num único ficheiro de 531 linhas; outros comandos CLI seguem 1 ficheiro por comando | Padrão do CLI |
+| Q4 | **JUnit format não implementado** | 🟡 Baixo | Plano prevê `--format junit` para GitLab CI, mas apenas `text` e `json` estão implementados | `CreateFormatOption()` |
+| Q5 | **Sem retry/timeout** | 🟡 Baixo | HttpClient sem políticas de retry ou timeout configuradas | Todos os subcomandos |
+| Q6 | **Token handling** | 🟡 Baixo | Token lido de `--token` ou `NEXTRACE_TOKEN` env var; nenhuma validação de formato ou feedback claro de erro 401 | `CreateUrlOption` / `CreateTokenOption` |
+
+### 24.3 Comparação com Padrão do CLI Existente
+
+O CLI existente em `tools/NexTraceOne.CLI/Commands/` segue o padrão:
+
+| Aspeto | Comandos existentes | ContractCommand |
+|--------|:-------------------:|:---------------:|
+| 1 ficheiro por comando | ✅ | ❌ (4 subcomandos em 1 ficheiro) |
+| Testes unitários | ✅ (44 testes CLI) | ❌ |
+| HttpClient com factory | ✅ | ❌ (new HttpClient direto) |
+| Spectre.Console para output | ✅ | ✅ |
+| Exit codes documentados | ✅ | ✅ (0, 1, 2, 3) |
+
+### 24.4 Recomendação de Refatoração
+
+1. **Separar em 4 ficheiros:** `ContractVerifyCommand.cs`, `ContractDiffCommand.cs`, `ContractChangelogCommand.cs`, `ContractSyncCommand.cs`
+2. **Extrair `NexTraceApiClient`:** Classe shared para chamadas HTTP com retry e timeout
+3. **Corrigir format branch:** Implementar `RenderVerificationText` e `RenderVerificationJson` como branches reais
+4. **Adicionar testes:** Mínimo de 8 testes (2 por subcomando: happy path + error)
+
+---
+
+## 25. Análise de Integration Events e Webhooks
+
+### 25.1 Integration Events Declarados vs Publicados
+
+| Integration Event | Declarado em `CatalogIntegrationEvents.cs` | Publicado no Handler | Consumido por outro módulo |
+|-------------------|:-------------------------------------------:|:--------------------:|:--------------------------:|
+| `ContractVerificationPassedIntegrationEvent` | ✅ | ❌ Não publicado | ❌ Nenhum handler |
+| `ContractVerificationFailedIntegrationEvent` | ✅ | ❌ Não publicado | ❌ Nenhum handler |
+| `ContractChangelogGeneratedIntegrationEvent` | ✅ | ❌ Não publicado | ❌ Nenhum handler |
+
+**Impacto:** Os 3 events foram corretamente modelados com todos os campos necessários (`VerificationId`, `ApiAssetId`, `ServiceName`, `SourceSystem`, `CommitSha`, `TenantId`) mas **nunca são emitidos**. Isto significa que:
+
+- O módulo de Changes **não é notificado** quando uma verificação falha (deveria reduzir change confidence)
+- O módulo de Notifications **não envia alertas** ao owner do contrato
+- O módulo de Knowledge **não indexa** changelogs gerados
+- Webhooks outbound **não são disparados** para `contract.verification.*`
+
+### 25.2 Webhook Event Types — Gap
+
+Os webhook event types registados em `GetWebhookEventTypes` são:
+
+| Event Code | Categoria | Existe? |
+|------------|-----------|:-------:|
+| `incident.created` | Incidents | ✅ |
+| `incident.resolved` | Incidents | ✅ |
+| `change.deployed` | Changes | ✅ |
+| `change.promoted` | Changes | ✅ |
+| `contract.published` | Contracts | ✅ |
+| `contract.deprecated` | Contracts | ✅ |
+| `service.registered` | Services | ✅ |
+| `alert.triggered` | Alerts | ✅ |
+| `contract.verification.passed` | Contracts | ❌ **Em falta** |
+| `contract.verification.failed` | Contracts | ❌ **Em falta** |
+| `contract.changelog.generated` | Contracts | ❌ **Em falta** |
+
+### 25.3 Fluxo Correto de Publicação de Events
+
+```
+VerifyContractCompliance.Handler.Handle()
+  ├── ... (diff e persistência existentes) ...
+  ├── await unitOfWork.CommitAsync(ct);
+  │
+  ├── IF status == Pass:
+  │   └── await eventBus.PublishAsync(new ContractVerificationPassedIntegrationEvent(
+  │         verificationId, apiAssetId, serviceName, sourceSystem, commitSha, tenantId), ct);
+  │
+  ├── IF status == Block:
+  │   └── await eventBus.PublishAsync(new ContractVerificationFailedIntegrationEvent(
+  │         verificationId, apiAssetId, serviceName, sourceSystem, breakingCount, commitSha, tenantId), ct);
+  │
+  └── (Changelog generation IF policy.AutoGenerateChangelog && changes detected)
+      └── await eventBus.PublishAsync(new ContractChangelogGeneratedIntegrationEvent(
+            changelogId, apiAssetId, serviceName, toVersion, entryCount, tenantId), ct);
+```
+
+**Pré-requisito:** O handler precisa de receber `IEventBus` como dependência (atualmente não injectado).
+
+### 25.4 Consumidores Esperados dos Events
+
+| Event | Consumidor Esperado | Módulo | Ação |
+|-------|--------------------|--------|------|
+| `ContractVerificationPassedIntegrationEvent` | Change Confidence Handler | ChangeGovernance | Aumentar change confidence score |
+| `ContractVerificationPassedIntegrationEvent` | Webhook Dispatcher | Integrations | Enviar webhook outbound |
+| `ContractVerificationFailedIntegrationEvent` | Change Confidence Handler | ChangeGovernance | Reduzir change confidence score |
+| `ContractVerificationFailedIntegrationEvent` | Notification Handler | Notifications | Notificar owner do serviço |
+| `ContractVerificationFailedIntegrationEvent` | Risk Center Handler | Governance | Registar risco |
+| `ContractChangelogGeneratedIntegrationEvent` | Knowledge Indexer | Knowledge | Indexar changelog |
+| `ContractChangelogGeneratedIntegrationEvent` | Notification Handler | Notifications | Notificar consumidores |
+
+---
+
+## 26. Análise de Consistência Cross-Module
+
+### 26.1 Acoplamento entre Módulos — Estado Atual
+
+```
+Catalog ──────────────── ISOLADO ─────────────── Configuration
+   │ VerifyContractCompliance                        │ GetEffectiveCompliancePolicy
+   │ (não consulta políticas)                        │ (não é consultado pelo Catalog)
+   │                                                  │
+   │ ContractVerification                             │ ContractCompliancePolicy
+   │ (não publica events)                             │ (não há Update/Activate)
+   │                                                  │
+   └──── ChangeGovernance ────────────────────────────┘
+         │ EvaluateContractComplianceGate
+         │ (ContractComplianceGatePassed: true ← hardcoded)
+         │ (não consulta Catalog nem Configuration)
+```
+
+**Observação:** Os 3 módulos foram implementados de forma **completamente isolada**. Nenhum consulta os outros. Isto é correto do ponto de vista de bounded contexts, **mas** o plano exige integração cross-module para o fluxo funcionar:
+
+### 26.2 Integrações Cross-Module Necessárias
+
+| Integração | De | Para | Mecanismo Recomendado | Estado |
+|------------|:--:|:----:|----------------------|:------:|
+| Verificação consulta política efetiva | Catalog | Configuration | MediatR cross-module query | ❌ Não implementado |
+| Gate consulta última verificação | ChangeGovernance | Catalog | MediatR cross-module query | ❌ Não implementado |
+| Gate consulta changelog pendente | ChangeGovernance | Catalog | MediatR cross-module query | ❌ Não implementado |
+| Gate consulta política efetiva | ChangeGovernance | Configuration | MediatR cross-module query | ❌ Não implementado |
+| Verificação publica evento de sucesso/falha | Catalog | * | Integration Event (IEventBus) | ❌ Declarado, não publicado |
+| Changelog publica evento de criação | Catalog | * | Integration Event (IEventBus) | ❌ Declarado, não publicado |
+
+### 26.3 Padrão de Integração Cross-Module no NexTraceOne
+
+O NexTraceOne já usa o padrão de **contratos de integração** (shared kernel via projeto `*.Contracts`) para comunicação cross-module. O mecanismo correto é:
+
+1. **Integration Events** — Para comunicação assíncrona e reativa (Catalog → ChangeGovernance)
+2. **Cross-Module Queries via MediatR** — Para leitura síncrona respeitando bounded contexts
+3. **Contratos partilhados** — Via projectos `*.Contracts` que contêm records/DTOs/events
+
+### 26.4 Risco de Acoplamento
+
+O padrão atual de isolamento total é **seguro mas incompleto**. O risco é baixo porque:
+- Nenhum módulo depende diretamente do DbContext de outro ✅
+- Nenhum módulo referencia projectos de Application/Domain de outro ✅
+- Os contratos de integração já estão modelados em `CatalogIntegrationEvents.cs` ✅
+
+O risco é de **funcionalidade incompleta**, não de acoplamento indevido.
+
+---
+
+## 27. Matriz de Rastreabilidade — Plano vs Implementação
+
+### 27.1 Fase 1 — Fundação Backend
+
+| Item do Plano | Secção | Estado | Observações |
+|---------------|:------:|:------:|-------------|
+| Entidade `ContractVerification` | 4.1.2 | ✅ | 155 linhas, Entity<TId>, factory method, guard clauses |
+| Entidade `ContractVerificationId` | 4.1.2 | ✅ | Strongly-typed ID via TypedIdBase |
+| Feature `VerifyContractCompliance` | 4.1.1 | ⚠️ | Implementado com diff simplificado (não usa ComputeSemanticDiff), sem events, sem política |
+| Feature `ListContractVerifications` | 4.1.3 | ✅ | Paginação por service/apiAsset |
+| Feature `GetContractVerificationDetail` | 4.1.4 | ✅ | Detalhe por ID |
+| Endpoint `POST /api/v1/contracts/verify-compliance` | 4.1.5 | ⚠️ | Rota é `/api/v1/contracts/verifications` (ligeira diferença) |
+| Permissão `contracts:verify` | 4.1.5 | ✅ | Configurada no EndpointModule |
+| Testes unitários | Sprint 1 | ✅ | 23 testes (8 cenários de verificação, 3 de listagem, 2 de detalhe, etc.) |
+| Migration EF Core | Sprint 1 | ❌ | **Crítico — tabela não existe em PostgreSQL** |
+
+### 27.2 Fase 2 — Configuração e Políticas
+
+| Item do Plano | Secção | Estado | Observações |
+|---------------|:------:|:------:|-------------|
+| Entidade `ContractCompliancePolicy` | 4.2.1 | ✅ | 265 linhas, AuditableEntity<TId>, 26 propriedades |
+| Enum `VerificationMode` | 4.2.2 | ✅ | Disabled, SpecFile, AutoExtract, Hybrid |
+| Enum `VerificationApproach` | 4.2.2 | ✅ | Passive, Active, Strict |
+| Enum `ComplianceAction` | 4.2.2 | ✅ | Ignore, Warn, BlockBuild, BlockDeploy |
+| `CreateContractCompliancePolicy` | 4.2.3 | ⚠️ | Create seguido de Update imediato (D8); factory method não aceita todos os parâmetros |
+| `UpdateContractCompliancePolicy` | 4.2.3 | ❌ | **Não implementado** |
+| `ActivateContractCompliancePolicy` | 4.2.3 | ❌ | **Não implementado** |
+| `DeactivateContractCompliancePolicy` | 4.2.3 | ❌ | **Não implementado** |
+| `GetContractCompliancePolicy` (by ID) | 4.2.3 | ❌ | **Não implementado** |
+| `ListContractCompliancePolicies` | 4.2.3 | ✅ | Filtro por tenant |
+| `GetEffectivePolicy` (cascata) | 4.2.4 | ✅ | Service → Team → Environment → Organization |
+| `DeleteContractCompliancePolicy` | — | ✅ | Funcionalidade extra (não estava no plano original) |
+| Testes unitários | Sprint 2 | ✅ | 10 testes (3 create, 2 list, 3 effective, 2 delete) |
+| Migration EF Core | Sprint 2 | ❌ | **Crítico — tabela não existe em PostgreSQL** |
+
+### 27.3 Fase 3 — Changelog
+
+| Item do Plano | Secção | Estado | Observações |
+|---------------|:------:|:------:|-------------|
+| Entidade `ContractChangelog` | 4.4.1 | ✅ | 151 linhas, Entity<TId>, jsonb para entries |
+| `GenerateContractChangelog` | 4.4.2 | ✅ | Criação manual de changelog |
+| `ApproveContractChangelog` | 4.4.2 | ✅ | Workflow de aprovação funcional |
+| `ListContractChangelogs` | 4.4.2 | ✅ | Filtro por apiAsset e pendingApproval |
+| `GetContractChangelog` | 4.4.2 | ✅ | Detalhe por ID |
+| `ExportContractChangelog` | 4.4.2 | ❌ | **Não implementado** |
+| `GetContractChangelogTimeline` | 4.4.2 | ❌ | **Não implementado** |
+| Integração changelog ↔ verificação | 4.4.3 | ❌ | **Crítico — verificação não gera changelog automaticamente** |
+| Formato Markdown do changelog | 4.4.4 | ⚠️ | Campo `MarkdownContent` existe mas não há gerador |
+| Migration EF Core | Sprint 3 | ❌ | **Crítico — tabela não existe em PostgreSQL** |
+
+### 27.4 Fase 4 — CLI
+
+| Item do Plano | Secção | Estado | Observações |
+|---------------|:------:|:------:|-------------|
+| `nex contract verify` | 4.3.1 | ⚠️ | Implementado mas format branch morto |
+| `nex contract diff` | 4.3.2 | ✅ | Funcional |
+| `nex contract changelog` | 4.3.3 | ✅ | Funcional |
+| `nex contract sync` | 4.3.4 | ✅ | Funcional |
+| Exit codes | 4.3.1 | ✅ | 0, 1, 2, 3 implementados |
+| `--format junit` | 4.3.1 | ❌ | **Não implementado** |
+| Testes CLI | Sprint 4 | ❌ | **0 testes para 531 linhas** |
+
+### 27.5 Fases 5-7 — CI/CD, Frontend, CDCT
+
+| Fase | Estado | Completude |
+|------|:------:|:----------:|
+| Fase 5 — Integração CI/CD e Promotion Gates | 🔴 | 10% (apenas documentação de exemplos CI/CD) |
+| Fase 6 — Frontend | 🔴 | 0% (0 das 6 páginas implementadas) |
+| Fase 7 — CDCT e Refinamentos | 🔴 | 0% (ConsumerExpectation existe mas sem automação) |
+
+### 27.6 Resumo de Rastreabilidade
+
+| Categoria | Planeado | Implementado | Parcial | Pendente | Taxa |
+|-----------|:--------:|:------------:|:-------:|:--------:|:----:|
+| Entidades de domínio | 6 | 6 | 0 | 0 | 100% |
+| Enums | 7 | 7 | 0 | 0 | 100% |
+| Features (Commands + Queries) | 18 | 11 | 2 | 5 | 72% |
+| Endpoints | 14 | 11 | 0 | 3 | 79% |
+| CLI subcomandos | 4 | 4 | 1 | 0 | 88% |
+| Migrations EF Core | 3 | 0 | 0 | 3 | 0% |
+| Integration Events (publicação) | 3 | 0 | 0 | 3 | 0% |
+| Frontend páginas | 6 | 0 | 0 | 6 | 0% |
+| i18n keys | ~30 | 0 | 0 | ~30 | 0% |
+| Testes | 33+ | 33 | 0 | ~20 | 62% |
+| Webhooks events | 3 | 0 | 0 | 3 | 0% |
+| Quartz jobs | 1 | 0 | 0 | 1 | 0% |
+
+---
+
+## 28. Recomendações Técnicas Priorizadas (Code-Level)
+
+### 28.1 Prioridade Crítica — Sem estes, a feature não funciona
+
+| # | Ação | Ficheiros | Esforço | Descrição |
+|---|------|-----------|:-------:|-----------|
+| R1 | **Gerar migrations EF Core** | 2 novos ficheiros | Baixo | `dotnet ef migrations add AddContractVerificationAndChangelog -p Catalog.Infrastructure -s ApiHost` e equivalente para Configuration |
+| R2 | **Substituir diff ad-hoc por `ContractDiffCalculator`** | `VerifyContractCompliance.cs` | Médio | Remover `ExtractOperations` e `NormalizeOp`; delegar a `ContractDiffCalculator.ComputeDiff()` |
+| R3 | **Publicar integration events** | `VerifyContractCompliance.cs` | Baixo | Injectar `IEventBus`, publicar `ContractVerificationPassedIntegrationEvent` ou `ContractVerificationFailedIntegrationEvent` após `CommitAsync` |
+| R4 | **Registar permissão `contracts:verify`** | Seed data ou IdentityAccess | Baixo | Sem permissão registada, o endpoint retorna 403 |
+
+### 28.2 Prioridade Alta — Completam o MVP funcional
+
+| # | Ação | Ficheiros | Esforço | Descrição |
+|---|------|-----------|:-------:|-----------|
+| R5 | **Integrar geração de changelog na verificação** | `VerifyContractCompliance.cs` | Médio | Quando diff detecta alterações e política tem `AutoGenerateChangelog=true`, criar `ContractChangelog` automaticamente |
+| R6 | **Consultar política efetiva na verificação** | `VerifyContractCompliance.cs` | Médio | Cross-module query para `GetEffectiveCompliancePolicy` via MediatR ou contrato de integração |
+| R7 | **Implementar `UpdateContractCompliancePolicy`** | 1 novo ficheiro | Baixo | CRUD incompleto; o Update está implícito na entity mas falta o feature VSA |
+| R8 | **Implementar `GetContractCompliancePolicy` (by ID)** | 1 novo ficheiro | Baixo | Query simples por ID |
+| R9 | **Corrigir `CreateContractCompliancePolicy` (D8)** | `CreateContractCompliancePolicy.cs` + `ContractCompliancePolicy.cs` | Baixo | Enriquecer factory method para aceitar todos os parâmetros, eliminar o Update imediato |
+| R10 | **Corrigir `EvaluateContractComplianceGate`** | `EvaluateContractComplianceGate.cs` | Alto | Substituir `ContractComplianceGatePassed: true` por avaliação real contra verificações e políticas |
+
+### 28.3 Prioridade Média — Qualidade e robustez
+
+| # | Ação | Ficheiros | Esforço | Descrição |
+|---|------|-----------|:-------:|-----------|
+| R11 | **Testes unitários para CLI** | 1-4 novos ficheiros | Médio | Mínimo 8 testes com mock de HttpClient |
+| R12 | **Testes de integração com PostgreSQL** | 2-3 novos ficheiros | Médio | Testcontainers para repositórios e configurations |
+| R13 | **Corrigir format branch no CLI** | `ContractCommand.cs` | Baixo | `RenderResult` deve respeitar `--format text` vs `--format json` |
+| R14 | **Adicionar limite de tamanho em SpecContent** | `VerifyContractCompliance.cs` (Validator) | Baixo | `RuleFor(x => x.SpecContent).MaximumLength(5_242_880)` |
+| R15 | **Adicionar webhook event types** | `GetWebhookEventTypes.cs` | Baixo | Adicionar `contract.verification.passed`, `contract.verification.failed`, `contract.changelog.generated` |
+| R16 | **Separar CLI em 4 ficheiros** | 4 novos + remover 1 | Médio | `ContractVerifyCommand.cs`, `ContractDiffCommand.cs`, etc. |
+
+### 28.4 Prioridade Baixa — Funcionalidades avançadas
+
+| # | Ação | Ficheiros | Esforço | Descrição |
+|---|------|-----------|:-------:|-----------|
+| R17 | **Implementar `ExportContractChangelog`** | 1 novo ficheiro | Baixo | Export em Markdown/JSON/HTML |
+| R18 | **Implementar `GetContractChangelogTimeline`** | 1 novo ficheiro | Baixo | Timeline de alterações |
+| R19 | **Implementar `--format junit` no CLI** | `ContractCommand.cs` | Médio | Formato JUnit XML para GitLab CI |
+| R20 | **Criar Quartz job para drift detection** | 1-2 novos ficheiros | Médio | `ContractDriftDetectionJob` agendado |
+| R21 | **6 páginas frontend** | 6 novos ficheiros + routes | Alto | Dashboard, history, detail, changelog, policies, policy form |
+| R22 | **i18n keys** | 4 ficheiros locale | Baixo | ~30 chaves × 4 locales |
+| R23 | **Implementar `ActivateContractCompliancePolicy`** | 1 novo ficheiro | Baixo | Toggle IsActive |
+| R24 | **Implementar `DeactivateContractCompliancePolicy`** | 1 novo ficheiro | Baixo | Toggle IsActive |
+
+### 28.5 Sequência de Implementação Recomendada
+
+```
+Semana 1 — Foundation Fix (R1-R4)
+  ├── R1: Migrations EF Core (30min)
+  ├── R2: Substituir diff por ContractDiffCalculator (2-3h)
+  ├── R3: Publicar integration events (1h)
+  └── R4: Registar permissão contracts:verify (30min)
+
+Semana 2 — MVP Integration (R5-R10)
+  ├── R5: Changelog automático na verificação (2-3h)
+  ├── R6: Consultar política efetiva cross-module (3-4h)
+  ├── R7-R8: Update e Get by ID para políticas (2h)
+  ├── R9: Fix CreateContractCompliancePolicy factory (1h)
+  └── R10: Fix EvaluateContractComplianceGate (4-6h)
+
+Semana 3 — Quality & Testing (R11-R16)
+  ├── R11: Testes CLI (3-4h)
+  ├── R12: Testes integração PostgreSQL (4-6h)
+  ├── R13: Fix CLI format branch (1h)
+  ├── R14: Size limit validator (15min)
+  ├── R15: Webhook event types (30min)
+  └── R16: Separar CLI (2h)
+
+Semana 4+ — Frontend & Advanced (R17-R24)
+  └── Sprint de frontend com 6 páginas + i18n
+```
+
+---
+
+## 29. Conclusão da Análise
+
+### 29.1 Resumo Executivo
+
+A implementação da feature de **Verificação de Conformidade de Contratos** avançou significativamente nas camadas de domínio, aplicação e infraestrutura. O código produzido segue os padrões arquiteturais do NexTraceOne (DDD, VSA, Clean Architecture, strongly-typed IDs, Result<T>, RLS, multi-tenancy, sealed classes, CancellationToken).
+
+### 29.2 Estado Global
+
+| Dimensão | Avaliação |
+|----------|:---------:|
+| **Modelação de domínio** | ✅ Completa — 6 entidades, 7 enums, strongly-typed IDs |
+| **Features de aplicação** | 🟡 72% — 11 de 18 features implementadas |
+| **Infraestrutura** | ⚠️ Incompleta — EF Configurations OK, migrations ausentes |
+| **API (endpoints)** | 🟡 79% — 11 de 14 endpoints implementados |
+| **CLI** | 🟡 75% — 4 comandos implementados, sem testes, format branch morto |
+| **Integration events** | ❌ 0% — 3 events declarados, nenhum publicado |
+| **Cross-module integration** | ❌ 0% — módulos completamente isolados |
+| **Frontend** | ❌ 0% — 0 de 6 páginas |
+| **Testes** | 🟡 62% — 33 testes (23 Catalog + 10 Config), CLI 0% |
+| **Segurança (RLS)** | ✅ 100% — 3 tabelas com RLS configurado |
+
+### 29.3 Risco Principal
+
+O **risco principal** é que as migrations EF Core não existem, o que significa que as 3 novas tabelas (`ctr_contract_verifications`, `ctr_contract_changelogs`, `cfg_contract_compliance_policies`) **não existem em PostgreSQL**. Sem as tabelas, toda a funcionalidade é inacessível em ambiente real.
+
+### 29.4 Próximos Passos Imediatos
+
+1. **R1:** Gerar migrations EF Core para Catalog e Configuration
+2. **R2:** Substituir diff ad-hoc por `ContractDiffCalculator.ComputeDiff()`
+3. **R3:** Publicar integration events após verificação
+4. **R4:** Registar permissão `contracts:verify`
+5. **R5:** Integrar geração automática de changelog
+6. **R10:** Corrigir `EvaluateContractComplianceGate` (remover hardcoded `true`)
+
+---
+
 > **Última atualização:** 2026-04-10  
-> **Próximo passo:** Gerar migrations EF Core para as 3 novas tabelas e completar a integração do diff semântico com o fluxo de verificação.
+> **Próximo passo:** Gerar migrations EF Core para as 3 novas tabelas, refatorar VerifyContractCompliance para usar ContractDiffCalculator, e publicar integration events.
