@@ -31,6 +31,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GetDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetBackgroundServiceContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetEventContractDetail;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSoapContractDetail;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetContractListing;
 using NexTraceOne.Catalog.Application.Contracts.Features.InferDependenciesFromContracts;
 using NexTraceOne.Catalog.Application.Contracts.Features.InitiateContractDeprecation;
 using NexTraceOne.Catalog.Application.Contracts.Features.SuggestSchemaFromContext;
@@ -41,6 +42,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.ListDraftReviews;
 using NexTraceOne.Catalog.Application.Contracts.Features.ListDrafts;
 using NexTraceOne.Catalog.Application.Contracts.Features.LockContractVersion;
 using NexTraceOne.Catalog.Application.Contracts.Features.PublishDraft;
+using NexTraceOne.Catalog.Application.Contracts.Features.PublishToMarketplace;
 using NexTraceOne.Catalog.Application.Contracts.Features.RejectDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.SubmitDraftForReview;
 using NexTraceOne.Catalog.Application.Contracts.Features.RegisterBackgroundServiceContract;
@@ -50,6 +52,8 @@ using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata;
 using NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity;
 using NexTraceOne.Catalog.Application.Contracts.Features.PropagateCanonicalEntityChange;
 using NexTraceOne.Catalog.Application.Contracts.Features.RegisterConsumerExpectation;
+using NexTraceOne.Catalog.Application.Contracts.Features.SearchMarketplace;
+using NexTraceOne.Catalog.Application.Contracts.Features.SubmitContractReview;
 using NexTraceOne.Catalog.Application.Contracts.Features.VerifyProviderCompatibility;
 
 namespace NexTraceOne.Catalog.Application.Contracts;
@@ -130,6 +134,12 @@ public static class DependencyInjection
         services.AddTransient<IValidator<SuggestSchemaFromContext.Query>, SuggestSchemaFromContext.Validator>();
         services.AddTransient<IValidator<InitiateContractDeprecation.Command>, InitiateContractDeprecation.Validator>();
         services.AddTransient<IValidator<GetDeprecationProgress.Query>, GetDeprecationProgress.Validator>();
+
+        // Phase 7 — Contract Marketplace Interno
+        services.AddTransient<IValidator<PublishToMarketplace.Command>, PublishToMarketplace.Validator>();
+        services.AddTransient<IValidator<SubmitContractReview.Command>, SubmitContractReview.Validator>();
+        services.AddTransient<IValidator<SearchMarketplace.Query>, SearchMarketplace.Validator>();
+        services.AddTransient<IValidator<GetContractListing.Query>, GetContractListing.Validator>();
 
         return services;
     }

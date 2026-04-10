@@ -232,5 +232,39 @@ public static class ContractsErrors
     /// <summary>Análise de evolução de schema não encontrada.</summary>
     public static Error SchemaEvolutionAdviceNotFound(string id)
         => Error.NotFound("Contracts.SchemaEvolutionAdvice.NotFound", "Schema evolution advice '{0}' was not found.", id);
+
+    // ── SemanticDiffResult ──────────────────────────────────────────
+
+    /// <summary>Resultado de diff semântico não encontrado.</summary>
+    public static Error SemanticDiffResultNotFound(string id)
+        => Error.NotFound("Contracts.SemanticDiffResult.NotFound", "Semantic diff result '{0}' was not found.", id);
+
+    // ── ContractComplianceGate ───────────────────────────────────────
+
+    /// <summary>Gate de compliance contratual não encontrado.</summary>
+    public static Error ComplianceGateNotFound(string id)
+        => Error.NotFound("Contracts.ComplianceGate.NotFound", "Contract compliance gate '{0}' was not found.", id);
+
+    /// <summary>Resultado de compliance contratual não encontrado.</summary>
+    public static Error ComplianceResultNotFound(string id)
+        => Error.NotFound("Contracts.ComplianceResult.NotFound", "Contract compliance result '{0}' was not found.", id);
+
+    // ── ContractListing ─────────────────────────────────────────────
+
+    /// <summary>Listagem de contrato no marketplace não encontrada.</summary>
+    public static Error ContractListingNotFound(string id)
+        => Error.NotFound("Contracts.Listing.NotFound", "Contract listing '{0}' was not found.", id);
+
+    // ── MarketplaceReview ───────────────────────────────────────────
+
+    /// <summary>Avaliação de contrato no marketplace não encontrada.</summary>
+    public static Error MarketplaceReviewNotFound(string id)
+        => Error.NotFound("Contracts.MarketplaceReview.NotFound", "Marketplace review '{0}' was not found.", id);
+
+    // ── ImpactSimulation ────────────────────────────────────────────
+
+    /// <summary>Simulação de impacto não encontrada.</summary>
+    public static Error ImpactSimulationNotFound(string id)
+        => Error.NotFound("Contracts.ImpactSimulation.NotFound", "Impact simulation '{0}' was not found.", id);
 }
 

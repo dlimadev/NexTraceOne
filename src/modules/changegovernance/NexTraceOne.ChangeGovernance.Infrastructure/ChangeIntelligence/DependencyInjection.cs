@@ -55,6 +55,8 @@ public static class DependencyInjection
         services.AddScoped<ICanaryRolloutRepository, CanaryRolloutRepository>();
         services.AddScoped<IChangeConfidenceEventRepository, ChangeConfidenceEventRepository>();
         services.AddScoped<IReleaseNotesRepository, ReleaseNotesRepository>();
+        services.AddScoped<IPromotionGateRepository, PromotionGateRepository>();
+        services.AddScoped<IPromotionGateEvaluationRepository, PromotionGateEvaluationRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
 

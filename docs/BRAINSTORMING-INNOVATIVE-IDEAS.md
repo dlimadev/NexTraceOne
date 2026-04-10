@@ -84,10 +84,11 @@ A narrativa é atualizada conforme novas informações chegam e serve como base 
 
 ---
 
-### 💡 Ideia 4 — Blast Radius Visualization 3D
+### ✅ Ideia 4 — Blast Radius Visualization 3D
 
 **Pilar:** Change Intelligence  
 **Persona:** Architect, Tech Lead  
+**Estado:** ✅ Implementado (Wave G) — Entidade `BlastRadiusReport` com profundidade configurável, nós afetados diretos e transitivos, RiskDistribution e CriticalPaths (JSONB), OverallRiskPercent (0-100), enum `BlastRadiusSeverity`. Handlers `CalculateBlastRadius`, `GetBlastRadiusReport`. Testes, RLS configurado.
 
 Representação visual 3D interativa do blast radius de uma mudança:
 
@@ -104,10 +105,11 @@ Permite rotação, zoom e click para ver detalhes de cada serviço afetado.
 
 ---
 
-### 💡 Ideia 5 — Contract Diff Semântico com IA
+### ✅ Ideia 5 — Contract Diff Semântico com IA
 
 **Pilar:** Contract Governance  
 **Persona:** Engineer, Architect  
+**Estado:** ✅ Implementado (Wave G) — Entidade `SemanticDiffResult` com classificação (Breaking/NonBreaking/Enhancement), CompatibilityScore (0-100), AffectedConsumers e MitigationSuggestions (JSONB), GeneratedByModel. Handlers `GenerateSemanticDiff`, `ComputeSemanticDiff`, `GetSemanticDiff`, `ListSemanticDiffs`. Testes, RLS configurado.
 
 Quando uma nova versão de contrato é criada, a IA analisa o diff e gera:
 
@@ -180,10 +182,11 @@ Gera relatório de drift com severidade e recomendações de correção.
 
 ---
 
-### 💡 Ideia 9 — Smart Promotion Gates
+### ✅ Ideia 9 — Smart Promotion Gates
 
 **Pilar:** Change Intelligence  
 **Persona:** Tech Lead, Platform Admin  
+**Estado:** ✅ Implementado (Wave G) — Entidades `PromotionGate` (regras JSONB por ambiente from/to) + `PromotionGateEvaluation` (resultado: Passed/Failed/Warning com RuleResults JSONB). Handlers `CreatePromotionGate`, `EvaluatePromotionGate`, `GetPromotionGateStatus`, `ListPromotionGatesByEnvironment`. Testes, RLS configurado.
 
 Gates de promoção inteligentes que combinam:
 
@@ -222,10 +225,11 @@ As release notes são personalizáveis por persona (técnico vs executivo).
 
 ---
 
-### 💡 Ideia 11 — Contract Marketplace Interno
+### ✅ Ideia 11 — Contract Marketplace Interno
 
 **Pilar:** Contract Governance  
 **Persona:** Engineer, Architect  
+**Estado:** ✅ Implementado (Wave G) — Entidades `ContractListing` (Category, Tags JSONB, ConsumerCount, Rating 0-5, TotalReviews, IsPromoted, Status Draft/Published/Archived) + `MarketplaceReview` (Rating 1-5, Comment, AuthorId). Handlers `PublishToMarketplace`, `SubmitContractReview`, `SearchMarketplace`, `GetContractListing`. 43 testes, RLS configurado.  
 
 Um "marketplace" interno onde equipas podem:
 
@@ -421,10 +425,11 @@ Builder visual para criar playbooks operacionais que:
 
 ---
 
-### 💡 Ideia 21 — Service Dependency Impact Simulator
+### ✅ Ideia 21 — Service Dependency Impact Simulator
 
 **Pilar:** Change Intelligence + Service Governance  
 **Persona:** Architect, Tech Lead  
+**Estado:** ✅ Implementado (Wave G) — Entidade `ImpactSimulation` com 4 cenários (EndpointRemoval, ServiceUnavailability, ContractMigration, SchemaChange), AffectedServices, BrokenConsumers e MitigationRecommendations (JSONB), TransitiveCascadeDepth, RiskPercent (0-100). Handlers `SimulateDependencyImpact`, `GetImpactSimulation`, `ListImpactSimulations`. 18 testes, RLS configurado.
 
 Simulador interativo que permite responder "E se...?" antes de uma mudança:
 
@@ -445,10 +450,11 @@ O simulador usa o topology graph e a lista de consumidores para calcular o impac
 
 ---
 
-### 💡 Ideia 22 — Automated Contract Compliance Gate
+### ✅ Ideia 22 — Automated Contract Compliance Gate
 
 **Pilar:** Contract Governance + Change Intelligence  
 **Persona:** Platform Admin, Tech Lead  
+**Estado:** ✅ Implementado (Wave G) — Entidades `ContractComplianceGate` (Rules JSONB, Scope Organization/Team/Environment, BlockOnViolation) + `ContractComplianceResult` (Result Pass/Warn/Block, Violations JSONB, EvidencePackId). Handlers `CreateComplianceGate`, `EvaluateContractComplianceGate`. Testes, RLS configurado.
 
 Gate automático que bloqueia deploys se os contratos afetados violarem políticas:
 
@@ -465,10 +471,11 @@ Funciona como **quality gate de contratos** similar ao SonarQube para código, m
 
 ---
 
-### 💡 Ideia 23 — Dependency License Compliance Radar
+### ✅ Ideia 23 — Dependency License Compliance Radar
 
 **Pilar:** Governance + Contract Governance  
 **Persona:** Architect, Auditor  
+**Estado:** ✅ Implementado (Wave G) — Entidade `LicenseComplianceReport` com 3 scopes (Service/Team/Domain), 4 risk levels (Low/Medium/High/Critical), CompliancePercent auto-computado (0-100), LicenseDetails, Conflicts e Recommendations (JSONB). Handlers `GenerateLicenseComplianceReport`, `GetLicenseComplianceReport`, `ListLicenseComplianceReports`. 18 testes, RLS configurado.
 
 Radar contínuo que analisa todas as dependências de todos os serviços e:
 
@@ -632,4 +639,4 @@ Sistema de feedback loop que melhora a IA continuamente:
 
 ---
 
-> **Estado:** 🟢 29 ideias aprovadas — Ideia 23 original (Multi-Tenant Benchmark) removida por decisão de produto.
+> **Estado:** 🟢 29 ideias aprovadas — **todas ✅ implementadas** (Waves A–G completas). Ideia 23 original (Multi-Tenant Benchmark) removida por decisão de produto.

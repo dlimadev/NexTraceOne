@@ -95,6 +95,24 @@ public sealed class ContractsDbContext(
     /// <summary>Análises de evolução de schema entre versões de contratos (API Assets).</summary>
     public DbSet<SchemaEvolutionAdvice> SchemaEvolutionAdvices => Set<SchemaEvolutionAdvice>();
 
+    /// <summary>Resultados de diff semântico assistido por IA entre versões de contrato.</summary>
+    public DbSet<SemanticDiffResult> SemanticDiffResults => Set<SemanticDiffResult>();
+
+    /// <summary>Listagens de contratos publicados no marketplace interno.</summary>
+    public DbSet<ContractListing> ContractListings => Set<ContractListing>();
+
+    /// <summary>Avaliações de contratos publicados no marketplace interno.</summary>
+    public DbSet<MarketplaceReview> MarketplaceReviews => Set<MarketplaceReview>();
+
+    /// <summary>Gates de compliance contratual configuráveis por organização, equipa ou ambiente.</summary>
+    public DbSet<ContractComplianceGate> ContractComplianceGates => Set<ContractComplianceGate>();
+
+    /// <summary>Resultados de avaliação de compliance contratual contra gates configurados.</summary>
+    public DbSet<ContractComplianceResult> ContractComplianceResults => Set<ContractComplianceResult>();
+
+    /// <summary>Simulações de impacto de dependências entre serviços para cenários what-if.</summary>
+    public DbSet<ImpactSimulation> ImpactSimulations => Set<ImpactSimulation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

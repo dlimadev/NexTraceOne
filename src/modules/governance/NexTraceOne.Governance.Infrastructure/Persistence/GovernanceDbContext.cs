@@ -82,6 +82,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Atribuições de custo operacional por dimensão (FinOps contextual).</summary>
     public DbSet<CostAttribution> CostAttributions => Set<CostAttribution>();
 
+    /// <summary>Relatórios de compliance de licenças de dependências.</summary>
+    public DbSet<LicenseComplianceReport> LicenseComplianceReports => Set<LicenseComplianceReport>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 
