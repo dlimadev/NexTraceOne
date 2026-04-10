@@ -1385,6 +1385,10 @@
     "totalCount": "({{count}} total)",
     "services": {
       "addContract": "Añadir Contrato"
+    },
+    "aiScaffold": {
+      "serviceNamePlaceholder": "api-pagos",
+      "entitiesPlaceholder": "Pago, Reembolso, Extracto"
     }
   },
   "catalogContractsConfig": {
@@ -2857,6 +2861,11 @@
       "definitions": "Definiciones",
       "effective": "Configuración Efectiva",
       "entries": "Valores Configurados"
+    },
+    "checklists": {
+      "categoryPlaceholder": "estándar",
+      "environmentPlaceholder": "producción",
+      "itemsPlaceholder": "Revisar resultados de pruebas\nVerificar plan de rollback\nNotificar partes interesadas"
     }
   },
   "contractGov": {
@@ -3060,7 +3069,16 @@
         "topicName": "Tópico Nombre",
         "unnamed": "Unnamed Tópico",
         "validate": "Validar",
-        "version": "Versión"
+        "version": "Versión",
+        "titlePlaceholder": "Eventos de Pedido",
+        "eventNamePlaceholder": "OrderCreated",
+        "brokerPlaceholder": "kafka://broker:9092",
+        "topicNamePlaceholder": "orders.created",
+        "producerPlaceholder": "servicio-pedidos",
+        "consumerPlaceholder": "servicio-notificaciones",
+        "orderingPlaceholder": "by-key",
+        "dlqPlaceholder": "orders.created.dlq",
+        "channelOwnerPlaceholder": "equipo-pedidos"
       },
       "legacy": {
         "addField": "Añadir Campo",
@@ -3081,7 +3099,17 @@
         "queueName": "Cola Nombre",
         "title": "Constructor de Contrato Legado",
         "totalLength": "Longitud Total del Registro (bytes)",
-        "transactionId": "CICS Transaction ID"
+        "transactionId": "CICS Transaction ID",
+        "recordNamePlaceholder": "REGISTRO-CLIENTE",
+        "programNamePlaceholder": "CUSTPROG",
+        "queueManagerPlaceholder": "QMGR01",
+        "queueNamePlaceholder": "CUST.REQUEST.Q",
+        "messageFormatPlaceholder": "MQHRF2",
+        "transactionIdPlaceholder": "CUST",
+        "fieldNamePlaceholder": "CUST-NAME",
+        "fieldPicturePlaceholder": "PIC X(30)",
+        "fieldRedefinesPlaceholder": "CUST-ID",
+        "ownerPlaceholder": "equipo-mainframe"
       },
       "rest": {
         "addBody": "Añadir Cuerpo de Petición",
@@ -3217,7 +3245,11 @@
         "name": "Schema Nombre",
         "namespace": "Namespace",
         "noProperties": "No hay propiedades definidas aún. Agregue su primera propiedad de schema.",
-        "title": "Constructor de Schema Compartido"
+        "title": "Constructor de Schema Compartido",
+        "namePlaceholder": "UserProfile",
+        "namespacePlaceholder": "com.example.schemas",
+        "ownerPlaceholder": "equipo-plataforma",
+        "propertyNamePlaceholder": "userId"
       },
       "soap": {
         "addOperation": "Añadir Operación",
@@ -3242,7 +3274,16 @@
         "serviceName": "Servicio Nombre",
         "soapAction": "SOAP Acción",
         "unnamed": "Unnamed Operación",
-        "validate": "Validar"
+        "validate": "Validar",
+        "serviceNamePlaceholder": "UserService",
+        "operationNamePlaceholder": "GetUser",
+        "inputMessagePlaceholder": "GetUserRequest",
+        "outputMessagePlaceholder": "GetUserResponse",
+        "faultMessagePlaceholder": "ServiceFault",
+        "endpointPlaceholder": "http://example.com/service",
+        "addressPlaceholder": "https://api.example.com/service",
+        "namespacePlaceholder": "http://schemas.example.com/types",
+        "soapActionPlaceholder": "urn:GetUser"
       },
       "validation": {
         "actorRequired": "Se requiere al menos un productor o consumidor",
@@ -3317,7 +3358,15 @@
         "timeout": "Timeout (seconds)",
         "title": "Constructor de Webhook",
         "urlPattern": "URL Patrón",
-        "urlPatternPlaceholder": "https://ejemplo.com/webhooks/{event}"
+        "urlPatternPlaceholder": "https://ejemplo.com/webhooks/{event}",
+        "secretHeaderPlaceholder": "X-Webhook-Secret",
+        "customHeaderPlaceholder": "X-Custom-Header",
+        "namePlaceholder": "webhook-pedido-creado",
+        "contentTypePlaceholder": "application/json",
+        "ownerPlaceholder": "equipo-integraciones",
+        "headerValuePlaceholder": "valor-header",
+        "retryPolicyPlaceholder": "exponential-backoff",
+        "eventsPlaceholder": "order.created, order.updated"
       },
       "workservice": {
         "addDep": "Añadir Dependencia",
@@ -3372,7 +3421,17 @@
         "trigger": "Disparador y Programación",
         "triggerType": "Disparador Tipo",
         "validate": "Validar",
-        "webhookUrl": "Webhook Ruta"
+        "webhookUrl": "Webhook Ruta",
+        "consumedEntityPlaceholder": "OrderEvent",
+        "producedEntityPlaceholder": "OrderProcessedEvent",
+        "eventNamePlaceholder": "OrderProcessed",
+        "namePlaceholder": "procesador-pedidos",
+        "ownerPlaceholder": "equipo-pedidos",
+        "depNamePlaceholder": "bd-pedidos",
+        "consumedTopicPlaceholder": "orders.created",
+        "producedTopicPlaceholder": "orders.processed",
+        "consumedServicePlaceholder": "api-usuarios",
+        "targetTopicPlaceholder": "orders.processed"
       },
       "canonical": {
         "picker": {
@@ -4083,7 +4142,19 @@
         "team": "Equipo",
         "technicalDescription": "Descripción Técnica",
         "technicalName": "Nombre Técnico",
-        "visibility": "Visibilidad"
+        "visibility": "Visibilidad",
+        "friendlyNamePlaceholder": "ej., API de Gestión de Usuarios",
+        "functionalDescPlaceholder": "¿Qué capacidad de negocio proporciona este servicio?",
+        "technicalDescPlaceholder": "Arquitectura técnica, stack, notas de integración...",
+        "domainPlaceholder": "Pagos",
+        "capabilityPlaceholder": "Procesamiento de Pagos",
+        "productPlaceholder": "Plataforma de Checkout",
+        "ownerPlaceholder": "juan.perez@empresa.com",
+        "teamPlaceholder": "Equipo Pagos",
+        "tagsPlaceholder": "pagos, checkout, pci (separados por coma)",
+        "slaPlaceholder": "99.9% disponibilidad",
+        "sloPlaceholder": "p99 < 200ms",
+        "externalLinksPlaceholder": "URLs de Runbook, wiki, dashboards de monitoreo (uno por línea)"
       },
       "dependencies": {
         "downstream": "Downstream",
@@ -4177,6 +4248,12 @@
         "postconditions": "Postconditions",
         "preconditions": "Preconditions",
         "title": "Casos de Uso"
+      },
+      "security": {
+        "authModelPlaceholder": "RBAC, ABAC, Basado en scopes...",
+        "scopesPlaceholder": "read:users, write:users, admin",
+        "rolesPlaceholder": "Admin, Editor, Visor",
+        "claimsPlaceholder": "sub, aud, tenant_id"
       }
     },
     "subtitle": "Gobernanza de contratos multi-protocolo y diff semántico",
@@ -6496,6 +6573,9 @@
       "lastMonthCount": "{{count}} incidentes el último mes",
       "incidentDistribution": "Distribución de Incidentes",
       "filterByTeam": "Filtrar por equipo..."
+    },
+    "logExplorer": {
+      "traceIdPlaceholder": "Trace ID"
     }
   },
   "opsFinOpsConfig": {

@@ -1258,6 +1258,7 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 
 | Data | Alteração |
 |------|-----------|
+| 2026-04-10 (rev.8) | ✅ **Eliminados todos os hardcoded placeholders**: 72 placeholders em 11 ficheiros movidos para i18n com `t()` + fallback. 72 novas chaves i18n adicionadas a 4 idiomas (en, es, pt-BR, pt-PT) |
 | 2026-04-10 (rev.7) | ✅ **Corrigidos 3 phantom RLS** → `chg_change_records`→`chg_change_events`, `chg_workflows`→`chg_releases`, `ctr_api_contracts`→`ctr_contract_versions` |
 | 2026-04-10 (rev.7) | ✅ **Adicionadas 86 tabelas ao RLS** (total: 186 tabelas, cobertura tenant-scoped: 186/193 = 96%) |
 | 2026-04-10 (rev.7) | ✅ **Adicionados 2 validators**: ActivateServiceTemplate.Validator e DeactivateServiceTemplate.Validator |
@@ -1425,28 +1426,26 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 
 ---
 
-### 🟡 MÉDIO — Hardcoded Strings no Frontend (i18n)
+### ✅ RESOLVIDO — Hardcoded Strings no Frontend (i18n) (rev.8)
 
-**27 ocorrências encontradas** de placeholders hardcoded em 10 ficheiros (excluindo ficheiros de teste e linhas que já usam `t()`). Adicionalmente, `DefinitionSection.tsx` tem 7 placeholders hardcoded em linhas que já usam `t()` para labels:
+**Todas as 71 ocorrências** de placeholders hardcoded em 11 ficheiros foram movidas para i18n com `t()` e fallback. Foram adicionadas 72 chaves i18n aos 4 idiomas (en, es, pt-BR, pt-PT).
 
-| Ficheiro | Ocorrências | Exemplos | Tipo |
-|----------|:-----------:|---------|------|
-| `VisualLegacyContractBuilder.tsx` | 9 | `"CUSTOMER-RECORD"`, `"CUSTPROG"`, `"QMGR01"` | example values |
-| `DefinitionSection.tsx`³ | 7 | `"Payments"`, `"Payment Processing"`, `"Checkout Platform"` | example values |
-| `VisualSoapBuilder.tsx` | 5 | `"UserService"`, `"GetUser"`, `"GetUserRequest"` | example values |
-| `VisualWorkserviceBuilder.tsx` | 3 | `"OrderEvent"`, `"OrderProcessedEvent"`, `"OrderProcessed"` | example values |
-| `SecuritySection.tsx` | 2 | `"RBAC, ABAC, Scope-based..."`, `"Admin, Editor, Viewer"` | hint text |
-| `VisualWebhookBuilder.tsx` | 2 | `"X-Webhook-Secret"`, `"X-Custom-Header"` | example values |
-| `VisualEventBuilder.tsx` | 2 | `"Order Events"`, `"OrderCreated"` | example values |
-| `LogExplorerPage.tsx` | 1 | `"Trace ID"` | placeholder |
-| `VisualSharedSchemaBuilder.tsx` | 1 | `"UserProfile"` | example value |
-| `ChangeChecklistsPage.tsx` | 1 | placeholder de pesquisa | placeholder |
-| `AiScaffoldWizardPage.tsx` | 1 | placeholder de input | placeholder |
-| **Total** | **34** | | **27 sem t() + 7 com t()** |
+| Ficheiro | Corrigidos | Tipo |
+|----------|:---------:|------|
+| `VisualLegacyContractBuilder.tsx` | 10 | example values (COBOL/MQ) |
+| `DefinitionSection.tsx` | 12 | example values (domain, owner, SLA) |
+| `VisualSoapBuilder.tsx` | 9 | SOAP service/operation examples |
+| `VisualWorkserviceBuilder.tsx` | 10 | worker/job/topic examples |
+| `VisualWebhookBuilder.tsx` | 8 | webhook header/event examples |
+| `VisualEventBuilder.tsx` | 9 | AsyncAPI/Kafka examples |
+| `SecuritySection.tsx` | 4 | auth model hints |
+| `VisualSharedSchemaBuilder.tsx` | 4 | schema property examples |
+| `ChangeChecklistsPage.tsx` | 3 | category/environment/items |
+| `AiScaffoldWizardPage.tsx` | 2 | service name/entities |
+| `LogExplorerPage.tsx` | 1 | trace ID placeholder |
+| **Total** | **72** | ✅ **0 hardcoded restantes** |
 
-> ³ `DefinitionSection.tsx` usa `t()` para labels mas mantém placeholders hardcoded em inglês. Os 7 placeholders estão em linhas que já possuem `t()` para o label, por isso não contam no total de 27 "puras" hardcoded. Idealmente deveriam usar i18n.
-
-**Recomendação**: Mover para chaves i18n. Prioridade baixa pois são maioritariamente placeholders de exemplo em visual builders do Contract Studio. A maioria são nomes técnicos/patterns que podem não precisar de tradução.
+> Todas as chaves usam o padrão `t('namespace.key', 'fallback')` para garantir compatibilidade mesmo se a chave i18n estiver em falta.
 
 ---
 
@@ -1682,7 +1681,7 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | Área | Estado | Detalhes |
 |------|:------:|---------|
 | i18n | ✅ | 4 idiomas, 117 top-level keys cada, 100% consistente |
-| Hardcoded strings | ⚠️ | 27 placeholders hardcoded em 10 ficheiros (maioritariamente visual builders) + 7 em DefinitionSection com t() |
+| Hardcoded strings | ✅ | 0 placeholders hardcoded (72 movidos para i18n em rev.8) |
 | dangerouslySetInnerHTML | ✅ | Nenhuma ocorrência — seguro |
 | Token storage | ✅ | In-memory para refresh/CSRF, sessionStorage para access token |
 | Sanitização | ✅ | sanitize.ts com isSafeUrl(), bloqueio de javascript:/data:/vbscript: |
@@ -1849,7 +1848,7 @@ Restam apenas 7 tabelas iam_ de sistema intencionalmente excluídas (TenantId nu
 | Sub-módulos no ApiHost | 26 | ✅ |
 | i18n keys (por idioma) | 117 | ✅ |
 | Idiomas | 4 | ✅ |
-| Hardcoded strings | 27 (10 ficheiros) + 7 em DefinitionSection com t() = 34 total em 11 ficheiros | ⚠️ |
+| Hardcoded strings | 0 (72 movidos para i18n em rev.8) | ✅ |
 | dangerouslySetInnerHTML | 0 | ✅ |
 | Docker security (non-root) | ✅ | ✅ |
 | Seed idempotência | 100% | ✅ |
@@ -1882,5 +1881,5 @@ O segundo gap remanescente é nos **testes de platform**: os testes E2E e de Int
 3. 🟠 **Aumentar cobertura de testes** nos módulos com <35% (Catalog, Configuration, Governance)
 4. ~~🟠 **Corrigir Selenium.Tests**~~ ✅ FEITO (rev.7) — pacotes adicionados ao CPM
 5. ~~🟡 **Adicionar 2 validators**~~ ✅ FEITO (rev.7) — ActivateServiceTemplate, DeactivateServiceTemplate
-6. 🟡 **Mover 34 hardcoded strings** para i18n (visual builders, DefinitionSection, SecuritySection, LogExplorerPage)
+6. ~~🟡 **Mover hardcoded strings para i18n**~~ ✅ FEITO (rev.8) — 72 placeholders em 11 ficheiros, 72 chaves i18n em 4 idiomas
 7. 🟡 **Configurar infraestrutura CI** para E2E e Integration tests (PostgreSQL em pipeline)

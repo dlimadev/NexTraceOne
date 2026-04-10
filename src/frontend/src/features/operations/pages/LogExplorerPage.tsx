@@ -185,7 +185,7 @@ export function LogExplorerPage() {
                 </label>
                 <input
                   className="h-9 rounded-md border border-input bg-background px-3 text-sm w-40 font-mono"
-                  placeholder="Trace ID"
+                  placeholder={t('operations.logExplorer.traceIdPlaceholder', 'Trace ID')}
                   value={traceIdFilter}
                   onChange={(e) => setTraceIdFilter(e.target.value)}
                 />
