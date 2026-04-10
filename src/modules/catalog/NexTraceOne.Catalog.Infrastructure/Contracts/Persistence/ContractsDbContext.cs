@@ -110,6 +110,9 @@ public sealed class ContractsDbContext(
     /// <summary>Resultados de avaliação de compliance contratual contra gates configurados.</summary>
     public DbSet<ContractComplianceResult> ContractComplianceResults => Set<ContractComplianceResult>();
 
+    /// <summary>Simulações de impacto de dependências entre serviços para cenários what-if.</summary>
+    public DbSet<ImpactSimulation> ImpactSimulations => Set<ImpactSimulation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

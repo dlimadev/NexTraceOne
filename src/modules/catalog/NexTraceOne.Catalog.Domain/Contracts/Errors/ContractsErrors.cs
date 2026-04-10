@@ -260,5 +260,11 @@ public static class ContractsErrors
     /// <summary>Avaliação de contrato no marketplace não encontrada.</summary>
     public static Error MarketplaceReviewNotFound(string id)
         => Error.NotFound("Contracts.MarketplaceReview.NotFound", "Marketplace review '{0}' was not found.", id);
+
+    // ── ImpactSimulation ────────────────────────────────────────────
+
+    /// <summary>Simulação de impacto não encontrada.</summary>
+    public static Error ImpactSimulationNotFound(string id)
+        => Error.NotFound("Contracts.ImpactSimulation.NotFound", "Impact simulation '{0}' was not found.", id);
 }
 
