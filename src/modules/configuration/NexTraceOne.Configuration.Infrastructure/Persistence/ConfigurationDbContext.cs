@@ -106,6 +106,11 @@ public sealed class ConfigurationDbContext(
     /// <summary>Templates de payload personalizados para webhooks do tenant.</summary>
     public DbSet<WebhookTemplate> WebhookTemplates => Set<WebhookTemplate>();
 
+    // ── Phase 9: Contract Compliance Policies ──────────────────────────
+
+    /// <summary>Políticas de compliance contratual configuráveis por âmbito.</summary>
+    public DbSet<ContractCompliancePolicy> ContractCompliancePolicies => Set<ContractCompliancePolicy>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ConfigurationDbContext).Assembly;
 
