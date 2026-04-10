@@ -40,7 +40,7 @@
 | # | Módulo | DbContexts | Tabelas¹ | Endpoints | Features² | Testes (verificados) |
 |---|--------|:---------:|:-------:|:---------:|:---------:|:-----:|
 | 1 | IdentityAccess | 1 | 19 | 13 | 46 | **462** ✅ |
-| 2 | Catalog | 7 | 73 | 28 | 225 | **1441** ✅ |
+| 2 | Catalog | 7 | 73 | 28 | 225 | **1475** ✅ |
 | 3 | ChangeGovernance | 4 | 28 | 15 | 84 | **422** ✅ |
 | 4 | OperationalIntelligence | 6 | 46 | 11 | 128 | **851** ✅ |
 | 5 | AIKnowledge | 3 | 35 | 5 | 106 | **982** ✅ |
@@ -49,12 +49,12 @@
 | 8 | Notifications | 1 | 6 | 2 | 16 | **470** ✅ |
 | 9 | Integrations | 1 | 4 | 2 | 16 | **109** ✅ |
 | 10 | AuditCompliance | 1 | 6 | 1 | 22 | **172** ✅ |
-| 11 | Configuration | 1 | 20 | 17 | 60 | **451** ✅ |
+| 11 | Configuration | 1 | 20 | 17 | 60 | **550** ✅ |
 | 12 | ProductAnalytics | 1 | 1 | 1 | 9 | **42** ✅ |
 | | **Subtotal Módulos** | **28** | **264** | **117** | **834** | **5.907** ✅ |
 | | **+ Building Blocks** | **5** | — | — | — | **395** ✅ |
 | | **+ Platform Tests** | — | — | — | — | **44** ✅ |
-| | **TOTAL GERAL** | **33** | **264** | **117** | **834** | **6.346** ✅ |
+| | **TOTAL GERAL** | **33** | **264** | **117** | **834** | **6.479** ✅ |
 
 > ¹ Tabelas excluindo outbox messages (28 tabelas de outbox não contabilizadas).  
 > ² Features contadas por ficheiros com `IRequest<>` (Commands + Queries).
@@ -1302,7 +1302,7 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 
 ## Resumo Executivo
 
-### Resultados dos Testes (6.346 testes verificados + 161 testes de platform)
+### Resultados dos Testes (6.479 testes verificados + 161 testes de platform)
 
 | Componente | Testes | Passam | Falham | Estado |
 |-----------|--------|--------|--------|--------|
