@@ -1,5 +1,7 @@
 using Ardalis.GuardClauses;
 
+using FluentValidation;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Templates.Abstractions;
@@ -13,12 +15,23 @@ namespace NexTraceOne.Catalog.Application.Templates.Features.ActivateServiceTemp
 /// Um template ativo fica imediatamente disponível para scaffolding por developers.
 ///
 /// Persona primária: Platform Admin.
-/// Estrutura VSA: Command + Handler + Response num único ficheiro.
+/// Estrutura VSA: Command + Validator + Handler + Response num único ficheiro.
 /// </summary>
 public static class ActivateServiceTemplate
 {
     /// <summary>Comando de ativação de template.</summary>
     public sealed record Command(Guid TemplateId) : ICommand<Response>;
+
+    /// <summary>Valida o comando de ativação.</summary>
+    public sealed class Validator : AbstractValidator<Command>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.TemplateId)
+                .NotEmpty()
+                .WithMessage("TemplateId is required.");
+        }
+    }
 
     /// <summary>Handler que localiza e ativa o template.</summary>
     public sealed class Handler(IServiceTemplateRepository repository) : ICommandHandler<Command, Response>
