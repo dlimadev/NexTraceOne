@@ -199,8 +199,72 @@ public static class ContractsErrors
     public static Error ConsumerExpectationNotFound(string id)
         => Error.NotFound("Contracts.ConsumerExpectation.NotFound", "Consumer expectation '{0}' was not found.", id);
 
+    /// <summary>Score de saúde de contrato não encontrado para o API Asset informado.</summary>
+    public static Error ContractHealthScoreNotFound(string apiAssetId)
+        => Error.NotFound("Contracts.HealthScore.NotFound", "Contract health score not found for API asset '{0}'.", apiAssetId);
+
+    /// <summary>Nenhuma versão de contrato encontrada para calcular o score de saúde.</summary>
+    public static Error NoVersionsForHealthScore(string apiAssetId)
+        => Error.NotFound("Contracts.HealthScore.NoVersions", "No contract versions found for API asset '{0}' to compute health score.", apiAssetId);
+
     /// <summary>Formato de exportação não suportado.</summary>
     public static Error UnsupportedExportFormat(string format)
         => Error.Validation("Contracts.Export.UnsupportedFormat", "Export format '{0}' is not supported.", format);
+
+    // ── PipelineExecution ───────────────────────────────────────────
+
+    /// <summary>Execução de pipeline não encontrada.</summary>
+    public static Error PipelineExecutionNotFound(string id)
+        => Error.NotFound("Contracts.PipelineExecution.NotFound", "Pipeline execution '{0}' was not found.", id);
+
+    // ── ContractNegotiation ─────────────────────────────────────────
+
+    /// <summary>Negociação de contrato não encontrada.</summary>
+    public static Error ContractNegotiationNotFound(string id)
+        => Error.NotFound("Contracts.Negotiation.NotFound", "Contract negotiation '{0}' was not found.", id);
+
+    /// <summary>Transição de estado de negociação inválida.</summary>
+    public static Error NegotiationInvalidStatusTransition(string from, string to)
+        => Error.Business("Contracts.Negotiation.InvalidTransition", "Cannot transition negotiation from '{0}' to '{1}'.", from, to);
+
+    // ── SchemaEvolutionAdvice ────────────────────────────────────────
+
+    /// <summary>Análise de evolução de schema não encontrada.</summary>
+    public static Error SchemaEvolutionAdviceNotFound(string id)
+        => Error.NotFound("Contracts.SchemaEvolutionAdvice.NotFound", "Schema evolution advice '{0}' was not found.", id);
+
+    // ── SemanticDiffResult ──────────────────────────────────────────
+
+    /// <summary>Resultado de diff semântico não encontrado.</summary>
+    public static Error SemanticDiffResultNotFound(string id)
+        => Error.NotFound("Contracts.SemanticDiffResult.NotFound", "Semantic diff result '{0}' was not found.", id);
+
+    // ── ContractComplianceGate ───────────────────────────────────────
+
+    /// <summary>Gate de compliance contratual não encontrado.</summary>
+    public static Error ComplianceGateNotFound(string id)
+        => Error.NotFound("Contracts.ComplianceGate.NotFound", "Contract compliance gate '{0}' was not found.", id);
+
+    /// <summary>Resultado de compliance contratual não encontrado.</summary>
+    public static Error ComplianceResultNotFound(string id)
+        => Error.NotFound("Contracts.ComplianceResult.NotFound", "Contract compliance result '{0}' was not found.", id);
+
+    // ── ContractListing ─────────────────────────────────────────────
+
+    /// <summary>Listagem de contrato no marketplace não encontrada.</summary>
+    public static Error ContractListingNotFound(string id)
+        => Error.NotFound("Contracts.Listing.NotFound", "Contract listing '{0}' was not found.", id);
+
+    // ── MarketplaceReview ───────────────────────────────────────────
+
+    /// <summary>Avaliação de contrato no marketplace não encontrada.</summary>
+    public static Error MarketplaceReviewNotFound(string id)
+        => Error.NotFound("Contracts.MarketplaceReview.NotFound", "Marketplace review '{0}' was not found.", id);
+
+    // ── ImpactSimulation ────────────────────────────────────────────
+
+    /// <summary>Simulação de impacto não encontrada.</summary>
+    public static Error ImpactSimulationNotFound(string id)
+        => Error.NotFound("Contracts.ImpactSimulation.NotFound", "Impact simulation '{0}' was not found.", id);
 }
 

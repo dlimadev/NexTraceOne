@@ -155,7 +155,7 @@ export function VisualLegacyContractBuilder({
               label={t('contracts.builder.workservice.name', 'Contract Name')}
               value={state.name}
               onChange={(v) => update({ name: v })}
-              placeholder="CUSTOMER-RECORD"
+              placeholder={t('contracts.builder.legacy.recordNamePlaceholder', 'CUSTOMER-RECORD')}
               required
               error={fieldError('name') ? t(fieldError('name')!.messageKey, fieldError('name')!.fallback) : undefined}
               disabled={isReadOnly}
@@ -189,7 +189,7 @@ export function VisualLegacyContractBuilder({
               label={t('contracts.builder.rest.contact', 'Owner')}
               value={state.owner}
               onChange={(v) => update({ owner: v })}
-              placeholder="mainframe-team"
+              placeholder={t('contracts.builder.legacy.ownerPlaceholder', 'mainframe-team')}
               disabled={isReadOnly}
             />
           </div>
@@ -214,7 +214,7 @@ export function VisualLegacyContractBuilder({
               label={t('contracts.builder.legacy.programName', 'COBOL Program Name')}
               value={state.programName}
               onChange={(v) => update({ programName: v })}
-              placeholder="CUSTPROG"
+              placeholder={t('contracts.builder.legacy.programNamePlaceholder', 'CUSTPROG')}
               required
               mono
               error={fieldError('programName') ? t(fieldError('programName')!.messageKey, fieldError('programName')!.fallback) : undefined}
@@ -235,7 +235,7 @@ export function VisualLegacyContractBuilder({
                 label={t('contracts.builder.legacy.queueManager', 'Queue Manager')}
                 value={state.queueManager}
                 onChange={(v) => update({ queueManager: v })}
-                placeholder="QMGR01"
+                placeholder={t('contracts.builder.legacy.queueManagerPlaceholder', 'QMGR01')}
                 mono
                 disabled={isReadOnly}
               />
@@ -243,7 +243,7 @@ export function VisualLegacyContractBuilder({
                 label={t('contracts.builder.legacy.queueName', 'Queue Name')}
                 value={state.queueName}
                 onChange={(v) => update({ queueName: v })}
-                placeholder="CUST.REQUEST.Q"
+                placeholder={t('contracts.builder.legacy.queueNamePlaceholder', 'CUST.REQUEST.Q')}
                 required
                 mono
                 error={fieldError('queueName') ? t(fieldError('queueName')!.messageKey, fieldError('queueName')!.fallback) : undefined}
@@ -254,7 +254,7 @@ export function VisualLegacyContractBuilder({
               label={t('contracts.builder.legacy.messageFormat', 'Message Format')}
               value={state.messageFormat}
               onChange={(v) => update({ messageFormat: v })}
-              placeholder="MQHRF2"
+              placeholder={t('contracts.builder.legacy.messageFormatPlaceholder', 'MQHRF2')}
               mono
               disabled={isReadOnly}
             />
@@ -273,7 +273,7 @@ export function VisualLegacyContractBuilder({
                 label={t('contracts.builder.legacy.transactionId', 'CICS Transaction ID')}
                 value={state.transactionId}
                 onChange={(v) => update({ transactionId: v })}
-                placeholder="CUST"
+                placeholder={t('contracts.builder.legacy.transactionIdPlaceholder', 'CUST')}
                 required
                 mono
                 error={fieldError('transactionId') ? t(fieldError('transactionId')!.messageKey, fieldError('transactionId')!.fallback) : undefined}
@@ -335,7 +335,7 @@ export function VisualLegacyContractBuilder({
                         <Field label={t('contracts.builder.legacy.fieldLevel', 'Level')} value={f.level}
                           onChange={(v) => updateField(f.id, { level: v })} placeholder="05" mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.legacy.fieldName', 'Field Name')} value={f.name}
-                          onChange={(v) => updateField(f.id, { name: v })} placeholder="CUST-NAME" required mono disabled={isReadOnly} />
+                          onChange={(v) => updateField(f.id, { name: v })} placeholder={t('contracts.builder.legacy.fieldNamePlaceholder', 'CUST-NAME')} required mono disabled={isReadOnly} />
                         <FieldSelect label={t('contracts.builder.legacy.fieldType', 'Data Type')} value={f.type}
                           onChange={(v) => updateField(f.id, { type: v as LegacyFieldType })} options={FIELD_TYPE_OPTIONS} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.legacy.fieldLength', 'Length')} value={f.length}
@@ -345,11 +345,11 @@ export function VisualLegacyContractBuilder({
                         <Field label={t('contracts.builder.legacy.fieldOffset', 'Offset')} value={f.offset}
                           onChange={(v) => updateField(f.id, { offset: v })} placeholder="0" mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.legacy.fieldPicture', 'PIC Clause')} value={f.picture}
-                          onChange={(v) => updateField(f.id, { picture: v })} placeholder="PIC X(30)" mono disabled={isReadOnly} />
+                          onChange={(v) => updateField(f.id, { picture: v })} placeholder={t('contracts.builder.legacy.fieldPicturePlaceholder', 'PIC X(30)')} mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.legacy.fieldOccurs', 'OCCURS')} value={f.occurs}
                           onChange={(v) => updateField(f.id, { occurs: v })} placeholder="10" mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.legacy.fieldRedefines', 'REDEFINES')} value={f.redefines}
-                          onChange={(v) => updateField(f.id, { redefines: v })} placeholder="CUST-ID" mono disabled={isReadOnly} />
+                          onChange={(v) => updateField(f.id, { redefines: v })} placeholder={t('contracts.builder.legacy.fieldRedefinesPlaceholder', 'CUST-ID')} mono disabled={isReadOnly} />
                       </div>
                       <FieldArea label={t('contracts.builder.rest.description', 'Description')} value={f.description}
                         onChange={(v) => updateField(f.id, { description: v })} rows={2} disabled={isReadOnly} />

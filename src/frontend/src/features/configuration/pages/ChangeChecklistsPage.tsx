@@ -212,7 +212,7 @@ export function ChangeChecklistsPage() {
                     value={changeType}
                     onChange={(e) => setChangeType(e.target.value)}
                     className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
-                    placeholder="standard"
+                    placeholder={t('configuration.checklists.categoryPlaceholder', 'standard')}
                   />
                 </div>
                 <div>
@@ -224,7 +224,7 @@ export function ChangeChecklistsPage() {
                     value={environment}
                     onChange={(e) => setEnvironment(e.target.value)}
                     className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
-                    placeholder="production"
+                    placeholder={t('configuration.checklists.environmentPlaceholder', 'production')}
                   />
                 </div>
               </div>
@@ -251,7 +251,7 @@ export function ChangeChecklistsPage() {
                   onChange={(e) => setItemsText(e.target.value)}
                   rows={4}
                   className="w-full border border-gray-200 dark:border-gray-700 rounded-lg p-2 text-sm bg-transparent text-gray-700 dark:text-gray-300"
-                  placeholder="Review test results&#10;Check rollback plan&#10;Notify stakeholders"
+                  placeholder={t('configuration.checklists.itemsPlaceholder', 'Review test results\nCheck rollback plan\nNotify stakeholders')}
                 />
               </div>
             </div>

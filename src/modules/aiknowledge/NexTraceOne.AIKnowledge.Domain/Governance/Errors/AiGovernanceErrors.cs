@@ -281,4 +281,22 @@ public static class AiGovernanceErrors
             "AiGovernance.Evaluation.NotFound",
             "AI evaluation '{0}' was not found.",
             evaluationId);
+
+    // ── Onboarding ──────────────────────────────────────────────────────
+
+    /// <summary>Sessão de onboarding não encontrada pelo identificador informado.</summary>
+    public static Error OnboardingSessionNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.OnboardingSession.NotFound",
+            "Onboarding session '{0}' was not found.",
+            id);
+
+    // ── IDE Query Sessions ──────────────────────────────────────────────
+
+    /// <summary>Sessão de consulta IDE não encontrada pelo identificador informado.</summary>
+    public static Error IdeQuerySessionNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.IdeQuerySession.NotFound",
+            "IDE query session '{0}' was not found.",
+            id);
 }

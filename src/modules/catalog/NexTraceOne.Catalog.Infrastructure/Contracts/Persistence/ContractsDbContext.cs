@@ -80,6 +80,39 @@ public sealed class ContractsDbContext(
     /// <summary>Expectativas de consumidores para Consumer-Driven Contract Testing (CDCT).</summary>
     public DbSet<ConsumerExpectation> ConsumerExpectations => Set<ConsumerExpectation>();
 
+    /// <summary>Scores de saúde contínuos de contratos (API Assets).</summary>
+    public DbSet<ContractHealthScore> ContractHealthScores => Set<ContractHealthScore>();
+
+    /// <summary>Execuções de pipeline de geração de código a partir de contratos.</summary>
+    public DbSet<PipelineExecution> PipelineExecutions => Set<PipelineExecution>();
+
+    /// <summary>Negociações cross-team de contratos para aprovação colaborativa.</summary>
+    public DbSet<ContractNegotiation> ContractNegotiations => Set<ContractNegotiation>();
+
+    /// <summary>Comentários em negociações de contratos para revisão colaborativa.</summary>
+    public DbSet<NegotiationComment> NegotiationComments => Set<NegotiationComment>();
+
+    /// <summary>Análises de evolução de schema entre versões de contratos (API Assets).</summary>
+    public DbSet<SchemaEvolutionAdvice> SchemaEvolutionAdvices => Set<SchemaEvolutionAdvice>();
+
+    /// <summary>Resultados de diff semântico assistido por IA entre versões de contrato.</summary>
+    public DbSet<SemanticDiffResult> SemanticDiffResults => Set<SemanticDiffResult>();
+
+    /// <summary>Listagens de contratos publicados no marketplace interno.</summary>
+    public DbSet<ContractListing> ContractListings => Set<ContractListing>();
+
+    /// <summary>Avaliações de contratos publicados no marketplace interno.</summary>
+    public DbSet<MarketplaceReview> MarketplaceReviews => Set<MarketplaceReview>();
+
+    /// <summary>Gates de compliance contratual configuráveis por organização, equipa ou ambiente.</summary>
+    public DbSet<ContractComplianceGate> ContractComplianceGates => Set<ContractComplianceGate>();
+
+    /// <summary>Resultados de avaliação de compliance contratual contra gates configurados.</summary>
+    public DbSet<ContractComplianceResult> ContractComplianceResults => Set<ContractComplianceResult>();
+
+    /// <summary>Simulações de impacto de dependências entre serviços para cenários what-if.</summary>
+    public DbSet<ImpactSimulation> ImpactSimulations => Set<ImpactSimulation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

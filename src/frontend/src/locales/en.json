@@ -1385,6 +1385,10 @@
     "totalCount": "({{count}} total)",
     "services": {
       "addContract": "Add Contract"
+    },
+    "aiScaffold": {
+      "serviceNamePlaceholder": "payment-api",
+      "entitiesPlaceholder": "Payment, Refund, Statement"
     }
   },
   "catalogContractsConfig": {
@@ -2857,6 +2861,11 @@
       "definitions": "Definitions",
       "effective": "Effective Settings",
       "entries": "Configured Values"
+    },
+    "checklists": {
+      "categoryPlaceholder": "standard",
+      "environmentPlaceholder": "production",
+      "itemsPlaceholder": "Review test results\nCheck rollback plan\nNotify stakeholders"
     }
   },
   "contractGov": {
@@ -3060,7 +3069,16 @@
         "topicName": "Topic Name",
         "unnamed": "Unnamed Topic",
         "validate": "Validate",
-        "version": "Version"
+        "version": "Version",
+        "titlePlaceholder": "Order Events",
+        "eventNamePlaceholder": "OrderCreated",
+        "brokerPlaceholder": "kafka://broker:9092",
+        "topicNamePlaceholder": "orders.created",
+        "producerPlaceholder": "order-service",
+        "consumerPlaceholder": "notification-service",
+        "orderingPlaceholder": "by-key",
+        "dlqPlaceholder": "orders.created.dlq",
+        "channelOwnerPlaceholder": "team-orders"
       },
       "legacy": {
         "addField": "Add Field",
@@ -3081,7 +3099,17 @@
         "queueName": "Queue Name",
         "title": "Legacy Contract Builder",
         "totalLength": "Total Record Length (bytes)",
-        "transactionId": "CICS Transaction ID"
+        "transactionId": "CICS Transaction ID",
+        "recordNamePlaceholder": "CUSTOMER-RECORD",
+        "programNamePlaceholder": "CUSTPROG",
+        "queueManagerPlaceholder": "QMGR01",
+        "queueNamePlaceholder": "CUST.REQUEST.Q",
+        "messageFormatPlaceholder": "MQHRF2",
+        "transactionIdPlaceholder": "CUST",
+        "fieldNamePlaceholder": "CUST-NAME",
+        "fieldPicturePlaceholder": "PIC X(30)",
+        "fieldRedefinesPlaceholder": "CUST-ID",
+        "ownerPlaceholder": "mainframe-team"
       },
       "rest": {
         "addBody": "Add Request Body",
@@ -3217,7 +3245,11 @@
         "name": "Schema Name",
         "namespace": "Namespace",
         "noProperties": "No properties defined yet. Add your first schema property.",
-        "title": "Shared Schema Builder"
+        "title": "Shared Schema Builder",
+        "namePlaceholder": "UserProfile",
+        "namespacePlaceholder": "com.example.schemas",
+        "ownerPlaceholder": "platform-team",
+        "propertyNamePlaceholder": "userId"
       },
       "soap": {
         "addOperation": "Add Operation",
@@ -3242,7 +3274,16 @@
         "serviceName": "Service Name",
         "soapAction": "SOAP Action",
         "unnamed": "Unnamed Operation",
-        "validate": "Validate"
+        "validate": "Validate",
+        "serviceNamePlaceholder": "UserService",
+        "operationNamePlaceholder": "GetUser",
+        "inputMessagePlaceholder": "GetUserRequest",
+        "outputMessagePlaceholder": "GetUserResponse",
+        "faultMessagePlaceholder": "ServiceFault",
+        "endpointPlaceholder": "http://example.com/service",
+        "addressPlaceholder": "https://api.example.com/service",
+        "namespacePlaceholder": "http://schemas.example.com/types",
+        "soapActionPlaceholder": "urn:GetUser"
       },
       "validation": {
         "actorRequired": "At least one producer or consumer is required",
@@ -3317,7 +3358,15 @@
         "timeout": "Timeout (seconds)",
         "title": "Webhook Builder",
         "urlPattern": "URL Pattern",
-        "urlPatternPlaceholder": "https://example.com/webhooks/{event}"
+        "urlPatternPlaceholder": "https://example.com/webhooks/{event}",
+        "secretHeaderPlaceholder": "X-Webhook-Secret",
+        "customHeaderPlaceholder": "X-Custom-Header",
+        "namePlaceholder": "order-created-webhook",
+        "contentTypePlaceholder": "application/json",
+        "ownerPlaceholder": "integrations-team",
+        "headerValuePlaceholder": "header-value",
+        "retryPolicyPlaceholder": "exponential-backoff",
+        "eventsPlaceholder": "order.created, order.updated"
       },
       "workservice": {
         "addDep": "Add Dependency",
@@ -3372,7 +3421,17 @@
         "trigger": "Trigger & Schedule",
         "triggerType": "Trigger Type",
         "validate": "Validate",
-        "webhookUrl": "Webhook Path"
+        "webhookUrl": "Webhook Path",
+        "consumedEntityPlaceholder": "OrderEvent",
+        "producedEntityPlaceholder": "OrderProcessedEvent",
+        "eventNamePlaceholder": "OrderProcessed",
+        "namePlaceholder": "order-processor",
+        "ownerPlaceholder": "team-orders",
+        "depNamePlaceholder": "orders-db",
+        "consumedTopicPlaceholder": "orders.created",
+        "producedTopicPlaceholder": "orders.processed",
+        "consumedServicePlaceholder": "user-api",
+        "targetTopicPlaceholder": "orders.processed"
       },
       "canonical": {
         "picker": {
@@ -4083,7 +4142,19 @@
         "team": "Team",
         "technicalDescription": "Technical Description",
         "technicalName": "Technical Name",
-        "visibility": "Visibility"
+        "visibility": "Visibility",
+        "friendlyNamePlaceholder": "e.g., User Management API",
+        "functionalDescPlaceholder": "What business capability does this service provide?",
+        "technicalDescPlaceholder": "Technical architecture, stack, integration notes...",
+        "domainPlaceholder": "Payments",
+        "capabilityPlaceholder": "Payment Processing",
+        "productPlaceholder": "Checkout Platform",
+        "ownerPlaceholder": "john.doe@company.com",
+        "teamPlaceholder": "Team Payments",
+        "tagsPlaceholder": "payments, checkout, pci (comma separated)",
+        "slaPlaceholder": "99.9% uptime",
+        "sloPlaceholder": "p99 < 200ms",
+        "externalLinksPlaceholder": "Runbook, wiki, monitoring dashboard URLs (one per line)"
       },
       "dependencies": {
         "downstream": "Downstream",
@@ -4177,6 +4248,12 @@
         "postconditions": "Postconditions",
         "preconditions": "Preconditions",
         "title": "Use Cases"
+      },
+      "security": {
+        "authModelPlaceholder": "RBAC, ABAC, Scope-based...",
+        "scopesPlaceholder": "read:users, write:users, admin",
+        "rolesPlaceholder": "Admin, Editor, Viewer",
+        "claimsPlaceholder": "sub, aud, tenant_id"
       }
     },
     "subtitle": "Multi-protocol contract governance and semantic diff",
@@ -6496,6 +6573,9 @@
       "lastMonthCount": "{{count}} incidents last month",
       "incidentDistribution": "Incident Distribution",
       "filterByTeam": "Filter by team..."
+    },
+    "logExplorer": {
+      "traceIdPlaceholder": "Trace ID"
     }
   },
   "opsFinOpsConfig": {

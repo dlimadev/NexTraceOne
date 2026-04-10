@@ -200,6 +200,51 @@ jobs:
           name: integration-test-results
           path: ./test-results/*.trx
 
+  # ── test-backend-e2e ──────────────────────────────────────────────────────────
+  test-backend-e2e:
+    name: Test Backend (E2E)
+    runs-on: ubuntu-latest
+    needs: build-backend
+    # E2E tests spin up the full ApiHost via WebApplicationFactory + Testcontainers PostgreSQL
+    env:
+      ASPNETCORE_ENVIRONMENT: Development
+      NEXTRACE_SKIP_INTEGRITY: "true"
+      NEXTRACE_IGNORE_PENDING_MODEL_CHANGES: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props', '**/Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore NexTraceOne.sln
+
+      - name: Run E2E backend tests
+        run: |
+          dotnet test tests/platform/NexTraceOne.E2E.Tests/NexTraceOne.E2E.Tests.csproj \
+            --configuration Release \
+            --no-restore \
+            --logger "trx;LogFileName=e2e-backend-test-results.trx" \
+            --results-directory ./test-results \
+            --verbosity normal
+        continue-on-error: false
+
+      - name: Upload E2E backend test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-backend-test-results
+          path: ./test-results/*.trx
+
   # ── build-frontend ───────────────────────────────────────────────────────────
   build-frontend:
     name: Build Frontend
@@ -398,6 +443,7 @@ jobs:
       - build-backend
       - test-backend-unit
       - test-backend-integration
+      - test-backend-e2e
       - build-frontend
       - test-frontend
       - e2e-smoke
@@ -409,6 +455,7 @@ jobs:
           echo "build-backend: ${{ needs.build-backend.result }}"
           echo "test-backend-unit: ${{ needs.test-backend-unit.result }}"
           echo "test-backend-integration: ${{ needs.test-backend-integration.result }}"
+          echo "test-backend-e2e: ${{ needs.test-backend-e2e.result }}"
           echo "build-frontend: ${{ needs.build-frontend.result }}"
           echo "test-frontend: ${{ needs.test-frontend.result }}"
           echo "e2e-smoke: ${{ needs.e2e-smoke.result }}"
@@ -419,6 +466,7 @@ jobs:
                 "${{ needs.build-backend.result }}" == "failure" || \
                 "${{ needs.test-backend-unit.result }}" == "failure" || \
                 "${{ needs.test-backend-integration.result }}" == "failure" || \
+                "${{ needs.test-backend-e2e.result }}" == "failure" || \
                 "${{ needs.build-frontend.result }}" == "failure" || \
                 "${{ needs.test-frontend.result }}" == "failure" || \
                 "${{ needs.security-audit.result }}" == "failure" || \

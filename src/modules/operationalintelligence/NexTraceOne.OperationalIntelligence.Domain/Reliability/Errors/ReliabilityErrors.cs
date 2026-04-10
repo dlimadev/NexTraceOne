@@ -83,4 +83,20 @@ public static class ReliabilityErrors
             "Error budget for service '{0}' SLO '{1}' has been exhausted.",
             serviceName,
             sloType);
+
+    /// <summary>Recomendação de self-healing não encontrada pelo identificador informado.</summary>
+    public static Error HealingRecommendationNotFound(string id)
+        => Error.NotFound(
+            "Reliability.HealingRecommendation.NotFound",
+            "Healing recommendation '{0}' was not found.",
+            id);
+
+    /// <summary>Transição de estado inválida para recomendação de self-healing.</summary>
+    public static Error HealingRecommendationInvalidTransition(string id, string from, string to)
+        => Error.Conflict(
+            "Reliability.HealingRecommendation.InvalidTransition",
+            "Cannot transition healing recommendation '{0}' from '{1}' to '{2}'.",
+            id,
+            from,
+            to);
 }

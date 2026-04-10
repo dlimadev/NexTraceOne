@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Knowledge.Application.Abstractions;
@@ -34,10 +35,14 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
+        // Unit of Work
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<KnowledgeDbContext>());
+
         // Repositories
         services.AddScoped<IKnowledgeDocumentRepository, KnowledgeDocumentRepository>();
         services.AddScoped<IOperationalNoteRepository, OperationalNoteRepository>();
         services.AddScoped<IKnowledgeRelationRepository, KnowledgeRelationRepository>();
+        services.AddScoped<IKnowledgeGraphSnapshotRepository, KnowledgeGraphSnapshotRepository>();
 
         // Cross-module search provider
         services.AddScoped<IKnowledgeSearchProvider, KnowledgeSearchProvider>();

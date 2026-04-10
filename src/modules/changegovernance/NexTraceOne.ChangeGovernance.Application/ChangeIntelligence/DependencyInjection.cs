@@ -20,6 +20,8 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetTr
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordConfidenceEvent;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeConfidenceTimeline;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordObservationMetrics;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordTraceCorrelation;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterRollback;
@@ -69,6 +71,8 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetTraceCorrelations.Query>, GetTraceCorrelations.Validator>();
         services.AddTransient<IValidator<RecordObservationMetrics.Command>, RecordObservationMetrics.Validator>();
         services.AddTransient<IValidator<GetPostReleaseReview.Query>, GetPostReleaseReview.Validator>();
+        services.AddTransient<IValidator<RecordConfidenceEvent.Command>, RecordConfidenceEvent.Validator>();
+        services.AddTransient<IValidator<GetChangeConfidenceTimeline.Query>, GetChangeConfidenceTimeline.Validator>();
 
         return services;
     }
