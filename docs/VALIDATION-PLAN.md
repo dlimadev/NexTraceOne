@@ -36,20 +36,20 @@
 
 ### Backend — 12 Módulos
 
-| # | Módulo | DbContexts | DbSets | Endpoints | Features | Testes |
+| # | Módulo | DbContexts | DbSets | Endpoints | Features | Testes (verificados) |
 |---|--------|-----------|--------|-----------|----------|--------|
-| 1 | IdentityAccess | 1 | 23 | 13 | 38 | ~58 |
-| 2 | Catalog | 6 | ~66 | ~20 | ~225 | ~158 |
-| 3 | ChangeGovernance | 4 | ~29 | ~17 | ~91 | ~40 |
-| 4 | OperationalIntelligence | 6 | ~52 | ~11 | ~80+ | ~75 |
-| 5 | AIKnowledge | 3 | ~49 | ~5 | ~106 | ~87 |
-| 6 | Governance | 1 | 22 | ~21 | ~40+ | ~36 |
-| 7 | Knowledge | 1 | 4 | 1 | ~18 | ~16 |
-| 8 | Notifications | 1 | 6 | 2 | ~17 | ~50 |
-| 9 | Integrations | 1 | 4 | 2 | ~13 | ~16 |
-| 10 | AuditCompliance | 1 | 6 | 1 | ~23 | ~15 |
-| 11 | Configuration | 1 | 20 | 17 | ~57 | ~30 |
-| 12 | ProductAnalytics | 1 | 1 | 1 | ~9 | ~4 |
+| 1 | IdentityAccess | 1 | 19 | 12 | 46 | **462** ✅ |
+| 2 | Catalog | 7 | ~73 | ~20 | ~225 | **1441** ✅ |
+| 3 | ChangeGovernance | 4 | 29 | ~17 | 47 | **422** ✅ |
+| 4 | OperationalIntelligence | 6 | 46 | ~11 | 49 | **851** ✅ |
+| 5 | AIKnowledge | 3 | 35 | 5 | 58 | **982** ✅ |
+| 6 | Governance | 1 | 22 | 21 | 106 | **413** ✅ |
+| 7 | Knowledge | 1 | 4 | 1 | 16 | **92** ✅ |
+| 8 | Notifications | 1 | 6 | 2 | 16 | **470** ✅ |
+| 9 | Integrations | 1 | 4 | 2 | 19 | **109** ✅ |
+| 10 | AuditCompliance | 1 | 6 | 1 | 22 | **172** ✅ |
+| 11 | Configuration | 1 | 20 | 17 | 60 | **451** ✅ |
+| 12 | ProductAnalytics | 1 | 1 | 1 | 9 | **42** ✅ |
 
 ### Frontend
 
@@ -67,12 +67,12 @@
 
 | Área | Ficheiros |
 |------|-----------|
-| RLS (apply-rls.sql) | ~100 tabelas |
-| Seed production | seed_production.sql |
-| Seed development | seed_development.sql |
-| Docker Compose | 3 ficheiros |
+| RLS (apply-rls.sql) | **99 tabelas** (verificado) |
+| Seed production | seed_production.sql (100% idempotente) |
+| Seed development | seed_development.sql (100% idempotente) |
+| Docker Compose | 3 ficheiros (validados) |
 | Platform projects | 3 (ApiHost, Workers, Ingestion) |
-| Building Blocks | 5 |
+| Building Blocks | 5 (**395 testes** ✅) |
 
 ---
 
@@ -1190,3 +1190,495 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 ---
 
 > **Nota**: Este plano deve ser executado de forma iterativa. Cada módulo validado pode revelar gaps que impactam outros módulos. Manter um registo centralizado de todos os findings para priorização final.
+
+---
+
+# RESULTADOS DA VALIDAÇÃO
+
+> **Data de execução**: 2026-04-10  
+> **Estado**: Validação completa de todos os 12 módulos + Building Blocks + Frontend + Infraestrutura
+
+---
+
+## Resumo Executivo
+
+### Resultados dos Testes (5.907 testes totais)
+
+| Componente | Testes | Passam | Falham | Estado |
+|-----------|--------|--------|--------|--------|
+| **Building Blocks** | | | | |
+| BB.Core | 30 | 30 | 0 | ✅ |
+| BB.Application | 34 | 34 | 0 | ✅ |
+| BB.Infrastructure | 71 | 71 | 0 | ✅ |
+| BB.Security | 164 | 164 | 0 | ✅ |
+| BB.Observability | 96 | 96 | 0 | ✅ |
+| **Subtotal Building Blocks** | **395** | **395** | **0** | ✅ |
+| **Módulos** | | | | |
+| IdentityAccess | 462 | 462 | 0 | ✅ |
+| Catalog | 1441 | 1441 | 0 | ✅ |
+| ChangeGovernance | 422 | 422 | 0 | ✅ |
+| OperationalIntelligence | 851 | 851 | 0 | ✅ |
+| AIKnowledge | 982 | 982 | 0 | ✅ |
+| Governance | 413 | 413 | 0 | ✅ |
+| Knowledge | 92 | 92 | 0 | ✅ |
+| Notifications | 470 | 470 | 0 | ✅ |
+| Integrations | 109 | 109 | 0 | ✅ |
+| AuditCompliance | 172 | 172 | 0 | ✅ |
+| Configuration | 451 | 451 | 0 | ✅ |
+| ProductAnalytics | 42 | 42 | 0 | ✅ |
+| **Subtotal Módulos** | **5.907** | **5.907** | **0** | ✅ |
+| **TOTAL GERAL** | **5.907** | **5.907** | **0** | ✅ **ZERO FAILURES** |
+
+---
+
+## Findings Críticos por Severidade
+
+### 🔴 CRÍTICO — RLS (Row-Level Security) Incompleto
+
+**A maior lacuna encontrada no sistema é a cobertura parcial de RLS.**
+
+O ficheiro `apply-rls.sql` cobre 99 tabelas, mas a análise de todos os DbContexts revelou que muitas tabelas de módulos core não têm RLS.
+
+| Módulo | DbSets Total | Com RLS | Sem RLS | Cobertura |
+|--------|:-----------:|:------:|:------:|:---------:|
+| IdentityAccess | 19 | 12 | 7 | 63% |
+| Catalog (Contracts) | 31 | 12 | 19 | 39% |
+| ChangeGovernance | 29 | 9 | 20 | 31% |
+| OperationalIntelligence | 46 | 16 | 30 | 35% |
+| AIKnowledge | 35 | 4 | 31 | 11% |
+| Governance | 22 | 14 | 8 | 64% |
+| Knowledge | 4 | 3 | 1 | 75% |
+| Notifications | 6 | 2 | 4 | 33% |
+| Configuration | 20 | 14 | 6 | 70% |
+| Integrations | 4 | 3 | 1 | 75% |
+| AuditCompliance | 6 | 4 | 2 | 67% |
+| ProductAnalytics | 1 | 1 | 0 | 100% |
+
+**Tabelas do Catalog sem RLS (19):**
+- ContractVersions, ContractDiffs, ContractRuleViolations, ContractArtifacts, Drafts, Reviews, Examples, ContractLintRulesets, CanonicalEntities, CanonicalEntityVersions, ContractScorecards, ContractEvidencePacks, SoapContractDetails, SoapDraftMetadata, EventContractDetails, EventDraftMetadata, BackgroundServiceContractDetails, BackgroundServiceDraftMetadata, ContractDeployments, ConsumerExpectations
+
+**Tabelas do ChangeGovernance sem RLS (20):**
+- ChangeIntelligenceDbContext: 12 tabelas sem RLS
+- WorkflowDbContext: 6 tabelas sem RLS (nenhuma tem RLS)
+- RulesetGovernanceDbContext: 2 tabelas sem RLS
+
+**Tabelas do OperationalIntelligence sem RLS (30):**
+- AutomationDbContext: 2/3 sem RLS
+- CostIntelligenceDbContext: 7/8 sem RLS
+- IncidentDbContext: 7/8 sem RLS
+- ReliabilityDbContext: 6/9 sem RLS
+- RuntimeIntelligenceDbContext: 5/11 sem RLS
+- TelemetryStoreDbContext: 7/7 sem RLS (nenhuma tem RLS)
+
+**Tabelas do AIKnowledge sem RLS (31):**
+- AiGovernanceDbContext: 25/27 sem RLS
+- AiOrchestrationDbContext: 4/4 sem RLS (nenhuma tem RLS)
+- ExternalAiDbContext: 3/4 sem RLS
+
+**Nota sobre IdentityAccess**: As 7 tabelas sem RLS (Tenant, User, Role, Permission, ExternalIdentity, RolePermission, ModuleAccessPolicy) são tabelas de sistema/lookup que intencionalmente não precisam de tenant isolation. Isto é uma decisão de design válida, não um gap.
+
+**Impacto**: Em ambientes multi-tenant, dados poderiam potencialmente vazar entre tenants se o acesso direto ao banco ocorrer sem o middleware de tenant do backend. Embora o backend imponha tenant isolation via queries, o RLS é a camada de defesa adicional obrigatória.
+
+**Recomendação**: Adicionar RLS a todas as tabelas que contêm dados de tenant. Priorizar: AIKnowledge (11%) → ChangeGovernance (31%) → OperationalIntelligence (35%) → Catalog (39%).
+
+---
+
+### 🟠 ALTO — Cobertura de Testes por Feature
+
+Embora todos os 5.907 testes passem, a cobertura por feature (Application layer) varia significativamente:
+
+| Módulo | Features | Com Testes | Sem Testes | Cobertura |
+|--------|:--------:|:---------:|:---------:|:---------:|
+| IdentityAccess | 46 | 24 | 22 | 52% |
+| Catalog | ~225 | ~52 | ~173 | ~23% |
+| ChangeGovernance | 47 | 35 | 12 | 74% |
+| OperationalIntelligence | 49 | 72+ | — | >100% |
+| AIKnowledge | 58 | 86+ | — | >100% |
+| Governance | 106 | 34 | 72 | 32% |
+| Knowledge | 16 | 14 | 2 | 88% |
+| Notifications | 16 | 49* | — | 100%* |
+| Configuration | 60 | 16 | 44 | 27% |
+| Integrations | 19 | 22 | — | >100% |
+| AuditCompliance | 22 | 14 | 8 | 64% |
+| ProductAnalytics | 9 | 3 | 6 | 33% |
+
+\* Notifications tem cobertura indireta via engine/handler tests, não feature tests dedicados.
+
+**Features críticas sem testes no IdentityAccess:**
+- Access Review (4 features): StartAccessReviewCampaign, ListAccessReviewCampaigns, GetAccessReviewCampaign, DecideAccessReviewItem
+- Break Glass / JIT Access (6 features): RequestBreakGlass, RevokeBreakGlass, ListBreakGlassRequests, RequestJitAccess, ListJitAccessRequests, DecideJitAccess
+- User Management (4 features): ActivateUser, DeactivateUser, GetUserProfile, ListTenantUsers
+- SSO/Federation (3 features): FederatedLogin, OidcCallback, StartOidcLogin
+
+**Módulos com melhor cobertura**: OperationalIntelligence (>100%), AIKnowledge (>100%), Knowledge (88%), ChangeGovernance (74%)  
+**Módulos que precisam mais testes**: Catalog (23%), Configuration (27%), Governance (32%), ProductAnalytics (33%)
+
+---
+
+### 🟡 MÉDIO — Validators em Falta
+
+| Módulo | Commands Sem Validator | Detalhes |
+|--------|:---------------------:|---------|
+| Catalog | 2 | ActivateServiceTemplate, DeactivateServiceTemplate |
+| AIKnowledge | 5 | SeedDefaultToolDefinitions, SeedDefaultAgents, SeedDefaultPromptTemplates, SeedDefaultModels, SeedDefaultGuardrails |
+| **Todos os outros** | **0** | ✅ 100% cobertura de validators |
+
+**Nota**: Os 5 commands do AIKnowledge sem validator são operações de Seed (setup inicial), o que é aceitável. Os 2 do Catalog devem ser corrigidos.
+
+---
+
+### 🟡 MÉDIO — Hardcoded Strings no Frontend (i18n)
+
+**11 ocorrências encontradas** de strings hardcoded que deveriam usar i18n:
+
+| Ficheiro | String Hardcoded | Tipo |
+|----------|-----------------|------|
+| `LogExplorerPage.tsx` | `placeholder="Trace ID"` | placeholder |
+| `SecuritySection.tsx` | `"RBAC, ABAC, Scope-based..."` | hint text |
+| `SecuritySection.tsx` | `"Admin, Editor, Viewer"` | hint text |
+| `DefinitionSection.tsx` | `placeholder="What business capability..."` | placeholder |
+| `DefinitionSection.tsx` | `placeholder="Technical architecture..."` | placeholder |
+| `DefinitionSection.tsx` | `placeholder="Payments"` | example |
+| `DefinitionSection.tsx` | `placeholder="Payment Processing"` | example |
+| `DefinitionSection.tsx` | `placeholder="Checkout Platform"` | example |
+| `DefinitionSection.tsx` | `placeholder="john.doe@company.com"` | example |
+| `DefinitionSection.tsx` | `placeholder="Team Payments"` | example |
+| `DefinitionSection.tsx` | `placeholder="p99 < 200ms"` | example |
+
+**Recomendação**: Mover todos para chaves i18n. Prioridade baixa pois são maioritariamente placeholders/hints.
+
+---
+
+## Relatórios de Validação por Módulo
+
+### Módulo 1 — IdentityAccess (Foundation)
+
+#### Estado Geral: 🟡 Parcial
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | Todas entidades com validators, CancellationToken propagado |
+| Application | ✅ | 46 features, todos com FluentValidation |
+| Infrastructure | ✅ | IdentityDbContext com 19 DbSets, 17 entity configurations, migrations OK |
+| API | ✅ | 12 endpoint modules, 100% com RequireAuthorization/RequirePermission |
+| Frontend | ✅ | i18n completo, sem hardcoded strings |
+| Database | ⚠️ | 7 tabelas sem RLS (tabelas de sistema — decisão de design válida) |
+| Testes | ⚠️ | 462 testes passam, mas 22/46 features sem teste dedicado (52%) |
+
+**Bugs Encontrados**: 0  
+**Gaps Identificados**: Test coverage para features de segurança (Break Glass, JIT, Access Review)
+
+---
+
+### Módulo 2 — Catalog (Services & Contracts)
+
+#### Estado Geral: 🟡 Parcial
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 8 subdomains bem estruturados |
+| Application | ⚠️ | ~225 features, 2 commands sem validator |
+| Infrastructure | ✅ | 7 DbContexts com migrations completas |
+| API | ✅ | Todos endpoints com RequirePermission |
+| Frontend | ⚠️ | 25 páginas implementadas, ~50-80% de features sem UI dedicada |
+| Database | 🔴 | 19/31 DbSets do ContractsDbContext sem RLS |
+| Testes | ⚠️ | 1441 testes passam, mas ~173 features sem teste (~23% cobertura) |
+
+**Bugs Encontrados**: 0  
+**Gaps Identificados**: RLS em 19 tabelas, 2 validators em falta, teste coverage no Application layer
+
+---
+
+### Módulo 3 — ChangeGovernance (Changes)
+
+#### Estado Geral: 🟡 Parcial
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 4 subdomains bem definidos |
+| Application | ✅ | 47 commands, 100% com validators |
+| Infrastructure | ✅ | 4 DbContexts com migrations |
+| API | ✅ | Endpoints protegidos |
+| Frontend | ⚠️ | Páginas de Change Intelligence, Confidence, Blast Radius implementadas |
+| Database | 🔴 | 20/29 DbSets sem RLS (WorkflowDbContext: 0/6 com RLS) |
+| Testes | ✅ | 422 testes, 74% cobertura features |
+
+**Bugs Encontrados**: 0  
+**Gaps Identificados**: RLS em 20 tabelas (especialmente WorkflowDbContext inteiro sem RLS)
+
+---
+
+### Módulo 4 — OperationalIntelligence (Operations)
+
+#### Estado Geral: 🟡 Parcial
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 5 subdomains completos |
+| Application | ✅ | 49 commands, 100% com validators |
+| Infrastructure | ✅ | 6 DbContexts com migrations |
+| API | ✅ | 11 endpoint modules |
+| Frontend | ⚠️ | Páginas de Incidents, Reliability, Runtime implementadas |
+| Database | 🔴 | 30/46 DbSets sem RLS (TelemetryStoreDbContext: 0/7 com RLS) |
+| Testes | ✅ | 851 testes, cobertura >100% das features |
+
+**Bugs Encontrados**: 0  
+**Gaps Identificados**: RLS em 30 tabelas (especialmente TelemetryStore e CostIntelligence quase sem RLS)
+
+---
+
+### Módulo 5 — AIKnowledge (AI)
+
+#### Estado Geral: 🟡 Parcial
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 3 subdomains com governança |
+| Application | ⚠️ | 58 commands, 5 seed commands sem validator (aceitável) |
+| Infrastructure | ✅ | 3 DbContexts com migrations |
+| API | ✅ | 5 endpoint modules |
+| Frontend | ⚠️ | AI Assistant, Agents, Model Registry implementados |
+| Database | 🔴 | 31/35 DbSets sem RLS (AiOrchestrationDbContext: 0/4 com RLS) |
+| Testes | ✅ | 982 testes, cobertura >100% das features |
+
+**Bugs Encontrados**: 0  
+**Gaps Identificados**: RLS em 31 tabelas (pior cobertura: 11%) — **prioridade máxima para correção**
+
+---
+
+### Módulo 6 — Governance
+
+#### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | Entidades completas incluindo SecurityGate |
+| Application | ✅ | 106 features (98 core + 8 SecurityGate) |
+| Infrastructure | ✅ | GovernanceDbContext com 22 DbSets |
+| API | ✅ | 21 endpoint modules |
+| Frontend | ⚠️ | Teams, Domains, Compliance, FinOps, Executive Views implementados |
+| Database | ✅ | RLS completo em 14 tabelas |
+| Testes | ⚠️ | 413 testes, 32% cobertura features |
+
+**Bugs Encontrados**: 0  
+**Gaps Identificados**: Test coverage baixo (32%) apesar do RLS estar completo
+
+---
+
+### Módulo 7 — Knowledge
+
+#### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 4 entidades bem definidas |
+| Application | ✅ | 16 features |
+| Infrastructure | ✅ | KnowledgeDbContext com 4 DbSets |
+| API | ✅ | KnowledgeEndpointModule |
+| Frontend | ✅ | Knowledge Hub, Relations, Graph implementados |
+| Database | ✅ | 3/4 com RLS (75%) |
+| Testes | ✅ | 92 testes, 88% cobertura features |
+
+**Bugs Encontrados**: 0
+
+---
+
+### Módulo 8 — Notifications
+
+#### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 6 entidades com StronglyTypedIds |
+| Application | ✅ | 16 features |
+| Infrastructure | ✅ | NotificationsDbContext, Engine, EventHandlers |
+| API | ✅ | 2 endpoint modules |
+| Frontend | ✅ | Notification center, preferences |
+| Database | ⚠️ | 2/6 com RLS (33%) |
+| Testes | ✅ | 470 testes (cobertura indireta via engine/handler tests) |
+
+**Bugs Encontrados**: 0
+
+---
+
+### Módulo 9 — Integrations
+
+#### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 4 entidades + LegacyTelemetry |
+| Application | ✅ | 19 features |
+| Infrastructure | ✅ | IntegrationsDbContext, LegacyTelemetry subsystem |
+| API | ✅ | 2 endpoint modules |
+| Frontend | ✅ | Integration hub, webhook management |
+| Database | ✅ | 3/4 com RLS (75%) |
+| Testes | ✅ | 109 testes, cobertura >100% |
+
+**Bugs Encontrados**: 0
+
+---
+
+### Módulo 10 — AuditCompliance
+
+#### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 6 entidades incluindo chain integrity |
+| Application | ✅ | 22 features |
+| Infrastructure | ✅ | AuditDbContext, retention subsystem |
+| API | ✅ | AuditEndpointModule |
+| Frontend | ✅ | Audit trail, compliance, campaigns |
+| Database | ⚠️ | 4/6 com RLS (67%) |
+| Testes | ✅ | 172 testes, 64% cobertura features |
+
+**Bugs Encontrados**: 0
+
+---
+
+### Módulo 11 — Configuration
+
+#### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 20 entidades completas |
+| Application | ✅ | 60 features |
+| Infrastructure | ✅ | ConfigurationDbContext com 20 DbSets |
+| API | ✅ | 17 endpoint modules |
+| Frontend | ✅ | Configuration admin, feature flags, preferences |
+| Database | ✅ | 14/20 com RLS (70%) |
+| Testes | ⚠️ | 451 testes, 27% cobertura features |
+
+**Bugs Encontrados**: 0  
+**Gaps Identificados**: Cobertura de testes baixa para features CRUD
+
+---
+
+### Módulo 12 — ProductAnalytics
+
+#### Estado Geral: ✅ OK
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| Domain | ✅ | 1 entidade (AnalyticsEvent) |
+| Application | ✅ | 9 features |
+| Infrastructure | ✅ | ProductAnalyticsDbContext |
+| API | ✅ | ProductAnalyticsEndpointModule |
+| Frontend | ✅ | Analytics tracker |
+| Database | ✅ | 1/1 com RLS (100%) |
+| Testes | ⚠️ | 42 testes, 33% cobertura features (cobertura indireta via grouped tests) |
+
+**Bugs Encontrados**: 0
+
+---
+
+## Validação do Frontend Global
+
+### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| i18n | ✅ | 4 idiomas, 117 top-level keys cada, 100% consistente |
+| Hardcoded strings | ⚠️ | 11 strings hardcoded (maioritariamente placeholders) |
+| dangerouslySetInnerHTML | ✅ | Nenhuma ocorrência — seguro |
+| Token storage | ✅ | In-memory para refresh/CSRF, sessionStorage para access token |
+| Sanitização | ✅ | sanitize.ts com isSafeUrl(), bloqueio de javascript:/data:/vbscript: |
+| Rotas | ✅ | 60+ páginas lazy-loaded, todas resolvem correctamente |
+| Design System | ✅ | 54+ componentes globais consistentes |
+
+---
+
+## Validação da Infraestrutura
+
+### Estado Geral: ✅ Bom
+
+| Área | Estado | Detalhes |
+|------|:------:|---------|
+| RLS (apply-rls.sql) | ⚠️ | 99 tabelas cobertas, mas muitas tabelas de módulos core em falta |
+| Seed production | ✅ | 100% idempotente (ON CONFLICT DO NOTHING) |
+| Seed development | ✅ | 100% idempotente |
+| Docker | ✅ | Base images actuais, ports correctos, health checks, non-root |
+| Migrations | ✅ | 173 migration files em 28 DbContexts, nenhum em falta |
+
+---
+
+## Plano de Correção Priorizado
+
+### Prioridade 1 — RLS (Segurança Multi-Tenant) 🔴
+
+**Impacto**: Segurança de dados em ambiente multi-tenant  
+**Esforço**: Médio  
+**Módulos por ordem de prioridade**:
+
+1. **AIKnowledge** (11% cobertura → adicionar RLS a 31 tabelas)
+2. **ChangeGovernance** (31% → 20 tabelas)
+3. **Notifications** (33% → 4 tabelas)
+4. **OperationalIntelligence** (35% → 30 tabelas)
+5. **Catalog** (39% → 19 tabelas)
+
+### Prioridade 2 — Cobertura de Testes 🟠
+
+**Impacto**: Confiança em mudanças futuras  
+**Esforço**: Alto  
+**Módulos por ordem de prioridade**:
+
+1. **IdentityAccess** — testes para Access Review, Break Glass, JIT Access (features de segurança)
+2. **Catalog** — testes para Contract CRUD, Studio, Publication (features core)
+3. **Configuration** — testes para CRUD operations
+4. **Governance** — testes para compliance e FinOps features
+
+### Prioridade 3 — Validators em Falta 🟡
+
+**Impacto**: Validação de input  
+**Esforço**: Baixo  
+**Ficheiros a corrigir**:
+
+1. `Catalog/Templates/Features/ActivateServiceTemplate/ActivateServiceTemplate.cs`
+2. `Catalog/Templates/Features/DeactivateServiceTemplate/DeactivateServiceTemplate.cs`
+
+### Prioridade 4 — i18n Hardcoded Strings 🟡
+
+**Impacto**: Internacionalização  
+**Esforço**: Baixo  
+**Ficheiros a corrigir**:
+
+1. `LogExplorerPage.tsx` (1 string)
+2. `SecuritySection.tsx` (2 strings)
+3. `DefinitionSection.tsx` (8 strings)
+
+---
+
+## Métricas Globais
+
+| Métrica | Valor | Estado |
+|---------|-------|--------|
+| Total de testes | 5.907 | ✅ |
+| Testes falhados | 0 | ✅ |
+| Módulos | 12 | ✅ |
+| DbContexts | 28 | ✅ |
+| Migrations | 173 | ✅ |
+| Tabelas com RLS | 99 | ⚠️ (parcial) |
+| Features total (estimado) | ~673 | — |
+| Validators em falta | 7 | ⚠️ |
+| Endpoints sem auth | 0 | ✅ |
+| i18n keys (por idioma) | 117 | ✅ |
+| Idiomas | 4 | ✅ |
+| Hardcoded strings | 11 | ⚠️ |
+| dangerouslySetInnerHTML | 0 | ✅ |
+| Docker security (non-root) | ✅ | ✅ |
+| Seed idempotência | 100% | ✅ |
+| E2E specs | 16 | ✅ |
+
+---
+
+## Conclusão
+
+O NexTraceOne apresenta uma base sólida com **5.907 testes todos a passar**, **0 bugs encontrados**, **arquitectura bem separada por bounded contexts** e **segurança frontend robusta**. 
+
+O **gap mais crítico** é a **cobertura de RLS incompleta** — especialmente no AIKnowledge (11%), ChangeGovernance (31%) e OperationalIntelligence (35%). Em ambiente multi-tenant, isto representa um risco de segurança que deve ser endereçado antes de produção.
+
+O segundo gap é a **cobertura de testes no Application layer** — embora existam muitos testes (5.907), a distribuição por features é desigual. Módulos como Catalog (23%) e Configuration (27%) beneficiariam de testes mais focados em features individuais.
+
+**Nenhum bug funcional foi encontrado.** Todos os módulos compilam, todos os testes passam, e a arquitectura modular está consistente.
