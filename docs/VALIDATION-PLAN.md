@@ -1,6 +1,6 @@
 # Plano de Validação Completa — NexTraceOne
 
-> **Última actualização**: 2026-04-10 (rev.4)  
+> **Última actualização**: 2026-04-10 (rev.5)  
 > **Objetivo**: Validar módulo a módulo, camada a camada, todo o fluxo funcional do NexTraceOne — frontend, backend, database, testes e documentação — identificando bugs, gaps, implementações incompletas ou parciais.
 
 > **Estratégia**: Cada módulo será validado de forma independente e completa, seguindo a mesma checklist estruturada. Ao final, uma validação cross-module garante integridade entre bounded contexts.
@@ -40,9 +40,9 @@
 | # | Módulo | DbContexts | Tabelas¹ | Endpoints | Features² | Testes (verificados) |
 |---|--------|:---------:|:-------:|:---------:|:---------:|:-----:|
 | 1 | IdentityAccess | 1 | 19 | 13 | 46 | **462** ✅ |
-| 2 | Catalog | 7 | 72 | 25 | 225 | **1441** ✅ |
+| 2 | Catalog | 7 | 73 | 28 | 225 | **1441** ✅ |
 | 3 | ChangeGovernance | 4 | 28 | 15 | 84 | **422** ✅ |
-| 4 | OperationalIntelligence | 6 | 46 | 11 | 128 | **851** ✅ |
+| 4 | OperationalIntelligence | 6 | 46 | 11 | 133 | **851** ✅ |
 | 5 | AIKnowledge | 3 | 35 | 5 | 106 | **982** ✅ |
 | 6 | Governance | 1 | 22 | 21 | 106 | **413** ✅ |
 | 7 | Knowledge | 1 | 4 | 1 | 16 | **92** ✅ |
@@ -51,10 +51,10 @@
 | 10 | AuditCompliance | 1 | 6 | 1 | 22 | **172** ✅ |
 | 11 | Configuration | 1 | 20 | 17 | 60 | **451** ✅ |
 | 12 | ProductAnalytics | 1 | 1 | 1 | 9 | **42** ✅ |
-| | **Subtotal Módulos** | **28** | **263** | **117** | **834** | **5.907** ✅ |
+| | **Subtotal Módulos** | **28** | **264** | **117** | **839** | **5.907** ✅ |
 | | **+ Building Blocks** | **5** | — | — | — | **395** ✅ |
 | | **+ Platform Tests** | — | — | — | — | **44** ✅ |
-| | **TOTAL GERAL** | **33** | **263** | **117** | **834** | **6.346** ✅ |
+| | **TOTAL GERAL** | **33** | **264** | **117** | **839** | **6.346** ✅ |
 
 > ¹ Tabelas excluindo outbox messages (28 tabelas de outbox não contabilizadas).  
 > ² Features contadas por ficheiros com `IRequest<>` (Commands + Queries).
@@ -65,8 +65,9 @@
 |------|----------|
 | Feature modules | 16 |
 | Componentes globais | 73 top-level (99 total com sub-componentes) |
-| Shell components | 28 |
-| Rotas/Páginas (ficheiros de rota / lazy-loaded) | 8 ficheiros / 147 rotas lazy |
+| Shell components | 24 |
+| Rotas/Páginas (ficheiros de rota / lazy-loaded) | 8 ficheiros / 155 rotas lazy |
+| Páginas frontend (*Page.tsx, excluindo testes) | 166 |
 | E2E specs | 17 |
 | Idiomas i18n | 4 (en, es, pt-BR, pt-PT) |
 | Contextos React | 4 (Auth, Environment, Persona, Theme) |
@@ -83,9 +84,10 @@
 | Platform test projects | 4 (CLI, E2E, Integration, Selenium) |
 | Sub-módulos registados no ApiHost | **26** |
 | Building Blocks | 5 (**395 testes** ✅) |
-| Endpoint modules (ficheiros) | **117** |
+| Endpoint files (ficheiros *Endpoint*.cs) | **117** (82 EndpointModule + 35 individuais) |
 | Migrations (ficheiros únicos) | **80** (excluindo Designer/ModelSnapshot) |
-| Tabelas totais (excluindo outbox) | **263** |
+| Tabelas totais (excluindo outbox) | **264** |
+| Documentação (docs/*.md) | **42** |
 
 ---
 
@@ -298,7 +300,7 @@
 - [ ] **Source of Truth**: Service registry operations
 - [ ] **Templates**: Service template management
 
-#### 2.3 Infrastructure (7 DbContexts, 72 tabelas)
+#### 2.3 Infrastructure (7 DbContexts, 73 tabelas)
 - [ ] ContractsDbContext — 31 DbSets (prefixo `ctr_`)
 - [ ] CatalogGraphDbContext — 16 DbSets (prefixo `cat_`)
 - [ ] LegacyAssetsDbContext — 14 DbSets (prefixo `cat_`)
@@ -342,7 +344,7 @@
 
 #### 2.6 Database
 - [ ] Prefixos: `ctr_` (Contracts), `cat_` (Graph, Legacy, Portal + Innovative Ideas), `dep_` (Dependencies), `dx_` (DX), `tpl_` (Templates)
-- [ ] RLS: apenas 12/72 tabelas com RLS (16%). Todo o prefixo `ctr_` tem 0 RLS efectivo (phantom `ctr_api_contracts`)
+- [ ] RLS: apenas 12/73 tabelas com RLS (16%). Todo o prefixo `ctr_` tem 0 RLS efectivo (phantom `ctr_api_contracts`)
 - [ ] Migrations sequenciais por cada DbContext
 - [ ] Verificar innovative ideas DbSets: SemanticDiffResults, ContractComplianceGates, ContractComplianceResults, ContractListings, MarketplaceReviews, ImpactSimulations, SchemaEvolutionAdvices, PipelineExecutions, ContractNegotiations, NegotiationComments
 
@@ -433,7 +435,7 @@
 - [ ] **Cost**: CostSnapshot, CostAttribution, CostTrend, ServiceCostProfile, BudgetForecast, EfficiencyRecommendation
 - [ ] **Automation**: AutomationWorkflow, ValidationRecord, AuditRecord
 
-#### 4.2 Application (128 features)
+#### 4.2 Application (133 features)
 - [ ] **Incidents**: RegisterIncident, EscalateIncident, ResolveIncident, CorrelateWithChange, CreateMitigationWorkflow, CreateRunbook, PerformPostIncidentReview, GenerateIncidentNarrative
 - [ ] **Reliability**: CreateSlo, CreateSla, CalculateErrorBudget, PredictServiceFailure, ForecastCapacity, GenerateHealingRecommendation
 - [ ] **Runtime**: RecordRuntimeSnapshot, DetectDrift, CreateCustomChart, RunChaosExperiment, GenerateAnomalyNarrative, DetectEnvironmentDrift, ExecutePlaybook, AssessResilience
@@ -983,12 +985,12 @@
 ### Design System
 - [ ] Tokens e foundations definidos
 - [ ] 73 componentes globais top-level (99 total) consistentes
-- [ ] 28 shell components funcionais (AppShell, Sidebar, Topbar, etc.)
+- [ ] 24 shell components funcionais (AppShell, Sidebar, Topbar, etc.)
 - [ ] ThemeToggle (dark/light mode)
 - [ ] Responsividade em todos os componentes
 
 ### Routing
-- [ ] 8 ficheiros de rota cobrem todos os módulos (147 rotas lazy-loaded)
+- [ ] 8 ficheiros de rota cobrem todos os módulos (155 rotas lazy-loaded)
 - [ ] Lazy loading funcional
 - [ ] Deep-link preservation no login
 
@@ -1251,13 +1253,24 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 # RESULTADOS DA VALIDAÇÃO
 
 > **Data de execução inicial**: 2026-04-10  
-> **Última revisão**: 2026-04-10 (rev.4 — platform tests, hardcoded strings, endpoint modules, componentes)  
+> **Última revisão**: 2026-04-10 (rev.5 — features OI, tabelas Catalog, endpoints, shell, lazy routes, pages, docs, DefinitionSection)    
 > **Estado**: Validação completa de todos os 12 módulos + Building Blocks + Platform Tests + Frontend + Infraestrutura + Platform + Cross-Module
 
 ### Changelog de Revisão
 
 | Data | Alteração |
 |------|-----------|
+| 2026-04-10 (rev.5) | Corrigidas features OI: 128 → 133 (+5 novas features); total features: 834 → 839 |
+| 2026-04-10 (rev.5) | Corrigidas tabelas Catalog: 72 → 73 (+1 ctr_contract_reviews); total tabelas: 263 → 264 |
+| 2026-04-10 (rev.5) | Corrigidos endpoint files Catalog: 25 → 28 (16 EndpointModule + 12 individuais LegacyAssets) |
+| 2026-04-10 (rev.5) | Clarificação endpoint count: 117 = 82 EndpointModule + 35 ficheiros individuais |
+| 2026-04-10 (rev.5) | Corrigidas shell components: 28 → 24 (.tsx files verificados) |
+| 2026-04-10 (rev.5) | Corrigidas rotas lazy-loaded: 147 → 155 (via verificação grep nos 8 ficheiros de rota) |
+| 2026-04-10 (rev.5) | Corrigida contagem de páginas frontend: 301 → 166 (page components *Page.tsx, excluindo testes) |
+| 2026-04-10 (rev.5) | Adicionada contagem de docs: 42 ficheiros .md em docs/ |
+| 2026-04-10 (rev.5) | DefinitionSection.tsx reintegrada na tabela de hardcoded strings (7 placeholders em linhas com t()) |
+| 2026-04-10 (rev.5) | Total hardcoded strings expandido: 26 (sem t()) + 8 (com t()) = 34 total em 11 ficheiros |
+| 2026-04-10 (rev.5) | Actualizada cobertura RLS: 168/264 tabelas sem RLS (era 167/263) |
 | 2026-04-10 (rev.4) | Adicionados 4 projectos de teste de platform: CLI (44 ✅), E2E (51), Integration (66), Selenium (build error) |
 | 2026-04-10 (rev.4) | Total de testes actualizado: 6.302 → 6.346 (+ CLI.Tests) / 6.507 (com todos platform tests) |
 | 2026-04-10 (rev.4) | Hardcoded strings corrigidas: 11 → 26, com lista actualizada de 10 ficheiros |
@@ -1329,14 +1342,14 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 
 **A maior lacuna encontrada no sistema é a cobertura parcial de RLS.**
 
-O ficheiro `apply-rls.sql` contém 99 ALTER TABLE com CREATE POLICY, mas 3 são **phantom** (tabelas que não existem). Das 263 tabelas reais (excluindo outbox), apenas 96 têm RLS, resultando em **167 tabelas sem RLS** (36% de cobertura global).
+O ficheiro `apply-rls.sql` contém 99 ALTER TABLE com CREATE POLICY, mas 3 são **phantom** (tabelas que não existem). Das 264 tabelas reais (excluindo outbox), apenas 96 têm RLS, resultando em **168 tabelas sem RLS** (36% de cobertura global).
 
 #### Tabelas por módulo (excluindo outbox messages)
 
 | Módulo | Prefixos | Tabelas | Com RLS | Sem RLS | Cobertura |
 |--------|----------|:-------:|:------:|:------:|:---------:|
 | IdentityAccess | iam_, env_ | 19 | 12 | 7¹ | 63% |
-| Catalog | ctr_, cat_, dep_, dx_, tpl_ | 72 | 12 | 60 | **16%** |
+| Catalog | ctr_, cat_, dep_, dx_, tpl_ | 73 | 12 | 61 | **16%** |
 | ChangeGovernance | chg_ | 28 | 7² | 21 | **25%** |
 | OperationalIntelligence | ops_ | 46 | 16 | 30 | **34%** |
 | AIKnowledge | aik_, ai_ | 35 | 8 | 27 | **22%** |
@@ -1347,7 +1360,7 @@ O ficheiro `apply-rls.sql` contém 99 ALTER TABLE com CREATE POLICY, mas 3 são 
 | AuditCompliance | aud_ | 6 | 4 | 2 | 66% |
 | Configuration | cfg_ | 20 | 14 | 6 | 70% |
 | ProductAnalytics | pan_ | 1 | 1 | 0 | 100% |
-| **TOTAL** | | **263** | **96** | **167** | **36%** |
+| **TOTAL** | | **264** | **96** | **168** | **36%** |
 
 > ¹ As 7 tabelas de IdentityAccess sem RLS são tabelas de sistema/lookup (tenants, users, roles, permissions, external_identities, role_permissions, module_access_policies) que **intencionalmente** não precisam de tenant isolation. Isto é uma decisão de design válida, não um gap.  
 > ² O RLS para ChangeGovernance conta 7 tabelas reais; 2 das 9 políticas no ficheiro são **phantom** (ver abaixo).
@@ -1377,7 +1390,7 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | IdentityAccess | 46 | 24 | 52% |
 | Catalog | 225 | ~52 | ~23% |
 | ChangeGovernance | 84 | 35 | 42% |
-| OperationalIntelligence | 128 | 72+ | 56%+ |
+| OperationalIntelligence | 133 | 72+ | 54%+ |
 | AIKnowledge | 106 | 86+ | 81%+ |
 | Governance | 106 | 34 | 32% |
 | Knowledge | 16 | 14 | 88% |
@@ -1414,22 +1427,25 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 
 ### 🟡 MÉDIO — Hardcoded Strings no Frontend (i18n)
 
-**26 ocorrências encontradas** de placeholders hardcoded em 10 ficheiros (excluindo ficheiros de teste):
+**26 ocorrências encontradas** de placeholders hardcoded em 10 ficheiros (excluindo ficheiros de teste e linhas que já usam `t()`). Adicionalmente, `DefinitionSection.tsx` tem 7 e `VisualWorkserviceBuilder.tsx` tem 1 placeholder extra em linhas que já usam `t()` para labels (8 total com t()):
 
 | Ficheiro | Ocorrências | Exemplos | Tipo |
 |----------|:-----------:|---------|------|
 | `VisualLegacyContractBuilder.tsx` | 9 | `"CUSTOMER-RECORD"`, `"CUSTPROG"`, `"QMGR01"` | example values |
+| `DefinitionSection.tsx`³ | 7 | `"Payments"`, `"Payment Processing"`, `"Checkout Platform"` | example values |
 | `VisualSoapBuilder.tsx` | 5 | `"UserService"`, `"GetUser"`, `"GetUserRequest"` | example values |
+| `VisualWorkserviceBuilder.tsx` | 3⁴ | `"OrderEvent"`, `"OrderProcessedEvent"`, `"OrderProcessed"` | example values |
 | `SecuritySection.tsx` | 2 | `"RBAC, ABAC, Scope-based..."`, `"Admin, Editor, Viewer"` | hint text |
-| `VisualWorkserviceBuilder.tsx` | 2 | `"OrderEvent"`, `"OrderProcessedEvent"` | example values |
 | `VisualWebhookBuilder.tsx` | 2 | `"X-Webhook-Secret"`, `"X-Custom-Header"` | example values |
 | `VisualEventBuilder.tsx` | 2 | `"Order Events"`, `"OrderCreated"` | example values |
 | `LogExplorerPage.tsx` | 1 | `"Trace ID"` | placeholder |
 | `VisualSharedSchemaBuilder.tsx` | 1 | `"UserProfile"` | example value |
 | `ChangeChecklistsPage.tsx` | 1 | placeholder de pesquisa | placeholder |
 | `AiScaffoldWizardPage.tsx` | 1 | placeholder de input | placeholder |
+| **Total** | **34** | | **26 sem t() + 8 com t()** |
 
-> **Nota sobre DefinitionSection.tsx**: Este ficheiro usa `t()` para labels mas mantém placeholders hardcoded em inglês (`"e.g., User Management API"`, `"Payments"`, etc.). Estes são parcialmente aceitáveis como exemplos, mas idealmente deveriam usar i18n.
+> ³ `DefinitionSection.tsx` usa `t()` para labels mas mantém placeholders hardcoded em inglês. Os 7 placeholders estão em linhas que já possuem `t()` para o label, por isso não contam no total de 26 "puras" hardcoded. Idealmente deveriam usar i18n.  
+> ⁴ `VisualWorkserviceBuilder.tsx` tem 2 puras + 1 em linha com `t()` (total 3).
 
 **Recomendação**: Mover para chaves i18n. Prioridade baixa pois são maioritariamente placeholders de exemplo em visual builders do Contract Studio. A maioria são nomes técnicos/patterns que podem não precisar de tradução.
 
@@ -1465,13 +1481,13 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | Domain | ✅ | 8 subdomains bem estruturados |
 | Application | ⚠️ | 225 features, 2 commands sem validator |
 | Infrastructure | ✅ | 7 DbContexts com migrations completas |
-| API | ✅ | 25 endpoints com RequirePermission |
+| API | ✅ | 28 endpoint files (16 EndpointModule + 12 individuais LegacyAssets) com RequirePermission |
 | Frontend | ⚠️ | 25 páginas implementadas, ~50-80% de features sem UI dedicada |
-| Database | 🔴 | 60/72 tabelas sem RLS (16% cobertura). Inclui 20 tabelas `ctr_` com **zero** RLS efectivo (phantom policy `ctr_api_contracts`) |
+| Database | 🔴 | 61/73 tabelas sem RLS (16% cobertura). Inclui 20 tabelas `ctr_` com **zero** RLS efectivo (phantom policy `ctr_api_contracts`) |
 | Testes | ⚠️ | 1441 testes passam, mas ~173 features sem teste (~23% cobertura) |
 
 **Bugs Encontrados**: 0  
-**Gaps Identificados**: RLS em 60 tabelas (pior módulo), 2 validators em falta, teste coverage no Application layer, phantom RLS em `ctr_api_contracts`
+**Gaps Identificados**: RLS em 61 tabelas (pior módulo), 2 validators em falta, teste coverage no Application layer, phantom RLS em `ctr_api_contracts`
 
 ---
 
@@ -1501,12 +1517,12 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | Área | Estado | Detalhes |
 |------|:------:|---------|
 | Domain | ✅ | 5 subdomains completos |
-| Application | ✅ | 128 features, 100% com validators |
+| Application | ✅ | 133 features, 100% com validators |
 | Infrastructure | ✅ | 6 DbContexts com migrations |
 | API | ✅ | 11 endpoint modules |
 | Frontend | ⚠️ | Páginas de Incidents, Reliability, Runtime implementadas |
 | Database | 🔴 | 30/46 tabelas sem RLS (34%). TelemetryStoreDbContext: 0/7, CostIntelligenceDbContext: 1/8 |
-| Testes | ✅ | 851 testes, cobertura 56%+ das features |
+| Testes | ✅ | 851 testes, cobertura 54%+ das features |
 
 **Bugs Encontrados**: 0  
 **Gaps Identificados**: RLS em 30 tabelas (especialmente TelemetryStore e CostIntelligence quase sem RLS)
@@ -1671,8 +1687,8 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | dangerouslySetInnerHTML | ✅ | Nenhuma ocorrência — seguro |
 | Token storage | ✅ | In-memory para refresh/CSRF, sessionStorage para access token |
 | Sanitização | ✅ | sanitize.ts com isSafeUrl(), bloqueio de javascript:/data:/vbscript: |
-| Rotas | ✅ | 147 páginas lazy-loaded via 8 ficheiros de rota, todas resolvem correctamente |
-| Design System | ✅ | 73 componentes globais top-level (99 total), 28 shell components consistentes |
+| Rotas | ✅ | 155 páginas lazy-loaded via 8 ficheiros de rota, todas resolvem correctamente |
+| Design System | ✅ | 73 componentes globais top-level (99 total), 24 shell components consistentes |
 
 ---
 
@@ -1682,7 +1698,7 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 
 | Área | Estado | Detalhes |
 |------|:------:|---------|
-| RLS (apply-rls.sql) | 🔴 | 99 ALTER TABLE, mas apenas 96 tabelas reais cobertas (3 phantom). 167/263 tabelas sem RLS (36%) |
+| RLS (apply-rls.sql) | 🔴 | 99 ALTER TABLE, mas apenas 96 tabelas reais cobertas (3 phantom). 168/264 tabelas sem RLS (36%) |
 | Phantom RLS | 🔴 | 3 policies em tabelas inexistentes: `chg_change_records`, `chg_workflows`, `ctr_api_contracts` |
 | Seed production | ✅ | 100% idempotente (ON CONFLICT DO NOTHING) |
 | Seed development | ✅ | 100% idempotente |
@@ -1752,7 +1768,7 @@ Existem 4 projectos de teste adicionais sob `tests/platform/` que testam a plata
 | IdentityAccess → todos | ✅ | Autenticação/autorização via BB.Security em todos os módulos |
 | Outbox Pattern | ✅ | 28 DbContexts com tabela Outbox via NexTraceDbContextBase |
 | Tenant Isolation (backend) | ✅ | Todos os endpoints filtram por tenant via middleware |
-| Tenant Isolation (RLS) | 🔴 | Apenas 36% das tabelas (96/263) com RLS |
+| Tenant Isolation (RLS) | 🔴 | Apenas 36% das tabelas (96/264) com RLS |
 | Persona Awareness | ✅ | PersonaContext funcional, adaptação de UI |
 | Bounded Context Isolation | ✅ | Nenhum módulo acede ao DbContext de outro módulo |
 
@@ -1771,10 +1787,10 @@ Existem 4 projectos de teste adicionais sob `tests/platform/` que testam a plata
 ### Prioridade 1 — RLS (Segurança Multi-Tenant) 🔴
 
 **Impacto**: Segurança de dados em ambiente multi-tenant  
-**Esforço**: Alto (167 tabelas)  
+**Esforço**: Alto (168 tabelas)  
 **Módulos por ordem de prioridade**:
 
-1. **Catalog** (16% cobertura → adicionar RLS a 60 tabelas, incluindo todo o `ctr_` prefix)
+1. **Catalog** (16% cobertura → adicionar RLS a 61 tabelas, incluindo todo o `ctr_` prefix)
 2. **AIKnowledge** (22% → 27 tabelas)
 3. **ChangeGovernance** (25% → 21 tabelas)
 4. **Notifications** (33% → 4 tabelas)
@@ -1805,18 +1821,19 @@ Existem 4 projectos de teste adicionais sob `tests/platform/` que testam a plata
 
 **Impacto**: Internacionalização  
 **Esforço**: Baixo  
-**Ficheiros a corrigir** (26 ocorrências em 10 ficheiros):
+**Ficheiros a corrigir** (34 ocorrências totais em 11 ficheiros: 26 puras + 8 em linhas com t()):
 
 1. `VisualLegacyContractBuilder.tsx` (9 strings — example values mainframe)
-2. `VisualSoapBuilder.tsx` (5 strings — SOAP operation examples)
-3. `SecuritySection.tsx` (2 strings — hint text)
-4. `VisualWorkserviceBuilder.tsx` (2 strings — event type examples)
-5. `VisualWebhookBuilder.tsx` (2 strings — header examples)
-6. `VisualEventBuilder.tsx` (2 strings — event examples)
-7. `LogExplorerPage.tsx` (1 string — placeholder)
-8. `VisualSharedSchemaBuilder.tsx` (1 string — schema name example)
-9. `ChangeChecklistsPage.tsx` (1 string — search placeholder)
-10. `AiScaffoldWizardPage.tsx` (1 string — input placeholder)
+2. `DefinitionSection.tsx` (7 strings — example values com t() no label)
+3. `VisualSoapBuilder.tsx` (5 strings — SOAP operation examples)
+4. `VisualWorkserviceBuilder.tsx` (3 strings — 2 puras + 1 em linha com t())
+5. `SecuritySection.tsx` (2 strings — hint text)
+6. `VisualWebhookBuilder.tsx` (2 strings — header examples)
+7. `VisualEventBuilder.tsx` (2 strings — event examples)
+8. `LogExplorerPage.tsx` (1 string — placeholder)
+9. `VisualSharedSchemaBuilder.tsx` (1 string — schema name example)
+10. `ChangeChecklistsPage.tsx` (1 string — search placeholder)
+11. `AiScaffoldWizardPage.tsx` (1 string — input placeholder)
 
 ---
 
@@ -1831,26 +1848,27 @@ Existem 4 projectos de teste adicionais sob `tests/platform/` que testam a plata
 | Módulos | 12 | ✅ |
 | DbContexts | 28 | ✅ |
 | Migrations (ficheiros únicos) | 80 | ✅ |
-| Tabelas totais (excl. outbox) | 263 | — |
+| Tabelas totais (excl. outbox) | 264 | — |
 | Tabelas com RLS (efectivo) | 96 | 🔴 (36%) |
-| Tabelas sem RLS | 167 | 🔴 |
+| Tabelas sem RLS | 168 | 🔴 |
 | Phantom RLS policies | 3 | 🔴 |
-| Features total | 834 | — |
-| Endpoint modules | 117 | ✅ |
+| Features total | 839 | — |
+| Endpoint files (*Endpoint*.cs) | 117 (82 modules + 35 individuais) | ✅ |
 | Validators em falta | 7 | ⚠️ |
 | Endpoints sem auth | 0 | ✅ |
 | Sub-módulos no ApiHost | 26 | ✅ |
 | i18n keys (por idioma) | 117 | ✅ |
 | Idiomas | 4 | ✅ |
-| Hardcoded strings | 26 | ⚠️ |
+| Hardcoded strings | 26 (10 ficheiros) + 8 em linhas com t() = 34 total em 11 ficheiros | ⚠️ |
 | dangerouslySetInnerHTML | 0 | ✅ |
 | Docker security (non-root) | ✅ | ✅ |
 | Seed idempotência | 100% | ✅ |
 | E2E specs | 17 | ✅ |
-| Páginas frontend (ficheiros) | 301 | ✅ |
-| Rotas lazy-loaded | 147 | ✅ |
+| Páginas frontend (page components) | 166 | ✅ |
+| Rotas lazy-loaded | 155 | ✅ |
 | Componentes globais | 73 (99 total) | ✅ |
-| Shell components | 28 | ✅ |
+| Shell components | 24 | ✅ |
+| Documentação (docs/*.md) | 42 | ✅ |
 | Platform test projects | 4 | ⚠️ (1 com build error) |
 
 ---
@@ -1859,7 +1877,7 @@ Existem 4 projectos de teste adicionais sob `tests/platform/` que testam a plata
 
 O NexTraceOne apresenta uma base sólida com **6.346 testes unitários/módulo todos a passar**, **0 bugs encontrados**, **arquitectura bem separada por bounded contexts** e **segurança frontend robusta**. Adicionalmente, existem **161 testes de platform** (CLI, E2E, Integration, Selenium), dos quais 84 passam e 77 requerem infraestrutura local (PostgreSQL/serviços).
 
-O **gap mais crítico** é a **cobertura de RLS** — apenas **36% das tabelas** (96/263) têm políticas RLS efectivas. A situação é agravada por **3 phantom RLS policies** que referenciam tabelas inexistentes (`chg_change_records`, `chg_workflows`, `ctr_api_contracts`), deixando tabelas reais sem protecção. Os módulos mais expostos são: Catalog (16%), AIKnowledge (22%), ChangeGovernance (25%) e OperationalIntelligence (34%).
+O **gap mais crítico** é a **cobertura de RLS** — apenas **36% das tabelas** (96/264) têm políticas RLS efectivas. A situação é agravada por **3 phantom RLS policies** que referenciam tabelas inexistentes (`chg_change_records`, `chg_workflows`, `ctr_api_contracts`), deixando tabelas reais sem protecção. Os módulos mais expostos são: Catalog (16%), AIKnowledge (22%), ChangeGovernance (25%) e OperationalIntelligence (34%).
 
 O segundo gap é a **cobertura de testes no Application layer** — embora existam muitos testes (6.346), a distribuição por features é desigual. Módulos como Catalog (23%) e Configuration (27%) beneficiariam de testes mais focados em features individuais.
 
@@ -1870,9 +1888,9 @@ O terceiro gap é nos **testes de platform**: os testes Selenium não compilam (
 ### Próximos Passos Recomendados
 
 1. 🔴 **Corrigir 3 phantom RLS policies** imediatamente (esforço: ~1h)
-2. 🔴 **Adicionar RLS** às 167 tabelas em falta, priorizando Catalog e AIKnowledge
+2. 🔴 **Adicionar RLS** às 168 tabelas em falta, priorizando Catalog e AIKnowledge
 3. 🟠 **Aumentar cobertura de testes** nos módulos com <35% (Catalog, Configuration, Governance)
 4. 🟠 **Corrigir Selenium.Tests** — adicionar pacotes NuGet ao Central Package Management
 5. 🟡 **Adicionar 2 validators** em falta no Catalog (ActivateServiceTemplate, DeactivateServiceTemplate)
-6. 🟡 **Mover 26 hardcoded strings** para i18n (visual builders, SecuritySection.tsx, LogExplorerPage.tsx)
+6. 🟡 **Mover 34 hardcoded strings** para i18n (visual builders, DefinitionSection, SecuritySection, LogExplorerPage)
 7. 🟡 **Configurar infraestrutura CI** para E2E e Integration tests (PostgreSQL em pipeline)
