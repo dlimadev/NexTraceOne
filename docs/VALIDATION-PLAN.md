@@ -1,6 +1,6 @@
 # Plano de Validação Completa — NexTraceOne
 
-> **Última actualização**: 2026-04-10 (rev.2)  
+> **Última actualização**: 2026-04-10 (rev.3)  
 > **Objetivo**: Validar módulo a módulo, camada a camada, todo o fluxo funcional do NexTraceOne — frontend, backend, database, testes e documentação — identificando bugs, gaps, implementações incompletas ou parciais.
 
 > **Estratégia**: Cada módulo será validado de forma independente e completa, seguindo a mesma checklist estruturada. Ao final, uma validação cross-module garante integridade entre bounded contexts.
@@ -63,10 +63,10 @@
 | Área | Contagem |
 |------|----------|
 | Feature modules | 16 |
-| Componentes globais | 54+ |
-| Shell components | 15+ |
-| Rotas/Páginas (ficheiros de rota) | 8 |
-| E2E specs | 16 |
+| Componentes globais | 73+ |
+| Shell components | 27+ |
+| Rotas/Páginas (ficheiros de rota / lazy-loaded) | 8 ficheiros / 147 rotas lazy |
+| E2E specs | 17 |
 | Idiomas i18n | 4 (en, es, pt-BR, pt-PT) |
 | Contextos React | 4 (Auth, Environment, Persona, Theme) |
 
@@ -77,7 +77,7 @@
 | RLS (apply-rls.sql) | **99 ALTER TABLE statements** (96 tabelas reais + 3 phantom) |
 | Seed production | seed_production.sql (100% idempotente) |
 | Seed development | seed_development.sql (100% idempotente) |
-| Docker Compose | 3 ficheiros (validados) |
+| Docker Compose | 5 ficheiros (3 core + 1 telemetria + 1 lab) |
 | Platform projects | 3 (ApiHost, Workers, Ingestion) |
 | Sub-módulos registados no ApiHost | **26** |
 | Building Blocks | 5 (**395 testes** ✅) |
@@ -979,13 +979,13 @@
 
 ### Design System
 - [ ] Tokens e foundations definidos
-- [ ] 54+ componentes globais consistentes
-- [ ] Shell components funcionais (AppShell, Sidebar, Topbar)
+- [ ] 73+ componentes globais consistentes
+- [ ] 27+ shell components funcionais (AppShell, Sidebar, Topbar, etc.)
 - [ ] ThemeToggle (dark/light mode)
 - [ ] Responsividade em todos os componentes
 
 ### Routing
-- [ ] 8 ficheiros de rota cobrem todos os módulos
+- [ ] 8 ficheiros de rota cobrem todos os módulos (147 rotas lazy-loaded)
 - [ ] Lazy loading funcional
 - [ ] Deep-link preservation no login
 
@@ -1008,7 +1008,7 @@
 - [ ] PersonaContext — adaptação por papel
 - [ ] ThemeContext — tema visual
 
-### E2E Tests (16 specs)
+### E2E Tests (17 specs)
 - [ ] Executar: Playwright E2E
 - [ ] app.spec.ts — bootstrap
 - [ ] login-form-flows.spec.ts — autenticação
@@ -1023,6 +1023,7 @@
 - [ ] governance-finops.spec.ts — FinOps
 - [ ] incident-business-flows.spec.ts — incidentes
 - [ ] incidents.spec.ts — CRUD incidentes
+- [ ] real-core-flows.spec.ts — fluxos core reais
 - [ ] service-catalog.spec.ts — catálogo
 - [ ] modules.spec.ts — módulos
 - [ ] refresh-token.spec.ts — refresh token
@@ -1060,10 +1061,13 @@
 - [ ] docker-compose.yml — funcional para desenvolvimento
 - [ ] docker-compose.override.yml — overrides de desenvolvimento
 - [ ] docker-compose.production.yml — configuração de produção
+- [ ] docker-compose.telemetry.yaml — stack de telemetria (build/otel-collector/)
+- [ ] docker-compose.lab.yml — ambiente lab com fake APIs (lab/)
 - [ ] Dockerfile.apihost — build funcional
 - [ ] Dockerfile.frontend — build funcional
 - [ ] Dockerfile.ingestion — build funcional
 - [ ] Dockerfile.workers — build funcional
+- [ ] Lab Dockerfiles — inventory-service, order-service, payment-service (lab/fake-apis/)
 
 ---
 
@@ -1105,23 +1109,58 @@
 ## Documentação Global
 
 ### Verificar atualização e completude de:
+
+#### Documentos core do produto
 - [ ] PRODUCT-VISION.md — alinhado com estado actual
 - [ ] ARCHITECTURE-OVERVIEW.md — reflecte arquitectura real
 - [ ] MODULES-AND-PAGES.md — lista todos os módulos e páginas
 - [ ] IMPLEMENTATION-STATUS.md — estado real de implementação
+- [ ] DOMAIN-BOUNDARIES.md — reflecte bounded contexts
+- [ ] DOCUMENTATION-INDEX.md — índice completo e actualizado
+- [ ] DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md — status actual das 29 ideias
+- [ ] BRAINSTORMING-INNOVATIVE-IDEAS.md — registo de ideias completo
+
+#### Documentos de arquitectura
 - [ ] FRONTEND-ARCHITECTURE.md — reflecte frontend actual
 - [ ] DATA-ARCHITECTURE.md — reflecte modelo de dados actual
 - [ ] SECURITY-ARCHITECTURE.md — reflecte security actual
-- [ ] AI-ARCHITECTURE.md — reflecte AI actual
+- [ ] DEPLOYMENT-ARCHITECTURE.md — reflecte deployment actual
+- [ ] INTEGRATIONS-ARCHITECTURE.md — reflecte integrações actuais
 - [ ] OBSERVABILITY-STRATEGY.md — reflecte observabilidade
+- [ ] BACKEND-MODULE-GUIDELINES.md — guidelines de módulos backend
+
+#### Documentos de AI
+- [ ] AI-ARCHITECTURE.md — reflecte AI actual
+- [ ] AI-GOVERNANCE.md — reflecte governança de AI actual
+- [ ] AI-ASSISTED-OPERATIONS.md — reflecte operações assistidas por AI
+- [ ] AI-DEVELOPER-EXPERIENCE.md — reflecte experiência developer AI
+- [ ] AI-MODELS-ANALYSIS.md — análise de modelos actualizada
+
+#### Documentos de UX e design
 - [ ] DESIGN-SYSTEM.md — reflecte design system actual
-- [ ] I18N-STRATEGY.md — reflecte i18n actual
+- [ ] DESIGN.md — princípios de design
+- [ ] UX-PRINCIPLES.md — princípios UX
 - [ ] PERSONA-MATRIX.md — reflecte personas
-- [ ] DOMAIN-BOUNDARIES.md — reflecte bounded contexts
-- [ ] DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md — status actual das 29 ideias
-- [ ] DOCUMENTATION-INDEX.md — índice completo e actualizado
+- [ ] PERSONA-UX-MAPPING.md — mapeamento UX por persona
+- [ ] BRAND-IDENTITY.md — identidade visual
+- [ ] I18N-STRATEGY.md — reflecte i18n actual
+
+#### Documentos de domínio funcional
+- [ ] SERVICE-CONTRACT-GOVERNANCE.md — governança de contratos
+- [ ] CONTRACT-STUDIO-VISION.md — visão do Contract Studio
+- [ ] SOURCE-OF-TRUTH-STRATEGY.md — estratégia de source of truth
+- [ ] CHANGE-CONFIDENCE.md — change confidence
+- [ ] LEGACY-MAINFRAME-WAVES.md — waves de integração mainframe
+
+#### Documentos de plataforma e operação
+- [ ] PLATFORM-CAPABILITIES.md — capacidades da plataforma
+- [ ] PLATFORM-CUSTOMIZATION-EVOLUTION.md — evolução da personalização
+- [ ] SECURITY.md — security overview
 - [ ] LOCAL-SETUP.md — instruções de setup funcionais
 - [ ] ENVIRONMENT-VARIABLES.md — todas as variáveis documentadas
+- [ ] GUIDELINE.md — guidelines gerais
+- [ ] FUTURE-ROADMAP.md — roadmap futuro actualizado
+- [ ] NEXTRACEONE-PRESENTATION.md — apresentação do produto actualizada
 - [ ] ADRs (Architecture Decision Records) — actualizados
 
 ---
@@ -1209,13 +1248,18 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 # RESULTADOS DA VALIDAÇÃO
 
 > **Data de execução inicial**: 2026-04-10  
-> **Última revisão**: 2026-04-10 (correções de dados, phantom RLS discovery, recálculo de métricas)  
+> **Última revisão**: 2026-04-10 (rev.3 — correções de contagens de componentes, specs E2E, rotas lazy-loaded)  
 > **Estado**: Validação completa de todos os 12 módulos + Building Blocks + Frontend + Infraestrutura + Platform + Cross-Module
 
 ### Changelog de Revisão
 
 | Data | Alteração |
 |------|-----------|
+| 2026-04-10 (rev.3) | Corrigidos componentes globais: 54+ → 73+; shell components: 15+ → 27+ |
+| 2026-04-10 (rev.3) | Corrigidos E2E specs: 16 → 17 (adicionado `real-core-flows.spec.ts`) |
+| 2026-04-10 (rev.3) | Corrigidas páginas lazy-loaded: 60+ → 147 (via 8 ficheiros de rota) |
+| 2026-04-10 (rev.3) | Corrigidas features de Integrations nos resultados: 19 → 16 |
+| 2026-04-10 (rev.3) | Adicionada métrica separada para rotas lazy-loaded (147) vs ficheiros de página (301) |
 | 2026-04-10 (rev.2) | Corrigido TOTAL GERAL: 5.907 → 6.302 (incluía apenas módulos, faltava BB) |
 | 2026-04-10 (rev.2) | Corrigida análise RLS: de DbSets para tabelas reais — Catalog baixou de 39% → 16%, AIKnowledge subiu de 11% → 22% |
 | 2026-04-10 (rev.2) | Descoberto 3 phantom RLS policies em tabelas inexistentes |
@@ -1527,7 +1571,7 @@ Embora todos os 6.302 testes passem, a cobertura por feature (Application layer)
 | Área | Estado | Detalhes |
 |------|:------:|---------|
 | Domain | ✅ | 4 entidades + LegacyTelemetry |
-| Application | ✅ | 19 features |
+| Application | ✅ | 16 features |
 | Infrastructure | ✅ | IntegrationsDbContext, LegacyTelemetry subsystem |
 | API | ✅ | 2 endpoint modules |
 | Frontend | ✅ | Integration hub, webhook management |
@@ -1604,8 +1648,8 @@ Embora todos os 6.302 testes passem, a cobertura por feature (Application layer)
 | dangerouslySetInnerHTML | ✅ | Nenhuma ocorrência — seguro |
 | Token storage | ✅ | In-memory para refresh/CSRF, sessionStorage para access token |
 | Sanitização | ✅ | sanitize.ts com isSafeUrl(), bloqueio de javascript:/data:/vbscript: |
-| Rotas | ✅ | 60+ páginas lazy-loaded, todas resolvem correctamente |
-| Design System | ✅ | 54+ componentes globais consistentes |
+| Rotas | ✅ | 147 páginas lazy-loaded via 8 ficheiros de rota, todas resolvem correctamente |
+| Design System | ✅ | 73+ componentes globais, 27+ shell components consistentes |
 
 ---
 
@@ -1751,8 +1795,9 @@ Embora todos os 6.302 testes passem, a cobertura por feature (Application layer)
 | dangerouslySetInnerHTML | 0 | ✅ |
 | Docker security (non-root) | ✅ | ✅ |
 | Seed idempotência | 100% | ✅ |
-| E2E specs | 16 | ✅ |
-| Páginas frontend | 301 | ✅ |
+| E2E specs | 17 | ✅ |
+| Páginas frontend (ficheiros) | 301 | ✅ |
+| Rotas lazy-loaded | 147 | ✅ |
 
 ---
 
