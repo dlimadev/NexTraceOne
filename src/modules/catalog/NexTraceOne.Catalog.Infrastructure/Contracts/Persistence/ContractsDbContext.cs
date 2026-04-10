@@ -113,6 +113,12 @@ public sealed class ContractsDbContext(
     /// <summary>Simulações de impacto de dependências entre serviços para cenários what-if.</summary>
     public DbSet<ImpactSimulation> ImpactSimulations => Set<ImpactSimulation>();
 
+    /// <summary>Registos de verificação de contrato provenientes de CI/CD.</summary>
+    public DbSet<ContractVerification> ContractVerifications => Set<ContractVerification>();
+
+    /// <summary>Entradas de changelog de evolução contratual.</summary>
+    public DbSet<ContractChangelog> ContractChangelogs => Set<ContractChangelog>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

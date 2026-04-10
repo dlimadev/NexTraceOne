@@ -69,6 +69,9 @@ public static class DependencyInjection
         // Phase 8: Webhook Templates — PostgreSQL persistence
         services.AddScoped<IWebhookTemplateRepository, WebhookTemplateRepository>();
 
+        // Phase 9: Contract Compliance Policies — PostgreSQL persistence
+        services.AddScoped<IContractCompliancePolicyRepository, ContractCompliancePolicyRepository>();
+
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();
 

@@ -266,5 +266,29 @@ public static class ContractsErrors
     /// <summary>Simulação de impacto não encontrada.</summary>
     public static Error ImpactSimulationNotFound(string id)
         => Error.NotFound("Contracts.ImpactSimulation.NotFound", "Impact simulation '{0}' was not found.", id);
+
+    // ── ContractVerification ──────────────────────────────────────────
+
+    /// <summary>Verificação de contrato não encontrada.</summary>
+    public static Error VerificationNotFound(string id)
+        => Error.NotFound("Contracts.Verification.NotFound", "Contract verification '{0}' was not found.", id);
+
+    /// <summary>Nenhuma versão de contrato aprovada ou bloqueada encontrada para o ativo de API.</summary>
+    public static Error VerificationContractNotFound(string apiAssetId)
+        => Error.NotFound("Contracts.Verification.ContractNotFound", "No approved or locked contract version found for API asset '{0}'.", apiAssetId);
+
+    /// <summary>Conteúdo da especificação não pode estar vazio para verificação.</summary>
+    public static Error VerificationSpecContentEmpty()
+        => Error.Validation("Contracts.Verification.SpecContentEmpty", "Spec content cannot be empty for verification.");
+
+    // ── ContractChangelog ─────────────────────────────────────────────
+
+    /// <summary>Entrada de changelog de contrato não encontrada.</summary>
+    public static Error ChangelogNotFound(string id)
+        => Error.NotFound("Contracts.Changelog.NotFound", "Contract changelog '{0}' was not found.", id);
+
+    /// <summary>Entrada de changelog já se encontra aprovada.</summary>
+    public static Error ChangelogAlreadyApproved(string id)
+        => Error.Conflict("Contracts.Changelog.AlreadyApproved", "Contract changelog '{0}' is already approved.", id);
 }
 
