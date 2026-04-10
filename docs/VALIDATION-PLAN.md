@@ -1,6 +1,6 @@
 # Plano de Validação Completa — NexTraceOne
 
-> **Última actualização**: 2026-04-10 (rev.5)  
+> **Última actualização**: 2026-04-10 (rev.6)  
 > **Objetivo**: Validar módulo a módulo, camada a camada, todo o fluxo funcional do NexTraceOne — frontend, backend, database, testes e documentação — identificando bugs, gaps, implementações incompletas ou parciais.
 
 > **Estratégia**: Cada módulo será validado de forma independente e completa, seguindo a mesma checklist estruturada. Ao final, uma validação cross-module garante integridade entre bounded contexts.
@@ -42,7 +42,7 @@
 | 1 | IdentityAccess | 1 | 19 | 13 | 46 | **462** ✅ |
 | 2 | Catalog | 7 | 73 | 28 | 225 | **1441** ✅ |
 | 3 | ChangeGovernance | 4 | 28 | 15 | 84 | **422** ✅ |
-| 4 | OperationalIntelligence | 6 | 46 | 11 | 133 | **851** ✅ |
+| 4 | OperationalIntelligence | 6 | 46 | 11 | 128 | **851** ✅ |
 | 5 | AIKnowledge | 3 | 35 | 5 | 106 | **982** ✅ |
 | 6 | Governance | 1 | 22 | 21 | 106 | **413** ✅ |
 | 7 | Knowledge | 1 | 4 | 1 | 16 | **92** ✅ |
@@ -51,10 +51,10 @@
 | 10 | AuditCompliance | 1 | 6 | 1 | 22 | **172** ✅ |
 | 11 | Configuration | 1 | 20 | 17 | 60 | **451** ✅ |
 | 12 | ProductAnalytics | 1 | 1 | 1 | 9 | **42** ✅ |
-| | **Subtotal Módulos** | **28** | **264** | **117** | **839** | **5.907** ✅ |
+| | **Subtotal Módulos** | **28** | **264** | **117** | **834** | **5.907** ✅ |
 | | **+ Building Blocks** | **5** | — | — | — | **395** ✅ |
 | | **+ Platform Tests** | — | — | — | — | **44** ✅ |
-| | **TOTAL GERAL** | **33** | **264** | **117** | **839** | **6.346** ✅ |
+| | **TOTAL GERAL** | **33** | **264** | **117** | **834** | **6.346** ✅ |
 
 > ¹ Tabelas excluindo outbox messages (28 tabelas de outbox não contabilizadas).  
 > ² Features contadas por ficheiros com `IRequest<>` (Commands + Queries).
@@ -66,7 +66,7 @@
 | Feature modules | 16 |
 | Componentes globais | 73 top-level (99 total com sub-componentes) |
 | Shell components | 24 |
-| Rotas/Páginas (ficheiros de rota / lazy-loaded) | 8 ficheiros / 155 rotas lazy |
+| Rotas/Páginas (ficheiros de rota / lazy-loaded) | 8 ficheiros / 147 rotas lazy |
 | Páginas frontend (*Page.tsx, excluindo testes) | 166 |
 | E2E specs | 17 |
 | Idiomas i18n | 4 (en, es, pt-BR, pt-PT) |
@@ -435,7 +435,7 @@
 - [ ] **Cost**: CostSnapshot, CostAttribution, CostTrend, ServiceCostProfile, BudgetForecast, EfficiencyRecommendation
 - [ ] **Automation**: AutomationWorkflow, ValidationRecord, AuditRecord
 
-#### 4.2 Application (133 features)
+#### 4.2 Application (128 features)
 - [ ] **Incidents**: RegisterIncident, EscalateIncident, ResolveIncident, CorrelateWithChange, CreateMitigationWorkflow, CreateRunbook, PerformPostIncidentReview, GenerateIncidentNarrative
 - [ ] **Reliability**: CreateSlo, CreateSla, CalculateErrorBudget, PredictServiceFailure, ForecastCapacity, GenerateHealingRecommendation
 - [ ] **Runtime**: RecordRuntimeSnapshot, DetectDrift, CreateCustomChart, RunChaosExperiment, GenerateAnomalyNarrative, DetectEnvironmentDrift, ExecutePlaybook, AssessResilience
@@ -990,7 +990,7 @@
 - [ ] Responsividade em todos os componentes
 
 ### Routing
-- [ ] 8 ficheiros de rota cobrem todos os módulos (155 rotas lazy-loaded)
+- [ ] 8 ficheiros de rota cobrem todos os módulos (147 rotas lazy-loaded)
 - [ ] Lazy loading funcional
 - [ ] Deep-link preservation no login
 
@@ -1253,24 +1253,26 @@ Ao concluir a validação de cada módulo, gerar relatório com:
 # RESULTADOS DA VALIDAÇÃO
 
 > **Data de execução inicial**: 2026-04-10  
-> **Última revisão**: 2026-04-10 (rev.5 — features OI, tabelas Catalog, endpoints, shell, lazy routes, pages, docs, DefinitionSection)    
+> **Última revisão**: 2026-04-10 (rev.6 — correcção de 3 erros introduzidos na rev.5: features OI, lazy routes, breakdown hardcoded strings)    
 > **Estado**: Validação completa de todos os 12 módulos + Building Blocks + Platform Tests + Frontend + Infraestrutura + Platform + Cross-Module
 
 ### Changelog de Revisão
 
 | Data | Alteração |
 |------|-----------|
-| 2026-04-10 (rev.5) | Corrigidas features OI: 128 → 133 (+5 novas features); total features: 834 → 839 |
+| 2026-04-10 (rev.6) | **Corrigido erro rev.5**: features OI revertidas de 133 → 128 (verificado: 49 ICommand + 79 IQuery = 128); total features: 839 → 834 |
+| 2026-04-10 (rev.6) | **Corrigido erro rev.5**: rotas lazy-loaded revertidas de 155 → 147 (verificado: grep -c "lazy(" nos 8 ficheiros de rota = 147) |
+| 2026-04-10 (rev.6) | **Corrigido erro rev.5**: breakdown hardcoded strings de "26 puras + 8 com t()" → "27 puras + 7 com t()" (total 34 mantém-se). VisualWorkserviceBuilder tem 3 puras, não 2+1 |
+| 2026-04-10 (rev.5) | ~~Corrigidas features OI: 128 → 133~~ **ERRO** — revertido em rev.6 |
+| 2026-04-10 (rev.5) | ~~Corrigidas rotas lazy-loaded: 147 → 155~~ **ERRO** — revertido em rev.6 |
+| 2026-04-10 (rev.5) | ~~Total hardcoded strings expandido: 26 + 8 = 34~~ **parcialmente errado** — corrigido em rev.6: 27 + 7 = 34 |
 | 2026-04-10 (rev.5) | Corrigidas tabelas Catalog: 72 → 73 (+1 ctr_contract_reviews); total tabelas: 263 → 264 |
 | 2026-04-10 (rev.5) | Corrigidos endpoint files Catalog: 25 → 28 (16 EndpointModule + 12 individuais LegacyAssets) |
 | 2026-04-10 (rev.5) | Clarificação endpoint count: 117 = 82 EndpointModule + 35 ficheiros individuais |
 | 2026-04-10 (rev.5) | Corrigidas shell components: 28 → 24 (.tsx files verificados) |
-| 2026-04-10 (rev.5) | Corrigidas rotas lazy-loaded: 147 → 155 (via verificação grep nos 8 ficheiros de rota) |
 | 2026-04-10 (rev.5) | Corrigida contagem de páginas frontend: 301 → 166 (page components *Page.tsx, excluindo testes) |
 | 2026-04-10 (rev.5) | Adicionada contagem de docs: 42 ficheiros .md em docs/ |
 | 2026-04-10 (rev.5) | DefinitionSection.tsx reintegrada na tabela de hardcoded strings (7 placeholders em linhas com t()) |
-| 2026-04-10 (rev.5) | Total hardcoded strings expandido: 26 (sem t()) + 8 (com t()) = 34 total em 11 ficheiros |
-| 2026-04-10 (rev.5) | Actualizada cobertura RLS: 168/264 tabelas sem RLS (era 167/263) |
 | 2026-04-10 (rev.4) | Adicionados 4 projectos de teste de platform: CLI (44 ✅), E2E (51), Integration (66), Selenium (build error) |
 | 2026-04-10 (rev.4) | Total de testes actualizado: 6.302 → 6.346 (+ CLI.Tests) / 6.507 (com todos platform tests) |
 | 2026-04-10 (rev.4) | Hardcoded strings corrigidas: 11 → 26, com lista actualizada de 10 ficheiros |
@@ -1390,7 +1392,7 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | IdentityAccess | 46 | 24 | 52% |
 | Catalog | 225 | ~52 | ~23% |
 | ChangeGovernance | 84 | 35 | 42% |
-| OperationalIntelligence | 133 | 72+ | 54%+ |
+| OperationalIntelligence | 128 | 72+ | 56%+ |
 | AIKnowledge | 106 | 86+ | 81%+ |
 | Governance | 106 | 34 | 32% |
 | Knowledge | 16 | 14 | 88% |
@@ -1427,14 +1429,14 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 
 ### 🟡 MÉDIO — Hardcoded Strings no Frontend (i18n)
 
-**26 ocorrências encontradas** de placeholders hardcoded em 10 ficheiros (excluindo ficheiros de teste e linhas que já usam `t()`). Adicionalmente, `DefinitionSection.tsx` tem 7 e `VisualWorkserviceBuilder.tsx` tem 1 placeholder extra em linhas que já usam `t()` para labels (8 total com t()):
+**27 ocorrências encontradas** de placeholders hardcoded em 10 ficheiros (excluindo ficheiros de teste e linhas que já usam `t()`). Adicionalmente, `DefinitionSection.tsx` tem 7 placeholders hardcoded em linhas que já usam `t()` para labels:
 
 | Ficheiro | Ocorrências | Exemplos | Tipo |
 |----------|:-----------:|---------|------|
 | `VisualLegacyContractBuilder.tsx` | 9 | `"CUSTOMER-RECORD"`, `"CUSTPROG"`, `"QMGR01"` | example values |
 | `DefinitionSection.tsx`³ | 7 | `"Payments"`, `"Payment Processing"`, `"Checkout Platform"` | example values |
 | `VisualSoapBuilder.tsx` | 5 | `"UserService"`, `"GetUser"`, `"GetUserRequest"` | example values |
-| `VisualWorkserviceBuilder.tsx` | 3⁴ | `"OrderEvent"`, `"OrderProcessedEvent"`, `"OrderProcessed"` | example values |
+| `VisualWorkserviceBuilder.tsx` | 3 | `"OrderEvent"`, `"OrderProcessedEvent"`, `"OrderProcessed"` | example values |
 | `SecuritySection.tsx` | 2 | `"RBAC, ABAC, Scope-based..."`, `"Admin, Editor, Viewer"` | hint text |
 | `VisualWebhookBuilder.tsx` | 2 | `"X-Webhook-Secret"`, `"X-Custom-Header"` | example values |
 | `VisualEventBuilder.tsx` | 2 | `"Order Events"`, `"OrderCreated"` | example values |
@@ -1442,10 +1444,9 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | `VisualSharedSchemaBuilder.tsx` | 1 | `"UserProfile"` | example value |
 | `ChangeChecklistsPage.tsx` | 1 | placeholder de pesquisa | placeholder |
 | `AiScaffoldWizardPage.tsx` | 1 | placeholder de input | placeholder |
-| **Total** | **34** | | **26 sem t() + 8 com t()** |
+| **Total** | **34** | | **27 sem t() + 7 com t()** |
 
-> ³ `DefinitionSection.tsx` usa `t()` para labels mas mantém placeholders hardcoded em inglês. Os 7 placeholders estão em linhas que já possuem `t()` para o label, por isso não contam no total de 26 "puras" hardcoded. Idealmente deveriam usar i18n.  
-> ⁴ `VisualWorkserviceBuilder.tsx` tem 2 puras + 1 em linha com `t()` (total 3).
+> ³ `DefinitionSection.tsx` usa `t()` para labels mas mantém placeholders hardcoded em inglês. Os 7 placeholders estão em linhas que já possuem `t()` para o label, por isso não contam no total de 27 "puras" hardcoded. Idealmente deveriam usar i18n.
 
 **Recomendação**: Mover para chaves i18n. Prioridade baixa pois são maioritariamente placeholders de exemplo em visual builders do Contract Studio. A maioria são nomes técnicos/patterns que podem não precisar de tradução.
 
@@ -1517,12 +1518,12 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | Área | Estado | Detalhes |
 |------|:------:|---------|
 | Domain | ✅ | 5 subdomains completos |
-| Application | ✅ | 133 features, 100% com validators |
+| Application | ✅ | 128 features, 100% com validators |
 | Infrastructure | ✅ | 6 DbContexts com migrations |
 | API | ✅ | 11 endpoint modules |
 | Frontend | ⚠️ | Páginas de Incidents, Reliability, Runtime implementadas |
 | Database | 🔴 | 30/46 tabelas sem RLS (34%). TelemetryStoreDbContext: 0/7, CostIntelligenceDbContext: 1/8 |
-| Testes | ✅ | 851 testes, cobertura 54%+ das features |
+| Testes | ✅ | 851 testes, cobertura 56%+ das features |
 
 **Bugs Encontrados**: 0  
 **Gaps Identificados**: RLS em 30 tabelas (especialmente TelemetryStore e CostIntelligence quase sem RLS)
@@ -1683,11 +1684,11 @@ Embora todos os 6.346 testes unitários/módulo passem, a cobertura por feature 
 | Área | Estado | Detalhes |
 |------|:------:|---------|
 | i18n | ✅ | 4 idiomas, 117 top-level keys cada, 100% consistente |
-| Hardcoded strings | ⚠️ | 26 placeholders hardcoded em 10 ficheiros (maioritariamente visual builders) |
+| Hardcoded strings | ⚠️ | 27 placeholders hardcoded em 10 ficheiros (maioritariamente visual builders) + 7 em DefinitionSection com t() |
 | dangerouslySetInnerHTML | ✅ | Nenhuma ocorrência — seguro |
 | Token storage | ✅ | In-memory para refresh/CSRF, sessionStorage para access token |
 | Sanitização | ✅ | sanitize.ts com isSafeUrl(), bloqueio de javascript:/data:/vbscript: |
-| Rotas | ✅ | 155 páginas lazy-loaded via 8 ficheiros de rota, todas resolvem correctamente |
+| Rotas | ✅ | 147 páginas lazy-loaded via 8 ficheiros de rota, todas resolvem correctamente |
 | Design System | ✅ | 73 componentes globais top-level (99 total), 24 shell components consistentes |
 
 ---
@@ -1821,12 +1822,12 @@ Existem 4 projectos de teste adicionais sob `tests/platform/` que testam a plata
 
 **Impacto**: Internacionalização  
 **Esforço**: Baixo  
-**Ficheiros a corrigir** (34 ocorrências totais em 11 ficheiros: 26 puras + 8 em linhas com t()):
+**Ficheiros a corrigir** (34 ocorrências totais em 11 ficheiros: 27 puras + 7 em DefinitionSection com t()):
 
 1. `VisualLegacyContractBuilder.tsx` (9 strings — example values mainframe)
-2. `DefinitionSection.tsx` (7 strings — example values com t() no label)
-3. `VisualSoapBuilder.tsx` (5 strings — SOAP operation examples)
-4. `VisualWorkserviceBuilder.tsx` (3 strings — 2 puras + 1 em linha com t())
+2. `VisualSoapBuilder.tsx` (5 strings — SOAP operation examples)
+3. `VisualWorkserviceBuilder.tsx` (3 strings — event type examples)
+4. `DefinitionSection.tsx` (7 strings — example values com t() no label)
 5. `SecuritySection.tsx` (2 strings — hint text)
 6. `VisualWebhookBuilder.tsx` (2 strings — header examples)
 7. `VisualEventBuilder.tsx` (2 strings — event examples)
@@ -1852,20 +1853,20 @@ Existem 4 projectos de teste adicionais sob `tests/platform/` que testam a plata
 | Tabelas com RLS (efectivo) | 96 | 🔴 (36%) |
 | Tabelas sem RLS | 168 | 🔴 |
 | Phantom RLS policies | 3 | 🔴 |
-| Features total | 839 | — |
+| Features total | 834 | — |
 | Endpoint files (*Endpoint*.cs) | 117 (82 modules + 35 individuais) | ✅ |
 | Validators em falta | 7 | ⚠️ |
 | Endpoints sem auth | 0 | ✅ |
 | Sub-módulos no ApiHost | 26 | ✅ |
 | i18n keys (por idioma) | 117 | ✅ |
 | Idiomas | 4 | ✅ |
-| Hardcoded strings | 26 (10 ficheiros) + 8 em linhas com t() = 34 total em 11 ficheiros | ⚠️ |
+| Hardcoded strings | 27 (10 ficheiros) + 7 em DefinitionSection com t() = 34 total em 11 ficheiros | ⚠️ |
 | dangerouslySetInnerHTML | 0 | ✅ |
 | Docker security (non-root) | ✅ | ✅ |
 | Seed idempotência | 100% | ✅ |
 | E2E specs | 17 | ✅ |
 | Páginas frontend (page components) | 166 | ✅ |
-| Rotas lazy-loaded | 155 | ✅ |
+| Rotas lazy-loaded | 147 | ✅ |
 | Componentes globais | 73 (99 total) | ✅ |
 | Shell components | 24 | ✅ |
 | Documentação (docs/*.md) | 42 | ✅ |
