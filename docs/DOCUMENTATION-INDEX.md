@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-09 — Wave F completa: Ideias 13, 15, 18, 28 (Wave F — Executive & FinOps) concluídas. Total: 22 ideias implementadas (Waves A+B+C+D+E+F). RLS actualizado para 90 tabelas.
+> **Última actualização:** 2026-04-10 — Plano de Contract Conformance adicionado: validação design vs. implementação, CI/CD gate, changelog, parametrização e análise de gaps.
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -71,6 +71,19 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`CONTRACT-STUDIO-VISION.md`](CONTRACT-STUDIO-VISION.md) | Visão do Contract Studio |
 | [`SERVICE-CONTRACT-GOVERNANCE.md`](SERVICE-CONTRACT-GOVERNANCE.md) | Governança de serviços e contratos |
 | [`CHANGE-CONFIDENCE.md`](CHANGE-CONFIDENCE.md) | Change Confidence |
+
+### 5.1 Plano de Implementação — Contract Conformance (`docs/contract-conformance/`)
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`contract-conformance/01-OVERVIEW.md`](contract-conformance/01-OVERVIEW.md) | Visão geral, contexto, fluxo alvo e componentes |
+| [`contract-conformance/02-DOMAIN-MODEL.md`](contract-conformance/02-DOMAIN-MODEL.md) | Novas entidades: `ContractConformanceCheck`, `ContractChangelogEntry`, `ContractCiToken`, `IActiveContractResolver` |
+| [`contract-conformance/03-CONFIGURATION-PARAMETERS.md`](contract-conformance/03-CONFIGURATION-PARAMETERS.md) | Todos os parâmetros de configuração persistidos — blocking policy, score threshold, changelog, notificações, CI tokens |
+| [`contract-conformance/04-API-ENDPOINTS.md`](contract-conformance/04-API-ENDPOINTS.md) | Especificação dos novos endpoints: validate-implementation, conformance-history, ci-tokens, changelog |
+| [`contract-conformance/05-CI-INTEGRATION.md`](contract-conformance/05-CI-INTEGRATION.md) | Integração CI/CD — CI Token binding, `.nextraceone.yaml`, GitHub Actions, Jenkins, GitLab CI, Azure DevOps |
+| [`contract-conformance/06-CHANGELOG.md`](contract-conformance/06-CHANGELOG.md) | Plano do changelog de contratos — entidade, eventos, handlers, retenção, frontend |
+| [`contract-conformance/07-GAP-ANALYSIS.md`](contract-conformance/07-GAP-ANALYSIS.md) | Análise completa de gaps no módulo de contratos — 50+ gaps categorizados por impacto e esforço |
+| [`contract-conformance/08-IMPLEMENTATION-PHASES.md`](contract-conformance/08-IMPLEMENTATION-PHASES.md) | 10 fases de implementação com dependências, ficheiros, critérios de aceitação |
 
 ---
 
