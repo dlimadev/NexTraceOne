@@ -45,7 +45,7 @@ public sealed class ConcurrencyConflictTests
         securitySvc.EncryptValue(Arg.Any<string>()).Returns(x => x.Arg<string>());
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(ThrowConcurrencyException("ConfigurationEntry"));
 
-        var handler = new SetConfigurationValue.Handler(definitionRepo, entryRepo, auditRepo, securitySvc, cacheSvc, currentUser, uow);
+        var handler = new SetConfigurationValue.Handler(definitionRepo, entryRepo, auditRepo, securitySvc, cacheSvc, currentUser, uow, Substitute.For<IEventBus>());
         var result = await handler.Handle(
             new SetConfigurationValue.Command("platform.test", ConfigurationScope.System, null, "true", null),
             CancellationToken.None);
@@ -142,7 +142,7 @@ public sealed class ConcurrencyConflictTests
         currentUser.Id.Returns("user-1");
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(ThrowConcurrencyException("FeatureFlagEntry"));
 
-        var handler = new SetFeatureFlagOverride.Handler(repository, cacheSvc, currentUser, uow);
+        var handler = new SetFeatureFlagOverride.Handler(repository, cacheSvc, currentUser, uow, Substitute.For<IEventBus>());
         var result = await handler.Handle(
             new SetFeatureFlagOverride.Command("feature.test", ConfigurationScope.System, null, IsEnabled: true, null),
             CancellationToken.None);

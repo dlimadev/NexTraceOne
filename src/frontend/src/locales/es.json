@@ -4235,7 +4235,8 @@
         "recentChanges": "Cambios Recientes",
         "risks": "Riesgos Identificados",
         "team": "Equipo",
-        "violations": "Violaciones"
+        "violations": "Violaciones",
+        "producer": "Productor"
       },
       "tabMetadata": "Metadatos",
       "tabPreview": "Vista previa",
@@ -4254,6 +4255,10 @@
         "scopesPlaceholder": "read:users, write:users, admin",
         "rolesPlaceholder": "Admin, Editor, Visor",
         "claimsPlaceholder": "sub, aud, tenant_id"
+      },
+      "livePreview": {
+        "parameters": "Parámetros",
+        "response": "Respuesta"
       }
     },
     "subtitle": "Gobernanza de contratos multi-protocolo y diff semántico",
@@ -4532,7 +4537,8 @@
     "scanSuccess": "Análisis completado correctamente.",
     "scanError": "Error al analizar dependencias.",
     "loading": "Cargando...",
-    "error": "Error al cargar datos."
+    "error": "Error al cargar datos.",
+    "serviceIdPlaceholder": "Introduzca nombre o ID del servicio"
   },
   "developerExperienceScore": {
     "title": "Puntuación de Experiencia del Desarrollador",
@@ -6311,7 +6317,8 @@
     "high": "Alto",
     "medium": "Medio",
     "low": "Bajo",
-    "info": "Info"
+    "info": "Info",
+    "serviceIdPlaceholder": "Introduzca nombre o ID del servicio"
   },
   "mfa": {
     "attemptsRemaining": "{{count}} intentos restantes",
@@ -6820,7 +6827,11 @@
       "breakingChange": "Cambio Disruptivo",
       "lifecycleState": "Estado del Ciclo de Vida",
       "createdAt": "Creado el",
-      "noData": "No se encontraron versiones para este contrato"
+      "noData": "No se encontraron versiones para este contrato",
+      "apiAssetIdLabel": "ID del Activo API",
+      "apiAssetIdPlaceholder": "Buscar o introducir nombre del activo API",
+      "loadTimeline": "Cargar Cronología",
+      "loadError": "Error al cargar la línea de tiempo. Verifique el ID del Activo API."
     },
     "maturityBenchmark": {
       "title": "Benchmark de Madurez de Servicios",
@@ -6865,7 +6876,9 @@
       "children": "Hijos",
       "analyze": "Analizar Cascada",
       "noChildren": "Sin impacto en cascada",
-      "depthLabel": "Profundidad {{depth}}"
+      "depthLabel": "Profundidad {{depth}}",
+      "entityIdPlaceholder": "Buscar o introducir nombre de entidad canónica",
+      "loadError": "Error al cargar el análisis en cascada. Verifique el ID de la entidad."
     }
   },
   "phase5": {

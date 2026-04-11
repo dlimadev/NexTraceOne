@@ -17,6 +17,7 @@ public static class AddBookmark
     {
         public Validator()
         {
+            RuleFor(x => x.EntityType).IsInEnum();
             RuleFor(x => x.EntityId).NotEmpty().MaximumLength(256);
             RuleFor(x => x.DisplayName).NotEmpty().MaximumLength(300);
         }

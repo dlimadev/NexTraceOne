@@ -5,6 +5,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Contracts.IntegrationEvents;
 using NexTraceOne.Configuration.Domain.Entities;
 using NexTraceOne.Configuration.Domain.Enums;
 
@@ -35,12 +36,13 @@ public static class SetFeatureFlagOverride
         }
     }
 
-    /// <summary>Handler that validates, persists the override, and invalidates cache.</summary>
+    /// <summary>Handler that validates, persists the override, publishes integration event, and invalidates cache.</summary>
     public sealed class Handler(
         IFeatureFlagRepository repository,
         IConfigurationCacheService cacheService,
         ICurrentUser currentUser,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, FeatureFlagEntryDto>
+        IUnitOfWork unitOfWork,
+        IEventBus eventBus) : ICommandHandler<Command, FeatureFlagEntryDto>
     {
         public async Task<Result<FeatureFlagEntryDto>> Handle(
             Command request,
@@ -118,6 +120,16 @@ public static class SetFeatureFlagOverride
             }
 
             await cacheService.InvalidateAsync(request.Key, request.Scope, cancellationToken);
+
+            await eventBus.PublishAsync(
+                new ConfigurationIntegrationEvents.ConfigurationValueChanged(
+                    Key: request.Key,
+                    Scope: request.Scope.ToString(),
+                    ScopeReferenceId: Guid.TryParse(request.ScopeReferenceId, out var scopeRef) ? scopeRef : null,
+                    PreviousValue: existingEntry is not null ? existingEntry.IsEnabled.ToString() : null,
+                    NewValue: request.IsEnabled.ToString(),
+                    ChangedBy: userId),
+                cancellationToken);
 
             return new FeatureFlagEntryDto(
                 Id: entry.Id.Value,

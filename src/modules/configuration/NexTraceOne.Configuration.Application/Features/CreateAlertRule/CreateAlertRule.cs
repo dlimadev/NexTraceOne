@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Contracts.IntegrationEvents;
 using NexTraceOne.Configuration.Domain.Entities;
 
 namespace NexTraceOne.Configuration.Application.Features.CreateAlertRule;
@@ -31,7 +32,8 @@ public static class CreateAlertRule
         IUserAlertRuleRepository repository,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
-        IDateTimeProvider clock) : ICommandHandler<Command, Response>
+        IDateTimeProvider clock,
+        IEventBus eventBus) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -42,6 +44,16 @@ public static class CreateAlertRule
 
             var rule = UserAlertRule.Create(currentUser.Id, currentTenant.Id.ToString(), request.Name, request.Condition, request.Channel, clock.UtcNow);
             await repository.AddAsync(rule, cancellationToken);
+
+            await eventBus.PublishAsync(
+                new ConfigurationIntegrationEvents.ConfigurationValueChanged(
+                    Key: $"alert-rule:{rule.Name}",
+                    Scope: "user",
+                    ScopeReferenceId: rule.Id.Value,
+                    PreviousValue: null,
+                    NewValue: $"channel={rule.Channel},condition={rule.Condition}",
+                    ChangedBy: currentUser.Id),
+                cancellationToken);
 
             return new Response(rule.Id.Value, rule.Name, rule.Channel, rule.IsEnabled, rule.CreatedAt);
         }

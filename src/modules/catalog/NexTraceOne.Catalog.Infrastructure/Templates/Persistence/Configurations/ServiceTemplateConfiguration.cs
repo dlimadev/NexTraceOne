@@ -90,7 +90,8 @@ internal sealed class ServiceTemplateConfiguration : IEntityTypeConfiguration<Se
             .IsRequired();
 
         builder.Property(t => t.TenantId)
-            .HasColumnType("uuid");
+            .HasColumnType("uuid")
+            .IsRequired();
 
         // Auditable fields
         builder.Property(t => t.CreatedAt).HasColumnType("timestamp with time zone");

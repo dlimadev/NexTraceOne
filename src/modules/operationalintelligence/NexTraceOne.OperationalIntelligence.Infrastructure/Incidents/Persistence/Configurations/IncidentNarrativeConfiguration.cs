@@ -30,7 +30,7 @@ internal sealed class IncidentNarrativeConfiguration : IEntityTypeConfiguration<
             .HasConversion<string>()
             .HasMaxLength(50)
             .IsRequired();
-        builder.Property(x => x.TenantId).HasColumnName("tenant_id");
+        builder.Property(x => x.TenantId).HasColumnName("tenant_id").IsRequired();
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.LastRefreshedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.RefreshCount).IsRequired();

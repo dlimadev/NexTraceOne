@@ -54,7 +54,7 @@ internal sealed class SchemaEvolutionAdviceConfiguration : IEntityTypeConfigurat
 
         builder.Property(x => x.AnalyzedByAgentName).HasMaxLength(200);
 
-        builder.Property(x => x.TenantId);
+        builder.Property(x => x.TenantId).IsRequired();
 
         // Concorrência otimista via PostgreSQL xmin
         builder.Property(x => x.RowVersion)

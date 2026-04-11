@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Contracts.IntegrationEvents;
 using NexTraceOne.Configuration.Domain.Entities;
 using NexTraceOne.Configuration.Domain.Enums;
 
@@ -39,7 +40,7 @@ public static class SetConfigurationValue
         }
     }
 
-    /// <summary>Handler that validates, persists, encrypts, audits, and invalidates cache.</summary>
+    /// <summary>Handler that validates, persists, encrypts, audits, publishes integration event, and invalidates cache.</summary>
     public sealed class Handler(
         IConfigurationDefinitionRepository definitionRepository,
         IConfigurationEntryRepository entryRepository,
@@ -47,7 +48,8 @@ public static class SetConfigurationValue
         IConfigurationSecurityService securityService,
         IConfigurationCacheService cacheService,
         ICurrentUser currentUser,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, ConfigurationEntryDto>
+        IUnitOfWork unitOfWork,
+        IEventBus eventBus) : ICommandHandler<Command, ConfigurationEntryDto>
     {
         public async Task<Result<ConfigurationEntryDto>> Handle(
             Command request,
@@ -170,6 +172,16 @@ public static class SetConfigurationValue
             }
 
             await cacheService.InvalidateAsync(request.Key, request.Scope, cancellationToken);
+
+            await eventBus.PublishAsync(
+                new ConfigurationIntegrationEvents.ConfigurationValueChanged(
+                    Key: request.Key,
+                    Scope: request.Scope.ToString(),
+                    ScopeReferenceId: Guid.TryParse(request.ScopeReferenceId, out var scopeRef) ? scopeRef : null,
+                    PreviousValue: definition.IsSensitive ? null : previousValue,
+                    NewValue: definition.IsSensitive ? null : request.Value,
+                    ChangedBy: userId),
+                cancellationToken);
 
             var displayValue = definition.IsSensitive
                 ? securityService.MaskValue(request.Value)

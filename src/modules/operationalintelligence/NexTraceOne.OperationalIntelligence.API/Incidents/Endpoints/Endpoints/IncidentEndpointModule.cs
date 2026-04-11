@@ -124,13 +124,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Get unified timeline of incidents and legacy events");
 
         // ── GET /api/v1/incidents/{incidentId} — Detalhe do incidente ──
-        group.MapGet("/{incidentId}", async (
+        group.MapGet("/{incidentId:guid}", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string incidentId,
+            Guid incidentId,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new GetIncidentDetail.Query(incidentId);
+            var query = new GetIncidentDetail.Query(incidentId.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -139,13 +139,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Get consolidated incident detail");
 
         // ── GET /api/v1/incidents/{incidentId}/correlation — Correlação ──
-        group.MapGet("/{incidentId}/correlation", async (
+        group.MapGet("/{incidentId:guid}/correlation", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string incidentId,
+            Guid incidentId,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new GetIncidentCorrelation.Query(incidentId);
+            var query = new GetIncidentCorrelation.Query(incidentId.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -154,13 +154,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Get incident correlation with changes and services");
 
         // ── POST /api/v1/incidents/{incidentId}/correlation/refresh — Refresh manual ──
-        group.MapPost("/{incidentId}/correlation/refresh", async (
+        group.MapPost("/{incidentId:guid}/correlation/refresh", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string incidentId,
+            Guid incidentId,
             CancellationToken cancellationToken = default) =>
         {
-            var command = new RefreshIncidentCorrelation.Command(incidentId);
+            var command = new RefreshIncidentCorrelation.Command(incidentId.ToString());
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -169,13 +169,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Recompute incident correlation on demand");
 
         // ── GET /api/v1/incidents/{incidentId}/evidence — Evidências ──
-        group.MapGet("/{incidentId}/evidence", async (
+        group.MapGet("/{incidentId:guid}/evidence", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string incidentId,
+            Guid incidentId,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new GetIncidentEvidence.Query(incidentId);
+            var query = new GetIncidentEvidence.Query(incidentId.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -184,13 +184,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Get incident evidence and operational signals");
 
         // ── GET /api/v1/incidents/{incidentId}/mitigation — Mitigação e runbooks ──
-        group.MapGet("/{incidentId}/mitigation", async (
+        group.MapGet("/{incidentId:guid}/mitigation", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string incidentId,
+            Guid incidentId,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new GetIncidentMitigation.Query(incidentId);
+            var query = new GetIncidentMitigation.Query(incidentId.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -272,13 +272,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("List incidents by team");
 
         // ── GET /api/v1/incidents/{id}/triage — Auto-triage de incidente ──
-        group.MapGet("/{id}/triage", async (
+        group.MapGet("/{id:guid}/triage", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string id,
+            Guid id,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new TriageIncident.Query(id);
+            var query = new TriageIncident.Query(id.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -287,13 +287,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Get AI-powered auto-triage suggestion for an incident");
 
         // ── GET /api/v1/incidents/{id}/root-cause — Sugestão de causa raiz ──
-        group.MapGet("/{id}/root-cause", async (
+        group.MapGet("/{id:guid}/root-cause", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string id,
+            Guid id,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new GetRootCauseSuggestion.Query(id);
+            var query = new GetRootCauseSuggestion.Query(id.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -302,13 +302,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Get AI-assisted root cause suggestion based on change correlation");
 
         // ── GET /api/v1/incidents/{id}/impact — Avaliação de impacto ──
-        group.MapGet("/{id}/impact", async (
+        group.MapGet("/{id:guid}/impact", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string id,
+            Guid id,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new GetIncidentImpactAssessment.Query(id);
+            var query = new GetIncidentImpactAssessment.Query(id.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -317,15 +317,15 @@ public sealed class IncidentEndpointModule
         .WithSummary("Get impact assessment: affected services, contracts and blast radius");
 
         // ── GET /api/v1/incidents/{id}/similar — Incidentes semelhantes ──
-        group.MapGet("/{id}/similar", async (
+        group.MapGet("/{id:guid}/similar", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string id,
+            Guid id,
             int lookbackDays = 90,
             int maxResults = 10,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new FindSimilarIncidents.Query(id, lookbackDays, maxResults);
+            var query = new FindSimilarIncidents.Query(id.ToString(), lookbackDays, maxResults);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -334,13 +334,13 @@ public sealed class IncidentEndpointModule
         .WithSummary("Find similar incidents in the last N days based on service, type and correlation patterns");
 
         // ── GET /api/v1/incidents/{id}/mitigation-playbook — Playbook auto-selecionado ──
-        group.MapGet("/{id}/mitigation-playbook", async (
+        group.MapGet("/{id:guid}/mitigation-playbook", async (
             ISender sender,
             IErrorLocalizer localizer,
-            string id,
+            Guid id,
             CancellationToken cancellationToken = default) =>
         {
-            var query = new SelectMitigationPlaybook.Query(id);
+            var query = new SelectMitigationPlaybook.Query(id.ToString());
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         })

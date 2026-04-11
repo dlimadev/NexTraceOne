@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Contracts.IntegrationEvents;
 using NexTraceOne.Configuration.Domain.Entities;
 using NexTraceOne.Configuration.Domain.Enums;
 
@@ -122,7 +123,7 @@ public sealed class FeatureFlagApplicationTests
         repo.GetEntryByKeyAndScopeAsync("ai.assistant.enabled", ConfigurationScope.Tenant, null, Arg.Any<CancellationToken>())
             .Returns((FeatureFlagEntry?)null);
 
-        var sut = new SetOverride.Handler(repo, cache, currentUser, uow);
+        var sut = new SetOverride.Handler(repo, cache, currentUser, uow, Substitute.For<IEventBus>());
         var result = await sut.Handle(
             new SetOverride.Command("ai.assistant.enabled", ConfigurationScope.Tenant, null, true, "Enable for tenant"),
             CancellationToken.None);
@@ -132,6 +133,34 @@ public sealed class FeatureFlagApplicationTests
         result.Value.IsEnabled.Should().BeTrue();
         await repo.Received(1).AddEntryAsync(Arg.Any<FeatureFlagEntry>(), Arg.Any<CancellationToken>());
         await uow.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SetFeatureFlagOverride_Should_Publish_Integration_Event()
+    {
+        var repo = Substitute.For<IFeatureFlagRepository>();
+        var cache = Substitute.For<IConfigurationCacheService>();
+        var currentUser = CreateUser();
+        var uow = Substitute.For<IUnitOfWork>();
+        var eventBus = Substitute.For<IEventBus>();
+        var definition = CreateDefinition();
+
+        repo.GetDefinitionByKeyAsync("ai.assistant.enabled", Arg.Any<CancellationToken>())
+            .Returns(definition);
+        repo.GetEntryByKeyAndScopeAsync("ai.assistant.enabled", ConfigurationScope.Tenant, null, Arg.Any<CancellationToken>())
+            .Returns((FeatureFlagEntry?)null);
+
+        var sut = new SetOverride.Handler(repo, cache, currentUser, uow, eventBus);
+        var result = await sut.Handle(
+            new SetOverride.Command("ai.assistant.enabled", ConfigurationScope.Tenant, null, true, "Enable for tenant"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        await eventBus.Received(1).PublishAsync(
+            Arg.Is<ConfigurationIntegrationEvents.ConfigurationValueChanged>(e =>
+                e.Key == "ai.assistant.enabled" &&
+                e.NewValue == "True"),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -145,7 +174,7 @@ public sealed class FeatureFlagApplicationTests
         repo.GetDefinitionByKeyAsync("missing.flag", Arg.Any<CancellationToken>())
             .Returns((FeatureFlagDefinition?)null);
 
-        var sut = new SetOverride.Handler(repo, cache, currentUser, uow);
+        var sut = new SetOverride.Handler(repo, cache, currentUser, uow, Substitute.For<IEventBus>());
         var result = await sut.Handle(
             new SetOverride.Command("missing.flag", ConfigurationScope.System, null, true, null),
             CancellationToken.None);
@@ -166,7 +195,7 @@ public sealed class FeatureFlagApplicationTests
         repo.GetDefinitionByKeyAsync("ai.assistant.enabled", Arg.Any<CancellationToken>())
             .Returns(definition);
 
-        var sut = new SetOverride.Handler(repo, cache, currentUser, uow);
+        var sut = new SetOverride.Handler(repo, cache, currentUser, uow, Substitute.For<IEventBus>());
         var result = await sut.Handle(
             new SetOverride.Command("ai.assistant.enabled", ConfigurationScope.System, null, true, null),
             CancellationToken.None);

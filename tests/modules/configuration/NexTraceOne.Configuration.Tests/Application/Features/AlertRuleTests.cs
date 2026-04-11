@@ -57,8 +57,9 @@ public sealed class AlertRuleTests
         var currentUser = CreateAuthenticatedUser();
         var currentTenant = CreateTenant();
         var clock = CreateClock();
+        var eventBus = Substitute.For<IEventBus>();
 
-        var sut = new CreateFeature.Handler(repo, currentUser, currentTenant, clock);
+        var sut = new CreateFeature.Handler(repo, currentUser, currentTenant, clock, eventBus);
         var result = await sut.Handle(
             new CreateFeature.Command("High Risk Alert", "{\"entity\":\"service\",\"field\":\"risk\",\"operator\":\">=\",\"value\":\"high\"}", "email"),
             CancellationToken.None);
@@ -69,6 +70,7 @@ public sealed class AlertRuleTests
         result.Value.IsEnabled.Should().BeTrue();
         result.Value.CreatedAt.Should().Be(FixedNow);
         await repo.Received(1).AddAsync(Arg.Any<UserAlertRule>(), Arg.Any<CancellationToken>());
+        await eventBus.Received(1).PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -78,8 +80,9 @@ public sealed class AlertRuleTests
         var currentUser = CreateAnonymousUser();
         var currentTenant = CreateTenant();
         var clock = CreateClock();
+        var eventBus = Substitute.For<IEventBus>();
 
-        var sut = new CreateFeature.Handler(repo, currentUser, currentTenant, clock);
+        var sut = new CreateFeature.Handler(repo, currentUser, currentTenant, clock, eventBus);
         var result = await sut.Handle(
             new CreateFeature.Command("Alert", "{\"entity\":\"service\"}", "in-app"),
             CancellationToken.None);

@@ -70,6 +70,18 @@ public static class GenerateAiScaffold
         private static readonly System.Text.RegularExpressions.Regex ServiceNamePattern =
             new(@"^[a-z0-9][a-z0-9\-]{0,62}[a-z0-9]$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
+        /// <summary>Supported language/stack identifiers for scaffold generation.</summary>
+        private static readonly HashSet<string> SupportedLanguages = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "csharp", "c#", "dotnet", ".net",
+            "java", "kotlin",
+            "typescript", "javascript", "node", "nodejs",
+            "python",
+            "go", "golang",
+            "rust",
+            "ruby"
+        };
+
         public Validator()
         {
             RuleFor(x => x).Must(x => x.TemplateId.HasValue || !string.IsNullOrWhiteSpace(x.TemplateSlug))
@@ -84,6 +96,10 @@ public static class GenerateAiScaffold
             RuleFor(x => x.ServiceDescription).NotEmpty().MaximumLength(3000);
             RuleFor(x => x.TeamName).MaximumLength(200).When(x => x.TeamName is not null);
             RuleFor(x => x.Domain).MaximumLength(200).When(x => x.Domain is not null);
+            RuleFor(x => x.LanguageOverride)
+                .Must(lang => SupportedLanguages.Contains(lang!))
+                .WithMessage($"LanguageOverride must be one of: {string.Join(", ", SupportedLanguages.Order())}")
+                .When(x => !string.IsNullOrWhiteSpace(x.LanguageOverride));
             RuleFor(x => x.MainEntities).MaximumLength(500).When(x => x.MainEntities is not null);
             RuleFor(x => x.AdditionalRequirements).MaximumLength(2000).When(x => x.AdditionalRequirements is not null);
         }

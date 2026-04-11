@@ -209,13 +209,13 @@ function OperationCard({ operation }: { operation: PreviewOperation }) {
           )}
           {operation.inputParameters.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-1">Parameters</p>
+              <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-1">{t('contracts.studio.livePreview.parameters', 'Parameters')}</p>
               <SchemaElementList elements={operation.inputParameters} />
             </div>
           )}
           {operation.outputFields.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-1">Response</p>
+              <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-1">{t('contracts.studio.livePreview.response', 'Response')}</p>
               <SchemaElementList elements={operation.outputFields} />
             </div>
           )}

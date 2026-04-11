@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Security.Authorization;
 using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.BuildingBlocks.Security.Encryption;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace NexTraceOne.BuildingBlocks.Security;
@@ -63,16 +64,14 @@ public static class DependencyInjection
         {
             if (isDevelopment)
             {
-                // Chave de fallback exclusiva para ambiente de desenvolvimento local.
-                // Nunca deve ser usada em ambientes não produtivos reais ou em produção.
-                // Para configurar corretamente: dotnet user-secrets set "Jwt:Secret" "<sua-chave>"
-                const string devFallbackKey = "NexTraceOne-Dev-Only-FallbackKey-NOT-FOR-NonDev-Or-Production!!";
-                signingKey = devFallbackKey;
+                // Gerar chave efémera — não persistida entre restarts.
+                // Tokens JWT emitidos em desenvolvimento serão invalidados automaticamente ao reiniciar.
+                signingKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Error.WriteLine(
                     "[NexTraceOne Security] WARNING: JWT signing key not configured. " +
-                    "Using insecure development fallback. DO NOT use in non-development environments. " +
+                    "Using ephemeral key for development — tokens will be invalidated on restart. " +
                     "Configure via: dotnet user-secrets set \"Jwt:Secret\" \"<key>\"");
                 Console.ResetColor();
             }

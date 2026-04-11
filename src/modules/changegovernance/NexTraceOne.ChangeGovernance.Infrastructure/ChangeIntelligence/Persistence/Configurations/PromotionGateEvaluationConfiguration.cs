@@ -30,7 +30,7 @@ internal sealed class PromotionGateEvaluationConfiguration : IEntityTypeConfigur
         builder.Property(x => x.RuleResults).HasColumnType("jsonb");
         builder.Property(x => x.EvaluatedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.EvaluatedBy).HasMaxLength(200);
-        builder.Property(x => x.TenantId).HasMaxLength(200);
+        builder.Property(x => x.TenantId).HasMaxLength(200).IsRequired();
         builder.Property(x => x.RowVersion)
             .IsRowVersion();
 

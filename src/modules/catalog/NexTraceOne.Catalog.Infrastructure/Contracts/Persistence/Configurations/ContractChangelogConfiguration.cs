@@ -20,7 +20,8 @@ internal sealed class ContractChangelogConfiguration : IEntityTypeConfiguration<
             .HasConversion(id => id.Value, value => ContractChangelogId.From(value));
 
         builder.Property(x => x.TenantId)
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         builder.Property(x => x.ApiAssetId)
             .HasMaxLength(200)

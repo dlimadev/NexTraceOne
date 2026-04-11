@@ -40,7 +40,7 @@ internal sealed class ImpactSimulationConfiguration : IEntityTypeConfiguration<I
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        builder.Property(x => x.TenantId).HasMaxLength(200);
+        builder.Property(x => x.TenantId).HasMaxLength(200).IsRequired();
 
         // Concorrência otimista via PostgreSQL xmin
         builder.Property(x => x.RowVersion)
