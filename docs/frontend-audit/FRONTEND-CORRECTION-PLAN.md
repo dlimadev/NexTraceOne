@@ -10,7 +10,7 @@
 
 | Fase | Descrição | Itens | Estado |
 |------|-----------|-------|--------|
-| Fase 1 | Correções Críticas (C-01 a C-05) | 5 | 🔲 Pendente |
+| Fase 1 | Correções Críticas (C-01 a C-05) | 5 | ✅ Concluída |
 | Fase 2 | Correções Altas (H-01 a H-03) | 3 | 🔲 Pendente |
 | Fase 3 | Correções Médias (M-01 a M-03) | 3 | 🔲 Pendente |
 
@@ -31,11 +31,11 @@ if (isLoading || isPending) return <PageContainer><PageLoadingState /></PageCont
 if (isError) return <PageContainer><PageErrorState /></PageContainer>;
 ```
 
-- [ ] C-01.1 — `features/ai-hub/pages/AgentDetailPage.tsx`
-- [ ] C-01.2 — `features/catalog/pages/SelfServicePortalPage.tsx`
-- [ ] C-01.3 — `features/contracts/cdct/ConsumerDrivenContractPage.tsx`
-- [ ] C-01.4 — `features/contracts/publication/PublicationCenterPage.tsx`
-- [ ] C-01.5 — `features/governance/pages/GovernanceGatesPage.tsx`
+- [x] C-01.1 — `features/ai-hub/pages/AgentDetailPage.tsx`
+- [x] C-01.2 — `features/catalog/pages/SelfServicePortalPage.tsx` — Skipped: página estática sem data fetching
+- [x] C-01.3 — `features/contracts/cdct/ConsumerDrivenContractPage.tsx`
+- [x] C-01.4 — `features/contracts/publication/PublicationCenterPage.tsx`
+- [x] C-01.5 — `features/governance/pages/GovernanceGatesPage.tsx`
 
 ---
 
@@ -51,22 +51,22 @@ placeholder="UserService"
 placeholder={t('contracts.soap.placeholder.serviceName', 'UserService')}
 ```
 
-- [ ] C-02.01 — `contracts/workspace/builders/VisualLegacyContractBuilder.tsx` (11 ocorrências)
-- [ ] C-02.02 — `contracts/workspace/builders/VisualEventBuilder.tsx` (10 ocorrências)
-- [ ] C-02.03 — `contracts/workspace/builders/VisualWorkserviceBuilder.tsx` (8 ocorrências)
-- [ ] C-02.04 — `contracts/workspace/builders/VisualWebhookBuilder.tsx` (8 ocorrências)
-- [ ] C-02.05 — `contracts/workspace/builders/VisualSoapBuilder.tsx` (8 ocorrências)
-- [ ] C-02.06 — `contracts/workspace/sections/SecuritySection.tsx` (4 ocorrências)
-- [ ] C-02.07 — `contracts/workspace/builders/VisualSharedSchemaBuilder.tsx` (3 ocorrências)
-- [ ] C-02.08 — `ai-hub/pages/AiAnalysisPage.tsx` (2 ocorrências)
-- [ ] C-02.09 — `ai-hub/pages/AiAgentsPage.tsx` (1 ocorrência)
-- [ ] C-02.10 — `governance/pages/ApiPolicyAsCodePage.tsx` (1 ocorrência)
-- [ ] C-02.11 — `contracts/cdct/ConsumerDrivenContractPage.tsx` (2 ocorrências)
-- [ ] C-02.12 — `contracts/governance/ContractHealthTimelinePage.tsx` (1 ocorrência)
-- [ ] C-02.13 — `contracts/canonical/CanonicalEntityImpactCascadePage.tsx` (1 ocorrência)
-- [ ] C-02.14 — `catalog/pages/AiScaffoldWizardPage.tsx` (1 ocorrência)
-- [ ] C-02.15 — `contracts/workspace/builders/shared/SchemaCompositionEditor.tsx` (1 ocorrência)
-- [ ] C-02.16 — Adicionar chaves i18n aos 4 locales (en, pt-BR, pt-PT, es)
+- [x] C-02.01 — `contracts/workspace/builders/VisualLegacyContractBuilder.tsx` (11 ocorrências)
+- [x] C-02.02 — `contracts/workspace/builders/VisualEventBuilder.tsx` (10 ocorrências)
+- [x] C-02.03 — `contracts/workspace/builders/VisualWorkserviceBuilder.tsx` (8 ocorrências)
+- [x] C-02.04 — `contracts/workspace/builders/VisualWebhookBuilder.tsx` (8 ocorrências)
+- [x] C-02.05 — `contracts/workspace/builders/VisualSoapBuilder.tsx` (8 ocorrências)
+- [x] C-02.06 — `contracts/workspace/sections/SecuritySection.tsx` (4 ocorrências)
+- [x] C-02.07 — `contracts/workspace/builders/VisualSharedSchemaBuilder.tsx` (3 ocorrências)
+- [x] C-02.08 — `ai-hub/pages/AiAnalysisPage.tsx` (2 ocorrências)
+- [x] C-02.09 — `ai-hub/pages/AiAgentsPage.tsx` (1 ocorrência)
+- [x] C-02.10 — `governance/pages/ApiPolicyAsCodePage.tsx` (1 ocorrência)
+- [x] C-02.11 — `contracts/cdct/ConsumerDrivenContractPage.tsx` (2 ocorrências)
+- [x] C-02.12 — `contracts/governance/ContractHealthTimelinePage.tsx` (1 ocorrência)
+- [x] C-02.13 — `contracts/canonical/CanonicalEntityImpactCascadePage.tsx` (1 ocorrência)
+- [x] C-02.14 — `catalog/pages/AiScaffoldWizardPage.tsx` (1 ocorrência)
+- [x] C-02.15 — `contracts/workspace/builders/shared/SchemaCompositionEditor.tsx` (1 ocorrência)
+- [x] C-02.16 — Adicionar chaves i18n aos 4 locales (en, pt-BR, pt-PT, es)
 
 ---
 
@@ -84,7 +84,7 @@ style={{ color: 'var(--t-muted)' }}              → className="text-muted"
 style={{ fontSize: '12px', ... }}                → className="text-xs text-muted"
 ```
 
-- [ ] C-03.1 — Converter todas as 28 ocorrências de `style={{}}` para classes Tailwind
+- [x] C-03.1 — Converter todas as 28 ocorrências de `style={{}}` para classes Tailwind
 
 ---
 
@@ -92,8 +92,8 @@ style={{ fontSize: '12px', ... }}                → className="text-xs text-mut
 
 **Impacto:** UX — secções sem título confundem o utilizador
 
-- [ ] C-04.1 — `features/operations/pages/PredictiveIntelligencePage.tsx:501` — adicionar título i18n ou remover PageSection
-- [ ] C-04.2 — `features/governance/pages/ApiPolicyAsCodePage.tsx:127` — adicionar título i18n ou remover PageSection
+- [x] C-04.1 — `features/operations/pages/PredictiveIntelligencePage.tsx:501` — título i18n adicionado
+- [x] C-04.2 — `features/governance/pages/ApiPolicyAsCodePage.tsx:127` — título i18n adicionado
 
 ---
 
@@ -109,13 +109,13 @@ aria-label="Close"
 aria-label={t('common.close')}
 ```
 
-- [ ] C-05.1 — `components/Breadcrumbs.tsx` — `"Breadcrumbs"` → `t('nav.breadcrumbs')`
-- [ ] C-05.2 — `components/Modal.tsx` — `"Close"` → `t('common.close')`
-- [ ] C-05.3 — `components/Drawer.tsx` — `"Close"` → `t('common.close')`
-- [ ] C-05.4 — `components/Toast.tsx` — `"Notifications"` → `t('notifications.title')`, `"Dismiss"` → `t('common.dismiss')`
-- [ ] C-05.5 — `components/NexTraceLogo.tsx` — `"NexTraceOne"` → `t('brand.name')` (×2)
-- [ ] C-05.6 — `contracts/governance/ContractHealthTimelinePage.tsx` — `"API Asset ID"` → `t('contracts.health.assetIdLabel')`
-- [ ] C-05.7 — Adicionar chaves i18n aos 4 locales
+- [x] C-05.1 — `components/Breadcrumbs.tsx` — `"Breadcrumbs"` → `t('nav.breadcrumbs')`
+- [x] C-05.2 — `components/Modal.tsx` — `"Close"` → `t('common.close')`
+- [x] C-05.3 — `components/Drawer.tsx` — `"Close"` → `t('common.close')`
+- [x] C-05.4 — `components/Toast.tsx` — `"Notifications"` → `t('notifications.title')`, `"Dismiss"` → `t('common.dismiss')`
+- [x] C-05.5 — `components/NexTraceLogo.tsx` — `"NexTraceOne"` → `t('brand.name')` (×2)
+- [x] C-05.6 — `contracts/governance/ContractHealthTimelinePage.tsx` — `"API Asset ID"` → `t('contracts.health.assetIdLabel')`
+- [x] C-05.7 — Adicionar chaves i18n aos 4 locales
 
 ---
 

@@ -283,11 +283,7 @@
   },
   "aiHub": {
     "activeModels": "Modelos Ativos",
-    "agents": {
-      "placeholder": {
-        "agentName": "meu-agente-customizado"
-      }
-    },
+    "agents": "Agentes",
     "agentsHint": "Os agentes fornecem capacidades de IA governadas e especializadas.",
     "agentsPanel": "Agentes Disponíveis",
     "analysis": {
@@ -495,7 +491,10 @@
     "typing": "Analisando contexto",
     "usingModel": "Usando modelo",
     "welcomeMessage": "Bem-vindo! Sou o Assistente IA do NexTraceOne. Posso ajudá-lo a investigar problemas de produção, analisar contratos, correlacionar incidentes e fornecer insights operacionais fundamentados na Source of Truth da sua organização. O que gostaria de explorar?",
-    "you": "Você"
+    "you": "Você",
+    "agentPlaceholder": {
+      "agentName": "meu-agente-customizado"
+    }
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Alterações Recentes",

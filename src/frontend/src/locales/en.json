@@ -283,11 +283,7 @@
   },
   "aiHub": {
     "activeModels": "Active Models",
-    "agents": {
-      "placeholder": {
-        "agentName": "my-custom-agent"
-      }
-    },
+    "agents": "Agents",
     "agentsHint": "Agents provide specialized governed AI capabilities.",
     "agentsPanel": "Available Agents",
     "analysis": {
@@ -495,7 +491,10 @@
     "typing": "Analyzing context",
     "usingModel": "Using model",
     "welcomeMessage": "Welcome! I'm the NexTraceOne AI Assistant. I can help you investigate production issues, analyze contracts, correlate incidents, and provide operational insights grounded in your organization's Source of Truth. What would you like to explore?",
-    "you": "You"
+    "you": "You",
+    "agentPlaceholder": {
+      "agentName": "my-custom-agent"
+    }
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Recent Changes",

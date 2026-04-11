@@ -164,7 +164,7 @@ function CreateAgentDialog({
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                placeholder={t('aiHub.agents.placeholder.agentName', 'my-custom-agent')}
+                placeholder={t('aiHub.agentPlaceholder.agentName', 'my-custom-agent')}
                 className="w-full rounded-md border border-edge bg-elevated px-3 py-2 text-sm text-body placeholder-muted focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
