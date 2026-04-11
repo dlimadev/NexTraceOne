@@ -11,8 +11,8 @@ namespace NexTraceOne.IdentityAccess.Application.Features.ForgotPassword;
 /// <summary>
 /// Feature: ForgotPassword — inicia o fluxo de recuperação de password.
 /// Retorna sempre sucesso para prevenir enumeração de emails.
-/// Quando o utilizador existe, regista evento de auditoria e prepara envio de email.
 /// A entrega do email de reset é responsabilidade futura do módulo de Notificações.
+/// Auditoria de reset será registada quando o token for efectivamente utilizado.
 /// </summary>
 public static class ForgotPassword
 {
@@ -29,24 +29,15 @@ public static class ForgotPassword
     public sealed record Response(bool Accepted);
 
     internal sealed class Handler(
-        IUserRepository userRepository,
-        ISecurityAuditRecorder auditRecorder) : ICommandHandler<Command, Response>
+        IUserRepository userRepository) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             var email = Email.Create(request.Email);
-            var user = await userRepository.GetByEmailAsync(email, cancellationToken);
-
-            if (user is not null)
-            {
-                var tenantId = auditRecorder.ResolveTenantIdForAudit();
-                auditRecorder.RecordAuthenticationFailure(
-                    tenantId,
-                    user.Id,
-                    "Password reset requested",
-                    null,
-                    null);
-            }
+            // Verificar existência para futuro envio de email de reset.
+            // Não registar evento de auditoria aqui — será registado quando o token
+            // for utilizado em ResetPassword, evitando confusão semântica nos logs.
+            _ = await userRepository.GetByEmailAsync(email, cancellationToken);
 
             // Sempre retorna sucesso para prevenir enumeração de emails
             return new Response(true);

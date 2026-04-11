@@ -179,6 +179,12 @@ export function DependencyDashboardPage() {
                   value={scanServiceId}
                   onChange={(e) => setScanServiceId(e.target.value)}
                   placeholder={t('dependencyDashboard.serviceIdPlaceholder', 'Enter service name or ID')}
+                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted mb-1">
+                  {t('dependencyDashboard.projectFileContent')}
                 </label>
                 <textarea
                   value={projectFileContent}
