@@ -16,7 +16,8 @@ namespace NexTraceOne.BuildingBlocks.Security.Authentication;
 /// associada a um tenant e conjunto de permissões configurados.
 ///
 /// Segurança:
-/// - API keys são validadas contra configuração em memória (MVP1).
+/// - Suporta comparação por hash SHA-256 (KeyIsHashed = true) ou texto plano (legacy).
+/// - Comparação sempre em tempo constante para prevenir ataques de timing.
 /// - Cada key está vinculada a um tenantId e lista de permissões.
 /// - Keys inválidas ou ausentes resultam em AuthenticateResult.NoResult()
 ///   para permitir fallback ao esquema JWT padrão.
@@ -45,8 +46,7 @@ public sealed class ApiKeyAuthenticationHandler(
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var configuredKey = Options.ConfiguredKeys
-            .FirstOrDefault(k => FixedTimeEquals(k.Key, apiKey));
+        var configuredKey = FindMatchingKey(apiKey);
 
         if (configuredKey is null)
         {
@@ -80,6 +80,43 @@ public sealed class ApiKeyAuthenticationHandler(
             configuredKey.TenantId);
 
         return Task.FromResult(AuthenticateResult.Success(ticket));
+    }
+
+    /// <summary>
+    /// Finds a matching configured key for the provided API key.
+    /// Supports both hashed (SHA-256) and plain-text key configurations.
+    /// </summary>
+    private ApiKeyConfiguration? FindMatchingKey(string apiKey)
+    {
+        // Pre-compute hash once for hashed key comparisons
+        string? apiKeyHash = null;
+
+        foreach (var configured in Options.ConfiguredKeys)
+        {
+            if (configured.KeyIsHashed)
+            {
+                apiKeyHash ??= ComputeSha256Hex(apiKey);
+                if (FixedTimeEquals(configured.Key, apiKeyHash))
+                    return configured;
+            }
+            else
+            {
+                if (FixedTimeEquals(configured.Key, apiKey))
+                    return configured;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Computes the SHA-256 hash of the input string and returns it as lowercase hex.
+    /// </summary>
+    private static string ComputeSha256Hex(string input)
+    {
+        var inputBytes = Encoding.UTF8.GetBytes(input);
+        var hashBytes = SHA256.HashData(inputBytes);
+        return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }
 
     /// <summary>

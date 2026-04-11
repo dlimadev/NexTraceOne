@@ -59,8 +59,10 @@ public static class GenerateMockConfiguration
             {
                 contractTitle = $"Contract {version.SemVer}";
                 routes.Add(new MockRoute("/api/v1/resource", "GET", 200, "{\"message\": \"mock response\"}", "application/json"));
-                instructions = BuildInstructions(contractTitle, routes);
-                return new Response(request.ContractVersionId, contractTitle, routes.AsReadOnly(), instructions);
+                instructions = "No spec content available for this contract version. " +
+                    "A default fallback mock route has been generated. " +
+                    "Import or define the OpenAPI/Swagger spec to generate routes from the real contract.";
+                return new Response(request.ContractVersionId, contractTitle, routes.AsReadOnly(), instructions, IsDefaultFallback: true);
             }
 
             try
@@ -86,10 +88,12 @@ public static class GenerateMockConfiguration
                 logger.LogWarning(ex, "Failed to parse spec for contract version {ContractVersionId}; falling back to default mock route", request.ContractVersionId);
                 contractTitle = $"Contract {version.SemVer}";
                 routes.Add(new MockRoute("/api/v1/resource", "GET", 200, "{\"message\": \"mock response\"}", "application/json"));
+                instructions = $"Spec content could not be parsed for '{contractTitle}'. A default fallback mock route has been generated.";
+                return new Response(request.ContractVersionId, contractTitle, routes.AsReadOnly(), instructions, IsDefaultFallback: true);
             }
 
             instructions = BuildInstructions(contractTitle, routes);
-            return new Response(request.ContractVersionId, contractTitle, routes.AsReadOnly(), instructions);
+            return new Response(request.ContractVersionId, contractTitle, routes.AsReadOnly(), instructions, IsDefaultFallback: false);
         }
 
         private static string BuildExampleBody(
@@ -201,5 +205,6 @@ public static class GenerateMockConfiguration
         Guid ContractVersionId,
         string ContractTitle,
         IReadOnlyList<MockRoute> Routes,
-        string Instructions);
+        string Instructions,
+        bool IsDefaultFallback = false);
 }

@@ -127,7 +127,7 @@ public sealed class ConfigurationEntryTests
         entryRepo.GetByKeyAndScopeAsync("platform.max.retries", ConfigurationScope.System, null, Arg.Any<CancellationToken>())
             .Returns((ConfigurationEntry?)null);
 
-        var sut = new SetValueFeature.Handler(defRepo, entryRepo, auditRepo, securityService, cache, currentUser, uow);
+        var sut = new SetValueFeature.Handler(defRepo, entryRepo, auditRepo, securityService, cache, currentUser, uow, Substitute.For<IEventBus>());
         var result = await sut.Handle(
             new SetValueFeature.Command("platform.max.retries", ConfigurationScope.System, null, "10", "Increase retries"),
             CancellationToken.None);
@@ -154,7 +154,7 @@ public sealed class ConfigurationEntryTests
         defRepo.GetByKeyAsync("missing.key", Arg.Any<CancellationToken>())
             .Returns((ConfigurationDefinition?)null);
 
-        var sut = new SetValueFeature.Handler(defRepo, entryRepo, auditRepo, securityService, cache, currentUser, uow);
+        var sut = new SetValueFeature.Handler(defRepo, entryRepo, auditRepo, securityService, cache, currentUser, uow, Substitute.For<IEventBus>());
         var result = await sut.Handle(
             new SetValueFeature.Command("missing.key", ConfigurationScope.System, null, "value", null),
             CancellationToken.None);
@@ -178,7 +178,7 @@ public sealed class ConfigurationEntryTests
         defRepo.GetByKeyAsync("platform.max.retries", Arg.Any<CancellationToken>())
             .Returns(definition);
 
-        var sut = new SetValueFeature.Handler(defRepo, entryRepo, auditRepo, securityService, cache, currentUser, uow);
+        var sut = new SetValueFeature.Handler(defRepo, entryRepo, auditRepo, securityService, cache, currentUser, uow, Substitute.For<IEventBus>());
         var result = await sut.Handle(
             new SetValueFeature.Command("platform.max.retries", ConfigurationScope.System, null, "not-a-number", null),
             CancellationToken.None);
