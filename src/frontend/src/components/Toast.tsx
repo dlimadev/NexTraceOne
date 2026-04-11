@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 import { cn } from '../lib/cn';
 
@@ -74,6 +75,7 @@ let toastCounter = 0;
  * @see docs/DESIGN-SYSTEM.md §4.13
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const removeToast = useCallback((id: string) => {
@@ -119,13 +121,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <div
           className="fixed top-4 right-4 z-[var(--z-toast,9999)] flex flex-col gap-2 pointer-events-none"
           aria-live="polite"
-          aria-label="Notifications"
+          aria-label={t('notifications.title', 'Notifications')}
         >
-          {toasts.map((t) => {
-            const styles = variantStyles[t.variant];
+          {toasts.map((toast) => {
+            const styles = variantStyles[toast.variant];
             return (
               <div
-                key={t.id}
+                key={toast.id}
                 role="status"
                 className={cn(
                   'pointer-events-auto flex items-center gap-3 rounded-lg border px-4 py-3 text-sm shadow-lg',
@@ -134,12 +136,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 )}
               >
                 <span className="shrink-0">{styles.icon}</span>
-                <span className="flex-1 text-xs font-medium">{t.message}</span>
+                <span className="flex-1 text-xs font-medium">{toast.message}</span>
                 <button
                   type="button"
-                  onClick={() => removeToast(t.id)}
+                  onClick={() => removeToast(toast.id)}
                   className="shrink-0 p-0.5 rounded hover:bg-black/10 transition-colors"
-                  aria-label="Dismiss"
+                  aria-label={t('common.dismiss', 'Dismiss')}
                 >
                   <X size={14} />
                 </button>

@@ -1579,7 +1579,8 @@
     "view": "View",
     "viewAll": "View all",
     "vs": "vs",
-    "yes": "Yes"
+    "yes": "Yes",
+    "dismiss": "Dismiss"
   },
   "configuration": {
     "actions": {
@@ -3144,6 +3145,9 @@
       "visualBuilder": "Visual",
       "visualBuilderDescription": "Design your contract visually without writing specification code. Configure endpoints, schemas, security and more through an intuitive form-based interface.",
       "visualBuilderTitle": "Visual Builder"
+    },
+    "health": {
+      "assetIdLabel": "API Asset ID"
     }
   },
   "dashboard": {
@@ -8465,5 +8469,11 @@
         "description": "Customization allows you to adapt the platform to your organization's branding. The NexTraceOne product identity is preserved through the 'Powered by NexTraceOne' watermark and the login page left panel."
       }
     }
+  },
+  "nav": {
+    "breadcrumbs": "Breadcrumbs"
+  },
+  "brand": {
+    "name": "NexTraceOne"
   }
 }

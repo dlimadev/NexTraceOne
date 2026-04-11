@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { cn } from '../lib/cn';
 
@@ -45,6 +46,7 @@ export function Modal({
   footer,
   className,
 }: ModalProps) {
+  const { t } = useTranslation();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -106,7 +108,7 @@ export function Modal({
               onClick={onClose}
               className="rounded-sm p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
               style={{ transitionDuration: 'var(--nto-motion-fast)' }}
-              aria-label="Close"
+              aria-label={t('common.close', 'Close')}
             >
               <X size={18} />
             </button>

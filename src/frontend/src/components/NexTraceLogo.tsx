@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/cn';
 
 interface NexTraceLogoProps {
@@ -23,6 +24,7 @@ interface NexTraceLogoProps {
  * - full: ícone + wordmark + tagline "Operational Confidence"
  */
 export function NexTraceLogo({ size = 40, iconOnly = false, className, variant = 'compact' }: NexTraceLogoProps) {
+  const { t } = useTranslation();
   const showWordmark = variant !== 'icon' && !iconOnly;
   const showTagline = variant === 'full';
 
@@ -51,6 +53,7 @@ export function NexTraceLogo({ size = 40, iconOnly = false, className, variant =
  * Glyph autossuficiente, reutilizável em qualquer contexto.
  */
 export function NexTraceIcon({ size = 40, className }: { size?: number; className?: string }) {
+  const { t } = useTranslation();
   const id = `nto-logo-${size}`;
 
   return (
@@ -60,7 +63,7 @@ export function NexTraceIcon({ size = 40, className }: { size?: number; classNam
       viewBox="0 0 40 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="NexTraceOne"
+      aria-label={t('brand.name', 'NexTraceOne')}
       className={className}
     >
       <defs>
@@ -141,13 +144,14 @@ export function NexTraceIcon({ size = 40, className }: { size?: number; classNam
  * "Nex" em azul-cyan, "Trace" em branco bold, "One" em cyan-mint.
  */
 export function NexTraceWordmark({ size = 40 }: { size?: number }) {
+  const { t } = useTranslation();
   const fontSize = Math.max(12, size * 0.38);
 
   return (
     <span
       className="font-bold tracking-tight leading-none"
       style={{ fontSize }}
-      aria-label="NexTraceOne"
+      aria-label={t('brand.name', 'NexTraceOne')}
     >
       <span className="text-blue">Nex</span>
       <span className="text-heading">Trace</span>

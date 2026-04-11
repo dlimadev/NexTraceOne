@@ -83,7 +83,7 @@ export function ContractHealthTimelinePage() {
               onChange={(e) => setApiAssetId(e.target.value)}
               placeholder="e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
               className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="API Asset ID"
+              aria-label={t('contracts.health.assetIdLabel', 'API Asset ID')}
             />
           </div>
           <div className="flex items-end">

@@ -1579,7 +1579,8 @@
     "view": "Ver",
     "viewAll": "Ver tudo",
     "vs": "vs",
-    "yes": "Sim"
+    "yes": "Sim",
+    "dismiss": "Dispensar"
   },
   "configuration": {
     "actions": {
@@ -3144,6 +3145,9 @@
       "visualBuilder": "Visual",
       "visualBuilderDescription": "Projete seu contrato visualmente sem escrever código de especificação. Configure endpoints, schemas, segurança e mais através de uma interface intuitiva baseada em formulários.",
       "visualBuilderTitle": "Construtor Visual"
+    },
+    "health": {
+      "assetIdLabel": "ID do Ativo de API"
     }
   },
   "dashboard": {
@@ -8449,5 +8453,11 @@
         "description": "A personalização permite adaptar a plataforma à marca da sua organização. A identidade do produto NexTraceOne é preservada através da marca d'água 'Powered by NexTraceOne' e do painel esquerdo da página de login."
       }
     }
+  },
+  "nav": {
+    "breadcrumbs": "Navegação"
+  },
+  "brand": {
+    "name": "NexTraceOne"
   }
 }
