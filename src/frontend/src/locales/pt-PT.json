@@ -4235,7 +4235,8 @@
         "recentChanges": "Mudanças Recentes",
         "risks": "Riscos Identificados",
         "team": "Equipa",
-        "violations": "Violações"
+        "violations": "Violações",
+        "producer": "Produtor"
       },
       "tabMetadata": "Metadados",
       "tabPreview": "Pré-visualização",
@@ -4254,6 +4255,10 @@
         "scopesPlaceholder": "read:users, write:users, admin",
         "rolesPlaceholder": "Admin, Editor, Visualizador",
         "claimsPlaceholder": "sub, aud, tenant_id"
+      },
+      "livePreview": {
+        "parameters": "Parâmetros",
+        "response": "Resposta"
       }
     },
     "subtitle": "Governança de contratos multi-protocolo e diff semântico",
@@ -4532,7 +4537,8 @@
     "scanSuccess": "Análise concluída com sucesso.",
     "scanError": "Falha ao analisar dependências.",
     "loading": "A carregar...",
-    "error": "Falha ao carregar dados."
+    "error": "Falha ao carregar dados.",
+    "serviceIdPlaceholder": "Introduzir nome ou ID do serviço"
   },
   "developerExperienceScore": {
     "title": "Pontuação de Experiência do Programador",
@@ -6311,7 +6317,8 @@
     "high": "Alto",
     "medium": "Médio",
     "low": "Baixo",
-    "info": "Info"
+    "info": "Info",
+    "serviceIdPlaceholder": "Introduzir nome ou ID do serviço"
   },
   "mfa": {
     "attemptsRemaining": "{{count}} tentativas restantes",
@@ -6820,7 +6827,10 @@
       "breakingChange": "Breaking Change",
       "lifecycleState": "Estado do Ciclo de Vida",
       "createdAt": "Criado em",
-      "noData": "Nenhuma versão encontrada para este contrato"
+      "noData": "Nenhuma versão encontrada para este contrato",
+      "apiAssetIdLabel": "ID do Ativo de API",
+      "apiAssetIdPlaceholder": "Pesquisar ou introduzir nome do ativo de API",
+      "loadError": "Falha ao carregar linha do tempo. Verifique o ID do Ativo de API."
     },
     "maturityBenchmark": {
       "title": "Benchmark de Maturidade de Serviços",
@@ -6865,7 +6875,9 @@
       "children": "Filhos",
       "analyze": "Analisar Cascata",
       "noChildren": "Sem impacto em cascata",
-      "depthLabel": "Profundidade {{depth}}"
+      "depthLabel": "Profundidade {{depth}}",
+      "entityIdPlaceholder": "Pesquisar ou introduzir nome da entidade canónica",
+      "loadError": "Falha ao carregar análise em cascata. Verifique o ID da entidade."
     }
   },
   "phase5": {

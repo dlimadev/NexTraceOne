@@ -4235,7 +4235,8 @@
         "recentChanges": "Recent Changes",
         "risks": "Identified Risks",
         "team": "Team",
-        "violations": "Violations"
+        "violations": "Violations",
+        "producer": "Producer"
       },
       "tabMetadata": "Metadata",
       "tabPreview": "Preview",
@@ -4254,6 +4255,10 @@
         "scopesPlaceholder": "read:users, write:users, admin",
         "rolesPlaceholder": "Admin, Editor, Viewer",
         "claimsPlaceholder": "sub, aud, tenant_id"
+      },
+      "livePreview": {
+        "parameters": "Parameters",
+        "response": "Response"
       }
     },
     "subtitle": "Multi-protocol contract governance and semantic diff",
@@ -4532,7 +4537,8 @@
     "scanSuccess": "Scan completed successfully.",
     "scanError": "Failed to scan dependencies.",
     "loading": "Loading...",
-    "error": "Failed to load data."
+    "error": "Failed to load data.",
+    "serviceIdPlaceholder": "Enter service name or ID"
   },
   "developerExperienceScore": {
     "title": "Developer Experience Score",
@@ -6311,7 +6317,8 @@
     "high": "High",
     "medium": "Medium",
     "low": "Low",
-    "info": "Info"
+    "info": "Info",
+    "serviceIdPlaceholder": "Enter service name or ID"
   },
   "mfa": {
     "attemptsRemaining": "{{count}} attempts remaining",
@@ -6820,7 +6827,10 @@
       "breakingChange": "Breaking Change",
       "lifecycleState": "Lifecycle State",
       "createdAt": "Created At",
-      "noData": "No versions found for this contract"
+      "noData": "No versions found for this contract",
+      "apiAssetIdLabel": "API Asset ID",
+      "apiAssetIdPlaceholder": "Search or enter API asset name",
+      "loadError": "Failed to load health timeline. Please verify the API Asset ID."
     },
     "maturityBenchmark": {
       "title": "Service Maturity Benchmark",
@@ -6865,7 +6875,9 @@
       "children": "Children",
       "analyze": "Analyze Cascade",
       "noChildren": "No cascading impact",
-      "depthLabel": "Depth {{depth}}"
+      "depthLabel": "Depth {{depth}}",
+      "entityIdPlaceholder": "Search or enter canonical entity name",
+      "loadError": "Failed to load cascade analysis. Please verify the entity ID."
     }
   },
   "phase5": {

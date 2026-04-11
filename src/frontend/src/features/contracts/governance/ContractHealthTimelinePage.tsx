@@ -75,15 +75,15 @@ export function ContractHealthTimelinePage() {
         <div className="flex gap-3 flex-wrap">
           <div className="flex-1 min-w-[260px]">
             <label className="block text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              API Asset ID
+              {t('phase4.healthTimeline.apiAssetIdLabel', 'API Asset ID')}
             </label>
             <input
               type="text"
               value={apiAssetId}
               onChange={(e) => setApiAssetId(e.target.value)}
-              placeholder="e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              placeholder={t('phase4.healthTimeline.apiAssetIdPlaceholder', 'Search or enter API asset name')}
               className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="API Asset ID"
+              aria-label={t('phase4.healthTimeline.apiAssetIdLabel', 'API Asset ID')}
             />
           </div>
           <div className="flex items-end">
@@ -102,8 +102,8 @@ export function ContractHealthTimelinePage() {
       {isError && (
         <div className="bg-red-500/10 border border-red-500/25 rounded-lg p-4 flex items-center gap-2 text-red-400">
           <AlertTriangle size={16} />
-          <span className="text-sm">Failed to load health timeline. Please verify the API Asset ID.</span>
-          <button onClick={() => refetch()} className="ml-auto text-xs underline">Retry</button>
+          <span className="text-sm">{t('phase4.healthTimeline.loadError', 'Failed to load health timeline. Please verify the API Asset ID.')}</span>
+          <button onClick={() => refetch()} className="ml-auto text-xs underline">{t('common.retry', 'Retry')}</button>
         </div>
       )}
 

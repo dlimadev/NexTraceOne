@@ -16,6 +16,10 @@ using ChangePasswordFeature = NexTraceOne.IdentityAccess.Application.Features.Ch
 using StartOidcLoginFeature = NexTraceOne.IdentityAccess.Application.Features.StartOidcLogin.StartOidcLogin;
 using OidcCallbackFeature = NexTraceOne.IdentityAccess.Application.Features.OidcCallback.OidcCallback;
 using VerifyMfaChallengeFeature = NexTraceOne.IdentityAccess.Application.Features.VerifyMfaChallenge.VerifyMfaChallenge;
+using ForgotPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ForgotPassword.ForgotPassword;
+using ResetPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ResetPassword.ResetPassword;
+using ActivateAccountFeature = NexTraceOne.IdentityAccess.Application.Features.ActivateAccount.ActivateAccount;
+using ResendMfaCodeFeature = NexTraceOne.IdentityAccess.Application.Features.ResendMfaCode.ResendMfaCode;
 
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
@@ -152,6 +156,54 @@ internal static class AuthEndpoints
             var userAgent = httpContext.Request.Headers.UserAgent.ToString();
             var enrichedCommand = command with { IpAddress = ip, UserAgent = userAgent };
             var result = await sender.Send(enrichedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // POST /auth/forgot-password — solicitar reset de password (sempre retorna sucesso)
+        authGroup.MapPost("/forgot-password", async (
+            ForgotPasswordFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // POST /auth/reset-password — reset de password com token
+        authGroup.MapPost("/reset-password", async (
+            ResetPasswordFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // POST /auth/activate — activar conta com token
+        authGroup.MapPost("/activate", async (
+            ActivateAccountFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // POST /auth/mfa/resend — reenviar código MFA
+        authGroup.MapPost("/mfa/resend", async (
+            ResendMfaCodeFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).AllowAnonymous()
           .RequireRateLimiting("auth");
