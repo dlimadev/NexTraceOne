@@ -1,6 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Contracts.IntegrationEvents;
 using NexTraceOne.Configuration.Domain.Entities;
 using NexTraceOne.Configuration.Domain.Enums;
 
@@ -138,6 +139,37 @@ public sealed class ConfigurationEntryTests
         await entryRepo.Received(1).AddAsync(Arg.Any<ConfigurationEntry>(), Arg.Any<CancellationToken>());
         await auditRepo.Received(1).AddAsync(Arg.Any<ConfigurationAuditEntry>(), Arg.Any<CancellationToken>());
         await uow.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SetConfigurationValue_Should_Publish_Integration_Event()
+    {
+        var defRepo = Substitute.For<IConfigurationDefinitionRepository>();
+        var entryRepo = Substitute.For<IConfigurationEntryRepository>();
+        var auditRepo = Substitute.For<IConfigurationAuditRepository>();
+        var securityService = Substitute.For<IConfigurationSecurityService>();
+        var cache = Substitute.For<IConfigurationCacheService>();
+        var currentUser = CreateUser();
+        var uow = Substitute.For<IUnitOfWork>();
+        var eventBus = Substitute.For<IEventBus>();
+        var definition = CreateDefinition();
+
+        defRepo.GetByKeyAsync("platform.max.retries", Arg.Any<CancellationToken>())
+            .Returns(definition);
+        entryRepo.GetByKeyAndScopeAsync("platform.max.retries", ConfigurationScope.System, null, Arg.Any<CancellationToken>())
+            .Returns((ConfigurationEntry?)null);
+
+        var sut = new SetValueFeature.Handler(defRepo, entryRepo, auditRepo, securityService, cache, currentUser, uow, eventBus);
+        var result = await sut.Handle(
+            new SetValueFeature.Command("platform.max.retries", ConfigurationScope.System, null, "10", "Increase retries"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        await eventBus.Received(1).PublishAsync(
+            Arg.Is<ConfigurationIntegrationEvents.ConfigurationValueChanged>(e =>
+                e.Key == "platform.max.retries" &&
+                e.NewValue == "10"),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
