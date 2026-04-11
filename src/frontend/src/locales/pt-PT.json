@@ -6830,6 +6830,7 @@
       "noData": "Nenhuma versão encontrada para este contrato",
       "apiAssetIdLabel": "ID do Ativo de API",
       "apiAssetIdPlaceholder": "Pesquisar ou introduzir nome do ativo de API",
+      "loadTimeline": "Carregar Linha do Tempo",
       "loadError": "Falha ao carregar linha do tempo. Verifique o ID do Ativo de API."
     },
     "maturityBenchmark": {

@@ -38,4 +38,5 @@ public sealed record DatabaseSearchHit(
     string EntityId,
     string DisplayName,
     string Summary,
-    double RelevanceScore);
+    double RelevanceScore,
+    bool IsTruncated = false);

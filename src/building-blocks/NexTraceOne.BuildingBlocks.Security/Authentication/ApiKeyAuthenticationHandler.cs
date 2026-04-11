@@ -51,7 +51,8 @@ public sealed class ApiKeyAuthenticationHandler(
         if (configuredKey is null)
         {
             Logger.LogWarning(
-                "API key authentication failed: invalid key provided from {RemoteIp}",
+                "API key authentication failed: invalid key provided from {RemoteIp}. " +
+                "Consider implementing per-IP rate limiting for API key failures.",
                 Context.Connection.RemoteIpAddress);
             return Task.FromResult(AuthenticateResult.Fail("Invalid API key."));
         }

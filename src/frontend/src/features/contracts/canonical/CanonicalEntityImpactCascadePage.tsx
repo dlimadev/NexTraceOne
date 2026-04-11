@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { GitBranch, AlertTriangle, CheckCircle2, ChevronRight, ChevronDown } from 'lucide-react';
+import { GitBranch, AlertTriangle, CheckCircle2, ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 import { contractsApi } from '../api/contracts';
 
 type CascadeNode = {
@@ -160,6 +160,14 @@ export function CanonicalEntityImpactCascadePage() {
           </div>
         </div>
       </div>
+
+      {/* Loading */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 size={24} className="animate-spin text-blue-400 mr-2" />
+          <span className="text-slate-400 text-sm">{t('common.loading', 'Loading...')}</span>
+        </div>
+      )}
 
       {/* Error */}
       {isError && (

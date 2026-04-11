@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, AlertTriangle, Zap } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Zap, Loader2 } from 'lucide-react';
 import { contractsApi } from '../api/contracts';
 
 type HealthTimelinePoint = {
@@ -21,6 +21,8 @@ type HealthTimelineResponse = {
   apiAssetId: string;
   points: HealthTimelinePoint[];
 };
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function ScoreBar({ score }: { score: number }) {
   const color = score >= 80 ? 'bg-green-500' : score >= 60 ? 'bg-yellow-500' : 'bg-red-500';
@@ -42,6 +44,7 @@ export function ContractHealthTimelinePage() {
   const { t } = useTranslation();
   const [apiAssetId, setApiAssetId] = useState('');
   const [submittedId, setSubmittedId] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   const { data, isLoading, isError, refetch } = useQuery<HealthTimelineResponse>({
     queryKey: ['contract-health-timeline', submittedId],
@@ -51,8 +54,16 @@ export function ContractHealthTimelinePage() {
   });
 
   const handleAnalyze = () => {
-    if (!apiAssetId.trim()) return;
-    setSubmittedId(apiAssetId.trim());
+    const trimmed = apiAssetId.trim();
+    if (!trimmed) return;
+    if (UUID_REGEX.test(trimmed)) {
+      setValidationError('');
+      setSubmittedId(trimmed);
+    } else {
+      // Accept non-UUID values as search terms (asset names)
+      setValidationError('');
+      setSubmittedId(trimmed);
+    }
   };
 
   const points = data?.points ?? [];
@@ -80,11 +91,14 @@ export function ContractHealthTimelinePage() {
             <input
               type="text"
               value={apiAssetId}
-              onChange={(e) => setApiAssetId(e.target.value)}
+              onChange={(e) => { setApiAssetId(e.target.value); setValidationError(''); }}
               placeholder={t('phase4.healthTimeline.apiAssetIdPlaceholder', 'Search or enter API asset name')}
               className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label={t('phase4.healthTimeline.apiAssetIdLabel', 'API Asset ID')}
             />
+            {validationError && (
+              <p className="text-red-400 text-xs mt-1">{validationError}</p>
+            )}
           </div>
           <div className="flex items-end">
             <button
@@ -92,11 +106,19 @@ export function ContractHealthTimelinePage() {
               disabled={!apiAssetId.trim() || isLoading}
               className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? '...' : t('phase4.healthTimeline.version', 'Load Timeline')}
+              {isLoading ? '...' : t('phase4.healthTimeline.loadTimeline', 'Load Timeline')}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Loading */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 size={24} className="animate-spin text-blue-400 mr-2" />
+          <span className="text-slate-400 text-sm">{t('common.loading', 'Loading...')}</span>
+        </div>
+      )}
 
       {/* Error */}
       {isError && (
@@ -104,6 +126,13 @@ export function ContractHealthTimelinePage() {
           <AlertTriangle size={16} />
           <span className="text-sm">{t('phase4.healthTimeline.loadError', 'Failed to load health timeline. Please verify the API Asset ID.')}</span>
           <button onClick={() => refetch()} className="ml-auto text-xs underline">{t('common.retry', 'Retry')}</button>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!isLoading && !isError && submittedId && !data && (
+        <div className="bg-slate-800 rounded-lg border border-slate-700 p-8 text-center text-slate-400 text-sm">
+          {t('common.noData', 'No data available')}
         </div>
       )}
 

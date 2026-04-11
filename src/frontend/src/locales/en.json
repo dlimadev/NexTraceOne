@@ -6830,6 +6830,7 @@
       "noData": "No versions found for this contract",
       "apiAssetIdLabel": "API Asset ID",
       "apiAssetIdPlaceholder": "Search or enter API asset name",
+      "loadTimeline": "Load Timeline",
       "loadError": "Failed to load health timeline. Please verify the API Asset ID."
     },
     "maturityBenchmark": {
