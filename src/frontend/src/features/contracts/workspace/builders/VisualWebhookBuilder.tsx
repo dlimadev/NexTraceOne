@@ -142,7 +142,7 @@ export function VisualWebhookBuilder({
               label={t('contracts.builder.webhook.name', 'Webhook Name')}
               value={state.name}
               onChange={(v) => update({ name: v })}
-              placeholder="order-created-webhook"
+              placeholder={t('contracts.webhook.placeholder.name', 'order-created-webhook')}
               required
               error={fieldError('name') ? t(fieldError('name')!.messageKey, fieldError('name')!.fallback) : undefined}
               disabled={isReadOnly}
@@ -170,14 +170,14 @@ export function VisualWebhookBuilder({
               label={t('contracts.builder.webhook.contentType', 'Content Type')}
               value={state.contentType}
               onChange={(v) => update({ contentType: v })}
-              placeholder="application/json"
+              placeholder={t('contracts.webhook.placeholder.contentType', 'application/json')}
               disabled={isReadOnly}
             />
             <Field
               label={t('contracts.builder.rest.contact', 'Owner')}
               value={state.owner}
               onChange={(v) => update({ owner: v })}
-              placeholder="integrations-team"
+              placeholder={t('contracts.webhook.placeholder.owner', 'integrations-team')}
               disabled={isReadOnly}
             />
           </div>
@@ -212,7 +212,7 @@ export function VisualWebhookBuilder({
                 label={t('contracts.builder.webhook.secretHeaderName', 'Secret Header Name')}
                 value={state.secretHeaderName}
                 onChange={(v) => update({ secretHeaderName: v })}
-                placeholder="X-Webhook-Secret"
+                placeholder={t('contracts.webhook.placeholder.secretHeader', 'X-Webhook-Secret')}
                 required
                 error={fieldError('secretHeaderName') ? t(fieldError('secretHeaderName')!.messageKey, fieldError('secretHeaderName')!.fallback) : undefined}
                 disabled={isReadOnly}
@@ -262,9 +262,9 @@ export function VisualWebhookBuilder({
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.rest.paramName', 'Name')} value={h.name}
-                          onChange={(v) => updateHeader(h.id, { name: v })} placeholder="X-Custom-Header" required disabled={isReadOnly} />
+                          onChange={(v) => updateHeader(h.id, { name: v })} placeholder={t('contracts.webhook.placeholder.headerName', 'X-Custom-Header')} required disabled={isReadOnly} />
                         <Field label={t('contracts.builder.rest.defaultValue', 'Value')} value={h.value}
-                          onChange={(v) => updateHeader(h.id, { value: v })} placeholder="header-value" disabled={isReadOnly} />
+                          onChange={(v) => updateHeader(h.id, { value: v })} placeholder={t('contracts.webhook.placeholder.headerValue', 'header-value')} disabled={isReadOnly} />
                       </div>
                       <FieldCheckbox label={t('contracts.builder.rest.required', 'Required')} checked={h.required}
                         onChange={(v) => updateHeader(h.id, { required: v })} disabled={isReadOnly} />
@@ -313,7 +313,7 @@ export function VisualWebhookBuilder({
               label={t('contracts.builder.webhook.retryPolicy', 'Retry Policy')}
               value={state.retryPolicy}
               onChange={(v) => update({ retryPolicy: v })}
-              placeholder="exponential-backoff"
+              placeholder={t('contracts.webhook.placeholder.retryStrategy', 'exponential-backoff')}
               disabled={isReadOnly}
             />
           </div>
@@ -321,7 +321,7 @@ export function VisualWebhookBuilder({
             label={t('contracts.builder.webhook.events', 'Trigger Events')}
             tags={state.events}
             onChange={(v) => update({ events: v })}
-            placeholder="order.created, order.updated"
+            placeholder={t('contracts.webhook.placeholder.events', 'order.created, order.updated')}
           />
           <FieldArea
             label={t('contracts.builder.workservice.observability', 'Observability Notes')}

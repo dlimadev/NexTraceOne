@@ -266,7 +266,7 @@ export function ConsumerDrivenContractPage() {
                   type="text"
                   value={newExpectation.consumerServiceName}
                   onChange={(e) => setNewExpectation((p) => ({ ...p, consumerServiceName: e.target.value }))}
-                  placeholder="e.g., checkout-service"
+                  placeholder={t('contracts.cdct.placeholder.serviceName', 'e.g., checkout-service')}
                   className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
                 />
               </div>
@@ -278,7 +278,7 @@ export function ConsumerDrivenContractPage() {
                   type="text"
                   value={newExpectation.consumerDomain}
                   onChange={(e) => setNewExpectation((p) => ({ ...p, consumerDomain: e.target.value }))}
-                  placeholder="e.g., Commerce"
+                  placeholder={t('contracts.cdct.placeholder.domain', 'e.g., Commerce')}
                   className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
                 />
               </div>
