@@ -7089,6 +7089,7 @@
     "high": "Alto",
     "medium": "Medio",
     "low": "Bajo",
+    "analysisPanel": "Análisis Predictivo",
     "noResult": "Complete el formulario para ver los resultados de predicción",
     "loading": "Procesando...",
     "error": "Error al obtener la predicción. Inténtelo de nuevo.",
@@ -7129,6 +7130,7 @@
   "apiPolicyAsCode": {
     "title": "API Policy as Code",
     "subtitle": "Defina y aplique reglas de gobernanza de APIs como políticas versionadas en YAML o JSON con modos de aplicación configurables",
+    "overview": "Descripción General de la Política",
     "registerPolicy": "Registrar Política",
     "policyName": "Nombre de Política (kebab-case)",
     "displayName": "Nombre para Mostrar",

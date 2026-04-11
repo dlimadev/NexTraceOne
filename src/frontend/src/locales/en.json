@@ -7095,6 +7095,7 @@
     "high": "High",
     "medium": "Medium",
     "low": "Low",
+    "analysisPanel": "Predictive Analysis",
     "noResult": "Submit the form to see prediction results",
     "loading": "Running...",
     "error": "Failed to retrieve prediction. Please try again.",
@@ -7135,6 +7136,7 @@
   "apiPolicyAsCode": {
     "title": "API Policy as Code",
     "subtitle": "Define and enforce API governance rules as versioned YAML or JSON policies with configurable enforcement modes",
+    "overview": "Policy Overview",
     "registerPolicy": "Register Policy",
     "policyName": "Policy Name (kebab-case)",
     "displayName": "Display Name",

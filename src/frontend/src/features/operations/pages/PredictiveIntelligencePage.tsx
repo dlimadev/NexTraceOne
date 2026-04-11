@@ -498,7 +498,7 @@ export function PredictiveIntelligencePage() {
         icon={<BrainCircuit size={24} />}
       />
 
-      <PageSection title="">
+      <PageSection title={t('predictiveIntelligence.analysisPanel')}>
         <div className="mb-4 flex gap-1 border-b border-gray-200 dark:border-gray-700">
           <button
             type="button"
