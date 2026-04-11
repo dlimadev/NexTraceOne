@@ -11,8 +11,8 @@
 | Fase | Descrição | Itens | Estado |
 |------|-----------|-------|--------|
 | Fase 1 | Correções Críticas (C-01 a C-05) | 5 | ✅ Concluída |
-| Fase 2 | Correções Altas (H-01 a H-03) | 3 | 🔲 Pendente |
-| Fase 3 | Correções Médias (M-01 a M-03) | 3 | 🔲 Pendente |
+| Fase 2 | Correções Altas (H-01 a H-03) | 3 | ✅ H-02, H-03 concluídas; H-01 diferida (roadmap) |
+| Fase 3 | Correções Médias (M-01 a M-03) | 3 | 🔲 Pendente (Roadmap) |
 
 ---
 
@@ -138,7 +138,7 @@ aria-label={t('common.close')}
 
 **Impacto:** Acessibilidade (WCAG 2.1)
 
-- [ ] H-02.1 — `features/catalog/pages/ServiceDiscoveryPage.tsx:403` — Adicionar `role="dialog"` ao overlay e `role="button"` com aria-label
+- [x] H-02.1 — `features/catalog/pages/ServiceDiscoveryPage.tsx:403` — Adicionado `role="dialog"` e `aria-modal="true"` ao overlay
 
 ---
 
@@ -148,44 +148,46 @@ aria-label={t('common.close')}
 **Abordagem:** Por ficheiro, converter `style={{}}` para classes Tailwind equivalentes.
 
 Ficheiros prioritários (excluindo EnvironmentsPage já tratado em C-03):
-- [ ] H-03.01 — `contracts/workspace/builders/shared/SchemaPropertyEditor.tsx` (5 inline styles)
-- [ ] H-03.02 — `contracts/catalog/components/CatalogTable.tsx`
-- [ ] H-03.03 — `contracts/catalog/components/CatalogToolbar.tsx`
-- [ ] H-03.04 — `contracts/workspace/sections/ApprovalsSection.tsx`
-- [ ] H-03.05 — `contracts/workspace/sections/ContractSection.tsx`
-- [ ] H-03.06 — `contracts/workspace/sections/ScorecardSection.tsx`
-- [ ] H-03.07 — `contracts/workspace/sections/SecuritySection.tsx`
-- [ ] H-03.08 — `contracts/workspace/components/StudioRail.tsx`
-- [ ] H-03.09 — `contracts/governance/ContractGovernancePage.tsx`
-- [ ] H-03.10 — `contracts/governance/ContractHealthTimelinePage.tsx`
-- [ ] H-03.11 — `change-governance/components/ReleasesIntelligenceTab.tsx`
-- [ ] H-03.12 — `change-governance/pages/ChangeCatalogPage.tsx`
-- [ ] H-03.13 — `change-governance/pages/ChangeDetailPage.tsx`
-- [ ] H-03.14 — `governance/pages/CompliancePage.tsx`
-- [ ] H-03.15 — `governance/pages/DomainDetailPage.tsx`
-- [ ] H-03.16 — `governance/pages/EnterpriseControlsPage.tsx`
-- [ ] H-03.17 — `governance/pages/ExecutiveOverviewPage.tsx`
-- [ ] H-03.18 — `governance/pages/MaturityScorecardsPage.tsx`
-- [ ] H-03.19 — `governance/pages/ReportsPage.tsx`
-- [ ] H-03.20 — `governance/pages/ServiceScorecardPage.tsx`
-- [ ] H-03.21 — `governance/pages/TeamDetailPage.tsx`
-- [ ] H-03.22 — `configuration/pages/BrandingAdminPage.tsx`
-- [ ] H-03.23 — `configuration/pages/ParameterComplianceDashboardPage.tsx`
-- [ ] H-03.24 — `catalog/components/DependencyGraph.tsx`
-- [ ] H-03.25 — `catalog/pages/ServiceMaturityPage.tsx`
-- [ ] H-03.26 — `catalog/pages/ServiceScorecardPage.tsx`
-- [ ] H-03.27 — `ai-hub/components/AssistantPanel.tsx` (animation-delay — pode manter)
-- [ ] H-03.28 — `ai-hub/pages/AiAssistantPage.tsx` (animation-delay — pode manter)
-- [ ] H-03.29 — `ai-hub/pages/AiRoutingPage.tsx`
-- [ ] H-03.30 — `ai-hub/pages/TokenBudgetPage.tsx`
-- [ ] H-03.31 — `identity-access/components/AuthCard.tsx`
-- [ ] H-03.32 — `identity-access/components/AuthShell.tsx`
-- [ ] H-03.33 — `product-analytics/pages/AdoptionFunnelPage.tsx`
-- [ ] H-03.34 — `product-analytics/pages/JourneyFunnelPage.tsx`
-- [ ] H-03.35 — `product-analytics/pages/ModuleAdoptionPage.tsx`
-- [ ] H-03.36 — `product-analytics/pages/PersonaUsagePage.tsx`
-- [ ] H-03.37 — `product-analytics/pages/TimeToValuePage.tsx`
-- [ ] H-03.38 — `product-analytics/pages/ValueTrackingPage.tsx`
+- [x] H-03.01 — `contracts/workspace/builders/shared/SchemaPropertyEditor.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.02 — `contracts/catalog/components/CatalogTable.tsx` — Convertido `transitionDuration`
+- [x] H-03.03 — `contracts/catalog/components/CatalogToolbar.tsx` — Convertido 2× `transitionDuration`
+- [x] H-03.04 — `contracts/workspace/sections/ApprovalsSection.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.05 — `contracts/workspace/sections/ContractSection.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.06 — `contracts/workspace/sections/ScorecardSection.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.07 — `contracts/workspace/sections/SecuritySection.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.08 — `contracts/workspace/components/StudioRail.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.09 — `contracts/governance/ContractGovernancePage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.10 — `contracts/governance/ContractHealthTimelinePage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.11 — `change-governance/components/ReleasesIntelligenceTab.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.12 — `change-governance/pages/ChangeCatalogPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.13 — `change-governance/pages/ChangeDetailPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.14 — `governance/pages/CompliancePage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.15 — `governance/pages/DomainDetailPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.16 — `governance/pages/EnterpriseControlsPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.17 — `governance/pages/ExecutiveOverviewPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.18 — `governance/pages/MaturityScorecardsPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.19 — `governance/pages/ReportsPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.20 — `governance/pages/ServiceScorecardPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.21 — `governance/pages/TeamDetailPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.22 — `configuration/pages/BrandingAdminPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.23 — `configuration/pages/ParameterComplianceDashboardPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.24 — `catalog/components/DependencyGraph.tsx` — Convertido `width: '100%'`; altura dinâmica permanece
+- [x] H-03.25 — `catalog/pages/ServiceMaturityPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.26 — `catalog/pages/ServiceScorecardPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.27 — `ai-hub/components/AssistantPanel.tsx` — animation-delay mantido (necessário inline)
+- [x] H-03.28 — `ai-hub/pages/AiAssistantPage.tsx` — animation-delay mantido (necessário inline)
+- [x] H-03.29 — `ai-hub/pages/AiRoutingPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.30 — `ai-hub/pages/TokenBudgetPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.31 — `identity-access/components/AuthCard.tsx` — Convertido boxShadow e gradient
+- [x] H-03.32 — `identity-access/components/AuthShell.tsx` — Convertido 3× gradient backgrounds
+- [x] H-03.33 — `product-analytics/pages/AdoptionFunnelPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.34 — `product-analytics/pages/JourneyFunnelPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.35 — `product-analytics/pages/ModuleAdoptionPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.36 — `product-analytics/pages/PersonaUsagePage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.37 — `product-analytics/pages/TimeToValuePage.tsx` — Sem inline styles convertíveis (dinâmicos)
+- [x] H-03.38 — `product-analytics/pages/ValueTrackingPage.tsx` — Sem inline styles convertíveis (dinâmicos)
+
+**Nota:** A maioria dos inline styles restantes usa valores dinâmicos calculados em runtime (width: `${pct}%`, paddingLeft com nível de aninhamento, cores de tema dinâmicas). Estes NÃO podem ser convertidos para Tailwind pois requerem nomes de classes conhecidos em build-time.
 
 ---
 
