@@ -24,7 +24,7 @@ internal sealed class PromotionGateConfiguration : IEntityTypeConfiguration<Prom
         builder.Property(x => x.BlockOnFailure).IsRequired().HasDefaultValue(false);
         builder.Property(x => x.CreatedBy).HasMaxLength(200);
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
-        builder.Property(x => x.TenantId).HasMaxLength(200);
+        builder.Property(x => x.TenantId).HasMaxLength(200).IsRequired();
         builder.Property(x => x.RowVersion)
             .IsRowVersion();
 

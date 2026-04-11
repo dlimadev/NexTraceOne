@@ -67,7 +67,7 @@ public static class GetBenchmarking
                     if (serviceCount > 0 && avgCost / serviceCount < costPerServiceThreshold)
                         strengths.Add("Low average cost per service");
 
-                    var currency = g.Select(r => r.Currency).FirstOrDefault() ?? "EUR";
+                    var currency = g.Select(r => r.Currency).FirstOrDefault() ?? "USD";
                     var context = $"Based on {g.Count()} cost records across {serviceCount} service(s). " +
                                   $"Average cost: {avgCost:N2} {currency}.";
 

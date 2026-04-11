@@ -19,14 +19,25 @@ internal sealed class IncidentCorrelationService(
     ISender sender,
     ILogger<IncidentCorrelationService> logger) : IIncidentCorrelationService
 {
+    // ── Temporal window thresholds (extractable to configuration) ──
+    private const int CorrelationWindowHoursBefore = 12;
+    private const int CorrelationWindowHoursAfter = 2;
+
+    // ── Confidence score thresholds (extractable to configuration) ──
+    private const decimal HighEvidenceThreshold = 75m;
+    private const decimal PartialEvidenceThreshold = 45m;
+    private const decimal HighConfidenceThreshold = 80m;
+    private const decimal MediumConfidenceThreshold = 45m;
+    private const decimal LowConfidenceThreshold = 20m;
+
     public async Task<GetIncidentCorrelation.Response?> RecomputeAsync(string incidentId, CancellationToken cancellationToken)
     {
         var context = store.GetIncidentCorrelationContext(incidentId);
         if (context is null)
             return null;
 
-        var from = context.DetectedAtUtc.AddHours(-12);
-        var to = context.DetectedAtUtc.AddHours(2);
+        var from = context.DetectedAtUtc.AddHours(-CorrelationWindowHoursBefore);
+        var to = context.DetectedAtUtc.AddHours(CorrelationWindowHoursAfter);
 
         var byServiceId = await sender.Send(new ListChanges.Query(
             ServiceName: null,
@@ -84,9 +95,9 @@ internal sealed class IncidentCorrelationService(
             if (totalScore <= 0m)
                 continue;
 
-            var confidenceStatus = totalScore >= 75m
+            var confidenceStatus = totalScore >= HighEvidenceThreshold
                 ? "HighEvidence"
-                : totalScore >= 45m
+                : totalScore >= PartialEvidenceThreshold
                     ? "PartialEvidence"
                     : "WeakEvidence";
 
@@ -198,9 +209,9 @@ internal sealed class IncidentCorrelationService(
 
     private static CorrelationConfidence MapConfidence(decimal score)
     {
-        if (score >= 80m) return CorrelationConfidence.High;
-        if (score >= 45m) return CorrelationConfidence.Medium;
-        if (score >= 20m) return CorrelationConfidence.Low;
+        if (score >= HighConfidenceThreshold) return CorrelationConfidence.High;
+        if (score >= MediumConfidenceThreshold) return CorrelationConfidence.Medium;
+        if (score >= LowConfidenceThreshold) return CorrelationConfidence.Low;
         return CorrelationConfidence.NotAssessed;
     }
 

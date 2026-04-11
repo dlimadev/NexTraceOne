@@ -41,7 +41,7 @@ internal sealed class ContractListingConfiguration : IEntityTypeConfiguration<Co
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        builder.Property(x => x.TenantId).HasMaxLength(200);
+        builder.Property(x => x.TenantId).HasMaxLength(200).IsRequired();
 
         builder.Property(x => x.RowVersion)
             .IsRowVersion();
