@@ -47,7 +47,8 @@ internal sealed class TeamHealthSnapshotConfiguration : IEntityTypeConfiguration
 
         builder.Property(x => x.TenantId)
             .HasColumnName("tenant_id")
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         // Concorrência otimista via PostgreSQL xmin
         builder.Property(x => x.RowVersion)

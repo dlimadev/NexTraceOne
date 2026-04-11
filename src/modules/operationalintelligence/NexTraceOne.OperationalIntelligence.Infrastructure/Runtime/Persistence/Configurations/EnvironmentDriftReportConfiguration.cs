@@ -44,7 +44,7 @@ internal sealed class EnvironmentDriftReportConfiguration : IEntityTypeConfigura
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.ReviewedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.ReviewComment).HasMaxLength(2000);
-        builder.Property(x => x.TenantId);
+        builder.Property(x => x.TenantId).IsRequired();
 
         builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_ops_environment_drift_reports_tenant_id");
         builder.HasIndex(x => new { x.SourceEnvironment, x.TargetEnvironment, x.GeneratedAt });

@@ -52,7 +52,8 @@ internal sealed class ContractComplianceGateConfiguration : IEntityTypeConfigura
             .IsRequired();
 
         builder.Property(x => x.TenantId)
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         builder.Property(x => x.RowVersion).IsRowVersion();
 

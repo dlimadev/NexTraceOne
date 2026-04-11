@@ -46,7 +46,7 @@ internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
                 value => value.HasValue ? ReleaseId.From(value.Value) : null);
 
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
-        builder.Property(x => x.TenantId).HasColumnName("tenant_id");
+        builder.Property(x => x.TenantId).HasColumnName("tenant_id").IsRequired();
         builder.Property(x => x.EnvironmentId).HasColumnName("environment_id");
 
         builder.HasIndex(x => x.ApiAssetId);

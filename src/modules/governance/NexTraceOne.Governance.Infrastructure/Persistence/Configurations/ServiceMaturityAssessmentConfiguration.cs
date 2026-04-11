@@ -56,7 +56,8 @@ internal sealed class ServiceMaturityAssessmentConfiguration : IEntityTypeConfig
 
         builder.Property(x => x.TenantId)
             .HasColumnName("tenant_id")
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         builder.Property(x => x.LastReassessedAt)
             .HasColumnType("timestamp with time zone");

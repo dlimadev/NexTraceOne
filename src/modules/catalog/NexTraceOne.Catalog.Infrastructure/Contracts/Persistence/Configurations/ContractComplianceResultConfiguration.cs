@@ -45,7 +45,8 @@ internal sealed class ContractComplianceResultConfiguration : IEntityTypeConfigu
             .IsRequired();
 
         builder.Property(x => x.TenantId)
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         builder.Property(x => x.RowVersion).IsRowVersion();
 

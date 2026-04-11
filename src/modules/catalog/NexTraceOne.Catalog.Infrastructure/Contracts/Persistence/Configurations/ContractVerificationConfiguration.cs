@@ -81,7 +81,8 @@ internal sealed class ContractVerificationConfiguration : IEntityTypeConfigurati
             .HasMaxLength(200);
 
         builder.Property(x => x.TenantId)
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         builder.Property(x => x.RowVersion).IsRowVersion();
 

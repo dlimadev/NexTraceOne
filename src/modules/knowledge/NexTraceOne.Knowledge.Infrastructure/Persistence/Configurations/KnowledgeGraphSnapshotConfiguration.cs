@@ -37,7 +37,7 @@ internal sealed class KnowledgeGraphSnapshotConfiguration : IEntityTypeConfigura
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.ReviewedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.ReviewComment).HasMaxLength(2000);
-        builder.Property(x => x.TenantId);
+        builder.Property(x => x.TenantId).IsRequired();
 
         builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_knw_knowledge_graph_snapshots_tenant_id");
         builder.HasIndex(x => x.Status);

@@ -33,7 +33,7 @@ internal sealed class AnomalyNarrativeConfiguration : IEntityTypeConfiguration<A
             .HasConversion<string>()
             .HasMaxLength(50)
             .IsRequired();
-        builder.Property(x => x.TenantId);
+        builder.Property(x => x.TenantId).IsRequired();
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.LastRefreshedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.RefreshCount).IsRequired();

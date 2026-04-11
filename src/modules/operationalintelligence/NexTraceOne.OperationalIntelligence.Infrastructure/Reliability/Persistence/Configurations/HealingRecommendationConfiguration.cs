@@ -46,7 +46,7 @@ internal sealed class HealingRecommendationConfiguration : IEntityTypeConfigurat
         builder.Property(x => x.ErrorMessage).HasMaxLength(4000);
         builder.Property(x => x.EvidenceTrail).HasColumnType("jsonb");
         builder.Property(x => x.GeneratedAt).HasColumnType("timestamp with time zone").IsRequired();
-        builder.Property(x => x.TenantId);
+        builder.Property(x => x.TenantId).IsRequired();
 
         builder.Property(x => x.RowVersion)
             .HasColumnName("xmin")

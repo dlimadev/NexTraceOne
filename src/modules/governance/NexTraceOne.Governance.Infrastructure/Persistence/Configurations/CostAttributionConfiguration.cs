@@ -64,7 +64,8 @@ internal sealed class CostAttributionConfiguration : IEntityTypeConfiguration<Co
 
         builder.Property(x => x.TenantId)
             .HasColumnName("tenant_id")
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         // Optimistic concurrency via PostgreSQL xmin
         builder.Property(x => x.RowVersion).IsRowVersion();

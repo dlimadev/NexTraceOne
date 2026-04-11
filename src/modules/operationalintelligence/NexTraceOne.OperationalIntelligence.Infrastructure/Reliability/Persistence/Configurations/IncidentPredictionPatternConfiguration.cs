@@ -50,7 +50,7 @@ internal sealed class IncidentPredictionPatternConfiguration : IEntityTypeConfig
         builder.Property(x => x.DetectedAt).HasColumnType("timestamp with time zone").IsRequired();
         builder.Property(x => x.ValidatedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.ValidationComment).HasMaxLength(2000);
-        builder.Property(x => x.TenantId);
+        builder.Property(x => x.TenantId).IsRequired();
 
         builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_ops_reliability_incident_prediction_patterns_tenant_id");
         builder.HasIndex(x => x.Environment);

@@ -31,7 +31,8 @@ internal sealed class RolePermissionConfiguration : IEntityTypeConfiguration<Rol
         builder.Property(x => x.TenantId)
             .HasConversion(
                 id => id == null ? (Guid?)null : id.Value,
-                value => value.HasValue ? TenantId.From(value.Value) : null);
+                value => value.HasValue ? TenantId.From(value.Value) : null)
+            .IsRequired();
 
         builder.Property(x => x.GrantedAt).IsRequired();
         builder.Property(x => x.GrantedBy).HasMaxLength(200);
