@@ -135,7 +135,7 @@ export function VisualSharedSchemaBuilder({
               label={t('contracts.builder.sharedSchema.name', 'Schema Name')}
               value={state.name}
               onChange={(v) => update({ name: v })}
-              placeholder="UserProfile"
+              placeholder={t('contracts.sharedSchema.placeholder.schemaName', 'UserProfile')}
               required
               error={fieldError('name') ? t(fieldError('name')!.messageKey, fieldError('name')!.fallback) : undefined}
               disabled={isReadOnly}
@@ -154,7 +154,7 @@ export function VisualSharedSchemaBuilder({
               label={t('contracts.builder.sharedSchema.namespace', 'Namespace')}
               value={state.namespace}
               onChange={(v) => update({ namespace: v })}
-              placeholder="com.example.schemas"
+              placeholder={t('contracts.sharedSchema.placeholder.namespace', 'com.example.schemas')}
               mono
               disabled={isReadOnly}
             />
@@ -162,7 +162,7 @@ export function VisualSharedSchemaBuilder({
               label={t('contracts.builder.rest.contact', 'Owner')}
               value={state.owner}
               onChange={(v) => update({ owner: v })}
-              placeholder="platform-team"
+              placeholder={t('contracts.sharedSchema.placeholder.owner', 'platform-team')}
               disabled={isReadOnly}
             />
           </div>

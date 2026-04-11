@@ -130,7 +130,7 @@ export function VisualSoapBuilder({
               label={t('contracts.builder.soap.serviceName', 'Service Name')}
               value={state.serviceName}
               onChange={(v) => update({ serviceName: v })}
-              placeholder="UserService"
+              placeholder={t('contracts.soap.placeholder.serviceName', 'UserService')}
               required
               error={fieldError('serviceName') ? t(fieldError('serviceName')!.messageKey, fieldError('serviceName')!.fallback) : undefined}
               disabled={isReadOnly}
@@ -147,7 +147,7 @@ export function VisualSoapBuilder({
             label={t('contracts.builder.soap.namespace', 'Target Namespace')}
             value={state.targetNamespace}
             onChange={(v) => update({ targetNamespace: v })}
-            placeholder="http://example.com/service"
+            placeholder={t('contracts.soap.placeholder.wsdlUrl', 'http://example.com/service')}
             required
             mono
             disabled={isReadOnly}
@@ -156,7 +156,7 @@ export function VisualSoapBuilder({
             label={t('contracts.builder.soap.endpoint', 'Endpoint URL')}
             value={state.endpoint}
             onChange={(v) => update({ endpoint: v })}
-            placeholder="https://api.example.com/service"
+            placeholder={t('contracts.soap.placeholder.endpointUrl', 'https://api.example.com/service')}
             mono
             disabled={isReadOnly}
           />
@@ -171,7 +171,7 @@ export function VisualSoapBuilder({
             label={t('contracts.builder.soap.namespaces', 'Additional Namespaces')}
             tags={state.namespaces}
             onChange={(v) => update({ namespaces: v })}
-            placeholder="http://schemas.example.com/types"
+            placeholder={t('contracts.soap.placeholder.namespace', 'http://schemas.example.com/types')}
           />
           <FieldArea
             label={t('contracts.builder.soap.securityPolicy', 'Security Policy')}
@@ -224,16 +224,16 @@ export function VisualSoapBuilder({
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.soap.operationName', 'Operation Name')} value={op.name}
-                          onChange={(v) => updateOp(op.id, { name: v })} placeholder="GetUser" required disabled={isReadOnly} />
+                          onChange={(v) => updateOp(op.id, { name: v })} placeholder={t('contracts.soap.placeholder.operationName', 'GetUser')} required disabled={isReadOnly} />
                         <Field label={t('contracts.builder.soap.soapAction', 'SOAP Action')} value={op.soapAction}
-                          onChange={(v) => updateOp(op.id, { soapAction: v })} placeholder="urn:GetUser" mono disabled={isReadOnly} />
+                          onChange={(v) => updateOp(op.id, { soapAction: v })} placeholder={t('contracts.soap.placeholder.soapAction', 'urn:GetUser')} mono disabled={isReadOnly} />
                       </div>
                       <Field label={t('contracts.builder.soap.inputMessage', 'Input Message')} value={op.inputMessage}
-                        onChange={(v) => updateOp(op.id, { inputMessage: v })} placeholder="GetUserRequest" mono disabled={isReadOnly} />
+                        onChange={(v) => updateOp(op.id, { inputMessage: v })} placeholder={t('contracts.soap.placeholder.inputMessage', 'GetUserRequest')} mono disabled={isReadOnly} />
                       <Field label={t('contracts.builder.soap.outputMessage', 'Output Message')} value={op.outputMessage}
-                        onChange={(v) => updateOp(op.id, { outputMessage: v })} placeholder="GetUserResponse" mono disabled={isReadOnly} />
+                        onChange={(v) => updateOp(op.id, { outputMessage: v })} placeholder={t('contracts.soap.placeholder.outputMessage', 'GetUserResponse')} mono disabled={isReadOnly} />
                       <Field label={t('contracts.builder.soap.faultMessage', 'Fault Message')} value={op.faultMessage}
-                        onChange={(v) => updateOp(op.id, { faultMessage: v })} placeholder="ServiceFault" mono disabled={isReadOnly} />
+                        onChange={(v) => updateOp(op.id, { faultMessage: v })} placeholder={t('contracts.soap.placeholder.faultMessage', 'ServiceFault')} mono disabled={isReadOnly} />
                       <FieldArea label={t('contracts.builder.soap.opDescription', 'Description')} value={op.description}
                         onChange={(v) => updateOp(op.id, { description: v })} rows={2} disabled={isReadOnly} />
                     </div>

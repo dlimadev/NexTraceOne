@@ -218,7 +218,7 @@ export function SchemaCompositionEditor({
                   type="text"
                   value={discriminator?.propertyName ?? ''}
                   onChange={(e) => updateDiscriminator({ propertyName: e.target.value })}
-                  placeholder="type"
+                  placeholder={t('contracts.schema.placeholder.compositionType', 'type')}
                   disabled={isReadOnly}
                   className="w-full text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
                 />

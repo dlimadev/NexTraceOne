@@ -171,7 +171,7 @@ export function ApiPolicyAsCodePage() {
                     type="text"
                     className={inputClass}
                     value={registerForm.name}
-                    placeholder="my-api-policy"
+                    placeholder={t('governance.policyAsCode.placeholder.policyName', 'my-api-policy')}
                     onChange={(e) => setRegisterForm((f) => ({ ...f, name: e.target.value }))}
                     required
                   />

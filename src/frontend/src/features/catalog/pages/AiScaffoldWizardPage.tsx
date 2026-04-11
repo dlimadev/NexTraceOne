@@ -320,7 +320,7 @@ export function AiScaffoldWizardPage() {
               </label>
               <input
                 className={INPUT_CLASS}
-                placeholder="Payment, Refund, Statement"
+                placeholder={t('catalog.scaffold.placeholder.domainEntities', 'Payment, Refund, Statement')}
                 value={mainEntities}
                 onChange={e => setMainEntities(e.target.value)}
               />

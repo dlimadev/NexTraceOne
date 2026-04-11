@@ -393,7 +393,7 @@ function ReadinessTab({
               className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
               value={serviceName}
               onChange={e => setServiceName(e.target.value)}
-              placeholder="e.g. payment-service"
+              placeholder={t('aiHub.analysis.placeholder.serviceName', 'e.g. payment-service')}
             />
           </div>
           <div>
@@ -402,7 +402,7 @@ function ReadinessTab({
               className="w-full rounded border border-edge bg-elevated px-3 py-2 text-sm text-muted focus:border-accent focus:outline-none"
               value={version}
               onChange={e => setVersion(e.target.value)}
-              placeholder="e.g. 2.1.0"
+              placeholder={t('aiHub.analysis.placeholder.version', 'e.g. 2.1.0')}
             />
           </div>
           <div className="sm:col-span-2">

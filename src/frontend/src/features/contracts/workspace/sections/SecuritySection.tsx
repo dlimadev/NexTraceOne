@@ -130,7 +130,7 @@ export function SecuritySection({ specContent, protocol, isReadOnly = false, onS
               value={fields.authorizationModel}
               onChange={(v) => update('authorizationModel', v)}
               disabled={isReadOnly}
-              placeholder="RBAC, ABAC, Scope-based..."
+              placeholder={t('contracts.security.placeholder.authMechanisms', 'RBAC, ABAC, Scope-based...')}
             />
           </div>
           <Field
@@ -138,7 +138,7 @@ export function SecuritySection({ specContent, protocol, isReadOnly = false, onS
             value={fields.scopes}
             onChange={(v) => update('scopes', v)}
             disabled={isReadOnly}
-            placeholder="read:users, write:users, admin"
+            placeholder={t('contracts.security.placeholder.scopes', 'read:users, write:users, admin')}
           />
           <div className="grid grid-cols-2 gap-3">
             <Field
@@ -146,14 +146,14 @@ export function SecuritySection({ specContent, protocol, isReadOnly = false, onS
               value={fields.roles}
               onChange={(v) => update('roles', v)}
               disabled={isReadOnly}
-              placeholder="Admin, Editor, Viewer"
+              placeholder={t('contracts.security.placeholder.roles', 'Admin, Editor, Viewer')}
             />
             <Field
               label={t('contracts.security.claims', 'Claims')}
               value={fields.claims}
               onChange={(v) => update('claims', v)}
               disabled={isReadOnly}
-              placeholder="sub, aud, tenant_id"
+              placeholder={t('contracts.security.placeholder.claims', 'sub, aud, tenant_id')}
             />
           </div>
         </CardBody>
