@@ -63,12 +63,10 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
       {/* Background radial halos */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
-          className="absolute top-[-15%] left-[-5%] w-[55%] h-[55%] rounded-full blur-[140px]"
-          style={{ background: 'radial-gradient(circle, rgba(27,127,232,0.10) 0%, transparent 70%)' }}
+          className="absolute top-[-15%] left-[-5%] w-[55%] h-[55%] rounded-full blur-[140px] bg-[radial-gradient(circle,rgba(27,127,232,0.10)_0%,transparent_70%)]"
         />
         <div
-          className="absolute bottom-[-20%] right-[-10%] w-[45%] h-[50%] rounded-full blur-[120px]"
-          style={{ background: 'radial-gradient(circle, rgba(18,196,232,0.07) 0%, transparent 70%)' }}
+          className="absolute bottom-[-20%] right-[-10%] w-[45%] h-[50%] rounded-full blur-[120px] bg-[radial-gradient(circle,rgba(18,196,232,0.07)_0%,transparent_70%)]"
         />
       </div>
 
@@ -79,16 +77,11 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
 
       {/* Left panel: Illustration + Branding — hidden below lg */}
       <div
-        className="hidden lg:flex lg:w-1/2 flex-col justify-center p-12 xl:p-16 relative"
-        style={{ background: 'var(--t-sidebar-gradient)' }}
+        className="hidden lg:flex lg:w-1/2 flex-col justify-center p-12 xl:p-16 relative bg-[var(--t-sidebar-gradient)]"
       >
         {/* Subtle grid overlay */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(129,170,214,1) 1px, transparent 1px), linear-gradient(90deg, rgba(129,170,214,1) 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
-          }}
+          className="absolute inset-0 pointer-events-none opacity-[0.03] [background-image:linear-gradient(rgba(129,170,214,1)_1px,transparent_1px),linear-gradient(90deg,rgba(129,170,214,1)_1px,transparent_1px)] [background-size:48px_48px]"
           aria-hidden="true"
         />
 

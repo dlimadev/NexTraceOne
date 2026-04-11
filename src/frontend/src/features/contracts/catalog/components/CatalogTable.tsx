@@ -204,8 +204,7 @@ function CatalogRow({ item }: { item: CatalogItem }) {
 
   return (
     <tr
-      className="hover:bg-elevated/40 transition-colors cursor-pointer group"
-      style={{ transitionDuration: 'var(--nto-motion-fast)' }}
+      className="hover:bg-elevated/40 transition-colors cursor-pointer group duration-[var(--nto-motion-fast)]"
       onClick={() => navigate(`/contracts/${item.versionId}`)}
     >
       {/* Name + domain */}

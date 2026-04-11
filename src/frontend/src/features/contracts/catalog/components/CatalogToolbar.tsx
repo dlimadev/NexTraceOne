@@ -78,11 +78,11 @@ export function CatalogToolbar({
           onClick={() => setExpanded((v) => !v)}
           className={cn(
             'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-medium transition-colors',
+            'duration-[var(--nto-motion-fast)]',
             expanded || filterCount > 0
               ? 'bg-accent-muted text-cyan border-edge-focus'
               : 'bg-elevated text-muted border-edge hover:border-edge-strong hover:text-body',
           )}
-          style={{ transitionDuration: 'var(--nto-motion-fast)' }}
         >
           <SlidersHorizontal size={13} />
           {t('contracts.catalog.filters.label', 'Filters')}
@@ -220,8 +220,8 @@ function InlineSelect({
         'h-8 text-xs rounded-lg border px-2.5 pr-7 appearance-none bg-elevated transition-colors',
         'focus:outline-none focus:border-edge-focus focus:shadow-glow-cyan',
         value ? 'text-heading border-edge-focus' : 'text-muted border-edge',
+        'duration-[var(--nto-motion-fast)]',
       )}
-      style={{ transitionDuration: 'var(--nto-motion-fast)' }}
     >
       <option value="">{placeholder}</option>
       {options.map((o) => (
