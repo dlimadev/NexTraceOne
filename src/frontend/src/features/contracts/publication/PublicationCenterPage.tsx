@@ -8,6 +8,7 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer } from '../../../components/shell';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { LoadingState } from '../shared/components/StateIndicators';
 import {
   usePublicationCenterEntries,
@@ -93,7 +94,9 @@ export function PublicationCenterPage() {
       </div>
 
       {/* Entries list */}
-      {entriesQuery.isLoading ? (
+      {entriesQuery.isError ? (
+        <PageErrorState onRetry={() => entriesQuery.refetch()} />
+      ) : entriesQuery.isLoading ? (
         <LoadingState />
       ) : !entriesQuery.data?.items.length ? (
         <EmptyState
@@ -164,8 +167,6 @@ export function PublicationCenterPage() {
           </CardBody>
         </Card>
       )}
-
-      {/* Withdraw confirmation dialog */}
       {withdrawTarget && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card rounded-lg border border-edge p-6 w-full max-w-md">
