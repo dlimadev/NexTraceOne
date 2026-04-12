@@ -1,8 +1,8 @@
 # NexTraceOne — Frontend Correction Plan
 
-**Data:** 2026-04-11  
+**Data:** 2026-04-11 (atualizado 2026-04-12)  
 **Baseado em:** [FRONTEND-AUDIT-REPORT.md](./FRONTEND-AUDIT-REPORT.md)  
-**Estado:** Em execução
+**Estado:** Fases 1 e 2 concluídas; Fase 3 em roadmap
 
 ---
 
@@ -11,8 +11,15 @@
 | Fase | Descrição | Itens | Estado |
 |------|-----------|-------|--------|
 | Fase 1 | Correções Críticas (C-01 a C-05) | 5 | ✅ Concluída |
-| Fase 2 | Correções Altas (H-01 a H-03) | 3 | ✅ H-02, H-03 concluídas; H-01 diferida (roadmap) |
+| Fase 2 | Correções Altas (H-01 a H-03) | 3 | ✅ Concluída |
 | Fase 3 | Correções Médias (M-01 a M-03) | 3 | 🔲 Pendente (Roadmap) |
+
+### Correções Adicionais (descobertas durante execução)
+
+| Descrição | Estado |
+|-----------|--------|
+| 50 placeholders hardcoded adicionais (não incluídos no audit original) | ✅ Concluída |
+| 2 testes pre-existentes falhando (DependencyDashboardPage, WebhookSubscriptionsPage) | ✅ Concluída |
 
 ---
 
@@ -126,11 +133,11 @@ aria-label={t('common.close')}
 **Impacto:** Manutenibilidade + Performance  
 **Estratégia:** Extrair sub-componentes lógicos (tabs, secções, modais) para ficheiros separados no mesmo diretório.
 
-- [ ] H-01.1 — `AiAssistantPage.tsx` (1.213 linhas) → Extrair ChatMessageList, ChatInput, SuggestionPanel
-- [ ] H-01.2 — `VisualRestBuilder.tsx` (1.124 linhas) → Extrair EndpointEditor, ResponseEditor, ParameterEditor
-- [ ] H-01.3 — `AssistantPanel.tsx` (1.004 linhas) → Extrair MessageBubble, TypingIndicator, ContextPanel
-- [ ] H-01.4 — `ServiceCatalogPage.tsx` (1.001 linhas) → Extrair CatalogFilters, CatalogGrid, CatalogTable
-- [ ] H-01.5 — `DeveloperPortalPage.tsx` (991 linhas) → Extrair PortalSidebar, ApiExplorer, SchemaViewer
+- [x] H-01.1 — `AiAssistantPage.tsx` (1.213→733 linhas) → Extraídos: ChatSidebar, ChatMessageItem, AgentsSidePanel, SuggestedPrompts, AiAssistantTypes
+- [x] H-01.2 — `VisualRestBuilder.tsx` (1.124→923 linhas) → Extraídos: RestBuilderHelpers, ParameterConstraintsPanel, CollapsibleSubSection
+- [x] H-01.3 — `AssistantPanel.tsx` (1.004→443 linhas) → Extraídos: AssistantPanelTypes, AssistantMessageBubble
+- [x] H-01.4 — `ServiceCatalogPage.tsx` (1.001→547 linhas) → Extraídos: ImpactPanel, TemporalPanel, ServiceDetailPanel
+- [x] H-01.5 — `DeveloperPortalPage.tsx` (991→424 linhas) → Extraídos: DevPortalSubscriptionsTab, DevPortalPlaygroundTab, DevPortalInboxTab
 
 ---
 
