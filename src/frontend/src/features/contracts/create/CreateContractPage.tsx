@@ -533,7 +533,7 @@ export function CreateContractPage() {
                       type="text"
                       value={soapTargetNamespace}
                       onChange={(e) => setSoapTargetNamespace(e.target.value)}
-                      placeholder="http://example.com/service"
+                      placeholder={t('contracts.create.placeholder.soapTargetNamespace', 'http://example.com/service')}
                       className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
                     />
                   </div>
@@ -562,7 +562,7 @@ export function CreateContractPage() {
                         type="text"
                         value={soapEndpointUrl}
                         onChange={(e) => setSoapEndpointUrl(e.target.value)}
-                        placeholder="http://example.com/service"
+                        placeholder={t('contracts.create.placeholder.soapEndpointUrl', 'http://example.com/service')}
                         className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
                       />
                     </div>

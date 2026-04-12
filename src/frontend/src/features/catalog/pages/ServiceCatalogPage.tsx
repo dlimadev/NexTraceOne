@@ -359,14 +359,14 @@ export function ServiceCatalogPage() {
                     <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.documentationUrl', 'Documentation URL')}</label>
                     <input type="url" value={serviceForm.documentationUrl}
                       onChange={(e) => setServiceForm((f) => ({ ...f, documentationUrl: e.target.value }))}
-                      placeholder="https://docs.company.com/payment-service"
+                      placeholder={t('catalog.detail.placeholder.documentationUrl', 'https://docs.company.com/payment-service')}
                       className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.repositoryUrl', 'Repository URL')}</label>
                     <input type="url" value={serviceForm.repositoryUrl}
                       onChange={(e) => setServiceForm((f) => ({ ...f, repositoryUrl: e.target.value }))}
-                      placeholder="https://github.com/org/payment-service"
+                      placeholder={t('catalog.detail.placeholder.repositoryUrl', 'https://github.com/org/payment-service')}
                       className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
                   </div>
                 </div>

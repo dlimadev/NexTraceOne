@@ -299,14 +299,14 @@ export function VisualWebhookBuilder({
               label={t('contracts.builder.webhook.retryCount', 'Retry Count')}
               value={state.retryCount}
               onChange={(v) => update({ retryCount: v })}
-              placeholder="3"
+              placeholder={t('contracts.builder.webhook.placeholder.retryCount', '3')}
               disabled={isReadOnly}
             />
             <Field
               label={t('contracts.builder.webhook.timeout', 'Timeout (seconds)')}
               value={state.timeout}
               onChange={(v) => update({ timeout: v })}
-              placeholder="30"
+              placeholder={t('contracts.builder.webhook.placeholder.timeout', '30')}
               disabled={isReadOnly}
             />
             <Field

@@ -49,9 +49,9 @@ function renderPage() {
 describe('WebhookSubscriptionsPage', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
-  it('renders page heading', () => {
+  it('renders page heading', async () => {
     renderPage();
-    expect(screen.getByText('Webhook Subscriptions')).toBeInTheDocument();
+    expect(await screen.findByText('Webhook Subscriptions')).toBeInTheDocument();
   });
 
   it('renders available event types section', async () => {
@@ -61,9 +61,9 @@ describe('WebhookSubscriptionsPage', () => {
     });
   });
 
-  it('renders register webhook button', () => {
+  it('renders register webhook button', async () => {
     renderPage();
-    expect(screen.getByText('Register Webhook')).toBeInTheDocument();
+    expect(await screen.findByText('Register Webhook')).toBeInTheDocument();
   });
 
   it('shows existing subscriptions after load', async () => {

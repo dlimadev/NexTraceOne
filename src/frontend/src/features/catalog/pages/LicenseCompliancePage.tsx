@@ -165,7 +165,7 @@ export function LicenseCompliancePage() {
                   type="text"
                   value={serviceId}
                   onChange={(e) => setServiceId(e.target.value)}
-                  placeholder="00000000-0000-0000-0000-000000000000"
+                  placeholder={t('catalog.license.placeholder.serviceId', '00000000-0000-0000-0000-000000000000')}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>

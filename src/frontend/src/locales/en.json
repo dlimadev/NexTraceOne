@@ -1280,7 +1280,11 @@
       "viewChange": "View change",
       "viewContract": "View Contract",
       "viewIncident": "View incident",
-      "visibility": "Visibility"
+      "visibility": "Visibility",
+      "placeholder": {
+        "documentationUrl": "https://docs.company.com/payment-service",
+        "repositoryUrl": "https://github.com/org/payment-service"
+      }
     },
     "discovery": {
       "actions": {
@@ -1351,7 +1355,8 @@
     },
     "scaffold": {
       "placeholder": {
-        "domainEntities": "Payment, Refund, Statement"
+        "domainEntities": "Payment, Refund, Statement",
+        "serviceName": "payment-api"
       }
     },
     "search": {
@@ -1399,7 +1404,38 @@
       "total": "Total Services"
     },
     "title": "Service Catalog",
-    "totalCount": "({{count}} total)"
+    "totalCount": "({{count}} total)",
+    "registration": {
+      "placeholder": {
+        "documentationUrl": "https://docs.example.com/service",
+        "repositoryUrl": "https://github.com/org/repo"
+      }
+    },
+    "links": {
+      "placeholder": {
+        "url": "https://..."
+      }
+    },
+    "license": {
+      "placeholder": {
+        "serviceId": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    "security": {
+      "placeholder": {
+        "filePath": "src/MyController.cs"
+      }
+    },
+    "template": {
+      "placeholder": {
+        "slug": "payment-api",
+        "version": "1.0.0",
+        "tags": "ddd, clean-architecture, payments",
+        "repoUrl": "https://github.com/org/template-name",
+        "repoBranch": "main",
+        "baseContractSpec": "openapi: 3.0.0\ninfo:\n  title: Payment API\n  version: 1.0.0\npaths: ..."
+      }
+    }
   },
   "catalogContractsConfig": {
     "actions": {
@@ -2927,7 +2963,10 @@
     },
     "branding": {
       "subtitle": "Customize the visual identity and default experience for the platform and tenants.",
-      "title": "Branding & Defaults"
+      "title": "Branding & Defaults",
+      "placeholder": {
+        "colorHex": "#3B82F6"
+      }
     },
     "category": {
       "bootstrap": "Bootstrap",
@@ -3278,7 +3317,17 @@
         "queueName": "Queue Name",
         "title": "Legacy Contract Builder",
         "totalLength": "Total Record Length (bytes)",
-        "transactionId": "CICS Transaction ID"
+        "transactionId": "CICS Transaction ID",
+        "placeholder": {
+          "version": "1.0.0",
+          "totalLength": "1024",
+          "owner": "mainframe-team",
+          "commareaLength": "2048",
+          "fieldLevel": "05",
+          "fieldLength": "30",
+          "fieldOffset": "0",
+          "fieldOccurs": "10"
+        }
       },
       "rest": {
         "addArray": "Array",
@@ -3403,7 +3452,10 @@
         "warnEmptyBody": "Request body exists but has no schema or properties defined",
         "warnMissingPathParam": "Path parameter '{{param}}' is used in path but not declared",
         "warnNo2xx": "No 2xx success response defined",
-        "writeOnly": "Write Only"
+        "writeOnly": "Write Only",
+        "placeholder": {
+          "pattern": "^[a-z]+$"
+        }
       },
       "sharedSchema": {
         "addProperty": "Add Property",
@@ -3414,7 +3466,11 @@
         "name": "Schema Name",
         "namespace": "Namespace",
         "noProperties": "No properties defined yet. Add your first schema property.",
-        "title": "Shared Schema Builder"
+        "title": "Shared Schema Builder",
+        "placeholder": {
+          "version": "1.0.0",
+          "propertyName": "userId"
+        }
       },
       "soap": {
         "addOperation": "Add Operation",
@@ -3514,7 +3570,11 @@
         "timeout": "Timeout (seconds)",
         "title": "Webhook Builder",
         "urlPattern": "URL Pattern",
-        "urlPatternPlaceholder": "https://example.com/webhooks/{event}"
+        "urlPatternPlaceholder": "https://example.com/webhooks/{event}",
+        "placeholder": {
+          "retryCount": "3",
+          "timeout": "30"
+        }
       },
       "workservice": {
         "addDep": "Add Dependency",
@@ -3569,7 +3629,37 @@
         "trigger": "Trigger & Schedule",
         "triggerType": "Trigger Type",
         "validate": "Validate",
-        "webhookUrl": "Webhook Path"
+        "webhookUrl": "Webhook Path",
+        "placeholder": {
+          "eventNameProduced": "OrderProcessed",
+          "targetTopicProduced": "orders.processed",
+          "cronSchedule": "0 */5 * * *",
+          "webhookPath": "/webhooks/process",
+          "retries": "3",
+          "timeout": "300",
+          "healthCheck": "/health"
+        }
+      },
+      "eventBuilder": {
+        "placeholder": {
+          "version": "1.0.0",
+          "eventVersion": "1.0.0",
+          "retention": "7d",
+          "partitions": "3",
+          "retries": "3"
+        }
+      },
+      "schemaComposition": {
+        "placeholder": {
+          "ref": "#/components/schemas/MySchema"
+        }
+      },
+      "schemaProperty": {
+        "placeholder": {
+          "refAddress": "#/components/schemas/Address",
+          "refArrayItem": "#/components/schemas/OrderItem",
+          "pattern": "^[a-z]+$"
+        }
       }
     },
     "canonical": {
@@ -3779,7 +3869,11 @@
       "typeDescSoap": "Create a SOAP service contract with WSDL",
       "typeDescWebhook": "Define a webhook integration contract with payload schema",
       "wsdlPlaceholder": "Paste the WSDL XML specification here...",
-      "wsdlXmlHint": "Use valid WSDL 1.1/2.0 XML and include imports when required."
+      "wsdlXmlHint": "Use valid WSDL 1.1/2.0 XML and include imports when required.",
+      "placeholder": {
+        "soapTargetNamespace": "http://example.com/service",
+        "soapEndpointUrl": "http://example.com/service"
+      }
     },
     "createVersion": "Create Version",
     "createVersionDescription": "Create a new version from an existing contract",
@@ -4343,7 +4437,21 @@
         "team": "Team",
         "technicalDescription": "Technical Description",
         "technicalName": "Technical Name",
-        "visibility": "Visibility"
+        "visibility": "Visibility",
+        "placeholder": {
+          "friendlyName": "e.g., User Management API",
+          "functionalDescription": "What business capability does this service provide?",
+          "technicalDescription": "Technical architecture, stack, integration notes...",
+          "domain": "Payments",
+          "capability": "Payment Processing",
+          "product": "Checkout Platform",
+          "owner": "john.doe@company.com",
+          "team": "Team Payments",
+          "tags": "payments, checkout, pci (comma separated)",
+          "sla": "99.9% uptime",
+          "slo": "p99 < 200ms",
+          "externalLinks": "Runbook, wiki, monitoring dashboard URLs (one per line)"
+        }
       },
       "dependencies": {
         "downstream": "Downstream",
@@ -4589,6 +4697,12 @@
       "visualBuilder": "Visual",
       "visualBuilderDescription": "Design your contract visually without writing specification code. Configure endpoints, schemas, security and more through an intuitive form-based interface.",
       "visualBuilderTitle": "Visual Builder"
+    },
+    "playground": {
+      "placeholder": {
+        "path": "/api/v1/resource",
+        "body": "{}"
+      }
     }
   },
   "dashboard": {
@@ -4657,7 +4771,11 @@
     "totalDependencies": "Total Dependencies",
     "vulnerabilityCount": "Vulnerabilities",
     "vulnerableServices": "Vulnerable Services",
-    "warning": "Warning"
+    "warning": "Warning",
+    "placeholder": {
+      "scanServiceId": "00000000-0000-0000-0000-000000000000",
+      "healthServiceId": "00000000-0000-0000-0000-000000000000"
+    }
   },
   "developerExperienceScore": {
     "cognitiveLoad": "Cognitive Load",
@@ -5285,7 +5403,8 @@
     },
     "policyAsCode": {
       "placeholder": {
-        "policyName": "my-api-policy"
+        "policyName": "my-api-policy",
+        "version": "1.0.0"
       }
     },
     "risk": {
@@ -8507,7 +8626,10 @@
     "subtitle": "Configure outbound webhooks to receive NexTraceOne events in external systems",
     "targetUrl": "Target URL",
     "title": "Webhook Subscriptions",
-    "webhookName": "Webhook Name"
+    "webhookName": "Webhook Name",
+    "placeholder": {
+      "targetUrl": "https://"
+    }
   },
   "workflow": {
     "allInstances": "All Workflow Instances",

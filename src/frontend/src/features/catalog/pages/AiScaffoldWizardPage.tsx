@@ -290,7 +290,7 @@ export function AiScaffoldWizardPage() {
               </label>
               <input
                 className={INPUT_CLASS}
-                placeholder="payment-api"
+                placeholder={t('catalog.scaffold.placeholder.serviceName', 'payment-api')}
                 value={serviceName}
                 onChange={e =>
                   setServiceName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))

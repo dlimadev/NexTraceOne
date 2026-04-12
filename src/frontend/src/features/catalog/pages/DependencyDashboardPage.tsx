@@ -178,7 +178,7 @@ export function DependencyDashboardPage() {
                   type="text"
                   value={scanServiceId}
                   onChange={(e) => setScanServiceId(e.target.value)}
-                  placeholder="00000000-0000-0000-0000-000000000000"
+                  placeholder={t('dependencyDashboard.placeholder.scanServiceId', '00000000-0000-0000-0000-000000000000')}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>
@@ -293,7 +293,7 @@ export function DependencyDashboardPage() {
                   value={healthServiceId}
                   onChange={(e) => setHealthServiceId(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleFetchHealth()}
-                  placeholder="00000000-0000-0000-0000-000000000000"
+                  placeholder={t('dependencyDashboard.placeholder.healthServiceId', '00000000-0000-0000-0000-000000000000')}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 />
               </div>

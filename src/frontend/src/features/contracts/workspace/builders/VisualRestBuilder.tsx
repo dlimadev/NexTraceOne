@@ -1046,7 +1046,7 @@ function ParameterConstraintsPanel({
             <div>
               <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.pattern', 'Pattern (Regex)')}</label>
               <input type="text" value={constraints.pattern ?? ''} onChange={(e) => update({ pattern: e.target.value || undefined })}
-                placeholder="^[a-z]+$" className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body font-mono" disabled={isReadOnly} />
+                placeholder={t('contracts.builder.rest.placeholder.pattern', '^[a-z]+$')} className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body font-mono" disabled={isReadOnly} />
             </div>
           </>
         )}

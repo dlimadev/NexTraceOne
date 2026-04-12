@@ -133,7 +133,7 @@ export function VisualEventBuilder({
             <Field label={t('contracts.builder.event.title', 'Title')} value={state.title}
               onChange={(v) => update({ title: v })} placeholder={t('contracts.event.placeholder.title', 'Order Events')} required disabled={isReadOnly} />
             <Field label={t('contracts.builder.event.version', 'Version')} value={state.version}
-              onChange={(v) => update({ version: v })} placeholder="1.0.0" mono disabled={isReadOnly} />
+              onChange={(v) => update({ version: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.version', '1.0.0')} mono disabled={isReadOnly} />
           </div>
           <Field label={t('contracts.builder.event.broker', 'Default Broker')} value={state.defaultBroker}
             onChange={(v) => update({ defaultBroker: v })} placeholder={t('contracts.event.placeholder.broker', 'kafka://broker:9092')} mono disabled={isReadOnly} />
@@ -189,7 +189,7 @@ export function VisualEventBuilder({
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <Field label={t('contracts.builder.event.eventVersion', 'Event Version')} value={ch.version}
-                          onChange={(v) => updateChannel(ch.id, { version: v })} placeholder="1.0.0" mono disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { version: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.eventVersion', '1.0.0')} mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.producer', 'Producer')} value={ch.producer}
                           onChange={(v) => updateChannel(ch.id, { producer: v })} placeholder={t('contracts.event.placeholder.producer', 'order-service')} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.consumer', 'Consumer')} value={ch.consumer}
@@ -210,15 +210,15 @@ export function VisualEventBuilder({
                           onChange={(v) => updateChannel(ch.id, { compatibility: v as CompatibilityMode })}
                           options={COMPAT_OPTIONS} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.retention', 'Retention')} value={ch.retention}
-                          onChange={(v) => updateChannel(ch.id, { retention: v })} placeholder="7d" disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { retention: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.retention', '7d')} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.partitions', 'Partitions')} value={ch.partitions}
-                          onChange={(v) => updateChannel(ch.id, { partitions: v })} placeholder="3" disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { partitions: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.partitions', '3')} disabled={isReadOnly} />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <Field label={t('contracts.builder.event.ordering', 'Ordering')} value={ch.ordering}
                           onChange={(v) => updateChannel(ch.id, { ordering: v })} placeholder={t('contracts.event.placeholder.ordering', 'by-key')} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.retries', 'Retries')} value={ch.retries}
-                          onChange={(v) => updateChannel(ch.id, { retries: v })} placeholder="3" disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { retries: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.retries', '3')} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.dlq', 'DLQ Topic')} value={ch.dlq}
                           onChange={(v) => updateChannel(ch.id, { dlq: v })} placeholder={t('contracts.event.placeholder.dlq', 'orders.created.dlq')} mono disabled={isReadOnly} />
                       </div>

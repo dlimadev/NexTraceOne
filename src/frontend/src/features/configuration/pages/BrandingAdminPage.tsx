@@ -625,7 +625,7 @@ function BrandingFieldEditor({
             type="text"
             value={value}
             onChange={(e) => onChange(field.key, e.target.value)}
-            placeholder="#3B82F6"
+            placeholder={t('configuration.branding.placeholder.colorHex', '#3B82F6')}
             className="flex-1 rounded-md border border-edge bg-input px-3 py-2 text-sm text-heading placeholder:text-faded focus:ring-2 focus:ring-accent focus:border-accent"
             maxLength={7}
           />

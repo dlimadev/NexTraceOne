@@ -174,7 +174,7 @@ export function SchemaCompositionEditor({
                       type="text"
                       value={schema.$ref ?? ''}
                       onChange={(e) => updateVariant(schema.id, { $ref: e.target.value })}
-                      placeholder="#/components/schemas/MySchema"
+                      placeholder={t('contracts.builder.schemaComposition.placeholder.ref', '#/components/schemas/MySchema')}
                       disabled={isReadOnly}
                       className="w-full text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
                     />

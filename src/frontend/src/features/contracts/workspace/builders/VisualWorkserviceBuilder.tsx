@@ -214,7 +214,7 @@ export function VisualWorkserviceBuilder({
             />
             {state.trigger === 'Cron' && (
               <Field label={t('contracts.builder.workservice.schedule', 'Schedule (Cron)')} value={state.schedule}
-                onChange={(v) => update({ schedule: v })} placeholder="0 */5 * * *" mono required
+                onChange={(v) => update({ schedule: v })} placeholder={t('contracts.builder.workservice.placeholder.cronSchedule', '0 */5 * * *')} mono required
                 error={fieldError('schedule') ? t(fieldError('schedule')!.messageKey, fieldError('schedule')!.fallback) : undefined}
                 disabled={isReadOnly} />
             )}
@@ -226,7 +226,7 @@ export function VisualWorkserviceBuilder({
             )}
             {state.trigger === 'Webhook' && (
               <Field label={t('contracts.builder.workservice.webhookUrl', 'Webhook Path')} value={state.schedule}
-                onChange={(v) => update({ schedule: v })} placeholder="/webhooks/process" mono disabled={isReadOnly} />
+                onChange={(v) => update({ schedule: v })} placeholder={t('contracts.builder.workservice.placeholder.webhookPath', '/webhooks/process')} mono disabled={isReadOnly} />
             )}
           </div>
         </CardBody>
@@ -250,9 +250,9 @@ export function VisualWorkserviceBuilder({
             rows={2} disabled={isReadOnly} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label={t('contracts.builder.workservice.retries', 'Max Retries')} value={state.retries}
-              onChange={(v) => update({ retries: v })} placeholder="3" disabled={isReadOnly} />
+              onChange={(v) => update({ retries: v })} placeholder={t('contracts.builder.workservice.placeholder.retries', '3')} disabled={isReadOnly} />
             <Field label={t('contracts.builder.workservice.timeout', 'Timeout (seconds)')} value={state.timeout}
-              onChange={(v) => update({ timeout: v })} placeholder="300" disabled={isReadOnly} />
+              onChange={(v) => update({ timeout: v })} placeholder={t('contracts.builder.workservice.placeholder.timeout', '300')} disabled={isReadOnly} />
           </div>
           <FieldArea label={t('contracts.builder.workservice.errorHandling', 'Error Handling')} value={state.errorHandling}
             onChange={(v) => update({ errorHandling: v })}
@@ -453,9 +453,9 @@ export function VisualWorkserviceBuilder({
               {state.producedEvents.map((evt) => (
                 <div key={evt.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
                   <Field label={t('contracts.builder.workservice.eventName', 'Event Name')} value={evt.eventName}
-                    onChange={(v) => updateProducedEvt(evt.id, { eventName: v })} placeholder="OrderProcessed" disabled={isReadOnly} />
+                    onChange={(v) => updateProducedEvt(evt.id, { eventName: v })} placeholder={t('contracts.builder.workservice.placeholder.eventNameProduced', 'OrderProcessed')} disabled={isReadOnly} />
                   <Field label={t('contracts.builder.workservice.targetTopic', 'Target Topic')} value={evt.targetTopic}
-                    onChange={(v) => updateProducedEvt(evt.id, { targetTopic: v })} placeholder="orders.processed" mono disabled={isReadOnly} />
+                    onChange={(v) => updateProducedEvt(evt.id, { targetTopic: v })} placeholder={t('contracts.builder.workservice.placeholder.targetTopicProduced', 'orders.processed')} mono disabled={isReadOnly} />
                   {!isReadOnly && (
                     <button type="button" onClick={() => removeProducedEvt(evt.id)} className="text-muted hover:text-danger transition-colors pb-1">
                       <Trash2 size={11} />
@@ -481,7 +481,7 @@ export function VisualWorkserviceBuilder({
             placeholder={t('contracts.builder.workservice.obsPlaceholder', 'Metrics, logs, traces, health checks...')}
             rows={2} disabled={isReadOnly} />
           <Field label={t('contracts.builder.workservice.healthCheck', 'Health Check Endpoint')} value={state.healthCheck}
-            onChange={(v) => update({ healthCheck: v })} placeholder="/health" mono disabled={isReadOnly} />
+            onChange={(v) => update({ healthCheck: v })} placeholder={t('contracts.builder.workservice.placeholder.healthCheck', '/health')} mono disabled={isReadOnly} />
         </CardBody>
       </Card>
 

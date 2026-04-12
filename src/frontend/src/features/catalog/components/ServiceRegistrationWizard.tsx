@@ -235,12 +235,12 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
               <div>
                 <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.documentationUrl', 'Documentation URL')}</label>
                 <input type="url" value={form.documentationUrl} onChange={(e) => set('documentationUrl', e.target.value)}
-                  placeholder="https://docs.example.com/service" className={monoClass} />
+                  placeholder={t('catalog.registration.placeholder.documentationUrl', 'https://docs.example.com/service')} className={monoClass} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.repositoryUrl', 'Repository URL')}</label>
                 <input type="url" value={form.repositoryUrl} onChange={(e) => set('repositoryUrl', e.target.value)}
-                  placeholder="https://github.com/org/repo" className={monoClass} />
+                  placeholder={t('catalog.registration.placeholder.repositoryUrl', 'https://github.com/org/repo')} className={monoClass} />
               </div>
             </div>
           </div>

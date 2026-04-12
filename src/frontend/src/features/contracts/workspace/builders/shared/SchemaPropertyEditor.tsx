@@ -332,7 +332,7 @@ export function SchemaPropertyEditor({
                         type="text"
                         value={prop.$ref ?? ''}
                         onChange={(e) => updateProperty(prop.id, { $ref: e.target.value })}
-                        placeholder="#/components/schemas/Address"
+                        placeholder={t('contracts.builder.schemaProperty.placeholder.refAddress', '#/components/schemas/Address')}
                         disabled={isReadOnly}
                         className="flex-1 text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
                       />
@@ -401,7 +401,7 @@ export function SchemaPropertyEditor({
                           type="text"
                           value={prop.items.$ref ?? ''}
                           onChange={(e) => updateProperty(prop.id, { items: { ...prop.items!, $ref: e.target.value } })}
-                          placeholder="#/components/schemas/OrderItem"
+                          placeholder={t('contracts.builder.schemaProperty.placeholder.refArrayItem', '#/components/schemas/OrderItem')}
                           disabled={isReadOnly}
                           className="w-full text-[10px] font-mono bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
                         />
@@ -540,7 +540,7 @@ function PropertyConstraintsEditor({
               disabled={isReadOnly} />
             <MiniField label={t('contracts.builder.rest.pattern', 'Pattern')} type="text" mono
               value={constraints.pattern ?? ''} onChange={(v) => update({ pattern: v || undefined })}
-              placeholder="^[a-z]+$" disabled={isReadOnly} />
+              placeholder={t('contracts.builder.schemaProperty.placeholder.pattern', '^[a-z]+$')} disabled={isReadOnly} />
           </>
         )}
 

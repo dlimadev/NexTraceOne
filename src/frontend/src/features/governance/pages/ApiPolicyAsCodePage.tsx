@@ -192,7 +192,7 @@ export function ApiPolicyAsCodePage() {
                     type="text"
                     className={inputClass}
                     value={registerForm.version}
-                    placeholder="1.0.0"
+                    placeholder={t('governance.policyAsCode.placeholder.version', '1.0.0')}
                     onChange={(e) => setRegisterForm((f) => ({ ...f, version: e.target.value }))}
                     required
                   />
