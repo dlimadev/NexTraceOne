@@ -1,286 +1,353 @@
 # NexTraceOne — Frontend Audit Report
 
-**Data:** 2026-04-11 (atualizado 2026-04-12)  
-**Escopo:** `src/frontend/src/` — 602 ficheiros TypeScript/TSX  
-**Páginas auditadas:** 155 componentes de página  
-**Testes existentes:** 181 ficheiros de teste (100% a passar — 1100 assertions)  
-**Stack:** React 19, TypeScript, Vite, TailwindCSS, React Query, i18next, Zod
+**Data:** 2026-04-10
+**Escopo:** Análise completa de layout, UX, HTML, CSS, i18n, navegação, duplicatas e responsividade
+**Ficheiros analisados:** ~301 páginas, ~74 componentes globais, ~24 componentes shell, 8 ficheiros de rotas, 4 ficheiros de localização
 
 ---
 
-## Sumário Executivo
+## Índice
 
-| Categoria | Estado | Quantidade | Observação |
-|-----------|--------|------------|------------|
-| Funcionalidades/Features | ✅ | 16 domínios | Bem organizadas por bounded context |
-| Componentes partilhados | ✅ | 75 | Biblioteca abrangente |
-| Páginas | ⚠️ | 155 | 28 excedem 500 linhas (era 34) |
-| Cobertura de testes | ✅ | 181/602 (30%) | Todos os 181 testes a passar (1100 assertions) |
-| Error handling | ✅ | 155/155 | Todas as páginas com PageErrorState ou inline error |
-| Loading states | ✅ | 211 usos de PageLoadingState | Boa cobertura |
-| Empty states | ✅ | 146 usos de EmptyState | Cobertura adequada |
-| React Query | ✅ | 440 hooks | Excelente integração API |
-| i18n | ✅ | 0 strings hardcoded | Todas convertidas para t() com fallback |
-| Type safety | ✅ | 9 `as any` | Aceitável (todos em testes/Monaco) |
-| Segurança | ✅ | 0 XSS/eval/credentials | Seguro |
-| Acessibilidade | ✅ | 0 aria-labels hardcoded | Todos migrados para i18n |
-| Performance | ✅ | 0 ficheiros > 1000 linhas; React.memo em 13 componentes/tabs | Decomposição e memoização aplicadas |
-| API Layer | ✅ | Centralizado + React Query | Boa estrutura |
-| Rotas | ✅ | 8 ficheiros, ~200 rotas | Bem organizadas, lazy-loaded |
-| Inline styles | ✅ | Apenas dinâmicos restantes | Estáticos convertidos para Tailwind |
+1. [Resumo Executivo](#1-resumo-executivo)
+2. [Problemas de Scroll e Overflow](#2-problemas-de-scroll-e-overflow)
+3. [Problemas de Layout e Dimensionamento](#3-problemas-de-layout-e-dimensionamento)
+4. [Problemas de Espaçamento](#4-problemas-de-espaçamento)
+5. [Problemas de i18n](#5-problemas-de-i18n)
+6. [Conteúdo e Páginas Duplicadas](#6-conteúdo-e-páginas-duplicadas)
+7. [Navegação Quebrada e Rotas Incorretas](#7-navegação-quebrada-e-rotas-incorretas)
+8. [Problemas de Responsividade](#8-problemas-de-responsividade)
+9. [Problemas de Z-Index e Layering](#9-problemas-de-z-index-e-layering)
+10. [Problemas de Segurança de Rotas](#10-problemas-de-segurança-de-rotas)
+11. [Plano de Correção Consolidado](#11-plano-de-correção-consolidado)
 
 ---
 
-## 1. Estrutura de Componentes e Organização
+## 1. Resumo Executivo
 
-### 1.1 Domínios de Funcionalidade (16 Total)
+### Totais por Severidade
 
-| Domínio | Diretório | Páginas |
-|---------|-----------|---------|
-| AI Hub | `features/ai-hub/` | AI Assistant, Agents, Routing, Analysis, Token Budget |
-| Audit & Compliance | `features/audit-compliance/` | Audit Trail |
-| Catalog | `features/catalog/` | Service Catalog, Contracts, Developer Portal, Discovery |
-| Change Governance | `features/change-governance/` | Releases, Changes, Workflows, DORA Metrics |
-| Configuration | `features/configuration/` | Platform Settings, Branding, User Preferences |
-| Contracts | `features/contracts/` | Contract Workspace, Governance, Catalog |
-| Governance | `features/governance/` | API Policies, Gates, Compliance |
-| Identity & Access | `features/identity-access/` | Users, Environments, Access Reviews, Sessions |
-| Integrations | `features/integrations/` | Connectors, Webhooks, Ingestion |
-| Knowledge | `features/knowledge/` | Documentation, Notes, Graphs |
-| Legacy Assets | `features/legacy-assets/` | Legacy Asset Management |
-| Notifications | `features/notifications/` | Notifications, Preferences, Analytics |
-| Operational Intelligence | `features/operational-intelligence/` | FinOps, Metrics |
-| Operations | `features/operations/` | Incidents, SLOs, Runbooks, Automation |
-| Product Analytics | `features/product-analytics/` | Analytics Dashboards |
-| Shared | `features/shared/` | Dashboard, Shared Utilities |
+| Severidade | Qtd | Descrição |
+|---|---|---|
+| 🔴 Crítico | 18 | Scroll quebrado, navegação impossível, conteúdo cortado |
+| 🟠 Alto | 34 | Layout quebrado em tablet/mobile, i18n em falta, z-index conflitante |
+| 🟡 Médio | 47 | Inconsistências de espaçamento, responsividade parcial, touch targets pequenos |
+| 🔵 Baixo | 15 | Padronização de estilo, otimizações |
 
-### 1.2 Componentes Partilhados (75 em `src/components/`)
+### Áreas mais afetadas
 
-- **UI Primitivos:** Badge, Button, Card, Checkbox, Radio, Select, TextField, TextArea, Toggle
-- **Layout:** Breadcrumbs, Drawer, Modal, Divider, Tabs
-- **Estado:** PageErrorState, PageLoadingState, ErrorBoundary, PageStateDisplay, EmptyState
-- **Utilitários:** ConfirmDialog, InlineMessage, Loader, SearchInput, CommandPalette, DiffViewer, Tooltip
-- **Domínio:** ModuleHeader, EntityHeader, PageHeader, StatCard, HomeWidgetCard
-
-### 1.3 Avaliação
-
-✅ Boa separação por bounded context  
-✅ Componentes partilhados abrangentes  
-⚠️ Alguns componentes de feature deveriam ser extraídos para partilhados
+1. **Módulo Contracts** — workspace com triple nested scroll, min-h-screen indevido
+2. **Módulo AI Hub** — scroll zones conflitantes, flex sem min-h-0
+3. **Shell/Sidebar** — overflow-hidden cortando conteúdo, min-h-0 em falta
+4. **Grids não-responsivos** — 64 grids com colunas fixas sem breakpoints
+5. **i18n hardcoded** — 59 strings hardcoded em ficheiros de produção
 
 ---
 
-## 2. Tratamento de Erros
+## 2. Problemas de Scroll e Overflow
 
-### 2.1 Métricas
+### 2.1 Arquitetura de Scroll
 
-- 244 usos de `PageErrorState`
-- 211 usos de `PageLoadingState`
-- 146 usos de `EmptyState`
-- 517 verificações de estado de loading
+A arquitetura base está correta:
+- `AppShell.tsx` → `flex h-screen overflow-hidden`
+- `AppContentFrame.tsx` → `flex-1 overflow-y-auto` (scroll principal)
 
-### 2.2 Páginas SEM Tratamento de Erro (15 ficheiros)
+**Porém, várias páginas criam containers de scroll internos que conflituam com o scroll principal.**
 
-| # | Ficheiro | Severidade | Nota |
-|---|---------|------------|------|
-| 1 | `features/ai-hub/pages/AgentDetailPage.tsx` | **ALTA** | Página de detalhe sem fallback de erro |
-| 2 | `features/ai-hub/pages/AiAssistantPage.tsx` | MÉDIA | Chat interativo — erros tratados inline |
-| 3 | `features/catalog/pages/SelfServicePortalPage.tsx` | **ALTA** | Portal self-service sem erro global |
-| 4 | `features/contracts/cdct/ConsumerDrivenContractPage.tsx` | **ALTA** | Fluxo CDCT sem PageErrorState |
-| 5 | `features/contracts/create/CreateServicePage.tsx` | MÉDIA | Formulário de criação |
-| 6 | `features/contracts/playground/ContractPlaygroundPage.tsx` | MÉDIA | Playground interativo |
-| 7 | `features/contracts/publication/PublicationCenterPage.tsx` | **ALTA** | Centro de publicação sem erro |
-| 8 | `features/governance/pages/GovernanceGatesPage.tsx` | **ALTA** | Gates de governança sem erro |
-| 9 | `features/identity-access/pages/ActivationPage.tsx` | BAIXA | Página de ativação (auth flow) |
-| 10 | `features/identity-access/pages/ForgotPasswordPage.tsx` | BAIXA | Fluxo de recuperação |
-| 11 | `features/identity-access/pages/InvitationPage.tsx` | BAIXA | Fluxo de convite |
-| 12 | `features/identity-access/pages/LoginPage.tsx` | BAIXA | Login — erros inline são aceitáveis |
-| 13 | `features/identity-access/pages/MfaPage.tsx` | BAIXA | MFA — erros inline |
-| 14 | `features/identity-access/pages/ResetPasswordPage.tsx` | BAIXA | Fluxo de reset |
-| 15 | `features/identity-access/pages/UnauthorizedPage.tsx` | BAIXA | É em si uma página de erro |
+### 2.2 Problemas Críticos de Scroll
 
-**Nota:** Páginas de autenticação (9-15) tratam erros inline no formulário, o que é aceitável. As 5 páginas de alta severidade (1, 3, 4, 7, 8) precisam de correção.
+| # | Ficheiro | Linha | Problema | Severidade |
+|---|---|---|---|---|
+| S-01 | `components/shell/AppSidebar.tsx` | 333-338 | Content panel usa `overflow-hidden` — conteúdo cortado, sem scroll | 🔴 Crítico |
+| S-02 | `components/shell/AppSidebar.tsx` | 360 | `<nav>` flex-1 sem `min-h-0` — scroll não funciona | 🔴 Crítico |
+| S-03 | `components/shell/AppSidebar.tsx` | 248-249 | Icon rail flex column sem `min-h-0` | 🟠 Alto |
+| S-04 | `components/shell/MobileDrawer.tsx` | 25 | `h-full` sem `overflow-y-auto` — drawer pode estourar verticalmente | 🟠 Alto |
+| S-05 | `features/identity-access/components/AuthShell.tsx` | 62 | `min-h-screen overflow-hidden` — conteúdo preso sem scroll | 🔴 Crítico |
+| S-06 | `features/contracts/workspace/WorkspaceLayout.tsx` | 68,73,114,120 | Triple nested scroll — nav + main + rail com `overflow-y-auto` separados | 🔴 Crítico |
+| S-07 | `features/contracts/cdct/ConsumerDrivenContractPage.tsx` | 83 | `min-h-screen` dentro do shell — força viewport height, quebra flex layout | 🔴 Crítico |
+| S-08 | `features/contracts/playground/ContractPlaygroundPage.tsx` | 95 | `min-h-screen` dentro do shell — mesmo problema que S-07 | 🔴 Crítico |
+| S-09 | `features/ai-hub/pages/AiAssistantPage.tsx` | 568,647,824,1158 | 4 containers `overflow-y-auto` aninhados — scroll zones conflitantes | 🔴 Crítico |
+| S-10 | `features/ai-hub/pages/AiCopilotPage.tsx` | 534,554,605,743 | Múltiplos flex scrolls + flex-1 sem `min-h-0` | 🔴 Crítico |
+| S-11 | `features/contracts/studio/DraftStudioPage.tsx` | 157,237 | `overflow-y-auto` interno conflitua com AppContentFrame | 🟠 Alto |
+| S-12 | `features/contracts/workspace/sections/ContractSection.tsx` | 78,221 | flex-col h-full sem scroll + flex-1 sem `min-h-0` | 🟠 Alto |
+| S-13 | `features/contracts/workspace/editor/ContractEditorSplitPane.tsx` | 38 | flex flex-col h-full sem overflow handling | 🟠 Alto |
+| S-14 | `features/catalog/pages/TraceExplorerPage.tsx` (via operations) | 223 | `overflow-hidden relative` — conteúdo preso | 🟠 Alto |
 
----
+### 2.3 Páginas com `overflow-hidden` que pode cortar conteúdo
 
-## 3. Conformidade i18n
-
-### 3.1 Locales Suportados (4)
-
-- `en.json` — Inglês
-- `pt-BR.json` — Português do Brasil
-- `pt-PT.json` — Português de Portugal
-- `es.json` — Espanhol
-
-### 3.2 Strings Hardcoded — ✅ Todas Corrigidas
-
-Todas as ~131 strings hardcoded (81 originais + 50 adicionais descobertas) foram convertidas para `t()` com fallback.
-As chaves i18n correspondentes foram adicionadas aos 4 locales (en, pt-BR, pt-PT, es).
-
-### 3.3 aria-labels Hardcoded — ✅ Todas Corrigidas
-
-Todos os 8 aria-labels hardcoded foram migrados para `t()`.
-
-### 3.4 Títulos Vazios — ✅ Todos Corrigidos
-
-Os 2 `PageSection title=""` vazios receberam títulos i18n.
+| Ficheiro | Linha |
+|---|---|
+| `features/catalog/pages/ContractPipelinePage.tsx` | 120 |
+| `features/catalog/pages/ServiceDiscoveryPage.tsx` | 193 |
+| `features/catalog/pages/SecurityGateDashboardPage.tsx` | 150, 453 |
+| `features/catalog/pages/AiScaffoldWizardPage.tsx` | 492 |
+| `features/contracts/governance/ContractHealthTimelinePage.tsx` | 112 |
 
 ---
 
-## 4. Type Safety
+## 3. Problemas de Layout e Dimensionamento
 
-### 4.1 Usos de `any` (9 instâncias)
+### 3.1 Componentes com larguras fixas problemáticas
 
-- **Testes (8):** `__tests__/pages/AiIntegrationsConfigurationPage.test.tsx` — mocks com `as any`
-- **Monaco Editor (1):** `contracts/workspace/editor/MonacoEditorWrapper.tsx` — `(self as any).MonacoEnvironment` (necessário para Web Workers)
+| # | Componente | Linha | Valor | Problema | Severidade |
+|---|---|---|---|---|---|
+| L-01 | `shell/MobileDrawer.tsx` | 25 | `w-[320px]` | Sem variante responsiva — pode estourar em phones < 375px | 🔴 Crítico |
+| L-02 | `shell/DetailPanel.tsx` | 22 | `lg:w-[400px] xl:w-[480px]` | Falta breakpoint `md:` — width errada em tablets (768-1024px) | 🟠 Alto |
+| L-03 | `components/SplitView.tsx` | 69 | `lg:w-[400px] xl:w-[480px]` | Mesmo problema: falta `md:` breakpoint | 🟠 Alto |
+| L-04 | `shell/PageContainer.tsx` | 31 | `max-w-[1600px]` | Sem redução responsiva para tablets | 🟡 Médio |
+| L-05 | `components/Drawer.tsx` | 26-28 | `w-80 / w-[480px] / w-[640px]` | Mix de Tailwind scale e pixel values; sem max-width constraint | 🟡 Médio |
+| L-06 | `shell/WorkspaceSwitcher.tsx` | 68,95 | `max-w-[100px] / min-w-[280px]` | Dropdown com min-width fixo; nome truncado | 🟡 Médio |
+| L-07 | `shell/AppUserMenu.tsx` | 40,43,53 | `max-w-[120px] × 2 / min-w-[200px]` | Username/email truncados em 120px | 🟡 Médio |
 
-**Avaliação:** ✅ Aceitável — todos justificados.
+### 3.2 Elementos com alturas fixas
 
-### 4.2 `@ts-ignore` / `@ts-expect-error` (6 instâncias)
-
-- Todas em ficheiros de teste (`sanitize.test.ts`, `navigation.test.ts`) — intencionais para testar input inválido.
-
-**Avaliação:** ✅ Aceitável.
-
----
-
-## 5. Segurança
-
-| Verificação | Resultado |
-|------------|-----------|
-| `dangerouslySetInnerHTML` | ✅ Nenhum uso encontrado |
-| `eval()` / `Function()` | ✅ Nenhum uso encontrado |
-| Credenciais hardcoded | ✅ Nenhuma encontrada |
-| Utilitário de sanitização | ✅ `utils/sanitize.ts` com testes |
-| XSS em conteúdo dinâmico | ✅ `DependencyGraph.tsx` usa template literals mas sem input de utilizador |
-
-**Avaliação:** ✅ Seguro.
+| Componente | Linha | Valor | Risco |
+|---|---|---|---|
+| `components/Stepper.tsx` | 128 | `text-[10px] max-w-[120px]` | Texto ilegível; step label cortado |
+| `shell/AppSidebar.tsx` | 285 | `h-[70px]` | Header fixo sem responsive |
+| `shell/AppSidebar.tsx` | 253 | `w-[48px]` | Icon rail fixo |
+| `components/FilterChip.tsx` | 57 | `h-[18px]` | Badge muito pequeno |
+| `components/NotesWidget.tsx` | 94 | `min-h-[160px]` | Sem encolhimento responsivo |
 
 ---
 
-## 6. Acessibilidade
+## 4. Problemas de Espaçamento
 
-| Verificação | Resultado |
-|------------|-----------|
-| Imagens sem `alt` | ✅ Todas as 6 `<img>` têm `alt` |
-| `onClick` em elementos não-interativos | ⚠️ 1 caso: `ServiceDiscoveryPage.tsx:403` (div de overlay sem `role`) |
-| aria-labels hardcoded | ⚠️ 8 ocorrências (ver secção 3.3) |
-| Hierarquia de headings | ⚠️ Não totalmente verificado — requer scan extensivo |
+### 4.1 Inconsistências de padding entre componentes
 
----
+| Componente | Horizontal | Vertical | Observação |
+|---|---|---|---|
+| Card (header) | `px-5` | `py-4` | Escala "5" |
+| Card (body) | `px-5` | `py-5` | Escala "5" |
+| Modal (header) | `px-6` | `py-4` | Escala "6" |
+| Modal (body) | `px-6` | `py-5` | Escala "6" |
+| Drawer | `px-6` | `py-4/5` | Escala "6" — coerente com Modal |
+| DetailPanel | `px-5` | `py-4/5` | Escala "5" — deveria ser "6" como Modal/Drawer |
 
-## 7. Performance
+**Problema:** Card e DetailPanel usam `px-5`, enquanto Modal e Drawer usam `px-6`. Deveria haver um padrão único.
 
-### 7.1 Componentes Grandes — Estado Após Decomposição
+### 4.2 Grids não-responsivos (64 instâncias)
 
-Os 5 ficheiros > 900 linhas foram decompostos com sucesso:
+| Ficheiro | Linha | Classes | Severidade |
+|---|---|---|---|
+| `features/change-governance/components/ReleasesIntelligenceTab.tsx` | 132,274 | `grid grid-cols-3 gap-3` | 🔴 Crítico |
+| `features/change-governance/pages/PromotionPage.tsx` | 163 | `grid grid-cols-3 gap-4` | 🔴 Crítico |
+| `features/contracts/workspace/sections/ValidationSection.tsx` | 138 | `grid grid-cols-5 gap-3` | 🔴 Crítico |
+| `features/governance/pages/TeamsOverviewPage.tsx` | 156 | `grid grid-cols-3 gap-3` | 🔴 Crítico |
+| `features/governance/pages/DomainsOverviewPage.tsx` | 158 | `grid grid-cols-3 gap-3` | 🟠 Alto |
+| `features/shared/pages/DashboardPage.tsx` | (6 inst.) | `grid grid-cols-2/3` sem breakpoints | 🟠 Alto |
+| `features/contracts/workspace/sections/DefinitionSection.tsx` | (6 inst.) | `grid grid-cols-2/3` sem breakpoints | 🟠 Alto |
+| `features/governance/pages/ExecutiveOverviewPage.tsx` | (3 inst.) | `grid grid-cols-2/3` sem breakpoints | 🟠 Alto |
+| `features/ai-hub/components/AssistantPanel.tsx` | 864 | `grid grid-cols-2` sem breakpoints | 🟡 Médio |
+| `features/ai-hub/pages/AgentDetailPage.tsx` | 404 | `grid grid-cols-2` sem breakpoints | 🟡 Médio |
 
-| Ficheiro | Antes | Depois | Sub-componentes Extraídos |
-|---------|-------|--------|--------------------------|
-| `AiAssistantPage.tsx` | 1.213 | 733 | ChatSidebar, ChatMessageItem, AgentsSidePanel, SuggestedPrompts, AiAssistantTypes |
-| `VisualRestBuilder.tsx` | 1.124 | 923 | RestBuilderHelpers, ParameterConstraintsPanel, CollapsibleSubSection |
-| `AssistantPanel.tsx` | 1.004 | 443 | AssistantPanelTypes, AssistantMessageBubble |
-| `ServiceCatalogPage.tsx` | 1.001 | 547 | ImpactPanel, TemporalPanel, ServiceDetailPanel |
-| `DeveloperPortalPage.tsx` | 991 | 424 | DevPortalSubscriptionsTab, DevPortalPlaygroundTab, DevPortalInboxTab |
+**Exemplo correto existente:** `features/operations/pages/ReliabilitySloManagementPage.tsx:135` — `grid grid-cols-1 xl:grid-cols-3` ✅
 
-Restam 29 ficheiros entre 500 e 900 linhas — candidatos para decomposição futura (M-01).
+### 4.3 Touch targets demasiado pequenos
 
-### 7.2 Memoização
-
-- ✅ 265 usos de `useCallback`/`useMemo`
-- ❌ 0 usos de `React.memo` — considerar para componentes pesados em listas
-
-### 7.3 Inline Styles vs. Tailwind
-
-- **39 ficheiros** usam `style={{}}` em vez de classes Tailwind
-- **Pior caso:** `EnvironmentsPage.tsx` com **28 inline styles** que deveriam ser Tailwind
-
----
-
-## 8. API Layer
-
-| Verificação | Resultado |
-|------------|-----------|
-| Cliente centralizado | ✅ `api/client.ts` (152 linhas) |
-| Chamadas diretas a fetch/axios | ✅ Nenhuma em componentes |
-| React Query integrado | ✅ 440 hooks useQuery/useMutation |
-| APIs por feature | ✅ Cada feature tem módulo API próprio |
+| Componente | Linha | Tamanho | Problema |
+|---|---|---|---|
+| `features/knowledge/pages/KnowledgeHubPage.tsx` | 215 | `p-1.5` | Abaixo do mínimo 44px para mobile |
+| `features/knowledge/pages/OperationalNotesPage.tsx` | 67,85,119 | `px-3 py-1` | Botões muito pequenos |
+| `shell/AppSidebar.tsx` | badges | `text-[9px] min-w-[16px]` | Texto ilegível em mobile |
+| `components/Stepper.tsx` | 128 | `text-[10px]` | Texto ilegível |
+| `components/FilterChip.tsx` | 57 | `h-[18px]` | Badge pequeno demais |
 
 ---
 
-## 9. Routing
+## 5. Problemas de i18n
 
-| Verificação | Resultado |
-|------------|-----------|
-| Ficheiros de rotas | 8 (aiHub, catalog, contracts, admin, knowledge, changes, operations, governance) |
-| Total de rotas | ~200 |
-| Convenção de nomes | ✅ kebab-case consistente |
-| Proteção de rotas | ✅ ProtectedRoute com permissões |
-| Lazy loading | ✅ Todas as rotas usam lazy import |
-| Rotas órfãs | ✅ Nenhuma detectada |
+### 5.1 Estado geral dos locales
+
+| Ficheiro | Keys | Vazios | Estado |
+|---|---|---|---|
+| `en.json` | 7.453 | 0 | ✅ Completo |
+| `es.json` | 7.453 | 0 | ✅ Sincronizado |
+| `pt-BR.json` | 7.453 | 0 | ✅ Sincronizado |
+| `pt-PT.json` | 7.453 | 0 | ✅ Sincronizado |
+
+**Os ficheiros de locale estão completos e sincronizados.** O problema é que há 59 strings hardcoded nos ficheiros TSX que deviam usar `t()`.
+
+### 5.2 Strings hardcoded em ficheiros de produção (59 instâncias)
+
+#### Placeholders hardcoded (26 instâncias)
+
+| Ficheiro | Linha | Valor |
+|---|---|---|
+| `features/ai-hub/pages/AiAnalysisPage.tsx` | 396 | `placeholder="e.g. payment-service"` |
+| `features/ai-hub/pages/AiAnalysisPage.tsx` | 405 | `placeholder="e.g. 2.1.0"` |
+| `features/ai-hub/pages/AiAgentsPage.tsx` | 167 | `placeholder="my-custom-agent"` |
+| `features/operations/pages/TraceExplorerPage.tsx` | 378 | `placeholder="0"` |
+| `features/contracts/governance/ApiPolicyAsCodePage.tsx` | 174 | `placeholder="my-api-policy"` |
+| `features/contracts/governance/ApiPolicyAsCodePage.tsx` | 195 | `placeholder="1.0.0"` |
+| `features/governance/pages/ScheduledReportsPage.tsx` | 278 | `placeholder="compliance"` |
+| `features/governance/pages/ScheduledReportsPage.tsx` | 326 | `placeholder="user@example.com, team@example.com"` |
+| `features/contracts/create/VisualEventBuilder.tsx` | 136,192,201,205,213,215,221 | Múltiplos placeholders de schema/config |
+| `features/contracts/create/VisualWorkserviceBuilder.tsx` | 217,224,229,253,255,484 | Múltiplos placeholders de config |
+| `features/contracts/create/VisualWebhookBuilder.tsx` | 302,309 | Placeholders de retry config |
+| `features/contracts/create/VisualRestBuilder.tsx` | 1049 | `placeholder="^[a-z]+$"` |
+| `features/contracts/create/SchemaCompositionEditor.tsx` | 177,221 | Placeholders de schema ref |
+
+#### Texto de status/badge hardcoded (10 instâncias)
+
+| Ficheiro | Linha | Valor |
+|---|---|---|
+| `features/ai-hub/pages/AiIntegrationsConfigurationPage.tsx` | 122-123 | `>Enabled<` / `>Disabled<` |
+| `features/configuration/pages/AdvancedConfigurationConsolePage.tsx` | 92,94-95 | `>Masked<` / `>Enabled<` / `>Disabled<` |
+| `features/configuration/pages/AdvancedConfigurationConsolePage.tsx` | 358-361 | `>Inherited<` / `>Default<` / `>Mandatory<` / `>Sensitive<` |
+| `features/configuration/pages/AdvancedConfigurationConsolePage.tsx` | 411 | `>Inherited<` |
+
+#### Labels/texto de secção hardcoded (5 instâncias)
+
+| Ficheiro | Linha | Valor |
+|---|---|---|
+| `features/contracts/workspace/sections/SummarySection.tsx` | 184 | `>Producer<` |
+| `features/contracts/workspace/editor/LivePreviewRenderer.tsx` | 212,218 | `>Parameters<` / `>Response<` |
+| `features/configuration/pages/AdvancedConfigurationConsolePage.tsx` | 661,666 | `>Previous:<` / `>New:<` |
+
+#### Mensagens de erro hardcoded (5 instâncias)
+
+| Ficheiro | Linha | Valor |
+|---|---|---|
+| `features/contracts/governance/ContractHealthTimelinePage.tsx` | 105-106 | `"Failed to load..."` / `>Retry<` |
+| `features/contracts/governance/CanonicalEntityImpactCascadePage.tsx` | 168-169 | `"Failed to load..."` / `>Retry<` |
+| `components/ComboBox.tsx` | 267 | `>No results<` |
+
+#### Aria-labels hardcoded (13 instâncias)
+
+| Ficheiro | Linha | Valor |
+|---|---|---|
+| `features/contracts/governance/ContractHealthTimelinePage.tsx` | 86 | `aria-label="API Asset ID"` |
+| `components/Breadcrumbs.tsx` | 91 | `aria-label="Breadcrumbs"` |
+| `components/StackedProgressBar.tsx` | 48 | `aria-label="Progress"` |
+| `components/Modal.tsx` | 170 | `aria-label="Close"` |
+| `components/NexTraceLogo.tsx` | 63,150 | `aria-label="NexTraceOne"` |
+| `components/StatCard.tsx` | 91 | `aria-label="More options"` |
+| `components/DataTable.tsx` | 185 | `aria-label="Select all rows"` |
+| `components/Toast.tsx` | 122,142 | `aria-label="Notifications"` / `aria-label="Dismiss"` |
+| `components/DatePicker.tsx` | 62 | `aria-label="Clear date"` |
+| `components/Drawer.tsx` | 165 | `aria-label="Close"` |
+| `components/RouteProgressBar.tsx` | 41 | `aria-label="Loading"` |
 
 ---
 
-## 10. Testes
+## 6. Conteúdo e Páginas Duplicadas
 
-| Métrica | Valor |
-|---------|-------|
-| Ficheiros de teste | 161 |
-| Ficheiros de código | 594 |
-| Ratio de cobertura | 27% |
-| Meta industry-standard | 70%+ |
-| Gap | ~272 ficheiros sem testes |
+### 6.1 Páginas duplicadas entre módulos
 
----
+| Página | Localização 1 | Localização 2 | Severidade |
+|---|---|---|---|
+| `DoraMetricsPage.tsx` | `features/change-governance/pages/` (257 linhas) | `features/governance/pages/` (289 linhas) | 🟠 Alto |
+| `ServiceScorecardPage.tsx` | `features/catalog/pages/` (334 linhas) | `features/governance/pages/` (348 linhas) | 🟠 Alto |
 
-## 11. CSS e Styling
+**Detalhes:**
+- **DoraMetricsPage** — versão change-governance usa `changeConfidenceApi.getDoraMetrics()`, versão governance usa executive API (`/executive/dora-metrics`). Rotas: `/dora-metrics` vs `/governance/dora-metrics`
+- **ServiceScorecardPage** — versão catalog usa `sourceOfTruthApi.getServiceScorecard()`, versão governance usa executive API. Rotas: `/services/scorecards` vs `/governance/scorecards`
 
-### 11.1 Inline Styles — ✅ Resolvido
-
-Todos os inline styles estáticos convertíveis foram migrados para classes Tailwind (C-03, H-03).
-Os inline styles restantes usam valores dinâmicos calculados em runtime (width: `${pct}%`, animation-delay, gradients dinâmicos) que **não podem** ser convertidos para Tailwind.
+**Problema:** Dois componentes com o mesmo nome servindo funcionalidade semelhante mas com dados de APIs diferentes, criando confusão de manutenção e experiência inconsistente para o utilizador.
 
 ---
 
-## 12. Qualidade de Código
+## 7. Navegação Quebrada e Rotas Incorretas
 
-| Verificação | Resultado |
-|------------|-----------|
-| `console.log` em produção | ✅ 0 encontrados |
-| `TODO`/`FIXME`/`HACK` | ✅ 0 encontrados |
-| Código morto | ✅ Nenhum padrão óbvio |
-| Cleanup em useEffect | ✅ Adequado |
+### 7.1 Rotas que não existem (navegação impossível)
 
----
+| # | Ficheiro | Linha | Path de navegação | Problema | Severidade |
+|---|---|---|---|---|---|
+| N-01 | `features/knowledge/pages/KnowledgeHubPage.tsx` | 105 | `/knowledge/documents/new` | Rota não definida — resulta em 404 | 🔴 Crítico |
+| N-02 | `features/contracts/publication/PublicationCenterPage.tsx` | 61 | `/contracts/studio/new` | Rota não existe — `/contracts/studio` faz redirect para `/contracts` | 🔴 Crítico |
 
-## Prioridades de Correção
+### 7.2 Colisão de rotas
 
-### CRÍTICO (C) — ✅ Todas Concluídas
+| # | Ficheiro | Linhas | Problema | Severidade |
+|---|---|---|---|---|
+| N-03 | `routes/governanceRoutes.tsx` | 253,261 | `/governance/scorecards` e `/governance/scorecards/:serviceName` — rota genérica captura antes da específica | 🟠 Alto |
 
-| ID | Descrição | Estado |
-|----|-----------|--------|
-| C-01 | PageErrorState nas 5 páginas de alta severidade | ✅ Concluído |
-| C-02 | Corrigir ~131 placeholders hardcoded para i18n | ✅ Concluído (81 + 50 adicionais) |
-| C-03 | Converter inline styles do EnvironmentsPage para Tailwind | ✅ Concluído |
-| C-04 | Corrigir 2 `PageSection title=""` vazios | ✅ Concluído |
-| C-05 | Migrar 8 aria-labels hardcoded para i18n | ✅ Concluído |
+### 7.3 Lazy imports inconsistentes
 
-### ALTO (H) — ✅ Todas Concluídas
-
-| ID | Descrição | Estado |
-|----|-----------|--------|
-| H-01 | Decompor os 5 ficheiros > 900 linhas | ✅ Concluído (redução 40-56%) |
-| H-02 | Adicionar `role="button"` a div clickável em ServiceDiscoveryPage | ✅ Concluído |
-| H-03 | Converter inline styles restantes (38 ficheiros) para Tailwind | ✅ Concluído (dinâmicos mantidos) |
-
-### MÉDIO (M) — Roadmap
-
-| ID | Descrição | Impacto |
-|----|-----------|---------|
-| M-01 | Decompor ficheiros 500-900 linhas (29 ficheiros) | Manutenibilidade |
-| M-02 | Adicionar React.memo a componentes pesados | Performance |
-| M-03 | Aumentar cobertura de testes frontend (27% → 50%+) | Qualidade |
+| # | Ficheiro | Linha | Componente | Problema |
+|---|---|---|---|---|
+| N-04 | `routes/catalogRoutes.tsx` | 17 | `LegacyAssetCatalogPage` | Lazy import sem `.then()` handler para named exports |
+| N-05 | `routes/catalogRoutes.tsx` | 18 | `MainframeSystemDetailPage` | Mesmo problema |
+| N-06 | `routes/catalogRoutes.tsx` | 19 | `ServiceDiscoveryPage` | Padrão inconsistente |
+| N-07 | `routes/catalogRoutes.tsx` | 20 | `ServiceMaturityPage` | Mesmo problema |
 
 ---
 
-*Relatório gerado automaticamente via análise estática do código-fonte.*
+## 8. Problemas de Responsividade
+
+### 8.1 Grids sem breakpoints responsivos
+
+**64 instâncias** de `grid-cols-N` (N>=2) sem prefixos `sm:`, `md:`, `lg:`, `xl:`.
+
+Ficheiros mais afetados:
+- `features/shared/pages/DashboardPage.tsx` — 6 instâncias
+- `features/contracts/workspace/sections/DefinitionSection.tsx` — 6 instâncias
+- `features/change-governance/components/ReleasesIntelligenceTab.tsx` — 4 instâncias
+- `features/governance/pages/ExecutiveOverviewPage.tsx` — 3 instâncias
+- `features/contracts/workspace/sections/SecuritySection.tsx` — 3 instâncias
+
+**Caso mais grave:** `ValidationSection.tsx:138` — `grid grid-cols-5 gap-3` sem qualquer breakpoint (ilegível em mobile).
+
+### 8.2 Flex layouts sem wrapping
+
+**~1.859 instâncias** de `flex` sem `flex-wrap`, `flex-col`, ou constraints de largura. Em ecrãs pequenos, o conteúdo pode criar overflow horizontal.
+
+### 8.3 Elementos sem max-width
+
+**~446 instâncias** de `w-full` sem `max-w-*` constraint, causando esticamento indevido em monitores ultra-wide.
+
+### 8.4 Imagens/SVGs sem dimensões
+
+| Ficheiro | Linha | Problema |
+|---|---|---|
+| `features/identity-access/components/AuthShell.tsx` | 99 | `<img>` sem w-/h- definidos |
+| `features/catalog/pages/ServiceSourceOfTruthPage.tsx` | 350 | `<svg>` sem w-/h- definidos |
+
+---
+
+## 9. Problemas de Z-Index e Layering
+
+### 9.1 Z-index hardcoded (fora do sistema CSS variables)
+
+| Componente | Linha | Valor | Conflito |
+|---|---|---|---|
+| `components/RouteProgressBar.tsx` | 39 | `z-[9999]` | Excessivo — bypassa todo o sistema |
+| `components/shell/AppShell.tsx` | 92 | `z-[9999]` | Conflitua com RouteProgressBar |
+| `components/Toast.tsx` | 120 | `z-[var(--z-toast,9999)]` | Fallback excessivo |
+| `components/CommandPalette.tsx` | 322 | `z-50` | Deveria usar `var(--z-modal)` |
+| `components/ColumnSelector.tsx` | 99 | `z-50` | Conflitua com CommandPalette |
+| `components/SavedViewSelector.tsx` | 115,179 | `z-50` × 2 | Conflitua com outros `z-50` |
+| `components/DashboardTemplatePicker.tsx` | 34 | `z-50` | Conflitua com CommandPalette |
+| `config/RolePicker.tsx` | 122 | `z-50` | Conflitua com modais |
+| `components/WatchButton.tsx` | 98 | `z-20` | Pode ser coberto por dropdown |
+| `components/ModuleHeader.tsx` | 45 | `z-20` | Hardcoded |
+| `components/DataTable.tsx` | 177 | `z-10` | Sticky header; aceitável |
+
+### 9.2 Componentes usando CSS variables corretamente ✅
+
+- `Modal.tsx` → `z-[var(--z-modal)]`
+- `Drawer.tsx` → `z-[var(--z-modal)]`
+- `Tooltip.tsx` → `z-[var(--z-dropdown)]`
+- `DropdownMenu.tsx` → `z-[var(--z-dropdown)]`
+- `AppSidebar.tsx` → `z-[var(--z-header)]`
+- `AppTopbar.tsx` → `z-[var(--z-header)]`
+
+---
+
+## 10. Problemas de Segurança de Rotas
+
+### 10.1 Rotas sem ProtectedRoute
+
+| Ficheiro | Linha | Página | Problema |
+|---|---|---|---|
+| `routes/adminRoutes.tsx` | 329-334 | `UserPreferencesPage` | Sem wrapper `ProtectedRoute` |
+| `routes/adminRoutes.tsx` | 343-348 | `APIKeysPage` | Sem wrapper `ProtectedRoute` |
+| `routes/adminRoutes.tsx` | 349-354 | `IntegrationMappingsPage` | Sem wrapper `ProtectedRoute` |
+
+**Nota:** O backend é a autoridade final de autorização, mas a UX deve refletir proteção adequada no frontend.
+
+---
+
+## 11. Plano de Correção Consolidado
+
+Ver ficheiro separado: [FRONTEND-CORRECTION-PLAN.md](./FRONTEND-CORRECTION-PLAN.md)

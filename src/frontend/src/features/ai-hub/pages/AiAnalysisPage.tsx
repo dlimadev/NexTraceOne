@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, ArrowUpCircle, BarChart3, Loader2, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowUpCircle, ArrowLeftRight, Loader2, XCircle } from 'lucide-react';
 import { PageContainer } from '../../../components/shell';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -510,7 +510,7 @@ export function AiAnalysisPage() {
 
   const tabs: Array<{ key: AnalysisTab; label: string; icon: React.ReactNode }> = [
     { key: 'non-prod', label: t('aiAnalysis.tabs.non-prod'), icon: <AlertTriangle size={14} /> },
-    { key: 'compare', label: t('aiAnalysis.tabs.compare'), icon: <BarChart3 size={14} /> },
+    { key: 'compare', label: t('aiAnalysis.tabs.compare'), icon: <ArrowLeftRight size={14} /> },
     { key: 'readiness', label: t('aiAnalysis.tabs.readiness'), icon: <ArrowUpCircle size={14} /> },
   ];
 

@@ -108,10 +108,10 @@ export function DefinitionSection({ contract, isReadOnly = false, onSave, classN
         <CardBody className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Field label={t('contracts.studio.definition.technicalName', 'Technical Name')} value={fields.technicalName} onChange={(v) => update('technicalName', v)} disabled={isReadOnly} />
-            <Field label={t('contracts.studio.definition.friendlyName', 'Friendly Name')} value={fields.friendlyName} onChange={(v) => update('friendlyName', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.friendlyName', 'e.g., User Management API')} />
+            <Field label={t('contracts.studio.definition.friendlyName', 'Friendly Name')} value={fields.friendlyName} onChange={(v) => update('friendlyName', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.friendlyNamePlaceholder', 'e.g., User Management API')} />
           </div>
-          <FieldArea label={t('contracts.studio.definition.functionalDescription', 'Functional Description')} value={fields.functionalDescription} onChange={(v) => update('functionalDescription', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.functionalDescription', 'What business capability does this service provide?')} />
-          <FieldArea label={t('contracts.studio.definition.technicalDescription', 'Technical Description')} value={fields.technicalDescription} onChange={(v) => update('technicalDescription', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.technicalDescription', 'Technical architecture, stack, integration notes...')} />
+          <FieldArea label={t('contracts.studio.definition.functionalDescription', 'Functional Description')} value={fields.functionalDescription} onChange={(v) => update('functionalDescription', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.functionalDescPlaceholder', 'What business capability does this service provide?')} />
+          <FieldArea label={t('contracts.studio.definition.technicalDescription', 'Technical Description')} value={fields.technicalDescription} onChange={(v) => update('technicalDescription', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.technicalDescPlaceholder', 'Technical architecture, stack, integration notes...')} />
           <div className="grid grid-cols-2 gap-3">
             <SelectField
               label={t('contracts.studio.definition.serviceType', 'Service Type')}
@@ -143,13 +143,13 @@ export function DefinitionSection({ contract, isReadOnly = false, onSave, classN
         </CardHeader>
         <CardBody className="space-y-3">
           <div className="grid grid-cols-3 gap-3">
-            <Field label={t('contracts.studio.definition.domain', 'Domain')} value={fields.domain} onChange={(v) => update('domain', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.domain', 'Payments')} />
-            <Field label={t('contracts.studio.definition.capability', 'Capability')} value={fields.capability} onChange={(v) => update('capability', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.capability', 'Payment Processing')} />
-            <Field label={t('contracts.studio.definition.product', 'Product')} value={fields.product} onChange={(v) => update('product', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.product', 'Checkout Platform')} />
+            <Field label={t('contracts.studio.definition.domain', 'Domain')} value={fields.domain} onChange={(v) => update('domain', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.domainPlaceholder', 'Payments')} />
+            <Field label={t('contracts.studio.definition.capability', 'Capability')} value={fields.capability} onChange={(v) => update('capability', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.capabilityPlaceholder', 'Payment Processing')} />
+            <Field label={t('contracts.studio.definition.product', 'Product')} value={fields.product} onChange={(v) => update('product', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.productPlaceholder', 'Checkout Platform')} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label={t('contracts.studio.definition.owner', 'Owner')} value={fields.owner} onChange={(v) => update('owner', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.owner', 'john.doe@company.com')} />
-            <Field label={t('contracts.studio.definition.team', 'Team')} value={fields.team} onChange={(v) => update('team', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.team', 'Team Payments')} />
+            <Field label={t('contracts.studio.definition.owner', 'Owner')} value={fields.owner} onChange={(v) => update('owner', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.ownerPlaceholder', 'john.doe@company.com')} />
+            <Field label={t('contracts.studio.definition.team', 'Team')} value={fields.team} onChange={(v) => update('team', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.teamPlaceholder', 'Team Payments')} />
           </div>
         </CardBody>
       </Card>
@@ -170,7 +170,7 @@ export function DefinitionSection({ contract, isReadOnly = false, onSave, classN
             <SelectField label={t('contracts.studio.definition.criticality', 'Criticality')} value={fields.criticality} onChange={(v) => update('criticality', v)} disabled={isReadOnly} options={['Critical', 'High', 'Medium', 'Low']} />
             <SelectField label={t('contracts.studio.definition.dataClassification', 'Data Classification')} value={fields.dataClassification} onChange={(v) => update('dataClassification', v)} disabled={isReadOnly} options={['Public', 'Internal', 'Confidential', 'Restricted']} />
           </div>
-          <Field label={t('contracts.studio.definition.tags', 'Tags')} value={fields.tags} onChange={(v) => update('tags', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.tags', 'payments, checkout, pci (comma separated)')} />
+          <Field label={t('contracts.studio.definition.tags', 'Tags')} value={fields.tags} onChange={(v) => update('tags', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.tagsPlaceholder', 'payments, checkout, pci (comma separated)')} />
         </CardBody>
       </Card>
 
@@ -186,10 +186,10 @@ export function DefinitionSection({ contract, isReadOnly = false, onSave, classN
         </CardHeader>
         <CardBody className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <Field label={t('contracts.studio.definition.sla', 'SLA')} value={fields.sla} onChange={(v) => update('sla', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.sla', '99.9% uptime')} />
-            <Field label={t('contracts.studio.definition.slo', 'SLO')} value={fields.slo} onChange={(v) => update('slo', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.slo', 'p99 < 200ms')} />
+            <Field label={t('contracts.studio.definition.sla', 'SLA')} value={fields.sla} onChange={(v) => update('sla', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.slaPlaceholder', '99.9% uptime')} />
+            <Field label={t('contracts.studio.definition.slo', 'SLO')} value={fields.slo} onChange={(v) => update('slo', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.sloPlaceholder', 'p99 < 200ms')} />
           </div>
-          <FieldArea label={t('contracts.studio.definition.externalLinks', 'External Links')} value={fields.externalLinks} onChange={(v) => update('externalLinks', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.placeholder.externalLinks', 'Runbook, wiki, monitoring dashboard URLs (one per line)')} rows={2} />
+          <FieldArea label={t('contracts.studio.definition.externalLinks', 'External Links')} value={fields.externalLinks} onChange={(v) => update('externalLinks', v)} disabled={isReadOnly} placeholder={t('contracts.studio.definition.externalLinksPlaceholder', 'Runbook, wiki, monitoring dashboard URLs (one per line)')} rows={2} />
         </CardBody>
       </Card>
 

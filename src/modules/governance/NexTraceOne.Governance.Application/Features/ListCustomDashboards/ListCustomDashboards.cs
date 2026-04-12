@@ -1,16 +1,16 @@
 using FluentValidation;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 
 namespace NexTraceOne.Governance.Application.Features.ListCustomDashboards;
 
 /// <summary>
 /// Feature: ListCustomDashboards — lista dashboards customizados do tenant com filtro por persona.
-/// Nesta etapa, retorna dados de demonstração para validar o contrato e a navegação.
+/// Consulta a base de dados real via ICustomDashboardRepository.
 ///
 /// Owner: módulo Governance.
-/// Pilar: Governance — Builder visual para personas criarem dashboards customizados.
+/// Pilar: Governance — Source of Truth para dashboards de governance por persona.
 /// </summary>
 public static class ListCustomDashboards
 {
@@ -32,48 +32,29 @@ public static class ListCustomDashboards
         }
     }
 
-    /// <summary>Handler que retorna uma lista de demonstração de dashboards customizados.</summary>
-    public sealed class Handler(IDateTimeProvider clock) : IQueryHandler<Query, Response>
+    /// <summary>Handler que consulta dashboards customizados da base de dados.</summary>
+    public sealed class Handler(ICustomDashboardRepository repository) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var now = clock.UtcNow;
+            var allItems = await repository.ListAsync(request.Persona, cancellationToken);
 
-            var allItems = new List<DashboardSummary>
-            {
-                new(
-                    DashboardId: new Guid("11111111-0000-0000-0000-000000000001"),
-                    Name: "Executive KPI Overview",
-                    Persona: "Executive",
-                    WidgetCount: 6,
-                    Layout: "grid",
-                    IsShared: true,
-                    CreatedAt: now.AddDays(-60)),
-                new(
-                    DashboardId: new Guid("11111111-0000-0000-0000-000000000002"),
-                    Name: "Team Health Dashboard",
-                    Persona: "TechLead",
-                    WidgetCount: 5,
-                    Layout: "two-column",
-                    IsShared: false,
-                    CreatedAt: now.AddDays(-30)),
-                new(
-                    DashboardId: new Guid("11111111-0000-0000-0000-000000000003"),
-                    Name: "Engineer Daily View",
-                    Persona: "Engineer",
-                    WidgetCount: 4,
-                    Layout: "single-column",
-                    IsShared: false,
-                    CreatedAt: now.AddDays(-7)),
-            };
+            var paged = allItems
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(d => new DashboardSummary(
+                    DashboardId: d.Id.Value,
+                    Name: d.Name,
+                    Persona: d.Persona,
+                    WidgetCount: d.WidgetIds.Count,
+                    Layout: d.Layout,
+                    IsShared: d.IsShared,
+                    CreatedAt: d.CreatedAt))
+                .ToList();
 
-            var filtered = string.IsNullOrWhiteSpace(request.Persona)
-                ? allItems
-                : allItems.Where(d => d.Persona.Equals(request.Persona, StringComparison.OrdinalIgnoreCase)).ToList();
-
-            return Task.FromResult(Result<Response>.Success(new Response(
-                Items: filtered,
-                TotalCount: filtered.Count)));
+            return Result<Response>.Success(new Response(
+                Items: paged,
+                TotalCount: allItems.Count));
         }
     }
 

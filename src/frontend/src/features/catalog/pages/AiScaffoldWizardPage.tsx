@@ -290,7 +290,7 @@ export function AiScaffoldWizardPage() {
               </label>
               <input
                 className={INPUT_CLASS}
-                placeholder={t('catalog.scaffold.placeholder.serviceName', 'payment-api')}
+                placeholder={t('catalog.aiScaffold.serviceNamePlaceholder', 'payment-api')}
                 value={serviceName}
                 onChange={e =>
                   setServiceName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
@@ -320,7 +320,7 @@ export function AiScaffoldWizardPage() {
               </label>
               <input
                 className={INPUT_CLASS}
-                placeholder={t('catalog.scaffold.placeholder.domainEntities', 'Payment, Refund, Statement')}
+                placeholder={t('catalog.aiScaffold.entitiesPlaceholder', 'Payment, Refund, Statement')}
                 value={mainEntities}
                 onChange={e => setMainEntities(e.target.value)}
               />

@@ -28,7 +28,8 @@ internal sealed class ModuleAccessPolicyConfiguration : IEntityTypeConfiguration
         builder.Property(x => x.TenantId)
             .HasConversion(
                 id => id == null ? (Guid?)null : id.Value,
-                value => value.HasValue ? TenantId.From(value.Value) : null);
+                value => value.HasValue ? TenantId.From(value.Value) : null)
+            .IsRequired();
 
         builder.Property(x => x.Module)
             .HasMaxLength(100)

@@ -48,6 +48,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             else
             {
                 await dbContext.Definitions.AddAsync(definition, cancellationToken);
+                existingKeys.Add(definition.Key);
                 added++;
             }
         }
@@ -922,68 +923,10 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             sortOrder: 1250),
 
         // ── BLOCK F — Branding & Experience Defaults ──────────────────────
-
-        ConfigurationDefinition.Create(
-            key: "branding.logo_url",
-            displayName: "config.branding.logo_url.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.logo_url.description",
-            uiEditorType: "text",
-            sortOrder: 1300),
-
-        ConfigurationDefinition.Create(
-            key: "branding.logo_dark_url",
-            displayName: "config.branding.logo_dark_url.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.logo_dark_url.description",
-            uiEditorType: "text",
-            sortOrder: 1310),
-
-        ConfigurationDefinition.Create(
-            key: "branding.accent_color",
-            displayName: "config.branding.accent_color.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.accent_color.description",
-            defaultValue: "#3B82F6",
-            validationRules: """{"pattern":"^#[0-9a-fA-F]{6}$"}""",
-            uiEditorType: "text",
-            sortOrder: 1320),
-
-        ConfigurationDefinition.Create(
-            key: "branding.favicon_url",
-            displayName: "config.branding.favicon_url.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.favicon_url.description",
-            uiEditorType: "text",
-            sortOrder: 1330),
-
-        ConfigurationDefinition.Create(
-            key: "branding.welcome_message",
-            displayName: "config.branding.welcome_message.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.welcome_message.description",
-            uiEditorType: "text",
-            sortOrder: 1340),
-
-        ConfigurationDefinition.Create(
-            key: "branding.footer_text",
-            displayName: "config.branding.footer_text.label",
-            category: ConfigurationCategory.Functional,
-            valueType: ConfigurationValueType.String,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
-            description: "config.branding.footer_text.description",
-            uiEditorType: "text",
-            sortOrder: 1350),
+        // REMOVED: All branding.* parameters (logo_url, logo_dark_url, accent_color,
+        // favicon_url, welcome_message, footer_text) were removed to preserve the
+        // NexTraceOne visual identity. The platform's brand (logo, colors, layout)
+        // must not be customizable by users or tenants.
 
         // ── Login Page Branding ──
 
@@ -5789,5 +5732,348 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: """["Incidents","Changes","Governance","Security"]""",
             uiEditorType: "json-editor",
             sortOrder: 9540),
+
+        // ── User Profile Preferences (Phase 1) ──────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "user.timezone",
+            displayName: "config.user.timezone.label",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.timezone.description",
+            defaultValue: "UTC",
+            uiEditorType: "select",
+            sortOrder: 9000),
+
+        ConfigurationDefinition.Create(
+            key: "user.date_format",
+            displayName: "config.user.date_format.label",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.date_format.description",
+            defaultValue: "yyyy-MM-dd",
+            validationRules: """{"enum":["yyyy-MM-dd","MM/dd/yyyy","dd/MM/yyyy","dd.MM.yyyy"]}""",
+            uiEditorType: "select",
+            sortOrder: 9010),
+
+        ConfigurationDefinition.Create(
+            key: "user.time_format",
+            displayName: "config.user.time_format.label",
+            category: ConfigurationCategory.Bootstrap,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.time_format.description",
+            defaultValue: "HH:mm:ss",
+            validationRules: """{"enum":["HH:mm:ss","hh:mm:ss a","HH:mm"]}""",
+            uiEditorType: "select",
+            sortOrder: 9020),
+
+        ConfigurationDefinition.Create(
+            key: "user.items_per_page",
+            displayName: "config.user.items_per_page.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.items_per_page.description",
+            defaultValue: "25",
+            validationRules: """{"enum":[10,25,50,100]}""",
+            uiEditorType: "select",
+            sortOrder: 9030),
+
+        // ── Default Scope Preferences ────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "default.environment",
+            displayName: "config.default.environment.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.default.environment.description",
+            uiEditorType: "select",
+            sortOrder: 9100),
+
+        ConfigurationDefinition.Create(
+            key: "default.team",
+            displayName: "config.default.team.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.default.team.description",
+            uiEditorType: "select",
+            sortOrder: 9110),
+
+        ConfigurationDefinition.Create(
+            key: "default.service",
+            displayName: "config.default.service.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.default.service.description",
+            uiEditorType: "select",
+            sortOrder: 9120),
+
+        // ── Table Column Preferences ─────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "table.columns.catalog.services",
+            displayName: "config.table.columns.catalog.services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.catalog.services.description",
+            defaultValue: """["name","team","type","status","criticality"]""",
+            uiEditorType: "json",
+            sortOrder: 9200),
+
+        ConfigurationDefinition.Create(
+            key: "table.columns.changes.list",
+            displayName: "config.table.columns.changes.list.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.changes.list.description",
+            defaultValue: """["title","service","environment","status","risk","createdAt"]""",
+            uiEditorType: "json",
+            sortOrder: 9210),
+
+        ConfigurationDefinition.Create(
+            key: "table.columns.contracts.list",
+            displayName: "config.table.columns.contracts.list.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.contracts.list.description",
+            defaultValue: """["name","service","type","version","status"]""",
+            uiEditorType: "json",
+            sortOrder: 9220),
+
+        ConfigurationDefinition.Create(
+            key: "table.columns.incidents.list",
+            displayName: "config.table.columns.incidents.list.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.table.columns.incidents.list.description",
+            defaultValue: """["title","service","severity","status","assignee","createdAt"]""",
+            uiEditorType: "json",
+            sortOrder: 9230),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.engineer",
+            displayName: "config.platform.home.template.engineer.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.engineer.description",
+            defaultValue: """["team-services","recent-changes","active-incidents","dora-metrics"]""",
+            uiEditorType: "json",
+            sortOrder: 9300),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.tech_lead",
+            displayName: "config.platform.home.template.tech_lead.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.tech_lead.description",
+            defaultValue: """["team-services","change-risk","pending-approvals","slo-status","dora-metrics"]""",
+            uiEditorType: "json",
+            sortOrder: 9310),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.architect",
+            displayName: "config.platform.home.template.architect.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.architect.description",
+            defaultValue: """["contract-health","dependency-map","compliance-status","reliability-trend"]""",
+            uiEditorType: "json",
+            sortOrder: 9320),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.executive",
+            displayName: "config.platform.home.template.executive.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.executive.description",
+            defaultValue: """["finops-summary","compliance-status","incident-overview","dora-metrics"]""",
+            uiEditorType: "json",
+            sortOrder: 9330),
+
+        ConfigurationDefinition.Create(
+            key: "platform.home.template.platform_admin",
+            displayName: "config.platform.home.template.platform_admin.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.home.template.platform_admin.description",
+            defaultValue: """["ai-usage","security-findings","audit-activity","system-health"]""",
+            uiEditorType: "json",
+            sortOrder: 9340),
+
+        ConfigurationDefinition.Create(
+            key: "home.widget.notes.content",
+            displayName: "config.home.widget.notes.content.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.home.widget.notes.content.description",
+            defaultValue: "",
+            uiEditorType: "markdown",
+            sortOrder: 9350),
+
+        // ── Phase 3: Quiet Hours ──────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.enabled",
+            displayName: "config.notifications.quiet_hours.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9400),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.start",
+            displayName: "config.notifications.quiet_hours.start.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.start.description",
+            defaultValue: "22:00",
+            uiEditorType: "time",
+            sortOrder: 9410),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.end",
+            displayName: "config.notifications.quiet_hours.end.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.end.description",
+            defaultValue: "08:00",
+            uiEditorType: "time",
+            sortOrder: 9420),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.quiet_hours.timezone",
+            displayName: "config.notifications.quiet_hours.timezone.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.quiet_hours.timezone.description",
+            defaultValue: "UTC",
+            uiEditorType: "timezone-select",
+            sortOrder: 9430),
+
+        // ── Phase 3: Digest ───────────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "notifications.digest.frequency",
+            displayName: "config.notifications.digest.frequency.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.digest.frequency.description",
+            defaultValue: "daily",
+            uiEditorType: "select",
+            sortOrder: 9440),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.digest.sections",
+            displayName: "config.notifications.digest.sections.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.notifications.digest.sections.description",
+            defaultValue: """["changes","incidents","contracts","compliance"]""",
+            uiEditorType: "json",
+            sortOrder: 9450),
+
+        // ── Phase 7 — AI Customization (User-level) ───────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.response_verbosity",
+            displayName: "config.user.ai.response_verbosity.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.response_verbosity.description",
+            defaultValue: "standard",
+            uiEditorType: "select",
+            sortOrder: 9500),
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.preferred_language",
+            displayName: "config.user.ai.preferred_language.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.preferred_language.description",
+            defaultValue: "en",
+            uiEditorType: "text",
+            sortOrder: 9510),
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.auto_context_scope",
+            displayName: "config.user.ai.auto_context_scope.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.auto_context_scope.description",
+            defaultValue: "team",
+            uiEditorType: "select",
+            sortOrder: 9520),
+
+        ConfigurationDefinition.Create(
+            key: "user.ai.knowledge_sources",
+            displayName: "config.user.ai.knowledge_sources.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.user.ai.knowledge_sources.description",
+            defaultValue: """["contracts","services","changes","incidents","runbooks"]""",
+            uiEditorType: "json",
+            sortOrder: 9530),
+
+        // ── Phase 6 — Reports Seeds ──────────────────
+
+        ConfigurationDefinition.Create(
+            key: "reports.saved_templates",
+            displayName: "config.reports.saved_templates.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.User],
+            description: "config.reports.saved_templates.description",
+            defaultValue: "[]",
+            uiEditorType: "json",
+            sortOrder: 9540),
+
+        ConfigurationDefinition.Create(
+            key: "reports.export.default_format",
+            displayName: "config.reports.export.default_format.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.User, ConfigurationScope.Tenant],
+            description: "config.reports.export.default_format.description",
+            defaultValue: "csv",
+            uiEditorType: "select",
+            sortOrder: 9545),
+
+        // ── Phase 8 — Integrations & API (Tenant-level) ──────────────────
+
+        ConfigurationDefinition.Create(
+            key: "integration.field_mapping.enabled",
+            displayName: "config.integration.field_mapping.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integration.field_mapping.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9600),
     ];
 }

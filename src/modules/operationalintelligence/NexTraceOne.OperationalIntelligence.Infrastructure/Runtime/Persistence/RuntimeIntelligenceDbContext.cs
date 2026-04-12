@@ -31,6 +31,27 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Perfis de maturidade de observabilidade por serviço.</summary>
     public DbSet<ObservabilityProfile> ObservabilityProfiles => Set<ObservabilityProfile>();
 
+    /// <summary>Gráficos customizados criados pelos utilizadores.</summary>
+    public DbSet<CustomChart> CustomCharts => Set<CustomChart>();
+
+    /// <summary>Experimentos de chaos engineering planeados e executados.</summary>
+    public DbSet<ChaosExperiment> ChaosExperiments => Set<ChaosExperiment>();
+
+    /// <summary>Narrativas de anomalia geradas por IA a partir de drift findings.</summary>
+    public DbSet<AnomalyNarrative> AnomalyNarratives => Set<AnomalyNarrative>();
+
+    /// <summary>Relatórios de drift entre ambientes.</summary>
+    public DbSet<EnvironmentDriftReport> EnvironmentDriftReports => Set<EnvironmentDriftReport>();
+
+    /// <summary>Playbooks operacionais estruturados e versionáveis.</summary>
+    public DbSet<OperationalPlaybook> OperationalPlaybooks => Set<OperationalPlaybook>();
+
+    /// <summary>Registos de execução de playbooks operacionais.</summary>
+    public DbSet<PlaybookExecution> PlaybookExecutions => Set<PlaybookExecution>();
+
+    /// <summary>Relatórios de resiliência gerados após experimentos de chaos.</summary>
+    public DbSet<ResilienceReport> ResilienceReports => Set<ResilienceReport>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;

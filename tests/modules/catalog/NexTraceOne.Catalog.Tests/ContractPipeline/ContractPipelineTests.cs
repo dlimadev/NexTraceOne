@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging.Abstractions;
+
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateClientSdkFromContract;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateContractTests;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateMockServer;
@@ -108,7 +110,7 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GenerateMockServer_WireMock_GeneratesStubFiles()
     {
-        var handler = new GenerateMockServer.Handler();
+        var handler = new GenerateMockServer.Handler(NullLogger<GenerateMockServer.Handler>.Instance);
         var command = new GenerateMockServer.Command(ContractVersionId, SampleOpenApiJson, "wiremock");
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -122,7 +124,7 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GenerateMockServer_JsonServer_GeneratesDbAndRoutes()
     {
-        var handler = new GenerateMockServer.Handler();
+        var handler = new GenerateMockServer.Handler(NullLogger<GenerateMockServer.Handler>.Instance);
         var command = new GenerateMockServer.Command(ContractVersionId, SampleOpenApiJson, "json-server");
 
         var result = await handler.Handle(command, CancellationToken.None);

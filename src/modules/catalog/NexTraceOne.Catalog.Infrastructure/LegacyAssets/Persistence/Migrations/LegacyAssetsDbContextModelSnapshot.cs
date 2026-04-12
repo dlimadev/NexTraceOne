@@ -17,7 +17,7 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -356,6 +356,98 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookContractMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CopybookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MappingType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopybookId");
+
+                    b.HasIndex("CopybookId", "ContractVersionId")
+                        .IsUnique();
+
+                    b.ToTable("cat_copybook_contract_mappings", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookDiffRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AdditiveChangeCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("BaseVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("BreakingChangeCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChangeLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ChangesJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CopybookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("NonBreakingChangeCount")
+                        .HasColumnType("integer");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<Guid>("TargetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopybookId");
+
+                    b.HasIndex("TargetVersionId");
+
+                    b.HasIndex("BaseVersionId", "TargetVersionId");
+
+                    b.ToTable("cat_copybook_diffs", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_cat_copybook_diffs_change_level", "\"ChangeLevel\" >= 0 AND \"ChangeLevel\" <= 4");
+                        });
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookField", b =>
                 {
                     b.Property<Guid>("Id")
@@ -455,6 +547,55 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("cat_copybook_program_usages", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CopybookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FieldCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RawContent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RecordFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<int>("TotalLength")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("VersionLabel")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CopybookId");
+
+                    b.HasIndex("CopybookId", "VersionLabel")
+                        .IsUnique();
+
+                    b.ToTable("cat_copybook_versions", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.Db2Artifact", b =>
@@ -824,6 +965,64 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.MqMessageContract", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CopybookReference")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EncodingScheme")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("HeaderFormat")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("MaxMessageLength")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MessageFormat")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PayloadSchema")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("QueueName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<Guid>("SystemId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SystemId");
+
+                    b.HasIndex("QueueName", "SystemId")
+                        .IsUnique();
+
+                    b.ToTable("cat_mq_contracts", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.ZosConnectBinding", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1032,6 +1231,36 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookContractMapping", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.Copybook", null)
+                        .WithMany()
+                        .HasForeignKey("CopybookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookDiffRecord", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookVersion", null)
+                        .WithMany()
+                        .HasForeignKey("BaseVersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.Copybook", null)
+                        .WithMany()
+                        .HasForeignKey("CopybookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookVersion", null)
+                        .WithMany()
+                        .HasForeignKey("TargetVersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookField", b =>
                 {
                     b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.Copybook", null)
@@ -1052,6 +1281,15 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Migrations
                     b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CobolProgram", null)
                         .WithMany()
                         .HasForeignKey("ProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.CopybookVersion", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.Copybook", null)
+                        .WithMany()
+                        .HasForeignKey("CopybookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1108,6 +1346,15 @@ namespace NexTraceOne.Catalog.Infrastructure.LegacyAssets.Persistence.Migrations
                         });
 
                     b.Navigation("Lpar")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.MqMessageContract", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.LegacyAssets.Entities.MainframeSystem", null)
+                        .WithMany()
+                        .HasForeignKey("SystemId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

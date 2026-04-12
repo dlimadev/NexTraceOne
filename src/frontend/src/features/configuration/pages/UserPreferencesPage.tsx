@@ -1,11 +1,27 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Settings, Sidebar, LayoutDashboard, Save, CheckCircle, XCircle,
   Sun, Moon, Globe, Bell, BellOff, Eye, Accessibility, Monitor,
-  Table, Clock, Type,
+  Table, Clock, Type, List, Rss, Bot,
 } from 'lucide-react';
+
+const TIMEZONES = [
+  'UTC',
+  'America/Sao_Paulo',
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'Europe/Lisbon',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'Asia/Tokyo',
+  'Asia/Shanghai',
+  'Australia/Sydney',
+];
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -142,85 +158,97 @@ export function UserPreferencesPage() {
   const [subscribedCategories, setSubscribedCategories] = useState<string[]>(NOTIFICATION_CATEGORIES);
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [timezone, setTimezone] = useState('UTC');
+  const [dateFormat, setDateFormat] = useState('yyyy-MM-dd');
+  const [timeFormat, setTimeFormat] = useState('HH:mm:ss');
+  const [itemsPerPage, setItemsPerPage] = useState('25');
+  const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
+  const [quietHoursStart, setQuietHoursStart] = useState('22:00');
+  const [quietHoursEnd, setQuietHoursEnd] = useState('08:00');
+  const [quietHoursTimezone, setQuietHoursTimezone] = useState('UTC');
+  const [digestFrequency, setDigestFrequency] = useState('daily');
+  const [digestSections, setDigestSections] = useState<string[]>(['changes', 'incidents', 'contracts', 'compliance']);
 
-  useEffect(() => {
-    if (data?.preferences) {
-      const getPref = (key: string) => data.preferences.find(p => p.key === key)?.value;
+  const DIGEST_SECTION_OPTIONS = ['changes', 'incidents', 'contracts', 'compliance', 'finops', 'ai-usage'];
 
-      // Sidebar & Dashboard
-      const sidebar = getPref('platform.sidebar.pinned_items');
-      const widgets = getPref('platform.home.active_widgets');
-      if (sidebar) try { setPinnedItems(JSON.parse(sidebar)); } catch { /* keep default */ }
-      if (widgets) try { setActiveWidgets(JSON.parse(widgets)); } catch { /* keep default */ }
+  // ── AI Preferences state ──────────────────────────────────────────────────
+  const [aiVerbosity, setAiVerbosity] = useState('standard');
+  const [aiLanguage, setAiLanguage] = useState('en');
+  const [aiContextScope, setAiContextScope] = useState('team');
+  const [aiKnowledgeSources, setAiKnowledgeSources] = useState<string[]>(['contracts', 'services', 'changes', 'incidents', 'runbooks']);
 
-      // Appearance
-      const lang = getPref('platform.ui.language');
-      const tz = getPref('platform.ui.timezone');
-      const dateFmt = getPref('platform.ui.date_display_format');
-      const density = getPref('platform.ui.density');
-      const anim = getPref('platform.ui.animations.enabled');
-      const rows = getPref('platform.ui.table_rows_per_page');
-      const fontSize = getPref('platform.ui.code_font_size');
-      if (lang) setSelectedLanguage(lang);
-      if (tz) setSelectedTimezone(tz);
-      if (dateFmt) setSelectedDateFormat(dateFmt);
-      if (density) setSelectedDensity(density);
-      if (anim) setAnimationsEnabled(anim === 'true');
-      if (rows) setTableRowsPerPage(parseInt(rows, 10) || 25);
-      if (fontSize) setCodeFontSize(parseInt(fontSize, 10) || 13);
+  const AI_KNOWLEDGE_OPTIONS = ['contracts', 'services', 'changes', 'incidents', 'runbooks', 'knowledge-articles', 'operational-notes'];
+  const [defaultEnv, setDefaultEnv] = useState('');
+  const [defaultTeam, setDefaultTeam] = useState('');
+  const [defaultService, setDefaultService] = useState('');
 
-      // Accessibility
-      const hc = getPref('platform.ui.high_contrast.enabled');
-      const rm = getPref('platform.ui.reduced_motion.enabled');
-      const ks = getPref('platform.ui.keyboard_shortcuts.enabled');
-      if (hc) setHighContrastEnabled(hc === 'true');
-      if (rm) setReducedMotionEnabled(rm === 'true');
-      if (ks) setKeyboardShortcutsEnabled(ks === 'true');
-
-      // Notifications
-      const email = getPref('notifications.user.email_enabled');
-      const inapp = getPref('notifications.user.inapp_enabled');
-      const digest = getPref('notifications.user.digest_enabled');
-      const freq = getPref('notifications.user.digest_frequency_hours');
-      const cats = getPref('notifications.user.categories_subscribed');
-      if (email) setEmailNotifications(email === 'true');
-      if (inapp) setInAppNotifications(inapp === 'true');
-      if (digest) setDigestEnabled(digest === 'true');
-      if (freq) setDigestFrequency(parseInt(freq, 10) || 24);
-      if (cats) try { setSubscribedCategories(JSON.parse(cats)); } catch { /* keep default */ }
-    }
-  }, [data]);
+  // Sync server preferences into local state once data arrives
+  const [prefsInitialized, setPrefsInitialized] = useState(false);
+  if (data?.preferences && !prefsInitialized) {
+    setPrefsInitialized(true);
+    const prefs = data.preferences;
+    const find = (k: string) => prefs.find(p => p.key === k)?.value;
+    const sidebar = find('platform.sidebar.pinned_items');
+    const widgets = find('platform.home.active_widgets');
+    if (sidebar) { try { setPinnedItems(JSON.parse(sidebar)); } catch { /* keep default */ } }
+    if (widgets) { try { setActiveWidgets(JSON.parse(widgets)); } catch { /* keep default */ } }
+    const tz = find('user.timezone');
+    const df = find('user.date_format');
+    const tf = find('user.time_format');
+    const ipp = find('user.items_per_page');
+    const de = find('default.environment');
+    const dtPref = find('default.team');
+    const ds = find('default.service');
+    if (tz) setTimezone(tz);
+    if (df) setDateFormat(df);
+    if (tf) setTimeFormat(tf);
+    if (ipp) setItemsPerPage(ipp);
+    if (de) setDefaultEnv(de);
+    if (dtPref) setDefaultTeam(dtPref);
+    if (ds) setDefaultService(ds);
+    const qhe = find('notifications.quiet_hours.enabled');
+    const qhs = find('notifications.quiet_hours.start');
+    const qhend = find('notifications.quiet_hours.end');
+    const qhtz = find('notifications.quiet_hours.timezone');
+    const df2 = find('notifications.digest.frequency');
+    const dsec = find('notifications.digest.sections');
+    if (qhe) setQuietHoursEnabled(qhe === 'true');
+    if (qhs) setQuietHoursStart(qhs);
+    if (qhend) setQuietHoursEnd(qhend);
+    if (qhtz) setQuietHoursTimezone(qhtz);
+    if (df2) setDigestFrequency(df2);
+    if (dsec) { try { setDigestSections(JSON.parse(dsec)); } catch { /* keep default */ } }
+    const aiVerb = find('user.ai.response_verbosity');
+    const aiLang = find('user.ai.preferred_language');
+    const aiScope = find('user.ai.auto_context_scope');
+    const aiKnow = find('user.ai.knowledge_sources');
+    if (aiVerb) setAiVerbosity(aiVerb);
+    if (aiLang) setAiLanguage(aiLang);
+    if (aiScope) setAiContextScope(aiScope);
+    if (aiKnow) { try { setAiKnowledgeSources(JSON.parse(aiKnow)); } catch { /* keep default */ } }
+  }
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const prefs: [string, string][] = [
-        // Sidebar & Dashboard
-        ['platform.sidebar.pinned_items', JSON.stringify(pinnedItems)],
-        ['platform.home.active_widgets', JSON.stringify(activeWidgets)],
-        // Appearance
-        ['platform.ui.language', selectedLanguage],
-        ['platform.ui.timezone', selectedTimezone],
-        ['platform.ui.date_display_format', selectedDateFormat],
-        ['platform.ui.density', selectedDensity],
-        ['platform.ui.animations.enabled', String(animationsEnabled)],
-        ['platform.ui.table_rows_per_page', String(tableRowsPerPage)],
-        ['platform.ui.code_font_size', String(codeFontSize)],
-        // Accessibility
-        ['platform.ui.high_contrast.enabled', String(highContrastEnabled)],
-        ['platform.ui.reduced_motion.enabled', String(reducedMotionEnabled)],
-        ['platform.ui.keyboard_shortcuts.enabled', String(keyboardShortcutsEnabled)],
-        // Notifications
-        ['notifications.user.email_enabled', String(emailNotifications)],
-        ['notifications.user.inapp_enabled', String(inAppNotifications)],
-        ['notifications.user.digest_enabled', String(digestEnabled)],
-        ['notifications.user.digest_frequency_hours', String(digestFrequency)],
-        ['notifications.user.categories_subscribed', JSON.stringify(subscribedCategories)],
-      ];
-      await Promise.all(prefs.map(([key, value]) => savePreference(key, value)));
-      // Apply language change
-      if (selectedLanguage !== i18n.language) {
-        await i18n.changeLanguage(selectedLanguage);
-      }
+      await savePreference('platform.sidebar.pinned_items', JSON.stringify(pinnedItems));
+      await savePreference('platform.home.active_widgets', JSON.stringify(activeWidgets));
+      await savePreference('user.timezone', timezone);
+      await savePreference('user.date_format', dateFormat);
+      await savePreference('user.time_format', timeFormat);
+      await savePreference('user.items_per_page', itemsPerPage);
+      if (defaultEnv) await savePreference('default.environment', defaultEnv);
+      if (defaultTeam) await savePreference('default.team', defaultTeam);
+      if (defaultService) await savePreference('default.service', defaultService);
+      await savePreference('notifications.quiet_hours.enabled', String(quietHoursEnabled));
+      await savePreference('notifications.quiet_hours.start', quietHoursStart);
+      await savePreference('notifications.quiet_hours.end', quietHoursEnd);
+      await savePreference('notifications.quiet_hours.timezone', quietHoursTimezone);
+      await savePreference('notifications.digest.frequency', digestFrequency);
+      await savePreference('notifications.digest.sections', JSON.stringify(digestSections));
+      await savePreference('user.ai.response_verbosity', aiVerbosity);
+      await savePreference('user.ai.preferred_language', aiLanguage);
+      await savePreference('user.ai.auto_context_scope', aiContextScope);
+      await savePreference('user.ai.knowledge_sources', JSON.stringify(aiKnowledgeSources));
     },
     onSuccess: () => {
       setSaveStatus('saved');
@@ -667,6 +695,195 @@ export function UserPreferencesPage() {
         </div>
       </div>
 
+      {/* Timezone & Date Format */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <Clock size={18} />
+            <span>{t('userPreferences.timezone.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('userPreferences.timezone.timezone')}</label>
+                <select value={timezone} onChange={e => setTimezone(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded">
+                  {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('userPreferences.timezone.dateFormat')}</label>
+                <select value={dateFormat} onChange={e => setDateFormat(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded">
+                  <option value="yyyy-MM-dd">yyyy-MM-dd (ISO)</option>
+                  <option value="MM/dd/yyyy">MM/dd/yyyy (US)</option>
+                  <option value="dd/MM/yyyy">dd/MM/yyyy (EU)</option>
+                  <option value="dd.MM.yyyy">dd.MM.yyyy</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('userPreferences.timezone.timeFormat')}</label>
+                <select value={timeFormat} onChange={e => setTimeFormat(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded">
+                  <option value="HH:mm:ss">HH:mm:ss (24h)</option>
+                  <option value="hh:mm:ss a">hh:mm:ss a (12h)</option>
+                  <option value="HH:mm">HH:mm (Short)</option>
+                </select>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Default Scope */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <Globe size={18} />
+            <span>{t('userPreferences.defaultScope.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <p className="text-sm text-muted mb-4">{t('userPreferences.defaultScope.description')}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('userPreferences.defaultScope.environment')}</label>
+                <input type="text" value={defaultEnv} onChange={e => setDefaultEnv(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded" placeholder="e.g. production" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('userPreferences.defaultScope.team')}</label>
+                <input type="text" value={defaultTeam} onChange={e => setDefaultTeam(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded" placeholder="e.g. platform" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('userPreferences.defaultScope.service')}</label>
+                <input type="text" value={defaultService} onChange={e => setDefaultService(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded" placeholder="e.g. api-gateway" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Items Per Page */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <List size={18} />
+            <span>{t('userPreferences.itemsPerPage.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <p className="text-sm text-muted mb-3">{t('userPreferences.itemsPerPage.description')}</p>
+            <select value={itemsPerPage} onChange={e => setItemsPerPage(e.target.value)} className="w-40 px-3 py-1.5 text-sm border rounded">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Quiet Hours */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <BellOff size={18} />
+            <span>{t('quietHours.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <p className="text-sm text-muted mb-4">{t('quietHours.subtitle')}</p>
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={quietHoursEnabled}
+                  onChange={e => setQuietHoursEnabled(e.target.checked)}
+                  className="w-4 h-4 accent-blue-600"
+                />
+                <span className="text-sm">{t('quietHours.enabled')}</span>
+              </label>
+              {quietHoursEnabled && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pl-7">
+                  <div>
+                    <label className="block text-xs text-muted mb-1">{t('quietHours.start')}</label>
+                    <input
+                      type="time"
+                      value={quietHoursStart}
+                      onChange={e => setQuietHoursStart(e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted mb-1">{t('quietHours.end')}</label>
+                    <input
+                      type="time"
+                      value={quietHoursEnd}
+                      onChange={e => setQuietHoursEnd(e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border rounded bg-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted mb-1">{t('quietHours.timezone')}</label>
+                    <select
+                      value={quietHoursTimezone}
+                      onChange={e => setQuietHoursTimezone(e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                    >
+                      {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Digest Settings */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <Rss size={18} />
+            <span>{t('digestSettings.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('digestSettings.frequency')}</label>
+                <select
+                  value={digestFrequency}
+                  onChange={e => setDigestFrequency(e.target.value)}
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                >
+                  <option value="daily">{t('digestSettings.frequencyOptions.daily')}</option>
+                  <option value="weekly">{t('digestSettings.frequencyOptions.weekly')}</option>
+                  <option value="none">{t('digestSettings.frequencyOptions.none')}</option>
+                </select>
+              </div>
+              {digestFrequency !== 'none' && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('digestSettings.sections')}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {DIGEST_SECTION_OPTIONS.map(sec => (
+                      <button
+                        key={sec}
+                        onClick={() =>
+                          setDigestSections(prev =>
+                            prev.includes(sec) ? prev.filter(s => s !== sec) : [...prev, sec]
+                          )
+                        }
+                        className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                          digestSections.includes(sec)
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                        }`}
+                      >
+                        {sec}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
       {/* Save button */}
       <div className="mt-6 flex items-center gap-3">
         <button
@@ -687,6 +904,86 @@ export function UserPreferencesPage() {
             <XCircle size={14} /> {t('userPreferences.error')}
           </span>
         )}
+      </div>
+
+      {/* AI Preferences */}
+      <div className="mt-6">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <Bot size={18} />
+            <span>{t('aiPreferences.title')}</span>
+          </CardHeader>
+          <CardBody>
+            <div className="space-y-5">
+              {/* Response Verbosity */}
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('aiPreferences.verbosity')}</label>
+                <select
+                  value={aiVerbosity}
+                  onChange={e => setAiVerbosity(e.target.value)}
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                >
+                  <option value="concise">{t('aiPreferences.verbosityOptions.concise')}</option>
+                  <option value="standard">{t('aiPreferences.verbosityOptions.standard')}</option>
+                  <option value="detailed">{t('aiPreferences.verbosityOptions.detailed')}</option>
+                </select>
+              </div>
+
+              {/* Preferred Language */}
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('aiPreferences.language')}</label>
+                <input
+                  type="text"
+                  value={aiLanguage}
+                  onChange={e => setAiLanguage(e.target.value)}
+                  className="w-32 px-3 py-1.5 text-sm border rounded bg-transparent"
+                  placeholder="en"
+                />
+              </div>
+
+              {/* Auto Context Scope */}
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('aiPreferences.contextScope')}</label>
+                <select
+                  value={aiContextScope}
+                  onChange={e => setAiContextScope(e.target.value)}
+                  className="w-48 px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
+                >
+                  <option value="service">{t('aiPreferences.scopeOptions.service')}</option>
+                  <option value="team">{t('aiPreferences.scopeOptions.team')}</option>
+                  <option value="all">{t('aiPreferences.scopeOptions.all')}</option>
+                </select>
+              </div>
+
+              {/* Knowledge Sources */}
+              <div>
+                <label className="block text-sm font-medium mb-2">{t('aiPreferences.knowledgeSources')}</label>
+                <div className="flex flex-wrap gap-2">
+                  {AI_KNOWLEDGE_OPTIONS.map(src => {
+                    return (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() =>
+                          setAiKnowledgeSources(prev =>
+                            prev.includes(src) ? prev.filter(s => s !== src) : [...prev, src]
+                          )
+                        }
+                        className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                          aiKnowledgeSources.includes(src)
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-blue-300'
+                        }`}
+                      >
+                        {t(`aiPreferences.knowledgeSourceOptions.${src === 'knowledge-articles' ? 'knowledgeArticles' : src === 'operational-notes' ? 'operationalNotes' : src}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
       </div>
     </PageContainer>
   );

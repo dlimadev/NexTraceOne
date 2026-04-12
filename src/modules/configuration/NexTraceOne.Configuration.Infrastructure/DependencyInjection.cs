@@ -43,6 +43,34 @@ public static class DependencyInjection
         services.AddScoped<IConfigurationEntryRepository, ConfigurationEntryRepository>();
         services.AddScoped<IConfigurationAuditRepository, ConfigurationAuditRepository>();
         services.AddScoped<IFeatureFlagRepository, FeatureFlagRepository>();
+        services.AddScoped<IUserSavedViewRepository, UserSavedViewRepository>();
+        services.AddScoped<IUserBookmarkRepository, UserBookmarkRepository>();
+
+        // Phase 3: Watch Lists & Alert Rules — PostgreSQL persistence
+        services.AddScoped<IUserWatchRepository, UserWatchRepository>();
+        services.AddScoped<IUserAlertRuleRepository, UserAlertRuleRepository>();
+
+        // Phase 4: Tags, Custom Fields & Taxonomies — PostgreSQL persistence
+        services.AddScoped<IEntityTagRepository, EntityTagRepository>();
+        services.AddScoped<IServiceCustomFieldRepository, ServiceCustomFieldRepository>();
+        services.AddScoped<ITaxonomyRepository, TaxonomyRepository>();
+
+        // Phase 5: Automation, Checklists & Contract Templates — PostgreSQL persistence
+        services.AddScoped<IAutomationRuleRepository, AutomationRuleRepository>();
+        services.AddScoped<IChangeChecklistRepository, ChangeChecklistRepository>();
+        services.AddScoped<IContractTemplateRepository, ContractTemplateRepository>();
+
+        // Phase 6: Scheduled Reports — PostgreSQL persistence
+        services.AddScoped<IScheduledReportRepository, ScheduledReportRepository>();
+
+        // Phase 7: Saved Prompts — PostgreSQL persistence
+        services.AddScoped<ISavedPromptRepository, SavedPromptRepository>();
+
+        // Phase 8: Webhook Templates — PostgreSQL persistence
+        services.AddScoped<IWebhookTemplateRepository, WebhookTemplateRepository>();
+
+        // Phase 9: Contract Compliance Policies — PostgreSQL persistence
+        services.AddScoped<IContractCompliancePolicyRepository, ContractCompliancePolicyRepository>();
 
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();

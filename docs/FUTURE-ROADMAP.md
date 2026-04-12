@@ -93,16 +93,22 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ## 6. Qualidade & Testes
 
-### 6.1 Frontend Unit Tests para Contract Builders
-- **Estado:** 0 testes para VisualRestBuilder, VisualSoapBuilder, VisualEventBuilder, ServiceRegistrationWizard, ContractHealthDashboard
-- **Escopo:** Testes unitários com Vitest para componentes complexos de contract building
-- **Prioridade:** Alta
+### 6.1 Frontend Unit Tests para Contract Builders ✅ IMPLEMENTADO (Abril 2026)
+- **Estado:** ✅ 6 novos ficheiros de teste — 69+ casos passando
+  - `VisualSoapBuilderValidation.test.ts` — 11 casos (validateSoapBuilder)
+  - `VisualEventBuilderValidation.test.ts` — 14 casos (validateEventBuilder)
+  - `WorkserviceBuilderValidation.test.ts` — 13 casos (validateWorkserviceBuilder)
+  - `WebhookBuilderValidation.test.ts` — 11 casos (validateWebhookBuilder)
+  - `SharedSchemaBuilderValidation.test.ts` — 9 casos (validateSharedSchemaBuilder)
+  - `ServiceRegistrationWizard.test.tsx` — 7 casos (step navigation, validation, submit)
+- **Total suite:** 1127 testes passando
 - **Referência:** GAP-CTR-09
 
-### 6.2 E2E Tests para Fluxos de Contrato
-- **Estado:** Versioning, approval, health dashboard, deprecation flows sem cobertura E2E
-- **Escopo:** Playwright specs para fluxos críticos de contrato
-- **Prioridade:** Média
+### 6.2 E2E Tests para Fluxos de Contrato ✅ IMPLEMENTADO (Abril 2026)
+- **Estado:** ✅ 3 novos ficheiros Playwright criados
+  - `contract-versioning-flows.spec.ts` — versioning, lifecycle badges, draft creation
+  - `contract-approval-flows.spec.ts` — draft/review/approved/rejected state display
+  - `contract-deprecation-flows.spec.ts` — deprecated contract list, detail, health metrics
 - **Referência:** GAP-CTR-10
 
 ---
@@ -187,7 +193,14 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 ## 13. EF Core Designer Files
 
 ### 13.1 Regenerar Designer Files
-- **Estado:** 6 Designer files em falta (requerem `dotnet ef` com PostgreSQL ativo)
+- **Estado:** 13 Designer files em falta (requerem `dotnet ef` com PostgreSQL ativo)
+- **Módulos afectados:**
+  - AuditCompliance (1): `P7_4_AuditCorrelationId`
+  - IdentityAccess (1): `AddTenantOrganizationFields`
+  - Catalog (3): `P52B_DeveloperSurveys`, `W04_LegacyContractGovernance`, `AddCatalogSearchGinIndexes`, `P52_DeveloperExperienceScore`
+  - Configuration (1): `AddPhase3To8ConfigurationTables`
+  - OperationalIntelligence (4): `P51_PredictiveIntelligence`, `W01_TelemetryStoreFoundation`, `AddCustomCharts`, `AddChaosExperiments`
+  - AIKnowledge (2): `P05_Innovation`, `P04_BackendEnhancements`
 - **Comando:** `dotnet ef migrations add <Name> --project <InfraProject> --startup-project src/platform/NexTraceOne.ApiHost`
 - **Nota:** Requer ambiente local com PostgreSQL; não executável em sandbox CI
 
@@ -197,8 +210,8 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 | Prioridade | Funcionalidade | Impacto |
 |------------|---------------|---------|
-| **Alta** | Frontend Unit Tests (6.1) | Qualidade e confiança em contract builders |
-| **Alta** | E2E Tests (6.2) | Cobertura de fluxos críticos |
+| ✅ **DONE** | Frontend Unit Tests (6.1) | Qualidade e confiança em contract builders |
+| ✅ **DONE** | E2E Tests (6.2) | Cobertura de fluxos críticos |
 | **Alta** | EF Designer Files (13.1) | Completar tooling de migrações |
 | **Média** | IDE Extensions (2.x) | Developer experience |
 | **Média** | GraphQL/Protobuf Contracts (1.x) | Expansão de tipos de contrato |
@@ -212,9 +225,27 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ---
 
+## 14. Evolução de Customização da Plataforma
+
+> Plano detalhado em [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
+
+Customizações que o utilizador pode realizar **sem alterar a identidade visual**:
+
+- **Fase 1:** ✅ Saved views, bookmarks, default scope, timezone, colunas visíveis, paginação
+- **Fase 2:** ✅ Dashboard templates por persona, custom charts, widget de notas, cloning, drill-down
+- **Fase 3:** ✅ Watch lists, quiet hours, custom alert rules, digest personalizado
+- **Fase 4:** ✅ Custom tags, custom metadata fields, custom taxonomies
+- **Fase 5:** ✅ Custom checklists, automation rules, custom contract templates
+- **Fase 6:** ✅ Scheduled reports, export configurável, saved report templates
+- **Fase 7:** ✅ Custom AI prompts, AI behavior preferences, AI knowledge scope
+- **Fase 8:** ✅ Custom webhook payloads, API keys management, custom integration mappings
+
+---
+
 ## Notas
 
 1. **Este documento substitui:** ROADMAP.md, EVOLUTION-ROADMAP-2026-2027.md, CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md, SERVICE-CREATION-STUDIO-PLAN.md
 2. **Documentos de referência mantidos:** PRODUCT-VISION.md, ARCHITECTURE-OVERVIEW.md, docs/adr/, docs/legacy/, docs/security/, docs/deployment/, docs/runbooks/, docs/observability/, docs/user-guide/
 3. **Licensing module** foi removido da solução e não consta neste roadmap
 4. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura
+5. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)

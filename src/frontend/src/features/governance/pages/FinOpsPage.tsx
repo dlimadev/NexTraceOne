@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   DollarSign, Search, TrendingUp, TrendingDown, Minus,
   AlertTriangle, CheckCircle, AlertCircle, XCircle,
-  Activity, Zap, ArrowRight, Target, BarChart3,
+  Activity, Zap, ArrowRight, Target, PieChart,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -112,7 +112,7 @@ export function FinOpsPage() {
         <Card>
           <CardHeader>
             <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
-              <BarChart3 size={16} className="text-accent" />
+              <PieChart size={16} className="text-accent" />
               {t('governance.finops.topCostDrivers')}
             </h2>
           </CardHeader>

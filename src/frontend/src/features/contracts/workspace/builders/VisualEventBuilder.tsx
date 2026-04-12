@@ -131,12 +131,12 @@ export function VisualEventBuilder({
         <CardBody className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label={t('contracts.builder.event.title', 'Title')} value={state.title}
-              onChange={(v) => update({ title: v })} placeholder={t('contracts.event.placeholder.title', 'Order Events')} required disabled={isReadOnly} />
+              onChange={(v) => update({ title: v })} placeholder={t('contracts.builder.event.titlePlaceholder', 'Order Events')} required disabled={isReadOnly} />
             <Field label={t('contracts.builder.event.version', 'Version')} value={state.version}
-              onChange={(v) => update({ version: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.version', '1.0.0')} mono disabled={isReadOnly} />
+              onChange={(v) => update({ version: v })} placeholder="1.0.0" mono disabled={isReadOnly} />
           </div>
           <Field label={t('contracts.builder.event.broker', 'Default Broker')} value={state.defaultBroker}
-            onChange={(v) => update({ defaultBroker: v })} placeholder={t('contracts.event.placeholder.broker', 'kafka://broker:9092')} mono disabled={isReadOnly} />
+            onChange={(v) => update({ defaultBroker: v })} placeholder={t('contracts.builder.event.brokerPlaceholder', 'kafka://broker:9092')} mono disabled={isReadOnly} />
           <FieldArea label={t('contracts.builder.event.description', 'Description')} value={state.description}
             onChange={(v) => update({ description: v })} disabled={isReadOnly} />
         </CardBody>
@@ -183,17 +183,17 @@ export function VisualEventBuilder({
                       {/* Identity */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.event.topicName', 'Topic Name')} value={ch.topicName}
-                          onChange={(v) => updateChannel(ch.id, { topicName: v })} placeholder={t('contracts.event.placeholder.topicName', 'orders.created')} required mono disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { topicName: v })} placeholder={t('contracts.builder.event.topicNamePlaceholder', 'orders.created')} required mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.eventName', 'Event Name')} value={ch.eventName}
-                          onChange={(v) => updateChannel(ch.id, { eventName: v })} placeholder={t('contracts.event.placeholder.eventName', 'OrderCreated')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { eventName: v })} placeholder={t('contracts.builder.event.eventNamePlaceholder', 'OrderCreated')} disabled={isReadOnly} />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <Field label={t('contracts.builder.event.eventVersion', 'Event Version')} value={ch.version}
-                          onChange={(v) => updateChannel(ch.id, { version: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.eventVersion', '1.0.0')} mono disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { version: v })} placeholder="1.0.0" mono disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.producer', 'Producer')} value={ch.producer}
-                          onChange={(v) => updateChannel(ch.id, { producer: v })} placeholder={t('contracts.event.placeholder.producer', 'order-service')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { producer: v })} placeholder={t('contracts.builder.event.producerPlaceholder', 'order-service')} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.consumer', 'Consumer')} value={ch.consumer}
-                          onChange={(v) => updateChannel(ch.id, { consumer: v })} placeholder={t('contracts.event.placeholder.consumer', 'notification-service')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { consumer: v })} placeholder={t('contracts.builder.event.consumerPlaceholder', 'notification-service')} disabled={isReadOnly} />
                       </div>
 
                       {/* Schema */}
@@ -210,17 +210,17 @@ export function VisualEventBuilder({
                           onChange={(v) => updateChannel(ch.id, { compatibility: v as CompatibilityMode })}
                           options={COMPAT_OPTIONS} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.retention', 'Retention')} value={ch.retention}
-                          onChange={(v) => updateChannel(ch.id, { retention: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.retention', '7d')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { retention: v })} placeholder="7d" disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.partitions', 'Partitions')} value={ch.partitions}
-                          onChange={(v) => updateChannel(ch.id, { partitions: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.partitions', '3')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { partitions: v })} placeholder="3" disabled={isReadOnly} />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         <Field label={t('contracts.builder.event.ordering', 'Ordering')} value={ch.ordering}
-                          onChange={(v) => updateChannel(ch.id, { ordering: v })} placeholder={t('contracts.event.placeholder.ordering', 'by-key')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { ordering: v })} placeholder={t('contracts.builder.event.orderingPlaceholder', 'by-key')} disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.retries', 'Retries')} value={ch.retries}
-                          onChange={(v) => updateChannel(ch.id, { retries: v })} placeholder={t('contracts.builder.eventBuilder.placeholder.retries', '3')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { retries: v })} placeholder="3" disabled={isReadOnly} />
                         <Field label={t('contracts.builder.event.dlq', 'DLQ Topic')} value={ch.dlq}
-                          onChange={(v) => updateChannel(ch.id, { dlq: v })} placeholder={t('contracts.event.placeholder.dlq', 'orders.created.dlq')} mono disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { dlq: v })} placeholder={t('contracts.builder.event.dlqPlaceholder', 'orders.created.dlq')} mono disabled={isReadOnly} />
                       </div>
                       <FieldCheckbox label={t('contracts.builder.event.idempotent', 'Idempotent')} checked={ch.idempotent}
                         onChange={(v) => updateChannel(ch.id, { idempotent: v })} disabled={isReadOnly} />
@@ -228,7 +228,7 @@ export function VisualEventBuilder({
                       {/* Ownership & Observability */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.event.owner', 'Owner')} value={ch.owner}
-                          onChange={(v) => updateChannel(ch.id, { owner: v })} placeholder={t('contracts.event.placeholder.owner', 'team-orders')} disabled={isReadOnly} />
+                          onChange={(v) => updateChannel(ch.id, { owner: v })} placeholder={t('contracts.builder.event.channelOwnerPlaceholder', 'team-orders')} disabled={isReadOnly} />
                         <FieldArea label={t('contracts.builder.event.observabilityNotes', 'Observability')} value={ch.observabilityNotes}
                           onChange={(v) => updateChannel(ch.id, { observabilityNotes: v })}
                           placeholder={t('contracts.builder.event.obsPlaceholder', 'Metrics, tracing, alerting...')}

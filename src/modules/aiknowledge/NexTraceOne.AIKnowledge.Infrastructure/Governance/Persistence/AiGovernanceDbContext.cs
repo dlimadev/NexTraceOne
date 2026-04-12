@@ -47,6 +47,15 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AiGuardrail> Guardrails => Set<AiGuardrail>();
     public DbSet<AiEvaluation> Evaluations => Set<AiEvaluation>();
 
+    // ── Phase 6: Feedback Loop ──────────────────────────────────
+    public DbSet<AiFeedback> Feedbacks => Set<AiFeedback>();
+
+    // ── Phase 7: Onboarding Companion ───────────────────────────
+    public DbSet<OnboardingSession> OnboardingSessions => Set<OnboardingSession>();
+
+    // ── Phase 8: IDE Query Sessions (AI Pair Programming) ───────
+    public DbSet<IdeQuerySession> IdeQuerySessions => Set<IdeQuerySession>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

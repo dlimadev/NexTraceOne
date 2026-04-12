@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePersona } from '../../contexts/PersonaContext';
 import { CommandPalette } from '../CommandPalette';
 import { AppSidebar } from './AppSidebar';
 import { AppTopbar } from './AppTopbar';
@@ -9,10 +11,14 @@ import { MobileDrawer } from './MobileDrawer';
 import { EnvironmentBanner } from './EnvironmentBanner';
 import { AnalyticsEventTracker } from '../../features/product-analytics';
 import { AppFooter } from './AppFooter';
+import { RouteProgressBar } from '../RouteProgressBar';
 import { cn } from '../../lib/cn';
 
 export function AppShell() {
   const { isAuthenticated, isLoadingUser } = useAuth();
+  const { t } = useTranslation();
+  const { persona } = usePersona();
+  const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -58,8 +64,39 @@ export function AppShell() {
     return <Navigate to="/login" replace />;
   }
 
+  // ── AiUser persona: redirect to /ai/assistant and render minimal shell ──
+  // For AiUser, there is no sidebar or topbar — only the AI chat page is accessible.
+  if (persona === 'AiUser') {
+    // Redirect any non-AI route to /ai/assistant (preserving query params)
+    if (location.pathname !== '/ai/assistant') {
+      return <Navigate to="/ai/assistant" replace />;
+    }
+
+    return (
+      <div className="flex h-screen bg-canvas overflow-hidden" data-testid="ai-only-shell">
+        <RouteProgressBar />
+        <div className="flex-1 flex flex-col min-h-0 min-w-0">
+          <main id="main-content" className="flex-1 overflow-hidden">
+            <Outlet />
+          </main>
+        </div>
+        <AnalyticsEventTracker />
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-canvas overflow-hidden" data-testid="app-shell">
+      {/* Skip-to-content — WCAG 2.1 AA: keyboard-first navigation */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-white focus:text-sm focus:font-medium focus:shadow-floating focus:outline-none"
+      >
+        {t('common.skipToContent', 'Skip to content')}
+      </a>
+
+      <RouteProgressBar />
+
       {/* Desktop sidebar */}
       <AppSidebar
         collapsed={sidebarCollapsed}
@@ -81,15 +118,19 @@ export function AppShell() {
         )}
         data-testid="app-shell-main"
       >
-        <AppTopbar
-          onOpenCommandPalette={openPalette}
-          onOpenMobileMenu={openMobile}
-          sidebarCollapsed={sidebarCollapsed}
-        />
-        <EnvironmentBanner />
-        <AppContentFrame>
-          <Outlet />
-        </AppContentFrame>
+        <header>
+          <AppTopbar
+            onOpenCommandPalette={openPalette}
+            onOpenMobileMenu={openMobile}
+            sidebarCollapsed={sidebarCollapsed}
+          />
+          <EnvironmentBanner />
+        </header>
+        <main id="main-content">
+          <AppContentFrame>
+            <Outlet />
+          </AppContentFrame>
+        </main>
         <AppFooter />
       </div>
 

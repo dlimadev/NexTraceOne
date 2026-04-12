@@ -181,7 +181,7 @@ export function SummarySection({
                   <div key={p.id} className="flex items-center gap-2 px-6 py-2.5 text-xs">
                     <ArrowUpRight size={10} className="text-mint rotate-180" />
                     <span className="text-body flex-1">{p.name}</span>
-                    <span className="text-[10px] text-muted">Producer</span>
+                    <span className="text-[10px] text-muted">{t('contracts.studio.summary.producer', 'Producer')}</span>
                   </div>
                 ))}
               </div>

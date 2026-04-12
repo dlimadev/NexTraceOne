@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using CloneDashboardFeature = NexTraceOne.Governance.Application.Features.CloneDashboard.CloneDashboard;
 using CreateCustomDashboardFeature = NexTraceOne.Governance.Application.Features.CreateCustomDashboard.CreateCustomDashboard;
 using GetCustomDashboardFeature = NexTraceOne.Governance.Application.Features.GetCustomDashboard.GetCustomDashboard;
 using ListCustomDashboardsFeature = NexTraceOne.Governance.Application.Features.ListCustomDashboards.ListCustomDashboards;
@@ -68,6 +69,19 @@ public sealed class DashboardsAndDebtEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");
+
+        // ── Clonar dashboard ──
+        group.MapPost("/{dashboardId:guid}/clone", async (
+            Guid dashboardId,
+            CloneDashboardFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { SourceDashboardId = dashboardId };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToCreatedResult("/api/v1/governance/dashboards/{0}", localizer);
+        }).RequirePermission("governance:reports:write");
     }
 
     private static void MapTechnicalDebtEndpoints(IEndpointRouteBuilder app)

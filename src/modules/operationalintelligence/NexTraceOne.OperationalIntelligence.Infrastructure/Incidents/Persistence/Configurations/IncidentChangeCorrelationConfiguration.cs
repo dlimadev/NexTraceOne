@@ -21,7 +21,7 @@ internal sealed class IncidentChangeCorrelationConfiguration : IEntityTypeConfig
         builder.Property(x => x.MatchType).HasColumnType("integer").IsRequired();
         builder.Property(x => x.TimeWindowHours).IsRequired();
         builder.Property(x => x.CorrelatedAt).HasColumnType("timestamp with time zone").IsRequired();
-        builder.Property(x => x.TenantId).HasColumnName("tenant_id");
+        builder.Property(x => x.TenantId).HasColumnName("tenant_id").IsRequired();
         builder.Property(x => x.ServiceName).HasMaxLength(200).IsRequired();
         builder.Property(x => x.ChangeDescription).HasMaxLength(2000).IsRequired();
         builder.Property(x => x.ChangeEnvironment).HasMaxLength(100).IsRequired();

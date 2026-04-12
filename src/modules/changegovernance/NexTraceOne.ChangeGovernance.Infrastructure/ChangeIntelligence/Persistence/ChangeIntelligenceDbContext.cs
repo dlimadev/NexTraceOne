@@ -48,6 +48,24 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Avaliações de viabilidade de rollback persistidas no módulo ChangeIntelligence.</summary>
     public DbSet<RollbackAssessment> RollbackAssessments => Set<RollbackAssessment>();
 
+    /// <summary>Estados de feature flags de releases persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ReleaseFeatureFlagState> FeatureFlagStates => Set<ReleaseFeatureFlagState>();
+
+    /// <summary>Registos de canary rollout de releases persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<CanaryRollout> CanaryRollouts => Set<CanaryRollout>();
+
+    /// <summary>Eventos de confiança de mudanças (append-only) persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ChangeConfidenceEvent> ChangeConfidenceEvents => Set<ChangeConfidenceEvent>();
+
+    /// <summary>Release notes geradas por IA persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<ReleaseNotes> ReleaseNotes => Set<ReleaseNotes>();
+
+    /// <summary>Gates de promoção configuráveis persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<PromotionGate> PromotionGates => Set<PromotionGate>();
+
+    /// <summary>Avaliações de gates de promoção persistidas no módulo ChangeIntelligence.</summary>
+    public DbSet<PromotionGateEvaluation> PromotionGateEvaluations => Set<PromotionGateEvaluation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

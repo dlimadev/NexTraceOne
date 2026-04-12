@@ -30,7 +30,7 @@ internal sealed class SecurityScanRepository(GovernanceDbContext context) : ISec
         {
             var scanIds = await context.SecurityScanResults
                 .Where(s => s.TargetId == targetId.Value)
-                .Select(s => s.Id.Value)
+                .Select(s => s.Id)
                 .ToListAsync(ct);
             query = query.Where(f => scanIds.Contains(f.ScanResultId));
         }

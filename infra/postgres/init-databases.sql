@@ -22,7 +22,12 @@
 --   aik_  — AI & Knowledge (all subdomains)
 --
 -- Executed automatically on first container initialization.
--- Updated: 2026-03-25 | E14 — Migration Removal Phase
+-- Updated: 2026-04-07 | Phase 1 — RLS integration
+--
+-- POST-MIGRATION STEP:
+--   After EF Core migrations have been applied, run apply-rls.sql to enforce
+--   Row-Level Security tenant isolation as a defence-in-depth layer:
+--     psql -U nextraceone -d nextraceone -f /rls/apply-rls.sql
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- Single physical database for all modules (architecture: 1 DB, isolation by prefix + DbContext)

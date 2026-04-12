@@ -72,7 +72,8 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                         EntityId: svc.ServiceId,
                         DisplayName: svc.DisplayName,
                         Summary: summary,
-                        RelevanceScore: 0.95));
+                        RelevanceScore: 0.95,
+                        IsTruncated: WasTruncated(svc.Description, MaxSnippetLength)));
                 }
 
                 _logger.LogDebug(
@@ -110,7 +111,8 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                     EntityId: release.ReleaseId,
                     DisplayName: $"{release.ServiceName} v{release.Version} ({release.Environment})",
                     Summary: summary,
-                    RelevanceScore: 0.85));
+                    RelevanceScore: 0.85,
+                    IsTruncated: WasTruncated(release.Description, MaxSnippetLength)));
             }
 
             _logger.LogDebug(
@@ -144,7 +146,8 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                     EntityId: incident.IncidentId,
                     DisplayName: incident.Title,
                     Summary: summary,
-                    RelevanceScore: 0.80));
+                    RelevanceScore: 0.80,
+                    IsTruncated: WasTruncated(incident.Description, MaxSnippetLength)));
             }
 
             _logger.LogDebug(
@@ -176,7 +179,8 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                     EntityId: m.Id.Value.ToString(),
                     DisplayName: m.DisplayName,
                     Summary: $"AI Model '{m.Name}' from provider '{m.Provider}' — {Truncate(m.Capabilities, MaxSnippetLength)}",
-                    RelevanceScore: Math.Max(0.0, 0.70 - (index * 0.1))))
+                    RelevanceScore: Math.Max(0.0, 0.70 - (index * 0.1)),
+                    IsTruncated: WasTruncated(m.Capabilities, MaxSnippetLength)))
                 .ToList();
 
             hits.AddRange(modelHits);
@@ -199,6 +203,11 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
     {
         if (string.IsNullOrWhiteSpace(text)) return string.Empty;
         return text.Length <= maxLength ? text : string.Concat(text.AsSpan(0, maxLength - 3), "...");
+    }
+
+    private static bool WasTruncated(string? text, int maxLength)
+    {
+        return !string.IsNullOrWhiteSpace(text) && text.Length > maxLength;
     }
 
     private static Guid? ParseGuid(string? value)

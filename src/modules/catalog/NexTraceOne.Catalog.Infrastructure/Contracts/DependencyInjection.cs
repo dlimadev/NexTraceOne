@@ -51,6 +51,19 @@ public static class DependencyInjection
         services.AddScoped<ICanonicalEntityRepository, CanonicalEntityRepository>();
         services.AddScoped<ICanonicalEntityVersionRepository, CanonicalEntityVersionRepository>();
         services.AddScoped<IConsumerExpectationRepository, ConsumerExpectationRepository>();
+        services.AddScoped<IContractHealthScoreRepository, ContractHealthScoreRepository>();
+        services.AddScoped<IPipelineExecutionRepository, PipelineExecutionRepository>();
+        services.AddScoped<IContractNegotiationRepository, ContractNegotiationRepository>();
+        services.AddScoped<INegotiationCommentRepository, NegotiationCommentRepository>();
+        services.AddScoped<ISchemaEvolutionAdviceRepository, SchemaEvolutionAdviceRepository>();
+        services.AddScoped<ISemanticDiffResultRepository, SemanticDiffResultRepository>();
+        services.AddScoped<IContractComplianceGateRepository, ContractComplianceGateRepository>();
+        services.AddScoped<IContractComplianceResultRepository, ContractComplianceResultRepository>();
+        services.AddScoped<IContractListingRepository, ContractListingRepository>();
+        services.AddScoped<IMarketplaceReviewRepository, MarketplaceReviewRepository>();
+        services.AddScoped<IImpactSimulationRepository, ImpactSimulationRepository>();
+        services.AddScoped<IContractVerificationRepository, ContractVerificationRepository>();
+        services.AddScoped<IContractChangelogRepository, ContractChangelogRepository>();
 
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();

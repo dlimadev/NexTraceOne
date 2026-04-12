@@ -6,7 +6,10 @@ namespace NexTraceOne.BuildingBlocks.Security.Authentication;
 /// Opções de configuração para autenticação via API key.
 /// Contém a lista de chaves configuradas e suas associações a tenants/permissões.
 ///
-/// Em MVP1, as chaves são lidas de appsettings.json (seção Security:ApiKeys).
+/// Suporta dois modos de armazenamento do segredo:
+///   1. Hash SHA-256 (recomendado): Key contém o hash hex do segredo. KeyIsHashed = true.
+///   2. Texto plano (MVP1/legacy): Key contém o segredo em claro. KeyIsHashed = false (default).
+///
 /// Em produção, migrar para armazenamento criptografado no banco de dados.
 /// </summary>
 public sealed class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
@@ -27,8 +30,18 @@ public sealed class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
 /// </summary>
 public sealed class ApiKeyConfiguration
 {
-    /// <summary>Valor da API key (segredo compartilhado).</summary>
+    /// <summary>
+    /// Valor da API key ou hash SHA-256 hex do segredo (conforme KeyIsHashed).
+    /// Quando KeyIsHashed = true, deve conter o hash hex lowercase de 64 caracteres.
+    /// </summary>
     public string Key { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Indica se o valor em Key é um hash SHA-256 hex do segredo real.
+    /// Quando true, o handler calcula SHA-256 do header recebido e compara com este hash.
+    /// Quando false (default, legacy), compara o valor em claro.
+    /// </summary>
+    public bool KeyIsHashed { get; set; }
 
     /// <summary>Identificador único do cliente/sistema externo.</summary>
     public string ClientId { get; set; } = string.Empty;

@@ -68,13 +68,13 @@ export function NexTraceIcon({ size = 40, className }: { size?: number; classNam
     >
       <defs>
         <linearGradient id={`${id}-grad`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1B7FE8" />
-          <stop offset="50%" stopColor="#12C4E8" />
-          <stop offset="100%" stopColor="#18E8B8" />
+          <stop offset="0%" stopColor="var(--t-blue)" />
+          <stop offset="50%" stopColor="var(--t-cyan)" />
+          <stop offset="100%" stopColor="var(--t-mint)" />
         </linearGradient>
         <linearGradient id={`${id}-grad2`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#12C4E8" />
-          <stop offset="100%" stopColor="#18E8B8" />
+          <stop offset="0%" stopColor="var(--t-cyan)" />
+          <stop offset="100%" stopColor="var(--t-mint)" />
         </linearGradient>
         <clipPath id={`${id}-clip`}>
           <circle cx="20" cy="20" r="18" />

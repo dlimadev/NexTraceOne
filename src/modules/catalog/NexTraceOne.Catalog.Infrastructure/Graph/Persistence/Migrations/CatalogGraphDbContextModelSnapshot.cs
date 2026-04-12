@@ -17,7 +17,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -68,6 +68,124 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     b.HasIndex("ProcessedAt");
 
                     b.ToTable("cat_outbox_messages", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DeveloperExperience.Entities.DxScore", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("CognitiveLoadScore")
+                        .HasPrecision(6, 4)
+                        .HasColumnType("numeric(6,4)");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("CycleTimeHours")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<decimal>("DeploymentFrequencyPerWeek")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal>("OverallScore")
+                        .HasPrecision(8, 4)
+                        .HasColumnType("numeric(8,4)");
+
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ScoreLevel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("ServiceId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TeamId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TeamName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<decimal>("ToilPercentage")
+                        .HasPrecision(8, 4)
+                        .HasColumnType("numeric(8,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Period");
+
+                    b.HasIndex("ScoreLevel");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("cat_dx_scores", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DeveloperExperience.Entities.ProductivitySnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("AverageCycleTimeHours")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<int>("DeploymentCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IncidentCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ManualStepsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("PeriodEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("PeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ServiceId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("SnapshotSource")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TeamId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PeriodEnd");
+
+                    b.HasIndex("PeriodStart");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("cat_productivity_snapshots", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", b =>
@@ -360,6 +478,95 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     b.HasIndex("ApiAssetId");
 
                     b.ToTable("cat_discovery_sources", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.FrameworkAssetDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ArtifactRegistryUrl")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("BuildPipelineUrl")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("ChangelogUrl")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasDefaultValue("");
+
+                    b.Property<int>("KnownConsumerCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LatestVersion")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("LicenseType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("MinSupportedVersion")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("PackageManager")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PackageName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<Guid>("ServiceAssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TargetPlatform")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasDefaultValue("");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Language");
+
+                    b.HasIndex("PackageName");
+
+                    b.HasIndex("ServiceAssetId")
+                        .IsUnique();
+
+                    b.ToTable("cat_framework_asset_details", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.GraphSnapshot", b =>
@@ -787,124 +994,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     b.Navigation("ConsumerRelationships");
 
                     b.Navigation("DiscoverySources");
-                });
-
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DeveloperExperience.Entities.DxScore", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("CognitiveLoadScore")
-                        .HasPrecision(6, 4)
-                        .HasColumnType("numeric(6,4)");
-
-                    b.Property<DateTimeOffset>("ComputedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("CycleTimeHours")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("numeric(10,4)");
-
-                    b.Property<decimal>("DeploymentFrequencyPerWeek")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("numeric(10,4)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<decimal>("OverallScore")
-                        .HasPrecision(8, 4)
-                        .HasColumnType("numeric(8,4)");
-
-                    b.Property<string>("Period")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("ScoreLevel")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("ServiceId")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("TeamId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("TeamName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<decimal>("ToilPercentage")
-                        .HasPrecision(8, 4)
-                        .HasColumnType("numeric(8,4)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Period");
-
-                    b.HasIndex("ScoreLevel");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("cat_dx_scores", (string)null);
-                });
-
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DeveloperExperience.Entities.ProductivitySnapshot", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("AverageCycleTimeHours")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("numeric(10,4)");
-
-                    b.Property<int>("DeploymentCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("IncidentCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ManualStepsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("PeriodEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("PeriodStart")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("RecordedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ServiceId")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("SnapshotSource")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("TeamId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PeriodEnd");
-
-                    b.HasIndex("PeriodStart");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("cat_productivity_snapshots", (string)null);
                 });
 #pragma warning restore 612, 618
         }

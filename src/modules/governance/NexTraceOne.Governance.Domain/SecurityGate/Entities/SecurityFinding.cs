@@ -14,7 +14,7 @@ public sealed class SecurityFinding
     public Guid FindingId { get; private set; }
 
     /// <summary>Identificador do scan ao qual pertence.</summary>
-    public Guid ScanResultId { get; private set; }
+    public SecurityScanResultId ScanResultId { get; private set; } = null!;
 
     /// <summary>Identificador da regra que detectou o achado (ex: "SAST-001", "CWE-89").</summary>
     public string RuleId { get; private set; } = string.Empty;
@@ -66,7 +66,7 @@ public sealed class SecurityFinding
         return new SecurityFinding
         {
             FindingId = Guid.NewGuid(),
-            ScanResultId = scanResultId,
+            ScanResultId = new SecurityScanResultId(scanResultId),
             RuleId = ruleId,
             Category = category,
             Severity = severity,

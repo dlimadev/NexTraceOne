@@ -17,7 +17,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -1447,6 +1447,13 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                             Description = "Restricted to workflow approvals only",
                             IsSystem = true,
                             Name = "ApprovalOnly"
+                        },
+                        new
+                        {
+                            Id = new Guid("1e91a557-fade-46df-b248-0f5f5899c008"),
+                            Description = "Restricted to AI assistant access only",
+                            IsSystem = true,
+                            Name = "AiUser"
                         });
                 });
 

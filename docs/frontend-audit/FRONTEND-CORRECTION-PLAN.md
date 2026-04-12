@@ -1,297 +1,405 @@
 # NexTraceOne — Frontend Correction Plan
 
-**Data:** 2026-04-11 (atualizado 2026-04-12)  
-**Baseado em:** [FRONTEND-AUDIT-REPORT.md](./FRONTEND-AUDIT-REPORT.md)  
-**Estado:** Fases 1, 2 e 3 concluídas ✅ — Continuação Fase 3 em progresso ✅
+**Data:** 2026-04-10
+**Referência:** [FRONTEND-AUDIT-REPORT.md](./FRONTEND-AUDIT-REPORT.md)
 
 ---
 
-## Resumo de Progresso
+## Organização
 
-| Fase | Descrição | Itens | Estado |
-|------|-----------|-------|--------|
-| Fase 1 | Correções Críticas (C-01 a C-05) | 5 | ✅ Concluída |
-| Fase 2 | Correções Altas (H-01 a H-03) | 3 | ✅ Concluída |
-| Fase 3 | Correções Médias (M-01 a M-03) | 3 | ✅ Concluída |
-
-### Correções Adicionais (descobertas durante execução)
-
-| Descrição | Estado |
-|-----------|--------|
-| 50 placeholders hardcoded adicionais (não incluídos no audit original) | ✅ Concluída |
-| 2 testes pre-existentes falhando (DependencyDashboardPage, WebhookSubscriptionsPage) | ✅ Concluída |
+O plano está dividido em **7 waves** por prioridade, com estimativa de complexidade e dependências.
 
 ---
 
-## Fase 1 — Correções Críticas
+## Wave 1 — Scroll e Overflow Críticos (Prioridade Máxima)
 
-### C-01: Adicionar PageErrorState às 5 Páginas de Alta Severidade
+> **Objetivo:** Corrigir todas as situações onde conteúdo está cortado ou scroll não funciona.
 
-**Impacto:** UX + Resiliência  
-**Padrão a seguir:**
-```tsx
-import { PageErrorState } from '../../../components/PageErrorState';
-import { PageLoadingState } from '../../../components/PageLoadingState';
+### 1.1 Shell — AppSidebar content panel overflow
 
-// Dentro do componente, antes do return principal:
-if (isLoading || isPending) return <PageContainer><PageLoadingState /></PageContainer>;
-if (isError) return <PageContainer><PageErrorState /></PageContainer>;
+- **Ficheiro:** `src/components/shell/AppSidebar.tsx`
+- **Linha:** 333-338
+- **Correção:** Mudar `overflow-hidden` para `overflow-y-auto` no content panel
+- **Complexidade:** Baixa
+
+### 1.2 Shell — AppSidebar nav sem min-h-0
+
+- **Ficheiro:** `src/components/shell/AppSidebar.tsx`
+- **Linha:** 360
+- **Correção:** Adicionar `min-h-0` ao `<nav className="flex-1 px-5 py-4 overflow-y-auto">`
+- **Complexidade:** Baixa
+
+### 1.3 Shell — AppSidebar icon rail sem min-h-0
+
+- **Ficheiro:** `src/components/shell/AppSidebar.tsx`
+- **Linha:** 248-249
+- **Correção:** Adicionar `min-h-0` ao flex column do icon rail
+- **Complexidade:** Baixa
+
+### 1.4 Shell — MobileDrawer sem overflow-y-auto
+
+- **Ficheiro:** `src/components/shell/MobileDrawer.tsx`
+- **Linha:** 25
+- **Correção:** Adicionar `overflow-y-auto` ao `div.h-full.w-[320px]`
+- **Complexidade:** Baixa
+
+### 1.5 AuthShell — overflow-hidden bloqueia conteúdo
+
+- **Ficheiro:** `src/features/identity-access/components/AuthShell.tsx`
+- **Linha:** 62
+- **Correção:** Remover `overflow-hidden` ou mudar para `overflow-y-auto`
+- **Complexidade:** Baixa
+
+### 1.6 WorkspaceLayout — triple nested scroll
+
+- **Ficheiro:** `src/features/contracts/workspace/WorkspaceLayout.tsx`
+- **Linhas:** 68, 73, 114, 120
+- **Correção:** Remover `overflow-y-auto` dos containers internos; deixar apenas um scroll principal. Adicionar `min-h-0` aos flex children.
+- **Complexidade:** Média — requer teste em todo o workspace de contratos
+
+### 1.7 ConsumerDrivenContractPage — min-h-screen indevido
+
+- **Ficheiro:** `src/features/contracts/cdct/ConsumerDrivenContractPage.tsx`
+- **Linha:** 83
+- **Correção:** Remover `min-h-screen`; confiar no flex layout do AppShell
+- **Complexidade:** Baixa
+
+### 1.8 ContractPlaygroundPage — min-h-screen indevido
+
+- **Ficheiro:** `src/features/contracts/playground/ContractPlaygroundPage.tsx`
+- **Linha:** 95
+- **Correção:** Remover `min-h-screen`; confiar no flex layout do AppShell
+- **Complexidade:** Baixa
+
+### 1.9 AiAssistantPage — scroll zones conflitantes
+
+- **Ficheiro:** `src/features/ai-hub/pages/AiAssistantPage.tsx`
+- **Linhas:** 568, 647, 824, 1158
+- **Correção:** Consolidar para uma única scroll zone por secção (sidebar e main). Adicionar `min-h-0` a todos os flex-1 children.
+- **Complexidade:** Alta — página complexa com sidebar + messages + modals
+
+### 1.10 AiCopilotPage — flex sem min-h-0
+
+- **Ficheiro:** `src/features/ai-hub/pages/AiCopilotPage.tsx`
+- **Linhas:** 534, 554, 605, 743
+- **Correção:** Adicionar `min-h-0` a todos os `flex-1 flex flex-col`. Remover `overflow-y-auto` duplicados.
+- **Complexidade:** Média
+
+### 1.11 DraftStudioPage — scroll interno conflitante
+
+- **Ficheiro:** `src/features/contracts/studio/DraftStudioPage.tsx`
+- **Linhas:** 157, 237
+- **Correção:** Remover `overflow-y-auto` interno; usar scroll do AppContentFrame
+- **Complexidade:** Média
+
+### 1.12 ContractSection — flex sem min-h-0
+
+- **Ficheiro:** `src/features/contracts/workspace/sections/ContractSection.tsx`
+- **Linhas:** 78, 221
+- **Correção:** Adicionar `min-h-0` e verificar overflow handling
+- **Complexidade:** Baixa
+
+---
+
+## Wave 2 — Navegação Quebrada (Prioridade Alta)
+
+> **Objetivo:** Corrigir todas as navegações que levam a páginas inexistentes ou incorretas.
+
+### 2.1 Criar rota /knowledge/documents/new
+
+- **Ficheiro:** `src/routes/knowledgeRoutes.tsx`
+- **Correção:** Adicionar rota para `/knowledge/documents/new` com o componente adequado (criar página ou redirecionar para KnowledgeDocumentPage em modo criação)
+- **Referência:** `features/knowledge/pages/KnowledgeHubPage.tsx:105` faz `navigate('/knowledge/documents/new')`
+- **Complexidade:** Média
+
+### 2.2 Criar rota /contracts/studio/new
+
+- **Ficheiro:** `src/routes/contractsRoutes.tsx`
+- **Correção:** Adicionar rota para `/contracts/studio/new` com o componente DraftStudioPage em modo criação
+- **Referência:** `features/contracts/publication/PublicationCenterPage.tsx:61` tem link para esta rota
+- **Complexidade:** Média
+
+### 2.3 Corrigir colisão de rotas /governance/scorecards
+
+- **Ficheiro:** `src/routes/governanceRoutes.tsx`
+- **Linhas:** 253, 261
+- **Correção:** Reordenar rotas — `/governance/scorecards/:serviceName` antes de `/governance/scorecards`, ou usar nested routes
+- **Complexidade:** Baixa
+
+### 2.4 Adicionar ProtectedRoute às rotas sem proteção
+
+- **Ficheiro:** `src/routes/adminRoutes.tsx`
+- **Linhas:** 329-334, 343-348, 349-354
+- **Correção:** Envolver `UserPreferencesPage`, `APIKeysPage` e `IntegrationMappingsPage` em `<ProtectedRoute>`
+- **Complexidade:** Baixa
+
+---
+
+## Wave 3 — i18n — Strings Hardcoded (Prioridade Alta)
+
+> **Objetivo:** Mover todas as 59 strings hardcoded para os ficheiros de locale.
+
+### 3.1 Placeholders hardcoded (26 instâncias)
+
+**Ação:** Criar novas keys nos 4 ficheiros de locale e substituir cada placeholder hardcoded por `t('chave')`.
+
+**Ficheiros a alterar:**
+1. `features/ai-hub/pages/AiAnalysisPage.tsx` — 2 placeholders
+2. `features/ai-hub/pages/AiAgentsPage.tsx` — 1 placeholder
+3. `features/operations/pages/TraceExplorerPage.tsx` — 1 placeholder
+4. `features/contracts/governance/ApiPolicyAsCodePage.tsx` — 2 placeholders
+5. `features/governance/pages/ScheduledReportsPage.tsx` — 2 placeholders
+6. `features/contracts/create/VisualEventBuilder.tsx` — 7 placeholders
+7. `features/contracts/create/VisualWorkserviceBuilder.tsx` — 6 placeholders
+8. `features/contracts/create/VisualWebhookBuilder.tsx` — 2 placeholders
+9. `features/contracts/create/VisualRestBuilder.tsx` — 1 placeholder
+10. `features/contracts/create/SchemaCompositionEditor.tsx` — 2 placeholders
+
+### 3.2 Texto de status/badge (10 instâncias)
+
+**Ficheiros a alterar:**
+1. `features/ai-hub/pages/AiIntegrationsConfigurationPage.tsx` — "Enabled"/"Disabled"
+2. `features/configuration/pages/AdvancedConfigurationConsolePage.tsx` — "Masked", "Enabled", "Disabled", "Inherited", "Default", "Mandatory", "Sensitive"
+
+### 3.3 Labels/secções (5 instâncias)
+
+**Ficheiros a alterar:**
+1. `features/contracts/workspace/sections/SummarySection.tsx` — "Producer"
+2. `features/contracts/workspace/editor/LivePreviewRenderer.tsx` — "Parameters", "Response"
+3. `features/configuration/pages/AdvancedConfigurationConsolePage.tsx` — "Previous:", "New:"
+
+### 3.4 Mensagens de erro (5 instâncias)
+
+**Ficheiros a alterar:**
+1. `features/contracts/governance/ContractHealthTimelinePage.tsx` — erro + botão Retry
+2. `features/contracts/governance/CanonicalEntityImpactCascadePage.tsx` — erro + botão Retry
+3. `components/ComboBox.tsx` — "No results"
+
+### 3.5 Aria-labels (13 instâncias)
+
+**Ficheiros a alterar:**
+1. `features/contracts/governance/ContractHealthTimelinePage.tsx` — "API Asset ID"
+2. `components/Breadcrumbs.tsx` — "Breadcrumbs"
+3. `components/StackedProgressBar.tsx` — "Progress"
+4. `components/Modal.tsx` — "Close"
+5. `components/NexTraceLogo.tsx` — "NexTraceOne" × 2
+6. `components/StatCard.tsx` — "More options"
+7. `components/DataTable.tsx` — "Select all rows"
+8. `components/Toast.tsx` — "Notifications", "Dismiss"
+9. `components/DatePicker.tsx` — "Clear date"
+10. `components/Drawer.tsx` — "Close"
+11. `components/RouteProgressBar.tsx` — "Loading"
+
+---
+
+## Wave 4 — Z-Index e Layering (Prioridade Média-Alta)
+
+> **Objetivo:** Migrar todos os z-index hardcoded para o sistema de CSS variables.
+
+### 4.1 Eliminar z-[9999]
+
+| Ficheiro | Linha | Correção |
+|---|---|---|
+| `components/RouteProgressBar.tsx` | 39 | Mudar para `z-[var(--z-toast)]` ou novo `--z-progress-bar` |
+| `components/shell/AppShell.tsx` | 92 | Mudar para `z-[var(--z-skip-link)]` (definir novo nível) |
+
+### 4.2 Migrar z-50 para CSS variables
+
+| Ficheiro | Linha | Correção |
+|---|---|---|
+| `components/CommandPalette.tsx` | 322 | Mudar para `z-[var(--z-modal)]` |
+| `components/ColumnSelector.tsx` | 99 | Mudar para `z-[var(--z-dropdown)]` |
+| `components/SavedViewSelector.tsx` | 115,179 | Mudar para `z-[var(--z-modal)]` |
+| `components/DashboardTemplatePicker.tsx` | 34 | Mudar para `z-[var(--z-modal)]` |
+| `config/RolePicker.tsx` | 122 | Mudar para `z-[var(--z-dropdown)]` |
+
+### 4.3 Migrar z-20 para CSS variables
+
+| Ficheiro | Linha | Correção |
+|---|---|---|
+| `components/WatchButton.tsx` | 98 | Mudar para `z-[var(--z-sticky)]` (definir novo nível) |
+| `components/ModuleHeader.tsx` | 45 | Mudar para `z-[var(--z-sticky)]` |
+
+### 4.4 Definir novos níveis de z-index
+
+Adicionar ao CSS/theme:
+```css
+:root {
+  --z-sticky: 10;
+  --z-header: 20;
+  --z-dropdown: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+  --z-skip-link: 60;
+  --z-progress-bar: 70;
+}
 ```
 
-- [x] C-01.1 — `features/ai-hub/pages/AgentDetailPage.tsx`
-- [x] C-01.2 — `features/catalog/pages/SelfServicePortalPage.tsx` — Skipped: página estática sem data fetching
-- [x] C-01.3 — `features/contracts/cdct/ConsumerDrivenContractPage.tsx`
-- [x] C-01.4 — `features/contracts/publication/PublicationCenterPage.tsx`
-- [x] C-01.5 — `features/governance/pages/GovernanceGatesPage.tsx`
-
 ---
 
-### C-02: Migrar 81 Placeholders Hardcoded para i18n
+## Wave 5 — Responsividade (Prioridade Média)
 
-**Impacto:** i18n + Conformidade multilingue  
-**Padrão a seguir:**
-```tsx
-// ANTES:
-placeholder="UserService"
+> **Objetivo:** Corrigir grids não-responsivos e elementos que quebram em mobile/tablet.
 
-// DEPOIS:
-placeholder={t('contracts.soap.placeholder.serviceName', 'UserService')}
+### 5.1 Grids não-responsivos — top 10 ficheiros
+
+**Padrão de correção:**
+```
+❌ grid grid-cols-3 gap-3
+✅ grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3
 ```
 
-- [x] C-02.01 — `contracts/workspace/builders/VisualLegacyContractBuilder.tsx` (11 ocorrências)
-- [x] C-02.02 — `contracts/workspace/builders/VisualEventBuilder.tsx` (10 ocorrências)
-- [x] C-02.03 — `contracts/workspace/builders/VisualWorkserviceBuilder.tsx` (8 ocorrências)
-- [x] C-02.04 — `contracts/workspace/builders/VisualWebhookBuilder.tsx` (8 ocorrências)
-- [x] C-02.05 — `contracts/workspace/builders/VisualSoapBuilder.tsx` (8 ocorrências)
-- [x] C-02.06 — `contracts/workspace/sections/SecuritySection.tsx` (4 ocorrências)
-- [x] C-02.07 — `contracts/workspace/builders/VisualSharedSchemaBuilder.tsx` (3 ocorrências)
-- [x] C-02.08 — `ai-hub/pages/AiAnalysisPage.tsx` (2 ocorrências)
-- [x] C-02.09 — `ai-hub/pages/AiAgentsPage.tsx` (1 ocorrência)
-- [x] C-02.10 — `governance/pages/ApiPolicyAsCodePage.tsx` (1 ocorrência)
-- [x] C-02.11 — `contracts/cdct/ConsumerDrivenContractPage.tsx` (2 ocorrências)
-- [x] C-02.12 — `contracts/governance/ContractHealthTimelinePage.tsx` (1 ocorrência)
-- [x] C-02.13 — `contracts/canonical/CanonicalEntityImpactCascadePage.tsx` (1 ocorrência)
-- [x] C-02.14 — `catalog/pages/AiScaffoldWizardPage.tsx` (1 ocorrência)
-- [x] C-02.15 — `contracts/workspace/builders/shared/SchemaCompositionEditor.tsx` (1 ocorrência)
-- [x] C-02.16 — Adicionar chaves i18n aos 4 locales (en, pt-BR, pt-PT, es)
+| # | Ficheiro | Correção |
+|---|---|---|
+| 1 | `features/change-governance/components/ReleasesIntelligenceTab.tsx` | Adicionar breakpoints nas 4 grids |
+| 2 | `features/change-governance/pages/PromotionPage.tsx` | Adicionar breakpoints |
+| 3 | `features/contracts/workspace/sections/ValidationSection.tsx` | grid-cols-5 → grid-cols-1 md:grid-cols-3 lg:grid-cols-5 |
+| 4 | `features/governance/pages/TeamsOverviewPage.tsx` | Adicionar breakpoints |
+| 5 | `features/governance/pages/DomainsOverviewPage.tsx` | Adicionar breakpoints |
+| 6 | `features/shared/pages/DashboardPage.tsx` | Adicionar breakpoints (6 instâncias) |
+| 7 | `features/contracts/workspace/sections/DefinitionSection.tsx` | Adicionar breakpoints (6 instâncias) |
+| 8 | `features/governance/pages/ExecutiveOverviewPage.tsx` | Adicionar breakpoints (3 instâncias) |
+| 9 | `features/ai-hub/components/AssistantPanel.tsx` | Adicionar breakpoints |
+| 10 | `features/ai-hub/pages/AgentDetailPage.tsx` | Adicionar breakpoints |
+
+### 5.2 Componentes com largura fixa problemática
+
+| Componente | Correção |
+|---|---|
+| `shell/MobileDrawer.tsx` | `w-[320px]` → `w-[min(320px,90vw)]` ou `max-w-[320px] w-[90vw]` |
+| `shell/DetailPanel.tsx` | Adicionar `md:w-[360px]` entre sm e lg |
+| `components/SplitView.tsx` | Adicionar `md:w-[360px]` entre sm e lg |
+| `shell/PageContainer.tsx` | Adicionar variantes responsivas de max-width |
+
+### 5.3 Imagens/SVGs sem dimensões
+
+| Ficheiro | Correção |
+|---|---|
+| `features/identity-access/components/AuthShell.tsx:99` | Adicionar `w-*` e `h-*` ao `<img>` |
+| `features/catalog/pages/ServiceSourceOfTruthPage.tsx:350` | Adicionar `w-*` e `h-*` ao `<svg>` |
 
 ---
 
-### C-03: Converter Inline Styles do EnvironmentsPage para Tailwind
+## Wave 6 — Duplicatas e Consolidação (Prioridade Média)
 
-**Impacto:** Consistência + Manutenibilidade  
-**Ficheiro:** `features/identity-access/pages/EnvironmentsPage.tsx` (28 inline styles)
+> **Objetivo:** Eliminar redundância entre módulos, consolidando páginas duplicadas.
 
-**Mapeamento de conversão:**
-```
-style={{ display: 'flex', gap: '8px' }}          → className="flex gap-2"
-style={{ display: 'grid', gap: '12px' }}         → className="grid gap-3"
-style={{ display: 'block', width: '100%', ... }} → className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
-style={{ color: 'var(--t-muted)' }}              → className="text-muted"
-style={{ fontSize: '12px', ... }}                → className="text-xs text-muted"
-```
+### 6.1 Consolidar DoraMetricsPage
 
-- [x] C-03.1 — Converter todas as 28 ocorrências de `style={{}}` para classes Tailwind
+**Estado atual:** Duas versões em `change-governance/` e `governance/`
 
----
+**Opções:**
+1. **Manter ambas** mas com nomes distintos que reflitam o propósito (e.g., `ChangeDoraMetricsPage` vs `ExecutiveDoraMetricsPage`) e documentar a distinção
+2. **Criar componente base** `DoraMetricsView` reutilizado por ambas as páginas com diferentes data sources
 
-### C-04: Corrigir PageSection com Título Vazio
+**Recomendação:** Opção 2 — extrair lógica visual para componente shared, manter páginas como wrappers que injectam dados.
 
-**Impacto:** UX — secções sem título confundem o utilizador
+### 6.2 Consolidar ServiceScorecardPage
 
-- [x] C-04.1 — `features/operations/pages/PredictiveIntelligencePage.tsx:501` — título i18n adicionado
-- [x] C-04.2 — `features/governance/pages/ApiPolicyAsCodePage.tsx:127` — título i18n adicionado
+**Estado atual:** Duas versões em `catalog/` e `governance/`
+
+**Opções:** Mesmo padrão da 6.1
+
+**Recomendação:** Extrair `ServiceScorecardView` para `features/shared/components/`
 
 ---
 
-### C-05: Migrar aria-labels Hardcoded para i18n
+## Wave 7 — Polish e Consistência (Prioridade Baixa)
 
-**Impacto:** Acessibilidade + i18n  
-**Padrão:**
-```tsx
-// ANTES:
-aria-label="Close"
+> **Objetivo:** Padronizar espaçamento, touch targets e detalhes visuais.
 
-// DEPOIS:
-aria-label={t('common.close')}
-```
+### 7.1 Padronizar espaçamento Card vs Modal/Drawer
 
-- [x] C-05.1 — `components/Breadcrumbs.tsx` — `"Breadcrumbs"` → `t('nav.breadcrumbs')`
-- [x] C-05.2 — `components/Modal.tsx` — `"Close"` → `t('common.close')`
-- [x] C-05.3 — `components/Drawer.tsx` — `"Close"` → `t('common.close')`
-- [x] C-05.4 — `components/Toast.tsx` — `"Notifications"` → `t('notifications.title')`, `"Dismiss"` → `t('common.dismiss')`
-- [x] C-05.5 — `components/NexTraceLogo.tsx` — `"NexTraceOne"` → `t('brand.name')` (×2)
-- [x] C-05.6 — `contracts/governance/ContractHealthTimelinePage.tsx` — `"API Asset ID"` → `t('contracts.health.assetIdLabel')`
-- [x] C-05.7 — Adicionar chaves i18n aos 4 locales
+- Card usa `px-5`, Modal/Drawer usam `px-6`
+- **Decisão necessária:** Escolher um padrão único (recomendado: `px-6` para todos)
 
----
+### 7.2 Touch targets mínimos
 
-## Fase 2 — Correções Altas
+- Auditar todos os elementos interativos com `p-1`, `p-1.5`, `px-3 py-1`
+- Garantir mínimo 44px de área clicável
+- Ficheiros prioritários: KnowledgeHubPage, OperationalNotesPage, AppSidebar badges
 
-### H-01: Decompor Componentes > 900 Linhas
+### 7.3 Lazy imports inconsistentes
 
-**Impacto:** Manutenibilidade + Performance  
-**Estratégia:** Extrair sub-componentes lógicos (tabs, secções, modais) para ficheiros separados no mesmo diretório.
+- **Ficheiro:** `src/routes/catalogRoutes.tsx` linhas 17-20
+- **Correção:** Padronizar uso de `.then()` handler em lazy imports para named exports
+- **Complexidade:** Baixa
 
-- [x] H-01.1 — `AiAssistantPage.tsx` (1.213→733 linhas) → Extraídos: ChatSidebar, ChatMessageItem, AgentsSidePanel, SuggestedPrompts, AiAssistantTypes
-- [x] H-01.2 — `VisualRestBuilder.tsx` (1.124→923 linhas) → Extraídos: RestBuilderHelpers, ParameterConstraintsPanel, CollapsibleSubSection
-- [x] H-01.3 — `AssistantPanel.tsx` (1.004→443 linhas) → Extraídos: AssistantPanelTypes, AssistantMessageBubble
-- [x] H-01.4 — `ServiceCatalogPage.tsx` (1.001→547 linhas) → Extraídos: ImpactPanel, TemporalPanel, ServiceDetailPanel
-- [x] H-01.5 — `DeveloperPortalPage.tsx` (991→424 linhas) → Extraídos: DevPortalSubscriptionsTab, DevPortalPlaygroundTab, DevPortalInboxTab
+### 7.4 Consistência de Drawer sizing
+
+- `Drawer.tsx` mistura `w-80` (Tailwind scale) com `w-[480px]` (pixel) e `w-[640px]` (pixel)
+- **Correção:** Converter todos para a mesma escala
+
+### 7.5 Remover texto com tamanho excessivamente pequeno
+
+| Componente | Valor | Correção |
+|---|---|---|
+| `AppSidebar.tsx` badges | `text-[9px]` | Mínimo `text-[10px]` ou `text-2xs` |
+| `Stepper.tsx` | `text-[10px]` | Mínimo `text-xs` |
 
 ---
 
-### H-02: Corrigir Acessibilidade em Elementos Clickáveis
+## Resumo por Wave
 
-**Impacto:** Acessibilidade (WCAG 2.1)
-
-- [x] H-02.1 — `features/catalog/pages/ServiceDiscoveryPage.tsx:403` — Adicionado `role="dialog"` e `aria-modal="true"` ao overlay
-
----
-
-### H-03: Converter Inline Styles Restantes para Tailwind
-
-**Impacto:** Consistência do design system  
-**Abordagem:** Por ficheiro, converter `style={{}}` para classes Tailwind equivalentes.
-
-Ficheiros prioritários (excluindo EnvironmentsPage já tratado em C-03):
-- [x] H-03.01 — `contracts/workspace/builders/shared/SchemaPropertyEditor.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.02 — `contracts/catalog/components/CatalogTable.tsx` — Convertido `transitionDuration`
-- [x] H-03.03 — `contracts/catalog/components/CatalogToolbar.tsx` — Convertido 2× `transitionDuration`
-- [x] H-03.04 — `contracts/workspace/sections/ApprovalsSection.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.05 — `contracts/workspace/sections/ContractSection.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.06 — `contracts/workspace/sections/ScorecardSection.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.07 — `contracts/workspace/sections/SecuritySection.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.08 — `contracts/workspace/components/StudioRail.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.09 — `contracts/governance/ContractGovernancePage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.10 — `contracts/governance/ContractHealthTimelinePage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.11 — `change-governance/components/ReleasesIntelligenceTab.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.12 — `change-governance/pages/ChangeCatalogPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.13 — `change-governance/pages/ChangeDetailPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.14 — `governance/pages/CompliancePage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.15 — `governance/pages/DomainDetailPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.16 — `governance/pages/EnterpriseControlsPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.17 — `governance/pages/ExecutiveOverviewPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.18 — `governance/pages/MaturityScorecardsPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.19 — `governance/pages/ReportsPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.20 — `governance/pages/ServiceScorecardPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.21 — `governance/pages/TeamDetailPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.22 — `configuration/pages/BrandingAdminPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.23 — `configuration/pages/ParameterComplianceDashboardPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.24 — `catalog/components/DependencyGraph.tsx` — Convertido `width: '100%'`; altura dinâmica permanece
-- [x] H-03.25 — `catalog/pages/ServiceMaturityPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.26 — `catalog/pages/ServiceScorecardPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.27 — `ai-hub/components/AssistantPanel.tsx` — animation-delay mantido (necessário inline)
-- [x] H-03.28 — `ai-hub/pages/AiAssistantPage.tsx` — animation-delay mantido (necessário inline)
-- [x] H-03.29 — `ai-hub/pages/AiRoutingPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.30 — `ai-hub/pages/TokenBudgetPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.31 — `identity-access/components/AuthCard.tsx` — Convertido boxShadow e gradient
-- [x] H-03.32 — `identity-access/components/AuthShell.tsx` — Convertido 3× gradient backgrounds
-- [x] H-03.33 — `product-analytics/pages/AdoptionFunnelPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.34 — `product-analytics/pages/JourneyFunnelPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.35 — `product-analytics/pages/ModuleAdoptionPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.36 — `product-analytics/pages/PersonaUsagePage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.37 — `product-analytics/pages/TimeToValuePage.tsx` — Sem inline styles convertíveis (dinâmicos)
-- [x] H-03.38 — `product-analytics/pages/ValueTrackingPage.tsx` — Sem inline styles convertíveis (dinâmicos)
-
-**Nota:** A maioria dos inline styles restantes usa valores dinâmicos calculados em runtime (width: `${pct}%`, paddingLeft com nível de aninhamento, cores de tema dinâmicas). Estes NÃO podem ser convertidos para Tailwind pois requerem nomes de classes conhecidos em build-time.
+| Wave | Foco | Items | Complexidade | Dependências |
+|---|---|---|---|---|
+| **1** | Scroll/Overflow | 12 | Média | Nenhuma |
+| **2** | Navegação | 4 | Média | Nenhuma |
+| **3** | i18n | 5 blocos (59 strings) | Baixa-Média | Nenhuma |
+| **4** | Z-Index | 4 blocos | Baixa | Definição CSS variables |
+| **5** | Responsividade | 3 blocos | Alta | Wave 1 concluída |
+| **6** | Duplicatas | 2 consolidações | Alta | Decisão de produto |
+| **7** | Polish | 5 items | Baixa | Waves 1-5 concluídas |
 
 ---
 
-## Fase 3 — Correções Médias
+## Checklist de Execução
 
-### M-01: Decompor Ficheiros 500-900 Linhas
+### Wave 1 — Scroll/Overflow
+- [ ] 1.1 AppSidebar content panel: `overflow-hidden` → `overflow-y-auto`
+- [ ] 1.2 AppSidebar nav: adicionar `min-h-0`
+- [ ] 1.3 AppSidebar icon rail: adicionar `min-h-0`
+- [ ] 1.4 MobileDrawer: adicionar `overflow-y-auto`
+- [ ] 1.5 AuthShell: remover `overflow-hidden`
+- [ ] 1.6 WorkspaceLayout: eliminar nested scrolls
+- [ ] 1.7 ConsumerDrivenContractPage: remover `min-h-screen`
+- [ ] 1.8 ContractPlaygroundPage: remover `min-h-screen`
+- [ ] 1.9 AiAssistantPage: consolidar scroll zones
+- [ ] 1.10 AiCopilotPage: adicionar `min-h-0` a flex children
+- [ ] 1.11 DraftStudioPage: remover scroll interno
+- [ ] 1.12 ContractSection: adicionar `min-h-0`
 
-**Prioridade:** Roadmap → ✅ Executado para ficheiro prioritário  
-**Ficheiro tratado:** `AdvancedConfigurationConsolePage.tsx` (838 → 326 linhas)
+### Wave 2 — Navegação
+- [ ] 2.1 Criar rota `/knowledge/documents/new`
+- [ ] 2.2 Criar rota `/contracts/studio/new`
+- [ ] 2.3 Reordenar rotas `/governance/scorecards`
+- [ ] 2.4 Adicionar ProtectedRoute a 3 rotas admin
 
-- [x] M-01.1 — `AdvancedConfigurationConsolePage.tsx` (838 linhas) → 326 linhas
-  - Extraído: `AdvancedConfigConsoleTypes.tsx` — tipos, constantes e helpers compartilhados
-  - Extraído: `AdvancedConfigExplorerTab.tsx` — aba Effective Explorer
-  - Extraído: `AdvancedConfigDiffTab.tsx` — aba Diff & Compare
-  - Extraído: `AdvancedConfigImportExportTab.tsx` — aba Import / Export
-  - Extraído: `AdvancedConfigRollbackTab.tsx` — aba Rollback & Restore
-  - Extraído: `AdvancedConfigHistoryTab.tsx` — aba History & Timeline
-  - Extraído: `AdvancedConfigHealthTab.tsx` — aba Health & Troubleshooting
+### Wave 3 — i18n
+- [ ] 3.1 Migrar 26 placeholders para i18n
+- [ ] 3.2 Migrar 10 textos de status/badge
+- [ ] 3.3 Migrar 5 labels de secção
+- [ ] 3.4 Migrar 5 mensagens de erro
+- [ ] 3.5 Migrar 13 aria-labels
 
-**Ficheiros 500-900 linhas tratados na continuação Fase 3 (2026-04-12):**
+### Wave 4 — Z-Index
+- [ ] 4.1 Eliminar z-[9999] (2 ficheiros)
+- [ ] 4.2 Migrar z-50 (5 componentes)
+- [ ] 4.3 Migrar z-20 (2 componentes)
+- [ ] 4.4 Definir novos níveis CSS variables
 
-- [x] M-01.2 — `ContractGovernancePage.tsx` (763 → 120 linhas)
-  - Extraído: `ContractGovernanceHelpers.ts` — tipos (GovernanceInsights, PolicySummary, AuditEntry) + helpers (computeGovernanceInsights, computePolicyChecks, countByLifecycle, generateAuditTimeline)
-  - Extraído: `ContractGovernanceComponents.tsx` — KpiCard, PolicyStat, InsightCard, ContractList (com `memo()`)
-  - Extraído: `ContractGovernanceViews.tsx` — OverviewView, ApprovalsView, ComplianceView, GapsView, AuditView (com `memo()`)
-- [x] M-01.3 — `AiAgentsPage.tsx` (765 → 221 linhas)
-  - Extraído: `AiAgentTypes.tsx` — interfaces, constantes e helpers (humanizeEnumValue, ownershipIcon, visibilityIcon, statusVariant)
-  - Extraído: `AiAgentCard.tsx` — AgentCard (com `memo()`)
-  - Extraído: `AiAgentDialogs.tsx` — CreateAgentDialog, ExecuteAgentDialog
+### Wave 5 — Responsividade
+- [ ] 5.1 Adicionar breakpoints a 64 grids (top 10 ficheiros)
+- [ ] 5.2 Corrigir larguras fixas (4 componentes)
+- [ ] 5.3 Adicionar dimensões a img/svg (2 ficheiros)
 
-**Ficheiros 500-900 linhas restantes (27 ficheiros):** disponíveis para sessões futuras conforme prioridade.
+### Wave 6 — Duplicatas
+- [ ] 6.1 Consolidar DoraMetricsPage
+- [ ] 6.2 Consolidar ServiceScorecardPage
 
----
-
-### M-02: Adicionar React.memo a Componentes Pesados
-
-**Prioridade:** Roadmap → ✅ Executado para componentes de alto impacto
-
-- [x] M-02.1 — `components/Badge.tsx` — `export function Badge` → `export const Badge = memo(...)` — usado em toda a plataforma
-- [x] M-02.2 — `components/StatCard.tsx` — `export function StatCard` → `export const StatCard = memo(...)` — usado em dashboards com múltiplas instâncias
-- [x] M-02.3 — `AdvancedConfigExplorerTab.tsx` — `memo()` adicionado ao sub-componente extraído em M-01
-- [x] M-02.4 — `AdvancedConfigDiffTab.tsx` — `memo()` adicionado
-- [x] M-02.5 — `AdvancedConfigHealthTab.tsx` — `memo()` adicionado
-- [x] M-02.6 — `AdvancedConfigHistoryTab.tsx` — `memo()` adicionado
-- [x] M-02.7 — `AdvancedConfigImportExportTab.tsx` — `memo()` adicionado
-- [x] M-02.8 — `AdvancedConfigRollbackTab.tsx` — `memo()` adicionado
-- [x] M-02.9 — `ContractGovernanceComponents.tsx` — KpiCard, PolicyStat, InsightCard, ContractList com `memo()` (extraídos de ContractGovernancePage)
-- [x] M-02.10 — `ContractGovernanceViews.tsx` — OverviewView, ApprovalsView, ComplianceView, GapsView, AuditView com `memo()` (extraídos de ContractGovernancePage)
-- [x] M-02.11 — `AiAgentCard.tsx` — AgentCard com `memo()` (extraído de AiAgentsPage)
-
----
-
-### M-03: Aumentar Cobertura de Testes Frontend
-
-**Meta:** 27% → 30%+  
-**Resultado:** 161 → 181 ficheiros de teste (+20); 1061 → 1100 assertions (+39)
-
-#### Novos testes adicionados
-
-- [x] M-03.01 — `GovernanceGatesPage.test.tsx` — página estática, renderização básica
-- [x] M-03.02 — `SecurityGateDashboardPage.test.tsx` — inline axios mock
-- [x] M-03.03 — `UserPreferencesPage.test.tsx` — fetch mock + ThemeContext
-- [x] M-03.04 — `BrandingAdminPage.test.tsx` — configurationApi mock
-- [x] M-03.05 — `AiScaffoldWizardPage.test.tsx` — templatesApi mock + route params
-- [x] M-03.06 — `CanonicalEntityImpactCascadePage.test.tsx` — contractsApi mock
-- [x] M-03.07 — `ConsumerDrivenContractPage.test.tsx` — contractsApi mock
-- [x] M-03.08 — `ContractHealthTimelinePage.test.tsx` — contractsApi mock
-- [x] M-03.09 — `ContractPipelinePage.test.tsx` — axios + jszip mock
-- [x] M-03.10 — `ContractPlaygroundPage.test.tsx` — contractsApi mock
-- [x] M-03.11 — `ContractPortalPage.test.tsx` — contractsApi mock + route params
-- [x] M-03.12 — `ContractWorkspacePage.test.tsx` — hooks mock + monaco-editor alias
-- [x] M-03.13 — `CreateContractPage.test.tsx` — contractStudioApi + serviceCatalogApi mock
-- [x] M-03.14 — `DraftStudioPage.test.tsx` — contractStudioApi + monaco mock + AuthContext
-- [x] M-03.15 — `ParameterComplianceDashboardPage.test.tsx` — página estática
-- [x] M-03.16 — `ParameterUsageReportPage.test.tsx` — página estática
-- [x] M-03.17 — `TemplateDetailPage.test.tsx` — templatesApi mock
-- [x] M-03.18 — `TemplateEditorPage.test.tsx` — templatesApi mock (create + edit)
-- [x] M-03.19 — `TemplateLibraryPage.test.tsx` — templatesApi mock
-- [x] M-03.20 — `CreateServicePage.test.tsx` — re-export de CreateContractPage
-
-#### Infraestrutura de teste melhorada
-
-- [x] `src/__tests__/__mocks__/monaco-editor.ts` — stub para monaco-editor em ambiente jsdom
-- [x] `vite.config.ts` — alias `monaco-editor` → stub em modo `test` (evita erro de resolução de pacote)
-
----
-
-## Regras de Execução
-
-1. **Cada correção deve preservar comportamento existente** — sem regressões.
-2. **TypeScript e build devem passar após cada correção** — `tsc --noEmit && vite build`.
-3. **i18n keys devem ser adicionadas nos 4 locales** — en, pt-BR, pt-PT, es.
-4. **Testes existentes devem continuar a passar** — `vitest run`.
-5. **Inline styles convertidos devem usar tokens de design existentes** — não criar novos.
-6. **Ficheiros decompostos devem manter exports públicos iguais** — sem breaking changes.
-7. **Não alterar funcionalidade** — apenas qualidade, consistência, acessibilidade e i18n.
-
----
-
-*Plano gerado a partir da auditoria frontend de 2026-04-11. Fases 1, 2 e 3 concluídas em 2026-04-12. Continuação Fase 3 (M-01.2/M-01.3/M-02.9–M-02.11) concluída em 2026-04-12.*
+### Wave 7 — Polish
+- [ ] 7.1 Padronizar espaçamento Card/Modal/Drawer
+- [ ] 7.2 Auditar touch targets mínimos
+- [ ] 7.3 Padronizar lazy imports
+- [ ] 7.4 Consistência Drawer sizing
+- [ ] 7.5 Remover texto excessivamente pequeno

@@ -5,6 +5,8 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
@@ -53,7 +55,7 @@ public static class ExportContractMultiFormat
     /// Handler que selecciona o exporter adequado ao formato solicitado
     /// e produz o conteúdo exportado com o content-type e filename corretos.
     /// </summary>
-    public sealed class Handler(IContractVersionRepository repository) : IQueryHandler<Query, Response>
+    public sealed class Handler(IContractVersionRepository repository, ILogger<Handler> logger) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -70,7 +72,7 @@ public static class ExportContractMultiFormat
 
             ContractCanonicalModel? canonical = null;
             try { canonical = CanonicalModelBuilder.Build(version.SpecContent, version.Protocol); }
-            catch { /* Fallback com canonical nulo */ }
+            catch (Exception ex) { logger.LogWarning(ex, "Failed to build canonical model for contract version {ContractVersionId}; continuing with null canonical model", request.ContractVersionId); }
 
             var safeName = (canonical?.Title ?? "contract").ToLowerInvariant().Replace(' ', '-');
             var semVer = version.SemVer;
@@ -78,7 +80,7 @@ public static class ExportContractMultiFormat
             var (content, fileName, contentType) = format switch
             {
                 "openapi-yaml" => OpenApiYamlExporter.Export(version.SpecContent, version.Format, safeName, semVer),
-                "openapi-json" => OpenApiJsonExporter.Export(version.SpecContent, version.Format, safeName, semVer),
+                "openapi-json" => OpenApiJsonExporter.Export(version.SpecContent, version.Format, safeName, semVer, logger),
                 "postman-v21" => PostmanCollectionExporter.Export(version.SpecContent, canonical, safeName, semVer),
                 "insomnia" => InsomniaExporter.Export(canonical, safeName, semVer),
                 "curl" => CurlExporter.Export(canonical, safeName, semVer),
@@ -106,7 +108,7 @@ public static class ExportContractMultiFormat
     private static class OpenApiJsonExporter
     {
         internal static (string content, string fileName, string contentType) Export(
-            string specContent, string format, string safeName, string semVer)
+            string specContent, string format, string safeName, string semVer, ILogger logger)
         {
             // Se já é JSON, devolve como está; se é YAML, retorna sem conversão (sem biblioteca YAML)
             string content = specContent;
@@ -117,7 +119,7 @@ public static class ExportContractMultiFormat
                     using var doc = JsonDocument.Parse(specContent);
                     content = JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true });
                 }
-                catch { content = specContent; }
+                catch (Exception ex) { logger.LogWarning(ex, "Failed to re-format JSON spec for export; using raw content"); content = specContent; }
             }
             return (content, $"{safeName}-{semVer}.json", "application/json");
         }

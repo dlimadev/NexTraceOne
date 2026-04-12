@@ -1,4 +1,4 @@
-import { RefreshCw, ShieldAlert, Target, Gauge, Undo2, Tag, BarChart3, CheckCircle2, XCircle } from 'lucide-react';
+import { RefreshCw, ShieldAlert, Target, Gauge, Undo2, Tag, LineChart, CheckCircle2, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -262,7 +262,7 @@ export function ReleasesIntelligenceTab({
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <BarChart3 size={16} className="text-accent" />
+              <LineChart size={16} className="text-accent" />
               <h3 className="text-sm font-semibold text-heading">
                 {t('releases.intelligence.baseline.title')}
               </h3>

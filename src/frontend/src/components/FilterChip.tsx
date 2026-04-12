@@ -54,7 +54,7 @@ export function FilterChip({
       {count !== undefined && (
         <span
           className={cn(
-            'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-pill px-1 text-[10px] font-semibold',
+            'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-pill px-1 type-micro font-semibold',
             active ? 'bg-cyan/20 text-cyan' : 'bg-elevated text-faded',
           )}
         >

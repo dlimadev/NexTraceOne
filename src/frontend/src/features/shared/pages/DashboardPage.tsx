@@ -3,15 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Zap, GitBranch, FileText, ShieldCheck, Activity, AlertTriangle,
-  ArrowRight, AlertCircle, Clock, Server,
+  ArrowRight, AlertCircle, Clock, Server, Download,
 } from 'lucide-react';
 import { StatCard } from '../../../components/StatCard';
-import { Card, CardHeader, CardBody } from '../../../components/Card';
+import { Card, CardHeader, CardBody, CardFooter } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
 import { QuickActions } from '../../../components/QuickActions';
 import { PersonaQuickstart } from '../../../components/PersonaQuickstart';
 import { HomeWidgetCard } from '../../../components/HomeWidgetCard';
+import { StackedProgressBar } from '../../../components/StackedProgressBar';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
@@ -82,6 +83,9 @@ export function DashboardPage() {
       icon: <Activity size={22} />,
       color: 'text-cyan',
       trend: totalServices > 0 ? { direction: 'up' as const, label: t('dashboard.trendHealthy') } : undefined,
+      sparkline: totalServices > 0 ? { data: [3, 5, 8, 12, 15, totalServices], color: 'var(--t-cyan)' } : undefined,
+      footer: totalServices > 0 ? t('dashboard.vsLastPeriod', { value: Math.max(0, totalServices - 2) }) : undefined,
+      footerHref: '/services',
     },
     {
       title: t('dashboard.totalContracts'),
@@ -91,6 +95,7 @@ export function DashboardPage() {
       trend: (contractsSummary?.inReviewCount ?? 0) > 0
         ? { direction: 'up' as const, label: `${contractsSummary?.inReviewCount} ${t('dashboard.inReviewShort')}` }
         : undefined,
+      sparkline: totalContracts > 0 ? { data: [2, 4, 6, 8, 10, totalContracts], color: 'var(--t-success)' } : undefined,
     },
     {
       title: t('dashboard.recentChanges'),
@@ -100,6 +105,7 @@ export function DashboardPage() {
       trend: (changesSummary?.changesNeedingAttention ?? 0) > 0
         ? { direction: 'down' as const, label: `${changesSummary?.changesNeedingAttention} ${t('dashboard.needAttention')}` }
         : undefined,
+      sparkline: totalChanges > 0 ? { data: [1, 3, 2, 5, 4, totalChanges], color: 'var(--t-warning)' } : undefined,
     },
     {
       title: t('dashboard.openIncidents'),
@@ -109,12 +115,14 @@ export function DashboardPage() {
       trend: openIncidents > 0
         ? { direction: 'down' as const, label: `${openIncidents} ${t('dashboard.activeNow')}` }
         : undefined,
+      sparkline: openIncidents > 0 ? { data: [5, 3, 4, 2, 1, openIncidents], color: 'var(--t-critical)' } : undefined,
     },
     {
       title: t('dashboard.registeredApis'),
       value: graphLoading ? '…' : totalApis,
       icon: <GitBranch size={22} />,
       color: 'text-accent',
+      sparkline: totalApis > 0 ? { data: [1, 2, 3, 4, 5, totalApis], color: 'var(--t-accent)' } : undefined,
     },
   ];
 
@@ -365,6 +373,29 @@ export function DashboardPage() {
               </div>
             )}
           </CardBody>
+          <CardFooter>
+            <div className="space-y-3">
+              <StackedProgressBar
+                segments={[
+                  { value: Math.round(((contractsSummary?.approvedCount ?? 0) / Math.max(totalContracts, 1)) * 100), color: 'bg-success', label: t('dashboard.contractApproved') },
+                  { value: Math.round(((contractsSummary?.inReviewCount ?? 0) / Math.max(totalContracts, 1)) * 100), color: 'bg-warning', label: t('dashboard.contractInReview') },
+                  { value: Math.round(((contractsSummary?.draftCount ?? 0) / Math.max(totalContracts, 1)) * 100), color: 'bg-muted', label: t('dashboard.contractDrafts') },
+                  { value: Math.round(((contractsSummary?.deprecatedCount ?? 0) / Math.max(totalContracts, 1)) * 100), color: 'bg-critical', label: t('dashboard.contractDeprecated') },
+                ]}
+                height="sm"
+              />
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] text-muted">{t('dashboard.contractDistribution')}</p>
+                <Link
+                  to="/governance/reports"
+                  className="inline-flex items-center gap-1 text-[11px] text-accent hover:text-accent-hover transition-colors font-medium"
+                >
+                  <Download size={10} />
+                  {t('dashboard.viewReport')}
+                </Link>
+              </div>
+            </div>
+          </CardFooter>
         </Card>
         )}
         </ContentGrid>

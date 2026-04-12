@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
-import { BrainCircuit, TrendingUp } from 'lucide-react';
+import { BrainCircuit } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer, PageSection } from '../../../components/shell';

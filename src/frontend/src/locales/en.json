@@ -208,7 +208,7 @@
       "PendingReview": "Pending Review",
       "Published": "Published"
     },
-    "subtitle": "Official and custom governed agents — create, execute, and review artifacts",
+    "subtitle": "Official and custom governed agents ÔÇö create, execute, and review artifacts",
     "systemPromptLabel": "System Prompt",
     "systemPromptPlaceholder": "You are a specialized agent that...",
     "tab": {
@@ -343,7 +343,7 @@
     "filterByStatus": "Filter by status",
     "filterInactive": "Inactive",
     "governanceNotice": "All interactions are governed, audited and grounded in NexTraceOne's Source of Truth.",
-    "groundingDevelopment": "Context grounding is under active development — full contextual responses with service catalog, contract registry, incident history and change intelligence will be available soon. This response demonstrates the metadata and explainability framework that is already in place.",
+    "groundingDevelopment": "Context grounding is under active development ÔÇö full contextual responses with service catalog, contract registry, incident history and change intelligence will be available soon. This response demonstrates the metadata and explainability framework that is already in place.",
     "groundingSources": "Grounded in",
     "ideActiveClientsLabel": "Active clients",
     "ideActivePolicies": "Active policies",
@@ -494,7 +494,12 @@
     "you": "You",
     "agentPlaceholder": {
       "agentName": "my-custom-agent"
-    }
+    },
+    "copilot.title": "NexTrace AI",
+    "copilot.greeting": "Hello, {{name}}",
+    "copilot.subtitle": "I can help you with services, contracts, incidents, changes and operational knowledge. Ask me anything.",
+    "copilot.inputPlaceholder": "Ask me anything about your services, contracts, or operationsÔÇª",
+    "copilot.toggleHistory": "Toggle conversation history"
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Recent Changes",
@@ -659,7 +664,7 @@
     "isCompliant": "Compliance Result",
     "json": "JSON",
     "loading": "Processing...",
-    "noViolations": "No violations found — policy is satisfied",
+    "noViolations": "No violations found ÔÇö policy is satisfied",
     "overview": "Policy Overview",
     "policyName": "Policy Name (kebab-case)",
     "registerPolicy": "Register Policy",
@@ -703,10 +708,10 @@
       "noVersionHistory": "No version history available"
     },
     "contextHint": {
-      "change": "Ask about {{name}} — risk, blast radius, rollback",
-      "contract": "Ask about {{name}} — versions, compatibility, consumers",
-      "incident": "Ask about {{name}} — root cause, mitigation, runbook",
-      "service": "Ask about {{name}} — contracts, dependencies, changes"
+      "change": "Ask about {{name}} ÔÇö risk, blast radius, rollback",
+      "contract": "Ask about {{name}} ÔÇö versions, compatibility, consumers",
+      "incident": "Ask about {{name}} ÔÇö root cause, mitigation, runbook",
+      "service": "Ask about {{name}} ÔÇö contracts, dependencies, changes"
     },
     "contextLabel": {
       "change": "Change",
@@ -777,10 +782,10 @@
     "title": "AI Assistant",
     "tryAsking": "Try asking",
     "welcome": {
-      "change": "I can help you assess the **{{name}}** change — its risk profile, blast radius, correlated incidents, and rollback readiness. All answers are grounded in Change Intelligence data.",
-      "contract": "I can help you analyze the **{{name}}** contract — its versions, compatibility, consumers, and governance status. All answers are grounded in the Contract Registry.",
-      "incident": "I can help you investigate the **{{name}}** incident — potential root causes, correlated changes, mitigation steps, and applicable runbooks. All answers are grounded in Incident History and operational knowledge.",
-      "service": "I can help you understand the **{{name}}** service — its contracts, dependencies, recent changes, and operational status. All answers are grounded in NexTraceOne's Source of Truth."
+      "change": "I can help you assess the **{{name}}** change ÔÇö its risk profile, blast radius, correlated incidents, and rollback readiness. All answers are grounded in Change Intelligence data.",
+      "contract": "I can help you analyze the **{{name}}** contract ÔÇö its versions, compatibility, consumers, and governance status. All answers are grounded in the Contract Registry.",
+      "incident": "I can help you investigate the **{{name}}** incident ÔÇö potential root causes, correlated changes, mitigation steps, and applicable runbooks. All answers are grounded in Incident History and operational knowledge.",
+      "service": "I can help you understand the **{{name}}** service ÔÇö its contracts, dependencies, recent changes, and operational status. All answers are grounded in NexTraceOne's Source of Truth."
     }
   },
   "audit": {
@@ -826,9 +831,9 @@
     "orContinueWith": "Or continue with",
     "orDivider": "or sign in with credentials",
     "password": "Password",
-    "passwordPlaceholder": "••••••••",
+    "passwordPlaceholder": "ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó",
     "rememberMe": "Remember me",
-    "selfHosted": "Self-hosted · Enterprise · Auditable",
+    "selfHosted": "Self-hosted ┬À Enterprise ┬À Auditable",
     "sessionExpired": "Your session has expired. Please sign in again.",
     "showPassword": "Show password",
     "signIn": "Sign in to your account",
@@ -843,7 +848,8 @@
     "tagline": "Sovereign Engineering Governance Platform",
     "trustCompliant": "Enterprise compliant",
     "trustEncrypted": "Encrypted in transit",
-    "welcomeTitle": "Welcome to NexTraceOne"
+    "welcomeTitle": "Welcome to NexTraceOne",
+    "logout": "Logout"
   },
   "authorization": {
     "accessDenied": "Access Denied",
@@ -1076,7 +1082,8 @@
     "workflowsTitle": "Automation Workflows"
   },
   "brand": {
-    "name": "NexTraceOne"
+    "name": "NexTraceOne",
+    "tagline": "Operational Confidence"
   },
   "branding": {
     "admin": {
@@ -1189,7 +1196,7 @@
     },
     "detail": {
       "active": "Active",
-      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumers",
+      "apiAndConsumerSummary": "{{apiCount}} APIs ┬À {{consumerCount}} consumers",
       "apiCount": "{{count}} APIs",
       "apiCount_one": "{{count}} API",
       "apiCount_other": "{{count}} APIs",
@@ -1241,7 +1248,7 @@
       "relatedIncidentsDescription": "Active incidents impacting this service",
       "repositoryUrl": "Repository",
       "routePattern": "Route",
-      "separator": "·",
+      "separator": "┬À",
       "serviceLinks": {
         "addFirstLink": "Add the first link to this service",
         "addLink": "Add Link",
@@ -1435,6 +1442,10 @@
         "repoBranch": "main",
         "baseContractSpec": "openapi: 3.0.0\ninfo:\n  title: Payment API\n  version: 1.0.0\npaths: ..."
       }
+    },
+    "aiScaffold": {
+      "serviceNamePlaceholder": "payment-api",
+      "entitiesPlaceholder": "Payment, Refund, Statement"
     }
   },
   "catalogContractsConfig": {
@@ -1691,7 +1702,7 @@
     "navigation": "Navigation",
     "noEntityResults": "No matching entities found",
     "operations": "Operations",
-    "placeholder": "Search pages, actions…",
+    "placeholder": "Search pages, actionsÔÇª",
     "searchResults": "Search Results",
     "seeAllResults": "See all results",
     "select": "select",
@@ -1756,7 +1767,21 @@
     "view": "View",
     "viewAll": "View all",
     "vs": "vs",
-    "yes": "Yes"
+    "yes": "Yes",
+    "commaSeparated": "comma-separated",
+    "default": "Default",
+    "description": "Description",
+    "environment": "Environment",
+    "items": "Items",
+    "name": "Name",
+    "onePerLine": "one per line",
+    "type": "Type",
+    "skipToContent": "Skip to content",
+    "steps": "Steps",
+    "optional": "Optional",
+    "step_completed": "completed",
+    "step_active": "active",
+    "step_upcoming": "upcoming"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "When enabled, users can create custom specialized AI agents.",
@@ -2255,7 +2280,7 @@
     "governance.gates.fourEyes.compliant": "Compliant",
     "governance.gates.fourEyes.description": "Evaluate whether an action requires dual approval",
     "governance.gates.fourEyes.disabled": "Four Eyes Principle is not enabled",
-    "governance.gates.fourEyes.notCompliant": "Not compliant — requires different approver",
+    "governance.gates.fourEyes.notCompliant": "Not compliant ÔÇö requires different approver",
     "governance.gates.fourEyes.required": "Second approver required",
     "governance.gates.fourEyes.title": "Four Eyes Principle",
     "governance.gates.subtitle": "Evaluate governance gates before critical actions",
@@ -2304,7 +2329,7 @@
     "governance.risk.thresholds_by_criticality.label": "Risk Thresholds by Service Criticality",
     "governance.scorecard.enabled.description": "Whether governance scorecards are active and calculated",
     "governance.scorecard.enabled.label": "Governance Scorecard Enabled",
-    "governance.scorecard.thresholds.description": "Score thresholds for governance scorecard classification (e.g. Excellent ≥90, Good ≥70, etc.)",
+    "governance.scorecard.thresholds.description": "Score thresholds for governance scorecard classification (e.g. Excellent ÔëÑ90, Good ÔëÑ70, etc.)",
     "governance.scorecard.thresholds.label": "Scorecard Score Thresholds",
     "governance.scorecard.thresholds_by_environment.description": "Override score thresholds per environment (e.g. Production requires higher scores)",
     "governance.scorecard.thresholds_by_environment.label": "Scorecard Thresholds by Environment",
@@ -2712,7 +2737,7 @@
     "promotion.freeze.windows.label": "Freeze Windows",
     "promotion.min_time_in_staging_hours.description": "Minimum hours a release must stay in staging before production promotion.",
     "promotion.min_time_in_staging_hours.label": "Minimum Time in Staging (hours)",
-    "promotion.paths.allowed.description": "Allowed source→target environment promotion paths",
+    "promotion.paths.allowed.description": "Allowed sourceÔåÆtarget environment promotion paths",
     "promotion.paths.allowed.label": "Allowed Promotion Paths",
     "promotion.production.extra_approvers_required.description": "Additional approvers required when promoting to production",
     "promotion.production.extra_approvers_required.label": "Extra Approvers for Production",
@@ -3045,7 +3070,7 @@
       "tenant": "Tenant",
       "user": "User"
     },
-    "subtitle": "Manage instance, tenant, and environment settings. Configure branding, feature flags, and structural policies.",
+    "subtitle": "Manage instance, tenant, and environment settings. Configure feature flags and structural policies.",
     "table": {
       "actions": "Actions",
       "active": "Active",
@@ -3084,6 +3109,11 @@
       "definitions": "Definitions",
       "effective": "Effective Settings",
       "entries": "Configured Values"
+    },
+    "checklists": {
+      "categoryPlaceholder": "standard",
+      "environmentPlaceholder": "production",
+      "itemsPlaceholder": "Review test results\nCheck rollback plan\nNotify stakeholders"
     }
   },
   "contractGov": {
@@ -3199,7 +3229,7 @@
     "configuration": "Configuration",
     "contractJson": "OpenAPI Contract (JSON)",
     "contractJsonPlaceholder": "Paste your OpenAPI 3.0 JSON here...",
-    "contractToCode": "Contract → Code",
+    "contractToCode": "Contract ÔåÆ Code",
     "copied": "Copied",
     "copy": "Copy",
     "download": "Download",
@@ -3296,7 +3326,16 @@
         "topicName": "Topic Name",
         "unnamed": "Unnamed Topic",
         "validate": "Validate",
-        "version": "Version"
+        "version": "Version",
+        "titlePlaceholder": "Order Events",
+        "eventNamePlaceholder": "OrderCreated",
+        "brokerPlaceholder": "kafka://broker:9092",
+        "topicNamePlaceholder": "orders.created",
+        "producerPlaceholder": "order-service",
+        "consumerPlaceholder": "notification-service",
+        "orderingPlaceholder": "by-key",
+        "dlqPlaceholder": "orders.created.dlq",
+        "channelOwnerPlaceholder": "team-orders"
       },
       "legacy": {
         "addField": "Add Field",
@@ -3327,7 +3366,17 @@
           "fieldLength": "30",
           "fieldOffset": "0",
           "fieldOccurs": "10"
-        }
+        },
+        "recordNamePlaceholder": "CUSTOMER-RECORD",
+        "programNamePlaceholder": "CUSTPROG",
+        "queueManagerPlaceholder": "QMGR01",
+        "queueNamePlaceholder": "CUST.REQUEST.Q",
+        "messageFormatPlaceholder": "MQHRF2",
+        "transactionIdPlaceholder": "CUST",
+        "fieldNamePlaceholder": "CUST-NAME",
+        "fieldPicturePlaceholder": "PIC X(30)",
+        "fieldRedefinesPlaceholder": "CUST-ID",
+        "ownerPlaceholder": "mainframe-team"
       },
       "rest": {
         "addArray": "Array",
@@ -3392,7 +3441,7 @@
         "minLength": "Min Length",
         "minimum": "Minimum",
         "modeRef": "$ref (Schema Reference)",
-        "modeVisualProps": "✦ Visual Properties",
+        "modeVisualProps": "Ô£ª Visual Properties",
         "nestedProperties": "Nested Properties",
         "noEndpoints": "No endpoints yet. Click \"Add Endpoint\" to get started.",
         "noVariants": "No variants. Add at least one sub-schema.",
@@ -3470,7 +3519,11 @@
         "placeholder": {
           "version": "1.0.0",
           "propertyName": "userId"
-        }
+        },
+        "namePlaceholder": "UserProfile",
+        "namespacePlaceholder": "com.example.schemas",
+        "ownerPlaceholder": "platform-team",
+        "propertyNamePlaceholder": "userId"
       },
       "soap": {
         "addOperation": "Add Operation",
@@ -3488,14 +3541,23 @@
         "operationName": "Operation Name",
         "operations": "Operations",
         "outputMessage": "Output Message",
-        "roundtripWarning": "SOAP round-trip is partial — some WSDL features may not be editable visually. Use source editor for advanced WSDL constructs.",
+        "roundtripWarning": "SOAP round-trip is partial ÔÇö some WSDL features may not be editable visually. Use source editor for advanced WSDL constructs.",
         "securityPlaceholder": "WS-Security, Transport Security, etc...",
         "securityPolicy": "Security Policy",
         "serviceInfo": "Service Information",
         "serviceName": "Service Name",
         "soapAction": "SOAP Action",
         "unnamed": "Unnamed Operation",
-        "validate": "Validate"
+        "validate": "Validate",
+        "serviceNamePlaceholder": "UserService",
+        "operationNamePlaceholder": "GetUser",
+        "inputMessagePlaceholder": "GetUserRequest",
+        "outputMessagePlaceholder": "GetUserResponse",
+        "faultMessagePlaceholder": "ServiceFault",
+        "endpointPlaceholder": "http://example.com/service",
+        "addressPlaceholder": "https://api.example.com/service",
+        "namespacePlaceholder": "http://schemas.example.com/types",
+        "soapActionPlaceholder": "urn:GetUser"
       },
       "validation": {
         "actorRequired": "At least one producer or consumer is required",
@@ -3574,7 +3636,15 @@
         "placeholder": {
           "retryCount": "3",
           "timeout": "30"
-        }
+        },
+        "secretHeaderPlaceholder": "X-Webhook-Secret",
+        "customHeaderPlaceholder": "X-Custom-Header",
+        "namePlaceholder": "order-created-webhook",
+        "contentTypePlaceholder": "application/json",
+        "ownerPlaceholder": "integrations-team",
+        "headerValuePlaceholder": "header-value",
+        "retryPolicyPlaceholder": "exponential-backoff",
+        "eventsPlaceholder": "order.created, order.updated"
       },
       "workservice": {
         "addDep": "Add Dependency",
@@ -3638,7 +3708,17 @@
           "retries": "3",
           "timeout": "300",
           "healthCheck": "/health"
-        }
+        },
+        "consumedEntityPlaceholder": "OrderEvent",
+        "producedEntityPlaceholder": "OrderProcessedEvent",
+        "eventNamePlaceholder": "OrderProcessed",
+        "namePlaceholder": "order-processor",
+        "ownerPlaceholder": "team-orders",
+        "depNamePlaceholder": "orders-db",
+        "consumedTopicPlaceholder": "orders.created",
+        "producedTopicPlaceholder": "orders.processed",
+        "consumedServicePlaceholder": "user-api",
+        "targetTopicPlaceholder": "orders.processed"
       },
       "eventBuilder": {
         "placeholder": {
@@ -4060,7 +4140,7 @@
     "healthDashboard": {
       "deprecated": "Deprecated Versions",
       "healthScore": "Health Score",
-      "noViolations": "No rule violations detected — contracts are healthy!",
+      "noViolations": "No rule violations detected ÔÇö contracts are healthy!",
       "subtitle": "Aggregated quality and governance metrics across all contracts",
       "title": "Contract Health Dashboard",
       "topViolations": "Contracts with Most Violations",
@@ -4304,7 +4384,7 @@
       "scoreModerate": "Some security aspects need attention.",
       "securityReviewState": "Security Review"
     },
-    "selectApiAsset": "Select an API asset…",
+    "selectApiAsset": "Select an API assetÔÇª",
     "selectApiAssetLabel": "API Asset:",
     "selectApiAssetPrompt": "Select an API asset above to view its contract history.",
     "selectProtocol": "Select Protocol",
@@ -4451,7 +4531,19 @@
           "sla": "99.9% uptime",
           "slo": "p99 < 200ms",
           "externalLinks": "Runbook, wiki, monitoring dashboard URLs (one per line)"
-        }
+        },
+        "friendlyNamePlaceholder": "e.g., User Management API",
+        "functionalDescPlaceholder": "What business capability does this service provide?",
+        "technicalDescPlaceholder": "Technical architecture, stack, integration notes...",
+        "domainPlaceholder": "Payments",
+        "capabilityPlaceholder": "Payment Processing",
+        "productPlaceholder": "Checkout Platform",
+        "ownerPlaceholder": "john.doe@company.com",
+        "teamPlaceholder": "Team Payments",
+        "tagsPlaceholder": "payments, checkout, pci (comma separated)",
+        "slaPlaceholder": "99.9% uptime",
+        "sloPlaceholder": "p99 < 200ms",
+        "externalLinksPlaceholder": "Runbook, wiki, monitoring dashboard URLs (one per line)"
       },
       "dependencies": {
         "downstream": "Downstream",
@@ -4532,7 +4624,8 @@
         "recentChanges": "Recent Changes",
         "risks": "Identified Risks",
         "team": "Team",
-        "violations": "Violations"
+        "violations": "Violations",
+        "producer": "Producer"
       },
       "tabMetadata": "Metadata",
       "tabPreview": "Preview",
@@ -4545,6 +4638,16 @@
         "postconditions": "Postconditions",
         "preconditions": "Preconditions",
         "title": "Use Cases"
+      },
+      "security": {
+        "authModelPlaceholder": "RBAC, ABAC, Scope-based...",
+        "scopesPlaceholder": "read:users, write:users, admin",
+        "rolesPlaceholder": "Admin, Editor, Viewer",
+        "claimsPlaceholder": "sub, aud, tenant_id"
+      },
+      "livePreview": {
+        "parameters": "Parameters",
+        "response": "Response"
       }
     },
     "subtitle": "Multi-protocol contract governance and semantic diff",
@@ -4665,7 +4768,7 @@
       "sourceValidation": {
         "invalid": "Invalid format",
         "unclosedTag": "Unclosed XML tag detected",
-        "valid": "✓ Valid"
+        "valid": "Ô£ô Valid"
       },
       "splitEditor": {
         "channels": "Channels",
@@ -4739,7 +4842,10 @@
     "subtitle": "Source of truth for services, contracts, changes and operational knowledge",
     "title": "Dashboard",
     "totalContracts": "Total Contracts",
-    "trendHealthy": "Healthy"
+    "trendHealthy": "Healthy",
+    "vsLastPeriod": "Vs last period: {{value}}",
+    "contractDistribution": "Contract distribution",
+    "viewReport": "Report"
   },
   "dependencyDashboard": {
     "critical": "Critical",
@@ -4775,11 +4881,12 @@
     "placeholder": {
       "scanServiceId": "00000000-0000-0000-0000-000000000000",
       "healthServiceId": "00000000-0000-0000-0000-000000000000"
-    }
+    },
+    "serviceIdPlaceholder": "Enter service name or ID"
   },
   "developerExperienceScore": {
     "cognitiveLoad": "Cognitive Load",
-    "cognitiveLoadScore": "Cognitive Load Score (0–10)",
+    "cognitiveLoadScore": "Cognitive Load Score (0ÔÇô10)",
     "computedAt": "Computed at",
     "createError": "Failed to submit score",
     "createSuccess": "Score submitted successfully",
@@ -4806,7 +4913,7 @@
     "teamName": "Team Name",
     "title": "Developer Experience Score",
     "toil": "Toil %",
-    "toilPercentage": "Toil Percentage (0–100%)"
+    "toilPercentage": "Toil Percentage (0ÔÇô100%)"
   },
   "developerPortal": {
     "analytics": {
@@ -5054,7 +5161,7 @@
     "overallPerformance": "Overall Performance",
     "period": "Period",
     "rolledBackDeploys": "Rolled Back",
-    "subtitle": "Deployment Frequency, Lead Time, Change Failure Rate, Time to Restore — powered by real release and incident data.",
+    "subtitle": "Deployment Frequency, Lead Time, Change Failure Rate, Time to Restore ÔÇö powered by real release and incident data.",
     "timeToRestore": "Time to Restore Service",
     "title": "DORA Metrics",
     "totalDeploys": "Total Deploys",
@@ -5062,7 +5169,7 @@
   },
   "environment": {
     "active": "Active Environment",
-    "nonProductionBanner": "You are operating in {{name}} ({{profile}}) — this is a non-production environment.",
+    "nonProductionBanner": "You are operating in {{name}} ({{profile}}) ÔÇö this is a non-production environment.",
     "profile": {
       "development": "Development",
       "production": "Production",
@@ -5183,7 +5290,7 @@
     "validation": "Please check the entered data and try again."
   },
   "footer": {
-    "default": "Powered by {{name}} — Operational Confidence Platform",
+    "default": "Powered by {{name}} ÔÇö Operational Confidence Platform",
     "poweredBy": "Powered by NexTraceOne"
   },
   "forgotPassword": {
@@ -5222,7 +5329,7 @@
       "rolloutCompletion": "Rollout completion",
       "rolloutFailure": "Rollout failure",
       "rollouts": "Rollouts",
-      "searchPlaceholder": "Search packs…",
+      "searchPlaceholder": "Search packsÔÇª",
       "status": {
         "Compliant": "Compliant",
         "NonCompliant": "Non-compliant",
@@ -5307,12 +5414,12 @@
       "mttr": "MTTR",
       "mttrTrend": "MTTR",
       "openIncidents": "Open Incidents",
-      "overallImproving": "Overall metrics are improving — keep up the great work!",
+      "overallImproving": "Overall metrics are improving ÔÇö keep up the great work!",
       "overallRating": "Overall Rating",
       "period": "Period",
       "recurrenceRate": "Recurrence Rate",
       "resolvedInPeriod": "Resolved in Period",
-      "subtitle": "DevOps Research & Assessment — Deployment Frequency, Lead Time, Change Failure Rate, MTTR",
+      "subtitle": "DevOps Research & Assessment ÔÇö Deployment Frequency, Lead Time, Change Failure Rate, MTTR",
       "title": "DORA Metrics",
       "trendDataPoints": "Trend Data Points",
       "trendSummary": "Trend Summary"
@@ -5381,7 +5488,7 @@
       },
       "filterAll": "All",
       "scope": "Scope",
-      "searchPlaceholder": "Search policies…",
+      "searchPlaceholder": "Search policiesÔÇª",
       "severity": {
         "Critical": "Critical",
         "High": "High",
@@ -5438,7 +5545,7 @@
       },
       "low": "Low",
       "medium": "Medium",
-      "searchPlaceholder": "Search packs…",
+      "searchPlaceholder": "Search packsÔÇª",
       "serviceRiskList": "Pack risk indicators",
       "totalAssessed": "Packs assessed"
     },
@@ -5675,13 +5782,15 @@
   },
   "header": {
     "languageEnglish": "English",
-    "languagePortuguese": "Português",
+    "languagePortuguese": "Portugu├¬s",
     "notifications": "Notifications",
     "settings": "Settings",
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
     "toggleLanguage": "Toggle language",
-    "toggleTheme": "Toggle dark/light mode"
+    "toggleTheme": "Toggle dark/light mode",
+    "switchToAuto": "Switch to system mode",
+    "selectLanguage": "Select Language"
   },
   "identity": {
     "accessReview": {
@@ -5713,7 +5822,7 @@
       "confirmRequest": "Confirm Emergency Request",
       "expiresAt": "Expires At",
       "justification": "Justification",
-      "justificationPlaceholder": "Describe the critical situation requiring emergency access…",
+      "justificationPlaceholder": "Describe the critical situation requiring emergency accessÔÇª",
       "noRequests": "No break glass requests found.",
       "request": "Request Emergency Access",
       "requestFormTitle": "Request Emergency Access",
@@ -5732,9 +5841,9 @@
       "delegationsList": "Active Delegations",
       "noDelegations": "No delegations found.",
       "permissions": "Delegated Permissions",
-      "permissionsPlaceholder": "permission1, permission2, …",
+      "permissionsPlaceholder": "permission1, permission2, ÔÇª",
       "reason": "Reason",
-      "reasonPlaceholder": "Reason for this delegation…",
+      "reasonPlaceholder": "Reason for this delegationÔÇª",
       "revoke": "Revoke Delegation",
       "status": "Status",
       "subtitle": "Manage formal permission delegations between users",
@@ -5747,7 +5856,7 @@
       "approve": "Approve",
       "decide": "Decide",
       "justification": "Justification",
-      "justificationPlaceholder": "Explain why this access is needed…",
+      "justificationPlaceholder": "Explain why this access is neededÔÇª",
       "noRequests": "No pending JIT access requests.",
       "pendingList": "Pending JIT Requests",
       "permissionCode": "Permission Code",
@@ -6091,20 +6200,20 @@
     "subtitle": "Centralized operational knowledge, runbooks, architecture docs and post-mortems",
     "tags": "Tags",
     "title": "Knowledge Hub",
-    "viewAllNotes": "View all operational notes →",
+    "viewAllNotes": "View all operational notes ÔåÆ",
     "viewRelatedNotes": "View Related Notes"
   },
   "legacy": {
     "artifacts": {
       "copybook": "Copybook",
-      "copybookDescription": "COBOL copybook — structured data layout definition",
+      "copybookDescription": "COBOL copybook ÔÇö structured data layout definition",
       "dataset": "Dataset",
       "db2Artifact": "DB2 Artifact",
       "db2StoredProcedure": "DB2 Stored Procedure",
       "db2Table": "DB2 Table",
       "db2View": "DB2 View",
       "jcl": "JCL",
-      "jclDescription": "Job Control Language — batch job definition",
+      "jclDescription": "Job Control Language ÔÇö batch job definition",
       "loadModule": "Load Module",
       "procLib": "PROC Library",
       "title": "Artifacts",
@@ -6195,11 +6304,11 @@
       "cpc": "CPC",
       "cpcDescription": "Central Processor Complex",
       "lpar": "LPAR",
-      "lparDescription": "Logical Partition — isolated z/OS instance",
+      "lparDescription": "Logical Partition ÔÇö isolated z/OS instance",
       "mips": "MIPS",
       "msu": "MSU",
       "sysplex": "Sysplex",
-      "sysplexDescription": "System Complex — cluster of LPARs",
+      "sysplexDescription": "System Complex ÔÇö cluster of LPARs",
       "title": "Infrastructure"
     },
     "messaging": {
@@ -6552,7 +6661,8 @@
     "submit": "Select Service",
     "subtitle": "Review license conflicts and upgrade suggestions for service dependencies",
     "title": "License Compliance & Upgrades",
-    "upgradeSuggestions": "Upgrade Suggestions"
+    "upgradeSuggestions": "Upgrade Suggestions",
+    "serviceIdPlaceholder": "Enter service name or ID"
   },
   "mfa": {
     "attemptsRemaining": "{{count}} attempts remaining",
@@ -6693,7 +6803,7 @@
       "inApp": "In-App",
       "loading": "Loading preferences...",
       "mandatory": "Mandatory",
-      "mandatoryTooltip": "This notification cannot be disabled — it is required by platform security and governance policies",
+      "mandatoryTooltip": "This notification cannot be disabled ÔÇö it is required by platform security and governance policies",
       "saveFailed": "Failed to save preference",
       "saved": "Preference saved successfully",
       "subtitle": "Manage how and where you receive notifications",
@@ -6810,6 +6920,9 @@
       "teamFatigue": "Team Fatigue",
       "title": "On-Call Intelligence",
       "totalIncidents": "Total Incidents"
+    },
+    "logExplorer": {
+      "traceIdPlaceholder": "Trace ID"
     }
   },
   "opsFinOpsConfig": {
@@ -7016,7 +7129,16 @@
       }
     },
     "quickActions": "Quick Actions",
-    "widgetComingSoon": "Data will be available when connected to backend services"
+    "widgetComingSoon": "Data will be available when connected to backend services",
+    "AiUser": {
+      "label": "AI User",
+      "homeSubtitle": "Your AI-powered operational assistant",
+      "ai": {
+        "prompt1": "What services are experiencing issues right now?",
+        "prompt2": "Show me recent changes with high blast radius",
+        "prompt3": "Summarize open incidents and their impact"
+      }
+    }
   },
   "phase4": {
     "contractDrift": {
@@ -7063,7 +7185,11 @@
       "noData": "No versions found for this contract",
       "subtitle": "Evolution of contract health over time",
       "title": "Health Score Timeline",
-      "version": "Version"
+      "version": "Version",
+      "apiAssetIdLabel": "API Asset ID",
+      "apiAssetIdPlaceholder": "Search or enter API asset name",
+      "loadTimeline": "Load Timeline",
+      "loadError": "Failed to load health timeline. Please verify the API Asset ID."
     },
     "impactCascade": {
       "affectedContracts": "Affected Contracts",
@@ -7078,7 +7204,9 @@
       "subtitle": "Multi-level cascade analysis of canonical entity changes",
       "title": "Canonical Entity Impact Cascade",
       "totalContracts": "Total Contracts Affected",
-      "uniqueEntities": "Unique Entities in Cascade"
+      "uniqueEntities": "Unique Entities in Cascade",
+      "entityIdPlaceholder": "Search or enter canonical entity name",
+      "loadError": "Failed to load cascade analysis. Please verify the entity ID."
     },
     "maturityBenchmark": {
       "avgMaturityScore": "Avg Maturity",
@@ -7184,9 +7312,9 @@
     "additionalContext": "Additional Context (optional)",
     "analysisPanel": "Predictive Analysis",
     "assessedAt": "Assessed at",
-    "blastRadius": "Blast Radius (0–100)",
+    "blastRadius": "Blast Radius (0ÔÇô100)",
     "causalFactors": "Causal Factors",
-    "changeFrequencyScore": "Change Frequency Score (0–10)",
+    "changeFrequencyScore": "Change Frequency Score (0ÔÇô10)",
     "changeRiskAssessment": "Change Risk Assessment",
     "changeType": "Change Type",
     "computedAt": "Computed at",
@@ -7314,7 +7442,18 @@
     "quotaExceededTitle": "Quota exceeded",
     "successTitle": "Success",
     "welcomeSubtitle": "The source of truth for services, contracts, changes and operational knowledge",
-    "welcomeTitle": "Welcome to NexTraceOne"
+    "welcomeTitle": "Welcome to NexTraceOne",
+    "userPreferences.timezone.title": "Timezone & Date Format",
+    "userPreferences.timezone.timezone": "Timezone",
+    "userPreferences.timezone.dateFormat": "Date Format",
+    "userPreferences.timezone.timeFormat": "Time Format",
+    "userPreferences.defaultScope.title": "Default Scope",
+    "userPreferences.defaultScope.description": "When set, lists will pre-filter to your default context",
+    "userPreferences.defaultScope.environment": "Default Environment",
+    "userPreferences.defaultScope.team": "Default Team",
+    "userPreferences.defaultScope.service": "Default Service",
+    "userPreferences.itemsPerPage.title": "Items Per Page",
+    "userPreferences.itemsPerPage.description": "Number of items shown per page in all lists"
   },
   "promotion": {
     "allRequests": "All Promotion Requests",
@@ -7334,7 +7473,7 @@
     "releaseId": "Release",
     "releaseIdPlaceholder": "UUID of the release",
     "route": "Route",
-    "selectRelease": "Select a release…",
+    "selectRelease": "Select a releaseÔÇª",
     "sourceEnvironment": "Source Environment",
     "status": "Status",
     "subtitle": "Control environment promotion with quality gates",
@@ -7565,10 +7704,10 @@
     "loadError": "Failed to load service reliability data. Please try again.",
     "mock": {
       "authGwSummary": "All authentication flows healthy.",
-      "catalogSyncAnomaly": "Complete service failure — dependency unavailable.",
+      "catalogSyncAnomaly": "Complete service failure ÔÇö dependency unavailable.",
       "catalogSyncSummary": "Integration partner unreachable.",
       "catalogSyncTrend": "Connectivity lost 2 hours ago.",
-      "inventorySummary": "Consumer lag increasing — needs attention.",
+      "inventorySummary": "Consumer lag increasing ÔÇö needs attention.",
       "noAnomalies": "No anomalies detected in the last 24 hours.",
       "notificationSummary": "Processing within expected parameters.",
       "orderApiSummary": "Service operating within expected parameters. All health checks passing.",
@@ -7576,7 +7715,7 @@
       "paymentGwAnomaly": "Error rate anomaly detected: 5.2% vs expected 1.0%. Correlated with recent change v3.1.0.",
       "paymentGwSummary": "Elevated error rate (5.2%) detected since last deployment.",
       "paymentGwTrend": "Error rate increased 40% after deployment v3.1.0.",
-      "reportSchedulerSummary": "Coverage gap detected — missing runbook.",
+      "reportSchedulerSummary": "Coverage gap detected ÔÇö missing runbook.",
       "userSvcSummary": "All systems operational."
     },
     "needsAttention": "Attention Required",
@@ -7612,7 +7751,7 @@
       "NeedsAttention": "Needs Attention",
       "Unavailable": "Unavailable"
     },
-    "subtitle": "Team-owned service reliability overview — health, trends and operational context",
+    "subtitle": "Team-owned service reliability overview ÔÇö health, trends and operational context",
     "title": "Service Reliability",
     "totalServices": "Total Services",
     "trend": {
@@ -7708,8 +7847,8 @@
     "dashboardError": "Failed to load dashboard data.",
     "emptyState": "Paste generated code and run the SAST scan to detect vulnerabilities.",
     "filePath": "File Path",
-    "gateFailed": "Security gate failed — critical or high findings detected.",
-    "gatePassed": "Security gate passed — no critical or high findings.",
+    "gateFailed": "Security gate failed ÔÇö critical or high findings detected.",
+    "gatePassed": "Security gate passed ÔÇö no critical or high findings.",
     "high": "High",
     "medium": "Medium",
     "noFindings": "No security findings detected. Code looks clean!",
@@ -7725,7 +7864,7 @@
     "securityScore": "Security Score",
     "sourceCode": "Source Code",
     "sourceCodePlaceholder": "Paste generated code to analyze...",
-    "subtitle": "SAST analysis of generated code — detect vulnerabilities before they reach production.",
+    "subtitle": "SAST analysis of generated code ÔÇö detect vulnerabilities before they reach production.",
     "tabs": {
       "dashboard": "Dashboard",
       "scan": "Scan Code"
@@ -7834,7 +7973,7 @@
     "exposureInternal": "Internal",
     "exposurePartner": "Partner",
     "impact": {
-      "calculating": "Calculating impact propagation…",
+      "calculating": "Calculating impact propagationÔÇª",
       "depth": "Depth",
       "directConsumers": "Direct consumers",
       "impactedNodes": "Impacted Nodes",
@@ -7843,7 +7982,7 @@
       "path": "Impact Path",
       "selectNode": "Root node",
       "selectNodeHint": "Select a service or API node to calculate its blast radius.",
-      "selectNodePlaceholder": "Select a node to analyze…",
+      "selectNodePlaceholder": "Select a node to analyzeÔÇª",
       "totalImpacted": "Total impacted",
       "transitiveConsumers": "Transitive consumers"
     },
@@ -7920,7 +8059,7 @@
     "registerService": "Register Service",
     "registerServiceTitle": "Register Service",
     "repositoryUrl": "Repository URL",
-    "searchPlaceholder": "Search services, APIs, domains…",
+    "searchPlaceholder": "Search services, APIs, domainsÔÇª",
     "serviceType": "Service Type",
     "sourceApi": "Source API",
     "stats": {
@@ -7946,7 +8085,7 @@
     "temporal": {
       "addedEdges": "Added edges",
       "addedNodes": "Added nodes",
-      "calculatingDiff": "Calculating temporal diff…",
+      "calculatingDiff": "Calculating temporal diffÔÇª",
       "capturedAt": "Captured at",
       "createFirst": "Create your first snapshot to start tracking graph evolution over time.",
       "createSnapshot": "Create Snapshot",
@@ -7958,7 +8097,7 @@
       "nodes": "Nodes",
       "removedEdges": "Removed edges",
       "removedNodes": "Removed nodes",
-      "selectSnapshot": "Select a snapshot…",
+      "selectSnapshot": "Select a snapshotÔÇª",
       "snapshotHistory": "Snapshot History",
       "toSnapshot": "To snapshot"
     },
@@ -8212,7 +8351,8 @@
     "users": "Users",
     "valueTracking": "Value Tracking",
     "waivers": "Waivers & Exceptions",
-    "workflow": "Workflow"
+    "workflow": "Workflow",
+    "navigation": "Main navigation"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -8336,7 +8476,7 @@
       "hasManifest": "Scaffolding manifest defined",
       "inactive": "Inactive",
       "noContract": "No base contract",
-      "noManifest": "No manifest — AI generates structure",
+      "noManifest": "No manifest ÔÇö AI generates structure",
       "notFound": "Template not found.",
       "ownership": "Ownership",
       "repoBranch": "Branch",
@@ -8385,13 +8525,13 @@
       },
       "placeholders": {
         "description": "Template for building REST APIs following DDD with Clean Architecture...",
-        "displayName": "Payment REST API — DDD .NET",
+        "displayName": "Payment REST API ÔÇö DDD .NET",
         "domain": "payments",
         "team": "platform-team"
       },
       "saveError": "Failed to save template. Please check your inputs.",
       "sections": {
-        "advanced": "Advanced — Contract & Scaffolding",
+        "advanced": "Advanced ÔÇö Contract & Scaffolding",
         "classification": "Classification",
         "identity": "Identity",
         "ownership": "Ownership & Tags"
@@ -8474,7 +8614,7 @@
       "review": {
         "downloadZip": "Download ZIP",
         "fallbackHint": "Configure an AI provider in AI Hub to get full code generation.",
-        "fallbackTitle": "AI provider unavailable — minimal scaffold generated",
+        "fallbackTitle": "AI provider unavailable ÔÇö minimal scaffold generated",
         "files": "files generated",
         "regenerate": "Regenerate",
         "successHint": "Service {{service}} scaffolded with {{language}}. Review the files below.",
@@ -8711,5 +8851,432 @@
     },
     "subtitle": "Configure approval workflows, SLAs, gates, promotion paths, release windows and freeze policies",
     "title": "Workflow & Promotion Governance"
+  },
+  "alertRules": {
+    "title": "Personal Alert Rules",
+    "subtitle": "Get notified when specific conditions are met",
+    "newRule": "New Rule",
+    "enable": "Enable rule",
+    "disable": "Disable rule",
+    "delete": "Delete rule",
+    "empty": {
+      "title": "No alert rules",
+      "description": "Create a personal alert rule to be notified about important events",
+      "cta": "Create your first rule"
+    },
+    "builder": {
+      "title": "Create Alert Rule",
+      "name": "Rule name",
+      "namePlaceholder": "e.g. High risk service detected",
+      "entity": "Entity",
+      "field": "Field",
+      "selectField": "Select field",
+      "operator": "Operator",
+      "selectOperator": "Select operator",
+      "value": "Value",
+      "channel": "Notification channel",
+      "save": "Create Rule"
+    }
+  },
+  "bookmarks": {
+    "add": "Add bookmark",
+    "remove": "Remove bookmark",
+    "title": "Bookmarks",
+    "empty": "No bookmarks yet",
+    "entityType": {
+      "Service": "Service",
+      "Contract": "Contract",
+      "Change": "Change",
+      "Incident": "Incident",
+      "Runbook": "Runbook",
+      "Dashboard": "Dashboard",
+      "KnowledgeArticle": "Knowledge Article"
+    }
+  },
+  "columnSelector": {
+    "title": "Columns",
+    "reset": "Reset to default",
+    "columns": "Visible columns",
+    "noColumns": "No columns configured"
+  },
+  "customCharts": {
+    "title": "Custom Charts",
+    "subtitle": "Build custom visualizations for your metrics and KPIs",
+    "newChart": "New Chart",
+    "timeRange": "Time range",
+    "empty": {
+      "title": "No custom charts",
+      "description": "Create a custom chart to visualize your platform metrics",
+      "cta": "Create your first chart"
+    },
+    "builder": {
+      "title": "Chart Builder",
+      "step": "Step {{step}} of {{total}}",
+      "chooseMetric": "Choose a metric source",
+      "chooseChartType": "Choose a chart type",
+      "defineFilters": "Define filters and grouping",
+      "groupBy": "Group by",
+      "groupByPlaceholder": "e.g. environment, team, service",
+      "timeRange": "Time range",
+      "preview": "Preview",
+      "saveName": "Name your chart",
+      "namePlaceholder": "e.g. Changes by Environment",
+      "save": "Save Chart"
+    }
+  },
+  "customFields": {
+    "title": "Custom Fields",
+    "add": "Add Field",
+    "delete": "Delete",
+    "empty": {
+      "title": "No custom fields",
+      "description": "Add custom fields to enrich service records"
+    },
+    "fieldTypes": {
+      "Text": "Text",
+      "Number": "Number",
+      "Date": "Date",
+      "Select": "Select",
+      "MultiSelect": "Multi-select",
+      "Url": "URL",
+      "Email": "Email"
+    },
+    "required": "Required"
+  },
+  "dashboardClone": {
+    "button": "Clone Dashboard",
+    "modal": {
+      "title": "Clone Dashboard",
+      "namePlaceholder": "e.g. My Team Dashboard (copy)",
+      "confirm": "Clone"
+    },
+    "success": "Dashboard cloned successfully"
+  },
+  "dashboardTemplates": {
+    "modal": {
+      "title": "Choose Dashboard Template",
+      "subtitle": "Start from a persona-specific template and customize it to your needs."
+    },
+    "engineer": {
+      "title": "Engineer",
+      "description": "Team services, recent changes, active incidents, DORA metrics"
+    },
+    "techLead": {
+      "title": "Tech Lead",
+      "description": "Team services, change risk, pending approvals, SLO status"
+    },
+    "architect": {
+      "title": "Architect",
+      "description": "Contract health, dependency map, compliance status, reliability trend"
+    },
+    "executive": {
+      "title": "Executive",
+      "description": "FinOps summary, compliance status, incident overview, DORA metrics"
+    },
+    "platformAdmin": {
+      "title": "Platform Admin",
+      "description": "AI usage, security findings, audit activity, system health"
+    }
+  },
+  "digestSettings": {
+    "title": "Digest Settings",
+    "frequency": "Digest frequency",
+    "frequencyOptions": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "none": "Disabled"
+    },
+    "sections": "Included sections"
+  },
+  "notesWidget": {
+    "title": "My Notes",
+    "edit": "Edit",
+    "preview": "Preview",
+    "placeholder": "Write your personal notes here... (markdown supported)",
+    "empty": "No notes yet. Click the edit icon to start writing."
+  },
+  "quietHours": {
+    "title": "Quiet Hours",
+    "subtitle": "Pause notifications during specified hours",
+    "enabled": "Enable quiet hours",
+    "start": "Start time",
+    "end": "End time",
+    "timezone": "Timezone",
+    "saved": "Quiet hours saved"
+  },
+  "savedViews": {
+    "title": "Saved Views",
+    "default": "Default",
+    "shared": "Shared",
+    "save": "Save current view",
+    "delete": "Delete view",
+    "empty": "No saved views",
+    "saveModal": {
+      "title": "Save View",
+      "name": "View name",
+      "namePlaceholder": "My team services",
+      "share": "Share with team",
+      "confirm": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "tags": {
+    "title": "Tags",
+    "add": "Add tag",
+    "remove": "Remove tag",
+    "placeholder": "key:value (e.g. team:payments)",
+    "empty": "No tags",
+    "keyLabel": "Tag key",
+    "valueLabel": "Tag value"
+  },
+  "taxonomies": {
+    "title": "Classification Taxonomies",
+    "addCategory": "Add Category",
+    "addValue": "Add Value",
+    "empty": {
+      "title": "No taxonomies",
+      "description": "Define classification categories for services"
+    }
+  },
+  "watch": {
+    "watch": "Watch",
+    "watching": "Watching",
+    "unwatch": "Stop watching",
+    "level": {
+      "all": "All changes",
+      "critical": "Critical only",
+      "none": "No notifications"
+    }
+  },
+  "workflows": {
+    "title": "Workflows & Automation",
+    "checklists": {
+      "title": "Change Checklists",
+      "empty": "No checklists defined yet.",
+      "create": "Create Checklist",
+      "required": "Required",
+      "optional": "Optional"
+    },
+    "automationRules": {
+      "title": "Automation Rules",
+      "empty": "No automation rules defined yet.",
+      "create": "Create Rule",
+      "trigger": "Trigger",
+      "conditions": "Conditions",
+      "actions": "Actions",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "contractTemplates": {
+      "title": "Contract Templates",
+      "empty": "No contract templates defined yet.",
+      "create": "Create Template",
+      "type": "Type",
+      "all": "All"
+    }
+  },
+  "scheduledReports": {
+    "title": "Scheduled Reports",
+    "empty": "No scheduled reports configured yet.",
+    "create": "Create Report",
+    "schedule": "Schedule",
+    "format": "Format",
+    "recipients": "Recipients",
+    "enabled": "Active",
+    "disabled": "Inactive",
+    "lastSent": "Last Sent"
+  },
+  "aiPreferences": {
+    "title": "AI Preferences",
+    "verbosity": "Response Verbosity",
+    "verbosityOptions": {
+      "concise": "Concise",
+      "standard": "Standard",
+      "detailed": "Detailed"
+    },
+    "language": "Preferred Language",
+    "contextScope": "Auto Context Scope",
+    "scopeOptions": {
+      "service": "Service",
+      "team": "Team",
+      "all": "All"
+    },
+    "knowledgeSources": "Knowledge Sources",
+    "knowledgeSourceOptions": {
+      "contracts": "Contracts",
+      "services": "Services",
+      "changes": "Changes",
+      "incidents": "Incidents",
+      "runbooks": "Runbooks",
+      "knowledgeArticles": "Knowledge Articles",
+      "operationalNotes": "Operational Notes"
+    }
+  },
+  "savedPrompts": {
+    "title": "Saved Prompts",
+    "empty": "No saved prompts yet.",
+    "save": "Save Prompt",
+    "share": "Share",
+    "unshare": "Unshare",
+    "contextType": "Context"
+  },
+  "webhookTemplates": {
+    "title": "Webhook Templates",
+    "empty": "No webhook templates defined yet.",
+    "create": "Create Template",
+    "eventType": "Event Type",
+    "payload": "Payload Template",
+    "enabled": "Active",
+    "disabled": "Inactive"
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "empty": "No API keys yet.",
+    "create": "Create API Key",
+    "copyOnce": "Copy this key ÔÇö it will not be shown again",
+    "revoke": "Revoke",
+    "scopes": "Scopes",
+    "expires": "Expires"
+  },
+  "integrationMappings": {
+    "title": "Integration Field Mappings",
+    "description": "Field mappings are configured per connector in the Integrations module."
+  },
+  "export": {
+    "title": "Export Data",
+    "description": "Choose export format and columns.",
+    "format": "Format",
+    "columns": "Columns",
+    "columnsSelected": "{{count}} of {{total}} columns selected",
+    "download": "Download",
+    "exporting": "Exporting...",
+    "saveAsTemplate": "Save as Template",
+    "savedTemplates": "Saved Templates",
+    "templateName": "Template Name",
+    "noTemplates": "No saved templates.",
+    "templateSaved": "Template saved successfully."
+  },
+  "pagination": {
+    "pageOf": "Page {{page}} of {{totalPages}}",
+    "showing": "Showing {{from}} to {{to}} of {{total}}",
+    "itemsPerPage": "Items per page",
+    "previous": "Previous page",
+    "next": "Next page",
+    "first": "First page",
+    "last": "Last page",
+    "navigation": "Pagination"
+  },
+  "telemetryExplorer": {
+    "title": "Telemetry Explorer",
+    "subtitle": "Search and analyze logs, traces and metrics from your services",
+    "traces": {
+      "title": "Trace Explorer",
+      "subtitle": "Distributed trace search with span hierarchy and correlation",
+      "searchPlaceholder": "Search by trace ID, service or operation...",
+      "traceId": "Trace ID",
+      "service": "Service",
+      "operation": "Operation",
+      "duration": "Duration",
+      "durationMs": "{{value}}ms",
+      "status": "Status",
+      "spanCount": "Spans",
+      "startTime": "Start Time",
+      "hasErrors": "Has Errors",
+      "errorsOnly": "Errors Only",
+      "minDuration": "Min Duration (ms)",
+      "noTraces": "No traces found",
+      "noTracesDescription": "Adjust your filters or time range to find traces.",
+      "detail": {
+        "title": "Trace Detail",
+        "services": "Services",
+        "totalDuration": "Total Duration",
+        "spans": "Spans",
+        "spanDetail": "Span Detail",
+        "spanId": "Span ID",
+        "parentSpan": "Parent Span",
+        "operationName": "Operation",
+        "serviceName": "Service",
+        "statusCode": "Status Code",
+        "statusMessage": "Status Message",
+        "startTime": "Start Time",
+        "endTime": "End Time",
+        "duration": "Duration",
+        "attributes": "Attributes",
+        "resourceAttributes": "Resource Attributes",
+        "spanAttributes": "Span Attributes",
+        "events": "Events",
+        "noEvents": "No events in this span",
+        "rootSpan": "Root Span",
+        "childSpan": "Child Span",
+        "waterfall": "Waterfall",
+        "timeline": "Timeline"
+      }
+    },
+    "logs": {
+      "title": "Log Explorer",
+      "subtitle": "Search and filter structured logs with trace correlation",
+      "searchPlaceholder": "Search in log messages...",
+      "level": "Level",
+      "message": "Message",
+      "service": "Service",
+      "timestamp": "Timestamp",
+      "traceId": "Trace ID",
+      "spanId": "Span ID",
+      "correlationId": "Correlation ID",
+      "host": "Host",
+      "container": "Container",
+      "exception": "Exception",
+      "allLevels": "All Levels",
+      "noLogs": "No logs found",
+      "noLogsDescription": "Adjust your filters or time range to find logs.",
+      "viewTrace": "View Trace",
+      "expandException": "Show Exception"
+    },
+    "filters": {
+      "environment": "Environment",
+      "service": "Service",
+      "timeRange": "Time Range",
+      "from": "From",
+      "until": "Until",
+      "last15m": "Last 15 min",
+      "last1h": "Last 1 hour",
+      "last6h": "Last 6 hours",
+      "last24h": "Last 24 hours",
+      "last7d": "Last 7 days",
+      "custom": "Custom",
+      "apply": "Apply Filters",
+      "reset": "Reset",
+      "limit": "Results Limit"
+    },
+    "errors": {
+      "title": "Top Errors",
+      "errorMessage": "Error Message",
+      "count": "Count",
+      "lastSeen": "Last Seen",
+      "service": "Service"
+    },
+    "latency": {
+      "title": "Latency Comparison",
+      "p50": "P50",
+      "p95": "P95",
+      "p99": "P99",
+      "drift": "Drift %"
+    },
+    "correlate": {
+      "title": "Signal Correlation",
+      "subtitle": "Correlated logs and spans for a given trace",
+      "relatedLogs": "Related Logs",
+      "relatedSpans": "Related Spans"
+    },
+    "health": {
+      "title": "Telemetry Health",
+      "provider": "Provider",
+      "status": "Status",
+      "healthy": "Healthy",
+      "unhealthy": "Unhealthy"
+    },
+    "loading": "Loading telemetry data...",
+    "error": "Failed to load telemetry data. Please check the observability provider status.",
+    "providerUnavailable": "Observability provider is not available. Ensure Elasticsearch or ClickHouse is running."
   }
 }

@@ -26,9 +26,11 @@ internal static class BreakGlassEndpoints
     {
         var bgGroup = group.MapGroup("/break-glass");
 
-        // Qualquer usuário autenticado pode solicitar break glass — trata-se de acesso
-        // emergencial. A auditoria e post-mortem garantem controlo. Não exige permissão
-        // específica para não bloquear situações reais de emergência.
+        // Requer permissão explícita para solicitar break glass — acesso emergencial
+        // não deve ser aberto a qualquer utilizador autenticado. A permissão
+        // identity:break-glass:request deve ser atribuída a utilizadores ou roles
+        // que podem iniciar o fluxo de acesso emergencial. A decisão (aprovar/rejeitar)
+        // exige a permissão separada identity:break-glass:decide.
         bgGroup.MapPost("/", async (
             RequestBreakGlassFeature.Command command,
             ISender sender,
@@ -37,7 +39,7 @@ internal static class BreakGlassEndpoints
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequireAuthorization();
+        }).RequirePermission("identity:break-glass:request");
 
         bgGroup.MapPost("/{requestId:guid}/revoke", async (
             Guid requestId,

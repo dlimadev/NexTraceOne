@@ -3,13 +3,13 @@ import { Route } from 'react-router-dom';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
 const KnowledgeHubPage = lazy(() =>
-  import('../features/knowledge').then(m => ({ default: m.KnowledgeHubPage }))
+  import('../features/knowledge/pages/KnowledgeHubPage').then(m => ({ default: m.KnowledgeHubPage }))
 );
 const KnowledgeDocumentPage = lazy(() =>
-  import('../features/knowledge').then(m => ({ default: m.KnowledgeDocumentPage }))
+  import('../features/knowledge/pages/KnowledgeDocumentPage').then(m => ({ default: m.KnowledgeDocumentPage }))
 );
 const OperationalNotesPage = lazy(() =>
-  import('../features/knowledge').then(m => ({ default: m.OperationalNotesPage }))
+  import('../features/knowledge/pages/OperationalNotesPage').then(m => ({ default: m.OperationalNotesPage }))
 );
 const KnowledgeGraphPage = lazy(() =>
   import('../features/knowledge/pages/KnowledgeGraphPage').then(m => ({ default: m.KnowledgeGraphPage }))

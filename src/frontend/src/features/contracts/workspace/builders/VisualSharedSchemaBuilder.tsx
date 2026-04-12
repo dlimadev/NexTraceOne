@@ -135,7 +135,7 @@ export function VisualSharedSchemaBuilder({
               label={t('contracts.builder.sharedSchema.name', 'Schema Name')}
               value={state.name}
               onChange={(v) => update({ name: v })}
-              placeholder={t('contracts.sharedSchema.placeholder.schemaName', 'UserProfile')}
+              placeholder={t('contracts.builder.sharedSchema.namePlaceholder', 'UserProfile')}
               required
               error={fieldError('name') ? t(fieldError('name')!.messageKey, fieldError('name')!.fallback) : undefined}
               disabled={isReadOnly}
@@ -144,7 +144,7 @@ export function VisualSharedSchemaBuilder({
               label={t('contracts.builder.rest.version', 'Version')}
               value={state.version}
               onChange={(v) => update({ version: v })}
-              placeholder={t('contracts.builder.sharedSchema.placeholder.version', '1.0.0')}
+              placeholder="1.0.0"
               required
               disabled={isReadOnly}
             />
@@ -154,7 +154,7 @@ export function VisualSharedSchemaBuilder({
               label={t('contracts.builder.sharedSchema.namespace', 'Namespace')}
               value={state.namespace}
               onChange={(v) => update({ namespace: v })}
-              placeholder={t('contracts.sharedSchema.placeholder.namespace', 'com.example.schemas')}
+              placeholder={t('contracts.builder.sharedSchema.namespacePlaceholder', 'com.example.schemas')}
               mono
               disabled={isReadOnly}
             />
@@ -162,7 +162,7 @@ export function VisualSharedSchemaBuilder({
               label={t('contracts.builder.rest.contact', 'Owner')}
               value={state.owner}
               onChange={(v) => update({ owner: v })}
-              placeholder={t('contracts.sharedSchema.placeholder.owner', 'platform-team')}
+              placeholder={t('contracts.builder.sharedSchema.ownerPlaceholder', 'platform-team')}
               disabled={isReadOnly}
             />
           </div>
@@ -238,7 +238,7 @@ export function VisualSharedSchemaBuilder({
                     <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <Field label={t('contracts.builder.rest.paramName', 'Name')} value={prop.name}
-                          onChange={(v) => updateProp(prop.id, { name: v })} placeholder={t('contracts.builder.sharedSchema.placeholder.propertyName', 'userId')} required disabled={isReadOnly} />
+                          onChange={(v) => updateProp(prop.id, { name: v })} placeholder={t('contracts.builder.sharedSchema.propertyNamePlaceholder', 'userId')} required disabled={isReadOnly} />
                         <FieldSelect label={t('contracts.builder.rest.paramType', 'Type')} value={prop.type}
                           onChange={(v) => updateProp(prop.id, { type: v as SharedSchemaProperty['type'] })} options={PROPERTY_TYPE_OPTIONS} disabled={isReadOnly} />
                       </div>

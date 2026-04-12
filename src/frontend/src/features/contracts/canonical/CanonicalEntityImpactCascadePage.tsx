@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { GitBranch, AlertTriangle, CheckCircle2, ChevronRight, ChevronDown } from 'lucide-react';
+import { GitBranch, AlertTriangle, CheckCircle2, ChevronRight, ChevronDown, Loader2 } from 'lucide-react';
 import { contractsApi } from '../api/contracts';
 
 type CascadeNode = {
@@ -129,7 +129,7 @@ export function CanonicalEntityImpactCascadePage() {
               type="text"
               value={entityId}
               onChange={(e) => setEntityId(e.target.value)}
-              placeholder={t('contracts.canonical.placeholder.entityId', 'e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6')}
+              placeholder={t('phase4.impactCascade.entityIdPlaceholder', 'Search or enter canonical entity name')}
               className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label={t('phase4.impactCascade.entityName')}
             />
@@ -161,12 +161,20 @@ export function CanonicalEntityImpactCascadePage() {
         </div>
       </div>
 
+      {/* Loading */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 size={24} className="animate-spin text-blue-400 mr-2" />
+          <span className="text-slate-400 text-sm">{t('common.loading', 'Loading...')}</span>
+        </div>
+      )}
+
       {/* Error */}
       {isError && (
         <div className="bg-red-500/10 border border-red-500/25 rounded-lg p-4 flex items-center gap-2 text-red-400">
           <AlertTriangle size={16} />
-          <span className="text-sm">Failed to load cascade analysis. Please verify the entity ID.</span>
-          <button onClick={() => refetch()} className="ml-auto text-xs underline">Retry</button>
+          <span className="text-sm">{t('phase4.impactCascade.loadError', 'Failed to load cascade analysis. Please verify the entity ID.')}</span>
+          <button onClick={() => refetch()} className="ml-auto text-xs underline">{t('common.retry', 'Retry')}</button>
         </div>
       )}
 

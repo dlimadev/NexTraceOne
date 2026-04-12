@@ -39,3 +39,42 @@ public sealed record ContractValidationFailedIntegrationEvent(
     string ValidationError,
     Guid? OwnerUserId,
     Guid? TenantId) : IntegrationEventBase("Catalog");
+
+// ── Phase 6: Contract Verification & Changelog Events ──
+
+/// <summary>
+/// Publicado quando a verificação de um contrato é bem-sucedida (sem breaking changes).
+/// Consumidores: módulo de changes (aumentar change confidence), notificações.
+/// </summary>
+public sealed record ContractVerificationPassedIntegrationEvent(
+    Guid VerificationId,
+    string ApiAssetId,
+    string ServiceName,
+    string SourceSystem,
+    string? CommitSha,
+    Guid? TenantId) : IntegrationEventBase("Catalog");
+
+/// <summary>
+/// Publicado quando a verificação de um contrato deteta breaking changes.
+/// Consumidores: módulo de changes (reduzir change confidence), notificações, risk center.
+/// </summary>
+public sealed record ContractVerificationFailedIntegrationEvent(
+    Guid VerificationId,
+    string ApiAssetId,
+    string ServiceName,
+    string SourceSystem,
+    int BreakingChangesCount,
+    string? CommitSha,
+    Guid? TenantId) : IntegrationEventBase("Catalog");
+
+/// <summary>
+/// Publicado quando um changelog de contrato é gerado automaticamente.
+/// Consumidores: módulo de knowledge (indexar changelog), notificações.
+/// </summary>
+public sealed record ContractChangelogGeneratedIntegrationEvent(
+    Guid ChangelogId,
+    string ApiAssetId,
+    string ServiceName,
+    string ToVersion,
+    int EntryCount,
+    Guid? TenantId) : IntegrationEventBase("Catalog");

@@ -9,7 +9,7 @@ using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListInc
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByService;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidentsByTeam;
 using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
-using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using NexTraceOne.OperationalIntelligence.Tests.Incidents.Infrastructure;
 using Xunit;
 
 namespace NexTraceOne.OperationalIntelligence.Tests.Incidents.Application;

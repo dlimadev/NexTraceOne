@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { cn } from '../lib/cn';
@@ -29,8 +29,17 @@ const sizeClasses = {
   lg: 'w-[640px]',
 };
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /**
  * Drawer lateral enterprise para detalhes, edições e painéis de contexto.
+ *
+ * WCAG 2.1 AA compliant:
+ * - Focus trap: Tab/Shift+Tab cicla dentro do drawer
+ * - Retorno de foco ao elemento trigger ao fechar
+ * - Escape key para fechar
+ * - aria-modal, aria-labelledby
  *
  * Abre pelo lado direito por padrão (padrão enterprise para detalhes).
  * Usa z-modal para layering.
@@ -50,9 +59,12 @@ export function Drawer({
 }: DrawerProps) {
   const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<Element | null>(null);
 
   useEffect(() => {
     if (!open) return;
+
+    triggerRef.current = document.activeElement;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -61,11 +73,55 @@ export function Drawer({
     document.addEventListener('keydown', handleEscape);
     document.body.style.overflow = 'hidden';
 
+    // Focus first focusable element in the drawer
+    requestAnimationFrame(() => {
+      const panel = panelRef.current;
+      if (!panel) return;
+      const firstFocusable = panel.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (firstFocusable) firstFocusable.focus();
+    });
+
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
+      // Return focus to trigger element
+      if (triggerRef.current instanceof HTMLElement) {
+        triggerRef.current.focus();
+        triggerRef.current = null;
+      }
     };
   }, [open, onClose]);
+
+  // Focus trap: Tab/Shift+Tab cycles within drawer
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const panel = panelRef.current;
+      if (!panel) return;
+
+      const focusableEls = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+      if (focusableEls.length === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      const first = focusableEls[0];
+      const last = focusableEls[focusableEls.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    },
+    [],
+  );
 
   if (!open) return null;
 
@@ -75,11 +131,13 @@ export function Drawer({
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'nto-drawer-title' : undefined}
+      onKeyDown={handleKeyDown}
     >
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-overlay animate-fade-in"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Panel */}

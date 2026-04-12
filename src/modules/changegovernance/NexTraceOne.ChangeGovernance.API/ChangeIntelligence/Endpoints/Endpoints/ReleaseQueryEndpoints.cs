@@ -38,14 +38,14 @@ internal static class ReleaseQueryEndpoints
         }).RequirePermission("change-intelligence:read");
 
         group.MapGet("/", async (
-            Guid apiAssetId,
+            Guid? apiAssetId,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken,
             int page = 1,
             int pageSize = 20) =>
         {
-            var result = await sender.Send(new ListReleasesFeature.Query(apiAssetId, page, pageSize), cancellationToken);
+            var result = await sender.Send(new ListReleasesFeature.Query(apiAssetId ?? Guid.Empty, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
 

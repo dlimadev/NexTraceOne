@@ -57,11 +57,19 @@ public sealed class IncidentAlertHandler(
         }
         catch (Exception ex)
         {
+            // Log with structured context to enable dead-letter analysis and manual retry.
+            // TODO: Migrate to outbox pattern or Quartz retry job for at-least-once delivery.
             logger.LogError(
                 ex,
-                "Failed to create incident from alert '{Title}'. Alert was dispatched to {Channels} channel(s).",
+                "Failed to create incident from alert '{Title}' [{Severity}]. " +
+                "Alert was dispatched to {Channels} channel(s). " +
+                "CorrelationId: {CorrelationId}, Source: {Source}. " +
+                "This alert-to-incident conversion was lost — manual review may be required.",
                 payload.Title,
-                dispatchResult.TotalChannels);
+                payload.Severity,
+                dispatchResult.TotalChannels,
+                payload.CorrelationId ?? "none",
+                payload.Source);
         }
 
         return Task.CompletedTask;

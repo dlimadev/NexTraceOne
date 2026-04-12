@@ -45,8 +45,10 @@ public sealed class ContractPipelineEndpointModule
             GenerateMockFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
+            httpContext.Response.Headers["X-Feature-Preview"] = "true";
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:contracts:pipeline:read");
@@ -56,8 +58,10 @@ public sealed class ContractPipelineEndpointModule
             GeneratePostmanFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
+            httpContext.Response.Headers["X-Feature-Preview"] = "true";
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:contracts:pipeline:read");
@@ -67,8 +71,10 @@ public sealed class ContractPipelineEndpointModule
             GenerateTestsFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
+            httpContext.Response.Headers["X-Feature-Preview"] = "true";
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:contracts:pipeline:read");
@@ -78,8 +84,10 @@ public sealed class ContractPipelineEndpointModule
             GenerateSdkFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
+            httpContext.Response.Headers["X-Feature-Preview"] = "true";
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:contracts:pipeline:read");
@@ -89,8 +97,10 @@ public sealed class ContractPipelineEndpointModule
             OrchestrateFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
+            HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
+            httpContext.Response.Headers["X-Feature-Preview"] = "true";
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:contracts:pipeline:read");

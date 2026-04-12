@@ -32,6 +32,9 @@ const UserPreferencesPage = lazy(() => import('../features/configuration/pages/U
 const ParameterUsageReportPage = lazy(() => import('../features/configuration/pages/ParameterUsageReportPage').then(m => ({ default: m.ParameterUsageReportPage })));
 const ParameterComplianceDashboardPage = lazy(() => import('../features/configuration/pages/ParameterComplianceDashboardPage').then(m => ({ default: m.ParameterComplianceDashboardPage })));
 const BrandingAdminPage = lazy(() => import('../features/configuration/pages/BrandingAdminPage').then(m => ({ default: m.BrandingAdminPage })));
+const WebhookTemplatesPage = lazy(() => import('../features/configuration/pages/WebhookTemplatesPage').then(m => ({ default: m.WebhookTemplatesPage })));
+const APIKeysPage = lazy(() => import('../features/configuration/pages/APIKeysPage').then(m => ({ default: m.APIKeysPage })));
+const IntegrationMappingsPage = lazy(() => import('../features/configuration/pages/IntegrationMappingsPage').then(m => ({ default: m.IntegrationMappingsPage })));
 const WorkflowConfigurationPage = lazy(() => import('../features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
 const CatalogContractsConfigurationPage = lazy(() => import('../features/catalog/pages/CatalogContractsConfigurationPage').then(m => ({ default: m.CatalogContractsConfigurationPage })));
 const OperationsFinOpsConfigurationPage = lazy(() => import('../features/operational-intelligence/pages/OperationsFinOpsConfigurationPage').then(m => ({ default: m.OperationsFinOpsConfigurationPage })));
@@ -336,6 +339,26 @@ export function AdminRoutes() {
         path="/user-preferences"
         element={
           <UserPreferencesPage />
+        }
+      />
+      <Route
+        path="/platform/configuration/webhook-templates"
+        element={
+          <ProtectedRoute permission="configuration:write" redirectTo="/unauthorized">
+            <WebhookTemplatesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/platform/configuration/api-keys"
+        element={
+          <APIKeysPage />
+        }
+      />
+      <Route
+        path="/platform/configuration/integration-mappings"
+        element={
+          <IntegrationMappingsPage />
         }
       />
     </>

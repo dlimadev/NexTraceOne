@@ -39,19 +39,82 @@ public static class GetOnCallIntelligence
             var total = allIncidents.Count;
             var avgPerDay = total > 0 ? Math.Round((decimal)total / request.PeriodDays, 2) : 0m;
 
-            // Heurísticas determinísticas baseadas no TeamId seed para consistência
-            var seed = Math.Abs(request.TeamId.GetHashCode()) % 100;
-            var peakHour = (seed + total) % 24;
-            var days = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-            var peakDayOfWeek = days[(seed + total) % 7];
+            // Computar hora e dia de pico a partir dos timestamps reais dos incidentes
+            int peakHour;
+            string peakDayOfWeek;
+            decimal nightCallsPercent;
+            decimal weekendCallsPercent;
 
-            // Indicadores de fadiga — derivados de métricas reais + heurísticas
-            var nightCallsPercent = total > 0 ? Math.Min(20m + (seed % 30), 60m) : 0m;
-            var weekendCallsPercent = total > 0 ? Math.Min(10m + (seed % 25), 40m) : 0m;
-            var avgResponseMinutes = total > 0 ? 15m + (seed % 45) : 0m;
-            var consecutiveDays = total > 0 ? Math.Min(total / 3 + 1, request.PeriodDays) : 0;
+            if (total > 0)
+            {
+                // Hora de pico — a hora UTC com mais incidentes
+                peakHour = allIncidents
+                    .GroupBy(i => i.CreatedAt.UtcDateTime.Hour)
+                    .OrderByDescending(g => g.Count())
+                    .First()
+                    .Key;
 
-            // Nível de fadiga
+                // Dia da semana com mais incidentes
+                var days = new[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+                peakDayOfWeek = days[(int)allIncidents
+                    .GroupBy(i => i.CreatedAt.UtcDateTime.DayOfWeek)
+                    .OrderByDescending(g => g.Count())
+                    .First()
+                    .Key];
+
+                // Incidentes nocturnos (22h-7h UTC)
+                var nightIncidents = allIncidents.Count(i =>
+                {
+                    var hour = i.CreatedAt.UtcDateTime.Hour;
+                    return hour >= 22 || hour < 7;
+                });
+                nightCallsPercent = Math.Round(100m * nightIncidents / total, 1);
+
+                // Incidentes ao fim-de-semana (sábado e domingo)
+                var weekendIncidents = allIncidents.Count(i =>
+                    i.CreatedAt.UtcDateTime.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday);
+                weekendCallsPercent = Math.Round(100m * weekendIncidents / total, 1);
+            }
+            else
+            {
+                peakHour = 0;
+                peakDayOfWeek = "N/A";
+                nightCallsPercent = 0m;
+                weekendCallsPercent = 0m;
+            }
+
+            // Dias consecutivos com pelo menos 1 incidente
+            var consecutiveDays = 0;
+            if (total > 0)
+            {
+                var incidentDates = allIncidents
+                    .Select(i => i.CreatedAt.UtcDateTime.Date)
+                    .Distinct()
+                    .OrderByDescending(d => d)
+                    .ToList();
+
+                var streak = 1;
+                var maxStreak = 1;
+                for (var idx = 1; idx < incidentDates.Count; idx++)
+                {
+                    if ((incidentDates[idx - 1] - incidentDates[idx]).Days == 1)
+                    {
+                        streak++;
+                        maxStreak = Math.Max(maxStreak, streak);
+                    }
+                    else
+                    {
+                        streak = 1;
+                    }
+                }
+                consecutiveDays = maxStreak;
+            }
+
+            // Tempo médio estimado de resposta — sem dados de acknowledging, retorna 0
+            // (requer integração com PagerDuty/OpsGenie para métricas reais de response time)
+            var avgResponseMinutes = 0m;
+
+            // Nível de fadiga — computado a partir de indicadores reais
             var fatigueScore = (nightCallsPercent / 60m * 30m) + (weekendCallsPercent / 40m * 20m) +
                                (avgPerDay * 10m) + (consecutiveDays > 5 ? 15m : 0m);
             var fatigueLevel = fatigueScore < 20m ? "Low" : fatigueScore < 40m ? "Medium" : fatigueScore < 60m ? "High" : "Critical";
@@ -64,13 +127,13 @@ public static class GetOnCallIntelligence
                 .Select(g => new ServiceIncidentCount(g.Key, g.Count()))
                 .ToList();
 
-            // Recomendações baseadas nos indicadores
+            // Recomendações baseadas nos indicadores reais
             var recommendations = new List<string>();
             if (nightCallsPercent > 35m) recommendations.Add("Consider rotating on-call shifts to reduce night-hour burden.");
             if (weekendCallsPercent > 25m) recommendations.Add("Review weekend deployment windows to reduce off-hours incidents.");
             if (avgPerDay > 1.5m) recommendations.Add("High incident volume detected — investigate recurring root causes.");
             if (consecutiveDays > 5) recommendations.Add("Extended consecutive incident period — consider temporary staffing increase.");
-            if (avgResponseMinutes > 30m) recommendations.Add("Average response time is elevated — review escalation policies.");
+            if (total == 0) recommendations.Add("No incidents recorded in the analysis period.");
             if (recommendations.Count == 0) recommendations.Add("On-call load is within acceptable parameters.");
 
             return Task.FromResult(Result<Response>.Success(new Response(

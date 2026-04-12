@@ -22,7 +22,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
   institutional:
-    'blue-gradient text-white shadow-md hover:brightness-110 hover:shadow-[0_0_24px_rgba(27,127,232,0.30)] disabled:opacity-40',
+    'blue-gradient text-white shadow-md hover:brightness-110 hover:shadow-glow-blue disabled:opacity-40',
   primary:
     'cta-gradient text-on-accent shadow-sm hover:brightness-110 hover:shadow-glow-sm disabled:opacity-40',
   secondary:

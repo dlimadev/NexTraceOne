@@ -183,11 +183,11 @@ export function VisualWorkserviceBuilder({
         <CardBody className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label={t('contracts.builder.workservice.name', 'Service Name')} value={state.name}
-              onChange={(v) => update({ name: v })} placeholder={t('contracts.workservice.placeholder.name', 'order-processor')} required
+              onChange={(v) => update({ name: v })} placeholder={t('contracts.builder.workservice.namePlaceholder', 'order-processor')} required
               error={fieldError('name') ? t(fieldError('name')!.messageKey, fieldError('name')!.fallback) : undefined}
               disabled={isReadOnly} />
             <Field label={t('contracts.builder.workservice.owner', 'Owner')} value={state.owner}
-              onChange={(v) => update({ owner: v })} placeholder={t('contracts.workservice.placeholder.owner', 'team-orders')} disabled={isReadOnly} />
+              onChange={(v) => update({ owner: v })} placeholder={t('contracts.builder.workservice.ownerPlaceholder', 'team-orders')} disabled={isReadOnly} />
           </div>
           <FieldArea label={t('contracts.builder.workservice.description', 'Description')} value={state.description}
             onChange={(v) => update({ description: v })}
@@ -214,7 +214,7 @@ export function VisualWorkserviceBuilder({
             />
             {state.trigger === 'Cron' && (
               <Field label={t('contracts.builder.workservice.schedule', 'Schedule (Cron)')} value={state.schedule}
-                onChange={(v) => update({ schedule: v })} placeholder={t('contracts.builder.workservice.placeholder.cronSchedule', '0 */5 * * *')} mono required
+                onChange={(v) => update({ schedule: v })} placeholder="0 */5 * * *" mono required
                 error={fieldError('schedule') ? t(fieldError('schedule')!.messageKey, fieldError('schedule')!.fallback) : undefined}
                 disabled={isReadOnly} />
             )}
@@ -226,7 +226,7 @@ export function VisualWorkserviceBuilder({
             )}
             {state.trigger === 'Webhook' && (
               <Field label={t('contracts.builder.workservice.webhookUrl', 'Webhook Path')} value={state.schedule}
-                onChange={(v) => update({ schedule: v })} placeholder={t('contracts.builder.workservice.placeholder.webhookPath', '/webhooks/process')} mono disabled={isReadOnly} />
+                onChange={(v) => update({ schedule: v })} placeholder="/webhooks/process" mono disabled={isReadOnly} />
             )}
           </div>
         </CardBody>
@@ -250,9 +250,9 @@ export function VisualWorkserviceBuilder({
             rows={2} disabled={isReadOnly} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label={t('contracts.builder.workservice.retries', 'Max Retries')} value={state.retries}
-              onChange={(v) => update({ retries: v })} placeholder={t('contracts.builder.workservice.placeholder.retries', '3')} disabled={isReadOnly} />
+              onChange={(v) => update({ retries: v })} placeholder="3" disabled={isReadOnly} />
             <Field label={t('contracts.builder.workservice.timeout', 'Timeout (seconds)')} value={state.timeout}
-              onChange={(v) => update({ timeout: v })} placeholder={t('contracts.builder.workservice.placeholder.timeout', '300')} disabled={isReadOnly} />
+              onChange={(v) => update({ timeout: v })} placeholder="300" disabled={isReadOnly} />
           </div>
           <FieldArea label={t('contracts.builder.workservice.errorHandling', 'Error Handling')} value={state.errorHandling}
             onChange={(v) => update({ errorHandling: v })}
@@ -288,7 +288,7 @@ export function VisualWorkserviceBuilder({
           {state.dependencies.map((dep) => (
             <div key={dep.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end">
               <Field label={t('contracts.builder.workservice.depName', 'Name')} value={dep.name}
-                onChange={(v) => updateDep(dep.id, { name: v })} placeholder={t('contracts.workservice.placeholder.depName', 'orders-db')} disabled={isReadOnly} />
+                onChange={(v) => updateDep(dep.id, { name: v })} placeholder={t('contracts.builder.workservice.depNamePlaceholder', 'orders-db')} disabled={isReadOnly} />
               <FieldSelect label={t('contracts.builder.workservice.depType', 'Type')} value={dep.type}
                 onChange={(v) => updateDep(dep.id, { type: v as WorkserviceDependency['type'] })}
                 options={DEP_TYPES} disabled={isReadOnly} />
@@ -344,9 +344,9 @@ export function VisualWorkserviceBuilder({
               {state.consumedTopics.map((topic) => (
                 <div key={topic.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end">
                   <Field label={t('contracts.builder.workservice.topicName', 'Topic')} value={topic.topicName}
-                    onChange={(v) => updateConsumedTopic(topic.id, { topicName: v })} placeholder={t('contracts.workservice.placeholder.consumedTopic', 'orders.created')} mono disabled={isReadOnly} />
+                    onChange={(v) => updateConsumedTopic(topic.id, { topicName: v })} placeholder={t('contracts.builder.workservice.consumedTopicPlaceholder', 'orders.created')} mono disabled={isReadOnly} />
                   <Field label={t('contracts.builder.workservice.entityType', 'Entity Type')} value={topic.entityType}
-                    onChange={(v) => updateConsumedTopic(topic.id, { entityType: v })} placeholder={t('contracts.workservice.placeholder.consumedEntity', 'OrderEvent')} disabled={isReadOnly} />
+                    onChange={(v) => updateConsumedTopic(topic.id, { entityType: v })} placeholder={t('contracts.builder.workservice.consumedEntityPlaceholder', 'OrderEvent')} disabled={isReadOnly} />
                   <FieldSelect label={t('contracts.builder.workservice.format', 'Format')} value={topic.format}
                     onChange={(v) => updateConsumedTopic(topic.id, { format: v as MessagingTopic['format'] })}
                     options={MSG_FORMATS} disabled={isReadOnly} />
@@ -381,9 +381,9 @@ export function VisualWorkserviceBuilder({
               {state.producedTopics.map((topic) => (
                 <div key={topic.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end">
                   <Field label={t('contracts.builder.workservice.topicName', 'Topic')} value={topic.topicName}
-                    onChange={(v) => updateProducedTopic(topic.id, { topicName: v })} placeholder={t('contracts.workservice.placeholder.producedTopic', 'orders.processed')} mono disabled={isReadOnly} />
+                    onChange={(v) => updateProducedTopic(topic.id, { topicName: v })} placeholder={t('contracts.builder.workservice.producedTopicPlaceholder', 'orders.processed')} mono disabled={isReadOnly} />
                   <Field label={t('contracts.builder.workservice.entityType', 'Entity Type')} value={topic.entityType}
-                    onChange={(v) => updateProducedTopic(topic.id, { entityType: v })} placeholder={t('contracts.workservice.placeholder.producedEntity', 'OrderProcessedEvent')} disabled={isReadOnly} />
+                    onChange={(v) => updateProducedTopic(topic.id, { entityType: v })} placeholder={t('contracts.builder.workservice.producedEntityPlaceholder', 'OrderProcessedEvent')} disabled={isReadOnly} />
                   <FieldSelect label={t('contracts.builder.workservice.format', 'Format')} value={topic.format}
                     onChange={(v) => updateProducedTopic(topic.id, { format: v as MessagingTopic['format'] })}
                     options={MSG_FORMATS} disabled={isReadOnly} />
@@ -418,7 +418,7 @@ export function VisualWorkserviceBuilder({
               {state.consumedServices.map((svc) => (
                 <div key={svc.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
                   <Field label={t('contracts.builder.workservice.serviceName', 'Service Name')} value={svc.serviceName}
-                    onChange={(v) => updateConsumedSvc(svc.id, { serviceName: v })} placeholder={t('contracts.workservice.placeholder.consumedService', 'user-api')} disabled={isReadOnly} />
+                    onChange={(v) => updateConsumedSvc(svc.id, { serviceName: v })} placeholder={t('contracts.builder.workservice.consumedServicePlaceholder', 'user-api')} disabled={isReadOnly} />
                   <FieldSelect label={t('contracts.builder.workservice.protocol', 'Protocol')} value={svc.protocol}
                     onChange={(v) => updateConsumedSvc(svc.id, { protocol: v as ConsumedService['protocol'] })}
                     options={SVC_PROTOCOLS} disabled={isReadOnly} />
@@ -453,9 +453,9 @@ export function VisualWorkserviceBuilder({
               {state.producedEvents.map((evt) => (
                 <div key={evt.id} className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
                   <Field label={t('contracts.builder.workservice.eventName', 'Event Name')} value={evt.eventName}
-                    onChange={(v) => updateProducedEvt(evt.id, { eventName: v })} placeholder={t('contracts.builder.workservice.placeholder.eventNameProduced', 'OrderProcessed')} disabled={isReadOnly} />
+                    onChange={(v) => updateProducedEvt(evt.id, { eventName: v })} placeholder={t('contracts.builder.workservice.eventNamePlaceholder', 'OrderProcessed')} disabled={isReadOnly} />
                   <Field label={t('contracts.builder.workservice.targetTopic', 'Target Topic')} value={evt.targetTopic}
-                    onChange={(v) => updateProducedEvt(evt.id, { targetTopic: v })} placeholder={t('contracts.builder.workservice.placeholder.targetTopicProduced', 'orders.processed')} mono disabled={isReadOnly} />
+                    onChange={(v) => updateProducedEvt(evt.id, { targetTopic: v })} placeholder={t('contracts.builder.workservice.targetTopicPlaceholder', 'orders.processed')} mono disabled={isReadOnly} />
                   {!isReadOnly && (
                     <button type="button" onClick={() => removeProducedEvt(evt.id)} className="text-muted hover:text-danger transition-colors pb-1">
                       <Trash2 size={11} />
@@ -481,7 +481,7 @@ export function VisualWorkserviceBuilder({
             placeholder={t('contracts.builder.workservice.obsPlaceholder', 'Metrics, logs, traces, health checks...')}
             rows={2} disabled={isReadOnly} />
           <Field label={t('contracts.builder.workservice.healthCheck', 'Health Check Endpoint')} value={state.healthCheck}
-            onChange={(v) => update({ healthCheck: v })} placeholder={t('contracts.builder.workservice.placeholder.healthCheck', '/health')} mono disabled={isReadOnly} />
+            onChange={(v) => update({ healthCheck: v })} placeholder="/health" mono disabled={isReadOnly} />
         </CardBody>
       </Card>
 
