@@ -1,8 +1,8 @@
 # NexTraceOne — Frontend Audit Report
 
 **Data:** 2026-04-11 (atualizado 2026-04-12)  
-**Escopo:** `src/frontend/src/` — 594 ficheiros TypeScript/TSX  
-**Páginas auditadas:** 140 componentes de página  
+**Escopo:** `src/frontend/src/` — 602 ficheiros TypeScript/TSX  
+**Páginas auditadas:** 155 componentes de página  
 **Testes existentes:** 181 ficheiros de teste (100% a passar — 1100 assertions)  
 **Stack:** React 19, TypeScript, Vite, TailwindCSS, React Query, i18next, Zod
 
@@ -14,9 +14,9 @@
 |-----------|--------|------------|------------|
 | Funcionalidades/Features | ✅ | 16 domínios | Bem organizadas por bounded context |
 | Componentes partilhados | ✅ | 75 | Biblioteca abrangente |
-| Páginas | ⚠️ | 140 | 34 excedem 500 linhas |
-| Cobertura de testes | ✅ | 181/594 (30%) | Todos os 181 testes a passar (1100 assertions) |
-| Error handling | ✅ | 140/140 | Todas as páginas com PageErrorState ou inline error |
+| Páginas | ⚠️ | 155 | 28 excedem 500 linhas (era 34) |
+| Cobertura de testes | ✅ | 181/602 (30%) | Todos os 181 testes a passar (1100 assertions) |
+| Error handling | ✅ | 155/155 | Todas as páginas com PageErrorState ou inline error |
 | Loading states | ✅ | 211 usos de PageLoadingState | Boa cobertura |
 | Empty states | ✅ | 146 usos de EmptyState | Cobertura adequada |
 | React Query | ✅ | 440 hooks | Excelente integração API |
@@ -24,7 +24,7 @@
 | Type safety | ✅ | 9 `as any` | Aceitável (todos em testes/Monaco) |
 | Segurança | ✅ | 0 XSS/eval/credentials | Seguro |
 | Acessibilidade | ✅ | 0 aria-labels hardcoded | Todos migrados para i18n |
-| Performance | ✅ | 0 ficheiros > 1000 linhas; React.memo em Badge, StatCard + 6 tabs AdvancedConfig | Decomposição e memoização aplicadas |
+| Performance | ✅ | 0 ficheiros > 1000 linhas; React.memo em 13 componentes/tabs | Decomposição e memoização aplicadas |
 | API Layer | ✅ | Centralizado + React Query | Boa estrutura |
 | Rotas | ✅ | 8 ficheiros, ~200 rotas | Bem organizadas, lazy-loaded |
 | Inline styles | ✅ | Apenas dinâmicos restantes | Estáticos convertidos para Tailwind |

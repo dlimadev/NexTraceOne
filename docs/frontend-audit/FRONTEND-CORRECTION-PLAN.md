@@ -2,7 +2,7 @@
 
 **Data:** 2026-04-11 (atualizado 2026-04-12)  
 **Baseado em:** [FRONTEND-AUDIT-REPORT.md](./FRONTEND-AUDIT-REPORT.md)  
-**Estado:** Fases 1, 2 e 3 concluídas ✅
+**Estado:** Fases 1, 2 e 3 concluídas ✅ — Continuação Fase 3 em progresso ✅
 
 ---
 
@@ -214,7 +214,18 @@ Ficheiros prioritários (excluindo EnvironmentsPage já tratado em C-03):
   - Extraído: `AdvancedConfigHistoryTab.tsx` — aba History & Timeline
   - Extraído: `AdvancedConfigHealthTab.tsx` — aba Health & Troubleshooting
 
-**Ficheiros 500-900 linhas restantes (29 ficheiros):** disponíveis para sessões futuras conforme prioridade.
+**Ficheiros 500-900 linhas tratados na continuação Fase 3 (2026-04-12):**
+
+- [x] M-01.2 — `ContractGovernancePage.tsx` (763 → 120 linhas)
+  - Extraído: `ContractGovernanceHelpers.ts` — tipos (GovernanceInsights, PolicySummary, AuditEntry) + helpers (computeGovernanceInsights, computePolicyChecks, countByLifecycle, generateAuditTimeline)
+  - Extraído: `ContractGovernanceComponents.tsx` — KpiCard, PolicyStat, InsightCard, ContractList (com `memo()`)
+  - Extraído: `ContractGovernanceViews.tsx` — OverviewView, ApprovalsView, ComplianceView, GapsView, AuditView (com `memo()`)
+- [x] M-01.3 — `AiAgentsPage.tsx` (765 → 221 linhas)
+  - Extraído: `AiAgentTypes.tsx` — interfaces, constantes e helpers (humanizeEnumValue, ownershipIcon, visibilityIcon, statusVariant)
+  - Extraído: `AiAgentCard.tsx` — AgentCard (com `memo()`)
+  - Extraído: `AiAgentDialogs.tsx` — CreateAgentDialog, ExecuteAgentDialog
+
+**Ficheiros 500-900 linhas restantes (27 ficheiros):** disponíveis para sessões futuras conforme prioridade.
 
 ---
 
@@ -230,6 +241,9 @@ Ficheiros prioritários (excluindo EnvironmentsPage já tratado em C-03):
 - [x] M-02.6 — `AdvancedConfigHistoryTab.tsx` — `memo()` adicionado
 - [x] M-02.7 — `AdvancedConfigImportExportTab.tsx` — `memo()` adicionado
 - [x] M-02.8 — `AdvancedConfigRollbackTab.tsx` — `memo()` adicionado
+- [x] M-02.9 — `ContractGovernanceComponents.tsx` — KpiCard, PolicyStat, InsightCard, ContractList com `memo()` (extraídos de ContractGovernancePage)
+- [x] M-02.10 — `ContractGovernanceViews.tsx` — OverviewView, ApprovalsView, ComplianceView, GapsView, AuditView com `memo()` (extraídos de ContractGovernancePage)
+- [x] M-02.11 — `AiAgentCard.tsx` — AgentCard com `memo()` (extraído de AiAgentsPage)
 
 ---
 
@@ -280,4 +294,4 @@ Ficheiros prioritários (excluindo EnvironmentsPage já tratado em C-03):
 
 ---
 
-*Plano gerado a partir da auditoria frontend de 2026-04-11. Fases 1, 2 e 3 concluídas em 2026-04-12.*
+*Plano gerado a partir da auditoria frontend de 2026-04-11. Fases 1, 2 e 3 concluídas em 2026-04-12. Continuação Fase 3 (M-01.2/M-01.3/M-02.9–M-02.11) concluída em 2026-04-12.*
