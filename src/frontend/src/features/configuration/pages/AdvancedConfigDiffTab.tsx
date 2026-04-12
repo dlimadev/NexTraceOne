@@ -4,6 +4,7 @@
  * Permite comparar valores efectivos de configuração entre dois scopes,
  * destacando as diferenças encontradas.
  */
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeftRight, CheckCircle2 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
@@ -33,7 +34,7 @@ export interface AdvancedConfigDiffTabProps {
 
 // ── Component ──────────────────────────────────────────────────────────
 
-export function AdvancedConfigDiffTab({
+export const AdvancedConfigDiffTab = memo(function AdvancedConfigDiffTab({
   selectedScope,
   compareScope,
   diffItems,
@@ -114,4 +115,4 @@ export function AdvancedConfigDiffTab({
       )}
     </div>
   );
-}
+});

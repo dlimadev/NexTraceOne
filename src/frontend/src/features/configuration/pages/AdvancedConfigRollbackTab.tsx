@@ -4,6 +4,7 @@
  * Permite pesquisar uma chave de configuração, visualizar o seu historial
  * de versões e restaurar um valor anterior. Todas as acções são auditadas.
  */
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, Clock, RotateCcw } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
@@ -25,7 +26,7 @@ export interface AdvancedConfigRollbackTabProps {
 
 // ── Component ──────────────────────────────────────────────────────────
 
-export function AdvancedConfigRollbackTab({
+export const AdvancedConfigRollbackTab = memo(function AdvancedConfigRollbackTab({
   selectedAuditKey,
   auditData,
   definitions,
@@ -114,4 +115,4 @@ export function AdvancedConfigRollbackTab({
       </Card>
     </div>
   );
-}
+});

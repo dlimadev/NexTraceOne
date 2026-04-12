@@ -4,6 +4,7 @@
  * Apresenta checks de saúde da plataforma de configuração, estatísticas
  * de governança de definições e breakdown por domínio.
  */
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Activity,
@@ -34,7 +35,7 @@ export interface AdvancedConfigHealthTabProps {
 
 // ── Component ──────────────────────────────────────────────────────────
 
-export function AdvancedConfigHealthTab({
+export const AdvancedConfigHealthTab = memo(function AdvancedConfigHealthTab({
   healthChecks,
   definitions,
 }: AdvancedConfigHealthTabProps) {
@@ -116,4 +117,4 @@ export function AdvancedConfigHealthTab({
       </Card>
     </div>
   );
-}
+});

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '../lib/cn';
@@ -21,7 +22,7 @@ interface StatCardProps {
  * Valor em texto grande, peso 700, tabular-nums.
  * Hover: borda forte + sombra elevada + micro translate para depth.
  */
-export function StatCard({ title, value, icon, color = 'text-accent', trend, href, ariaLabel, context }: StatCardProps) {
+export const StatCard = memo(function StatCard({ title, value, icon, color = 'text-accent', trend, href, ariaLabel, context }: StatCardProps) {
   const content = (
     <div
       className={cn(
@@ -75,4 +76,4 @@ export function StatCard({ title, value, icon, color = 'text-accent', trend, hre
   }
 
   return content;
-}
+});

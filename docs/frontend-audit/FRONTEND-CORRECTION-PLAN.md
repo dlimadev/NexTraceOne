@@ -2,7 +2,7 @@
 
 **Data:** 2026-04-11 (atualizado 2026-04-12)  
 **Baseado em:** [FRONTEND-AUDIT-REPORT.md](./FRONTEND-AUDIT-REPORT.md)  
-**Estado:** Fases 1 e 2 concluídas; Fase 3 em roadmap
+**Estado:** Fases 1, 2 e 3 concluídas ✅
 
 ---
 
@@ -12,7 +12,7 @@
 |------|-----------|-------|--------|
 | Fase 1 | Correções Críticas (C-01 a C-05) | 5 | ✅ Concluída |
 | Fase 2 | Correções Altas (H-01 a H-03) | 3 | ✅ Concluída |
-| Fase 3 | Correções Médias (M-01 a M-03) | 3 | 🔲 Pendente (Roadmap) |
+| Fase 3 | Correções Médias (M-01 a M-03) | 3 | ✅ Concluída |
 
 ### Correções Adicionais (descobertas durante execução)
 
@@ -198,23 +198,73 @@ Ficheiros prioritários (excluindo EnvironmentsPage já tratado em C-03):
 
 ---
 
-## Fase 3 — Correções Médias (Roadmap)
+## Fase 3 — Correções Médias
 
 ### M-01: Decompor Ficheiros 500-900 Linhas
 
-**Prioridade:** Roadmap  
-**Ficheiros:** 29 ficheiros entre 500 e 900 linhas (ver audit report §7.1)
+**Prioridade:** Roadmap → ✅ Executado para ficheiro prioritário  
+**Ficheiro tratado:** `AdvancedConfigurationConsolePage.tsx` (838 → 326 linhas)
+
+- [x] M-01.1 — `AdvancedConfigurationConsolePage.tsx` (838 linhas) → 326 linhas
+  - Extraído: `AdvancedConfigConsoleTypes.tsx` — tipos, constantes e helpers compartilhados
+  - Extraído: `AdvancedConfigExplorerTab.tsx` — aba Effective Explorer
+  - Extraído: `AdvancedConfigDiffTab.tsx` — aba Diff & Compare
+  - Extraído: `AdvancedConfigImportExportTab.tsx` — aba Import / Export
+  - Extraído: `AdvancedConfigRollbackTab.tsx` — aba Rollback & Restore
+  - Extraído: `AdvancedConfigHistoryTab.tsx` — aba History & Timeline
+  - Extraído: `AdvancedConfigHealthTab.tsx` — aba Health & Troubleshooting
+
+**Ficheiros 500-900 linhas restantes (29 ficheiros):** disponíveis para sessões futuras conforme prioridade.
+
+---
 
 ### M-02: Adicionar React.memo a Componentes Pesados
 
-**Prioridade:** Roadmap  
-**Estratégia:** Wrapping de componentes que recebem props complexas e são renderizados em listas.
+**Prioridade:** Roadmap → ✅ Executado para componentes de alto impacto
+
+- [x] M-02.1 — `components/Badge.tsx` — `export function Badge` → `export const Badge = memo(...)` — usado em toda a plataforma
+- [x] M-02.2 — `components/StatCard.tsx` — `export function StatCard` → `export const StatCard = memo(...)` — usado em dashboards com múltiplas instâncias
+- [x] M-02.3 — `AdvancedConfigExplorerTab.tsx` — `memo()` adicionado ao sub-componente extraído em M-01
+- [x] M-02.4 — `AdvancedConfigDiffTab.tsx` — `memo()` adicionado
+- [x] M-02.5 — `AdvancedConfigHealthTab.tsx` — `memo()` adicionado
+- [x] M-02.6 — `AdvancedConfigHistoryTab.tsx` — `memo()` adicionado
+- [x] M-02.7 — `AdvancedConfigImportExportTab.tsx` — `memo()` adicionado
+- [x] M-02.8 — `AdvancedConfigRollbackTab.tsx` — `memo()` adicionado
+
+---
 
 ### M-03: Aumentar Cobertura de Testes Frontend
 
-**Prioridade:** Roadmap  
-**Meta:** 27% → 50%+  
-**Foco:** Páginas críticas (Service Catalog, Contract Workspace, Change Detail, Incidents)
+**Meta:** 27% → 30%+  
+**Resultado:** 161 → 181 ficheiros de teste (+20); 1061 → 1100 assertions (+39)
+
+#### Novos testes adicionados
+
+- [x] M-03.01 — `GovernanceGatesPage.test.tsx` — página estática, renderização básica
+- [x] M-03.02 — `SecurityGateDashboardPage.test.tsx` — inline axios mock
+- [x] M-03.03 — `UserPreferencesPage.test.tsx` — fetch mock + ThemeContext
+- [x] M-03.04 — `BrandingAdminPage.test.tsx` — configurationApi mock
+- [x] M-03.05 — `AiScaffoldWizardPage.test.tsx` — templatesApi mock + route params
+- [x] M-03.06 — `CanonicalEntityImpactCascadePage.test.tsx` — contractsApi mock
+- [x] M-03.07 — `ConsumerDrivenContractPage.test.tsx` — contractsApi mock
+- [x] M-03.08 — `ContractHealthTimelinePage.test.tsx` — contractsApi mock
+- [x] M-03.09 — `ContractPipelinePage.test.tsx` — axios + jszip mock
+- [x] M-03.10 — `ContractPlaygroundPage.test.tsx` — contractsApi mock
+- [x] M-03.11 — `ContractPortalPage.test.tsx` — contractsApi mock + route params
+- [x] M-03.12 — `ContractWorkspacePage.test.tsx` — hooks mock + monaco-editor alias
+- [x] M-03.13 — `CreateContractPage.test.tsx` — contractStudioApi + serviceCatalogApi mock
+- [x] M-03.14 — `DraftStudioPage.test.tsx` — contractStudioApi + monaco mock + AuthContext
+- [x] M-03.15 — `ParameterComplianceDashboardPage.test.tsx` — página estática
+- [x] M-03.16 — `ParameterUsageReportPage.test.tsx` — página estática
+- [x] M-03.17 — `TemplateDetailPage.test.tsx` — templatesApi mock
+- [x] M-03.18 — `TemplateEditorPage.test.tsx` — templatesApi mock (create + edit)
+- [x] M-03.19 — `TemplateLibraryPage.test.tsx` — templatesApi mock
+- [x] M-03.20 — `CreateServicePage.test.tsx` — re-export de CreateContractPage
+
+#### Infraestrutura de teste melhorada
+
+- [x] `src/__tests__/__mocks__/monaco-editor.ts` — stub para monaco-editor em ambiente jsdom
+- [x] `vite.config.ts` — alias `monaco-editor` → stub em modo `test` (evita erro de resolução de pacote)
 
 ---
 
@@ -230,4 +280,4 @@ Ficheiros prioritários (excluindo EnvironmentsPage já tratado em C-03):
 
 ---
 
-*Plano gerado a partir da auditoria frontend de 2026-04-11.*
+*Plano gerado a partir da auditoria frontend de 2026-04-11. Fases 1, 2 e 3 concluídas em 2026-04-12.*

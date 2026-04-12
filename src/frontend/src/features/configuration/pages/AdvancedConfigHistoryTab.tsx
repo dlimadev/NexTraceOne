@@ -4,6 +4,7 @@
  * Exibe a timeline de todas as alterações de configuração para uma
  * chave seleccionada, com filtragem por chave, utilizador e período.
  */
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, History } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
@@ -20,7 +21,7 @@ export interface AdvancedConfigHistoryTabProps {
 
 // ── Component ──────────────────────────────────────────────────────────
 
-export function AdvancedConfigHistoryTab({
+export const AdvancedConfigHistoryTab = memo(function AdvancedConfigHistoryTab({
   selectedAuditKey,
   auditData,
   setSelectedAuditKey,
@@ -84,4 +85,4 @@ export function AdvancedConfigHistoryTab({
       </Card>
     </div>
   );
-}
+});

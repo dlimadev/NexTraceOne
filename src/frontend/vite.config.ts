@@ -28,6 +28,9 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),
+        ...(mode === 'test' ? {
+          'monaco-editor': resolve(__dirname, 'src/__tests__/__mocks__/monaco-editor.ts'),
+        } : {}),
       },
     },
     server: {
@@ -79,6 +82,11 @@ export default defineConfig(({ mode }) => {
       setupFiles: ['./src/__tests__/setup.ts'],
       css: false,
       include: ['src/__tests__/**/*.test.{ts,tsx}'],
+      resolve: {
+        alias: {
+          'monaco-editor': resolve(__dirname, 'src/__tests__/__mocks__/monaco-editor.ts'),
+        },
+      },
       coverage: {
         provider: 'v8',
         reporter: ['text', 'html', 'lcov'],

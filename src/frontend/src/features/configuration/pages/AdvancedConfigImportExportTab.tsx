@@ -4,6 +4,7 @@
  * Permite exportar configurações filtradas por scope e domínio como JSON,
  * e importar ficheiros de exportação anteriores com validação prévia.
  */
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, Upload, AlertTriangle, Info } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -23,7 +24,7 @@ export interface AdvancedConfigImportExportTabProps {
 
 // ── Component ──────────────────────────────────────────────────────────
 
-export function AdvancedConfigImportExportTab({
+export const AdvancedConfigImportExportTab = memo(function AdvancedConfigImportExportTab({
   selectedScope,
   activeDomain,
   setSelectedScope,
@@ -117,4 +118,4 @@ export function AdvancedConfigImportExportTab({
       </div>
     </div>
   );
-}
+});

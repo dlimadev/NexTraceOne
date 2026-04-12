@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
@@ -29,7 +30,7 @@ const sizeClasses: Record<NonNullable<BadgeProps['size']>, string> = {
   md: 'px-2.5 py-0.5 text-xs',
 };
 
-export function Badge({ children, variant = 'default', size = 'md', icon, className }: BadgeProps) {
+export const Badge = memo(function Badge({ children, variant = 'default', size = 'md', icon, className }: BadgeProps) {
   return (
     <span
       className={cn(
@@ -43,4 +44,4 @@ export function Badge({ children, variant = 'default', size = 'md', icon, classN
       {children}
     </span>
   );
-}
+});

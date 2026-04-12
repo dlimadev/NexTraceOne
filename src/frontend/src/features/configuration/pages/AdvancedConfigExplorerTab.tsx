@@ -4,6 +4,7 @@
  * Exibe todas as definições de configuração com o seu valor efectivo,
  * herança, scope resolvido e acesso ao histórico de auditoria.
  */
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ChevronDown,
@@ -40,7 +41,7 @@ export interface AdvancedConfigExplorerTabProps {
 
 // ── Component ──────────────────────────────────────────────────────────
 
-export function AdvancedConfigExplorerTab({
+export const AdvancedConfigExplorerTab = memo(function AdvancedConfigExplorerTab({
   selectedScope,
   filteredDefs,
   effectiveMap,
@@ -176,4 +177,4 @@ export function AdvancedConfigExplorerTab({
       )}
     </div>
   );
-}
+});
