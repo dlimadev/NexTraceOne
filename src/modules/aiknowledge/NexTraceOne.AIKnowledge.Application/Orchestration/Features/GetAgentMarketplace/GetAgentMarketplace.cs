@@ -39,7 +39,7 @@ public static class GetAgentMarketplace
 
     // ── DTO ───────────────────────────────────────────────────────────────
 
-    /// <summary>Dados de um agent no marketplace, incluindo metadados e estatísticas de uso.</summary>
+    /// <summary>Dados de um agent no marketplace, incluindo metadados, estatísticas de uso e rating médio.</summary>
     public sealed record MarketplaceAgentDto(
         Guid AgentId,
         string Name,
@@ -56,22 +56,40 @@ public static class GetAgentMarketplace
         long ExecutionCount,
         string PublicationStatus,
         string OwnershipType,
-        IReadOnlyList<string> Tags);
+        IReadOnlyList<string> Tags,
+        double AverageRating = 0.0);
 
     // ── HANDLER ───────────────────────────────────────────────────────────
 
     /// <summary>
     /// Handler que recupera agents ativos e publicados do repositório,
     /// aplicando filtros em memória por categoria, pesquisa e estado oficial.
+    /// Carrega também o rating médio por agent via IAiFeedbackRepository.
     /// </summary>
-    public sealed class Handler(
-        IAiAgentRepository agentRepository) : IQueryHandler<Query, Response>
+    public sealed class Handler : IQueryHandler<Query, Response>
     {
+        private readonly IAiAgentRepository _agentRepository;
+        private readonly IAiFeedbackRepository? _feedbackRepository;
+
+        /// <summary>Construtor completo com suporte a ratings via feedback repository.</summary>
+        public Handler(IAiAgentRepository agentRepository, IAiFeedbackRepository feedbackRepository)
+        {
+            _agentRepository = agentRepository;
+            _feedbackRepository = feedbackRepository;
+        }
+
+        /// <summary>Construtor backward-compatible sem ratings (ratings retornam 0.0).</summary>
+        public Handler(IAiAgentRepository agentRepository)
+        {
+            _agentRepository = agentRepository;
+            _feedbackRepository = null;
+        }
+
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
-            var agents = await agentRepository.ListAsync(
+            var agents = await _agentRepository.ListAsync(
                 isActive: true,
                 isOfficial: request.IsOfficial,
                 ct: cancellationToken);
@@ -105,7 +123,20 @@ public static class GetAgentMarketplace
                 .Take(pageSize)
                 .ToList();
 
-            var items = pagedAgents.Select(a => new MarketplaceAgentDto(
+            // Carrega ratings em batch para os agents da página (quando disponível)
+            double[] ratings;
+            if (_feedbackRepository is not null)
+            {
+                var ratingTasks = pagedAgents.Select(a =>
+                    _feedbackRepository.GetAverageRatingAsync(a.Id.Value, cancellationToken));
+                ratings = await System.Threading.Tasks.Task.WhenAll(ratingTasks);
+            }
+            else
+            {
+                ratings = new double[pagedAgents.Count];
+            }
+
+            var items = pagedAgents.Select((a, index) => new MarketplaceAgentDto(
                 AgentId: a.Id.Value,
                 Name: a.Name,
                 DisplayName: a.DisplayName,
@@ -123,7 +154,8 @@ public static class GetAgentMarketplace
                 OwnershipType: a.OwnershipType.ToString(),
                 Tags: string.IsNullOrWhiteSpace(a.Capabilities)
                     ? []
-                    : a.Capabilities.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    : a.Capabilities.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                AverageRating: Math.Round(ratings[index], 2)
             )).ToList();
 
             var categories = matchingAgents

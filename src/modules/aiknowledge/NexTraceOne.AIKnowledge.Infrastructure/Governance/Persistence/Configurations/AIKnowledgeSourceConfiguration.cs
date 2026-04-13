@@ -20,6 +20,10 @@ internal sealed class AIKnowledgeSourceConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.EndpointOrPath).HasMaxLength(2000).IsRequired();
         builder.Property(x => x.RegisteredAt).HasColumnType("timestamp with time zone").IsRequired();
 
+        builder.Property(x => x.EmbeddingJson)
+            .HasColumnType("text")
+            .IsRequired(false);
+
         builder.HasIndex(x => x.SourceType);
         builder.HasIndex(x => x.IsActive);
     }

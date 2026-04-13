@@ -115,6 +115,13 @@ public sealed class AiAgentRuntimeService(
         // 7. Resolve tools permitidas para o agent
         var allowedTools = toolPermissionValidator.GetAllowedTools(agent.AllowedTools);
 
+        // 7a. Planning mode — gera plano de execução quando activado
+        string? planSummary = null;
+        if (agent.UsePlanningMode)
+        {
+            planSummary = await TryBuildExecutionPlanAsync(agent, input, chatProvider, resolvedModel, cancellationToken);
+        }
+
         // 8. Inicia execução
         var now = dateTimeProvider.UtcNow;
         var execution = AiAgentExecution.Start(
@@ -130,6 +137,8 @@ public sealed class AiAgentRuntimeService(
 
         // 9. Monta prompt com contexto e executa inferência (com tool loop)
         var systemPrompt = BuildSystemPrompt(agent, allowedTools, contextJson);
+        if (!string.IsNullOrWhiteSpace(planSummary))
+            systemPrompt = $"## Execution Plan\n{planSummary}\n\n{systemPrompt}".TrimStart();
         var chatMessages = new List<ChatMessage>();
         if (!string.IsNullOrWhiteSpace(systemPrompt))
             chatMessages.Add(new ChatMessage("system", systemPrompt));
@@ -323,7 +332,8 @@ public sealed class AiAgentRuntimeService(
             sw.ElapsedMilliseconds,
             artifacts,
             toolResults.Select(tr => new ToolExecutionSummary(
-                tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList());
+                tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList(),
+            PlanSummary: planSummary);
     }
 
     /// <summary>
@@ -410,6 +420,41 @@ public sealed class AiAgentRuntimeService(
             return null;
 
         return new ToolCallRequest(toolName, argsJson);
+    }
+
+    /// <summary>
+    /// Gera um plano de execução breve via LLM para o modo de planeamento.
+    /// Falha silenciosamente — se o plan não for gerado, a execução continua sem ele.
+    /// </summary>
+    private static async Task<string?> TryBuildExecutionPlanAsync(
+        AiAgent agent,
+        string input,
+        IChatCompletionProvider chatProvider,
+        ResolvedModel resolvedModel,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var planPrompt = $"Given this task, list the steps you will take (be brief, 3-5 steps):\n{input}";
+            var planRequest = new ChatCompletionRequest(
+                resolvedModel.ModelName,
+                [new ChatMessage("user", planPrompt)],
+                Temperature: 0.2,
+                MaxTokens: 256,
+                SystemPrompt: $"You are a planning assistant for an AI agent named '{agent.DisplayName}'. " +
+                              "Respond with a concise numbered step list only.");
+
+            var planResult = await chatProvider.CompleteAsync(planRequest, cancellationToken);
+
+            return planResult.Success && !string.IsNullOrWhiteSpace(planResult.Content)
+                ? planResult.Content.Trim()
+                : null;
+        }
+        catch
+        {
+            // Falha non-fatal — execução continua sem plano
+            return null;
+        }
     }
 
     private static string BuildSystemPrompt(AiAgent agent, IReadOnlyList<ToolDefinition> allowedTools, string? contextJson)

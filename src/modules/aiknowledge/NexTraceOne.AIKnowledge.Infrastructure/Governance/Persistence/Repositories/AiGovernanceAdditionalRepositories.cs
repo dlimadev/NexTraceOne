@@ -198,6 +198,26 @@ internal sealed class AiFeedbackRepository(AiGovernanceDbContext context) : IAiF
                  && f.Rating == FeedbackRating.Negative
                  && f.SubmittedAt >= since,
             ct);
+
+    public async Task<double> GetAverageRatingAsync(Guid agentId, CancellationToken ct)
+    {
+        // Obtém execuções do agent e correlaciona com feedbacks via AgentExecutionId
+        var typedAgentId = AiAgentId.From(agentId);
+        var executionIds = await context.AgentExecutions
+            .Where(e => e.AgentId == typedAgentId)
+            .Select(e => (Guid?)e.Id.Value)
+            .ToListAsync(ct);
+
+        if (executionIds.Count == 0)
+            return 0.0;
+
+        var ratings = await context.Feedbacks
+            .Where(f => f.AgentExecutionId.HasValue && executionIds.Contains(f.AgentExecutionId))
+            .Select(f => (int)f.Rating)
+            .ToListAsync(ct);
+
+        return ratings.Count == 0 ? 0.0 : ratings.Average();
+    }
 }
 
 internal sealed class AiToolDefinitionRepository(AiGovernanceDbContext context) : IAiToolDefinitionRepository

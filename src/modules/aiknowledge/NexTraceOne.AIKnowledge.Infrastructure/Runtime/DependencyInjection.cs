@@ -137,6 +137,18 @@ public static class DependencyInjection
         services.AddScoped<IDatabaseRetrievalService, DatabaseRetrievalService>();
         services.AddScoped<ITelemetryRetrievalService, TelemetryRetrievalService>();
 
+        // Embedding cache — singleton para partilhar cache entre requests dentro do processo.
+        // Usa IServiceScopeFactory para resolver IEmbeddingProvider no momento de uso (evita captive dependency).
+        services.AddSingleton<NexTraceOne.AIKnowledge.Application.Governance.Abstractions.IEmbeddingCacheService>(sp =>
+        {
+            var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<
+                NexTraceOne.AIKnowledge.Infrastructure.Governance.Services.InMemoryEmbeddingCacheService>>();
+            return new NexTraceOne.AIKnowledge.Infrastructure.Governance.Services.InMemoryEmbeddingCacheService(
+                new NexTraceOne.AIKnowledge.Infrastructure.Governance.Services.ScopedEmbeddingProviderProxy(scopeFactory),
+                logger);
+        });
+
         // ── Tool infrastructure ──────────────────────────────────────────
         services.AddSingleton<IAgentTool, ListServicesInfoTool>();
         services.AddSingleton<IAgentTool, GetServiceHealthTool>();

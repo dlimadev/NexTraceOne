@@ -499,6 +499,46 @@
     "trustRestrictedByPolicy": "Restricted by policy",
     "turns": "turns",
     "typing": "Analyzing context",
+    "streaming": {
+      "generating": "Generating response...",
+      "cancel": "Cancel"
+    },
+    "onboarding": {
+      "back": "Back",
+      "next": "Next",
+      "finish": "Start chatting",
+      "personas": {
+        "Engineer": "Engineer",
+        "TechLead": "Tech Lead",
+        "Architect": "Architect",
+        "Product": "Product",
+        "Executive": "Executive"
+      },
+      "step1": {
+        "title": "Welcome to AI Assistant",
+        "description": "Your governed, context-aware AI assistant for services, contracts and operations. Let's get you set up in seconds.",
+        "personaPrompt": "Select your persona"
+      },
+      "step2": {
+        "title": "Meet your AI Assistant",
+        "description": "Ask anything about your services, contracts, incidents and changes. The assistant uses your organisation's Source of Truth to provide grounded, accurate answers.",
+        "sampleLabel": "Try asking:",
+        "samplePrompt": "\"What changed in the payment-service in the last 24 hours?\""
+      },
+      "step3": {
+        "title": "Discover AI Agents",
+        "description": "Specialised AI Agents help you generate contracts, analyse incidents and create test scenarios — all governed and audited.",
+        "agents": {
+          "contractAgent": "Contract Design Agent — generate REST and SOAP contracts",
+          "incidentAgent": "Incident Analysis Agent — correlate incidents with changes",
+          "testAgent": "Test Generation Agent — create scenario coverage from contracts"
+        }
+      },
+      "step4": {
+        "title": "You're ready!",
+        "description": "Your AI Assistant is configured and ready to help. Start a conversation to explore your operational context."
+      }
+    },
     "usingModel": "Using model",
     "welcomeMessage": "Welcome! I'm the NexTraceOne AI Assistant. I can help you investigate production issues, analyze contracts, correlate incidents, and provide operational insights grounded in your organization's Source of Truth. What would you like to explore?",
     "you": "You",

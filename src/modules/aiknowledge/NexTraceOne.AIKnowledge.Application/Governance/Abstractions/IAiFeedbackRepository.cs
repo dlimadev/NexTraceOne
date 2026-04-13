@@ -36,4 +36,7 @@ public interface IAiFeedbackRepository
         string modelUsed,
         DateTimeOffset since,
         CancellationToken ct = default);
+
+    /// <summary>Calcula a média de rating para um agent específico, via AgentExecutionId.</summary>
+    Task<double> GetAverageRatingAsync(Guid agentId, CancellationToken ct = default);
 }

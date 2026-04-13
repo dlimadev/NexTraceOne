@@ -86,6 +86,7 @@ public static class DependencyInjection
         // Background jobs
         services.AddHostedService<FeedbackThresholdJob>();
         services.AddHostedService<AiDataRetentionJob>();
+        services.AddHostedService<EmbeddingIndexJob>();
 
         return services;
     }
