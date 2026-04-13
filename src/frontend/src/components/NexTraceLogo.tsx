@@ -24,7 +24,6 @@ interface NexTraceLogoProps {
  * - full: ícone + wordmark + tagline "Operational Confidence"
  */
 export function NexTraceLogo({ size = 40, iconOnly = false, className, variant = 'compact' }: NexTraceLogoProps) {
-  const { t } = useTranslation();
   const showWordmark = variant !== 'icon' && !iconOnly;
   const showTagline = variant === 'full';
 
