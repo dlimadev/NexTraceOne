@@ -49,7 +49,8 @@ public sealed class AiModelCatalogService : IAiModelCatalogService
             model.Provider,
             model.Provider,
             model.IsInternal,
-            model.Capabilities);
+            model.Capabilities,
+            model.ContextWindow);
     }
 
     public async Task<ResolvedModel?> ResolveModelByIdAsync(
@@ -70,6 +71,7 @@ public sealed class AiModelCatalogService : IAiModelCatalogService
             model.Provider,
             model.Provider,
             model.IsInternal,
-            model.Capabilities);
+            model.Capabilities,
+            model.ContextWindow);
     }
 }

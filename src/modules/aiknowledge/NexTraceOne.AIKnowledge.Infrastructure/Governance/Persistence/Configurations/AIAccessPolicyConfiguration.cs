@@ -21,6 +21,7 @@ internal sealed class AIAccessPolicyConfiguration : IEntityTypeConfiguration<AIA
         builder.Property(x => x.AllowedModelIds).HasMaxLength(4000).IsRequired();
         builder.Property(x => x.BlockedModelIds).HasMaxLength(4000).IsRequired();
         builder.Property(x => x.EnvironmentRestrictions).HasMaxLength(1000).IsRequired();
+        builder.Property(x => x.DataRetentionDays);
 
         builder.HasIndex(x => x.Scope);
         builder.HasIndex(x => x.IsActive);

@@ -39,6 +39,7 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateBudget;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateConversation;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateModel;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePolicy;
+using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.BuildingBlocks.Application;
 
 namespace NexTraceOne.AIKnowledge.Application.Governance;
@@ -73,6 +74,12 @@ public static class DependencyInjection
         services.AddTransient<IValidator<SendAssistantMessage.Command>, SendAssistantMessage.Validator>();
         services.AddTransient<IValidator<CreateConversation.Command>, CreateConversation.Validator>();
         services.AddTransient<IValidator<UpdateConversation.Command>, UpdateConversation.Validator>();
+
+        // ── AI Governance services (extracted from SendAssistantMessage) ──
+        services.AddScoped<IContextGroundingService, ContextGroundingService>();
+        services.AddScoped<IAiRoutingResolver, AiRoutingResolver>();
+        services.AddScoped<IConversationPersistenceService, ConversationPersistenceService>();
+        services.AddScoped<IAiGuardrailEnforcementService, AiGuardrailEnforcementService>();
 
         // ── IDE Integrations ─────────────────────────────────────────────
         services.AddTransient<IValidator<RegisterIdeClient.Command>, RegisterIdeClient.Validator>();

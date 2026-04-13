@@ -46,11 +46,18 @@ public sealed class AiAgentRuntimeService(
     /// <summary>Número máximo de iterações do loop de tools para prevenir ciclos infinitos.</summary>
     private const int MaxToolIterations = 5;
 
+    /// <summary>Context window padrão em tokens quando o modelo não especifica.</summary>
+    private const int DefaultContextWindowTokens = 4096;
+
+    /// <summary>Tokens reservados para a resposta do modelo.</summary>
+    private const int ReservedCompletionTokens = 1024;
+
     public async Task<Result<AgentExecutionResult>> ExecuteAsync(
         AiAgentId agentId,
         string input,
         Guid? modelIdOverride,
         string? contextJson,
+        string? callerTeamId,
         CancellationToken cancellationToken)
     {
         // 1. Resolve agent
@@ -62,8 +69,8 @@ public sealed class AiAgentRuntimeService(
         if (!agent.IsActive)
             return AiGovernanceErrors.AgentNotActive(agentId.Value.ToString());
 
-        // 3. Valida acesso (TeamId não disponível ainda — passa null)
-        if (!agent.IsAccessibleBy(currentUser.Id, teamId: null))
+        // 3. Valida acesso — passa o teamId real do caller para enforçar visibilidade por equipa
+        if (!agent.IsAccessibleBy(currentUser.Id, teamId: callerTeamId))
             return AiGovernanceErrors.AgentAccessDenied(agentId.Value.ToString());
 
         // 4. Resolve modelo
@@ -108,6 +115,13 @@ public sealed class AiAgentRuntimeService(
         // 7. Resolve tools permitidas para o agent
         var allowedTools = toolPermissionValidator.GetAllowedTools(agent.AllowedTools);
 
+        // 7a. Planning mode — gera plano de execução quando activado
+        string? planSummary = null;
+        if (agent.UsePlanningMode)
+        {
+            planSummary = await TryBuildExecutionPlanAsync(agent, input, chatProvider, resolvedModel, cancellationToken);
+        }
+
         // 8. Inicia execução
         var now = dateTimeProvider.UtcNow;
         var execution = AiAgentExecution.Start(
@@ -123,6 +137,8 @@ public sealed class AiAgentRuntimeService(
 
         // 9. Monta prompt com contexto e executa inferência (com tool loop)
         var systemPrompt = BuildSystemPrompt(agent, allowedTools, contextJson);
+        if (!string.IsNullOrWhiteSpace(planSummary))
+            systemPrompt = $"## Execution Plan\n{planSummary}\n\n{systemPrompt}".TrimStart();
         var chatMessages = new List<ChatMessage>();
         if (!string.IsNullOrWhiteSpace(systemPrompt))
             chatMessages.Add(new ChatMessage("system", systemPrompt));
@@ -131,50 +147,122 @@ public sealed class AiAgentRuntimeService(
         var sw = Stopwatch.StartNew();
         ChatCompletionResult chatResult;
         var toolResults = new List<ToolExecutionResult>();
+        var contextWindowTruncated = false;
+
+        // Determine context window limit from resolved model
+        var contextWindowTokens = resolvedModel.ContextWindow ?? DefaultContextWindowTokens;
 
         try
         {
-            chatResult = await chatProvider.CompleteAsync(
-                new ChatCompletionRequest(
-                    resolvedModel.ModelName,
-                    chatMessages,
-                    Temperature: 0.3,
-                    MaxTokens: 4096,
-                    SystemPrompt: null),
-                cancellationToken);
-
-            // 10. Tool execution loop — detect tool call patterns and execute
-            if (chatResult.Success && allowedTools.Count > 0 && chatResult.Content is not null)
+            // Apply context window trimming before first inference
+            var (trimmedMessages, wasTruncated) = ContextWindowManager.TrimToFit(
+                chatMessages, contextWindowTokens, ReservedCompletionTokens);
+            if (wasTruncated)
             {
+                contextWindowTruncated = true;
+                chatMessages = trimmedMessages.ToList();
+            }
+
+            // 10. Inference + tool execution loop
+            // When the provider supports native function calling (OpenAI/Anthropic), use structured
+            // tool calls for 100% reliability. Otherwise fall back to the textual [TOOL_CALL:] pattern
+            // which is compatible with Ollama and other local providers.
+            if (chatProvider is IFunctionCallingChatProvider nativeProvider && allowedTools.Count > 0)
+            {
+                var functions = allowedTools.Select(BuildFunctionDefinition).ToList();
                 var iteration = 0;
-                while (iteration < MaxToolIterations)
+                FunctionCallingResult fcResult;
+
+                do
                 {
-                    var toolCall = DetectToolCall(chatResult.Content, allowedTools);
-                    if (toolCall is null)
-                        break;
-
-                    // Execute tool (AllowedTools already enforced by DetectToolCall filtering)
-                    var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
-                    toolResults.Add(toolResult);
-
-                    // Append tool result to conversation and re-infer
-                    chatMessages.Add(new ChatMessage("assistant", chatResult.Content));
-                    chatMessages.Add(new ChatMessage("user",
-                        $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
-
-                    chatResult = await chatProvider.CompleteAsync(
+                    fcResult = await nativeProvider.CompleteWithToolsAsync(
                         new ChatCompletionRequest(
                             resolvedModel.ModelName,
                             chatMessages,
                             Temperature: 0.3,
                             MaxTokens: 4096,
                             SystemPrompt: null),
+                        functions,
                         cancellationToken);
 
-                    if (!chatResult.Success)
+                    chatResult = FunctionCallingResultToChatResult(fcResult);
+
+                    if (!fcResult.Success || !fcResult.HasToolCalls)
                         break;
 
+                    // Execute all tool calls returned by the model in this round
+                    foreach (var nativeCall in fcResult.ToolCalls)
+                    {
+                        var toolResult = await toolExecutor.ExecuteAsync(
+                            new ToolCallRequest(nativeCall.FunctionName, nativeCall.ArgumentsJson),
+                            cancellationToken);
+                        toolResults.Add(toolResult);
+
+                        // Append tool result as user message (compatible with all providers)
+                        chatMessages.Add(new ChatMessage("assistant",
+                            fcResult.Content ?? $"[TOOL_CALL_ID: {nativeCall.Id}]"));
+                        chatMessages.Add(new ChatMessage("user",
+                            $"[Tool Result for {nativeCall.FunctionName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
+                    }
+
+                    var (trimmedNative, nativeTruncated) = ContextWindowManager.TrimToFit(
+                        chatMessages, contextWindowTokens, ReservedCompletionTokens);
+                    if (nativeTruncated)
+                        contextWindowTruncated = true;
+                    chatMessages = trimmedNative.ToList();
+
                     iteration++;
+                }
+                while (iteration < MaxToolIterations);
+            }
+            else
+            {
+                // Textual tool detection path — compatible with Ollama and providers without
+                // native function calling support.
+                chatResult = await chatProvider.CompleteAsync(
+                    new ChatCompletionRequest(
+                        resolvedModel.ModelName,
+                        chatMessages,
+                        Temperature: 0.3,
+                        MaxTokens: 4096,
+                        SystemPrompt: null),
+                    cancellationToken);
+
+                if (chatResult.Success && allowedTools.Count > 0 && chatResult.Content is not null)
+                {
+                    var iteration = 0;
+                    while (iteration < MaxToolIterations)
+                    {
+                        var toolCall = DetectToolCall(chatResult.Content, allowedTools);
+                        if (toolCall is null)
+                            break;
+
+                        var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
+                        toolResults.Add(toolResult);
+
+                        chatMessages.Add(new ChatMessage("assistant", chatResult.Content));
+                        chatMessages.Add(new ChatMessage("user",
+                            $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
+
+                        var (trimmedLoop, loopTruncated) = ContextWindowManager.TrimToFit(
+                            chatMessages, contextWindowTokens, ReservedCompletionTokens);
+                        if (loopTruncated)
+                            contextWindowTruncated = true;
+
+                        chatResult = await chatProvider.CompleteAsync(
+                            new ChatCompletionRequest(
+                                resolvedModel.ModelName,
+                                trimmedLoop,
+                                Temperature: 0.3,
+                                MaxTokens: 4096,
+                                SystemPrompt: null),
+                            cancellationToken);
+
+                        if (!chatResult.Success)
+                            break;
+
+                        iteration++;
+                    }
                 }
             }
         }
@@ -244,7 +332,48 @@ public sealed class AiAgentRuntimeService(
             sw.ElapsedMilliseconds,
             artifacts,
             toolResults.Select(tr => new ToolExecutionSummary(
-                tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList());
+                tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList(),
+            PlanSummary: planSummary);
+    }
+
+    /// <summary>
+    /// Converte um FunctionCallingResult num ChatCompletionResult para compatibilidade
+    /// com o restante pipeline do agent runtime.
+    /// </summary>
+    private static ChatCompletionResult FunctionCallingResultToChatResult(FunctionCallingResult fcResult)
+        => new(
+            fcResult.Success,
+            fcResult.Content,
+            fcResult.ModelId,
+            fcResult.ProviderId,
+            fcResult.PromptTokens,
+            fcResult.CompletionTokens,
+            fcResult.Duration,
+            fcResult.ErrorMessage);
+
+    /// <summary>
+    /// Constrói uma FunctionDefinition a partir de uma ToolDefinition para uso em native function calling.
+    /// O JSON Schema dos parâmetros é construído com type=object, properties e required.
+    /// </summary>
+    private static FunctionDefinition BuildFunctionDefinition(ToolDefinition tool)
+    {
+        var properties = tool.Parameters.ToDictionary(
+            p => p.Name,
+            p => (object)new { type = p.Type.ToLowerInvariant(), description = p.Description });
+
+        var required = tool.Parameters
+            .Where(p => p.Required)
+            .Select(p => p.Name)
+            .ToArray();
+
+        var parameters = new
+        {
+            type = "object",
+            properties,
+            required
+        };
+
+        return new FunctionDefinition(tool.Name, tool.Description, parameters);
     }
 
     /// <summary>
@@ -291,6 +420,41 @@ public sealed class AiAgentRuntimeService(
             return null;
 
         return new ToolCallRequest(toolName, argsJson);
+    }
+
+    /// <summary>
+    /// Gera um plano de execução breve via LLM para o modo de planeamento.
+    /// Falha silenciosamente — se o plan não for gerado, a execução continua sem ele.
+    /// </summary>
+    private static async Task<string?> TryBuildExecutionPlanAsync(
+        AiAgent agent,
+        string input,
+        IChatCompletionProvider chatProvider,
+        ResolvedModel resolvedModel,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var planPrompt = $"Given this task, list the steps you will take (be brief, 3-5 steps):\n{input}";
+            var planRequest = new ChatCompletionRequest(
+                resolvedModel.ModelName,
+                [new ChatMessage("user", planPrompt)],
+                Temperature: 0.2,
+                MaxTokens: 256,
+                SystemPrompt: $"You are a planning assistant for an AI agent named '{agent.DisplayName}'. " +
+                              "Respond with a concise numbered step list only.");
+
+            var planResult = await chatProvider.CompleteAsync(planRequest, cancellationToken);
+
+            return planResult.Success && !string.IsNullOrWhiteSpace(planResult.Content)
+                ? planResult.Content.Trim()
+                : null;
+        }
+        catch
+        {
+            // Falha non-fatal — execução continua sem plano
+            return null;
+        }
     }
 
     private static string BuildSystemPrompt(AiAgent agent, IReadOnlyList<ToolDefinition> allowedTools, string? contextJson)

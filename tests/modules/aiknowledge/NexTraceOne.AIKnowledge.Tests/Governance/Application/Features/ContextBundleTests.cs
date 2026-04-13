@@ -16,7 +16,7 @@ public sealed class ContextBundleTests
     [Fact]
     public void ContextBundleData_ShouldRoundTripSerialize_ForService()
     {
-        var bundle = new SendAssistantMessage.ContextBundleData(
+        var bundle = new ContextBundleData(
             EntityType: "service",
             EntityName: "payment-service",
             EntityStatus: "Active",
@@ -29,14 +29,14 @@ public sealed class ContextBundleTests
                 ["serviceType"] = "REST API",
             },
             Relations: [
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Contracts", "contract", "payment-api-v2", "Active",
                     new Dictionary<string, string> { ["protocol"] = "OpenApi", ["version"] = "2.1.0" }),
             ],
             Caveats: null);
 
         var json = JsonSerializer.Serialize(bundle);
-        var deserialized = JsonSerializer.Deserialize<SendAssistantMessage.ContextBundleData>(
+        var deserialized = JsonSerializer.Deserialize<ContextBundleData>(
             json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         deserialized.Should().NotBeNull();
@@ -53,7 +53,7 @@ public sealed class ContextBundleTests
     [Fact]
     public void ContextBundleData_ShouldRoundTripSerialize_ForContract()
     {
-        var bundle = new SendAssistantMessage.ContextBundleData(
+        var bundle = new ContextBundleData(
             EntityType: "contract",
             EntityName: "order-api — OpenApi",
             EntityStatus: "Active",
@@ -66,17 +66,17 @@ public sealed class ContextBundleTests
                 ["format"] = "yaml",
             },
             Relations: [
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Version History", "version", "v3.1.0", "Active",
                     new Dictionary<string, string> { ["created"] = "2026-01-15" }),
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Violations", "violation", "must-have-description", "Warning",
                     new Dictionary<string, string> { ["message"] = "Operations should have descriptions" }),
             ],
             Caveats: null);
 
         var json = JsonSerializer.Serialize(bundle);
-        var deserialized = JsonSerializer.Deserialize<SendAssistantMessage.ContextBundleData>(
+        var deserialized = JsonSerializer.Deserialize<ContextBundleData>(
             json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         deserialized.Should().NotBeNull();
@@ -89,7 +89,7 @@ public sealed class ContextBundleTests
     [Fact]
     public void ContextBundleData_ShouldRoundTripSerialize_ForChange()
     {
-        var bundle = new SendAssistantMessage.ContextBundleData(
+        var bundle = new ContextBundleData(
             EntityType: "change",
             EntityName: "order-service — v3.2.0",
             EntityStatus: "PendingReview",
@@ -104,17 +104,17 @@ public sealed class ContextBundleTests
                 ["confidence"] = "Medium",
             },
             Relations: [
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Advisory Factors", "factor", "UnitTestCoverage", "Warning",
                     new Dictionary<string, string> { ["description"] = "Coverage below threshold" }),
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Decision History", "decision", "Submitted for review", "Submitted",
                     new Dictionary<string, string> { ["source"] = "CI Pipeline" }),
             ],
             Caveats: ["No decision history"]);
 
         var json = JsonSerializer.Serialize(bundle);
-        var deserialized = JsonSerializer.Deserialize<SendAssistantMessage.ContextBundleData>(
+        var deserialized = JsonSerializer.Deserialize<ContextBundleData>(
             json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         deserialized.Should().NotBeNull();
@@ -126,7 +126,7 @@ public sealed class ContextBundleTests
     [Fact]
     public void ContextBundleData_ShouldRoundTripSerialize_ForIncident()
     {
-        var bundle = new SendAssistantMessage.ContextBundleData(
+        var bundle = new ContextBundleData(
             EntityType: "incident",
             EntityName: "INC-2847 — Payment latency spike",
             EntityStatus: "Investigating",
@@ -141,19 +141,19 @@ public sealed class ContextBundleTests
                 ["correlationReason"] = "Temporal proximity to deployment",
             },
             Relations: [
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Affected Services", "service", "payment-service", "Critical",
                     new Dictionary<string, string> { ["type"] = "REST API" }),
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Runbooks", "runbook", "Payment Latency Recovery", null,
                     new Dictionary<string, string> { ["url"] = "https://wiki/runbooks/payment-latency" }),
-                new SendAssistantMessage.ContextBundleRelation(
+                new ContextBundleRelation(
                     "Correlated Changes", "change", "deploy-v3.2.0", null, null),
             ],
             Caveats: null);
 
         var json = JsonSerializer.Serialize(bundle);
-        var deserialized = JsonSerializer.Deserialize<SendAssistantMessage.ContextBundleData>(
+        var deserialized = JsonSerializer.Deserialize<ContextBundleData>(
             json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         deserialized.Should().NotBeNull();
@@ -240,7 +240,7 @@ public sealed class ContextBundleTests
     [Fact]
     public void ContextBundleRelation_ShouldAllowNullProperties()
     {
-        var relation = new SendAssistantMessage.ContextBundleRelation(
+        var relation = new ContextBundleRelation(
             "Correlated Changes", "change", "deploy-v3.2.0", null, null);
 
         relation.RelationType.Should().Be("Correlated Changes");
@@ -277,7 +277,7 @@ public sealed class ContextBundleTests
     [Fact]
     public void Command_ShouldAcceptContextBundleJson()
     {
-        var bundle = new SendAssistantMessage.ContextBundleData(
+        var bundle = new ContextBundleData(
             "service", "payment-service", "Active", "Payment processing",
             new Dictionary<string, string> { ["team"] = "payments" },
             [], null);

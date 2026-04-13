@@ -6,6 +6,7 @@ using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Infrastructure.Context;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Anthropic;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
@@ -36,6 +37,8 @@ public static class DependencyInjection
             configuration.GetSection(AiRoutingOptions.SectionName));
         services.Configure<OpenAiOptions>(
             configuration.GetSection(OpenAiOptions.SectionName));
+        services.Configure<AnthropicOptions>(
+            configuration.GetSection(AnthropicOptions.SectionName));
 
         // Ollama HTTP client (registered via IHttpClientFactory — typed client pattern)
         services.AddHttpClient<OllamaHttpClient>((sp, client) =>
@@ -72,6 +75,24 @@ public static class DependencyInjection
             services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<OpenAiProvider>());
             services.AddScoped<OpenAiEmbeddingProvider>();
             services.AddScoped<IEmbeddingProvider>(sp => sp.GetRequiredService<OpenAiEmbeddingProvider>());
+        }
+
+        // Anthropic provider — registered only when ApiKey is configured
+        var anthropicOptions = configuration.GetSection(AnthropicOptions.SectionName).Get<AnthropicOptions>();
+        if (anthropicOptions?.IsConfigured == true)
+        {
+            services.AddHttpClient<AnthropicHttpClient>((sp, client) =>
+            {
+                var normalized = anthropicOptions.BaseUrl.EndsWith("/", StringComparison.Ordinal)
+                    ? anthropicOptions.BaseUrl
+                    : $"{anthropicOptions.BaseUrl}/";
+                client.BaseAddress = new Uri(normalized);
+                client.Timeout = TimeSpan.FromSeconds(anthropicOptions.TimeoutSeconds);
+            });
+
+            services.AddScoped<AnthropicProvider>();
+            services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<AnthropicProvider>());
+            services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<AnthropicProvider>());
         }
 
         // Factory — scoped to resolve scoped providers
@@ -116,11 +137,31 @@ public static class DependencyInjection
         services.AddScoped<IDatabaseRetrievalService, DatabaseRetrievalService>();
         services.AddScoped<ITelemetryRetrievalService, TelemetryRetrievalService>();
 
+        // Embedding cache — singleton para partilhar cache entre requests dentro do processo.
+        // Usa IServiceScopeFactory para resolver IEmbeddingProvider no momento de uso (evita captive dependency).
+        services.AddSingleton<NexTraceOne.AIKnowledge.Application.Governance.Abstractions.IEmbeddingCacheService>(sp =>
+        {
+            var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<
+                NexTraceOne.AIKnowledge.Infrastructure.Governance.Services.InMemoryEmbeddingCacheService>>();
+            return new NexTraceOne.AIKnowledge.Infrastructure.Governance.Services.InMemoryEmbeddingCacheService(
+                new NexTraceOne.AIKnowledge.Infrastructure.Governance.Services.ScopedEmbeddingProviderProxy(scopeFactory),
+                logger);
+        });
+
         // ── Tool infrastructure ──────────────────────────────────────────
         services.AddSingleton<IAgentTool, ListServicesInfoTool>();
         services.AddSingleton<IAgentTool, GetServiceHealthTool>();
         services.AddSingleton<IAgentTool, ListRecentChangesTool>();
-        services.AddSingleton<IToolRegistry, InMemoryToolRegistry>();
+        // Scoped tools that depend on scoped repositories/readers
+        services.AddScoped<IAgentTool, GetContractDetailsTool>();
+        services.AddScoped<IAgentTool, SearchIncidentsTool>();
+        services.AddScoped<IAgentTool, GetTokenUsageSummaryTool>();
+        services.AddScoped<IAgentTool, SearchKnowledgeTool>();
+        services.AddScoped<IAgentTool, GetRunbookTool>();
+        services.AddScoped<IAgentTool, ListContractVersionsTool>();
+        // Registry is Scoped (not Singleton) so that it can capture scoped tool instances
+        services.AddScoped<IToolRegistry, InMemoryToolRegistry>();
         services.AddScoped<IToolExecutor, AgentToolExecutor>();
         services.AddScoped<IToolPermissionValidator, AllowedToolsPermissionValidator>();
 

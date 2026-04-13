@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiUsageDashboard;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
@@ -169,6 +170,9 @@ internal sealed class AiMessageRepository(AiGovernanceDbContext context) : IAiMe
 
     public async Task<int> CountByConversationAsync(Guid conversationId, CancellationToken ct)
         => await context.Messages.CountAsync(m => m.ConversationId == conversationId, ct);
+
+    public async Task<int> DeleteOlderThanAsync(DateTimeOffset cutoff, CancellationToken ct)
+        => await context.Messages.Where(m => m.CreatedAt < cutoff).ExecuteDeleteAsync(ct);
 }
 
 internal sealed class AiUsageEntryRepository(AiGovernanceDbContext context) : IAiUsageEntryRepository
@@ -207,6 +211,57 @@ internal sealed class AiUsageEntryRepository(AiGovernanceDbContext context) : IA
     {
         await context.UsageEntries.AddAsync(entry, ct);
         await context.SaveChangesAsync(ct);
+    }
+
+    public async Task<int> DeleteOlderThanAsync(DateTimeOffset cutoff, CancellationToken ct)
+        => await context.UsageEntries.Where(e => e.Timestamp < cutoff).ExecuteDeleteAsync(ct);
+
+    public async Task<IReadOnlyList<AiUsageAggregate>> GetAggregatedUsageAsync(
+        Guid tenantId, DateTimeOffset start, DateTimeOffset end, string groupBy, int top, CancellationToken ct)
+    {
+        // TenantId filtering is applied when available on the entity
+        var query = context.UsageEntries
+            .Where(e => e.Timestamp >= start && e.Timestamp <= end)
+            .AsQueryable();
+
+        return groupBy.ToLowerInvariant() switch
+        {
+            "user" => await query
+                .GroupBy(e => e.UserId)
+                .OrderByDescending(g => g.Sum(e => (long)e.TotalTokens))
+                .Take(top)
+                .Select(g => new AiUsageAggregate(
+                    g.Key,
+                    g.Key,
+                    g.Sum(e => (long)e.TotalTokens),
+                    g.Count(),
+                    null))
+                .ToListAsync(ct),
+
+            "provider" => await query
+                .GroupBy(e => e.Provider)
+                .OrderByDescending(g => g.Sum(e => (long)e.TotalTokens))
+                .Take(top)
+                .Select(g => new AiUsageAggregate(
+                    g.Key,
+                    g.Key,
+                    g.Sum(e => (long)e.TotalTokens),
+                    g.Count(),
+                    null))
+                .ToListAsync(ct),
+
+            _ => await query
+                .GroupBy(e => e.ModelId)
+                .OrderByDescending(g => g.Sum(e => (long)e.TotalTokens))
+                .Take(top)
+                .Select(g => new AiUsageAggregate(
+                    g.Key.ToString(),
+                    g.Key.ToString(),
+                    g.Sum(e => (long)e.TotalTokens),
+                    g.Count(),
+                    null))
+                .ToListAsync(ct),
+        };
     }
 }
 

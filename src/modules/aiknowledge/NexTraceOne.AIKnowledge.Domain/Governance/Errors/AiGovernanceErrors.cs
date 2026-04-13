@@ -241,6 +241,13 @@ public static class AiGovernanceErrors
             "An AI guardrail with name '{0}' already exists.",
             name);
 
+    /// <summary>Guardrail de IA ativado — input ou output bloqueado por política.</summary>
+    public static Error GuardrailViolation(string pattern, string reason)
+        => Error.Business(
+            "AiGovernance.Guardrail.Violation",
+            "Request blocked by guardrail '{0}': {1}.",
+            pattern, reason);
+
     // ── Prompt Templates ────────────────────────────────────────────────
 
     /// <summary>Template de prompt não encontrado pelo identificador informado.</summary>

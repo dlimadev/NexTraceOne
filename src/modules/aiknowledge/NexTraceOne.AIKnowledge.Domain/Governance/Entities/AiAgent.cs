@@ -104,6 +104,9 @@ public sealed class AiAgent : AuditableEntity<AiAgentId>
     /// <summary>Permite override de modelo na execução.</summary>
     public bool AllowModelOverride { get; private set; }
 
+    /// <summary>Activa o modo de planeamento: o runtime gera um plano de execução antes de responder.</summary>
+    public bool UsePlanningMode { get; private set; }
+
     /// <summary>Número de versão do agent (incrementa em cada publicação).</summary>
     public int Version { get; private set; } = 1;
 
@@ -290,6 +293,12 @@ public sealed class AiAgent : AuditableEntity<AiAgentId>
 
         return Unit.Value;
     }
+
+    /// <summary>Activa o modo de planeamento de execução para este agent.</summary>
+    public void EnablePlanningMode() => UsePlanningMode = true;
+
+    /// <summary>Desactiva o modo de planeamento de execução.</summary>
+    public void DisablePlanningMode() => UsePlanningMode = false;
 
     /// <summary>Ativa o agent para uso.</summary>
     public Result<Unit> Activate()

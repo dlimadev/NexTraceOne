@@ -143,6 +143,40 @@ public sealed class OpenAiHttpClient
         }
     }
 
+    /// <summary>
+    /// Envia uma requisição de chat com tools (function calling nativo) à API OpenAI.
+    /// Retorna tool_calls quando o modelo decide invocar uma função.
+    /// Documentação: https://platform.openai.com/docs/guides/function-calling
+    /// </summary>
+    public async Task<OpenAiToolChatResponse?> ChatWithToolsAsync(
+        OpenAiToolChatRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "OpenAI tool-calling chat request for model {Model}", request.Model);
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/v1/chat/completions")
+            {
+                Content = JsonContent.Create(request, options: JsonOptions)
+            };
+            httpRequest.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+
+            var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<OpenAiToolChatResponse>(
+                JsonOptions, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "OpenAI tool-calling chat failed for model {Model}", request.Model);
+            throw;
+        }
+    }
+
     public async Task<bool> IsHealthyAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -334,4 +368,113 @@ public sealed class OpenAiEmbeddingData
 
     [JsonPropertyName("index")]
     public int Index { get; set; }
+}
+
+// ── OpenAI Function Calling DTOs ──
+
+/// <summary>Request de chat com tools (function calling nativo).</summary>
+public sealed class OpenAiToolChatRequest
+{
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("messages")]
+    public List<OpenAiChatMessage> Messages { get; set; } = [];
+
+    [JsonPropertyName("tools")]
+    public List<OpenAiTool> Tools { get; set; } = [];
+
+    [JsonPropertyName("tool_choice")]
+    public string ToolChoice { get; set; } = "auto";
+
+    [JsonPropertyName("temperature")]
+    public double? Temperature { get; set; }
+
+    [JsonPropertyName("max_tokens")]
+    public int? MaxTokens { get; set; }
+}
+
+/// <summary>Definição de tool no formato OpenAI (type: "function").</summary>
+public sealed class OpenAiTool
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "function";
+
+    [JsonPropertyName("function")]
+    public OpenAiToolFunction Function { get; set; } = new();
+}
+
+/// <summary>Definição da função dentro de uma tool OpenAI.</summary>
+public sealed class OpenAiToolFunction
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = string.Empty;
+
+    [JsonPropertyName("parameters")]
+    public object? Parameters { get; set; }
+}
+
+/// <summary>Resposta de chat com tools — inclui tool_calls quando o modelo invoca funções.</summary>
+public sealed class OpenAiToolChatResponse
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("choices")]
+    public List<OpenAiToolChoice> Choices { get; set; } = [];
+
+    [JsonPropertyName("usage")]
+    public OpenAiUsage? Usage { get; set; }
+}
+
+/// <summary>Choice de uma resposta com function calling.</summary>
+public sealed class OpenAiToolChoice
+{
+    [JsonPropertyName("message")]
+    public OpenAiToolMessage? Message { get; set; }
+
+    [JsonPropertyName("finish_reason")]
+    public string? FinishReason { get; set; }
+}
+
+/// <summary>Mensagem com possíveis tool_calls no response.</summary>
+public sealed class OpenAiToolMessage
+{
+    [JsonPropertyName("role")]
+    public string Role { get; set; } = string.Empty;
+
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
+
+    [JsonPropertyName("tool_calls")]
+    public List<OpenAiToolCall>? ToolCalls { get; set; }
+}
+
+/// <summary>Chamada de tool nativa incluída na resposta OpenAI.</summary>
+public sealed class OpenAiToolCall
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "function";
+
+    [JsonPropertyName("function")]
+    public OpenAiToolCallFunction Function { get; set; } = new();
+}
+
+/// <summary>Detalhe da função chamada pelo modelo.</summary>
+public sealed class OpenAiToolCallFunction
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("arguments")]
+    public string Arguments { get; set; } = string.Empty;
 }

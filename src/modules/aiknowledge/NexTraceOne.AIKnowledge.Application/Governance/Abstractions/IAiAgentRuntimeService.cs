@@ -15,6 +15,7 @@ public interface IAiAgentRuntimeService
         string input,
         Guid? modelIdOverride,
         string? contextJson,
+        string? callerTeamId,
         CancellationToken cancellationToken);
 }
 
@@ -29,7 +30,8 @@ public sealed record AgentExecutionResult(
     int CompletionTokens,
     long DurationMs,
     IReadOnlyList<AgentArtifactResult> Artifacts,
-    IReadOnlyList<ToolExecutionSummary>? ToolExecutions = null);
+    IReadOnlyList<ToolExecutionSummary>? ToolExecutions = null,
+    string? PlanSummary = null);
 
 /// <summary>Artefacto produzido pela execução.</summary>
 public sealed record AgentArtifactResult(

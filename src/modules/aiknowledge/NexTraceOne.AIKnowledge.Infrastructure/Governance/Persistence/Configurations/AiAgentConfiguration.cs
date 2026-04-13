@@ -67,6 +67,7 @@ public sealed class AiAgentConfiguration : IEntityTypeConfiguration<AiAgent>
         builder.Property(e => e.Objective).HasMaxLength(2000);
         builder.Property(e => e.InputSchema).HasMaxLength(5000);
         builder.Property(e => e.OutputSchema).HasMaxLength(5000);
+        builder.Property(e => e.UsePlanningMode).HasDefaultValue(false);
 
         builder.HasIndex(e => e.Slug).IsUnique();
         builder.HasIndex(e => e.IsActive);

@@ -1,4 +1,22 @@
 import client from '../../../api/client';
+import { getAccessToken, getCsrfToken, getTenantId, getEnvironmentId } from '../../../utils/tokenStorage';
+
+/** Payload reutilizável para envio de mensagens ao assistente de IA. */
+export type SendMessagePayload = {
+  conversationId?: string;
+  message: string;
+  contextScope?: string;
+  persona?: string;
+  preferredModelId?: string;
+  clientType?: string;
+  serviceId?: string;
+  contractId?: string;
+  incidentId?: string;
+  changeId?: string;
+  teamId?: string;
+  domainId?: string;
+  contextBundle?: string;
+};
 
 export const aiGovernanceApi = {
   listModels: (params?: { provider?: string; modelType?: string; status?: string; isInternal?: boolean }) =>
@@ -39,22 +57,96 @@ export const aiGovernanceApi = {
     client.get('/ai/token-usage', { params }).then(r => r.data),
   listKnowledgeSources: (params?: { sourceType?: string; isActive?: boolean }) =>
     client.get('/ai/knowledge-sources', { params }).then(r => r.data),
-  sendMessage: (data: {
-    conversationId?: string;
-    message: string;
-    contextScope?: string;
-    persona?: string;
-    preferredModelId?: string;
-    clientType?: string;
-    serviceId?: string;
-    contractId?: string;
-    incidentId?: string;
-    changeId?: string;
-    teamId?: string;
-    domainId?: string;
-    contextBundle?: string;
-  }) =>
+  sendMessage: (data: SendMessagePayload) =>
     client.post('/ai/assistant/chat', data).then(r => r.data),
+
+  /**
+   * Envia uma mensagem ao assistente via SSE streaming.
+   * Consome o endpoint POST /api/v1/ai/assistant/chat/stream com ReadableStream.
+   * Retorna um AbortController para cancelamento (ex: navegação).
+   */
+  sendMessageStreaming: (
+    data: SendMessagePayload,
+    onChunk: (text: string) => void,
+    onComplete: (metadata?: unknown) => void,
+    onError: (err: Error) => void,
+  ): AbortController => {
+    const controller = new AbortController();
+
+    const run = async () => {
+      try {
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        const token = getAccessToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const tenantId = getTenantId();
+        if (tenantId) headers['X-Tenant-Id'] = tenantId;
+        const envId = getEnvironmentId();
+        if (envId) headers['X-Environment-Id'] = envId;
+        const csrf = getCsrfToken();
+        if (csrf) headers['X-CSRF-Token'] = csrf;
+
+        const response = await fetch('/api/v1/ai/assistant/chat/stream', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(data),
+          signal: controller.signal,
+        });
+
+        if (!response.ok || !response.body) {
+          onError(new Error(`Stream request failed: ${response.status}`));
+          return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let finalMetadata: unknown;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() ?? '';
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const payload = line.slice(6).trim();
+            if (payload === '[DONE]') {
+              onComplete(finalMetadata);
+              return;
+            }
+            try {
+              const parsed = JSON.parse(payload) as { text?: string; metadata?: unknown; done?: boolean };
+              if (parsed.text) onChunk(parsed.text);
+              if (parsed.metadata) finalMetadata = parsed.metadata;
+              if (parsed.done) {
+                onComplete(finalMetadata);
+                return;
+              }
+            } catch {
+              // linha SSE não-JSON — ignorar
+            }
+          }
+        }
+
+        onComplete(finalMetadata);
+      } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        onError(err instanceof Error ? err : new Error(String(err)));
+      }
+    };
+
+    void run();
+    return controller;
+  },
+
+  /** Stub: marca onboarding como completo para o utilizador no servidor. */
+  completeOnboarding: (_sessionId: string): Promise<void> =>
+    Promise.resolve(),
   listConversations: (params?: { userId?: string; pageSize?: number }) =>
     client.get('/ai/assistant/conversations', { params }).then(r => r.data),
   getConversation: (conversationId: string, params?: { messagePageSize?: number }) =>

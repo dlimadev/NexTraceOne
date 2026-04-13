@@ -23,4 +23,10 @@ public interface IAiTokenUsageLedgerRepository
         DateTimeOffset start,
         DateTimeOffset end,
         CancellationToken ct = default);
+
+    /// <summary>
+    /// Elimina entradas do ledger com CreatedAt anterior à data limite.
+    /// Usado pelo AiDataRetentionJob para aplicar política de retenção de dados.
+    /// </summary>
+    Task<int> DeleteOlderThanAsync(DateTimeOffset cutoff, CancellationToken ct = default);
 }

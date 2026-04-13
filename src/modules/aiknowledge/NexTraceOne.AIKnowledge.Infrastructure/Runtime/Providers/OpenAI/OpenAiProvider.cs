@@ -10,10 +10,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 
 /// <summary>
 /// Provider de IA OpenAI — externo, configurável, sem SDK proprietário.
-/// Implementa IAiProvider e IChatCompletionProvider para integração no AI Runtime.
+/// Implementa IAiProvider, IChatCompletionProvider e IFunctionCallingChatProvider para integração no AI Runtime.
 /// Activo apenas quando ApiKey está configurada em AiRuntime:OpenAI.
 /// </summary>
-public sealed class OpenAiProvider : IAiProvider, IChatCompletionProvider
+public sealed class OpenAiProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider
 {
     public const string ProviderIdentifier = "openai";
 
@@ -188,6 +188,85 @@ public sealed class OpenAiProvider : IAiProvider, IChatCompletionProvider
             yield return new ChatStreamChunk(
                 string.Empty, true, modelId, ProviderId,
                 ErrorMessage: "No streaming response from OpenAI");
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<FunctionCallingResult> CompleteWithToolsAsync(
+        ChatCompletionRequest request,
+        IReadOnlyList<FunctionDefinition> functions,
+        CancellationToken cancellationToken = default)
+    {
+        var modelId = string.IsNullOrWhiteSpace(request.ModelId)
+            ? _options.DefaultChatModel
+            : request.ModelId;
+
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            var messages = request.Messages.Select(m => new OpenAiChatMessage
+            {
+                Role = m.Role,
+                Content = m.Content
+            }).ToList();
+
+            var tools = functions.Select(f => new OpenAiTool
+            {
+                Function = new OpenAiToolFunction
+                {
+                    Name = f.Name,
+                    Description = f.Description,
+                    Parameters = f.Parameters
+                }
+            }).ToList();
+
+            var toolRequest = new OpenAiToolChatRequest
+            {
+                Model = modelId,
+                Messages = messages,
+                Tools = tools,
+                ToolChoice = "auto",
+                Temperature = request.Temperature ?? _options.DefaultTemperature,
+                MaxTokens = request.MaxTokens ?? _options.DefaultMaxTokens,
+            };
+
+            var response = await _client.ChatWithToolsAsync(toolRequest, cancellationToken);
+            sw.Stop();
+
+            if (response?.Choices is not { Count: > 0 })
+            {
+                return new FunctionCallingResult(
+                    false, null, [], modelId, ProviderId,
+                    0, 0, sw.Elapsed, ErrorMessage: "No response from OpenAI tool-calling endpoint");
+            }
+
+            var choice = response.Choices[0];
+            var msg = choice.Message;
+
+            var nativeToolCalls = msg?.ToolCalls?.Select(tc => new NativeToolCall(
+                tc.Id,
+                tc.Function.Name,
+                tc.Function.Arguments)).ToList()
+                ?? [];
+
+            return new FunctionCallingResult(
+                true,
+                msg?.Content,
+                nativeToolCalls,
+                response.Model ?? modelId,
+                ProviderId,
+                response.Usage?.PromptTokens ?? 0,
+                response.Usage?.CompletionTokens ?? 0,
+                sw.Elapsed,
+                FinishReason: choice.FinishReason);
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            _logger.LogError(ex, "OpenAI tool-calling completion failed for model {Model}", modelId);
+            return new FunctionCallingResult(
+                false, null, [], modelId, ProviderId,
+                0, 0, sw.Elapsed, ErrorMessage: ex.Message);
         }
     }
 }

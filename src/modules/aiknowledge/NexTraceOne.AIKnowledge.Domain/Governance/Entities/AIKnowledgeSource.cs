@@ -2,6 +2,8 @@ using Ardalis.GuardClauses;
 
 using MediatR;
 
+using System.Text.Json;
+
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -43,6 +45,12 @@ public sealed class AIKnowledgeSource : AuditableEntity<AIKnowledgeSourceId>
 
     /// <summary>Data/hora UTC em que a fonte foi registrada.</summary>
     public DateTimeOffset RegisteredAt { get; private set; }
+
+    /// <summary>
+    /// Representação JSON do vetor de embedding da fonte, gerado pelo job de indexação.
+    /// Null quando ainda não indexado.
+    /// </summary>
+    public string? EmbeddingJson { get; private set; }
 
     /// <summary>
     /// Regista uma nova fonte de conhecimento com validações de invariantes.
@@ -117,6 +125,26 @@ public sealed class AIKnowledgeSource : AuditableEntity<AIKnowledgeSourceId>
         Description = description;
         EndpointOrPath = endpointOrPath;
         return Unit.Value;
+    }
+
+    /// <summary>
+    /// Armazena o vetor de embedding serializado como JSON.
+    /// Usado pelo EmbeddingIndexJob para persistir o resultado da indexação semântica.
+    /// </summary>
+    public void SetEmbedding(float[] embedding)
+    {
+        Guard.Against.Null(embedding);
+        EmbeddingJson = JsonSerializer.Serialize(embedding);
+    }
+
+    /// <summary>
+    /// Desserializa e retorna o vetor de embedding, ou null se não indexado.
+    /// </summary>
+    public float[]? GetEmbedding()
+    {
+        if (string.IsNullOrWhiteSpace(EmbeddingJson))
+            return null;
+        return JsonSerializer.Deserialize<float[]>(EmbeddingJson);
     }
 }
 

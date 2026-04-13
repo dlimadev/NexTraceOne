@@ -23,6 +23,7 @@ import {
   Globe,
   Lock,
   Users,
+  X,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
@@ -33,6 +34,7 @@ import { ChatSidebar } from './ChatSidebar';
 import { ChatMessageItem } from './ChatMessageItem';
 import { AgentsSidePanel } from './AgentsSidePanel';
 import { SuggestedPrompts } from './SuggestedPrompts';
+import { AiOnboardingModal } from '../components/AiOnboardingModal';
 import type {
   Conversation,
   ChatMessage,
@@ -76,6 +78,10 @@ export function AiAssistantPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [expandedMeta, setExpandedMeta] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingContent, setStreamingContent] = useState<string>('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const streamAbortRef = useRef<AbortController | null>(null);
   const [backendConnected, setBackendConnected] = useState<boolean | null>(null);
   const [providerStatus, setProviderStatus] = useState<string>('');
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
@@ -231,6 +237,13 @@ export function AiAssistantPage() {
     void loadConversations();
   }, [loadConversations]);
 
+  // ── Onboarding detection ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!localStorage.getItem('ai-onboarding-complete')) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
   // ── Load messages when conversation changes ───────────────────────────
   useEffect(() => {
     if (selectedConversation) {
@@ -320,44 +333,97 @@ export function AiAssistantPage() {
     }
   };
 
+  const handleCancelStream = () => {
+    streamAbortRef.current?.abort();
+    streamAbortRef.current = null;
+    setIsStreaming(false);
+    setStreamingContent('');
+    setIsTyping(false);
+  };
+
   const handleSendMessage = async () => {
     const messageToSend = inputValue.trim();
-    if (!messageToSend || isTyping) return;
+    if (!messageToSend || isTyping || isStreaming) return;
 
     setInputValue('');
     setIsTyping(true);
+    setStreamingContent('');
     setMessagesError(null);
 
-    try {
-      const response = await aiGovernanceApi.sendMessage({
-        message: messageToSend,
-        conversationId: selectedConversation || undefined,
-        contextScope: activeContexts.join(','),
-        persona,
-        clientType: 'Web',
-        preferredModelId: selectedModelId || undefined,
-      });
+    const payload = {
+      message: messageToSend,
+      conversationId: selectedConversation || undefined,
+      contextScope: activeContexts.join(','),
+      persona,
+      clientType: 'Web',
+      preferredModelId: selectedModelId || undefined,
+    };
 
-      const targetConversationId = response.conversationId || selectedConversation;
-      if (targetConversationId) {
-        setSelectedConversationState(targetConversationId);
-        await loadMessages(targetConversationId);
-        await loadConversations(targetConversationId);
-      } else {
-        await loadConversations();
-      }
-    } catch (error: unknown) {
-      setInputValue(messageToSend);
-      setMessagesError(getProblemStatus(error) === 404 ? t('aiHub.conversationNotFound') : t('aiHub.errorSendingMessage'));
+    // Attempt streaming — fall back to regular sendMessage on error
+    let streamSucceeded = false;
+    let streamedConversationId: string | undefined;
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        setIsStreaming(true);
+        setIsTyping(false);
+
+        const abort = aiGovernanceApi.sendMessageStreaming(
+          payload,
+          (chunk) => {
+            setStreamingContent(prev => prev + chunk);
+          },
+          (metadata) => {
+            streamSucceeded = true;
+            if (metadata && typeof metadata === 'object' && 'conversationId' in metadata) {
+              streamedConversationId = (metadata as { conversationId: string }).conversationId;
+            }
+            resolve();
+          },
+          (err) => {
+            reject(err);
+          },
+        );
+        streamAbortRef.current = abort;
+      });
+    } catch {
+      streamSucceeded = false;
     } finally {
-      setIsTyping(false);
+      streamAbortRef.current = null;
+      setIsStreaming(false);
+      setStreamingContent('');
+    }
+
+    if (!streamSucceeded) {
+      // Fallback to non-streaming
+      setIsTyping(true);
+      try {
+        const response = await aiGovernanceApi.sendMessage(payload);
+        streamedConversationId = response.conversationId as string | undefined;
+      } catch (error: unknown) {
+        setInputValue(messageToSend);
+        setMessagesError(getProblemStatus(error) === 404 ? t('aiHub.conversationNotFound') : t('aiHub.errorSendingMessage'));
+        setIsTyping(false);
+        return;
+      } finally {
+        setIsTyping(false);
+      }
+    }
+
+    const targetConversationId = streamedConversationId || selectedConversation;
+    if (targetConversationId) {
+      setSelectedConversationState(targetConversationId);
+      await loadMessages(targetConversationId);
+      await loadConversations(targetConversationId);
+    } else {
+      await loadConversations();
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      if (!isStreaming) void handleSendMessage();
     }
   };
 
@@ -651,6 +717,31 @@ export function AiAssistantPage() {
               </div>
             )}
 
+            {isStreaming && (
+              <div className="flex justify-start">
+                <div className="bg-elevated rounded-lg px-4 py-3 max-w-[80%]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Bot size={14} className="text-accent" />
+                    <span className="text-xs text-muted animate-pulse">{t('aiHub.streaming.generating')}</span>
+                    <button
+                      onClick={handleCancelStream}
+                      className="ml-2 text-xs text-muted hover:text-destructive flex items-center gap-1"
+                      title={t('aiHub.streaming.cancel')}
+                    >
+                      <X size={10} />
+                      {t('aiHub.streaming.cancel')}
+                    </button>
+                  </div>
+                  {streamingContent && (
+                    <p className="text-sm text-body whitespace-pre-wrap">
+                      {streamingContent}
+                      <span className="inline-block w-2 h-4 bg-accent ml-0.5 animate-pulse" />
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* ── Suggested Prompts (shown only when conversation has few messages) ── */}
             <SuggestedPrompts
               prompts={config.aiSuggestedPromptKeys}
@@ -690,9 +781,9 @@ export function AiAssistantPage() {
                 onKeyDown={handleKeyDown}
                 placeholder={t('aiHub.inputPlaceholder')}
                 className="flex-1 bg-elevated border border-edge rounded-lg px-4 py-2.5 text-sm text-body placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
-                disabled={isTyping}
+                disabled={isTyping || isStreaming}
               />
-              <Button variant="primary" size="md" disabled={!inputValue.trim() || isTyping} onClick={handleSendMessage}>
+              <Button variant="primary" size="md" disabled={!inputValue.trim() || isTyping || isStreaming} onClick={() => void handleSendMessage()}>
                 <Send size={16} />
                 {t('aiHub.send')}
               </Button>
@@ -728,6 +819,14 @@ export function AiAssistantPage() {
           onClose={() => setIsAgentsPanelOpen(false)}
         />
       </div>
+
+      <AiOnboardingModal
+        open={showOnboarding}
+        onFinish={() => {
+          localStorage.setItem('ai-onboarding-complete', 'true');
+          setShowOnboarding(false);
+        }}
+      />
     </PageContainer>
   );
 }

@@ -43,7 +43,9 @@ public static class ExecuteAiChat
         IAiAssistantConversationRepository conversationRepository,
         IAiMessageRepository messageRepository,
         IAiUsageEntryRepository usageEntryRepository,
+        IAiTokenQuotaService tokenQuotaService,
         ICurrentUser currentUser,
+        ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -83,7 +85,27 @@ public static class ExecuteAiChat
                     resolvedModel.ProviderId);
             }
 
-            // 3. Resolve or create conversation
+            // 3. Pre-validate token quota before inference
+            var estimatedTokens = ContextWindowManager.EstimateTokens(request.Message) +
+                                  ContextWindowManager.EstimateTokens(request.SystemPrompt ?? string.Empty);
+
+            var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
+                currentUser.Id,
+                currentTenant.Id,
+                resolvedModel.ModelName,
+                resolvedModel.ProviderId,
+                estimatedTokens,
+                cancellationToken);
+
+            if (!quotaResult.IsAllowed)
+            {
+                return Error.Business(
+                    "AIKnowledge.QuotaExceeded",
+                    "Token quota exceeded: {0}",
+                    quotaResult.BlockReason ?? "Policy limit reached");
+            }
+
+            // 4. Resolve or create conversation
             AiAssistantConversation? conversation = null;
             if (request.ConversationId.HasValue)
             {
@@ -106,7 +128,7 @@ public static class ExecuteAiChat
                 await conversationRepository.AddAsync(conversation, cancellationToken);
             }
 
-            // 4. Save user message
+            // 5. Save user message
             var userMessage = AiMessage.UserMessage(
                 conversation.Id.Value,
                 request.Message,

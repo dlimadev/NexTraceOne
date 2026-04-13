@@ -1,0 +1,40 @@
+{
+  "name": "nextraceone-copilot",
+  "displayName": "NexTraceOne Copilot",
+  "description": "AI-assisted operations and contract governance for NexTraceOne",
+  "version": "0.1.0",
+  "publisher": "nextraceone",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onCommand:nextraceone.chat", "onCommand:nextraceone.configure"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "nextraceone.chat", "title": "NexTraceOne: Ask AI" },
+      { "command": "nextraceone.configure", "title": "NexTraceOne: Configure" }
+    ],
+    "configuration": {
+      "title": "NexTraceOne",
+      "properties": {
+        "nextraceone.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:5000",
+          "description": "NexTraceOne server URL"
+        },
+        "nextraceone.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "NexTraceOne IDE API Key"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -watch -p ."
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.0.0"
+  }
+}

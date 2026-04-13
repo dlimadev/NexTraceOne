@@ -52,6 +52,73 @@ public sealed record ChatCompletionResult(
     TimeSpan Duration,
     string? ErrorMessage = null);
 
+// ── Native Function Calling ──
+
+/// <summary>
+/// Definição de função disponível para o modelo chamar via native function calling.
+/// Mapeada a partir de ToolDefinition para o formato esperado pelo provider (OpenAI / Anthropic).
+/// </summary>
+public sealed record FunctionDefinition(
+    /// <summary>Nome único da função (igual ao nome da ToolDefinition).</summary>
+    string Name,
+    /// <summary>Descrição da função para o modelo.</summary>
+    string Description,
+    /// <summary>JSON Schema dos parâmetros aceites (serializado como objeto anónimo).</summary>
+    object? Parameters = null);
+
+/// <summary>
+/// Chamada de tool nativa retornada pelo modelo no response.
+/// Cada NativeToolCall corresponde a uma invocação estruturada decidida pelo modelo.
+/// </summary>
+public sealed record NativeToolCall(
+    /// <summary>Identificador único da chamada (fornecido pelo provider).</summary>
+    string Id,
+    /// <summary>Nome da função a invocar.</summary>
+    string FunctionName,
+    /// <summary>Argumentos da chamada em formato JSON.</summary>
+    string ArgumentsJson);
+
+/// <summary>
+/// Resultado de uma inferência com suporte a native function calling.
+/// Pode conter texto de resposta, chamadas de tool, ou ambos.
+/// </summary>
+public sealed record FunctionCallingResult(
+    bool Success,
+    string? Content,
+    IReadOnlyList<NativeToolCall> ToolCalls,
+    string ModelId,
+    string ProviderId,
+    int PromptTokens,
+    int CompletionTokens,
+    TimeSpan Duration,
+    string? FinishReason = null,
+    string? ErrorMessage = null)
+{
+    /// <summary>Indica se o modelo solicitou execução de tools nativas.</summary>
+    public bool HasToolCalls => ToolCalls.Count > 0;
+}
+
+/// <summary>
+/// Extensão de IChatCompletionProvider com suporte a native function calling.
+/// Implementado por providers que suportam o protocolo nativo de tools (OpenAI, Anthropic).
+/// Providers sem esta interface usam o fallback textual [TOOL_CALL:] em AiAgentRuntimeService.
+/// </summary>
+public interface IFunctionCallingChatProvider : IChatCompletionProvider
+{
+    /// <summary>
+    /// Executa inferência com definições de funções disponíveis para chamada nativa.
+    /// O modelo decide autonomamente se chama uma função ou responde com texto.
+    /// </summary>
+    /// <param name="request">Request de chat com histórico de mensagens.</param>
+    /// <param name="functions">Lista de funções disponíveis para o modelo invocar.</param>
+    /// <param name="cancellationToken">Token de cancelamento.</param>
+    /// <returns>Resultado com Content (texto) e/ou ToolCalls (chamadas nativas).</returns>
+    Task<FunctionCallingResult> CompleteWithToolsAsync(
+        ChatCompletionRequest request,
+        IReadOnlyList<FunctionDefinition> functions,
+        CancellationToken cancellationToken = default);
+}
+
 /// <summary>
 /// Fragmento incremental de resposta durante streaming de chat/completion.
 /// Emitido progressivamente pelo provider conforme o modelo gera tokens.

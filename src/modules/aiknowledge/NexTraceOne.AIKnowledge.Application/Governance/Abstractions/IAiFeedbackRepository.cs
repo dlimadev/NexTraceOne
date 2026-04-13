@@ -26,4 +26,17 @@ public interface IAiFeedbackRepository
 
     /// <summary>Lista feedbacks por nome de agente, limitados a um máximo.</summary>
     Task<IReadOnlyList<AiFeedback>> ListByAgentNameAsync(string agentName, int limit, CancellationToken ct = default);
+
+    /// <summary>
+    /// Conta feedbacks negativos para um agente e modelo específicos desde uma data.
+    /// Usado pelo FeedbackThresholdJob para detetar acumulação de feedback negativo.
+    /// </summary>
+    Task<int> CountNegativeSinceAsync(
+        string agentName,
+        string modelUsed,
+        DateTimeOffset since,
+        CancellationToken ct = default);
+
+    /// <summary>Calcula a média de rating para um agent específico, via AgentExecutionId.</summary>
+    Task<double> GetAverageRatingAsync(Guid agentId, CancellationToken ct = default);
 }

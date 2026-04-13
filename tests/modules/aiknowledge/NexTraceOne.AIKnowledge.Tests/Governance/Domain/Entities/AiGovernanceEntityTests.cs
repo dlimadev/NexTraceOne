@@ -585,4 +585,57 @@ public sealed class AiGovernanceEntityTests
         source.Description.Should().Be("New description");
         source.EndpointOrPath.Should().Be("/api/new-endpoint");
     }
+
+    // ── AIAccessPolicy.SetDataRetentionDays ─────────────────────────────
+
+    [Fact]
+    public void Policy_SetDataRetentionDays_SetsValue()
+    {
+        var policy = AIAccessPolicy.Create("P", "D", "role", "admin", true, false, 4000, FixedNow);
+
+        var result = policy.SetDataRetentionDays(90);
+
+        result.IsSuccess.Should().BeTrue();
+        policy.DataRetentionDays.Should().Be(90);
+    }
+
+    [Fact]
+    public void Policy_SetDataRetentionDays_NullClearsRetention()
+    {
+        var policy = AIAccessPolicy.Create("P", "D", "role", "admin", true, false, 4000, FixedNow);
+        policy.SetDataRetentionDays(30);
+
+        var result = policy.SetDataRetentionDays(null);
+
+        result.IsSuccess.Should().BeTrue();
+        policy.DataRetentionDays.Should().BeNull();
+    }
+
+    [Fact]
+    public void Policy_SetDataRetentionDays_NegativeValue_ReturnsError()
+    {
+        var policy = AIAccessPolicy.Create("P", "D", "role", "admin", true, false, 4000, FixedNow);
+
+        var result = policy.SetDataRetentionDays(-1);
+
+        result.IsFailure.Should().BeTrue();
+        policy.DataRetentionDays.Should().BeNull();
+    }
+
+    [Fact]
+    public void Policy_SetDataRetentionDays_ZeroValue_ReturnsError()
+    {
+        var policy = AIAccessPolicy.Create("P", "D", "role", "admin", true, false, 4000, FixedNow);
+
+        var result = policy.SetDataRetentionDays(0);
+
+        result.IsFailure.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Policy_Create_DataRetentionDays_DefaultsToNull()
+    {
+        var policy = AIAccessPolicy.Create("P", "D", "role", "admin", true, false, 4000, FixedNow);
+        policy.DataRetentionDays.Should().BeNull();
+    }
 }
