@@ -1,4 +1,4 @@
-{
+﻿{
   "activation": {
     "activating": "Activating...",
     "confirmPasswordLabel": "Confirm password",
@@ -208,7 +208,7 @@
       "PendingReview": "Pending Review",
       "Published": "Published"
     },
-    "subtitle": "Official and custom governed agents ÔÇö create, execute, and review artifacts",
+    "subtitle": "Official and custom governed agents — create, execute, and review artifacts",
     "systemPromptLabel": "System Prompt",
     "systemPromptPlaceholder": "You are a specialized agent that...",
     "tab": {
@@ -343,7 +343,7 @@
     "filterByStatus": "Filter by status",
     "filterInactive": "Inactive",
     "governanceNotice": "All interactions are governed, audited and grounded in NexTraceOne's Source of Truth.",
-    "groundingDevelopment": "Context grounding is under active development ÔÇö full contextual responses with service catalog, contract registry, incident history and change intelligence will be available soon. This response demonstrates the metadata and explainability framework that is already in place.",
+    "groundingDevelopment": "Context grounding is under active development — full contextual responses with service catalog, contract registry, incident history and change intelligence will be available soon. This response demonstrates the metadata and explainability framework that is already in place.",
     "groundingSources": "Grounded in",
     "ideActiveClientsLabel": "Active clients",
     "ideActivePolicies": "Active policies",
@@ -498,7 +498,7 @@
     "copilot.title": "NexTrace AI",
     "copilot.greeting": "Hello, {{name}}",
     "copilot.subtitle": "I can help you with services, contracts, incidents, changes and operational knowledge. Ask me anything.",
-    "copilot.inputPlaceholder": "Ask me anything about your services, contracts, or operationsÔÇª",
+    "copilot.inputPlaceholder": "Ask me anything about your services, contracts, or operations…",
     "copilot.toggleHistory": "Toggle conversation history"
   },
   "aiIntegrationsConfig": {
@@ -664,7 +664,7 @@
     "isCompliant": "Compliance Result",
     "json": "JSON",
     "loading": "Processing...",
-    "noViolations": "No violations found ÔÇö policy is satisfied",
+    "noViolations": "No violations found — policy is satisfied",
     "overview": "Policy Overview",
     "policyName": "Policy Name (kebab-case)",
     "registerPolicy": "Register Policy",
@@ -708,10 +708,10 @@
       "noVersionHistory": "No version history available"
     },
     "contextHint": {
-      "change": "Ask about {{name}} ÔÇö risk, blast radius, rollback",
-      "contract": "Ask about {{name}} ÔÇö versions, compatibility, consumers",
-      "incident": "Ask about {{name}} ÔÇö root cause, mitigation, runbook",
-      "service": "Ask about {{name}} ÔÇö contracts, dependencies, changes"
+      "change": "Ask about {{name}} — risk, blast radius, rollback",
+      "contract": "Ask about {{name}} — versions, compatibility, consumers",
+      "incident": "Ask about {{name}} — root cause, mitigation, runbook",
+      "service": "Ask about {{name}} — contracts, dependencies, changes"
     },
     "contextLabel": {
       "change": "Change",
@@ -782,10 +782,10 @@
     "title": "AI Assistant",
     "tryAsking": "Try asking",
     "welcome": {
-      "change": "I can help you assess the **{{name}}** change ÔÇö its risk profile, blast radius, correlated incidents, and rollback readiness. All answers are grounded in Change Intelligence data.",
-      "contract": "I can help you analyze the **{{name}}** contract ÔÇö its versions, compatibility, consumers, and governance status. All answers are grounded in the Contract Registry.",
-      "incident": "I can help you investigate the **{{name}}** incident ÔÇö potential root causes, correlated changes, mitigation steps, and applicable runbooks. All answers are grounded in Incident History and operational knowledge.",
-      "service": "I can help you understand the **{{name}}** service ÔÇö its contracts, dependencies, recent changes, and operational status. All answers are grounded in NexTraceOne's Source of Truth."
+      "change": "I can help you assess the **{{name}}** change — its risk profile, blast radius, correlated incidents, and rollback readiness. All answers are grounded in Change Intelligence data.",
+      "contract": "I can help you analyze the **{{name}}** contract — its versions, compatibility, consumers, and governance status. All answers are grounded in the Contract Registry.",
+      "incident": "I can help you investigate the **{{name}}** incident — potential root causes, correlated changes, mitigation steps, and applicable runbooks. All answers are grounded in Incident History and operational knowledge.",
+      "service": "I can help you understand the **{{name}}** service — its contracts, dependencies, recent changes, and operational status. All answers are grounded in NexTraceOne's Source of Truth."
     }
   },
   "audit": {
@@ -831,9 +831,9 @@
     "orContinueWith": "Or continue with",
     "orDivider": "or sign in with credentials",
     "password": "Password",
-    "passwordPlaceholder": "ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó",
+    "passwordPlaceholder": "••••••••",
     "rememberMe": "Remember me",
-    "selfHosted": "Self-hosted ┬À Enterprise ┬À Auditable",
+    "selfHosted": "Self-hosted · Enterprise · Auditable",
     "sessionExpired": "Your session has expired. Please sign in again.",
     "showPassword": "Show password",
     "signIn": "Sign in to your account",
@@ -1196,7 +1196,7 @@
     },
     "detail": {
       "active": "Active",
-      "apiAndConsumerSummary": "{{apiCount}} APIs ┬À {{consumerCount}} consumers",
+      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumers",
       "apiCount": "{{count}} APIs",
       "apiCount_one": "{{count}} API",
       "apiCount_other": "{{count}} APIs",
@@ -1248,7 +1248,7 @@
       "relatedIncidentsDescription": "Active incidents impacting this service",
       "repositoryUrl": "Repository",
       "routePattern": "Route",
-      "separator": "┬À",
+      "separator": "·",
       "serviceLinks": {
         "addFirstLink": "Add the first link to this service",
         "addLink": "Add Link",
@@ -1702,7 +1702,7 @@
     "navigation": "Navigation",
     "noEntityResults": "No matching entities found",
     "operations": "Operations",
-    "placeholder": "Search pages, actionsÔÇª",
+    "placeholder": "Search pages, actions…",
     "searchResults": "Search Results",
     "seeAllResults": "See all results",
     "select": "select",
@@ -2280,7 +2280,7 @@
     "governance.gates.fourEyes.compliant": "Compliant",
     "governance.gates.fourEyes.description": "Evaluate whether an action requires dual approval",
     "governance.gates.fourEyes.disabled": "Four Eyes Principle is not enabled",
-    "governance.gates.fourEyes.notCompliant": "Not compliant ÔÇö requires different approver",
+    "governance.gates.fourEyes.notCompliant": "Not compliant — requires different approver",
     "governance.gates.fourEyes.required": "Second approver required",
     "governance.gates.fourEyes.title": "Four Eyes Principle",
     "governance.gates.subtitle": "Evaluate governance gates before critical actions",
@@ -2329,7 +2329,7 @@
     "governance.risk.thresholds_by_criticality.label": "Risk Thresholds by Service Criticality",
     "governance.scorecard.enabled.description": "Whether governance scorecards are active and calculated",
     "governance.scorecard.enabled.label": "Governance Scorecard Enabled",
-    "governance.scorecard.thresholds.description": "Score thresholds for governance scorecard classification (e.g. Excellent ÔëÑ90, Good ÔëÑ70, etc.)",
+    "governance.scorecard.thresholds.description": "Score thresholds for governance scorecard classification (e.g. Excellent ≥90, Good ≥70, etc.)",
     "governance.scorecard.thresholds.label": "Scorecard Score Thresholds",
     "governance.scorecard.thresholds_by_environment.description": "Override score thresholds per environment (e.g. Production requires higher scores)",
     "governance.scorecard.thresholds_by_environment.label": "Scorecard Thresholds by Environment",
@@ -2737,7 +2737,7 @@
     "promotion.freeze.windows.label": "Freeze Windows",
     "promotion.min_time_in_staging_hours.description": "Minimum hours a release must stay in staging before production promotion.",
     "promotion.min_time_in_staging_hours.label": "Minimum Time in Staging (hours)",
-    "promotion.paths.allowed.description": "Allowed sourceÔåÆtarget environment promotion paths",
+    "promotion.paths.allowed.description": "Allowed source→target environment promotion paths",
     "promotion.paths.allowed.label": "Allowed Promotion Paths",
     "promotion.production.extra_approvers_required.description": "Additional approvers required when promoting to production",
     "promotion.production.extra_approvers_required.label": "Extra Approvers for Production",
@@ -3229,7 +3229,7 @@
     "configuration": "Configuration",
     "contractJson": "OpenAPI Contract (JSON)",
     "contractJsonPlaceholder": "Paste your OpenAPI 3.0 JSON here...",
-    "contractToCode": "Contract ÔåÆ Code",
+    "contractToCode": "Contract → Code",
     "copied": "Copied",
     "copy": "Copy",
     "download": "Download",
@@ -3441,7 +3441,7 @@
         "minLength": "Min Length",
         "minimum": "Minimum",
         "modeRef": "$ref (Schema Reference)",
-        "modeVisualProps": "Ô£ª Visual Properties",
+        "modeVisualProps": "✦ Visual Properties",
         "nestedProperties": "Nested Properties",
         "noEndpoints": "No endpoints yet. Click \"Add Endpoint\" to get started.",
         "noVariants": "No variants. Add at least one sub-schema.",
@@ -3541,7 +3541,7 @@
         "operationName": "Operation Name",
         "operations": "Operations",
         "outputMessage": "Output Message",
-        "roundtripWarning": "SOAP round-trip is partial ÔÇö some WSDL features may not be editable visually. Use source editor for advanced WSDL constructs.",
+        "roundtripWarning": "SOAP round-trip is partial — some WSDL features may not be editable visually. Use source editor for advanced WSDL constructs.",
         "securityPlaceholder": "WS-Security, Transport Security, etc...",
         "securityPolicy": "Security Policy",
         "serviceInfo": "Service Information",
@@ -4140,7 +4140,7 @@
     "healthDashboard": {
       "deprecated": "Deprecated Versions",
       "healthScore": "Health Score",
-      "noViolations": "No rule violations detected ÔÇö contracts are healthy!",
+      "noViolations": "No rule violations detected — contracts are healthy!",
       "subtitle": "Aggregated quality and governance metrics across all contracts",
       "title": "Contract Health Dashboard",
       "topViolations": "Contracts with Most Violations",
@@ -4384,7 +4384,7 @@
       "scoreModerate": "Some security aspects need attention.",
       "securityReviewState": "Security Review"
     },
-    "selectApiAsset": "Select an API assetÔÇª",
+    "selectApiAsset": "Select an API asset…",
     "selectApiAssetLabel": "API Asset:",
     "selectApiAssetPrompt": "Select an API asset above to view its contract history.",
     "selectProtocol": "Select Protocol",
@@ -4768,7 +4768,7 @@
       "sourceValidation": {
         "invalid": "Invalid format",
         "unclosedTag": "Unclosed XML tag detected",
-        "valid": "Ô£ô Valid"
+        "valid": "✓ Valid"
       },
       "splitEditor": {
         "channels": "Channels",
@@ -4886,7 +4886,7 @@
   },
   "developerExperienceScore": {
     "cognitiveLoad": "Cognitive Load",
-    "cognitiveLoadScore": "Cognitive Load Score (0ÔÇô10)",
+    "cognitiveLoadScore": "Cognitive Load Score (0–10)",
     "computedAt": "Computed at",
     "createError": "Failed to submit score",
     "createSuccess": "Score submitted successfully",
@@ -4913,7 +4913,7 @@
     "teamName": "Team Name",
     "title": "Developer Experience Score",
     "toil": "Toil %",
-    "toilPercentage": "Toil Percentage (0ÔÇô100%)"
+    "toilPercentage": "Toil Percentage (0–100%)"
   },
   "developerPortal": {
     "analytics": {
@@ -5161,7 +5161,7 @@
     "overallPerformance": "Overall Performance",
     "period": "Period",
     "rolledBackDeploys": "Rolled Back",
-    "subtitle": "Deployment Frequency, Lead Time, Change Failure Rate, Time to Restore ÔÇö powered by real release and incident data.",
+    "subtitle": "Deployment Frequency, Lead Time, Change Failure Rate, Time to Restore — powered by real release and incident data.",
     "timeToRestore": "Time to Restore Service",
     "title": "DORA Metrics",
     "totalDeploys": "Total Deploys",
@@ -5169,7 +5169,7 @@
   },
   "environment": {
     "active": "Active Environment",
-    "nonProductionBanner": "You are operating in {{name}} ({{profile}}) ÔÇö this is a non-production environment.",
+    "nonProductionBanner": "You are operating in {{name}} ({{profile}}) — this is a non-production environment.",
     "profile": {
       "development": "Development",
       "production": "Production",
@@ -5290,7 +5290,7 @@
     "validation": "Please check the entered data and try again."
   },
   "footer": {
-    "default": "Powered by {{name}} ÔÇö Operational Confidence Platform",
+    "default": "Powered by {{name}} — Operational Confidence Platform",
     "poweredBy": "Powered by NexTraceOne"
   },
   "forgotPassword": {
@@ -5329,7 +5329,7 @@
       "rolloutCompletion": "Rollout completion",
       "rolloutFailure": "Rollout failure",
       "rollouts": "Rollouts",
-      "searchPlaceholder": "Search packsÔÇª",
+      "searchPlaceholder": "Search packs…",
       "status": {
         "Compliant": "Compliant",
         "NonCompliant": "Non-compliant",
@@ -5414,12 +5414,12 @@
       "mttr": "MTTR",
       "mttrTrend": "MTTR",
       "openIncidents": "Open Incidents",
-      "overallImproving": "Overall metrics are improving ÔÇö keep up the great work!",
+      "overallImproving": "Overall metrics are improving — keep up the great work!",
       "overallRating": "Overall Rating",
       "period": "Period",
       "recurrenceRate": "Recurrence Rate",
       "resolvedInPeriod": "Resolved in Period",
-      "subtitle": "DevOps Research & Assessment ÔÇö Deployment Frequency, Lead Time, Change Failure Rate, MTTR",
+      "subtitle": "DevOps Research & Assessment — Deployment Frequency, Lead Time, Change Failure Rate, MTTR",
       "title": "DORA Metrics",
       "trendDataPoints": "Trend Data Points",
       "trendSummary": "Trend Summary"
@@ -5488,7 +5488,7 @@
       },
       "filterAll": "All",
       "scope": "Scope",
-      "searchPlaceholder": "Search policiesÔÇª",
+      "searchPlaceholder": "Search policies…",
       "severity": {
         "Critical": "Critical",
         "High": "High",
@@ -5545,7 +5545,7 @@
       },
       "low": "Low",
       "medium": "Medium",
-      "searchPlaceholder": "Search packsÔÇª",
+      "searchPlaceholder": "Search packs…",
       "serviceRiskList": "Pack risk indicators",
       "totalAssessed": "Packs assessed"
     },
@@ -5782,7 +5782,7 @@
   },
   "header": {
     "languageEnglish": "English",
-    "languagePortuguese": "Portugu├¬s",
+    "languagePortuguese": "Português",
     "notifications": "Notifications",
     "settings": "Settings",
     "switchToDark": "Switch to dark mode",
@@ -5822,7 +5822,7 @@
       "confirmRequest": "Confirm Emergency Request",
       "expiresAt": "Expires At",
       "justification": "Justification",
-      "justificationPlaceholder": "Describe the critical situation requiring emergency accessÔÇª",
+      "justificationPlaceholder": "Describe the critical situation requiring emergency access…",
       "noRequests": "No break glass requests found.",
       "request": "Request Emergency Access",
       "requestFormTitle": "Request Emergency Access",
@@ -5841,9 +5841,9 @@
       "delegationsList": "Active Delegations",
       "noDelegations": "No delegations found.",
       "permissions": "Delegated Permissions",
-      "permissionsPlaceholder": "permission1, permission2, ÔÇª",
+      "permissionsPlaceholder": "permission1, permission2, …",
       "reason": "Reason",
-      "reasonPlaceholder": "Reason for this delegationÔÇª",
+      "reasonPlaceholder": "Reason for this delegation…",
       "revoke": "Revoke Delegation",
       "status": "Status",
       "subtitle": "Manage formal permission delegations between users",
@@ -5856,7 +5856,7 @@
       "approve": "Approve",
       "decide": "Decide",
       "justification": "Justification",
-      "justificationPlaceholder": "Explain why this access is neededÔÇª",
+      "justificationPlaceholder": "Explain why this access is needed…",
       "noRequests": "No pending JIT access requests.",
       "pendingList": "Pending JIT Requests",
       "permissionCode": "Permission Code",
@@ -6200,20 +6200,20 @@
     "subtitle": "Centralized operational knowledge, runbooks, architecture docs and post-mortems",
     "tags": "Tags",
     "title": "Knowledge Hub",
-    "viewAllNotes": "View all operational notes ÔåÆ",
+    "viewAllNotes": "View all operational notes →",
     "viewRelatedNotes": "View Related Notes"
   },
   "legacy": {
     "artifacts": {
       "copybook": "Copybook",
-      "copybookDescription": "COBOL copybook ÔÇö structured data layout definition",
+      "copybookDescription": "COBOL copybook — structured data layout definition",
       "dataset": "Dataset",
       "db2Artifact": "DB2 Artifact",
       "db2StoredProcedure": "DB2 Stored Procedure",
       "db2Table": "DB2 Table",
       "db2View": "DB2 View",
       "jcl": "JCL",
-      "jclDescription": "Job Control Language ÔÇö batch job definition",
+      "jclDescription": "Job Control Language — batch job definition",
       "loadModule": "Load Module",
       "procLib": "PROC Library",
       "title": "Artifacts",
@@ -6304,11 +6304,11 @@
       "cpc": "CPC",
       "cpcDescription": "Central Processor Complex",
       "lpar": "LPAR",
-      "lparDescription": "Logical Partition ÔÇö isolated z/OS instance",
+      "lparDescription": "Logical Partition — isolated z/OS instance",
       "mips": "MIPS",
       "msu": "MSU",
       "sysplex": "Sysplex",
-      "sysplexDescription": "System Complex ÔÇö cluster of LPARs",
+      "sysplexDescription": "System Complex — cluster of LPARs",
       "title": "Infrastructure"
     },
     "messaging": {
@@ -6803,7 +6803,7 @@
       "inApp": "In-App",
       "loading": "Loading preferences...",
       "mandatory": "Mandatory",
-      "mandatoryTooltip": "This notification cannot be disabled ÔÇö it is required by platform security and governance policies",
+      "mandatoryTooltip": "This notification cannot be disabled — it is required by platform security and governance policies",
       "saveFailed": "Failed to save preference",
       "saved": "Preference saved successfully",
       "subtitle": "Manage how and where you receive notifications",
@@ -7312,9 +7312,9 @@
     "additionalContext": "Additional Context (optional)",
     "analysisPanel": "Predictive Analysis",
     "assessedAt": "Assessed at",
-    "blastRadius": "Blast Radius (0ÔÇô100)",
+    "blastRadius": "Blast Radius (0–100)",
     "causalFactors": "Causal Factors",
-    "changeFrequencyScore": "Change Frequency Score (0ÔÇô10)",
+    "changeFrequencyScore": "Change Frequency Score (0–10)",
     "changeRiskAssessment": "Change Risk Assessment",
     "changeType": "Change Type",
     "computedAt": "Computed at",
@@ -7473,7 +7473,7 @@
     "releaseId": "Release",
     "releaseIdPlaceholder": "UUID of the release",
     "route": "Route",
-    "selectRelease": "Select a releaseÔÇª",
+    "selectRelease": "Select a release…",
     "sourceEnvironment": "Source Environment",
     "status": "Status",
     "subtitle": "Control environment promotion with quality gates",
@@ -7704,10 +7704,10 @@
     "loadError": "Failed to load service reliability data. Please try again.",
     "mock": {
       "authGwSummary": "All authentication flows healthy.",
-      "catalogSyncAnomaly": "Complete service failure ÔÇö dependency unavailable.",
+      "catalogSyncAnomaly": "Complete service failure — dependency unavailable.",
       "catalogSyncSummary": "Integration partner unreachable.",
       "catalogSyncTrend": "Connectivity lost 2 hours ago.",
-      "inventorySummary": "Consumer lag increasing ÔÇö needs attention.",
+      "inventorySummary": "Consumer lag increasing — needs attention.",
       "noAnomalies": "No anomalies detected in the last 24 hours.",
       "notificationSummary": "Processing within expected parameters.",
       "orderApiSummary": "Service operating within expected parameters. All health checks passing.",
@@ -7715,7 +7715,7 @@
       "paymentGwAnomaly": "Error rate anomaly detected: 5.2% vs expected 1.0%. Correlated with recent change v3.1.0.",
       "paymentGwSummary": "Elevated error rate (5.2%) detected since last deployment.",
       "paymentGwTrend": "Error rate increased 40% after deployment v3.1.0.",
-      "reportSchedulerSummary": "Coverage gap detected ÔÇö missing runbook.",
+      "reportSchedulerSummary": "Coverage gap detected — missing runbook.",
       "userSvcSummary": "All systems operational."
     },
     "needsAttention": "Attention Required",
@@ -7751,7 +7751,7 @@
       "NeedsAttention": "Needs Attention",
       "Unavailable": "Unavailable"
     },
-    "subtitle": "Team-owned service reliability overview ÔÇö health, trends and operational context",
+    "subtitle": "Team-owned service reliability overview — health, trends and operational context",
     "title": "Service Reliability",
     "totalServices": "Total Services",
     "trend": {
@@ -7847,8 +7847,8 @@
     "dashboardError": "Failed to load dashboard data.",
     "emptyState": "Paste generated code and run the SAST scan to detect vulnerabilities.",
     "filePath": "File Path",
-    "gateFailed": "Security gate failed ÔÇö critical or high findings detected.",
-    "gatePassed": "Security gate passed ÔÇö no critical or high findings.",
+    "gateFailed": "Security gate failed — critical or high findings detected.",
+    "gatePassed": "Security gate passed — no critical or high findings.",
     "high": "High",
     "medium": "Medium",
     "noFindings": "No security findings detected. Code looks clean!",
@@ -7864,7 +7864,7 @@
     "securityScore": "Security Score",
     "sourceCode": "Source Code",
     "sourceCodePlaceholder": "Paste generated code to analyze...",
-    "subtitle": "SAST analysis of generated code ÔÇö detect vulnerabilities before they reach production.",
+    "subtitle": "SAST analysis of generated code — detect vulnerabilities before they reach production.",
     "tabs": {
       "dashboard": "Dashboard",
       "scan": "Scan Code"
@@ -7973,7 +7973,7 @@
     "exposureInternal": "Internal",
     "exposurePartner": "Partner",
     "impact": {
-      "calculating": "Calculating impact propagationÔÇª",
+      "calculating": "Calculating impact propagation…",
       "depth": "Depth",
       "directConsumers": "Direct consumers",
       "impactedNodes": "Impacted Nodes",
@@ -7982,7 +7982,7 @@
       "path": "Impact Path",
       "selectNode": "Root node",
       "selectNodeHint": "Select a service or API node to calculate its blast radius.",
-      "selectNodePlaceholder": "Select a node to analyzeÔÇª",
+      "selectNodePlaceholder": "Select a node to analyze…",
       "totalImpacted": "Total impacted",
       "transitiveConsumers": "Transitive consumers"
     },
@@ -8059,7 +8059,7 @@
     "registerService": "Register Service",
     "registerServiceTitle": "Register Service",
     "repositoryUrl": "Repository URL",
-    "searchPlaceholder": "Search services, APIs, domainsÔÇª",
+    "searchPlaceholder": "Search services, APIs, domains…",
     "serviceType": "Service Type",
     "sourceApi": "Source API",
     "stats": {
@@ -8085,7 +8085,7 @@
     "temporal": {
       "addedEdges": "Added edges",
       "addedNodes": "Added nodes",
-      "calculatingDiff": "Calculating temporal diffÔÇª",
+      "calculatingDiff": "Calculating temporal diff…",
       "capturedAt": "Captured at",
       "createFirst": "Create your first snapshot to start tracking graph evolution over time.",
       "createSnapshot": "Create Snapshot",
@@ -8097,7 +8097,7 @@
       "nodes": "Nodes",
       "removedEdges": "Removed edges",
       "removedNodes": "Removed nodes",
-      "selectSnapshot": "Select a snapshotÔÇª",
+      "selectSnapshot": "Select a snapshot…",
       "snapshotHistory": "Snapshot History",
       "toSnapshot": "To snapshot"
     },
@@ -8476,7 +8476,7 @@
       "hasManifest": "Scaffolding manifest defined",
       "inactive": "Inactive",
       "noContract": "No base contract",
-      "noManifest": "No manifest ÔÇö AI generates structure",
+      "noManifest": "No manifest — AI generates structure",
       "notFound": "Template not found.",
       "ownership": "Ownership",
       "repoBranch": "Branch",
@@ -8525,13 +8525,13 @@
       },
       "placeholders": {
         "description": "Template for building REST APIs following DDD with Clean Architecture...",
-        "displayName": "Payment REST API ÔÇö DDD .NET",
+        "displayName": "Payment REST API — DDD .NET",
         "domain": "payments",
         "team": "platform-team"
       },
       "saveError": "Failed to save template. Please check your inputs.",
       "sections": {
-        "advanced": "Advanced ÔÇö Contract & Scaffolding",
+        "advanced": "Advanced — Contract & Scaffolding",
         "classification": "Classification",
         "identity": "Identity",
         "ownership": "Ownership & Tags"
@@ -8614,7 +8614,7 @@
       "review": {
         "downloadZip": "Download ZIP",
         "fallbackHint": "Configure an AI provider in AI Hub to get full code generation.",
-        "fallbackTitle": "AI provider unavailable ÔÇö minimal scaffold generated",
+        "fallbackTitle": "AI provider unavailable — minimal scaffold generated",
         "files": "files generated",
         "regenerate": "Regenerate",
         "successHint": "Service {{service}} scaffolded with {{language}}. Review the files below.",
@@ -9133,7 +9133,7 @@
     "title": "API Keys",
     "empty": "No API keys yet.",
     "create": "Create API Key",
-    "copyOnce": "Copy this key ÔÇö it will not be shown again",
+    "copyOnce": "Copy this key — it will not be shown again",
     "revoke": "Revoke",
     "scopes": "Scopes",
     "expires": "Expires"

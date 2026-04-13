@@ -40,3 +40,4 @@ appsettings.Development.json
 appsettings.*.local.json
 *.pfx
 node_modules/
+src/frontend/package-lock.json
