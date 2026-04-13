@@ -7,7 +7,7 @@ import {
   Table, Clock, Type, List, Rss, Bot,
 } from 'lucide-react';
 
-const TIMEZONES = [
+const TIMEZONE_VALUES = [
   'UTC',
   'America/Sao_Paulo',
   'America/New_York',
