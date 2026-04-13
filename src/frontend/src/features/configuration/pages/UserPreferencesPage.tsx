@@ -154,7 +154,6 @@ export function UserPreferencesPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [inAppNotifications, setInAppNotifications] = useState(true);
   const [digestEnabled, setDigestEnabled] = useState(false);
-  const [digestFrequency, setDigestFrequency] = useState(24);
   const [subscribedCategories, setSubscribedCategories] = useState<string[]>(NOTIFICATION_CATEGORIES);
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
