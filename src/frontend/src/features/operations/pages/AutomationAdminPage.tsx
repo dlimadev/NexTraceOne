@@ -8,7 +8,6 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -73,8 +72,6 @@ export function AutomationAdminPage() {
         subtitle={t('automation.admin.subtitle')}
         badge={<ShieldAlert size={22} className="text-accent" />}
       />
-
-      <OnboardingHints module="operations" />
 
       {/* Stats */}
       <StatsGrid columns={4}>

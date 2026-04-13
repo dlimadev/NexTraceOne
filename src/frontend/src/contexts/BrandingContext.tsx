@@ -66,23 +66,6 @@ const DEFAULT_BRANDING: BrandingValues = {
 
 const BrandingContext = createContext<BrandingValues>(DEFAULT_BRANDING);
 
-const BRANDING_KEYS = [
-  'branding.logo_url',
-  'branding.logo_dark_url',
-  'branding.accent_color',
-  'branding.favicon_url',
-  'branding.welcome_message',
-  'branding.footer_text',
-  'branding.login_logo_url',
-  'branding.login_heading',
-  'branding.login_subheading',
-  'branding.login_background_url',
-  'branding.login_sso_button_text',
-  'branding.login_help_text',
-  'branding.powered_by_visible',
-  'instance.name',
-];
-
 function extractValue(
   settings: EffectiveConfigurationDto[],
   key: string,
@@ -145,16 +128,7 @@ function applyFavicon(url: string): void {
 export function BrandingProvider({ children }: { children: ReactNode }) {
   const { data: settings } = useQuery({
     queryKey: ['branding-settings'],
-    queryFn: async () => {
-      const settled = await Promise.allSettled(
-        BRANDING_KEYS.map((key) =>
-          configurationApi.getEffectiveSettings('System', null, key),
-        ),
-      );
-      return settled.flatMap((r) =>
-        r.status === 'fulfilled' ? r.value : [],
-      );
-    },
+    queryFn: () => configurationApi.getEffectiveSettings('System'),
     staleTime: 10 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     retry: 1,

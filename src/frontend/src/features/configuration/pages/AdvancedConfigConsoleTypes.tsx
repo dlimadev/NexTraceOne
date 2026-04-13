@@ -14,6 +14,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
+import type { TFunction } from 'i18next';
 
 // ── Domain Navigation ──────────────────────────────────────────────────
 
@@ -61,11 +62,11 @@ export function matchDomain(key: string, domain: DomainMeta): boolean {
   return domain.prefixes.some((p) => key.startsWith(p));
 }
 
-export function renderValuePreview(value: string | null, isSensitive: boolean): React.ReactNode {
-  if (isSensitive) return <Badge variant="warning"><Lock className="w-3 h-3 mr-1" />Masked</Badge>;
+export function renderValuePreview(value: string | null, isSensitive: boolean, t: TFunction): React.ReactNode {
+  if (isSensitive) return <Badge variant="warning"><Lock className="w-3 h-3 mr-1" />{t('advancedConfig.badges.masked', 'Masked')}</Badge>;
   if (!value) return <span className="text-muted italic text-xs">null</span>;
-  if (value === 'true') return <Badge variant="success">Enabled</Badge>;
-  if (value === 'false') return <Badge variant="default">Disabled</Badge>;
+  if (value === 'true') return <Badge variant="success">{t('advancedConfig.badges.enabled', 'Enabled')}</Badge>;
+  if (value === 'false') return <Badge variant="default">{t('advancedConfig.badges.disabled', 'Disabled')}</Badge>;
   try {
     const parsed = JSON.parse(value);
     if (Array.isArray(parsed)) return <Badge variant="info">{parsed.length} items</Badge>;

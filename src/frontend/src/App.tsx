@@ -92,22 +92,6 @@ export default function App() {
       </AuthProvider>
       </BrandingProvider>
       </ThemeProvider>
-      {/* PHASE-0 guardrail: ReactQueryDevtools must only render in DEV.
-          The import.meta.env.DEV flag is evaluated at build time by Vite —
-          this entire branch is tree-shaken out of production bundles. */}
-      {import.meta.env.DEV && <ReactQueryDevtoolsDev />}
     </QueryClientProvider>
   );
 }
-
-/**
- * Isolated lazy wrapper for ReactQueryDevtools.
- * Only imported when the DEV guard at the call site is true.
- * Do NOT remove the import.meta.env.DEV condition from the call site.
- */
-const ReactQueryDevtoolsDev = lazy(async () => {
-  const { ReactQueryDevtools } = await import('@tanstack/react-query-devtools');
-  return {
-    default: () => <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />,
-  };
-});

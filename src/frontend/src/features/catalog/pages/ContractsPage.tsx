@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { ContractVersionDetailPanel } from '../components/ContractVersionDetailPanel';
@@ -226,8 +225,6 @@ export function ContractsPage() {
 
   return (
     <PageContainer>
-      {/* Onboarding hints — orientação contextual para novos utilizadores */}
-      <OnboardingHints module="contracts" />
 
       {/* Notificação inline */}
       {notification && (

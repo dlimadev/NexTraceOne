@@ -230,7 +230,7 @@ builder.Services.AddRateLimiter(options =>
 });
 
 // [9] Tratamento de exceções não capturadas
-builder.Services.AddExceptionHandler(_ => { });
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // [10] Compressão de respostas — melhoria de performance nas APIs

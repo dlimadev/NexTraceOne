@@ -17,7 +17,7 @@ public sealed class LegacyAssetsEndpointModule
     /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/catalog/legacy")
+        var group = app.MapGroup("/api/v1/catalog/legacy")
             .WithTags("Legacy Assets")
             .RequireRateLimiting("data-intensive");
 

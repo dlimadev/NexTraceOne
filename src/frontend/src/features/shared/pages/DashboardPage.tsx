@@ -9,9 +9,6 @@ import { StatCard } from '../../../components/StatCard';
 import { Card, CardHeader, CardBody, CardFooter } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { EmptyState } from '../../../components/EmptyState';
-import { QuickActions } from '../../../components/QuickActions';
-import { PersonaQuickstart } from '../../../components/PersonaQuickstart';
-import { HomeWidgetCard } from '../../../components/HomeWidgetCard';
 import { StackedProgressBar } from '../../../components/StackedProgressBar';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { usePersona } from '../../../contexts/PersonaContext';
@@ -161,27 +158,6 @@ export function DashboardPage() {
     });
   }
 
-  const visibleHomeWidgets = config.homeWidgets.filter((widget) => {
-    const routeByWidgetType: Record<string, string> = {
-      services: '/services',
-      changes: '/changes',
-      incidents: '/operations/incidents',
-      contracts: '/contracts',
-      reliability: '/operations/reliability',
-      dependencies: '/services/graph',
-      risk: '/governance/risk',
-      trend: '/governance/reports',
-      governance: '/governance/reports',
-      audit: '/audit',
-      ownership: '/services',
-      releaseConfidence: '/changes',
-      aiInsights: '/ai/assistant',
-    };
-
-    const route = routeByWidgetType[widget.type] ?? '/';
-    return isRouteAvailableInFinalProductionScope(route);
-  });
-
   const severityColors = {
     critical: 'bg-critical/10 border-critical/25 text-critical',
     warning: 'bg-warning/10 border-warning/25 text-warning',
@@ -200,12 +176,6 @@ export function DashboardPage() {
         </div>
         <p className="text-sm text-muted">{t(config.homeSubtitleKey)}</p>
       </div>
-
-      {/* Quick Actions — adaptadas à persona */}
-      <QuickActions />
-
-      {/* Quickstart persona-aware — orientação para novos utilizadores */}
-      <PersonaQuickstart />
 
       {/* Error state */}
       {graphError && (
@@ -240,15 +210,6 @@ export function DashboardPage() {
               <span className="flex-1">{alert.text}</span>
               <ArrowRight size={14} className="opacity-60" />
             </Link>
-          ))}
-        </div>
-      )}
-
-      {/* Persona-specific widgets */}
-      {visibleHomeWidgets.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-          {visibleHomeWidgets.map((widget) => (
-            <HomeWidgetCard key={widget.id} widget={widget} />
           ))}
         </div>
       )}

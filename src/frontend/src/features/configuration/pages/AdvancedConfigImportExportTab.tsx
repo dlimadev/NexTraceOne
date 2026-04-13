@@ -56,9 +56,9 @@ export const AdvancedConfigImportExportTab = memo(function AdvancedConfigImportE
                   onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
                   className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
                 >
-                  <option value="System">System</option>
-                  <option value="Tenant">Tenant</option>
-                  <option value="Environment">Environment</option>
+                  <option value="System">{t('advancedConfig.scopeOptions.system', 'System')}</option>
+                  <option value="Tenant">{t('advancedConfig.scopeOptions.tenant', 'Tenant')}</option>
+                  <option value="Environment">{t('advancedConfig.scopeOptions.environment', 'Environment')}</option>
                 </select>
               </div>
               <div>

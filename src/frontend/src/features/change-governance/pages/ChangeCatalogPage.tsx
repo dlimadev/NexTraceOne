@@ -16,7 +16,6 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { changeConfidenceApi } from '../api/changeConfidence';
@@ -184,9 +183,6 @@ export function ChangeCatalogPage() {
         title={t('changeConfidence.title')}
         subtitle={t('changeConfidence.subtitle')}
       />
-
-      {/* Onboarding hints — orientação contextual para novos utilizadores */}
-      <OnboardingHints module="changes" />
 
       {/* ── Summary cards ── */}
       <PageSection>

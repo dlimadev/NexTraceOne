@@ -208,9 +208,9 @@ function CabForm({ onEvaluate }: { onEvaluate: (s: string, e: string, c: string,
     <div className="space-y-2">
       <input value={service} onChange={e => setService(e.target.value)} placeholder={t('governance.gates.cab.serviceName', 'Service name')} className="input w-full" />
       <select value={env} onChange={e => setEnv(e.target.value)} className="input w-full" aria-label={t('governance.gates.cab.environment', 'Environment')}>
-        <option value="production">Production</option>
-        <option value="staging">Staging</option>
-        <option value="development">Development</option>
+        <option value="production">{t('environment.profile.production', 'Production')}</option>
+        <option value="staging">{t('environment.profile.staging', 'Staging')}</option>
+        <option value="development">{t('environment.profile.development', 'Development')}</option>
       </select>
       <select value={crit} onChange={e => setCrit(e.target.value)} className="input w-full" aria-label={t('governance.gates.cab.criticality', 'Criticality')}>
         <option value="Low">Low</option>
@@ -258,8 +258,8 @@ function ErrorBudgetForm({ onEvaluate }: { onEvaluate: (s: string, e: string, b:
     <div className="space-y-2">
       <input value={service} onChange={e => setService(e.target.value)} placeholder={t('governance.gates.errorBudget.serviceName', 'Service name')} className="input w-full" />
       <select value={env} onChange={e => setEnv(e.target.value)} className="input w-full" aria-label={t('governance.gates.errorBudget.environment', 'Environment')}>
-        <option value="production">Production</option>
-        <option value="staging">Staging</option>
+        <option value="production">{t('environment.profile.production', 'Production')}</option>
+        <option value="staging">{t('environment.profile.staging', 'Staging')}</option>
       </select>
       <input type="number" value={budget} onChange={e => setBudget(e.target.value)} placeholder={t('governance.gates.errorBudget.remainingPct', 'Budget remaining %')} className="input w-full" min="0" max="100" />
       <button onClick={() => onEvaluate(service, env, budget)} className="btn btn-primary w-full" disabled={!service}>

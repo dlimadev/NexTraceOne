@@ -87,7 +87,7 @@ public static class RecordTraceCorrelation
             // SuppressWriteErrors = true garante que falhas no Elasticsearch não propagam
             await traceCorrelationWriter.WriteAsync(
                 mappingId: mappingId,
-                tenantId: release.TenantId ?? Guid.Empty,
+                tenantId: release.TenantId,
                 releaseId: request.ReleaseId,
                 traceId: request.TraceId,
                 serviceName: request.ServiceName,

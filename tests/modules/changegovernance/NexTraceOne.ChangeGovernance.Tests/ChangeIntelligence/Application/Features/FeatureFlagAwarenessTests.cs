@@ -22,7 +22,7 @@ public sealed class FeatureFlagAwarenessTests
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     private static Release CreateRelease(string service = "svc-payments")
-        => Release.Create(Guid.NewGuid(), service, "1.0.0", "production",
+        => Release.Create(Guid.NewGuid(), Guid.Empty, service, "1.0.0", "production",
             "https://ci/p", "abc123", FixedNow);
 
     public FeatureFlagAwarenessTests()

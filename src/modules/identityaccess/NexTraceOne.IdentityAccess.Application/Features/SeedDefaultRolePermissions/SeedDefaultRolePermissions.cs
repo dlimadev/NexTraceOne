@@ -23,7 +23,7 @@ public static class SeedDefaultRolePermissions
     /// <summary>Resposta com contagem de papéis e permissões criadas.</summary>
     public sealed record Response(int RolesSeeded, int TotalPermissionsCreated);
 
-    /// <summary>Handler que popula mapeamentos padrão do catálogo para papéis sem registos.</summary>
+    /// <summary>Handler que popula mapeamentos padrão do catálogo, adicionando apenas as permissões em falta (delta).</summary>
     public sealed class Handler(
         IRoleRepository roleRepository,
         IRolePermissionRepository rolePermissionRepository,
@@ -38,19 +38,24 @@ public static class SeedDefaultRolePermissions
 
             foreach (var role in systemRoles)
             {
-                var hasExisting = await rolePermissionRepository.HasMappingsForRoleAsync(
-                    role.Id, tenantId: null, cancellationToken);
-
-                if (hasExisting)
-                    continue;
-
                 var catalogPermissions = RolePermissionCatalog.GetPermissionsForRole(role.Name);
                 if (catalogPermissions.Count == 0)
                     continue;
 
+                var existing = new HashSet<string>(
+                    await rolePermissionRepository.GetPermissionCodesForRoleAsync(role.Id, tenantId: null, cancellationToken),
+                    StringComparer.OrdinalIgnoreCase);
+
+                var missingPermissions = catalogPermissions
+                    .Where(p => !existing.Contains(p))
+                    .ToList();
+
+                if (missingPermissions.Count == 0)
+                    continue;
+
                 var now = dateTimeProvider.UtcNow;
 
-                var entities = catalogPermissions.Select(permissionCode =>
+                var entities = missingPermissions.Select(permissionCode =>
                     RolePermission.Create(
                         RolePermissionId.New(),
                         role.Id,

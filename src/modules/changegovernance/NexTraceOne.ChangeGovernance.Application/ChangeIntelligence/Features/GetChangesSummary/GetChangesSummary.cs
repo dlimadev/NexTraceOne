@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
@@ -28,7 +29,7 @@ public static class GetChangesSummary
     }
 
     /// <summary>Handler que retorna contadores agregados de mudanças.</summary>
-    public sealed class Handler(IReleaseRepository repository) : IQueryHandler<Query, Response>
+    public sealed class Handler(IReleaseRepository repository, ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -36,6 +37,7 @@ public static class GetChangesSummary
 
             var (total, validated, needsAttention, suspectedRegressions, correlatedWithIncidents) =
                 await repository.GetSummaryCountsAsync(
+                    currentTenant.Id,
                     request.TeamName, request.Environment,
                     request.From, request.To, cancellationToken);
 

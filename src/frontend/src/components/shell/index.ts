@@ -3,7 +3,7 @@ export { AppSidebar } from './AppSidebar';
 export { AppSidebarHeader } from './AppSidebarHeader';
 export { AppSidebarGroup } from './AppSidebarGroup';
 export { AppSidebarItem } from './AppSidebarItem';
-export { AppSidebarFooter } from './AppSidebarFooter';
+// export { AppSidebarFooter } from './AppSidebarFooter';
 export { AppTopbar } from './AppTopbar';
 export { AppTopbarSearch } from './AppTopbarSearch';
 export { AppTopbarActions } from './AppTopbarActions';

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useId, useMemo, type KeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, X, Search, Plus } from 'lucide-react';
 import { cn } from '../lib/cn';
 
@@ -61,6 +62,7 @@ export function ComboBox({
   className,
 }: ComboBoxProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -264,7 +266,7 @@ export function ComboBox({
           )}
         >
           {filtered.length === 0 && !showCreateOption && (
-            <div className="px-3 py-2 text-xs text-muted text-center">No results</div>
+            <div className="px-3 py-2 text-xs text-muted text-center">{t('common.noResults', 'No results')}</div>
           )}
           {filtered.map((opt, i) => {
             const isSelected = multi ? (values ?? []).includes(opt.value) : value === opt.value;

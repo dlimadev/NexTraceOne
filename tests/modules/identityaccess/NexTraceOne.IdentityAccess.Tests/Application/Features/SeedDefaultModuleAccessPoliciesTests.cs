@@ -147,8 +147,21 @@ public sealed class SeedDefaultModuleAccessPoliciesTests
     {
         var roles = CreateAllSystemRoles();
         _roleRepository.GetSystemRolesAsync(Arg.Any<CancellationToken>()).Returns(roles);
-        _policyRepository.HasPoliciesForRoleAsync(Arg.Any<RoleId>(), null, Arg.Any<CancellationToken>())
-            .Returns(true);
+        _policyRepository
+            .GetPoliciesForRoleAsync(Arg.Any<RoleId>(), null, Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                var roleId = ci.Arg<RoleId>();
+                var module = ci.Arg<string>();
+                var role = roles.FirstOrDefault(r => r.Id == roleId);
+                IReadOnlyList<ModuleAccessPolicy> policies = role is null
+                    ? []
+                    : ModuleAccessPolicyCatalog.GetPoliciesForRole(role.Name)
+                        .Where(p => p.Module == module)
+                        .Select(p => ModuleAccessPolicy.Create(role.Id, null, p.Module, p.Page, p.Action, p.IsAllowed, Now, "system-seed"))
+                        .ToList();
+                return Task.FromResult(policies);
+            });
 
         var result = await CreateSut().Handle(new SeedFeature.Command(), CancellationToken.None);
 
@@ -167,13 +180,22 @@ public sealed class SeedDefaultModuleAccessPoliciesTests
         _roleRepository.GetSystemRolesAsync(Arg.Any<CancellationToken>()).Returns(roles);
 
         // 3 papéis já existem, 4 são novos
-        _policyRepository.HasPoliciesForRoleAsync(roles[0].Id, null, Arg.Any<CancellationToken>()).Returns(true);
-        _policyRepository.HasPoliciesForRoleAsync(roles[1].Id, null, Arg.Any<CancellationToken>()).Returns(true);
-        _policyRepository.HasPoliciesForRoleAsync(roles[2].Id, null, Arg.Any<CancellationToken>()).Returns(true);
-        _policyRepository.HasPoliciesForRoleAsync(roles[3].Id, null, Arg.Any<CancellationToken>()).Returns(false);
-        _policyRepository.HasPoliciesForRoleAsync(roles[4].Id, null, Arg.Any<CancellationToken>()).Returns(false);
-        _policyRepository.HasPoliciesForRoleAsync(roles[5].Id, null, Arg.Any<CancellationToken>()).Returns(false);
-        _policyRepository.HasPoliciesForRoleAsync(roles[6].Id, null, Arg.Any<CancellationToken>()).Returns(false);
+        var seededRoleIds = new HashSet<RoleId> { roles[0].Id, roles[1].Id, roles[2].Id };
+        _policyRepository
+            .GetPoliciesForRoleAsync(Arg.Any<RoleId>(), null, Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                var roleId = ci.Arg<RoleId>();
+                if (!seededRoleIds.Contains(roleId))
+                    return Task.FromResult<IReadOnlyList<ModuleAccessPolicy>>([]);
+                var module = ci.Arg<string>();
+                var role = roles.FirstOrDefault(r => r.Id == roleId)!;
+                return Task.FromResult<IReadOnlyList<ModuleAccessPolicy>>(
+                    ModuleAccessPolicyCatalog.GetPoliciesForRole(role.Name)
+                        .Where(p => p.Module == module)
+                        .Select(p => ModuleAccessPolicy.Create(role.Id, null, p.Module, p.Page, p.Action, p.IsAllowed, Now, "system-seed"))
+                        .ToList());
+            });
 
         var result = await CreateSut().Handle(new SeedFeature.Command(), CancellationToken.None);
 

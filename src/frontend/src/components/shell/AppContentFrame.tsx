@@ -9,7 +9,7 @@ interface AppContentFrameProps {
 export function AppContentFrame({ children, className }: AppContentFrameProps) {
   return (
     <main
-      className={cn('flex-1 overflow-y-auto', className)}
+      className={cn('h-full overflow-y-auto overflow-x-hidden', className)}
       id="main-content"
       role="main"
     >

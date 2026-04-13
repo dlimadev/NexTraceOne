@@ -409,7 +409,7 @@ public sealed class ContractsEndpointModule
 
         // ── Canonical Entities ───────────────────────────────────────────
 
-        var canonicalGroup = app.MapGroup("/api/v1/catalog/canonical-entities");
+        var canonicalGroup = app.MapGroup("/api/v1/contracts/canonical-entities");
 
         canonicalGroup.MapGet("/search", async (
             string? searchTerm,
@@ -596,11 +596,11 @@ public sealed class ContractsEndpointModule
         group.MapGet("/health-dashboard", async (
             string? domain,
             string? contractType,
-            int page,
-            int pageSize,
             ISender sender,
             IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
         {
             var result = await sender.Send(
                 new ComputeContractHealthDashboardFeature.Query(domain, contractType, page <= 0 ? 1 : page, pageSize <= 0 ? 20 : pageSize),

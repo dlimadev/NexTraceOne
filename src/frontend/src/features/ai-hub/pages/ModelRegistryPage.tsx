@@ -15,7 +15,6 @@ import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { Button } from '../../../components/Button';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { CardListSkeleton } from '../../../components/CardListSkeleton';
@@ -118,8 +117,6 @@ export function ModelRegistryPage() {
 
   return (
     <PageContainer>
-      {/* Onboarding hints — orientação contextual para novos utilizadores */}
-      <OnboardingHints module="aiHub" />
 
       <PageHeader
         title={t('aiHub.modelsTitle')}

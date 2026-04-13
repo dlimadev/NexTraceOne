@@ -16,7 +16,7 @@ public sealed class ChangeGovernanceDecisionTests
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
 
     private static Release CreateRelease(string serviceName = "TestService") =>
-        Release.Create(Guid.NewGuid(), serviceName, "1.0.0", "prod", "https://ci/pipeline/1", "abc123def456", FixedNow);
+        Release.Create(Guid.NewGuid(), Guid.Empty, serviceName, "1.0.0", "prod", "https://ci/pipeline/1", "abc123def456", FixedNow);
 
     // ── GetChangeAdvisory ───────────────────────────────────────────────
 

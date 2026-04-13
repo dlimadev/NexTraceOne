@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Brain,
   Server,
@@ -118,9 +119,9 @@ function matchSection(key: string, section: SectionMeta): boolean {
   return section.prefixes.some((p) => key.startsWith(p));
 }
 
-function renderValuePreview(value: string): React.ReactNode {
-  if (value === 'true') return <Badge variant="success">Enabled</Badge>;
-  if (value === 'false') return <Badge variant="default">Disabled</Badge>;
+function renderValuePreview(value: string, t: TFunction): React.ReactNode {
+  if (value === 'true') return <Badge variant="success">{t('advancedConfig.badges.enabled', 'Enabled')}</Badge>;
+  if (value === 'false') return <Badge variant="default">{t('advancedConfig.badges.disabled', 'Disabled')}</Badge>;
   try {
     const parsed = JSON.parse(value);
     if (Array.isArray(parsed)) return <Badge variant="info">{parsed.length} items</Badge>;
@@ -313,10 +314,10 @@ export function AiIntegrationsConfigurationPage() {
                     {showEffective && eff ? (
                       <div className="text-right">
                         <div className="text-xs text-muted">{eff.resolvedScope}</div>
-                        {renderValuePreview(eff.effectiveValue ?? '')}
+                        {renderValuePreview(eff.effectiveValue ?? '', t)}
                       </div>
                     ) : (
-                      renderValuePreview(def.defaultValue ?? '')
+                      renderValuePreview(def.defaultValue ?? '', t)
                     )}
                     {def.isEditable !== false && (
                       <button
@@ -383,7 +384,7 @@ export function AiIntegrationsConfigurationPage() {
                           onChange={(e) => setEditValue(e.target.checked ? 'true' : 'false')}
                           className="rounded border-edge"
                         />
-                        <span className="text-sm">{editValue === 'true' ? 'Enabled' : 'Disabled'}</span>
+                        <span className="text-sm">{editValue === 'true' ? t('advancedConfig.badges.enabled', 'Enabled') : t('advancedConfig.badges.disabled', 'Disabled')}</span>
                       </label>
                     ) : def.uiEditorType === 'select' ? (
                       <select

@@ -122,9 +122,9 @@ export function DoraMetricsPage() {
             onChange={e => setEnvironment(e.target.value)}
             className="px-3 py-1.5 text-sm rounded-md bg-elevated border border-edge text-body focus:outline-none focus:ring-1 focus:ring-accent"
           >
-            <option value="Production">Production</option>
-            <option value="Staging">Staging</option>
-            <option value="Development">Development</option>
+            <option value="Production">{t('environment.profile.production', 'Production')}</option>
+            <option value="Staging">{t('environment.profile.staging', 'Staging')}</option>
+            <option value="Development">{t('environment.profile.development', 'Development')}</option>
           </select>
         </div>
         <div>

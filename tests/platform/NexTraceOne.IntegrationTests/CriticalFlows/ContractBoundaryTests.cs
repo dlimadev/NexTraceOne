@@ -133,6 +133,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
 
         var apiAssetId = Guid.NewGuid();
         var release = Release.Create(
+            tenantId: Guid.NewGuid(),
             apiAssetId: apiAssetId,
             serviceName: "payments-service",
             version: "2.1.0",

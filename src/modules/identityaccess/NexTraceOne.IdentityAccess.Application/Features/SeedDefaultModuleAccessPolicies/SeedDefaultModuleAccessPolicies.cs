@@ -27,7 +27,7 @@ public static class SeedDefaultModuleAccessPolicies
     /// <summary>Resposta com contagem de papéis e políticas criadas.</summary>
     public sealed record Response(int RolesSeeded, int TotalPoliciesCreated);
 
-    /// <summary>Handler que popula políticas padrão do catálogo para papéis sem registos.</summary>
+    /// <summary>Handler que popula políticas padrão do catálogo, adicionando apenas as políticas em falta (delta).</summary>
     public sealed class Handler(
         IRoleRepository roleRepository,
         IModuleAccessPolicyRepository moduleAccessPolicyRepository,
@@ -42,19 +42,29 @@ public static class SeedDefaultModuleAccessPolicies
 
             foreach (var role in systemRoles)
             {
-                var hasExisting = await moduleAccessPolicyRepository.HasPoliciesForRoleAsync(
-                    role.Id, tenantId: null, cancellationToken);
-
-                if (hasExisting)
-                    continue;
-
                 var catalogPolicies = ModuleAccessPolicyCatalog.GetPoliciesForRole(role.Name);
                 if (catalogPolicies.Count == 0)
                     continue;
 
+                var existingKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var module in ModuleAccessPolicyCatalog.GetAllModules())
+                {
+                    var modulePolicies = await moduleAccessPolicyRepository.GetPoliciesForRoleAsync(
+                        role.Id, tenantId: null, module, cancellationToken);
+                    foreach (var p in modulePolicies)
+                        existingKeys.Add($"{p.Module}|{p.Page}|{p.Action}");
+                }
+
+                var missingPolicies = catalogPolicies
+                    .Where(p => !existingKeys.Contains($"{p.Module}|{p.Page}|{p.Action}"))
+                    .ToList();
+
+                if (missingPolicies.Count == 0)
+                    continue;
+
                 var now = dateTimeProvider.UtcNow;
 
-                var entities = catalogPolicies.Select(entry =>
+                var entities = missingPolicies.Select(entry =>
                     ModuleAccessPolicy.Create(
                         role.Id,
                         tenantId: null,

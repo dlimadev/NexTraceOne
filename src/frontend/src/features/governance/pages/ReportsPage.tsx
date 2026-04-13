@@ -9,7 +9,6 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
@@ -77,9 +76,6 @@ export function ReportsPage() {
 
   return (
     <PageContainer>
-      {/* Onboarding hints */}
-      <OnboardingHints module="governance" />
-
       <PageHeader
         title={t('governance.reportsTitle')}
         subtitle={t('governance.reportsSubtitle')}

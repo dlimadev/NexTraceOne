@@ -62,9 +62,9 @@ export const AdvancedConfigExplorerTab = memo(function AdvancedConfigExplorerTab
           onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
           className="px-3 py-2 border border-edge rounded-lg text-sm bg-card"
         >
-          <option value="System">System</option>
-          <option value="Tenant">Tenant</option>
-          <option value="Environment">Environment</option>
+          <option value="System">{t('advancedConfig.scopeOptions.system', 'System')}</option>
+          <option value="Tenant">{t('advancedConfig.scopeOptions.tenant', 'Tenant')}</option>
+          <option value="Environment">{t('advancedConfig.scopeOptions.environment', 'Environment')}</option>
         </select>
         <span className="text-sm text-faded">
           {t('advancedConfig.explorer.showing', 'Showing')} {filteredDefs.length} {t('advancedConfig.explorer.definitions', 'definitions')}
@@ -89,10 +89,10 @@ export const AdvancedConfigExplorerTab = memo(function AdvancedConfigExplorerTab
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       <span className="font-medium text-sm">{def.displayName}</span>
                     </button>
-                    {eff?.isInherited && <Badge variant="info" className="text-xs">Inherited</Badge>}
-                    {eff?.isDefault && <Badge variant="default" className="text-xs">Default</Badge>}
-                    {!def.isInheritable && <Badge variant="warning" className="text-xs"><Lock className="w-3 h-3 mr-1" />Mandatory</Badge>}
-                    {def.isSensitive && <Badge variant="warning" className="text-xs"><Shield className="w-3 h-3 mr-1" />Sensitive</Badge>}
+                    {eff?.isInherited && <Badge variant="info" className="text-xs">{t('configuration.badges.inherited', 'Inherited')}</Badge>}
+                    {eff?.isDefault && <Badge variant="default" className="text-xs">{t('configuration.badges.default', 'Default')}</Badge>}
+                    {!def.isInheritable && <Badge variant="warning" className="text-xs"><Lock className="w-3 h-3 mr-1" />{t('aiIntegrationsConfig.mandatory', 'Mandatory')}</Badge>}
+                    {def.isSensitive && <Badge variant="warning" className="text-xs"><Shield className="w-3 h-3 mr-1" />{t('advancedConfig.health.sensitiveDefinitions', 'Sensitive')}</Badge>}
                   </div>
                   <p className="text-xs text-faded mt-1 ml-5">{def.key}</p>
                 </div>
@@ -100,10 +100,10 @@ export const AdvancedConfigExplorerTab = memo(function AdvancedConfigExplorerTab
                   {eff && (
                     <div className="text-right">
                       <div className="text-xs text-muted">{eff.resolvedScope}</div>
-                      {renderValuePreview(eff.effectiveValue, def.isSensitive && !showSensitive)}
+                      {renderValuePreview(eff.effectiveValue, def.isSensitive && !showSensitive, t)}
                     </div>
                   )}
-                  {!eff && renderValuePreview(def.defaultValue, def.isSensitive && !showSensitive)}
+                  {!eff && renderValuePreview(def.defaultValue, def.isSensitive && !showSensitive, t)}
                 </div>
               </div>
 
@@ -142,7 +142,7 @@ export const AdvancedConfigExplorerTab = memo(function AdvancedConfigExplorerTab
                         <Layers className="w-3 h-3" />
                         {t('advancedConfig.explorer.effectiveValue', 'Effective Value')}
                         <Badge variant="info" className="text-xs">{eff.resolvedScope}</Badge>
-                        {eff.isInherited && <Badge variant="default" className="text-xs">Inherited</Badge>}
+                        {eff.isInherited && <Badge variant="default" className="text-xs">{t('configuration.badges.inherited', 'Inherited')}</Badge>}
                       </div>
                       <pre className="text-xs overflow-x-auto">
                         {def.isSensitive && !showSensitive ? '***MASKED***' : (eff.effectiveValue ?? 'null')}

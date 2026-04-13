@@ -13,7 +13,7 @@ public sealed class GenerateReleaseNotesTests
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
 
     private static Release CreateRelease() =>
-        Release.Create(Guid.NewGuid(), "TestService", "1.0.0", "prod", "https://ci/pipeline/1", "abc123def456", FixedNow);
+        Release.Create(Guid.NewGuid(), Guid.Empty, "TestService", "1.0.0", "prod", "https://ci/pipeline/1", "abc123def456", FixedNow);
 
     private static GenerateReleaseNotesFeature.Handler CreateHandler(
         IReleaseRepository releaseRepository,

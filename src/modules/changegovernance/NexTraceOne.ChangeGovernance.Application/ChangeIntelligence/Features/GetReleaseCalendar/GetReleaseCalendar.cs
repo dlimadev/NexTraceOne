@@ -42,16 +42,11 @@ public static class GetReleaseCalendar
         {
             Guard.Against.Null(request);
 
-            var releasesTask = releaseRepository.ListInRangeAsync(
+            var releases = await releaseRepository.ListInRangeAsync(
                 request.From, request.To, request.Environment, cancellationToken);
 
-            var freezesTask = freezeRepository.ListInRangeAsync(
+            var freezes = await freezeRepository.ListInRangeAsync(
                 request.From, request.To, request.Environment, true, cancellationToken);
-
-            await Task.WhenAll(releasesTask, freezesTask);
-
-            var releases = releasesTask.Result;
-            var freezes = freezesTask.Result;
 
             var releaseDtos = releases.Select(r => new CalendarReleaseDto(
                 r.Id.Value,

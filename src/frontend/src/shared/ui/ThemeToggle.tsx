@@ -22,7 +22,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     <div
       className={cn(
         'relative inline-flex items-center rounded-full p-1',
-        'bg-black/20 backdrop-blur-sm border border-white/10',
+        'bg-elevated border border-edge shadow-sm',
         className,
       )}
       role="radiogroup"
@@ -32,7 +32,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       <div
         className={cn(
           'absolute top-1 h-[30px] w-[30px] rounded-full transition-transform duration-300 ease-[var(--ease-emphasis)]',
-          'bg-white/10 shadow-sm',
+          'bg-panel border border-edge shadow-sm',
           isDark ? 'translate-x-[32px]' : 'translate-x-0',
         )}
         aria-hidden="true"
@@ -44,7 +44,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         onClick={() => setTheme('light')}
         className={cn(
           'relative z-10 flex items-center justify-center w-[30px] h-[30px] rounded-full transition-colors duration-200',
-          !isDark ? 'text-amber-400' : 'text-white/40 hover:text-white/60',
+          !isDark ? 'text-warning' : 'text-muted hover:text-body',
         )}
         role="radio"
         aria-checked={!isDark}
@@ -59,7 +59,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         onClick={() => setTheme('dark')}
         className={cn(
           'relative z-10 flex items-center justify-center w-[30px] h-[30px] rounded-full transition-colors duration-200 ml-0.5',
-          isDark ? 'text-blue-300' : 'text-white/40 hover:text-white/60',
+          isDark ? 'text-accent' : 'text-muted hover:text-body',
         )}
         role="radio"
         aria-checked={isDark}

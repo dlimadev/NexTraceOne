@@ -28,36 +28,48 @@ public sealed class LoggingBehavior<TRequest, TResponse>(
         // (senhas, tokens, API keys, dados pessoais) em logs e sistemas de observabilidade.
         logger.LogInformation("Handling request {RequestName}", requestName);
 
-        var response = await next();
-
-        stopwatch.Stop();
-
-        if (ResultResponseFactory.TryGetResultState(response, out var isSuccess, out var error))
+        try
         {
-            if (isSuccess)
+            var response = await next();
+
+            stopwatch.Stop();
+
+            if (ResultResponseFactory.TryGetResultState(response, out var isSuccess, out var error))
             {
-                logger.LogInformation(
-                    "Request {RequestName} completed successfully in {ElapsedMilliseconds}ms",
-                    requestName,
-                    stopwatch.ElapsedMilliseconds);
+                if (isSuccess)
+                {
+                    logger.LogInformation(
+                        "Request {RequestName} completed successfully in {ElapsedMilliseconds}ms",
+                        requestName,
+                        stopwatch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    logger.LogWarning(
+                        "Request {RequestName} failed in {ElapsedMilliseconds}ms with code {ErrorCode}",
+                        requestName,
+                        stopwatch.ElapsedMilliseconds,
+                        error?.Code);
+                }
             }
             else
             {
-                logger.LogWarning(
-                    "Request {RequestName} failed in {ElapsedMilliseconds}ms with code {ErrorCode}",
+                logger.LogInformation(
+                    "Request {RequestName} completed in {ElapsedMilliseconds}ms",
                     requestName,
-                    stopwatch.ElapsedMilliseconds,
-                    error?.Code);
+                    stopwatch.ElapsedMilliseconds);
             }
+
+            return response;
         }
-        else
+        catch (OperationCanceledException)
         {
-            logger.LogInformation(
-                "Request {RequestName} completed in {ElapsedMilliseconds}ms",
+            stopwatch.Stop();
+            logger.LogDebug(
+                "Request {RequestName} was cancelled after {ElapsedMilliseconds}ms",
                 requestName,
                 stopwatch.ElapsedMilliseconds);
+            throw;
         }
-
-        return response;
     }
 }

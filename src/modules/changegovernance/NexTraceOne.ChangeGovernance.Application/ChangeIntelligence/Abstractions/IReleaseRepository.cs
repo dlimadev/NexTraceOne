@@ -30,6 +30,7 @@ public interface IReleaseRepository
 
     /// <summary>Lista mudanças com filtros avançados para o catálogo de changes.</summary>
     Task<IReadOnlyList<Release>> ListFilteredAsync(
+        Guid tenantId,
         string? serviceName,
         string? teamName,
         string? environment,
@@ -45,6 +46,7 @@ public interface IReleaseRepository
 
     /// <summary>Conta mudanças com filtros avançados.</summary>
     Task<int> CountFilteredAsync(
+        Guid tenantId,
         string? serviceName,
         string? teamName,
         string? environment,
@@ -78,6 +80,7 @@ public interface IReleaseRepository
     /// <summary>Obtém contadores agregados de mudanças.</summary>
     Task<(int total, int validated, int needsAttention, int suspectedRegressions, int correlatedWithIncidents)>
         GetSummaryCountsAsync(
+            Guid tenantId,
             string? teamName,
             string? environment,
             DateTimeOffset? from,

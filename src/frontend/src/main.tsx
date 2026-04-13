@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource-variable/instrument-sans'
+import '@fontsource/jetbrains-mono'
 import './i18n'
 import './index.css'
 import App from './App.tsx'

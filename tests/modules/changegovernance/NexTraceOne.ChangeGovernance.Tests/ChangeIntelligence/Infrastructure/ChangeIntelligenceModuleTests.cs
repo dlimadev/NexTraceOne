@@ -19,7 +19,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetReleaseAsync_WhenReleaseExists_ShouldReturnMappedDto()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), "PaymentService", "2.1.0", "production", "https://ci/pipe/1", "abc123", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "PaymentService", "2.1.0", "production", "https://ci/pipe/1", "abc123", FixedNow);
         db.Releases.Add(release);
         await db.SaveChangesAsync();
 
@@ -49,7 +49,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetReleaseAsync_ShouldReturnCorrectStatusAndChangeLevel()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), "OrderService", "1.0.0", "staging", "https://ci/pipe/2", "def456", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "OrderService", "1.0.0", "staging", "https://ci/pipe/2", "def456", FixedNow);
         db.Releases.Add(release);
         await db.SaveChangesAsync();
 
@@ -69,7 +69,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetChangeScoreAsync_WhenScoreExists_ShouldReturnLatestScore()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), "InventoryService", "3.0.0", "staging", "https://ci/pipe/3", "aaa111", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "InventoryService", "3.0.0", "staging", "https://ci/pipe/3", "aaa111", FixedNow);
         db.Releases.Add(release);
 
         var score = ChangeIntelligenceScore.Compute(release.Id, 0.8m, 0.5m, 0.9m, FixedNow, "auto");
@@ -99,7 +99,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetChangeScoreAsync_WhenMultipleScoresExist_ShouldReturnMostRecent()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), "ShippingService", "1.2.0", "staging", "https://ci/pipe/4", "bbb222", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "ShippingService", "1.2.0", "staging", "https://ci/pipe/4", "bbb222", FixedNow);
         db.Releases.Add(release);
 
         var olderScore = ChangeIntelligenceScore.Compute(release.Id, 0.2m, 0.2m, 0.2m, FixedNow.AddHours(-2), "auto");
@@ -122,7 +122,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetBlastRadiusAsync_WhenReportExists_ShouldReturnMappedDto()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), "CatalogService", "4.0.0", "production", "https://ci/pipe/5", "ccc333", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "CatalogService", "4.0.0", "production", "https://ci/pipe/5", "ccc333", FixedNow);
         db.Releases.Add(release);
 
         var report = BlastRadiusReport.Calculate(
@@ -160,7 +160,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetBlastRadiusAsync_WhenMultipleReportsExist_ShouldReturnMostRecent()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), "NotificationService", "2.0.0", "staging", "https://ci/pipe/6", "ddd444", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "NotificationService", "2.0.0", "staging", "https://ci/pipe/6", "ddd444", FixedNow);
         db.Releases.Add(release);
 
         var olderReport = BlastRadiusReport.Calculate(release.Id, release.ApiAssetId, ["OldConsumer"], [], FixedNow.AddHours(-3));

@@ -21,7 +21,7 @@ public sealed class ChangeIntelligenceApplicationTests
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
 
     private static Release CreateRelease() =>
-        Release.Create(Guid.NewGuid(), "TestService", "1.0.0", "staging", "https://ci/pipeline/1", "abc123def456", FixedNow);
+        Release.Create(Guid.NewGuid(), Guid.Empty, "TestService", "1.0.0", "staging", "https://ci/pipeline/1", "abc123def456", FixedNow);
 
     // ── NotifyDeployment ──────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, Substitute.For<ICurrentTenant>(), unitOfWork, dateTimeProvider);
 
         repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((Release?)null);
@@ -70,7 +70,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, Substitute.For<ICurrentTenant>(), unitOfWork, dateTimeProvider);
 
         repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(existingRelease);
@@ -101,7 +101,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
+        var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, Substitute.For<ICurrentTenant>(), unitOfWork, dateTimeProvider);
 
         repository.GetByServiceNameVersionEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((Release?)null);

@@ -212,9 +212,9 @@ export function ServiceScorecardPage() {
                   onChange={(e) => setEnvironment(e.target.value)}
                   className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
                 >
-                  <option value="Production">Production</option>
-                  <option value="Staging">Staging</option>
-                  <option value="Development">Development</option>
+                  <option value="Production">{t('environment.profile.production', 'Production')}</option>
+                  <option value="Staging">{t('environment.profile.staging', 'Staging')}</option>
+                  <option value="Development">{t('environment.profile.development', 'Development')}</option>
                 </select>
               </div>
               <button

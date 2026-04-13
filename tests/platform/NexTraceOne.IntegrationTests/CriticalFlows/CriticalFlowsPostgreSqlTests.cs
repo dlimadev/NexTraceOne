@@ -131,6 +131,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
         await using var context = Fixture.CreateChangeIntelligenceDbContext();
 
         var release = Release.Create(
+            tenantId: Guid.NewGuid(),
             apiAssetId: Guid.NewGuid(),
             serviceName: "orders-service",
             version: "2026.03.18",

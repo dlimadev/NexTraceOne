@@ -4,6 +4,7 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Diagnostics;
 
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
@@ -239,25 +240,13 @@ public static class WebApplicationExtensions
 
     /// <summary>
     /// Configura o tratamento global de exceções não capturadas.
-    /// Retorna ProblemDetails padronizado sem expor detalhes internos (stack traces, tipos).
+    /// Delega no GlobalExceptionHandler (IExceptionHandler) registado em DI.
+    /// Quando TryHandleAsync retorna true, o ExceptionHandlerMiddleware não emite
+    /// o LogError automático — o logging fica sob controlo total do GlobalExceptionHandler.
     /// </summary>
     public static void UseGlobalExceptionHandler(this WebApplication app)
     {
-        app.UseExceptionHandler(exceptionApp =>
-        {
-            exceptionApp.Run(async context =>
-            {
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                context.Response.ContentType = "application/problem+json";
-
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    title = "Unexpected error",
-                    detail = "An unexpected error occurred while processing the request.",
-                    status = StatusCodes.Status500InternalServerError
-                });
-            });
-        });
+        app.UseExceptionHandler();
     }
 
     /// <summary>

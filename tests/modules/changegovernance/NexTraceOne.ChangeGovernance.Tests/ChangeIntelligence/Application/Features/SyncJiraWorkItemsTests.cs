@@ -14,7 +14,7 @@ public sealed class SyncJiraWorkItemsTests
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
 
     private static Release CreateRelease() =>
-        Release.Create(Guid.NewGuid(), "TestService", "1.0.0", "staging", "https://ci/pipeline/1", "abc123def456", FixedNow);
+        Release.Create(Guid.NewGuid(), Guid.Empty, "TestService", "1.0.0", "staging", "https://ci/pipeline/1", "abc123def456", FixedNow);
 
     [Fact]
     public async Task SyncJiraWorkItems_ExistingRelease_ShouldReturnDeferralError()

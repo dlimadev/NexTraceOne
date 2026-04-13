@@ -19,7 +19,6 @@ import { Button } from '../../../components/Button';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { serviceCatalogApi } from '../api';
 import { ServiceCatalogOverviewTab } from '../components/ServiceCatalogOverviewTab';
 import { ServiceCatalogServicesTab } from '../components/ServiceCatalogServicesTab';
@@ -164,8 +163,6 @@ export function ServiceCatalogPage() {
 
   return (
     <PageContainer>
-      {/* Onboarding hints — orientação contextual para novos utilizadores */}
-      <OnboardingHints module="services" />
 
       <PageHeader
         title={t('serviceCatalog.title')}

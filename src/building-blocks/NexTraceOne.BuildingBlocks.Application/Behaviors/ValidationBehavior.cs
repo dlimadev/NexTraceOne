@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -27,7 +28,19 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
 
         var context = new ValidationContext<TRequest>(request);
 
-        var failures = (await Task.WhenAll(validators.Select(v => v.ValidateAsync(context, cancellationToken))))
+        ValidationResult[] results;
+
+        try
+        {
+            results = await Task.WhenAll(
+                validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+
+        var failures = results
             .SelectMany(result => result.Errors)
             .Where(error => error is not null)
             .Select(error => error.ErrorMessage)

@@ -7,7 +7,6 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { EmptyState } from '../../../components/EmptyState';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageContainer, PageSection, StatsGrid } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -59,8 +58,7 @@ export function RunbooksPage() {
       />
 
       <PageSection>
-        <div className="flex items-center justify-between mb-4">
-          <OnboardingHints module="operations" />
+        <div className="flex justify-end mb-4">
           <button
             onClick={() => navigate('/operations/runbooks/create')}
             className="flex items-center gap-1 px-3 py-2 rounded-md bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors"

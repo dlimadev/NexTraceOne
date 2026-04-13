@@ -59,6 +59,7 @@ public static class NotifyDeployment
         IExternalMarkerRepository markerRepository,
         IChangeScoreRepository scoreRepository,
         IChangeScoreCalculator scoreCalculator,
+        ICurrentTenant currentTenant,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
@@ -97,6 +98,7 @@ public static class NotifyDeployment
             {
                 // Cria nova Release e regista o evento inicial
                 release = Release.Create(
+                    currentTenant.Id,
                     request.ApiAssetId ?? Guid.Empty,
                     request.ServiceName,
                     request.Version,

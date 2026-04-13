@@ -147,31 +147,31 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
                 <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.serviceType', 'Service Type')}</label>
                 <select value={form.serviceType} onChange={(e) => set('serviceType', e.target.value)} className={selectClass}>
                   <optgroup label={t('serviceCatalog.typeGroupModern', 'Modern Services')}>
-                    <option value="RestApi">REST API</option>
-                    <option value="GraphqlApi">GraphQL API</option>
-                    <option value="GrpcService">gRPC Service</option>
-                    <option value="SoapService">SOAP Service</option>
-                    <option value="KafkaProducer">Kafka Producer</option>
-                    <option value="KafkaConsumer">Kafka Consumer</option>
-                    <option value="BackgroundService">Background Service</option>
-                    <option value="ScheduledProcess">Scheduled Process</option>
-                    <option value="Gateway">API Gateway</option>
+                    <option value="RestApi">{t('serviceCatalog.typeRestApi', 'REST API')}</option>
+                    <option value="GraphqlApi">{t('serviceCatalog.typeGraphqlApi', 'GraphQL API')}</option>
+                    <option value="GrpcService">{t('serviceCatalog.typeGrpcService', 'gRPC Service')}</option>
+                    <option value="SoapService">{t('serviceCatalog.typeSoapService', 'SOAP Service')}</option>
+                    <option value="KafkaProducer">{t('serviceCatalog.typeKafkaProducer', 'Kafka Producer')}</option>
+                    <option value="KafkaConsumer">{t('serviceCatalog.typeKafkaConsumer', 'Kafka Consumer')}</option>
+                    <option value="BackgroundService">{t('serviceCatalog.typeBackgroundService', 'Background Service')}</option>
+                    <option value="ScheduledProcess">{t('serviceCatalog.typeScheduledProcess', 'Scheduled Process')}</option>
+                    <option value="Gateway">{t('serviceCatalog.typeGateway', 'API Gateway')}</option>
                   </optgroup>
                   <optgroup label={t('serviceCatalog.typeGroupPlatform', 'Platform & Integration')}>
-                    <option value="IntegrationComponent">Integration Component</option>
-                    <option value="SharedPlatformService">Shared Platform Service</option>
-                    <option value="Framework">Framework / SDK</option>
-                    <option value="ThirdParty">Third-Party Service</option>
-                    <option value="LegacySystem">Legacy System</option>
+                    <option value="IntegrationComponent">{t('serviceCatalog.typeIntegrationComponent', 'Integration Component')}</option>
+                    <option value="SharedPlatformService">{t('serviceCatalog.typeSharedPlatformService', 'Shared Platform Service')}</option>
+                    <option value="Framework">{t('serviceCatalog.typeFramework', 'Framework / SDK')}</option>
+                    <option value="ThirdParty">{t('serviceCatalog.typeThirdParty', 'Third-Party Service')}</option>
+                    <option value="LegacySystem">{t('serviceCatalog.typeLegacySystem', 'Legacy System')}</option>
                   </optgroup>
                   <optgroup label={t('serviceCatalog.typeGroupMainframe', 'Mainframe')}>
-                    <option value="CobolProgram">COBOL Program</option>
-                    <option value="CicsTransaction">CICS Transaction</option>
-                    <option value="ImsTransaction">IMS Transaction</option>
-                    <option value="BatchJob">Batch Job</option>
-                    <option value="MainframeSystem">Mainframe System</option>
-                    <option value="MqQueueManager">MQ Queue Manager</option>
-                    <option value="ZosConnectApi">z/OS Connect API</option>
+                    <option value="CobolProgram">{t('serviceCatalog.typeCobolProgram', 'COBOL Program')}</option>
+                    <option value="CicsTransaction">{t('serviceCatalog.typeCicsTransaction', 'CICS Transaction')}</option>
+                    <option value="ImsTransaction">{t('serviceCatalog.typeImsTransaction', 'IMS Transaction')}</option>
+                    <option value="BatchJob">{t('serviceCatalog.typeBatchJob', 'Batch Job')}</option>
+                    <option value="MainframeSystem">{t('serviceCatalog.typeMainframeSystem', 'Mainframe System')}</option>
+                    <option value="MqQueueManager">{t('serviceCatalog.typeMqQueueManager', 'MQ Queue Manager')}</option>
+                    <option value="ZosConnectApi">{t('serviceCatalog.typeZosConnectApi', 'z/OS Connect API')}</option>
                   </optgroup>
                 </select>
               </div>
@@ -306,7 +306,7 @@ function SummaryRow({ label, value, mono }: { label: string; value: string; mono
 // ── Conditional fields by ServiceType ─────────────────────────────
 function ConditionalTypeFields({ serviceType }: { serviceType: string }) {
   const { t } = useTranslation();
-  
+
   // These are informational hint fields (metadata not yet persisted by backend)
   const fields: Record<string, { label: string; placeholder: string }[]> = {
     RestApi: [

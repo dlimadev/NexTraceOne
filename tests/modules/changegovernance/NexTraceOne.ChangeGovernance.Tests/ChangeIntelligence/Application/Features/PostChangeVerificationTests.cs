@@ -282,7 +282,7 @@ public sealed class PostChangeVerificationTests
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static Release CreateRelease()
-        => Release.Create(Guid.NewGuid(), "payments-service", "1.2.0", "staging", "github-actions", "abc123def456", FixedNow);
+        => Release.Create(Guid.NewGuid(), Guid.Empty, "payments-service", "1.2.0", "staging", "github-actions", "abc123def456", FixedNow);
 
     private static ReleaseBaseline CreateBaseline(decimal errorRate, decimal avgLatency, decimal p95Latency)
         => ReleaseBaseline.Create(

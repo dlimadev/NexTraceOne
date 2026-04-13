@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
@@ -14,7 +15,7 @@ public sealed class ChangeConfidenceApplicationTests
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 1, 10, 0, 0, TimeSpan.Zero);
 
     private static Release CreateRelease(string serviceName = "TestService") =>
-        Release.Create(Guid.NewGuid(), serviceName, "1.0.0", "prod", "https://ci/pipeline/1", "abc123def456", FixedNow);
+        Release.Create(Guid.NewGuid(), Guid.Empty, serviceName, "1.0.0", "prod", "https://ci/pipeline/1", "abc123def456", FixedNow);
 
     // ── ListChanges ───────────────────────────────────────────────────
 
@@ -22,10 +23,13 @@ public sealed class ChangeConfidenceApplicationTests
     public async Task ListChanges_Should_ReturnFilteredResults()
     {
         var repository = Substitute.For<IReleaseRepository>();
+        var currentTenant = Substitute.For<ICurrentTenant>();
+        currentTenant.Id.Returns(Guid.NewGuid());
         var release = CreateRelease();
-        var sut = new ListChangesFeature.Handler(repository);
+        var sut = new ListChangesFeature.Handler(repository, currentTenant);
 
         repository.ListFilteredAsync(
+            Arg.Any<Guid>(),
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
             Arg.Any<ChangeType?>(), Arg.Any<ConfidenceStatus?>(), Arg.Any<DeploymentStatus?>(),
             Arg.Any<string?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(),
@@ -33,6 +37,7 @@ public sealed class ChangeConfidenceApplicationTests
             .Returns(new List<Release> { release });
 
         repository.CountFilteredAsync(
+            Arg.Any<Guid>(),
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
             Arg.Any<ChangeType?>(), Arg.Any<ConfidenceStatus?>(), Arg.Any<DeploymentStatus?>(),
             Arg.Any<string?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(),
@@ -53,9 +58,12 @@ public sealed class ChangeConfidenceApplicationTests
     public async Task ListChanges_Should_ReturnEmpty_WhenNoResults()
     {
         var repository = Substitute.For<IReleaseRepository>();
-        var sut = new ListChangesFeature.Handler(repository);
+        var currentTenant = Substitute.For<ICurrentTenant>();
+        currentTenant.Id.Returns(Guid.NewGuid());
+        var sut = new ListChangesFeature.Handler(repository, currentTenant);
 
         repository.ListFilteredAsync(
+            Arg.Any<Guid>(),
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
             Arg.Any<ChangeType?>(), Arg.Any<ConfidenceStatus?>(), Arg.Any<DeploymentStatus?>(),
             Arg.Any<string?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(),
@@ -63,6 +71,7 @@ public sealed class ChangeConfidenceApplicationTests
             .Returns(new List<Release>());
 
         repository.CountFilteredAsync(
+            Arg.Any<Guid>(),
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
             Arg.Any<ChangeType?>(), Arg.Any<ConfidenceStatus?>(), Arg.Any<DeploymentStatus?>(),
             Arg.Any<string?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(),
@@ -84,9 +93,12 @@ public sealed class ChangeConfidenceApplicationTests
     public async Task GetChangesSummary_Should_ReturnAggregatedCounts()
     {
         var repository = Substitute.For<IReleaseRepository>();
-        var sut = new GetChangesSummaryFeature.Handler(repository);
+        var currentTenant = Substitute.For<ICurrentTenant>();
+        currentTenant.Id.Returns(Guid.NewGuid());
+        var sut = new GetChangesSummaryFeature.Handler(repository, currentTenant);
 
         repository.GetSummaryCountsAsync(
+            Arg.Any<Guid>(),
             Arg.Any<string?>(), Arg.Any<string?>(),
             Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(),
             Arg.Any<CancellationToken>())

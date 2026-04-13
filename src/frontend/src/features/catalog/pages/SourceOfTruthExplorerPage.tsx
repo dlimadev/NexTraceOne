@@ -14,7 +14,6 @@ import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
 
@@ -85,8 +84,6 @@ export function SourceOfTruthExplorerPage() {
 
   return (
     <PageContainer>
-      {/* Onboarding hints — orientação contextual para Source of Truth */}
-      <OnboardingHints module="knowledge" />
 
       {/* Header */}
       <div className="mb-8">

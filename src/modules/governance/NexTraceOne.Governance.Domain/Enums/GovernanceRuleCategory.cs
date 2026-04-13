@@ -11,5 +11,6 @@ public enum GovernanceRuleCategory
     Incidents = 3,
     AIGovernance = 4,
     Reliability = 5,
-    Operations = 6
+    Operations = 6,
+    ContractQuality = 7
 }

@@ -26,7 +26,7 @@ public sealed class HistoricalPatternInsightTests
         ChangeLevel changeLevel = ChangeLevel.Breaking)
     {
         var r = Release.Create(
-            Guid.NewGuid(), serviceName, "1.0.0", environment,
+            Guid.NewGuid(), Guid.Empty, serviceName, "1.0.0", environment,
             "https://ci/pipeline", "abc123", FixedNow.AddDays(-10));
         r.Classify(changeLevel);
         if (status == DeploymentStatus.Succeeded)
@@ -58,7 +58,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-payments", "2.0.0", "production",
+            Guid.NewGuid(), Guid.Empty, "svc-payments", "2.0.0", "production",
             "https://ci/pipeline", "def456", FixedNow);
         targetRelease.Classify(ChangeLevel.Breaking);
 
@@ -104,7 +104,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-orders", "1.5.0", "staging",
+            Guid.NewGuid(), Guid.Empty, "svc-orders", "1.5.0", "staging",
             "https://ci/pipeline", "ghi789", FixedNow);
         targetRelease.Classify(ChangeLevel.Additive);
 
@@ -147,7 +147,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-catalog", "3.0.0", "staging",
+            Guid.NewGuid(), Guid.Empty, "svc-catalog", "3.0.0", "staging",
             "https://ci/pipeline", "jkl012", FixedNow);
         targetRelease.Classify(ChangeLevel.NonBreaking);
 
@@ -184,7 +184,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-new", "1.0.0", "production",
+            Guid.NewGuid(), Guid.Empty, "svc-new", "1.0.0", "production",
             "https://ci/pipeline", "mno345", FixedNow);
         targetRelease.Classify(ChangeLevel.Breaking);
 
@@ -220,7 +220,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-brand-new", "0.1.0", "production",
+            Guid.NewGuid(), Guid.Empty, "svc-brand-new", "0.1.0", "production",
             "https://ci/pipeline", "pqr678", FixedNow);
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -271,7 +271,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-test", "1.0.0", "staging",
+            Guid.NewGuid(), Guid.Empty, "svc-test", "1.0.0", "staging",
             "https://ci/pipeline", "stu901", FixedNow);
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -308,7 +308,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-core", "4.0.0", "production",
+            Guid.NewGuid(), Guid.Empty, "svc-core", "4.0.0", "production",
             "https://ci/pipeline", "vwx234", FixedNow);
         targetRelease.Classify(ChangeLevel.Breaking);
 
@@ -368,7 +368,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-test", "1.0.0", "staging",
+            Guid.NewGuid(), Guid.Empty, "svc-test", "1.0.0", "staging",
             "https://ci/pipeline", "yza567", FixedNow);
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -410,7 +410,7 @@ public sealed class HistoricalPatternInsightTests
         clock.UtcNow.Returns(FixedNow);
 
         var targetRelease = Release.Create(
-            Guid.NewGuid(), "svc-test", "1.0.0", "production",
+            Guid.NewGuid(), Guid.Empty, "svc-test", "1.0.0", "production",
             "https://ci/pipeline", "bcd890", FixedNow);
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())

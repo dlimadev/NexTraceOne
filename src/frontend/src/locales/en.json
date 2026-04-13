@@ -1,4 +1,4 @@
-﻿{
+{
   "activation": {
     "activating": "Activating...",
     "confirmPasswordLabel": "Confirm password",
@@ -108,7 +108,17 @@
       "importExport": "Import / Export",
       "rollback": "Rollback & Restore"
     },
-    "title": "Advanced Configuration Console"
+    "title": "Advanced Configuration Console",
+    "scopeOptions": {
+      "system": "System",
+      "tenant": "Tenant",
+      "environment": "Environment"
+    },
+    "badges": {
+      "masked": "Masked",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    }
   },
   "agentMarketplace": {
     "category": "Category",
@@ -3953,7 +3963,18 @@
       "placeholder": {
         "soapTargetNamespace": "http://example.com/service",
         "soapEndpointUrl": "http://example.com/service"
-      }
+      },
+      "bgCategoryJob": "Job",
+      "bgCategoryWorker": "Worker",
+      "bgCategoryScheduler": "Scheduler",
+      "bgCategoryProcessor": "Processor",
+      "bgCategoryExporter": "Exporter",
+      "bgCategoryNotifier": "Notifier",
+      "bgTriggerOnDemand": "On Demand",
+      "bgTriggerCron": "Cron",
+      "bgTriggerInterval": "Interval",
+      "bgTriggerEventTriggered": "Event Triggered",
+      "bgTriggerContinuous": "Continuous"
     },
     "createVersion": "Create Version",
     "createVersionDescription": "Create a new version from an existing contract",
@@ -8246,6 +8267,7 @@
   "sidebar": {
     "accessReview": "Access Review",
     "aiAgents": "AI Agents",
+    "aiHub": "AI Hub",
     "aiAnalysis": "AI Analysis",
     "aiAssistant": "AI Assistant",
     "aiAudit": "AI Audit",
@@ -8292,7 +8314,9 @@
     "executiveFinOps": "Executive FinOps",
     "executiveOverview": "Executive Overview",
     "finops": "FinOps",
+    "governance": "Governance",
     "governancePacks": "Governance Packs",
+    "ide": "IDE Integrations",
     "ideIntegrations": "IDE Integrations",
     "incidentTimeline": "Incident Timeline",
     "incidents": "Incidents",
@@ -8306,6 +8330,7 @@
     "maturityScorecards": "Maturity Scorecards",
     "modelRegistry": "Model Registry",
     "moduleAdoption": "Module Adoption",
+    "operations": "Operations",
     "mySessions": "My Sessions",
     "operationalNotes": "Operational Notes",
     "parameterCompliance": "Parameter Compliance",

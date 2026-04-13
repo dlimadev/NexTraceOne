@@ -77,10 +77,9 @@ public sealed class Release : AggregateRoot<ReleaseId>
 
     /// <summary>
     /// Identificador do tenant ao qual a release pertence.
-    /// Nullable por retrocompatibilidade — releases criadas antes da Fase 4
-    /// não possuem este campo preenchido.
+    /// Obrigatório — toda release deve pertencer a um tenant válido.
     /// </summary>
-    public Guid? TenantId { get; private set; }
+    public Guid TenantId { get; private set; }
 
     /// <summary>
     /// Identificador do ambiente (infra) de destino da release.
@@ -126,6 +125,7 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// </para>
     /// </summary>
     public static Release Create(
+        Guid tenantId,
         Guid apiAssetId,
         string serviceName,
         string version,
@@ -143,6 +143,7 @@ public sealed class Release : AggregateRoot<ReleaseId>
         return new Release
         {
             Id = ReleaseId.New(),
+            TenantId = tenantId,
             ApiAssetId = apiAssetId,
             ServiceName = serviceName,
             Version = version,
@@ -264,13 +265,12 @@ public sealed class Release : AggregateRoot<ReleaseId>
     }
 
     /// <summary>
-    /// Define o contexto de tenant e ambiente da release.
+    /// Define o identificador do ambiente (infra) da release.
     /// Operação idempotente — apenas atribui se o valor atual for null (??= semantics).
-    /// Garante que o primeiro contexto definido não seja sobrescrito.
+    /// <c>TenantId</c> é definido na criação e não pode ser alterado.
     /// </summary>
-    public void SetTenantContext(Guid? tenantId, Guid? environmentId)
+    public void SetTenantContext(Guid? environmentId)
     {
-        TenantId ??= tenantId;
         EnvironmentId ??= environmentId;
     }
 

@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
@@ -44,7 +45,8 @@ public static class GetDoraMetrics
     /// <summary>Handler que calcula métricas DORA a partir de dados reais de releases e incidentes.</summary>
     public sealed class Handler(
         IReleaseRepository releaseRepository,
-        IIncidentModule incidentModule) : IQueryHandler<Query, Response>
+        IIncidentModule incidentModule,
+        ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -56,6 +58,7 @@ public static class GetDoraMetrics
             // ── 1. Deployment Frequency ──────────────────────────────
             // Número de deploys bem-sucedidos por dia no período.
             var succeededCount = await releaseRepository.CountFilteredAsync(
+                tenantId: currentTenant.Id,
                 serviceName: request.ServiceName,
                 teamName: request.TeamName,
                 environment: request.Environment,
@@ -111,6 +114,7 @@ public static class GetDoraMetrics
             // ── 3. Change Failure Rate ───────────────────────────────
             // Percentagem de deploys que falharam ou foram rolled back.
             var failedCount = await releaseRepository.CountFilteredAsync(
+                tenantId: currentTenant.Id,
                 serviceName: request.ServiceName,
                 teamName: request.TeamName,
                 environment: request.Environment,
@@ -123,6 +127,7 @@ public static class GetDoraMetrics
                 cancellationToken: cancellationToken);
 
             var rolledBackCount = await releaseRepository.CountFilteredAsync(
+                tenantId: currentTenant.Id,
                 serviceName: request.ServiceName,
                 teamName: request.TeamName,
                 environment: request.Environment,

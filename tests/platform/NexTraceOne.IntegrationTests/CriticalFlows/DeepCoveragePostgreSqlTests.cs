@@ -248,6 +248,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         await using var context = Fixture.CreateChangeIntelligenceDbContext();
 
         var release = Release.Create(
+            tenantId: Guid.NewGuid(),
             apiAssetId: Guid.NewGuid(),
             serviceName: "billing-service",
             version: "2026.03.19",
@@ -298,10 +299,10 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         await using var context = Fixture.CreateChangeIntelligenceDbContext();
 
         var apiId = Guid.NewGuid();
-        var prodRelease = Release.Create(apiId, "auth-service", "2026.1", "production", "pipeline", "sha1", DateTimeOffset.UtcNow);
+        var prodRelease = Release.Create(Guid.NewGuid(), apiId, "auth-service", "2026.1", "production", "pipeline", "sha1", DateTimeOffset.UtcNow);
         prodRelease.SetChangeScore(0.90m);
 
-        var stagingRelease = Release.Create(apiId, "auth-service", "2026.2", "staging", "pipeline", "sha2", DateTimeOffset.UtcNow);
+        var stagingRelease = Release.Create(Guid.NewGuid(), apiId, "auth-service", "2026.2", "staging", "pipeline", "sha2", DateTimeOffset.UtcNow);
         stagingRelease.SetChangeScore(0.30m);
 
         context.Releases.AddRange(prodRelease, stagingRelease);

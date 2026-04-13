@@ -49,6 +49,7 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<Release>> ListFilteredAsync(
+        Guid tenantId,
         string? serviceName, string? teamName, string? environment,
         ChangeType? changeType, ConfidenceStatus? confidenceStatus,
         DeploymentStatus? deploymentStatus, string? searchTerm,
@@ -56,6 +57,7 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
         int page, int pageSize, CancellationToken cancellationToken = default)
     {
         var query = ApplyFilters(
+            tenantId,
             serviceName, teamName, environment, changeType,
             confidenceStatus, deploymentStatus, searchTerm, from, to);
 
@@ -68,6 +70,7 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
 
     /// <inheritdoc />
     public async Task<int> CountFilteredAsync(
+        Guid tenantId,
         string? serviceName, string? teamName, string? environment,
         ChangeType? changeType, ConfidenceStatus? confidenceStatus,
         DeploymentStatus? deploymentStatus, string? searchTerm,
@@ -75,6 +78,7 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
         CancellationToken cancellationToken = default)
     {
         var query = ApplyFilters(
+            tenantId,
             serviceName, teamName, environment, changeType,
             confidenceStatus, deploymentStatus, searchTerm, from, to);
 
@@ -101,11 +105,13 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
     /// <inheritdoc />
     public async Task<(int total, int validated, int needsAttention, int suspectedRegressions, int correlatedWithIncidents)>
         GetSummaryCountsAsync(
+            Guid tenantId,
             string? teamName, string? environment,
             DateTimeOffset? from, DateTimeOffset? to,
             CancellationToken cancellationToken = default)
     {
-        var query = context.Releases.AsQueryable();
+        var query = context.Releases
+            .Where(r => r.TenantId == tenantId);
 
         if (!string.IsNullOrWhiteSpace(teamName))
             query = query.Where(r => r.TeamName == teamName);
@@ -165,12 +171,14 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
             .ToListAsync(cancellationToken);
 
     private IQueryable<Release> ApplyFilters(
+        Guid tenantId,
         string? serviceName, string? teamName, string? environment,
         ChangeType? changeType, ConfidenceStatus? confidenceStatus,
         DeploymentStatus? deploymentStatus, string? searchTerm,
         DateTimeOffset? from, DateTimeOffset? to)
     {
-        var query = context.Releases.AsQueryable();
+        var query = context.Releases
+            .Where(r => r.TenantId == tenantId);
 
         if (!string.IsNullOrWhiteSpace(serviceName))
             query = query.Where(r => r.ServiceName == serviceName);

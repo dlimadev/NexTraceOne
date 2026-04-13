@@ -640,12 +640,12 @@ export function CreateContractPage() {
                         onChange={(e) => setBgCategory(e.target.value)}
                         className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
                       >
-                        <option value="Job">Job</option>
-                        <option value="Worker">Worker</option>
-                        <option value="Scheduler">Scheduler</option>
-                        <option value="Processor">Processor</option>
-                        <option value="Exporter">Exporter</option>
-                        <option value="Notifier">Notifier</option>
+                        <option value="Job">{t('contracts.create.bgCategoryJob', 'Job')}</option>
+                        <option value="Worker">{t('contracts.create.bgCategoryWorker', 'Worker')}</option>
+                        <option value="Scheduler">{t('contracts.create.bgCategoryScheduler', 'Scheduler')}</option>
+                        <option value="Processor">{t('contracts.create.bgCategoryProcessor', 'Processor')}</option>
+                        <option value="Exporter">{t('contracts.create.bgCategoryExporter', 'Exporter')}</option>
+                        <option value="Notifier">{t('contracts.create.bgCategoryNotifier', 'Notifier')}</option>
                       </select>
                     </div>
 
@@ -658,11 +658,11 @@ export function CreateContractPage() {
                         onChange={(e) => setBgTriggerType(e.target.value)}
                         className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
                       >
-                        <option value="OnDemand">On Demand</option>
-                        <option value="Cron">Cron</option>
-                        <option value="Interval">Interval</option>
-                        <option value="EventTriggered">Event Triggered</option>
-                        <option value="Continuous">Continuous</option>
+                        <option value="OnDemand">{t('contracts.create.bgTriggerOnDemand', 'On Demand')}</option>
+                        <option value="Cron">{t('contracts.create.bgTriggerCron', 'Cron')}</option>
+                        <option value="Interval">{t('contracts.create.bgTriggerInterval', 'Interval')}</option>
+                        <option value="EventTriggered">{t('contracts.create.bgTriggerEventTriggered', 'Event Triggered')}</option>
+                        <option value="Continuous">{t('contracts.create.bgTriggerContinuous', 'Continuous')}</option>
                       </select>
                     </div>
                   </div>

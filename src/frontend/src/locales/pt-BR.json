@@ -1,4 +1,4 @@
-﻿{
+{
   "activation": {
     "activating": "Ativando...",
     "confirmPasswordLabel": "Confirmar senha",
@@ -108,7 +108,17 @@
       "importExport": "Importar / Exportar",
       "rollback": "Rollback e Restauração"
     },
-    "title": "Console Avançada de Configuração"
+    "title": "Console Avançada de Configuração",
+    "scopeOptions": {
+      "system": "Sistema",
+      "tenant": "Tenant",
+      "environment": "Ambiente"
+    },
+    "badges": {
+      "masked": "Mascarado",
+      "enabled": "Habilitado",
+      "disabled": "Desabilitado"
+    }
   },
   "agentMarketplace": {
     "category": "Categoria",
@@ -2941,7 +2951,17 @@
     "workflow.timeout.approval_hours.description": "Hours before an individual aprovação step times out",
     "workflow.timeout.approval_hours.label": "Aprovação Timeout (Hours)",
     "workflow.types.enabled.description": "Lista de ativado fluxo de trabalho tipos (e.g. ReleaseApproval, PromotionApproval, WaiverApproval, GovernanceReview, AccessRequest)",
-    "workflow.types.enabled.label": "Ativado Fluxo de Trabalho Tipos"
+    "workflow.types.enabled.label": "Ativado Fluxo de Trabalho Tipos",
+    "email.sender.display_name.description": "Nome exibido no campo De dos e-mails da plataforma",
+    "email.sender.display_name.label": "Nome do Remetente",
+    "email.sender.from_address.description": "Endere?o de e-mail utilizado como remetente para notifica??es da plataforma",
+    "email.sender.from_address.label": "Endere?o de E-mail do Remetente",
+    "email.templates.change_approval.description": "Template de e-mail utilizado para solicita??es de aprova??o de mudan?a",
+    "email.templates.change_approval.label": "Template de E-mail de Aprova??o de Mudan?a",
+    "email.templates.incident_notification.description": "Template de e-mail utilizado para notifica??es de incidentes",
+    "email.templates.incident_notification.label": "Template de E-mail de Incidente",
+    "email.templates.welcome.description": "Template de e-mail utilizado para mensagens de boas-vindas a novos usu?rios",
+    "email.templates.welcome.label": "Template de E-mail de Boas-Vindas"
   },
   "configuration": {
     "actions": {
@@ -3943,7 +3963,18 @@
       "placeholder": {
         "soapTargetNamespace": "http://example.com/service",
         "soapEndpointUrl": "http://example.com/service"
-      }
+      },
+      "bgCategoryJob": "Job",
+      "bgCategoryWorker": "Worker",
+      "bgCategoryScheduler": "Agendador",
+      "bgCategoryProcessor": "Processador",
+      "bgCategoryExporter": "Exportador",
+      "bgCategoryNotifier": "Notificador",
+      "bgTriggerOnDemand": "Por Demanda",
+      "bgTriggerCron": "Cron",
+      "bgTriggerInterval": "Intervalo",
+      "bgTriggerEventTriggered": "Disparado por Evento",
+      "bgTriggerContinuous": "Cont?nuo"
     },
     "createVersion": "Criar Versão",
     "createVersionDescription": "Criar uma nova versão a partir de um contrato existente",
@@ -8098,7 +8129,7 @@
     "trustLevel": "Nível de Confiança",
     "typeBackgroundService": "Serviço em Background",
     "typeBatchJob": "Job Batch",
-    "typeCicsTransaction": "Transação CICS",
+    "typeCicsTransaction": "Transa??o CICS",
     "typeCobolProgram": "Programa COBOL",
     "typeFramework": "Framework / SDK",
     "typeGateway": "API Gateway",
@@ -8106,20 +8137,20 @@
     "typeGroupMainframe": "Mainframe",
     "typeGroupModern": "Serviços Modernos",
     "typeGroupPlatform": "Plataforma e Integração",
-    "typeGrpcService": "Serviço gRPC",
-    "typeImsTransaction": "Transação IMS",
-    "typeIntegrationComponent": "Componente de Integração",
+    "typeGrpcService": "Servi?o gRPC",
+    "typeImsTransaction": "Transa??o IMS",
+    "typeIntegrationComponent": "Componente de Integra??o",
     "typeKafkaConsumer": "Consumidor Kafka",
     "typeKafkaProducer": "Produtor Kafka",
     "typeLegacySystem": "Sistema Legado",
     "typeMainframeSystem": "Sistema Mainframe",
-    "typeMqQueueManager": "MQ Queue Manager",
+    "typeMqQueueManager": "Gerenciador de Filas MQ",
     "typeRestApi": "REST API",
     "typeScheduledProcess": "Processo Agendado",
-    "typeSharedPlatformService": "Serviço de Plataforma Compartilhado",
+    "typeSharedPlatformService": "Servi?o Compartilhado de Plataforma",
     "typeSoapService": "Serviço SOAP",
-    "typeThirdParty": "Serviço de Terceiros",
-    "typeZosConnectApi": "z/OS Connect API"
+    "typeThirdParty": "Servi?o de Terceiros",
+    "typeZosConnectApi": "API z/OS Connect"
   },
   "serviceMaturity": {
     "audit": {
@@ -8239,6 +8270,7 @@
   "sidebar": {
     "accessReview": "Revisão de Acessos",
     "aiAgents": "AI Agentes",
+    "aiHub": "Hub de IA",
     "aiAnalysis": "Análise de IA",
     "aiAssistant": "Assistente IA",
     "aiAudit": "Auditoria IA",
@@ -8285,7 +8317,9 @@
     "executiveFinOps": "FinOps Executivo",
     "executiveOverview": "Visão Executiva",
     "finops": "FinOps",
+    "governance": "Governança",
     "governancePacks": "Packs de Governança",
+    "ide": "Integrações IDE",
     "ideIntegrations": "Integrações IDE",
     "incidentTimeline": "Linha do Tempo de Incidentes",
     "incidents": "Incidentes",
@@ -8298,6 +8332,7 @@
     "licenseCompliance": "Conformidade de Licenças",
     "maturityScorecards": "Scorecards de Maturidade",
     "modelRegistry": "Registo de Modelos",
+    "operations": "Operações",
     "moduleAdoption": "Adoção por Módulo",
     "mySessions": "Minhas Sessões",
     "operationalNotes": "Notas Operacionais",

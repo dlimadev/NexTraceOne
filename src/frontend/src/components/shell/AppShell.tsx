@@ -76,7 +76,7 @@ export function AppShell() {
       <div className="flex h-screen bg-canvas overflow-hidden" data-testid="ai-only-shell">
         <RouteProgressBar />
         <div className="flex-1 flex flex-col min-h-0 min-w-0">
-          <main id="main-content" className="flex-1 overflow-hidden">
+          <main id="main-content" className="flex-1 overflow-y-auto overflow-x-hidden">
             <Outlet />
           </main>
         </div>
@@ -126,11 +126,11 @@ export function AppShell() {
           />
           <EnvironmentBanner />
         </header>
-        <main id="main-content">
+        <div className="flex-1 min-h-0">
           <AppContentFrame>
             <Outlet />
           </AppContentFrame>
-        </main>
+        </div>
         <AppFooter />
       </div>
 

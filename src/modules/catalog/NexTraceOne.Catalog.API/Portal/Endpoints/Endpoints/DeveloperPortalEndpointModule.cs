@@ -258,13 +258,17 @@ public sealed class DeveloperPortalEndpointModule
 
         // GET /api/v1/developerportal/analytics — Obter métricas de analytics
         group.MapGet("/analytics", async (
-            int daysBack,
+            DateTimeOffset? since,
+            int? daysBack,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
+            var resolvedDaysBack = since.HasValue
+                ? Math.Max(1, (int)Math.Ceiling((DateTimeOffset.UtcNow - since.Value).TotalDays))
+                : (daysBack ?? 30);
             var result = await sender.Send(
-                new GetPortalAnalyticsFeature.Query(daysBack),
+                new GetPortalAnalyticsFeature.Query(Math.Min(365, resolvedDaysBack)),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("developer-portal:read");

@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
@@ -42,19 +43,21 @@ public static class ListChanges
     }
 
     /// <summary>Handler que lista mudanças com filtros avançados.</summary>
-    public sealed class Handler(IReleaseRepository repository) : IQueryHandler<Query, Response>
+    public sealed class Handler(IReleaseRepository repository, ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
             var releases = await repository.ListFilteredAsync(
+                currentTenant.Id,
                 request.ServiceName, request.TeamName, request.Environment,
                 request.ChangeType, request.ConfidenceStatus, request.DeploymentStatus,
                 request.SearchTerm, request.From, request.To,
                 request.Page, request.PageSize, cancellationToken);
 
             var total = await repository.CountFilteredAsync(
+                currentTenant.Id,
                 request.ServiceName, request.TeamName, request.Environment,
                 request.ChangeType, request.ConfidenceStatus, request.DeploymentStatus,
                 request.SearchTerm, request.From, request.To, cancellationToken);

@@ -143,8 +143,17 @@ public sealed class SeedDefaultRolePermissionsTests
     {
         var roles = CreateAllSystemRoles();
         _roleRepository.GetSystemRolesAsync(Arg.Any<CancellationToken>()).Returns(roles);
-        _rolePermissionRepository.HasMappingsForRoleAsync(Arg.Any<RoleId>(), null, Arg.Any<CancellationToken>())
-            .Returns(true);
+        _rolePermissionRepository
+            .GetPermissionCodesForRoleAsync(Arg.Any<RoleId>(), null, Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                var roleId = ci.Arg<RoleId>();
+                var role = roles.FirstOrDefault(r => r.Id == roleId);
+                IReadOnlyList<string> permissions = role is not null
+                    ? RolePermissionCatalog.GetPermissionsForRole(role.Name).ToList()
+                    : [];
+                return Task.FromResult(permissions);
+            });
 
         var result = await CreateSut().Handle(new SeedFeature.Command(), CancellationToken.None);
 
@@ -163,13 +172,18 @@ public sealed class SeedDefaultRolePermissionsTests
         _roleRepository.GetSystemRolesAsync(Arg.Any<CancellationToken>()).Returns(roles);
 
         // PlatformAdmin, TechLead e Developer já existem; restantes são novos
-        _rolePermissionRepository.HasMappingsForRoleAsync(roles[0].Id, null, Arg.Any<CancellationToken>()).Returns(true);
-        _rolePermissionRepository.HasMappingsForRoleAsync(roles[1].Id, null, Arg.Any<CancellationToken>()).Returns(true);
-        _rolePermissionRepository.HasMappingsForRoleAsync(roles[2].Id, null, Arg.Any<CancellationToken>()).Returns(true);
-        _rolePermissionRepository.HasMappingsForRoleAsync(roles[3].Id, null, Arg.Any<CancellationToken>()).Returns(false);
-        _rolePermissionRepository.HasMappingsForRoleAsync(roles[4].Id, null, Arg.Any<CancellationToken>()).Returns(false);
-        _rolePermissionRepository.HasMappingsForRoleAsync(roles[5].Id, null, Arg.Any<CancellationToken>()).Returns(false);
-        _rolePermissionRepository.HasMappingsForRoleAsync(roles[6].Id, null, Arg.Any<CancellationToken>()).Returns(false);
+        var seededRoleIds = new HashSet<RoleId> { roles[0].Id, roles[1].Id, roles[2].Id };
+        _rolePermissionRepository
+            .GetPermissionCodesForRoleAsync(Arg.Any<RoleId>(), null, Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                var roleId = ci.Arg<RoleId>();
+                if (!seededRoleIds.Contains(roleId))
+                    return Task.FromResult<IReadOnlyList<string>>([]);
+                var role = roles.FirstOrDefault(r => r.Id == roleId)!;
+                return Task.FromResult<IReadOnlyList<string>>(
+                    RolePermissionCatalog.GetPermissionsForRole(role.Name).ToList());
+            });
 
         var result = await CreateSut().Handle(new SeedFeature.Command(), CancellationToken.None);
 

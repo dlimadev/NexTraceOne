@@ -81,7 +81,6 @@ internal sealed class ReliabilityRuntimeSurface(
         var profiles = await query
             .GroupBy(p => p.ServiceName)
             .Select(g => g.OrderByDescending(p => p.LastAssessedAt).First())
-            .Select(p => new { p.ServiceName, p.ObservabilityScore })
             .ToListAsync(ct);
 
         return profiles.ToDictionary(p => p.ServiceName, p => p.ObservabilityScore);

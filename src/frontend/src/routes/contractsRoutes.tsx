@@ -61,7 +61,7 @@ export function ContractsRoutes() {
       <Route
         path="/contracts/spectral"
         element={
-          <ProtectedRoute permission="contracts:spectral:read" redirectTo="/unauthorized">
+          <ProtectedRoute permission="rulesets:read" redirectTo="/unauthorized">
             <SpectralRulesetManagerPage />
           </ProtectedRoute>
         }

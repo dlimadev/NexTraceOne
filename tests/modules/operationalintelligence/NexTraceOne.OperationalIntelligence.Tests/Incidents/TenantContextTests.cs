@@ -82,7 +82,11 @@ public sealed class TenantContextTests
     [Fact]
     public void Release_SetTenantContext_SetsValues()
     {
+        var tenantId = Guid.NewGuid();
+        var environmentId = Guid.NewGuid();
+
         var release = Release.Create(
+            tenantId: tenantId,
             apiAssetId: Guid.NewGuid(),
             serviceName: "my-service",
             version: "1.0.0",
@@ -91,10 +95,7 @@ public sealed class TenantContextTests
             commitSha: "abc123def456",
             createdAt: DateTimeOffset.UtcNow);
 
-        var tenantId = Guid.NewGuid();
-        var environmentId = Guid.NewGuid();
-
-        release.SetTenantContext(tenantId, environmentId);
+        release.SetTenantContext(environmentId);
 
         release.TenantId.Should().Be(tenantId);
         release.EnvironmentId.Should().Be(environmentId);
@@ -103,7 +104,11 @@ public sealed class TenantContextTests
     [Fact]
     public void Release_SetTenantContext_IsIdempotent()
     {
+        var originalTenantId = Guid.NewGuid();
+        var originalEnvironmentId = Guid.NewGuid();
+
         var release = Release.Create(
+            tenantId: originalTenantId,
             apiAssetId: Guid.NewGuid(),
             serviceName: "my-service",
             version: "1.0.0",
@@ -112,11 +117,8 @@ public sealed class TenantContextTests
             commitSha: "abc123def456",
             createdAt: DateTimeOffset.UtcNow);
 
-        var originalTenantId = Guid.NewGuid();
-        var originalEnvironmentId = Guid.NewGuid();
-
-        release.SetTenantContext(originalTenantId, originalEnvironmentId);
-        release.SetTenantContext(Guid.NewGuid(), Guid.NewGuid());
+        release.SetTenantContext(originalEnvironmentId);
+        release.SetTenantContext(Guid.NewGuid());
 
         release.TenantId.Should().Be(originalTenantId);
         release.EnvironmentId.Should().Be(originalEnvironmentId);

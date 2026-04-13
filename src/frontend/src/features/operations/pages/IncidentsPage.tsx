@@ -11,7 +11,6 @@ import {
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
-import { OnboardingHints } from '../../../components/OnboardingHints';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
@@ -166,9 +165,6 @@ export function IncidentsPage() {
           {t('incidents.timelineView.open')}
         </NavLink>
       </div>
-
-      {/* Onboarding hints — orientação contextual para novos utilizadores */}
-      <OnboardingHints module="operations" />
 
       {/* Stats */}
       <PageSection className="!mb-6">

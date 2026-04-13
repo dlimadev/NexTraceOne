@@ -59,7 +59,7 @@ export function AuthShell({ children, cardMaxWidth = 'max-w-[460px]' }: AuthShel
   ];
 
   return (
-    <div className="min-h-screen bg-canvas flex relative overflow-hidden">
+    <div className="min-h-screen bg-canvas flex relative overflow-x-hidden overflow-y-auto">
       {/* Background radial halos */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
