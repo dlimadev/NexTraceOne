@@ -223,15 +223,15 @@ function CanonicalEntityCard({
             </div>
 
             {/* Tags & Aliases */}
-            {(entity.tags.length > 0 || entity.aliases.length > 0) && (
+            {((entity.tags?.length ?? 0) > 0 || (entity.aliases?.length ?? 0) > 0) && (
               <div className="flex flex-wrap gap-2">
-                {entity.tags.map((tag) => (
+                {(entity.tags ?? []).map((tag) => (
                   <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded-full bg-accent/10 text-accent border border-accent/20">
                     <Tag size={8} />
                     {tag}
                   </span>
                 ))}
-                {entity.aliases.map((alias) => (
+                {(entity.aliases ?? []).map((alias) => (
                   <span key={alias} className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded-full bg-muted/15 text-muted border border-muted/25">
                     <BookOpen size={8} />
                     {alias}
@@ -244,8 +244,8 @@ function CanonicalEntityCard({
             <div>
               <p className="text-xs text-muted mb-1">{t('contracts.canonical.catalog.schema', 'Schema Content')}</p>
               <pre className="p-3 rounded-lg bg-panel/50 border border-edge/10 text-[11px] text-heading font-mono overflow-x-auto max-h-[200px]">
-                {entity.schemaContent.slice(0, 800)}
-                {entity.schemaContent.length > 800 && '...'}
+                {(entity.schemaContent ?? '').slice(0, 800)}
+                {(entity.schemaContent?.length ?? 0) > 800 && '...'}
               </pre>
             </div>
 

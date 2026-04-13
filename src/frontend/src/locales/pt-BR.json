@@ -5744,6 +5744,7 @@
     },
     "draft": "Rascunho",
     "filterAll": "Todos",
+    "noPacks": "Nenhum pack de governança encontrado.",
     "published": "Publicados",
     "rules": "Regras",
     "scopes": "Escopos",
@@ -5787,6 +5788,7 @@
       "filterAll": "Todos",
       "listDescription": "Todas as isenções de governança e seus status atuais",
       "listTitle": "Lista de Isenções",
+      "noWaivers": "Nenhuma isenção encontrada.",
       "pendingApproval": "Aprovação Pendente",
       "reject": "Rejeitar",
       "requestedBy": "Solicitado por",
@@ -6947,6 +6949,67 @@
     },
     "logExplorer": {
       "traceIdPlaceholder": "Trace ID"
+    }
+  },
+  "organization": {
+    "domains": {
+      "avgMaturity": "Maturidade Média",
+      "capability": "Capacidade",
+      "contracts": "Contratos",
+      "criticality": {
+        "Critical": "Crítico",
+        "High": "Alto",
+        "Low": "Baixo",
+        "Medium": "Médio"
+      },
+      "empty": "Nenhum domínio encontrado",
+      "emptyDescription": "Nenhum domínio corresponde aos critérios de pesquisa.",
+      "maturityLevel": {
+        "Defined": "Definida",
+        "Developing": "Em Desenvolvimento",
+        "Initial": "Inicial",
+        "Managed": "Gerenciada",
+        "Optimizing": "Otimizando"
+      },
+      "noDomains": "Nenhum domínio encontrado.",
+      "searchPlaceholder": "Pesquisar domínios...",
+      "services": "Serviços",
+      "subtitle": "Domínios de negócio, ownership e fronteiras de governança",
+      "teams": "Times",
+      "title": "Domínios de Negócio",
+      "totalDomains": "Total de Domínios",
+      "totalServices": "Total de Serviços",
+      "totalTeams": "Total de Times",
+      "viewDetails": "Ver Detalhes"
+    },
+    "teams": {
+      "activeIncidents": "Incidentes Ativos",
+      "avgMaturity": "Maturidade Média",
+      "contracts": "Contratos",
+      "empty": "Nenhum time encontrado",
+      "emptyDescription": "Nenhum time corresponde aos critérios de pesquisa.",
+      "maturityLevel": {
+        "Defined": "Definida",
+        "Developing": "Em Desenvolvimento",
+        "Initial": "Inicial",
+        "Managed": "Gerenciada",
+        "Optimizing": "Otimizando"
+      },
+      "members": "Membros",
+      "noTeams": "Nenhum time encontrado.",
+      "orgUnit": "Unidade Org.",
+      "searchPlaceholder": "Pesquisar times...",
+      "services": "Serviços",
+      "status": {
+        "Active": "Ativo",
+        "Archived": "Arquivado",
+        "Inactive": "Inativo"
+      },
+      "subtitle": "Times, ownership e responsabilidades de serviço",
+      "title": "Times & Ownership",
+      "totalServices": "Total de Serviços",
+      "totalTeams": "Total de Times",
+      "viewDetails": "Ver Detalhes"
     }
   },
   "opsFinOpsConfig": {

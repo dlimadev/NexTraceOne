@@ -122,7 +122,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetBlastRadiusAsync_WhenReportExists_ShouldReturnMappedDto()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "CatalogService", "4.0.0", "production", "https://ci/pipe/5", "ccc333", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.NewGuid(), "CatalogService", "4.0.0", "production", "https://ci/pipe/5", "ccc333", FixedNow);
         db.Releases.Add(release);
 
         var report = BlastRadiusReport.Calculate(
@@ -160,7 +160,7 @@ public sealed class ChangeIntelligenceModuleTests
     public async Task GetBlastRadiusAsync_WhenMultipleReportsExist_ShouldReturnMostRecent()
     {
         await using var db = CreateDbContext();
-        var release = Release.Create(Guid.NewGuid(), Guid.Empty, "NotificationService", "2.0.0", "staging", "https://ci/pipe/6", "ddd444", FixedNow);
+        var release = Release.Create(Guid.NewGuid(), Guid.NewGuid(), "NotificationService", "2.0.0", "staging", "https://ci/pipe/6", "ddd444", FixedNow);
         db.Releases.Add(release);
 
         var olderReport = BlastRadiusReport.Calculate(release.Id, release.ApiAssetId, ["OldConsumer"], [], FixedNow.AddHours(-3));

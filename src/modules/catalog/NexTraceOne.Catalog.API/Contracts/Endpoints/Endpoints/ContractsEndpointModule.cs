@@ -411,6 +411,23 @@ public sealed class ContractsEndpointModule
 
         var canonicalGroup = app.MapGroup("/api/v1/contracts/canonical-entities");
 
+        canonicalGroup.MapGet("/", async (
+            string? searchTerm,
+            string? domain,
+            string? category,
+            string? state,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
+        {
+            var result = await sender.Send(
+                new SearchCanonicalEntitiesFeature.Query(searchTerm, domain, category, page, pageSize),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
         canonicalGroup.MapGet("/search", async (
             string? searchTerm,
             string? domain,

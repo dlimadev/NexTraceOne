@@ -23,4 +23,10 @@ public interface IWorkflowInstanceRepository
 
     /// <summary>Conta o total de instâncias de workflow com o status informado.</summary>
     Task<int> CountByStatusAsync(WorkflowStatus status, CancellationToken cancellationToken = default);
+
+    /// <summary>Lista todas as instâncias de workflow com paginação.</summary>
+    Task<IReadOnlyList<WorkflowInstance>> ListAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+
+    /// <summary>Conta o total de instâncias de workflow.</summary>
+    Task<int> CountAsync(CancellationToken cancellationToken = default);
 }

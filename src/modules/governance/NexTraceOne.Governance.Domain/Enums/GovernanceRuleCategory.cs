@@ -12,5 +12,8 @@ public enum GovernanceRuleCategory
     AIGovernance = 4,
     Reliability = 5,
     Operations = 6,
-    ContractQuality = 7
+    ContractQuality = 7,
+    ChangeManagement = 8,
+    Security = 9,
+    Observability = 10
 }

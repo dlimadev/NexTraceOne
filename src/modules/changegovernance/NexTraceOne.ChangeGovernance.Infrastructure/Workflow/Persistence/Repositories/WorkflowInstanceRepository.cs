@@ -36,4 +36,16 @@ internal sealed class WorkflowInstanceRepository(WorkflowDbContext context)
     public async Task<int> CountByStatusAsync(WorkflowStatus status, CancellationToken cancellationToken = default)
         => await context.WorkflowInstances
             .CountAsync(i => i.Status == status, cancellationToken);
+
+    /// <summary>Lista todas as instâncias de workflow com paginação.</summary>
+    public async Task<IReadOnlyList<WorkflowInstance>> ListAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        => await context.WorkflowInstances
+            .OrderByDescending(i => i.SubmittedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+    /// <summary>Conta o total de instâncias de workflow.</summary>
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+        => await context.WorkflowInstances.CountAsync(cancellationToken);
 }

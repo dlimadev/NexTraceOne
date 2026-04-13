@@ -7,5 +7,6 @@ public enum EnforcementMode
 {
     Advisory = 0,
     Required = 1,
-    Blocking = 2
+    Blocking = 2,
+    Warning = 3
 }

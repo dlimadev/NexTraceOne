@@ -70,11 +70,12 @@ public interface IReleaseRepository
         string serviceName,
         CancellationToken cancellationToken = default);
 
-    /// <summary>Lista releases numa janela temporal, com filtro opcional de ambiente.</summary>
+    /// <summary>Lista releases numa janela temporal, com filtro opcional de ambiente e isolamento por tenant.</summary>
     Task<IReadOnlyList<Release>> ListInRangeAsync(
         DateTimeOffset from,
         DateTimeOffset to,
         string? environment,
+        Guid tenantId,
         CancellationToken cancellationToken = default);
 
     /// <summary>Obtém contadores agregados de mudanças.</summary>

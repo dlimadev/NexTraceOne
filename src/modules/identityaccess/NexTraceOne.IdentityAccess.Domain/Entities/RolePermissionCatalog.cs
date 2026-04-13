@@ -59,6 +59,7 @@ public static class RolePermissionCatalog
                 // Workflow
                 "workflow:instances:read",
                 "workflow:instances:write",
+                "workflow:templates:read",
                 "workflow:templates:write",
 
                 // Operations
@@ -174,6 +175,7 @@ public static class RolePermissionCatalog
                 "change-intelligence:write",
                 "workflow:instances:read",
                 "workflow:instances:write",
+                "workflow:templates:read",
                 "workflow:templates:write",
                 "operations:incidents:read",
                 "operations:incidents:write",
@@ -206,6 +208,7 @@ public static class RolePermissionCatalog
                 "notifications:preferences:read",
                 "notifications:preferences:write",
                 "notifications:configuration:read",
+                "configuration:read",
                 "env:environments:read",
                 "env:environments:write",
                 "env:access:read"],
@@ -219,6 +222,7 @@ public static class RolePermissionCatalog
                 "developer-portal:write",
                 "change-intelligence:read",
                 "workflow:instances:read",
+                "workflow:templates:read",
                 "operations:incidents:read",
                 "operations:incidents:write",
                 "operations:reliability:read",
@@ -236,6 +240,7 @@ public static class RolePermissionCatalog
                 "notifications:inbox:write",
                 "notifications:preferences:read",
                 "notifications:preferences:write",
+                "configuration:read",
                 "env:environments:read",
                 "env:access:read"],
             Role.Viewer => [
@@ -245,6 +250,7 @@ public static class RolePermissionCatalog
                 "developer-portal:read",
                 "change-intelligence:read",
                 "workflow:instances:read",
+                "workflow:templates:read",
                 "operations:incidents:read",
                 "operations:reliability:read",
                 "governance:domains:read",
@@ -256,6 +262,7 @@ public static class RolePermissionCatalog
                 "ai:assistant:read",
                 "notifications:inbox:read",
                 "notifications:preferences:read",
+                "configuration:read",
                 "env:environments:read"],
             Role.Auditor => [
                 "identity:users:read",
@@ -281,7 +288,8 @@ public static class RolePermissionCatalog
                 "env:environments:read",
                 "env:access:read",
                 "notifications:inbox:read",
-                "notifications:preferences:read"],
+                "notifications:preferences:read",
+                "configuration:read"],
             Role.SecurityReview => [
                 "identity:users:read",
                 "identity:roles:read",
@@ -307,6 +315,7 @@ public static class RolePermissionCatalog
                 "audit:compliance:read",
                 "notifications:inbox:read",
                 "notifications:preferences:read",
+                "configuration:read",
                 "env:environments:read",
                 "env:access:read"],
             Role.ApprovalOnly => [

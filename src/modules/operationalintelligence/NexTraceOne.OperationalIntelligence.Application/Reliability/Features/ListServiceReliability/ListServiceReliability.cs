@@ -32,7 +32,7 @@ public static class ListServiceReliability
         public Validator()
         {
             RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
-            RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
             RuleFor(x => x.TeamId).MaximumLength(200).When(x => x.TeamId is not null);
             RuleFor(x => x.ServiceId).MaximumLength(200).When(x => x.ServiceId is not null);
             RuleFor(x => x.Domain).MaximumLength(200).When(x => x.Domain is not null);

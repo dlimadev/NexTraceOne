@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Enums;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -36,14 +37,15 @@ public static class GetReleaseCalendar
     /// <summary>Handler que agrega releases e freeze windows para o calendário.</summary>
     public sealed class Handler(
         IReleaseRepository releaseRepository,
-        IFreezeWindowRepository freezeRepository) : IQueryHandler<Query, Response>
+        IFreezeWindowRepository freezeRepository,
+        ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
 
             var releases = await releaseRepository.ListInRangeAsync(
-                request.From, request.To, request.Environment, cancellationToken);
+                request.From, request.To, request.Environment, currentTenant.Id, cancellationToken);
 
             var freezes = await freezeRepository.ListInRangeAsync(
                 request.From, request.To, request.Environment, true, cancellationToken);

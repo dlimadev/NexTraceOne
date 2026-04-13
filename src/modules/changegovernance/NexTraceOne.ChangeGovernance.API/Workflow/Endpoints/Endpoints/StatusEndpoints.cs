@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using GetWorkflowStatusFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetWorkflowStatus.GetWorkflowStatus;
 using ListPendingApprovalsFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListPendingApprovals.ListPendingApprovals;
+using ListWorkflowInstancesFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListWorkflowInstances.ListWorkflowInstances;
 using EscalateSlaViolationFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.EscalateSlaViolation.EscalateSlaViolation;
 
 namespace NexTraceOne.ChangeGovernance.API.Workflow.Endpoints.Endpoints;
@@ -27,6 +28,17 @@ internal static class StatusEndpoints
     /// </summary>
     internal static void Map(Microsoft.AspNetCore.Routing.RouteGroupBuilder group)
     {
+        group.MapGet("/instances", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
+        {
+            var result = await sender.Send(new ListWorkflowInstancesFeature.Query(page, pageSize), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("workflow:instances:read");
+
         group.MapGet("/{instanceId:guid}/status", async (
             Guid instanceId,
             ISender sender,

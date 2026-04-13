@@ -5741,6 +5741,7 @@
     },
     "draft": "Draft",
     "filterAll": "All",
+    "noPacks": "No governance packs found.",
     "published": "Published",
     "rules": "Rules",
     "scopes": "Scopes",
@@ -5784,6 +5785,7 @@
       "filterAll": "All",
       "listDescription": "All governance waivers and their current status",
       "listTitle": "Waiver List",
+      "noWaivers": "No waivers found.",
       "pendingApproval": "Pending Approval",
       "reject": "Reject",
       "requestedBy": "Requested By",
@@ -6944,6 +6946,67 @@
     },
     "logExplorer": {
       "traceIdPlaceholder": "Trace ID"
+    }
+  },
+  "organization": {
+    "domains": {
+      "avgMaturity": "Avg Maturity",
+      "capability": "Capability",
+      "contracts": "Contracts",
+      "criticality": {
+        "Critical": "Critical",
+        "High": "High",
+        "Low": "Low",
+        "Medium": "Medium"
+      },
+      "empty": "No domains found",
+      "emptyDescription": "No domains match your search criteria.",
+      "maturityLevel": {
+        "Defined": "Defined",
+        "Developing": "Developing",
+        "Initial": "Initial",
+        "Managed": "Managed",
+        "Optimizing": "Optimizing"
+      },
+      "noDomains": "No domains found.",
+      "searchPlaceholder": "Search domains...",
+      "services": "Services",
+      "subtitle": "Business domains, ownership and governance boundaries",
+      "teams": "Teams",
+      "title": "Business Domains",
+      "totalDomains": "Total Domains",
+      "totalServices": "Total Services",
+      "totalTeams": "Total Teams",
+      "viewDetails": "View Details"
+    },
+    "teams": {
+      "activeIncidents": "Active Incidents",
+      "avgMaturity": "Avg Maturity",
+      "contracts": "Contracts",
+      "empty": "No teams found",
+      "emptyDescription": "No teams match your search criteria.",
+      "maturityLevel": {
+        "Defined": "Defined",
+        "Developing": "Developing",
+        "Initial": "Initial",
+        "Managed": "Managed",
+        "Optimizing": "Optimizing"
+      },
+      "members": "Members",
+      "noTeams": "No teams found.",
+      "orgUnit": "Org Unit",
+      "searchPlaceholder": "Search teams...",
+      "services": "Services",
+      "status": {
+        "Active": "Active",
+        "Archived": "Archived",
+        "Inactive": "Inactive"
+      },
+      "subtitle": "Teams, service ownership and responsibilities",
+      "title": "Teams & Ownership",
+      "totalServices": "Total Services",
+      "totalTeams": "Total Teams",
+      "viewDetails": "View Details"
     }
   },
   "opsFinOpsConfig": {

@@ -27,7 +27,7 @@ public sealed class RulesetGovernanceEndpointModule
     /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/v1/rulesets");
+        var group = app.MapGroup("/api/v1/contracts/spectral/rulesets");
 
         group.MapPost("/", async (
             UploadRulesetFeature.Command command,
@@ -36,7 +36,7 @@ public sealed class RulesetGovernanceEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/rulesets/{0}", localizer);
+            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/{0}", localizer);
         })
         .RequirePermission("rulesets:write");
 
@@ -72,7 +72,7 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var updatedCommand = command with { RulesetId = rulesetId };
             var result = await sender.Send(updatedCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/rulesets/{0}/bindings", localizer);
+            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/{0}/bindings", localizer);
         })
         .RequirePermission("rulesets:write");
 
@@ -83,7 +83,7 @@ public sealed class RulesetGovernanceEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/rulesets/findings/{0}", localizer);
+            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/findings/{0}", localizer);
         })
         .RequirePermission("rulesets:execute");
 
@@ -115,7 +115,7 @@ public sealed class RulesetGovernanceEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new InstallDefaultRulesetsFeature.Command(), cancellationToken);
-            return result.ToCreatedResult("/api/v1/rulesets/{0}", localizer);
+            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/{0}", localizer);
         })
         .RequirePermission("rulesets:write");
 

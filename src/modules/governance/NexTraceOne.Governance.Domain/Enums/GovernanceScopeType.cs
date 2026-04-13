@@ -11,5 +11,6 @@ public enum GovernanceScopeType
     Environment = 3,
     ServiceCriticality = 4,
     ContractType = 5,
-    AIUsageScope = 6
+    AIUsageScope = 6,
+    Service = 7
 }

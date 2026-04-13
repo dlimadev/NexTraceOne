@@ -136,10 +136,11 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
         DateTimeOffset from,
         DateTimeOffset to,
         string? environment,
+        Guid tenantId,
         CancellationToken cancellationToken = default)
     {
         var query = context.Releases
-            .Where(r => r.CreatedAt >= from && r.CreatedAt <= to);
+            .Where(r => r.TenantId == tenantId && r.CreatedAt >= from && r.CreatedAt <= to);
 
         if (!string.IsNullOrWhiteSpace(environment))
             query = query.Where(r => r.Environment == environment);

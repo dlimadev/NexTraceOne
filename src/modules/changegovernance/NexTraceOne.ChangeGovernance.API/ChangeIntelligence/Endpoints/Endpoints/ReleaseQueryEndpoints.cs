@@ -45,7 +45,7 @@ internal static class ReleaseQueryEndpoints
             int page = 1,
             int pageSize = 20) =>
         {
-            var result = await sender.Send(new ListReleasesFeature.Query(apiAssetId ?? Guid.Empty, page, pageSize), cancellationToken);
+            var result = await sender.Send(new ListReleasesFeature.Query(apiAssetId, page, pageSize), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
 

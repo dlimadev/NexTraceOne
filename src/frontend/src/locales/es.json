@@ -5744,6 +5744,7 @@
     },
     "draft": "Borrador",
     "filterAll": "Todos",
+    "noPacks": "No se encontraron packs de gobernanza.",
     "published": "Publicados",
     "rules": "Reglas",
     "scopes": "Ámbitos",
@@ -5787,6 +5788,7 @@
       "filterAll": "Todos",
       "listDescription": "Todas las exenciones de gobernanza y su estado actual",
       "listTitle": "Lista de Exenciones",
+      "noWaivers": "No se encontraron exenciones.",
       "pendingApproval": "Aprobación Pendiente",
       "reject": "Rechazar",
       "requestedBy": "Solicitado por",
@@ -6947,6 +6949,67 @@
     },
     "logExplorer": {
       "traceIdPlaceholder": "Trace ID"
+    }
+  },
+  "organization": {
+    "domains": {
+      "avgMaturity": "Madurez Promedio",
+      "capability": "Capacidad",
+      "contracts": "Contratos",
+      "criticality": {
+        "Critical": "Crítico",
+        "High": "Alto",
+        "Low": "Bajo",
+        "Medium": "Medio"
+      },
+      "empty": "No se encontraron dominios",
+      "emptyDescription": "Ningún dominio coincide con los criterios de búsqueda.",
+      "maturityLevel": {
+        "Defined": "Definida",
+        "Developing": "En Desarrollo",
+        "Initial": "Inicial",
+        "Managed": "Gestionada",
+        "Optimizing": "Optimizando"
+      },
+      "noDomains": "No se encontraron dominios.",
+      "searchPlaceholder": "Buscar dominios...",
+      "services": "Servicios",
+      "subtitle": "Dominios de negocio, ownership y fronteras de gobernanza",
+      "teams": "Equipos",
+      "title": "Dominios de Negocio",
+      "totalDomains": "Total de Dominios",
+      "totalServices": "Total de Servicios",
+      "totalTeams": "Total de Equipos",
+      "viewDetails": "Ver Detalles"
+    },
+    "teams": {
+      "activeIncidents": "Incidentes Activos",
+      "avgMaturity": "Madurez Promedio",
+      "contracts": "Contratos",
+      "empty": "No se encontraron equipos",
+      "emptyDescription": "Ningún equipo coincide con los criterios de búsqueda.",
+      "maturityLevel": {
+        "Defined": "Definida",
+        "Developing": "En Desarrollo",
+        "Initial": "Inicial",
+        "Managed": "Gestionada",
+        "Optimizing": "Optimizando"
+      },
+      "members": "Miembros",
+      "noTeams": "No se encontraron equipos.",
+      "orgUnit": "Unidad Org.",
+      "searchPlaceholder": "Buscar equipos...",
+      "services": "Servicios",
+      "status": {
+        "Active": "Activo",
+        "Archived": "Archivado",
+        "Inactive": "Inactivo"
+      },
+      "subtitle": "Equipos, ownership y responsabilidades de servicio",
+      "title": "Equipos & Ownership",
+      "totalServices": "Total de Servicios",
+      "totalTeams": "Total de Equipos",
+      "viewDetails": "Ver Detalles"
     }
   },
   "opsFinOpsConfig": {

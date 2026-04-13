@@ -79,7 +79,7 @@ public static class GetDoraMetrics
             // Como o NexTraceOne rastreia CreatedAt (quando o release foi registado)
             // e o status do deploy, calculamos a diferença média.
             var releases = await releaseRepository.ListInRangeAsync(
-                from, to, request.Environment, cancellationToken);
+                from, to, request.Environment, currentTenant.Id, cancellationToken);
 
             var succeededReleases = releases
                 .Where(r => r.Status == DeploymentStatus.Succeeded)
