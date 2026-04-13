@@ -20,7 +20,8 @@ public static class ExecuteAgent
         Guid AgentId,
         string Input,
         Guid? ModelIdOverride,
-        string? ContextJson) : ICommand<Response>;
+        string? ContextJson,
+        string? TeamId = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de execução.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -48,6 +49,7 @@ public static class ExecuteAgent
                 request.Input,
                 request.ModelIdOverride,
                 request.ContextJson,
+                request.TeamId,
                 cancellationToken);
 
             if (result.IsFailure)

@@ -280,7 +280,8 @@ public sealed class AiGovernanceEndpointModule
                 agentId,
                 body.Input,
                 body.ModelIdOverride,
-                body.ContextJson);
+                body.ContextJson,
+                body.TeamId);
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:assistant:write");
@@ -950,7 +951,8 @@ public sealed record UpdateAgentRequest(
 public sealed record ExecuteAgentRequest(
     string Input,
     Guid? ModelIdOverride,
-    string? ContextJson);
+    string? ContextJson,
+    string? TeamId = null);
 
 /// <summary>Corpo de pedido para review de um artefacto.</summary>
 public sealed record ReviewArtifactRequest(

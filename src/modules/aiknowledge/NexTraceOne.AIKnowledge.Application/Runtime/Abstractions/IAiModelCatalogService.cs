@@ -25,4 +25,5 @@ public sealed record ResolvedModel(
     string ProviderId,
     string ProviderDisplayName,
     bool IsInternal,
-    string Capabilities);
+    string Capabilities,
+    int? ContextWindow = null);

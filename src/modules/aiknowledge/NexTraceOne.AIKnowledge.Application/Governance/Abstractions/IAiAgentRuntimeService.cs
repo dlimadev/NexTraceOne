@@ -15,6 +15,7 @@ public interface IAiAgentRuntimeService
         string input,
         Guid? modelIdOverride,
         string? contextJson,
+        string? callerTeamId,
         CancellationToken cancellationToken);
 }
 

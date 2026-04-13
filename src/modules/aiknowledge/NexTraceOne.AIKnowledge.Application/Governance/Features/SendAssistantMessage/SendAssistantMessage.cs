@@ -95,12 +95,14 @@ public static class SendAssistantMessage
         IAiKnowledgeSourceRepository knowledgeSourceRepository,
         IAiModelCatalogService modelCatalogService,
         IAiModelAuthorizationService modelAuthorizationService,
+        IAiTokenQuotaService tokenQuotaService,
         IExternalAIRoutingPort externalAiRoutingPort,
         IAiProviderFactory providerFactory,
         IDocumentRetrievalService documentRetrievalService,
         IDatabaseRetrievalService databaseRetrievalService,
         ITelemetryRetrievalService telemetryRetrievalService,
         ICurrentUser currentUser,
+        ICurrentTenant currentTenant,
         ICurrentEnvironment currentEnvironment,
         IDateTimeProvider dateTimeProvider,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
@@ -199,6 +201,27 @@ public static class SendAssistantMessage
                         request.PreferredModelId.Value.ToString(),
                         accessDecision.DenialReason ?? "Access denied by policy");
                 }
+            }
+
+            // ── Validar quota de tokens antes da inferência ──────────────
+            var estimatedTokens = Math.Max(1, (request.Message.Length) / 4);
+            var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
+                currentUser.Id,
+                currentTenant.Id,
+                selectedProvider,
+                selectedModel,
+                estimatedTokens,
+                cancellationToken);
+
+            if (!quotaResult.IsAllowed)
+            {
+                logger.LogWarning(
+                    "Token quota exceeded for user {UserId}, tenant {TenantId}: {BlockReason}",
+                    currentUser.Id, currentTenant.Id, quotaResult.BlockReason);
+
+                return AiGovernanceErrors.QuotaExceeded(
+                    "user",
+                    currentUser.Id);
             }
 
             // ── Resolver fontes e pesos de contexto ──────────────────────

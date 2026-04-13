@@ -28,12 +28,14 @@ public sealed class SendAssistantMessageLlmTests
     private readonly IAiKnowledgeSourceRepository _sourceRepo = Substitute.For<IAiKnowledgeSourceRepository>();
     private readonly IAiModelCatalogService _modelCatalog = Substitute.For<IAiModelCatalogService>();
     private readonly IAiModelAuthorizationService _modelAuth = Substitute.For<IAiModelAuthorizationService>();
+    private readonly IAiTokenQuotaService _quotaService = Substitute.For<IAiTokenQuotaService>();
     private readonly IExternalAIRoutingPort _routingPort = Substitute.For<IExternalAIRoutingPort>();
     private readonly IAiProviderFactory _providerFactory = Substitute.For<IAiProviderFactory>();
     private readonly IDocumentRetrievalService _docRetrieval = Substitute.For<IDocumentRetrievalService>();
     private readonly IDatabaseRetrievalService _dbRetrieval = Substitute.For<IDatabaseRetrievalService>();
     private readonly ITelemetryRetrievalService _telRetrieval = Substitute.For<ITelemetryRetrievalService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
@@ -44,7 +46,14 @@ public sealed class SendAssistantMessageLlmTests
         _currentUser.Email.Returns("engineer@nextraceone.io");
         _currentUser.Name.Returns("Test Engineer");
         _currentUser.IsAuthenticated.Returns(true);
+        _currentTenant.Id.Returns(Guid.NewGuid());
         _clock.UtcNow.Returns(FixedNow);
+
+        // Quota always allowed by default
+        _quotaService.ValidateQuotaAsync(
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new TokenQuotaValidationResult(IsAllowed: true));
 
         // Default repository stubs
         _routingRepo.ListAsync(true, Arg.Any<CancellationToken>())
@@ -65,10 +74,10 @@ public sealed class SendAssistantMessageLlmTests
 
     private SendAssistantMessage.Handler CreateHandler() => new(
         _usageRepo, _convRepo, _msgRepo, _routingRepo, _sourceRepo,
-        _modelCatalog, _modelAuth,
+        _modelCatalog, _modelAuth, _quotaService,
         _routingPort, _providerFactory,
         _docRetrieval, _dbRetrieval, _telRetrieval,
-        _currentUser, _currentEnvironment, _clock,
+        _currentUser, _currentTenant, _currentEnvironment, _clock,
         NullLogger<SendAssistantMessage.Handler>.Instance);
 
     private IChatCompletionProvider MockProvider(string content, int promptTokens = 50, int completionTokens = 120)
@@ -306,5 +315,35 @@ public sealed class SendAssistantMessageLlmTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.GroundingSources.Should().NotBeNull();
+    }
+
+    // ── Test 9: quota exceeded returns error before inference ─────────────
+
+    [Fact]
+    public async Task Handle_WhenQuotaExceeded_ReturnsQuotaExceededError()
+    {
+        // Override quota service to deny
+        _quotaService.ValidateQuotaAsync(
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new TokenQuotaValidationResult(IsAllowed: false, BlockReason: "Daily limit exceeded"));
+
+        var result = await CreateHandler().Handle(
+            new SendAssistantMessage.Command(
+                ConversationId: null,
+                Message: "What is the health of service X?",
+                ContextScope: null,
+                Persona: "Engineer",
+                PreferredModelId: null,
+                ClientType: "Web",
+                ServiceId: null, ContractId: null, IncidentId: null,
+                ChangeId: null, TeamId: null, DomainId: null),
+            CancellationToken.None);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Contain("QuotaExceeded");
+
+        // Provider should NOT have been called
+        _providerFactory.DidNotReceive().GetChatProvider(Arg.Any<string>());
     }
 }

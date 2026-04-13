@@ -29,12 +29,14 @@ public sealed class ConversationPersistenceTests
     private readonly IAiKnowledgeSourceRepository _sourceRepo = Substitute.For<IAiKnowledgeSourceRepository>();
     private readonly IAiModelCatalogService _modelCatalog = Substitute.For<IAiModelCatalogService>();
     private readonly IAiModelAuthorizationService _modelAuth = Substitute.For<IAiModelAuthorizationService>();
+    private readonly IAiTokenQuotaService _quotaService = Substitute.For<IAiTokenQuotaService>();
     private readonly IExternalAIRoutingPort _routingPort = Substitute.For<IExternalAIRoutingPort>();
     private readonly IAiProviderFactory _providerFactory = Substitute.For<IAiProviderFactory>();
     private readonly IDocumentRetrievalService _docRetrieval = Substitute.For<IDocumentRetrievalService>();
     private readonly IDatabaseRetrievalService _dbRetrieval = Substitute.For<IDatabaseRetrievalService>();
     private readonly ITelemetryRetrievalService _telRetrieval = Substitute.For<ITelemetryRetrievalService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
@@ -44,7 +46,14 @@ public sealed class ConversationPersistenceTests
         _currentUser.Email.Returns("persist@nextraceone.io");
         _currentUser.Name.Returns("Persist Tester");
         _currentUser.IsAuthenticated.Returns(true);
+        _currentTenant.Id.Returns(Guid.NewGuid());
         _clock.UtcNow.Returns(FixedNow);
+
+        // Quota always allowed by default
+        _quotaService.ValidateQuotaAsync(
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new TokenQuotaValidationResult(IsAllowed: true));
 
         _routingRepo.ListAsync(true, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIRoutingStrategy>().AsReadOnly());
@@ -66,10 +75,10 @@ public sealed class ConversationPersistenceTests
 
     private SendAssistantMessage.Handler CreateHandler() => new(
         _usageRepo, _convRepo, _msgRepo, _routingRepo, _sourceRepo,
-        _modelCatalog, _modelAuth,
+        _modelCatalog, _modelAuth, _quotaService,
         _routingPort, _providerFactory,
         _docRetrieval, _dbRetrieval, _telRetrieval,
-        _currentUser, _currentEnvironment, _clock,
+        _currentUser, _currentTenant, _currentEnvironment, _clock,
         NullLogger<SendAssistantMessage.Handler>.Instance);
 
     private void MockProvider(string content, int promptTokens = 40, int completionTokens = 80)

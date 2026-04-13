@@ -46,11 +46,18 @@ public sealed class AiAgentRuntimeService(
     /// <summary>Número máximo de iterações do loop de tools para prevenir ciclos infinitos.</summary>
     private const int MaxToolIterations = 5;
 
+    /// <summary>Context window padrão em tokens quando o modelo não especifica.</summary>
+    private const int DefaultContextWindowTokens = 4096;
+
+    /// <summary>Tokens reservados para a resposta do modelo.</summary>
+    private const int ReservedCompletionTokens = 1024;
+
     public async Task<Result<AgentExecutionResult>> ExecuteAsync(
         AiAgentId agentId,
         string input,
         Guid? modelIdOverride,
         string? contextJson,
+        string? callerTeamId,
         CancellationToken cancellationToken)
     {
         // 1. Resolve agent
@@ -62,8 +69,8 @@ public sealed class AiAgentRuntimeService(
         if (!agent.IsActive)
             return AiGovernanceErrors.AgentNotActive(agentId.Value.ToString());
 
-        // 3. Valida acesso (TeamId não disponível ainda — passa null)
-        if (!agent.IsAccessibleBy(currentUser.Id, teamId: null))
+        // 3. Valida acesso — passa o teamId real do caller para enforçar visibilidade por equipa
+        if (!agent.IsAccessibleBy(currentUser.Id, teamId: callerTeamId))
             return AiGovernanceErrors.AgentAccessDenied(agentId.Value.ToString());
 
         // 4. Resolve modelo
@@ -131,9 +138,22 @@ public sealed class AiAgentRuntimeService(
         var sw = Stopwatch.StartNew();
         ChatCompletionResult chatResult;
         var toolResults = new List<ToolExecutionResult>();
+        var contextWindowTruncated = false;
+
+        // Determine context window limit from resolved model
+        var contextWindowTokens = resolvedModel.ContextWindow ?? DefaultContextWindowTokens;
 
         try
         {
+            // Apply context window trimming before first inference
+            var (trimmedMessages, wasTruncated) = ContextWindowManager.TrimToFit(
+                chatMessages, contextWindowTokens, ReservedCompletionTokens);
+            if (wasTruncated)
+            {
+                contextWindowTruncated = true;
+                chatMessages = trimmedMessages.ToList();
+            }
+
             chatResult = await chatProvider.CompleteAsync(
                 new ChatCompletionRequest(
                     resolvedModel.ModelName,
@@ -157,15 +177,20 @@ public sealed class AiAgentRuntimeService(
                     var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
                     toolResults.Add(toolResult);
 
-                    // Append tool result to conversation and re-infer
+                    // Append tool result to conversation and apply sliding window before re-inference
                     chatMessages.Add(new ChatMessage("assistant", chatResult.Content));
                     chatMessages.Add(new ChatMessage("user",
                         $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
 
+                    var (trimmedLoop, loopTruncated) = ContextWindowManager.TrimToFit(
+                        chatMessages, contextWindowTokens, ReservedCompletionTokens);
+                    if (loopTruncated)
+                        contextWindowTruncated = true;
+
                     chatResult = await chatProvider.CompleteAsync(
                         new ChatCompletionRequest(
                             resolvedModel.ModelName,
-                            chatMessages,
+                            trimmedLoop,
                             Temperature: 0.3,
                             MaxTokens: 4096,
                             SystemPrompt: null),
