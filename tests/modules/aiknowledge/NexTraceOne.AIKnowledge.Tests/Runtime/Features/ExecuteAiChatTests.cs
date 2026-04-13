@@ -16,7 +16,9 @@ public sealed class ExecuteAiChatTests
     private readonly IAiAssistantConversationRepository _conversationRepo = Substitute.For<IAiAssistantConversationRepository>();
     private readonly IAiMessageRepository _messageRepo = Substitute.For<IAiMessageRepository>();
     private readonly IAiUsageEntryRepository _usageRepo = Substitute.For<IAiUsageEntryRepository>();
+    private readonly IAiTokenQuotaService _quotaService = Substitute.For<IAiTokenQuotaService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
     public ExecuteAiChatTests()
@@ -24,7 +26,14 @@ public sealed class ExecuteAiChatTests
         _currentUser.IsAuthenticated.Returns(true);
         _currentUser.Id.Returns("user-1");
         _currentUser.Name.Returns("Test User");
+        _currentTenant.Id.Returns(Guid.NewGuid());
         _dateTimeProvider.UtcNow.Returns(FixedNow);
+
+        // Quota allowed by default
+        _quotaService.ValidateQuotaAsync(
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new TokenQuotaValidationResult(IsAllowed: true));
     }
 
     private ExecuteAiChat.Handler CreateHandler() => new(
@@ -33,7 +42,9 @@ public sealed class ExecuteAiChatTests
         _conversationRepo,
         _messageRepo,
         _usageRepo,
+        _quotaService,
         _currentUser,
+        _currentTenant,
         _dateTimeProvider);
 
     private static ExecuteAiChat.Command CreateCommand(string message = "Hello AI") =>

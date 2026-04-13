@@ -2,8 +2,10 @@
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantMessage;
+using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Tests.Governance.Application.Features;
@@ -22,32 +24,26 @@ public sealed class SendAssistantMessageLlmTests
 
     // ── Mocks ────────────────────────────────────────────────────────────
     private readonly IAiUsageEntryRepository _usageRepo = Substitute.For<IAiUsageEntryRepository>();
-    private readonly IAiAssistantConversationRepository _convRepo = Substitute.For<IAiAssistantConversationRepository>();
-    private readonly IAiMessageRepository _msgRepo = Substitute.For<IAiMessageRepository>();
     private readonly IAiRoutingStrategyRepository _routingRepo = Substitute.For<IAiRoutingStrategyRepository>();
     private readonly IAiKnowledgeSourceRepository _sourceRepo = Substitute.For<IAiKnowledgeSourceRepository>();
-    private readonly IAiModelCatalogService _modelCatalog = Substitute.For<IAiModelCatalogService>();
     private readonly IAiModelAuthorizationService _modelAuth = Substitute.For<IAiModelAuthorizationService>();
     private readonly IAiTokenQuotaService _quotaService = Substitute.For<IAiTokenQuotaService>();
     private readonly IExternalAIRoutingPort _routingPort = Substitute.For<IExternalAIRoutingPort>();
     private readonly IAiProviderFactory _providerFactory = Substitute.For<IAiProviderFactory>();
-    private readonly IDocumentRetrievalService _docRetrieval = Substitute.For<IDocumentRetrievalService>();
-    private readonly IDatabaseRetrievalService _dbRetrieval = Substitute.For<IDatabaseRetrievalService>();
-    private readonly ITelemetryRetrievalService _telRetrieval = Substitute.For<ITelemetryRetrievalService>();
+    private readonly IContextGroundingService _groundingService = Substitute.For<IContextGroundingService>();
+    private readonly IAiRoutingResolver _routingResolver = Substitute.For<IAiRoutingResolver>();
+    private readonly IConversationPersistenceService _convPersistence = Substitute.For<IConversationPersistenceService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
-    private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public SendAssistantMessageLlmTests()
     {
-        // Default user setup
         _currentUser.Id.Returns("user-001");
         _currentUser.Email.Returns("engineer@nextraceone.io");
         _currentUser.Name.Returns("Test Engineer");
         _currentUser.IsAuthenticated.Returns(true);
         _currentTenant.Id.Returns(Guid.NewGuid());
-        _clock.UtcNow.Returns(FixedNow);
 
         // Quota always allowed by default
         _quotaService.ValidateQuotaAsync(
@@ -55,29 +51,104 @@ public sealed class SendAssistantMessageLlmTests
             Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new TokenQuotaValidationResult(IsAllowed: true));
 
-        // Default repository stubs
+        // Default routing strategy repo
         _routingRepo.ListAsync(true, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIRoutingStrategy>().AsReadOnly());
+
+        // Default source repo
         _sourceRepo.ListAsync(null, true, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIKnowledgeSource>().AsReadOnly());
-        _modelCatalog.ResolveDefaultModelAsync("chat", Arg.Any<CancellationToken>())
-            .Returns((ResolvedModel?)null);
 
-        // Retrieval services return empty by default
-        _docRetrieval.SearchAsync(Arg.Any<DocumentSearchRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new DocumentSearchResult(false, []));
-        _dbRetrieval.SearchAsync(Arg.Any<DatabaseSearchRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new DatabaseSearchResult(false, []));
-        _telRetrieval.SearchAsync(Arg.Any<TelemetrySearchRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new TelemetrySearchResult(false, []));
+        // Default grounding service — reflects actual persona and contextScope
+        _groundingService.ResolveGroundingAsync(
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<Guid?>(),
+            Arg.Any<Guid?>(), Arg.Any<Guid?>(), Arg.Any<Guid?>(), Arg.Any<Guid?>(), Arg.Any<Guid?>(),
+            Arg.Any<string?>(), Arg.Any<IReadOnlyList<NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIKnowledgeSource>>(),
+            Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                var personaArg = callInfo.ArgAt<string>(1);
+                var contextScopeArg = callInfo.ArgAt<string?>(2) ?? "general";
+                return new GroundingResolutionResult(
+                    GroundingContext: $"Persona: {personaArg}\nContextScope: {contextScopeArg}",
+                    SystemPrompt: $"You are NexTraceOne AI Assistant. Context scope: {contextScopeArg}\n\n## Grounding Context\nPersona: {personaArg}\nContextScope: {contextScopeArg}",
+                    GroundingSources: ["Service Catalog", "Contract Registry"],
+                    ContextSummary: null,
+                    SuggestedSteps: null,
+                    Caveats: null,
+                    ContextStrength: "none",
+                    ConfidenceLevel: "Unknown",
+                    SourceWeightingSummary: "no-matches",
+                    UseCaseType: AIUseCaseType.General);
+            });
+
+        // Default routing resolver
+        _routingResolver.ResolveRoutingAsync(
+            Arg.Any<string>(), Arg.Any<AIUseCaseType>(), Arg.Any<string>(), Arg.Any<Guid?>(),
+            Arg.Any<string>(), Arg.Any<IReadOnlyList<NexTraceOne.AIKnowledge.Domain.Governance.Entities.AIRoutingStrategy>>(),
+            Arg.Any<CancellationToken>())
+            .Returns(new RoutingResolutionResult(
+                SelectedModel: string.Empty,
+                SelectedProvider: string.Empty,
+                IsInternal: true,
+                RoutingPath: AIRoutingPath.InternalOnly,
+                RoutingRationale: "Test routing",
+                CostClass: "low",
+                EscalationReason: "None",
+                AppliedStrategy: null));
+
+        // Default conversation persistence
+        SetupDefaultConversationPersistence();
+    }
+
+    private void SetupDefaultConversationPersistence()
+    {
+        var convId = Guid.NewGuid();
+        var conversation = NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiAssistantConversation.Start(
+            "Test", "Engineer",
+            NexTraceOne.AIKnowledge.Domain.Governance.Enums.AIClientType.Web,
+            "general", "user-001");
+
+        _convPersistence.GetOrCreateAsync(
+            Arg.Any<Guid?>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<NexTraceOne.AIKnowledge.Domain.Governance.Enums.AIClientType>(),
+            Arg.Any<string?>(), Arg.Any<Guid?>(), Arg.Any<Guid?>(), Arg.Any<Guid?>(), Arg.Any<Guid?>(),
+            Arg.Any<Guid?>(), Arg.Any<CancellationToken>())
+            .Returns((conversation, (NexTraceOne.BuildingBlocks.Core.Results.Error?)null));
+
+        _convPersistence.PersistMessagePairAsync(
+            Arg.Any<NexTraceOne.AIKnowledge.Domain.Governance.Entities.AiAssistantConversation>(),
+            Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<int>(), Arg.Any<int>(),
+            Arg.Any<string?>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                var promptTokens = callInfo.ArgAt<int>(7);
+                var completionTokens = callInfo.ArgAt<int>(8);
+                var isDegradedArg = callInfo.ArgAt<bool>(13);
+                return new MessagePersistenceResult(
+                    convId, Guid.NewGuid(), FixedNow, Guid.NewGuid(), FixedNow,
+                    isDegradedArg ? "Degraded" : "Ready",
+                    isDegradedArg, isDegradedArg ? "Provider unavailable" : null,
+                    "Test conversation", 2, FixedNow);
+            });
     }
 
     private SendAssistantMessage.Handler CreateHandler() => new(
-        _usageRepo, _convRepo, _msgRepo, _routingRepo, _sourceRepo,
-        _modelCatalog, _modelAuth, _quotaService,
-        _routingPort, _providerFactory,
-        _docRetrieval, _dbRetrieval, _telRetrieval,
-        _currentUser, _currentTenant, _currentEnvironment, _clock,
+        _usageRepo,
+        _routingRepo,
+        _sourceRepo,
+        _modelAuth,
+        _quotaService,
+        _routingPort,
+        _providerFactory,
+        _groundingService,
+        _routingResolver,
+        _convPersistence,
+        _currentUser,
+        _currentTenant,
+        _currentEnvironment,
         NullLogger<SendAssistantMessage.Handler>.Instance);
 
     private IChatCompletionProvider MockProvider(string content, int promptTokens = 50, int completionTokens = 120)
