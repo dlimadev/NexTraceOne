@@ -22,7 +22,8 @@ public sealed class MissingOrchestrationFeaturesTests
     public async Task SuggestSemanticVersion_ShouldReturnParsedVersion_WhenProviderResponds()
     {
         var port = Substitute.For<IExternalAIRoutingPort>();
-        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(),
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("For this minor change with backward-compatible additions, I suggest version 2.3.0. " +
                      "The change adds new optional fields which does not break existing consumers.");
 
@@ -51,7 +52,8 @@ public sealed class MissingOrchestrationFeaturesTests
     public async Task SuggestSemanticVersion_ShouldReturnFallback_WhenProviderUnavailable()
     {
         var port = Substitute.For<IExternalAIRoutingPort>();
-        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(),
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromException<string>(new InvalidOperationException("Provider unreachable")));
 
         var dateProvider = Substitute.For<IDateTimeProvider>();
@@ -69,7 +71,8 @@ public sealed class MissingOrchestrationFeaturesTests
     public async Task SuggestSemanticVersion_ShouldFallbackToCurrentVersion_WhenNoVersionInResponse()
     {
         var port = Substitute.For<IExternalAIRoutingPort>();
-        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(),
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("Based on the context, you should increment the version appropriately for this change.");
 
         var dateProvider = Substitute.For<IDateTimeProvider>();
@@ -105,7 +108,8 @@ public sealed class MissingOrchestrationFeaturesTests
     public async Task SuggestSemanticVersion_ShouldDetectMajorVersionInResponse()
     {
         var port = Substitute.For<IExternalAIRoutingPort>();
-        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        port.RouteQueryAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>(),
+            Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns("This change breaks backward compatibility. I recommend bumping to 3.0.0 as it removes endpoints.");
 
         var dateProvider = Substitute.For<IDateTimeProvider>();
@@ -133,7 +137,7 @@ public sealed class MissingOrchestrationFeaturesTests
                 AiAgent.Register("api-designer", "API Designer", "Helps design REST APIs",
                     AgentCategory.ApiDesign, isOfficial: false, systemPrompt: "Design APIs"),
                 AiAgent.Register("incident-responder", "Incident Responder", "Helps investigate incidents",
-                    AgentCategory.OperationalIntelligence, isOfficial: true, systemPrompt: "Investigate incidents"),
+                    AgentCategory.IncidentResponse, isOfficial: true, systemPrompt: "Investigate incidents"),
             } as IReadOnlyList<AiAgent>);
 
         var handler = new GetAgentMarketplace.Handler(repo);

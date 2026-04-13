@@ -36,10 +36,9 @@ public sealed class AiGuardrailEnforcementService(
             new Regex(p, RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant))
         .ToArray();
 
-    // Padrões de PII / dados sensíveis no output
+    // Padrões de PII / dados sensíveis no output — focados em padrões concretos e de alta confiança
     private static readonly (string Name, Regex Pattern)[] PiiOutputPatterns =
     [
-        ("API_KEY", new Regex(@"[A-Za-z0-9_\-]{20,}\b", RegexOptions.Compiled | RegexOptions.CultureInvariant)),
         ("CONNECTION_STRING", new Regex(@"(?:Server|Data Source|Initial Catalog|Password|Pwd)\s*=", RegexOptions.IgnoreCase | RegexOptions.Compiled)),
         ("BEARER_TOKEN", new Regex(@"Bearer\s+[A-Za-z0-9\-_.~+/]+=*", RegexOptions.Compiled)),
         ("PRIVATE_KEY_HEADER", new Regex(@"-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----", RegexOptions.Compiled)),

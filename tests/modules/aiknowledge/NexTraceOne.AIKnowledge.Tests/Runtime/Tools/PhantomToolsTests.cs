@@ -9,7 +9,10 @@ using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
 namespace NexTraceOne.AIKnowledge.Tests.Runtime.Tools;
 
 /// <summary>
-/// Testes unitários para as três novas tools: GetContractDetailsTool, SearchIncidentsTool, GetTokenUsageSummaryTool.
+/// Testes unitários para as primeiras três phantom tools (P1 fase 1):
+/// GetContractDetailsTool, SearchIncidentsTool, GetTokenUsageSummaryTool.
+/// As três tools adicionais (SearchKnowledgeTool, GetRunbookTool, ListContractVersionsTool)
+/// estão cobertas em AdditionalPhantomToolsTests.
 /// </summary>
 public sealed class PhantomToolsTests
 {

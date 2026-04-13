@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
