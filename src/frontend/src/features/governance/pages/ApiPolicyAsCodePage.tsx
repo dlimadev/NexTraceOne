@@ -124,7 +124,7 @@ export function ApiPolicyAsCodePage() {
       />
 
       {/* Info section */}
-      <PageSection title="">
+      <PageSection title={t('apiPolicyAsCode.overview')}>
         <Card>
           <CardBody>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -171,7 +171,7 @@ export function ApiPolicyAsCodePage() {
                     type="text"
                     className={inputClass}
                     value={registerForm.name}
-                    placeholder="my-api-policy"
+                    placeholder={t('governance.policyAsCode.placeholder.policyName', 'my-api-policy')}
                     onChange={(e) => setRegisterForm((f) => ({ ...f, name: e.target.value }))}
                     required
                   />
@@ -192,7 +192,7 @@ export function ApiPolicyAsCodePage() {
                     type="text"
                     className={inputClass}
                     value={registerForm.version}
-                    placeholder="1.0.0"
+                    placeholder={t('governance.policyAsCode.placeholder.version', '1.0.0')}
                     onChange={(e) => setRegisterForm((f) => ({ ...f, version: e.target.value }))}
                     required
                   />

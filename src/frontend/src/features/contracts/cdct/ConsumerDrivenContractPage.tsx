@@ -8,6 +8,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { contractsApi } from '../api/contracts';
+import { PageErrorState } from '../../../components/PageErrorState';
+import { PageContainer } from '../../../components/shell';
 import {
   ShieldCheck,
   ShieldAlert,
@@ -55,7 +57,7 @@ export function ConsumerDrivenContractPage() {
     notes: '',
   });
 
-  const { data: expectations, isLoading: loadingExpectations } = useQuery({
+  const { data: expectations, isLoading: loadingExpectations, isError: isExpectationsError, refetch: refetchExpectations } = useQuery({
     queryKey: ['consumer-expectations', apiAssetId],
     queryFn: () => contractsApi.getConsumerExpectations(apiAssetId),
     enabled: !!apiAssetId,
@@ -78,6 +80,14 @@ export function ConsumerDrivenContractPage() {
 
   const typed = cdctResult as CdctResult | undefined;
   const expectationList = (expectations as { items?: ConsumerExpectation[] })?.items ?? [];
+
+  if (isExpectationsError) {
+    return (
+      <PageContainer>
+        <PageErrorState onRetry={() => refetchExpectations()} />
+      </PageContainer>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background px-6 py-6 text-body">
@@ -256,7 +266,7 @@ export function ConsumerDrivenContractPage() {
                   type="text"
                   value={newExpectation.consumerServiceName}
                   onChange={(e) => setNewExpectation((p) => ({ ...p, consumerServiceName: e.target.value }))}
-                  placeholder="e.g., checkout-service"
+                  placeholder={t('contracts.cdct.placeholder.serviceName', 'e.g., checkout-service')}
                   className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
                 />
               </div>
@@ -268,7 +278,7 @@ export function ConsumerDrivenContractPage() {
                   type="text"
                   value={newExpectation.consumerDomain}
                   onChange={(e) => setNewExpectation((p) => ({ ...p, consumerDomain: e.target.value }))}
-                  placeholder="e.g., Commerce"
+                  placeholder={t('contracts.cdct.placeholder.domain', 'e.g., Commerce')}
                   className="w-full text-xs bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
                 />
               </div>

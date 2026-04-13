@@ -10,6 +10,7 @@ import { AppContentFrame } from './AppContentFrame';
 import { MobileDrawer } from './MobileDrawer';
 import { EnvironmentBanner } from './EnvironmentBanner';
 import { AnalyticsEventTracker } from '../../features/product-analytics';
+import { AppFooter } from './AppFooter';
 import { RouteProgressBar } from '../RouteProgressBar';
 import { cn } from '../../lib/cn';
 
@@ -130,6 +131,7 @@ export function AppShell() {
             <Outlet />
           </AppContentFrame>
         </main>
+        <AppFooter />
       </div>
 
       <CommandPalette open={paletteOpen} onClose={closePalette} />

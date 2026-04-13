@@ -21,3 +21,4 @@ export { MobileDrawer } from './MobileDrawer';
 export { FilterBar } from './FilterBar';
 export { TableWrapper } from './TableWrapper';
 export { StatsGrid } from './StatsGrid';
+export { AppFooter } from './AppFooter';

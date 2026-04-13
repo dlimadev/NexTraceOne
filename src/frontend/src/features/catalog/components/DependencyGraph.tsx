@@ -217,8 +217,8 @@ export function DependencyGraph({
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', height: `${height}px` }}
-      className="rounded-lg overflow-hidden bg-panel border border-edge"
+      style={{ height: `${height}px` }}
+      className="w-full rounded-lg overflow-hidden bg-panel border border-edge"
       aria-label={t('catalog.dependencyGraph.ariaLabel')}
     />
   );

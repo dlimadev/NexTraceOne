@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { PageErrorState } from '../../../components/PageErrorState';
 
 /**
  * GovernanceGatesPage — interface para avaliar gates de governança:
@@ -73,9 +74,11 @@ export function GovernanceGatesPage() {
       />
 
       {gateError && (
-        <div className="mt-4 p-3 rounded bg-critical/10 border border-critical/30 flex items-center gap-2">
-          <AlertTriangle size={16} className="text-critical shrink-0" />
-          <span className="text-sm text-critical">{gateError}</span>
+        <div className="mt-4">
+          <PageErrorState
+            message={gateError}
+            onRetry={() => setGateError(null)}
+          />
         </div>
       )}
 

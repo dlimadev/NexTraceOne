@@ -324,7 +324,7 @@ function LinkForm({ initialData, onSubmit, onCancel, isSubmitting }: LinkFormPro
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://..."
+          placeholder={t('catalog.links.placeholder.url', 'https://...')}
           className="w-full text-xs bg-panel border border-edge rounded px-2 py-1.5 text-body placeholder:text-muted/40 focus:outline-none focus:ring-1 focus:ring-accent"
           required
         />

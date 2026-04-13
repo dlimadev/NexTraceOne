@@ -215,7 +215,7 @@ export function WebhookSubscriptionsPage() {
                     className="input input-sm w-full"
                     value={form.targetUrl}
                     onChange={e => setForm(p => ({ ...p, targetUrl: e.target.value }))}
-                    placeholder="https://"
+                    placeholder={t('webhookSubscriptions.placeholder.targetUrl', 'https://')}
                     required
                     maxLength={500}
                   />

@@ -88,7 +88,7 @@ export function Breadcrumbs() {
   }
 
   return (
-    <nav aria-label="Breadcrumbs" className="flex items-center gap-1 px-6 pt-3 pb-1 text-xs">
+    <nav aria-label={t('nav.breadcrumbs', 'Breadcrumbs')} className="flex items-center gap-1 px-6 pt-3 pb-1 text-xs">
       {crumbs.map((crumb, index) => {
         const isLast = index === crumbs.length - 1;
         return (

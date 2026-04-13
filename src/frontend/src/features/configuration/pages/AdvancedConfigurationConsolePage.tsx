@@ -1,32 +1,27 @@
+/**
+ * AdvancedConfigurationConsolePage — console avançada de administração de configuração.
+ *
+ * Organizada em 6 tabs extraídos como sub-componentes:
+ *  - AdvancedConfigExplorerTab
+ *  - AdvancedConfigDiffTab
+ *  - AdvancedConfigImportExportTab
+ *  - AdvancedConfigRollbackTab
+ *  - AdvancedConfigHistoryTab
+ *  - AdvancedConfigHealthTab
+ *
+ * Tipos, constantes e helpers partilhados em AdvancedConfigConsoleTypes.
+ */
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Settings,
   Search,
-  Filter,
   ArrowLeftRight,
   Download,
-  Upload,
   RotateCcw,
   History,
   Activity,
-  Shield,
   Eye,
-  ChevronDown,
-  ChevronUp,
-  Lock,
-  AlertTriangle,
-  CheckCircle2,
-  XCircle,
-  Info,
-  Layers,
-  FileJson,
-  RefreshCw,
-  ArrowRight,
-  Clock,
 } from 'lucide-react';
-import { Card, CardBody, CardHeader } from '../../../components/Card';
-import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -41,65 +36,15 @@ import type {
   EffectiveConfigurationDto,
   ConfigurationScope,
 } from '../types';
-
-// ── Domain Navigation ──────────────────────────────────────────────────
-
-type ConfigDomain =
-  | 'all'
-  | 'instance'
-  | 'notifications'
-  | 'workflows'
-  | 'governance'
-  | 'catalog'
-  | 'operations'
-  | 'ai'
-  | 'integrations';
-
-type AdminTab =
-  | 'explorer'
-  | 'diff'
-  | 'importExport'
-  | 'rollback'
-  | 'history'
-  | 'health';
-
-interface DomainMeta {
-  key: ConfigDomain;
-  prefixes: string[];
-  icon: React.ReactNode;
-}
-
-const DOMAINS: DomainMeta[] = [
-  { key: 'all', prefixes: [], icon: <Layers className="w-4 h-4" /> },
-  { key: 'instance', prefixes: ['instance.', 'tenant.', 'environment.', 'featureFlags.'], icon: <Settings className="w-4 h-4" /> },
-  { key: 'notifications', prefixes: ['notifications.'], icon: <Activity className="w-4 h-4" /> },
-  { key: 'workflows', prefixes: ['workflow.', 'promotion.'], icon: <ArrowRight className="w-4 h-4" /> },
-  { key: 'governance', prefixes: ['governance.'], icon: <Shield className="w-4 h-4" /> },
-  { key: 'catalog', prefixes: ['catalog.', 'change.'], icon: <FileJson className="w-4 h-4" /> },
-  { key: 'operations', prefixes: ['incidents.', 'operations.', 'finops.', 'benchmarking.'], icon: <Activity className="w-4 h-4" /> },
-  { key: 'ai', prefixes: ['ai.'], icon: <Eye className="w-4 h-4" /> },
-  { key: 'integrations', prefixes: ['integrations.'], icon: <ArrowLeftRight className="w-4 h-4" /> },
-];
-
-// ── Helpers ────────────────────────────────────────────────────────────
-
-function matchDomain(key: string, domain: DomainMeta): boolean {
-  if (domain.key === 'all') return true;
-  return domain.prefixes.some((p) => key.startsWith(p));
-}
-
-function renderValuePreview(value: string | null, isSensitive: boolean): React.ReactNode {
-  if (isSensitive) return <Badge variant="warning"><Lock className="w-3 h-3 mr-1" />Masked</Badge>;
-  if (!value) return <span className="text-muted italic text-xs">null</span>;
-  if (value === 'true') return <Badge variant="success">Enabled</Badge>;
-  if (value === 'false') return <Badge variant="default">Disabled</Badge>;
-  try {
-    const parsed = JSON.parse(value);
-    if (Array.isArray(parsed)) return <Badge variant="info">{parsed.length} items</Badge>;
-    if (typeof parsed === 'object') return <Badge variant="info">{Object.keys(parsed).length} fields</Badge>;
-  } catch { /* not JSON */ }
-  return <span className="text-sm text-faded truncate max-w-[200px] inline-block">{value}</span>;
-}
+import { DOMAINS, matchDomain } from './AdvancedConfigConsoleTypes';
+import type { ConfigDomain, AdminTab } from './AdvancedConfigConsoleTypes';
+import { AdvancedConfigExplorerTab } from './AdvancedConfigExplorerTab';
+import { AdvancedConfigDiffTab } from './AdvancedConfigDiffTab';
+import { AdvancedConfigImportExportTab } from './AdvancedConfigImportExportTab';
+import { AdvancedConfigRollbackTab } from './AdvancedConfigRollbackTab';
+import { AdvancedConfigHistoryTab } from './AdvancedConfigHistoryTab';
+import { AdvancedConfigHealthTab } from './AdvancedConfigHealthTab';
+import type { HealthCheck } from './AdvancedConfigHealthTab';
 
 // ── Main Component ─────────────────────────────────────────────────────
 
@@ -160,10 +105,10 @@ export function AdvancedConfigurationConsolePage() {
   }, [filteredDefs, effectiveMap, compareMap]);
 
   // ── Health checks ──────────────────────────────────────────────────
-  const healthChecks = useMemo(() => {
+  const healthChecks = useMemo<HealthCheck[]>(() => {
     if (!definitions || !effective) return [];
-    const checks: { name: string; status: 'ok' | 'warning' | 'error'; message: string }[] = [];
-    
+    const checks: HealthCheck[] = [];
+
     const defCount = definitions.length;
     checks.push({
       name: t('advancedConfig.health.definitionCount', 'Definition Count'),
@@ -317,521 +262,64 @@ export function AdvancedConfigurationConsolePage() {
         />
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* TAB: Effective Explorer                                       */}
-      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* ── Tab Content ───────────────────────────────────────────────── */}
       {activeTab === 'explorer' && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-4 mb-4">
-            <select
-              value={selectedScope}
-              onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-              className="px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-            >
-              <option value="System">System</option>
-              <option value="Tenant">Tenant</option>
-              <option value="Environment">Environment</option>
-            </select>
-            <span className="text-sm text-faded">
-              {t('advancedConfig.explorer.showing', 'Showing')} {filteredDefs.length} {t('advancedConfig.explorer.definitions', 'definitions')}
-              {loadingEffective && <RefreshCw className="w-3 h-3 ml-2 animate-spin inline" />}
-            </span>
-          </div>
-
-          {filteredDefs.map((def: ConfigurationDefinitionDto) => {
-            const eff = effectiveMap.get(def.key);
-            const isExpanded = expandedKey === def.key;
-
-            return (
-              <Card key={def.key}>
-                <CardBody>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setExpandedKey(isExpanded ? null : def.key)}
-                          className="flex items-center gap-1 text-left"
-                        >
-                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                          <span className="font-medium text-sm">{def.displayName}</span>
-                        </button>
-                        {eff?.isInherited && <Badge variant="info" className="text-xs">Inherited</Badge>}
-                        {eff?.isDefault && <Badge variant="default" className="text-xs">Default</Badge>}
-                        {!def.isInheritable && <Badge variant="warning" className="text-xs"><Lock className="w-3 h-3 mr-1" />Mandatory</Badge>}
-                        {def.isSensitive && <Badge variant="warning" className="text-xs"><Shield className="w-3 h-3 mr-1" />Sensitive</Badge>}
-                      </div>
-                      <p className="text-xs text-faded mt-1 ml-5">{def.key}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {eff && (
-                        <div className="text-right">
-                          <div className="text-xs text-muted">{eff.resolvedScope}</div>
-                          {renderValuePreview(eff.effectiveValue, def.isSensitive && !showSensitive)}
-                        </div>
-                      )}
-                      {!eff && renderValuePreview(def.defaultValue, def.isSensitive && !showSensitive)}
-                    </div>
-                  </div>
-
-                  {isExpanded && (
-                    <div className="mt-4 pt-4 border-t border-edge space-y-3">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <div>
-                          <span className="text-muted">{t('advancedConfig.explorer.type', 'Type')}</span>
-                          <p className="font-medium">{def.valueType}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted">{t('advancedConfig.explorer.scopes', 'Scopes')}</span>
-                          <p className="font-medium">{def.allowedScopes?.join(', ')}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted">{t('advancedConfig.explorer.editor', 'Editor')}</span>
-                          <p className="font-medium">{def.uiEditorType ?? 'text'}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted">{t('advancedConfig.explorer.inheritable', 'Inheritable')}</span>
-                          <p className="font-medium">{def.isInheritable ? 'Yes' : 'No'}</p>
-                        </div>
-                      </div>
-                      {def.description && (
-                        <p className="text-xs text-faded">{def.description}</p>
-                      )}
-                      <div>
-                        <span className="text-xs text-muted">{t('advancedConfig.explorer.defaultValue', 'Default Value')}</span>
-                        <pre className="mt-1 p-2 bg-subtle rounded text-xs overflow-x-auto">
-                          {def.defaultValue ?? 'null'}
-                        </pre>
-                      </div>
-                      {eff && (
-                        <div className="p-3 bg-brand-50 rounded-lg">
-                          <div className="flex items-center gap-2 text-xs text-brand-700 mb-1">
-                            <Layers className="w-3 h-3" />
-                            {t('advancedConfig.explorer.effectiveValue', 'Effective Value')}
-                            <Badge variant="info" className="text-xs">{eff.resolvedScope}</Badge>
-                            {eff.isInherited && <Badge variant="default" className="text-xs">Inherited</Badge>}
-                          </div>
-                          <pre className="text-xs overflow-x-auto">
-                            {def.isSensitive && !showSensitive ? '***MASKED***' : (eff.effectiveValue ?? 'null')}
-                          </pre>
-                        </div>
-                      )}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setSelectedAuditKey(def.key)}
-                          className="flex items-center gap-1 px-2 py-1 text-xs text-faded hover:text-brand-600 transition-colors"
-                        >
-                          <History className="w-3 h-3" />
-                          {t('advancedConfig.explorer.viewHistory', 'View History')}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </CardBody>
-              </Card>
-            );
-          })}
-
-          {filteredDefs.length === 0 && (
-            <Card>
-              <CardBody>
-                <div className="text-center py-8 text-faded">
-                  <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>{t('advancedConfig.explorer.noResults', 'No matching definitions found.')}</p>
-                </div>
-              </CardBody>
-            </Card>
-          )}
-        </div>
+        <AdvancedConfigExplorerTab
+          selectedScope={selectedScope}
+          filteredDefs={filteredDefs}
+          effectiveMap={effectiveMap}
+          expandedKey={expandedKey}
+          loadingEffective={loadingEffective}
+          showSensitive={showSensitive}
+          setSelectedScope={setSelectedScope}
+          setExpandedKey={setExpandedKey}
+          setSelectedAuditKey={setSelectedAuditKey}
+        />
       )}
 
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* TAB: Diff & Compare                                          */}
-      {/* ══════════════════════════════════════════════════════════════ */}
       {activeTab === 'diff' && (
-        <div className="space-y-4">
-          <Card>
-            <CardBody>
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <label className="text-xs text-faded mb-1 block">{t('advancedConfig.diff.leftScope', 'Left Scope')}</label>
-                  <select
-                    value={selectedScope}
-                    onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-                    className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-                  >
-                    <option value="System">System</option>
-                    <option value="Tenant">Tenant</option>
-                    <option value="Environment">Environment</option>
-                  </select>
-                </div>
-                <ArrowLeftRight className="w-5 h-5 text-muted mt-5" />
-                <div className="flex-1">
-                  <label className="text-xs text-faded mb-1 block">{t('advancedConfig.diff.rightScope', 'Right Scope')}</label>
-                  <select
-                    value={compareScope}
-                    onChange={(e) => setCompareScope(e.target.value as ConfigurationScope)}
-                    className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-                  >
-                    <option value="System">System</option>
-                    <option value="Tenant">Tenant</option>
-                    <option value="Environment">Environment</option>
-                  </select>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-
-          <div className="flex items-center gap-2 text-sm text-faded">
-            <ArrowLeftRight className="w-4 h-4" />
-            {diffItems.length} {t('advancedConfig.diff.differences', 'differences found')}
-          </div>
-
-          {diffItems.map(({ def, leftVal, rightVal }) => (
-            <Card key={def.key}>
-              <CardBody>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="font-medium text-sm">{def.displayName}</span>
-                  <span className="text-xs text-muted">{def.key}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-critical/15 rounded-lg">
-                    <div className="text-xs text-critical mb-1">{selectedScope}</div>
-                    <pre className="text-xs overflow-x-auto">{def.isSensitive ? '***' : (leftVal ?? 'null')}</pre>
-                  </div>
-                  <div className="p-3 bg-success/15 rounded-lg">
-                    <div className="text-xs text-success mb-1">{compareScope}</div>
-                    <pre className="text-xs overflow-x-auto">{def.isSensitive ? '***' : (rightVal ?? 'null')}</pre>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-
-          {diffItems.length === 0 && (
-            <Card>
-              <CardBody>
-                <div className="text-center py-8 text-faded">
-                  <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-success" />
-                  <p>{t('advancedConfig.diff.noDifferences', 'No differences between the selected scopes.')}</p>
-                </div>
-              </CardBody>
-            </Card>
-          )}
-        </div>
+        <AdvancedConfigDiffTab
+          selectedScope={selectedScope}
+          compareScope={compareScope}
+          diffItems={diffItems}
+          setSelectedScope={setSelectedScope}
+          setCompareScope={setCompareScope}
+        />
       )}
 
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* TAB: Import / Export                                         */}
-      {/* ══════════════════════════════════════════════════════════════ */}
       {activeTab === 'importExport' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Export */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Download className="w-5 h-5 text-brand-600" />
-                  <h3 className="font-semibold">{t('advancedConfig.export.title', 'Export Configuration')}</h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <p className="text-sm text-faded mb-4">
-                  {t('advancedConfig.export.description', 'Export configuration definitions and effective values as a validated JSON file. Sensitive values are automatically masked.')}
-                </p>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-xs text-faded mb-1 block">{t('advancedConfig.export.scope', 'Scope')}</label>
-                    <select
-                      value={selectedScope}
-                      onChange={(e) => setSelectedScope(e.target.value as ConfigurationScope)}
-                      className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-                    >
-                      <option value="System">System</option>
-                      <option value="Tenant">Tenant</option>
-                      <option value="Environment">Environment</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs text-faded mb-1 block">{t('advancedConfig.export.domain', 'Domain')}</label>
-                    <select
-                      value={activeDomain}
-                      onChange={(e) => setActiveDomain(e.target.value as ConfigDomain)}
-                      className="w-full px-3 py-2 border border-edge rounded-lg text-sm bg-card"
-                    >
-                      {DOMAINS.map(d => <option key={d.key} value={d.key}>{d.key}</option>)}
-                    </select>
-                  </div>
-                  <div className="bg-warning/15 p-3 rounded-lg">
-                    <div className="flex items-start gap-2 text-xs text-warning">
-                      <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>{t('advancedConfig.export.sensitiveWarning', 'Sensitive values will be masked in the export for security.')}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleExport}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700"
-                  >
-                    <Download className="w-4 h-4" />
-                    {t('advancedConfig.export.button', 'Export JSON')}
-                  </button>
-                </div>
-              </CardBody>
-            </Card>
-
-            {/* Import */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Upload className="w-5 h-5 text-brand-600" />
-                  <h3 className="font-semibold">{t('advancedConfig.import.title', 'Import Configuration')}</h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <p className="text-sm text-faded mb-4">
-                  {t('advancedConfig.import.description', 'Import a previously exported configuration file. All values will be validated against current definitions before applying.')}
-                </p>
-                <div className="space-y-3">
-                  <div className="border-2 border-dashed border-edge rounded-lg p-8 text-center">
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-muted" />
-                    <p className="text-sm text-faded">{t('advancedConfig.import.dropzone', 'Drop JSON file here or click to select')}</p>
-                    <p className="text-xs text-muted mt-1">{t('advancedConfig.import.format', 'Accepts NexTraceOne configuration export format')}</p>
-                  </div>
-                  <div className="bg-info/15 p-3 rounded-lg">
-                    <div className="flex items-start gap-2 text-xs text-info">
-                      <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>{t('advancedConfig.import.previewNote', 'Import will show a preview and validation report before applying any changes.')}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </div>
-        </div>
+        <AdvancedConfigImportExportTab
+          selectedScope={selectedScope}
+          activeDomain={activeDomain}
+          setSelectedScope={setSelectedScope}
+          setActiveDomain={setActiveDomain}
+          onExport={handleExport}
+        />
       )}
 
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* TAB: Rollback & Restore                                      */}
-      {/* ══════════════════════════════════════════════════════════════ */}
       {activeTab === 'rollback' && (
-        <div className="space-y-4">
-          <Card>
-            <CardBody>
-              <div className="flex items-center gap-2 mb-4">
-                <RotateCcw className="w-5 h-5 text-brand-600" />
-                <h3 className="font-semibold">{t('advancedConfig.rollback.title', 'Configuration Rollback')}</h3>
-              </div>
-              <p className="text-sm text-faded mb-6">
-                {t('advancedConfig.rollback.description', 'Select a configuration key to view its version history and restore a previous value. All rollbacks are audited and validated.')}
-              </p>
-
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-                <input
-                  type="text"
-                  placeholder={t('advancedConfig.rollback.searchKey', 'Search key to rollback...')}
-                  className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    if (e.target.value.length > 3) {
-                      const found = definitions?.find((d: ConfigurationDefinitionDto) => d.key === e.target.value);
-                      if (found) setSelectedAuditKey(found.key);
-                    }
-                  }}
-                />
-              </div>
-
-              {selectedAuditKey && auditData && auditData.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-body">
-                    {t('advancedConfig.rollback.historyFor', 'Version History for')} <code className="text-brand-600">{selectedAuditKey}</code>
-                  </h4>
-                  {auditData.map((entry, idx) => (
-                    <div key={idx} className="flex items-start gap-3 p-3 bg-subtle rounded-lg">
-                      <Clock className="w-4 h-4 text-muted mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 text-xs text-faded">
-                          <span>{new Date(entry.changedAt).toLocaleString()}</span>
-                          <span>•</span>
-                          <span>{entry.changedBy}</span>
-                          <Badge variant="default" className="text-xs">{entry.action}</Badge>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-                          {entry.previousValue !== null && (
-                            <div className="p-2 bg-critical/15 rounded">
-                              <span className="text-critical">Previous:</span>
-                              <pre className="mt-1 overflow-x-auto">{entry.isSensitive ? '***' : entry.previousValue}</pre>
-                            </div>
-                          )}
-                          <div className="p-2 bg-success/15 rounded">
-                            <span className="text-success">New:</span>
-                            <pre className="mt-1 overflow-x-auto">{entry.isSensitive ? '***' : entry.newValue}</pre>
-                          </div>
-                        </div>
-                        {entry.changeReason && (
-                          <p className="text-xs text-faded mt-1 italic">"{entry.changeReason}"</p>
-                        )}
-                      </div>
-                      {idx > 0 && (
-                        <button className="flex items-center gap-1 px-2 py-1 text-xs text-brand-600 hover:bg-brand-50 rounded transition-colors">
-                          <RotateCcw className="w-3 h-3" />
-                          {t('advancedConfig.rollback.restore', 'Restore')}
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {(!selectedAuditKey || !auditData || auditData.length === 0) && (
-                <div className="text-center py-8 text-faded">
-                  <RotateCcw className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>{t('advancedConfig.rollback.selectKey', 'Search and select a configuration key to view its version history.')}</p>
-                </div>
-              )}
-            </CardBody>
-          </Card>
-        </div>
+        <AdvancedConfigRollbackTab
+          selectedAuditKey={selectedAuditKey}
+          auditData={auditData}
+          definitions={definitions}
+          setSearchQuery={setSearchQuery}
+          setSelectedAuditKey={setSelectedAuditKey}
+        />
       )}
 
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* TAB: History & Timeline                                      */}
-      {/* ══════════════════════════════════════════════════════════════ */}
       {activeTab === 'history' && (
-        <div className="space-y-4">
-          <Card>
-            <CardBody>
-              <div className="flex items-center gap-2 mb-4">
-                <History className="w-5 h-5 text-brand-600" />
-                <h3 className="font-semibold">{t('advancedConfig.history.title', 'Configuration Change Timeline')}</h3>
-              </div>
-              <p className="text-sm text-faded mb-4">
-                {t('advancedConfig.history.description', 'View all configuration changes across domains. Filter by key, user, or time period.')}
-              </p>
-
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-                <input
-                  type="text"
-                  placeholder={t('advancedConfig.history.searchPlaceholder', 'Search by key...')}
-                  className="w-full pl-10 pr-4 py-2 border border-edge rounded-lg bg-card text-sm"
-                  onChange={(e) => {
-                    if (e.target.value.length > 2) setSelectedAuditKey(e.target.value);
-                  }}
-                />
-              </div>
-
-              {selectedAuditKey && auditData && auditData.length > 0 && (
-                <div className="space-y-2">
-                  {auditData.map((entry, idx) => (
-                    <div key={idx} className="flex items-start gap-3 py-3 border-b border-edge last:border-0">
-                      <div className="w-2 h-2 rounded-full bg-brand-500 mt-2 flex-shrink-0" />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="font-medium text-body">{entry.key}</span>
-                          <Badge variant={entry.action === 'Set' ? 'success' : entry.action === 'Remove' ? 'danger' : 'default'} className="text-xs">{entry.action}</Badge>
-                          <span className="text-muted">{entry.scope}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-faded mt-1">
-                          <span>{entry.changedBy}</span>
-                          <span>•</span>
-                          <span>{new Date(entry.changedAt).toLocaleString()}</span>
-                          {entry.changeReason && <span className="italic">— {entry.changeReason}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {(!selectedAuditKey || !auditData || auditData.length === 0) && (
-                <div className="text-center py-8 text-faded">
-                  <History className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>{t('advancedConfig.history.empty', 'Enter a configuration key to view its change timeline.')}</p>
-                </div>
-              )}
-            </CardBody>
-          </Card>
-        </div>
+        <AdvancedConfigHistoryTab
+          selectedAuditKey={selectedAuditKey}
+          auditData={auditData}
+          setSelectedAuditKey={setSelectedAuditKey}
+        />
       )}
 
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* TAB: Health & Troubleshooting                                */}
-      {/* ══════════════════════════════════════════════════════════════ */}
       {activeTab === 'health' && (
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-brand-600" />
-                <h3 className="font-semibold">{t('advancedConfig.health.title', 'Configuration Platform Health')}</h3>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <div className="space-y-3">
-                {healthChecks.map((check, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-subtle rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {check.status === 'ok' && <CheckCircle2 className="w-5 h-5 text-success" />}
-                      {check.status === 'warning' && <AlertTriangle className="w-5 h-5 text-warning" />}
-                      {check.status === 'error' && <XCircle className="w-5 h-5 text-critical" />}
-                      <span className="text-sm font-medium">{check.name}</span>
-                    </div>
-                    <span className="text-xs text-faded">{check.message}</span>
-                  </div>
-                ))}
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-brand-600" />
-                <h3 className="font-semibold">{t('advancedConfig.health.governanceTitle', 'Definition Governance')}</h3>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-subtle rounded-lg">
-                  <p className="text-2xl font-bold text-brand-600">{definitions?.length ?? 0}</p>
-                  <p className="text-xs text-faded">{t('advancedConfig.health.totalDefinitions', 'Total Definitions')}</p>
-                </div>
-                <div className="text-center p-4 bg-subtle rounded-lg">
-                  <p className="text-2xl font-bold text-warning">{definitions?.filter((d: ConfigurationDefinitionDto) => d.isSensitive).length ?? 0}</p>
-                  <p className="text-xs text-faded">{t('advancedConfig.health.sensitiveDefinitions', 'Sensitive')}</p>
-                </div>
-                <div className="text-center p-4 bg-subtle rounded-lg">
-                  <p className="text-2xl font-bold text-success">{definitions?.filter((d: ConfigurationDefinitionDto) => d.isEditable).length ?? 0}</p>
-                  <p className="text-xs text-faded">{t('advancedConfig.health.editableDefinitions', 'Editable')}</p>
-                </div>
-                <div className="text-center p-4 bg-subtle rounded-lg">
-                  <p className="text-2xl font-bold text-info">{definitions?.filter((d: ConfigurationDefinitionDto) => !d.isInheritable).length ?? 0}</p>
-                  <p className="text-xs text-faded">{t('advancedConfig.health.mandatoryDefinitions', 'Mandatory (System-only)')}</p>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="text-sm font-medium text-body mb-3">
-                  {t('advancedConfig.health.domainBreakdown', 'Domain Breakdown')}
-                </h4>
-                <div className="space-y-2">
-                  {DOMAINS.filter(d => d.key !== 'all').map(domain => {
-                    const count = definitions?.filter((def: ConfigurationDefinitionDto) => matchDomain(def.key, domain)).length ?? 0;
-                    return (
-                      <div key={domain.key} className="flex items-center justify-between py-2 px-3 bg-subtle rounded">
-                        <div className="flex items-center gap-2">
-                          {domain.icon}
-                          <span className="text-sm">{t(`advancedConfig.domains.${domain.key}`, domain.key)}</span>
-                        </div>
-                        <Badge variant="info">{count}</Badge>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
+        <AdvancedConfigHealthTab
+          healthChecks={healthChecks}
+          definitions={definitions}
+        />
       )}
     </PageContainer>
   );

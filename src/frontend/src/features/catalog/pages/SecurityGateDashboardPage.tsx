@@ -288,7 +288,7 @@ export function SecurityGateDashboardPage() {
                 type="text"
                 value={filePathInput}
                 onChange={e => setFilePathInput(e.target.value)}
-                placeholder="src/MyController.cs"
+                placeholder={t('catalog.security.placeholder.filePath', 'src/MyController.cs')}
                 className="rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:border-blue-500 focus:outline-none font-mono"
               />
             </div>

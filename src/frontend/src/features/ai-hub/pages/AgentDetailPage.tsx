@@ -23,6 +23,7 @@ import {
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageContainer } from '../../../components/shell';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { aiGovernanceApi } from '../api/aiGovernance';
 
 // ── Types ───────────────────────────────────────────────────────────────
@@ -194,12 +195,20 @@ export function AgentDetailPage() {
     );
   }
 
-  if (error || !agent) {
+  if (error) {
+    return (
+      <PageContainer>
+        <PageErrorState onRetry={loadAgent} />
+      </PageContainer>
+    );
+  }
+
+  if (!agent) {
     return (
       <PageContainer>
         <div className="text-center py-16">
           <AlertCircle size={32} className="text-warning mx-auto mb-3" />
-          <p className="text-sm text-muted">{error || t('agents.detailNotFound')}</p>
+          <p className="text-sm text-muted">{t('agents.detailNotFound')}</p>
           <Button variant="ghost" size="sm" className="mt-3" onClick={() => navigate('/ai/agents')}>
             <ArrowLeft size={14} className="mr-1" /> {t('agents.backToList')}
           </Button>

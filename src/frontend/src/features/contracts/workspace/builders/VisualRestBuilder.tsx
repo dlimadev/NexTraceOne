@@ -28,101 +28,17 @@ import type {
   RestEndpoint,
   RestParameter,
   RestResponse,
-  SchemaProperty,
-  PropertyConstraints,
   BuilderValidationResult,
   SyncResult,
 } from './shared/builderTypes';
 
-const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] as const;
-const PARAM_LOCATIONS = ['query', 'path', 'header', 'cookie'] as const;
-const PARAM_TYPES = ['string', 'integer', 'number', 'boolean', 'array', 'object'] as const;
-const STATUS_CODES = ['200', '201', '204', '400', '401', '403', '404', '409', '422', '500', '502', '503'] as const;
-
-const METHOD_COLORS: Record<string, string> = {
-  GET: 'bg-mint/15 text-mint border border-mint/25',
-  POST: 'bg-cyan/15 text-cyan border border-cyan/25',
-  PUT: 'bg-warning/15 text-warning border border-warning/25',
-  PATCH: 'bg-accent/15 text-accent border border-accent/25',
-  DELETE: 'bg-danger/15 text-danger border border-danger/25',
-  HEAD: 'bg-muted/15 text-muted border border-muted/25',
-  OPTIONS: 'bg-muted/10 text-muted/60 border border-muted/15',
-};
-
-/** Gera IDs únicos por instância do builder usando crypto.randomUUID(). */
-function genId(prefix: string) {
-  return `${prefix}-${crypto.randomUUID()}`;
-}
-
-/** Cria as propriedades RFC 7807 Problem Details para um conjunto de campos. */
-function problemDetailsProps(fields: string[]): SchemaProperty[] {
-  const typeMap: Record<string, SchemaProperty['type']> = {
-    type: 'string',
-    title: 'string',
-    status: 'integer',
-    detail: 'string',
-    instance: 'string',
-  };
-  return fields.map((name) => ({
-    id: genId('pd'),
-    name,
-    type: typeMap[name] ?? 'string',
-    description: '',
-    required: false,
-    constraints: {},
-  }));
-}
-
-/** Resposta HTTP com schema RFC 7807. */
-function createProblemResponse(statusCode: string, description: string, fields: string[]): RestResponse {
-  return {
-    id: genId('res'),
-    statusCode,
-    description,
-    contentType: 'application/problem+json',
-    schema: '',
-    example: '',
-    properties: problemDetailsProps(fields),
-  };
-}
-
-/** Colecção de respostas de erro comuns RFC 7807. */
-const COMMON_ERROR_RESPONSES: RestResponse[] = [
-  createProblemResponse('400', 'Bad Request', ['type', 'title', 'status', 'detail', 'instance']),
-  createProblemResponse('401', 'Unauthorized', ['type', 'title', 'status']),
-  createProblemResponse('403', 'Forbidden', ['type', 'title', 'status']),
-  createProblemResponse('404', 'Not Found', ['type', 'title', 'status']),
-  createProblemResponse('500', 'Internal Server Error', ['type', 'title', 'status', 'detail']),
-];
-
-function createEndpoint(): RestEndpoint {
-  return {
-    id: genId('ep'),
-    method: 'GET',
-    path: '/resource',
-    operationId: '',
-    summary: '',
-    description: '',
-    tags: [],
-    deprecated: false,
-    deprecationNote: '',
-    parameters: [],
-    requestBody: null,
-    responses: [{ id: genId('res'), statusCode: '200', description: 'OK', contentType: 'application/json', schema: '', example: '', properties: [] }],
-    authScopes: [],
-    rateLimit: '',
-    idempotencyKey: '',
-    observabilityNotes: '',
-  };
-}
-
-function createParameter(): RestParameter {
-  return { id: genId('param'), name: '', in: 'query', required: false, type: 'string', description: '', constraints: {} };
-}
-
-function createResponse(): RestResponse {
-  return { id: genId('res'), statusCode: '200', description: '', contentType: 'application/json', schema: '', example: '', properties: [] };
-}
+import {
+  HTTP_METHODS, PARAM_LOCATIONS, PARAM_TYPES, STATUS_CODES,
+  METHOD_COLORS, COMMON_ERROR_RESPONSES,
+  genId, createEndpoint, createParameter, createResponse,
+} from './RestBuilderHelpers';
+import { ParameterConstraintsPanel } from './ParameterConstraintsPanel';
+import { CollapsibleSubSection } from './CollapsibleSubSection';
 
 interface VisualRestBuilderProps {
   initialState?: RestBuilderState;
@@ -1002,123 +918,6 @@ export function VisualRestBuilder({
           </button>
         </div>
       )}
-    </div>
-  );
-}
-
-// ── Parameter Constraints Panel ────────────────────────────────────────────────
-
-const FORMAT_OPTIONS = ['', 'date', 'date-time', 'email', 'uri', 'uuid', 'hostname', 'ipv4', 'ipv6', 'byte', 'binary', 'password', 'int32', 'int64', 'float', 'double'] as const;
-
-function ParameterConstraintsPanel({
-  constraints,
-  paramType,
-  onChange,
-  isReadOnly,
-}: {
-  constraints: PropertyConstraints;
-  paramType: string;
-  onChange: (c: PropertyConstraints) => void;
-  isReadOnly?: boolean;
-}) {
-  const { t } = useTranslation();
-  const isString = paramType === 'string';
-  const isNumber = ['integer', 'number'].includes(paramType);
-
-  const update = (patch: Partial<PropertyConstraints>) => onChange({ ...constraints, ...patch });
-
-  return (
-    <div className="ml-2 pl-3 border-l-2 border-accent/20 pb-2 space-y-2">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {/* String constraints */}
-        {isString && (
-          <>
-            <div>
-              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.minLength', 'Min Length')}</label>
-              <input type="number" min={0} value={constraints.minLength ?? ''} onChange={(e) => update({ minLength: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
-            </div>
-            <div>
-              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.maxLength', 'Max Length')}</label>
-              <input type="number" min={0} value={constraints.maxLength ?? ''} onChange={(e) => update({ maxLength: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
-            </div>
-            <div>
-              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.pattern', 'Pattern (Regex)')}</label>
-              <input type="text" value={constraints.pattern ?? ''} onChange={(e) => update({ pattern: e.target.value || undefined })}
-                placeholder="^[a-z]+$" className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body font-mono" disabled={isReadOnly} />
-            </div>
-          </>
-        )}
-
-        {/* Number constraints */}
-        {isNumber && (
-          <>
-            <div>
-              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.minimum', 'Minimum')}</label>
-              <input type="number" value={constraints.minimum ?? ''} onChange={(e) => update({ minimum: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
-            </div>
-            <div>
-              <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.maximum', 'Maximum')}</label>
-              <input type="number" value={constraints.maximum ?? ''} onChange={(e) => update({ maximum: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
-            </div>
-          </>
-        )}
-
-        {/* Format */}
-        <div>
-          <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.format', 'Format')}</label>
-          <select value={constraints.format ?? ''} onChange={(e) => update({ format: e.target.value || undefined })}
-            className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly}>
-            {FORMAT_OPTIONS.map((f) => <option key={f} value={f}>{f || '—'}</option>)}
-          </select>
-        </div>
-
-        {/* Default Value */}
-        <div>
-          <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.defaultValue', 'Default Value')}</label>
-          <input type="text" value={constraints.defaultValue ?? ''} onChange={(e) => update({ defaultValue: e.target.value || undefined })}
-            className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
-        </div>
-      </div>
-
-      {/* Boolean flags */}
-      <div className="flex flex-wrap gap-4">
-        <FieldCheckbox label={t('contracts.builder.rest.readOnly', 'Read Only')} checked={constraints.readOnly ?? false} onChange={(v) => update({ readOnly: v || undefined })} disabled={isReadOnly} />
-        <FieldCheckbox label={t('contracts.builder.rest.writeOnly', 'Write Only')} checked={constraints.writeOnly ?? false} onChange={(v) => update({ writeOnly: v || undefined })} disabled={isReadOnly} />
-        <FieldCheckbox label={t('contracts.builder.rest.nullable', 'Nullable')} checked={constraints.nullable ?? false} onChange={(v) => update({ nullable: v || undefined })} disabled={isReadOnly} />
-      </div>
-
-      {/* Enum values */}
-      <div>
-        <label className="block text-[9px] text-muted mb-0.5">{t('contracts.builder.rest.enumValues', 'Enum Values')}</label>
-        <input type="text" value={constraints.enumValues?.join(', ') ?? ''} onChange={(e) => {
-          const values = e.target.value ? e.target.value.split(',').map((s) => s.trim()).filter(Boolean) : undefined;
-          update({ enumValues: values?.length ? values : undefined });
-        }} placeholder={t('contracts.builder.rest.enumPlaceholder', 'Comma-separated values')}
-          className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body" disabled={isReadOnly} />
-      </div>
-    </div>
-  );
-}
-
-// ── Collapsible sub-section ───────────────────────────────────────────────────
-
-function CollapsibleSubSection({
-  title, count, isOpen, onToggle, children,
-}: {
-  title: string; count: number; isOpen: boolean; onToggle: () => void; children: React.ReactNode;
-}) {
-  return (
-    <div className="border border-edge rounded-md">
-      <button type="button" onClick={onToggle} className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-elevated/20 transition-colors">
-        {isOpen ? <ChevronDown size={10} className="text-muted" /> : <ChevronRight size={10} className="text-muted" />}
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted/70 flex-1">{title}</span>
-        {count > 0 && <span className="text-[9px] text-accent bg-accent/10 px-1.5 py-0.5 rounded">{count}</span>}
-      </button>
-      {isOpen && <div className="px-3 pb-3 space-y-2">{children}</div>}
     </div>
   );
 }

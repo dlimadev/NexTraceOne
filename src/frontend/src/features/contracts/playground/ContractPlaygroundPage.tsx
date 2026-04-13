@@ -185,7 +185,7 @@ export function ContractPlaygroundPage() {
               type="text"
               value={request.path}
               onChange={(e) => setRequest((prev) => ({ ...prev, path: e.target.value }))}
-              placeholder="/api/v1/resource"
+              placeholder={t('contracts.playground.placeholder.path', '/api/v1/resource')}
               className="flex-1 text-xs font-mono bg-elevated border border-edge rounded px-3 py-1.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
             />
             <button
@@ -232,7 +232,7 @@ export function ContractPlaygroundPage() {
                 value={request.body}
                 onChange={(e) => setRequest((prev) => ({ ...prev, body: e.target.value }))}
                 rows={8}
-                placeholder="{}"
+                placeholder={t('contracts.playground.placeholder.body', '{}')}
                 className="w-full text-xs font-mono bg-elevated border border-edge rounded px-3 py-2 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent"
               />
             </>

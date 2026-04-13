@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { cn } from '../lib/cn';
 
@@ -56,6 +57,7 @@ export function Drawer({
   footer,
   className,
 }: DrawerProps) {
+  const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<Element | null>(null);
 
@@ -162,7 +164,7 @@ export function Drawer({
               onClick={onClose}
               className="rounded-sm p-1.5 text-muted hover:text-heading hover:bg-hover transition-colors"
               style={{ transitionDuration: 'var(--nto-motion-fast)' }}
-              aria-label="Close"
+              aria-label={t('common.close', 'Close')}
             >
               <X size={18} />
             </button>

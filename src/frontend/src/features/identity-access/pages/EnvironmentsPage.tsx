@@ -167,7 +167,7 @@ export function EnvironmentsPage() {
         title={t('environments.title')}
         subtitle={t('environments.subtitle')}
         actions={
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="flex gap-2">
             <Button type="button" onClick={() => void refetch()}>
               <RefreshCw size={16} />
             </Button>
@@ -193,7 +193,7 @@ export function EnvironmentsPage() {
             </CardHeader>
             <CardBody>
               <form onSubmit={handleSubmit}>
-                <div style={{ display: 'grid', gap: '12px' }}>
+                <div className="grid gap-3">
                   <div>
                     <label htmlFor="env-name">{t('environments.name')} *</label>
                     <input
@@ -203,7 +203,7 @@ export function EnvironmentsPage() {
                       maxLength={100}
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                      style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
+                      className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                     />
                   </div>
 
@@ -218,13 +218,13 @@ export function EnvironmentsPage() {
                         pattern="^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
                         value={form.slug}
                         onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value.toLowerCase() }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
+                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
-                      <small style={{ color: 'var(--t-muted)' }}>{t('environments.slugHelp')}</small>
+                      <small className="text-muted">{t('environments.slugHelp')}</small>
                     </div>
                   )}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label htmlFor="env-profile">{t('environments.profile')} *</label>
                       <select
@@ -232,7 +232,7 @@ export function EnvironmentsPage() {
                         required
                         value={form.profile}
                         onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
+                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       >
                         {PROFILE_OPTIONS.map((p) => (
                           <option key={p} value={p}>
@@ -249,7 +249,7 @@ export function EnvironmentsPage() {
                         required
                         value={form.criticality}
                         onChange={(e) => setForm((f) => ({ ...f, criticality: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
+                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       >
                         {CRITICALITY_OPTIONS.map((c) => (
                           <option key={c} value={c}>
@@ -260,7 +260,7 @@ export function EnvironmentsPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label htmlFor="env-code">{t('environments.code')}</label>
                       <input
@@ -269,9 +269,9 @@ export function EnvironmentsPage() {
                         maxLength={50}
                         value={form.code}
                         onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
+                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
-                      <small style={{ color: 'var(--t-muted)' }}>{t('environments.codeHelp')}</small>
+                      <small className="text-muted">{t('environments.codeHelp')}</small>
                     </div>
 
                     <div>
@@ -282,7 +282,7 @@ export function EnvironmentsPage() {
                         maxLength={100}
                         value={form.region}
                         onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
+                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
                     </div>
 
@@ -295,7 +295,7 @@ export function EnvironmentsPage() {
                         required
                         value={form.sortOrder}
                         onChange={(e) => setForm((f) => ({ ...f, sortOrder: parseInt(e.target.value, 10) || 0 }))}
-                        style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)' }}
+                        className="block w-full mt-1 px-2 py-1.5 rounded border border-edge"
                       />
                     </div>
                   </div>
@@ -307,12 +307,12 @@ export function EnvironmentsPage() {
                       rows={2}
                       value={form.description}
                       onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                      style={{ display: 'block', width: '100%', marginTop: '4px', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--t-edge-strong)', resize: 'vertical' }}
+                      className="block w-full mt-1 px-2 py-1.5 rounded border border-edge resize-y"
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         id="env-is-primary"
                         type="checkbox"
@@ -321,12 +321,12 @@ export function EnvironmentsPage() {
                       />
                       <span>{t('environments.isPrimaryProduction')}</span>
                     </label>
-                    <small style={{ color: 'var(--t-muted)', marginLeft: '24px' }}>
+                    <small className="text-muted ml-6">
                       {t('environments.isPrimaryProductionHelp')}
                     </small>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                  <div className="flex gap-2 justify-end">
                     <Button
                       type="button"
                       onClick={() => {
@@ -360,23 +360,23 @@ export function EnvironmentsPage() {
             }
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="flex flex-col gap-2">
             {environments.map((env) => (
               <Card key={env.id}>
                 <CardBody>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <Globe size={16} style={{ color: 'var(--t-faded)', flexShrink: 0 }} />
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <Globe size={16} className="text-faded shrink-0" />
                       <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div className="flex items-center gap-1.5">
                           <strong>{env.name}</strong>
                           {env.code && (
-                            <code style={{ fontSize: '11px', background: 'var(--t-elevated)', padding: '1px 4px', borderRadius: '3px', color: 'var(--t-muted)' }}>
+                            <code className="text-[11px] bg-elevated px-1 rounded-sm text-muted">
                               {env.code}
                             </code>
                           )}
                         </div>
-                        <div style={{ fontSize: '12px', color: 'var(--t-muted)' }}>{env.slug}{env.region ? ` · ${env.region}` : ''}</div>
+                        <div className="text-xs text-muted">{env.slug}{env.region ? ` · ${env.region}` : ''}</div>
                       </div>
                       <Badge variant={getProfileBadgeVariant(env.profile)}>
                         {t(`environments.profiles.${env.profile}`, { defaultValue: env.profile })}
@@ -386,13 +386,13 @@ export function EnvironmentsPage() {
                       </Badge>
                       {env.isPrimaryProduction && (
                         <Badge variant="warning">
-                          <Star size={10} style={{ marginRight: '3px' }} />
+                          <Star size={10} className="mr-0.5" />
                           {t('environments.primaryProductionBadge')}
                         </Badge>
                       )}
                       {!env.isPrimaryProduction && env.isProductionLike && (
                         <Badge variant="default">
-                          <Shield size={10} style={{ marginRight: '3px' }} />
+                          <Shield size={10} className="mr-0.5" />
                           {t('environments.productionLikeBadge')}
                         </Badge>
                       )}
@@ -401,7 +401,7 @@ export function EnvironmentsPage() {
                       </Badge>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                    <div className="flex gap-2 shrink-0">
                       {env.isActive && !env.isPrimaryProduction && (
                         <Button
                           type="button"
@@ -418,7 +418,7 @@ export function EnvironmentsPage() {
                     </div>
                   </div>
                   {env.description && (
-                    <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--t-muted)', paddingLeft: '26px' }}>
+                    <div className="mt-1.5 text-xs text-muted pl-[26px]">
                       {env.description}
                     </div>
                   )}

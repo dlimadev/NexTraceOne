@@ -19,7 +19,7 @@ import {
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
   Network, Workflow, StickyNote, BookMarked, Radar,
-  CalendarDays, Award, BrainCircuit,
+  CalendarDays, Award, BrainCircuit, Palette,
 } from 'lucide-react';
 
 interface NavItem {
@@ -113,6 +113,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.parameterUsageReport', to: '/platform/configuration/analytics/usage', icon: <BarChart3 size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
   { labelKey: 'sidebar.parameterCompliance', to: '/platform/configuration/analytics/compliance', icon: <ShieldCheck size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
+  { labelKey: 'sidebar.branding', to: '/platform/branding', icon: <Palette size={18} />, permission: 'configuration:admin', section: 'admin' },
   { labelKey: 'sidebar.userPreferences', to: '/user-preferences', icon: <Settings size={18} />, section: 'admin' },
 ];
 

@@ -111,19 +111,19 @@
     "title": "Advanced Configuration Console"
   },
   "agentMarketplace": {
-    "title": "Agent Marketplace",
-    "subtitle": "Discover and use governed AI agents for operations, engineering and governance",
-    "searchPlaceholder": "Search agents by name or description...",
+    "category": "Category",
+    "error": "Failed to load the agent marketplace. Please try again.",
+    "executions": "{{count}} executions",
     "filterAll": "All",
     "filterOfficial": "Official",
+    "loading": "Loading marketplace...",
     "noAgents": "No agents found",
     "noAgentsHint": "Try adjusting your search or category filter.",
-    "useAgent": "Use Agent",
-    "executions": "{{count}} executions",
     "official": "Official",
-    "category": "Category",
-    "loading": "Loading marketplace...",
-    "error": "Failed to load the agent marketplace. Please try again."
+    "searchPlaceholder": "Search agents by name or description...",
+    "subtitle": "Discover and use governed AI agents for operations, engineering and governance",
+    "title": "Agent Marketplace",
+    "useAgent": "Use Agent"
   },
   "agents": {
     "active": "Active",
@@ -208,7 +208,7 @@
       "PendingReview": "Pending Review",
       "Published": "Published"
     },
-    "subtitle": "Official and custom governed agents — create, execute, and review artifacts",
+    "subtitle": "Official and custom governed agents ÔÇö create, execute, and review artifacts",
     "systemPromptLabel": "System Prompt",
     "systemPromptPlaceholder": "You are a specialized agent that...",
     "tab": {
@@ -286,6 +286,12 @@
     "agents": "Agents",
     "agentsHint": "Agents provide specialized governed AI capabilities.",
     "agentsPanel": "Available Agents",
+    "analysis": {
+      "placeholder": {
+        "serviceName": "e.g. payment-service",
+        "version": "e.g. 2.1.0"
+      }
+    },
     "assistant": "Assistant",
     "assistantEmptyDescription": "The AI assistant will provide context-aware help grounded in your services, contracts and operational data.",
     "assistantEmptyTitle": "AI Assistant coming soon",
@@ -337,7 +343,7 @@
     "filterByStatus": "Filter by status",
     "filterInactive": "Inactive",
     "governanceNotice": "All interactions are governed, audited and grounded in NexTraceOne's Source of Truth.",
-    "groundingDevelopment": "Context grounding is under active development — full contextual responses with service catalog, contract registry, incident history and change intelligence will be available soon. This response demonstrates the metadata and explainability framework that is already in place.",
+    "groundingDevelopment": "Context grounding is under active development ÔÇö full contextual responses with service catalog, contract registry, incident history and change intelligence will be available soon. This response demonstrates the metadata and explainability framework that is already in place.",
     "groundingSources": "Grounded in",
     "ideActiveClientsLabel": "Active clients",
     "ideActivePolicies": "Active policies",
@@ -486,10 +492,13 @@
     "usingModel": "Using model",
     "welcomeMessage": "Welcome! I'm the NexTraceOne AI Assistant. I can help you investigate production issues, analyze contracts, correlate incidents, and provide operational insights grounded in your organization's Source of Truth. What would you like to explore?",
     "you": "You",
+    "agentPlaceholder": {
+      "agentName": "my-custom-agent"
+    },
     "copilot.title": "NexTrace AI",
     "copilot.greeting": "Hello, {{name}}",
     "copilot.subtitle": "I can help you with services, contracts, incidents, changes and operational knowledge. Ask me anything.",
-    "copilot.inputPlaceholder": "Ask me anything about your services, contracts, or operations…",
+    "copilot.inputPlaceholder": "Ask me anything about your services, contracts, or operationsÔÇª",
     "copilot.toggleHistory": "Toggle conversation history"
   },
   "aiIntegrationsConfig": {
@@ -520,32 +529,6 @@
     },
     "subtitle": "Manage AI providers, models, budgets, connectors, and integration governance",
     "title": "AI & Integrations Configuration"
-  },
-  "alertRules": {
-    "title": "Personal Alert Rules",
-    "subtitle": "Get notified when specific conditions are met",
-    "newRule": "New Rule",
-    "enable": "Enable rule",
-    "disable": "Disable rule",
-    "delete": "Delete rule",
-    "empty": {
-      "title": "No alert rules",
-      "description": "Create a personal alert rule to be notified about important events",
-      "cta": "Create your first rule"
-    },
-    "builder": {
-      "title": "Create Alert Rule",
-      "name": "Rule name",
-      "namePlaceholder": "e.g. High risk service detected",
-      "entity": "Entity",
-      "field": "Field",
-      "selectField": "Select field",
-      "operator": "Operator",
-      "selectOperator": "Select operator",
-      "value": "Value",
-      "channel": "Notification channel",
-      "save": "Create Rule"
-    }
   },
   "analytics": {
     "actions": "actions",
@@ -666,36 +649,37 @@
     "viewValueTracking": "Value Tracking"
   },
   "apiPolicyAsCode": {
-    "title": "API Policy as Code",
-    "subtitle": "Define and enforce API governance rules as versioned YAML or JSON policies with configurable enforcement modes",
-    "registerPolicy": "Register Policy",
-    "policyName": "Policy Name (kebab-case)",
-    "displayName": "Display Name",
-    "description": "Description (optional)",
-    "version": "Version",
-    "format": "Format",
-    "definitionContent": "Policy Definition",
-    "enforcementMode": "Enforcement Mode",
-    "registeredBy": "Registered By",
-    "submit": "Register Policy",
-    "simulatePolicy": "Simulate Policy",
-    "resourceType": "Resource Type",
-    "resourceId": "Resource ID",
-    "context": "Context (JSON)",
-    "simulate": "Simulate",
-    "isCompliant": "Compliance Result",
-    "violationMessages": "Violation Messages",
-    "disabled": "Disabled",
     "auditOnly": "Audit Only",
-    "enforce": "Enforce",
-    "yaml": "YAML",
-    "json": "JSON",
-    "createSuccess": "Policy registered",
+    "context": "Context (JSON)",
     "createError": "Failed to register policy",
-    "simulateSuccess": "Compliant",
-    "noViolations": "No violations found — policy is satisfied",
+    "createSuccess": "Policy registered",
+    "definitionContent": "Policy Definition",
+    "description": "Description (optional)",
+    "disabled": "Disabled",
+    "displayName": "Display Name",
+    "enforce": "Enforce",
+    "enforcementMode": "Enforcement Mode",
+    "error": "Non-Compliant",
+    "format": "Format",
+    "isCompliant": "Compliance Result",
+    "json": "JSON",
     "loading": "Processing...",
-    "error": "Non-Compliant"
+    "noViolations": "No violations found ÔÇö policy is satisfied",
+    "overview": "Policy Overview",
+    "policyName": "Policy Name (kebab-case)",
+    "registerPolicy": "Register Policy",
+    "registeredBy": "Registered By",
+    "resourceId": "Resource ID",
+    "resourceType": "Resource Type",
+    "simulate": "Simulate",
+    "simulatePolicy": "Simulate Policy",
+    "simulateSuccess": "Compliant",
+    "submit": "Register Policy",
+    "subtitle": "Define and enforce API governance rules as versioned YAML or JSON policies with configurable enforcement modes",
+    "title": "API Policy as Code",
+    "version": "Version",
+    "violationMessages": "Violation Messages",
+    "yaml": "YAML"
   },
   "assistantPanel": {
     "actions": {
@@ -724,10 +708,10 @@
       "noVersionHistory": "No version history available"
     },
     "contextHint": {
-      "change": "Ask about {{name}} — risk, blast radius, rollback",
-      "contract": "Ask about {{name}} — versions, compatibility, consumers",
-      "incident": "Ask about {{name}} — root cause, mitigation, runbook",
-      "service": "Ask about {{name}} — contracts, dependencies, changes"
+      "change": "Ask about {{name}} ÔÇö risk, blast radius, rollback",
+      "contract": "Ask about {{name}} ÔÇö versions, compatibility, consumers",
+      "incident": "Ask about {{name}} ÔÇö root cause, mitigation, runbook",
+      "service": "Ask about {{name}} ÔÇö contracts, dependencies, changes"
     },
     "contextLabel": {
       "change": "Change",
@@ -798,10 +782,10 @@
     "title": "AI Assistant",
     "tryAsking": "Try asking",
     "welcome": {
-      "change": "I can help you assess the **{{name}}** change — its risk profile, blast radius, correlated incidents, and rollback readiness. All answers are grounded in Change Intelligence data.",
-      "contract": "I can help you analyze the **{{name}}** contract — its versions, compatibility, consumers, and governance status. All answers are grounded in the Contract Registry.",
-      "incident": "I can help you investigate the **{{name}}** incident — potential root causes, correlated changes, mitigation steps, and applicable runbooks. All answers are grounded in Incident History and operational knowledge.",
-      "service": "I can help you understand the **{{name}}** service — its contracts, dependencies, recent changes, and operational status. All answers are grounded in NexTraceOne's Source of Truth."
+      "change": "I can help you assess the **{{name}}** change ÔÇö its risk profile, blast radius, correlated incidents, and rollback readiness. All answers are grounded in Change Intelligence data.",
+      "contract": "I can help you analyze the **{{name}}** contract ÔÇö its versions, compatibility, consumers, and governance status. All answers are grounded in the Contract Registry.",
+      "incident": "I can help you investigate the **{{name}}** incident ÔÇö potential root causes, correlated changes, mitigation steps, and applicable runbooks. All answers are grounded in Incident History and operational knowledge.",
+      "service": "I can help you understand the **{{name}}** service ÔÇö its contracts, dependencies, recent changes, and operational status. All answers are grounded in NexTraceOne's Source of Truth."
     }
   },
   "audit": {
@@ -841,14 +825,15 @@
     "invalidCredentials": "Invalid credentials. Please try again.",
     "loginHeadline": "Operational governance for critical environments",
     "loginSubheadline": "Unify services, contracts, changes and operational context in a single enterprise experience, with traceability, control and intelligence for confident decisions.",
+    "logoAlt": "Organization logo",
     "needHelp": "Need help signing in?",
     "notAuthenticated": "Authentication is required to access this resource.",
     "orContinueWith": "Or continue with",
     "orDivider": "or sign in with credentials",
     "password": "Password",
-    "passwordPlaceholder": "••••••••",
+    "passwordPlaceholder": "ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó",
     "rememberMe": "Remember me",
-    "selfHosted": "Self-hosted · Enterprise · Auditable",
+    "selfHosted": "Self-hosted ┬À Enterprise ┬À Auditable",
     "sessionExpired": "Your session has expired. Please sign in again.",
     "showPassword": "Show password",
     "signIn": "Sign in to your account",
@@ -1096,19 +1081,50 @@
     },
     "workflowsTitle": "Automation Workflows"
   },
-  "bookmarks": {
-    "add": "Add bookmark",
-    "remove": "Remove bookmark",
-    "title": "Bookmarks",
-    "empty": "No bookmarks yet",
-    "entityType": {
-      "Service": "Service",
-      "Contract": "Contract",
-      "Change": "Change",
-      "Incident": "Incident",
-      "Runbook": "Runbook",
-      "Dashboard": "Dashboard",
-      "KnowledgeArticle": "Knowledge Article"
+  "brand": {
+    "name": "NexTraceOne",
+    "tagline": "Operational Confidence"
+  },
+  "branding": {
+    "admin": {
+      "content": {
+        "title": "Content & Messaging"
+      },
+      "description": "Customize the platform visual identity, logos, colors, and content",
+      "error": "Failed to save branding",
+      "identity": {
+        "title": "Instance Identity"
+      },
+      "identityNotice": {
+        "description": "Customization allows you to adapt the platform to your organization's branding. The NexTraceOne product identity is preserved through the 'Powered by NexTraceOne' watermark and the login page left panel.",
+        "title": "Identity Protection Active"
+      },
+      "links": {
+        "description": "Configure custom navigation links and help resources for your users.",
+        "title": "Navigation & Help Links"
+      },
+      "login": {
+        "description": "Customize the login page appearance. The NexTraceOne identity is always preserved on the left panel.",
+        "title": "Login Page"
+      },
+      "preview": {
+        "dark": "Dark Mode",
+        "light": "Light Mode",
+        "loginTitle": "Login Preview",
+        "primaryButton": "Primary Action",
+        "secondaryButton": "Secondary",
+        "title": "Live Preview"
+      },
+      "protection": {
+        "description": "Control the visibility of the NexTraceOne brand identity. The 'Powered by NexTraceOne' watermark helps maintain product recognition.",
+        "title": "Identity Protection"
+      },
+      "save": "Save Branding",
+      "saved": "Branding saved successfully",
+      "title": "Branding & Identity",
+      "visual": {
+        "title": "Visual Customization"
+      }
     }
   },
   "breadcrumbs": {
@@ -1180,7 +1196,7 @@
     },
     "detail": {
       "active": "Active",
-      "apiAndConsumerSummary": "{{apiCount}} APIs · {{consumerCount}} consumers",
+      "apiAndConsumerSummary": "{{apiCount}} APIs ┬À {{consumerCount}} consumers",
       "apiCount": "{{count}} APIs",
       "apiCount_one": "{{count}} API",
       "apiCount_other": "{{count}} APIs",
@@ -1232,7 +1248,7 @@
       "relatedIncidentsDescription": "Active incidents impacting this service",
       "repositoryUrl": "Repository",
       "routePattern": "Route",
-      "separator": "·",
+      "separator": "┬À",
       "serviceLinks": {
         "addFirstLink": "Add the first link to this service",
         "addLink": "Add Link",
@@ -1271,7 +1287,11 @@
       "viewChange": "View change",
       "viewContract": "View Contract",
       "viewIncident": "View incident",
-      "visibility": "Visibility"
+      "visibility": "Visibility",
+      "placeholder": {
+        "documentationUrl": "https://docs.company.com/payment-service",
+        "repositoryUrl": "https://github.com/org/payment-service"
+      }
     },
     "discovery": {
       "actions": {
@@ -1340,6 +1360,12 @@
       "serviceType": "Service Type",
       "team": "Team"
     },
+    "scaffold": {
+      "placeholder": {
+        "domainEntities": "Payment, Refund, Statement",
+        "serviceName": "payment-api"
+      }
+    },
     "search": {
       "placeholder": "Search services by name, team, domain..."
     },
@@ -1372,6 +1398,9 @@
       },
       "noLinks": "No links added yet."
     },
+    "services": {
+      "addContract": "Add Contract"
+    },
     "subtitle": "Central registry of services, ownership and governance",
     "summary": {
       "active": "Active",
@@ -1383,8 +1412,36 @@
     },
     "title": "Service Catalog",
     "totalCount": "({{count}} total)",
-    "services": {
-      "addContract": "Add Contract"
+    "registration": {
+      "placeholder": {
+        "documentationUrl": "https://docs.example.com/service",
+        "repositoryUrl": "https://github.com/org/repo"
+      }
+    },
+    "links": {
+      "placeholder": {
+        "url": "https://..."
+      }
+    },
+    "license": {
+      "placeholder": {
+        "serviceId": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    "security": {
+      "placeholder": {
+        "filePath": "src/MyController.cs"
+      }
+    },
+    "template": {
+      "placeholder": {
+        "slug": "payment-api",
+        "version": "1.0.0",
+        "tags": "ddd, clean-architecture, payments",
+        "repoUrl": "https://github.com/org/template-name",
+        "repoBranch": "main",
+        "baseContractSpec": "openapi: 3.0.0\ninfo:\n  title: Payment API\n  version: 1.0.0\npaths: ..."
+      }
     },
     "aiScaffold": {
       "serviceNamePlaceholder": "payment-api",
@@ -1582,43 +1639,37 @@
     "title": "Change Confidence"
   },
   "chaosEngineering": {
-    "title": "Chaos Engineering",
-    "subtitle": "Plan and manage chaos experiments to validate system resilience",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "cpuStress": "CPU Stress",
+    "createError": "Failed to create experiment",
     "createExperiment": "Create Experiment",
-    "experimentType": "Experiment Type",
-    "serviceName": "Service Name",
-    "environment": "Environment",
+    "createSuccess": "Experiment plan created successfully",
     "description": "Description",
     "duration": "Duration (seconds)",
-    "targetPercentage": "Target Percentage (%)",
-    "submit": "Create Experiment",
-    "riskLevel": "Risk Level",
-    "status": "Status",
-    "safetyChecks": "Safety Checks",
-    "steps": "Execution Steps",
-    "recentExperiments": "Recent Experiments",
-    "noExperiments": "No experiments found",
-    "planned": "Planned",
-    "running": "Running",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "latencyInjection": "Latency Injection",
+    "environment": "Environment",
     "errorInjection": "Error Injection",
-    "cpuStress": "CPU Stress",
-    "memoryStress": "Memory Stress",
-    "podKill": "Pod Kill",
-    "networkPartition": "Network Partition",
+    "experimentType": "Experiment Type",
+    "high": "High",
+    "latencyInjection": "Latency Injection",
     "low": "Low",
     "medium": "Medium",
-    "high": "High",
-    "createSuccess": "Experiment plan created successfully",
-    "createError": "Failed to create experiment"
-  },
-  "columnSelector": {
-    "title": "Columns",
-    "reset": "Reset to default",
-    "columns": "Visible columns",
-    "noColumns": "No columns configured"
+    "memoryStress": "Memory Stress",
+    "networkPartition": "Network Partition",
+    "noExperiments": "No experiments found",
+    "planned": "Planned",
+    "podKill": "Pod Kill",
+    "recentExperiments": "Recent Experiments",
+    "riskLevel": "Risk Level",
+    "running": "Running",
+    "safetyChecks": "Safety Checks",
+    "serviceName": "Service Name",
+    "status": "Status",
+    "steps": "Execution Steps",
+    "submit": "Create Experiment",
+    "subtitle": "Plan and manage chaos experiments to validate system resilience",
+    "targetPercentage": "Target Percentage (%)",
+    "title": "Chaos Engineering"
   },
   "commandPalette": {
     "admin": "Administration",
@@ -1651,7 +1702,7 @@
     "navigation": "Navigation",
     "noEntityResults": "No matching entities found",
     "operations": "Operations",
-    "placeholder": "Search pages, actions…",
+    "placeholder": "Search pages, actionsÔÇª",
     "searchResults": "Search Results",
     "seeAllResults": "See all results",
     "select": "select",
@@ -1679,6 +1730,7 @@
       "description": "The data shown on this page is simulated for demonstration purposes. Real data will be available when the underlying integration is complete.",
       "title": "Demo Data"
     },
+    "dismiss": "Dismiss",
     "edit": "Edit",
     "error": "An error occurred",
     "errorDescription": "Something went wrong. Please try again later.",
@@ -1842,6 +1894,48 @@
     "benchmarking.score.weights.label": "Benchmarking Score Weights",
     "benchmarking.thresholds.by_environment.description": "Override benchmarking thresholds per environment",
     "benchmarking.thresholds.by_environment.label": "Benchmarking Thresholds by Environment",
+    "branding": {
+      "login_background_url": {
+        "description": "Background image URL for the login page left panel.",
+        "label": "Login Background Image"
+      },
+      "login_heading": {
+        "description": "Custom heading displayed on the login card (e.g. 'Welcome to Your Platform').",
+        "label": "Login Heading"
+      },
+      "login_help_text": {
+        "description": "Custom help text displayed below the login form.",
+        "label": "Login Help Text"
+      },
+      "login_logo_url": {
+        "description": "Custom logo displayed on the login card. Falls back to the default NexTraceOne icon if not set.",
+        "label": "Login Page Logo"
+      },
+      "login_sso_button_text": {
+        "description": "Custom text for the SSO sign-in button (e.g. 'Sign in with Corporate SSO').",
+        "label": "SSO Button Text"
+      },
+      "login_subheading": {
+        "description": "Custom subheading text displayed below the login heading.",
+        "label": "Login Subheading"
+      },
+      "powered_by_visible": {
+        "description": "When enabled, displays the 'Powered by NexTraceOne' watermark in the application footer.",
+        "label": "Show 'Powered by NexTraceOne'"
+      }
+    },
+    "branding.accent_color.description": "Primary accent color in hex format",
+    "branding.accent_color.label": "Branding Accent Color",
+    "branding.favicon_url.description": "URL for the custom favicon",
+    "branding.favicon_url.label": "Branding Favicon URL",
+    "branding.footer_text.description": "Custom footer text displayed on all pages",
+    "branding.footer_text.label": "Branding Footer Text",
+    "branding.logo_dark_url.description": "URL for the organization logo (dark variant)",
+    "branding.logo_dark_url.label": "Branding Logo Dark URL",
+    "branding.logo_url.description": "URL for the organization logo (light variant)",
+    "branding.logo_url.label": "Branding Logo URL",
+    "branding.welcome_message.description": "Custom welcome message displayed on the dashboard",
+    "branding.welcome_message.label": "Branding Welcome Message",
     "catalog.api.rate_limiting.default_policy.description": "Default rate limiting policy for published APIs.",
     "catalog.api.rate_limiting.default_policy.label": "Default API Rate Limiting Policy",
     "catalog.contract.api_types_enabled.description": "API classification types enabled (Public, Internal, Partner, ThirdParty)",
@@ -2012,6 +2106,30 @@
     "change.severity_criteria.label": "Change Severity Criteria",
     "change.types_enabled.description": "Types of changes supported (Feature, Bugfix, Hotfix, Refactor, Config, Infrastructure, Rollback)",
     "change.types_enabled.label": "Enabled Change Types",
+    "data.export.formats_enabled.description": "Allowed export formats (CSV, JSON, PDF)",
+    "data.export.formats_enabled.label": "Export Formats",
+    "data.export.max_records.description": "Maximum number of records allowed in a single data export",
+    "data.export.max_records.label": "Export Max Records",
+    "data.retention.ai_conversation_days.description": "Number of days to retain AI conversation history",
+    "data.retention.ai_conversation_days.label": "AI Conversation Retention (days)",
+    "data.retention.audit_log_days.description": "Number of days to retain audit log entries",
+    "data.retention.audit_log_days.label": "Audit Log Retention (days)",
+    "data.retention.change_history_days.description": "Number of days to retain change history",
+    "data.retention.change_history_days.label": "Change History Retention (days)",
+    "data.retention.incident_history_days.description": "Number of days to retain incident history",
+    "data.retention.incident_history_days.label": "Incident History Retention (days)",
+    "data.retention.telemetry_days.description": "Number of days to retain telemetry data",
+    "data.retention.telemetry_days.label": "Telemetry Retention (days)",
+    "email.sender.display_name.description": "Display name shown in the from field of platform emails",
+    "email.sender.display_name.label": "Sender Display Name",
+    "email.sender.from_address.description": "Email address used as the sender for platform notifications",
+    "email.sender.from_address.label": "Sender Email Address",
+    "email.templates.change_approval.description": "Email template used for change approval requests",
+    "email.templates.change_approval.label": "Change Approval Email Template",
+    "email.templates.incident_notification.description": "Email template used for incident notifications",
+    "email.templates.incident_notification.label": "Incident Email Template",
+    "email.templates.welcome.description": "Email template used for welcome messages to new users",
+    "email.templates.welcome.label": "Welcome Email Template",
     "environment.active.description": "Whether the environment is currently active",
     "environment.active.label": "Environment Active",
     "environment.classification.description": "Classification/profile of the environment",
@@ -2162,7 +2280,7 @@
     "governance.gates.fourEyes.compliant": "Compliant",
     "governance.gates.fourEyes.description": "Evaluate whether an action requires dual approval",
     "governance.gates.fourEyes.disabled": "Four Eyes Principle is not enabled",
-    "governance.gates.fourEyes.notCompliant": "Not compliant — requires different approver",
+    "governance.gates.fourEyes.notCompliant": "Not compliant ÔÇö requires different approver",
     "governance.gates.fourEyes.required": "Second approver required",
     "governance.gates.fourEyes.title": "Four Eyes Principle",
     "governance.gates.subtitle": "Evaluate governance gates before critical actions",
@@ -2211,7 +2329,7 @@
     "governance.risk.thresholds_by_criticality.label": "Risk Thresholds by Service Criticality",
     "governance.scorecard.enabled.description": "Whether governance scorecards are active and calculated",
     "governance.scorecard.enabled.label": "Governance Scorecard Enabled",
-    "governance.scorecard.thresholds.description": "Score thresholds for governance scorecard classification (e.g. Excellent ≥90, Good ≥70, etc.)",
+    "governance.scorecard.thresholds.description": "Score thresholds for governance scorecard classification (e.g. Excellent ÔëÑ90, Good ÔëÑ70, etc.)",
     "governance.scorecard.thresholds.label": "Scorecard Score Thresholds",
     "governance.scorecard.thresholds_by_environment.description": "Override score thresholds per environment (e.g. Production requires higher scores)",
     "governance.scorecard.thresholds_by_environment.label": "Scorecard Thresholds by Environment",
@@ -2475,6 +2593,24 @@
     "notifications.templates.teams.label": "Teams Notification Templates",
     "notifications.types.enabled.description": "JSON array of enabled notification type identifiers. Only listed types will be processed.",
     "notifications.types.enabled.label": "Enabled Notification Types",
+    "notifications.user.categories_subscribed.description": "Categories of notifications you want to receive",
+    "notifications.user.categories_subscribed.label": "Subscribed Categories",
+    "notifications.user.digest_enabled.description": "Receive a periodic summary of notifications",
+    "notifications.user.digest_enabled.label": "Notification Digest",
+    "notifications.user.digest_frequency_hours.description": "How often to receive the notification digest summary",
+    "notifications.user.digest_frequency_hours.label": "Digest Frequency (hours)",
+    "notifications.user.email_enabled.description": "Receive notifications via email",
+    "notifications.user.email_enabled.label": "Email Notifications",
+    "notifications.user.inapp_enabled.description": "Receive notifications within the platform",
+    "notifications.user.inapp_enabled.label": "In-App Notifications",
+    "onboarding.checklist.enabled.description": "Show a getting-started checklist for new users",
+    "onboarding.checklist.enabled.label": "Onboarding Checklist",
+    "onboarding.enabled.description": "Enable the guided onboarding experience for new users",
+    "onboarding.enabled.label": "Onboarding Experience",
+    "onboarding.sample_data.enabled.description": "Load sample data to help new users explore the platform",
+    "onboarding.sample_data.enabled.label": "Sample Data",
+    "onboarding.tooltips.enabled.description": "Show helpful tooltips and hints across the platform",
+    "onboarding.tooltips.enabled.label": "Contextual Tooltips",
     "operations.automation.blocked_in_production.description": "Automations explicitly blocked in production environments",
     "operations.automation.blocked_in_production.label": "Automation Blocked in Production",
     "operations.automation.by_severity.description": "Which automations are allowed per incident severity",
@@ -2505,6 +2641,38 @@
     "operations.runbook.auto_suggest.enabled.label": "Auto-Suggest Runbooks",
     "operations.runbook.defaults_by_category.description": "Default runbook identifier per incident category",
     "operations.runbook.defaults_by_category.label": "Default Runbook by Category",
+    "platform": {
+      "custom_links": {
+        "enabled": {
+          "description": "When enabled, allows custom navigation links to appear in the platform.",
+          "label": "Custom Navigation Links"
+        },
+        "items": {
+          "description": "JSON array of custom navigation links. Each item should have 'label', 'url', and optionally 'icon' and 'target'.",
+          "label": "Custom Link Items"
+        },
+        "max_items": {
+          "description": "Maximum number of custom navigation links allowed.",
+          "label": "Maximum Custom Links"
+        }
+      },
+      "help": {
+        "enabled": {
+          "description": "When enabled, displays a help link in the platform navigation.",
+          "label": "Help Link Visible"
+        },
+        "url": {
+          "description": "URL for the platform help documentation or knowledge base.",
+          "label": "Help Documentation URL"
+        }
+      },
+      "homepage": {
+        "default_route": {
+          "description": "The default route users see after login (e.g. '/dashboard', '/catalog').",
+          "label": "Default Homepage Route"
+        }
+      }
+    },
     "platform.custom_dashboards.enabled.description": "When enabled, users can create fully custom dashboards.",
     "platform.custom_dashboards.enabled.label": "Custom Dashboards",
     "platform.custom_dashboards.max_per_user.description": "Maximum number of custom dashboards each user can create.",
@@ -2527,6 +2695,22 @@
     "platform.sidebar.pinned_items.max.label": "Maximum Pinned Sidebar Items",
     "platform.sidebar.user_customization.enabled.description": "When enabled, users can reorder, hide, and pin sidebar items.",
     "platform.sidebar.user_customization.enabled.label": "Sidebar Customization",
+    "platform.ui.animations.enabled.description": "Enable smooth transitions and animations in the interface",
+    "platform.ui.animations.enabled.label": "UI Animations",
+    "platform.ui.code_font_size.description": "Font size in pixels for code editors and technical content",
+    "platform.ui.code_font_size.label": "Code Font Size",
+    "platform.ui.date_display_format.description": "How dates are displayed across the platform",
+    "platform.ui.date_display_format.label": "Date Display Format",
+    "platform.ui.density.description": "Default display density for the user interface (compact, comfortable, spacious)",
+    "platform.ui.density.label": "UI Density",
+    "platform.ui.high_contrast.enabled.description": "Enable high contrast colors for better visibility",
+    "platform.ui.high_contrast.enabled.label": "High Contrast Mode",
+    "platform.ui.keyboard_shortcuts.enabled.description": "Enable keyboard shortcuts for common actions",
+    "platform.ui.keyboard_shortcuts.enabled.label": "Keyboard Shortcuts",
+    "platform.ui.reduced_motion.enabled.description": "Minimize animations and motion effects",
+    "platform.ui.reduced_motion.enabled.label": "Reduced Motion",
+    "platform.ui.table_rows_per_page.description": "Default number of rows displayed in data tables",
+    "platform.ui.table_rows_per_page.label": "Table Rows per Page",
     "policy.environment.allow_automation.description": "Whether automated operations are allowed in this environment",
     "policy.environment.allow_automation.label": "Policy: Allow Automation",
     "policy.environment.allow_drift_analysis.description": "Whether drift analysis is active for this environment",
@@ -2553,7 +2737,7 @@
     "promotion.freeze.windows.label": "Freeze Windows",
     "promotion.min_time_in_staging_hours.description": "Minimum hours a release must stay in staging before production promotion.",
     "promotion.min_time_in_staging_hours.label": "Minimum Time in Staging (hours)",
-    "promotion.paths.allowed.description": "Allowed source→target environment promotion paths",
+    "promotion.paths.allowed.description": "Allowed sourceÔåÆtarget environment promotion paths",
     "promotion.paths.allowed.label": "Allowed Promotion Paths",
     "promotion.production.extra_approvers_required.description": "Additional approvers required when promoting to production",
     "promotion.production.extra_approvers_required.label": "Extra Approvers for Production",
@@ -2624,12 +2808,69 @@
     "tenant.max_environments.label": "Tenant Maximum Environments",
     "tenant.max_users.description": "Maximum number of users allowed in the tenant",
     "tenant.max_users.label": "Tenant Maximum Users",
+    "userPreferences.accessibility.highContrast": "High Contrast Mode",
+    "userPreferences.accessibility.highContrastDesc": "Increases color contrast for better visibility",
+    "userPreferences.accessibility.keyboardShortcuts": "Keyboard Shortcuts",
+    "userPreferences.accessibility.keyboardShortcutsDesc": "Enable keyboard shortcuts (Ctrl+K for command palette, etc.)",
+    "userPreferences.accessibility.reducedMotion": "Reduced Motion",
+    "userPreferences.accessibility.reducedMotionDesc": "Minimizes animations and transitions",
+    "userPreferences.accessibility.title": "Accessibility",
+    "userPreferences.appearance.animations": "Enable animations and transitions",
+    "userPreferences.appearance.dark": "Dark",
+    "userPreferences.appearance.density": "Display Density",
+    "userPreferences.appearance.density_comfortable": "Comfortable",
+    "userPreferences.appearance.density_compact": "Compact",
+    "userPreferences.appearance.density_spacious": "Spacious",
+    "userPreferences.appearance.light": "Light",
+    "userPreferences.appearance.theme": "Theme",
+    "userPreferences.appearance.title": "Appearance",
     "userPreferences.description": "Personalize your sidebar, home dashboard and widgets",
     "userPreferences.error": "Failed to save preferences",
     "userPreferences.home.title": "Home Dashboard",
+    "userPreferences.home.widget_activeIncidents": "Active Incidents",
+    "userPreferences.home.widget_aiUsage": "AI Usage",
+    "userPreferences.home.widget_complianceStatus": "Compliance Status",
+    "userPreferences.home.widget_contractCoverage": "Contract Coverage",
+    "userPreferences.home.widget_doraMetrics": "DORA Metrics",
+    "userPreferences.home.widget_errorBudget": "Error Budget",
+    "userPreferences.home.widget_knowledgeActivity": "Knowledge Activity",
+    "userPreferences.home.widget_recentChanges": "Recent Changes",
+    "userPreferences.home.widget_releaseCalendar": "Release Calendar",
+    "userPreferences.home.widget_securityFindings": "Security Findings",
+    "userPreferences.home.widget_serviceHealth": "Service Health",
+    "userPreferences.home.widget_teamOverview": "Team Overview",
     "userPreferences.home.widgets": "Active Widgets",
+    "userPreferences.notifications.allMuted": "All notifications are muted. You may miss critical alerts.",
+    "userPreferences.notifications.categories": "Notification Categories",
+    "userPreferences.notifications.category_Changes": "Changes",
+    "userPreferences.notifications.category_Contracts": "Contracts",
+    "userPreferences.notifications.category_Governance": "Governance",
+    "userPreferences.notifications.category_Incidents": "Incidents",
+    "userPreferences.notifications.category_Operations": "Operations",
+    "userPreferences.notifications.category_Security": "Security",
+    "userPreferences.notifications.digest": "Enable notification digest",
+    "userPreferences.notifications.digestFrequency": "Digest frequency",
+    "userPreferences.notifications.email": "Email notifications",
+    "userPreferences.notifications.inApp": "In-app notifications",
+    "userPreferences.notifications.title": "Notifications",
+    "userPreferences.regional.codeFontSize": "Code Font Size",
+    "userPreferences.regional.dateFormat": "Date Format",
+    "userPreferences.regional.language": "Language",
+    "userPreferences.regional.tableRows": "Table Rows per Page",
+    "userPreferences.regional.timezone": "Timezone",
+    "userPreferences.regional.title": "Language & Regional",
     "userPreferences.save": "Save Preferences",
     "userPreferences.saved": "Preferences saved successfully",
+    "userPreferences.sidebar.disabled": "Sidebar customization is disabled by platform settings",
+    "userPreferences.sidebar.module_ai-hub": "AI Hub",
+    "userPreferences.sidebar.module_audit": "Audit",
+    "userPreferences.sidebar.module_catalog": "Service Catalog",
+    "userPreferences.sidebar.module_changes": "Changes",
+    "userPreferences.sidebar.module_contracts": "Contracts",
+    "userPreferences.sidebar.module_governance": "Governance",
+    "userPreferences.sidebar.module_integrations": "Integrations",
+    "userPreferences.sidebar.module_knowledge": "Knowledge",
+    "userPreferences.sidebar.module_operations": "Operations",
     "userPreferences.sidebar.pinnedItems": "Pinned Items",
     "userPreferences.sidebar.title": "Sidebar",
     "userPreferences.title": "User Preferences",
@@ -2744,6 +2985,13 @@
       "override": "Override",
       "production": "Production",
       "sensitive": "Sensitive"
+    },
+    "branding": {
+      "subtitle": "Customize the visual identity and default experience for the platform and tenants.",
+      "title": "Branding & Defaults",
+      "placeholder": {
+        "colorHex": "#3B82F6"
+      }
     },
     "category": {
       "bootstrap": "Bootstrap",
@@ -2970,42 +3218,42 @@
     "title": "Contract Governance"
   },
   "contractPipeline": {
-    "title": "Contract-to-Code Pipeline",
-    "subtitle": "Generate server stubs, mock servers, tests and SDK clients from an OpenAPI contract.",
-    "contractToCode": "Contract → Code",
-    "configuration": "Configuration",
-    "serviceName": "Service Name",
-    "serviceNamePlaceholder": "e.g. UserService",
-    "targetLanguage": "Target Language",
-    "artifacts": "Artifacts to Generate",
-    "runPipeline": "Run Pipeline",
-    "running": "Running...",
-    "runError": "Pipeline failed. Check the contract JSON and try again.",
-    "contractJson": "OpenAPI Contract (JSON)",
-    "contractJsonPlaceholder": "Paste your OpenAPI 3.0 JSON here...",
-    "pipelineSuccess": "Pipeline completed: {{count}} artifact type(s) generated.",
-    "duration": "Duration: {{ms}}ms",
-    "downloadAll": "Download All",
-    "emptyState": "Enter a contract and configure outputs, then run the pipeline.",
-    "files": "files",
-    "copy": "Copy",
-    "copied": "Copied",
-    "download": "Download",
     "artifactTypes": {
-      "ServerStubs": "Server Stubs",
+      "ClientSdk": "Client SDK",
+      "ContractTests": "Contract Tests",
       "MockServer": "Mock Server",
       "PostmanCollection": "Postman Collection",
-      "ContractTests": "Contract Tests",
-      "ClientSdk": "Client SDK"
+      "ServerStubs": "Server Stubs"
     },
+    "artifacts": "Artifacts to Generate",
+    "configuration": "Configuration",
+    "contractJson": "OpenAPI Contract (JSON)",
+    "contractJsonPlaceholder": "Paste your OpenAPI 3.0 JSON here...",
+    "contractToCode": "Contract ÔåÆ Code",
+    "copied": "Copied",
+    "copy": "Copy",
+    "download": "Download",
+    "downloadAll": "Download All",
+    "duration": "Duration: {{ms}}ms",
+    "emptyState": "Enter a contract and configure outputs, then run the pipeline.",
+    "files": "files",
+    "pipelineSuccess": "Pipeline completed: {{count}} artifact type(s) generated.",
+    "runError": "Pipeline failed. Check the contract JSON and try again.",
+    "runPipeline": "Run Pipeline",
+    "running": "Running...",
+    "serviceName": "Service Name",
+    "serviceNamePlaceholder": "e.g. UserService",
     "steps": {
       "contract": "Contract",
-      "pipeline": "Pipeline",
-      "server": "Server",
       "mock": "Mock",
-      "tests": "Tests",
-      "sdk": "SDK"
-    }
+      "pipeline": "Pipeline",
+      "sdk": "SDK",
+      "server": "Server",
+      "tests": "Tests"
+    },
+    "subtitle": "Generate server stubs, mock servers, tests and SDK clients from an OpenAPI contract.",
+    "targetLanguage": "Target Language",
+    "title": "Contract-to-Code Pipeline"
   },
   "contracts": {
     "active": "Active",
@@ -3039,6 +3287,15 @@
     },
     "artifacts": "Artifacts",
     "builder": {
+      "canonical": {
+        "picker": {
+          "browse": "Browse",
+          "empty": "No canonical entities found",
+          "search": "Search entities...",
+          "select": "Select",
+          "title": "Browse Canonical Entities"
+        }
+      },
       "event": {
         "addChannel": "Add Channel",
         "apiInfo": "Event API Information",
@@ -3100,6 +3357,16 @@
         "title": "Legacy Contract Builder",
         "totalLength": "Total Record Length (bytes)",
         "transactionId": "CICS Transaction ID",
+        "placeholder": {
+          "version": "1.0.0",
+          "totalLength": "1024",
+          "owner": "mainframe-team",
+          "commareaLength": "2048",
+          "fieldLevel": "05",
+          "fieldLength": "30",
+          "fieldOffset": "0",
+          "fieldOccurs": "10"
+        },
         "recordNamePlaceholder": "CUSTOMER-RECORD",
         "programNamePlaceholder": "CUSTPROG",
         "queueManagerPlaceholder": "QMGR01",
@@ -3112,34 +3379,54 @@
         "ownerPlaceholder": "mainframe-team"
       },
       "rest": {
+        "addArray": "Array",
         "addBody": "Add Request Body",
+        "addBodyProp": "Add Property",
+        "addCommonResponses": "Add common error responses",
         "addEndpoint": "Add Endpoint",
+        "addObject": "Object",
         "addParam": "Add Parameter",
+        "addProperty": "Add Property",
+        "addRef": "$ref",
         "addResponse": "Add Response",
+        "addResponseProp": "Add Property",
+        "addVariant": "Add Variant",
         "apiInfo": "API Information",
+        "arrayItems": "Array Item Type",
+        "arrayItemsDesc": "Define the type of each item in the array",
         "authScopePlaceholder": "read:users",
         "authScopes": "OAuth2 Scopes",
         "authSecurity": "Auth & Security",
+        "autoSuggest": "Auto-suggest",
         "basePath": "Base Path",
         "basePathPlaceholder": "/api/v1",
         "behavior": "Rate Limits & Behavior",
+        "bodyProperties": "Request Body Properties",
+        "compositionType": "Composition Type",
         "constraints": "Constraints",
         "constraintsToggle": "Show constraints",
         "contact": "Contact",
         "contactPlaceholder": "API Team",
         "contentType": "Content Type",
         "contentTypePlaceholder": "application/json",
+        "copyExample": "Copy",
         "defaultValue": "Default Value",
         "deprecated": "Deprecated",
         "deprecationNote": "Deprecation Note",
         "deprecationPlaceholder": "Use v2 endpoint instead...",
         "descPlaceholder": "Describe what this API does...",
         "description": "Description",
+        "discriminator": "Discriminator",
+        "discriminatorHint": "The property used to distinguish between variants",
+        "discriminatorProperty": "Property Name",
         "duplicate": "Duplicate",
         "endpoints": "Endpoints",
         "enumPlaceholder": "Comma-separated values",
         "enumValues": "Enum Values",
         "example": "Example",
+        "exampleCopied": "Copied!",
+        "exclusiveMax": "Exclusive Max",
+        "exclusiveMin": "Exclusive Min",
         "format": "Format",
         "generateExample": "Generate Example",
         "generateSource": "Generate Source",
@@ -3147,12 +3434,17 @@
         "idempotencyPlaceholder": "X-Idempotency-Key",
         "license": "License",
         "licensePlaceholder": "MIT",
+        "maxDepthReached": "Maximum nesting depth reached. Use $ref for deeper structures.",
         "maxLength": "Max Length",
         "maximum": "Maximum",
         "method": "Method",
         "minLength": "Min Length",
         "minimum": "Minimum",
+        "modeRef": "$ref (Schema Reference)",
+        "modeVisualProps": "Ô£ª Visual Properties",
+        "nestedProperties": "Nested Properties",
         "noEndpoints": "No endpoints yet. Click \"Add Endpoint\" to get started.",
+        "noVariants": "No variants. Add at least one sub-schema.",
         "nullable": "Nullable",
         "obsPlaceholder": "Metrics, SLOs, tracing expectations...",
         "observability": "Observability",
@@ -3167,18 +3459,29 @@
         "path": "Path",
         "pathPlaceholder": "/users/{id}",
         "pattern": "Pattern (Regex)",
+        "previewExample": "Preview Example",
+        "problemDetails": "Problem Details (RFC 7807)",
+        "propDescPlaceholder": "Description of this property...",
+        "propNamePlaceholder": "propertyName",
+        "quickAdd": "Quick add:",
         "rateLimit": "Rate Limit",
         "rateLimitPlaceholder": "100/min",
         "readOnly": "Read Only",
+        "refHint": "Reference a shared/canonical schema defined in the Canonical Entity Catalog",
+        "refModeHint": "Reference a schema from Canonical Entities or define inline using Visual Properties mode",
+        "refTarget": "$ref Target (Canonical Entity)",
         "removeBody": "Remove Request Body",
         "removeResponse": "Remove",
+        "removeVariant": "Remove Variant",
         "requestBody": "Request Body",
         "required": "Required",
         "resDescPlaceholder": "OK",
         "resDescription": "Description",
         "resSchemaPlaceholder": "#/components/schemas/User",
+        "responseProperties": "Response Properties",
         "responses": "Responses",
         "schema": "Schema ($ref)",
+        "schemaMode": "Schema Mode",
         "schemaPlaceholder": "#/components/schemas/CreateUserRequest",
         "serverPlaceholder": "https://api.example.com",
         "servers": "Servers",
@@ -3190,51 +3493,18 @@
         "title": "Title",
         "titlePlaceholder": "User Management API",
         "validate": "Validate",
+        "variantDescription": "Variant description...",
+        "variantType": "Type",
         "version": "Version",
         "versionPlaceholder": "1.0.0",
-        "writeOnly": "Write Only",
-        "propNamePlaceholder": "propertyName",
-        "propDescPlaceholder": "Description of this property...",
-        "refTarget": "$ref Target (Canonical Entity)",
-        "refHint": "Reference a shared/canonical schema defined in the Canonical Entity Catalog",
-        "arrayItems": "Array Item Type",
-        "arrayItemsDesc": "Define the type of each item in the array",
-        "nestedProperties": "Nested Properties",
-        "maxDepthReached": "Maximum nesting depth reached. Use $ref for deeper structures.",
-        "addProperty": "Add Property",
-        "addObject": "Object",
-        "addArray": "Array",
-        "addRef": "$ref",
-        "schemaMode": "Schema Mode",
-        "modeRef": "$ref (Schema Reference)",
-        "modeVisualProps": "✦ Visual Properties",
-        "refModeHint": "Reference a schema from Canonical Entities or define inline using Visual Properties mode",
-        "bodyProperties": "Request Body Properties",
-        "addBodyProp": "Add Property",
-        "responseProperties": "Response Properties",
-        "addResponseProp": "Add Property",
-        "exclusiveMin": "Exclusive Min",
-        "exclusiveMax": "Exclusive Max",
-        "compositionType": "Composition Type",
-        "addVariant": "Add Variant",
-        "removeVariant": "Remove Variant",
-        "noVariants": "No variants. Add at least one sub-schema.",
-        "variantType": "Type",
-        "variantDescription": "Variant description...",
-        "discriminator": "Discriminator",
-        "discriminatorProperty": "Property Name",
-        "discriminatorHint": "The property used to distinguish between variants",
-        "autoSuggest": "Auto-suggest",
         "warnBodyOnGet": "{{method}} requests should not have a request body",
         "warnEmptyBody": "Request body exists but has no schema or properties defined",
         "warnMissingPathParam": "Path parameter '{{param}}' is used in path but not declared",
         "warnNo2xx": "No 2xx success response defined",
-        "addCommonResponses": "Add common error responses",
-        "quickAdd": "Quick add:",
-        "problemDetails": "Problem Details (RFC 7807)",
-        "previewExample": "Preview Example",
-        "copyExample": "Copy",
-        "exampleCopied": "Copied!"
+        "writeOnly": "Write Only",
+        "placeholder": {
+          "pattern": "^[a-z]+$"
+        }
       },
       "sharedSchema": {
         "addProperty": "Add Property",
@@ -3246,6 +3516,10 @@
         "namespace": "Namespace",
         "noProperties": "No properties defined yet. Add your first schema property.",
         "title": "Shared Schema Builder",
+        "placeholder": {
+          "version": "1.0.0",
+          "propertyName": "userId"
+        },
         "namePlaceholder": "UserProfile",
         "namespacePlaceholder": "com.example.schemas",
         "ownerPlaceholder": "platform-team",
@@ -3267,7 +3541,7 @@
         "operationName": "Operation Name",
         "operations": "Operations",
         "outputMessage": "Output Message",
-        "roundtripWarning": "SOAP round-trip is partial — some WSDL features may not be editable visually. Use source editor for advanced WSDL constructs.",
+        "roundtripWarning": "SOAP round-trip is partial ÔÇö some WSDL features may not be editable visually. Use source editor for advanced WSDL constructs.",
         "securityPlaceholder": "WS-Security, Transport Security, etc...",
         "securityPolicy": "Security Policy",
         "serviceInfo": "Service Information",
@@ -3289,6 +3563,7 @@
         "actorRequired": "At least one producer or consumer is required",
         "basePathRequired": "Base path is required",
         "basePathSlash": "Base path must start with /",
+        "compositionRequiresVariants": "Composition type requires at least one variant",
         "cronInvalid": "Cron expression must have 5 fields (Unix) or 6-7 fields (Quartz)",
         "deprecationNoteRequired": "Deprecation note is required when endpoint is deprecated",
         "duplicateOperationId": "Duplicate operationId across endpoints",
@@ -3316,6 +3591,12 @@
         "pathRequired": "Path is required for this endpoint",
         "pathSyntaxInvalid": "Path has invalid syntax (unmatched braces)",
         "programNameRequired": "COBOL program name is required for Copybook contracts",
+        "propArrayRefRequired": "Array items must define a type or $ref",
+        "propMinGtMax": "minLength cannot be greater than maxLength",
+        "propMinValueGtMax": "minimum cannot be greater than maximum",
+        "propNameDuplicate": "Duplicate property name in this object",
+        "propNameRequired": "Property name is required",
+        "propRefRequired": "$ref target is required for reference properties",
         "propertiesRequired": "At least one property is required",
         "queueNameRequired": "Queue name is required for MQ Message contracts",
         "responseRequired": "At least one response is required",
@@ -3334,14 +3615,7 @@
         "totalLengthMustBeNumber": "Total length must be a positive number",
         "transactionIdRequired": "Transaction ID is required for CICS Commarea contracts",
         "urlPatternRequired": "URL pattern is required",
-        "versionRequired": "Version is required",
-        "compositionRequiresVariants": "Composition type requires at least one variant",
-        "propArrayRefRequired": "Array items must define a type or $ref",
-        "propMinGtMax": "minLength cannot be greater than maxLength",
-        "propMinValueGtMax": "minimum cannot be greater than maximum",
-        "propNameDuplicate": "Duplicate property name in this object",
-        "propNameRequired": "Property name is required",
-        "propRefRequired": "$ref target is required for reference properties"
+        "versionRequired": "Version is required"
       },
       "webhook": {
         "addHeader": "Add Header",
@@ -3359,6 +3633,10 @@
         "title": "Webhook Builder",
         "urlPattern": "URL Pattern",
         "urlPatternPlaceholder": "https://example.com/webhooks/{event}",
+        "placeholder": {
+          "retryCount": "3",
+          "timeout": "30"
+        },
         "secretHeaderPlaceholder": "X-Webhook-Secret",
         "customHeaderPlaceholder": "X-Custom-Header",
         "namePlaceholder": "order-created-webhook",
@@ -3422,6 +3700,15 @@
         "triggerType": "Trigger Type",
         "validate": "Validate",
         "webhookUrl": "Webhook Path",
+        "placeholder": {
+          "eventNameProduced": "OrderProcessed",
+          "targetTopicProduced": "orders.processed",
+          "cronSchedule": "0 */5 * * *",
+          "webhookPath": "/webhooks/process",
+          "retries": "3",
+          "timeout": "300",
+          "healthCheck": "/health"
+        },
         "consumedEntityPlaceholder": "OrderEvent",
         "producedEntityPlaceholder": "OrderProcessedEvent",
         "eventNamePlaceholder": "OrderProcessed",
@@ -3433,13 +3720,25 @@
         "consumedServicePlaceholder": "user-api",
         "targetTopicPlaceholder": "orders.processed"
       },
-      "canonical": {
-        "picker": {
-          "title": "Browse Canonical Entities",
-          "search": "Search entities...",
-          "select": "Select",
-          "empty": "No canonical entities found",
-          "browse": "Browse"
+      "eventBuilder": {
+        "placeholder": {
+          "version": "1.0.0",
+          "eventVersion": "1.0.0",
+          "retention": "7d",
+          "partitions": "3",
+          "retries": "3"
+        }
+      },
+      "schemaComposition": {
+        "placeholder": {
+          "ref": "#/components/schemas/MySchema"
+        }
+      },
+      "schemaProperty": {
+        "placeholder": {
+          "refAddress": "#/components/schemas/Address",
+          "refArrayItem": "#/components/schemas/OrderItem",
+          "pattern": "^[a-z]+$"
         }
       }
     },
@@ -3464,6 +3763,9 @@
         "updated": "Updated",
         "usages": "Known Usages",
         "usedBy": "Used by"
+      },
+      "placeholder": {
+        "entityId": "e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
       }
     },
     "catalog": {
@@ -3541,6 +3843,12 @@
         "total": "Total"
       },
       "title": "Contract Catalog"
+    },
+    "cdct": {
+      "placeholder": {
+        "domain": "e.g., Commerce",
+        "serviceName": "e.g., checkout-service"
+      }
     },
     "changelog": {
       "by": "by",
@@ -3641,7 +3949,11 @@
       "typeDescSoap": "Create a SOAP service contract with WSDL",
       "typeDescWebhook": "Define a webhook integration contract with payload schema",
       "wsdlPlaceholder": "Paste the WSDL XML specification here...",
-      "wsdlXmlHint": "Use valid WSDL 1.1/2.0 XML and include imports when required."
+      "wsdlXmlHint": "Use valid WSDL 1.1/2.0 XML and include imports when required.",
+      "placeholder": {
+        "soapTargetNamespace": "http://example.com/service",
+        "soapEndpointUrl": "http://example.com/service"
+      }
     },
     "createVersion": "Create Version",
     "createVersionDescription": "Create a new version from an existing contract",
@@ -3710,23 +4022,24 @@
       "verifyFailed": "Failed to verify contract signature",
       "violationsFailed": "Failed to load rule violations"
     },
+    "event": {
+      "placeholder": {
+        "broker": "kafka://broker:9092",
+        "consumer": "notification-service",
+        "dlq": "orders.created.dlq",
+        "eventName": "OrderCreated",
+        "ordering": "by-key",
+        "owner": "team-orders",
+        "producer": "order-service",
+        "title": "Order Events",
+        "topicName": "orders.created"
+      }
+    },
     "export": "Export",
     "exportSuccess": "Contract exported successfully.",
     "filterPlaceholder": "Enter UUID to view contract history",
     "fingerprint": "Fingerprint",
     "format": "Format",
-    "healthDashboard": {
-      "title": "Contract Health Dashboard",
-      "subtitle": "Aggregated quality and governance metrics across all contracts",
-      "healthScore": "Health Score",
-      "totalContracts": "Total Contracts",
-      "withExamples": "With Examples",
-      "withCanonical": "With Canonical Entities",
-      "deprecated": "Deprecated Versions",
-      "topViolations": "Contracts with Most Violations",
-      "violations": "violations",
-      "noViolations": "No rule violations detected — contracts are healthy!"
-    },
     "governance": {
       "approvedCount": "Approved",
       "audit": {
@@ -3818,12 +4131,43 @@
         "title": "Lifecycle Workflow"
       }
     },
+    "health": {
+      "assetIdLabel": "API Asset ID",
+      "placeholder": {
+        "assetId": "e.g. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+      }
+    },
+    "healthDashboard": {
+      "deprecated": "Deprecated Versions",
+      "healthScore": "Health Score",
+      "noViolations": "No rule violations detected ÔÇö contracts are healthy!",
+      "subtitle": "Aggregated quality and governance metrics across all contracts",
+      "title": "Contract Health Dashboard",
+      "topViolations": "Contracts with Most Violations",
+      "totalContracts": "Total Contracts",
+      "violations": "violations",
+      "withCanonical": "With Canonical Entities",
+      "withExamples": "With Examples"
+    },
     "humanCreated": "Human Created",
     "import": "Import",
     "importContract": "Import Contract",
     "importSuccess": "Contract imported successfully.",
     "importTitle": "Import Contract",
     "importedFrom": "Imported from",
+    "legacy": {
+      "placeholder": {
+        "copybook": "CUST",
+        "fieldName": "CUST-NAME",
+        "messageFormat": "MQHRF2",
+        "picture": "PIC X(30)",
+        "programName": "CUSTPROG",
+        "queueManager": "QMGR01",
+        "queueName": "CUST.REQUEST.Q",
+        "recordName": "CUSTOMER-RECORD",
+        "redefines": "CUST-ID"
+      }
+    },
     "lifecycle": "Lifecycle",
     "lifecycleActions": {
       "approve": "Approve",
@@ -3989,6 +4333,11 @@
     },
     "readOnly": "Read-only",
     "ruleViolations": "Rule Violations",
+    "schema": {
+      "placeholder": {
+        "compositionType": "type"
+      }
+    },
     "schemas": {
       "description": "Description",
       "emptyDescription": "Schemas and models will appear here once the contract specification is defined.",
@@ -4020,6 +4369,12 @@
       "maskingPlaceholder": "Fields that require masking in logs and responses (e.g., email, SSN, card number)",
       "maskingRequirements": "Masking Requirements",
       "penTestState": "Penetration Test",
+      "placeholder": {
+        "authMechanisms": "RBAC, ABAC, Scope-based...",
+        "claims": "sub, aud, tenant_id",
+        "roles": "Admin, Editor, Viewer",
+        "scopes": "read:users, write:users, admin"
+      },
       "reviewTitle": "Security Review & Evidence",
       "roles": "Roles",
       "scopes": "Scopes",
@@ -4029,7 +4384,7 @@
       "scoreModerate": "Some security aspects need attention.",
       "securityReviewState": "Security Review"
     },
-    "selectApiAsset": "Select an API asset…",
+    "selectApiAsset": "Select an API assetÔÇª",
     "selectApiAssetLabel": "API Asset:",
     "selectApiAssetPrompt": "Select an API asset above to view its contract history.",
     "selectProtocol": "Select Protocol",
@@ -4047,6 +4402,13 @@
       "Soap": "SOAP Service",
       "Webhook": "Webhook"
     },
+    "sharedSchema": {
+      "placeholder": {
+        "namespace": "com.example.schemas",
+        "owner": "platform-team",
+        "schemaName": "UserProfile"
+      }
+    },
     "sign": "Sign",
     "signed": "Signed",
     "signedAt": "Signed at",
@@ -4060,6 +4422,19 @@
       "signedAndVerified": "Signed & Verified",
       "title": "Contract Signing",
       "verifyIntegrity": "Verify Integrity"
+    },
+    "soap": {
+      "placeholder": {
+        "endpointUrl": "https://api.example.com/service",
+        "faultMessage": "ServiceFault",
+        "inputMessage": "GetUserRequest",
+        "namespace": "http://schemas.example.com/types",
+        "operationName": "GetUser",
+        "outputMessage": "GetUserResponse",
+        "serviceName": "UserService",
+        "soapAction": "urn:GetUser",
+        "wsdlUrl": "http://example.com/service"
+      }
     },
     "specContent": "Specification Content",
     "specContentPlaceholder": "Paste your specification here (JSON/YAML/XML)...",
@@ -4143,6 +4518,20 @@
         "technicalDescription": "Technical Description",
         "technicalName": "Technical Name",
         "visibility": "Visibility",
+        "placeholder": {
+          "friendlyName": "e.g., User Management API",
+          "functionalDescription": "What business capability does this service provide?",
+          "technicalDescription": "Technical architecture, stack, integration notes...",
+          "domain": "Payments",
+          "capability": "Payment Processing",
+          "product": "Checkout Platform",
+          "owner": "john.doe@company.com",
+          "team": "Team Payments",
+          "tags": "payments, checkout, pci (comma separated)",
+          "sla": "99.9% uptime",
+          "slo": "p99 < 200ms",
+          "externalLinks": "Runbook, wiki, monitoring dashboard URLs (one per line)"
+        },
         "friendlyNamePlaceholder": "e.g., User Management API",
         "functionalDescPlaceholder": "What business capability does this service provide?",
         "technicalDescPlaceholder": "Technical architecture, stack, integration notes...",
@@ -4316,6 +4705,30 @@
     "violationSeverity": "Severity",
     "violations": "Violations",
     "violationsTitle": "Rule Violations",
+    "webhook": {
+      "placeholder": {
+        "contentType": "application/json",
+        "events": "order.created, order.updated",
+        "headerName": "X-Custom-Header",
+        "headerValue": "header-value",
+        "name": "order-created-webhook",
+        "owner": "integrations-team",
+        "retryStrategy": "exponential-backoff",
+        "secretHeader": "X-Webhook-Secret"
+      }
+    },
+    "workservice": {
+      "placeholder": {
+        "consumedEntity": "OrderEvent",
+        "consumedService": "user-api",
+        "consumedTopic": "orders.created",
+        "depName": "orders-db",
+        "name": "order-processor",
+        "owner": "team-orders",
+        "producedEntity": "OrderProcessedEvent",
+        "producedTopic": "orders.processed"
+      }
+    },
     "workspace": {
       "aiAgents": "AI Agents",
       "aiAgentsArtifactPending": "Pending review",
@@ -4355,7 +4768,7 @@
       "sourceValidation": {
         "invalid": "Invalid format",
         "unclosedTag": "Unclosed XML tag detected",
-        "valid": "✓ Valid"
+        "valid": "Ô£ô Valid"
       },
       "splitEditor": {
         "channels": "Channels",
@@ -4387,51 +4800,13 @@
       "visualBuilder": "Visual",
       "visualBuilderDescription": "Design your contract visually without writing specification code. Configure endpoints, schemas, security and more through an intuitive form-based interface.",
       "visualBuilderTitle": "Visual Builder"
+    },
+    "playground": {
+      "placeholder": {
+        "path": "/api/v1/resource",
+        "body": "{}"
+      }
     }
-  },
-  "customCharts": {
-    "title": "Custom Charts",
-    "subtitle": "Build custom visualizations for your metrics and KPIs",
-    "newChart": "New Chart",
-    "timeRange": "Time range",
-    "empty": {
-      "title": "No custom charts",
-      "description": "Create a custom chart to visualize your platform metrics",
-      "cta": "Create your first chart"
-    },
-    "builder": {
-      "title": "Chart Builder",
-      "step": "Step {{step}} of {{total}}",
-      "chooseMetric": "Choose a metric source",
-      "chooseChartType": "Choose a chart type",
-      "defineFilters": "Define filters and grouping",
-      "groupBy": "Group by",
-      "groupByPlaceholder": "e.g. environment, team, service",
-      "timeRange": "Time range",
-      "preview": "Preview",
-      "saveName": "Name your chart",
-      "namePlaceholder": "e.g. Changes by Environment",
-      "save": "Save Chart"
-    }
-  },
-  "customFields": {
-    "title": "Custom Fields",
-    "add": "Add Field",
-    "delete": "Delete",
-    "empty": {
-      "title": "No custom fields",
-      "description": "Add custom fields to enrich service records"
-    },
-    "fieldTypes": {
-      "Text": "Text",
-      "Number": "Number",
-      "Date": "Date",
-      "Select": "Select",
-      "MultiSelect": "Multi-select",
-      "Url": "URL",
-      "Email": "Email"
-    },
-    "required": "Required"
   },
   "dashboard": {
     "activeNow": "active now",
@@ -4472,104 +4847,73 @@
     "contractDistribution": "Contract distribution",
     "viewReport": "Report"
   },
-  "dashboardClone": {
-    "button": "Clone Dashboard",
-    "modal": {
-      "title": "Clone Dashboard",
-      "namePlaceholder": "e.g. My Team Dashboard (copy)",
-      "confirm": "Clone"
-    },
-    "success": "Dashboard cloned successfully"
-  },
-  "dashboardTemplates": {
-    "modal": {
-      "title": "Choose Dashboard Template",
-      "subtitle": "Start from a persona-specific template and customize it to your needs."
-    },
-    "engineer": {
-      "title": "Engineer",
-      "description": "Team services, recent changes, active incidents, DORA metrics"
-    },
-    "techLead": {
-      "title": "Tech Lead",
-      "description": "Team services, change risk, pending approvals, SLO status"
-    },
-    "architect": {
-      "title": "Architect",
-      "description": "Contract health, dependency map, compliance status, reliability trend"
-    },
-    "executive": {
-      "title": "Executive",
-      "description": "FinOps summary, compliance status, incident overview, DORA metrics"
-    },
-    "platformAdmin": {
-      "title": "Platform Admin",
-      "description": "AI usage, security findings, audit activity, system health"
-    }
-  },
   "dependencyDashboard": {
-    "title": "Dependency Dashboard",
-    "subtitle": "Scan and monitor dependency health across services",
-    "scanner": "Dependency Health Scanner",
-    "serviceId": "Service ID",
+    "critical": "Critical",
+    "criticalVulns": "Critical",
+    "deprecatedCount": "Deprecated",
+    "directDependencies": "Direct Dependencies",
+    "error": "Failed to load data.",
+    "healthScore": "Health Score",
+    "healthy": "Healthy",
+    "highVulns": "High",
+    "lastScanAt": "Last Scan",
+    "licenseRiskCounts": "License Risk Breakdown",
+    "loadVulnerable": "Load Vulnerable Services",
+    "loading": "Loading...",
+    "lowVulns": "Low",
+    "mediumVulns": "Medium",
+    "noVulnerable": "No vulnerable services found.",
+    "outdatedCount": "Outdated",
     "projectFileContent": "Project File Content",
     "projectFileType": "Project File Type",
     "scanButton": "Scan Dependencies",
-    "healthScore": "Health Score",
-    "totalDependencies": "Total Dependencies",
-    "directDependencies": "Direct Dependencies",
-    "vulnerabilityCount": "Vulnerabilities",
-    "serviceHealth": "Service Dependency Health",
-    "criticalVulns": "Critical",
-    "highVulns": "High",
-    "mediumVulns": "Medium",
-    "lowVulns": "Low",
-    "outdatedCount": "Outdated",
-    "deprecatedCount": "Deprecated",
-    "licenseRiskCounts": "License Risk Breakdown",
-    "vulnerableServices": "Vulnerable Services",
-    "loadVulnerable": "Load Vulnerable Services",
-    "noVulnerable": "No vulnerable services found.",
-    "lastScanAt": "Last Scan",
-    "healthy": "Healthy",
-    "warning": "Warning",
-    "critical": "Critical",
-    "scanSuccess": "Scan completed successfully.",
     "scanError": "Failed to scan dependencies.",
-    "loading": "Loading...",
-    "error": "Failed to load data.",
+    "scanSuccess": "Scan completed successfully.",
+    "scanner": "Dependency Health Scanner",
+    "serviceHealth": "Service Dependency Health",
+    "serviceId": "Service ID",
+    "subtitle": "Scan and monitor dependency health across services",
+    "title": "Dependency Dashboard",
+    "totalDependencies": "Total Dependencies",
+    "vulnerabilityCount": "Vulnerabilities",
+    "vulnerableServices": "Vulnerable Services",
+    "warning": "Warning",
+    "placeholder": {
+      "scanServiceId": "00000000-0000-0000-0000-000000000000",
+      "healthServiceId": "00000000-0000-0000-0000-000000000000"
+    },
     "serviceIdPlaceholder": "Enter service name or ID"
   },
   "developerExperienceScore": {
-    "title": "Developer Experience Score",
-    "subtitle": "Track and improve developer experience metrics by team and period",
-    "submitScore": "Submit Score",
-    "teamId": "Team ID",
-    "teamName": "Team Name",
-    "period": "Period",
+    "cognitiveLoad": "Cognitive Load",
+    "cognitiveLoadScore": "Cognitive Load Score (0ÔÇô10)",
+    "computedAt": "Computed at",
+    "createError": "Failed to submit score",
+    "createSuccess": "Score submitted successfully",
+    "cycleTime": "Cycle Time",
     "cycleTimeHours": "Cycle Time (hours)",
     "deploymentFrequency": "Deployment Frequency (per week)",
-    "cognitiveLoadScore": "Cognitive Load Score (0–10)",
-    "toilPercentage": "Toil Percentage (0–100%)",
-    "notes": "Notes (optional)",
-    "submit": "Submit Score",
-    "overallScore": "Overall Score",
-    "scoreLevel": "Score Level",
+    "deploysPerWeek": "Deploys/Week",
+    "error": "Failed to load scores",
     "excellent": "Excellent",
-    "good": "Good",
     "fair": "Fair",
+    "good": "Good",
+    "loading": "Submitting...",
+    "noScores": "No scores found",
+    "notes": "Notes (optional)",
+    "overallScore": "Overall Score",
+    "period": "Period",
     "poor": "Poor",
     "recentScores": "Recent Scores",
-    "noScores": "No scores found",
-    "loading": "Submitting...",
-    "error": "Failed to load scores",
-    "computedAt": "Computed at",
-    "cycleTime": "Cycle Time",
-    "deploysPerWeek": "Deploys/Week",
-    "cognitiveLoad": "Cognitive Load",
+    "scoreLevel": "Score Level",
+    "submit": "Submit Score",
+    "submitScore": "Submit Score",
+    "subtitle": "Track and improve developer experience metrics by team and period",
+    "teamId": "Team ID",
+    "teamName": "Team Name",
+    "title": "Developer Experience Score",
     "toil": "Toil %",
-    "createSuccess": "Score submitted successfully",
-    "createError": "Failed to submit score"
+    "toilPercentage": "Toil Percentage (0ÔÇô100%)"
   },
   "developerPortal": {
     "analytics": {
@@ -4698,16 +5042,6 @@
     },
     "title": "Developer Portal"
   },
-  "digestSettings": {
-    "title": "Digest Settings",
-    "frequency": "Digest frequency",
-    "frequencyOptions": {
-      "daily": "Daily",
-      "weekly": "Weekly",
-      "none": "Disabled"
-    },
-    "sections": "Included sections"
-  },
   "discovery": {
     "actions": {
       "ignore": "Ignore",
@@ -4827,7 +5161,7 @@
     "overallPerformance": "Overall Performance",
     "period": "Period",
     "rolledBackDeploys": "Rolled Back",
-    "subtitle": "Deployment Frequency, Lead Time, Change Failure Rate, Time to Restore — powered by real release and incident data.",
+    "subtitle": "Deployment Frequency, Lead Time, Change Failure Rate, Time to Restore ÔÇö powered by real release and incident data.",
     "timeToRestore": "Time to Restore Service",
     "title": "DORA Metrics",
     "totalDeploys": "Total Deploys",
@@ -4835,7 +5169,7 @@
   },
   "environment": {
     "active": "Active Environment",
-    "nonProductionBanner": "You are operating in {{name}} ({{profile}}) — this is a non-production environment.",
+    "nonProductionBanner": "You are operating in {{name}} ({{profile}}) ÔÇö this is a non-production environment.",
     "profile": {
       "development": "Development",
       "production": "Production",
@@ -4955,6 +5289,10 @@
     "unknownError": "An unknown error occurred.",
     "validation": "Please check the entered data and try again."
   },
+  "footer": {
+    "default": "Powered by {{name}} ÔÇö Operational Confidence Platform",
+    "poweredBy": "Powered by NexTraceOne"
+  },
   "forgotPassword": {
     "backToLogin": "Back to sign in",
     "emailLabel": "Email address",
@@ -4968,10 +5306,15 @@
     "title": "Forgot your password?"
   },
   "governance": {
+    "benchmarking": {
+      "empty": "No benchmarking data",
+      "emptyDescription": "No comparison data available for benchmarking."
+    },
     "compliance": {
       "approvedWaivers": "Approved waivers",
       "compliant": "Compliant",
       "coverageIndicators": "Coverage indicators",
+      "emptyDescription": "No compliance items match your search criteria.",
       "failedRollouts": "Failed rollouts",
       "filterAll": "All",
       "filterNonCompliant": "Non-compliant",
@@ -4986,7 +5329,7 @@
       "rolloutCompletion": "Rollout completion",
       "rolloutFailure": "Rollout failure",
       "rollouts": "Rollouts",
-      "searchPlaceholder": "Search packs…",
+      "searchPlaceholder": "Search packsÔÇª",
       "status": {
         "Compliant": "Compliant",
         "NonCompliant": "Non-compliant",
@@ -4995,8 +5338,7 @@
       },
       "totalAssessed": "Packs assessed",
       "waiverApproval": "Waiver approval",
-      "waivers": "Waivers",
-      "emptyDescription": "No compliance items match your search criteria."
+      "waivers": "Waivers"
     },
     "complianceSubtitle": "Enterprise compliance derived from governance pack adoption (rollouts) and exceptions (waivers).",
     "complianceTitle": "Compliance",
@@ -5019,6 +5361,77 @@
       "title": "Control management",
       "totalDimensions": "Total dimensions",
       "trendColumn": "Trend"
+    },
+    "customDashboards": {
+      "createDashboard": "Create Dashboard",
+      "createError": "Failed to create dashboard. Please try again.",
+      "createSuccess": "Dashboard created successfully.",
+      "custom": "Custom",
+      "dashboardName": "Dashboard Name",
+      "description": "Description",
+      "error": "Failed to load dashboards.",
+      "grid": "Grid",
+      "layout": "Layout",
+      "loading": "Loading dashboards...",
+      "noDashboards": "No dashboards created yet.",
+      "noDashboardsHint": "Use the form above to create your first custom dashboard.",
+      "persona": "Persona",
+      "selectWidgets": "Select Widgets",
+      "singleColumn": "Single Column",
+      "submit": "Create Dashboard",
+      "subtitle": "Build persona-specific dashboards with your preferred widgets and layout.",
+      "threeColumn": "Three Column",
+      "title": "Custom Dashboards",
+      "twoColumn": "Two Column",
+      "viewDashboard": "View Dashboard",
+      "widgetCount": "Widget count",
+      "widgets": {
+        "changeConfidence": "Change Confidence",
+        "costTrend": "Cost Trend",
+        "doraMetrics": "DORA Metrics",
+        "incidentSummary": "Incident Summary",
+        "knowledgeGraph": "Knowledge Graph",
+        "onCallStatus": "On-Call Status",
+        "reliabilitySlo": "Reliability SLO",
+        "serviceScorecard": "Service Scorecard"
+      }
+    },
+    "dashboards": {
+      "empty": "No custom dashboards",
+      "emptyDescription": "Create your first custom dashboard to get started."
+    },
+    "dora": {
+      "cfr": "CFR",
+      "cfrTrend": "Change Failure Rate",
+      "deployFreq": "Deploy Freq.",
+      "dfTrend": "Deployment Frequency",
+      "empty": "No DORA metrics data available",
+      "emptyDescription": "No trend data points available for the selected period.",
+      "error": "Failed to compute DORA metrics",
+      "leadTime": "Lead Time",
+      "loading": "Computing DORA metrics...",
+      "metricsSection": "DORA Metrics",
+      "mttr": "MTTR",
+      "mttrTrend": "MTTR",
+      "openIncidents": "Open Incidents",
+      "overallImproving": "Overall metrics are improving ÔÇö keep up the great work!",
+      "overallRating": "Overall Rating",
+      "period": "Period",
+      "recurrenceRate": "Recurrence Rate",
+      "resolvedInPeriod": "Resolved in Period",
+      "subtitle": "DevOps Research & Assessment ÔÇö Deployment Frequency, Lead Time, Change Failure Rate, MTTR",
+      "title": "DORA Metrics",
+      "trendDataPoints": "Trend Data Points",
+      "trendSummary": "Trend Summary"
+    },
+    "evidence": {
+      "emptyDescription": "No evidence packages match your search criteria."
+    },
+    "executive": {
+      "emptyDomains": "No domain data",
+      "emptyDomainsDescription": "No domain performance data available.",
+      "emptyFocusAreas": "No focus areas",
+      "emptyFocusAreasDescription": "No focus areas identified at this time."
     },
     "finops": {
       "backToOverview": "Back to overview",
@@ -5066,6 +5479,7 @@
         "ServiceGovernance": "Service Governance"
       },
       "draft": "Draft",
+      "emptyDescription": "No policies match your search criteria.",
       "enforcement": {
         "Advisory": "Advisory",
         "HardEnforce": "Hard enforce",
@@ -5074,7 +5488,7 @@
       },
       "filterAll": "All",
       "scope": "Scope",
-      "searchPlaceholder": "Search policies…",
+      "searchPlaceholder": "Search policiesÔÇª",
       "severity": {
         "Critical": "Critical",
         "High": "High",
@@ -5092,8 +5506,13 @@
       "title": "Policy Catalog",
       "totalPolicies": "Total policies",
       "totalViolations": "Active waivers",
-      "violations": "Waivers",
-      "emptyDescription": "No policies match your search criteria."
+      "violations": "Waivers"
+    },
+    "policyAsCode": {
+      "placeholder": {
+        "policyName": "my-api-policy",
+        "version": "1.0.0"
+      }
     },
     "risk": {
       "critical": "Critical",
@@ -5110,6 +5529,8 @@
         "Rollouts": "Rollouts",
         "Waivers": "Waivers"
       },
+      "empty": "No risk data available",
+      "emptyDescription": "No risk data available for the current filters.",
       "filterAll": "All",
       "filterCritical": "Critical",
       "filterHigh": "High",
@@ -5124,147 +5545,70 @@
       },
       "low": "Low",
       "medium": "Medium",
-      "searchPlaceholder": "Search packs…",
+      "searchPlaceholder": "Search packsÔÇª",
       "serviceRiskList": "Pack risk indicators",
-      "totalAssessed": "Packs assessed",
-      "empty": "No risk data available",
-      "emptyDescription": "No risk data available for the current filters."
-    },
-    "riskSubtitle": "Risk indicators derived from governance pack lifecycle, rollouts and waivers.",
-    "riskTitle": "Risk Center",
-    "dora": {
-      "title": "DORA Metrics",
-      "subtitle": "DevOps Research & Assessment — Deployment Frequency, Lead Time, Change Failure Rate, MTTR",
-      "loading": "Computing DORA metrics...",
-      "error": "Failed to compute DORA metrics",
-      "period": "Period",
-      "overallRating": "Overall Rating",
-      "openIncidents": "Open Incidents",
-      "resolvedInPeriod": "Resolved in Period",
-      "recurrenceRate": "Recurrence Rate",
-      "metricsSection": "DORA Metrics",
-      "trendSummary": "Trend Summary",
-      "trendDataPoints": "Trend Data Points",
-      "dfTrend": "Deployment Frequency",
-      "mttrTrend": "MTTR",
-      "cfrTrend": "Change Failure Rate",
-      "overallImproving": "Overall metrics are improving — keep up the great work!",
-      "deployFreq": "Deploy Freq.",
-      "leadTime": "Lead Time",
-      "cfr": "CFR",
-      "mttr": "MTTR",
-      "empty": "No DORA metrics data available",
-      "emptyDescription": "No trend data points available for the selected period."
-    },
-    "scorecard": {
-      "title": "Service Scorecards",
-      "subtitle": "Maturity scorecard across 8 dimensions: ownership, contracts, incidents, documentation, and more",
-      "loading": "Loading scorecards...",
-      "computing": "Computing scorecard...",
-      "error": "Failed to load scorecards",
-      "computeError": "Failed to compute scorecard",
-      "listTab": "All Services",
-      "detailTab": "Service Detail",
-      "filterByTeam": "Filter by team...",
-      "allLevels": "All Maturity Levels",
-      "avgScore": "Avg: {{score}}",
-      "dimensions": "Dimensions",
-      "serviceNamePlaceholder": "Enter service name...",
-      "compute": "Compute",
-      "enterServiceName": "Enter a service name to compute its scorecard",
-      "empty": "No scorecard data",
-      "emptyDescription": "No scorecard data available for this service."
-    },
-    "customDashboards": {
-      "title": "Custom Dashboards",
-      "subtitle": "Build persona-specific dashboards with your preferred widgets and layout.",
-      "createDashboard": "Create Dashboard",
-      "dashboardName": "Dashboard Name",
-      "description": "Description",
-      "layout": "Layout",
-      "persona": "Persona",
-      "selectWidgets": "Select Widgets",
-      "submit": "Create Dashboard",
-      "noDashboards": "No dashboards created yet.",
-      "noDashboardsHint": "Use the form above to create your first custom dashboard.",
-      "viewDashboard": "View Dashboard",
-      "widgetCount": "Widget count",
-      "widgets": {
-        "doraMetrics": "DORA Metrics",
-        "serviceScorecard": "Service Scorecard",
-        "incidentSummary": "Incident Summary",
-        "changeConfidence": "Change Confidence",
-        "costTrend": "Cost Trend",
-        "reliabilitySlo": "Reliability SLO",
-        "knowledgeGraph": "Knowledge Graph",
-        "onCallStatus": "On-Call Status"
-      },
-      "singleColumn": "Single Column",
-      "twoColumn": "Two Column",
-      "threeColumn": "Three Column",
-      "grid": "Grid",
-      "custom": "Custom",
-      "createSuccess": "Dashboard created successfully.",
-      "createError": "Failed to create dashboard. Please try again.",
-      "loading": "Loading dashboards...",
-      "error": "Failed to load dashboards."
-    },
-    "technicalDebt": {
-      "title": "Technical Debt",
-      "subtitle": "Track and score technical debt items by service, type and severity.",
-      "totalScore": "Total Debt Score",
-      "highestRisk": "Highest Risk Service",
-      "recordDebt": "Record Debt Item",
-      "serviceName": "Service Name",
-      "debtType": "Debt Type",
-      "debtTitle": "Title",
-      "debtDescription": "Description",
-      "severity": "Severity",
-      "effortDays": "Effort (days)",
-      "submit": "Record Debt",
-      "noDebt": "No debt items recorded yet.",
-      "noDebtHint": "Use the form below to record your first technical debt item.",
-      "byType": "Summary",
-      "score": "pts",
-      "critical": "Critical",
-      "high": "High",
-      "medium": "Medium",
-      "low": "Low",
-      "architecture": "Architecture",
-      "codequality": "Code Quality",
-      "security": "Security",
-      "dependency": "Dependency",
-      "documentation": "Documentation",
-      "testing": "Testing",
-      "performance": "Performance",
-      "infrastructure": "Infrastructure",
-      "createSuccess": "Debt item recorded successfully.",
-      "createError": "Failed to record debt item. Please try again.",
-      "loading": "Loading technical debt...",
-      "error": "Failed to load technical debt data.",
-      "empty": "No technical debt items",
-      "emptyDescription": "No technical debt items have been recorded yet."
-    },
-    "evidence": {
-      "emptyDescription": "No evidence packages match your search criteria."
+      "totalAssessed": "Packs assessed"
     },
     "riskCenter": {
       "empty": "No risk items found",
       "emptyDescription": "No risk items match your search criteria."
     },
-    "dashboards": {
-      "empty": "No custom dashboards",
-      "emptyDescription": "Create your first custom dashboard to get started."
+    "riskSubtitle": "Risk indicators derived from governance pack lifecycle, rollouts and waivers.",
+    "riskTitle": "Risk Center",
+    "scorecard": {
+      "allLevels": "All Maturity Levels",
+      "avgScore": "Avg: {{score}}",
+      "compute": "Compute",
+      "computeError": "Failed to compute scorecard",
+      "computing": "Computing scorecard...",
+      "detailTab": "Service Detail",
+      "dimensions": "Dimensions",
+      "empty": "No scorecard data",
+      "emptyDescription": "No scorecard data available for this service.",
+      "enterServiceName": "Enter a service name to compute its scorecard",
+      "error": "Failed to load scorecards",
+      "filterByTeam": "Filter by team...",
+      "listTab": "All Services",
+      "loading": "Loading scorecards...",
+      "serviceNamePlaceholder": "Enter service name...",
+      "subtitle": "Maturity scorecard across 8 dimensions: ownership, contracts, incidents, documentation, and more",
+      "title": "Service Scorecards"
     },
-    "executive": {
-      "emptyFocusAreas": "No focus areas",
-      "emptyFocusAreasDescription": "No focus areas identified at this time.",
-      "emptyDomains": "No domain data",
-      "emptyDomainsDescription": "No domain performance data available."
-    },
-    "benchmarking": {
-      "empty": "No benchmarking data",
-      "emptyDescription": "No comparison data available for benchmarking."
+    "technicalDebt": {
+      "architecture": "Architecture",
+      "byType": "Summary",
+      "codequality": "Code Quality",
+      "createError": "Failed to record debt item. Please try again.",
+      "createSuccess": "Debt item recorded successfully.",
+      "critical": "Critical",
+      "debtDescription": "Description",
+      "debtTitle": "Title",
+      "debtType": "Debt Type",
+      "dependency": "Dependency",
+      "documentation": "Documentation",
+      "effortDays": "Effort (days)",
+      "empty": "No technical debt items",
+      "emptyDescription": "No technical debt items have been recorded yet.",
+      "error": "Failed to load technical debt data.",
+      "high": "High",
+      "highestRisk": "Highest Risk Service",
+      "infrastructure": "Infrastructure",
+      "loading": "Loading technical debt...",
+      "low": "Low",
+      "medium": "Medium",
+      "noDebt": "No debt items recorded yet.",
+      "noDebtHint": "Use the form below to record your first technical debt item.",
+      "performance": "Performance",
+      "recordDebt": "Record Debt Item",
+      "score": "pts",
+      "security": "Security",
+      "serviceName": "Service Name",
+      "severity": "Severity",
+      "submit": "Record Debt",
+      "subtitle": "Track and score technical debt items by service, type and severity.",
+      "testing": "Testing",
+      "title": "Technical Debt",
+      "totalScore": "Total Debt Score"
     }
   },
   "governanceConfig": {
@@ -5438,7 +5782,7 @@
   },
   "header": {
     "languageEnglish": "English",
-    "languagePortuguese": "Português",
+    "languagePortuguese": "Portugu├¬s",
     "notifications": "Notifications",
     "settings": "Settings",
     "switchToDark": "Switch to dark mode",
@@ -5478,7 +5822,7 @@
       "confirmRequest": "Confirm Emergency Request",
       "expiresAt": "Expires At",
       "justification": "Justification",
-      "justificationPlaceholder": "Describe the critical situation requiring emergency access…",
+      "justificationPlaceholder": "Describe the critical situation requiring emergency accessÔÇª",
       "noRequests": "No break glass requests found.",
       "request": "Request Emergency Access",
       "requestFormTitle": "Request Emergency Access",
@@ -5497,9 +5841,9 @@
       "delegationsList": "Active Delegations",
       "noDelegations": "No delegations found.",
       "permissions": "Delegated Permissions",
-      "permissionsPlaceholder": "permission1, permission2, …",
+      "permissionsPlaceholder": "permission1, permission2, ÔÇª",
       "reason": "Reason",
-      "reasonPlaceholder": "Reason for this delegation…",
+      "reasonPlaceholder": "Reason for this delegationÔÇª",
       "revoke": "Revoke Delegation",
       "status": "Status",
       "subtitle": "Manage formal permission delegations between users",
@@ -5512,7 +5856,7 @@
       "approve": "Approve",
       "decide": "Decide",
       "justification": "Justification",
-      "justificationPlaceholder": "Explain why this access is needed…",
+      "justificationPlaceholder": "Explain why this access is neededÔÇª",
       "noRequests": "No pending JIT access requests.",
       "pendingList": "Pending JIT Requests",
       "permissionCode": "Permission Code",
@@ -5780,42 +6124,42 @@
     "title": "You've been invited"
   },
   "knowledge": {
-    "graph": {
-      "title": "Knowledge Graph",
-      "subtitle": "Explore relationships between services, contracts, teams, and incidents",
-      "loading": "Loading knowledge graph...",
-      "error": "Failed to load knowledge graph",
-      "totalNodes": "Total Nodes",
-      "totalEdges": "Total Edges",
-      "connectedComponents": "Connected Components",
-      "maxDepth": "Max Depth",
-      "nodesSection": "Nodes",
-      "edgesSection": "Edges",
-      "noNodes": "No nodes found for this depth",
-      "noEdges": "No edges found"
-    },
     "autoDoc": {
-      "title": "Auto Documentation",
-      "subtitle": "AI-assisted auto-generated documentation for any service",
-      "loading": "Loading documentation...",
+      "docs": "{{count}} docs",
+      "enterServiceName": "Enter a service name to generate documentation",
       "error": "Failed to load documentation",
-      "generating": "Generating documentation...",
-      "serviceNamePlaceholder": "Enter service name...",
       "generate": "Generate",
       "generatedAt": "Generated {{date}}",
-      "docs": "{{count}} docs",
+      "generating": "Generating documentation...",
+      "loading": "Loading documentation...",
       "runbooks": "{{count}} runbooks",
       "sectionUnavailable": "Section not available for this service",
-      "enterServiceName": "Enter a service name to generate documentation",
       "sections": {
-        "Overview": "Overview",
-        "Ownership": "Ownership",
         "Contracts": "Contracts",
         "Dependencies": "Dependencies",
-        "SLOs": "SLOs",
+        "Overview": "Overview",
+        "Ownership": "Ownership",
+        "RecentChanges": "Recent Changes",
         "Runbooks": "Runbooks",
-        "RecentChanges": "Recent Changes"
-      }
+        "SLOs": "SLOs"
+      },
+      "serviceNamePlaceholder": "Enter service name...",
+      "subtitle": "AI-assisted auto-generated documentation for any service",
+      "title": "Auto Documentation"
+    },
+    "graph": {
+      "connectedComponents": "Connected Components",
+      "edgesSection": "Edges",
+      "error": "Failed to load knowledge graph",
+      "loading": "Loading knowledge graph...",
+      "maxDepth": "Max Depth",
+      "noEdges": "No edges found",
+      "noNodes": "No nodes found for this depth",
+      "nodesSection": "Nodes",
+      "subtitle": "Explore relationships between services, contracts, teams, and incidents",
+      "title": "Knowledge Graph",
+      "totalEdges": "Total Edges",
+      "totalNodes": "Total Nodes"
     }
   },
   "knowledgeHub": {
@@ -5856,20 +6200,20 @@
     "subtitle": "Centralized operational knowledge, runbooks, architecture docs and post-mortems",
     "tags": "Tags",
     "title": "Knowledge Hub",
-    "viewAllNotes": "View all operational notes →",
+    "viewAllNotes": "View all operational notes ÔåÆ",
     "viewRelatedNotes": "View Related Notes"
   },
   "legacy": {
     "artifacts": {
       "copybook": "Copybook",
-      "copybookDescription": "COBOL copybook — structured data layout definition",
+      "copybookDescription": "COBOL copybook ÔÇö structured data layout definition",
       "dataset": "Dataset",
       "db2Artifact": "DB2 Artifact",
       "db2StoredProcedure": "DB2 Stored Procedure",
       "db2Table": "DB2 Table",
       "db2View": "DB2 View",
       "jcl": "JCL",
-      "jclDescription": "Job Control Language — batch job definition",
+      "jclDescription": "Job Control Language ÔÇö batch job definition",
       "loadModule": "Load Module",
       "procLib": "PROC Library",
       "title": "Artifacts",
@@ -5960,11 +6304,11 @@
       "cpc": "CPC",
       "cpcDescription": "Central Processor Complex",
       "lpar": "LPAR",
-      "lparDescription": "Logical Partition — isolated z/OS instance",
+      "lparDescription": "Logical Partition ÔÇö isolated z/OS instance",
       "mips": "MIPS",
       "msu": "MSU",
       "sysplex": "Sysplex",
-      "sysplexDescription": "System Complex — cluster of LPARs",
+      "sysplexDescription": "System Complex ÔÇö cluster of LPARs",
       "title": "Infrastructure"
     },
     "messaging": {
@@ -6298,26 +6642,26 @@
     }
   },
   "licenseCompliance": {
-    "title": "License Compliance & Upgrades",
-    "subtitle": "Review license conflicts and upgrade suggestions for service dependencies",
-    "serviceId": "Service ID",
     "checkLicenses": "Check Licenses",
-    "getUpgrades": "Get Upgrade Suggestions",
-    "generateSbom": "Generate SBOM",
-    "licenseConflicts": "License Conflicts",
-    "noConflicts": "No license conflicts detected.",
-    "upgradeSuggestions": "Upgrade Suggestions",
-    "noUpgrades": "No upgrade suggestions available.",
-    "sbomGenerated": "SBOM generated successfully.",
-    "profileId": "Profile ID",
-    "loading": "Loading...",
-    "error": "Failed to load data.",
-    "submit": "Select Service",
     "critical": "Critical",
+    "error": "Failed to load data.",
+    "generateSbom": "Generate SBOM",
+    "getUpgrades": "Get Upgrade Suggestions",
     "high": "High",
-    "medium": "Medium",
-    "low": "Low",
     "info": "Info",
+    "licenseConflicts": "License Conflicts",
+    "loading": "Loading...",
+    "low": "Low",
+    "medium": "Medium",
+    "noConflicts": "No license conflicts detected.",
+    "noUpgrades": "No upgrade suggestions available.",
+    "profileId": "Profile ID",
+    "sbomGenerated": "SBOM generated successfully.",
+    "serviceId": "Service ID",
+    "submit": "Select Service",
+    "subtitle": "Review license conflicts and upgrade suggestions for service dependencies",
+    "title": "License Compliance & Upgrades",
+    "upgradeSuggestions": "Upgrade Suggestions",
     "serviceIdPlaceholder": "Enter service name or ID"
   },
   "mfa": {
@@ -6335,12 +6679,8 @@
     "title": "Two-factor authentication",
     "verifying": "Verifying..."
   },
-  "notesWidget": {
-    "title": "My Notes",
-    "edit": "Edit",
-    "preview": "Preview",
-    "placeholder": "Write your personal notes here... (markdown supported)",
-    "empty": "No notes yet. Click the edit icon to start writing."
+  "nav": {
+    "breadcrumbs": "Breadcrumbs"
   },
   "notificationConfig": {
     "actions": {
@@ -6463,7 +6803,7 @@
       "inApp": "In-App",
       "loading": "Loading preferences...",
       "mandatory": "Mandatory",
-      "mandatoryTooltip": "This notification cannot be disabled — it is required by platform security and governance policies",
+      "mandatoryTooltip": "This notification cannot be disabled ÔÇö it is required by platform security and governance policies",
       "saveFailed": "Failed to save preference",
       "saved": "Preference saved successfully",
       "subtitle": "Manage how and where you receive notifications",
@@ -6563,23 +6903,23 @@
   },
   "operations": {
     "onCall": {
-      "title": "On-Call Intelligence",
-      "subtitle": "Analyze on-call patterns, team fatigue, and incident distribution",
-      "loading": "Loading on-call intelligence...",
-      "error": "Failed to load on-call intelligence",
-      "period": "Period",
-      "totalIncidents": "Total Incidents",
       "avgPerWeek": "Avg per Week",
-      "peakHour": "Peak Hour",
-      "peakDay": "Peak Day",
-      "fatigueAlert": "High on-call fatigue detected: {{level}}",
-      "recommendations": "Recommendations",
-      "teamFatigue": "Team Fatigue",
       "avgResponse": "Avg response: {{minutes}} min",
-      "lastWeekCount": "{{count}} incidents last week",
-      "lastMonthCount": "{{count}} incidents last month",
+      "error": "Failed to load on-call intelligence",
+      "fatigueAlert": "High on-call fatigue detected: {{level}}",
+      "filterByTeam": "Filter by team...",
       "incidentDistribution": "Incident Distribution",
-      "filterByTeam": "Filter by team..."
+      "lastMonthCount": "{{count}} incidents last month",
+      "lastWeekCount": "{{count}} incidents last week",
+      "loading": "Loading on-call intelligence...",
+      "peakDay": "Peak Day",
+      "peakHour": "Peak Hour",
+      "period": "Period",
+      "recommendations": "Recommendations",
+      "subtitle": "Analyze on-call patterns, team fatigue, and incident distribution",
+      "teamFatigue": "Team Fatigue",
+      "title": "On-Call Intelligence",
+      "totalIncidents": "Total Incidents"
     },
     "logExplorer": {
       "traceIdPlaceholder": "Trace ID"
@@ -6802,119 +7142,119 @@
   },
   "phase4": {
     "contractDrift": {
-      "title": "Contract Drift Detection",
-      "subtitle": "Compare your published contract against real observed traffic",
       "analyze": "Analyze Drift",
       "driftScore": "Drift Score",
-      "status": "Status",
       "ghostEndpoints": "Ghost Endpoints",
       "ghostEndpointsDesc": "Declared in contract but never observed in traces",
-      "undeclaredEndpoints": "Undeclared Endpoints",
-      "undeclaredEndpointsDesc": "Observed in traces but not declared in contract",
-      "statusClean": "Clean",
-      "statusMinor": "Minor",
-      "statusMajor": "Major",
-      "statusCritical": "Critical",
-      "noObservations": "No trace observations provided",
       "method": "Method",
-      "path": "Path"
+      "noObservations": "No trace observations provided",
+      "path": "Path",
+      "status": "Status",
+      "statusClean": "Clean",
+      "statusCritical": "Critical",
+      "statusMajor": "Major",
+      "statusMinor": "Minor",
+      "subtitle": "Compare your published contract against real observed traffic",
+      "title": "Contract Drift Detection",
+      "undeclaredEndpoints": "Undeclared Endpoints",
+      "undeclaredEndpointsDesc": "Observed in traces but not declared in contract"
+    },
+    "contractReviewer": {
+      "approve": "Approve",
+      "category": "Category",
+      "description": "Description",
+      "issues": "Issues",
+      "noIssues": "No issues found",
+      "noSuggestions": "No suggestions",
+      "qualityScore": "Quality Score",
+      "recommendation": "Recommendation",
+      "reject": "Reject",
+      "requestChanges": "Request Changes",
+      "review": "Start Review",
+      "reviewing": "Reviewing...",
+      "severity": "Severity",
+      "subtitle": "Automated AI review of your contract draft",
+      "suggestions": "Suggestions",
+      "title": "AI Contract Reviewer"
     },
     "healthTimeline": {
-      "title": "Health Score Timeline",
-      "subtitle": "Evolution of contract health over time",
-      "version": "Version",
-      "healthScore": "Health Score",
       "breakingChange": "Breaking Change",
-      "lifecycleState": "Lifecycle State",
       "createdAt": "Created At",
+      "healthScore": "Health Score",
+      "lifecycleState": "Lifecycle State",
       "noData": "No versions found for this contract",
+      "subtitle": "Evolution of contract health over time",
+      "title": "Health Score Timeline",
+      "version": "Version",
       "apiAssetIdLabel": "API Asset ID",
       "apiAssetIdPlaceholder": "Search or enter API asset name",
       "loadTimeline": "Load Timeline",
       "loadError": "Failed to load health timeline. Please verify the API Asset ID."
     },
-    "maturityBenchmark": {
-      "title": "Service Maturity Benchmark",
-      "subtitle": "Compare maturity across teams and domains",
-      "teams": "Teams",
-      "domains": "Domains",
-      "rank": "Rank",
-      "teamName": "Team",
-      "domainName": "Domain",
-      "serviceCount": "Services",
-      "avgMaturityScore": "Avg Maturity",
-      "noData": "No services found for benchmarking"
-    },
-    "contractReviewer": {
-      "title": "AI Contract Reviewer",
-      "subtitle": "Automated AI review of your contract draft",
-      "review": "Start Review",
-      "reviewing": "Reviewing...",
-      "qualityScore": "Quality Score",
-      "recommendation": "Recommendation",
-      "issues": "Issues",
-      "suggestions": "Suggestions",
-      "severity": "Severity",
-      "category": "Category",
-      "description": "Description",
-      "approve": "Approve",
-      "requestChanges": "Request Changes",
-      "reject": "Reject",
-      "noIssues": "No issues found",
-      "noSuggestions": "No suggestions"
-    },
     "impactCascade": {
-      "title": "Canonical Entity Impact Cascade",
+      "affectedContracts": "Affected Contracts",
+      "analyze": "Analyze Cascade",
+      "children": "Children",
+      "depth": "Depth",
+      "depthLabel": "Depth {{depth}}",
+      "entityName": "Entity",
+      "maxDepth": "Max Depth",
+      "noChildren": "No cascading impact",
+      "riskLevel": "Risk Level",
       "subtitle": "Multi-level cascade analysis of canonical entity changes",
+      "title": "Canonical Entity Impact Cascade",
       "totalContracts": "Total Contracts Affected",
       "uniqueEntities": "Unique Entities in Cascade",
-      "riskLevel": "Risk Level",
-      "maxDepth": "Max Depth",
-      "entityName": "Entity",
-      "depth": "Depth",
-      "affectedContracts": "Affected Contracts",
-      "children": "Children",
-      "analyze": "Analyze Cascade",
-      "noChildren": "No cascading impact",
-      "depthLabel": "Depth {{depth}}",
       "entityIdPlaceholder": "Search or enter canonical entity name",
       "loadError": "Failed to load cascade analysis. Please verify the entity ID."
+    },
+    "maturityBenchmark": {
+      "avgMaturityScore": "Avg Maturity",
+      "domainName": "Domain",
+      "domains": "Domains",
+      "noData": "No services found for benchmarking",
+      "rank": "Rank",
+      "serviceCount": "Services",
+      "subtitle": "Compare maturity across teams and domains",
+      "teamName": "Team",
+      "teams": "Teams",
+      "title": "Service Maturity Benchmark"
     }
   },
   "phase5": {
-    "usage": {
-      "title": "Parameter Usage Report",
-      "subtitle": "Overview of configuration parameter utilization across the platform",
-      "refresh": "Refresh",
-      "loading": "Loading usage report...",
-      "totalDefinitions": "Total Definitions",
-      "totalOverrides": "Total Overrides",
-      "overrideCoverage": "Override Coverage",
-      "usingDefault": "Using Default",
-      "mostOverridden": "Most Overridden Parameters",
-      "noOverrides": "No overrides found.",
-      "overrides": "overrides",
-      "scopeDistribution": "Overrides by Scope",
-      "noScopes": "No scope data available.",
-      "recentlyChanged": "Recently Changed Parameters",
-      "noRecent": "No recent changes."
-    },
     "compliance": {
-      "title": "Parameterization Compliance Dashboard",
-      "subtitle": "Executive view of configuration governance and compliance",
-      "refresh": "Refresh",
-      "loading": "Loading compliance summary...",
-      "i18nCoverage": "i18n Coverage",
-      "validationCoverage": "Validation Coverage",
-      "deprecated": "Deprecated Parameters",
-      "sensitive": "Sensitive Parameters",
       "byCategory": "Compliance by Category",
-      "params": "params",
+      "deprecated": "Deprecated Parameters",
+      "deprecatedList": "Deprecated Parameters",
       "deprecatedShort": "dep.",
       "editability": "Editability Overview",
       "editable": "Editable",
+      "i18nCoverage": "i18n Coverage",
+      "loading": "Loading compliance summary...",
+      "params": "params",
       "readOnly": "Read-Only",
-      "deprecatedList": "Deprecated Parameters"
+      "refresh": "Refresh",
+      "sensitive": "Sensitive Parameters",
+      "subtitle": "Executive view of configuration governance and compliance",
+      "title": "Parameterization Compliance Dashboard",
+      "validationCoverage": "Validation Coverage"
+    },
+    "usage": {
+      "loading": "Loading usage report...",
+      "mostOverridden": "Most Overridden Parameters",
+      "noOverrides": "No overrides found.",
+      "noRecent": "No recent changes.",
+      "noScopes": "No scope data available.",
+      "overrideCoverage": "Override Coverage",
+      "overrides": "overrides",
+      "recentlyChanged": "Recently Changed Parameters",
+      "refresh": "Refresh",
+      "scopeDistribution": "Overrides by Scope",
+      "subtitle": "Overview of configuration parameter utilization across the platform",
+      "title": "Parameter Usage Report",
+      "totalDefinitions": "Total Definitions",
+      "totalOverrides": "Total Overrides",
+      "usingDefault": "Using Default"
     }
   },
   "platformOps": {
@@ -6969,40 +7309,41 @@
     "yes": "Yes"
   },
   "predictiveIntelligence": {
-    "title": "Predictive Intelligence",
-    "subtitle": "Predict service failures and assess change risk before they impact production",
-    "serviceFailurePrediction": "Service Failure Prediction",
+    "additionalContext": "Additional Context (optional)",
+    "analysisPanel": "Predictive Analysis",
+    "assessedAt": "Assessed at",
+    "blastRadius": "Blast Radius (0ÔÇô100)",
+    "causalFactors": "Causal Factors",
+    "changeFrequencyScore": "Change Frequency Score (0ÔÇô10)",
     "changeRiskAssessment": "Change Risk Assessment",
+    "changeType": "Change Type",
+    "computedAt": "Computed at",
+    "critical": "Critical",
+    "environment": "Environment",
+    "error": "Failed to retrieve prediction. Please try again.",
+    "errorRatePercent": "Error Rate (%)",
+    "failureProbability": "Failure Probability",
+    "hasTestEvidence": "Has Test Evidence",
+    "high": "High",
+    "incidentCount": "Incident Count (last 30 days)",
+    "isBusinessHours": "Is Business Hours",
+    "loading": "Running...",
+    "low": "Low",
+    "medium": "Medium",
+    "noResult": "Submit the form to see prediction results",
+    "predictionHorizon": "Prediction Horizon",
+    "priorIncidentRate": "Prior Incident Rate",
+    "recommendations": "Recommendations",
+    "recommendedAction": "Recommended Action",
+    "riskFactors": "Risk Factors",
+    "riskLevel": "Risk Level",
+    "riskScore": "Risk Score",
+    "serviceFailurePrediction": "Service Failure Prediction",
     "serviceId": "Service ID",
     "serviceName": "Service Name",
-    "environment": "Environment",
-    "predictionHorizon": "Prediction Horizon",
-    "errorRatePercent": "Error Rate (%)",
-    "incidentCount": "Incident Count (last 30 days)",
-    "changeFrequencyScore": "Change Frequency Score (0–10)",
-    "additionalContext": "Additional Context (optional)",
     "submit": "Run Prediction",
-    "failureProbability": "Failure Probability",
-    "riskLevel": "Risk Level",
-    "causalFactors": "Causal Factors",
-    "recommendedAction": "Recommended Action",
-    "changeType": "Change Type",
-    "priorIncidentRate": "Prior Incident Rate",
-    "blastRadius": "Blast Radius (0–100)",
-    "hasTestEvidence": "Has Test Evidence",
-    "isBusinessHours": "Is Business Hours",
-    "riskScore": "Risk Score",
-    "riskFactors": "Risk Factors",
-    "recommendations": "Recommendations",
-    "critical": "Critical",
-    "high": "High",
-    "medium": "Medium",
-    "low": "Low",
-    "noResult": "Submit the form to see prediction results",
-    "loading": "Running...",
-    "error": "Failed to retrieve prediction. Please try again.",
-    "computedAt": "Computed at",
-    "assessedAt": "Assessed at"
+    "subtitle": "Predict service failures and assess change risk before they impact production",
+    "title": "Predictive Intelligence"
   },
   "preview": {
     "badge": "Preview",
@@ -7132,21 +7473,12 @@
     "releaseId": "Release",
     "releaseIdPlaceholder": "UUID of the release",
     "route": "Route",
-    "selectRelease": "Select a release…",
+    "selectRelease": "Select a releaseÔÇª",
     "sourceEnvironment": "Source Environment",
     "status": "Status",
     "subtitle": "Control environment promotion with quality gates",
     "targetEnvironment": "Target Environment",
     "title": "Promotion"
-  },
-  "quietHours": {
-    "title": "Quiet Hours",
-    "subtitle": "Pause notifications during specified hours",
-    "enabled": "Enable quiet hours",
-    "start": "Start time",
-    "end": "End time",
-    "timezone": "Timezone",
-    "saved": "Quiet hours saved"
   },
   "releaseCalendar": {
     "activeFreezeWindows": "Active Freeze Windows",
@@ -7372,10 +7704,10 @@
     "loadError": "Failed to load service reliability data. Please try again.",
     "mock": {
       "authGwSummary": "All authentication flows healthy.",
-      "catalogSyncAnomaly": "Complete service failure — dependency unavailable.",
+      "catalogSyncAnomaly": "Complete service failure ÔÇö dependency unavailable.",
       "catalogSyncSummary": "Integration partner unreachable.",
       "catalogSyncTrend": "Connectivity lost 2 hours ago.",
-      "inventorySummary": "Consumer lag increasing — needs attention.",
+      "inventorySummary": "Consumer lag increasing ÔÇö needs attention.",
       "noAnomalies": "No anomalies detected in the last 24 hours.",
       "notificationSummary": "Processing within expected parameters.",
       "orderApiSummary": "Service operating within expected parameters. All health checks passing.",
@@ -7383,7 +7715,7 @@
       "paymentGwAnomaly": "Error rate anomaly detected: 5.2% vs expected 1.0%. Correlated with recent change v3.1.0.",
       "paymentGwSummary": "Elevated error rate (5.2%) detected since last deployment.",
       "paymentGwTrend": "Error rate increased 40% after deployment v3.1.0.",
-      "reportSchedulerSummary": "Coverage gap detected — missing runbook.",
+      "reportSchedulerSummary": "Coverage gap detected ÔÇö missing runbook.",
       "userSvcSummary": "All systems operational."
     },
     "needsAttention": "Attention Required",
@@ -7419,7 +7751,7 @@
       "NeedsAttention": "Needs Attention",
       "Unavailable": "Unavailable"
     },
-    "subtitle": "Team-owned service reliability overview — health, trends and operational context",
+    "subtitle": "Team-owned service reliability overview ÔÇö health, trends and operational context",
     "title": "Service Reliability",
     "totalServices": "Total Services",
     "trend": {
@@ -7507,114 +7839,108 @@
     "subtitle": "Operational procedures and mitigation guides",
     "title": "Runbooks"
   },
-  "savedViews": {
-    "title": "Saved Views",
-    "default": "Default",
-    "shared": "Shared",
-    "save": "Save current view",
-    "delete": "Delete view",
-    "empty": "No saved views",
-    "saveModal": {
-      "title": "Save View",
-      "name": "View name",
-      "namePlaceholder": "My team services",
-      "share": "Share with team",
-      "confirm": "Save",
-      "cancel": "Cancel"
-    }
-  },
   "securityGate": {
-    "title": "Security Gate Dashboard",
-    "subtitle": "SAST analysis of generated code — detect vulnerabilities before they reach production.",
-    "sastEngine": "Internal SAST Engine",
-    "tabs": {
-      "scan": "Scan Code",
-      "dashboard": "Dashboard"
-    },
-    "filePath": "File Path",
-    "sourceCode": "Source Code",
-    "sourceCodePlaceholder": "Paste generated code to analyze...",
-    "runScan": "Run SAST Scan",
-    "scanning": "Scanning...",
-    "gatePassed": "Security gate passed — no critical or high findings.",
-    "gateFailed": "Security gate failed — critical or high findings detected.",
-    "riskLevel": "Risk Level",
+    "allSeverities": "All severities",
     "critical": "Critical",
+    "criticalFindings": "Critical Findings",
+    "dashboardEmpty": "No security scans recorded yet. Run a scan to start tracking security posture.",
+    "dashboardError": "Failed to load dashboard data.",
+    "emptyState": "Paste generated code and run the SAST scan to detect vulnerabilities.",
+    "filePath": "File Path",
+    "gateFailed": "Security gate failed ÔÇö critical or high findings detected.",
+    "gatePassed": "Security gate passed ÔÇö no critical or high findings.",
     "high": "High",
     "medium": "Medium",
-    "searchFindings": "Search findings...",
-    "allSeverities": "All severities",
-    "noMatchingFindings": "No findings match the current filters.",
     "noFindings": "No security findings detected. Code looks clean!",
-    "emptyState": "Paste generated code and run the SAST scan to detect vulnerabilities.",
-    "remediation": "Remediation",
-    "totalScans": "Total Scans",
+    "noMatchingFindings": "No findings match the current filters.",
     "passedScans": "Passed",
-    "criticalFindings": "Critical Findings",
-    "securityScore": "Security Score",
-    "topCategories": "Top Vulnerable Categories",
     "recentScans": "Recent Scans",
-    "dashboardError": "Failed to load dashboard data.",
-    "dashboardEmpty": "No security scans recorded yet. Run a scan to start tracking security posture."
+    "remediation": "Remediation",
+    "riskLevel": "Risk Level",
+    "runScan": "Run SAST Scan",
+    "sastEngine": "Internal SAST Engine",
+    "scanning": "Scanning...",
+    "searchFindings": "Search findings...",
+    "securityScore": "Security Score",
+    "sourceCode": "Source Code",
+    "sourceCodePlaceholder": "Paste generated code to analyze...",
+    "subtitle": "SAST analysis of generated code ÔÇö detect vulnerabilities before they reach production.",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "scan": "Scan Code"
+    },
+    "title": "Security Gate Dashboard",
+    "topCategories": "Top Vulnerable Categories",
+    "totalScans": "Total Scans"
   },
   "selfServicePortal": {
-    "title": "Self-Service Portal",
-    "subtitle": "Governance-backed quick actions for developers",
-    "groups": {
-      "services": "Services",
-      "contracts": "Contracts",
-      "changes": "Changes",
-      "access": "Access & Identity",
-      "operations": "Operations",
-      "ai": "AI & Scaffolding"
-    },
     "actions": {
-      "createService": "Create Service",
-      "createService_desc": "Register a new service in the catalog",
-      "registerIntegration": "Register Integration",
-      "registerIntegration_desc": "Add a new integration to the platform",
-      "viewServiceCatalog": "View Service Catalog",
-      "viewServiceCatalog_desc": "Browse all services and their metadata",
-      "publishRestContract": "Publish REST Contract",
-      "publishRestContract_desc": "Create and publish a new REST API contract",
-      "publishEventContract": "Publish Event Contract",
-      "publishEventContract_desc": "Define and publish an event contract",
-      "viewContractHealth": "View Contract Health",
-      "viewContractHealth_desc": "Monitor contract health and compliance status",
-      "promoteRelease": "Promote Release",
-      "promoteRelease_desc": "Initiate a release promotion across environments",
-      "requestBlastRadius": "Request Blast Radius Analysis",
-      "requestBlastRadius_desc": "Analyze the potential impact of a change",
-      "viewReleaseCalendar": "View Release Calendar",
-      "viewReleaseCalendar_desc": "Review scheduled releases and change windows",
-      "requestJitAccess": "Request JIT Access",
-      "requestJitAccess_desc": "Request just-in-time privileged access",
-      "viewMyPermissions": "View My Permissions",
-      "viewMyPermissions_desc": "Review your current access and permissions",
-      "breakGlassAccess": "Break Glass Access",
-      "breakGlassAccess_desc": "Emergency access request for critical situations",
-      "runRunbook": "Run Runbook",
-      "runRunbook_desc": "Execute an operational runbook",
-      "viewOnCallStatus": "View On-Call Status",
-      "viewOnCallStatus_desc": "Check on-call schedules and team availability",
-      "reportIncident": "Report Incident",
-      "reportIncident_desc": "Create a new incident report",
       "aiAgentMarketplace": "AI Agent Marketplace",
       "aiAgentMarketplace_desc": "Discover and use governed AI agents",
+      "breakGlassAccess": "Break Glass Access",
+      "breakGlassAccess_desc": "Emergency access request for critical situations",
       "createAiScaffold": "Create AI Scaffold",
       "createAiScaffold_desc": "Generate a new service scaffold with AI assistance",
+      "createService": "Create Service",
+      "createService_desc": "Register a new service in the catalog",
       "generateAdr": "Generate ADR",
-      "generateAdr_desc": "Create an Architecture Decision Record with AI"
-    }
+      "generateAdr_desc": "Create an Architecture Decision Record with AI",
+      "promoteRelease": "Promote Release",
+      "promoteRelease_desc": "Initiate a release promotion across environments",
+      "publishEventContract": "Publish Event Contract",
+      "publishEventContract_desc": "Define and publish an event contract",
+      "publishRestContract": "Publish REST Contract",
+      "publishRestContract_desc": "Create and publish a new REST API contract",
+      "registerIntegration": "Register Integration",
+      "registerIntegration_desc": "Add a new integration to the platform",
+      "reportIncident": "Report Incident",
+      "reportIncident_desc": "Create a new incident report",
+      "requestBlastRadius": "Request Blast Radius Analysis",
+      "requestBlastRadius_desc": "Analyze the potential impact of a change",
+      "requestJitAccess": "Request JIT Access",
+      "requestJitAccess_desc": "Request just-in-time privileged access",
+      "runRunbook": "Run Runbook",
+      "runRunbook_desc": "Execute an operational runbook",
+      "viewContractHealth": "View Contract Health",
+      "viewContractHealth_desc": "Monitor contract health and compliance status",
+      "viewMyPermissions": "View My Permissions",
+      "viewMyPermissions_desc": "Review your current access and permissions",
+      "viewOnCallStatus": "View On-Call Status",
+      "viewOnCallStatus_desc": "Check on-call schedules and team availability",
+      "viewReleaseCalendar": "View Release Calendar",
+      "viewReleaseCalendar_desc": "Review scheduled releases and change windows",
+      "viewServiceCatalog": "View Service Catalog",
+      "viewServiceCatalog_desc": "Browse all services and their metadata"
+    },
+    "groups": {
+      "access": "Access & Identity",
+      "ai": "AI & Scaffolding",
+      "changes": "Changes",
+      "contracts": "Contracts",
+      "operations": "Operations",
+      "services": "Services"
+    },
+    "subtitle": "Governance-backed quick actions for developers",
+    "title": "Self-Service Portal"
   },
   "serviceCatalog": {
     "apiAsset": "API Asset",
     "baseUrl": "Base URL",
+    "basicInfo": "Basic Information",
+    "businessOwner": "Business Owner",
+    "businessOwnerPlaceholder": "e.g., Product Manager Name",
+    "classification": "Classification",
     "confidence": "Confidence",
     "consumerService": "Consumer Service",
     "consumers": "consumers",
+    "criticality": "Criticality",
+    "criticalityCritical": "Critical",
+    "criticalityHigh": "High",
+    "criticalityLow": "Low",
+    "criticalityMedium": "Medium",
     "crossServiceDependencies": "Cross-Service Dependencies",
     "description": "Description",
+    "descriptionPlaceholder": "Describe the purpose and responsibilities of this service...",
     "detail": {
       "avgLatency": "Avg Latency",
       "close": "Close",
@@ -7638,9 +7964,16 @@
       "title": "Service Detail",
       "version": "Version"
     },
+    "documentationUrl": "Documentation URL",
+    "domain": "Domain",
+    "domainPlaceholder": "e.g., payments, identity, orders",
     "emptyGraph": "No services or APIs registered yet. Register your first asset to start building the graph.",
+    "exposure": "Exposure",
+    "exposureExternal": "External / Public",
+    "exposureInternal": "Internal",
+    "exposurePartner": "Partner",
     "impact": {
-      "calculating": "Calculating impact propagation…",
+      "calculating": "Calculating impact propagationÔÇª",
       "depth": "Depth",
       "directConsumers": "Direct consumers",
       "impactedNodes": "Impacted Nodes",
@@ -7649,7 +7982,7 @@
       "path": "Impact Path",
       "selectNode": "Root node",
       "selectNodeHint": "Select a service or API node to calculate its blast radius.",
-      "selectNodePlaceholder": "Select a node to analyze…",
+      "selectNodePlaceholder": "Select a node to analyzeÔÇª",
       "totalImpacted": "Total impacted",
       "transitiveConsumers": "Transitive consumers"
     },
@@ -7672,6 +8005,7 @@
     "legendDependency": "Dependency",
     "legendService": "Service",
     "name": "Name",
+    "namePlaceholder": "e.g., payment-service",
     "noApis": "No APIs registered",
     "noApisForService": "No APIs registered for this service",
     "noDependencies": "No dependency relationships mapped",
@@ -7717,12 +8051,16 @@
       "unknown": "Unknown"
     },
     "ownerServiceId": "Owner Service ID",
+    "ownership": "Ownership",
+    "references": "References",
     "register": "Register",
     "registerApi": "Register API",
     "registerApiTitle": "Register API Asset",
     "registerService": "Register Service",
     "registerServiceTitle": "Register Service",
-    "searchPlaceholder": "Search services, APIs, domains…",
+    "repositoryUrl": "Repository URL",
+    "searchPlaceholder": "Search services, APIs, domainsÔÇª",
+    "serviceType": "Service Type",
     "sourceApi": "Source API",
     "stats": {
       "apis": "APIs",
@@ -7741,10 +8079,13 @@
       "temporal": "Temporal Diff"
     },
     "team": "Team",
+    "teamPlaceholder": "e.g., platform-team",
+    "technicalOwner": "Technical Owner",
+    "technicalOwnerPlaceholder": "e.g., john.smith@company.com",
     "temporal": {
       "addedEdges": "Added edges",
       "addedNodes": "Added nodes",
-      "calculatingDiff": "Calculating temporal diff…",
+      "calculatingDiff": "Calculating temporal diffÔÇª",
       "capturedAt": "Captured at",
       "createFirst": "Create your first snapshot to start tracking graph evolution over time.",
       "createSnapshot": "Create Snapshot",
@@ -7756,60 +8097,35 @@
       "nodes": "Nodes",
       "removedEdges": "Removed edges",
       "removedNodes": "Removed nodes",
-      "selectSnapshot": "Select a snapshot…",
+      "selectSnapshot": "Select a snapshotÔÇª",
       "snapshotHistory": "Snapshot History",
       "toSnapshot": "To snapshot"
     },
     "title": "Service Catalog",
     "trustLevel": "Trust Level",
-    "basicInfo": "Basic Information",
-    "classification": "Classification",
-    "ownership": "Ownership",
-    "references": "References",
-    "domain": "Domain",
-    "domainPlaceholder": "e.g., payments, identity, orders",
-    "namePlaceholder": "e.g., payment-service",
-    "teamPlaceholder": "e.g., platform-team",
-    "descriptionPlaceholder": "Describe the purpose and responsibilities of this service...",
-    "serviceType": "Service Type",
+    "typeBackgroundService": "Background Service",
+    "typeBatchJob": "Batch Job",
+    "typeCicsTransaction": "CICS Transaction",
+    "typeCobolProgram": "COBOL Program",
+    "typeFramework": "Framework / SDK",
+    "typeGateway": "API Gateway",
+    "typeGraphqlApi": "GraphQL API",
+    "typeGroupMainframe": "Mainframe",
     "typeGroupModern": "Modern Services",
     "typeGroupPlatform": "Platform & Integration",
-    "typeGroupMainframe": "Mainframe",
-    "criticality": "Criticality",
-    "criticalityLow": "Low",
-    "criticalityMedium": "Medium",
-    "criticalityHigh": "High",
-    "criticalityCritical": "Critical",
-    "exposure": "Exposure",
-    "exposureInternal": "Internal",
-    "exposurePartner": "Partner",
-    "exposureExternal": "External / Public",
-    "technicalOwner": "Technical Owner",
-    "technicalOwnerPlaceholder": "e.g., john.smith@company.com",
-    "businessOwner": "Business Owner",
-    "businessOwnerPlaceholder": "e.g., Product Manager Name",
-    "documentationUrl": "Documentation URL",
-    "repositoryUrl": "Repository URL",
     "typeGrpcService": "gRPC Service",
-    "typeGateway": "API Gateway",
-    "typeFramework": "Framework / SDK",
-    "typeRestApi": "REST API",
-    "typeGraphqlApi": "GraphQL API",
-    "typeSoapService": "SOAP Service",
-    "typeKafkaProducer": "Kafka Producer",
-    "typeKafkaConsumer": "Kafka Consumer",
-    "typeBackgroundService": "Background Service",
-    "typeScheduledProcess": "Scheduled Process",
-    "typeIntegrationComponent": "Integration Component",
-    "typeSharedPlatformService": "Shared Platform Service",
-    "typeThirdParty": "Third-Party Service",
-    "typeLegacySystem": "Legacy System",
-    "typeCobolProgram": "COBOL Program",
-    "typeCicsTransaction": "CICS Transaction",
     "typeImsTransaction": "IMS Transaction",
-    "typeBatchJob": "Batch Job",
+    "typeIntegrationComponent": "Integration Component",
+    "typeKafkaConsumer": "Kafka Consumer",
+    "typeKafkaProducer": "Kafka Producer",
+    "typeLegacySystem": "Legacy System",
     "typeMainframeSystem": "Mainframe System",
     "typeMqQueueManager": "MQ Queue Manager",
+    "typeRestApi": "REST API",
+    "typeScheduledProcess": "Scheduled Process",
+    "typeSharedPlatformService": "Shared Platform Service",
+    "typeSoapService": "SOAP Service",
+    "typeThirdParty": "Third-Party Service",
     "typeZosConnectApi": "z/OS Connect API"
   },
   "serviceMaturity": {
@@ -7939,11 +8255,14 @@
     "aiRouting": "AI Routing",
     "analyticsOverview": "Analytics Overview",
     "apiContracts": "API Contracts",
+    "apiPolicyAsCode": "API Policy as Code",
     "audit": "Audit",
     "automation": "Automation",
     "benchmarking": "Benchmarking",
+    "branding": "Branding & Identity",
     "breakGlass": "Break Glass",
     "canonicalEntities": "Canonical Entities",
+    "cdct": "Consumer-Driven Testing",
     "changeConfidence": "Change Confidence",
     "changeIntelligence": "Change Intelligence",
     "changes": "Changes",
@@ -7951,13 +8270,17 @@
     "contractCatalog": "Contract Catalog",
     "contractGovernance": "Contract Governance",
     "contractHealthDashboard": "Contract Health Dashboard",
+    "contractPipeline": "Contract Pipeline",
+    "contractPlayground": "Contract Playground",
     "contractStudio": "Contract Studio",
     "controls": "Enterprise Controls",
     "createContract": "New Contract",
     "dashboard": "Dashboard",
     "delegatedAdmin": "Delegated Admin",
     "delegations": "Delegations",
+    "dependencyDashboard": "Dependency Dashboard",
     "dependencyGraph": "Dependency Graph",
+    "developerExperienceScore": "Developer Experience Score",
     "developerPortal": "Developer Portal",
     "domains": "Domains",
     "doraMetrics": "DORA Metrics",
@@ -7979,20 +8302,22 @@
     "jitAccess": "JIT Access",
     "journeyFunnels": "Journeys & Funnels",
     "knowledgeHub": "Knowledge Hub",
+    "licenseCompliance": "License Compliance",
     "maturityScorecards": "Maturity Scorecards",
     "modelRegistry": "Model Registry",
     "moduleAdoption": "Module Adoption",
     "mySessions": "My Sessions",
     "operationalNotes": "Operational Notes",
+    "parameterCompliance": "Parameter Compliance",
+    "parameterUsageReport": "Parameter Usage",
     "personaUsage": "Persona Usage",
     "platformConfiguration": "Platform Configuration",
     "platformOperations": "Platform Operations",
     "policyCatalog": "Policy Catalog",
+    "predictiveIntelligence": "Predictive Intelligence",
     "productAnalytics": "Product Analytics",
     "promotion": "Promotion",
     "publicationCenter": "Publication Center",
-    "contractPlayground": "Contract Playground",
-    "cdct": "Consumer-Driven Testing",
     "releaseCalendar": "Release Calendar",
     "releases": "Releases",
     "reliability": "Service Reliability",
@@ -8013,6 +8338,7 @@
     "sectionOrganization": "Organization",
     "sectionOwnershipTeams": "Ownership & Teams",
     "sectionServices": "Services",
+    "securityGate": "Security Gate",
     "serviceCatalog": "Service Catalog",
     "serviceDiscovery": "Service Discovery",
     "serviceMaturity": "Service Maturity",
@@ -8026,15 +8352,6 @@
     "valueTracking": "Value Tracking",
     "waivers": "Waivers & Exceptions",
     "workflow": "Workflow",
-    "contractPipeline": "Contract Pipeline",
-    "securityGate": "Security Gate",
-    "predictiveIntelligence": "Predictive Intelligence",
-    "developerExperienceScore": "Developer Experience Score",
-    "apiPolicyAsCode": "API Policy as Code",
-    "dependencyDashboard": "Dependency Dashboard",
-    "licenseCompliance": "License Compliance",
-    "parameterUsageReport": "Parameter Usage",
-    "parameterCompliance": "Parameter Compliance",
     "navigation": "Main navigation"
   },
   "sourceOfTruth": {
@@ -8142,192 +8459,174 @@
     },
     "title": "Source of Truth"
   },
-  "tags": {
-    "title": "Tags",
-    "add": "Add tag",
-    "remove": "Remove tag",
-    "placeholder": "key:value (e.g. team:payments)",
-    "empty": "No tags",
-    "keyLabel": "Tag key",
-    "valueLabel": "Tag value"
-  },
-  "taxonomies": {
-    "title": "Classification Taxonomies",
-    "addCategory": "Add Category",
-    "addValue": "Add Value",
-    "empty": {
-      "title": "No taxonomies",
-      "description": "Define classification categories for services"
-    }
-  },
   "templates": {
-    "library": {
-      "title": "Template Library",
-      "subtitle": "Governed project templates for developer scaffolding with AI assistance",
-      "createTemplate": "New Template",
-      "searchPlaceholder": "Search templates...",
-      "hasContract": "Base contract",
-      "hasManifest": "Manifest",
-      "viewDetails": "View Details",
-      "scaffold": "Scaffold with AI",
-      "empty": "No templates found. Create the first template to accelerate your team.",
-      "createFirst": "Create First Template",
-      "stats": {
-        "total": "Total templates",
-        "active": "Active",
-        "dotnet": ".NET templates",
-        "withContract": "With contract"
-      },
-      "filters": {
-        "allTypes": "All types",
-        "allLanguages": "All languages",
-        "showInactive": "Show inactive"
-      }
-    },
     "detail": {
-      "notFound": "Template not found.",
-      "backToLibrary": "Template Library",
-      "edit": "Edit",
       "activate": "Activate",
-      "deactivate": "Deactivate",
-      "scaffoldWithAi": "Scaffold with AI",
       "active": "Active",
-      "inactive": "Inactive",
-      "ownership": "Ownership",
+      "audit": "Audit",
+      "backToLibrary": "Template Library",
+      "baseContract": "Base Contract Spec",
+      "createdAt": "Created",
+      "deactivate": "Deactivate",
       "defaultDomain": "Default domain",
       "defaultTeam": "Default team",
-      "repository": "Repository",
-      "repoUrl": "Repository URL",
+      "edit": "Edit",
+      "governancePolicies": "Governance Policies",
+      "hasContract": "Base contract included",
+      "hasManifest": "Scaffolding manifest defined",
+      "inactive": "Inactive",
+      "noContract": "No base contract",
+      "noManifest": "No manifest ÔÇö AI generates structure",
+      "notFound": "Template not found.",
+      "ownership": "Ownership",
       "repoBranch": "Branch",
-      "tags": "Tags",
-      "baseContract": "Base Contract Spec",
+      "repoUrl": "Repository URL",
+      "repository": "Repository",
+      "scaffoldWithAi": "Scaffold with AI",
       "scaffoldingManifest": "Scaffolding Manifest",
       "stats": "Usage & Coverage",
+      "tags": "Tags",
       "timesUsed": "times scaffolded",
-      "hasContract": "Base contract included",
-      "noContract": "No base contract",
-      "hasManifest": "Scaffolding manifest defined",
-      "noManifest": "No manifest — AI generates structure",
-      "audit": "Audit",
-      "createdAt": "Created",
-      "updatedAt": "Last updated",
-      "governancePolicies": "Governance Policies"
+      "updatedAt": "Last updated"
     },
     "editor": {
       "createTitle": "New Service Template",
       "editTitle": "Edit Template",
-      "saveError": "Failed to save template. Please check your inputs.",
-      "sections": {
-        "identity": "Identity",
-        "classification": "Classification",
-        "ownership": "Ownership & Tags",
-        "advanced": "Advanced — Contract & Scaffolding"
-      },
       "fields": {
-        "slug": "Slug",
-        "displayName": "Display Name",
-        "version": "Version",
-        "description": "Description",
-        "serviceType": "Service Type",
-        "language": "Language / Stack",
+        "baseContractSpec": "Base Contract Spec",
         "defaultDomain": "Default Domain",
         "defaultTeam": "Default Team",
-        "tags": "Tags",
-        "repoUrl": "Repository Template URL",
+        "description": "Description",
+        "displayName": "Display Name",
+        "language": "Language / Stack",
         "repoBranch": "Branch",
-        "baseContractSpec": "Base Contract Spec",
-        "scaffoldingManifest": "Scaffolding Manifest (JSON)"
+        "repoUrl": "Repository Template URL",
+        "scaffoldingManifest": "Scaffolding Manifest (JSON)",
+        "serviceType": "Service Type",
+        "slug": "Slug",
+        "tags": "Tags",
+        "version": "Version"
+      },
+      "hints": {
+        "baseContractSpec": "OpenAPI, AsyncAPI or WSDL contract included in every generated service.",
+        "repoUrl": "Optional Git repository used as source for the scaffolding.",
+        "scaffoldingManifest": "JSON array of { path, content } objects. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} as variables.",
+        "slug": "Unique identifier in kebab-case. Cannot be changed after creation.",
+        "tags": "Comma-separated tags for discoverability.",
+        "typeLanguageImmutable": "Service type and language cannot be changed after creation."
+      },
+      "languages": {
+        "agnostic": "Agnostic",
+        "dotnet": ".NET",
+        "go": "Go",
+        "java": "Java",
+        "nodejs": "Node.js",
+        "python": "Python"
       },
       "placeholders": {
-        "displayName": "Payment REST API — DDD .NET",
         "description": "Template for building REST APIs following DDD with Clean Architecture...",
+        "displayName": "Payment REST API ÔÇö DDD .NET",
         "domain": "payments",
         "team": "platform-team"
       },
-      "hints": {
-        "slug": "Unique identifier in kebab-case. Cannot be changed after creation.",
-        "tags": "Comma-separated tags for discoverability.",
-        "typeLanguageImmutable": "Service type and language cannot be changed after creation.",
-        "repoUrl": "Optional Git repository used as source for the scaffolding.",
-        "baseContractSpec": "OpenAPI, AsyncAPI or WSDL contract included in every generated service.",
-        "scaffoldingManifest": "JSON array of { path, content } objects. Use {{ServiceName}}, {{ServiceNamePascal}}, {{Domain}}, {{TeamName}} as variables."
+      "saveError": "Failed to save template. Please check your inputs.",
+      "sections": {
+        "advanced": "Advanced ÔÇö Contract & Scaffolding",
+        "classification": "Classification",
+        "identity": "Identity",
+        "ownership": "Ownership & Tags"
       },
       "serviceTypes": {
+        "backgroundWorker": "Background Worker",
+        "eventDriven": "Event Driven",
+        "generic": "Generic",
         "grpc": "gRPC",
         "restApi": "REST API",
-        "eventDriven": "Event Driven",
-        "backgroundWorker": "Background Worker",
-        "soap": "SOAP",
-        "generic": "Generic"
-      },
-      "languages": {
-        "dotnet": ".NET",
-        "nodejs": "Node.js",
-        "java": "Java",
-        "go": "Go",
-        "python": "Python",
-        "agnostic": "Agnostic"
+        "soap": "SOAP"
       }
     },
+    "library": {
+      "createFirst": "Create First Template",
+      "createTemplate": "New Template",
+      "empty": "No templates found. Create the first template to accelerate your team.",
+      "filters": {
+        "allLanguages": "All languages",
+        "allTypes": "All types",
+        "showInactive": "Show inactive"
+      },
+      "hasContract": "Base contract",
+      "hasManifest": "Manifest",
+      "scaffold": "Scaffold with AI",
+      "searchPlaceholder": "Search templates...",
+      "stats": {
+        "active": "Active",
+        "dotnet": ".NET templates",
+        "total": "Total templates",
+        "withContract": "With contract"
+      },
+      "subtitle": "Governed project templates for developer scaffolding with AI assistance",
+      "title": "Template Library",
+      "viewDetails": "View Details"
+    },
     "scaffold": {
-      "title": "AI Scaffold Generator",
       "backToTemplate": "Back to Template",
-      "next": "Next",
+      "fields": {
+        "additionalRequirements": "Additional Requirements",
+        "domain": "Domain",
+        "languageOverride": "Language Override",
+        "mainEntities": "Main Entities / Routes",
+        "serviceDescription": "Service Description",
+        "serviceName": "Service Name",
+        "teamName": "Team"
+      },
       "generate": "Generate with AI",
-      "retry": "Try Again",
       "generateError": "AI generation failed",
       "generateErrorGeneric": "An unexpected error occurred. The AI provider may be unavailable.",
-      "steps": {
-        "template": "Template",
-        "intent": "Intent",
-        "generate": "Generating",
-        "review": "Review"
-      },
-      "info": {
-        "baseContract": "Base Contract",
-        "scaffoldManifest": "Scaffold Manifest",
-        "defaultDomain": "Domain",
-        "included": "Included",
-        "notIncluded": "Not included",
-        "aiGeneratesStructure": "AI generates structure"
-      },
-      "fields": {
-        "serviceName": "Service Name",
-        "serviceDescription": "Service Description",
-        "mainEntities": "Main Entities / Routes",
-        "languageOverride": "Language Override",
-        "teamName": "Team",
-        "domain": "Domain",
-        "additionalRequirements": "Additional Requirements"
-      },
-      "placeholders": {
-        "serviceDescription": "Describe what this service does. E.g.: Handles payment processing including credit card charges, refunds, and transaction history for the checkout flow.",
-        "additionalRequirements": "E.g.: Use Result<T> pattern, add Serilog structured logging, include Swagger annotations..."
-      },
-      "hints": {
-        "serviceName": "Lowercase kebab-case. Used as project name and namespace base.",
-        "descriptionTip": "The more context you provide, the better the AI generation will be."
-      },
-      "options": {
-        "useTemplateDefault": "Use template default"
-      },
       "generating": {
-        "title": "AI is generating your project scaffold...",
-        "subtitle": "This may take 20-60 seconds depending on the complexity.",
         "step1": "Resolving template and governance context",
         "step2": "Analyzing service description and entities",
         "step3": "Generating project structure and code",
-        "step4": "Building tests, DTOs and configuration files"
+        "step4": "Building tests, DTOs and configuration files",
+        "subtitle": "This may take 20-60 seconds depending on the complexity.",
+        "title": "AI is generating your project scaffold..."
       },
+      "hints": {
+        "descriptionTip": "The more context you provide, the better the AI generation will be.",
+        "serviceName": "Lowercase kebab-case. Used as project name and namespace base."
+      },
+      "info": {
+        "aiGeneratesStructure": "AI generates structure",
+        "baseContract": "Base Contract",
+        "defaultDomain": "Domain",
+        "included": "Included",
+        "notIncluded": "Not included",
+        "scaffoldManifest": "Scaffold Manifest"
+      },
+      "next": "Next",
+      "options": {
+        "useTemplateDefault": "Use template default"
+      },
+      "placeholders": {
+        "additionalRequirements": "E.g.: Use Result<T> pattern, add Serilog structured logging, include Swagger annotations...",
+        "serviceDescription": "Describe what this service does. E.g.: Handles payment processing including credit card charges, refunds, and transaction history for the checkout flow."
+      },
+      "retry": "Try Again",
       "review": {
-        "files": "files generated",
-        "fallbackTitle": "AI provider unavailable — minimal scaffold generated",
+        "downloadZip": "Download ZIP",
         "fallbackHint": "Configure an AI provider in AI Hub to get full code generation.",
-        "successTitle": "{{count}} files generated successfully",
-        "successHint": "Service {{service}} scaffolded with {{language}}. Review the files below.",
+        "fallbackTitle": "AI provider unavailable ÔÇö minimal scaffold generated",
+        "files": "files generated",
         "regenerate": "Regenerate",
-        "downloadZip": "Download ZIP"
-      }
+        "successHint": "Service {{service}} scaffolded with {{language}}. Review the files below.",
+        "successTitle": "{{count}} files generated successfully"
+      },
+      "steps": {
+        "generate": "Generating",
+        "intent": "Intent",
+        "review": "Review",
+        "template": "Template"
+      },
+      "title": "AI Scaffold Generator"
     }
   },
   "tenants": {
@@ -8436,48 +8735,41 @@
     },
     "title": "Commercial Catalog"
   },
-  "watch": {
-    "watch": "Watch",
-    "watching": "Watching",
-    "unwatch": "Stop watching",
-    "level": {
-      "all": "All changes",
-      "critical": "Critical only",
-      "none": "No notifications"
-    }
-  },
   "webhookSubscriptions": {
-    "title": "Webhook Subscriptions",
-    "subtitle": "Configure outbound webhooks to receive NexTraceOne events in external systems",
-    "registerWebhook": "Register Webhook",
-    "webhookName": "Webhook Name",
-    "targetUrl": "Target URL",
-    "eventTypes": "Event Types",
-    "secret": "Secret",
-    "secretHint": "Optional HMAC secret for payload signature verification",
-    "description": "Description",
-    "isActive": "Active",
-    "submit": "Register Subscription",
-    "noWebhooks": "No webhook subscriptions found",
-    "noWebhooksHint": "Register a webhook to receive real-time event notifications in your external systems",
-    "subscriptionId": "Subscription ID",
-    "eventCount": "Events",
-    "hasSecret": "Signed",
-    "lastTriggered": "Last Triggered",
+    "alertTriggered": "Alert Triggered",
     "availableEventTypes": "Available Event Types",
-    "selectEvents": "Select events to subscribe",
-    "createSuccess": "Webhook subscription registered successfully",
-    "createError": "Failed to register webhook subscription",
-    "loading": "Loading subscriptions...",
-    "error": "Failed to load webhook subscriptions",
-    "incidentCreated": "Incident Created",
-    "incidentResolved": "Incident Resolved",
     "changeDeployed": "Change Deployed",
     "changePromoted": "Change Promoted",
-    "contractPublished": "Contract Published",
     "contractDeprecated": "Contract Deprecated",
+    "contractPublished": "Contract Published",
+    "createError": "Failed to register webhook subscription",
+    "createSuccess": "Webhook subscription registered successfully",
+    "description": "Description",
+    "error": "Failed to load webhook subscriptions",
+    "eventCount": "Events",
+    "eventTypes": "Event Types",
+    "hasSecret": "Signed",
+    "incidentCreated": "Incident Created",
+    "incidentResolved": "Incident Resolved",
+    "isActive": "Active",
+    "lastTriggered": "Last Triggered",
+    "loading": "Loading subscriptions...",
+    "noWebhooks": "No webhook subscriptions found",
+    "noWebhooksHint": "Register a webhook to receive real-time event notifications in your external systems",
+    "registerWebhook": "Register Webhook",
+    "secret": "Secret",
+    "secretHint": "Optional HMAC secret for payload signature verification",
+    "selectEvents": "Select events to subscribe",
     "serviceRegistered": "Service Registered",
-    "alertTriggered": "Alert Triggered"
+    "submit": "Register Subscription",
+    "subscriptionId": "Subscription ID",
+    "subtitle": "Configure outbound webhooks to receive NexTraceOne events in external systems",
+    "targetUrl": "Target URL",
+    "title": "Webhook Subscriptions",
+    "webhookName": "Webhook Name",
+    "placeholder": {
+      "targetUrl": "https://"
+    }
   },
   "workflow": {
     "allInstances": "All Workflow Instances",
@@ -8559,6 +8851,202 @@
     },
     "subtitle": "Configure approval workflows, SLAs, gates, promotion paths, release windows and freeze policies",
     "title": "Workflow & Promotion Governance"
+  },
+  "alertRules": {
+    "title": "Personal Alert Rules",
+    "subtitle": "Get notified when specific conditions are met",
+    "newRule": "New Rule",
+    "enable": "Enable rule",
+    "disable": "Disable rule",
+    "delete": "Delete rule",
+    "empty": {
+      "title": "No alert rules",
+      "description": "Create a personal alert rule to be notified about important events",
+      "cta": "Create your first rule"
+    },
+    "builder": {
+      "title": "Create Alert Rule",
+      "name": "Rule name",
+      "namePlaceholder": "e.g. High risk service detected",
+      "entity": "Entity",
+      "field": "Field",
+      "selectField": "Select field",
+      "operator": "Operator",
+      "selectOperator": "Select operator",
+      "value": "Value",
+      "channel": "Notification channel",
+      "save": "Create Rule"
+    }
+  },
+  "bookmarks": {
+    "add": "Add bookmark",
+    "remove": "Remove bookmark",
+    "title": "Bookmarks",
+    "empty": "No bookmarks yet",
+    "entityType": {
+      "Service": "Service",
+      "Contract": "Contract",
+      "Change": "Change",
+      "Incident": "Incident",
+      "Runbook": "Runbook",
+      "Dashboard": "Dashboard",
+      "KnowledgeArticle": "Knowledge Article"
+    }
+  },
+  "columnSelector": {
+    "title": "Columns",
+    "reset": "Reset to default",
+    "columns": "Visible columns",
+    "noColumns": "No columns configured"
+  },
+  "customCharts": {
+    "title": "Custom Charts",
+    "subtitle": "Build custom visualizations for your metrics and KPIs",
+    "newChart": "New Chart",
+    "timeRange": "Time range",
+    "empty": {
+      "title": "No custom charts",
+      "description": "Create a custom chart to visualize your platform metrics",
+      "cta": "Create your first chart"
+    },
+    "builder": {
+      "title": "Chart Builder",
+      "step": "Step {{step}} of {{total}}",
+      "chooseMetric": "Choose a metric source",
+      "chooseChartType": "Choose a chart type",
+      "defineFilters": "Define filters and grouping",
+      "groupBy": "Group by",
+      "groupByPlaceholder": "e.g. environment, team, service",
+      "timeRange": "Time range",
+      "preview": "Preview",
+      "saveName": "Name your chart",
+      "namePlaceholder": "e.g. Changes by Environment",
+      "save": "Save Chart"
+    }
+  },
+  "customFields": {
+    "title": "Custom Fields",
+    "add": "Add Field",
+    "delete": "Delete",
+    "empty": {
+      "title": "No custom fields",
+      "description": "Add custom fields to enrich service records"
+    },
+    "fieldTypes": {
+      "Text": "Text",
+      "Number": "Number",
+      "Date": "Date",
+      "Select": "Select",
+      "MultiSelect": "Multi-select",
+      "Url": "URL",
+      "Email": "Email"
+    },
+    "required": "Required"
+  },
+  "dashboardClone": {
+    "button": "Clone Dashboard",
+    "modal": {
+      "title": "Clone Dashboard",
+      "namePlaceholder": "e.g. My Team Dashboard (copy)",
+      "confirm": "Clone"
+    },
+    "success": "Dashboard cloned successfully"
+  },
+  "dashboardTemplates": {
+    "modal": {
+      "title": "Choose Dashboard Template",
+      "subtitle": "Start from a persona-specific template and customize it to your needs."
+    },
+    "engineer": {
+      "title": "Engineer",
+      "description": "Team services, recent changes, active incidents, DORA metrics"
+    },
+    "techLead": {
+      "title": "Tech Lead",
+      "description": "Team services, change risk, pending approvals, SLO status"
+    },
+    "architect": {
+      "title": "Architect",
+      "description": "Contract health, dependency map, compliance status, reliability trend"
+    },
+    "executive": {
+      "title": "Executive",
+      "description": "FinOps summary, compliance status, incident overview, DORA metrics"
+    },
+    "platformAdmin": {
+      "title": "Platform Admin",
+      "description": "AI usage, security findings, audit activity, system health"
+    }
+  },
+  "digestSettings": {
+    "title": "Digest Settings",
+    "frequency": "Digest frequency",
+    "frequencyOptions": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "none": "Disabled"
+    },
+    "sections": "Included sections"
+  },
+  "notesWidget": {
+    "title": "My Notes",
+    "edit": "Edit",
+    "preview": "Preview",
+    "placeholder": "Write your personal notes here... (markdown supported)",
+    "empty": "No notes yet. Click the edit icon to start writing."
+  },
+  "quietHours": {
+    "title": "Quiet Hours",
+    "subtitle": "Pause notifications during specified hours",
+    "enabled": "Enable quiet hours",
+    "start": "Start time",
+    "end": "End time",
+    "timezone": "Timezone",
+    "saved": "Quiet hours saved"
+  },
+  "savedViews": {
+    "title": "Saved Views",
+    "default": "Default",
+    "shared": "Shared",
+    "save": "Save current view",
+    "delete": "Delete view",
+    "empty": "No saved views",
+    "saveModal": {
+      "title": "Save View",
+      "name": "View name",
+      "namePlaceholder": "My team services",
+      "share": "Share with team",
+      "confirm": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "tags": {
+    "title": "Tags",
+    "add": "Add tag",
+    "remove": "Remove tag",
+    "placeholder": "key:value (e.g. team:payments)",
+    "empty": "No tags",
+    "keyLabel": "Tag key",
+    "valueLabel": "Tag value"
+  },
+  "taxonomies": {
+    "title": "Classification Taxonomies",
+    "addCategory": "Add Category",
+    "addValue": "Add Value",
+    "empty": {
+      "title": "No taxonomies",
+      "description": "Define classification categories for services"
+    }
+  },
+  "watch": {
+    "watch": "Watch",
+    "watching": "Watching",
+    "unwatch": "Stop watching",
+    "level": {
+      "all": "All changes",
+      "critical": "Critical only",
+      "none": "No notifications"
+    }
   },
   "workflows": {
     "title": "Workflows & Automation",
@@ -8645,7 +9133,7 @@
     "title": "API Keys",
     "empty": "No API keys yet.",
     "create": "Create API Key",
-    "copyOnce": "Copy this key — it will not be shown again",
+    "copyOnce": "Copy this key ÔÇö it will not be shown again",
     "revoke": "Revoke",
     "scopes": "Scopes",
     "expires": "Expires"
@@ -8677,10 +9165,6 @@
     "first": "First page",
     "last": "Last page",
     "navigation": "Pagination"
-  },
-  "brand": {
-    "name": "NexTraceOne",
-    "tagline": "Operational Confidence"
   },
   "telemetryExplorer": {
     "title": "Telemetry Explorer",

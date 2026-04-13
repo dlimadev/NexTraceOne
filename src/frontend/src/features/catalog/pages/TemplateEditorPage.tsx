@@ -251,7 +251,7 @@ export function TemplateEditorPage() {
               >
                 <input
                   className={INPUT_CLASS}
-                  placeholder="payment-api"
+                  placeholder={t('catalog.template.placeholder.slug', 'payment-api')}
                   value={slug}
                   onChange={e => updateField('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                   required
@@ -272,7 +272,7 @@ export function TemplateEditorPage() {
             <FormField label={t('templates.editor.fields.version')} required>
               <input
                 className={INPUT_CLASS}
-                placeholder="1.0.0"
+                placeholder={t('catalog.template.placeholder.version', '1.0.0')}
                 value={version}
                 onChange={e => updateField('version', e.target.value)}
                 required
@@ -362,7 +362,7 @@ export function TemplateEditorPage() {
           <FormField label={t('templates.editor.fields.tags')} hint={t('templates.editor.hints.tags')}>
             <input
               className={INPUT_CLASS}
-              placeholder="ddd, clean-architecture, payments"
+              placeholder={t('catalog.template.placeholder.tags', 'ddd, clean-architecture, payments')}
               value={tagsInput}
               onChange={e => updateField('tagsInput', e.target.value)}
             />
@@ -377,7 +377,7 @@ export function TemplateEditorPage() {
             <FormField label={t('templates.editor.fields.repoUrl')} hint={t('templates.editor.hints.repoUrl')}>
               <input
                 className={INPUT_CLASS}
-                placeholder="https://github.com/org/template-name"
+                placeholder={t('catalog.template.placeholder.repoUrl', 'https://github.com/org/template-name')}
                 value={repositoryTemplateUrl}
                 onChange={e => updateField('repositoryTemplateUrl', e.target.value)}
               />
@@ -386,7 +386,7 @@ export function TemplateEditorPage() {
             <FormField label={t('templates.editor.fields.repoBranch')}>
               <input
                 className={INPUT_CLASS}
-                placeholder="main"
+                placeholder={t('catalog.template.placeholder.repoBranch', 'main')}
                 value={repositoryTemplateBranch}
                 onChange={e => updateField('repositoryTemplateBranch', e.target.value)}
               />
@@ -400,7 +400,7 @@ export function TemplateEditorPage() {
             <textarea
               className={`${INPUT_CLASS} resize-none font-mono text-xs`}
               rows={8}
-              placeholder="openapi: 3.0.0&#10;info:&#10;  title: Payment API&#10;  version: 1.0.0&#10;paths: ..."
+              placeholder={t('catalog.template.placeholder.baseContractSpec', 'openapi: 3.0.0&#10;info:&#10;  title: Payment API&#10;  version: 1.0.0&#10;paths: ...')}
               value={baseContractSpec}
               onChange={e => updateField('baseContractSpec', e.target.value)}
             />

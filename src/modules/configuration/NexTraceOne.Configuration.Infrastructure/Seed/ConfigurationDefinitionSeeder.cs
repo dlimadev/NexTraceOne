@@ -928,6 +928,151 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         // NexTraceOne visual identity. The platform's brand (logo, colors, layout)
         // must not be customizable by users or tenants.
 
+        // ── Login Page Branding ──
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_logo_url",
+            displayName: "config.branding.login_logo_url.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_logo_url.description",
+            uiEditorType: "text",
+            sortOrder: 1360),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_heading",
+            displayName: "config.branding.login_heading.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_heading.description",
+            uiEditorType: "text",
+            sortOrder: 1361),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_subheading",
+            displayName: "config.branding.login_subheading.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_subheading.description",
+            uiEditorType: "text",
+            sortOrder: 1362),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_background_url",
+            displayName: "config.branding.login_background_url.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_background_url.description",
+            uiEditorType: "text",
+            sortOrder: 1363),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_sso_button_text",
+            displayName: "config.branding.login_sso_button_text.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_sso_button_text.description",
+            uiEditorType: "text",
+            sortOrder: 1364),
+
+        ConfigurationDefinition.Create(
+            key: "branding.login_help_text",
+            displayName: "config.branding.login_help_text.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.branding.login_help_text.description",
+            uiEditorType: "text",
+            sortOrder: 1365),
+
+        // ── Identity Protection ──
+
+        ConfigurationDefinition.Create(
+            key: "branding.powered_by_visible",
+            displayName: "config.branding.powered_by_visible.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.branding.powered_by_visible.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1370),
+
+        // ── Custom Navigation Links ──
+
+        ConfigurationDefinition.Create(
+            key: "platform.custom_links.enabled",
+            displayName: "config.platform.custom_links.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.custom_links.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 1380),
+
+        ConfigurationDefinition.Create(
+            key: "platform.custom_links.items",
+            displayName: "config.platform.custom_links.items.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.custom_links.items.description",
+            defaultValue: "[]",
+            uiEditorType: "json-editor",
+            sortOrder: 1381),
+
+        ConfigurationDefinition.Create(
+            key: "platform.custom_links.max_items",
+            displayName: "config.platform.custom_links.max_items.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.platform.custom_links.max_items.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 1382),
+
+        // ── Default Homepage ──
+
+        ConfigurationDefinition.Create(
+            key: "platform.homepage.default_route",
+            displayName: "config.platform.homepage.default_route.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Role],
+            description: "config.platform.homepage.default_route.description",
+            defaultValue: "/",
+            validationRules: """{"pattern":"^/[a-zA-Z0-9/_-]*$"}""",
+            uiEditorType: "text",
+            sortOrder: 1390),
+
+        ConfigurationDefinition.Create(
+            key: "platform.help.url",
+            displayName: "config.platform.help.url.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.help.url.description",
+            uiEditorType: "text",
+            sortOrder: 1391),
+
+        ConfigurationDefinition.Create(
+            key: "platform.help.enabled",
+            displayName: "config.platform.help.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.platform.help.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 1392),
+
         // ── BLOCK G — Feature Flags ───────────────────────────────────────
 
         ConfigurationDefinition.Create(
@@ -5258,6 +5403,335 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "text",
             sortOrder: 9090),
+
+        // ── Phase 12: Data Retention & Export/Import ─────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "data.retention.audit_log_days",
+            displayName: "config.data.retention.audit_log_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.data.retention.audit_log_days.description",
+            defaultValue: "365",
+            uiEditorType: "text",
+            sortOrder: 9100),
+
+        ConfigurationDefinition.Create(
+            key: "data.retention.telemetry_days",
+            displayName: "config.data.retention.telemetry_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.data.retention.telemetry_days.description",
+            defaultValue: "90",
+            uiEditorType: "text",
+            sortOrder: 9110),
+
+        ConfigurationDefinition.Create(
+            key: "data.retention.incident_history_days",
+            displayName: "config.data.retention.incident_history_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.data.retention.incident_history_days.description",
+            defaultValue: "730",
+            uiEditorType: "text",
+            sortOrder: 9120),
+
+        ConfigurationDefinition.Create(
+            key: "data.retention.change_history_days",
+            displayName: "config.data.retention.change_history_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.data.retention.change_history_days.description",
+            defaultValue: "730",
+            uiEditorType: "text",
+            sortOrder: 9130),
+
+        ConfigurationDefinition.Create(
+            key: "data.retention.ai_conversation_days",
+            displayName: "config.data.retention.ai_conversation_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.data.retention.ai_conversation_days.description",
+            defaultValue: "90",
+            uiEditorType: "text",
+            sortOrder: 9140),
+
+        ConfigurationDefinition.Create(
+            key: "data.export.max_records",
+            displayName: "config.data.export.max_records.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.data.export.max_records.description",
+            defaultValue: "10000",
+            uiEditorType: "text",
+            sortOrder: 9150),
+
+        ConfigurationDefinition.Create(
+            key: "data.export.formats_enabled",
+            displayName: "config.data.export.formats_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.data.export.formats_enabled.description",
+            defaultValue: """["CSV","JSON","PDF"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 9160),
+
+        // ── Phase 13: Onboarding & Guided Experience ─────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "onboarding.enabled",
+            displayName: "config.onboarding.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.onboarding.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9200),
+
+        ConfigurationDefinition.Create(
+            key: "onboarding.checklist.enabled",
+            displayName: "config.onboarding.checklist.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.onboarding.checklist.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9210),
+
+        ConfigurationDefinition.Create(
+            key: "onboarding.tooltips.enabled",
+            displayName: "config.onboarding.tooltips.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.onboarding.tooltips.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9220),
+
+        ConfigurationDefinition.Create(
+            key: "onboarding.sample_data.enabled",
+            displayName: "config.onboarding.sample_data.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.onboarding.sample_data.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9230),
+
+        // ── Phase 14: Email Templates & Communication ────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "email.templates.incident_notification",
+            displayName: "config.email.templates.incident_notification.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.email.templates.incident_notification.description",
+            defaultValue: "default",
+            uiEditorType: "select",
+            sortOrder: 9300),
+
+        ConfigurationDefinition.Create(
+            key: "email.templates.change_approval",
+            displayName: "config.email.templates.change_approval.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.email.templates.change_approval.description",
+            defaultValue: "default",
+            uiEditorType: "select",
+            sortOrder: 9310),
+
+        ConfigurationDefinition.Create(
+            key: "email.templates.welcome",
+            displayName: "config.email.templates.welcome.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.email.templates.welcome.description",
+            defaultValue: "default",
+            uiEditorType: "select",
+            sortOrder: 9320),
+
+        ConfigurationDefinition.Create(
+            key: "email.sender.from_address",
+            displayName: "config.email.sender.from_address.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.email.sender.from_address.description",
+            defaultValue: "noreply@nextrace.local",
+            uiEditorType: "text",
+            sortOrder: 9330),
+
+        ConfigurationDefinition.Create(
+            key: "email.sender.display_name",
+            displayName: "config.email.sender.display_name.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.email.sender.display_name.description",
+            defaultValue: "NexTraceOne",
+            uiEditorType: "text",
+            sortOrder: 9340),
+
+        // ── Phase 15: UI Density & Accessibility ─────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.density",
+            displayName: "config.platform.ui.density.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.density.description",
+            defaultValue: "comfortable",
+            uiEditorType: "select",
+            sortOrder: 9400),
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.animations.enabled",
+            displayName: "config.platform.ui.animations.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.animations.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9410),
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.table_rows_per_page",
+            displayName: "config.platform.ui.table_rows_per_page.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.table_rows_per_page.description",
+            defaultValue: "25",
+            uiEditorType: "select",
+            sortOrder: 9420),
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.date_display_format",
+            displayName: "config.platform.ui.date_display_format.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.date_display_format.description",
+            defaultValue: "relative",
+            uiEditorType: "select",
+            sortOrder: 9430),
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.code_font_size",
+            displayName: "config.platform.ui.code_font_size.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.code_font_size.description",
+            defaultValue: "13",
+            uiEditorType: "text",
+            sortOrder: 9440),
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.high_contrast.enabled",
+            displayName: "config.platform.ui.high_contrast.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.high_contrast.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9450),
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.reduced_motion.enabled",
+            displayName: "config.platform.ui.reduced_motion.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.reduced_motion.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9460),
+
+        ConfigurationDefinition.Create(
+            key: "platform.ui.keyboard_shortcuts.enabled",
+            displayName: "config.platform.ui.keyboard_shortcuts.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.platform.ui.keyboard_shortcuts.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9470),
+
+        // ── Phase 16: Notification User Preferences ──────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "notifications.user.email_enabled",
+            displayName: "config.notifications.user.email_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.notifications.user.email_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9500),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.user.inapp_enabled",
+            displayName: "config.notifications.user.inapp_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.notifications.user.inapp_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9510),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.user.digest_enabled",
+            displayName: "config.notifications.user.digest_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.notifications.user.digest_enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 9520),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.user.digest_frequency_hours",
+            displayName: "config.notifications.user.digest_frequency_hours.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.notifications.user.digest_frequency_hours.description",
+            defaultValue: "24",
+            uiEditorType: "select",
+            sortOrder: 9530),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.user.categories_subscribed",
+            displayName: "config.notifications.user.categories_subscribed.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.User],
+            description: "config.notifications.user.categories_subscribed.description",
+            defaultValue: """["Incidents","Changes","Governance","Security"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 9540),
 
         // ── User Profile Preferences (Phase 1) ──────────────────────────────────
         ConfigurationDefinition.Create(

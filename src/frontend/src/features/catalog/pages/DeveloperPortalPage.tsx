@@ -4,6 +4,11 @@
  * Organizada em tabs seguindo o padrão de ServiceCatalogPage e ContractCatalogPage.
  * Todo texto visível usa i18n via t('developerPortal.*').
  * Mutations invalidam as queries relacionadas para manter a UI consistente.
+ *
+ * Tabs extraídos em sub-componentes:
+ *  - DevPortalSubscriptionsTab
+ *  - DevPortalPlaygroundTab
+ *  - DevPortalInboxTab / DevPortalMyConsumptionTab
  */
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,15 +18,9 @@ import {
   Bell,
   Play,
   BarChart3,
-  Trash2,
-  Plus,
   RefreshCw,
   Package,
   Inbox,
-  AlertTriangle,
-  Clock,
-  ExternalLink,
-  Code,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -31,16 +30,18 @@ import { PageContainer } from '../../../components/shell';
 import { developerPortalApi } from '../api';
 import type {
   CatalogItem,
-  Subscription,
   PlaygroundResult,
   SubscriptionLevel,
   NotificationChannel,
 } from '../../../types';
+import { DevPortalSubscriptionsTab } from './DevPortalSubscriptionsTab';
+import { DevPortalPlaygroundTab } from './DevPortalPlaygroundTab';
+import { DevPortalMyConsumptionTab, DevPortalInboxTab } from './DevPortalInboxTab';
 
 type Tab = 'catalog' | 'subscriptions' | 'playground' | 'analytics' | 'myConsumption' | 'inbox';
 
 /** Formulário de criação de subscription. */
-interface SubscriptionForm {
+export interface SubscriptionForm {
   apiAssetId: string;
   apiName: string;
   subscriberEmail: string;
@@ -52,7 +53,7 @@ interface SubscriptionForm {
 }
 
 /** Formulário de execução do playground. */
-interface PlaygroundForm {
+export interface PlaygroundForm {
   apiAssetId: string;
   apiName: string;
   httpMethod: string;
@@ -82,16 +83,6 @@ const emptyPlayForm: PlaygroundForm = {
   requestHeaders: '',
   environment: '',
 };
-
-const SUBSCRIPTION_LEVELS: SubscriptionLevel[] = [
-  'BreakingChangesOnly',
-  'AllChanges',
-  'DeprecationNotices',
-  'SecurityAdvisories',
-];
-
-const NOTIFICATION_CHANNELS: NotificationChannel[] = ['Email', 'Webhook'];
-const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
 export function DeveloperPortalPage() {
   const { t } = useTranslation();
@@ -288,380 +279,32 @@ export function DeveloperPortalPage() {
 
       {/* ── Tab: Subscriptions ───────────────────────────────────────────────── */}
       {activeTab === 'subscriptions' && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-heading">
-              {t('developerPortal.subscriptions.title')}
-            </h2>
-            <Button onClick={() => setShowSubForm(!showSubForm)}>
-              <Plus size={16} className="mr-1" />
-              {t('developerPortal.subscriptions.create')}
-            </Button>
-          </div>
-
-          {showSubForm && (
-            <Card>
-              <CardBody>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('developerPortal.subscriptions.form.apiAssetId')}
-                    </label>
-                    <input
-                      className={fieldClass}
-                      value={subForm.apiAssetId}
-                      onChange={(e) => setSubForm({ ...subForm, apiAssetId: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('developerPortal.subscriptions.form.apiName')}
-                    </label>
-                    <input
-                      className={fieldClass}
-                      value={subForm.apiName}
-                      onChange={(e) => setSubForm({ ...subForm, apiName: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('developerPortal.subscriptions.form.subscriberEmail')}
-                    </label>
-                    <input
-                      type="email"
-                      className={fieldClass}
-                      value={subForm.subscriberEmail}
-                      onChange={(e) => setSubForm({ ...subForm, subscriberEmail: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('developerPortal.subscriptions.form.consumerServiceName')}
-                    </label>
-                    <input
-                      className={fieldClass}
-                      value={subForm.consumerServiceName}
-                      onChange={(e) =>
-                        setSubForm({ ...subForm, consumerServiceName: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('developerPortal.subscriptions.form.consumerServiceVersion')}
-                    </label>
-                    <input
-                      className={fieldClass}
-                      value={subForm.consumerServiceVersion}
-                      onChange={(e) =>
-                        setSubForm({ ...subForm, consumerServiceVersion: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('developerPortal.subscriptions.form.level')}
-                    </label>
-                    <select
-                      className={fieldClass}
-                      value={subForm.level}
-                      onChange={(e) =>
-                        setSubForm({ ...subForm, level: e.target.value as SubscriptionLevel })
-                      }
-                    >
-                      {SUBSCRIPTION_LEVELS.map((lvl) => (
-                        <option key={lvl} value={lvl}>
-                          {t(`developerPortal.subscriptions.levels.${lvl}`)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('developerPortal.subscriptions.form.channel')}
-                    </label>
-                    <select
-                      className={fieldClass}
-                      value={subForm.channel}
-                      onChange={(e) =>
-                        setSubForm({ ...subForm, channel: e.target.value as NotificationChannel })
-                      }
-                    >
-                      {NOTIFICATION_CHANNELS.map((ch) => (
-                        <option key={ch} value={ch}>
-                          {t(`developerPortal.subscriptions.channels.${ch}`)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {subForm.channel === 'Webhook' && (
-                    <div>
-                      <label className="block text-sm font-medium text-body mb-1">
-                        {t('developerPortal.subscriptions.form.webhookUrl')}
-                      </label>
-                      <input
-                        className={fieldClass}
-                        value={subForm.webhookUrl}
-                        onChange={(e) => setSubForm({ ...subForm, webhookUrl: e.target.value })}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <Button onClick={handleSubscribe} disabled={createSubMutation.isPending}>
-                    {t('developerPortal.subscriptions.form.submit')}
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
-          )}
-
-          {subscriptionsQuery.isLoading && (
-            <p className="text-muted text-sm">{t('common.loading')}</p>
-          )}
-          {subscriptionsQuery.data && subscriptionsQuery.data.length === 0 && (
-            <p className="text-muted text-sm">
-              {t('developerPortal.subscriptions.noSubscriptions')}
-            </p>
-          )}
-          {subscriptionsQuery.data && subscriptionsQuery.data.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 z-10 bg-panel">
-                  <tr className="border-b border-edge text-left text-muted">
-                    <th className="py-2 px-3">{t('developerPortal.subscriptions.apiName')}</th>
-                    <th className="py-2 px-3">{t('developerPortal.subscriptions.level')}</th>
-                    <th className="py-2 px-3">{t('developerPortal.subscriptions.channel')}</th>
-                    <th className="py-2 px-3">{t('developerPortal.subscriptions.status')}</th>
-                    <th className="py-2 px-3">{t('common.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subscriptionsQuery.data.map((sub: Subscription) => (
-                    <tr key={sub.id} className="border-b border-edge/50">
-                      <td className="py-2 px-3 text-body">{sub.apiName}</td>
-                      <td className="py-2 px-3">
-                        <Badge variant="info">
-                          {t(`developerPortal.subscriptions.levels.${sub.level}`)}
-                        </Badge>
-                      </td>
-                      <td className="py-2 px-3 text-muted">
-                        {t(`developerPortal.subscriptions.channels.${sub.channel}`)}
-                      </td>
-                      <td className="py-2 px-3">
-                        <Badge variant={sub.isActive ? 'success' : 'default'}>
-                          {sub.isActive
-                            ? t('developerPortal.subscriptions.active')
-                            : t('developerPortal.subscriptions.inactive')}
-                        </Badge>
-                      </td>
-                      <td className="py-2 px-3">
-                        <button
-                          onClick={() => deleteSubMutation.mutate(sub.id)}
-                          className="text-critical hover:text-critical/80 transition-colors"
-                          title={t('developerPortal.subscriptions.unsubscribe')}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <DevPortalSubscriptionsTab
+          showSubForm={showSubForm}
+          onToggleForm={() => setShowSubForm(!showSubForm)}
+          subForm={subForm}
+          onSubFormChange={setSubForm}
+          onSubscribe={handleSubscribe}
+          isSubscribing={createSubMutation.isPending}
+          subscriptions={subscriptionsQuery.data}
+          isLoading={subscriptionsQuery.isLoading}
+          onDeleteSubscription={(id) => deleteSubMutation.mutate(id)}
+          fieldClass={fieldClass}
+        />
       )}
 
       {/* ── Tab: Playground ──────────────────────────────────────────────────── */}
       {activeTab === 'playground' && (
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-semibold text-heading">
-                {t('developerPortal.playground.title')}
-              </h2>
-            </CardHeader>
-            <CardBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('developerPortal.playground.form.apiAssetId')}
-                  </label>
-                  <input
-                    className={fieldClass}
-                    value={playForm.apiAssetId}
-                    onChange={(e) => setPlayForm({ ...playForm, apiAssetId: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('developerPortal.playground.form.apiName')}
-                  </label>
-                  <input
-                    className={fieldClass}
-                    value={playForm.apiName}
-                    onChange={(e) => setPlayForm({ ...playForm, apiName: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('developerPortal.playground.form.httpMethod')}
-                  </label>
-                  <select
-                    className={fieldClass}
-                    value={playForm.httpMethod}
-                    onChange={(e) => setPlayForm({ ...playForm, httpMethod: e.target.value })}
-                  >
-                    {HTTP_METHODS.map((m) => (
-                      <option key={m} value={m}>
-                        {m}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('developerPortal.playground.form.requestPath')}
-                  </label>
-                  <input
-                    className={fieldClass}
-                    value={playForm.requestPath}
-                    onChange={(e) => setPlayForm({ ...playForm, requestPath: e.target.value })}
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('developerPortal.playground.form.requestBody')}
-                  </label>
-                  <textarea
-                    className={`${fieldClass} h-24 font-mono`}
-                    value={playForm.requestBody}
-                    onChange={(e) => setPlayForm({ ...playForm, requestBody: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('developerPortal.playground.form.requestHeaders')}
-                  </label>
-                  <input
-                    className={fieldClass}
-                    value={playForm.requestHeaders}
-                    onChange={(e) => setPlayForm({ ...playForm, requestHeaders: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-body mb-1">
-                    {t('developerPortal.playground.form.environment')}
-                  </label>
-                  <input
-                    className={fieldClass}
-                    value={playForm.environment}
-                    onChange={(e) => setPlayForm({ ...playForm, environment: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="mt-4">
-                <Button onClick={handleExecute} disabled={executeMutation.isPending}>
-                  <Play size={16} className="mr-1" />
-                  {t('developerPortal.playground.execute')}
-                </Button>
-              </div>
-            </CardBody>
-          </Card>
-
-          {playResult && (
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-heading">
-                    {t('developerPortal.playground.result.responseBody')}
-                  </h3>
-                  <Badge
-                    variant={(playResult.responseStatusCode ?? playResult.statusCode) < 400 ? 'success' : 'danger'}
-                  >
-                    {t('developerPortal.playground.result.statusCode')}: {playResult.responseStatusCode ?? playResult.statusCode}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <pre className="bg-surface p-3 rounded-md text-xs font-mono overflow-x-auto max-h-64">
-                  {playResult.responseBody}
-                </pre>
-                <div className="flex gap-4 mt-2 text-xs text-muted">
-                  <span>
-                    {t('developerPortal.playground.result.duration')}: {playResult.durationMs}ms
-                  </span>
-                  <span>
-                    {t('developerPortal.playground.result.executedAt')}:{' '}
-                    {playResult.executedAt ? new Date(playResult.executedAt).toLocaleString() : '-'}
-                  </span>
-                </div>
-              </CardBody>
-            </Card>
-          )}
-
-          {/* Histórico do playground */}
-          <Card>
-            <CardHeader>
-              <h3 className="font-semibold text-heading">
-                {t('developerPortal.playground.history')}
-              </h3>
-            </CardHeader>
-            <CardBody>
-              {historyQuery.isLoading && (
-                <p className="text-muted text-sm">{t('common.loading')}</p>
-              )}
-              {historyQuery.data && historyQuery.data.items.length === 0 && (
-                <p className="text-muted text-sm">
-                  {t('developerPortal.playground.noHistory')}
-                </p>
-              )}
-              {historyQuery.data && historyQuery.data.items.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="sticky top-0 z-10 bg-panel">
-                      <tr className="border-b border-edge text-left text-muted">
-                        <th className="py-2 px-3">{t('sourceOfTruth.table.api')}</th>
-                        <th className="py-2 px-3">
-                          {t('developerPortal.playground.form.httpMethod')}
-                        </th>
-                        <th className="py-2 px-3">
-                          {t('developerPortal.playground.form.requestPath')}
-                        </th>
-                        <th className="py-2 px-3">
-                          {t('developerPortal.playground.result.statusCode')}
-                        </th>
-                        <th className="py-2 px-3">
-                          {t('developerPortal.playground.result.duration')}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {historyQuery.data.items.map((h) => (
-                        <tr key={h.sessionId} className="border-b border-edge/50">
-                          <td className="py-2 px-3 text-body">{h.apiName}</td>
-                          <td className="py-2 px-3">
-                            <Badge variant="info">{h.httpMethod}</Badge>
-                          </td>
-                          <td className="py-2 px-3 text-muted font-mono text-xs">
-                            {h.requestPath}
-                          </td>
-                          <td className="py-2 px-3">
-                            <Badge variant={(h.responseStatusCode ?? h.statusCode) < 400 ? 'success' : 'danger'}>
-                              {h.responseStatusCode ?? h.statusCode}
-                            </Badge>
-                          </td>
-                          <td className="py-2 px-3 text-muted">{h.durationMs}ms</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardBody>
-          </Card>
-        </div>
+        <DevPortalPlaygroundTab
+          playForm={playForm}
+          onPlayFormChange={setPlayForm}
+          onExecute={handleExecute}
+          isExecuting={executeMutation.isPending}
+          playResult={playResult}
+          historyItems={historyQuery.data?.items}
+          historyLoading={historyQuery.isLoading}
+          fieldClass={fieldClass}
+        />
       )}
 
       {/* ── Tab: Analytics ───────────────────────────────────────────────────── */}
@@ -757,234 +400,24 @@ export function DeveloperPortalPage() {
 
       {/* ── Tab: My Consumption ────────────────────────────────────────────── */}
       {activeTab === 'myConsumption' && (
-        <div className="space-y-6">
-          {/* APIs que o utilizador consome */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-heading">
-                {t('developerPortal.myConsumption.consuming')}
-              </h2>
-              <Button
-                variant="secondary"
-                onClick={() =>
-                  queryClient.invalidateQueries({ queryKey: ['developerPortal', 'consuming'] })
-                }
-              >
-                <RefreshCw size={16} className="mr-1" />
-                {t('common.refresh')}
-              </Button>
-            </div>
-
-            {consumingQuery.isLoading && (
-              <p className="text-muted text-sm">{t('common.loading')}</p>
-            )}
-            {consumingQuery.isError && (
-              <p className="text-critical text-sm">{t('common.error')}</p>
-            )}
-            {consumingQuery.data && consumingQuery.data.items.length === 0 && (
-              <Card>
-                <CardBody>
-                  <p className="text-muted text-sm text-center py-4">
-                    {t('developerPortal.myConsumption.noConsuming')}
-                  </p>
-                </CardBody>
-              </Card>
-            )}
-            {consumingQuery.data && consumingQuery.data.items.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {consumingQuery.data.items.map((item: CatalogItem) => (
-                  <Card key={item.apiAssetId}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-semibold text-heading">{item.apiName}</h3>
-                        <Badge variant={item.healthStatus === 'Healthy' ? 'success' : 'warning'}>
-                          {item.healthStatus}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardBody>
-                      <p className="text-sm text-muted mb-2">{item.description}</p>
-                      <div className="flex justify-between text-xs text-muted">
-                        <span>{t('developerPortal.catalog.owner')}: {item.ownerServiceName}</span>
-                        <span>{t('developerPortal.catalog.version')}: {item.version}</span>
-                      </div>
-                    </CardBody>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* APIs que o utilizador é dono */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-heading">
-              {t('developerPortal.myConsumption.myApis')}
-            </h2>
-            {myApisQuery.isLoading && (
-              <p className="text-muted text-sm">{t('common.loading')}</p>
-            )}
-            {myApisQuery.data && myApisQuery.data.items.length === 0 && (
-              <Card>
-                <CardBody>
-                  <p className="text-muted text-sm text-center py-4">
-                    {t('developerPortal.myConsumption.noMyApis')}
-                  </p>
-                </CardBody>
-              </Card>
-            )}
-            {myApisQuery.data && myApisQuery.data.items.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {myApisQuery.data.items.map((item: CatalogItem) => (
-                  <Card key={item.apiAssetId}>
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-semibold text-heading">{item.apiName}</h3>
-                        <Badge variant={item.healthStatus === 'Healthy' ? 'success' : 'warning'}>
-                          {item.healthStatus}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardBody>
-                      <p className="text-sm text-muted mb-2">{item.description}</p>
-                      <div className="flex justify-between text-xs text-muted">
-                        <span>{t('developerPortal.catalog.owner')}: {item.ownerServiceName}</span>
-                        <span>{t('developerPortal.catalog.version')}: {item.version}</span>
-                      </div>
-                    </CardBody>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        <DevPortalMyConsumptionTab
+          consumingItems={consumingQuery.data?.items}
+          consumingLoading={consumingQuery.isLoading}
+          consumingError={consumingQuery.isError}
+          myApisItems={myApisQuery.data?.items}
+          myApisLoading={myApisQuery.isLoading}
+          onRefreshConsuming={() =>
+            queryClient.invalidateQueries({ queryKey: ['developerPortal', 'consuming'] })
+          }
+        />
       )}
 
       {/* ── Tab: Inbox / Change Awareness ──────────────────────────────────── */}
       {activeTab === 'inbox' && (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-heading">
-              {t('developerPortal.inbox.title')}
-            </h2>
-          </div>
-          <p className="text-sm text-muted">
-            {t('developerPortal.inbox.description')}
-          </p>
-
-          {/* Painel de notificações — alimentado pelas subscriptions ativas */}
-          {subscriptionsQuery.isLoading && (
-            <p className="text-muted text-sm">{t('common.loading')}</p>
-          )}
-
-          {/* Cards informativos sobre tipos de notificações que o utilizador receberá */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle size={18} className="text-warning" />
-                  <h3 className="font-semibold text-heading">
-                    {t('developerPortal.inbox.breakingChanges')}
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <p className="text-sm text-muted">
-                  {t('developerPortal.inbox.breakingChangesDescription')}
-                </p>
-              </CardBody>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Clock size={18} className="text-info" />
-                  <h3 className="font-semibold text-heading">
-                    {t('developerPortal.inbox.deprecations')}
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <p className="text-sm text-muted">
-                  {t('developerPortal.inbox.deprecationsDescription')}
-                </p>
-              </CardBody>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <ExternalLink size={18} className="text-accent" />
-                  <h3 className="font-semibold text-heading">
-                    {t('developerPortal.inbox.migrations')}
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <p className="text-sm text-muted">
-                  {t('developerPortal.inbox.migrationsDescription')}
-                </p>
-              </CardBody>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Code size={18} className="text-success" />
-                  <h3 className="font-semibold text-heading">
-                    {t('developerPortal.inbox.newVersions')}
-                  </h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <p className="text-sm text-muted">
-                  {t('developerPortal.inbox.newVersionsDescription')}
-                </p>
-              </CardBody>
-            </Card>
-          </div>
-
-          {/* Lista de subscriptions ativas que geram notificações */}
-          <Card>
-            <CardHeader>
-              <h3 className="font-semibold text-heading">
-                {t('developerPortal.inbox.activeSubscriptions')}
-              </h3>
-            </CardHeader>
-            <CardBody>
-              {subscriptionsQuery.data && subscriptionsQuery.data.length > 0 ? (
-                <div className="space-y-2">
-                  {subscriptionsQuery.data
-                    .filter((sub: Subscription) => sub.isActive)
-                    .map((sub: Subscription) => (
-                      <div
-                        key={sub.id}
-                        className="flex items-center justify-between p-3 bg-surface rounded-lg border border-edge/50"
-                      >
-                        <div>
-                          <span className="font-medium text-body">{sub.apiName}</span>
-                          <div className="flex gap-2 mt-1">
-                            <Badge variant="info">
-                              {t(`developerPortal.subscriptions.levels.${sub.level}`)}
-                            </Badge>
-                            <Badge variant="default">
-                              {t(`developerPortal.subscriptions.channels.${sub.channel}`)}
-                            </Badge>
-                          </div>
-                        </div>
-                        <Badge variant="success">
-                          {t('developerPortal.subscriptions.active')}
-                        </Badge>
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <p className="text-muted text-sm text-center py-4">
-                  {t('developerPortal.inbox.noSubscriptions')}
-                </p>
-              )}
-            </CardBody>
-          </Card>
-        </div>
+        <DevPortalInboxTab
+          subscriptions={subscriptionsQuery.data}
+          subscriptionsLoading={subscriptionsQuery.isLoading}
+        />
       )}
     </PageContainer>
   );
