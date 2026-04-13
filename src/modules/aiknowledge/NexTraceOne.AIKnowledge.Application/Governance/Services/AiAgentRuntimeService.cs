@@ -154,52 +154,106 @@ public sealed class AiAgentRuntimeService(
                 chatMessages = trimmedMessages.ToList();
             }
 
-            chatResult = await chatProvider.CompleteAsync(
-                new ChatCompletionRequest(
-                    resolvedModel.ModelName,
-                    chatMessages,
-                    Temperature: 0.3,
-                    MaxTokens: 4096,
-                    SystemPrompt: null),
-                cancellationToken);
-
-            // 10. Tool execution loop — detect tool call patterns and execute
-            if (chatResult.Success && allowedTools.Count > 0 && chatResult.Content is not null)
+            // 10. Inference + tool execution loop
+            // When the provider supports native function calling (OpenAI/Anthropic), use structured
+            // tool calls for 100% reliability. Otherwise fall back to the textual [TOOL_CALL:] pattern
+            // which is compatible with Ollama and other local providers.
+            if (chatProvider is IFunctionCallingChatProvider nativeProvider && allowedTools.Count > 0)
             {
+                var functions = allowedTools.Select(BuildFunctionDefinition).ToList();
                 var iteration = 0;
-                while (iteration < MaxToolIterations)
+                FunctionCallingResult fcResult;
+
+                do
                 {
-                    var toolCall = DetectToolCall(chatResult.Content, allowedTools);
-                    if (toolCall is null)
-                        break;
-
-                    // Execute tool (AllowedTools already enforced by DetectToolCall filtering)
-                    var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
-                    toolResults.Add(toolResult);
-
-                    // Append tool result to conversation and apply sliding window before re-inference
-                    chatMessages.Add(new ChatMessage("assistant", chatResult.Content));
-                    chatMessages.Add(new ChatMessage("user",
-                        $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
-
-                    var (trimmedLoop, loopTruncated) = ContextWindowManager.TrimToFit(
-                        chatMessages, contextWindowTokens, ReservedCompletionTokens);
-                    if (loopTruncated)
-                        contextWindowTruncated = true;
-
-                    chatResult = await chatProvider.CompleteAsync(
+                    fcResult = await nativeProvider.CompleteWithToolsAsync(
                         new ChatCompletionRequest(
                             resolvedModel.ModelName,
-                            trimmedLoop,
+                            chatMessages,
                             Temperature: 0.3,
                             MaxTokens: 4096,
                             SystemPrompt: null),
+                        functions,
                         cancellationToken);
 
-                    if (!chatResult.Success)
+                    chatResult = FunctionCallingResultToChatResult(fcResult);
+
+                    if (!fcResult.Success || !fcResult.HasToolCalls)
                         break;
 
+                    // Execute all tool calls returned by the model in this round
+                    foreach (var nativeCall in fcResult.ToolCalls)
+                    {
+                        var toolResult = await toolExecutor.ExecuteAsync(
+                            new ToolCallRequest(nativeCall.FunctionName, nativeCall.ArgumentsJson),
+                            cancellationToken);
+                        toolResults.Add(toolResult);
+
+                        // Append tool result as user message (compatible with all providers)
+                        chatMessages.Add(new ChatMessage("assistant",
+                            fcResult.Content ?? $"[TOOL_CALL_ID: {nativeCall.Id}]"));
+                        chatMessages.Add(new ChatMessage("user",
+                            $"[Tool Result for {nativeCall.FunctionName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
+                    }
+
+                    var (trimmedNative, nativeTruncated) = ContextWindowManager.TrimToFit(
+                        chatMessages, contextWindowTokens, ReservedCompletionTokens);
+                    if (nativeTruncated)
+                        contextWindowTruncated = true;
+                    chatMessages = trimmedNative.ToList();
+
                     iteration++;
+                }
+                while (iteration < MaxToolIterations);
+            }
+            else
+            {
+                // Textual tool detection path — compatible with Ollama and providers without
+                // native function calling support.
+                chatResult = await chatProvider.CompleteAsync(
+                    new ChatCompletionRequest(
+                        resolvedModel.ModelName,
+                        chatMessages,
+                        Temperature: 0.3,
+                        MaxTokens: 4096,
+                        SystemPrompt: null),
+                    cancellationToken);
+
+                if (chatResult.Success && allowedTools.Count > 0 && chatResult.Content is not null)
+                {
+                    var iteration = 0;
+                    while (iteration < MaxToolIterations)
+                    {
+                        var toolCall = DetectToolCall(chatResult.Content, allowedTools);
+                        if (toolCall is null)
+                            break;
+
+                        var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
+                        toolResults.Add(toolResult);
+
+                        chatMessages.Add(new ChatMessage("assistant", chatResult.Content));
+                        chatMessages.Add(new ChatMessage("user",
+                            $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
+
+                        var (trimmedLoop, loopTruncated) = ContextWindowManager.TrimToFit(
+                            chatMessages, contextWindowTokens, ReservedCompletionTokens);
+                        if (loopTruncated)
+                            contextWindowTruncated = true;
+
+                        chatResult = await chatProvider.CompleteAsync(
+                            new ChatCompletionRequest(
+                                resolvedModel.ModelName,
+                                trimmedLoop,
+                                Temperature: 0.3,
+                                MaxTokens: 4096,
+                                SystemPrompt: null),
+                            cancellationToken);
+
+                        if (!chatResult.Success)
+                            break;
+
+                        iteration++;
+                    }
                 }
             }
         }
@@ -270,6 +324,46 @@ public sealed class AiAgentRuntimeService(
             artifacts,
             toolResults.Select(tr => new ToolExecutionSummary(
                 tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList());
+    }
+
+    /// <summary>
+    /// Converte um FunctionCallingResult num ChatCompletionResult para compatibilidade
+    /// com o restante pipeline do agent runtime.
+    /// </summary>
+    private static ChatCompletionResult FunctionCallingResultToChatResult(FunctionCallingResult fcResult)
+        => new(
+            fcResult.Success,
+            fcResult.Content,
+            fcResult.ModelId,
+            fcResult.ProviderId,
+            fcResult.PromptTokens,
+            fcResult.CompletionTokens,
+            fcResult.Duration,
+            fcResult.ErrorMessage);
+
+    /// <summary>
+    /// Constrói uma FunctionDefinition a partir de uma ToolDefinition para uso em native function calling.
+    /// O JSON Schema dos parâmetros é construído com type=object, properties e required.
+    /// </summary>
+    private static FunctionDefinition BuildFunctionDefinition(ToolDefinition tool)
+    {
+        var properties = tool.Parameters.ToDictionary(
+            p => p.Name,
+            p => (object)new { type = p.Type.ToLowerInvariant(), description = p.Description });
+
+        var required = tool.Parameters
+            .Where(p => p.Required)
+            .Select(p => p.Name)
+            .ToArray();
+
+        var parameters = new
+        {
+            type = "object",
+            properties,
+            required
+        };
+
+        return new FunctionDefinition(tool.Name, tool.Description, parameters);
     }
 
     /// <summary>

@@ -150,6 +150,34 @@ public sealed class AnthropicHttpClient
         }
     }
 
+    /// <summary>
+    /// Envia uma requisição de chat com tools (function calling nativo) à API Anthropic.
+    /// Retorna blocos tool_use quando o modelo decide invocar uma função.
+    /// Documentação: https://docs.anthropic.com/en/docs/build-with-claude/tool-use
+    /// </summary>
+    public async Task<AnthropicToolChatResponse?> ChatWithToolsAsync(
+        AnthropicToolChatRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Anthropic tool-calling chat request for model {Model}", request.Model);
+
+            var httpRequest = BuildRequest("/v1/messages", request);
+            var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<AnthropicToolChatResponse>(
+                JsonOptions, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Anthropic tool-calling chat failed for model {Model}", request.Model);
+            throw;
+        }
+    }
+
     private HttpRequestMessage BuildRequest(string path, object body)
     {
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, path)
@@ -269,4 +297,83 @@ public sealed class AnthropicStreamDelta
 
     [JsonPropertyName("stop_reason")]
     public string? StopReason { get; set; }
+}
+
+// ── Anthropic Function Calling DTOs ──────────────────────────────────────────
+
+/// <summary>Request de chat com tools para a API Anthropic (function calling).</summary>
+public sealed record AnthropicToolChatRequest
+{
+    [JsonPropertyName("model")]
+    public string Model { get; init; } = string.Empty;
+
+    [JsonPropertyName("max_tokens")]
+    public int MaxTokens { get; init; } = 4096;
+
+    [JsonPropertyName("messages")]
+    public List<AnthropicMessage> Messages { get; init; } = [];
+
+    [JsonPropertyName("tools")]
+    public List<AnthropicTool> Tools { get; init; } = [];
+
+    [JsonPropertyName("system")]
+    public string? System { get; init; }
+
+    [JsonPropertyName("temperature")]
+    public double? Temperature { get; init; }
+}
+
+/// <summary>Definição de tool no formato Anthropic.</summary>
+public sealed class AnthropicTool
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = string.Empty;
+
+    [JsonPropertyName("input_schema")]
+    public object? InputSchema { get; set; }
+}
+
+/// <summary>Resposta de chat com tools — inclui tool_use blocks quando o modelo invoca funções.</summary>
+public sealed class AnthropicToolChatResponse
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+
+    [JsonPropertyName("stop_reason")]
+    public string? StopReason { get; set; }
+
+    [JsonPropertyName("content")]
+    public List<AnthropicToolContentBlock> Content { get; set; } = [];
+
+    [JsonPropertyName("usage")]
+    public AnthropicUsage? Usage { get; set; }
+}
+
+/// <summary>Bloco de conteúdo na resposta com tools (tipo "text" ou "tool_use").</summary>
+public sealed class AnthropicToolContentBlock
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = string.Empty;
+
+    /// <summary>Texto gerado (quando type = "text").</summary>
+    [JsonPropertyName("text")]
+    public string? Text { get; set; }
+
+    /// <summary>Identificador único da chamada de tool (quando type = "tool_use").</summary>
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    /// <summary>Nome da função chamada (quando type = "tool_use").</summary>
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    /// <summary>Inputs da chamada de tool como objeto JSON (quando type = "tool_use").</summary>
+    [JsonPropertyName("input")]
+    public System.Text.Json.JsonElement? Input { get; set; }
 }

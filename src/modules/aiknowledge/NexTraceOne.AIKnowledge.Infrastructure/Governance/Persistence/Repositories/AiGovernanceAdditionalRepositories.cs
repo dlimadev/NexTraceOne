@@ -186,6 +186,18 @@ internal sealed class AiFeedbackRepository(AiGovernanceDbContext context) : IAiF
 
     public async Task<IReadOnlyList<AiFeedback>> ListByAgentNameAsync(string agentName, int limit, CancellationToken ct)
         => await context.Feedbacks.Where(f => f.AgentName == agentName).OrderByDescending(f => f.SubmittedAt).Take(limit).ToListAsync(ct);
+
+    public async Task<int> CountNegativeSinceAsync(
+        string agentName,
+        string modelUsed,
+        DateTimeOffset since,
+        CancellationToken ct)
+        => await context.Feedbacks.CountAsync(
+            f => f.AgentName == agentName
+                 && f.ModelUsed == modelUsed
+                 && f.Rating == FeedbackRating.Negative
+                 && f.SubmittedAt >= since,
+            ct);
 }
 
 internal sealed class AiToolDefinitionRepository(AiGovernanceDbContext context) : IAiToolDefinitionRepository

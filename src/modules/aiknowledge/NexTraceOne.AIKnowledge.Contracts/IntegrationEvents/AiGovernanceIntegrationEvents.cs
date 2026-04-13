@@ -44,3 +44,16 @@ public sealed record AiActionBlockedByPolicyIntegrationEvent(
     string ActionDescription,
     Guid? UserId,
     Guid? TenantId) : IntegrationEventBase("AIKnowledge");
+
+/// <summary>
+/// Publicado quando o feedback negativo acumulado sobre um modelo ou agent
+/// excede o threshold configurado nas últimas 24h.
+/// Consumidores: módulo de notificações (alertar Platform Admin).
+/// </summary>
+public sealed record ModelFeedbackThresholdExceededIntegrationEvent(
+    string AgentName,
+    string ModelUsed,
+    int NegativeCount,
+    int ThresholdValue,
+    string Period,
+    Guid? TenantId) : IntegrationEventBase("AIKnowledge");

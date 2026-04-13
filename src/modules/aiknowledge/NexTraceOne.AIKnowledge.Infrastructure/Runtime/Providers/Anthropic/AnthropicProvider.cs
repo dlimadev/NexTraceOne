@@ -10,14 +10,14 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Anthropic;
 
 /// <summary>
 /// Provider de IA Anthropic/Claude — externo, configurável, sem SDK proprietário.
-/// Implementa IAiProvider e IChatCompletionProvider para integração no AI Runtime.
+/// Implementa IAiProvider, IChatCompletionProvider e IFunctionCallingChatProvider para integração no AI Runtime.
 /// Activo apenas quando ApiKey está configurada em AiRuntime:Anthropic.
 ///
 /// Anthropic usa a Messages API (POST /v1/messages).
 /// O campo "content" da resposta é uma lista de blocos; extraímos o primeiro bloco do tipo "text".
 /// Referência: https://docs.anthropic.com/en/api/messages
 /// </summary>
-public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider
+public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider
 {
     public const string ProviderIdentifier = "anthropic";
 
@@ -223,6 +223,89 @@ public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider
 
     private static string? ExtractTextContent(IReadOnlyList<AnthropicContentBlock> blocks)
         => blocks.FirstOrDefault(b => b.Type == "text")?.Text;
+
+    /// <inheritdoc/>
+    public async Task<FunctionCallingResult> CompleteWithToolsAsync(
+        ChatCompletionRequest request,
+        IReadOnlyList<FunctionDefinition> functions,
+        CancellationToken cancellationToken = default)
+    {
+        var modelId = string.IsNullOrWhiteSpace(request.ModelId)
+            ? _options.DefaultChatModel
+            : request.ModelId;
+
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            var messages = request.Messages
+                .Where(m => m.Role != "system")
+                .Select(m => new AnthropicMessage { Role = m.Role, Content = m.Content })
+                .ToList();
+
+            var systemPrompt = request.Messages
+                .FirstOrDefault(m => m.Role == "system")?.Content;
+
+            var tools = functions.Select(f => new AnthropicTool
+            {
+                Name = f.Name,
+                Description = f.Description,
+                InputSchema = f.Parameters
+            }).ToList();
+
+            var toolRequest = new AnthropicToolChatRequest
+            {
+                Model = modelId,
+                MaxTokens = request.MaxTokens ?? _options.DefaultMaxTokens,
+                Messages = messages,
+                Tools = tools,
+                System = systemPrompt.NullIfEmpty(),
+                Temperature = request.Temperature ?? _options.DefaultTemperature,
+            };
+
+            var response = await _client.ChatWithToolsAsync(toolRequest, cancellationToken);
+            sw.Stop();
+
+            if (response is null)
+            {
+                return new FunctionCallingResult(
+                    false, null, [], modelId, ProviderId,
+                    0, 0, sw.Elapsed, ErrorMessage: "No response from Anthropic tool-calling endpoint");
+            }
+
+            // Extract text content and tool_use blocks
+            var textContent = response.Content
+                .Where(b => b.Type == "text")
+                .Select(b => b.Text)
+                .FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
+
+            var nativeToolCalls = response.Content
+                .Where(b => b.Type == "tool_use" && b.Id is not null && b.Name is not null)
+                .Select(b => new NativeToolCall(
+                    b.Id!,
+                    b.Name!,
+                    b.Input.HasValue ? b.Input.Value.GetRawText() : "{}"))
+                .ToList();
+
+            return new FunctionCallingResult(
+                true,
+                textContent,
+                nativeToolCalls,
+                response.Model ?? modelId,
+                ProviderId,
+                response.Usage?.InputTokens ?? 0,
+                response.Usage?.OutputTokens ?? 0,
+                sw.Elapsed,
+                FinishReason: response.StopReason);
+        }
+        catch (Exception ex)
+        {
+            sw.Stop();
+            _logger.LogError(ex, "Anthropic tool-calling completion failed for model {Model}", modelId);
+            return new FunctionCallingResult(
+                false, null, [], modelId, ProviderId,
+                0, 0, sw.Elapsed, ErrorMessage: ex.Message);
+        }
+    }
 }
 
 /// <summary>Extension helper para strings.</summary>

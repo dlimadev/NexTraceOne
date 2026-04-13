@@ -109,6 +109,9 @@ internal sealed class AiTokenUsageLedgerRepository(AiGovernanceDbContext context
         => await context.TokenUsageLedger
             .Where(e => e.UserId == userId && e.Timestamp >= start && e.Timestamp <= end && !e.IsBlocked)
             .SumAsync(e => (long)e.TotalTokens, ct);
+
+    public async Task<int> DeleteOlderThanAsync(DateTimeOffset cutoff, CancellationToken ct)
+        => await context.TokenUsageLedger.Where(e => e.Timestamp < cutoff).ExecuteDeleteAsync(ct);
 }
 
 internal sealed class AiExternalInferenceRecordRepository(AiGovernanceDbContext context) : IAiExternalInferenceRecordRepository

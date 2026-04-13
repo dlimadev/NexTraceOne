@@ -57,6 +57,13 @@ public sealed class AIAccessPolicy : AuditableEntity<AIAccessPolicyId>
     public bool IsActive { get; private set; }
 
     /// <summary>
+    /// Número de dias de retenção de dados de IA (mensagens, conversas, tokens).
+    /// Null significa sem expiração automática.
+    /// Quando definido, o AiDataRetentionJob elimina dados com CreatedAt anterior ao período.
+    /// </summary>
+    public int? DataRetentionDays { get; private set; }
+
+    /// <summary>
     /// Cria uma nova política de acesso de IA com validações de invariantes.
     /// A política inicia ativa e pronta para avaliação.
     /// </summary>
@@ -152,6 +159,22 @@ public sealed class AIAccessPolicy : AuditableEntity<AIAccessPolicyId>
     public Result<Unit> Activate()
     {
         IsActive = true;
+        return Unit.Value;
+    }
+
+    /// <summary>
+    /// Define (ou remove) a política de retenção de dados de IA.
+    /// Null desactiva a expiração automática.
+    /// Valores positivos indicam o número de dias após os quais os dados são eliminados.
+    /// </summary>
+    public Result<Unit> SetDataRetentionDays(int? days)
+    {
+        if (days.HasValue && days.Value <= 0)
+            return Error.Validation(
+                "AIAccessPolicy.InvalidRetentionDays",
+                "DataRetentionDays must be a positive integer or null.");
+
+        DataRetentionDays = days;
         return Unit.Value;
     }
 

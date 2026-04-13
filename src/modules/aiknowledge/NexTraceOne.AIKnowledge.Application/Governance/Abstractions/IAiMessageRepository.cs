@@ -19,4 +19,10 @@ public interface IAiMessageRepository
 
     /// <summary>Conta o total de mensagens de uma conversa.</summary>
     Task<int> CountByConversationAsync(Guid conversationId, CancellationToken ct);
+
+    /// <summary>
+    /// Elimina mensagens com CreatedAt anterior à data limite.
+    /// Usado pelo AiDataRetentionJob para aplicar política de retenção de dados.
+    /// </summary>
+    Task<int> DeleteOlderThanAsync(DateTimeOffset cutoff, CancellationToken ct);
 }

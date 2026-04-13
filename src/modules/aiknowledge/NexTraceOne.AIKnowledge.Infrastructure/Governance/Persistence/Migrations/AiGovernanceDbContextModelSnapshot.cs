@@ -63,6 +63,9 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("DataRetentionDays")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 

@@ -60,6 +60,7 @@ using UpdateToolDefinitionFeature = NexTraceOne.AIKnowledge.Application.Governan
 using ListEvaluationsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListEvaluations.ListEvaluations;
 using GetEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluation.GetEvaluation;
 using SubmitEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitEvaluation.SubmitEvaluation;
+using GetAiUsageDashboardFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiUsageDashboard.GetAiUsageDashboard;
 
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
@@ -85,6 +86,7 @@ public sealed class AiGovernanceEndpointModule
         MapAccessPolicyEndpoints(app);
         MapBudgetEndpoints(app);
         MapAuditEndpoints(app);
+        MapUsageDashboardEndpoints(app);
         MapKnowledgeSourceEndpoints(app);
         MapAssistantEndpoints(app);
         MapRoutingEndpoints(app);
@@ -441,6 +443,27 @@ public sealed class AiGovernanceEndpointModule
                     parsedResult, parsedClientType, pageSize ?? 50),
                 cancellationToken);
             return queryResult.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
+
+    // ── Usage Dashboard ─────────────────────────────────────────────────
+
+    private static void MapUsageDashboardEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/usage");
+
+        group.MapGet("/dashboard", async (
+            string? period,
+            string? groupBy,
+            int? top,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAiUsageDashboardFeature.Query(period, groupBy, top),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:read");
     }
 
