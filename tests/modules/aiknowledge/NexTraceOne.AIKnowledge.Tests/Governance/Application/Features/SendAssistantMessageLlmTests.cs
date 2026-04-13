@@ -33,6 +33,7 @@ public sealed class SendAssistantMessageLlmTests
     private readonly IContextGroundingService _groundingService = Substitute.For<IContextGroundingService>();
     private readonly IAiRoutingResolver _routingResolver = Substitute.For<IAiRoutingResolver>();
     private readonly IConversationPersistenceService _convPersistence = Substitute.For<IConversationPersistenceService>();
+    private readonly IAiGuardrailEnforcementService _guardrailService = Substitute.For<IAiGuardrailEnforcementService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
@@ -50,6 +51,12 @@ public sealed class SendAssistantMessageLlmTests
             Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new TokenQuotaValidationResult(IsAllowed: true));
+
+        // Guardrails always pass by default
+        _guardrailService.EvaluateInputAsync(Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(GuardrailEvaluationResult.Passed());
+        _guardrailService.EvaluateOutputAsync(Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(GuardrailEvaluationResult.Passed());
 
         // Default routing strategy repo
         _routingRepo.ListAsync(true, Arg.Any<CancellationToken>())
@@ -146,6 +153,7 @@ public sealed class SendAssistantMessageLlmTests
         _groundingService,
         _routingResolver,
         _convPersistence,
+        _guardrailService,
         _currentUser,
         _currentTenant,
         _currentEnvironment,

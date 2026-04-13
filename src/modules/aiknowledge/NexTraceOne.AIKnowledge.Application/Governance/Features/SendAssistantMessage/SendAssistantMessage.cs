@@ -77,6 +77,7 @@ public static class SendAssistantMessage
         IContextGroundingService contextGroundingService,
         IAiRoutingResolver routingResolver,
         IConversationPersistenceService conversationPersistenceService,
+        IAiGuardrailEnforcementService guardrailEnforcementService,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
         ICurrentEnvironment currentEnvironment,
@@ -94,6 +95,25 @@ public static class SendAssistantMessage
                 ? ct
                 : AIClientType.Web;
             var persona = request.Persona ?? "Engineer";
+
+            // 0. Guardrail — evaluate input before any processing
+            var inputGuardrailResult = await guardrailEnforcementService.EvaluateInputAsync(
+                request.Message,
+                currentTenant.Id,
+                persona,
+                cancellationToken);
+
+            if (inputGuardrailResult.IsBlocked)
+            {
+                logger.LogWarning(
+                    "Input guardrail blocked message for user {UserId}, tenant {TenantId}: pattern={Pattern}, reason={Reason}",
+                    currentUser.Id, currentTenant.Id,
+                    inputGuardrailResult.ViolatedPattern, inputGuardrailResult.ViolationReason);
+
+                return AiGovernanceErrors.GuardrailViolation(
+                    inputGuardrailResult.ViolatedPattern ?? "unknown",
+                    inputGuardrailResult.ViolationReason ?? "Input blocked by policy");
+            }
 
             // 1. Resolve or create conversation
             var (conversation, convError) = await conversationPersistenceService.GetOrCreateAsync(
@@ -291,7 +311,28 @@ public static class SendAssistantMessage
                 catch (System.Text.Json.JsonException) { /* ignore */ }
             }
 
-            // 7. Persist message pair
+            // 7. Guardrail — evaluate output before persisting
+            if (!usedDeterministicFallback)
+            {
+                var outputGuardrailResult = await guardrailEnforcementService.EvaluateOutputAsync(
+                    grounded,
+                    currentTenant.Id,
+                    cancellationToken);
+
+                if (outputGuardrailResult.IsBlocked)
+                {
+                    logger.LogWarning(
+                        "Output guardrail blocked response for user {UserId}, tenant {TenantId}: pattern={Pattern}, reason={Reason}",
+                        currentUser.Id, currentTenant.Id,
+                        outputGuardrailResult.ViolatedPattern, outputGuardrailResult.ViolationReason);
+
+                    return AiGovernanceErrors.GuardrailViolation(
+                        outputGuardrailResult.ViolatedPattern ?? "output_policy",
+                        outputGuardrailResult.ViolationReason ?? "Output blocked by policy");
+                }
+            }
+
+            // 8. Persist message pair
             var persistResult = await conversationPersistenceService.PersistMessagePairAsync(
                 conversation,
                 request.Message,

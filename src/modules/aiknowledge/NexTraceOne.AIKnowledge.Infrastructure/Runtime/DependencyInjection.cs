@@ -145,6 +145,9 @@ public static class DependencyInjection
         services.AddScoped<IAgentTool, GetContractDetailsTool>();
         services.AddScoped<IAgentTool, SearchIncidentsTool>();
         services.AddScoped<IAgentTool, GetTokenUsageSummaryTool>();
+        services.AddScoped<IAgentTool, SearchKnowledgeTool>();
+        services.AddScoped<IAgentTool, GetRunbookTool>();
+        services.AddScoped<IAgentTool, ListContractVersionsTool>();
         // Registry is Scoped (not Singleton) so that it can capture scoped tool instances
         services.AddScoped<IToolRegistry, InMemoryToolRegistry>();
         services.AddScoped<IToolExecutor, AgentToolExecutor>();

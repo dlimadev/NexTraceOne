@@ -79,6 +79,7 @@ public static class DependencyInjection
         services.AddScoped<IContextGroundingService, ContextGroundingService>();
         services.AddScoped<IAiRoutingResolver, AiRoutingResolver>();
         services.AddScoped<IConversationPersistenceService, ConversationPersistenceService>();
+        services.AddScoped<IAiGuardrailEnforcementService, AiGuardrailEnforcementService>();
 
         // ── IDE Integrations ─────────────────────────────────────────────
         services.AddTransient<IValidator<RegisterIdeClient.Command>, RegisterIdeClient.Validator>();
