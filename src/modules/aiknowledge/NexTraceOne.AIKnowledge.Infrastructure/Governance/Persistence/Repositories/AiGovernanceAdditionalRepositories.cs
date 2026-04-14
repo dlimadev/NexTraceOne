@@ -125,10 +125,20 @@ internal sealed class AiGuardrailRepository(AiGovernanceDbContext context) : IAi
         => await context.Guardrails.Where(g => g.IsActive).OrderBy(g => g.Priority).ToListAsync(ct);
 
     public async Task<IReadOnlyList<AiGuardrail>> GetByCategoryAsync(string category, CancellationToken ct)
-        => await context.Guardrails.Where(g => g.Category == category).OrderBy(g => g.Priority).ToListAsync(ct);
+    {
+        if (!Enum.TryParse<GuardrailCategory>(category, ignoreCase: true, out var categoryEnum))
+            return Array.Empty<AiGuardrail>();
+
+        return await context.Guardrails.Where(g => g.Category == categoryEnum).OrderBy(g => g.Priority).ToListAsync(ct);
+    }
 
     public async Task<IReadOnlyList<AiGuardrail>> GetByGuardTypeAsync(string guardType, CancellationToken ct)
-        => await context.Guardrails.Where(g => g.GuardType == guardType).OrderBy(g => g.Priority).ToListAsync(ct);
+    {
+        if (!Enum.TryParse<GuardrailType>(guardType, ignoreCase: true, out var guardTypeEnum))
+            return Array.Empty<AiGuardrail>();
+
+        return await context.Guardrails.Where(g => g.GuardType == guardTypeEnum).OrderBy(g => g.Priority).ToListAsync(ct);
+    }
 
     public async Task<bool> ExistsByNameAsync(string name, CancellationToken ct)
         => await context.Guardrails.AnyAsync(g => g.Name == name, ct);

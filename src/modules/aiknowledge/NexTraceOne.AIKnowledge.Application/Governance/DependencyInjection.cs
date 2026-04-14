@@ -16,6 +16,7 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.GetModel;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.GetPromptTemplate;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.GetRoutingDecision;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.GetToolDefinition;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.HandleModelFeedbackThresholdExceeded;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ListAgentsByContext;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ListAuditEntries;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ListBudgets;

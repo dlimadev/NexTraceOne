@@ -13,6 +13,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { aiGovernanceApi } from '../api/aiGovernance';
+import { mapAiError } from '../../../utils/apiErrors';
 import { AssistantMessageBubble } from './AssistantMessageBubble';
 import {
   contextGroundingSources,
@@ -173,7 +174,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
         await stopTyping();
         setIsTyping(false);
       })
-      .catch(async () => {
+      .catch(async (err: unknown) => {
         // When contextData is available, generate a local grounded response.
         // This ensures entity-specific data is shown even when the provider is unavailable,
         // without silent mock — the fallback indicator is always explicit.
@@ -195,7 +196,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
           catchContextSummaryText = localResponse.contextSummaryText;
           confidence = localResponse.confidence;
         } else {
-          const unavailableText = t('common.errorLoading');
+          const unavailableText = mapAiError(err, 'chat');
           content = t('assistantPanel.fallbackCaveat');
           caveats = [unavailableText];
           contextRefs = [`${contextType}:${contextSummary.name}`];

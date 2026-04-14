@@ -13,6 +13,7 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 /// </summary>
 public sealed class AiRoutingResolver(
     IAiModelCatalogService modelCatalogService,
+    IAiProviderHealthService providerHealthService,
     ILogger<AiRoutingResolver> logger) : IAiRoutingResolver
 {
     /// <summary>
@@ -66,6 +67,59 @@ public sealed class AiRoutingResolver(
             isInternal = true;
         }
 
+        // E-A02: verificar saúde do provider selecionado; redirecionar para fallback se indisponível.
+        var usedFallback = false;
+        string? fallbackReason = null;
+
+        if (!string.IsNullOrWhiteSpace(selectedProvider))
+        {
+            AiProviderHealthResult primaryHealth;
+            using (var healthCts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500)))
+            using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(healthCts.Token, cancellationToken))
+            {
+                try
+                {
+                    primaryHealth = await providerHealthService.CheckProviderAsync(
+                        selectedProvider, linkedCts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    primaryHealth = new AiProviderHealthResult(false, selectedProvider, "Health check timed out");
+                }
+            }
+
+            if (!primaryHealth.IsHealthy)
+            {
+                logger.LogWarning(
+                    "AI provider '{Provider}' is unhealthy ({Message}) — attempting fallback routing. " +
+                    "Model={Model} UseCaseType={UseCaseType}",
+                    selectedProvider, primaryHealth.Message, selectedModel, useCaseType);
+
+                var allHealthResults = await providerHealthService.CheckAllProvidersAsync(cancellationToken);
+                var healthyFallback = allHealthResults
+                    .FirstOrDefault(h => h.IsHealthy && h.ProviderId != selectedProvider);
+
+                if (healthyFallback is not null)
+                {
+                    var primaryProvider = selectedProvider;
+                    fallbackReason = $"Provider {primaryProvider} unhealthy, routing to fallback {healthyFallback.ProviderId}";
+                    selectedProvider = healthyFallback.ProviderId;
+                    usedFallback = true;
+
+                    logger.LogInformation(
+                        "Fallback routing activated: primary={PrimaryProvider} → fallback={FallbackProvider}. " +
+                        "Reason={FallbackReason}",
+                        primaryProvider, healthyFallback.ProviderId, fallbackReason);
+                }
+                else
+                {
+                    logger.LogWarning(
+                        "No healthy fallback provider found. Proceeding with original provider '{Provider}'.",
+                        selectedProvider);
+                }
+            }
+        }
+
         var costClass = isInternal
             ? (useCaseType is AIUseCaseType.ContractGeneration or AIUseCaseType.ChangeAnalysis ? "medium" : "low")
             : "high";
@@ -86,7 +140,9 @@ public sealed class AiRoutingResolver(
             rationale,
             costClass,
             escalationReason,
-            applicableStrategy);
+            applicableStrategy,
+            usedFallback,
+            fallbackReason);
     }
 
     private static (string Model, string Provider, bool IsInternal) SelectModel(

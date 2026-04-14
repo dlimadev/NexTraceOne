@@ -68,6 +68,21 @@ public sealed class AIExecutionPlan : AuditableEntity<AIExecutionPlanId>
     public DateTimeOffset PlannedAt { get; private set; }
 
     /// <summary>
+    /// Identificador da execução de agent associada a este plano.
+    /// Preenchido após criação da execução via LinkToExecution. (E-A04)
+    /// </summary>
+    public AiAgentExecutionId? ExecutionId { get; private set; }
+
+    /// <summary>
+    /// Associa este plano de execução a uma execução de agent concreta.
+    /// Chamado imediatamente após a criação da AiAgentExecution. (E-A04)
+    /// </summary>
+    public void LinkToExecution(AiAgentExecutionId executionId)
+    {
+        ExecutionId = executionId;
+    }
+
+    /// <summary>
     /// Cria um novo plano de execução com metadados completos.
     /// </summary>
     public static AIExecutionPlan Create(
@@ -86,7 +101,8 @@ public sealed class AIExecutionPlan : AuditableEntity<AIExecutionPlanId>
         string rationaleSummary,
         AIConfidenceLevel confidenceLevel,
         AIEscalationReason escalationReason,
-        DateTimeOffset plannedAt)
+        DateTimeOffset plannedAt,
+        AiAgentExecutionId? executionId = null)
     {
         Guard.Against.NullOrWhiteSpace(correlationId);
         Guard.Against.NullOrWhiteSpace(inputQuery);
@@ -112,7 +128,8 @@ public sealed class AIExecutionPlan : AuditableEntity<AIExecutionPlanId>
             RationaleSummary = rationaleSummary ?? string.Empty,
             ConfidenceLevel = confidenceLevel,
             EscalationReason = escalationReason,
-            PlannedAt = plannedAt
+            PlannedAt = plannedAt,
+            ExecutionId = executionId
         };
     }
 }

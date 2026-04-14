@@ -36,6 +36,7 @@ public sealed class AiAgentRuntimeService(
     IAiAgentRepository agentRepository,
     IAiAgentExecutionRepository executionRepository,
     IAiAgentArtifactRepository artifactRepository,
+    IAiExecutionPlanRepository executionPlanRepository,
     IAiModelCatalogService modelCatalogService,
     IAiProviderFactory providerFactory,
     IToolRegistry toolRegistry,
@@ -141,6 +142,7 @@ public sealed class AiAgentRuntimeService(
 
         // 7a. Planning mode — gera plano de execução quando activado
         string? planSummary = null;
+        AIExecutionPlan? executionPlan = null;
         if (agent.UsePlanningMode)
         {
             planSummary = await TryBuildExecutionPlanAsync(agent, input, chatProvider, resolvedModel, cancellationToken);
@@ -158,6 +160,31 @@ public sealed class AiAgentRuntimeService(
             now);
 
         await executionRepository.AddAsync(execution, cancellationToken);
+
+        // E-A04: criar e persistir plano de execução quando em planning mode, ligando-o à execução.
+        if (!string.IsNullOrWhiteSpace(planSummary))
+        {
+            executionPlan = AIExecutionPlan.Create(
+                correlationId: Guid.NewGuid().ToString(),
+                inputQuery: input,
+                persona: currentUser.Id,
+                useCaseType: AIUseCaseType.General,
+                selectedModel: resolvedModel.ModelName,
+                selectedProvider: resolvedModel.ProviderId,
+                isInternal: resolvedModel.IsInternal,
+                routingPath: AIRoutingPath.InternalOnly,
+                selectedSources: string.Empty,
+                sourceWeightingSummary: string.Empty,
+                policyDecision: string.Empty,
+                estimatedCostClass: "low",
+                rationaleSummary: planSummary,
+                confidenceLevel: AIConfidenceLevel.Medium,
+                escalationReason: AIEscalationReason.None,
+                plannedAt: now,
+                executionId: execution.Id);
+            executionPlan.LinkToExecution(execution.Id);
+            await executionPlanRepository.AddAsync(executionPlan, cancellationToken);
+        }
 
         // 9. Monta prompt com contexto e executa inferência (com tool loop)
         var systemPrompt = BuildSystemPrompt(agent, allowedTools, contextJson);
@@ -357,7 +384,8 @@ public sealed class AiAgentRuntimeService(
             artifacts,
             toolResults.Select(tr => new ToolExecutionSummary(
                 tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList(),
-            PlanSummary: planSummary);
+            PlanSummary: planSummary,
+            PlanId: executionPlan?.Id.Value);
     }
 
     /// <summary>

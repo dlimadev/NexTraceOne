@@ -80,14 +80,14 @@ Antes de mapear os gaps, é importante reconhecer o que está sólido:
 
 ## Plano de execução detalhado
 
-### Fase 1 — Estabilização crítica
+### Fase 1 — Estabilização crítica ✅
 
 > Objetivo: eliminar riscos de segurança e fiabilidade em runtime.  
-> Duração estimada: 1–2 sprints
+> Estado: **Concluída** (sessão anterior)
 
 ---
 
-#### E-C01 — Pré-validação de quota em AiAgentRuntimeService
+#### E-C01 — Pré-validação de quota em AiAgentRuntimeService ✅
 
 **Gap:** `AiAgentRuntimeService.ExecuteAsync()` não injeta `IAiTokenQuotaService` nem chama `ValidateQuotaAsync` antes de invocar o provider. Execuções de agents pesados (com múltiplos tool loops até `MaxToolIterations = 5`) podem consumir tokens sem pré-verificação, ultrapassando limites de orçamento sem aviso.
 
@@ -108,7 +108,7 @@ Antes de mapear os gaps, é importante reconhecer o que está sólido:
 
 ---
 
-#### E-C02 — Persona explícita no JWT
+#### E-C02 — Persona explícita no JWT ✅
 
 **Gap:** `AIContextBuilder` infere a persona por permissões (`HasPermission("aiknowledge:write") → "Engineer"`). O fallback final retorna `"Engineer"` para qualquer utilizador sem permissões correspondentes. Utilizadores de leitura, auditores e executivos recebem contextos de IA desenhados para engineers — com mais detalhe técnico e fontes inapropriadas ao seu papel.
 
@@ -131,7 +131,7 @@ Antes de mapear os gaps, é importante reconhecer o que está sólido:
 
 ---
 
-#### E-C03 — Contract Grounding Reader
+#### E-C03 — Contract Grounding Reader ✅
 
 **Gap:** O `CrossModuleGroundingReaders.cs` implementa readers para: Catalog/Services, ChangeIntelligence/Releases, Incidents, KnowledgeHub. **Não existe reader para o módulo de Contracts.** Para use cases como `ContractExplanation` e `ContractGeneration`, o grounding não carrega o contrato real — depende apenas do `ContextBundle` passado pelo frontend, que pode estar incompleto ou ausente.
 
@@ -156,10 +156,10 @@ Antes de mapear os gaps, é importante reconhecer o que está sólido:
 
 ---
 
-### Fase 2 — Fiabilidade e escalabilidade
+### Fase 2 — Fiabilidade e escalabilidade ✅ (parcial)
 
 > Objetivo: tornar o sistema fiável em condições de carga e falha de providers.  
-> Duração estimada: 2–3 sprints
+> Estado: E-A02, E-A03, E-A04 concluídos. E-A01 (pgvector) pendente.
 
 ---
 
@@ -190,7 +190,7 @@ Antes de mapear os gaps, é importante reconhecer o que está sólido:
 
 ---
 
-#### E-A02 — Provider fallback automático via health checks
+#### E-A02 — Provider fallback automático via health checks ✅
 
 **Gap:** Se o provider principal falhar (ex: Ollama não acessível), o sistema cai para o `system-fallback` determinístico. Não existe lógica de failover para o próximo provider disponível. `IAiProviderHealthService` existe mas não é integrado no fluxo de routing de `SendAssistantMessage` nem em `AiAgentRuntimeService`.
 
@@ -215,7 +215,7 @@ Antes de mapear os gaps, é importante reconhecer o que está sólido:
 
 ---
 
-#### E-A03 — AiRoutingResolver sem modelo vazio como fallback
+#### E-A03 — AiRoutingResolver sem modelo vazio como fallback ✅
 
 **Gap:**
 ```csharp
@@ -247,7 +247,7 @@ Se `IAiModelCatalogService` não conseguir resolver o modelo (sem modelos regist
 
 ---
 
-#### E-A04 — AIExecutionPlan com FK para AiAgentExecution
+#### E-A04 — AIExecutionPlan com FK para AiAgentExecution ✅
 
 **Gap:** A entidade `AIExecutionPlan` não tem FK para `AiAgentExecution`. O plano é gerado pela feature `PlanExecution` mas não é persistido com referência à execução que o usou. Não é possível auditar "qual plano foi usado na execução X" nem navegar do detalhe de uma execução para o plano que a gerou.
 
@@ -272,14 +272,14 @@ Se `IAiModelCatalogService` não conseguir resolver o modelo (sem modelos regist
 
 ---
 
-### Fase 3 — Correctitude e qualidade de domínio
+### Fase 3 — Correctitude e qualidade de domínio ✅ (parcial)
 
 > Objetivo: eliminar ambiguidades no domínio e melhorar a experiência de configuração e uso.  
 > Duração estimada: 2–3 sprints
 
 ---
 
-#### E-M01 — Guardrails com enums fortemente tipados
+#### E-M01 — Guardrails com enums fortemente tipados ✅
 
 **Gap:** As propriedades `Category`, `GuardType`, `PatternType`, `Severity`, `Action` da entidade `AiGuardrail` são strings livres. Um guardrail criado com `Action = "blokk"` (typo) ou `Severity = "HIGH"` (case errado) nunca é activado correctamente. O `AiGuardrailEnforcementService` faz comparações de string sem normalização.
 
@@ -306,7 +306,7 @@ Se `IAiModelCatalogService` não conseguir resolver o modelo (sem modelos regist
 
 ---
 
-#### E-M02 — Feedback loop com routing adjustment efectivo
+#### E-M02 — Feedback loop com routing adjustment efectivo ✅
 
 **Gap:** O `FeedbackThresholdJob` existe e publica o evento `ModelFeedbackThresholdExceeded`. Porém, não há implementação do consumidor que ajusta `AIRoutingStrategy.Priority` quando um modelo acumula feedback negativo. O loop de melhoria é apenas um alerta, não uma acção correctiva real.
 
@@ -331,7 +331,7 @@ Se `IAiModelCatalogService` não conseguir resolver o modelo (sem modelos regist
 
 ---
 
-#### E-M03 — Embedding cache com LRU correcto
+#### E-M03 — Embedding cache com LRU correcto ✅
 
 **Gap:**
 ```csharp
@@ -357,7 +357,7 @@ A evicção do cache de embeddings não é atómica e não garante FIFO real. Em
 
 ---
 
-#### E-M04 — Contrato estável de erros de IA no frontend
+#### E-M04 — Contrato estável de erros de IA no frontend ✅
 
 **Gap:** Os erros de IA (`GuardrailViolation`, `QuotaExceeded`, `AgentAccessDenied`, `NoModelAvailable`) são retornados como `Result<T>` com `Error.Business(...)`. O frontend precisa de mapear `messageKey` para mensagens i18n contextuais específicas do módulo de IA, mas essa padronização não está documentada nem aplicada de forma uniforme.
 

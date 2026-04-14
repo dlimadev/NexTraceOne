@@ -384,6 +384,12 @@ internal sealed class AiRoutingStrategyRepository(AiGovernanceDbContext context)
 
     public async Task AddAsync(AIRoutingStrategy strategy, CancellationToken ct)
         => await context.RoutingStrategies.AddAsync(strategy, ct);
+
+    public Task UpdateAsync(AIRoutingStrategy strategy, CancellationToken ct)
+    {
+        context.RoutingStrategies.Update(strategy);
+        return Task.CompletedTask;
+    }
 }
 
 internal sealed class AiAgentRepository(AiGovernanceDbContext context) : IAiAgentRepository
@@ -526,4 +532,13 @@ internal sealed class AiKnowledgeSourceWeightRepository(AiGovernanceDbContext co
         context.SourceWeights.Update(weight);
         return Task.CompletedTask;
     }
+}
+
+internal sealed class AiExecutionPlanRepository(AiGovernanceDbContext context) : IAiExecutionPlanRepository
+{
+    public async Task AddAsync(AIExecutionPlan plan, CancellationToken ct)
+        => await context.ExecutionPlans.AddAsync(plan, ct);
+
+    public async Task<AIExecutionPlan?> GetByIdAsync(AIExecutionPlanId id, CancellationToken ct)
+        => await context.ExecutionPlans.SingleOrDefaultAsync(p => p.Id == id, ct);
 }

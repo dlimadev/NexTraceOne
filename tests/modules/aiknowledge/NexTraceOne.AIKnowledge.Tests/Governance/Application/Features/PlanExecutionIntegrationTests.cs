@@ -17,6 +17,7 @@ public sealed class PlanExecutionIntegrationTests
     private readonly IAiAgentRepository _agentRepository = Substitute.For<IAiAgentRepository>();
     private readonly IAiAgentExecutionRepository _executionRepository = Substitute.For<IAiAgentExecutionRepository>();
     private readonly IAiAgentArtifactRepository _artifactRepository = Substitute.For<IAiAgentArtifactRepository>();
+    private readonly IAiExecutionPlanRepository _executionPlanRepository = Substitute.For<IAiExecutionPlanRepository>();
     private readonly IAiModelCatalogService _modelCatalogService = Substitute.For<IAiModelCatalogService>();
     private readonly IAiProviderFactory _providerFactory = Substitute.For<IAiProviderFactory>();
     private readonly IToolRegistry _toolRegistry = Substitute.For<IToolRegistry>();
@@ -42,6 +43,7 @@ public sealed class PlanExecutionIntegrationTests
         _agentRepository,
         _executionRepository,
         _artifactRepository,
+        _executionPlanRepository,
         _modelCatalogService,
         _providerFactory,
         _toolRegistry,
