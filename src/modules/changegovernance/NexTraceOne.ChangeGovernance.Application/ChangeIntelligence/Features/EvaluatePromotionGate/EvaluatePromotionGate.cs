@@ -42,7 +42,7 @@ public static class EvaluatePromotionGate
     public sealed class Handler(
         IPromotionGateRepository gateRepository,
         IPromotionGateEvaluationRepository evaluationRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
         ICurrentUser currentUser) : ICommandHandler<Command, Response>
     {

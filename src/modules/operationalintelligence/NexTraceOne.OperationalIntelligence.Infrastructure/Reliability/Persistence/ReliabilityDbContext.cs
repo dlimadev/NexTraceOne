@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Application.Reliability.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Reliability.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persistence;
@@ -18,7 +19,7 @@ public sealed class ReliabilityDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IReliabilityUnitOfWork
 {
     /// <summary>Snapshots computados de confiabilidade por serviço e ambiente.</summary>
     public DbSet<ReliabilitySnapshot> ReliabilitySnapshots => Set<ReliabilitySnapshot>();

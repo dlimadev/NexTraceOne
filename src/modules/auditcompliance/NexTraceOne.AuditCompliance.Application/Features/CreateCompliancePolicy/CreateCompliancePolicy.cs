@@ -43,7 +43,7 @@ public static class CreateCompliancePolicy
     public sealed class Handler(
         ICompliancePolicyRepository compliancePolicyRepository,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IAuditComplianceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

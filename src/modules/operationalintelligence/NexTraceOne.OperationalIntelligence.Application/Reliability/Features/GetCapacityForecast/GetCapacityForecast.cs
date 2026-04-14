@@ -38,7 +38,7 @@ public static class GetCapacityForecast
 
     public sealed class Handler(
         ICapacityForecastRepository repository,
-        IUnitOfWork unitOfWork,
+        IReliabilityUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

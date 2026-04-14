@@ -18,17 +18,24 @@ internal sealed class ServiceCustomFieldRepository(ConfigurationDbContext contex
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(ServiceCustomField field, CancellationToken cancellationToken)
-        => await context.ServiceCustomFields.AddAsync(field, cancellationToken);
+    {
+        await context.ServiceCustomFields.AddAsync(field, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(ServiceCustomField field, CancellationToken cancellationToken)
+    public async Task UpdateAsync(ServiceCustomField field, CancellationToken cancellationToken)
     {
         context.ServiceCustomFields.Update(field);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(ServiceCustomFieldId id, CancellationToken cancellationToken)
     {
         var entity = await context.ServiceCustomFields.SingleOrDefaultAsync(f => f.Id == id, cancellationToken);
-        if (entity is not null) context.ServiceCustomFields.Remove(entity);
+        if (entity is not null)
+        {
+            context.ServiceCustomFields.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

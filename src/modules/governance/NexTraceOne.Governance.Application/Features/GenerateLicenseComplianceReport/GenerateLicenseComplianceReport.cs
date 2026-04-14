@@ -51,7 +51,7 @@ public static class GenerateLicenseComplianceReport
     /// <summary>Handler que cria um relatório de compliance de licenças de dependências.</summary>
     public sealed class Handler(
         ILicenseComplianceReportRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

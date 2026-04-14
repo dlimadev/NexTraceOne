@@ -51,7 +51,7 @@ public static class AssessServiceMaturity
     /// <summary>Handler que cria ou reavalia a maturidade de um serviço.</summary>
     public sealed class Handler(
         IServiceMaturityAssessmentRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

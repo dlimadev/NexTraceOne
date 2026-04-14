@@ -32,7 +32,7 @@ public static class CloneDashboard
 
     public sealed class Handler(
         ICustomDashboardRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

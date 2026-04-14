@@ -53,7 +53,7 @@ public static class AttachCiCdEvidence
     public sealed class Handler(
         IWorkflowInstanceRepository instanceRepository,
         IEvidencePackRepository evidencePackRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IWorkflowUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -57,7 +57,7 @@ public static class CreateCustomDashboard
     /// <summary>Handler que cria e persiste um novo dashboard customizado.</summary>
     public sealed class Handler(
         ICustomDashboardRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

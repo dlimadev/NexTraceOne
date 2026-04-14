@@ -36,7 +36,7 @@ public static class CreateGovernancePack
     /// <summary>Handler que cria um novo governance pack e retorna o ID gerado.</summary>
     public sealed class Handler(
         IGovernancePackRepository packRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

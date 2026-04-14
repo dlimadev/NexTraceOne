@@ -40,12 +40,19 @@ internal sealed class ContractCompliancePolicyRepository(ConfigurationDbContext 
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(ContractCompliancePolicy policy, CancellationToken cancellationToken)
-        => await context.ContractCompliancePolicies.AddAsync(policy, cancellationToken);
+    {
+        await context.ContractCompliancePolicies.AddAsync(policy, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
     public async Task DeleteAsync(ContractCompliancePolicyId id, CancellationToken cancellationToken)
     {
         var entity = await context.ContractCompliancePolicies.SingleOrDefaultAsync(
             p => p.Id == id, cancellationToken);
-        if (entity is not null) context.ContractCompliancePolicies.Remove(entity);
+        if (entity is not null)
+        {
+            context.ContractCompliancePolicies.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

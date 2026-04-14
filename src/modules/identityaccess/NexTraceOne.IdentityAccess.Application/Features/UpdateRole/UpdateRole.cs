@@ -32,7 +32,7 @@ public static class UpdateRole
     /// <summary>Handler que atualiza o papel customizado.</summary>
     public sealed class Handler(
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, RoleResponse>
+        IIdentityAccessUnitOfWork unitOfWork) : ICommandHandler<Command, RoleResponse>
     {
         public async Task<Result<RoleResponse>> Handle(Command request, CancellationToken cancellationToken)
         {

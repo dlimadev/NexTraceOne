@@ -51,7 +51,7 @@ public static class AttributeCostToService
     /// </summary>
     public sealed class Handler(
         ICostAttributionRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICostIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

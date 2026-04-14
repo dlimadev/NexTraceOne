@@ -19,11 +19,18 @@ internal sealed class ContractTemplateRepository(ConfigurationDbContext context)
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(ContractTemplate template, CancellationToken cancellationToken)
-        => await context.ContractTemplates.AddAsync(template, cancellationToken);
+    {
+        await context.ContractTemplates.AddAsync(template, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
     public async Task DeleteAsync(ContractTemplateId id, CancellationToken cancellationToken)
     {
         var entity = await context.ContractTemplates.SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
-        if (entity is not null) context.ContractTemplates.Remove(entity);
+        if (entity is not null)
+        {
+            context.ContractTemplates.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

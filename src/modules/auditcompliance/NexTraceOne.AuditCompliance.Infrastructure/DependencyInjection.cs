@@ -39,6 +39,7 @@ public static class DependencyInjection
             configuration.GetSection(AuditRetentionOptions.SectionName));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AuditDbContext>());
+        services.AddScoped<IAuditComplianceUnitOfWork>(sp => sp.GetRequiredService<AuditDbContext>());
         services.AddScoped<IAuditEventRepository, AuditEventRepository>();
         services.AddScoped<IAuditChainRepository, AuditChainRepository>();
         services.AddScoped<ICompliancePolicyRepository, CompliancePolicyRepository>();

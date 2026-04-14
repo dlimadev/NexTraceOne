@@ -36,7 +36,7 @@ public static class StartPostReleaseReview
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IPostReleaseReviewRepository reviewRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

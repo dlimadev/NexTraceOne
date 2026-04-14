@@ -38,6 +38,7 @@ public static class DependencyInjection
 
         // IUnitOfWork — resolve para ReliabilityDbContext (implementa IUnitOfWork diretamente)
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ReliabilityDbContext>());
+        services.AddScoped<IReliabilityUnitOfWork>(sp => sp.GetRequiredService<ReliabilityDbContext>());
 
         // P6.1 — SLO / SLA / ErrorBudget / BurnRate
         services.AddScoped<ISloDefinitionRepository, SloDefinitionRepository>();

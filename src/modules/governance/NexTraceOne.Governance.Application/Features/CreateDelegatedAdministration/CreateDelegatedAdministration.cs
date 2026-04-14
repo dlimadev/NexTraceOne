@@ -45,7 +45,7 @@ public static class CreateDelegatedAdministration
     /// <summary>Handler que cria a delegação e retorna o ID gerado.</summary>
     public sealed class Handler(
         IDelegatedAdministrationRepository delegationRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

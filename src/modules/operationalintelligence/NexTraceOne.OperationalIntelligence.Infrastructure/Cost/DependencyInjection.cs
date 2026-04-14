@@ -37,6 +37,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<CostIntelligenceDbContext>());
+        services.AddScoped<ICostIntelligenceUnitOfWork>(sp => sp.GetRequiredService<CostIntelligenceDbContext>());
         services.AddScoped<ICostSnapshotRepository, CostSnapshotRepository>();
         services.AddScoped<ICostAttributionRepository, CostAttributionRepository>();
         services.AddScoped<IServiceCostProfileRepository, ServiceCostProfileRepository>();

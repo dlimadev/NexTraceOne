@@ -49,7 +49,7 @@ public static class RecordConfidenceEvent
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IChangeConfidenceEventRepository confidenceEventRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         private const int DefaultConfidenceScore = 50;

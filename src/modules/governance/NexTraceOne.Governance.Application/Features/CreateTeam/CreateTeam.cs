@@ -36,7 +36,7 @@ public static class CreateTeam
     /// <summary>Handler que cria uma nova equipa e retorna o ID gerado.</summary>
     public sealed class Handler(
         ITeamRepository teamRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

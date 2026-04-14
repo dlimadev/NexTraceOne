@@ -1,3 +1,4 @@
+using NexTraceOne.Governance.Application.Abstractions;
 using Ardalis.GuardClauses;
 using FluentValidation;
 using MediatR;
@@ -40,7 +41,7 @@ public static class ScanGeneratedCode
     /// <summary>Handler que executa o scan e persiste o resultado.</summary>
     public sealed class Handler(
         ISecurityScanRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -39,7 +39,7 @@ public static class ApprovePromotion
         IPromotionRequestRepository requestRepository,
         IPromotionGateRepository gateRepository,
         IGateEvaluationRepository evaluationRepository,
-        IUnitOfWork unitOfWork,
+        IPromotionUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

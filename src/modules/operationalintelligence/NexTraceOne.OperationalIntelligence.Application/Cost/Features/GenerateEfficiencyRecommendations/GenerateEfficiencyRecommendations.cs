@@ -30,7 +30,7 @@ public static class GenerateEfficiencyRecommendations
     public sealed class Handler(
         ICostRecordRepository recordRepository,
         IEfficiencyRecommendationRepository recommendationRepository,
-        IUnitOfWork unitOfWork,
+        ICostIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

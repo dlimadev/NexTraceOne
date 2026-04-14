@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Workflow.Entities;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence;
@@ -16,7 +17,7 @@ public sealed class WorkflowDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IWorkflowUnitOfWork
 {
     /// <summary>Templates de workflow persistidos no módulo Workflow.</summary>
     public DbSet<WorkflowTemplate> WorkflowTemplates => Set<WorkflowTemplate>();

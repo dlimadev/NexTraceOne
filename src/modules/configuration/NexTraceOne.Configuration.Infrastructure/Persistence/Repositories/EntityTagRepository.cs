@@ -27,17 +27,24 @@ internal sealed class EntityTagRepository(ConfigurationDbContext context) : IEnt
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(EntityTag tag, CancellationToken cancellationToken)
-        => await context.EntityTags.AddAsync(tag, cancellationToken);
+    {
+        await context.EntityTags.AddAsync(tag, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(EntityTag tag, CancellationToken cancellationToken)
+    public async Task UpdateAsync(EntityTag tag, CancellationToken cancellationToken)
     {
         context.EntityTags.Update(tag);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(EntityTagId id, CancellationToken cancellationToken)
     {
         var entity = await context.EntityTags.SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
-        if (entity is not null) context.EntityTags.Remove(entity);
+        if (entity is not null)
+        {
+            context.EntityTags.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

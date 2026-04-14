@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
@@ -17,7 +18,7 @@ public sealed class RuntimeIntelligenceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IRuntimeIntelligenceUnitOfWork
 {
     /// <summary>Snapshots de saúde e performance de serviços em runtime.</summary>
     public DbSet<RuntimeSnapshot> RuntimeSnapshots => Set<RuntimeSnapshot>();

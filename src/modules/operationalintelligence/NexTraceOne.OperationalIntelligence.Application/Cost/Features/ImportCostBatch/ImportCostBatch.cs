@@ -62,7 +62,7 @@ public static class ImportCostBatch
     public sealed class Handler(
         ICostImportBatchRepository batchRepository,
         ICostRecordRepository recordRepository,
-        IUnitOfWork unitOfWork,
+        ICostIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider clock,
         ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {

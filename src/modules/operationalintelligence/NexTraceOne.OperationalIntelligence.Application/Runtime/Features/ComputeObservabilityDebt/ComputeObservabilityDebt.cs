@@ -46,7 +46,7 @@ public static class ComputeObservabilityDebt
     /// </summary>
     public sealed class Handler(
         IObservabilityProfileRepository repository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

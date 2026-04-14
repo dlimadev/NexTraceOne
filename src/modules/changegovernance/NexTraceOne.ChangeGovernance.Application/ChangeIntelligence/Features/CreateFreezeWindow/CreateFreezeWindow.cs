@@ -44,7 +44,7 @@ public static class CreateFreezeWindow
     /// </summary>
     public sealed class Handler(
         IFreezeWindowRepository freezeRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
         ICurrentUser currentUser) : ICommandHandler<Command, Response>
     {

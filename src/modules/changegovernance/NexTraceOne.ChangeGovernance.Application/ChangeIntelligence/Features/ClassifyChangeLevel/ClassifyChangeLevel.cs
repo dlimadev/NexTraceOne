@@ -36,7 +36,7 @@ public static class ClassifyChangeLevel
     /// <summary>Handler que classifica o nível de mudança de uma Release.</summary>
     public sealed class Handler(
         IReleaseRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IChangeIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

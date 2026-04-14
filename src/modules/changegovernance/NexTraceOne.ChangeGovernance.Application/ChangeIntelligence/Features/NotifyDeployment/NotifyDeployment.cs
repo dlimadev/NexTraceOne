@@ -60,7 +60,7 @@ public static class NotifyDeployment
         IChangeScoreRepository scoreRepository,
         IChangeScoreCalculator scoreCalculator,
         ICurrentTenant currentTenant,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

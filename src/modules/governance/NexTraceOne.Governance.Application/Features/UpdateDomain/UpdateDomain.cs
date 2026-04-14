@@ -41,7 +41,7 @@ public static class UpdateDomain
     /// <summary>Handler que atualiza os dados do domínio.</summary>
     public sealed class Handler(
         IGovernanceDomainRepository domainRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {

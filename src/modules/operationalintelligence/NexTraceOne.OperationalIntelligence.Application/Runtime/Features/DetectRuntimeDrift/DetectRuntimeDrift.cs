@@ -48,7 +48,7 @@ public static class DetectRuntimeDrift
         IRuntimeSnapshotRepository snapshotRepository,
         IRuntimeBaselineRepository baselineRepository,
         IDriftFindingRepository driftFindingRepository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

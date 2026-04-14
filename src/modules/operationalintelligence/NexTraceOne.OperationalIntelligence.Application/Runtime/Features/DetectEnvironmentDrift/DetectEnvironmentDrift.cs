@@ -51,7 +51,7 @@ public static class DetectEnvironmentDrift
         IEnvironmentDriftReportRepository reportRepository,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IRuntimeIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

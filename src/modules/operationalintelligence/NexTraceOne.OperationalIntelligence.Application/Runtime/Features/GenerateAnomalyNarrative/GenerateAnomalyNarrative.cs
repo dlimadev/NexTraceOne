@@ -42,7 +42,7 @@ public static class GenerateAnomalyNarrative
     public sealed class Handler(
         IDriftFindingRepository driftFindingRepository,
         IAnomalyNarrativeRepository narrativeRepository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
         ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {

@@ -57,7 +57,7 @@ public static class CreateChaosExperiment
     /// </summary>
     public sealed class Handler(
         IChaosExperimentRepository repository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         ICurrentTenant currentTenant,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>

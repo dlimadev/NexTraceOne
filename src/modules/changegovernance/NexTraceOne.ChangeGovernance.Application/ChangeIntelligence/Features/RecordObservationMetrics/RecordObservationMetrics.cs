@@ -73,7 +73,7 @@ public static class RecordObservationMetrics
         IObservationWindowRepository windowRepository,
         IPostReleaseReviewRepository reviewRepository,
         IPostChangeVerificationService verificationService,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

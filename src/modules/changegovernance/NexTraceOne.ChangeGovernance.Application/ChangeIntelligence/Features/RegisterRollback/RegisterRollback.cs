@@ -33,7 +33,7 @@ public static class RegisterRollback
     /// <summary>Handler que registra um rollback de uma Release.</summary>
     public sealed class Handler(
         IReleaseRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IChangeIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

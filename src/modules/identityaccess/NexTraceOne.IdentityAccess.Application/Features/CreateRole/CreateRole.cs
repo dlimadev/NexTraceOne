@@ -32,7 +32,7 @@ public static class CreateRole
     /// <summary>Handler que cria o papel customizado no repositório.</summary>
     public sealed class Handler(
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, RoleResponse>
+        IIdentityAccessUnitOfWork unitOfWork) : ICommandHandler<Command, RoleResponse>
     {
         public async Task<Result<RoleResponse>> Handle(Command request, CancellationToken cancellationToken)
         {

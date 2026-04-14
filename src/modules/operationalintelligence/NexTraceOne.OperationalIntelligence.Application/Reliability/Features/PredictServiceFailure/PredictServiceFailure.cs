@@ -40,7 +40,7 @@ public static class PredictServiceFailure
 
     public sealed class Handler(
         IServiceFailurePredictionRepository repository,
-        IUnitOfWork unitOfWork,
+        IReliabilityUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

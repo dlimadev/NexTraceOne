@@ -42,7 +42,7 @@ public static class CreatePromotionRequest
     public sealed class Handler(
         IPromotionRequestRepository requestRepository,
         IDeploymentEnvironmentRepository environmentRepository,
-        IUnitOfWork unitOfWork,
+        IPromotionUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

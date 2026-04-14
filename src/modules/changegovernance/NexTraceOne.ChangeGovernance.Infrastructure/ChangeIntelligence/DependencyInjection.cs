@@ -41,6 +41,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ChangeIntelligenceDbContext>());
+        services.AddScoped<IChangeIntelligenceUnitOfWork>(sp => sp.GetRequiredService<ChangeIntelligenceDbContext>());
         services.AddScoped<IReleaseRepository, ReleaseRepository>();
         services.AddScoped<IBlastRadiusRepository, BlastRadiusRepository>();
         services.AddScoped<IChangeScoreRepository, ChangeScoreRepository>();

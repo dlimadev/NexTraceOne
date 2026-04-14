@@ -20,7 +20,7 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
         {
             t.HasCheckConstraint(
                 "CK_ctr_contract_drafts_status",
-                "\"Status\" IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
+                "\"Status\" IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published', 'Discarded')");
         });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

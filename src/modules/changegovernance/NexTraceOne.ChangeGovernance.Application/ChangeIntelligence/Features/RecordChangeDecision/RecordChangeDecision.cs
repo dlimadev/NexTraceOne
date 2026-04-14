@@ -51,7 +51,7 @@ public static class RecordChangeDecision
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IChangeEventRepository changeEventRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

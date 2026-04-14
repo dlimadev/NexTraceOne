@@ -17,17 +17,24 @@ internal sealed class SavedPromptRepository(ConfigurationDbContext context) : IS
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(SavedPrompt prompt, CancellationToken cancellationToken)
-        => await context.SavedPrompts.AddAsync(prompt, cancellationToken);
+    {
+        await context.SavedPrompts.AddAsync(prompt, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(SavedPrompt prompt, CancellationToken cancellationToken)
+    public async Task UpdateAsync(SavedPrompt prompt, CancellationToken cancellationToken)
     {
         context.SavedPrompts.Update(prompt);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(SavedPromptId id, CancellationToken cancellationToken)
     {
         var entity = await context.SavedPrompts.SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
-        if (entity is not null) context.SavedPrompts.Remove(entity);
+        if (entity is not null)
+        {
+            context.SavedPrompts.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

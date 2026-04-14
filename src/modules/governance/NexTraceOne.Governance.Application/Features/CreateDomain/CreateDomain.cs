@@ -39,7 +39,7 @@ public static class CreateDomain
     /// <summary>Handler que cria um novo domínio e retorna o ID gerado.</summary>
     public sealed class Handler(
         IGovernanceDomainRepository domainRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

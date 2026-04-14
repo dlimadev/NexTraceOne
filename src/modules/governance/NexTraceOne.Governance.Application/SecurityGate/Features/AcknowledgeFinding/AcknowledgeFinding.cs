@@ -1,3 +1,4 @@
+using NexTraceOne.Governance.Application.Abstractions;
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -33,7 +34,7 @@ public static class AcknowledgeFinding
     /// <summary>Handler que actualiza o estado do achado.</summary>
     public sealed class Handler(
         ISecurityScanRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -35,7 +35,7 @@ public static class EnrichCostRecordWithRelease
 
     public sealed class Handler(
         ICostRecordRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICostIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

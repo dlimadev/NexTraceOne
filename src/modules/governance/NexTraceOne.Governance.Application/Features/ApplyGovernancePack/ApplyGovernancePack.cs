@@ -39,7 +39,7 @@ public static class ApplyGovernancePack
         IGovernancePackRepository packRepository,
         IGovernancePackVersionRepository versionRepository,
         IGovernanceRolloutRecordRepository rolloutRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

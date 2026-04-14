@@ -34,7 +34,7 @@ public static class PublishExecutiveBriefing
     /// <summary>Handler que publica o executive briefing (Draft → Published).</summary>
     public sealed class Handler(
         IExecutiveBriefingRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Unit>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)

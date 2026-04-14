@@ -25,20 +25,34 @@ internal sealed class TaxonomyRepository(ConfigurationDbContext context) : ITaxo
             .ToListAsync(cancellationToken);
 
     public async Task AddCategoryAsync(TaxonomyCategory category, CancellationToken cancellationToken)
-        => await context.TaxonomyCategories.AddAsync(category, cancellationToken);
+    {
+        await context.TaxonomyCategories.AddAsync(category, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
     public async Task AddValueAsync(TaxonomyValue value, CancellationToken cancellationToken)
-        => await context.TaxonomyValues.AddAsync(value, cancellationToken);
+    {
+        await context.TaxonomyValues.AddAsync(value, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
     public async Task DeleteCategoryAsync(TaxonomyCategoryId id, CancellationToken cancellationToken)
     {
         var entity = await context.TaxonomyCategories.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
-        if (entity is not null) context.TaxonomyCategories.Remove(entity);
+        if (entity is not null)
+        {
+            context.TaxonomyCategories.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 
     public async Task DeleteValueAsync(TaxonomyValueId id, CancellationToken cancellationToken)
     {
         var entity = await context.TaxonomyValues.SingleOrDefaultAsync(v => v.Id == id, cancellationToken);
-        if (entity is not null) context.TaxonomyValues.Remove(entity);
+        if (entity is not null)
+        {
+            context.TaxonomyValues.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

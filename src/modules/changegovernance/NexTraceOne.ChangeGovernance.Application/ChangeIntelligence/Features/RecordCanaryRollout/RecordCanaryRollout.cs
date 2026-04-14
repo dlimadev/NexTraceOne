@@ -53,7 +53,7 @@ public static class RecordCanaryRollout
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         ICanaryRolloutRepository canaryRolloutRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

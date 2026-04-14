@@ -1,3 +1,4 @@
+using NexTraceOne.Governance.Application.Abstractions;
 using System.Text.Json;
 using Ardalis.GuardClauses;
 using FluentValidation;
@@ -31,7 +32,7 @@ public static class ScanContractSecurity
     /// <summary>Handler que analisa o contrato e persiste o resultado.</summary>
     public sealed class Handler(
         ISecurityScanRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

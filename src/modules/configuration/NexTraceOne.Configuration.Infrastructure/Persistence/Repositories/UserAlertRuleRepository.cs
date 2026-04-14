@@ -17,17 +17,20 @@ internal sealed class UserAlertRuleRepository(ConfigurationDbContext context) : 
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(UserAlertRule rule, CancellationToken cancellationToken)
-        => await context.UserAlertRules.AddAsync(rule, cancellationToken);
-
-    public Task UpdateAsync(UserAlertRule rule, CancellationToken cancellationToken)
     {
-        context.UserAlertRules.Update(rule);
-        return Task.CompletedTask;
+        await context.UserAlertRules.AddAsync(rule, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task DeleteAsync(UserAlertRule rule, CancellationToken cancellationToken)
+    public async Task UpdateAsync(UserAlertRule rule, CancellationToken cancellationToken)
+    {
+        context.UserAlertRules.Update(rule);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(UserAlertRule rule, CancellationToken cancellationToken)
     {
         context.UserAlertRules.Remove(rule);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

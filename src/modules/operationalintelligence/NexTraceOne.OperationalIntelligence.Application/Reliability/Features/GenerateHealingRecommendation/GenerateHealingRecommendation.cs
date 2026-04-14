@@ -64,7 +64,7 @@ public static class GenerateHealingRecommendation
         IHealingRecommendationRepository repository,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IReliabilityUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

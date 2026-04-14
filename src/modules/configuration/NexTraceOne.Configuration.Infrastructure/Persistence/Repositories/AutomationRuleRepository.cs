@@ -24,17 +24,24 @@ internal sealed class AutomationRuleRepository(ConfigurationDbContext context) :
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(AutomationRule rule, CancellationToken cancellationToken)
-        => await context.AutomationRules.AddAsync(rule, cancellationToken);
+    {
+        await context.AutomationRules.AddAsync(rule, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(AutomationRule rule, CancellationToken cancellationToken)
+    public async Task UpdateAsync(AutomationRule rule, CancellationToken cancellationToken)
     {
         context.AutomationRules.Update(rule);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(AutomationRuleId id, CancellationToken cancellationToken)
     {
         var entity = await context.AutomationRules.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-        if (entity is not null) context.AutomationRules.Remove(entity);
+        if (entity is not null)
+        {
+            context.AutomationRules.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

@@ -25,11 +25,14 @@ internal sealed class UserBookmarkRepository(ConfigurationDbContext context) : I
             .ToListAsync(ct);
 
     public async Task AddAsync(UserBookmark bookmark, CancellationToken ct)
-        => await context.UserBookmarks.AddAsync(bookmark, ct);
+    {
+        await context.UserBookmarks.AddAsync(bookmark, ct);
+        await context.SaveChangesAsync(ct);
+    }
 
-    public Task DeleteAsync(UserBookmark bookmark, CancellationToken ct)
+    public async Task DeleteAsync(UserBookmark bookmark, CancellationToken ct)
     {
         context.UserBookmarks.Remove(bookmark);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(ct);
     }
 }

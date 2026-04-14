@@ -48,7 +48,7 @@ public static class RecordFeatureFlagState
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IFeatureFlagStateRepository flagStateRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

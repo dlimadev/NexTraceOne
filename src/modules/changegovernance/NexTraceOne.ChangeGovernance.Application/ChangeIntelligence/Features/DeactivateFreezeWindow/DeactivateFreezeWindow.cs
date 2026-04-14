@@ -33,7 +33,7 @@ public static class DeactivateFreezeWindow
     /// <summary>Handler que desativa uma janela de freeze existente.</summary>
     public sealed class Handler(
         IFreezeWindowRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Unit>
+        IChangeIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Unit>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {

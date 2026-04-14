@@ -54,7 +54,7 @@ public static class CompareEnvironments
     public sealed class Handler(
         IRuntimeSnapshotRepository snapshotRepository,
         IDriftFindingRepository driftFindingRepository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

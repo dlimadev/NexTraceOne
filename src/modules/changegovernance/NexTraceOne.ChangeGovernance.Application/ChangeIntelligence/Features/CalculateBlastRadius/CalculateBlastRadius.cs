@@ -40,7 +40,7 @@ public static class CalculateBlastRadius
         IBlastRadiusRepository blastRadiusRepository,
         IChangeScoreRepository scoreRepository,
         IChangeScoreCalculator scoreCalculator,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

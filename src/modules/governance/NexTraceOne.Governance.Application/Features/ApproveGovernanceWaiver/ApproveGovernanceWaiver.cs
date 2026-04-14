@@ -30,7 +30,7 @@ public static class ApproveGovernanceWaiver
     /// <summary>Handler que aprova o waiver e retorna o ID confirmado.</summary>
     public sealed class Handler(
         IGovernanceWaiverRepository waiverRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
