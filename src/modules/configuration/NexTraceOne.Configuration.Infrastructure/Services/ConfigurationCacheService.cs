@@ -9,6 +9,7 @@ namespace NexTraceOne.Configuration.Infrastructure.Services;
 /// Implementação de cache de configurações usando IMemoryCache.
 /// Chaves prefixadas com "cfg:" para isolamento. Expiração padrão de 5 minutos.
 /// Invalidação global via contador de versão para evitar enumerar chaves.
+/// Protege contra cache de resultados cancelados ou falhados.
 /// </summary>
 internal sealed class ConfigurationCacheService(IMemoryCache memoryCache) : IConfigurationCacheService
 {
@@ -21,15 +22,26 @@ internal sealed class ConfigurationCacheService(IMemoryCache memoryCache) : ICon
     /// </summary>
     private long _version;
 
-    public Task<T> GetOrSetAsync<T>(string cacheKey, Func<Task<T>> factory, CancellationToken cancellationToken)
+    public async Task<T> GetOrSetAsync<T>(string cacheKey, Func<Task<T>> factory, CancellationToken cancellationToken)
     {
         var versionedKey = BuildVersionedKey(cacheKey);
 
-        return memoryCache.GetOrCreateAsync(versionedKey, async entry =>
+        if (memoryCache.TryGetValue(versionedKey, out T? cached))
         {
-            entry.AbsoluteExpirationRelativeToNow = DefaultExpiration;
-            return await factory();
-        })!;
+            return cached!;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var value = await factory();
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        using var entry = memoryCache.CreateEntry(versionedKey);
+        entry.AbsoluteExpirationRelativeToNow = DefaultExpiration;
+        entry.Value = value;
+
+        return value;
     }
 
     public Task InvalidateAsync(string key, ConfigurationScope? scope, CancellationToken cancellationToken)

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.RulesetGovernance.Persistence;
@@ -16,7 +17,7 @@ public sealed class RulesetGovernanceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IRulesetGovernanceUnitOfWork
 {
     /// <summary>Rulesets de governança persistidos no módulo RulesetGovernance.</summary>
     public DbSet<Ruleset> Rulesets => Set<Ruleset>();

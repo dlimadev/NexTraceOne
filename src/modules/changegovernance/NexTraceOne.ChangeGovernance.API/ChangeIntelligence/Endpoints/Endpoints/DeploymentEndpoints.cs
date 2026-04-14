@@ -34,7 +34,7 @@ internal static class DeploymentEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/releases/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/releases/{r.ReleaseId}", localizer);
         }).RequirePermission("change-intelligence:write");
 
         group.MapPut("/{releaseId:guid}/status", async (

@@ -28,7 +28,7 @@ public sealed class CustomChartEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/custom-charts/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/custom-charts/{r.ChartId}", localizer);
         }).RequirePermission("operations:runtime:write");
 
         group.MapGet("/", async (

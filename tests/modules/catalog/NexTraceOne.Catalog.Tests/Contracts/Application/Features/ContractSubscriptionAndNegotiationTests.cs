@@ -34,7 +34,7 @@ public sealed class ContractSubscriptionAndNegotiationTests
     public async Task CreateSubscription_Should_ReturnResponse_When_NoDuplicate()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new CreateSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -64,7 +64,7 @@ public sealed class ContractSubscriptionAndNegotiationTests
     public async Task CreateSubscription_Should_ReturnFailure_When_SubscriptionAlreadyExists()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new CreateSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -126,7 +126,7 @@ public sealed class ContractSubscriptionAndNegotiationTests
     public async Task ApproveSubscription_Should_ReturnResponse_When_SubscriptionExists()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new ApproveSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -152,7 +152,7 @@ public sealed class ContractSubscriptionAndNegotiationTests
     public async Task ApproveSubscription_Should_ReturnNotFound_When_SubscriptionDoesNotExist()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new ApproveSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -174,7 +174,7 @@ public sealed class ContractSubscriptionAndNegotiationTests
     public async Task DeleteSubscription_Should_ReturnSuccess_When_SubscriptionExists()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var sut = new DeleteSubscriptionFeature.Handler(repository, unitOfWork);
 
         var subscription = Subscription.Create(
@@ -197,7 +197,7 @@ public sealed class ContractSubscriptionAndNegotiationTests
     public async Task DeleteSubscription_Should_ReturnNotFound_When_SubscriptionDoesNotExist()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var sut = new DeleteSubscriptionFeature.Handler(repository, unitOfWork);
 
         repository.GetByIdAsync(Arg.Any<SubscriptionId>(), Arg.Any<CancellationToken>())

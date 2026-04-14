@@ -21,7 +21,7 @@ public sealed class RegisterServiceAssetApprovalTests
         // Arrange
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
 
         repository.GetByNameAsync("order-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -62,7 +62,7 @@ public sealed class RegisterServiceAssetApprovalTests
         // Arrange
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
 
         repository.GetByNameAsync("order-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -103,7 +103,7 @@ public sealed class RegisterServiceAssetApprovalTests
         // Arrange
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
 
         repository.GetByNameAsync("order-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);

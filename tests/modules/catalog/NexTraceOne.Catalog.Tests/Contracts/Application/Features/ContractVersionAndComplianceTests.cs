@@ -31,7 +31,7 @@ public sealed class ContractVersionAndComplianceTests
     public async Task CreateContractVersion_Should_ReturnResponse_When_PreviousVersionExists()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -60,7 +60,7 @@ public sealed class ContractVersionAndComplianceTests
     public async Task CreateContractVersion_Should_ReturnFailure_When_NoPreviousVersionExists()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -81,7 +81,7 @@ public sealed class ContractVersionAndComplianceTests
     public async Task CreateContractVersion_Should_ReturnFailure_When_VersionAlreadyExists()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -121,7 +121,7 @@ public sealed class ContractVersionAndComplianceTests
     public async Task DeprecateContractVersion_Should_ReturnResponse_When_VersionExists()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new DeprecateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -151,7 +151,7 @@ public sealed class ContractVersionAndComplianceTests
     public async Task DeprecateContractVersion_Should_ReturnNotFound_When_VersionDoesNotExist()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new DeprecateContractVersionFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -186,7 +186,7 @@ public sealed class ContractVersionAndComplianceTests
     {
         var repository = Substitute.For<IContractVersionRepository>();
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var eventBus = Substitute.For<IEventBus>();
         var currentUser = Substitute.For<ICurrentUser>();
@@ -210,7 +210,7 @@ public sealed class ContractVersionAndComplianceTests
     {
         var repository = Substitute.For<IContractVersionRepository>();
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var eventBus = Substitute.For<IEventBus>();
         var currentUser = Substitute.For<ICurrentUser>();

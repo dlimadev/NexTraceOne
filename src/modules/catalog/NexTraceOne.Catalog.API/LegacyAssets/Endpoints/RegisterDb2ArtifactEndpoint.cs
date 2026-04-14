@@ -27,7 +27,7 @@ public static class RegisterDb2ArtifactEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/catalog/legacy/db2-artifacts/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/catalog/legacy/db2-artifacts/{r.Id}", localizer);
         }).RequirePermission("catalog:legacy-assets:write");
     }
 }

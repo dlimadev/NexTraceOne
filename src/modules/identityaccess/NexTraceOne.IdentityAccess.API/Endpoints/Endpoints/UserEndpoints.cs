@@ -37,7 +37,7 @@ internal static class UserEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/identity/users/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/identity/users/{r}", localizer);
         }).RequirePermission("identity:users:write");
 
         group.MapGet("/users/{id:guid}", async (

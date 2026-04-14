@@ -277,12 +277,15 @@ export interface ValidationIssue {
   ruleId: string;
   ruleName: string;
   severity: ValidationSeverity;
+  messageKey?: string;
+  messageParams?: Record<string, string>;
   message: string;
   path: string;
   line?: number;
   column?: number;
   source: ValidationSource;
   rulesetId?: string;
+  suggestedFixKey?: string;
   suggestedFix?: string;
 }
 
@@ -336,6 +339,8 @@ export interface ContractLintRuleset {
   applicableProtocols?: string;
   isActive: boolean;
   isDefault: boolean;
+  /** Tipo do ruleset conforme retornado pelo backend (Custom | Default). */
+  rulesetType?: string;
   sourceUrl?: string;
   createdAt: string;
   updatedAt: string;

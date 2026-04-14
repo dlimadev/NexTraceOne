@@ -33,7 +33,7 @@ public sealed class PolicyAsCodeEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/governance/policy-as-code/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/governance/policy-as-code/{r.Id}", localizer);
         }).RequirePermission("governance:policies:write");
 
         // ── Obter política como código pelo nome ──

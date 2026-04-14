@@ -65,7 +65,7 @@ public sealed class CostIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/cost/snapshots/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/cost/snapshots/{r.SnapshotId}", localizer);
         })
         .RequirePermission("operations:cost:write");
 
@@ -137,7 +137,7 @@ public sealed class CostIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/cost/attributions/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/cost/attributions/{r.AttributionId}", localizer);
         })
         .RequirePermission("operations:cost:write");
 
@@ -148,7 +148,7 @@ public sealed class CostIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/cost/trends/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/cost/trends/{r.TrendId}", localizer);
         })
         .RequirePermission("operations:cost:write");
 
@@ -159,7 +159,7 @@ public sealed class CostIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/cost/import/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/cost/import/{r.BatchId}", localizer);
         })
         .RequirePermission("operations:cost:write");
 
@@ -211,7 +211,7 @@ public sealed class CostIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/cost/profiles/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/cost/profiles/{r.ProfileId}", localizer);
         })
         .RequirePermission("operations:cost:write");
 
@@ -295,7 +295,7 @@ public sealed class CostIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/cost/forecasts/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/cost/forecasts/{r.ForecastId}", localizer);
         })
         .RequirePermission("operations:cost:write");
 

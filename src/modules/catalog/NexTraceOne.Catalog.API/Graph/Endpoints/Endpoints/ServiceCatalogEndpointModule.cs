@@ -80,7 +80,7 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/catalog/services/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/services/{r.ServiceAssetId}", localizer);
         }).RequirePermission("catalog:assets:write");
 
         group.MapPost("/apis", async (
@@ -90,7 +90,7 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/catalog/apis/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/apis/{r.ApiAssetId}", localizer);
         }).RequirePermission("catalog:assets:write");
 
         group.MapPost("/apis/{apiAssetId:guid}/consumers", async (
@@ -254,7 +254,7 @@ public sealed class ServiceCatalogEndpointModule
         {
             var updatedCommand = command with { ServiceAssetId = serviceId };
             var result = await sender.Send(updatedCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/catalog/services/{0}/links", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/services/{r.ServiceAssetId}/links", localizer);
         }).RequirePermission("catalog:assets:write");
 
         group.MapPut("/services/{serviceId:guid}/links/{linkId:guid}", async (
@@ -319,7 +319,7 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/catalog/snapshots/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/snapshots/{r.SnapshotId}", localizer);
         }).RequirePermission("catalog:assets:write");
 
         group.MapGet("/snapshots", async (
@@ -394,7 +394,7 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/catalog/views/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/views/{r.ViewId}", localizer);
         }).RequirePermission("catalog:assets:write");
 
         group.MapGet("/views", async (
@@ -476,7 +476,7 @@ public sealed class ServiceCatalogEndpointModule
         {
             var updatedCommand = command with { DiscoveredServiceId = discoveredServiceId };
             var result = await sender.Send(updatedCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/catalog/services/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/services/{r.ServiceAssetId}", localizer);
         }).RequirePermission("catalog:assets:write");
 
         group.MapPost("/discovery/services/{discoveredServiceId:guid}/ignore", async (
@@ -538,7 +538,7 @@ public sealed class ServiceCatalogEndpointModule
         {
             var updatedCommand = command with { ServiceAssetId = serviceId };
             var result = await sender.Send(updatedCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/catalog/services/{0}/framework", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/services/{r.ServiceAssetId}/framework", localizer);
         }).RequirePermission("catalog:assets:write");
 
         group.MapPut("/services/{serviceId:guid}/framework", async (

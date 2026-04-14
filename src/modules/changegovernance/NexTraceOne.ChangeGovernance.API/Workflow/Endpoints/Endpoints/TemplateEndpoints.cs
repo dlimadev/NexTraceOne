@@ -43,7 +43,7 @@ internal static class TemplateEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/workflow/templates/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/workflow/templates/{r.TemplateId}", localizer);
         }).RequirePermission("workflow:templates:write");
     }
 }

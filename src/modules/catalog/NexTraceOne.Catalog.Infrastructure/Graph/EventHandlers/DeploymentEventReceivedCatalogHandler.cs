@@ -14,7 +14,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.EventHandlers;
 /// </summary>
 internal sealed class DeploymentEventReceivedCatalogHandler(
     INodeHealthRepository nodeHealthRepository,
-    IUnitOfWork unitOfWork,
+    ICatalogGraphUnitOfWork unitOfWork,
     IDateTimeProvider clock,
     ILogger<DeploymentEventReceivedCatalogHandler> logger) : IIntegrationEventHandler<DeploymentEventReceivedEvent>
 {

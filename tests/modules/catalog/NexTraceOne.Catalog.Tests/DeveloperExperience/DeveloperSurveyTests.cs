@@ -166,7 +166,7 @@ public sealed class DeveloperSurveyTests
     public async Task SubmitDeveloperSurvey_HappyPath_ShouldPersistAndReturnPromoter()
     {
         var repository = Substitute.For<IDeveloperSurveyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IDeveloperExperienceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -190,7 +190,7 @@ public sealed class DeveloperSurveyTests
     public async Task SubmitDeveloperSurvey_WithInvalidNps_ShouldReturnFailure()
     {
         var repository = Substitute.For<IDeveloperSurveyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IDeveloperExperienceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -210,7 +210,7 @@ public sealed class DeveloperSurveyTests
     public async Task SubmitDeveloperSurvey_WithDetractorScore_ShouldReturnDetractor()
     {
         var repository = Substitute.For<IDeveloperSurveyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IDeveloperExperienceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 

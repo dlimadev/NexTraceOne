@@ -31,7 +31,7 @@ public sealed class ServiceLifecycleAndDependencyTests
     public async Task DecommissionAsset_Should_ReturnSuccess_When_AssetExists()
     {
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new DecommissionAssetFeature.Handler(apiAssetRepository, unitOfWork);
 
         var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
@@ -52,7 +52,7 @@ public sealed class ServiceLifecycleAndDependencyTests
     public async Task DecommissionAsset_Should_ReturnNotFound_When_AssetDoesNotExist()
     {
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new DecommissionAssetFeature.Handler(apiAssetRepository, unitOfWork);
 
         apiAssetRepository.GetByIdAsync(Arg.Any<ApiAssetId>(), Arg.Any<CancellationToken>())

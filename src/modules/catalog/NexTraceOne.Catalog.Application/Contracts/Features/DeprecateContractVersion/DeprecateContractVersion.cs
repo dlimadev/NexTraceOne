@@ -38,7 +38,7 @@ public static class DeprecateContractVersion
     /// <summary>Handler que executa a deprecação e persiste o resultado.</summary>
     public sealed class Handler(
         IContractVersionRepository repository,
-        IUnitOfWork unitOfWork,
+        IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

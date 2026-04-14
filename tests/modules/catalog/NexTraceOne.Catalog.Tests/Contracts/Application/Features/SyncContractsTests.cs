@@ -28,7 +28,7 @@ public sealed class SyncContractsTests
     {
         // Arrange
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new SyncContractsFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -66,7 +66,7 @@ public sealed class SyncContractsTests
         var existing = ContractVersion.Import(assetId, "1.0.0", OpenApiSpec, "json", "upload").Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new SyncContractsFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -100,7 +100,7 @@ public sealed class SyncContractsTests
         var assetId2 = Guid.NewGuid();
 
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new SyncContractsFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -135,7 +135,7 @@ public sealed class SyncContractsTests
     {
         // Arrange: conteúdo Swagger com Protocol=OpenApi (padrão) deve ter protocolo auto-detectado
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new SyncContractsFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -166,7 +166,7 @@ public sealed class SyncContractsTests
     {
         // Arrange: conteúdo AsyncAPI deve ser auto-detectado
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new SyncContractsFeature.Handler(repository, unitOfWork, dateTimeProvider);
 
@@ -200,7 +200,7 @@ public sealed class SyncContractsTests
         var existingVersion = ContractVersion.Import(assetId3, "1.0.0", OpenApiSpec, "json", "upload").Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new SyncContractsFeature.Handler(repository, unitOfWork, dateTimeProvider);
 

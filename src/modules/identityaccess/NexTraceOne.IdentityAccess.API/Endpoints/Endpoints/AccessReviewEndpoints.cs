@@ -39,7 +39,7 @@ internal static class AccessReviewEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/identity/access-reviews/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/identity/access-reviews/{r.CampaignId}", localizer);
         }).RequirePermission("identity:users:write");
 
         // Lista campanhas abertas do tenant — requer leitura de usuários

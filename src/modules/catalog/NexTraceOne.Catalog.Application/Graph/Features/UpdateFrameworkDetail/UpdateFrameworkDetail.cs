@@ -51,7 +51,7 @@ public static class UpdateFrameworkDetail
     /// <summary>Handler que atualiza os detalhes de framework de um serviço existente.</summary>
     public sealed class Handler(
         IFrameworkAssetDetailRepository frameworkRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

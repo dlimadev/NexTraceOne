@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Layers, FileCheck, Clock, ShieldCheck, Lock, AlertTriangle, ListTree } from 'lucide-react';
+import { Layers, FileCheck, Clock, ShieldCheck, Lock, AlertTriangle, ListTree } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -71,14 +71,6 @@ export function ContractCatalogPage() {
       <PageHeader
         title={t('contracts.catalog.title', 'Contract Catalog')}
         subtitle={t('contracts.catalog.subtitle', 'Governed catalog of all contracts, APIs, and service definitions.')}
-        actions={
-          <Link to="/contracts/new">
-            <Button size="sm">
-              <Plus size={14} />
-              {t('contracts.create.title', 'Create')}
-            </Button>
-          </Link>
-        }
       />
 
       {/* Summary chips */}
@@ -163,15 +155,14 @@ export function ContractCatalogPage() {
               }
               description={
                 catalogItems.length === 0
-                  ? t('contracts.catalog.states.emptyDescription', 'Start by creating your first service contract or importing an existing specification.')
+                  ? t('contracts.catalog.states.emptyDescription', 'To create a contract, navigate to a service in the Service Catalog and use the Contracts tab.')
                   : t('contracts.catalog.states.noResultsDescription', 'Try adjusting your search criteria or clearing some filters.')
               }
               action={
                 catalogItems.length === 0 ? (
-                  <Link to="/contracts/new">
+                  <Link to="/services">
                     <Button variant="secondary" size="sm">
-                      <Plus size={12} />
-                      {t('contracts.create.title', 'Create')}
+                      {t('contracts.catalog.goToServices', 'Go to Service Catalog')}
                     </Button>
                   </Link>
                 ) : undefined

@@ -25,7 +25,7 @@ public static class RejectSubscription
 
     public sealed class Handler(
         ISubscriptionRepository repository,
-        IUnitOfWork unitOfWork,
+        IPortalUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

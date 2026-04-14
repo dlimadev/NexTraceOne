@@ -44,7 +44,7 @@ public sealed class GovernanceWaiversEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/governance/waivers/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/governance/waivers/{r.WaiverId}", localizer);
         }).RequirePermission("governance:waivers:write");
 
         // ── Aprovar waiver de governança ──

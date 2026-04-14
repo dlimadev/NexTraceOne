@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  Plus,
   Server,
   Globe,
   Search,
@@ -14,8 +13,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, CardBody } from '../../../components/Card';
-import { Button } from '../../../components/Button';
+import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
@@ -37,20 +35,11 @@ export function ServiceCatalogPage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('overview');
   const [selectedDetailNode, setSelectedDetailNode] = useState<string | null>(null);
-  const [showServiceForm, setShowServiceForm] = useState(false);
-  const [showApiForm, setShowApiForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [impactDepth, setImpactDepth] = useState(3);
   const [selectedFromSnapshot, setSelectedFromSnapshot] = useState<string>('');
   const [selectedToSnapshot, setSelectedToSnapshot] = useState<string>('');
-
-  const [serviceForm, setServiceForm] = useState({
-    name: '', team: '', description: '', domain: '',
-    serviceType: 'RestApi', criticality: 'Medium', exposureType: 'Internal',
-    technicalOwner: '', businessOwner: '', documentationUrl: '', repositoryUrl: '',
-  });
-  const [apiForm, setApiForm] = useState({ name: '', baseUrl: '', ownerServiceId: '', description: '' });
 
   // ── Queries principais ──────────────────────────────────────────────
   const { data: graph, isLoading, isError: isGraphError } = useQuery({
@@ -87,28 +76,6 @@ export function ServiceCatalogPage() {
   });
 
   // ── Mutations ───────────────────────────────────────────────────────
-  const registerService = useMutation({
-    mutationFn: serviceCatalogApi.registerService,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['graph'] });
-      setShowServiceForm(false);
-      setServiceForm({
-        name: '', team: '', description: '', domain: '',
-        serviceType: 'RestApi', criticality: 'Medium', exposureType: 'Internal',
-        technicalOwner: '', businessOwner: '', documentationUrl: '', repositoryUrl: '',
-      });
-    },
-  });
-
-  const registerApi = useMutation({
-    mutationFn: serviceCatalogApi.registerApi,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['graph'] });
-      setShowApiForm(false);
-      setApiForm({ name: '', baseUrl: '', ownerServiceId: '', description: '' });
-    },
-  });
-
   const createSnapshot = useMutation({
     mutationFn: (label: string) => serviceCatalogApi.createSnapshot(label),
     onSuccess: () => {
@@ -167,16 +134,6 @@ export function ServiceCatalogPage() {
       <PageHeader
         title={t('serviceCatalog.title')}
         subtitle={t('serviceCatalog.subtitle')}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={() => setShowServiceForm((v) => !v)}>
-              <Plus size={16} /> {t('serviceCatalog.registerService')}
-            </Button>
-            <Button onClick={() => setShowApiForm((v) => !v)}>
-              <Plus size={16} /> {t('serviceCatalog.registerApi')}
-            </Button>
-          </div>
-        }
       />
 
       {/* ── Estatísticas resumidas ──────────────────────────────────── */}
@@ -198,206 +155,6 @@ export function ServiceCatalogPage() {
           </Card>
         ))}
       </StatsGrid>
-
-      {/* ── Formulário de registro de serviço ───────────────────────── */}
-      {showServiceForm && (
-        <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-heading">{t('serviceCatalog.registerServiceTitle')}</h2></CardHeader>
-          <CardBody>
-            <form
-              onSubmit={(e) => { e.preventDefault(); registerService.mutate(serviceForm); }}
-              className="space-y-4"
-            >
-              {/* ── Basic Information ── */}
-              <div>
-                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.basicInfo', 'Basic Information')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('serviceCatalog.name')} <span className="text-danger">*</span>
-                    </label>
-                    <input type="text" value={serviceForm.name}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, name: e.target.value }))}
-                      required placeholder={t('serviceCatalog.namePlaceholder', 'e.g., payment-service')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('serviceCatalog.domain', 'Domain')} <span className="text-danger">*</span>
-                    </label>
-                    <input type="text" value={serviceForm.domain}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, domain: e.target.value }))}
-                      required placeholder={t('serviceCatalog.domainPlaceholder', 'e.g., payments, identity, orders')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">
-                      {t('serviceCatalog.team')} <span className="text-danger">*</span>
-                    </label>
-                    <input type="text" value={serviceForm.team}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, team: e.target.value }))}
-                      required placeholder={t('serviceCatalog.teamPlaceholder', 'e.g., platform-team')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Service Type & Classification ── */}
-              <div>
-                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.classification', 'Classification')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.serviceType', 'Service Type')}</label>
-                    <select value={serviceForm.serviceType}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, serviceType: e.target.value }))}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                      <optgroup label={t('serviceCatalog.typeGroupModern', 'Modern Services')}>
-                        <option value="RestApi">{t('serviceCatalog.typeRestApi', 'REST API')}</option>
-                        <option value="GraphqlApi">{t('serviceCatalog.typeGraphqlApi', 'GraphQL API')}</option>
-                        <option value="GrpcService">{t('serviceCatalog.typeGrpcService', 'gRPC Service')}</option>
-                        <option value="SoapService">{t('serviceCatalog.typeSoapService', 'SOAP Service')}</option>
-                        <option value="KafkaProducer">{t('serviceCatalog.typeKafkaProducer', 'Kafka Producer')}</option>
-                        <option value="KafkaConsumer">{t('serviceCatalog.typeKafkaConsumer', 'Kafka Consumer')}</option>
-                        <option value="BackgroundService">{t('serviceCatalog.typeBackgroundService', 'Background Service')}</option>
-                        <option value="ScheduledProcess">{t('serviceCatalog.typeScheduledProcess', 'Scheduled Process')}</option>
-                        <option value="Gateway">{t('serviceCatalog.typeGateway', 'API Gateway')}</option>
-                      </optgroup>
-                      <optgroup label={t('serviceCatalog.typeGroupPlatform', 'Platform & Integration')}>
-                        <option value="IntegrationComponent">{t('serviceCatalog.typeIntegrationComponent', 'Integration Component')}</option>
-                        <option value="SharedPlatformService">{t('serviceCatalog.typeSharedPlatformService', 'Shared Platform Service')}</option>
-                        <option value="Framework">{t('serviceCatalog.typeFramework', 'Framework / SDK')}</option>
-                        <option value="ThirdParty">{t('serviceCatalog.typeThirdParty', 'Third-Party Service')}</option>
-                        <option value="LegacySystem">{t('serviceCatalog.typeLegacySystem', 'Legacy System')}</option>
-                      </optgroup>
-                      <optgroup label={t('serviceCatalog.typeGroupMainframe', 'Mainframe')}>
-                        <option value="CobolProgram">{t('serviceCatalog.typeCobolProgram', 'COBOL Program')}</option>
-                        <option value="CicsTransaction">{t('serviceCatalog.typeCicsTransaction', 'CICS Transaction')}</option>
-                        <option value="ImsTransaction">{t('serviceCatalog.typeImsTransaction', 'IMS Transaction')}</option>
-                        <option value="BatchJob">{t('serviceCatalog.typeBatchJob', 'Batch Job')}</option>
-                        <option value="MainframeSystem">{t('serviceCatalog.typeMainframeSystem', 'Mainframe System')}</option>
-                        <option value="MqQueueManager">{t('serviceCatalog.typeMqQueueManager', 'MQ Queue Manager')}</option>
-                        <option value="ZosConnectApi">{t('serviceCatalog.typeZosConnectApi', 'z/OS Connect API')}</option>
-                      </optgroup>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.criticality', 'Criticality')}</label>
-                    <select value={serviceForm.criticality}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, criticality: e.target.value }))}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                      <option value="Low">{t('serviceCatalog.criticalityLow', 'Low')}</option>
-                      <option value="Medium">{t('serviceCatalog.criticalityMedium', 'Medium')}</option>
-                      <option value="High">{t('serviceCatalog.criticalityHigh', 'High')}</option>
-                      <option value="Critical">{t('serviceCatalog.criticalityCritical', 'Critical')}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.exposure', 'Exposure')}</label>
-                    <select value={serviceForm.exposureType}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, exposureType: e.target.value }))}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
-                      <option value="Internal">{t('serviceCatalog.exposureInternal', 'Internal')}</option>
-                      <option value="Partner">{t('serviceCatalog.exposurePartner', 'Partner')}</option>
-                      <option value="External">{t('serviceCatalog.exposureExternal', 'External / Public')}</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── Description ── */}
-              <div>
-                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.description')}</label>
-                <textarea value={serviceForm.description}
-                  onChange={(e) => setServiceForm((f) => ({ ...f, description: e.target.value }))}
-                  rows={2} placeholder={t('serviceCatalog.descriptionPlaceholder', 'Describe the purpose and responsibilities of this service...')}
-                  className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-none" />
-              </div>
-
-              {/* ── Ownership ── */}
-              <div>
-                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.ownership', 'Ownership')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.technicalOwner', 'Technical Owner')}</label>
-                    <input type="text" value={serviceForm.technicalOwner}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, technicalOwner: e.target.value }))}
-                      placeholder={t('serviceCatalog.technicalOwnerPlaceholder', 'e.g., john.smith@company.com')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.businessOwner', 'Business Owner')}</label>
-                    <input type="text" value={serviceForm.businessOwner}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, businessOwner: e.target.value }))}
-                      placeholder={t('serviceCatalog.businessOwnerPlaceholder', 'e.g., Product Manager Name')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors" />
-                  </div>
-                </div>
-              </div>
-
-              {/* ── References ── */}
-              <div>
-                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{t('serviceCatalog.references', 'References')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.documentationUrl', 'Documentation URL')}</label>
-                    <input type="url" value={serviceForm.documentationUrl}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, documentationUrl: e.target.value }))}
-                      placeholder={t('catalog.detail.placeholder.documentationUrl', 'https://docs.company.com/payment-service')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.repositoryUrl', 'Repository URL')}</label>
-                    <input type="url" value={serviceForm.repositoryUrl}
-                      onChange={(e) => setServiceForm((f) => ({ ...f, repositoryUrl: e.target.value }))}
-                      placeholder={t('catalog.detail.placeholder.repositoryUrl', 'https://github.com/org/payment-service')}
-                      className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors font-mono" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2 justify-end pt-2 border-t border-edge">
-                <Button variant="secondary" type="button" onClick={() => setShowServiceForm(false)}>{t('common.cancel')}</Button>
-                <Button type="submit" loading={registerService.isPending}>{t('serviceCatalog.register')}</Button>
-              </div>
-            </form>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* ── Formulário de registro de API ────────────────────────────── */}
-      {showApiForm && (
-        <Card className="mb-6">
-          <CardHeader><h2 className="font-semibold text-heading">{t('serviceCatalog.registerApiTitle')}</h2></CardHeader>
-          <CardBody>
-            <form
-              onSubmit={(e) => { e.preventDefault(); registerApi.mutate(apiForm); }}
-              className="grid grid-cols-2 gap-4"
-            >
-              {([
-                { field: 'name' as const, label: t('serviceCatalog.name') },
-                { field: 'baseUrl' as const, label: t('serviceCatalog.baseUrl') },
-                { field: 'ownerServiceId' as const, label: t('serviceCatalog.ownerServiceId') },
-                { field: 'description' as const, label: t('serviceCatalog.description') },
-              ]).map(({ field, label }) => (
-                <div key={field}>
-                  <label className="block text-sm font-medium text-body mb-1">{label}</label>
-                  <input
-                    type="text"
-                    value={apiForm[field]}
-                    onChange={(e) => setApiForm((f) => ({ ...f, [field]: e.target.value }))}
-                    required={field !== 'description'}
-                    className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
-                  />
-                </div>
-              ))}
-              <div className="col-span-2 flex gap-2 justify-end">
-                <Button variant="secondary" type="button" onClick={() => setShowApiForm(false)}>{t('common.cancel')}</Button>
-                <Button type="submit" loading={registerApi.isPending}>{t('serviceCatalog.register')}</Button>
-              </div>
-            </form>
-          </CardBody>
-        </Card>
-      )}
 
       {/* ── Busca global ────────────────────────────────────────────── */}
       <div className="flex items-center gap-4 mb-4">

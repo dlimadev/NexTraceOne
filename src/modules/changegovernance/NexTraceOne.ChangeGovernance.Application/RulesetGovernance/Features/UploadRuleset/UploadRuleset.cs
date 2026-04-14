@@ -38,7 +38,7 @@ public static class UploadRuleset
     /// <summary>Handler que cria um novo Ruleset a partir do upload.</summary>
     public sealed class Handler(
         IRulesetRepository repository,
-        IUnitOfWork unitOfWork,
+        IRulesetGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         /// <summary>Processa o comando de upload de ruleset.</summary>

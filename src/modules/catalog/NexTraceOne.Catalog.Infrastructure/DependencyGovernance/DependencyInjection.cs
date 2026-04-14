@@ -6,6 +6,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.Catalog.Application.DependencyGovernance.Abstractions;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Ports;
 using NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
 
@@ -31,6 +32,7 @@ public static class DependencyInjection
                     sp.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DependencyGovernanceDbContext>());
+        services.AddScoped<IDependencyGovernanceUnitOfWork>(sp => sp.GetRequiredService<DependencyGovernanceDbContext>());
         services.AddScoped<IServiceDependencyProfileRepository, ServiceDependencyProfileRepository>();
 
         return services;

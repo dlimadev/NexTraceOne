@@ -1,12 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { contractsApi } from '../api/contracts';
 import { contractQueryKeys } from './useContractDetail';
-import type { SpectralRulesetOrigin } from '../types';
 
 /**
  * Hook para listar rulesets Spectral com filtros opcionais.
  */
-export function useSpectralRulesets(params?: { origin?: SpectralRulesetOrigin; isActive?: boolean; domain?: string }) {
+export function useSpectralRulesets(params?: { isActive?: boolean }) {
   return useQuery({
     queryKey: contractQueryKeys.spectralRulesets(params as Record<string, unknown>),
     queryFn: () => contractsApi.listSpectralRulesets(params),
@@ -56,13 +55,16 @@ export function useUpdateSpectralRuleset(rulesetId: string) {
 
 /**
  * Hook para alternar estado ativo/inativo de um ruleset.
+ * Usa archive (desativar) ou activate (reativar) conforme o estado desejado.
  */
 export function useToggleSpectralRuleset() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ rulesetId, isActive }: { rulesetId: string; isActive: boolean }) =>
-      contractsApi.toggleSpectralRuleset(rulesetId, isActive),
+      isActive
+        ? contractsApi.activateSpectralRuleset(rulesetId)
+        : contractsApi.archiveSpectralRuleset(rulesetId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: contractQueryKeys.spectralRulesets() });
     },

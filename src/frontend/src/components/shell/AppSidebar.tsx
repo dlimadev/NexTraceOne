@@ -15,7 +15,7 @@ import {
   Shield, ClipboardList, AlertTriangle, Clock, UserCheck,
   ClipboardCheck, Monitor, Bot, Database, ShieldCheck,
   FileCode, Share2, Server, Layers,
-  Globe, Activity, Plus, Settings,
+  Globe, Activity, Settings,
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
   Network, Workflow, StickyNote, BookMarked, Radar,
@@ -28,6 +28,8 @@ interface NavItem {
   icon: React.ReactNode;
   permission?: Permission;
   section: NavSection;
+  /** Sub-group label key for visual separation within the same section. */
+  subGroup?: string;
   /** Módulo em preview — não homologável. Mostra badge e estilo atenuado. */
   preview?: boolean;
 }
@@ -44,17 +46,6 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.knowledgeHub', to: '/knowledge', icon: <BookOpen size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
   { labelKey: 'sidebar.operationalNotes', to: '/knowledge/notes', icon: <StickyNote size={18} />, permission: 'catalog:assets:read', section: 'knowledge' },
   { labelKey: 'sidebar.developerPortal', to: '/portal', icon: <BookMarked size={18} />, permission: 'developer-portal:read', section: 'knowledge' },
-  { labelKey: 'sidebar.contractCatalog', to: '/contracts', icon: <FileText size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.createContract', to: '/contracts/new', icon: <Plus size={18} />, permission: 'contracts:write', section: 'contracts' },
-  { labelKey: 'sidebar.contractStudio', to: '/contracts/studio', icon: <Layers size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.contractGovernance', to: '/contracts/governance', icon: <Shield size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.contractHealthDashboard', to: '/contracts/health', icon: <BarChart3 size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ShieldCheck size={18} />, permission: 'contracts:write', section: 'contracts' },
-  { labelKey: 'sidebar.canonicalEntities', to: '/contracts/canonical', icon: <Database size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <ArrowUpCircle size={18} />, permission: 'contracts:write', section: 'contracts' },
-  { labelKey: 'sidebar.contractPlayground', to: '/contracts/playground', icon: <Monitor size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.cdct', to: '/contracts/cdct', icon: <Activity size={18} />, permission: 'contracts:read', section: 'contracts' },
-  { labelKey: 'sidebar.contractPipeline', to: '/catalog/contracts/pipeline', icon: <Zap size={18} />, permission: 'catalog:contracts:pipeline:read', section: 'contracts' },
   { labelKey: 'sidebar.changes', to: '/changes', icon: <ShieldCheck size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.releaseCalendar', to: '/release-calendar', icon: <CalendarDays size={18} />, permission: 'change-intelligence:read', section: 'changes' },
@@ -91,6 +82,13 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.maturityScorecards', to: '/governance/maturity', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.benchmarking', to: '/governance/benchmarking', icon: <TrendingUp size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.securityGate', to: '/catalog/security-gate', icon: <ShieldCheck size={18} />, permission: 'governance:security:scan', section: 'governance' },
+  { labelKey: 'sidebar.contractGovernance', to: '/contracts/governance', icon: <Shield size={18} />, permission: 'contracts:read', section: 'governance', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.contractHealthDashboard', to: '/contracts/health', icon: <BarChart3 size={18} />, permission: 'contracts:read', section: 'governance', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.publicationCenter', to: '/contracts/publication', icon: <ArrowUpCircle size={18} />, permission: 'contracts:write', section: 'governance', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.cdct', to: '/contracts/cdct', icon: <Activity size={18} />, permission: 'contracts:read', section: 'governance', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.spectralRulesets', to: '/contracts/spectral', icon: <ShieldCheck size={18} />, permission: 'contracts:write', section: 'governance', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.canonicalEntities', to: '/contracts/canonical', icon: <Database size={18} />, permission: 'contracts:read', section: 'governance', subGroup: 'sidebar.subGroupContractGovernance' },
+  { labelKey: 'sidebar.contractPipeline', to: '/catalog/contracts/pipeline', icon: <Zap size={18} />, permission: 'catalog:contracts:pipeline:read', section: 'governance', subGroup: 'sidebar.subGroupContractGovernance' },
   { labelKey: 'sidebar.developerExperienceScore', to: '/catalog/developer-experience-score', icon: <Activity size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.dependencyDashboard', to: '/catalog/dependency-dashboard', icon: <Shield size={18} />, permission: 'catalog:assets:read', section: 'services' },
   { labelKey: 'sidebar.licenseCompliance', to: '/catalog/license-compliance', icon: <CheckSquare size={18} />, permission: 'catalog:assets:read', section: 'services' },
@@ -121,7 +119,6 @@ const sectionLabels: Record<NavSection, string> = {
   home: '',
   services: 'sidebar.sectionServices',
   knowledge: 'sidebar.sectionKnowledge',
-  contracts: 'sidebar.sectionContracts',
   changes: 'sidebar.sectionChanges',
   operations: 'sidebar.sectionOperations',
   aiHub: 'sidebar.sectionAiHub',
@@ -137,7 +134,6 @@ const sectionIcons: Partial<Record<NavSection, React.ReactNode>> = {
   home: <LayoutDashboard size={22} />,
   services: <Server size={22} />,
   knowledge: <BookOpen size={22} />,
-  contracts: <FileText size={22} />,
   changes: <Zap size={22} />,
   operations: <AlertTriangle size={22} />,
   aiHub: <Bot size={22} />,
@@ -149,7 +145,7 @@ const sectionIcons: Partial<Record<NavSection, React.ReactNode>> = {
 
 /** Agrupamento visual para separadores no icon rail. */
 const sectionGroups: NavSection[][] = [
-  ['home', 'services', 'knowledge', 'contracts', 'changes', 'operations'],
+  ['home', 'services', 'knowledge', 'changes', 'operations'],
   ['aiHub'],
   ['governance', 'organization', 'integrations'],
   ['admin'],
@@ -366,9 +362,21 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           )}
 
           <ul className="space-y-0.5" role="list">
-            {activeItems.map(item => (
-              <li key={item.to}>
-                <NavLink
+            {activeItems.map((item, idx) => {
+              const prev = idx > 0 ? activeItems[idx - 1] : undefined;
+              const prevSubGroup = prev?.subGroup;
+              const showSubGroupHeading = item.subGroup && item.subGroup !== prevSubGroup;
+
+              return (
+                <li key={item.to}>
+                  {showSubGroupHeading && (
+                    <div className="pt-4 pb-1 px-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.06em] text-muted/60">
+                        {t(item.subGroup!)}
+                      </p>
+                    </div>
+                  )}
+                  <NavLink
                   to={item.to}
                   end={item.to === '/'}
                   className={({ isActive }) =>
@@ -397,7 +405,8 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
                   )}
                 </NavLink>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </nav>
 

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.Portal.Abstractions;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Portal.Persistence;
@@ -16,7 +17,7 @@ public sealed class DeveloperPortalDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IPortalUnitOfWork
 {
     /// <summary>Subscrições de notificações de API.</summary>
     public DbSet<Subscription> Subscriptions => Set<Subscription>();

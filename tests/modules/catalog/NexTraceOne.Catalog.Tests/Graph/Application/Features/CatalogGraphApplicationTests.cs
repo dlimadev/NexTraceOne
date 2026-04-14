@@ -23,7 +23,7 @@ public sealed class CatalogGraphApplicationTests
     {
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>()).Returns((ServiceAsset?)null);
@@ -45,7 +45,7 @@ public sealed class CatalogGraphApplicationTests
         var existing = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>()).Returns(existing);
@@ -67,7 +67,7 @@ public sealed class CatalogGraphApplicationTests
         var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var serviceAssetRepository = Substitute.For<IServiceAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterApiAssetFeature.Handler(apiAssetRepository, serviceAssetRepository, unitOfWork);
 
         serviceAssetRepository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>()).Returns(ownerService);
@@ -89,7 +89,7 @@ public sealed class CatalogGraphApplicationTests
     {
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var serviceAssetRepository = Substitute.For<IServiceAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterApiAssetFeature.Handler(apiAssetRepository, serviceAssetRepository, unitOfWork);
 
         serviceAssetRepository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>()).Returns((ServiceAsset?)null);
@@ -110,7 +110,7 @@ public sealed class CatalogGraphApplicationTests
         var existing = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var serviceAssetRepository = Substitute.For<IServiceAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterApiAssetFeature.Handler(apiAssetRepository, serviceAssetRepository, unitOfWork);
 
         serviceAssetRepository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>()).Returns(ownerService);
@@ -133,7 +133,7 @@ public sealed class CatalogGraphApplicationTests
         var apiAsset = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var now = new DateTimeOffset(2025, 01, 10, 10, 0, 0, TimeSpan.Zero);
         var sut = new MapConsumerRelationshipFeature.Handler(apiAssetRepository, dateTimeProvider, unitOfWork);
 
@@ -162,7 +162,7 @@ public sealed class CatalogGraphApplicationTests
     {
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new MapConsumerRelationshipFeature.Handler(apiAssetRepository, dateTimeProvider, unitOfWork);
 
         apiAssetRepository.GetByIdAsync(Arg.Any<ApiAssetId>(), Arg.Any<CancellationToken>()).Returns((ApiAsset?)null);

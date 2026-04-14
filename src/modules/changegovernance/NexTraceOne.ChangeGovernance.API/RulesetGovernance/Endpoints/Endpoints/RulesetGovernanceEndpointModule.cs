@@ -9,6 +9,8 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using UploadRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.UploadRuleset.UploadRuleset;
 using ListRulesetsFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ListRulesets.ListRulesets;
 using ArchiveRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ArchiveRuleset.ArchiveRuleset;
+using ActivateRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ActivateRuleset.ActivateRuleset;
+using DeleteRulesetFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.DeleteRuleset.DeleteRuleset;
 using BindRulesetToAssetTypeFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.BindRulesetToAssetType.BindRulesetToAssetType;
 using ExecuteLintForReleaseFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ExecuteLintForRelease.ExecuteLintForRelease;
 using GetRulesetFindingsFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetFindings.GetRulesetFindings;
@@ -36,7 +38,7 @@ public sealed class RulesetGovernanceEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/spectral/rulesets/{r.RulesetId}", localizer);
         })
         .RequirePermission("rulesets:write");
 
@@ -63,6 +65,28 @@ public sealed class RulesetGovernanceEndpointModule
         })
         .RequirePermission("rulesets:write");
 
+        group.MapPut("/{rulesetId:guid}/activate", async (
+            Guid rulesetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ActivateRulesetFeature.Command(rulesetId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("rulesets:write");
+
+        group.MapDelete("/{rulesetId:guid}", async (
+            Guid rulesetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DeleteRulesetFeature.Command(rulesetId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("rulesets:write");
+
         group.MapPost("/{rulesetId:guid}/bindings", async (
             Guid rulesetId,
             BindRulesetToAssetTypeFeature.Command command,
@@ -72,7 +96,7 @@ public sealed class RulesetGovernanceEndpointModule
         {
             var updatedCommand = command with { RulesetId = rulesetId };
             var result = await sender.Send(updatedCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/{0}/bindings", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/spectral/rulesets/{r.RulesetId}/bindings", localizer);
         })
         .RequirePermission("rulesets:write");
 
@@ -83,7 +107,7 @@ public sealed class RulesetGovernanceEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/findings/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/spectral/rulesets/findings/{r.ReleaseId}", localizer);
         })
         .RequirePermission("rulesets:execute");
 
@@ -115,7 +139,7 @@ public sealed class RulesetGovernanceEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new InstallDefaultRulesetsFeature.Command(), cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/spectral/rulesets/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/spectral/rulesets/{r.RulesetId}", localizer);
         })
         .RequirePermission("rulesets:write");
 

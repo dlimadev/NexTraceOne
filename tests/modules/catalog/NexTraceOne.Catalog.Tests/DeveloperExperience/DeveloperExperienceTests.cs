@@ -126,7 +126,7 @@ public sealed class DeveloperExperienceTests
     public async Task ComputeDeveloperExperienceScore_WhenHighPerformance_ShouldReturnEliteScore()
     {
         var repo = Substitute.For<IDxScoreRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IDeveloperExperienceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -148,7 +148,7 @@ public sealed class DeveloperExperienceTests
     public async Task ComputeDeveloperExperienceScore_WhenPersisted_ShouldReturnCorrectPeriod()
     {
         var repo = Substitute.For<IDxScoreRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IDeveloperExperienceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -240,7 +240,7 @@ public sealed class DeveloperExperienceTests
     public async Task RecordProductivitySnapshot_WhenValid_ShouldPersistAndReturn()
     {
         var repo = Substitute.For<IProductivitySnapshotRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IDeveloperExperienceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
@@ -14,7 +15,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.EventHandlers;
 /// </summary>
 internal sealed class ReleasePublishedEventHandler(
     ILinkedReferenceRepository linkedReferenceRepository,
-    IUnitOfWork unitOfWork,
+    ICatalogGraphUnitOfWork unitOfWork,
     ILogger<ReleasePublishedEventHandler> logger) : IIntegrationEventHandler<ReleasePublishedEvent>
 {
     public async Task HandleAsync(ReleasePublishedEvent @event, CancellationToken ct = default)

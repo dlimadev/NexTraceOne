@@ -38,7 +38,7 @@ public static class UpdateServiceOwnership
     /// <summary>Handler que atualiza o ownership de um serviço existente.</summary>
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -50,6 +50,17 @@ public static class ParseSpecPreview
             try
             {
                 var canonical = CanonicalModelBuilder.Build(request.SpecContent, protocol);
+
+                // Detect silent parse failures — CanonicalModelBuilder returns EmptyModel
+                // with title "Unknown" and zero operations/schemas when parsing fails.
+                if (canonical.Title == "Unknown" && canonical.OperationCount == 0 && canonical.SchemaCount == 0)
+                {
+                    return Task.FromResult(Result<Response>.Success(new Response(
+                        false,
+                        "Could not parse specification. Verify the content is valid for the selected protocol.",
+                        null)));
+                }
+
                 var model = MapToPreviewModel(canonical);
                 return Task.FromResult(Result<Response>.Success(new Response(true, null, model)));
             }
@@ -74,7 +85,20 @@ public static class ParseSpecPreview
                     o.IsDeprecated,
                     o.Tags?.ToList() ?? [],
                     o.InputParameters.Select(MapSchemaElement).ToList(),
-                    o.OutputFields.Select(MapSchemaElement).ToList()))
+                    o.OutputFields.Select(MapSchemaElement).ToList(),
+                    o.RequestBody is not null
+                        ? new PreviewRequestBody(
+                            o.RequestBody.ContentType,
+                            o.RequestBody.IsRequired,
+                            o.RequestBody.Properties.Select(MapSchemaElement).ToList(),
+                            o.RequestBody.SchemaRef)
+                        : null,
+                    o.Responses?.Select(r => new PreviewResponse(
+                        r.StatusCode,
+                        r.Description,
+                        r.ContentType,
+                        r.Properties.Select(MapSchemaElement).ToList(),
+                        r.SchemaRef)).ToList()))
                 .ToList();
 
             var schemas = canonical.GlobalSchemas
@@ -149,7 +173,24 @@ public static class ParseSpecPreview
         bool IsDeprecated,
         List<string> Tags,
         List<PreviewSchemaElement> InputParameters,
-        List<PreviewSchemaElement> OutputFields);
+        List<PreviewSchemaElement> OutputFields,
+        PreviewRequestBody? RequestBody,
+        List<PreviewResponse>? Responses);
+
+    /// <summary>Request body normalizado para preview.</summary>
+    public sealed record PreviewRequestBody(
+        string ContentType,
+        bool IsRequired,
+        List<PreviewSchemaElement> Properties,
+        string? SchemaRef);
+
+    /// <summary>Resposta normalizada para preview.</summary>
+    public sealed record PreviewResponse(
+        string StatusCode,
+        string? Description,
+        string? ContentType,
+        List<PreviewSchemaElement> Properties,
+        string? SchemaRef);
 
     /// <summary>Elemento de schema para preview.</summary>
     public sealed record PreviewSchemaElement(

@@ -16,7 +16,7 @@ namespace NexTraceOne.Catalog.Tests.Graph.Application.Features;
 public sealed class DecommissionAssetTests
 {
     private readonly IApiAssetRepository _apiAssetRepository = Substitute.For<IApiAssetRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly ICatalogGraphUnitOfWork _unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
     private readonly DecommissionAssetFeature.Handler _sut;
 
     public DecommissionAssetTests()

@@ -16,7 +16,7 @@ public sealed class ImportFromKongGatewayTests
     private readonly IServiceAssetRepository _serviceAssetRepository = Substitute.For<IServiceAssetRepository>();
     private readonly IApiAssetRepository _apiAssetRepository = Substitute.For<IApiAssetRepository>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly ICatalogGraphUnitOfWork _unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
     private readonly DateTimeOffset _now = new(2026, 03, 14, 10, 0, 0, TimeSpan.Zero);
 
     private ImportFromKongFeature.Handler CreateSut()

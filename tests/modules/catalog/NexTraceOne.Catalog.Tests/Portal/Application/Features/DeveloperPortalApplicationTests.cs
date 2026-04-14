@@ -26,7 +26,7 @@ public sealed class DeveloperPortalApplicationTests
         var apiAssetId = Guid.NewGuid();
         var subscriberId = Guid.NewGuid();
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new CreateSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -63,7 +63,7 @@ public sealed class DeveloperPortalApplicationTests
         var subscriberId = Guid.NewGuid();
         var existing = CreateActiveSubscription(apiAssetId, subscriberId);
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new CreateSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -95,7 +95,7 @@ public sealed class DeveloperPortalApplicationTests
         var apiAssetId = Guid.NewGuid();
         var subscriberId = Guid.NewGuid();
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new CreateSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -131,7 +131,7 @@ public sealed class DeveloperPortalApplicationTests
         var subscriptionId = Guid.NewGuid();
         var subscription = CreateActiveSubscription(Guid.NewGuid(), Guid.NewGuid());
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var sut = new DeleteSubscriptionFeature.Handler(repository, unitOfWork);
 
         repository.GetByIdAsync(Arg.Any<SubscriptionId>(), Arg.Any<CancellationToken>())
@@ -150,7 +150,7 @@ public sealed class DeveloperPortalApplicationTests
     public async Task DeleteSubscription_Should_ReturnFailure_When_SubscriptionNotFound()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var sut = new DeleteSubscriptionFeature.Handler(repository, unitOfWork);
 
         Subscription? noSubscription = null;
@@ -176,7 +176,7 @@ public sealed class DeveloperPortalApplicationTests
         var apiAssetId = Guid.NewGuid();
         var requestedById = Guid.NewGuid();
         var repository = Substitute.For<ICodeGenerationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new GenerateCodeFeature.Handler(repository, unitOfWork, clock);
 
@@ -206,7 +206,7 @@ public sealed class DeveloperPortalApplicationTests
     public async Task GenerateCode_Should_ReturnSuccess_When_TypeScriptSdkClient()
     {
         var repository = Substitute.For<ICodeGenerationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new GenerateCodeFeature.Handler(repository, unitOfWork, clock);
 
@@ -231,7 +231,7 @@ public sealed class DeveloperPortalApplicationTests
     public async Task GenerateCode_Should_ReturnSuccess_When_IntegrationExample()
     {
         var repository = Substitute.For<ICodeGenerationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new GenerateCodeFeature.Handler(repository, unitOfWork, clock);
 

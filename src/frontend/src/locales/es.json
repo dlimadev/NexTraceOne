@@ -1960,6 +1960,8 @@
     "catalog.contract.breaking_change_severity.label": "Ruptura Cambio Predeterminado Severidad",
     "catalog.contract.breaking_promotion_restriction.description": "Block promotion a production when unresolved breaking changes exist",
     "catalog.contract.breaking_promotion_restriction.label": "Ruptura Cambio Promoción Restriction",
+    "catalog.contract.max_active_versions.description": "Número máximo de versiones de contrato que pueden estar simultáneamente activas por servicio. Cuando se excede, la versión más antigua debe ser depreciada antes de activar una nueva.",
+    "catalog.contract.max_active_versions.label": "Máx. Versiones de Contrato Activas",
     "catalog.contract.creation.approval_required.description": "Cuando está activado, nuevas versiones de contrato requieren aprobación antes de estar disponibles.",
     "catalog.contract.creation.approval_required.label": "Aprobación Obligatoria para Creación de Contrato",
     "catalog.contract.creation.approval_roles.description": "Roles que pueden aprobar la creación o cambios de contratos.",
@@ -1968,7 +1970,9 @@
     "catalog.contract.deprecation.grace_period_days.label": "Período de Gracia para Depreciación (días)",
     "catalog.contract.publication.require_examples.description": "Cuando está activado, los contratos deben incluir ejemplos de request/response para ser publicados.",
     "catalog.contract.publication.require_examples.label": "Requerir Ejemplos para Publicación",
-    "catalog.contract.types_enabled.description": "Contrato tipos supported and activado (REST, SOAP, GraphQL, gRPC, AsyncAPI, Event, SharedSchema)",
+    "catalog.contract.require_approval_on_change.description": "Cuando está activado, los cambios en contratos de servicios ya en producción requieren un flujo de aprobación separado antes de que la nueva versión esté activa.",
+    "catalog.contract.require_approval_on_change.label": "Requerir Aprobación para Cambio de Contrato",
+    "catalog.contract.types_enabled.description": "Tipos de contrato soportados y activados (REST, SOAP, GraphQL, gRPC, AsyncAPI, Event, SharedSchema)",
     "catalog.contract.types_enabled.label": "Activado Contrato Tipos",
     "catalog.contract.validation.auto_lint_on_save.description": "Cuando está activado, las reglas de lint se ejecutan automáticamente al guardar un contrato.",
     "catalog.contract.validation.auto_lint_on_save.label": "Auto-Lint al Guardar",
@@ -2034,7 +2038,9 @@
     "catalog.service.deactivation.approval_required.label": "Aprobación Obligatoria para Desactivación de Servicio",
     "catalog.service.deactivation.require_dependency_check.description": "Cuando está activado, bloquea la desactivación si otros servicios activos dependen de él.",
     "catalog.service.deactivation.require_dependency_check.label": "Verificar Dependencias Antes de la Desactivación",
-    "catalog.templates.by_contract_type.description": "Predeterminado templates a use when creating new contratos por tipo",
+    "catalog.service.require_approval_on_registration.description": "Cuando está activado, nuevos registros de servicio (incluyendo todos los contratos y definiciones de eventos) requieren aprobación antes de estar activos.",
+    "catalog.service.require_approval_on_registration.label": "Requerir Aprobación para Registro de Servicio",
+    "catalog.templates.by_contract_type.description": "Plantillas predeterminadas para usar al crear nuevos contratos por tipo",
     "catalog.templates.by_contract_type.label": "Contrato Plantillas by Tipo",
     "catalog.templates.metadata_defaults.description": "Predeterminado metadata fields pre-filled en new contrato drafts",
     "catalog.templates.metadata_defaults.label": "Contrato Metadata Defaults",
@@ -3400,6 +3406,7 @@
         "addRef": "$ref",
         "addResponse": "Añadir Respuesta",
         "addResponseProp": "Agregar Propiedad",
+        "addSchema": "Añadir Schema",
         "addVariant": "Agregar Variante",
         "apiInfo": "Información de la API",
         "arrayItems": "Tipo de Elemento del Array",
@@ -3412,6 +3419,7 @@
         "basePathPlaceholder": "/api/v1",
         "behavior": "Límites y Comportamiento",
         "bodyProperties": "Propiedades del Cuerpo de la Solicitud",
+        "componentsSchemas": "Componentes / Schemas",
         "compositionType": "Tipo de Composición",
         "constraints": "Constraints",
         "constraintsToggle": "Show constraints",
@@ -3447,13 +3455,16 @@
         "maxDepthReached": "Profundidad máxima de anidamiento alcanzada. Use $ref para estructuras más profundas.",
         "maxLength": "Max Longitud",
         "maximum": "Máximo",
+        "maxItems": "Máx Ítems",
         "method": "Método",
         "minLength": "Min Longitud",
         "minimum": "Mínimo",
+        "minItems": "Mín Ítems",
         "modeRef": "$ref (Referencia de Esquema)",
         "modeVisualProps": "✦ Propiedades Visuales",
         "nestedProperties": "Propiedades Anidadas",
         "noEndpoints": "Aún no hay endpoints. Haz clic en \"Añadir Endpoint\" para empezar.",
+        "noSchemas": "Sin schemas reutilizables. Define schemas aquí para referenciar via $ref en los endpoints.",
         "noVariants": "Sin variantes. Agregue al menos un sub-schema.",
         "nullable": "Anulable",
         "obsPlaceholder": "Métricas, SLOs, expectativas de trazabilidad...",
@@ -3473,6 +3484,7 @@
         "problemDetails": "Detalles del Problema (RFC 7807)",
         "propDescPlaceholder": "Descripción de esta propiedad...",
         "propNamePlaceholder": "nombreDePropiedad",
+        "propsCount": "props",
         "quickAdd": "Agregar rápido:",
         "rateLimit": "Límite de Tasa",
         "rateLimitPlaceholder": "100/min",
@@ -3491,8 +3503,13 @@
         "responseProperties": "Propiedades de la Respuesta",
         "responses": "Respuestas",
         "schema": "Schema ($ref)",
+        "schemaDescPlaceholder": "Describe este schema...",
         "schemaMode": "Modo de Esquema",
+        "schemaName": "Nombre del Schema",
+        "schemaNamePlaceholder": "CreateUserRequest",
         "schemaPlaceholder": "#/components/schemas/CreateUserRequest",
+        "schemaProperties": "Propiedades",
+        "schemaRefPath": "Ruta $ref",
         "serverPlaceholder": "https://api.example.com",
         "servers": "Servidores",
         "statusCode": "Código de Estado",
@@ -3502,6 +3519,7 @@
         "tagsPlaceholder": "Añadir etiqueta...",
         "title": "Título",
         "titlePlaceholder": "API de Gestión de Usuarios",
+        "unnamedSchema": "(sin nombre)",
         "validate": "Validar",
         "variantDescription": "Descripción de la variante...",
         "variantType": "Tipo",
@@ -3512,6 +3530,7 @@
         "warnMissingPathParam": "El parámetro de path '{{param}}' está en el path pero no fue declarado",
         "warnNo2xx": "No se ha definido ninguna respuesta de éxito 2xx",
         "writeOnly": "Write Solo",
+        "uniqueItems": "Ítems Únicos",
         "placeholder": {
           "pattern": "^[a-z]+$"
         }
@@ -4460,6 +4479,34 @@
     "specContent": "Contenido de la Especificación",
     "specContentPlaceholder": "Pegue su especificación aquí (JSON/YAML/XML)...",
     "spectral": {
+      "form": {
+        "content": "Contenido del Conjunto de Reglas",
+        "contentPlaceholder": "Pegue el contenido de su conjunto de reglas Spectral aquí (JSON o YAML)...",
+        "contentRequired": "El contenido del conjunto de reglas es obligatorio.",
+        "description": "Descripción",
+        "descriptionMaxLength": "La descripción debe tener como máximo 2000 caracteres.",
+        "descriptionPlaceholder": "Describa el propósito y alcance de este conjunto de reglas...",
+        "name": "Nombre",
+        "nameMaxLength": "El nombre debe tener como máximo 200 caracteres.",
+        "namePlaceholder": "ej.: api-naming-conventions",
+        "nameRequired": "El nombre es obligatorio.",
+        "rulesetType": "Tipo de Conjunto de Reglas",
+        "submit": "Crear Conjunto de Reglas",
+        "title": "Crear Conjunto de Reglas",
+        "typeCustom": "Personalizado",
+        "typeDefault": "Predeterminado",
+        "uploadFile": "Subir Archivo",
+        "loadTemplate": "Cargar Plantilla",
+        "createError": "Error al crear el conjunto de reglas. Inténtelo de nuevo."
+      },
+      "templates": {
+        "openapiBestPractices": "Buenas Prácticas OpenAPI",
+        "openapiBestPracticesDesc": "Reglas completas para calidad de contratos OpenAPI: metadatos de operación, convenciones de nomenclatura, versionado y documentación.",
+        "securityAuth": "Seguridad y Autenticación",
+        "securityAuthDesc": "Reglas enfocadas en definiciones de seguridad, esquemas de autenticación y requisitos de transporte seguro.",
+        "schemaDataQuality": "Schema y Calidad de Datos",
+        "schemaDataQualityDesc": "Reglas para completitud de schema, seguridad de tipos, ejemplos y calidad de contratos de datos."
+      },
       "manager": {
         "activate": "Activar",
         "active": "Activo",
@@ -4669,6 +4716,85 @@
       "livePreview": {
         "parameters": "Parámetros",
         "response": "Respuesta"
+      }
+    },
+    "draftValidation": {
+      "title": "Validación de Draft",
+      "tabValidation": "Validación",
+      "phases": "fases",
+      "phaseSyntax": "Sintaxis",
+      "phaseRules": "Reglas & Diseño",
+      "phaseCanonical": "Canónico",
+      "running": "Validando...",
+      "runAll": "Validar Todo",
+      "noErrors": "Sin errores encontrados",
+      "errorsFound": "{{count}} error(es) encontrado(s)",
+      "totalIssues": "{{count}} issue(s) en total",
+      "filterAll": "Todos",
+      "emptyTitle": "Sin resultados de validación",
+      "emptyDescription": "Haz clic en \"Validar Todo\" para verificar el contrato contra reglas de sintaxis, directrices de diseño y conformidad canónica.",
+      "issues": {
+        "unsupportedProtocol": "El protocolo '{{protocol}}' no es soportado.",
+        "parseFailed": "No se pudo analizar la especificación. Verifique que el contenido sea válido para el protocolo seleccionado.",
+        "parseError": "Error al analizar la especificación: {{detail}}",
+        "noGlobalTags": "No hay tags globales definidos. Los tags ayudan a organizar endpoints por recurso.",
+        "pathNotKebabCase": "La ruta '{{path}}' no sigue la convención kebab-case.",
+        "missingOperationId": "La operación {{method}} {{path}} no tiene 'operationId'.",
+        "missingOperationIdCanonical": "La operación '{{operation}}' no tiene operationId.",
+        "noSuccessResponse": "La operación {{method}} {{path}} no tiene respuesta 2xx definida.",
+        "emptyRef": "Destino $ref vacío en {{path}}.",
+        "emptyRefAtLine": "Destino $ref vacío en la línea {{line}}."
+      },
+      "fixes": {
+        "useValidProtocol": "Use uno de los siguientes: OpenApi, Swagger, AsyncApi, Wsdl, WorkerService.",
+        "verifySpecContent": "Verifique que el contenido de la spec sea YAML, JSON o XML bien formado.",
+        "addTagsArray": "Agregue un array 'tags' en el nivel raíz.",
+        "useKebabCase": "Use minúsculas con guiones (ej.: /mi-recurso).",
+        "addOperationId": "Agregue un 'operationId' para identificar esta operación de forma única.",
+        "addSuccessResponse": "Agregue al menos una respuesta 2xx (ej.: 200, 201, 204).",
+        "provideRefTarget": "Proporcione un destino $ref válido (ej.: '#/components/schemas/MiModelo')."
+      },
+      "rules": {
+        "OperationDescription": {
+          "message": "La operación '{{path}}' no tiene descripción.",
+          "fix": "Agregue una descripción a la operación para mejorar la documentación."
+        },
+        "NamingConvention": {
+          "message": "El nombre de la operación contiene caracteres de espacio.",
+          "fix": "Use camelCase o PascalCase sin espacios para nombres de operaciones."
+        },
+        "SecurityDefinition": {
+          "message": "El contrato no define ningún esquema de seguridad.",
+          "fix": "Agregue definiciones de seguridad (OAuth2, API Key, Bearer, etc.) al contrato."
+        },
+        "VersionConsistency": {
+          "message": "La versión de la spec del contrato difiere de la versión semántica registrada.",
+          "fix": "Asegúrese de que la versión de la spec coincida con la versión semántica registrada."
+        },
+        "ExamplesCoverage": {
+          "message": "El contrato no incluye ejemplos en las operaciones.",
+          "fix": "Agregue ejemplos de request/response para mejorar la experiencia del desarrollador."
+        },
+        "SchemaCompleteness": {
+          "message": "El elemento de schema no tiene tipo de datos definido.",
+          "fix": "Defina el tipo de datos para todos los elementos de schema."
+        },
+        "DeprecationDocumentation": {
+          "message": "La operación deprecated no tiene aviso de depreciación o guía de migración.",
+          "fix": "Agregue aviso de depreciación con guía de migración a las operaciones deprecated."
+        },
+        "WorkerOperationMissing": {
+          "message": "El contrato de servicio en background no tiene operaciones declaradas.",
+          "fix": "Declare el nombre y categoría del servicio en background en el contrato."
+        },
+        "WorkerTriggerTypeMissing": {
+          "message": "El contrato de servicio en background no declara un TriggerType.",
+          "fix": "Defina TriggerType como uno de: Cron, Interval, EventTriggered, OnDemand, Continuous."
+        },
+        "WorkerScheduleMissing": {
+          "message": "Servicio en background con trigger programado debe declarar una ScheduleExpression.",
+          "fix": "Proporcione una expresión cron o intervalo ISO 8601 (ej.: '0 * * * *' o 'PT5M')."
+        }
       }
     },
     "subtitle": "Gobernanza de contratos multi-protocolo y diff semántico",
@@ -8437,6 +8563,8 @@
     "sloManagement": "Gestión de SLO",
     "sourceOfTruth": "Fuente de Verdad",
     "spectralRulesets": "Conjuntos de Reglas Spectral",
+    "subGroupContracts": "Contratos",
+    "subGroupContractGovernance": "Gobernanza de Contratos",
     "tagline": "Plataforma de Gobernanza de Ingeniería",
     "teams": "Equipos",
     "users": "Usuarios",

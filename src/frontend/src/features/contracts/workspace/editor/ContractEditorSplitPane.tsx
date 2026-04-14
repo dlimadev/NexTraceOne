@@ -29,7 +29,7 @@ export function ContractEditorSplitPane({
 }: ContractEditorSplitPaneProps) {
   const { t } = useTranslation();
   // Use internal simple split pane to avoid dependency issues in dev.
-  const { preview, error, isLoading } = useSpecPreview(content, protocol);
+  const { preview, error, isLoading } = useSpecPreview(content, protocol, format);
 
   const monacoLanguage = format === 'xml' ? 'xml' : format === 'json' ? 'json' : 'yaml';
   const lineCount = content ? content.split('\n').length : 0;

@@ -28,7 +28,7 @@ public static class InstallDefaultRulesets
     /// <summary>Handler que cria o ruleset padrão "OpenAPI Best Practices".</summary>
     public sealed class Handler(
         IRulesetRepository repository,
-        IUnitOfWork unitOfWork,
+        IRulesetGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         private const string DefaultRulesetName = "OpenAPI Best Practices";

@@ -27,7 +27,7 @@ public static class RegisterCicsTransactionEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/catalog/legacy/cics-transactions/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/catalog/legacy/cics-transactions/{r.Id}", localizer);
         }).RequirePermission("catalog:legacy-assets:write");
     }
 }

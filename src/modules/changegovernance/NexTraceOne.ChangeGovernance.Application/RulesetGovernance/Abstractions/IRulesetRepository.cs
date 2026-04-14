@@ -16,4 +16,7 @@ public interface IRulesetRepository
 
     /// <summary>Adiciona um novo Ruleset ao repositório.</summary>
     void Add(Ruleset ruleset);
+
+    /// <summary>Remove um Ruleset do repositório.</summary>
+    void Remove(Ruleset ruleset);
 }

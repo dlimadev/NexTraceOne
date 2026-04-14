@@ -17,14 +17,14 @@ public sealed class RegisterServiceAssetEnrichmentTests
 {
     private readonly IServiceAssetRepository _repository;
     private readonly IConfigurationResolutionService _configService;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICatalogGraphUnitOfWork _unitOfWork;
     private readonly RegisterServiceAssetFeature.Handler _sut;
 
     public RegisterServiceAssetEnrichmentTests()
     {
         _repository = Substitute.For<IServiceAssetRepository>();
         _configService = Substitute.For<IConfigurationResolutionService>();
-        _unitOfWork = Substitute.For<IUnitOfWork>();
+        _unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
 
         _repository.GetByNameAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);

@@ -24,4 +24,8 @@ public sealed record ContractOperation(
     /// <summary>Indica se a operação está marcada como deprecated na spec original.</summary>
     bool IsDeprecated = false,
     /// <summary>Tags/categorias associadas à operação para agrupamento lógico.</summary>
-    IReadOnlyList<string>? Tags = null);
+    IReadOnlyList<string>? Tags = null,
+    /// <summary>Corpo de requisição da operação (REST POST/PUT/PATCH), quando aplicável.</summary>
+    ContractRequestBody? RequestBody = null,
+    /// <summary>Respostas HTTP da operação com status code, descrição e schema.</summary>
+    IReadOnlyList<ContractOperationResponse>? Responses = null);

@@ -27,7 +27,7 @@ public static class RegisterMainframeSystemEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/catalog/legacy/mainframe-systems/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/catalog/legacy/mainframe-systems/{r.Id}", localizer);
         }).RequirePermission("catalog:legacy-assets:write");
     }
 }

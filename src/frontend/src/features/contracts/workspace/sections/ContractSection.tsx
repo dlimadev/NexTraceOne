@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Code, Columns, Eye, AlertTriangle, Check, List, PanelLeftClose } from 'lucide-react';
 import { VisualRestBuilder } from '../builders/VisualRestBuilder';
@@ -9,6 +9,26 @@ import { VisualSharedSchemaBuilder } from '../builders/VisualSharedSchemaBuilder
 import { VisualWebhookBuilder } from '../builders/VisualWebhookBuilder';
 import { VisualLegacyContractBuilder } from '../builders/VisualLegacyContractBuilder';
 import { ContractEditorSplitPane } from '../editor/ContractEditorSplitPane';
+import { LivePreviewRenderer } from '../editor/LivePreviewRenderer';
+import { useSpecPreview } from '../../hooks/useSpecPreview';
+import {
+  parseOpenApiToRest,
+  parseWsdlToSoap,
+  parseAsyncApiToEvent,
+  parseWorkserviceYaml,
+  parseJsonSchemaToSharedSchema,
+  parseWebhookYaml,
+  parseLegacyContractYaml,
+} from '../builders/shared/builderParse';
+import {
+  restBuilderToYaml,
+  soapBuilderToXml,
+  eventBuilderToYaml,
+  workserviceBuilderToYaml,
+  sharedSchemaBuilderToJson,
+  webhookBuilderToYaml,
+  legacyContractBuilderToYaml,
+} from '../builders/shared/builderSync';
 import type { SyncResult, LegacyContractKind } from '../builders/shared/builderTypes';
 
 type EditorMode = 'visual' | 'source' | 'split' | 'preview';
@@ -43,12 +63,14 @@ export function ContractSection({
   const [content, setContent] = useState(specContent);
   const [syncWarnings, setSyncWarnings] = useState<string[]>([]);
   const [syncSuccess, setSyncSuccess] = useState(false);
+  const [builderKey, setBuilderKey] = useState(0);
 
   const handleContentChange = useCallback(
     (newContent: string) => {
       setContent(newContent);
       onContentChange?.(newContent);
       setSyncSuccess(false);
+      setBuilderKey((k) => k + 1);
     },
     [onContentChange],
   );
@@ -63,6 +85,14 @@ export function ContractSection({
         setMode('source');
         setTimeout(() => setSyncSuccess(false), 3000);
       }
+    },
+    [onContentChange],
+  );
+
+  const handleAutoSyncFromVisual = useCallback(
+    (newContent: string) => {
+      setContent(newContent);
+      onContentChange?.(newContent);
     },
     [onContentChange],
   );
@@ -115,7 +145,7 @@ export function ContractSection({
       </div>
 
       {/* Content area */}
-      <div className="flex-1 min-h-0 overflow-auto">
+      <div className="flex-1 min-h-0 overflow-hidden">
         {mode === 'source' && (
           <SourceEditor
             content={content}
@@ -136,12 +166,18 @@ export function ContractSection({
         )}
 
         {mode === 'visual' && (
-          <VisualBuilderByProtocol
-            protocol={protocol}
-            contractType={contractType}
-            isReadOnly={isReadOnly}
-            onSync={handleSyncFromVisual}
-          />
+          <div className="h-full overflow-y-auto">
+            <VisualBuilderByProtocol
+              protocol={protocol}
+              contractType={contractType}
+              content={content}
+              format={format}
+              isReadOnly={isReadOnly}
+              onSync={handleSyncFromVisual}
+              onAutoSync={handleAutoSyncFromVisual}
+              builderKey={builderKey}
+            />
+          </div>
         )}
 
         {mode === 'preview' && (
@@ -274,36 +310,124 @@ function SourceEditor({ content, format, isReadOnly, onChange }: SourceEditorPro
 function VisualBuilderByProtocol({
   protocol,
   contractType,
+  content,
+  format,
   isReadOnly,
   onSync,
+  onAutoSync,
+  builderKey,
 }: {
   protocol: string;
   contractType?: string;
+  content: string;
+  format: string;
   isReadOnly?: boolean;
   onSync?: (result: SyncResult) => void;
+  onAutoSync?: (content: string) => void;
+  builderKey?: number;
 }) {
   const resolvedType = contractType ?? resolveTypeFromProtocol(protocol);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, []);
+
+  const handleBuilderChange = useCallback((state: unknown) => {
+    if (!onAutoSync) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      try {
+        let result: SyncResult | null = null;
+        switch (resolvedType) {
+          case 'RestApi':
+            result = restBuilderToYaml(state as Parameters<typeof restBuilderToYaml>[0]);
+            break;
+          case 'Soap':
+            result = soapBuilderToXml(state as Parameters<typeof soapBuilderToXml>[0]);
+            break;
+          case 'Event':
+            result = eventBuilderToYaml(state as Parameters<typeof eventBuilderToYaml>[0]);
+            break;
+          case 'BackgroundService':
+            result = workserviceBuilderToYaml(state as Parameters<typeof workserviceBuilderToYaml>[0]);
+            break;
+          case 'SharedSchema':
+            result = sharedSchemaBuilderToJson(state as Parameters<typeof sharedSchemaBuilderToJson>[0]);
+            break;
+          case 'Webhook':
+            result = webhookBuilderToYaml(state as Parameters<typeof webhookBuilderToYaml>[0]);
+            break;
+          case 'Copybook':
+          case 'MqMessage':
+          case 'FixedLayout':
+          case 'CicsCommarea':
+            result = legacyContractBuilderToYaml(state as Parameters<typeof legacyContractBuilderToYaml>[0]);
+            break;
+          default:
+            result = restBuilderToYaml(state as Parameters<typeof restBuilderToYaml>[0]);
+        }
+        if (result?.success) onAutoSync(result.content);
+      } catch {
+        // Sync failure is non-critical — manual Generate Source still available
+      }
+    }, 500);
+  }, [resolvedType, onAutoSync]);
+
+  // Parse source content into initial state for the visual builder.
+  // useMemo avoids re-parsing on every render; builderKey ensures
+  // the builder re-mounts only when the source changes externally.
+  const parsed = useMemo(() => {
+    if (!content.trim()) return null;
+    try {
+      switch (resolvedType) {
+        case 'RestApi':
+          return parseOpenApiToRest(content, format);
+        case 'Soap':
+          return parseWsdlToSoap(content);
+        case 'Event':
+          return parseAsyncApiToEvent(content, format);
+        case 'BackgroundService':
+          return parseWorkserviceYaml(content, format);
+        case 'SharedSchema':
+          return parseJsonSchemaToSharedSchema(content, format);
+        case 'Webhook':
+          return parseWebhookYaml(content, format);
+        case 'Copybook':
+        case 'MqMessage':
+        case 'FixedLayout':
+        case 'CicsCommarea':
+          return parseLegacyContractYaml(content, format, resolvedType as LegacyContractKind);
+        default:
+          return parseOpenApiToRest(content, format);
+      }
+    } catch {
+      return null;
+    }
+  }, [content, format, resolvedType]);
+
+  const stableKey = builderKey ?? content;
 
   switch (resolvedType) {
     case 'RestApi':
-      return <VisualRestBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualRestBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     case 'Soap':
-      return <VisualSoapBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualSoapBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     case 'Event':
-      return <VisualEventBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualEventBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     case 'BackgroundService':
-      return <VisualWorkserviceBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualWorkserviceBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     case 'SharedSchema':
-      return <VisualSharedSchemaBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualSharedSchemaBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     case 'Webhook':
-      return <VisualWebhookBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualWebhookBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     case 'Copybook':
     case 'MqMessage':
     case 'FixedLayout':
     case 'CicsCommarea':
-      return <VisualLegacyContractBuilder kind={resolvedType as LegacyContractKind} isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualLegacyContractBuilder key={stableKey} kind={resolvedType as LegacyContractKind} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     default:
-      return <VisualRestBuilder isReadOnly={isReadOnly} onSync={onSync} />;
+      return <VisualRestBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
   }
 }
 
@@ -321,10 +445,11 @@ function resolveTypeFromProtocol(protocol: string): string {
   }
 }
 
-// ── Preview Panel (enhanced) ─────────────────────────────────────────────────
+// ── Preview Panel (live preview only) ────────────────────────────────────────
 
 function PreviewPanel({ content, format, protocol }: { content: string; format: string; protocol: string }) {
   const { t } = useTranslation();
+  const { preview, error, isLoading } = useSpecPreview(content, protocol, format);
 
   if (!content) {
     return (
@@ -338,24 +463,49 @@ function PreviewPanel({ content, format, protocol }: { content: string; format: 
     );
   }
 
-  const lineCount = content.split('\n').length;
-
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] text-muted px-2 py-0.5 rounded bg-elevated border border-edge uppercase">
-            {format}
-          </span>
-          <span className="text-[10px] text-muted px-2 py-0.5 rounded bg-elevated border border-edge">
-            {protocol}
-          </span>
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-2 px-2 py-1 border-b border-edge bg-panel/50">
+        <span className="text-[10px] font-medium text-muted uppercase tracking-wider">
+          {t('contracts.workspace.splitEditor.livePreview', 'Live Preview')}
+        </span>
+        <div className="ml-auto flex items-center gap-2">
+          {isLoading && (
+            <span className="text-[10px] text-muted animate-pulse">
+              {t('contracts.workspace.splitEditor.updating', 'Updating...')}
+            </span>
+          )}
+          {!isLoading && preview && !error && (
+            <span className="inline-flex items-center gap-1 text-[10px] text-mint">
+              <Check size={10} />
+              {t('contracts.workspace.splitEditor.valid', 'Valid')}
+            </span>
+          )}
+          {!isLoading && error && (
+            <span className="inline-flex items-center gap-1 text-[10px] text-warning">
+              <AlertTriangle size={10} />
+              {t('contracts.workspace.splitEditor.invalid', 'Invalid')}
+            </span>
+          )}
         </div>
-        <span className="text-[10px] text-muted">{lineCount} {t('contracts.workspace.lines', 'lines')}</span>
       </div>
-      <pre className="text-xs font-mono text-body leading-5 whitespace-pre-wrap break-words bg-elevated/30 rounded-lg p-4 border border-edge max-h-[60vh] overflow-auto">
-        {content}
-      </pre>
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <LivePreviewRenderer
+          preview={preview}
+          error={error}
+          isLoading={isLoading}
+        />
+      </div>
+      {preview && (
+        <div className="flex items-center gap-3 px-3 py-1 border-t border-edge bg-panel text-[10px] text-muted">
+          <span>
+            {preview.operationCount} {t('contracts.workspace.splitEditor.operations', 'operations')} · {preview.schemaCount} {t('contracts.workspace.splitEditor.schemas', 'schemas')}
+          </span>
+          {preview.hasSecurityDefinitions && (
+            <span className="text-mint">🔒 {t('contracts.workspace.splitEditor.securityDefined', 'Security defined')}</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

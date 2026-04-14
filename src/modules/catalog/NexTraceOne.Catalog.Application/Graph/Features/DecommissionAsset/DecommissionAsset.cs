@@ -30,7 +30,7 @@ public static class DecommissionAsset
     /// <summary>Handler que descomissiona um ativo de API.</summary>
     public sealed class Handler(
         IApiAssetRepository apiAssetRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {

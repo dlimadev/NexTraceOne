@@ -28,7 +28,7 @@ public sealed class RulesetGovernanceApplicationTests
     public async Task UploadRuleset_Should_CreateRuleset_AndReturnResponse()
     {
         var repository = Substitute.For<IRulesetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -70,7 +70,7 @@ public sealed class RulesetGovernanceApplicationTests
     {
         var ruleset = CreateRuleset();
         var repository = Substitute.For<IRulesetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         repository.GetByIdAsync(Arg.Any<RulesetId>(), Arg.Any<CancellationToken>()).Returns(ruleset);
 
         var sut = new ArchiveRulesetFeature.Handler(repository, unitOfWork);
@@ -86,7 +86,7 @@ public sealed class RulesetGovernanceApplicationTests
     public async Task ArchiveRuleset_Should_ReturnError_WhenNotFound()
     {
         var repository = Substitute.For<IRulesetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         repository.GetByIdAsync(Arg.Any<RulesetId>(), Arg.Any<CancellationToken>()).Returns((Ruleset?)null);
 
         var sut = new ArchiveRulesetFeature.Handler(repository, unitOfWork);
@@ -103,7 +103,7 @@ public sealed class RulesetGovernanceApplicationTests
         var ruleset = CreateRuleset();
         ruleset.Archive();
         var repository = Substitute.For<IRulesetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         repository.GetByIdAsync(Arg.Any<RulesetId>(), Arg.Any<CancellationToken>()).Returns(ruleset);
 
         var sut = new ArchiveRulesetFeature.Handler(repository, unitOfWork);
@@ -122,7 +122,7 @@ public sealed class RulesetGovernanceApplicationTests
         var ruleset = CreateRuleset();
         var rulesetRepo = Substitute.For<IRulesetRepository>();
         var bindingRepo = Substitute.For<IRulesetBindingRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
         rulesetRepo.GetByIdAsync(Arg.Any<RulesetId>(), Arg.Any<CancellationToken>()).Returns(ruleset);
@@ -147,7 +147,7 @@ public sealed class RulesetGovernanceApplicationTests
         var ruleset = CreateRuleset();
         var rulesetRepo = Substitute.For<IRulesetRepository>();
         var bindingRepo = Substitute.For<IRulesetBindingRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         rulesetRepo.GetByIdAsync(Arg.Any<RulesetId>(), Arg.Any<CancellationToken>()).Returns(ruleset);
         var existingBinding = RulesetBinding.Create(ruleset.Id, "REST", FixedNow);
@@ -172,7 +172,7 @@ public sealed class RulesetGovernanceApplicationTests
         var ruleset = CreateRuleset();
         var rulesetRepo = Substitute.For<IRulesetRepository>();
         var lintResultRepo = Substitute.For<ILintResultRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
         rulesetRepo.GetByIdAsync(Arg.Any<RulesetId>(), Arg.Any<CancellationToken>()).Returns(ruleset);
@@ -201,7 +201,7 @@ public sealed class RulesetGovernanceApplicationTests
     {
         var rulesetRepo = Substitute.For<IRulesetRepository>();
         var lintResultRepo = Substitute.For<ILintResultRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         rulesetRepo.GetByIdAsync(Arg.Any<RulesetId>(), Arg.Any<CancellationToken>()).Returns((Ruleset?)null);
 
@@ -290,7 +290,7 @@ public sealed class RulesetGovernanceApplicationTests
     public async Task InstallDefaultRulesets_Should_CreateDefaultRuleset()
     {
         var repository = Substitute.For<IRulesetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRulesetGovernanceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 

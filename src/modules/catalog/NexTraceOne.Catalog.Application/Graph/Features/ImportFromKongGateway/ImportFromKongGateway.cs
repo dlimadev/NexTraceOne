@@ -94,7 +94,7 @@ public static class ImportFromKongGateway
         IServiceAssetRepository serviceAssetRepository,
         IApiAssetRepository apiAssetRepository,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -50,7 +50,7 @@ public static class ComputeSemanticDiff
     public sealed class Handler(
         IContractVersionRepository repository,
         IApiAssetRepository apiAssetRepository,
-        IUnitOfWork unitOfWork,
+        IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
         IEventBus eventBus,
         ICurrentUser currentUser,

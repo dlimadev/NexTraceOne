@@ -39,7 +39,7 @@ public static class RecordProductivitySnapshot
 
     public sealed class Handler(
         IProductivitySnapshotRepository repository,
-        IUnitOfWork unitOfWork,
+        IDeveloperExperienceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

@@ -39,7 +39,7 @@ public static class UpdateAssetMetadata
     /// <summary>Handler que atualiza metadados de um ativo de API.</summary>
     public sealed class Handler(
         IApiAssetRepository apiAssetRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -37,7 +37,7 @@ public sealed class PromotionEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/promotion/environments/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/promotion/environments/{r.EnvironmentId}", localizer);
         })
         .RequirePermission("promotion:environments:write");
 
@@ -48,7 +48,7 @@ public sealed class PromotionEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/promotion/requests/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/promotion/requests/{r.PromotionRequestId}", localizer);
         })
         .RequirePermission("promotion:requests:write");
 

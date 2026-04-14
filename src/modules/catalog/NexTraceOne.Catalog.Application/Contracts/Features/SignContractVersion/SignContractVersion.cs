@@ -40,7 +40,7 @@ public static class SignContractVersion
     /// </summary>
     public sealed class Handler(
         IContractVersionRepository repository,
-        IUnitOfWork unitOfWork,
+        IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
         ICurrentUser currentUser) : ICommandHandler<Command, Response>
     {

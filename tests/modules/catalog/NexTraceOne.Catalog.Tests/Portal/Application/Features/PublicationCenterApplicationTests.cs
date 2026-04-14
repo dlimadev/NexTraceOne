@@ -26,7 +26,7 @@ public sealed class PublicationCenterApplicationTests
     public async Task PublishContractToPortal_Should_ReturnPublished_When_NoDuplicateExists()
     {
         var repository = Substitute.For<IContractPublicationEntryRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
 
@@ -54,7 +54,7 @@ public sealed class PublicationCenterApplicationTests
     public async Task PublishContractToPortal_Should_ReturnFailure_When_DuplicateExists()
     {
         var repository = Substitute.For<IContractPublicationEntryRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
 
@@ -106,7 +106,7 @@ public sealed class PublicationCenterApplicationTests
     {
         var entryId = Guid.NewGuid();
         var repository = Substitute.For<IContractPublicationEntryRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
 
@@ -131,7 +131,7 @@ public sealed class PublicationCenterApplicationTests
     public async Task WithdrawContractFromPortal_Should_ReturnFailure_When_EntryNotFound()
     {
         var repository = Substitute.For<IContractPublicationEntryRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         ContractPublicationEntry? none = null;

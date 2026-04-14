@@ -15,7 +15,7 @@ public sealed class SyncConsumersTests
 {
     private readonly IApiAssetRepository _apiAssetRepository = Substitute.For<IApiAssetRepository>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly ICatalogGraphUnitOfWork _unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
     private readonly DateTimeOffset _now = new(2026, 03, 13, 10, 0, 0, TimeSpan.Zero);
 
     private SyncConsumersFeature.Handler CreateSut()

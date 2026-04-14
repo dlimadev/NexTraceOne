@@ -36,7 +36,7 @@ public static class DeleteSubscription
     /// <summary>Handler que remove subscrição de API do repositório.</summary>
     public sealed class Handler(
         ISubscriptionRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command>
+        IPortalUnitOfWork unitOfWork) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {

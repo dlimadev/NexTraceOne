@@ -207,7 +207,6 @@ export function SchemaPropertyEditor({
       {properties.map((prop, idx) => {
         const isExpanded = expandedIds.has(prop.id);
         const isComposition = prop.type === 'oneOf' || prop.type === 'anyOf' || prop.type === 'allOf';
-        const hasDetails = prop.type === 'object' || prop.type === 'array' || prop.type === '$ref' || isComposition;
         const IconComponent = TYPE_ICONS[prop.type] ?? FileJson;
         const typeColor = TYPE_COLORS[prop.type] ?? 'text-muted';
 
@@ -231,15 +230,11 @@ export function SchemaPropertyEditor({
                   <GripVertical size={10} />
                 </span>
               )}
-              {/* Expand/collapse for complex types */}
-              {hasDetails ? (
-                <button type="button" onClick={() => toggleExpand(prop.id)}
-                  className="text-muted hover:text-body transition-colors flex-shrink-0">
-                  {isExpanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                </button>
-              ) : (
-                <span className="w-[10px] flex-shrink-0" />
-              )}
+              {/* Expand/collapse for property details */}
+              <button type="button" onClick={() => toggleExpand(prop.id)}
+                className="text-muted hover:text-body transition-colors flex-shrink-0">
+                {isExpanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+              </button>
 
               {/* Type icon */}
               <IconComponent size={11} className={`flex-shrink-0 ${typeColor}`} />
@@ -251,7 +246,7 @@ export function SchemaPropertyEditor({
                 onChange={(e) => updateProperty(prop.id, { name: e.target.value })}
                 placeholder={t('contracts.builder.rest.propNamePlaceholder', 'propertyName')}
                 disabled={isReadOnly}
-                className="flex-1 min-w-0 text-[10px] font-mono bg-transparent border-none outline-none text-body placeholder:text-muted/30"
+                className="flex-1 min-w-0 text-[10px] font-mono bg-transparent border border-transparent rounded px-1 py-0.5 text-body placeholder:text-muted/30 focus:outline-none focus:border-accent/40 focus:bg-elevated/50 hover:bg-elevated/30 transition-colors"
               />
 
               {/* Type selector */}
@@ -317,7 +312,7 @@ export function SchemaPropertyEditor({
                     onChange={(e) => updateProperty(prop.id, { description: e.target.value })}
                     placeholder={t('contracts.builder.rest.propDescPlaceholder', 'Description of this property...')}
                     disabled={isReadOnly}
-                    className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30"
+                    className="w-full text-[10px] bg-elevated border border-edge rounded px-2 py-1 text-body placeholder:text-muted/30 focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
 
@@ -358,6 +353,24 @@ export function SchemaPropertyEditor({
                   <PropertyConstraintsEditor
                     constraints={prop.constraints}
                     propertyType={prop.type}
+                    onChange={(c) => updateProperty(prop.id, { constraints: c })}
+                    isReadOnly={isReadOnly}
+                  />
+                )}
+
+                {/* Array-level constraints (minItems, maxItems, uniqueItems) + common flags */}
+                {prop.type === 'array' && (
+                  <ArrayConstraintsEditor
+                    constraints={prop.constraints}
+                    onChange={(c) => updateProperty(prop.id, { constraints: c })}
+                    isReadOnly={isReadOnly}
+                  />
+                )}
+
+                {/* Common flags for object types (readOnly, writeOnly, nullable) */}
+                {prop.type === 'object' && (
+                  <CommonFlagsEditor
+                    constraints={prop.constraints}
                     onChange={(c) => updateProperty(prop.id, { constraints: c })}
                     isReadOnly={isReadOnly}
                   />
@@ -647,6 +660,106 @@ function MiniField({
           mono ? 'font-mono' : ''
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       />
+    </div>
+  );
+}
+
+// ── Array Constraints Editor ──────────────────────────────────────────────────
+
+function ArrayConstraintsEditor({
+  constraints,
+  onChange,
+  isReadOnly,
+}: {
+  constraints: PropertyConstraints;
+  onChange: (c: PropertyConstraints) => void;
+  isReadOnly?: boolean;
+}) {
+  const { t } = useTranslation();
+  const update = (patch: Partial<PropertyConstraints>) => onChange({ ...constraints, ...patch });
+
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider">
+        {t('contracts.builder.rest.constraints', 'Constraints')}
+      </label>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
+        <MiniField label={t('contracts.builder.rest.minItems', 'Min Items')} type="number"
+          value={constraints.minItems ?? ''} onChange={(v) => update({ minItems: v !== '' ? Number(v) : undefined })}
+          disabled={isReadOnly} />
+        <MiniField label={t('contracts.builder.rest.maxItems', 'Max Items')} type="number"
+          value={constraints.maxItems ?? ''} onChange={(v) => update({ maxItems: v !== '' ? Number(v) : undefined })}
+          disabled={isReadOnly} />
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <label className="flex items-center gap-1 text-[9px] text-muted">
+          <input type="checkbox" checked={constraints.uniqueItems ?? false}
+            onChange={(e) => update({ uniqueItems: e.target.checked || undefined })}
+            disabled={isReadOnly} className="rounded border-edge accent-accent" />
+          {t('contracts.builder.rest.uniqueItems', 'Unique Items')}
+        </label>
+        <label className="flex items-center gap-1 text-[9px] text-muted">
+          <input type="checkbox" checked={constraints.readOnly ?? false}
+            onChange={(e) => update({ readOnly: e.target.checked || undefined })}
+            disabled={isReadOnly} className="rounded border-edge accent-accent" />
+          {t('contracts.builder.rest.readOnly', 'Read Only')}
+        </label>
+        <label className="flex items-center gap-1 text-[9px] text-muted">
+          <input type="checkbox" checked={constraints.writeOnly ?? false}
+            onChange={(e) => update({ writeOnly: e.target.checked || undefined })}
+            disabled={isReadOnly} className="rounded border-edge accent-accent" />
+          {t('contracts.builder.rest.writeOnly', 'Write Only')}
+        </label>
+        <label className="flex items-center gap-1 text-[9px] text-muted">
+          <input type="checkbox" checked={constraints.nullable ?? false}
+            onChange={(e) => update({ nullable: e.target.checked || undefined })}
+            disabled={isReadOnly} className="rounded border-edge accent-accent" />
+          {t('contracts.builder.rest.nullable', 'Nullable')}
+        </label>
+      </div>
+    </div>
+  );
+}
+
+// ── Common Flags Editor (for object types) ────────────────────────────────────
+
+function CommonFlagsEditor({
+  constraints,
+  onChange,
+  isReadOnly,
+}: {
+  constraints: PropertyConstraints;
+  onChange: (c: PropertyConstraints) => void;
+  isReadOnly?: boolean;
+}) {
+  const { t } = useTranslation();
+  const update = (patch: Partial<PropertyConstraints>) => onChange({ ...constraints, ...patch });
+
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider">
+        {t('contracts.builder.rest.constraints', 'Constraints')}
+      </label>
+      <div className="flex flex-wrap gap-3">
+        <label className="flex items-center gap-1 text-[9px] text-muted">
+          <input type="checkbox" checked={constraints.readOnly ?? false}
+            onChange={(e) => update({ readOnly: e.target.checked || undefined })}
+            disabled={isReadOnly} className="rounded border-edge accent-accent" />
+          {t('contracts.builder.rest.readOnly', 'Read Only')}
+        </label>
+        <label className="flex items-center gap-1 text-[9px] text-muted">
+          <input type="checkbox" checked={constraints.writeOnly ?? false}
+            onChange={(e) => update({ writeOnly: e.target.checked || undefined })}
+            disabled={isReadOnly} className="rounded border-edge accent-accent" />
+          {t('contracts.builder.rest.writeOnly', 'Write Only')}
+        </label>
+        <label className="flex items-center gap-1 text-[9px] text-muted">
+          <input type="checkbox" checked={constraints.nullable ?? false}
+            onChange={(e) => update({ nullable: e.target.checked || undefined })}
+            disabled={isReadOnly} className="rounded border-edge accent-accent" />
+          {t('contracts.builder.rest.nullable', 'Nullable')}
+        </label>
+      </div>
     </div>
   );
 }

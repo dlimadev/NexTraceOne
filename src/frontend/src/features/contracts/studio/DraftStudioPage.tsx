@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,23 +10,26 @@ import {
   Code,
   Settings,
   Loader2,
+  ScanSearch,
 } from 'lucide-react';
 import { ContractSection } from '../workspace/sections/ContractSection';
+import { DraftValidationPanel } from '../workspace/sections/DraftValidationPanel';
 import { Card, CardBody } from '../../../components/Card';
 import { contractStudioApi } from '../api/contractStudio';
 import { useDraftExport } from '../hooks/useDraftExport';
+import { useDraftValidation } from '../hooks/useDraftValidation';
 import { PROTOCOL_COLORS, LIFECYCLE_COLORS } from '../shared/constants';
 import { cn } from '../../../lib/cn';
 import { PageContainer } from '../../../components/shell';
 import { useAuth } from '../../../contexts/AuthContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
-import type { ServiceListItem } from '../types';
+import type { ServiceListItem, ContractProtocol } from '../types';
 
 const draftKeys = {
   detail: (id: string) => ['contract-drafts', 'detail', id] as const,
 };
 
-type DraftTab = 'spec' | 'metadata';
+type DraftTab = 'spec' | 'metadata' | 'validation';
 
 /**
  * Página do studio de edição de draft de contrato.
@@ -41,6 +44,7 @@ export function DraftStudioPage() {
   const { user } = useAuth();
   const currentActor = user?.email || user?.fullName || user?.id || 'system';
   const { exportDraft, isExporting, exportError } = useDraftExport();
+  const draftValidation = useDraftValidation();
 
   const [activeTab, setActiveTab] = useState<DraftTab>('spec');
   const [saveKey, setSaveKey] = useState(0);
@@ -116,6 +120,15 @@ export function DraftStudioPage() {
     },
   });
 
+  const handleRunValidation = useCallback(() => {
+    if (!specContent.trim() || !draft) return;
+    draftValidation.validateAll(
+      specContent,
+      format,
+      draft.protocol as ContractProtocol,
+    );
+  }, [specContent, format, draft, draftValidation]);
+
   if (draftQuery.isLoading) {
     return (
       <PageContainer>
@@ -147,10 +160,12 @@ export function DraftStudioPage() {
 
   const isEditable = draft.status === 'Editing';
   const isSaving = saveContentMutation.isPending || saveMetadataMutation.isPending;
+  const validationIssueCount = draftValidation.state.summary.totalIssues;
 
-  const TABS: { id: DraftTab; labelKey: string; Icon: React.ComponentType<{ size?: number }> }[] = [
+  const TABS: { id: DraftTab; labelKey: string; Icon: React.ComponentType<{ size?: number }>; badge?: number }[] = [
     { id: 'spec', labelKey: 'contracts.studio.tabSpec', Icon: Code },
     { id: 'metadata', labelKey: 'contracts.studio.tabMetadata', Icon: Settings },
+    { id: 'validation', labelKey: 'contracts.draftValidation.tabValidation', Icon: ScanSearch, badge: validationIssueCount || undefined },
   ];
 
   return (
@@ -229,12 +244,20 @@ export function DraftStudioPage() {
           >
             <tab.Icon size={13} />
             {t(tab.labelKey, tab.id)}
+            {tab.badge != null && tab.badge > 0 && (
+              <span className="ml-1 inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[9px] font-bold rounded-full bg-danger/20 text-danger">
+                {tab.badge > 99 ? '99+' : tab.badge}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
       {/* ── Content ── */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className={cn(
+        'flex-1 min-h-0 p-6',
+        activeTab === 'spec' ? 'flex flex-col overflow-hidden' : 'overflow-y-auto',
+      )}>
         {/* Feedback messages */}
         {(saveContentMutation.isError || saveMetadataMutation.isError) && (
           <div className="mb-4 text-xs text-critical bg-critical/15 border border-critical/25 rounded-md px-3 py-2">
@@ -264,8 +287,8 @@ export function DraftStudioPage() {
 
         {/* Tab: Spec Content */}
         {activeTab === 'spec' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 flex-1 min-h-0">
+            <div className="flex items-center justify-between flex-shrink-0">
               <label className="text-xs font-medium text-heading">
                 {t('contracts.studio.specContent', 'Specification Content')}
               </label>
@@ -288,9 +311,20 @@ export function DraftStudioPage() {
               contractType={draft.contractType}
               isReadOnly={!isEditable}
               onContentChange={setDraftSpecContent}
-              className="border border-edge rounded-lg overflow-hidden min-h-[560px]"
+              className="border border-edge rounded-lg overflow-hidden flex-1 min-h-0"
             />
           </div>
+        )}
+
+        {/* Tab: Validation */}
+        {activeTab === 'validation' && draft && (
+          <DraftValidationPanel
+            state={draftValidation.state}
+            isRunning={draftValidation.isRunning}
+            protocol={draft.protocol as ContractProtocol}
+            onRunValidation={handleRunValidation}
+            className="flex-1 min-h-0"
+          />
         )}
 
         {/* Tab: Metadata */}

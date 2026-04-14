@@ -87,7 +87,7 @@ export function FieldArea({
         rows={rows}
         disabled={disabled}
         aria-invalid={error ? true : undefined}
-        className={`${INPUT_CLASS} resize-none ${mono ? 'font-mono' : ''} ${error ? 'border-danger/50 focus:ring-danger' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`${INPUT_CLASS} resize-y ${mono ? 'font-mono' : ''} ${error ? 'border-danger/50 focus:ring-danger' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       />
       {error && <p className="text-[9px] text-danger mt-0.5" role="alert">{error}</p>}
     </div>

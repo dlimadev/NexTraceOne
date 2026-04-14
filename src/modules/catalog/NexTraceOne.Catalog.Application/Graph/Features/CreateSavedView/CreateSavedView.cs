@@ -38,7 +38,7 @@ public static class CreateSavedView
         ISavedGraphViewRepository viewRepository,
         ICurrentUser currentUser,
         IDateTimeProvider clock,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

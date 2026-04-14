@@ -80,7 +80,7 @@ public sealed class DashboardsAndDebtEndpointModule
         {
             var cmd = command with { SourceDashboardId = dashboardId };
             var result = await sender.Send(cmd, cancellationToken);
-            return result.ToCreatedResult("/api/v1/governance/dashboards/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/governance/dashboards/{r.CloneId}", localizer);
         }).RequirePermission("governance:reports:write");
     }
 

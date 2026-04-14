@@ -36,6 +36,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<RulesetGovernanceDbContext>());
+        services.AddScoped<IRulesetGovernanceUnitOfWork>(sp => sp.GetRequiredService<RulesetGovernanceDbContext>());
         services.AddScoped<IRulesetRepository, RulesetRepository>();
         services.AddScoped<IRulesetBindingRepository, RulesetBindingRepository>();
         services.AddScoped<ILintResultRepository, LintResultRepository>();

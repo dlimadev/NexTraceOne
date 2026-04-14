@@ -257,7 +257,7 @@ public sealed class ServiceTemplateAndGovernanceTests
     public async Task GenerateCode_Should_ReturnResponse_When_CommandIsValid()
     {
         var repository = Substitute.For<ICodeGenerationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new GenerateCodeFeature.Handler(repository, unitOfWork, clock);
 

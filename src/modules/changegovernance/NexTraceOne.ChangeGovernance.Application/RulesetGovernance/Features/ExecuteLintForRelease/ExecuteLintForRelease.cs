@@ -43,7 +43,7 @@ public static class ExecuteLintForRelease
     public sealed class Handler(
         IRulesetRepository rulesetRepository,
         ILintResultRepository lintResultRepository,
-        IUnitOfWork unitOfWork,
+        IRulesetGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         /// <summary>Processa o comando de execução de linting.</summary>

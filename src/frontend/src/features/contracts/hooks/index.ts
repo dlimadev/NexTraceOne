@@ -19,6 +19,8 @@ export { useDraftExport } from './useDraftExport';
 
 // ── Validation hooks ──────────────────────────────────────────────────────────
 export { useValidationSummary, useExecuteValidation, useValidateSpec } from './useValidation';
+export { useDraftValidation } from './useDraftValidation';
+export type { DraftValidationState, ValidationPhase, DraftValidationSummary } from './useDraftValidation';
 
 // ── Preview hooks ─────────────────────────────────────────────────────────────
 export { useSpecPreview } from './useSpecPreview';

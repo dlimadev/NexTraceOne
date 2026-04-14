@@ -2414,6 +2414,40 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "toggle",
             sortOrder: 4060),
 
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.max_active_versions",
+            displayName: "config.catalog.contract.max_active_versions.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.catalog.contract.max_active_versions.description",
+            defaultValue: "2",
+            validationRules: """{"min":1,"max":10}""",
+            uiEditorType: "text",
+            sortOrder: 4070),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract.require_approval_on_change",
+            displayName: "config.catalog.contract.require_approval_on_change.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.catalog.contract.require_approval_on_change.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4071),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service.require_approval_on_registration",
+            displayName: "config.catalog.service.require_approval_on_registration.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.catalog.service.require_approval_on_registration.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4072),
+
         // ── Block B — Validation, Linting, Rulesets & Templates ────────
 
         ConfigurationDefinition.Create(

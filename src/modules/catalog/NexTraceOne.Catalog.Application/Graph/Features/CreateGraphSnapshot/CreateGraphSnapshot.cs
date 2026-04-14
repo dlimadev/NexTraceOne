@@ -39,7 +39,7 @@ public static class CreateGraphSnapshot
         IGraphSnapshotRepository snapshotRepository,
         ICurrentUser currentUser,
         IDateTimeProvider clock,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

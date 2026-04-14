@@ -65,7 +65,7 @@ public sealed class FrameworkAssetDetailTests
     {
         var serviceRepo = Substitute.For<IServiceAssetRepository>();
         var frameworkRepo = Substitute.For<IFrameworkAssetDetailRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterFrameworkDetailFeature.Handler(serviceRepo, frameworkRepo, unitOfWork);
 
         var service = CreateFrameworkService();
@@ -104,7 +104,7 @@ public sealed class FrameworkAssetDetailTests
     {
         var serviceRepo = Substitute.For<IServiceAssetRepository>();
         var frameworkRepo = Substitute.For<IFrameworkAssetDetailRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterFrameworkDetailFeature.Handler(serviceRepo, frameworkRepo, unitOfWork);
 
         serviceRepo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
@@ -124,7 +124,7 @@ public sealed class FrameworkAssetDetailTests
     {
         var serviceRepo = Substitute.For<IServiceAssetRepository>();
         var frameworkRepo = Substitute.For<IFrameworkAssetDetailRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterFrameworkDetailFeature.Handler(serviceRepo, frameworkRepo, unitOfWork);
 
         var service = CreateNonFrameworkService();
@@ -145,7 +145,7 @@ public sealed class FrameworkAssetDetailTests
     {
         var serviceRepo = Substitute.For<IServiceAssetRepository>();
         var frameworkRepo = Substitute.For<IFrameworkAssetDetailRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterFrameworkDetailFeature.Handler(serviceRepo, frameworkRepo, unitOfWork);
 
         var service = CreateFrameworkService();
@@ -171,7 +171,7 @@ public sealed class FrameworkAssetDetailTests
     public async Task UpdateFrameworkDetail_Should_UpdateFields()
     {
         var frameworkRepo = Substitute.For<IFrameworkAssetDetailRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateFrameworkDetailFeature.Handler(frameworkRepo, unitOfWork);
 
         var service = CreateFrameworkService();
@@ -207,7 +207,7 @@ public sealed class FrameworkAssetDetailTests
     public async Task UpdateFrameworkDetail_Should_ReturnError_When_NotFound()
     {
         var frameworkRepo = Substitute.For<IFrameworkAssetDetailRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateFrameworkDetailFeature.Handler(frameworkRepo, unitOfWork);
 
         frameworkRepo.GetByServiceAssetIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
@@ -273,7 +273,7 @@ public sealed class FrameworkAssetDetailTests
     public async Task PublishFrameworkVersion_Should_UpdateLatestVersion()
     {
         var frameworkRepo = Substitute.For<IFrameworkAssetDetailRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new PublishFrameworkVersionFeature.Handler(frameworkRepo, unitOfWork);
 
         var service = CreateFrameworkService();

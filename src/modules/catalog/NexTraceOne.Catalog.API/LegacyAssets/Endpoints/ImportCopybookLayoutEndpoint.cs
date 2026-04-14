@@ -30,7 +30,7 @@ public static class ImportCopybookLayoutEndpoint
             var command = new ImportCopybookLayoutFeature.Command(
                 copybookId, request.CopybookText, request.VersionLabel);
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/catalog/legacy/copybooks/{0}/versions", localizer);
+            return result.ToCreatedResult(r => $"/api/catalog/legacy/copybooks/{r.CopybookId}/versions", localizer);
         }).RequirePermission("catalog:legacy-assets:write");
     }
 

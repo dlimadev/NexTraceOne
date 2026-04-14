@@ -211,7 +211,7 @@ public sealed class MultiProtocolImportTests
         var targetVersion = ContractVersion.Import(apiAssetId, "1.1.0", AdditiveWsdlSpec, "xml", "upload", ContractProtocol.Wsdl).Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var eventBus = Substitute.For<IEventBus>();
@@ -242,7 +242,7 @@ public sealed class MultiProtocolImportTests
         var targetVersion = ContractVersion.Import(apiAssetId, "1.1.0", AdditiveAsyncApiSpec, "json", "upload", ContractProtocol.AsyncApi).Value;
 
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var eventBus = Substitute.For<IEventBus>();

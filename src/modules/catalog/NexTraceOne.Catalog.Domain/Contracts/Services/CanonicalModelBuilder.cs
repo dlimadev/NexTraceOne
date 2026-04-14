@@ -1,8 +1,12 @@
+using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Xml.Linq;
 
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Contracts.ValueObjects;
+
+using YamlDotNet.Serialization;
 
 #pragma warning disable CA1031 // Captura genérica necessária para resiliência ao processar specs malformadas
 
@@ -41,7 +45,8 @@ public static class CanonicalModelBuilder
     {
         try
         {
-            using var doc = JsonDocument.Parse(specContent);
+            var json = NormalizeToJson(specContent);
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
             var title = GetJsonString(root, "info", "title") ?? "Untitled API";
@@ -77,7 +82,8 @@ public static class CanonicalModelBuilder
     {
         try
         {
-            using var doc = JsonDocument.Parse(specContent);
+            var json = NormalizeToJson(specContent);
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
             var title = GetJsonString(root, "info", "title") ?? "Untitled API";
@@ -111,7 +117,8 @@ public static class CanonicalModelBuilder
     {
         try
         {
-            using var doc = JsonDocument.Parse(specContent);
+            var json = NormalizeToJson(specContent);
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
             var title = GetJsonString(root, "info", "title") ?? "Untitled Event API";
@@ -171,6 +178,70 @@ public static class CanonicalModelBuilder
     }
 
     // ── Helpers privados ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Normaliza o conteúdo da spec para JSON quando está em formato YAML.
+    /// Deteta JSON pelo primeiro caracter ('{' ou '[') e devolve o conteúdo original.
+    /// Caso contrário, converte YAML→JSON usando YamlDotNet + conversão recursiva
+    /// para System.Text.Json.Nodes.JsonNode que preserva tipos primitivos.
+    /// </summary>
+    private static string NormalizeToJson(string specContent)
+    {
+        var trimmed = specContent.AsSpan().TrimStart();
+        if (trimmed.Length > 0 && (trimmed[0] == '{' || trimmed[0] == '['))
+            return specContent;
+
+        var deserializer = new DeserializerBuilder()
+            .Build();
+
+        var yamlObject = deserializer.Deserialize(new StringReader(specContent));
+        if (yamlObject is null)
+            return specContent;
+
+        var jsonNode = ToJsonNode(yamlObject);
+        return jsonNode?.ToJsonString() ?? "{}";
+    }
+
+    /// <summary>
+    /// Converte recursivamente o grafo de objetos do YamlDotNet
+    /// (Dictionary&lt;object,object&gt;, List&lt;object&gt;, escalares)
+    /// para System.Text.Json.Nodes.JsonNode.
+    /// YamlDotNet 16.x devolve escalares como strings por defeito ao desserializar
+    /// sem tipo alvo, por isso é necessário resolver tipos YAML (bool, int, float, null)
+    /// explicitamente para produzir JSON semanticamente correto.
+    /// </summary>
+    private static JsonNode? ToJsonNode(object? value) => value switch
+    {
+        Dictionary<object, object> dict => new JsonObject(
+            dict.Select(kvp => new KeyValuePair<string, JsonNode?>(
+                kvp.Key?.ToString() ?? string.Empty,
+                ToJsonNode(kvp.Value)))),
+        List<object> list => new JsonArray(list.Select(ToJsonNode).ToArray()),
+        bool b => JsonValue.Create(b),
+        int i => JsonValue.Create(i),
+        long l => JsonValue.Create(l),
+        double d => JsonValue.Create(d),
+        string s => ResolveYamlScalar(s),
+        null => null,
+        _ => JsonValue.Create(value.ToString())
+    };
+
+    /// <summary>
+    /// Resolve um escalar YAML (devolvido como string pelo YamlDotNet) para o
+    /// JsonNode com o tipo JSON correto (boolean, number, null ou string).
+    /// Segue as regras de resolução do YAML Core Schema (RFC 9512 §10.3).
+    /// </summary>
+    private static JsonNode? ResolveYamlScalar(string s) => s switch
+    {
+        "true" or "True" or "TRUE" => JsonValue.Create(true),
+        "false" or "False" or "FALSE" => JsonValue.Create(false),
+        "null" or "Null" or "NULL" or "~" or "" => null,
+        _ when long.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var l) =>
+            l is >= int.MinValue and <= int.MaxValue ? JsonValue.Create((int)l) : JsonValue.Create(l),
+        _ when double.TryParse(s, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var d) =>
+            JsonValue.Create(d),
+        _ => JsonValue.Create(s)
+    };
 
     /// <summary>
     /// Constrói modelo canônico a partir de especificação de Background Service Contract.
@@ -265,19 +336,31 @@ public static class CanonicalModelBuilder
 
         foreach (var path in paths.EnumerateObject())
         {
+            if (path.Value.ValueKind != JsonValueKind.Object) continue;
+
             foreach (var method in path.Value.EnumerateObject())
             {
+                if (method.Value.ValueKind != JsonValueKind.Object) continue;
+
                 var methodName = method.Name.ToUpperInvariant();
-                if (methodName is "PARAMETERS" or "SERVERS" or "$REF") continue;
+                if (methodName is "PARAMETERS" or "SERVERS" or "$REF" or "SUMMARY" or "DESCRIPTION") continue;
 
                 var opId = method.Value.TryGetProperty("operationId", out var oid) ? oid.GetString() ?? "" : $"{methodName} {path.Name}";
                 var desc = method.Value.TryGetProperty("description", out var d) ? d.GetString() :
                            method.Value.TryGetProperty("summary", out var s) ? s.GetString() : null;
-                var deprecated = method.Value.TryGetProperty("deprecated", out var dep) && dep.GetBoolean();
+                var deprecated = method.Value.TryGetProperty("deprecated", out var dep) && dep.ValueKind == JsonValueKind.True;
                 var tags = ExtractArrayStrings(method.Value, "tags");
                 var inputParams = ExtractOperationParameters(method.Value);
+                var requestBody = ExtractRequestBody(method.Value, root);
+                var responses = ExtractResponses(method.Value, root);
 
-                ops.Add(new ContractOperation(opId, opId, desc, methodName, path.Name, inputParams, [], deprecated, tags));
+                // OutputFields: flatten first 2xx response properties for backward compat
+                var outputFields = responses
+                    .Where(r => r.StatusCode.StartsWith('2'))
+                    .SelectMany(r => r.Properties)
+                    .ToList();
+
+                ops.Add(new ContractOperation(opId, opId, desc, methodName, path.Name, inputParams, outputFields, deprecated, tags, requestBody, responses));
             }
         }
         return ops;
@@ -290,21 +373,115 @@ public static class CanonicalModelBuilder
 
         foreach (var path in paths.EnumerateObject())
         {
+            if (path.Value.ValueKind != JsonValueKind.Object) continue;
+
             foreach (var method in path.Value.EnumerateObject())
             {
+                if (method.Value.ValueKind != JsonValueKind.Object) continue;
+
                 var methodName = method.Name.ToUpperInvariant();
-                if (methodName is "PARAMETERS" or "$REF") continue;
+                if (methodName is "PARAMETERS" or "$REF" or "SUMMARY" or "DESCRIPTION") continue;
 
                 var opId = method.Value.TryGetProperty("operationId", out var oid) ? oid.GetString() ?? "" : $"{methodName} {path.Name}";
                 var desc = method.Value.TryGetProperty("description", out var d) ? d.GetString() :
                            method.Value.TryGetProperty("summary", out var s) ? s.GetString() : null;
-                var deprecated = method.Value.TryGetProperty("deprecated", out var dep) && dep.GetBoolean();
+                var deprecated = method.Value.TryGetProperty("deprecated", out var dep) && dep.ValueKind == JsonValueKind.True;
                 var tags = ExtractArrayStrings(method.Value, "tags");
+                var inputParams = ExtractOperationParameters(method.Value);
+                var requestBody = ExtractSwaggerRequestBody(method.Value, root);
+                var responses = ExtractSwaggerResponses(method.Value, root);
 
-                ops.Add(new ContractOperation(opId, opId, desc, methodName, path.Name, [], [], deprecated, tags));
+                var outputFields = responses
+                    .Where(r => r.StatusCode.StartsWith('2'))
+                    .SelectMany(r => r.Properties)
+                    .ToList();
+
+                ops.Add(new ContractOperation(opId, opId, desc, methodName, path.Name, inputParams, outputFields, deprecated, tags, requestBody, responses));
             }
         }
         return ops;
+    }
+
+    /// <summary>
+    /// Extrai request body de uma operação Swagger 2.0.
+    /// No Swagger 2.0, o body param está em "parameters" com in:"body".
+    /// </summary>
+    private static ContractRequestBody? ExtractSwaggerRequestBody(JsonElement operation, JsonElement root)
+    {
+        if (!operation.TryGetProperty("parameters", out var pArr) || pArr.ValueKind != JsonValueKind.Array)
+            return null;
+
+        foreach (var p in pArr.EnumerateArray())
+        {
+            if (p.ValueKind != JsonValueKind.Object) continue;
+            if (!p.TryGetProperty("in", out var inProp) || inProp.GetString() != "body") continue;
+
+            var required = p.TryGetProperty("required", out var req) && req.ValueKind == JsonValueKind.True;
+
+            if (!p.TryGetProperty("schema", out var schema) || schema.ValueKind != JsonValueKind.Object)
+                return new ContractRequestBody("application/json", required, []);
+
+            string? schemaRef = null;
+            if (schema.TryGetProperty("$ref", out var refProp))
+            {
+                schemaRef = refProp.GetString();
+                var resolved = ResolveRef(root, schemaRef);
+                if (resolved.ValueKind == JsonValueKind.Object)
+                {
+                    var props = ExtractSchemaProperties(resolved, root);
+                    return new ContractRequestBody("application/json", required, props, schemaRef);
+                }
+                return new ContractRequestBody("application/json", required, [], schemaRef);
+            }
+
+            var properties = ExtractSchemaProperties(schema, root);
+            return new ContractRequestBody("application/json", required, properties, schemaRef);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Extrai respostas de uma operação Swagger 2.0.
+    /// </summary>
+    private static List<ContractOperationResponse> ExtractSwaggerResponses(JsonElement operation, JsonElement root)
+    {
+        var responses = new List<ContractOperationResponse>();
+        if (!operation.TryGetProperty("responses", out var resObj) || resObj.ValueKind != JsonValueKind.Object)
+            return responses;
+
+        foreach (var resp in resObj.EnumerateObject())
+        {
+            if (resp.Value.ValueKind != JsonValueKind.Object) continue;
+
+            var statusCode = resp.Name;
+            var description = resp.Value.TryGetProperty("description", out var d) ? d.GetString() : null;
+
+            if (!resp.Value.TryGetProperty("schema", out var schema) || schema.ValueKind != JsonValueKind.Object)
+            {
+                responses.Add(new ContractOperationResponse(statusCode, description, null, []));
+                continue;
+            }
+
+            string? schemaRef = null;
+            if (schema.TryGetProperty("$ref", out var refProp))
+            {
+                schemaRef = refProp.GetString();
+                var resolved = ResolveRef(root, schemaRef);
+                if (resolved.ValueKind == JsonValueKind.Object)
+                {
+                    var props = ExtractSchemaProperties(resolved, root);
+                    responses.Add(new ContractOperationResponse(statusCode, description, "application/json", props, schemaRef));
+                    continue;
+                }
+                responses.Add(new ContractOperationResponse(statusCode, description, "application/json", [], schemaRef));
+                continue;
+            }
+
+            var properties = ExtractSchemaProperties(schema, root);
+            responses.Add(new ContractOperationResponse(statusCode, description, "application/json", properties, schemaRef));
+        }
+
+        return responses;
     }
 
     private static List<ContractOperation> ExtractAsyncApiOperations(JsonElement root)
@@ -314,8 +491,12 @@ public static class CanonicalModelBuilder
 
         foreach (var channel in channels.EnumerateObject())
         {
+            if (channel.Value.ValueKind != JsonValueKind.Object) continue;
+
             foreach (var prop in channel.Value.EnumerateObject())
             {
+                if (prop.Value.ValueKind != JsonValueKind.Object) continue;
+
                 var opType = prop.Name.ToUpperInvariant();
                 if (opType is not ("PUBLISH" or "SUBSCRIBE")) continue;
 
@@ -362,9 +543,12 @@ public static class CanonicalModelBuilder
 
         foreach (var schema in current.EnumerateObject())
         {
+            if (schema.Value.ValueKind != JsonValueKind.Object) continue;
+
             var type = schema.Value.TryGetProperty("type", out var t) ? t.GetString() ?? "object" : "object";
             var desc = schema.Value.TryGetProperty("description", out var d) ? d.GetString() : null;
-            schemas.Add(new ContractSchemaElement(schema.Name, type, false, desc));
+            var children = ExtractSchemaProperties(schema.Value, root);
+            schemas.Add(new ContractSchemaElement(schema.Name, type, false, desc, Children: children.Count > 0 ? children : null));
         }
         return schemas;
     }
@@ -431,7 +615,7 @@ public static class CanonicalModelBuilder
         {
             foreach (var s in svrs.EnumerateObject())
             {
-                if (s.Value.TryGetProperty("url", out var url))
+                if (s.Value.ValueKind == JsonValueKind.Object && s.Value.TryGetProperty("url", out var url))
                     servers.Add(url.GetString() ?? "");
             }
         }
@@ -445,7 +629,7 @@ public static class CanonicalModelBuilder
         {
             foreach (var t in arr.EnumerateArray())
             {
-                if (t.TryGetProperty("name", out var name))
+                if (t.ValueKind == JsonValueKind.Object && t.TryGetProperty("name", out var name))
                     tags.Add(name.GetString() ?? "");
             }
         }
@@ -474,16 +658,233 @@ public static class CanonicalModelBuilder
 
         foreach (var p in pArr.EnumerateArray())
         {
+            if (p.ValueKind != JsonValueKind.Object) continue;
+
             var name = p.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
-            var required = p.TryGetProperty("required", out var r) && r.GetBoolean();
-            var schema = p.TryGetProperty("schema", out var s) ? s : default;
+            var required = p.TryGetProperty("required", out var r) && r.ValueKind == JsonValueKind.True;
+            var schema = p.TryGetProperty("schema", out var s) && s.ValueKind == JsonValueKind.Object ? s : default;
             var type = schema.ValueKind != JsonValueKind.Undefined && schema.TryGetProperty("type", out var t) ? t.GetString() ?? "string" : "string";
             var desc = p.TryGetProperty("description", out var d) ? d.GetString() : null;
-            var deprecated = p.TryGetProperty("deprecated", out var dep) && dep.GetBoolean();
+            var deprecated = p.TryGetProperty("deprecated", out var dep) && dep.ValueKind == JsonValueKind.True;
 
             parameters.Add(new ContractSchemaElement(name, type, required, desc, IsDeprecated: deprecated));
         }
         return parameters;
+    }
+
+    /// <summary>
+    /// Extrai o request body de uma operação OpenAPI 3.x.
+    /// Resolve o content type principal, required flag e propriedades do schema.
+    /// </summary>
+    private static ContractRequestBody? ExtractRequestBody(JsonElement operation, JsonElement root)
+    {
+        if (!operation.TryGetProperty("requestBody", out var rb) || rb.ValueKind != JsonValueKind.Object)
+            return null;
+
+        var required = rb.TryGetProperty("required", out var req) && req.ValueKind == JsonValueKind.True;
+
+        if (!rb.TryGetProperty("content", out var content) || content.ValueKind != JsonValueKind.Object)
+            return new ContractRequestBody("application/json", required, [], null);
+
+        // Resolve primeiro media type (prioriza application/json)
+        JsonElement mediaTypeElement = default;
+        string contentType = "application/json";
+
+        if (content.TryGetProperty("application/json", out var jsonMedia) && jsonMedia.ValueKind == JsonValueKind.Object)
+        {
+            mediaTypeElement = jsonMedia;
+        }
+        else
+        {
+            foreach (var mt in content.EnumerateObject())
+            {
+                if (mt.Value.ValueKind != JsonValueKind.Object) continue;
+                contentType = mt.Name;
+                mediaTypeElement = mt.Value;
+                break;
+            }
+        }
+
+        if (mediaTypeElement.ValueKind == JsonValueKind.Undefined)
+            return new ContractRequestBody(contentType, required, [], null);
+
+        var (properties, schemaRef) = ExtractSchemaFromMediaType(mediaTypeElement, root);
+        return new ContractRequestBody(contentType, required, properties, schemaRef);
+    }
+
+    /// <summary>
+    /// Extrai as respostas de uma operação OpenAPI 3.x.
+    /// Cada resposta inclui status code, descrição, content type e propriedades do schema.
+    /// </summary>
+    private static List<ContractOperationResponse> ExtractResponses(JsonElement operation, JsonElement root)
+    {
+        var responses = new List<ContractOperationResponse>();
+        if (!operation.TryGetProperty("responses", out var resObj) || resObj.ValueKind != JsonValueKind.Object)
+            return responses;
+
+        foreach (var resp in resObj.EnumerateObject())
+        {
+            if (resp.Value.ValueKind != JsonValueKind.Object) continue;
+
+            var statusCode = resp.Name;
+            var description = resp.Value.TryGetProperty("description", out var d) ? d.GetString() : null;
+
+            if (!resp.Value.TryGetProperty("content", out var content) || content.ValueKind != JsonValueKind.Object)
+            {
+                // Resposta sem body (ex: 204 No Content)
+                responses.Add(new ContractOperationResponse(statusCode, description, null, []));
+                continue;
+            }
+
+            // Resolve primeiro media type (prioriza application/json)
+            JsonElement mediaTypeElement = default;
+            string contentType = "application/json";
+
+            if (content.TryGetProperty("application/json", out var jsonMedia) && jsonMedia.ValueKind == JsonValueKind.Object)
+            {
+                mediaTypeElement = jsonMedia;
+            }
+            else
+            {
+                foreach (var mt in content.EnumerateObject())
+                {
+                    if (mt.Value.ValueKind != JsonValueKind.Object) continue;
+                    contentType = mt.Name;
+                    mediaTypeElement = mt.Value;
+                    break;
+                }
+            }
+
+            if (mediaTypeElement.ValueKind == JsonValueKind.Undefined)
+            {
+                responses.Add(new ContractOperationResponse(statusCode, description, contentType, []));
+                continue;
+            }
+
+            var (properties, schemaRef) = ExtractSchemaFromMediaType(mediaTypeElement, root);
+            responses.Add(new ContractOperationResponse(statusCode, description, contentType, properties, schemaRef));
+        }
+
+        return responses;
+    }
+
+    /// <summary>
+    /// Extrai propriedades de um schema a partir de um media type element.
+    /// Resolve $ref para schemas definidos em components/schemas ou definitions.
+    /// </summary>
+    private static (List<ContractSchemaElement> Properties, string? SchemaRef) ExtractSchemaFromMediaType(
+        JsonElement mediaType, JsonElement root)
+    {
+        if (!mediaType.TryGetProperty("schema", out var schema) || schema.ValueKind != JsonValueKind.Object)
+            return ([], null);
+
+        // Resolve $ref
+        if (schema.TryGetProperty("$ref", out var refProp))
+        {
+            var refPath = refProp.GetString();
+            var resolved = ResolveRef(root, refPath);
+            if (resolved.ValueKind == JsonValueKind.Object)
+            {
+                var props = ExtractSchemaProperties(resolved, root);
+                return (props, refPath);
+            }
+            return ([], refPath);
+        }
+
+        var properties = ExtractSchemaProperties(schema, root);
+        return (properties, null);
+    }
+
+    /// <summary>
+    /// Extrai propriedades de um schema JSON (object com "properties").
+    /// Suporta também array items com propriedades.
+    /// </summary>
+    private static List<ContractSchemaElement> ExtractSchemaProperties(JsonElement schema, JsonElement root)
+    {
+        var result = new List<ContractSchemaElement>();
+
+        // Resolve $ref no próprio schema se necessário
+        if (schema.TryGetProperty("$ref", out var refProp))
+        {
+            var resolved = ResolveRef(root, refProp.GetString());
+            if (resolved.ValueKind == JsonValueKind.Object)
+                return ExtractSchemaProperties(resolved, root);
+            return result;
+        }
+
+        var requiredFields = new HashSet<string>(StringComparer.Ordinal);
+        if (schema.TryGetProperty("required", out var reqArr) && reqArr.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var r in reqArr.EnumerateArray())
+            {
+                var val = r.GetString();
+                if (!string.IsNullOrEmpty(val)) requiredFields.Add(val);
+            }
+        }
+
+        // Handle type: array with items
+        if (schema.TryGetProperty("type", out var typeEl) && typeEl.GetString() == "array")
+        {
+            if (schema.TryGetProperty("items", out var items) && items.ValueKind == JsonValueKind.Object)
+            {
+                return ExtractSchemaProperties(items, root);
+            }
+            return result;
+        }
+
+        if (!schema.TryGetProperty("properties", out var props) || props.ValueKind != JsonValueKind.Object)
+            return result;
+
+        foreach (var prop in props.EnumerateObject())
+        {
+            if (prop.Value.ValueKind != JsonValueKind.Object) continue;
+
+            var propType = prop.Value.TryGetProperty("type", out var pt) ? pt.GetString() ?? "string" : "string";
+            var desc = prop.Value.TryGetProperty("description", out var pd) ? pd.GetString() : null;
+            var format = prop.Value.TryGetProperty("format", out var pf) ? pf.GetString() : null;
+            var defaultVal = prop.Value.TryGetProperty("default", out var dv) ? dv.ToString() : null;
+            var deprecated = prop.Value.TryGetProperty("deprecated", out var dp) && dp.ValueKind == JsonValueKind.True;
+            var isRequired = requiredFields.Contains(prop.Name);
+
+            // Resolve children for nested objects
+            List<ContractSchemaElement>? children = null;
+            if (propType == "object")
+            {
+                var nested = ExtractSchemaProperties(prop.Value, root);
+                if (nested.Count > 0) children = nested;
+            }
+            else if (propType == "array" && prop.Value.TryGetProperty("items", out var itemsEl) && itemsEl.ValueKind == JsonValueKind.Object)
+            {
+                var nested = ExtractSchemaProperties(itemsEl, root);
+                if (nested.Count > 0) children = nested;
+                var itemType = itemsEl.TryGetProperty("type", out var it) ? it.GetString() : null;
+                propType = itemType != null ? $"array<{itemType}>" : "array";
+            }
+
+            result.Add(new ContractSchemaElement(prop.Name, propType, isRequired, desc, format, defaultVal, deprecated, children));
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Resolve uma referência JSON ($ref) dentro do documento root.
+    /// Suporta referências no formato "#/components/schemas/Name" e "#/definitions/Name".
+    /// </summary>
+    private static JsonElement ResolveRef(JsonElement root, string? refPath)
+    {
+        if (string.IsNullOrEmpty(refPath) || !refPath.StartsWith("#/"))
+            return default;
+
+        var segments = refPath[2..].Split('/');
+        var current = root;
+        foreach (var segment in segments)
+        {
+            if (current.ValueKind != JsonValueKind.Object) return default;
+            if (!current.TryGetProperty(segment, out var next)) return default;
+            current = next;
+        }
+        return current;
     }
 
     private static bool HasOpenApiExamples(JsonElement root)
@@ -492,16 +893,21 @@ public static class CanonicalModelBuilder
 
         foreach (var path in paths.EnumerateObject())
         {
+            if (path.Value.ValueKind != JsonValueKind.Object) continue;
+
             foreach (var method in path.Value.EnumerateObject())
             {
-                if (method.Value.TryGetProperty("requestBody", out var rb))
+                if (method.Value.ValueKind != JsonValueKind.Object) continue;
+
+                if (method.Value.TryGetProperty("requestBody", out var rb) && rb.ValueKind == JsonValueKind.Object)
                 {
                     if (HasExamplesInContent(rb)) return true;
                 }
-                if (method.Value.TryGetProperty("responses", out var responses))
+                if (method.Value.TryGetProperty("responses", out var responses) && responses.ValueKind == JsonValueKind.Object)
                 {
                     foreach (var resp in responses.EnumerateObject())
                     {
+                        if (resp.Value.ValueKind != JsonValueKind.Object) continue;
                         if (HasExamplesInContent(resp.Value)) return true;
                     }
                 }

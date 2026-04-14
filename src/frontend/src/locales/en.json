@@ -2000,6 +2000,8 @@
     "catalog.contract.breaking_change_severity.label": "Breaking Change Default Severity",
     "catalog.contract.breaking_promotion_restriction.description": "Block promotion to production when unresolved breaking changes exist",
     "catalog.contract.breaking_promotion_restriction.label": "Breaking Change Promotion Restriction",
+    "catalog.contract.max_active_versions.description": "Maximum number of contract versions that can be simultaneously active per service. When exceeded, the oldest version must be deprecated before activating a new one.",
+    "catalog.contract.max_active_versions.label": "Max Active Contract Versions",
     "catalog.contract.creation.approval_required.description": "When enabled, new contract versions require approval before becoming available.",
     "catalog.contract.creation.approval_required.label": "Contract Creation Approval Required",
     "catalog.contract.creation.approval_roles.description": "Roles that can approve contract creation or changes.",
@@ -2008,6 +2010,8 @@
     "catalog.contract.deprecation.grace_period_days.label": "Deprecation Grace Period (days)",
     "catalog.contract.publication.require_examples.description": "When enabled, contracts must include request/response examples to be published.",
     "catalog.contract.publication.require_examples.label": "Require Examples for Publication",
+    "catalog.contract.require_approval_on_change.description": "When enabled, changes to contracts of services already in production require a separate approval workflow before the new version becomes active.",
+    "catalog.contract.require_approval_on_change.label": "Require Approval on Contract Change",
     "catalog.contract.types_enabled.description": "Contract types supported and enabled (REST, SOAP, GraphQL, gRPC, AsyncAPI, Event, SharedSchema)",
     "catalog.contract.types_enabled.label": "Enabled Contract Types",
     "catalog.contract.validation.auto_lint_on_save.description": "When enabled, lint rules are automatically executed when a contract is saved.",
@@ -2074,6 +2078,8 @@
     "catalog.service.deactivation.approval_required.label": "Service Deactivation Approval Required",
     "catalog.service.deactivation.require_dependency_check.description": "When enabled, blocks deactivation if other active services depend on it.",
     "catalog.service.deactivation.require_dependency_check.label": "Check Dependencies Before Deactivation",
+    "catalog.service.require_approval_on_registration.description": "When enabled, new service registrations (including all contracts and event definitions) require approval before becoming active.",
+    "catalog.service.require_approval_on_registration.label": "Require Approval on Service Registration",
     "catalog.templates.by_contract_type.description": "Default templates to use when creating new contracts per type",
     "catalog.templates.by_contract_type.label": "Contract Templates by Type",
     "catalog.templates.metadata_defaults.description": "Default metadata fields pre-filled in new contract drafts",
@@ -3440,6 +3446,7 @@
         "addRef": "$ref",
         "addResponse": "Add Response",
         "addResponseProp": "Add Property",
+        "addSchema": "Add Schema",
         "addVariant": "Add Variant",
         "apiInfo": "API Information",
         "arrayItems": "Array Item Type",
@@ -3452,6 +3459,7 @@
         "basePathPlaceholder": "/api/v1",
         "behavior": "Rate Limits & Behavior",
         "bodyProperties": "Request Body Properties",
+        "componentsSchemas": "Components / Schemas",
         "compositionType": "Composition Type",
         "constraints": "Constraints",
         "constraintsToggle": "Show constraints",
@@ -3487,13 +3495,16 @@
         "maxDepthReached": "Maximum nesting depth reached. Use $ref for deeper structures.",
         "maxLength": "Max Length",
         "maximum": "Maximum",
+        "maxItems": "Max Items",
         "method": "Method",
         "minLength": "Min Length",
         "minimum": "Minimum",
+        "minItems": "Min Items",
         "modeRef": "$ref (Schema Reference)",
         "modeVisualProps": "✦ Visual Properties",
         "nestedProperties": "Nested Properties",
         "noEndpoints": "No endpoints yet. Click \"Add Endpoint\" to get started.",
+        "noSchemas": "No reusable schemas. Define schemas here to reference via $ref in endpoints.",
         "noVariants": "No variants. Add at least one sub-schema.",
         "nullable": "Nullable",
         "obsPlaceholder": "Metrics, SLOs, tracing expectations...",
@@ -3513,6 +3524,7 @@
         "problemDetails": "Problem Details (RFC 7807)",
         "propDescPlaceholder": "Description of this property...",
         "propNamePlaceholder": "propertyName",
+        "propsCount": "props",
         "quickAdd": "Quick add:",
         "rateLimit": "Rate Limit",
         "rateLimitPlaceholder": "100/min",
@@ -3531,8 +3543,13 @@
         "responseProperties": "Response Properties",
         "responses": "Responses",
         "schema": "Schema ($ref)",
+        "schemaDescPlaceholder": "Describe this schema...",
         "schemaMode": "Schema Mode",
+        "schemaName": "Schema Name",
+        "schemaNamePlaceholder": "CreateUserRequest",
         "schemaPlaceholder": "#/components/schemas/CreateUserRequest",
+        "schemaProperties": "Properties",
+        "schemaRefPath": "$ref Path",
         "serverPlaceholder": "https://api.example.com",
         "servers": "Servers",
         "statusCode": "Status Code",
@@ -3542,6 +3559,7 @@
         "tagsPlaceholder": "Add tag...",
         "title": "Title",
         "titlePlaceholder": "User Management API",
+        "unnamedSchema": "(unnamed)",
         "validate": "Validate",
         "variantDescription": "Variant description...",
         "variantType": "Type",
@@ -3552,6 +3570,7 @@
         "warnMissingPathParam": "Path parameter '{{param}}' is used in path but not declared",
         "warnNo2xx": "No 2xx success response defined",
         "writeOnly": "Write Only",
+        "uniqueItems": "Unique Items",
         "placeholder": {
           "pattern": "^[a-z]+$"
         }
@@ -4500,6 +4519,34 @@
     "specContent": "Specification Content",
     "specContentPlaceholder": "Paste your specification here (JSON/YAML/XML)...",
     "spectral": {
+      "form": {
+        "content": "Ruleset Content",
+        "contentPlaceholder": "Paste your Spectral ruleset content here (JSON or YAML)...",
+        "contentRequired": "Ruleset content is required.",
+        "description": "Description",
+        "descriptionMaxLength": "Description must be at most 2000 characters.",
+        "descriptionPlaceholder": "Describe the purpose and scope of this ruleset...",
+        "name": "Name",
+        "nameMaxLength": "Name must be at most 200 characters.",
+        "namePlaceholder": "e.g., api-naming-conventions",
+        "nameRequired": "Name is required.",
+        "rulesetType": "Ruleset Type",
+        "submit": "Create Ruleset",
+        "title": "Create Ruleset",
+        "typeCustom": "Custom",
+        "typeDefault": "Default",
+        "uploadFile": "Upload File",
+        "loadTemplate": "Load Template",
+        "createError": "Failed to create ruleset. Please try again."
+      },
+      "templates": {
+        "openapiBestPractices": "OpenAPI Best Practices",
+        "openapiBestPracticesDesc": "Comprehensive rules for OpenAPI contract quality: operation metadata, naming conventions, versioning and documentation.",
+        "securityAuth": "Security & Authentication",
+        "securityAuthDesc": "Rules focused on security definitions, authentication schemes and safe transport requirements.",
+        "schemaDataQuality": "Schema & Data Quality",
+        "schemaDataQualityDesc": "Rules for schema completeness, type safety, examples and data contract quality."
+      },
       "manager": {
         "activate": "Activate",
         "active": "Active",
@@ -4709,6 +4756,85 @@
       "livePreview": {
         "parameters": "Parameters",
         "response": "Response"
+      }
+    },
+    "draftValidation": {
+      "title": "Draft Validation",
+      "tabValidation": "Validation",
+      "phases": "phases",
+      "phaseSyntax": "Syntax",
+      "phaseRules": "Rules & Design",
+      "phaseCanonical": "Canonical",
+      "running": "Validating...",
+      "runAll": "Validate All",
+      "noErrors": "No errors found",
+      "errorsFound": "{{count}} error(s) found",
+      "totalIssues": "{{count}} total issue(s)",
+      "filterAll": "All",
+      "emptyTitle": "No validation results yet",
+      "emptyDescription": "Click \"Validate All\" to check your contract against syntax rules, design guidelines, and canonical conformance.",
+      "issues": {
+        "unsupportedProtocol": "Protocol '{{protocol}}' is not supported.",
+        "parseFailed": "Could not parse specification. Verify the content is valid for the selected protocol.",
+        "parseError": "Failed to parse specification: {{detail}}",
+        "noGlobalTags": "No global tags defined. Tags help organise endpoints by resource.",
+        "pathNotKebabCase": "Path '{{path}}' does not follow kebab-case convention.",
+        "missingOperationId": "Operation {{method}} {{path}} is missing 'operationId'.",
+        "missingOperationIdCanonical": "Operation '{{operation}}' is missing operationId.",
+        "noSuccessResponse": "Operation {{method}} {{path}} has no 2xx response defined.",
+        "emptyRef": "Empty $ref target at {{path}}.",
+        "emptyRefAtLine": "Empty $ref target at line {{line}}."
+      },
+      "fixes": {
+        "useValidProtocol": "Use one of: OpenApi, Swagger, AsyncApi, Wsdl, WorkerService.",
+        "verifySpecContent": "Verify the spec content is well-formed YAML, JSON or XML.",
+        "addTagsArray": "Add a 'tags' array at the root level.",
+        "useKebabCase": "Use lowercase with hyphens (e.g., /my-resource).",
+        "addOperationId": "Add an 'operationId' to uniquely identify this operation.",
+        "addSuccessResponse": "Add at least one 2xx response (e.g., 200, 201, 204).",
+        "provideRefTarget": "Provide a valid $ref target (e.g., '#/components/schemas/MyModel')."
+      },
+      "rules": {
+        "OperationDescription": {
+          "message": "Operation '{{path}}' has no description.",
+          "fix": "Add a description to the operation for better documentation."
+        },
+        "NamingConvention": {
+          "message": "Operation name contains whitespace characters.",
+          "fix": "Use camelCase or PascalCase without spaces for operation names."
+        },
+        "SecurityDefinition": {
+          "message": "Contract does not define any security schemes.",
+          "fix": "Add security definitions (OAuth2, API Key, Bearer, etc.) to the contract."
+        },
+        "VersionConsistency": {
+          "message": "Contract spec version differs from the registered semantic version.",
+          "fix": "Ensure the spec version matches the registered semantic version."
+        },
+        "ExamplesCoverage": {
+          "message": "Contract does not include examples in operations.",
+          "fix": "Add request/response examples to improve developer experience."
+        },
+        "SchemaCompleteness": {
+          "message": "Schema element has no data type defined.",
+          "fix": "Define the data type for all schema elements."
+        },
+        "DeprecationDocumentation": {
+          "message": "Deprecated operation lacks deprecation notice or migration guidance.",
+          "fix": "Add deprecation notice with migration guidance to deprecated operations."
+        },
+        "WorkerOperationMissing": {
+          "message": "Background service contract has no declared operations.",
+          "fix": "Declare the background service name and category in the contract."
+        },
+        "WorkerTriggerTypeMissing": {
+          "message": "Background service contract does not declare a TriggerType.",
+          "fix": "Set TriggerType to one of: Cron, Interval, EventTriggered, OnDemand, Continuous."
+        },
+        "WorkerScheduleMissing": {
+          "message": "Background service with scheduled trigger should declare a ScheduleExpression.",
+          "fix": "Provide a cron expression or ISO 8601 interval (e.g. '0 * * * *' or 'PT5M')."
+        }
       }
     },
     "subtitle": "Multi-protocol contract governance and semantic diff",
@@ -8474,6 +8600,8 @@
     "sloManagement": "SLO Management",
     "sourceOfTruth": "Source of Truth",
     "spectralRulesets": "Spectral Rulesets",
+    "subGroupContracts": "Contracts",
+    "subGroupContractGovernance": "Contract Governance",
     "tagline": "Engineering Governance Platform",
     "teams": "Teams",
     "users": "Users",

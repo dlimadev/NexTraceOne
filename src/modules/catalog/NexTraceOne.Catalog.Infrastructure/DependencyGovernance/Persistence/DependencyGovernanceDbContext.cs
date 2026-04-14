@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.Catalog.Application.DependencyGovernance.Abstractions;
 using NexTraceOne.Catalog.Domain.DependencyGovernance.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence;
@@ -15,7 +16,7 @@ public sealed class DependencyGovernanceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IDependencyGovernanceUnitOfWork
 {
     public DbSet<ServiceDependencyProfile> ServiceDependencyProfiles => Set<ServiceDependencyProfile>();
     public DbSet<PackageDependency> PackageDependencies => Set<PackageDependency>();

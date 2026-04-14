@@ -32,7 +32,7 @@ public static class ArchiveRuleset
     /// <summary>Handler que arquiva um ruleset existente.</summary>
     public sealed class Handler(
         IRulesetRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IRulesetGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         /// <summary>Processa o comando de arquivamento de ruleset.</summary>
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

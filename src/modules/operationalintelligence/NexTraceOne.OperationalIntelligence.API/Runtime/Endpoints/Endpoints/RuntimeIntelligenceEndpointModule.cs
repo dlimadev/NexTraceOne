@@ -53,7 +53,7 @@ public sealed class RuntimeIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/runtime/snapshots/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/runtime/snapshots/{r.SnapshotId}", localizer);
         })
         .RequirePermission("operations:runtime:write");
 
@@ -90,7 +90,7 @@ public sealed class RuntimeIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
-            return result.ToCreatedResult("/api/v1/runtime/observability/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/runtime/observability/{r.ProfileId}", localizer);
         })
         .RequirePermission("operations:runtime:write");
 

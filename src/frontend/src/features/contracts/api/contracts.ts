@@ -26,9 +26,6 @@ import type {
   ValidationIssue,
   ValidationSummary,
   SpectralRuleset,
-  SpectralExecutionMode,
-  SpectralEnforcementBehavior,
-  SpectralRulesetOrigin,
   CanonicalEntity,
   CanonicalUsageReference,
   ContractScorecard,
@@ -186,15 +183,53 @@ export const contractsApi = {
     client.get<ValidationSummary>(`/contracts/${contractVersionId}/validation-summary`).then((r) => r.data),
 
   validateSpecContent: (data: { specContent: string; protocol: ContractProtocol; rulesetIds?: string[] }) =>
-    client.post<{ issues: ValidationIssue[]; summary: ValidationSummary }>('/contracts/validate-spec', data).then((r) => r.data),
+    client.post<{
+      totalIssues: number;
+      errorCount: number;
+      warningCount: number;
+      infoCount: number;
+      hintCount: number;
+      isValid: boolean;
+      fingerprint: string;
+      sources: string[];
+      issues: ValidationIssue[];
+    }>('/contracts/validate-spec', data).then((r) => r.data),
 
   parseSpecPreview: (data: { specContent: string; protocol: string }) =>
     client.post('/contracts/parse-preview', data).then((r) => r.data),
 
   // ── Spectral Rulesets ───────────────────────────────────────────────────────
 
-  listSpectralRulesets: (params?: { origin?: SpectralRulesetOrigin; isActive?: boolean; domain?: string }) =>
-    client.get<{ items: SpectralRuleset[]; total: number }>('/contracts/spectral/rulesets', { params }).then((r) => r.data),
+  listSpectralRulesets: (params?: { isActive?: boolean }) =>
+    client.get<{
+      rulesets: Array<{
+        rulesetId: string;
+        name: string;
+        description: string;
+        content: string;
+        rulesetType: string;
+        isActive: boolean;
+        createdAt: string;
+      }>;
+      totalCount: number;
+    }>('/contracts/spectral/rulesets', { params }).then((r) => ({
+      items: r.data.rulesets.map((item) => ({
+        id: item.rulesetId,
+        name: item.name,
+        description: item.description,
+        content: item.content,
+        rulesetType: item.rulesetType,
+        isActive: item.isActive,
+        isDefault: item.rulesetType === 'Default',
+        createdAt: item.createdAt,
+        updatedAt: item.createdAt,
+        version: '',
+        origin: 'Platform' as const,
+        defaultExecutionMode: 'OnDemand' as const,
+        enforcementBehavior: 'AdvisoryOnly' as const,
+      })) as SpectralRuleset[],
+      total: r.data.totalCount,
+    })),
 
   getSpectralRuleset: (rulesetId: string) =>
     client.get<SpectralRuleset>(`/contracts/spectral/rulesets/${rulesetId}`).then((r) => r.data),
@@ -203,17 +238,9 @@ export const contractsApi = {
     name: string;
     description: string;
     content: string;
-    origin: SpectralRulesetOrigin;
-    defaultExecutionMode: SpectralExecutionMode;
-    enforcementBehavior: SpectralEnforcementBehavior;
-    organizationId?: string;
-    owner?: string;
-    domain?: string;
-    applicableServiceType?: string;
-    applicableProtocols?: string;
-    sourceUrl?: string;
+    rulesetType: string;
   }) =>
-    client.post<{ id: string }>('/contracts/spectral/rulesets', data).then((r) => r.data),
+    client.post<{ rulesetId: string }>('/contracts/spectral/rulesets', data).then((r) => r.data),
 
   updateSpectralRuleset: (rulesetId: string, data: Partial<SpectralRuleset>) =>
     client.put(`/contracts/spectral/rulesets/${rulesetId}`, data).then((r) => r.data),
@@ -221,8 +248,11 @@ export const contractsApi = {
   deleteSpectralRuleset: (rulesetId: string) =>
     client.delete(`/contracts/spectral/rulesets/${rulesetId}`).then((r) => r.data),
 
-  toggleSpectralRuleset: (rulesetId: string, isActive: boolean) =>
-    client.patch(`/contracts/spectral/rulesets/${rulesetId}/status`, { isActive }).then((r) => r.data),
+  archiveSpectralRuleset: (rulesetId: string) =>
+    client.put(`/contracts/spectral/rulesets/${rulesetId}/archive`).then((r) => r.data),
+
+  activateSpectralRuleset: (rulesetId: string) =>
+    client.put(`/contracts/spectral/rulesets/${rulesetId}/activate`).then((r) => r.data),
 
   // ── Canonical Entities ──────────────────────────────────────────────────────
 

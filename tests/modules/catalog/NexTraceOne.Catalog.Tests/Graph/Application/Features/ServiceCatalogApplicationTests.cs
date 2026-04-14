@@ -113,7 +113,7 @@ public sealed class ServiceCatalogApplicationTests
     public async Task UpdateServiceAsset_Should_UpdateDetails_When_ServiceExists()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateServiceAssetFeature.Handler(repository, unitOfWork);
 
         var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
@@ -145,7 +145,7 @@ public sealed class ServiceCatalogApplicationTests
     public async Task UpdateServiceAsset_Should_ReturnNotFound_When_ServiceDoesNotExist()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateServiceAssetFeature.Handler(repository, unitOfWork);
 
         repository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
@@ -167,7 +167,7 @@ public sealed class ServiceCatalogApplicationTests
     public async Task UpdateServiceOwnership_Should_UpdateOwnership_When_ServiceExists()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateServiceOwnershipFeature.Handler(repository, unitOfWork);
 
         var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
@@ -190,7 +190,7 @@ public sealed class ServiceCatalogApplicationTests
     public async Task UpdateServiceOwnership_Should_ReturnNotFound_When_ServiceDoesNotExist()
     {
         var repository = Substitute.For<IServiceAssetRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateServiceOwnershipFeature.Handler(repository, unitOfWork);
 
         repository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
@@ -331,7 +331,7 @@ public sealed class ServiceCatalogApplicationTests
     {
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("new-service", Arg.Any<CancellationToken>())
@@ -361,7 +361,7 @@ public sealed class ServiceCatalogApplicationTests
     {
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("full-service", Arg.Any<CancellationToken>())
@@ -402,7 +402,7 @@ public sealed class ServiceCatalogApplicationTests
     {
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         var existing = ServiceAsset.Create("existing-service", "Finance", "Team Alpha");
@@ -423,7 +423,7 @@ public sealed class ServiceCatalogApplicationTests
     {
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("safe-service", Arg.Any<CancellationToken>())
@@ -450,7 +450,7 @@ public sealed class ServiceCatalogApplicationTests
     {
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
 
         repository.GetByNameAsync("detail-service", Arg.Any<CancellationToken>())

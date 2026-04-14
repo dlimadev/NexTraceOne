@@ -25,6 +25,9 @@ public sealed class CatalogContractsChangeGovernanceConfigurationDefinitionsTest
         ConfigurationDefinition.Create("catalog.contract.breaking_change_severity", "Breaking Change Default Severity", ConfigurationCategory.Functional, ConfigurationValueType.String, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: "High", validationRules: """{"enum":["Critical","High","Medium","Low"]}""", uiEditorType: "select", sortOrder: 4040),
         ConfigurationDefinition.Create("catalog.contract.version_increment_rules", "Version Increment Rules", ConfigurationCategory.Functional, ConfigurationValueType.Json, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: """{"breakingChange":"major","newFeature":"minor","bugfix":"patch","documentation":"patch"}""", uiEditorType: "json-editor", sortOrder: 4050),
         ConfigurationDefinition.Create("catalog.contract.breaking_promotion_restriction", "Breaking Change Promotion Restriction", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment], defaultValue: "true", uiEditorType: "toggle", sortOrder: 4060),
+        ConfigurationDefinition.Create("catalog.contract.max_active_versions", "Max Active Contract Versions", ConfigurationCategory.Functional, ConfigurationValueType.Integer, [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment], defaultValue: "2", validationRules: """{"min":1,"max":10}""", uiEditorType: "text", sortOrder: 4070),
+        ConfigurationDefinition.Create("catalog.contract.require_approval_on_change", "Require Approval on Contract Change", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment], defaultValue: "true", uiEditorType: "toggle", sortOrder: 4071),
+        ConfigurationDefinition.Create("catalog.service.require_approval_on_registration", "Require Approval on Service Registration", ConfigurationCategory.Functional, ConfigurationValueType.Boolean, [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment], defaultValue: "true", uiEditorType: "toggle", sortOrder: 4072),
 
         // Block B — Validation, Linting, Rulesets & Templates
         ConfigurationDefinition.Create("catalog.validation.lint_severity_defaults", "Lint Severity Defaults", ConfigurationCategory.Functional, ConfigurationValueType.Json, [ConfigurationScope.System, ConfigurationScope.Tenant], defaultValue: """{"missingDescription":"warn","missingExample":"info","unusedSchema":"warn","invalidReference":"error","securitySchemeUndefined":"error"}""", uiEditorType: "json-editor", sortOrder: 4100),
@@ -492,8 +495,8 @@ public sealed class CatalogContractsChangeGovernanceConfigurationDefinitionsTest
     {
         var definitions = BuildPhase5Definitions();
 
-        // 7 contract types/versioning + 6 validation/rulesets + 10 requirements + 5 publication + 4 import/export + 7 change types/blast + 10 release scoring/evidence/rollback = 49
-        definitions.Should().HaveCount(49,
-            "Phase 5 should deliver 49 catalog, contracts and change governance definitions");
+        // 7 contract types/versioning + 3 versioning/approval governance + 6 validation/rulesets + 10 requirements + 5 publication + 4 import/export + 7 change types/blast + 10 release scoring/evidence/rollback = 52
+        definitions.Should().HaveCount(52,
+            "Phase 5 should deliver 52 catalog, contracts and change governance definitions");
     }
 }

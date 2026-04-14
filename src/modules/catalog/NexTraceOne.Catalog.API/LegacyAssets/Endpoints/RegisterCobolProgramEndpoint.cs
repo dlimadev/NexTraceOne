@@ -27,7 +27,7 @@ public static class RegisterCobolProgramEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/catalog/legacy/cobol-programs/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/catalog/legacy/cobol-programs/{r.Id}", localizer);
         }).RequirePermission("catalog:legacy-assets:write");
     }
 }

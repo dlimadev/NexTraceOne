@@ -36,7 +36,7 @@ internal static class ApprovalEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/workflow/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/workflow/{r.WorkflowInstanceId}", localizer);
         }).RequirePermission("workflow:instances:write");
 
         group.MapPost("/stages/{stageId:guid}/approve", async (

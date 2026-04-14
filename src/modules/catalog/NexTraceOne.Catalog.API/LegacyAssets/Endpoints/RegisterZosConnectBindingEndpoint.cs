@@ -27,7 +27,7 @@ public static class RegisterZosConnectBindingEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/catalog/legacy/zos-connect-bindings/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/catalog/legacy/zos-connect-bindings/{r.Id}", localizer);
         }).RequirePermission("catalog:legacy-assets:write");
     }
 }

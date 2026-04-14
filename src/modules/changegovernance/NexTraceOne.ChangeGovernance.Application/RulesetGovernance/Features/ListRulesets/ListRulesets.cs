@@ -36,16 +36,18 @@ public static class ListRulesets
             Guard.Against.Null(request);
 
             var rulesets = await repository.ListAsync(request.Page, request.PageSize, cancellationToken);
+            var totalCount = await repository.CountAsync(cancellationToken);
 
             var dtos = rulesets.Select(r => new RulesetDto(
                 r.Id.Value,
                 r.Name,
                 r.Description,
+                r.Content,
                 r.RulesetType.ToString(),
                 r.IsActive,
                 r.RulesetCreatedAt)).ToList();
 
-            return new Response(dtos);
+            return new Response(dtos, totalCount);
         }
     }
 
@@ -54,10 +56,11 @@ public static class ListRulesets
         Guid RulesetId,
         string Name,
         string Description,
+        string Content,
         string RulesetType,
         bool IsActive,
         DateTimeOffset CreatedAt);
 
     /// <summary>Resposta da listagem de rulesets.</summary>
-    public sealed record Response(IReadOnlyList<RulesetDto> Rulesets);
+    public sealed record Response(IReadOnlyList<RulesetDto> Rulesets, int TotalCount);
 }

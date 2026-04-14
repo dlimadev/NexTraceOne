@@ -33,7 +33,7 @@ public static class PublishFrameworkVersion
     /// <summary>Handler que publica nova versão do framework.</summary>
     public sealed class Handler(
         IFrameworkAssetDetailRepository frameworkRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

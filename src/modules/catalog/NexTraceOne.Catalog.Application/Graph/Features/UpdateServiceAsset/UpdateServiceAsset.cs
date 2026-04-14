@@ -46,7 +46,7 @@ public static class UpdateServiceAsset
     /// <summary>Handler que atualiza os detalhes de um serviço existente.</summary>
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

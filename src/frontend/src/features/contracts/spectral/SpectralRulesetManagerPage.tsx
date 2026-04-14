@@ -7,29 +7,17 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
-  Globe,
-  Building2,
-  Users,
-  Download,
-  ExternalLink,
   Star,
+  FileCode,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageContainer, StatsGrid } from '../../../components/shell';
 import { LoadingState, ErrorState } from '../shared/components/StateIndicators';
-import { useSpectralRulesets, useToggleSpectralRuleset, useDeleteSpectralRuleset } from '../hooks';
-import { SEVERITY_COLORS } from '../shared/constants';
-import type { SpectralRuleset, SpectralRulesetOrigin } from '../types';
-
-const ORIGIN_CONFIG: Record<SpectralRulesetOrigin, { icon: React.ComponentType<{ size?: number; className?: string }>; color: string }> = {
-  Platform: { icon: Globe, color: 'text-mint' },
-  Organization: { icon: Building2, color: 'text-accent' },
-  Team: { icon: Users, color: 'text-cyan' },
-  Imported: { icon: Download, color: 'text-warning' },
-  ExternalRepository: { icon: ExternalLink, color: 'text-muted' },
-};
+import { useSpectralRulesets, useToggleSpectralRuleset, useDeleteSpectralRuleset, useCreateSpectralRuleset } from '../hooks';
+import { CreateRulesetModal } from './CreateRulesetModal';
+import type { SpectralRuleset } from '../types';
 
 /**
  * Página de gestão de rulesets Spectral.
@@ -37,14 +25,14 @@ const ORIGIN_CONFIG: Record<SpectralRulesetOrigin, { icon: React.ComponentType<{
  */
 export function SpectralRulesetManagerPage() {
   const { t } = useTranslation();
-  const [originFilter, setOriginFilter] = useState<SpectralRulesetOrigin | ''>('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
-  const rulesetsQuery = useSpectralRulesets(
-    originFilter ? { origin: originFilter as SpectralRulesetOrigin } : undefined,
-  );
+  const rulesetsQuery = useSpectralRulesets();
   const toggleMutation = useToggleSpectralRuleset();
   const deleteMutation = useDeleteSpectralRuleset();
+  const createMutation = useCreateSpectralRuleset();
 
   const rulesets = rulesetsQuery.data?.items ?? [];
 
@@ -65,37 +53,22 @@ export function SpectralRulesetManagerPage() {
         title={t('contracts.spectral.manager.title', 'Spectral Rulesets')}
         subtitle={t('contracts.spectral.manager.subtitle', 'Manage linting rulesets for contract validation and governance.')}
         actions={
-          <button type="button" className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors">
+          <button
+            type="button"
+            onClick={() => setIsCreateOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-accent/15 text-accent border border-accent/25 hover:bg-accent/25 transition-colors"
+          >
             <Plus size={14} />
             {t('contracts.spectral.manager.create', 'Add Ruleset')}
           </button>
         }
       />
 
-      {/* Filters */}
-      <div className="flex items-center gap-3">
-        <label className="text-xs text-muted">{t('contracts.spectral.manager.filterOrigin', 'Origin:')}</label>
-        {(['', 'Platform', 'Organization', 'Team', 'Imported', 'ExternalRepository'] as const).map((origin) => (
-          <button type="button"
-            key={origin || 'all'}
-            onClick={() => setOriginFilter(origin)}
-            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-              originFilter === origin
-                ? 'bg-accent/15 text-accent border-accent/25'
-                : 'bg-elevated/50 text-muted border-edge/20 hover:border-accent/30'
-            }`}
-          >
-            {origin || t('common.viewAll', 'All')}
-          </button>
-        ))}
-      </div>
-
       {/* Stats */}
-      <StatsGrid columns={4}>
+      <StatsGrid columns={3}>
         <StatCard label={t('contracts.spectral.manager.total', 'Total')} value={rulesets.length} />
         <StatCard label={t('contracts.spectral.manager.active', 'Active')} value={rulesets.filter((r) => r.isActive).length} variant="success" />
         <StatCard label={t('contracts.spectral.manager.inactive', 'Inactive')} value={rulesets.filter((r) => !r.isActive).length} variant="warning" />
-        <StatCard label={t('contracts.spectral.manager.defaults', 'Default')} value={rulesets.filter((r) => r.isDefault).length} variant="accent" />
       </StatsGrid>
       {rulesets.length === 0 && !rulesetsQuery.isLoading && (
         <EmptyState
@@ -108,8 +81,6 @@ export function SpectralRulesetManagerPage() {
       <div className="space-y-3">
         {rulesets.map((ruleset) => {
           const isExpanded = expandedId === ruleset.id;
-          const OriginIcon = ORIGIN_CONFIG[ruleset.origin]?.icon ?? Globe;
-          const originColor = ORIGIN_CONFIG[ruleset.origin]?.color ?? 'text-muted';
 
           return (
             <Card key={ruleset.id}>
@@ -123,32 +94,26 @@ export function SpectralRulesetManagerPage() {
                     {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                   </button>
 
-                  {/* Origin icon */}
-                  <OriginIcon size={16} className={originColor} />
+                  {/* Icon */}
+                  <FileCode size={16} className="text-accent" />
 
-                  {/* Name & version */}
+                  {/* Name & description */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-heading truncate">{ruleset.name}</p>
                       {ruleset.isDefault && (
                         <Star size={12} className="text-warning fill-warning" />
                       )}
-                      <span className="text-[10px] text-muted">v{ruleset.version}</span>
+                      <span className={`px-2 py-0.5 text-[10px] rounded-full ${
+                        ruleset.rulesetType === 'Default'
+                          ? 'bg-accent/10 text-accent border border-accent/20'
+                          : 'bg-elevated/50 text-muted border border-edge/20'
+                      }`}>
+                        {ruleset.rulesetType}
+                      </span>
                     </div>
                     <p className="text-xs text-muted truncate">{ruleset.description}</p>
                   </div>
-
-                  {/* Metadata badges */}
-                  <span className={`px-2 py-0.5 text-[10px] rounded-full ${SEVERITY_COLORS.Info}`}>
-                    {ruleset.defaultExecutionMode}
-                  </span>
-                  <span className={`px-2 py-0.5 text-[10px] rounded-full ${
-                    ruleset.enforcementBehavior.includes('Blocking')
-                      ? SEVERITY_COLORS.Error
-                      : SEVERITY_COLORS.Warning
-                  }`}>
-                    {ruleset.enforcementBehavior}
-                  </span>
 
                   {/* Active toggle */}
                   <button type="button"
@@ -179,54 +144,34 @@ export function SpectralRulesetManagerPage() {
 
                 {/* Expanded detail */}
                 {isExpanded && (
-                  <div className="mt-4 pt-4 border-t border-edge/10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 text-xs">
-                    <div>
-                      <p className="text-muted mb-1">{t('contracts.spectral.manager.origin', 'Origin')}</p>
-                      <p className="text-heading">{ruleset.origin}</p>
+                  <div className="mt-4 pt-4 border-t border-edge/10 space-y-4 text-xs">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-muted mb-1">{t('contracts.spectral.manager.rulesetType', 'Type')}</p>
+                        <p className="text-heading">{ruleset.rulesetType}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted mb-1">{t('contracts.spectral.manager.status', 'Status')}</p>
+                        <p className={ruleset.isActive ? 'text-mint' : 'text-warning'}>
+                          {ruleset.isActive
+                            ? t('contracts.spectral.manager.active', 'Active')
+                            : t('contracts.spectral.manager.inactive', 'Inactive')}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted mb-1">{t('contracts.spectral.manager.createdAt', 'Created')}</p>
+                        <p className="text-heading">{new Date(ruleset.createdAt).toLocaleDateString()}</p>
+                      </div>
                     </div>
-                    {ruleset.owner && (
+                    {ruleset.content && (
                       <div>
-                        <p className="text-muted mb-1">{t('contracts.spectral.manager.owner', 'Owner')}</p>
-                        <p className="text-heading">{ruleset.owner}</p>
+                        <p className="text-muted mb-1">{t('contracts.spectral.manager.contentPreview', 'Ruleset Content')}</p>
+                        <pre className="p-3 rounded-lg bg-panel/50 border border-edge/10 text-[11px] text-heading font-mono overflow-x-auto max-h-[200px]">
+                          {ruleset.content.slice(0, 800)}
+                          {ruleset.content.length > 800 && '...'}
+                        </pre>
                       </div>
                     )}
-                    {ruleset.domain && (
-                      <div>
-                        <p className="text-muted mb-1">{t('contracts.spectral.manager.domain', 'Domain')}</p>
-                        <p className="text-heading">{ruleset.domain}</p>
-                      </div>
-                    )}
-                    {ruleset.applicableServiceType && (
-                      <div>
-                        <p className="text-muted mb-1">{t('contracts.spectral.manager.serviceType', 'Service Type')}</p>
-                        <p className="text-heading">{ruleset.applicableServiceType}</p>
-                      </div>
-                    )}
-                    {ruleset.applicableProtocols && (
-                      <div>
-                        <p className="text-muted mb-1">{t('contracts.spectral.manager.protocols', 'Protocols')}</p>
-                        <p className="text-heading">{ruleset.applicableProtocols}</p>
-                      </div>
-                    )}
-                    {ruleset.sourceUrl && (
-                      <div>
-                        <p className="text-muted mb-1">{t('contracts.spectral.manager.sourceUrl', 'Source URL')}</p>
-                        <a href={ruleset.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline truncate block">
-                          {ruleset.sourceUrl}
-                        </a>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-muted mb-1">{t('contracts.spectral.manager.updatedAt', 'Updated')}</p>
-                      <p className="text-heading">{new Date(ruleset.updatedAt).toLocaleDateString()}</p>
-                    </div>
-                    <div className="col-span-3">
-                      <p className="text-muted mb-1">{t('contracts.spectral.manager.contentPreview', 'Ruleset Content')}</p>
-                      <pre className="p-3 rounded-lg bg-panel/50 border border-edge/10 text-[11px] text-heading font-mono overflow-x-auto max-h-[200px]">
-                        {ruleset.content.slice(0, 800)}
-                        {ruleset.content.length > 800 && '...'}
-                      </pre>
-                    </div>
                   </div>
                 )}
               </CardBody>
@@ -234,6 +179,21 @@ export function SpectralRulesetManagerPage() {
           );
         })}
       </div>
+
+      {/* Create Modal */}
+      <CreateRulesetModal
+        isOpen={isCreateOpen}
+        onClose={() => { setIsCreateOpen(false); setCreateError(null); }}
+        isSubmitting={createMutation.isPending}
+        error={createError}
+        onSubmit={(data) => {
+          setCreateError(null);
+          createMutation.mutate(data, {
+            onSuccess: () => { setIsCreateOpen(false); setCreateError(null); },
+            onError: () => setCreateError(t('contracts.spectral.form.createError', 'Failed to create ruleset. Please try again.')),
+          });
+        }}
+      />
     </PageContainer>
   );
 }

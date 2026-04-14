@@ -1960,6 +1960,8 @@
     "catalog.contract.breaking_change_severity.label": "Quebra Mudança Padrão Severidade",
     "catalog.contract.breaking_promotion_restriction.description": "Block promotion para production when unresolved breaking changes exist",
     "catalog.contract.breaking_promotion_restriction.label": "Quebra Mudança Promoção Restriction",
+    "catalog.contract.max_active_versions.description": "Número máximo de versões de contrato que podem estar simultaneamente ativas por serviço. Quando excedido, a versão mais antiga deve ser depreciada antes de ativar uma nova.",
+    "catalog.contract.max_active_versions.label": "Máx. Versões de Contrato Ativas",
     "catalog.contract.creation.approval_required.description": "Quando ativado, novas versões de contrato requerem aprovação antes de ficarem disponíveis.",
     "catalog.contract.creation.approval_required.label": "Aprovação Obrigatória para Criação de Contrato",
     "catalog.contract.creation.approval_roles.description": "Papéis que podem aprovar a criação ou alteração de contratos.",
@@ -1968,7 +1970,9 @@
     "catalog.contract.deprecation.grace_period_days.label": "Período de Carência para Depreciação (dias)",
     "catalog.contract.publication.require_examples.description": "Quando ativado, contratos devem incluir exemplos de request/response para serem publicados.",
     "catalog.contract.publication.require_examples.label": "Exigir Exemplos para Publicação",
-    "catalog.contract.types_enabled.description": "Contrato tipos supported and ativado (REST, SOAP, GraphQL, gRPC, AsyncAPI, Event, SharedSchema)",
+    "catalog.contract.require_approval_on_change.description": "Quando ativado, alterações em contratos de serviços já em produção requerem um fluxo de aprovação separado antes que a nova versão fique ativa.",
+    "catalog.contract.require_approval_on_change.label": "Exigir Aprovação para Alteração de Contrato",
+    "catalog.contract.types_enabled.description": "Tipos de contrato suportados e ativados (REST, SOAP, GraphQL, gRPC, AsyncAPI, Event, SharedSchema)",
     "catalog.contract.types_enabled.label": "Ativado Contrato Tipos",
     "catalog.contract.validation.auto_lint_on_save.description": "Quando ativado, regras de lint são executadas automaticamente ao salvar um contrato.",
     "catalog.contract.validation.auto_lint_on_save.label": "Auto-Lint ao Salvar",
@@ -2034,7 +2038,9 @@
     "catalog.service.deactivation.approval_required.label": "Aprovação Obrigatória para Desativação de Serviço",
     "catalog.service.deactivation.require_dependency_check.description": "Quando ativado, bloqueia a desativação se outros serviços ativos dependem dele.",
     "catalog.service.deactivation.require_dependency_check.label": "Verificar Dependências Antes da Desativação",
-    "catalog.templates.by_contract_type.description": "Padrão templates para use when creating new contratos por tipo",
+    "catalog.service.require_approval_on_registration.description": "Quando ativado, novos registros de serviço (incluindo todos os contratos e definições de eventos) requerem aprovação antes de ficarem ativos.",
+    "catalog.service.require_approval_on_registration.label": "Exigir Aprovação para Registro de Serviço",
+    "catalog.templates.by_contract_type.description": "Modelos padrão para usar ao criar novos contratos por tipo",
     "catalog.templates.by_contract_type.label": "Contrato Templates by Tipo",
     "catalog.templates.metadata_defaults.description": "Padrão metadata fields pre-filled em new contrato drafts",
     "catalog.templates.metadata_defaults.label": "Contrato Metadata Defaults",
@@ -3400,6 +3406,7 @@
         "addRef": "$ref",
         "addResponse": "Adicionar Resposta",
         "addResponseProp": "Adicionar Propriedade",
+        "addSchema": "Adicionar Schema",
         "addVariant": "Adicionar Variante",
         "apiInfo": "Informações da API",
         "arrayItems": "Tipo de Item do Array",
@@ -3412,6 +3419,7 @@
         "basePathPlaceholder": "/api/v1",
         "behavior": "Limites e Comportamento",
         "bodyProperties": "Propriedades do Corpo da Requisição",
+        "componentsSchemas": "Componentes / Schemas",
         "compositionType": "Tipo de Composição",
         "constraints": "Constraints",
         "constraintsToggle": "Show constraints",
@@ -3447,13 +3455,16 @@
         "maxDepthReached": "Profundidade máxima de aninhamento atingida. Use $ref para estruturas mais profundas.",
         "maxLength": "Max Comprimento",
         "maximum": "Máximo",
+        "maxItems": "Máx Itens",
         "method": "Método",
         "minLength": "Min Comprimento",
         "minimum": "Mínimo",
+        "minItems": "Mín Itens",
         "modeRef": "$ref (Referência de Schema)",
         "modeVisualProps": "✦ Propriedades Visuais",
         "nestedProperties": "Propriedades Aninhadas",
         "noEndpoints": "Ainda não há endpoints. Clique em \"Adicionar Endpoint\" para começar.",
+        "noSchemas": "Sem schemas reutilizáveis. Defina schemas aqui para referenciar via $ref nos endpoints.",
         "noVariants": "Nenhuma variante. Adicione ao menos um sub-schema.",
         "nullable": "Anulável",
         "obsPlaceholder": "Métricas, SLOs, expectativas de rastreamento...",
@@ -3473,6 +3484,7 @@
         "problemDetails": "Detalhes do Problema (RFC 7807)",
         "propDescPlaceholder": "Descrição desta propriedade...",
         "propNamePlaceholder": "nomeDaPropriedade",
+        "propsCount": "props",
         "quickAdd": "Adicionar rápido:",
         "rateLimit": "Limite de Taxa",
         "rateLimitPlaceholder": "100/min",
@@ -3491,8 +3503,13 @@
         "responseProperties": "Propriedades da Resposta",
         "responses": "Respostas",
         "schema": "Schema ($ref)",
+        "schemaDescPlaceholder": "Descreva este schema...",
         "schemaMode": "Modo de Schema",
+        "schemaName": "Nome do Schema",
+        "schemaNamePlaceholder": "CreateUserRequest",
         "schemaPlaceholder": "#/components/schemas/CreateUserRequest",
+        "schemaProperties": "Propriedades",
+        "schemaRefPath": "Caminho $ref",
         "serverPlaceholder": "https://api.example.com",
         "servers": "Servidores",
         "statusCode": "Código de Status",
@@ -3502,6 +3519,7 @@
         "tagsPlaceholder": "Adicionar tag...",
         "title": "Título",
         "titlePlaceholder": "API de Gestão de Usuários",
+        "unnamedSchema": "(sem nome)",
         "validate": "Validar",
         "variantDescription": "Descrição da variante...",
         "variantType": "Tipo",
@@ -3512,6 +3530,7 @@
         "warnMissingPathParam": "O parâmetro de path '{{param}}' está no path mas não foi declarado",
         "warnNo2xx": "Nenhuma resposta de sucesso 2xx definida",
         "writeOnly": "Write Apenas",
+        "uniqueItems": "Itens Únicos",
         "placeholder": {
           "pattern": "^[a-z]+$"
         }
@@ -4460,6 +4479,34 @@
     "specContent": "Conteúdo da Especificação",
     "specContentPlaceholder": "Cole sua especificação aqui (JSON/YAML/XML)...",
     "spectral": {
+      "form": {
+        "content": "Conteúdo do Conjunto de Regras",
+        "contentPlaceholder": "Cole o conteúdo do seu conjunto de regras Spectral aqui (JSON ou YAML)...",
+        "contentRequired": "O conteúdo do conjunto de regras é obrigatório.",
+        "description": "Descrição",
+        "descriptionMaxLength": "A descrição deve ter no máximo 2000 caracteres.",
+        "descriptionPlaceholder": "Descreva o propósito e escopo deste conjunto de regras...",
+        "name": "Nome",
+        "nameMaxLength": "O nome deve ter no máximo 200 caracteres.",
+        "namePlaceholder": "ex.: api-naming-conventions",
+        "nameRequired": "O nome é obrigatório.",
+        "rulesetType": "Tipo do Conjunto de Regras",
+        "submit": "Criar Conjunto de Regras",
+        "title": "Criar Conjunto de Regras",
+        "typeCustom": "Personalizado",
+        "typeDefault": "Padrão",
+        "uploadFile": "Enviar Arquivo",
+        "loadTemplate": "Carregar Modelo",
+        "createError": "Falha ao criar o conjunto de regras. Tente novamente."
+      },
+      "templates": {
+        "openapiBestPractices": "Boas Práticas OpenAPI",
+        "openapiBestPracticesDesc": "Regras abrangentes para qualidade de contratos OpenAPI: metadados de operação, convenções de nomenclatura, versionamento e documentação.",
+        "securityAuth": "Segurança e Autenticação",
+        "securityAuthDesc": "Regras focadas em definições de segurança, esquemas de autenticação e requisitos de transporte seguro.",
+        "schemaDataQuality": "Schema e Qualidade de Dados",
+        "schemaDataQualityDesc": "Regras para completude de schema, segurança de tipos, exemplos e qualidade de contratos de dados."
+      },
       "manager": {
         "activate": "Ativar",
         "active": "Ativo",
@@ -4669,6 +4716,85 @@
       "livePreview": {
         "parameters": "Parâmetros",
         "response": "Resposta"
+      }
+    },
+    "draftValidation": {
+      "title": "Validação de Draft",
+      "tabValidation": "Validação",
+      "phases": "fases",
+      "phaseSyntax": "Sintaxe",
+      "phaseRules": "Regras & Design",
+      "phaseCanonical": "Canónico",
+      "running": "Validando...",
+      "runAll": "Validar Tudo",
+      "noErrors": "Nenhum erro encontrado",
+      "errorsFound": "{{count}} erro(s) encontrado(s)",
+      "totalIssues": "{{count}} issue(s) no total",
+      "filterAll": "Todos",
+      "emptyTitle": "Sem resultados de validação",
+      "emptyDescription": "Clique em \"Validar Tudo\" para verificar o contrato contra regras de sintaxe, directrizes de design e conformidade canónica.",
+      "issues": {
+        "unsupportedProtocol": "Protocolo '{{protocol}}' não é suportado.",
+        "parseFailed": "Não foi possível analisar a especificação. Verifique se o conteúdo é válido para o protocolo selecionado.",
+        "parseError": "Falha ao analisar a especificação: {{detail}}",
+        "noGlobalTags": "Nenhuma tag global definida. Tags ajudam a organizar endpoints por recurso.",
+        "pathNotKebabCase": "O caminho '{{path}}' não segue a convenção kebab-case.",
+        "missingOperationId": "A operação {{method}} {{path}} não possui 'operationId'.",
+        "missingOperationIdCanonical": "A operação '{{operation}}' não possui operationId.",
+        "noSuccessResponse": "A operação {{method}} {{path}} não possui resposta 2xx definida.",
+        "emptyRef": "Alvo $ref vazio em {{path}}.",
+        "emptyRefAtLine": "Alvo $ref vazio na linha {{line}}."
+      },
+      "fixes": {
+        "useValidProtocol": "Use um dos seguintes: OpenApi, Swagger, AsyncApi, Wsdl, WorkerService.",
+        "verifySpecContent": "Verifique se o conteúdo da spec é YAML, JSON ou XML bem formado.",
+        "addTagsArray": "Adicione um array 'tags' no nível raiz.",
+        "useKebabCase": "Use letras minúsculas com hífens (ex.: /meu-recurso).",
+        "addOperationId": "Adicione um 'operationId' para identificar esta operação de forma única.",
+        "addSuccessResponse": "Adicione pelo menos uma resposta 2xx (ex.: 200, 201, 204).",
+        "provideRefTarget": "Forneça um alvo $ref válido (ex.: '#/components/schemas/MeuModelo')."
+      },
+      "rules": {
+        "OperationDescription": {
+          "message": "A operação '{{path}}' não possui descrição.",
+          "fix": "Adicione uma descrição à operação para melhorar a documentação."
+        },
+        "NamingConvention": {
+          "message": "O nome da operação contém caracteres de espaço.",
+          "fix": "Use camelCase ou PascalCase sem espaços para nomes de operações."
+        },
+        "SecurityDefinition": {
+          "message": "O contrato não define nenhum esquema de segurança.",
+          "fix": "Adicione definições de segurança (OAuth2, API Key, Bearer, etc.) ao contrato."
+        },
+        "VersionConsistency": {
+          "message": "A versão da spec do contrato difere da versão semântica registrada.",
+          "fix": "Certifique-se de que a versão da spec corresponde à versão semântica registrada."
+        },
+        "ExamplesCoverage": {
+          "message": "O contrato não inclui exemplos nas operações.",
+          "fix": "Adicione exemplos de request/response para melhorar a experiência do desenvolvedor."
+        },
+        "SchemaCompleteness": {
+          "message": "O elemento de schema não possui tipo de dados definido.",
+          "fix": "Defina o tipo de dados para todos os elementos de schema."
+        },
+        "DeprecationDocumentation": {
+          "message": "A operação deprecated não possui aviso de depreciação ou guia de migração.",
+          "fix": "Adicione aviso de depreciação com guia de migração às operações deprecated."
+        },
+        "WorkerOperationMissing": {
+          "message": "O contrato de serviço em background não possui operações declaradas.",
+          "fix": "Declare o nome e categoria do serviço em background no contrato."
+        },
+        "WorkerTriggerTypeMissing": {
+          "message": "O contrato de serviço em background não declara um TriggerType.",
+          "fix": "Defina TriggerType como um dos seguintes: Cron, Interval, EventTriggered, OnDemand, Continuous."
+        },
+        "WorkerScheduleMissing": {
+          "message": "Serviço em background com trigger agendado deve declarar uma ScheduleExpression.",
+          "fix": "Forneça uma expressão cron ou intervalo ISO 8601 (ex.: '0 * * * *' ou 'PT5M')."
+        }
       }
     },
     "subtitle": "Governança de contratos multi-protocolo e diff semântico",
@@ -8437,6 +8563,8 @@
     "sloManagement": "Gestão de SLO",
     "sourceOfTruth": "Fonte de Verdade",
     "spectralRulesets": "Conjuntos de Regras Spectral",
+    "subGroupContracts": "Contratos",
+    "subGroupContractGovernance": "Governança de Contratos",
     "tagline": "Plataforma de Governança de Engenharia",
     "teams": "Equipes",
     "users": "Usuários",

@@ -53,7 +53,7 @@ public static class GenerateCode
     /// </summary>
     public sealed class Handler(
         ICodeGenerationRepository repository,
-        IUnitOfWork unitOfWork,
+        IPortalUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

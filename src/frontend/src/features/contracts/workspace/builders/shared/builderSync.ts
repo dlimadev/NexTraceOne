@@ -142,11 +142,14 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
           if (ep.requestBody.required) yaml += `        required: true\n`;
           yaml += `        content:\n`;
           yaml += `          ${ep.requestBody.contentType || 'application/json'}:\n`;
-          if (ep.requestBody.schema) {
-            yaml += `            schema:\n              $ref: "${esc(ep.requestBody.schema)}"\n`;
-          } else if (ep.requestBody.properties && ep.requestBody.properties.length > 0) {
+          if (ep.requestBody.properties && ep.requestBody.properties.length > 0) {
             yaml += `            schema:\n`;
             yaml += emitInlineSchema(ep.requestBody.properties as SchemaProperty[], 14);
+          } else if (ep.requestBody.schema) {
+            yaml += `            schema:\n              $ref: "${esc(ep.requestBody.schema)}"\n`;
+          } else if (ep.requestBody.properties) {
+            // Empty properties array — emit minimal schema to preserve Visual Properties mode on round-trip
+            yaml += `            schema:\n              type: object\n              properties: {}\n`;
           }
         }
 
@@ -155,15 +158,20 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
           for (const r of ep.responses) {
             yaml += `        "${r.statusCode}":\n`;
             yaml += `          description: "${esc(r.description || 'Response')}"\n`;
-            if (r.schema) {
-              yaml += `          content:\n`;
-              yaml += `            ${r.contentType || 'application/json'}:\n`;
-              yaml += `              schema:\n                $ref: "${esc(r.schema)}"\n`;
-            } else if (r.properties && r.properties.length > 0) {
+            if (r.properties && r.properties.length > 0) {
               yaml += `          content:\n`;
               yaml += `            ${r.contentType || 'application/json'}:\n`;
               yaml += `              schema:\n`;
               yaml += emitInlineSchema(r.properties as SchemaProperty[], 16);
+            } else if (r.schema) {
+              yaml += `          content:\n`;
+              yaml += `            ${r.contentType || 'application/json'}:\n`;
+              yaml += `              schema:\n                $ref: "${esc(r.schema)}"\n`;
+            } else if (r.properties) {
+              // Empty properties array — emit minimal schema to preserve Visual Properties mode on round-trip
+              yaml += `          content:\n`;
+              yaml += `            ${r.contentType || 'application/json'}:\n`;
+              yaml += `              schema:\n                type: object\n                properties: {}\n`;
             }
           }
         } else {
@@ -174,6 +182,7 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
           yaml += `      security:\n        - oauth2: [${ep.authScopes.join(', ')}]\n`;
         }
 
+
         if (ep.rateLimit || ep.idempotencyKey || ep.observabilityNotes) {
           yaml += `      x-nto-metadata:\n`;
           if (ep.rateLimit) yaml += `        rateLimit: "${esc(ep.rateLimit)}"\n`;
@@ -181,6 +190,32 @@ export function restBuilderToYaml(state: RestBuilderState): SyncResult {
           if (ep.observabilityNotes) yaml += `        observability: "${esc(ep.observabilityNotes)}"\n`;
           if (ep.deprecationNote) yaml += `        deprecationNote: "${esc(String(ep.deprecationNote))}"\n`;
         }
+      }
+    }
+  }
+
+  // Emit components/schemas when present
+  if (state.schemas && state.schemas.length > 0) {
+    yaml += `components:\n`;
+    yaml += `  schemas:\n`;
+    for (const schema of state.schemas) {
+      if (!schema.name) continue;
+      yaml += `    ${schema.name}:\n`;
+      if (schema.description) yaml += `      description: "${esc(schema.description)}"\n`;
+      if (schema.properties.length > 0) {
+        yaml += `      type: object\n`;
+        const requiredProps = schema.properties.filter((p) => p.required);
+        if (requiredProps.length > 0) {
+          yaml += `      required:\n`;
+          for (const p of requiredProps) yaml += `        - ${p.name}\n`;
+        }
+        yaml += `      properties:\n`;
+        for (const prop of schema.properties) {
+          yaml += emitSchemaPropertyYaml(prop, 8);
+        }
+      } else {
+        yaml += `      type: object\n`;
+        yaml += `      properties: {}\n`;
       }
     }
   }
@@ -303,6 +338,13 @@ function emitSchemaPropertyYaml(prop: SchemaProperty, indentLevel: number): stri
 
   // Array items
   if (prop.type === 'array' && prop.items) {
+    // Array-level constraints
+    const ac = prop.constraints;
+    if (ac) {
+      if (ac.minItems !== undefined) yaml += `${indent(indentLevel + 2)}minItems: ${ac.minItems}\n`;
+      if (ac.maxItems !== undefined) yaml += `${indent(indentLevel + 2)}maxItems: ${ac.maxItems}\n`;
+      if (ac.uniqueItems) yaml += `${indent(indentLevel + 2)}uniqueItems: true\n`;
+    }
     yaml += `${indent(indentLevel + 2)}items:\n`;
     if (prop.items.type === '$ref' && prop.items.$ref) {
       yaml += `${indent(indentLevel + 4)}$ref: "${esc(prop.items.$ref)}"\n`;

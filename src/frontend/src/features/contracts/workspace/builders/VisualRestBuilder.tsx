@@ -12,7 +12,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, AlertTriangle, Copy, Sparkles, Zap, ClipboardCopy, Check,
+  Plus, Trash2, ChevronDown, ChevronRight, AlertCircle, AlertTriangle, Copy, Sparkles, Zap, ClipboardCopy, Check, Braces,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../../components/Card';
 import {
@@ -28,8 +28,10 @@ import type {
   RestEndpoint,
   RestParameter,
   RestResponse,
+  RestComponentSchema,
   BuilderValidationResult,
   SyncResult,
+  SchemaProperty,
 } from './shared/builderTypes';
 
 import {
@@ -71,6 +73,7 @@ export function VisualRestBuilder({
       license: '',
       servers: [],
       endpoints: [],
+      schemas: [],
     },
   );
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -80,6 +83,9 @@ export function VisualRestBuilder({
   const [previewKeys, setPreviewKeys] = useState<Set<string>>(new Set());
   /** Estado de "copiado!" por chave de preview. */
   const [copiedKeys, setCopiedKeys] = useState<Set<string>>(new Set());
+  /** Schema mode overrides: tracks user's explicit choice per request body / response.
+   *  Key format: "ep-{epId}.reqBody" or "ep-{epId}.res-{resId}". */
+  const [schemaModeOverride, setSchemaModeOverride] = useState<Record<string, 'ref' | 'visual'>>({});
 
   const update = useCallback(
     (partial: Partial<RestBuilderState>) => {
@@ -89,6 +95,15 @@ export function VisualRestBuilder({
     },
     [state, onChange],
   );
+
+  /** Determines the active schema mode for a given key, falling back to data-based detection. */
+  const getSchemaMode = useCallback((key: string, schema: string | undefined, properties: SchemaProperty[] | undefined): 'ref' | 'visual' => {
+    const override = schemaModeOverride[key];
+    if (override) return override;
+    if (properties && properties.length > 0) return 'visual';
+    if (schema) return 'ref';
+    return 'visual';
+  }, [schemaModeOverride]);
 
   const addEndpoint = () => {
     const ep = createEndpoint();
@@ -292,6 +307,118 @@ export function VisualRestBuilder({
         </CardBody>
       </Card>
 
+      {/* ── Components / Schemas ── */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-semibold text-heading flex items-center gap-1.5">
+              <Braces size={12} className="text-purple-400" />
+              {t('contracts.builder.rest.componentsSchemas', 'Components / Schemas')} ({(state.schemas ?? []).length})
+            </h3>
+            {!isReadOnly && (
+              <button type="button"
+                onClick={() => {
+                  const newSchema: RestComponentSchema = { id: genId('cs'), name: '', description: '', properties: [] };
+                  update({ schemas: [...(state.schemas ?? []), newSchema] });
+                }}
+                className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors"
+              >
+                <Plus size={10} /> {t('contracts.builder.rest.addSchema', 'Add Schema')}
+              </button>
+            )}
+          </div>
+        </CardHeader>
+        <CardBody className="p-0">
+          {(state.schemas ?? []).length === 0 && (
+            <div className="py-6 text-center text-xs text-muted">
+              {t('contracts.builder.rest.noSchemas', 'No reusable schemas. Define schemas here to reference via $ref in endpoints.')}
+            </div>
+          )}
+          <div className="divide-y divide-edge">
+            {(state.schemas ?? []).map((schema) => {
+              const isSchemaExpanded = expandedSection[`schema.${schema.id}`] === 'open';
+              return (
+                <div key={schema.id} className="group">
+                  <div role="button" tabIndex={0}
+                    onClick={() => setExpandedSection((prev) => ({ ...prev, [`schema.${schema.id}`]: prev[`schema.${schema.id}`] === 'open' ? '' : 'open' }))}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedSection((prev) => ({ ...prev, [`schema.${schema.id}`]: prev[`schema.${schema.id}`] === 'open' ? '' : 'open' })); } }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors cursor-pointer"
+                  >
+                    {isSchemaExpanded ? <ChevronDown size={12} className="text-muted" /> : <ChevronRight size={12} className="text-muted" />}
+                    <Braces size={12} className="text-purple-400" />
+                    <span className="text-xs font-mono text-heading flex-1 truncate">
+                      {schema.name || t('contracts.builder.rest.unnamedSchema', '(unnamed)')}
+                    </span>
+                    <span className="text-[10px] text-muted">
+                      {schema.properties.length} {t('contracts.builder.rest.propsCount', 'props')}
+                    </span>
+                    {!isReadOnly && (
+                      <button type="button"
+                        onClick={(e) => { e.stopPropagation(); update({ schemas: (state.schemas ?? []).filter((s) => s.id !== schema.id) }); }}
+                        className="text-muted hover:text-danger transition-colors opacity-0 group-hover:opacity-100">
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </div>
+                  {isSchemaExpanded && (
+                    <div className="px-4 pb-4 pt-1 bg-elevated/10 space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <Field
+                          label={t('contracts.builder.rest.schemaName', 'Schema Name')}
+                          value={schema.name}
+                          onChange={(v) => update({ schemas: (state.schemas ?? []).map((s) => s.id === schema.id ? { ...s, name: v } : s) })}
+                          placeholder={t('contracts.builder.rest.schemaNamePlaceholder', 'CreateUserRequest')}
+                          required
+                          mono
+                          disabled={isReadOnly}
+                        />
+                        <Field
+                          label={t('contracts.builder.rest.schemaRefPath', '$ref Path')}
+                          value={`#/components/schemas/${schema.name || '...'}`}
+                          onChange={() => {}}
+                          disabled
+                          mono
+                        />
+                      </div>
+                      <Field
+                        label={t('contracts.builder.rest.description', 'Description')}
+                        value={schema.description}
+                        onChange={(v) => update({ schemas: (state.schemas ?? []).map((s) => s.id === schema.id ? { ...s, description: v } : s) })}
+                        placeholder={t('contracts.builder.rest.schemaDescPlaceholder', 'Describe this schema...')}
+                        disabled={isReadOnly}
+                      />
+                      <div className="space-y-1">
+                        <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider">
+                          {t('contracts.builder.rest.schemaProperties', 'Properties')}
+                        </label>
+                        <SchemaPropertyEditor
+                          properties={schema.properties}
+                          onChange={(props) => update({ schemas: (state.schemas ?? []).map((s) => s.id === schema.id ? { ...s, properties: props } : s) })}
+                          isReadOnly={isReadOnly}
+                          addLabel={t('contracts.builder.rest.addProperty', 'Add Property')}
+                        />
+                      </div>
+                      {!isReadOnly && schema.properties.length > 0 && (
+                        <button type="button" onClick={() => {
+                          const example = generateExampleFromSchema(schema.properties);
+                          // Copy the generated example to clipboard
+                          const formatted = formatExample(example);
+                          navigator.clipboard.writeText(formatted).catch(() => {});
+                        }}
+                          className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                          <Sparkles size={9} />
+                          {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardBody>
+      </Card>
+
       {/* ── Endpoints ── */}
       <Card>
         <CardHeader>
@@ -324,9 +451,10 @@ export function VisualRestBuilder({
               return (
                 <div key={ep.id} className="group">
                   {/* Collapsed row */}
-                  <button type="button"
+                  <div role="button" tabIndex={0}
                     onClick={() => setExpandedId(isExpanded ? null : ep.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors"
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : ep.id); } }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-elevated/30 transition-colors cursor-pointer"
                   >
                     {isExpanded ? <ChevronDown size={12} className="text-muted" /> : <ChevronRight size={12} className="text-muted" />}
                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${METHOD_COLORS[ep.method]}`}>
@@ -365,7 +493,7 @@ export function VisualRestBuilder({
                         </>
                       )}
                     </div>
-                  </button>
+                  </div>
 
                   {/* Expanded detail */}
                   {isExpanded && (
@@ -542,18 +670,23 @@ export function VisualRestBuilder({
                                   {t('contracts.builder.rest.schemaMode', 'Schema Mode')}:
                                 </span>
                                 <button type="button"
-                                  onClick={() => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, properties: undefined } })}
+                                  onClick={() => setSchemaModeOverride((prev) => ({ ...prev, [`ep-${ep.id}.reqBody`]: 'ref' }))}
                                   className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
-                                    (!ep.requestBody.properties || ep.requestBody.properties.length === 0) && ep.requestBody.schema
+                                    getSchemaMode(`ep-${ep.id}.reqBody`, ep.requestBody.schema, ep.requestBody.properties) === 'ref'
                                       ? 'bg-accent/15 text-accent border border-accent/25'
                                       : 'bg-muted/10 text-muted border border-edge hover:text-body'
                                   }`}>
                                   {t('contracts.builder.rest.modeRef', '$ref (Schema Reference)')}
                                 </button>
                                 <button type="button"
-                                  onClick={() => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, schema: '', properties: ep.requestBody!.properties ?? [] } })}
+                                  onClick={() => {
+                                    setSchemaModeOverride((prev) => ({ ...prev, [`ep-${ep.id}.reqBody`]: 'visual' }));
+                                    if (!ep.requestBody!.properties) {
+                                      updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, properties: [] } });
+                                    }
+                                  }}
                                   className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
-                                    ep.requestBody.properties && ep.requestBody.properties.length >= 0 && !ep.requestBody.schema
+                                    getSchemaMode(`ep-${ep.id}.reqBody`, ep.requestBody.schema, ep.requestBody.properties) === 'visual'
                                       ? 'bg-accent/15 text-accent border border-accent/25'
                                       : 'bg-muted/10 text-muted border border-edge hover:text-body'
                                   }`}>
@@ -562,7 +695,7 @@ export function VisualRestBuilder({
                               </div>
 
                               {/* $ref mode */}
-                              {(!ep.requestBody.properties || (ep.requestBody.properties.length === 0 && ep.requestBody.schema)) && (
+                              {getSchemaMode(`ep-${ep.id}.reqBody`, ep.requestBody.schema, ep.requestBody.properties) === 'ref' && (
                                 <>
                                   <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={ep.requestBody.schema}
                                     onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, schema: v } })}
@@ -574,13 +707,13 @@ export function VisualRestBuilder({
                               )}
 
                               {/* Visual properties mode */}
-                              {ep.requestBody.properties && (!ep.requestBody.schema || ep.requestBody.properties.length > 0) && (
+                              {getSchemaMode(`ep-${ep.id}.reqBody`, ep.requestBody.schema, ep.requestBody.properties) === 'visual' && (
                                 <div className="space-y-1">
                                   <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider">
                                     {t('contracts.builder.rest.bodyProperties', 'Request Body Properties')}
                                   </label>
                                   <SchemaPropertyEditor
-                                    properties={ep.requestBody.properties}
+                                    properties={ep.requestBody.properties ?? []}
                                     onChange={(props) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, properties: props } })}
                                     isReadOnly={isReadOnly}
                                     addLabel={t('contracts.builder.rest.addBodyProp', 'Add Property')}
@@ -591,21 +724,34 @@ export function VisualRestBuilder({
                               <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={ep.requestBody.example}
                                 onChange={(v) => updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: v } })}
                                 rows={3} mono disabled={isReadOnly} />
-                              {!isReadOnly && ep.requestBody.properties && ep.requestBody.properties.length > 0 && (
+                              {!isReadOnly && (
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <button type="button" onClick={() => {
-                                    const example = generateExampleFromSchema(ep.requestBody!.properties!);
-                                    updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: formatExample(example) } });
-                                  }}
-                                    className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
-                                    <Sparkles size={9} />
-                                    {t('contracts.builder.rest.generateExample', 'Generate Example')}
-                                  </button>
-                                  <button type="button" onClick={() => togglePreview(`${ep.id}.reqBody`)}
-                                    className="inline-flex items-center gap-1 text-[9px] text-muted hover:text-body transition-colors">
-                                    {previewKeys.has(`${ep.id}.reqBody`) ? '▾' : '▸'}
-                                    {t('contracts.builder.rest.previewExample', 'Preview Example')}
-                                  </button>
+                                  {ep.requestBody.properties && ep.requestBody.properties.length > 0 && (
+                                    <>
+                                      <button type="button" onClick={() => {
+                                        const example = generateExampleFromSchema(ep.requestBody!.properties!);
+                                        updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: formatExample(example) } });
+                                      }}
+                                        className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                        <Sparkles size={9} />
+                                        {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                                      </button>
+                                      <button type="button" onClick={() => togglePreview(`${ep.id}.reqBody`)}
+                                        className="inline-flex items-center gap-1 text-[9px] text-muted hover:text-body transition-colors">
+                                        {previewKeys.has(`${ep.id}.reqBody`) ? '▾' : '▸'}
+                                        {t('contracts.builder.rest.previewExample', 'Preview Example')}
+                                      </button>
+                                    </>
+                                  )}
+                                  {(!ep.requestBody.properties || ep.requestBody.properties.length === 0) && (
+                                    <button type="button" onClick={() => {
+                                      updateEndpoint(ep.id, { requestBody: { ...ep.requestBody!, example: formatExample({}) } });
+                                    }}
+                                      className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                      <Sparkles size={9} />
+                                      {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                                    </button>
+                                  )}
                                 </div>
                               )}
                               {/* Preview panel for request body */}
@@ -676,12 +822,9 @@ export function VisualRestBuilder({
                                 {t('contracts.builder.rest.schemaMode', 'Schema Mode')}:
                               </span>
                               <button type="button"
-                                onClick={() => {
-                                  const next = [...ep.responses]; next[ri] = { ...res, properties: undefined };
-                                  updateEndpoint(ep.id, { responses: next });
-                                }}
+                                onClick={() => setSchemaModeOverride((prev) => ({ ...prev, [`ep-${ep.id}.res-${res.id}`]: 'ref' }))}
                                 className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
-                                  (!res.properties || res.properties.length === 0) && res.schema
+                                  getSchemaMode(`ep-${ep.id}.res-${res.id}`, res.schema, res.properties) === 'ref'
                                     ? 'bg-accent/15 text-accent border border-accent/25'
                                     : 'bg-muted/10 text-muted border border-edge hover:text-body'
                                 }`}>
@@ -689,11 +832,14 @@ export function VisualRestBuilder({
                               </button>
                               <button type="button"
                                 onClick={() => {
-                                  const next = [...ep.responses]; next[ri] = { ...res, schema: '', properties: res.properties ?? [] };
-                                  updateEndpoint(ep.id, { responses: next });
+                                  setSchemaModeOverride((prev) => ({ ...prev, [`ep-${ep.id}.res-${res.id}`]: 'visual' }));
+                                  if (!res.properties) {
+                                    const next = [...ep.responses]; next[ri] = { ...res, properties: [] };
+                                    updateEndpoint(ep.id, { responses: next });
+                                  }
                                 }}
                                 className={`text-[9px] px-2 py-0.5 rounded transition-colors ${
-                                  res.properties && res.properties.length >= 0 && !res.schema
+                                  getSchemaMode(`ep-${ep.id}.res-${res.id}`, res.schema, res.properties) === 'visual'
                                     ? 'bg-accent/15 text-accent border border-accent/25'
                                     : 'bg-muted/10 text-muted border border-edge hover:text-body'
                                 }`}>
@@ -702,20 +848,20 @@ export function VisualRestBuilder({
                             </div>
 
                             {/* $ref mode */}
-                            {(!res.properties || (res.properties.length === 0 && res.schema)) && (
+                            {getSchemaMode(`ep-${ep.id}.res-${res.id}`, res.schema, res.properties) === 'ref' && (
                               <Field label={t('contracts.builder.rest.schema', 'Schema ($ref)')} value={res.schema}
                                 onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, schema: v }; updateEndpoint(ep.id, { responses: next }); }}
                                 placeholder={t('contracts.builder.rest.resSchemaPlaceholder', '#/components/schemas/User')} mono disabled={isReadOnly} />
                             )}
 
                             {/* Visual properties mode */}
-                            {res.properties && (!res.schema || res.properties.length > 0) && (
+                            {getSchemaMode(`ep-${ep.id}.res-${res.id}`, res.schema, res.properties) === 'visual' && (
                               <div className="space-y-1">
                                 <label className="block text-[9px] font-semibold text-muted uppercase tracking-wider">
                                   {t('contracts.builder.rest.responseProperties', 'Response Properties')}
                                 </label>
                                 <SchemaPropertyEditor
-                                  properties={res.properties}
+                                  properties={res.properties ?? []}
                                   onChange={(props) => {
                                     const next = [...ep.responses]; next[ri] = { ...res, properties: props };
                                     updateEndpoint(ep.id, { responses: next });
@@ -729,22 +875,36 @@ export function VisualRestBuilder({
                             <FieldArea label={t('contracts.builder.rest.example', 'Example')} value={res.example}
                               onChange={(v) => { const next = [...ep.responses]; next[ri] = { ...res, example: v }; updateEndpoint(ep.id, { responses: next }); }}
                               rows={2} mono disabled={isReadOnly} />
-                            {!isReadOnly && res.properties && res.properties.length > 0 && (
+                            {!isReadOnly && (
                               <div className="flex items-center gap-2 flex-wrap">
-                                <button type="button" onClick={() => {
-                                  const example = generateExampleFromSchema(res.properties!);
-                                  const next = [...ep.responses]; next[ri] = { ...res, example: formatExample(example) };
-                                  updateEndpoint(ep.id, { responses: next });
-                                }}
-                                  className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
-                                  <Sparkles size={9} />
-                                  {t('contracts.builder.rest.generateExample', 'Generate Example')}
-                                </button>
-                                <button type="button" onClick={() => togglePreview(`${ep.id}.res.${res.id}`)}
-                                  className="inline-flex items-center gap-1 text-[9px] text-muted hover:text-body transition-colors">
-                                  {previewKeys.has(`${ep.id}.res.${res.id}`) ? '▾' : '▸'}
-                                  {t('contracts.builder.rest.previewExample', 'Preview Example')}
-                                </button>
+                                {res.properties && res.properties.length > 0 && (
+                                  <>
+                                    <button type="button" onClick={() => {
+                                      const example = generateExampleFromSchema(res.properties!);
+                                      const next = [...ep.responses]; next[ri] = { ...res, example: formatExample(example) };
+                                      updateEndpoint(ep.id, { responses: next });
+                                    }}
+                                      className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                      <Sparkles size={9} />
+                                      {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                                    </button>
+                                    <button type="button" onClick={() => togglePreview(`${ep.id}.res.${res.id}`)}
+                                      className="inline-flex items-center gap-1 text-[9px] text-muted hover:text-body transition-colors">
+                                      {previewKeys.has(`${ep.id}.res.${res.id}`) ? '▾' : '▸'}
+                                      {t('contracts.builder.rest.previewExample', 'Preview Example')}
+                                    </button>
+                                  </>
+                                )}
+                                {(!res.properties || res.properties.length === 0) && (
+                                  <button type="button" onClick={() => {
+                                    const next = [...ep.responses]; next[ri] = { ...res, example: formatExample({}) };
+                                    updateEndpoint(ep.id, { responses: next });
+                                  }}
+                                    className="inline-flex items-center gap-1 text-[9px] text-accent hover:text-accent/80 transition-colors">
+                                    <Sparkles size={9} />
+                                    {t('contracts.builder.rest.generateExample', 'Generate Example')}
+                                  </button>
+                                )}
                               </div>
                             )}
                             {/* Preview panel for response */}

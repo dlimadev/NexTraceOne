@@ -61,7 +61,7 @@ public sealed class GovernancePacksEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/governance/packs/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/governance/packs/{r.PackId}", localizer);
         }).RequirePermission("governance:packs:write");
 
         // ── Atualizar governance pack existente ──
@@ -101,7 +101,7 @@ public sealed class GovernancePacksEndpointModule
         {
             var cmd = command with { PackId = packId };
             var result = await sender.Send(cmd, cancellationToken);
-            return result.ToCreatedResult("/api/v1/governance/packs/{0}/versions", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/governance/packs/{r.PackId}/versions", localizer);
         }).RequirePermission("governance:packs:write");
 
         // ── Consultar aplicabilidade de um governance pack ──
@@ -126,7 +126,7 @@ public sealed class GovernancePacksEndpointModule
         {
             var cmd = command with { PackId = packId };
             var result = await sender.Send(cmd, cancellationToken);
-            return result.ToCreatedResult("/api/v1/governance/packs/{0}/apply", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/governance/packs/{r.PackId}/apply", localizer);
         }).RequirePermission("governance:packs:write");
 
         // ── Consultar cobertura de um governance pack ──

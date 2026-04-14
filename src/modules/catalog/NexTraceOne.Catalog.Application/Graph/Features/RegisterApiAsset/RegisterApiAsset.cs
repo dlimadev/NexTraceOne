@@ -40,7 +40,7 @@ public static class RegisterApiAsset
     public sealed class Handler(
         IApiAssetRepository apiAssetRepository,
         IServiceAssetRepository serviceAssetRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

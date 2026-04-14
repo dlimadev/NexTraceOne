@@ -40,6 +40,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DeveloperPortalDbContext>());
+        services.AddScoped<IPortalUnitOfWork>(sp => sp.GetRequiredService<DeveloperPortalDbContext>());
         services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
         services.AddScoped<IPlaygroundSessionRepository, PlaygroundSessionRepository>();
         services.AddScoped<ICodeGenerationRepository, CodeGenerationRepository>();

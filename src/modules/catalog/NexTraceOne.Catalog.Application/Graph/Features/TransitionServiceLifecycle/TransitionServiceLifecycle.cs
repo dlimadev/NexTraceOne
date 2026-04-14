@@ -37,7 +37,7 @@ public static class TransitionServiceLifecycle
     /// </summary>
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
-        IUnitOfWork unitOfWork,
+        ICatalogGraphUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

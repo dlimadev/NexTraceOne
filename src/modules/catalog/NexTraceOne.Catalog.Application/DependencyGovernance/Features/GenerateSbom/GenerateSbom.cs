@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Application.DependencyGovernance.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.DependencyGovernance.Ports;
@@ -29,7 +30,7 @@ public static class GenerateSbom
 
     public sealed class Handler(
         IServiceDependencyProfileRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IDependencyGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

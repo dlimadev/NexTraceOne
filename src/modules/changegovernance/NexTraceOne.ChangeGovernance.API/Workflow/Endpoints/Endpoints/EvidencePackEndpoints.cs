@@ -37,7 +37,7 @@ internal static class EvidencePackEndpoints
         {
             var updatedCommand = command with { WorkflowInstanceId = instanceId };
             var result = await sender.Send(updatedCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/workflow/{0}/evidence-pack", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/workflow/{instanceId}/evidence-pack", localizer);
         }).RequirePermission("workflow:instances:write");
 
         group.MapGet("/{instanceId:guid}/evidence-pack", async (

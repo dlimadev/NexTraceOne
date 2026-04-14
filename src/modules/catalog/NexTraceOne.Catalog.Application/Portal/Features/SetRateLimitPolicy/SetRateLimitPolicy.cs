@@ -37,7 +37,7 @@ public static class SetRateLimitPolicy
 
     public sealed class Handler(
         IApiRateLimitPolicyRepository repository,
-        IUnitOfWork unitOfWork,
+        IPortalUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

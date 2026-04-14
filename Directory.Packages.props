@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup Label="Utilitários">
     <PackageVersion Include="Ardalis.GuardClauses" Version="5.0.0" />
+    <PackageVersion Include="YamlDotNet" Version="16.3.0" />
     <PackageVersion Include="BCrypt.Net-Next" Version="4.1.0" />
     <PackageVersion Include="Mapster" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.5" />

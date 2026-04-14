@@ -1,8 +1,9 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Catalog.Application.DependencyGovernance.Abstractions;
 
 namespace NexTraceOne.Catalog.Tests.DependencyGovernance;
 
-internal sealed class InMemoryUnitOfWork : IUnitOfWork
+internal sealed class InMemoryUnitOfWork : IDependencyGovernanceUnitOfWork
 {
     public int CommitCount { get; private set; }
 

@@ -21,6 +21,12 @@ export interface PropertyConstraints {
   nullable?: boolean;
   enumValues?: string[];
   example?: string;
+  /** Minimum number of items (when parent property type is 'array'). */
+  minItems?: number;
+  /** Maximum number of items (when parent property type is 'array'). */
+  maxItems?: number;
+  /** Whether array items must be unique (when parent property type is 'array'). */
+  uniqueItems?: boolean;
 }
 
 // ── Schema Property ───────────────────────────────────────────────────────────
@@ -96,6 +102,14 @@ export interface RestEndpoint {
   observabilityNotes: string;
 }
 
+/** Reusable schema defined in components/schemas. */
+export interface RestComponentSchema {
+  id: string;
+  name: string;
+  description: string;
+  properties: SchemaProperty[];
+}
+
 export interface RestBuilderState {
   basePath: string;
   title: string;
@@ -105,6 +119,8 @@ export interface RestBuilderState {
   license: string;
   servers: string[];
   endpoints: RestEndpoint[];
+  /** Reusable schemas in components/schemas. */
+  schemas?: RestComponentSchema[];
 }
 
 // ── SOAP Builder ──────────────────────────────────────────────────────────────

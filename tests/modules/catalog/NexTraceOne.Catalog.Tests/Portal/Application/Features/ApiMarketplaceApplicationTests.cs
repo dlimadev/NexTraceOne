@@ -29,7 +29,7 @@ public sealed class ApiMarketplaceApplicationTests
     {
         var ownerId = Guid.NewGuid();
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new CreateApiKeyFeature.Handler(repository, unitOfWork, clock);
@@ -54,7 +54,7 @@ public sealed class ApiMarketplaceApplicationTests
         var ownerId = Guid.NewGuid();
         var apiAssetId = Guid.NewGuid();
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new CreateApiKeyFeature.Handler(repository, unitOfWork, clock);
@@ -74,7 +74,7 @@ public sealed class ApiMarketplaceApplicationTests
         var ownerId = Guid.NewGuid();
         var expiry = Now.AddDays(30);
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new CreateApiKeyFeature.Handler(repository, unitOfWork, clock);
@@ -91,7 +91,7 @@ public sealed class ApiMarketplaceApplicationTests
     public async Task CreateApiKey_RawKey_Should_BeHex64Characters()
     {
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new CreateApiKeyFeature.Handler(repository, unitOfWork, clock);
@@ -110,7 +110,7 @@ public sealed class ApiMarketplaceApplicationTests
         var ownerId = Guid.NewGuid();
         var apiKey = CreateActiveApiKey(ownerId);
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new RevokeApiKeyFeature.Handler(repository, unitOfWork, clock);
@@ -132,7 +132,7 @@ public sealed class ApiMarketplaceApplicationTests
     public async Task RevokeApiKey_Should_ReturnFailure_When_KeyNotFound()
     {
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new RevokeApiKeyFeature.Handler(repository, unitOfWork, clock);
 
@@ -154,7 +154,7 @@ public sealed class ApiMarketplaceApplicationTests
         var otherUserId = Guid.NewGuid();
         var apiKey = CreateActiveApiKey(ownerId);
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new RevokeApiKeyFeature.Handler(repository, unitOfWork, clock);
 
@@ -176,7 +176,7 @@ public sealed class ApiMarketplaceApplicationTests
         var apiKey = CreateActiveApiKey(ownerId);
         apiKey.Revoke(ownerId.ToString(), Now);
         var repository = Substitute.For<IApiKeyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new RevokeApiKeyFeature.Handler(repository, unitOfWork, clock);
@@ -252,7 +252,7 @@ public sealed class ApiMarketplaceApplicationTests
     {
         var subscription = CreatePendingSubscription();
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new ApproveSubscriptionFeature.Handler(repository, unitOfWork, clock);
@@ -276,7 +276,7 @@ public sealed class ApiMarketplaceApplicationTests
     public async Task ApproveSubscription_Should_ReturnFailure_When_SubscriptionNotFound()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new ApproveSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -298,7 +298,7 @@ public sealed class ApiMarketplaceApplicationTests
         var subscription = CreatePendingSubscription();
         subscription.Approve("admin", Now);
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new ApproveSubscriptionFeature.Handler(repository, unitOfWork, clock);
@@ -319,7 +319,7 @@ public sealed class ApiMarketplaceApplicationTests
     {
         var subscription = CreatePendingSubscription();
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new RejectSubscriptionFeature.Handler(repository, unitOfWork, clock);
@@ -343,7 +343,7 @@ public sealed class ApiMarketplaceApplicationTests
     public async Task RejectSubscription_Should_ReturnFailure_When_SubscriptionNotFound()
     {
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var sut = new RejectSubscriptionFeature.Handler(repository, unitOfWork, clock);
 
@@ -365,7 +365,7 @@ public sealed class ApiMarketplaceApplicationTests
         var subscription = CreatePendingSubscription();
         subscription.Reject("Initial rejection", Now);
         var repository = Substitute.For<ISubscriptionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new RejectSubscriptionFeature.Handler(repository, unitOfWork, clock);
@@ -388,7 +388,7 @@ public sealed class ApiMarketplaceApplicationTests
     {
         var apiAssetId = Guid.NewGuid();
         var repository = Substitute.For<IApiRateLimitPolicyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new SetRateLimitPolicyFeature.Handler(repository, unitOfWork, clock);
@@ -416,7 +416,7 @@ public sealed class ApiMarketplaceApplicationTests
         var apiAssetId = Guid.NewGuid();
         var existingPolicy = CreateRateLimitPolicy(apiAssetId);
         var repository = Substitute.For<IApiRateLimitPolicyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new SetRateLimitPolicyFeature.Handler(repository, unitOfWork, clock);
@@ -440,7 +440,7 @@ public sealed class ApiMarketplaceApplicationTests
     {
         var apiAssetId = Guid.NewGuid();
         var repository = Substitute.For<IApiRateLimitPolicyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPortalUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(Now);
         var sut = new SetRateLimitPolicyFeature.Handler(repository, unitOfWork, clock);

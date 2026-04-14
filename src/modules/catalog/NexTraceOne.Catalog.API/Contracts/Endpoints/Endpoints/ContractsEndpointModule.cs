@@ -57,6 +57,7 @@ using DetectContractDriftFeature = NexTraceOne.Catalog.Application.Contracts.Fea
 using GetContractHealthTimelineFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractHealthTimeline.GetContractHealthTimeline;
 using GetCanonicalEntityImpactCascadeFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpactCascade.GetCanonicalEntityImpactCascade;
 using ValidatePublicationReadinessFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractPublicationReadiness.ValidateContractPublicationReadiness;
+using ValidateDraftSpecFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateDraftSpec.ValidateDraftSpec;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -125,7 +126,7 @@ public sealed class ContractsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/{r.ContractVersionId}", localizer);
         }).RequirePermission("contracts:import");
 
         group.MapPost("/versions", async (
@@ -135,7 +136,7 @@ public sealed class ContractsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/{r.ContractVersionId}", localizer);
         }).RequirePermission("contracts:write");
 
         // ── Diff & Classification ───────────────────────────────
@@ -364,7 +365,7 @@ public sealed class ContractsEndpointModule
         {
             var updated = command with { ContractVersionId = contractVersionId };
             var result = await sender.Send(updated, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/{0}/deployments", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/{r.ContractVersionId}/deployments", localizer);
         }).RequirePermission("contracts:write");
 
         group.MapGet("/{contractVersionId:guid}/deployments", async (
@@ -381,6 +382,21 @@ public sealed class ContractsEndpointModule
 
         group.MapPost("/parse-preview", async (
             ParseSpecPreviewFeature.Query query,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        /// <summary>
+        /// Valida conteúdo de especificação ad-hoc (sem contrato persistido).
+        /// Aplica regras determinísticas, directrizes de design e conformidade canónica.
+        /// Utilizado pelo Contract Studio para feedback durante a edição de drafts.
+        /// </summary>
+        group.MapPost("/validate-spec", async (
+            ValidateDraftSpecFeature.Query query,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
@@ -558,7 +574,7 @@ public sealed class ContractsEndpointModule
         {
             var updated = command with { ApiAssetId = apiAssetId };
             var result = await sender.Send(updated, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/{0}/consumer-expectations", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/{r.ApiAssetId}/consumer-expectations", localizer);
         }).RequirePermission("contracts:write");
 
         group.MapGet("/{apiAssetId:guid}/consumer-expectations", async (

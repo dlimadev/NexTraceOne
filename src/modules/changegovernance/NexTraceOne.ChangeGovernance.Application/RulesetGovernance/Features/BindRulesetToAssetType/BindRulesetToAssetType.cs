@@ -34,7 +34,7 @@ public static class BindRulesetToAssetType
     public sealed class Handler(
         IRulesetRepository rulesetRepository,
         IRulesetBindingRepository bindingRepository,
-        IUnitOfWork unitOfWork,
+        IRulesetGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         /// <summary>Processa o comando de vinculação.</summary>

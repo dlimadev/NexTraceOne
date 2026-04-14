@@ -44,7 +44,7 @@ public sealed class ContractsNewFeaturesTests
     {
         var contract = CreateContractInState(ContractLifecycleState.Draft);
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -66,7 +66,7 @@ public sealed class ContractsNewFeaturesTests
     {
         var contract = CreateContractInState(ContractLifecycleState.Draft);
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -86,7 +86,7 @@ public sealed class ContractsNewFeaturesTests
     public async Task TransitionLifecycle_Should_ReturnNotFound_WhenContractMissing()
     {
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -109,7 +109,7 @@ public sealed class ContractsNewFeaturesTests
     {
         var contract = CreateContractInState(ContractLifecycleState.Approved);
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var currentUser = Substitute.For<ICurrentUser>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
@@ -134,7 +134,7 @@ public sealed class ContractsNewFeaturesTests
     {
         var contract = CreateContractInState(ContractLifecycleState.Draft);
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var currentUser = Substitute.For<ICurrentUser>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
@@ -159,7 +159,7 @@ public sealed class ContractsNewFeaturesTests
     {
         var contract = CreateContractInState(ContractLifecycleState.Locked);
         var repository = Substitute.For<IContractVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IContractsUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 

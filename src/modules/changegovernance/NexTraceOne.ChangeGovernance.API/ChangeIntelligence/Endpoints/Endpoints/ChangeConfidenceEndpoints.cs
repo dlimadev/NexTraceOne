@@ -232,7 +232,7 @@ internal static class ChangeConfidenceEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToCreatedResult("/api/v1/releases/{0}", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/releases/{r.ReleaseId}", localizer);
         }).RequirePermission("change-intelligence:write");
 
         // ── Padrão histórico de mudanças similares (Change Confidence Score V2) ──
@@ -261,7 +261,7 @@ internal static class ChangeConfidenceEndpoints
         {
             var effectiveCommand = command with { ReleaseId = changeId };
             var result = await sender.Send(effectiveCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/changes/{0}/feature-flags", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/changes/{r.ReleaseId}/feature-flags", localizer);
         }).RequirePermission("change-intelligence:write");
 
         group.MapGet("/{changeId:guid}/feature-flags", async (
@@ -287,7 +287,7 @@ internal static class ChangeConfidenceEndpoints
         {
             var effectiveCommand = command with { ReleaseId = changeId };
             var result = await sender.Send(effectiveCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/changes/{0}/canary-rollout", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/changes/{r.ReleaseId}/canary-rollout", localizer);
         }).RequirePermission("change-intelligence:write");
 
         group.MapGet("/{changeId:guid}/canary-rollout", async (

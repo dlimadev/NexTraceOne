@@ -46,7 +46,7 @@ public static class RecordAnalyticsEvent
     /// <summary>Handler que regista evento de analytics no repositório.</summary>
     public sealed class Handler(
         IPortalAnalyticsRepository repository,
-        IUnitOfWork unitOfWork,
+        IPortalUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)

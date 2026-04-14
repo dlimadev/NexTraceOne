@@ -187,7 +187,7 @@ public sealed class ContractStudioEndpointModule
         {
             var updatedCommand = command with { DraftId = draftId };
             var result = await sender.Send(updatedCommand, cancellationToken);
-            return result.ToCreatedResult("/api/v1/contracts/drafts/{0}/examples", localizer);
+            return result.ToCreatedResult(r => $"/api/v1/contracts/drafts/{r.DraftId}/examples", localizer);
         }).RequirePermission("contracts:write");
 
         // ── AI Generation ───────────────────────────────────────

@@ -44,7 +44,7 @@ public static class SubmitDeveloperSurvey
 
     public sealed class Handler(
         IDeveloperSurveyRepository repository,
-        IUnitOfWork unitOfWork,
+        IDeveloperExperienceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

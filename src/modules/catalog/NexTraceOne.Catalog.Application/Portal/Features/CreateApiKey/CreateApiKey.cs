@@ -40,7 +40,7 @@ public static class CreateApiKey
 
     public sealed class Handler(
         IApiKeyRepository repository,
-        IUnitOfWork unitOfWork,
+        IPortalUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         private const int KeyPrefixLength = 8;

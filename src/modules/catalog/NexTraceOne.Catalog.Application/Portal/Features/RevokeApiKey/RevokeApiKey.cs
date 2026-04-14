@@ -25,7 +25,7 @@ public static class RevokeApiKey
 
     public sealed class Handler(
         IApiKeyRepository repository,
-        IUnitOfWork unitOfWork,
+        IPortalUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
