@@ -76,7 +76,7 @@ export function ExecutiveDigestPage() {
 
       <StatsGrid columns={2}>
         <StatCard title={t('common.total')} value={data?.totalSent ?? 0} icon={<Mail size={20} />} color="text-accent" />
-        <StatCard title={t('executiveDigest.recipients')} value={data?.settings.recipients.length ?? 0} icon={<Mail size={20} />} color="text-info" />
+        <StatCard title={t('executiveDigest.recipients')} value={data?.settings?.recipients?.length ?? 0} icon={<Mail size={20} />} color="text-info" />
       </StatsGrid>
 
       {data?.settings && (
@@ -87,24 +87,24 @@ export function ExecutiveDigestPage() {
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{t('executiveDigest.frequency')}</p>
                   <p className="font-medium text-sm text-gray-900 dark:text-white mt-0.5">
-                    {data.settings.frequency}
+                    {data?.settings?.frequency}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{t('executiveDigest.recipients')}</p>
                   <p className="font-medium text-sm text-gray-900 dark:text-white mt-0.5">
-                    {data.settings.recipients.length}
+                    {data?.settings?.recipients?.length}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{t('executiveDigest.lastSent')}</p>
                   <p className="font-medium text-sm text-gray-900 dark:text-white mt-0.5">
-                    {data.settings.lastSent}
+                    {data?.settings?.lastSent}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={data.settings.enabled ? 'success' : 'neutral'}>
-                    {data.settings.enabled ? t('executiveDigest.enabled') : t('executiveDigest.disabled')}
+                  <Badge variant={data?.settings?.enabled ? 'success' : 'neutral'}>
+                    {data?.settings?.enabled ? t('executiveDigest.enabled') : t('executiveDigest.disabled')}
                   </Badge>
                   <Button size="sm" variant="ghost" onClick={() => refetch()}>
                     <RefreshCw size={12} />
@@ -113,7 +113,7 @@ export function ExecutiveDigestPage() {
               </div>
               <div className="mt-3 flex items-center gap-1 text-xs text-gray-400">
                 <Clock size={11} />
-                {t('executiveDigest.nextScheduled')}: {data.settings.nextScheduled}
+                {t('executiveDigest.nextScheduled')}: {data?.settings?.nextScheduled}
               </div>
             </CardBody>
           </Card>
