@@ -37,6 +37,7 @@ const CustomDashboardsPage = lazy(() => import('../features/governance/pages/Cus
 const TechnicalDebtPage = lazy(() => import('../features/governance/pages/TechnicalDebtPage').then(m => ({ default: m.TechnicalDebtPage })));
 const ApiPolicyAsCodePage = lazy(() => import('../features/governance/pages/ApiPolicyAsCodePage').then(m => ({ default: m.ApiPolicyAsCodePage })));
 const GovernanceGatesPage = lazy(() => import('../features/governance/pages/GovernanceGatesPage').then(m => ({ default: m.GovernanceGatesPage })));
+const ExecutiveDigestPage = lazy(() => import('../features/governance/pages/ExecutiveDigestPage').then(m => ({ default: m.ExecutiveDigestPage })));
 
 export function GovernanceRoutes() {
   return (
@@ -294,6 +295,14 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:gates:read" redirectTo="/unauthorized">
             <GovernanceGatesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/executive-digest"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ExecutiveDigestPage />
           </ProtectedRoute>
         }
       />

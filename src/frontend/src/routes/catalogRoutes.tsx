@@ -29,6 +29,9 @@ const SelfServicePortalPage = lazy(() => import('../features/catalog/pages/SelfS
 const DeveloperExperienceScorePage = lazy(() => import('../features/catalog/pages/DeveloperExperienceScorePage').then(m => ({ default: m.DeveloperExperienceScorePage })));
 const DependencyDashboardPage = lazy(() => import('../features/catalog/pages/DependencyDashboardPage').then(m => ({ default: m.DependencyDashboardPage })));
 const LicenseCompliancePage = lazy(() => import('../features/catalog/pages/LicenseCompliancePage').then(m => ({ default: m.LicenseCompliancePage })));
+const OwnershipTransferPage = lazy(() => import('../features/catalog/pages/OwnershipTransferPage').then(m => ({ default: m.OwnershipTransferPage })));
+const OrphanServicePage = lazy(() => import('../features/catalog/pages/OrphanServicePage').then(m => ({ default: m.OrphanServicePage })));
+const ServiceChangelogPage = lazy(() => import('../features/catalog/pages/ServiceChangelogPage').then(m => ({ default: m.ServiceChangelogPage })));
 
 export function CatalogRoutes() {
   return (
@@ -225,6 +228,30 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <LicenseCompliancePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/ownership-transfer"
+        element={
+          <ProtectedRoute permission="catalog:assets:write" redirectTo="/unauthorized">
+            <OwnershipTransferPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/orphan-services"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <OrphanServicePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/changelog"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <ServiceChangelogPage />
           </ProtectedRoute>
         }
       />

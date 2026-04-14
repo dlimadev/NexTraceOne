@@ -20,6 +20,7 @@ const CanonicalEntityImpactCascadePage = lazy(() => import('../features/contract
 const ContractHealthTimelinePage = lazy(() => import('../features/contracts/governance/ContractHealthTimelinePage').then(m => ({ default: m.ContractHealthTimelinePage })));
 const ContractPlaygroundPage = lazy(() => import('../features/contracts/playground/ContractPlaygroundPage').then(m => ({ default: m.ContractPlaygroundPage })));
 const ConsumerDrivenContractPage = lazy(() => import('../features/contracts/cdct/ConsumerDrivenContractPage').then(m => ({ default: m.ConsumerDrivenContractPage })));
+const ContractLifecyclePolicyPage = lazy(() => import('../features/contracts/ContractLifecyclePolicyPage').then(m => ({ default: m.ContractLifecyclePolicyPage })));
 
 export function ContractsRoutes() {
   return (
@@ -119,6 +120,14 @@ export function ContractsRoutes() {
         element={
           <ProtectedRoute permission="contracts:read" redirectTo="/unauthorized">
             <ConsumerDrivenContractPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/lifecycle-policy"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <ContractLifecyclePolicyPage />
           </ProtectedRoute>
         }
       />

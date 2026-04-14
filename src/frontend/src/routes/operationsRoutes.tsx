@@ -24,6 +24,9 @@ const PredictiveIntelligencePage = lazy(() => import('../features/operations/pag
 const PlatformOperationsPage = lazy(() => import('../features/operations/pages/PlatformOperationsPage').then(m => ({ default: m.PlatformOperationsPage })));
 const TraceExplorerPage = lazy(() => import('../features/operations/pages/TraceExplorerPage').then(m => ({ default: m.TraceExplorerPage })));
 const LogExplorerPage = lazy(() => import('../features/operations/pages/LogExplorerPage').then(m => ({ default: m.LogExplorerPage })));
+const IncidentPostMortemPage = lazy(() => import('../features/operations/pages/IncidentPostMortemPage').then(m => ({ default: m.IncidentPostMortemPage })));
+const OperationalPlaybookBuilderPage = lazy(() => import('../features/operations/pages/OperationalPlaybookBuilderPage').then(m => ({ default: m.OperationalPlaybookBuilderPage })));
+const ConfigurationDriftPage = lazy(() => import('../features/operations/pages/ConfigurationDriftPage').then(m => ({ default: m.ConfigurationDriftPage })));
 
 export function OperationsRoutes() {
   return (
@@ -177,6 +180,30 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
             <LogExplorerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/incident-post-mortem"
+        element={
+          <ProtectedRoute permission="operations:incidents:write" redirectTo="/unauthorized">
+            <IncidentPostMortemPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/playbook-builder"
+        element={
+          <ProtectedRoute permission="operations:runbooks:write" redirectTo="/unauthorized">
+            <OperationalPlaybookBuilderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/configuration-drift"
+        element={
+          <ProtectedRoute permission="operations:runtime:read" redirectTo="/unauthorized">
+            <ConfigurationDriftPage />
           </ProtectedRoute>
         }
       />

@@ -18,6 +18,11 @@ const AiAgentsPage = lazy(() => import('../features/ai-hub/pages/AiAgentsPage').
 const AgentDetailPage = lazy(() => import('../features/ai-hub/pages/AgentDetailPage').then(m => ({ default: m.AgentDetailPage })));
 const AgentMarketplacePage = lazy(() => import('../features/ai-hub/pages/AgentMarketplacePage').then(m => ({ default: m.AgentMarketplacePage })));
 const AiIntegrationsConfigurationPage = lazy(() => import('../features/ai-hub/pages/AiIntegrationsConfigurationPage').then(m => ({ default: m.AiIntegrationsConfigurationPage })));
+const AiChangeImpactAdvisorPage = lazy(() => import('../features/ai-hub/pages/AiChangeImpactAdvisorPage').then(m => ({ default: m.AiChangeImpactAdvisorPage })));
+const AiContractGeneratorPage = lazy(() => import('../features/ai-hub/pages/AiContractGeneratorPage').then(m => ({ default: m.AiContractGeneratorPage })));
+const AiRunbookCopilotPage = lazy(() => import('../features/ai-hub/pages/AiRunbookCopilotPage').then(m => ({ default: m.AiRunbookCopilotPage })));
+const AiKnowledgeExtractionPage = lazy(() => import('../features/ai-hub/pages/AiKnowledgeExtractionPage').then(m => ({ default: m.AiKnowledgeExtractionPage })));
+const AiTestScenarioGeneratorPage = lazy(() => import('../features/ai-hub/pages/AiTestScenarioGeneratorPage').then(m => ({ default: m.AiTestScenarioGeneratorPage })));
 
 export function AiHubRoutes() {
   return (
@@ -115,6 +120,46 @@ export function AiHubRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <AiIntegrationsConfigurationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/change-impact-advisor"
+        element={
+          <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+            <AiChangeImpactAdvisorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/contract-generator"
+        element={
+          <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+            <AiContractGeneratorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/runbook-copilot"
+        element={
+          <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+            <AiRunbookCopilotPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/knowledge-extraction"
+        element={
+          <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+            <AiKnowledgeExtractionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/test-scenario-generator"
+        element={
+          <ProtectedRoute permission="ai:assistant:read" redirectTo="/unauthorized">
+            <AiTestScenarioGeneratorPage />
           </ProtectedRoute>
         }
       />

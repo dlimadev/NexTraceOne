@@ -13,6 +13,8 @@ const ChangeCatalogPage = lazy(() => import('../features/change-governance/pages
 const ChangeDetailPage = lazy(() => import('../features/change-governance/pages/ChangeDetailPage').then(m => ({ default: m.ChangeDetailPage })));
 const ReleaseCalendarPage = lazy(() => import('../features/change-governance/pages/ReleaseCalendarPage').then(m => ({ default: m.ReleaseCalendarPage })));
 const DoraMetricsPage = lazy(() => import('../features/change-governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
+const RollbackIntelligencePage = lazy(() => import('../features/change-governance/pages/RollbackIntelligencePage').then(m => ({ default: m.RollbackIntelligencePage })));
+const ChangeIncidentCorrelationPage = lazy(() => import('../features/change-governance/pages/ChangeIncidentCorrelationPage').then(m => ({ default: m.ChangeIncidentCorrelationPage })));
 
 export function ChangesRoutes() {
   return (
@@ -70,6 +72,22 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
             <DoraMetricsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/changes/rollback-intelligence"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <RollbackIntelligencePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/changes/incident-correlation"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ChangeIncidentCorrelationPage />
           </ProtectedRoute>
         }
       />
