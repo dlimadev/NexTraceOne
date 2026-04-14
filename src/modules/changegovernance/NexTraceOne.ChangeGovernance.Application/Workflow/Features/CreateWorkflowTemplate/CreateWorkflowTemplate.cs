@@ -42,7 +42,7 @@ public static class CreateWorkflowTemplate
     /// <summary>Handler que cria um novo WorkflowTemplate e o persiste.</summary>
     public sealed class Handler(
         IWorkflowTemplateRepository repository,
-        IUnitOfWork unitOfWork,
+        IWorkflowUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

@@ -57,7 +57,7 @@ public static class ComputeCostAttribution
     /// <summary>Handler que cria um registo de atribuição de custo operacional.</summary>
     public sealed class Handler(
         ICostAttributionRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

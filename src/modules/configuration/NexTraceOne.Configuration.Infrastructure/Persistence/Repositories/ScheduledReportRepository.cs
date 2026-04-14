@@ -19,17 +19,24 @@ internal sealed class ScheduledReportRepository(ConfigurationDbContext context) 
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(ScheduledReport report, CancellationToken cancellationToken)
-        => await context.ScheduledReports.AddAsync(report, cancellationToken);
+    {
+        await context.ScheduledReports.AddAsync(report, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(ScheduledReport report, CancellationToken cancellationToken)
+    public async Task UpdateAsync(ScheduledReport report, CancellationToken cancellationToken)
     {
         context.ScheduledReports.Update(report);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(ScheduledReportId id, CancellationToken cancellationToken)
     {
         var entity = await context.ScheduledReports.SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-        if (entity is not null) context.ScheduledReports.Remove(entity);
+        if (entity is not null)
+        {
+            context.ScheduledReports.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

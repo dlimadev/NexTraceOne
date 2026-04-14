@@ -50,7 +50,7 @@ public static class RecordChangeCostImpact
     /// <summary>Handler que regista o impacto de custo de uma mudança.</summary>
     public sealed class Handler(
         IChangeCostImpactRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

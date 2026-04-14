@@ -59,7 +59,7 @@ public static class IngestRuntimeSnapshot
     /// </summary>
     public sealed class Handler(
         IRuntimeSnapshotRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IRuntimeIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

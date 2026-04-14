@@ -30,14 +30,17 @@ internal sealed class FeatureFlagRepository(ConfigurationDbContext context)
     public async Task AddDefinitionAsync(
         FeatureFlagDefinition definition,
         CancellationToken cancellationToken)
-        => await context.FeatureFlagDefinitions.AddAsync(definition, cancellationToken);
+    {
+        await context.FeatureFlagDefinitions.AddAsync(definition, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateDefinitionAsync(
+    public async Task UpdateDefinitionAsync(
         FeatureFlagDefinition definition,
         CancellationToken cancellationToken)
     {
         context.FeatureFlagDefinitions.Update(definition);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     // ── FeatureFlagEntry ───────────────────────────────────────────────
@@ -64,21 +67,24 @@ internal sealed class FeatureFlagRepository(ConfigurationDbContext context)
     public async Task AddEntryAsync(
         FeatureFlagEntry entry,
         CancellationToken cancellationToken)
-        => await context.FeatureFlagEntries.AddAsync(entry, cancellationToken);
+    {
+        await context.FeatureFlagEntries.AddAsync(entry, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateEntryAsync(
+    public async Task UpdateEntryAsync(
         FeatureFlagEntry entry,
         CancellationToken cancellationToken)
     {
         context.FeatureFlagEntries.Update(entry);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task DeleteEntryAsync(
+    public async Task DeleteEntryAsync(
         FeatureFlagEntry entry,
         CancellationToken cancellationToken)
     {
         context.FeatureFlagEntries.Remove(entry);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

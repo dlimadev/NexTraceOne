@@ -40,7 +40,7 @@ public static class ConfigureRetention
     /// <summary>Handler que cria e persiste uma nova RetentionPolicy.</summary>
     public sealed class Handler(
         IRetentionPolicyRepository retentionPolicyRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IAuditComplianceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

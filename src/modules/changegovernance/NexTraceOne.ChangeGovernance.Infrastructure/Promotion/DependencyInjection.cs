@@ -36,6 +36,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PromotionDbContext>());
+        services.AddScoped<IPromotionUnitOfWork>(sp => sp.GetRequiredService<PromotionDbContext>());
         services.AddScoped<IDeploymentEnvironmentRepository, DeploymentEnvironmentRepository>();
         services.AddScoped<IPromotionRequestRepository, PromotionRequestRepository>();
         services.AddScoped<IPromotionGateRepository, PromotionGateRepository>();

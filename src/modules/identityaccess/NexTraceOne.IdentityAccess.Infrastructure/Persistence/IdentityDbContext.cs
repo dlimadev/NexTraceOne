@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 
 using Environment = NexTraceOne.IdentityAccess.Domain.Entities.Environment;
@@ -26,7 +27,7 @@ public sealed class IdentityDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IIdentityAccessUnitOfWork
 {
     // ── v1.0 Core ────────────────────────────────────────────────────────
 

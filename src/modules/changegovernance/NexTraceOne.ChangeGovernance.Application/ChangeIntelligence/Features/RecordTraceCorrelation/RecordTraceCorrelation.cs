@@ -56,7 +56,7 @@ public static class RecordTraceCorrelation
         IReleaseRepository releaseRepository,
         IChangeEventRepository changeEventRepository,
         ITraceCorrelationWriter traceCorrelationWriter,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

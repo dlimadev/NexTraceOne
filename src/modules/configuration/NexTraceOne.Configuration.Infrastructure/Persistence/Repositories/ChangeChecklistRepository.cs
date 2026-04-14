@@ -26,17 +26,24 @@ internal sealed class ChangeChecklistRepository(ConfigurationDbContext context) 
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(ChangeChecklist checklist, CancellationToken cancellationToken)
-        => await context.ChangeChecklists.AddAsync(checklist, cancellationToken);
+    {
+        await context.ChangeChecklists.AddAsync(checklist, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(ChangeChecklist checklist, CancellationToken cancellationToken)
+    public async Task UpdateAsync(ChangeChecklist checklist, CancellationToken cancellationToken)
     {
         context.ChangeChecklists.Update(checklist);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(ChangeChecklistId id, CancellationToken cancellationToken)
     {
         var entity = await context.ChangeChecklists.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
-        if (entity is not null) context.ChangeChecklists.Remove(entity);
+        if (entity is not null)
+        {
+            context.ChangeChecklists.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

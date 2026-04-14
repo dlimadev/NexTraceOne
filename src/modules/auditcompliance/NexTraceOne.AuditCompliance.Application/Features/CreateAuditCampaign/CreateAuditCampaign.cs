@@ -40,7 +40,7 @@ public static class CreateAuditCampaign
     public sealed class Handler(
         IAuditCampaignRepository auditCampaignRepository,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IAuditComplianceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

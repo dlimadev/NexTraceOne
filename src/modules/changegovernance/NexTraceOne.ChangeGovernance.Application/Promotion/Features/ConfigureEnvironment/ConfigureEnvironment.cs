@@ -39,7 +39,7 @@ public static class ConfigureEnvironment
     /// <summary>Handler que cria um novo DeploymentEnvironment e o persiste.</summary>
     public sealed class Handler(
         IDeploymentEnvironmentRepository environmentRepository,
-        IUnitOfWork unitOfWork,
+        IPromotionUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

@@ -50,7 +50,7 @@ public static class GenerateEvidencePack
     public sealed class Handler(
         IWorkflowInstanceRepository instanceRepository,
         IEvidencePackRepository evidencePackRepository,
-        IUnitOfWork unitOfWork,
+        IWorkflowUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

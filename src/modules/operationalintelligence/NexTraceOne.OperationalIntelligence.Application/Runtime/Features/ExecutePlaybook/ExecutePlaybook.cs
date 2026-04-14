@@ -40,7 +40,7 @@ public static class ExecutePlaybook
     public sealed class Handler(
         IOperationalPlaybookRepository playbookRepository,
         IPlaybookExecutionRepository executionRepository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         ICurrentTenant currentTenant,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>

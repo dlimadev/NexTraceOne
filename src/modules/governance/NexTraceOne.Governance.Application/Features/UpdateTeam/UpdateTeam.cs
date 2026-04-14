@@ -37,7 +37,7 @@ public static class UpdateTeam
     /// <summary>Handler que atualiza os dados da equipa.</summary>
     public sealed class Handler(
         ITeamRepository teamRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {

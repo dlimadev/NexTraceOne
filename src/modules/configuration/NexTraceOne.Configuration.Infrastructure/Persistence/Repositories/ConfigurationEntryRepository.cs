@@ -42,17 +42,20 @@ internal sealed class ConfigurationEntryRepository(ConfigurationDbContext contex
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(ConfigurationEntry entry, CancellationToken cancellationToken)
-        => await context.Entries.AddAsync(entry, cancellationToken);
-
-    public Task UpdateAsync(ConfigurationEntry entry, CancellationToken cancellationToken)
     {
-        context.Entries.Update(entry);
-        return Task.CompletedTask;
+        await context.Entries.AddAsync(entry, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task DeleteAsync(ConfigurationEntry entry, CancellationToken cancellationToken)
+    public async Task UpdateAsync(ConfigurationEntry entry, CancellationToken cancellationToken)
+    {
+        context.Entries.Update(entry);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(ConfigurationEntry entry, CancellationToken cancellationToken)
     {
         context.Entries.Remove(entry);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

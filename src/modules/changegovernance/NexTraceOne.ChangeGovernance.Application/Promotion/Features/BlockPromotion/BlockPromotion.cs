@@ -38,7 +38,7 @@ public static class BlockPromotion
     /// <summary>Handler que bloqueia uma PromotionRequest por regra de governança.</summary>
     public sealed class Handler(
         IPromotionRequestRepository requestRepository,
-        IUnitOfWork unitOfWork,
+        IPromotionUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

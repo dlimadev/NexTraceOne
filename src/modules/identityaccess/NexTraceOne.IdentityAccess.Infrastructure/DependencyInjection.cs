@@ -39,6 +39,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IdentityDbContext>());
+        services.AddScoped<IIdentityAccessUnitOfWork>(sp => sp.GetRequiredService<IdentityDbContext>());
 
         // Repositórios — v1.0 Core
         services.AddScoped<ITenantRepository, TenantRepository>();

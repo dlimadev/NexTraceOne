@@ -39,7 +39,7 @@ public static class EscalateSlaViolation
         IWorkflowInstanceRepository instanceRepository,
         IWorkflowStageRepository stageRepository,
         ISlaPolicyRepository slaPolicyRepository,
-        IUnitOfWork unitOfWork,
+        IWorkflowUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

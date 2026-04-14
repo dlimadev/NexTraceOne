@@ -47,7 +47,7 @@ public static class ComputeCostTrend
     public sealed class Handler(
         ICostSnapshotRepository snapshotRepository,
         ICostTrendRepository trendRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICostIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

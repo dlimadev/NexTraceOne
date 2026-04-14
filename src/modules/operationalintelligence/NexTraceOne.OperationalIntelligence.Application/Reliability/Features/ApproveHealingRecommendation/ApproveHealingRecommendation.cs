@@ -40,7 +40,7 @@ public static class ApproveHealingRecommendation
         IHealingRecommendationRepository repository,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IReliabilityUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

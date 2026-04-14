@@ -45,7 +45,7 @@ public static class RecordComplianceResult
     public sealed class Handler(
         IComplianceResultRepository complianceResultRepository,
         IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IAuditComplianceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

@@ -27,17 +27,20 @@ internal sealed class UserWatchRepository(ConfigurationDbContext context) : IUse
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(UserWatch watch, CancellationToken cancellationToken)
-        => await context.UserWatches.AddAsync(watch, cancellationToken);
-
-    public Task UpdateAsync(UserWatch watch, CancellationToken cancellationToken)
     {
-        context.UserWatches.Update(watch);
-        return Task.CompletedTask;
+        await context.UserWatches.AddAsync(watch, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task DeleteAsync(UserWatch watch, CancellationToken cancellationToken)
+    public async Task UpdateAsync(UserWatch watch, CancellationToken cancellationToken)
+    {
+        context.UserWatches.Update(watch);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(UserWatch watch, CancellationToken cancellationToken)
     {
         context.UserWatches.Remove(watch);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

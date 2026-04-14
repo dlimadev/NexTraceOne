@@ -52,7 +52,7 @@ public static class ComputeTeamHealth
     /// <summary>Handler que cria ou recomputa a saúde de uma equipa.</summary>
     public sealed class Handler(
         ITeamHealthSnapshotRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

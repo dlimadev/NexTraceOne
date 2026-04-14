@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
@@ -16,7 +17,7 @@ public sealed class ChangeIntelligenceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IChangeIntelligenceUnitOfWork
 {
     /// <summary>Releases de serviços/APIs persistidas no módulo ChangeIntelligence.</summary>
     public DbSet<Release> Releases => Set<Release>();

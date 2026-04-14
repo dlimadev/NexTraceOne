@@ -41,7 +41,7 @@ public static class RegisterPolicyAsCode
     public sealed class Handler(
         IPolicyAsCodeRepository repository,
         ICurrentTenant tenant,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

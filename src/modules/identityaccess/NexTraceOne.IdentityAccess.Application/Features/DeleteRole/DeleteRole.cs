@@ -32,7 +32,7 @@ public static class DeleteRole
     /// <summary>Handler que remove o papel do repositório.</summary>
     public sealed class Handler(
         IRoleRepository roleRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Unit>
+        IIdentityAccessUnitOfWork unitOfWork) : ICommandHandler<Command, Unit>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {

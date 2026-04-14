@@ -17,17 +17,24 @@ internal sealed class WebhookTemplateRepository(ConfigurationDbContext context) 
             .ToListAsync(cancellationToken);
 
     public async Task AddAsync(WebhookTemplate template, CancellationToken cancellationToken)
-        => await context.WebhookTemplates.AddAsync(template, cancellationToken);
+    {
+        await context.WebhookTemplates.AddAsync(template, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(WebhookTemplate template, CancellationToken cancellationToken)
+    public async Task UpdateAsync(WebhookTemplate template, CancellationToken cancellationToken)
     {
         context.WebhookTemplates.Update(template);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(WebhookTemplateId id, CancellationToken cancellationToken)
     {
         var entity = await context.WebhookTemplates.SingleOrDefaultAsync(t => t.Id == id, cancellationToken);
-        if (entity is not null) context.WebhookTemplates.Remove(entity);
+        if (entity is not null)
+        {
+            context.WebhookTemplates.Remove(entity);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

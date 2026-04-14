@@ -40,7 +40,7 @@ public static class ComputeChangeScore
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IChangeScoreRepository scoreRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

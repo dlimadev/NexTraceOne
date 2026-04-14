@@ -45,7 +45,7 @@ public static class RequestChanges
         IWorkflowInstanceRepository instanceRepository,
         IWorkflowStageRepository stageRepository,
         IApprovalDecisionRepository decisionRepository,
-        IUnitOfWork unitOfWork,
+        IWorkflowUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

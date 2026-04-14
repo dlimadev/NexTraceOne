@@ -39,7 +39,7 @@ public static class CreatePackVersion
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernancePackVersionRepository versionRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

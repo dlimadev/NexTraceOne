@@ -40,6 +40,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<RuntimeIntelligenceDbContext>());
+        services.AddScoped<IRuntimeIntelligenceUnitOfWork>(sp => sp.GetRequiredService<RuntimeIntelligenceDbContext>());
         services.AddScoped<IRuntimeSnapshotRepository, RuntimeSnapshotRepository>();
         services.AddScoped<IRuntimeBaselineRepository, RuntimeBaselineRepository>();
         services.AddScoped<IDriftFindingRepository, DriftFindingRepository>();

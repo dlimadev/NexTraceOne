@@ -43,7 +43,7 @@ public static class CreateOperationalPlaybook
     /// </summary>
     public sealed class Handler(
         IOperationalPlaybookRepository repository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         ICurrentTenant currentTenant,
         ICurrentUser currentUser,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>

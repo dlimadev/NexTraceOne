@@ -59,7 +59,7 @@ public static class GenerateResilienceReport
     /// </summary>
     public sealed class Handler(
         IResilienceReportRepository repository,
-        IUnitOfWork unitOfWork,
+        IRuntimeIntelligenceUnitOfWork unitOfWork,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {

@@ -46,7 +46,7 @@ public static class RegisterExternalMarker
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IExternalMarkerRepository markerRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

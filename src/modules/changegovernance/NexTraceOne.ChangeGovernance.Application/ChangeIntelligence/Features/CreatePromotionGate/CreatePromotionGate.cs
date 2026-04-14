@@ -43,7 +43,7 @@ public static class CreatePromotionGate
     /// </summary>
     public sealed class Handler(
         IPromotionGateRepository repository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
         ICurrentUser currentUser) : ICommandHandler<Command, Response>
     {

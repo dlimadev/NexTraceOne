@@ -51,7 +51,7 @@ public static class GenerateExecutiveBriefing
     /// <summary>Handler que gera o executive briefing e persiste em estado Draft.</summary>
     public sealed class Handler(
         IExecutiveBriefingRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Domain.Cost.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence;
@@ -17,7 +18,7 @@ public sealed class CostIntelligenceDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, ICostIntelligenceUnitOfWork
 {
     /// <summary>Snapshots de custo de infraestrutura capturados periodicamente.</summary>
     public DbSet<CostSnapshot> CostSnapshots => Set<CostSnapshot>();

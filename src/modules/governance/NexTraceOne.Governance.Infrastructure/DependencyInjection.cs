@@ -37,6 +37,7 @@ public static class DependencyInjection
 
         // UnitOfWork
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<GovernanceDbContext>());
+        services.AddScoped<IGovernanceUnitOfWork>(sp => sp.GetRequiredService<GovernanceDbContext>());
 
         // Repositories
         services.AddScoped<ITeamRepository, TeamRepository>();

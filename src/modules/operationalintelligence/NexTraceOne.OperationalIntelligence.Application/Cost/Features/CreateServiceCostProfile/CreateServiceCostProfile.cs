@@ -34,7 +34,7 @@ public static class CreateServiceCostProfile
 
     public sealed class Handler(
         IServiceCostProfileRepository repository,
-        IUnitOfWork unitOfWork,
+        ICostIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

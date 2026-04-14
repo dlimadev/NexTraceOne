@@ -1,3 +1,4 @@
+using NexTraceOne.Governance.Application.Abstractions;
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -31,7 +32,7 @@ public static class EvaluateSecurityGate
     /// <summary>Handler que avalia o gate com os thresholds fornecidos.</summary>
     public sealed class Handler(
         ISecurityScanRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

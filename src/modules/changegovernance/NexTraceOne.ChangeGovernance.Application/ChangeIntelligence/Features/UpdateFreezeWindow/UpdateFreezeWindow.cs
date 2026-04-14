@@ -44,7 +44,7 @@ public static class UpdateFreezeWindow
     /// <summary>Handler que atualiza uma janela de freeze.</summary>
     public sealed class Handler(
         IFreezeWindowRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IChangeIntelligenceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

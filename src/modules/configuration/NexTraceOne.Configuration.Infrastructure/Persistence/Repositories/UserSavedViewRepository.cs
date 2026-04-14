@@ -24,17 +24,20 @@ internal sealed class UserSavedViewRepository(ConfigurationDbContext context) : 
             .ToListAsync(ct);
 
     public async Task AddAsync(UserSavedView view, CancellationToken ct)
-        => await context.UserSavedViews.AddAsync(view, ct);
-
-    public Task UpdateAsync(UserSavedView view, CancellationToken ct)
     {
-        context.UserSavedViews.Update(view);
-        return Task.CompletedTask;
+        await context.UserSavedViews.AddAsync(view, ct);
+        await context.SaveChangesAsync(ct);
     }
 
-    public Task DeleteAsync(UserSavedView view, CancellationToken ct)
+    public async Task UpdateAsync(UserSavedView view, CancellationToken ct)
+    {
+        context.UserSavedViews.Update(view);
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteAsync(UserSavedView view, CancellationToken ct)
     {
         context.UserSavedViews.Remove(view);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(ct);
     }
 }

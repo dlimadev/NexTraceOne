@@ -45,7 +45,7 @@ public static class ProgressPostReleaseReview
     /// </summary>
     public sealed class Handler(
         IPostReleaseReviewRepository reviewRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

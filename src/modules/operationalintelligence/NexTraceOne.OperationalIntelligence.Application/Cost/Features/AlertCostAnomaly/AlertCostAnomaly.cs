@@ -42,7 +42,7 @@ public static class AlertCostAnomaly
     /// </summary>
     public sealed class Handler(
         IServiceCostProfileRepository profileRepository,
-        IUnitOfWork unitOfWork,
+        ICostIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider,
         IEventBus eventBus) : ICommandHandler<Command, Response>
     {

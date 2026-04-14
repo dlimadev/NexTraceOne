@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence;
@@ -16,7 +17,7 @@ public sealed class PromotionDbContext(
     ICurrentTenant tenant,
     ICurrentUser user,
     IDateTimeProvider clock)
-    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork
+    : NexTraceDbContextBase(options, tenant, user, clock), IUnitOfWork, IPromotionUnitOfWork
 {
     /// <summary>Ambientes de deployment persistidos no módulo Promotion.</summary>
     public DbSet<DeploymentEnvironment> DeploymentEnvironments => Set<DeploymentEnvironment>();

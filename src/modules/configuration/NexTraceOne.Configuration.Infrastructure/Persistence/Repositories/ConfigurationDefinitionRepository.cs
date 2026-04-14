@@ -18,11 +18,14 @@ internal sealed class ConfigurationDefinitionRepository(ConfigurationDbContext c
         => await context.Definitions.OrderBy(d => d.SortOrder).ThenBy(d => d.Key).AsNoTracking().ToListAsync(cancellationToken);
 
     public async Task AddAsync(ConfigurationDefinition definition, CancellationToken cancellationToken)
-        => await context.Definitions.AddAsync(definition, cancellationToken);
+    {
+        await context.Definitions.AddAsync(definition, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task UpdateAsync(ConfigurationDefinition definition, CancellationToken cancellationToken)
+    public async Task UpdateAsync(ConfigurationDefinition definition, CancellationToken cancellationToken)
     {
         context.Definitions.Update(definition);
-        return Task.CompletedTask;
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

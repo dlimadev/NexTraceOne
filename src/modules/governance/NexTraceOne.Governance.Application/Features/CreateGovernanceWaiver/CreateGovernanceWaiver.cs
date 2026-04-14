@@ -49,7 +49,7 @@ public static class CreateGovernanceWaiver
     public sealed class Handler(
         IGovernanceWaiverRepository waiverRepository,
         IGovernancePackRepository packRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IGovernanceUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {

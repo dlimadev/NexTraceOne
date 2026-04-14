@@ -37,7 +37,7 @@ public static class OverrideGateWithJustification
     /// <summary>Handler que aplica override justificado em uma avaliação de gate existente.</summary>
     public sealed class Handler(
         IGateEvaluationRepository evaluationRepository,
-        IUnitOfWork unitOfWork,
+        IPromotionUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

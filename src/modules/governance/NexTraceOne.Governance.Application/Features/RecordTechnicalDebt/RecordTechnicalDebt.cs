@@ -54,7 +54,7 @@ public static class RecordTechnicalDebt
     /// <summary>Handler que cria e persiste um novo item de dívida técnica.</summary>
     public sealed class Handler(
         ITechnicalDebtRepository repository,
-        IUnitOfWork unitOfWork,
+        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)

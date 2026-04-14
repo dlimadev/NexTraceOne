@@ -36,6 +36,7 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WorkflowDbContext>());
+        services.AddScoped<IWorkflowUnitOfWork>(sp => sp.GetRequiredService<WorkflowDbContext>());
         services.AddScoped<IWorkflowTemplateRepository, WorkflowTemplateRepository>();
         services.AddScoped<IWorkflowInstanceRepository, WorkflowInstanceRepository>();
         services.AddScoped<IWorkflowStageRepository, WorkflowStageRepository>();

@@ -33,7 +33,7 @@ public static class UpdateDeploymentState
     /// <summary>Handler que atualiza o status de deployment de uma Release.</summary>
     public sealed class Handler(
         IReleaseRepository repository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
