@@ -9646,5 +9646,13 @@
     "disabled": "Inativo",
     "digestContent": "Conteúdo do Digest",
     "recentDigests": "Digests Recentes"
+  },
+  "sidebarFooter": {
+    "quickSearch": "Pesquisa Rápida (Ctrl+K)",
+    "search": "Pesquisar",
+    "knowledgeHub": "Base de Conhecimento",
+    "docs": "Docs",
+    "help": "Ajuda & Suporte",
+    "settings": "Configurações da Plataforma"
   }
 }

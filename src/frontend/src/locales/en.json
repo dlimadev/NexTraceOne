@@ -9652,5 +9652,13 @@
     "disabled": "Disabled",
     "digestContent": "Content",
     "recentDigests": "Recent Digests"
+  },
+  "sidebarFooter": {
+    "quickSearch": "Quick Search (Ctrl+K)",
+    "search": "Search",
+    "knowledgeHub": "Knowledge Hub",
+    "docs": "Docs",
+    "help": "Help & Support",
+    "settings": "Platform Settings"
   }
 }
