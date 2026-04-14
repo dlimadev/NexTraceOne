@@ -12,9 +12,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 ///   1. Catálogo de serviços (quando ServiceId ou EntityType=Service fornecidos)
 ///   2. Releases recentes do ChangeIntelligence (janela configurável, padrão 7 dias)
 ///   3. Incidentes recentes do OperationalIntelligence (janela configurável, padrão 30 dias)
-///   4. Modelos de IA (fallback para queries genéricas)
+///   4. Contratos publicados (quando EntityType=Contract ou ContractId fornecidos) (E-C03)
+///   5. Modelos de IA (fallback para queries genéricas)
 /// Todas as queries são somente-leitura via interfaces ICatalogGroundingReader, IChangeGroundingReader,
-/// IIncidentGroundingReader — nunca escreve em módulos externos.
+/// IIncidentGroundingReader, IContractGroundingReader — nunca escreve em módulos externos.
 /// Falhas são silenciosas — log de aviso e resultado parcial, nunca bloqueia o pipeline de IA.
 /// </summary>
 public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
@@ -25,6 +26,7 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
     private readonly ICatalogGroundingReader _catalogReader;
     private readonly IChangeGroundingReader _changeReader;
     private readonly IIncidentGroundingReader _incidentReader;
+    private readonly IContractGroundingReader _contractReader;
     private readonly ILogger<DatabaseRetrievalService> _logger;
 
     public DatabaseRetrievalService(
@@ -32,12 +34,14 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
         ICatalogGroundingReader catalogReader,
         IChangeGroundingReader changeReader,
         IIncidentGroundingReader incidentReader,
+        IContractGroundingReader contractReader,
         ILogger<DatabaseRetrievalService> logger)
     {
         _modelRepository = modelRepository;
         _catalogReader = catalogReader;
         _changeReader = changeReader;
         _incidentReader = incidentReader;
+        _contractReader = contractReader;
         _logger = logger;
     }
 
@@ -190,6 +194,49 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
             _logger.LogWarning(ex,
                 "AI model grounding failed for query='{Query}' — continuing",
                 request.Query);
+        }
+
+        // ── 5. Contract versions from Catalog Contracts (E-C03) ──────────────────────────────
+        if (string.Equals(request.EntityType, "Contract", StringComparison.OrdinalIgnoreCase)
+            || !string.IsNullOrWhiteSpace(request.ContractId))
+        {
+            try
+            {
+                var contractVersionId = ParseGuid(request.ContractId);
+                var apiAssetId = ParseGuid(request.ServiceId);
+
+                var contracts = await _contractReader.FindContractVersionsAsync(
+                    contractVersionId, apiAssetId, request.Query, maxResults: 5, ct);
+
+                foreach (var cv in contracts)
+                {
+                    var lockedInfo = cv.IsLocked
+                        ? $" (locked at {cv.LockedAt:yyyy-MM-dd HH:mm} UTC)"
+                        : string.Empty;
+
+                    var summary = $"Contract v{cv.Version} [{cv.Protocol}] — " +
+                                  $"State: {cv.LifecycleState}{lockedInfo}. " +
+                                  $"ApiAsset: {cv.ApiAssetId}.";
+
+                    hits.Add(new DatabaseSearchHit(
+                        EntityType: "Contract",
+                        EntityId: cv.ContractVersionId,
+                        DisplayName: $"Contract v{cv.Version} ({cv.Protocol})",
+                        Summary: summary,
+                        RelevanceScore: 0.90,
+                        IsTruncated: false));
+                }
+
+                _logger.LogDebug(
+                    "Contract grounding: {Count} versions retrieved for contractId='{ContractId}'",
+                    contracts.Count, request.ContractId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex,
+                    "Contract grounding failed for contractId='{ContractId}' — continuing",
+                    request.ContractId);
+            }
         }
 
         _logger.LogDebug(

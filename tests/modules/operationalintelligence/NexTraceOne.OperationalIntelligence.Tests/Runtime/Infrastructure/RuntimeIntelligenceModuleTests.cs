@@ -140,6 +140,7 @@ public sealed class RuntimeIntelligenceModuleTests
         public string Id => "runtime-tests-user";
         public string Name => "Runtime Tests";
         public string Email => "runtime.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

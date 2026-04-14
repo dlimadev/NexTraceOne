@@ -209,6 +209,7 @@ public sealed class ChangeIntelligenceModuleTests
         public string Id => "chg-module-tests-user";
         public string Name => "ChangeIntelligence Tests";
         public string Email => "chg.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

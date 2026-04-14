@@ -170,6 +170,7 @@ public sealed class AiOrchestrationModuleTests
         public string Id => "aik-tests-user";
         public string Name => "AIKnowledge Tests";
         public string Email => "aik.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

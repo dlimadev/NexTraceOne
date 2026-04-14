@@ -22,7 +22,9 @@ public sealed class PlanExecutionIntegrationTests
     private readonly IToolRegistry _toolRegistry = Substitute.For<IToolRegistry>();
     private readonly IToolExecutor _toolExecutor = Substitute.For<IToolExecutor>();
     private readonly IToolPermissionValidator _toolPermissionValidator = Substitute.For<IToolPermissionValidator>();
+    private readonly IAiTokenQuotaService _tokenQuotaService = Substitute.For<IAiTokenQuotaService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
     private readonly IChatCompletionProvider _chatProvider = Substitute.For<IChatCompletionProvider>();
 
@@ -45,7 +47,9 @@ public sealed class PlanExecutionIntegrationTests
         _toolRegistry,
         _toolExecutor,
         _toolPermissionValidator,
+        _tokenQuotaService,
         _currentUser,
+        _currentTenant,
         _dateTimeProvider);
 
     // ── 1. Planning-enabled agent includes plan in result ─────────────────
@@ -64,6 +68,9 @@ public sealed class PlanExecutionIntegrationTests
         _toolPermissionValidator.GetAllowedTools(Arg.Any<string?>())
             .Returns(new List<ToolDefinition>() as IReadOnlyList<ToolDefinition>);
         _currentUser.Id.Returns("user-test");
+        _currentTenant.Id.Returns(Guid.NewGuid());
+        _tokenQuotaService.ValidateQuotaAsync(Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new TokenQuotaValidationResult(IsAllowed: true));
         _dateTimeProvider.UtcNow.Returns(DateTimeOffset.UtcNow);
         _executionRepository.AddAsync(Arg.Any<AiAgentExecution>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
@@ -111,6 +118,9 @@ public sealed class PlanExecutionIntegrationTests
         _toolPermissionValidator.GetAllowedTools(Arg.Any<string?>())
             .Returns(new List<ToolDefinition>() as IReadOnlyList<ToolDefinition>);
         _currentUser.Id.Returns("user-test");
+        _currentTenant.Id.Returns(Guid.NewGuid());
+        _tokenQuotaService.ValidateQuotaAsync(Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new TokenQuotaValidationResult(IsAllowed: true));
         _dateTimeProvider.UtcNow.Returns(DateTimeOffset.UtcNow);
         _executionRepository.AddAsync(Arg.Any<AiAgentExecution>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
@@ -157,6 +167,9 @@ public sealed class PlanExecutionIntegrationTests
         _toolPermissionValidator.GetAllowedTools(Arg.Any<string?>())
             .Returns(new List<ToolDefinition>() as IReadOnlyList<ToolDefinition>);
         _currentUser.Id.Returns("user-test");
+        _currentTenant.Id.Returns(Guid.NewGuid());
+        _tokenQuotaService.ValidateQuotaAsync(Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new TokenQuotaValidationResult(IsAllowed: true));
         _dateTimeProvider.UtcNow.Returns(DateTimeOffset.UtcNow);
         _executionRepository.AddAsync(Arg.Any<AiAgentExecution>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);

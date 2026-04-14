@@ -172,6 +172,7 @@ public sealed class OutboxEndToEndFlowTests
         public string Id { get; } = "outbox-test-user";
         public string Name { get; } = "Outbox Test";
         public string Email { get; } = "outbox.test@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated { get; } = true;
         public bool HasPermission(string permission) => true;
     }

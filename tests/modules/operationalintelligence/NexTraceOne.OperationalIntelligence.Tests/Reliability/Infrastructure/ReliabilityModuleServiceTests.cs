@@ -237,6 +237,7 @@ public sealed class ReliabilityModuleServiceTests
         public string Id => "reliability-tests-user";
         public string Name => "Reliability Tests";
         public string Email => "reliability.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

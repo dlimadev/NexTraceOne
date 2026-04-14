@@ -115,6 +115,7 @@ public sealed class RunbookKnowledgeLinkingServiceTests
         public string Id { get; } = "33333333-3333-3333-3333-333333333333";
         public string Name { get; } = "Knowledge Tests User";
         public string Email { get; } = "knowledge-tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated { get; } = true;
         public bool HasPermission(string permission) => true;
     }

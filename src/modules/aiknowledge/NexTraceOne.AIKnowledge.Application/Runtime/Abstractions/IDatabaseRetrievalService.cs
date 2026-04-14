@@ -24,7 +24,8 @@ public sealed record DatabaseSearchRequest(
     int ChangesWindowDays = 7,
     int IncidentsWindowDays = 30,
     int MaxChanges = 10,
-    int MaxIncidents = 5);
+    int MaxIncidents = 5,
+    string? ContractId = null);
 
 /// <summary>Resultado de pesquisa de dados estruturados.</summary>
 public sealed record DatabaseSearchResult(

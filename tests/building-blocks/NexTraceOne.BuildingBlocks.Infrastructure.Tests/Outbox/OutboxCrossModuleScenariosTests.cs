@@ -312,6 +312,7 @@ public sealed class OutboxCrossModuleScenariosTests
         public string Id { get; } = "cross-module-user";
         public string Name { get; } = "Cross Module User";
         public string Email { get; } = "cross.module@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated { get; } = true;
         public bool HasPermission(string permission) => true;
     }

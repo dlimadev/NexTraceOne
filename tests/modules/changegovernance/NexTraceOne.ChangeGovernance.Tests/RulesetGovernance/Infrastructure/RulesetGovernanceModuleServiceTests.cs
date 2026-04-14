@@ -157,6 +157,7 @@ public sealed class RulesetGovernanceModuleServiceTests
         public string Id => "rg-module-tests-user";
         public string Name => "RulesetGovernance Tests";
         public string Email => "rg.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

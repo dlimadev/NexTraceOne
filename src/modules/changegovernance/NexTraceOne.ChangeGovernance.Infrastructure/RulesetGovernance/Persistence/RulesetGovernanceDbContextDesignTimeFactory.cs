@@ -42,6 +42,7 @@ internal sealed class RulesetGovernanceDbContextDesignTimeFactory : IDesignTimeD
         public string Id => "design-time";
         public string Name => "Design Time";
         public string Email => "design-time@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => false;
         public bool HasPermission(string permission) => false;
     }

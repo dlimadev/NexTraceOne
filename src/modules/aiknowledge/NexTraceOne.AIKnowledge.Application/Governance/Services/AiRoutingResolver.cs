@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
@@ -10,8 +12,18 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 /// construção de justificativa e classificação de custo.
 /// </summary>
 public sealed class AiRoutingResolver(
-    IAiModelCatalogService modelCatalogService) : IAiRoutingResolver
+    IAiModelCatalogService modelCatalogService,
+    ILogger<AiRoutingResolver> logger) : IAiRoutingResolver
 {
+    /// <summary>
+    /// Identificador do modelo de sistema usado como fallback quando o catalog não retorna nenhum
+    /// modelo configurado. Garante que nenhuma string vazia alcance o provider. (E-A03)
+    /// </summary>
+    private const string SystemFallbackModel = "llama3.2";
+
+    /// <summary>Identificador do provider padrão associado ao modelo de fallback. (E-A03)</summary>
+    private const string SystemFallbackProvider = "ollama";
+
     public async Task<RoutingResolutionResult> ResolveRoutingAsync(
         string persona,
         AIUseCaseType useCaseType,
@@ -39,6 +51,19 @@ public sealed class AiRoutingResolver(
             selectedModel = resolvedModel.ModelName;
             selectedProvider = resolvedModel.ProviderId;
             isInternal = resolvedModel.IsInternal;
+        }
+        else if (string.IsNullOrWhiteSpace(selectedModel))
+        {
+            // E-A03: quando o catalog não retorna modelo algum e SelectModel também retorna vazio,
+            // usar o fallback de sistema para evitar que uma string vazia chegue ao provider.
+            logger.LogWarning(
+                "No AI model resolved from catalog for useCaseType={UseCaseType} persona={Persona} — " +
+                "applying system fallback model '{FallbackModel}'.",
+                useCaseType, persona, SystemFallbackModel);
+
+            selectedModel = SystemFallbackModel;
+            selectedProvider = SystemFallbackProvider;
+            isInternal = true;
         }
 
         var costClass = isInternal

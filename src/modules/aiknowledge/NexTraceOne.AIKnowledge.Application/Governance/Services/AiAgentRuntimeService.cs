@@ -21,6 +21,7 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 /// 3. Valida acesso do utilizador ao agent
 /// 4. Resolve modelo (override ou preferred do agent)
 /// 5. Valida modelo permitido para o agent
+/// 5a. Pré-valida quota de tokens antes de inferir (E-C01)
 /// 6. Resolve provider
 /// 7. Resolve tools permitidas para o agent
 /// 8. Monta prompt (system + tools + input)
@@ -40,7 +41,9 @@ public sealed class AiAgentRuntimeService(
     IToolRegistry toolRegistry,
     IToolExecutor toolExecutor,
     IToolPermissionValidator toolPermissionValidator,
+    IAiTokenQuotaService tokenQuotaService,
     ICurrentUser currentUser,
+    ICurrentTenant currentTenant,
     IDateTimeProvider dateTimeProvider) : IAiAgentRuntimeService
 {
     /// <summary>Número máximo de iterações do loop de tools para prevenir ciclos infinitos.</summary>
@@ -51,6 +54,9 @@ public sealed class AiAgentRuntimeService(
 
     /// <summary>Tokens reservados para a resposta do modelo.</summary>
     private const int ReservedCompletionTokens = 1024;
+
+    /// <summary>Estimativa conservadora de tokens por carácter para pré-validação de quota.</summary>
+    private const double TokensPerCharEstimate = 0.25;
 
     public async Task<Result<AgentExecutionResult>> ExecuteAsync(
         AiAgentId agentId,
@@ -100,6 +106,24 @@ public sealed class AiAgentRuntimeService(
         {
             return AiGovernanceErrors.ModelNotAllowedForAgent(
                 resolvedModel.ModelId.ToString(), agent.DisplayName);
+        }
+
+        // 5a. Pré-valida quota de tokens antes de consumir recursos de inferência.
+        // Estimativa conservadora: caracteres / 4 + tokens reservados para completion.
+        var estimatedTokens = (int)(input.Length * TokensPerCharEstimate) + ReservedCompletionTokens;
+        var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
+            currentUser.Id,
+            currentTenant.Id,
+            resolvedModel.ProviderId,
+            resolvedModel.ModelId.ToString(),
+            estimatedTokens,
+            cancellationToken);
+
+        if (!quotaResult.IsAllowed)
+        {
+            return AiGovernanceErrors.QuotaExceeded(
+                quotaResult.PolicyName ?? "agent",
+                quotaResult.BlockReason ?? currentUser.Id);
         }
 
         // 6. Resolve provider

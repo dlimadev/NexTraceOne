@@ -38,14 +38,16 @@ public sealed class GroundingContextAssemblyTests
         IAiModelRepository? modelRepo = null,
         ICatalogGroundingReader? catalogReader = null,
         IChangeGroundingReader? changeReader = null,
-        IIncidentGroundingReader? incidentReader = null)
+        IIncidentGroundingReader? incidentReader = null,
+        IContractGroundingReader? contractReader = null)
     {
         modelRepo ??= Substitute.For<IAiModelRepository>();
         catalogReader ??= Substitute.For<ICatalogGroundingReader>();
         changeReader ??= Substitute.For<IChangeGroundingReader>();
         incidentReader ??= Substitute.For<IIncidentGroundingReader>();
+        contractReader ??= Substitute.For<IContractGroundingReader>();
         return new DatabaseRetrievalService(
-            modelRepo, catalogReader, changeReader, incidentReader,
+            modelRepo, catalogReader, changeReader, incidentReader, contractReader,
             Substitute.For<ILogger<DatabaseRetrievalService>>());
     }
 

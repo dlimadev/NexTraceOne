@@ -11,6 +11,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
+using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence;
@@ -125,12 +126,15 @@ public static class DependencyInjection
             services, configuration, "IncidentDatabase");
         RegisterCrossModuleContextIfNeeded<KnowledgeDbContext>(
             services, configuration, "KnowledgeDatabase");
+        RegisterCrossModuleContextIfNeeded<ContractsDbContext>(
+            services, configuration, "ContractsDatabase");
 
         // Cross-module grounding readers — thin abstractions over read-only DbContext access
         services.AddScoped<ICatalogGroundingReader, CatalogGroundingReader>();
         services.AddScoped<IChangeGroundingReader, ChangeGroundingReader>();
         services.AddScoped<IIncidentGroundingReader, IncidentGroundingReader>();
         services.AddScoped<IKnowledgeDocumentGroundingReader, KnowledgeDocumentGroundingReader>();
+        services.AddScoped<IContractGroundingReader, ContractGroundingReader>();
 
         // Retrieval services — scoped (foundation for RAG, database grounding and telemetry)
         services.AddScoped<IDocumentRetrievalService, DocumentRetrievalService>();

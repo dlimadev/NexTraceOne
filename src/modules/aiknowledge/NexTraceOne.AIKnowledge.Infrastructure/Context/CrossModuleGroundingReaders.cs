@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.Knowledge.Infrastructure.Persistence;
@@ -159,5 +161,45 @@ public sealed class KnowledgeDocumentGroundingReader(KnowledgeDbContext knowledg
             Title: d.Title,
             Summary: d.Summary,
             Category: d.Category.ToString())).ToList();
+    }
+}
+
+/// <summary>
+/// Implementação do leitor de versões de contrato para grounding de IA.
+/// Acesso somente-leitura ao ContractsDbContext do módulo Catalog.
+/// </summary>
+public sealed class ContractGroundingReader(ContractsDbContext contractsDb) : IContractGroundingReader
+{
+    public async Task<IReadOnlyList<ContractGroundingContext>> FindContractVersionsAsync(
+        Guid? contractVersionId,
+        Guid? apiAssetId,
+        string? searchTerm,
+        int maxResults,
+        CancellationToken ct = default)
+    {
+        var query = contractsDb.ContractVersions.AsNoTracking();
+
+        if (contractVersionId.HasValue)
+            query = query.Where(cv => cv.Id == ContractVersionId.From(contractVersionId.Value));
+
+        if (apiAssetId.HasValue)
+            query = query.Where(cv => cv.ApiAssetId == apiAssetId.Value);
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            query = query.Where(cv => cv.SemVer.Contains(searchTerm));
+
+        var versions = await query
+            .OrderByDescending(cv => cv.CreatedAt)
+            .Take(maxResults)
+            .ToListAsync(ct);
+
+        return versions.Select(cv => new ContractGroundingContext(
+            ContractVersionId: cv.Id.Value.ToString(),
+            ApiAssetId: cv.ApiAssetId.ToString(),
+            Version: cv.SemVer,
+            Protocol: cv.Protocol.ToString(),
+            LifecycleState: cv.LifecycleState.ToString(),
+            IsLocked: cv.IsLocked,
+            LockedAt: cv.LockedAt)).ToList();
     }
 }
