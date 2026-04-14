@@ -5,7 +5,7 @@ import { cn } from '../../lib/cn';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePermissions } from '../../hooks/usePermissions';
 import { usePersona } from '../../contexts/PersonaContext';
-import { AppSidebarFooter } from './AppSidebarFooter';
+// import { AppSidebarFooter } from './AppSidebarFooter';
 import type { Permission } from '../../auth/permissions';
 import type { NavSection } from '../../auth/persona';
 import { SIDEBAR_RAIL_WIDTH, SIDEBAR_CONTENT_WIDTH, SIDEBAR_WIDTH_COLLAPSED, SIDEBAR_WIDTH_EXPANDED } from './constants';
@@ -336,14 +336,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           </div>
         )}
 
-        {/* User avatar — rail mode */}
-        <AppSidebarFooter
-          collapsed
-          email={user?.email}
-          persona={persona}
-          roleName={roleName}
-          onLogout={handleLogout}
-        />
+        {/* User avatar — rail mode (removed: user info is in AppTopbar/AppUserMenu) */}
       </div>
 
       {/* ─── Content Panel ─────────────────────────────────────────────────── */}
@@ -417,14 +410,7 @@ export function AppSidebar({ collapsed = false, onToggleCollapse, mobile = false
           </ul>
         </nav>
 
-        {/* User card — expanded mode */}
-        <AppSidebarFooter
-          collapsed={false}
-          email={user?.email}
-          persona={persona}
-          roleName={roleName}
-          onLogout={handleLogout}
-        />
+        {/* User card — expanded mode (removed: user info is in AppTopbar/AppUserMenu) */}
       </div>
     </div>
   );

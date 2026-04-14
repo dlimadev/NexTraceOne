@@ -4,7 +4,6 @@ import { renderWithProviders } from '../../test-utils';
 import { AppSidebarItem } from '../../../components/shell/AppSidebarItem';
 import { AppSidebarGroup } from '../../../components/shell/AppSidebarGroup';
 import { AppSidebarHeader } from '../../../components/shell/AppSidebarHeader';
-import { AppSidebarFooter } from '../../../components/shell/AppSidebarFooter';
 
 describe('AppSidebarItem', () => {
   it('renders label and icon in expanded mode', () => {
@@ -94,48 +93,5 @@ describe('AppSidebarHeader', () => {
     renderWithProviders(<AppSidebarHeader collapsed={true} />);
     expect(screen.getByText('N')).toBeInTheDocument();
     expect(screen.queryByText('NexTraceOne')).not.toBeInTheDocument();
-  });
-});
-
-describe('AppSidebarFooter', () => {
-  it('renders user display name and persona in expanded mode', () => {
-    renderWithProviders(
-      <AppSidebarFooter
-        collapsed={false}
-        email="test@example.com"
-        persona="Engineer"
-        roleName="Developer"
-        onLogout={vi.fn()}
-      />,
-    );
-    expect(screen.getByText('test')).toBeInTheDocument();
-  });
-
-  it('renders initial letter in collapsed mode', () => {
-    renderWithProviders(
-      <AppSidebarFooter
-        collapsed={true}
-        email="test@example.com"
-        persona="Engineer"
-        roleName="Developer"
-        onLogout={vi.fn()}
-      />,
-    );
-    expect(screen.getByText('T')).toBeInTheDocument();
-  });
-
-  it('calls onLogout when logout button is clicked', () => {
-    const onLogout = vi.fn();
-    renderWithProviders(
-      <AppSidebarFooter
-        collapsed={false}
-        email="test@example.com"
-        persona="Engineer"
-        roleName="Developer"
-        onLogout={onLogout}
-      />,
-    );
-    fireEvent.click(screen.getByLabelText('Sign out'));
-    expect(onLogout).toHaveBeenCalledTimes(1);
   });
 });

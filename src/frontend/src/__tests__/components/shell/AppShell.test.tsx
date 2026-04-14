@@ -127,9 +127,9 @@ describe('AppShell', () => {
     expect(sidebarNav).toBeInTheDocument();
   });
 
-  it('renders the user display name in sidebar footer', () => {
+  it('renders the user display name in header bar', () => {
     renderShell();
-    expect(screen.getAllByText('admin').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Admin/i).length).toBeGreaterThan(0);
   });
 
   it('opens command palette with Ctrl+K', () => {
