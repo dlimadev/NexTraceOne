@@ -180,6 +180,108 @@ export interface BackupScheduleConfig {
   compressionEnabled: boolean;
 }
 
+// ─── W2-02 Startup Report ────────────────────────────────────────────────────
+
+export interface StartupConfigSnapshot {
+  smtpConfigured: boolean;
+  ollamaConfigured: boolean;
+  elasticsearchConfigured: boolean;
+  corsOrigins: string[];
+}
+
+export interface StartupReportEntry {
+  id: string;
+  startedAt: string;
+  version: string;
+  build: string;
+  environment: string;
+  hostname: string;
+  migrationsApplied: number;
+  migrationsTotal: number;
+  modulesRegistered: number;
+  configuration: StartupConfigSnapshot;
+  warnings: string[];
+}
+
+export interface StartupReportListResponse {
+  reports: StartupReportEntry[];
+}
+
+// ─── W6-03 Resource Budget ────────────────────────────────────────────────────
+
+export interface TenantResourceUsage {
+  cpuRequestsCores: number;
+  memoryRequestsGb: number;
+  diskUsageGb: number;
+  aiTokensUsedThisMonth: number;
+  activeConnections: number;
+}
+
+export interface TenantResourceQuota {
+  maxCpuCores: number | null;
+  maxMemoryGb: number | null;
+  maxDiskGb: number | null;
+  maxAiTokensPerMonth: number | null;
+  maxConnections: number | null;
+}
+
+export interface TenantBudgetEntry {
+  tenantId: string;
+  tenantName: string;
+  quota: TenantResourceQuota;
+  usage: TenantResourceUsage;
+  isBlocked: boolean;
+  blockReason: string | null;
+  overrideUntil: string | null;
+  overrideReason: string | null;
+}
+
+export interface ResourceBudgetResponse {
+  tenants: TenantBudgetEntry[];
+  updatedAt: string;
+}
+
+// ─── W7-01/02 Elasticsearch Manager ──────────────────────────────────────────
+
+export type EsIndexPhase = 'hot' | 'warm' | 'cold' | 'delete';
+
+export interface EsIndexInfo {
+  name: string;
+  docsCount: number;
+  storeSizeGb: number;
+  currentPhase: EsIndexPhase;
+  createdAt: string;
+  ilmPolicyName: string | null;
+}
+
+export interface EsClusterHealth {
+  status: 'green' | 'yellow' | 'red';
+  clusterName: string;
+  numberOfNodes: number;
+  activeShards: number;
+  unassignedShards: number;
+  jvmHeapUsedPercent: number;
+  diskUsedPercent: number;
+  diskTotalGb: number;
+  diskUsedGb: number;
+  projectedDaysUntilFull: number | null;
+  isReadOnly: boolean;
+  checkedAt: string;
+}
+
+export interface EsIlmPolicy {
+  name: string;
+  hotMaxAgeDays: number | null;
+  warmAfterDays: number | null;
+  deleteAfterDays: number | null;
+}
+
+export interface ElasticsearchManagerResponse {
+  clusterHealth: EsClusterHealth;
+  indices: EsIndexInfo[];
+  ilmPolicies: EsIlmPolicy[];
+}
+
 export interface BackupCoordinatorResponse {
   schedule: BackupScheduleConfig;
   recentBackups: BackupRecord[];
@@ -292,5 +394,56 @@ export const platformAdminApi = {
    */
   runBackupNow: () =>
     client.post<BackupRecord>('/api/v1/admin/backup/run').then((r) => r.data),
+
+  // ── W2-02: Startup Report ─────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/startup-report — requer platform:admin:read.
+   * Retorna os últimos 30 relatórios de startup.
+   */
+  getStartupReports: () =>
+    client
+      .get<StartupReportListResponse>('/api/v1/admin/startup-report')
+      .then((r) => r.data),
+
+  // ── W6-03: Resource Budget ────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/resource-budget — requer platform:admin:read.
+   * Retorna quotas e uso actual por tenant.
+   */
+  getResourceBudget: () =>
+    client
+      .get<ResourceBudgetResponse>('/api/v1/admin/resource-budget')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/resource-budget/:tenantId — requer platform:admin:write.
+   * Actualiza as quotas de um tenant específico.
+   */
+  updateTenantQuota: (tenantId: string, quota: TenantResourceQuota) =>
+    client
+      .put<TenantBudgetEntry>(`/api/v1/admin/resource-budget/${tenantId}`, quota)
+      .then((r) => r.data),
+
+  // ── W7-01/02: Elasticsearch Manager ──────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/elasticsearch — requer platform:admin:read.
+   * Retorna saúde do cluster, lista de índices e políticas ILM.
+   */
+  getElasticsearchManager: () =>
+    client
+      .get<ElasticsearchManagerResponse>('/api/v1/admin/elasticsearch')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/elasticsearch/ilm/:policyName — requer platform:admin:write.
+   * Actualiza uma política ILM.
+   */
+  updateIlmPolicy: (policyName: string, policy: EsIlmPolicy) =>
+    client
+      .put<EsIlmPolicy>(`/api/v1/admin/elasticsearch/ilm/${policyName}`, policy)
+      .then((r) => r.data),
 };
 

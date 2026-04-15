@@ -65,6 +65,9 @@ const NetworkPolicyPage = lazy(() => import('../features/platform-admin/pages/Ne
 const DatabaseHealthPage = lazy(() => import('../features/platform-admin/pages/DatabaseHealthPage').then(m => ({ default: m.DatabaseHealthPage })));
 const SupportBundlePage = lazy(() => import('../features/platform-admin/pages/SupportBundlePage').then(m => ({ default: m.SupportBundlePage })));
 const BackupCoordinatorPage = lazy(() => import('../features/platform-admin/pages/BackupCoordinatorPage').then(m => ({ default: m.BackupCoordinatorPage })));
+const StartupReportPage = lazy(() => import('../features/platform-admin/pages/StartupReportPage').then(m => ({ default: m.StartupReportPage })));
+const ResourceBudgetPage = lazy(() => import('../features/platform-admin/pages/ResourceBudgetPage').then(m => ({ default: m.ResourceBudgetPage })));
+const ElasticsearchManagerPage = lazy(() => import('../features/platform-admin/pages/ElasticsearchManagerPage').then(m => ({ default: m.ElasticsearchManagerPage })));
 
 export function AdminRoutes() {
   return (
@@ -434,6 +437,36 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <BackupCoordinatorPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Startup Report — W2-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/startup-report"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <StartupReportPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Resource Budget — W6-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/resource-budget"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ResourceBudgetPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Elasticsearch Manager — W7-01/02 (on-prem admin) ── */}
+      <Route
+        path="/admin/elasticsearch"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ElasticsearchManagerPage />
           </ProtectedRoute>
         }
       />
