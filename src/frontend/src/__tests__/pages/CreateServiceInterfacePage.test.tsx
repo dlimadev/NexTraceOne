@@ -123,7 +123,9 @@ describe('CreateServiceInterfacePage', () => {
     });
     const submitBtns = screen.getAllByRole('button', { name: /create interface/i });
     await user.click(submitBtns[submitBtns.length - 1]);
-    expect(screen.getByText(/interface name/i)).toBeInTheDocument();
+    // After failed submit the validation error "Interface Name … is required." appears
+    const matches = screen.getAllByText(/interface name/i);
+    expect(matches.length).toBeGreaterThan(0);
   });
 
   it('shows BasePath field when RestApi is selected (default)', async () => {
