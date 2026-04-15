@@ -26,7 +26,7 @@ Motor de previsão de capacidade baseado em tendências reais:
 **Análise automática:**
 ```
 Previsão de Capacidade — Próximos 90 dias
-├── Disco ClickHouse
+├── Disco Elasticsearch
 │   Crescimento: +12 GB/semana (últimas 8 semanas)
 │   Actual: 148 GB / 500 GB
 │   Estimativa disco cheio: 29 de Julho de 2026
@@ -73,7 +73,7 @@ nextraceone/
 │   ├── workers-deployment.yaml
 │   ├── ingestion-deployment.yaml
 │   ├── postgres-statefulset.yaml  (opcional — pode usar BD externa)
-│   ├── clickhouse-statefulset.yaml
+│   ├── elasticsearch-statefulset.yaml
 │   ├── ollama-deployment.yaml
 │   ├── hpa.yaml               ← autoscaling horizontal para ApiHost
 │   ├── pdb.yaml               ← pod disruption budget
@@ -84,7 +84,7 @@ nextraceone/
 **Funcionalidades:**
 - HA para ApiHost (mínimo 2 réplicas)
 - BackgroundWorkers com leader election (apenas 1 instância activa)
-- Persistent Volumes para PostgreSQL e ClickHouse
+- Persistent Volumes para PostgreSQL e Elasticsearch
 - Health probes configuradas (`/health`, `/ready`, `/live`)
 - Resource requests e limits definidos
 
@@ -272,7 +272,7 @@ Estado: 4/5 controls passam | 1 control em falta
 ║  W5-05 Fine-Grained Authorization por Ambiente                   ║
 ║  W6-01 Waste Detection Engine                                    ║
 ║  W6-03 Resource Budget por Tenant                                ║
-║  W7-01 ClickHouse Space Manager                                  ║
+║  W7-01 Elasticsearch Index Manager                               ║
 ║  W7-03 PostgreSQL Health Dashboard                               ║
 ║  W7-04 DORA Metrics Dashboard                                    ║
 ╠══════════════════════════════════════════════════════════════════╣

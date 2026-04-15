@@ -13,7 +13,7 @@ O NexTraceOne já tem uma base sólida para on-prem:
 - PostgreSQL como única dependência obrigatória
 - Ollama para LLM local sem cloud
 - Fontes servidas localmente (sem CDN externo)
-- ClickHouse como stack de observabilidade self-hosted
+- Elasticsearch como provider principal de observabilidade self-hosted
 - IIS + Windows suportados
 - Docker Compose para POC/avaliação
 
@@ -36,7 +36,7 @@ um produto que "funciona num servidor" num produto que uma equipa de infra conse
 | W4 | [WAVE-04-AI-LOCAL.md](./WAVE-04-AI-LOCAL.md) | IA Local, Gestão de Modelos, LLM Governance | **Alta** |
 | W5 | [WAVE-05-SECURITY-NETWORK.md](./WAVE-05-SECURITY-NETWORK.md) | Segurança, Rede, Air-Gap, Zero Trust | **Alta** |
 | W6 | [WAVE-06-RESOURCES-FINOPS.md](./WAVE-06-RESOURCES-FINOPS.md) | Recursos, FinOps, Sustentabilidade, GreenOps | **Média** |
-| W7 | [WAVE-07-OBSERVABILITY.md](./WAVE-07-OBSERVABILITY.md) | Observabilidade, ClickHouse, Retenção de Dados | **Média** |
+| W7 | [WAVE-07-OBSERVABILITY.md](./WAVE-07-OBSERVABILITY.md) | Observabilidade, Elasticsearch, Retenção de Dados | **Média** |
 | W8 | [WAVE-08-FUTURE.md](./WAVE-08-FUTURE.md) | Evoluções Futuras, Capacidade, Multi-Tenant | **Roadmap** |
 
 ---
@@ -50,7 +50,7 @@ um produto que "funciona num servidor" num produto que uma equipa de infra conse
 | PostgreSQL como única dependência obrigatória | READY |
 | Ollama para LLM local (sem cloud) | READY |
 | Fontes servidas localmente via `@fontsource` | READY |
-| ClickHouse como stack de observabilidade self-hosted | READY |
+| Elasticsearch como provider principal de observabilidade self-hosted | READY |
 | Auto-migration bloqueado em produção | READY |
 | Health endpoints `/health`, `/ready`, `/live` | READY |
 | Docker Compose para avaliação/POC | READY |
@@ -71,7 +71,7 @@ um produto que "funciona num servidor" num produto que uma equipa de infra conse
 | Sem Model Manager UI (LLM) | Gestão de IA requer SSH | W4 |
 | Sem Air-Gap Mode explícito | Dados podem sair do perímetro | W5 |
 | Sem Resource Budget por Tenant | Consumo descontrolado em shared servers | W6 |
-| Sem ClickHouse Space Manager | Disco pode encher sem aviso | W7 |
+| Sem Elasticsearch Index Manager | Disco pode encher sem aviso | W7 |
 | Sem Offline Release Bundle | Actualização requer internet | W3 |
 
 ---

@@ -63,7 +63,7 @@ Endpoint público `GET /preflight` (sem autenticação) que executa antes do pri
 - Ollama acessível em :11434
 - SMTP configurado
 - OTel Collector acessível
-- ClickHouse acessível
+- Elasticsearch acessível
 
 ### Implementação sugerida
 ```csharp

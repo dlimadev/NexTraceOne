@@ -110,7 +110,7 @@ Endpoint `GET /api/v1/admin/startup-report` que retorna o relatório do último 
   "configuration": {
     "smtp_configured": true,
     "ollama_configured": true,
-    "clickhouse_configured": true,
+    "elasticsearch_configured": true,
     "cors_origins": ["https://app.acme.com"]
   },
   "warnings": [
