@@ -18,12 +18,16 @@ import {
   Sparkles,
   ArrowLeft,
   ArrowRight,
+  Lock,
+  Info,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { PageContainer } from '../../../components/shell';
 import { SERVICE_TYPES as CONTRACT_TYPES, PROTOCOL_BY_TYPE, type ContractTypeValue } from '../shared/constants';
+import { supportsContracts, allowedContractTypes } from '../shared/serviceContractPolicy';
 import { contractStudioApi } from '../api/contractStudio';
 import type { ContractType, ContractProtocol, ServiceListItem } from '../types';
+import type { ServiceType } from '../../../types';
 import { useAuth } from '../../../contexts/AuthContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
 
@@ -55,13 +59,12 @@ const CREATION_MODES: CreationModeOption[] = [
   { id: 'ai', labelKey: 'contracts.create.modeAi', descriptionKey: 'contracts.create.modeAiDesc', Icon: Sparkles },
 ];
 
-type Step = 'type' | 'mode' | 'details';
+type Step = 'service' | 'type' | 'mode' | 'details';
 
 /**
  * Página de criação de novo contrato.
- * Fluxo em 3 passos: escolha de tipo → modo de criação → detalhes.
- * Para contratos SOAP com modo import, usa o endpoint dedicado createSoapDraft
- * que popula o SoapDraftMetadata com os campos específicos do contrato.
+ * Fluxo obrigatório: service (se não pré-preenchido) → tipo (filtrado por serviceType) → modo → detalhes.
+ * O serviço é obrigatório; o tipo de contrato é filtrado pela política ServiceContractPolicy.
  */
 export function CreateContractPage() {
   const { t } = useTranslation();
@@ -70,18 +73,22 @@ export function CreateContractPage() {
   const { user } = useAuth();
   const currentActor = user?.email || user?.fullName || user?.id || 'system';
 
-  const [step, setStep] = useState<Step>('type');
+  const prefilledServiceId = searchParams.get('serviceId') ?? '';
+  const hasPrefilledService = prefilledServiceId.length > 0;
+
+  const [step, setStep] = useState<Step>(hasPrefilledService ? 'type' : 'service');
   const [selectedType, setSelectedType] = useState<ContractTypeValue | null>(null);
   const [selectedMode, setSelectedMode] = useState<CreationMode | null>(null);
   const [selectedProtocol, setSelectedProtocol] = useState<ContractProtocol | ''>('');
-  const [linkedServiceId, setLinkedServiceId] = useState(() => searchParams.get('serviceId') ?? '');
+  const [linkedServiceId, setLinkedServiceId] = useState(prefilledServiceId);
+  const [selectedServiceType, setSelectedServiceType] = useState<ServiceType | null>(null);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [importContent, setImportContent] = useState('');
   const [aiPrompt, setAiPrompt] = useState('');
 
-  // SOAP-specific fields for import/create flows
+  // SOAP-specific fields
   const [soapServiceName, setSoapServiceName] = useState('');
   const [soapTargetNamespace, setSoapTargetNamespace] = useState('http://example.com/service');
   const [soapVersion, setSoapVersion] = useState<'1.1' | '1.2'>('1.1');
@@ -106,11 +113,45 @@ export function CreateContractPage() {
     queryFn: () => serviceCatalogApi.listServices(),
   });
 
+  // When service is pre-filled via URL param, load its data to get serviceType
+  const prefilledServiceQuery = useQuery({
+    queryKey: ['catalog-service-for-contract-create', prefilledServiceId],
+    queryFn: () => serviceCatalogApi.listServices(),
+    enabled: hasPrefilledService,
+    select: (data) => data?.items?.find((s) => s.serviceId === prefilledServiceId) ?? null,
+  });
+
+  // Determine serviceType for the selected service
+  const effectiveServiceType: ServiceType | null =
+    selectedServiceType ??
+    (prefilledServiceQuery.data?.serviceType ?? null);
+
+  // Filtered contract types based on the selected service's serviceType
+  const filteredContractTypes = effectiveServiceType
+    ? CONTRACT_TYPES.filter((ct) =>
+        allowedContractTypes(effectiveServiceType).includes(ct.value as ContractTypeValue),
+      )
+    : CONTRACT_TYPES;
+
+  const serviceSupportsContracts = effectiveServiceType
+    ? supportsContracts(effectiveServiceType)
+    : true;
+
+  const availableServices = servicesQuery.data?.items ?? [];
+
+  const prefilledService = prefilledServiceQuery.data ?? null;
+  const selectedServiceDisplay =
+    prefilledService ??
+    (linkedServiceId
+      ? availableServices.find((s) => s.serviceId === linkedServiceId) ?? null
+      : null);
+
   const createMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedType || !selectedProtocol) throw new Error('Missing required fields');
+      if (!selectedType || !selectedProtocol || !linkedServiceId) {
+        throw new Error(t('contracts.create.missingRequiredFields', 'Missing required fields'));
+      }
 
-      // AI Generation mode uses dedicated generateFromAi endpoint
       if (selectedMode === 'ai') {
         const aiDraft = await contractStudioApi.generateFromAi({
           title,
@@ -118,13 +159,11 @@ export function CreateContractPage() {
           contractType: selectedType as ContractType,
           protocol: selectedProtocol as ContractProtocol,
           prompt: aiPrompt,
-          serviceId: linkedServiceId || undefined,
+          serviceId: linkedServiceId,
         });
-
         return { draftId: aiDraft.draftId };
       }
 
-      // SOAP type uses dedicated createSoapDraft to populate SoapDraftMetadata
       if (isSoapType) {
         const soapDraft = await contractStudioApi.createSoapDraft({
           title,
@@ -132,12 +171,10 @@ export function CreateContractPage() {
           serviceName: soapServiceName || title,
           targetNamespace: soapTargetNamespace || 'http://example.com/service',
           soapVersion,
-          serviceId: linkedServiceId || undefined,
+          serviceId: linkedServiceId,
           description,
           endpointUrl: soapEndpointUrl || undefined,
         });
-
-        // If import mode and WSDL content provided, update draft spec content
         if (selectedMode === 'import' && importContent.trim()) {
           await contractStudioApi.updateContent(soapDraft.draftId, {
             specContent: importContent,
@@ -145,22 +182,18 @@ export function CreateContractPage() {
             editedBy: currentActor,
           });
         }
-
         return { draftId: soapDraft.draftId };
       }
 
-      // Event type uses dedicated createEventDraft to populate EventDraftMetadata
       if (isEventType) {
         const eventDraft = await contractStudioApi.createEventDraft({
           title,
           author: currentActor,
           asyncApiVersion,
-          serviceId: linkedServiceId || undefined,
+          serviceId: linkedServiceId,
           description,
           defaultContentType,
         });
-
-        // If import mode and AsyncAPI content provided, update draft spec content
         if (selectedMode === 'import' && importContent.trim()) {
           await contractStudioApi.updateContent(eventDraft.draftId, {
             specContent: importContent,
@@ -168,11 +201,9 @@ export function CreateContractPage() {
             editedBy: currentActor,
           });
         }
-
         return { draftId: eventDraft.draftId };
       }
 
-      // Background Service type uses dedicated createBackgroundServiceDraft to populate BackgroundServiceDraftMetadata
       if (isBackgroundServiceType) {
         const bgDraft = await contractStudioApi.createBackgroundServiceDraft({
           title,
@@ -180,24 +211,21 @@ export function CreateContractPage() {
           serviceName: bgServiceName || title,
           category: bgCategory,
           triggerType: bgTriggerType,
-          serviceId: linkedServiceId || undefined,
+          serviceId: linkedServiceId,
           description,
           scheduleExpression: bgScheduleExpression || undefined,
         });
-
         return { draftId: bgDraft.draftId };
       }
 
-      // Generic draft creation for other types
       const createdDraft = await contractStudioApi.createDraft({
         title,
         author: currentActor,
         contractType: selectedType as ContractType,
         protocol: selectedProtocol as ContractProtocol,
-        serviceId: linkedServiceId || undefined,
+        serviceId: linkedServiceId,
         description,
       });
-
       if (selectedMode === 'import' && importContent.trim()) {
         await contractStudioApi.updateContent(createdDraft.draftId, {
           specContent: importContent,
@@ -205,7 +233,6 @@ export function CreateContractPage() {
           editedBy: currentActor,
         });
       }
-
       return createdDraft;
     },
     onSuccess: (data) => {
@@ -214,22 +241,34 @@ export function CreateContractPage() {
   });
 
   const protocols = selectedType ? PROTOCOL_BY_TYPE[selectedType] : [];
-  const availableServices = servicesQuery.data?.items ?? [];
 
+  const canProceedFromService = linkedServiceId.length > 0;
   const canProceedToMode = !!selectedType;
   const canProceedToDetails = !!selectedMode;
-  const canCreate = !!title && !!selectedProtocol && (() => {
+  const canCreate = !!title && !!selectedProtocol && !!linkedServiceId && (() => {
     if (selectedMode === 'ai') return !!aiPrompt.trim();
     if (selectedMode === 'import') return !!importContent.trim();
     return true;
   })();
+
+  // Back navigation
+  const handleBack = () => {
+    if (step === 'service') navigate('/contracts');
+    else if (step === 'type') setStep(hasPrefilledService ? ('type' as Step) : 'service');
+    else if (step === 'mode') setStep('type');
+    else if (step === 'details') setStep('mode');
+  };
+
+  const allSteps: Step[] = hasPrefilledService
+    ? ['type', 'mode', 'details']
+    : ['service', 'type', 'mode', 'details'];
 
   return (
     <PageContainer className="max-w-4xl">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <button
-          onClick={() => step === 'type' ? navigate('/contracts') : setStep(step === 'details' ? 'mode' : 'type')}
+          onClick={handleBack}
           className="text-muted hover:text-heading transition-colors"
         >
           <ArrowLeft size={18} />
@@ -246,11 +285,11 @@ export function CreateContractPage() {
 
       {/* Step indicators */}
       <div className="flex items-center gap-2 mb-8">
-        {(['type', 'mode', 'details'] as Step[]).map((s, i) => (
+        {allSteps.map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium
               ${step === s ? 'bg-accent text-white' :
-                i < ['type', 'mode', 'details'].indexOf(step) ? 'bg-success/15 text-success' :
+                i < allSteps.indexOf(step) ? 'bg-success/15 text-success' :
                 'bg-elevated text-muted'}`}
             >
               {i + 1}
@@ -258,58 +297,162 @@ export function CreateContractPage() {
             <span className={`text-xs ${step === s ? 'text-heading font-medium' : 'text-muted'}`}>
               {t(`contracts.create.step${s.charAt(0).toUpperCase() + s.slice(1)}`, s)}
             </span>
-            {i < 2 && <div className="w-8 h-px bg-edge" />}
+            {i < allSteps.length - 1 && <div className="w-8 h-px bg-edge" />}
           </div>
         ))}
       </div>
 
-      {/* Step 1: Type selection */}
-      {step === 'type' && (
+      {/* Step 0 (when no prefilled service): Service selection */}
+      {step === 'service' && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-heading mb-4">
-            {t('contracts.create.selectType', 'What type of service?')}
+            {t('contracts.create.selectService', 'Select the service for this contract')} *
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {CONTRACT_TYPES.map((st) => {
-              const Icon = TYPE_ICONS[st.value] ?? Globe;
-              const isSelected = selectedType === st.value;
-
-              return (
-                <button
-                  key={st.value}
-                  onClick={() => {
-                    setSelectedType(st.value);
-                    const protos = PROTOCOL_BY_TYPE[st.value];
-                    const singleProtocol = protos[0];
-                    if (protos.length === 1 && singleProtocol) setSelectedProtocol(singleProtocol);
-                    else setSelectedProtocol('');
-                  }}
-                  className={`text-left rounded-lg border p-4 transition-all
-                    ${isSelected
-                      ? 'border-accent bg-accent/5 ring-1 ring-accent/30'
-                      : 'border-edge bg-card hover:border-accent/30 hover:bg-elevated/30'}`}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center
-                      ${isSelected ? 'bg-accent/20 text-accent' : 'bg-elevated text-muted'}`}>
-                      <Icon size={18} />
-                    </div>
-                    <h3 className="text-sm font-medium text-heading">
-                      {t(st.labelKey, st.value)}
-                    </h3>
+          <Card>
+            <CardBody>
+              <div>
+                <label className="block text-xs font-medium text-heading mb-1">
+                  {t('contracts.create.linkedService', 'Linked Service')} *
+                </label>
+                {servicesQuery.isLoading ? (
+                  <div className="text-xs text-muted py-2">
+                    {t('common.loading', 'Loading...')}
                   </div>
-                  <p className="text-xs text-muted">
-                    {t(`contracts.create.typeDesc${st.value}`, `Create a ${st.value} contract`)}
-                  </p>
-                </button>
-              );
-            })}
-          </div>
+                ) : (
+                  <select
+                    value={linkedServiceId}
+                    onChange={(e) => {
+                      const svcId = e.target.value;
+                      setLinkedServiceId(svcId);
+                      const svc = availableServices.find((s) => s.serviceId === svcId);
+                      const svcType = (svc?.serviceType as ServiceType) ?? null;
+                      setSelectedServiceType(svcType);
+                      // Reset downstream selections when service changes
+                      setSelectedType(null);
+                      setSelectedMode(null);
+                      setSelectedProtocol('');
+                    }}
+                    className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
+                  >
+                    <option value="">{t('contracts.create.selectServicePlaceholder', 'Select a service...')}</option>
+                    {availableServices.map((service: ServiceListItem) => (
+                      <option key={service.serviceId} value={service.serviceId}>
+                        {service.displayName} · {service.domain} · {service.teamName}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <p className="mt-1 text-[10px] text-muted">
+                  {t('contracts.create.linkedServiceHint', 'Linking a real catalog service enables publish and workspace enrichment without artificial fallback.')}
+                </p>
+              </div>
+
+              {/* No contracts support message */}
+              {selectedServiceType && !serviceSupportsContracts && (
+                <div className="mt-4 flex items-start gap-2 text-xs text-warning bg-warning/10 border border-warning/20 rounded-md px-3 py-2">
+                  <Info size={14} className="shrink-0 mt-0.5" />
+                  <span>
+                    {t(
+                      'contracts.create.serviceTypeNoContracts',
+                      'This service type ({{type}}) does not expose public interface contracts.',
+                      { type: selectedServiceType },
+                    )}
+                  </span>
+                </div>
+              )}
+            </CardBody>
+          </Card>
 
           <div className="flex justify-end mt-6">
             <button
+              onClick={() => setStep('type')}
+              disabled={!canProceedFromService || !serviceSupportsContracts}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {t('common.next', 'Next')} <ArrowRight size={14} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 1: Type selection */}
+      {step === 'type' && (
+        <div className="space-y-4">
+          {/* Locked service banner */}
+          {selectedServiceDisplay && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-elevated rounded-md border border-edge text-xs">
+              <Lock size={12} className="text-muted shrink-0" />
+              <span className="text-muted">{t('contracts.create.linkedService', 'Linked Service')}:</span>
+              <span className="text-heading font-medium">{selectedServiceDisplay.displayName}</span>
+              <span className="text-muted">· {selectedServiceDisplay.domain}</span>
+            </div>
+          )}
+
+          <h2 className="text-sm font-semibold text-heading mb-4">
+            {t('contracts.create.selectType', 'What type of contract?')}
+          </h2>
+
+          {/* No contracts support message for pre-filled service */}
+          {effectiveServiceType && !serviceSupportsContracts ? (
+            <div className="flex items-start gap-2 text-xs text-warning bg-warning/10 border border-warning/20 rounded-md px-3 py-3">
+              <Info size={14} className="shrink-0 mt-0.5" />
+              <span>
+                {t(
+                  'contracts.create.serviceTypeNoContracts',
+                  'This service type ({{type}}) does not expose public interface contracts.',
+                  { type: effectiveServiceType },
+                )}
+              </span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {filteredContractTypes.map((st) => {
+                const Icon = TYPE_ICONS[st.value] ?? Globe;
+                const isSelected = selectedType === st.value;
+
+                return (
+                  <button
+                    key={st.value}
+                    onClick={() => {
+                      setSelectedType(st.value);
+                      const protos = PROTOCOL_BY_TYPE[st.value];
+                      const singleProtocol = protos[0];
+                      if (protos.length === 1 && singleProtocol) setSelectedProtocol(singleProtocol);
+                      else setSelectedProtocol('');
+                    }}
+                    className={`text-left rounded-lg border p-4 transition-all
+                      ${isSelected
+                        ? 'border-accent bg-accent/5 ring-1 ring-accent/30'
+                        : 'border-edge bg-card hover:border-accent/30 hover:bg-elevated/30'}`}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center
+                        ${isSelected ? 'bg-accent/20 text-accent' : 'bg-elevated text-muted'}`}>
+                        <Icon size={18} />
+                      </div>
+                      <h3 className="text-sm font-medium text-heading">
+                        {t(st.labelKey, st.value)}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-muted">
+                      {t(`contracts.create.typeDesc${st.value}`, `Create a ${st.value} contract`)}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex justify-between mt-6">
+            <button
+              onClick={() => setStep(hasPrefilledService ? 'service' : 'service')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-elevated text-muted hover:text-heading transition-colors"
+            >
+              <ArrowLeft size={14} /> {t('common.back', 'Back')}
+            </button>
+            <button
               onClick={() => setStep('mode')}
-              disabled={!canProceedToMode}
+              disabled={!canProceedToMode || !serviceSupportsContracts}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-accent text-white hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {t('common.next', 'Next')} <ArrowRight size={14} />
@@ -409,26 +552,22 @@ export function CreateContractPage() {
                 />
               </div>
 
-              {/* Linked Service */}
+              {/* Linked Service — read-only locked display */}
               <div>
                 <label className="block text-xs font-medium text-heading mb-1">
-                  {t('contracts.create.linkedService', 'Linked Service')}
+                  {t('contracts.create.linkedService', 'Linked Service')} *
                 </label>
-                <select
-                  value={linkedServiceId}
-                  onChange={(e) => setLinkedServiceId(e.target.value)}
-                  className="w-full text-sm bg-elevated border border-edge rounded-md px-3 py-2 text-body focus:outline-none focus:ring-1 focus:ring-accent"
-                >
-                  <option value="">{t('contracts.create.linkedServiceOptional', 'No linked service yet')}</option>
-                  {availableServices.map((service: ServiceListItem) => (
-                    <option key={service.serviceId} value={service.serviceId}>
-                      {service.displayName} · {service.domain} · {service.teamName}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-[10px] text-muted">
-                  {t('contracts.create.linkedServiceHint', 'Linking a real catalog service enables publish and workspace enrichment without artificial fallback.')}
-                </p>
+                {selectedServiceDisplay ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-elevated border border-edge rounded-md text-xs">
+                    <Lock size={12} className="text-muted shrink-0" />
+                    <span className="text-heading font-medium">{selectedServiceDisplay.displayName}</span>
+                    <span className="text-muted">· {selectedServiceDisplay.domain} · {selectedServiceDisplay.teamName}</span>
+                  </div>
+                ) : (
+                  <div className="text-xs text-muted italic px-1">
+                    {t('contracts.create.noServiceSelected', 'No service selected')}
+                  </div>
+                )}
               </div>
 
               {/* Protocol selection */}
@@ -456,7 +595,7 @@ export function CreateContractPage() {
                 </div>
               )}
 
-              {/* Import content (when mode is 'import') */}
+              {/* Import content */}
               {selectedMode === 'import' && (
                 <div>
                   <label className="block text-xs font-medium text-heading mb-1">
@@ -486,7 +625,7 @@ export function CreateContractPage() {
                 </div>
               )}
 
-              {/* AI prompt (when mode is 'ai') */}
+              {/* AI prompt */}
               {selectedMode === 'ai' && (
                 <div>
                   <label className="block text-xs font-medium text-heading mb-1">
@@ -716,3 +855,4 @@ export function CreateContractPage() {
     </PageContainer>
   );
 }
+

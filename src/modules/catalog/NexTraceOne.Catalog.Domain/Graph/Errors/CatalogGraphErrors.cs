@@ -136,4 +136,20 @@ public static class CatalogGraphErrors
     /// <summary>Serviço não é do tipo Framework.</summary>
     public static Error ServiceIsNotFrameworkType(Guid serviceAssetId)
         => Error.Business("CatalogGraph.ServiceAsset.NotFrameworkType", "Service '{0}' is not of type Framework.", serviceAssetId);
+
+    // ── Service Interface ──────────────────────────────────────────────────
+
+    /// <summary>Interface de serviço não encontrada pelo identificador.</summary>
+    public static Error InterfaceNotFound(Guid interfaceId)
+        => Error.NotFound("CatalogGraph.ServiceInterface.NotFound", "Service interface '{0}' was not found.", interfaceId);
+
+    /// <summary>Interface de serviço já foi retirada e não pode ser modificada.</summary>
+    public static Error InterfaceAlreadyRetired(Guid interfaceId)
+        => Error.Conflict("CatalogGraph.ServiceInterface.AlreadyRetired", "Service interface '{0}' has already been retired.", interfaceId);
+
+    // ── Contract Binding ──────────────────────────────────────────────────
+
+    /// <summary>Vínculo de contrato não encontrado pelo identificador.</summary>
+    public static Error ContractBindingNotFound(Guid bindingId)
+        => Error.NotFound("CatalogGraph.ContractBinding.NotFound", "Contract binding '{0}' was not found.", bindingId);
 }

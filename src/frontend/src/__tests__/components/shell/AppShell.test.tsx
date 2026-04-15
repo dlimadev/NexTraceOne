@@ -127,9 +127,10 @@ describe('AppShell', () => {
     expect(sidebarNav).toBeInTheDocument();
   });
 
-  it('renders the user display name in sidebar footer', () => {
+  it('renders the user display name in topbar', () => {
     renderShell();
-    expect(screen.getAllByText('admin').length).toBeGreaterThan(0);
+    // 'Admin User' is the mock user's fullName — rendered by AppUserMenu in the topbar
+    expect(screen.getAllByText('Admin User').length).toBeGreaterThan(0);
   });
 
   it('opens command palette with Ctrl+K', () => {

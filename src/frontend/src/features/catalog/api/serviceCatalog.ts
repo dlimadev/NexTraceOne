@@ -9,6 +9,9 @@ import type {
   ServiceListResponse,
   ServiceDetail,
   ServicesSummary,
+  ServiceInterface,
+  ContractBinding,
+  InterfaceType,
 } from '../../../types';
 
 /** Categorias de link disponíveis para serviços. */
@@ -317,6 +320,52 @@ export const serviceCatalogApi = {
     client
       .get<OwnershipAuditResponse>('/catalog/ownership/audit', { params })
       .then((r) => r.data),
+
+  // ── Service Interfaces ─────────────────────────────────────────
+
+  /** Lista as interfaces de um serviço. */
+  listServiceInterfaces: (serviceAssetId: string) =>
+    client
+      .get<ServiceInterface[]>(`/catalog/services/${serviceAssetId}/interfaces`)
+      .then((r) => r.data),
+
+  /** Regista uma nova interface num serviço. */
+  createServiceInterface: (data: CreateServiceInterfaceRequest) =>
+    client
+      .post<ServiceInterface>(`/catalog/services/${data.serviceAssetId}/interfaces`, data)
+      .then((r) => r.data),
+
+  /** Obtém o detalhe de uma interface. */
+  getServiceInterface: (interfaceId: string) =>
+    client
+      .get<ServiceInterface>(`/catalog/interfaces/${interfaceId}`)
+      .then((r) => r.data),
+
+  /** Marca uma interface como deprecada. */
+  deprecateServiceInterface: (interfaceId: string, body: { deprecationDate?: string; notice?: string }) =>
+    client
+      .patch(`/catalog/interfaces/${interfaceId}/deprecate`, body)
+      .then((r) => r.data),
+
+  // ── Contract Bindings ──────────────────────────────────────────
+
+  /** Lista os contract bindings de uma interface. */
+  listContractBindings: (interfaceId: string) =>
+    client
+      .get<ContractBinding[]>(`/catalog/interfaces/${interfaceId}/bindings`)
+      .then((r) => r.data),
+
+  /** Liga uma versão de contrato a uma interface. */
+  bindContractToInterface: (data: BindContractRequest) =>
+    client
+      .post<ContractBinding>(`/catalog/interfaces/${data.serviceInterfaceId}/bindings`, data)
+      .then((r) => r.data),
+
+  /** Desactiva um contract binding. */
+  deactivateContractBinding: (bindingId: string, body: { deactivatedBy: string }) =>
+    client
+      .patch(`/catalog/bindings/${bindingId}/deactivate`, body)
+      .then((r) => r.data),
 };
 
 // ── Discovery Types ────────────────────────────────────────────────
@@ -481,4 +530,30 @@ export interface OwnershipAuditResponse {
   summary: AuditSummaryDto;
   findings: AuditFindingDto[];
   auditedAt: string;
+}
+
+// ── Service Interface Request Types ───────────────────────────────
+
+/** Payload para criar uma nova interface de serviço. */
+export interface CreateServiceInterfaceRequest {
+  serviceAssetId: string;
+  name: string;
+  interfaceType: InterfaceType;
+  description?: string;
+  exposureScope?: string;
+  basePath?: string;
+  topicName?: string;
+  wsdlNamespace?: string;
+  grpcServiceName?: string;
+  scheduleCron?: string;
+  documentationUrl?: string;
+  requiresContract?: boolean;
+}
+
+/** Payload para ligar um contrato a uma interface. */
+export interface BindContractRequest {
+  serviceInterfaceId: string;
+  contractVersionId: string;
+  bindingEnvironment: string;
+  isDefaultVersion?: boolean;
 }

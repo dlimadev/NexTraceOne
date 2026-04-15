@@ -78,3 +78,61 @@ public sealed record ContractChangelogGeneratedIntegrationEvent(
     string ToVersion,
     int EntryCount,
     Guid? TenantId) : IntegrationEventBase("Catalog");
+
+// ── Phase 7: ServiceInterface & ContractBinding Domain Events ──
+
+/// <summary>
+/// Publicado quando uma nova interface de serviço é criada.
+/// Consumidores: módulo de knowledge (indexar interface), módulo de AI (grounding), notificações.
+/// </summary>
+public sealed record ServiceInterfaceCreatedIntegrationEvent(
+    Guid InterfaceId,
+    Guid ServiceAssetId,
+    string ServiceName,
+    string InterfaceName,
+    string InterfaceType,
+    string ExposureScope,
+    bool RequiresContract,
+    string CreatedBy,
+    Guid? TenantId) : IntegrationEventBase("Catalog");
+
+/// <summary>
+/// Publicado quando uma interface de serviço é marcada como depreciada.
+/// Consumidores: notificações (avisar consumidores/owners), módulo de changes (risco de breaking change),
+/// módulo de AI (ajustar análise de impacto).
+/// </summary>
+public sealed record ServiceInterfaceDeprecatedIntegrationEvent(
+    Guid InterfaceId,
+    Guid ServiceAssetId,
+    string ServiceName,
+    string InterfaceName,
+    string InterfaceType,
+    DateTimeOffset? DeprecationDate,
+    DateTimeOffset? SunsetDate,
+    string? DeprecationNotice,
+    Guid? TenantId) : IntegrationEventBase("Catalog");
+
+/// <summary>
+/// Publicado quando uma versão de contrato é vinculada a uma interface de serviço.
+/// Consumidores: módulo de changes (change confidence), notificações, módulo de AI (grounding de contratos).
+/// </summary>
+public sealed record ContractBoundToInterfaceIntegrationEvent(
+    Guid BindingId,
+    Guid ServiceInterfaceId,
+    Guid ContractVersionId,
+    string BindingEnvironment,
+    bool IsDefaultVersion,
+    string BoundBy,
+    Guid? TenantId) : IntegrationEventBase("Catalog");
+
+/// <summary>
+/// Publicado quando um vínculo entre interface e versão de contrato é desactivado.
+/// Consumidores: notificações (avisar consumidores), módulo de changes (reduzir confiança).
+/// </summary>
+public sealed record ContractBindingDeactivatedIntegrationEvent(
+    Guid BindingId,
+    Guid ServiceInterfaceId,
+    Guid ContractVersionId,
+    string BindingEnvironment,
+    string DeactivatedBy,
+    Guid? TenantId) : IntegrationEventBase("Catalog");

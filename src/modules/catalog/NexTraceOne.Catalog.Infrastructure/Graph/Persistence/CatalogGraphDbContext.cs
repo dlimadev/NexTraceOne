@@ -63,6 +63,12 @@ public sealed class CatalogGraphDbContext(
     /// <summary>Detalhes de framework/SDK associados a serviços do catálogo.</summary>
     public DbSet<FrameworkAssetDetail> FrameworkAssetDetails => Set<FrameworkAssetDetail>();
 
+    /// <summary>Interfaces expostas por serviços do catálogo.</summary>
+    public DbSet<ServiceInterface> ServiceInterfaces => Set<ServiceInterface>();
+
+    /// <summary>Vínculos entre interfaces de serviço e versões de contrato.</summary>
+    public DbSet<ContractBinding> ContractBindings => Set<ContractBinding>();
+
     /// <summary>Scores de experiência do desenvolvedor por equipa e período.</summary>
     public DbSet<DxScore> DxScores => Set<DxScore>();
 

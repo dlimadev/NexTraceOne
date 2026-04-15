@@ -135,6 +135,7 @@ public static class DependencyInjection
         services.AddScoped<IIncidentGroundingReader, IncidentGroundingReader>();
         services.AddScoped<IKnowledgeDocumentGroundingReader, KnowledgeDocumentGroundingReader>();
         services.AddScoped<IContractGroundingReader, ContractGroundingReader>();
+        services.AddScoped<IServiceInterfaceGroundingReader, ServiceInterfaceGroundingReader>();
 
         // Retrieval services — scoped (foundation for RAG, database grounding and telemetry)
         services.AddScoped<IDocumentRetrievalService, DocumentRetrievalService>();

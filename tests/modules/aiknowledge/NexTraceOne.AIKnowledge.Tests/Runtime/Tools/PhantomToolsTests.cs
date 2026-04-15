@@ -21,11 +21,10 @@ public sealed class PhantomToolsTests
     [Fact]
     public async Task GetContractDetailsTool_ShouldHaveCorrectDefinition()
     {
-        var catalogReader = Substitute.For<ICatalogGroundingReader>();
-        catalogReader.FindServicesAsync(Arg.Any<string?>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<ServiceGroundingContext>() as IReadOnlyList<ServiceGroundingContext>);
+        var interfaceReader = Substitute.For<IServiceInterfaceGroundingReader>();
+        var contractReader = Substitute.For<IContractGroundingReader>();
 
-        var tool = new GetContractDetailsTool(catalogReader, Substitute.For<ILogger<GetContractDetailsTool>>());
+        var tool = new GetContractDetailsTool(interfaceReader, contractReader, Substitute.For<ILogger<GetContractDetailsTool>>());
 
         tool.Definition.Name.Should().Be("get_contract_details");
         tool.Definition.Category.Should().Be("contract_governance");
@@ -36,8 +35,9 @@ public sealed class PhantomToolsTests
     [Fact]
     public async Task GetContractDetailsTool_ShouldFailWhenContractIdMissing()
     {
-        var catalogReader = Substitute.For<ICatalogGroundingReader>();
-        var tool = new GetContractDetailsTool(catalogReader, Substitute.For<ILogger<GetContractDetailsTool>>());
+        var interfaceReader = Substitute.For<IServiceInterfaceGroundingReader>();
+        var contractReader = Substitute.For<IContractGroundingReader>();
+        var tool = new GetContractDetailsTool(interfaceReader, contractReader, Substitute.For<ILogger<GetContractDetailsTool>>());
 
         var result = await tool.ExecuteAsync("{}", CancellationToken.None);
 
@@ -48,28 +48,38 @@ public sealed class PhantomToolsTests
     [Fact]
     public async Task GetContractDetailsTool_ShouldSucceedWithValidArgs()
     {
-        var catalogReader = Substitute.For<ICatalogGroundingReader>();
-        catalogReader.FindServicesAsync(Arg.Any<string?>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceGroundingContext>
-            {
-                new("svc-001", "Payment API", "Payments Team", "Finance", "Critical", "Active", "REST", "Handles payments"),
-            } as IReadOnlyList<ServiceGroundingContext>);
+        var interfaceReader = Substitute.For<IServiceInterfaceGroundingReader>();
+        var contractReader = Substitute.For<IContractGroundingReader>();
 
-        var tool = new GetContractDetailsTool(catalogReader, Substitute.For<ILogger<GetContractDetailsTool>>());
+        interfaceReader.FindInterfacesByNameAsync(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ServiceInterfaceGroundingContext>
+            {
+                new("iface-001", "svc-001", "Payment API", "payment-api-v2", "REST payment interface",
+                    "RestApi", "Active", "Internal", "99.9%", true, "Bearer", null),
+            } as IReadOnlyList<ServiceInterfaceGroundingContext>);
+
+        contractReader.FindContractsByServiceInterfaceAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<ContractGroundingContext>() as IReadOnlyList<ContractGroundingContext>);
+
+        contractReader.FindContractVersionsAsync(Arg.Any<Guid?>(), Arg.Any<Guid?>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<ContractGroundingContext>() as IReadOnlyList<ContractGroundingContext>);
+
+        var tool = new GetContractDetailsTool(interfaceReader, contractReader, Substitute.For<ILogger<GetContractDetailsTool>>());
 
         var result = await tool.ExecuteAsync("{\"contractId\":\"payment-api-v2\"}", CancellationToken.None);
 
         result.Success.Should().BeTrue();
         result.ToolName.Should().Be("get_contract_details");
         result.Output.Should().Contain("get_contract_details");
-        result.Output.Should().Contain("Payment API");
+        result.Output.Should().Contain("payment-api-v2");
     }
 
     [Fact]
     public async Task GetContractDetailsTool_ShouldHandleInvalidJson()
     {
-        var catalogReader = Substitute.For<ICatalogGroundingReader>();
-        var tool = new GetContractDetailsTool(catalogReader, Substitute.For<ILogger<GetContractDetailsTool>>());
+        var interfaceReader = Substitute.For<IServiceInterfaceGroundingReader>();
+        var contractReader = Substitute.For<IContractGroundingReader>();
+        var tool = new GetContractDetailsTool(interfaceReader, contractReader, Substitute.For<ILogger<GetContractDetailsTool>>());
 
         var result = await tool.ExecuteAsync("not-json", CancellationToken.None);
 
@@ -237,7 +247,8 @@ public sealed class PhantomToolsTests
     [Fact]
     public void AllSixTools_ShouldHaveUniqueNames()
     {
-        var catalogReader = Substitute.For<ICatalogGroundingReader>();
+        var interfaceReader = Substitute.For<IServiceInterfaceGroundingReader>();
+        var contractReader = Substitute.For<IContractGroundingReader>();
         var incidentReader = Substitute.For<IIncidentGroundingReader>();
         var ledger = Substitute.For<IAiTokenUsageLedgerRepository>();
 
@@ -246,7 +257,7 @@ public sealed class PhantomToolsTests
             new ListServicesInfoTool(Substitute.For<ILogger<ListServicesInfoTool>>()),
             new GetServiceHealthTool(Substitute.For<ILogger<GetServiceHealthTool>>()),
             new ListRecentChangesTool(Substitute.For<ILogger<ListRecentChangesTool>>()),
-            new GetContractDetailsTool(catalogReader, Substitute.For<ILogger<GetContractDetailsTool>>()),
+            new GetContractDetailsTool(interfaceReader, contractReader, Substitute.For<ILogger<GetContractDetailsTool>>()),
             new SearchIncidentsTool(incidentReader, Substitute.For<ILogger<SearchIncidentsTool>>()),
             new GetTokenUsageSummaryTool(ledger, Substitute.For<ILogger<GetTokenUsageSummaryTool>>()),
         };

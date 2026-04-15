@@ -184,7 +184,7 @@ describe('ContractHealthDashboardPage', () => {
     renderDashboard();
     await waitFor(() => {
       const scoreEl = screen.getByText('82');
-      expect(scoreEl).toHaveClass('text-green-400');
+      expect(scoreEl).toHaveClass('text-success');
     });
   });
 
@@ -193,7 +193,7 @@ describe('ContractHealthDashboardPage', () => {
     renderDashboard();
     await waitFor(() => {
       const scoreEl = screen.getByText('65');
-      expect(scoreEl).toHaveClass('text-yellow-400');
+      expect(scoreEl).toHaveClass('text-warning');
     });
   });
 
@@ -202,7 +202,7 @@ describe('ContractHealthDashboardPage', () => {
     renderDashboard();
     await waitFor(() => {
       const scoreEl = screen.getByText('30');
-      expect(scoreEl).toHaveClass('text-red-400');
+      expect(scoreEl).toHaveClass('text-critical');
     });
   });
 

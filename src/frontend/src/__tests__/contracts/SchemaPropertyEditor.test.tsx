@@ -64,12 +64,11 @@ describe('SchemaPropertyEditor', () => {
     const user = userEvent.setup();
     const props = [makeProp({ id: 'p1', name: 'field1' })];
     const onChange = vi.fn();
-    const { container } = render(<SchemaPropertyEditor properties={props} onChange={onChange} />);
+    render(<SchemaPropertyEditor properties={props} onChange={onChange} />);
 
-    // The delete button is the last button inside the property row, with class containing 'hover:text-danger'
-    const deleteBtn = container.querySelector('button.flex-shrink-0');
+    const deleteBtn = screen.getByLabelText('delete-property');
     expect(deleteBtn).not.toBeNull();
-    await user.click(deleteBtn!);
+    await user.click(deleteBtn);
     expect(onChange).toHaveBeenCalled();
     const result = onChange.mock.calls[0]?.[0] as SchemaProperty[];
     expect(result).toHaveLength(0);
@@ -206,18 +205,12 @@ describe('SchemaPropertyEditor', () => {
     const onChange = vi.fn();
     render(<SchemaPropertyEditor properties={props} onChange={onChange} />);
 
-    // Find the up arrow for the second property (the one that isn't disabled)
-    // We look for buttons that are not disabled and are in the second property row
-    const allButtons = screen.getAllByRole('button');
-    const upButtons = allButtons.filter(btn => {
-      const svg = btn.querySelector('svg');
-      if (!svg) return false;
-      // Up arrow buttons - check that it's not disabled and near text 'second'
-      return !btn.hasAttribute('disabled') && btn.closest('.border-edge')?.querySelector('input[value="second"]');
-    });
-
-    if (upButtons[0]) {
-      await user.click(upButtons[0]);
+    // Find the enabled "move up" button — the first property's up button is disabled,
+    // so we click the second property's up button (index 1, not disabled)
+    const upButtons = screen.getAllByLabelText('move-property-up');
+    const enabledUpBtn = upButtons.find(btn => !btn.hasAttribute('disabled'));
+    if (enabledUpBtn) {
+      await user.click(enabledUpBtn);
       expect(onChange).toHaveBeenCalled();
       const result = onChange.mock.calls[0]?.[0] as SchemaProperty[];
       expect(result[0]?.name).toBe('second');

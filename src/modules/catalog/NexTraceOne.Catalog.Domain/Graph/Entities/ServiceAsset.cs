@@ -68,6 +68,53 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
     /// <summary>URL ou referência para o repositório de código.</summary>
     public string RepositoryUrl { get; private set; } = string.Empty;
 
+    // ── Metadados estendidos ──────────────────────────────────────────
+
+    /// <summary>Subdomínio dentro do Domain de negócio.</summary>
+    public string? SubDomain { get; private set; }
+
+    /// <summary>Capacidade de negócio que o serviço representa.</summary>
+    public string? Capability { get; private set; }
+
+    /// <summary>URL do repositório Git do serviço.</summary>
+    public string GitRepository { get; private set; } = string.Empty;
+
+    /// <summary>URL do pipeline de CI/CD do serviço.</summary>
+    public string CiPipelineUrl { get; private set; } = string.Empty;
+
+    /// <summary>Plataforma de infraestrutura onde o serviço corre (Kubernetes, IIS, ECS, VM, Mainframe).</summary>
+    public string InfrastructureProvider { get; private set; } = string.Empty;
+
+    /// <summary>Plataforma de hosting (Azure, AWS, GCP, On-Prem, Hybrid).</summary>
+    public string HostingPlatform { get; private set; } = string.Empty;
+
+    /// <summary>Linguagem principal do runtime (C#, Java, Python, COBOL).</summary>
+    public string RuntimeLanguage { get; private set; } = string.Empty;
+
+    /// <summary>Versão do runtime (ex: .NET 10, Java 21).</summary>
+    public string RuntimeVersion { get; private set; } = string.Empty;
+
+    /// <summary>Objetivo de SLO do serviço (ex: 99.9%).</summary>
+    public string SloTarget { get; private set; } = string.Empty;
+
+    /// <summary>Classificação de dados tratados pelo serviço (Public, Internal, Confidential, Restricted).</summary>
+    public string DataClassification { get; private set; } = string.Empty;
+
+    /// <summary>Âmbito regulatório aplicável (PCI-DSS, LGPD, GDPR, None).</summary>
+    public string RegulatoryScope { get; private set; } = string.Empty;
+
+    /// <summary>Frequência de mudança do serviço (High, Medium, Low, Stable).</summary>
+    public string ChangeFrequency { get; private set; } = string.Empty;
+
+    /// <summary>PM/PO responsável pelo serviço.</summary>
+    public string ProductOwner { get; private set; } = string.Empty;
+
+    /// <summary>Canal de contacto da equipa (Slack, lista de e-mail).</summary>
+    public string ContactChannel { get; private set; } = string.Empty;
+
+    /// <summary>Referência à rotação de on-call do serviço.</summary>
+    public string OnCallRotationId { get; private set; } = string.Empty;
+
     // ── Concorrência ──────────────────────────────────────────────────
 
     /// <summary>
@@ -112,6 +159,41 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
         ExposureType = exposureType;
         DocumentationUrl = documentationUrl ?? string.Empty;
         RepositoryUrl = repositoryUrl ?? string.Empty;
+    }
+
+    /// <summary>Atualiza os metadados estendidos de infraestrutura, runtime e governança do serviço.</summary>
+    public void UpdateExtendedMetadata(
+        string? subDomain,
+        string? capability,
+        string? gitRepository,
+        string? ciPipelineUrl,
+        string? infrastructureProvider,
+        string? hostingPlatform,
+        string? runtimeLanguage,
+        string? runtimeVersion,
+        string? sloTarget,
+        string? dataClassification,
+        string? regulatoryScope,
+        string? changeFrequency,
+        string? productOwner,
+        string? contactChannel,
+        string? onCallRotationId)
+    {
+        SubDomain = subDomain;
+        Capability = capability;
+        GitRepository = gitRepository ?? string.Empty;
+        CiPipelineUrl = ciPipelineUrl ?? string.Empty;
+        InfrastructureProvider = infrastructureProvider ?? string.Empty;
+        HostingPlatform = hostingPlatform ?? string.Empty;
+        RuntimeLanguage = runtimeLanguage ?? string.Empty;
+        RuntimeVersion = runtimeVersion ?? string.Empty;
+        SloTarget = sloTarget ?? string.Empty;
+        DataClassification = dataClassification ?? string.Empty;
+        RegulatoryScope = regulatoryScope ?? string.Empty;
+        ChangeFrequency = changeFrequency ?? string.Empty;
+        ProductOwner = productOwner ?? string.Empty;
+        ContactChannel = contactChannel ?? string.Empty;
+        OnCallRotationId = onCallRotationId ?? string.Empty;
     }
 
     /// <summary>Atualiza o ownership do serviço.</summary>

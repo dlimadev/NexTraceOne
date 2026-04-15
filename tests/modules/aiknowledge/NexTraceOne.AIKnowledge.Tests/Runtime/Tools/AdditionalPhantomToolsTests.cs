@@ -230,7 +230,8 @@ public sealed class AdditionalPhantomToolsTests
     [Fact]
     public void AllNineTools_ShouldHaveUniqueNames()
     {
-        var catalogReader = Substitute.For<ICatalogGroundingReader>();
+        var interfaceReader = Substitute.For<IServiceInterfaceGroundingReader>();
+        var contractReader = Substitute.For<IContractGroundingReader>();
         var incidentReader = Substitute.For<IIncidentGroundingReader>();
         var knowledgeReader = Substitute.For<IKnowledgeDocumentGroundingReader>();
         var changeReader = Substitute.For<IChangeGroundingReader>();
@@ -241,7 +242,7 @@ public sealed class AdditionalPhantomToolsTests
             new ListServicesInfoTool(Substitute.For<ILogger<ListServicesInfoTool>>()),
             new GetServiceHealthTool(Substitute.For<ILogger<GetServiceHealthTool>>()),
             new ListRecentChangesTool(Substitute.For<ILogger<ListRecentChangesTool>>()),
-            new GetContractDetailsTool(catalogReader, Substitute.For<ILogger<GetContractDetailsTool>>()),
+            new GetContractDetailsTool(interfaceReader, contractReader, Substitute.For<ILogger<GetContractDetailsTool>>()),
             new SearchIncidentsTool(incidentReader, Substitute.For<ILogger<SearchIncidentsTool>>()),
             new GetTokenUsageSummaryTool(ledger, Substitute.For<ILogger<GetTokenUsageSummaryTool>>()),
             new SearchKnowledgeTool(knowledgeReader, Substitute.For<ILogger<SearchKnowledgeTool>>()),

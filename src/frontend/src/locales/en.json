@@ -1477,7 +1477,8 @@
       "noLinks": "No links added yet."
     },
     "services": {
-      "addContract": "Add Contract"
+      "addContract": "Add Contract",
+      "noContractsForType": "No public contracts for this type"
     },
     "subtitle": "Central registry of services, ownership and governance",
     "summary": {
@@ -4061,7 +4062,13 @@
       "bgTriggerCron": "Cron",
       "bgTriggerInterval": "Interval",
       "bgTriggerEventTriggered": "Event Triggered",
-      "bgTriggerContinuous": "Continuous"
+      "bgTriggerContinuous": "Continuous",
+      "selectService": "Select the service for this contract",
+      "selectServicePlaceholder": "Select a service...",
+      "serviceTypeNoContracts": "This service type ({{type}}) does not expose public interface contracts.",
+      "noServiceSelected": "No service selected",
+      "missingRequiredFields": "Missing required fields. Service and contract type are mandatory.",
+      "stepService": "Service"
     },
     "createVersion": "Create Version",
     "createVersionDescription": "Create a new version from an existing contract",
@@ -4128,7 +4135,10 @@
       "transitionFailed": "Failed to transition lifecycle state",
       "validateFailed": "Validation failed. Please try again.",
       "verifyFailed": "Failed to verify contract signature",
-      "violationsFailed": "Failed to load rule violations"
+      "violationsFailed": "Failed to load rule violations",
+      "draftRequiresServiceId": "A contract draft must be linked to a service.",
+      "serviceTypeDoesNotSupportContracts": "Service type '{{type}}' does not support contracts.",
+      "contractTypeNotAllowedForServiceType": "Contract type '{{contractType}}' is not allowed for service type '{{serviceType}}'."
     },
     "event": {
       "placeholder": {
@@ -8404,7 +8414,31 @@
     "typeSharedPlatformService": "Shared Platform Service",
     "typeSoapService": "SOAP Service",
     "typeThirdParty": "Third-Party Service",
-    "typeZosConnectApi": "z/OS Connect API"
+    "typeZosConnectApi": "z/OS Connect API",
+    "wizard": {
+      "subDomain": "Sub-Domain",
+      "subDomainPlaceholder": "fraud, payments-core",
+      "capability": "Business Capability",
+      "capabilityPlaceholder": "Payment Processing, Identity Verification",
+      "productOwner": "Product Owner",
+      "productOwnerPlaceholder": "jane.doe@company.com",
+      "contactChannel": "Contact Channel",
+      "contactChannelPlaceholder": "#payments-support",
+      "dataClassification": "Data Classification",
+      "regulatoryScope": "Regulatory Scope",
+      "infrastructureProvider": "Infrastructure Provider",
+      "infrastructureProviderPlaceholder": "Kubernetes, IIS, VM",
+      "runtimeLanguage": "Runtime Language",
+      "runtimeLanguagePlaceholder": "C#, Java, Python",
+      "step1": "Identity",
+      "step2": "Classification",
+      "step3": "Ownership",
+      "step4": "References",
+      "step5": "Confirmation",
+      "nameRequired": "Name is required",
+      "domainRequired": "Domain is required",
+      "teamRequired": "Team is required"
+    }
   },
   "serviceMaturity": {
     "audit": {
@@ -9562,5 +9596,61 @@
     "loading": "Loading telemetry data...",
     "error": "Failed to load telemetry data. Please check the observability provider status.",
     "providerUnavailable": "Observability provider is not available. Ensure Elasticsearch or ClickHouse is running."
+  },
+  "serviceInterfaces": {
+    "title": "Service Interfaces",
+    "add": "Add Interface",
+    "empty": "No interfaces registered for this service.",
+    "emptyHint": "Add an interface to associate contracts to this service.",
+    "name": "Name",
+    "type": "Type",
+    "exposure": "Exposure",
+    "status": "Status",
+    "requiresContract": "Requires Contract",
+    "basePath": "Base Path",
+    "topicName": "Topic Name",
+    "viewBindings": "View Bindings",
+    "typeRestApi": "REST API",
+    "typeSoapService": "SOAP Service",
+    "typeKafkaProducer": "Kafka Producer",
+    "typeKafkaConsumer": "Kafka Consumer",
+    "typeGrpcService": "gRPC Service",
+    "typeGraphqlApi": "GraphQL API",
+    "typeBackgroundWorker": "Background Worker",
+    "typeScheduledJob": "Scheduled Job",
+    "typeWebhookProducer": "Webhook Producer",
+    "typeWebhookConsumer": "Webhook Consumer",
+    "typeZosConnectApi": "z/OS Connect API",
+    "typeMqQueue": "MQ Queue",
+    "typeIntegrationBridge": "Integration Bridge",
+    "statusActive": "Active",
+    "statusDeprecated": "Deprecated",
+    "statusSunset": "Sunset",
+    "statusRetired": "Retired",
+    "createTitle": "New Interface",
+    "createSubtitle": "Register a new interface for this service",
+    "fieldName": "Interface Name",
+    "fieldNamePlaceholder": "Orders REST API v1",
+    "fieldType": "Interface Type",
+    "fieldDescription": "Description",
+    "fieldExposure": "Exposure Scope",
+    "fieldBasePath": "Base Path",
+    "fieldBasePathPlaceholder": "/api/orders",
+    "fieldTopicName": "Topic Name",
+    "fieldTopicNamePlaceholder": "orders.events.v1",
+    "fieldWsdlNamespace": "WSDL Namespace",
+    "fieldGrpcServiceName": "Proto Service Name",
+    "fieldScheduleCron": "Cron Expression",
+    "fieldDocumentationUrl": "Documentation URL",
+    "fieldRequiresContract": "Requires Contract",
+    "groupPublicApi": "Public API",
+    "groupEventDriven": "Event-Driven",
+    "groupBackground": "Background",
+    "groupInfrastructure": "Infrastructure",
+    "submit": "Create Interface",
+    "cancel": "Cancel"
+  },
+  "serviceDetail": {
+    "tabInterfaces": "Interfaces"
   }
 }

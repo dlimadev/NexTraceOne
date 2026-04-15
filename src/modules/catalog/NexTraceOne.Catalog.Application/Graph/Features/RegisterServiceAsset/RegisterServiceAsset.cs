@@ -32,7 +32,23 @@ public static class RegisterServiceAsset
         string? TechnicalOwner = null,
         string? BusinessOwner = null,
         string? DocumentationUrl = null,
-        string? RepositoryUrl = null) : ICommand<Response>;
+        string? RepositoryUrl = null,
+        // Metadados estendidos
+        string? SubDomain = null,
+        string? Capability = null,
+        string? GitRepository = null,
+        string? CiPipelineUrl = null,
+        string? InfrastructureProvider = null,
+        string? HostingPlatform = null,
+        string? RuntimeLanguage = null,
+        string? RuntimeVersion = null,
+        string? SloTarget = null,
+        string? DataClassification = null,
+        string? RegulatoryScope = null,
+        string? ChangeFrequency = null,
+        string? ProductOwner = null,
+        string? ContactChannel = null,
+        string? OnCallRotationId = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de registo de serviço.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -50,6 +66,21 @@ public static class RegisterServiceAsset
             RuleFor(x => x.BusinessOwner).MaximumLength(200).When(x => x.BusinessOwner is not null);
             RuleFor(x => x.DocumentationUrl).MaximumLength(500).When(x => x.DocumentationUrl is not null);
             RuleFor(x => x.RepositoryUrl).MaximumLength(500).When(x => x.RepositoryUrl is not null);
+            RuleFor(x => x.SubDomain).MaximumLength(200).When(x => x.SubDomain is not null);
+            RuleFor(x => x.Capability).MaximumLength(300).When(x => x.Capability is not null);
+            RuleFor(x => x.GitRepository).MaximumLength(1000).When(x => x.GitRepository is not null);
+            RuleFor(x => x.CiPipelineUrl).MaximumLength(1000).When(x => x.CiPipelineUrl is not null);
+            RuleFor(x => x.InfrastructureProvider).MaximumLength(200).When(x => x.InfrastructureProvider is not null);
+            RuleFor(x => x.HostingPlatform).MaximumLength(200).When(x => x.HostingPlatform is not null);
+            RuleFor(x => x.RuntimeLanguage).MaximumLength(100).When(x => x.RuntimeLanguage is not null);
+            RuleFor(x => x.RuntimeVersion).MaximumLength(100).When(x => x.RuntimeVersion is not null);
+            RuleFor(x => x.SloTarget).MaximumLength(50).When(x => x.SloTarget is not null);
+            RuleFor(x => x.DataClassification).MaximumLength(100).When(x => x.DataClassification is not null);
+            RuleFor(x => x.RegulatoryScope).MaximumLength(200).When(x => x.RegulatoryScope is not null);
+            RuleFor(x => x.ChangeFrequency).MaximumLength(50).When(x => x.ChangeFrequency is not null);
+            RuleFor(x => x.ProductOwner).MaximumLength(200).When(x => x.ProductOwner is not null);
+            RuleFor(x => x.ContactChannel).MaximumLength(500).When(x => x.ContactChannel is not null);
+            RuleFor(x => x.OnCallRotationId).MaximumLength(200).When(x => x.OnCallRotationId is not null);
         }
     }
 
@@ -107,6 +138,43 @@ public static class RegisterServiceAsset
                     request.BusinessOwner ?? string.Empty);
             }
 
+            // ── Metadados estendidos ──────────────────────────────────────────
+            var hasExtendedMetadata = request.SubDomain is not null
+                || request.Capability is not null
+                || request.GitRepository is not null
+                || request.CiPipelineUrl is not null
+                || request.InfrastructureProvider is not null
+                || request.HostingPlatform is not null
+                || request.RuntimeLanguage is not null
+                || request.RuntimeVersion is not null
+                || request.SloTarget is not null
+                || request.DataClassification is not null
+                || request.RegulatoryScope is not null
+                || request.ChangeFrequency is not null
+                || request.ProductOwner is not null
+                || request.ContactChannel is not null
+                || request.OnCallRotationId is not null;
+
+            if (hasExtendedMetadata)
+            {
+                serviceAsset.UpdateExtendedMetadata(
+                    request.SubDomain,
+                    request.Capability,
+                    request.GitRepository,
+                    request.CiPipelineUrl,
+                    request.InfrastructureProvider,
+                    request.HostingPlatform,
+                    request.RuntimeLanguage,
+                    request.RuntimeVersion,
+                    request.SloTarget,
+                    request.DataClassification,
+                    request.RegulatoryScope,
+                    request.ChangeFrequency,
+                    request.ProductOwner,
+                    request.ContactChannel,
+                    request.OnCallRotationId);
+            }
+
             // ── PARAMETERIZATION: approval gate ──────────────────────────────
             var approvalConfig = await configurationService.ResolveEffectiveValueAsync(
                 "catalog.service.creation.approval_required",
@@ -140,7 +208,22 @@ public static class RegisterServiceAsset
                 serviceAsset.BusinessOwner,
                 serviceAsset.DocumentationUrl,
                 serviceAsset.RepositoryUrl,
-                requiresApproval);
+                requiresApproval,
+                serviceAsset.SubDomain,
+                serviceAsset.Capability,
+                serviceAsset.GitRepository,
+                serviceAsset.CiPipelineUrl,
+                serviceAsset.InfrastructureProvider,
+                serviceAsset.HostingPlatform,
+                serviceAsset.RuntimeLanguage,
+                serviceAsset.RuntimeVersion,
+                serviceAsset.SloTarget,
+                serviceAsset.DataClassification,
+                serviceAsset.RegulatoryScope,
+                serviceAsset.ChangeFrequency,
+                serviceAsset.ProductOwner,
+                serviceAsset.ContactChannel,
+                serviceAsset.OnCallRotationId);
         }
 
         /// <summary>Parse seguro de string para enum — retorna o valor default do enum se a conversão falhar.</summary>
@@ -164,5 +247,20 @@ public static class RegisterServiceAsset
         string BusinessOwner,
         string DocumentationUrl,
         string RepositoryUrl,
-        bool IsPendingApproval = false);
+        bool IsPendingApproval = false,
+        string? SubDomain = null,
+        string? Capability = null,
+        string? GitRepository = null,
+        string? CiPipelineUrl = null,
+        string? InfrastructureProvider = null,
+        string? HostingPlatform = null,
+        string? RuntimeLanguage = null,
+        string? RuntimeVersion = null,
+        string? SloTarget = null,
+        string? DataClassification = null,
+        string? RegulatoryScope = null,
+        string? ChangeFrequency = null,
+        string? ProductOwner = null,
+        string? ContactChannel = null,
+        string? OnCallRotationId = null);
 }

@@ -50,6 +50,9 @@ public interface IServiceAssetRepository
     /// <summary>Conta o total de serviços por domínio.</summary>
     Task<int> CountByDomainAsync(string domain, CancellationToken cancellationToken);
 
+    /// <summary>Lista serviços de um subdomínio específico.</summary>
+    Task<IReadOnlyList<ServiceAsset>> ListBySubDomainAsync(string subDomain, CancellationToken cancellationToken);
+
     /// <summary>Adiciona um novo ativo de serviço para persistência.</summary>
     void Add(ServiceAsset serviceAsset);
 }

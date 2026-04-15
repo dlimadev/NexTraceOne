@@ -1329,7 +1329,22 @@
       "placeholder": {
         "documentationUrl": "https://docs.company.com/payment-service",
         "repositoryUrl": "https://github.com/org/payment-service"
-      }
+      },
+      "subDomain": "Sub-domínio",
+      "capability": "Capacidade de Negócio",
+      "dataClassification": "Classificação de Dados",
+      "regulatoryScope": "Âmbito Regulatório",
+      "sloTarget": "SLO Alvo",
+      "infrastructureProvider": "Fornecedor de Infraestrutura",
+      "hostingPlatform": "Plataforma de Alojamento",
+      "runtimeLanguage": "Linguagem de Runtime",
+      "runtimeVersion": "Versão de Runtime",
+      "changeFrequency": "Frequência de Mudança",
+      "productOwner": "Product Owner",
+      "contactChannel": "Canal de Contacto",
+      "onCallRotationId": "On-Call Rotation",
+      "gitRepository": "Repositório Git",
+      "ciPipelineUrl": "Pipeline CI"
     },
     "discovery": {
       "actions": {
@@ -1437,7 +1452,8 @@
       "noLinks": "Nenhum link adicionado ainda."
     },
     "services": {
-      "addContract": "Adicionar Contrato"
+      "addContract": "Adicionar Contrato",
+      "noContractsForType": "Nenhum contrato público para este tipo"
     },
     "subtitle": "Registo central de serviços, ownership e governança",
     "summary": {
@@ -2068,6 +2084,14 @@
     "catalog.service.deactivation.require_dependency_check.label": "Verificar Dependências Antes da Desativação",
     "catalog.service.require_approval_on_registration.description": "Quando ativado, novos registos de serviço (incluindo todos os contratos e definições de eventos) requerem aprovação antes de ficarem ativos.",
     "catalog.service.require_approval_on_registration.label": "Exigir Aprovação para Registo de Serviço",
+    "catalog.service_interface.allowed_types.description": "Tipos de interface de serviço que podem ser registados neste tenant.",
+    "catalog.service_interface.allowed_types.label": "Tipos de Interface Permitidos",
+    "catalog.service_interface.deprecation_notice_days.description": "Número de dias de antecedência exigidos para aviso antes de depreciar uma interface de serviço.",
+    "catalog.service_interface.deprecation_notice_days.label": "Prazo de Aviso de Depreciação (Dias)",
+    "catalog.service_interface.require_contract_for_types.description": "Lista de tipos de interface de serviço que obrigatoriamente devem ter um contrato associado.",
+    "catalog.service_interface.require_contract_for_types.label": "Tipos de Interface que Requerem Contrato",
+    "catalog.service_interface.slo_enforcement_enabled.description": "Quando ativado, as interfaces de serviço devem ter SLO definido antes de serem publicadas como ativas.",
+    "catalog.service_interface.slo_enforcement_enabled.label": "Aplicar Conformidade de SLO nas Interfaces",
     "catalog.templates.by_contract_type.description": "Modelos predefinidos para usar ao criar novos contratos por tipo",
     "catalog.templates.by_contract_type.label": "Contrato Modelos by Tipo",
     "catalog.templates.metadata_defaults.description": "Predefinição metadata fields pre-filled em new contrato drafts",
@@ -4021,7 +4045,13 @@
       "bgTriggerCron": "Cron",
       "bgTriggerInterval": "Intervalo",
       "bgTriggerEventTriggered": "Despoletado por Evento",
-      "bgTriggerContinuous": "Cont?nuo"
+      "bgTriggerContinuous": "Cont?nuo",
+      "selectService": "Selecione o serviço para este contrato",
+      "selectServicePlaceholder": "Selecione um serviço...",
+      "serviceTypeNoContracts": "Este tipo de serviço ({{type}}) não expõe contratos de interface pública.",
+      "noServiceSelected": "Nenhum serviço selecionado",
+      "missingRequiredFields": "Campos obrigatórios em falta. Serviço e tipo de contrato são obrigatórios.",
+      "stepService": "Serviço"
     },
     "createVersion": "Criar Versão",
     "createVersionDescription": "Criar uma nova versão a partir de um contrato existente",
@@ -4088,7 +4118,10 @@
       "transitionFailed": "Falha ao transicionar estado do ciclo de vida",
       "validateFailed": "Validação falhou. Por favor, tente novamente.",
       "verifyFailed": "Falha ao verificar assinatura do contrato",
-      "violationsFailed": "Falha ao carregar violações de regras"
+      "violationsFailed": "Falha ao carregar violações de regras",
+      "draftRequiresServiceId": "Um rascunho de contrato deve estar vinculado a um serviço.",
+      "serviceTypeDoesNotSupportContracts": "O tipo de serviço '{{type}}' não suporta contratos.",
+      "contractTypeNotAllowedForServiceType": "O tipo de contrato '{{contractType}}' não é permitido para o tipo de serviço '{{serviceType}}'."
     },
     "event": {
       "placeholder": {
@@ -8364,7 +8397,31 @@
     "typeSharedPlatformService": "Servi?o Partilhado de Plataforma",
     "typeSoapService": "Serviço SOAP",
     "typeThirdParty": "Servi?o de Terceiros",
-    "typeZosConnectApi": "API z/OS Connect"
+    "typeZosConnectApi": "API z/OS Connect",
+    "wizard": {
+      "subDomain": "Subdomínio",
+      "subDomainPlaceholder": "fraude, pagamentos-core",
+      "capability": "Capacidade de Negócio",
+      "capabilityPlaceholder": "Processamento de Pagamentos, Verificação de Identidade",
+      "productOwner": "Product Owner",
+      "productOwnerPlaceholder": "jane.doe@empresa.com",
+      "contactChannel": "Canal de Contacto",
+      "contactChannelPlaceholder": "#suporte-pagamentos",
+      "dataClassification": "Classificação de Dados",
+      "regulatoryScope": "Âmbito Regulatório",
+      "infrastructureProvider": "Fornecedor de Infraestrutura",
+      "infrastructureProviderPlaceholder": "Kubernetes, IIS, VM",
+      "runtimeLanguage": "Linguagem de Execução",
+      "runtimeLanguagePlaceholder": "C#, Java, Python",
+      "step1": "Identidade",
+      "step2": "Classificação",
+      "step3": "Responsável",
+      "step4": "Referências",
+      "step5": "Confirmação",
+      "nameRequired": "Nome é obrigatório",
+      "domainRequired": "Domínio é obrigatório",
+      "teamRequired": "Equipa é obrigatória"
+    }
   },
   "serviceMaturity": {
     "audit": {
@@ -9522,5 +9579,61 @@
     "loading": "A carregar dados de telemetria...",
     "error": "Falha ao carregar dados de telemetria. Verifique o estado do provider de observabilidade.",
     "providerUnavailable": "O provider de observabilidade não está disponível. Verifique se o Elasticsearch ou ClickHouse está em execução."
+  },
+  "serviceInterfaces": {
+    "title": "Interfaces de Serviço",
+    "add": "Adicionar Interface",
+    "empty": "Nenhuma interface registada para este serviço.",
+    "emptyHint": "Adicione uma interface para associar contratos a este serviço.",
+    "name": "Nome",
+    "type": "Tipo",
+    "exposure": "Exposição",
+    "status": "Estado",
+    "requiresContract": "Requer Contrato",
+    "basePath": "Caminho Base",
+    "topicName": "Nome do Tópico",
+    "viewBindings": "Ver Ligações",
+    "typeRestApi": "REST API",
+    "typeSoapService": "Serviço SOAP",
+    "typeKafkaProducer": "Produtor Kafka",
+    "typeKafkaConsumer": "Consumidor Kafka",
+    "typeGrpcService": "Serviço gRPC",
+    "typeGraphqlApi": "API GraphQL",
+    "typeBackgroundWorker": "Worker em Background",
+    "typeScheduledJob": "Tarefa Agendada",
+    "typeWebhookProducer": "Webhook Producer",
+    "typeWebhookConsumer": "Webhook Consumer",
+    "typeZosConnectApi": "API z/OS Connect",
+    "typeMqQueue": "Fila MQ",
+    "typeIntegrationBridge": "Bridge de Integração",
+    "statusActive": "Ativo",
+    "statusDeprecated": "Depreciado",
+    "statusSunset": "Sunset",
+    "statusRetired": "Inativo",
+    "createTitle": "Nova Interface",
+    "createSubtitle": "Registe uma nova interface para este serviço",
+    "fieldName": "Nome da Interface",
+    "fieldNamePlaceholder": "API REST de Encomendas v1",
+    "fieldType": "Tipo de Interface",
+    "fieldDescription": "Descrição",
+    "fieldExposure": "Âmbito de Exposição",
+    "fieldBasePath": "Caminho Base",
+    "fieldBasePathPlaceholder": "/api/encomendas",
+    "fieldTopicName": "Nome do Tópico",
+    "fieldTopicNamePlaceholder": "encomendas.eventos.v1",
+    "fieldWsdlNamespace": "Namespace WSDL",
+    "fieldGrpcServiceName": "Nome do Serviço Proto",
+    "fieldScheduleCron": "Expressão Cron",
+    "fieldDocumentationUrl": "URL de Documentação",
+    "fieldRequiresContract": "Requer Contrato",
+    "groupPublicApi": "API Pública",
+    "groupEventDriven": "Orientado a Eventos",
+    "groupBackground": "Background",
+    "groupInfrastructure": "Infraestrutura",
+    "submit": "Criar Interface",
+    "cancel": "Cancelar"
+  },
+  "serviceDetail": {
+    "tabInterfaces": "Interfaces"
   }
 }

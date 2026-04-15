@@ -6,8 +6,12 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Policies;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.CreateEventDraft;
 
@@ -26,7 +30,7 @@ public static class CreateEventDraft
         string Title,
         string Author,
         string AsyncApiVersion = "2.6.0",
-        Guid? ServiceId = null,
+        Guid ServiceId = default,
         string? Description = null,
         string DefaultContentType = "application/json",
         string? ChannelsJson = null,
@@ -41,16 +45,19 @@ public static class CreateEventDraft
             RuleFor(x => x.Author).NotEmpty().MaximumLength(200);
             RuleFor(x => x.AsyncApiVersion).NotEmpty().MaximumLength(20);
             RuleFor(x => x.DefaultContentType).NotEmpty().MaximumLength(200);
+            RuleFor(x => x.ServiceId).NotEqual(Guid.Empty).WithMessage("ServiceId is required.");
         }
     }
 
     /// <summary>
     /// Handler que cria um draft Event/AsyncAPI com metadados específicos:
-    /// 1. Cria ContractDraft com ContractType=Event e Protocol=AsyncApi
-    /// 2. Cria EventDraftMetadata com os campos AsyncAPI informados
+    /// 1. Valida existência do serviço e compatibilidade do tipo de contrato
+    /// 2. Cria ContractDraft com ContractType=Event e Protocol=AsyncApi
+    /// 3. Cria EventDraftMetadata com os campos AsyncAPI informados
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository draftRepository,
+        IServiceAssetRepository serviceAssetRepository,
         IEventDraftMetadataRepository eventMetadataRepository,
         IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
@@ -58,6 +65,24 @@ public static class CreateEventDraft
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // Valida existência do serviço
+            var service = await serviceAssetRepository.GetByIdAsync(
+                ServiceAssetId.From(request.ServiceId),
+                cancellationToken);
+
+            if (service is null)
+                return ContractsErrors.CatalogLinkNotFound(request.ServiceId.ToString());
+
+            // Valida que o tipo de serviço suporta contratos
+            if (!ServiceContractPolicy.SupportsContracts(service.ServiceType))
+                return ContractsErrors.ServiceTypeDoesNotSupportContracts(service.ServiceType.ToString());
+
+            // Valida que o tipo de contrato Event é permitido para o tipo de serviço
+            if (!ServiceContractPolicy.IsContractTypeAllowed(service.ServiceType, ContractType.Event))
+                return ContractsErrors.ContractTypeNotAllowedForServiceType(
+                    ContractType.Event.ToString(),
+                    service.ServiceType.ToString());
 
             // 1. Cria o ContractDraft com tipo e protocolo Event/AsyncAPI
             var draftResult = ContractDraft.Create(
