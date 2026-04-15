@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
+using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
 
@@ -20,7 +22,8 @@ public static class BindContractToInterface
         Guid ServiceInterfaceId,
         Guid ContractVersionId,
         string BindingEnvironment,
-        bool IsDefaultVersion = false) : ICommand<Response>;
+        bool IsDefaultVersion = false,
+        string BoundBy = "") : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de vinculação.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -37,7 +40,9 @@ public static class BindContractToInterface
     public sealed class Handler(
         IServiceInterfaceRepository serviceInterfaceRepository,
         IContractBindingRepository contractBindingRepository,
-        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork,
+        IEventBus eventBus,
+        IAuditModule auditModule) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -63,6 +68,21 @@ public static class BindContractToInterface
 
             contractBindingRepository.Add(binding);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            await eventBus.PublishAsync(new ContractBoundToInterfaceIntegrationEvent(
+                binding.Id.Value,
+                binding.ServiceInterfaceId,
+                binding.ContractVersionId,
+                binding.BindingEnvironment,
+                binding.IsDefaultVersion,
+                request.BoundBy,
+                TenantId: null), cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(request.BoundBy))
+                await auditModule.RecordEventAsync(
+                    "Catalog", "ContractBinding.Created",
+                    binding.Id.Value.ToString(), "ContractBinding",
+                    request.BoundBy, Guid.Empty, null, cancellationToken);
 
             return new Response(
                 binding.Id.Value,

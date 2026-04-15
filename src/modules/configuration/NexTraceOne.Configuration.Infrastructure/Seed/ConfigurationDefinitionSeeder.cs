@@ -4318,6 +4318,29 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "toggle",
             sortOrder: 7088),
 
+        // ── Service Taxonomy: Data Classification & Regulatory Scope ─────────────
+        ConfigurationDefinition.Create(
+            key: "catalog.service.data_classification.values",
+            displayName: "config.catalog.service.data_classification.values.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.service.data_classification.values.description",
+            defaultValue: """["Public","Internal","Confidential","Restricted","TopSecret"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 7090),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service.regulatory_scope.values",
+            displayName: "config.catalog.service.regulatory_scope.values.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.service.regulatory_scope.values.description",
+            defaultValue: """["None","LGPD","GDPR","PCI-DSS","SOX","HIPAA","ISO27001"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 7091),
+
         // ── Contracts ──────────────────────────────────────────────────────────────
         ConfigurationDefinition.Create(
             key: "catalog.contract.creation.approval_required",

@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
+using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
 
@@ -34,7 +36,9 @@ public static class DeactivateContractBinding
     public sealed class Handler(
         IContractBindingRepository contractBindingRepository,
         ICatalogGraphUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, MediatR.Unit>
+        IDateTimeProvider dateTimeProvider,
+        IEventBus eventBus,
+        IAuditModule auditModule) : ICommandHandler<Command, MediatR.Unit>
     {
         public async Task<Result<MediatR.Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -47,9 +51,26 @@ public static class DeactivateContractBinding
             if (binding is null)
                 return CatalogGraphErrors.ContractBindingNotFound(request.BindingId);
 
+            var interfaceId = binding.ServiceInterfaceId;
+            var contractVersionId = binding.ContractVersionId;
+            var bindingEnvironment = binding.BindingEnvironment;
+
             binding.Deactivate(request.DeactivatedBy, dateTimeProvider.UtcNow);
 
             await unitOfWork.CommitAsync(cancellationToken);
+
+            await eventBus.PublishAsync(new ContractBindingDeactivatedIntegrationEvent(
+                binding.Id.Value,
+                interfaceId,
+                contractVersionId,
+                bindingEnvironment,
+                request.DeactivatedBy,
+                TenantId: null), cancellationToken);
+
+            await auditModule.RecordEventAsync(
+                "Catalog", "ContractBinding.Deactivated",
+                binding.Id.Value.ToString(), "ContractBinding",
+                request.DeactivatedBy, Guid.Empty, null, cancellationToken);
 
             return MediatR.Unit.Value;
         }

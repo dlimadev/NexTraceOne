@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
+using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
@@ -29,7 +31,8 @@ public static class CreateServiceInterface
         string? GrpcServiceName = null,
         string? ScheduleCron = null,
         string? DocumentationUrl = null,
-        bool? RequiresContract = null) : ICommand<Response>;
+        bool? RequiresContract = null,
+        string CreatedBy = "") : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de criação de interface.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -52,7 +55,9 @@ public static class CreateServiceInterface
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
         IServiceInterfaceRepository serviceInterfaceRepository,
-        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork,
+        IEventBus eventBus,
+        IAuditModule auditModule) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -89,6 +94,23 @@ public static class CreateServiceInterface
 
             serviceInterfaceRepository.Add(iface);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            await eventBus.PublishAsync(new ServiceInterfaceCreatedIntegrationEvent(
+                iface.Id.Value,
+                iface.ServiceAssetId,
+                service.Name,
+                iface.Name,
+                iface.InterfaceType.ToString(),
+                iface.ExposureScope.ToString(),
+                iface.RequiresContract,
+                request.CreatedBy,
+                TenantId: null), cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(request.CreatedBy))
+                await auditModule.RecordEventAsync(
+                    "Catalog", "ServiceInterface.Created",
+                    iface.Id.Value.ToString(), "ServiceInterface",
+                    request.CreatedBy, Guid.Empty, null, cancellationToken);
 
             return new Response(
                 iface.Id.Value,

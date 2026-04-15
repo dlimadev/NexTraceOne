@@ -204,6 +204,51 @@ export function ServiceDetailPage() {
                       label={t('catalog.columns.serviceType')}
                       value={t(`catalog.badges.type.${service.serviceType}`)}
                     />
+                    {service.subDomain && (
+                      <DetailField label={t('catalog.detail.subDomain')} value={service.subDomain} />
+                    )}
+                    {service.capability && (
+                      <DetailField label={t('catalog.detail.capability')} value={service.capability} />
+                    )}
+                    {service.dataClassification && (
+                      <DetailField label={t('catalog.detail.dataClassification')} value={service.dataClassification} />
+                    )}
+                    {service.regulatoryScope && (
+                      <DetailField label={t('catalog.detail.regulatoryScope')} value={service.regulatoryScope} />
+                    )}
+                    {service.sloTarget && (
+                      <DetailField label={t('catalog.detail.sloTarget')} value={service.sloTarget} />
+                    )}
+                    {service.infrastructureProvider && (
+                      <DetailField label={t('catalog.detail.infrastructureProvider')} value={service.infrastructureProvider} />
+                    )}
+                    {service.hostingPlatform && (
+                      <DetailField label={t('catalog.detail.hostingPlatform')} value={service.hostingPlatform} />
+                    )}
+                    {service.runtimeLanguage && (
+                      <DetailField label={t('catalog.detail.runtimeLanguage')} value={service.runtimeLanguage} />
+                    )}
+                    {service.runtimeVersion && (
+                      <DetailField label={t('catalog.detail.runtimeVersion')} value={service.runtimeVersion} />
+                    )}
+                    {service.changeFrequency && (
+                      <DetailField label={t('catalog.detail.changeFrequency')} value={service.changeFrequency} />
+                    )}
+                    {service.productOwner && (
+                      <DetailField label={t('catalog.detail.productOwner')} value={service.productOwner} />
+                    )}
+                    {service.contactChannel && (
+                      <DetailField label={t('catalog.detail.contactChannel')} value={service.contactChannel} />
+                    )}
+                    {service.onCallRotationId && (
+                      <DetailField label={t('catalog.detail.onCallRotationId')} value={service.onCallRotationId} />
+                    )}
+                    {service.gitRepository && (
+                      <DetailField label={t('catalog.detail.gitRepository')} value={service.gitRepository} />
+                    )}
+                    {service.ciPipelineUrl && (
+                      <DetailField label={t('catalog.detail.ciPipelineUrl')} value={service.ciPipelineUrl} />
+                    )}
                   </dl>
                 </CardBody>
               </Card>

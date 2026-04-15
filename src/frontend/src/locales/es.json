@@ -1329,7 +1329,22 @@
       "placeholder": {
         "documentationUrl": "https://docs.company.com/payment-service",
         "repositoryUrl": "https://github.com/org/payment-service"
-      }
+      },
+      "subDomain": "Sub-dominio",
+      "capability": "Capacidad de Negocio",
+      "dataClassification": "Clasificación de Datos",
+      "regulatoryScope": "Alcance Regulatorio",
+      "sloTarget": "SLO Objetivo",
+      "infrastructureProvider": "Proveedor de Infraestructura",
+      "hostingPlatform": "Plataforma de Alojamiento",
+      "runtimeLanguage": "Lenguaje de Runtime",
+      "runtimeVersion": "Versión de Runtime",
+      "changeFrequency": "Frecuencia de Cambio",
+      "productOwner": "Product Owner",
+      "contactChannel": "Canal de Contacto",
+      "onCallRotationId": "On-Call Rotation",
+      "gitRepository": "Repositorio Git",
+      "ciPipelineUrl": "Pipeline CI"
     },
     "discovery": {
       "actions": {

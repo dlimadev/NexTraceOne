@@ -49,6 +49,13 @@ using UpdateFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Featu
 using GetFrameworkDetailFeature = NexTraceOne.Catalog.Application.Graph.Features.GetFrameworkDetail.GetFrameworkDetail;
 using PublishFrameworkVersionFeature = NexTraceOne.Catalog.Application.Graph.Features.PublishFrameworkVersion.PublishFrameworkVersion;
 using GetServiceMaturityBenchmarkFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceMaturityBenchmark.GetServiceMaturityBenchmark;
+using CreateServiceInterfaceFeature = NexTraceOne.Catalog.Application.Graph.Features.CreateServiceInterface.CreateServiceInterface;
+using ListServiceInterfacesFeature = NexTraceOne.Catalog.Application.Graph.Features.ListServiceInterfaces.ListServiceInterfaces;
+using GetServiceInterfaceByIdFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceInterfaceById.GetServiceInterfaceById;
+using DeprecateServiceInterfaceFeature = NexTraceOne.Catalog.Application.Graph.Features.DeprecateServiceInterface.DeprecateServiceInterface;
+using BindContractToInterfaceFeature = NexTraceOne.Catalog.Application.Graph.Features.BindContractToInterface.BindContractToInterface;
+using ListContractBindingsByInterfaceFeature = NexTraceOne.Catalog.Application.Graph.Features.ListContractBindingsByInterface.ListContractBindingsByInterface;
+using DeactivateContractBindingFeature = NexTraceOne.Catalog.Application.Graph.Features.DeactivateContractBinding.DeactivateContractBinding;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
@@ -66,7 +73,8 @@ namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 /// </summary>
 public sealed class ServiceCatalogEndpointModule
 {
-    /// <summary>Registra endpoints no roteador do ASP.NET Core.</summary>
+/// <summary>
+    /// Registra endpoints no roteador do ASP.NET Core.</summary>
     public static void MapEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/v1/catalog").RequireRateLimiting("data-intensive");
@@ -589,5 +597,86 @@ public sealed class ServiceCatalogEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");
+
+        // ── Service Interfaces ───────────────────────────────────────────
+
+        group.MapGet("/services/{serviceId:guid}/interfaces", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListServiceInterfacesFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:interfaces:read");
+
+        group.MapPost("/services/{serviceId:guid}/interfaces", async (
+            Guid serviceId,
+            CreateServiceInterfaceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceAssetId = serviceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/interfaces/{r.InterfaceId}", localizer);
+        }).RequirePermission("catalog:interfaces:write");
+
+        group.MapGet("/interfaces/{interfaceId:guid}", async (
+            Guid interfaceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetServiceInterfaceByIdFeature.Query(interfaceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:interfaces:read");
+
+        group.MapPatch("/interfaces/{interfaceId:guid}/deprecate", async (
+            Guid interfaceId,
+            DeprecateServiceInterfaceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { InterfaceId = interfaceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:interfaces:write");
+
+        // ── Contract Bindings ─────────────────────────────────────────────
+
+        group.MapGet("/interfaces/{interfaceId:guid}/bindings", async (
+            Guid interfaceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListContractBindingsByInterfaceFeature.Query(interfaceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:contract-bindings:read");
+
+        group.MapPost("/interfaces/{interfaceId:guid}/bindings", async (
+            Guid interfaceId,
+            BindContractToInterfaceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ServiceInterfaceId = interfaceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/catalog/bindings/{r.BindingId}", localizer);
+        }).RequirePermission("catalog:contract-bindings:write");
+
+        group.MapDelete("/bindings/{bindingId:guid}", async (
+            Guid bindingId,
+            string deactivatedBy,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DeactivateContractBindingFeature.Command(bindingId, deactivatedBy), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:contract-bindings:write");
     }
 }

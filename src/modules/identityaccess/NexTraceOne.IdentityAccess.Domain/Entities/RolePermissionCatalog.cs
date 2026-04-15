@@ -42,6 +42,10 @@ public static class RolePermissionCatalog
                 // Catalog
                 "catalog:assets:read",
                 "catalog:assets:write",
+                "catalog:interfaces:read",
+                "catalog:interfaces:write",
+                "catalog:contract-bindings:read",
+                "catalog:contract-bindings:write",
 
                 // Contracts
                 "contracts:read",
@@ -166,6 +170,10 @@ public static class RolePermissionCatalog
                 "identity:delegations:manage",
                 "catalog:assets:read",
                 "catalog:assets:write",
+                "catalog:interfaces:read",
+                "catalog:interfaces:write",
+                "catalog:contract-bindings:read",
+                "catalog:contract-bindings:write",
                 "contracts:read",
                 "contracts:write",
                 "contracts:import",
@@ -215,6 +223,9 @@ public static class RolePermissionCatalog
             Role.Developer => [
                 "identity:users:read",
                 "catalog:assets:read",
+                "catalog:interfaces:read",
+                "catalog:interfaces:write",
+                "catalog:contract-bindings:read",
                 "contracts:read",
                 "contracts:write",
                 "contracts:import",
@@ -246,6 +257,8 @@ public static class RolePermissionCatalog
             Role.Viewer => [
                 "identity:users:read",
                 "catalog:assets:read",
+                "catalog:interfaces:read",
+                "catalog:contract-bindings:read",
                 "contracts:read",
                 "developer-portal:read",
                 "change-intelligence:read",
@@ -268,6 +281,8 @@ public static class RolePermissionCatalog
                 "identity:users:read",
                 "identity:sessions:read",
                 "catalog:assets:read",
+                "catalog:interfaces:read",
+                "catalog:contract-bindings:read",
                 "contracts:read",
                 "developer-portal:read",
                 "change-intelligence:read",
@@ -297,6 +312,8 @@ public static class RolePermissionCatalog
                 "identity:sessions:revoke",
                 "identity:break-glass:decide",
                 "catalog:assets:read",
+                "catalog:interfaces:read",
+                "catalog:contract-bindings:read",
                 "contracts:read",
                 "developer-portal:read",
                 "change-intelligence:read",

@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
 using FluentValidation;
+using NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
+using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
 
@@ -20,7 +22,8 @@ public static class DeprecateServiceInterface
         Guid InterfaceId,
         DateTimeOffset? DeprecationDate = null,
         DateTimeOffset? SunsetDate = null,
-        string? Notice = null) : ICommand<MediatR.Unit>;
+        string? Notice = null,
+        string DeprecatedBy = "") : ICommand<MediatR.Unit>;
 
     /// <summary>Valida a entrada do comando de deprecação.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -35,7 +38,10 @@ public static class DeprecateServiceInterface
     /// <summary>Handler que depreca uma interface de serviço.</summary>
     public sealed class Handler(
         IServiceInterfaceRepository serviceInterfaceRepository,
-        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, MediatR.Unit>
+        IServiceAssetRepository serviceAssetRepository,
+        ICatalogGraphUnitOfWork unitOfWork,
+        IEventBus eventBus,
+        IAuditModule auditModule) : ICommandHandler<Command, MediatR.Unit>
     {
         public async Task<Result<MediatR.Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -54,6 +60,27 @@ public static class DeprecateServiceInterface
             iface.Deprecate(request.DeprecationDate, request.SunsetDate, request.Notice);
 
             await unitOfWork.CommitAsync(cancellationToken);
+
+            var service = await serviceAssetRepository.GetByIdAsync(
+                ServiceAssetId.From(iface.ServiceAssetId),
+                cancellationToken);
+
+            await eventBus.PublishAsync(new ServiceInterfaceDeprecatedIntegrationEvent(
+                iface.Id.Value,
+                iface.ServiceAssetId,
+                service?.Name ?? string.Empty,
+                iface.Name,
+                iface.InterfaceType.ToString(),
+                iface.DeprecationDate,
+                iface.SunsetDate,
+                iface.DeprecationNotice,
+                TenantId: null), cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(request.DeprecatedBy))
+                await auditModule.RecordEventAsync(
+                    "Catalog", "ServiceInterface.Deprecated",
+                    iface.Id.Value.ToString(), "ServiceInterface",
+                    request.DeprecatedBy, Guid.Empty, null, cancellationToken);
 
             return MediatR.Unit.Value;
         }
