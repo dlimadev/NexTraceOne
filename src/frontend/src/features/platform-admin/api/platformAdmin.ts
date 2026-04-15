@@ -505,6 +505,75 @@ export const platformAdminApi = {
     client
       .put<GreenOpsConfig>('/api/v1/admin/greenops/config', config)
       .then((r) => r.data),
+
+  // ── W4-03: AI Resource Governor ───────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/ai/governor — requer platform:admin:read.
+   * Retorna configuração e métricas em tempo real do AI Resource Governor.
+   */
+  getAiGovernorStatus: () =>
+    client
+      .get<AiGovernorStatus>('/api/v1/admin/ai/governor')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/ai/governor — requer platform:admin:write.
+   * Actualiza os limites de concorrência e circuit breaker do AI Governor.
+   */
+  updateAiGovernorConfig: (config: AiResourceGovernorConfigUpdate) =>
+    client
+      .put<AiResourceGovernorConfig>('/api/v1/admin/ai/governor', config)
+      .then((r) => r.data),
+
+  // ── W4-04: AI Governance ──────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/ai/governance — requer platform:admin:read.
+   * Retorna dashboard de qualidade de respostas AI por modelo.
+   */
+  getAiGovernanceDashboard: () =>
+    client
+      .get<AiGovernanceDashboard>('/api/v1/admin/ai/governance')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/ai/governance/config — requer platform:admin:write.
+   * Actualiza configuração de grounding check e hallucination detection.
+   */
+  updateAiGovernanceConfig: (config: AiGovernanceConfigUpdate) =>
+    client
+      .put<AiGovernanceConfig>('/api/v1/admin/ai/governance/config', config)
+      .then((r) => r.data),
+
+  // ── W5-02: Proxy Config ───────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/proxy-config — requer platform:admin:read.
+   * Retorna configuração de proxy corporativo e CA interna.
+   */
+  getProxyConfig: () =>
+    client
+      .get<ProxyConfig>('/api/v1/admin/proxy-config')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/proxy-config — requer platform:admin:write.
+   * Actualiza configuração de proxy e CA interna.
+   */
+  updateProxyConfig: (config: ProxyConfigUpdate) =>
+    client
+      .put<ProxyConfig>('/api/v1/admin/proxy-config', config)
+      .then((r) => r.data),
+
+  /**
+   * POST /api/v1/admin/proxy-config/test — requer platform:admin:write.
+   * Testa a conectividade via proxy configurado.
+   */
+  testProxyConnectivity: () =>
+    client
+      .post<ProxyConnectivityTestResult>('/api/v1/admin/proxy-config/test', {})
+      .then((r) => r.data),
 };
 
 // ── W2-03 Types ───────────────────────────────────────────────────────────────
@@ -636,3 +705,121 @@ export interface GreenOpsReport {
   simulatedNote: string;
 }
 
+
+// ── W4-03 Types ───────────────────────────────────────────────────────────────
+
+export type AiRequestPriority = 'Low' | 'Normal' | 'High' | 'Admin';
+export type CircuitBreakerState = 'Closed' | 'Open' | 'HalfOpen';
+
+export interface AiResourceGovernorConfig {
+  maxConcurrency: number;
+  inferenceTimeoutSeconds: number;
+  queueTimeoutSeconds: number;
+  circuitBreakerEnabled: boolean;
+  circuitBreakerErrorThresholdPercent: number;
+  circuitBreakerResetAfterMinutes: number;
+  priorityQueueEnabled: boolean;
+  updatedAt: string;
+}
+
+export interface AiResourceGovernorConfigUpdate {
+  maxConcurrency: number;
+  inferenceTimeoutSeconds: number;
+  queueTimeoutSeconds: number;
+  circuitBreakerEnabled: boolean;
+  circuitBreakerErrorThresholdPercent: number;
+  circuitBreakerResetAfterMinutes: number;
+  priorityQueueEnabled: boolean;
+}
+
+export interface AiGovernorMetrics {
+  activeRequests: number;
+  queueDepth: number;
+  circuitBreakerState: CircuitBreakerState;
+  circuitBreakerOpenSince?: string;
+  latencyP95Ms: number;
+  errorRatePercent: number;
+  totalRequestsLast5Min: number;
+  rejectedRequestsLast5Min: number;
+  sampledAt: string;
+}
+
+export interface AiGovernorStatus {
+  config: AiResourceGovernorConfig;
+  metrics: AiGovernorMetrics;
+}
+
+// ── W4-04 Types ───────────────────────────────────────────────────────────────
+
+export type AiResponseQuality = 'Good' | 'LowConfidence' | 'Hallucination' | 'Unknown';
+
+export interface AiModelQualityStats {
+  modelName: string;
+  totalResponses: number;
+  goodPercent: number;
+  lowConfidencePercent: number;
+  hallucinationPercent: number;
+  negativeFeedbackCount: number;
+  averageConfidenceScore: number;
+  lastUpdated: string;
+}
+
+export interface AiGovernanceConfig {
+  groundingCheckEnabled: boolean;
+  hallucinationFlagThreshold: number;
+  feedbackEnabled: boolean;
+  autoSuspendOnHighHallucinationRate: boolean;
+  highHallucinationThresholdPercent: number;
+  updatedAt: string;
+}
+
+export interface AiGovernanceConfigUpdate {
+  groundingCheckEnabled: boolean;
+  hallucinationFlagThreshold: number;
+  feedbackEnabled: boolean;
+  autoSuspendOnHighHallucinationRate: boolean;
+  highHallucinationThresholdPercent: number;
+}
+
+export interface AiGovernanceDashboard {
+  config: AiGovernanceConfig;
+  modelStats: AiModelQualityStats[];
+  totalFeedbackCount: number;
+  negativeFeedbackPercent: number;
+  topHallucinationPatterns: string[];
+  generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W5-02 Types ───────────────────────────────────────────────────────────────
+
+export type ProxyConfigStatus = 'NotConfigured' | 'Configured' | 'TestPassed' | 'TestFailed';
+
+export interface ProxyConfig {
+  proxyUrl?: string;
+  bypassList: string[];
+  username?: string;
+  hasPassword: boolean;
+  customCaCertificatePath?: string;
+  hasCaCertificate: boolean;
+  status: ProxyConfigStatus;
+  lastTestedAt?: string;
+  lastTestError?: string;
+  updatedAt?: string;
+}
+
+export interface ProxyConfigUpdate {
+  proxyUrl?: string;
+  bypassList: string[];
+  username?: string;
+  password?: string;
+  customCaCertificatePath?: string;
+}
+
+export interface ProxyConnectivityTestResult {
+  success: boolean;
+  testedUrl: string;
+  durationMs: number;
+  error?: string;
+  testedAt: string;
+}

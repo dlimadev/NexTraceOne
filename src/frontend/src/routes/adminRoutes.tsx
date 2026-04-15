@@ -71,6 +71,9 @@ const ElasticsearchManagerPage = lazy(() => import('../features/platform-admin/p
 const PlatformAlertRulesPage = lazy(() => import('../features/platform-admin/pages/PlatformAlertRulesPage').then(m => ({ default: m.PlatformAlertRulesPage })));
 const RecoveryWizardPage = lazy(() => import('../features/platform-admin/pages/RecoveryWizardPage').then(m => ({ default: m.RecoveryWizardPage })));
 const GreenOpsPage = lazy(() => import('../features/platform-admin/pages/GreenOpsPage').then(m => ({ default: m.GreenOpsPage })));
+const AiResourceGovernorPage = lazy(() => import('../features/platform-admin/pages/AiResourceGovernorPage').then(m => ({ default: m.AiResourceGovernorPage })));
+const AiGovernancePage = lazy(() => import('../features/platform-admin/pages/AiGovernancePage').then(m => ({ default: m.AiGovernancePage })));
+const ProxyConfigPage = lazy(() => import('../features/platform-admin/pages/ProxyConfigPage').then(m => ({ default: m.ProxyConfigPage })));
 
 export function AdminRoutes() {
   return (
@@ -497,6 +500,33 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <GreenOpsPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── AI Resource Governor — W4-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/ai-governor"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <AiResourceGovernorPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── AI Governance — W4-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/ai-governance"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <AiGovernancePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Proxy Config — W5-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/proxy-config"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ProxyConfigPage />
           </ProtectedRoute>
         }
       />
