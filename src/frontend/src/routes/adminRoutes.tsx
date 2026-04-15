@@ -74,6 +74,10 @@ const GreenOpsPage = lazy(() => import('../features/platform-admin/pages/GreenOp
 const AiResourceGovernorPage = lazy(() => import('../features/platform-admin/pages/AiResourceGovernorPage').then(m => ({ default: m.AiResourceGovernorPage })));
 const AiGovernancePage = lazy(() => import('../features/platform-admin/pages/AiGovernancePage').then(m => ({ default: m.AiGovernancePage })));
 const ProxyConfigPage = lazy(() => import('../features/platform-admin/pages/ProxyConfigPage').then(m => ({ default: m.ProxyConfigPage })));
+const ExternalHttpAuditPage = lazy(() => import('../features/platform-admin/pages/ExternalHttpAuditPage').then(m => ({ default: m.ExternalHttpAuditPage })));
+const EnvironmentPoliciesPage = lazy(() => import('../features/platform-admin/pages/EnvironmentPoliciesPage').then(m => ({ default: m.EnvironmentPoliciesPage })));
+const NonProdSchedulerPage = lazy(() => import('../features/platform-admin/pages/NonProdSchedulerPage').then(m => ({ default: m.NonProdSchedulerPage })));
+const CapacityForecastPage = lazy(() => import('../features/platform-admin/pages/CapacityForecastPage').then(m => ({ default: m.CapacityForecastPage })));
 
 export function AdminRoutes() {
   return (
@@ -527,6 +531,42 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <ProxyConfigPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── External HTTP Audit — W5-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/external-http-audit"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ExternalHttpAuditPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Environment Policies — W5-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/environment-policies"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <EnvironmentPoliciesPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Non-Prod Scheduler — W6-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/nonprod-scheduler"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <NonProdSchedulerPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Capacity Forecast — W8-01 (on-prem admin) ── */}
+      <Route
+        path="/admin/capacity-forecast"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <CapacityForecastPage />
           </ProtectedRoute>
         }
       />

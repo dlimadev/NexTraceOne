@@ -574,6 +574,77 @@ export const platformAdminApi = {
     client
       .post<ProxyConnectivityTestResult>('/api/v1/admin/proxy-config/test', {})
       .then((r) => r.data),
+
+  // ── W5-03: External HTTP Audit ────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/external-http-audit — requer platform:admin:read.
+   * Retorna registo de chamadas HTTP externas auditadas.
+   */
+  getExternalHttpAudit: (params?: ExternalHttpAuditParams) =>
+    client
+      .get<ExternalHttpAuditResponse>('/api/v1/admin/external-http-audit', { params })
+      .then((r) => r.data),
+
+  // ── W5-05: Environment Policies ───────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/environment-policies — requer platform:admin:read.
+   * Retorna políticas de acesso por ambiente configuradas.
+   */
+  getEnvironmentPolicies: () =>
+    client
+      .get<EnvironmentPoliciesResponse>('/api/v1/admin/environment-policies')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/environment-policies/:id — requer platform:admin:write.
+   * Actualiza uma política de acesso por ambiente.
+   */
+  updateEnvironmentPolicy: (id: string, update: EnvironmentPolicyUpdate) =>
+    client
+      .put<EnvironmentAccessPolicy>(`/api/v1/admin/environment-policies/${id}`, update)
+      .then((r) => r.data),
+
+  // ── W6-02: Non-Prod Scheduler ─────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/nonprod-schedules — requer platform:admin:read.
+   * Retorna schedules de shutdown para ambientes não-produtivos.
+   */
+  getNonProdSchedules: () =>
+    client
+      .get<NonProdSchedulesResponse>('/api/v1/admin/nonprod-schedules')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/nonprod-schedules/:environmentId — requer platform:admin:write.
+   * Actualiza schedule de um ambiente não-produtivo.
+   */
+  updateNonProdSchedule: (environmentId: string, update: NonProdScheduleUpdate) =>
+    client
+      .put<NonProdScheduleEntry>(`/api/v1/admin/nonprod-schedules/${environmentId}`, update)
+      .then((r) => r.data),
+
+  /**
+   * POST /api/v1/admin/nonprod-schedules/:environmentId/override — requer platform:admin:write.
+   * Activa override manual de schedule com justificação.
+   */
+  overrideNonProdSchedule: (environmentId: string, payload: NonProdScheduleOverride) =>
+    client
+      .post<NonProdScheduleEntry>(`/api/v1/admin/nonprod-schedules/${environmentId}/override`, payload)
+      .then((r) => r.data),
+
+  // ── W8-01: Capacity Forecast ──────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/capacity-forecast — requer platform:admin:read.
+   * Retorna previsão de capacidade baseada em tendências reais.
+   */
+  getCapacityForecast: () =>
+    client
+      .get<CapacityForecastResponse>('/api/v1/admin/capacity-forecast')
+      .then((r) => r.data),
 };
 
 // ── W2-03 Types ───────────────────────────────────────────────────────────────
@@ -822,4 +893,132 @@ export interface ProxyConnectivityTestResult {
   durationMs: number;
   error?: string;
   testedAt: string;
+}
+
+// ── W5-03 Types ───────────────────────────────────────────────────────────────
+
+export interface ExternalHttpAuditEntry {
+  id: string;
+  eventType: 'ExternalHttpCall' | 'BlockedByAirGap' | 'NetworkViolation';
+  timestamp: string;
+  destination: string;
+  method: string;
+  path: string;
+  tenantId: string;
+  userId?: string;
+  context: string;
+  requestSizeBytes: number;
+  responseStatus?: number;
+  durationMs?: number;
+  blocked: boolean;
+}
+
+export interface ExternalHttpAuditParams {
+  destination?: string;
+  context?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ExternalHttpAuditResponse {
+  entries: ExternalHttpAuditEntry[];
+  total: number;
+  page: number;
+  pageSize: number;
+  generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W5-05 Types ───────────────────────────────────────────────────────────────
+
+export type EnvPolicyRole = 'Engineer' | 'TechLead' | 'Architect' | 'PlatformAdmin' | 'Auditor';
+
+export interface EnvironmentAccessPolicy {
+  id: string;
+  policyName: string;
+  environments: string[];
+  allowedRoles: EnvPolicyRole[];
+  requireJitFor: EnvPolicyRole[];
+  jitApprovalRequiredFrom?: EnvPolicyRole;
+  description: string;
+  updatedAt: string;
+}
+
+export interface EnvironmentPolicyUpdate {
+  allowedRoles: EnvPolicyRole[];
+  requireJitFor: EnvPolicyRole[];
+  jitApprovalRequiredFrom?: EnvPolicyRole;
+  description: string;
+}
+
+export interface EnvironmentPoliciesResponse {
+  policies: EnvironmentAccessPolicy[];
+  availableEnvironments: string[];
+  generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W6-02 Types ───────────────────────────────────────────────────────────────
+
+export type NonProdScheduleStatus = 'Active' | 'Suspended' | 'OverriddenUntil';
+
+export interface NonProdScheduleEntry {
+  environmentId: string;
+  environmentName: string;
+  enabled: boolean;
+  activeDaysOfWeek: number[];
+  activeFromHour: number;
+  activeToHour: number;
+  timezone: string;
+  status: NonProdScheduleStatus;
+  overrideUntil?: string;
+  overrideReason?: string;
+  estimatedSavingPercent: number;
+  updatedAt: string;
+}
+
+export interface NonProdScheduleUpdate {
+  enabled: boolean;
+  activeDaysOfWeek: number[];
+  activeFromHour: number;
+  activeToHour: number;
+  timezone: string;
+}
+
+export interface NonProdScheduleOverride {
+  keepActiveUntil: string;
+  reason: string;
+}
+
+export interface NonProdSchedulesResponse {
+  schedules: NonProdScheduleEntry[];
+  totalEstimatedSavingPercent: number;
+  generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W8-01 Types ───────────────────────────────────────────────────────────────
+
+export type CapacityRiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
+
+export interface CapacityResourceForecast {
+  resource: string;
+  current: number;
+  capacity: number;
+  unit: string;
+  weeklyGrowthRate: number;
+  estimatedFullDate?: string;
+  daysUntilFull?: number;
+  riskLevel: CapacityRiskLevel;
+  recommendation?: string;
+}
+
+export interface CapacityForecastResponse {
+  forecasts: CapacityResourceForecast[];
+  analysisWeeks: number;
+  nextReviewDate: string;
+  generatedAt: string;
+  simulatedNote: string;
 }

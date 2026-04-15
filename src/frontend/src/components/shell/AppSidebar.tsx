@@ -20,7 +20,7 @@ import {
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
   Network, Workflow, StickyNote, BookMarked, Radar,
   CalendarDays, Award, BrainCircuit, Palette, Cpu,
-  Archive, HardDrive, Gauge, Bell, RotateCcw, Leaf,
+  Archive, HardDrive, Gauge, Bell, RotateCcw, Leaf, Lock,
 } from 'lucide-react';
 
 interface NavItem {
@@ -125,6 +125,10 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.aiResourceGovernor', to: '/admin/ai-governor', icon: <Cpu size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.aiGovernance', to: '/admin/ai-governance', icon: <ShieldCheck size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.proxyConfig', to: '/admin/proxy-config', icon: <Globe size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.externalHttpAudit', to: '/admin/external-http-audit', icon: <Activity size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.environmentPolicies', to: '/admin/environment-policies', icon: <Lock size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.nonProdScheduler', to: '/admin/nonprod-scheduler', icon: <Clock size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.capacityForecast', to: '/admin/capacity-forecast', icon: <TrendingUp size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.parameterUsageReport', to: '/platform/configuration/analytics/usage', icon: <BarChart3 size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
   { labelKey: 'sidebar.parameterCompliance', to: '/platform/configuration/analytics/compliance', icon: <ShieldCheck size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
