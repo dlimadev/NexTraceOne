@@ -281,11 +281,13 @@ export function SchemaPropertyEditor({
                 <>
                   <button type="button" onClick={() => moveProperty(idx, -1)}
                     disabled={idx === 0}
+                    aria-label="move-property-up"
                     className="text-muted/40 hover:text-muted transition-colors disabled:opacity-30">
                     <ArrowUp size={9} />
                   </button>
                   <button type="button" onClick={() => moveProperty(idx, 1)}
                     disabled={idx === properties.length - 1}
+                    aria-label="move-property-down"
                     className="text-muted/40 hover:text-muted transition-colors disabled:opacity-30">
                     <ArrowDown size={9} />
                   </button>
@@ -295,6 +297,7 @@ export function SchemaPropertyEditor({
               {/* Delete */}
               {!isReadOnly && (
                 <button type="button" onClick={() => removeProperty(prop.id)}
+                  aria-label="delete-property"
                   className="text-muted/40 hover:text-danger transition-colors flex-shrink-0">
                   <Trash2 size={10} />
                 </button>

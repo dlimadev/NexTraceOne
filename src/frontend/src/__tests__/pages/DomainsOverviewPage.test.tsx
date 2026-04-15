@@ -20,7 +20,7 @@ describe('DomainsOverviewPage', () => {
   it('renders page heading', async () => {
     renderWithProviders(<DomainsOverviewPage />);
     await waitFor(() => {
-      expect(screen.getByText('organization.domains.title')).toBeInTheDocument();
+      expect(screen.getByText('Business Domains')).toBeInTheDocument();
     });
   });
 
