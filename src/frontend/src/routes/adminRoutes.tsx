@@ -68,6 +68,9 @@ const BackupCoordinatorPage = lazy(() => import('../features/platform-admin/page
 const StartupReportPage = lazy(() => import('../features/platform-admin/pages/StartupReportPage').then(m => ({ default: m.StartupReportPage })));
 const ResourceBudgetPage = lazy(() => import('../features/platform-admin/pages/ResourceBudgetPage').then(m => ({ default: m.ResourceBudgetPage })));
 const ElasticsearchManagerPage = lazy(() => import('../features/platform-admin/pages/ElasticsearchManagerPage').then(m => ({ default: m.ElasticsearchManagerPage })));
+const PlatformAlertRulesPage = lazy(() => import('../features/platform-admin/pages/PlatformAlertRulesPage').then(m => ({ default: m.PlatformAlertRulesPage })));
+const RecoveryWizardPage = lazy(() => import('../features/platform-admin/pages/RecoveryWizardPage').then(m => ({ default: m.RecoveryWizardPage })));
+const GreenOpsPage = lazy(() => import('../features/platform-admin/pages/GreenOpsPage').then(m => ({ default: m.GreenOpsPage })));
 
 export function AdminRoutes() {
   return (
@@ -467,6 +470,33 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <ElasticsearchManagerPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Platform Alert Rules — W2-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/platform-alerts"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <PlatformAlertRulesPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Recovery Wizard — W3-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/recovery"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <RecoveryWizardPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── GreenOps — W6-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/greenops"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <GreenOpsPage />
           </ProtectedRoute>
         }
       />

@@ -445,5 +445,194 @@ export const platformAdminApi = {
     client
       .put<EsIlmPolicy>(`/api/v1/admin/elasticsearch/ilm/${policyName}`, policy)
       .then((r) => r.data),
+
+  // ── W2-03: Platform Alert Rules ───────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/platform-alerts — requer platform:admin:read.
+   * Retorna regras de alerta configuradas e histórico recente.
+   */
+  getPlatformAlerts: () =>
+    client
+      .get<PlatformAlertsResponse>('/api/v1/admin/platform-alerts')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/platform-alerts/:ruleId — requer platform:admin:write.
+   * Actualiza uma regra de alerta.
+   */
+  updateAlertRule: (ruleId: string, rule: PlatformAlertRuleUpdate) =>
+    client
+      .put<PlatformAlertRule>(`/api/v1/admin/platform-alerts/${ruleId}`, rule)
+      .then((r) => r.data),
+
+  // ── W3-04: Recovery Wizard ────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/recovery/restore-points — requer platform:admin:read.
+   * Lista os pontos de restauro disponíveis (backups).
+   */
+  getRestorePoints: () =>
+    client
+      .get<RestorePointsResponse>('/api/v1/admin/recovery/restore-points')
+      .then((r) => r.data),
+
+  /**
+   * POST /api/v1/admin/recovery/initiate — requer platform:admin:write.
+   * Inicia ou faz dry-run de um processo de recuperação.
+   */
+  initiateRecovery: (request: RecoveryRequest) =>
+    client
+      .post<RecoveryResponse>('/api/v1/admin/recovery/initiate', request)
+      .then((r) => r.data),
+
+  // ── W6-04: GreenOps ───────────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/greenops — requer platform:admin:read.
+   * Retorna carbon score por serviço e emissões totais da organização.
+   */
+  getGreenOpsReport: () =>
+    client
+      .get<GreenOpsReport>('/api/v1/admin/greenops')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/greenops/config — requer platform:admin:write.
+   * Actualiza o intensity factor e meta ESG da organização.
+   */
+  updateGreenOpsConfig: (config: GreenOpsConfigUpdate) =>
+    client
+      .put<GreenOpsConfig>('/api/v1/admin/greenops/config', config)
+      .then((r) => r.data),
 };
+
+// ── W2-03 Types ───────────────────────────────────────────────────────────────
+
+export type PlatformAlertSeverity = 'Warning' | 'Critical';
+export type PlatformAlertStatus = 'Active' | 'Resolved' | 'Suppressed';
+
+export interface PlatformAlertRule {
+  id: string;
+  name: string;
+  metric: string;
+  warningThreshold: number;
+  criticalThreshold: number;
+  unit: string;
+  enabled: boolean;
+  cooldownMinutes: number;
+  description: string;
+}
+
+export interface PlatformAlertRuleUpdate {
+  warningThreshold: number;
+  criticalThreshold: number;
+  enabled: boolean;
+  cooldownMinutes: number;
+}
+
+export interface PlatformAlertHistoryEntry {
+  id: string;
+  ruleId: string;
+  ruleName: string;
+  severity: PlatformAlertSeverity;
+  status: PlatformAlertStatus;
+  triggeredAt: string;
+  resolvedAt?: string;
+  value: number;
+  unit: string;
+  message: string;
+}
+
+export interface PlatformAlertsResponse {
+  rules: PlatformAlertRule[];
+  recentAlerts: PlatformAlertHistoryEntry[];
+  activeAlertCount: number;
+  suppressedUntil?: string;
+}
+
+// ── W3-04 Types ───────────────────────────────────────────────────────────────
+
+export type RestorePointStatus = 'Available' | 'Corrupted' | 'Expired';
+export type RecoveryScope = 'Full' | 'Partial';
+export type RecoveryStatus = 'Pending' | 'Running' | 'Completed' | 'Failed';
+
+export interface RestorePoint {
+  id: string;
+  timestamp: string;
+  sizeMb: number;
+  status: RestorePointStatus;
+  checksum: string;
+  version: string;
+  schemasIncluded: string[];
+}
+
+export interface RestorePointsResponse {
+  restorePoints: RestorePoint[];
+  totalCount: number;
+  oldestAvailable?: string;
+  latestAvailable?: string;
+}
+
+export interface RecoveryRequest {
+  restorePointId: string;
+  scope: RecoveryScope;
+  schemas?: string[];
+  dryRun: boolean;
+}
+
+export interface RecoveryResponse {
+  recoveryId: string;
+  status: RecoveryStatus;
+  dryRun: boolean;
+  estimatedDurationSeconds?: number;
+  dataLossWarning?: string;
+  schemasAffected: string[];
+  startedAt?: string;
+}
+
+// ── W6-04 Types ───────────────────────────────────────────────────────────────
+
+export interface ServiceCarbonEntry {
+  serviceId: string;
+  serviceName: string;
+  teamName: string;
+  carbonKgCo2: number;
+  changePercent: number;
+  cpuHours: number;
+  memoryGbHours: number;
+  networkGb: number;
+  period: string;
+}
+
+export interface GreenOpsConfig {
+  intensityFactorKgPerKwh: number;
+  esgTargetKgCo2PerMonth: number;
+  datacenterRegion: string;
+  updatedAt: string;
+}
+
+export interface GreenOpsConfigUpdate {
+  intensityFactorKgPerKwh: number;
+  esgTargetKgCo2PerMonth: number;
+  datacenterRegion: string;
+}
+
+export interface GreenOpsTrend {
+  month: string;
+  totalKgCo2: number;
+}
+
+export interface GreenOpsReport {
+  generatedAt: string;
+  period: string;
+  totalKgCo2: number;
+  equivalentKmByCar: number;
+  esgTargetKgCo2: number;
+  percentAboveTarget: number;
+  config: GreenOpsConfig;
+  topServices: ServiceCarbonEntry[];
+  trend: GreenOpsTrend[];
+  simulatedNote: string;
+}
 
