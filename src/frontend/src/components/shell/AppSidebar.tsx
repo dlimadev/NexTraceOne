@@ -19,7 +19,7 @@ import {
   PanelLeftClose, PanelLeftOpen,
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
   Network, Workflow, StickyNote, BookMarked, Radar,
-  CalendarDays, Award, BrainCircuit, Palette,
+  CalendarDays, Award, BrainCircuit, Palette, Cpu,
 } from 'lucide-react';
 
 interface NavItem {
@@ -74,6 +74,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:compliance:read', section: 'governance' },
   { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <AlertTriangle size={18} />, permission: 'governance:risk:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:finops:read', section: 'governance' },
+  { labelKey: 'sidebar.wasteDetection', to: '/governance/waste-detection', icon: <Zap size={18} />, permission: 'governance:finops:read', section: 'governance' },
   { labelKey: 'sidebar.policies', to: '/governance/policies', icon: <Shield size={18} />, permission: 'governance:policies:read', section: 'governance' },
   { labelKey: 'sidebar.packs', to: '/governance/packs', icon: <Layers size={18} />, permission: 'governance:packs:read', section: 'governance' },
   { labelKey: 'sidebar.waivers', to: '/governance/waivers', icon: <ClipboardList size={18} />, permission: 'governance:waivers:read', section: 'governance' },
@@ -109,6 +110,9 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.audit', to: '/audit', icon: <ClipboardList size={18} />, permission: 'audit:trail:read', section: 'admin' },
   { labelKey: 'sidebar.platformOperations', to: '/platform/operations', icon: <Server size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.platformHealthDashboard', to: '/platform/health', icon: <Activity size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.databaseHealth', to: '/admin/database-health', icon: <Database size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.aiModelManager', to: '/admin/ai/models', icon: <Cpu size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.networkPolicy', to: '/admin/network-policy', icon: <Network size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.parameterUsageReport', to: '/platform/configuration/analytics/usage', icon: <BarChart3 size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
   { labelKey: 'sidebar.parameterCompliance', to: '/platform/configuration/analytics/compliance', icon: <ShieldCheck size={18} />, permission: 'configuration:analytics:read', section: 'admin' },

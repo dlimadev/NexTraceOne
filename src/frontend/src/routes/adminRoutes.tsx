@@ -60,6 +60,9 @@ const TimeToValuePage = lazy(() => import('../features/product-analytics/pages/T
 const PreflightPage = lazy(() => import('../features/platform-admin/pages/PreflightPage').then(m => ({ default: m.PreflightPage })));
 const SetupWizardPage = lazy(() => import('../features/platform-admin/pages/SetupWizardPage').then(m => ({ default: m.SetupWizardPage })));
 const PlatformHealthDashboardPage = lazy(() => import('../features/platform-admin/pages/PlatformHealthDashboardPage').then(m => ({ default: m.PlatformHealthDashboardPage })));
+const AiModelManagerPage = lazy(() => import('../features/platform-admin/pages/AiModelManagerPage').then(m => ({ default: m.AiModelManagerPage })));
+const NetworkPolicyPage = lazy(() => import('../features/platform-admin/pages/NetworkPolicyPage').then(m => ({ default: m.NetworkPolicyPage })));
+const DatabaseHealthPage = lazy(() => import('../features/platform-admin/pages/DatabaseHealthPage').then(m => ({ default: m.DatabaseHealthPage })));
 
 export function AdminRoutes() {
   return (
@@ -373,6 +376,36 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <PlatformHealthDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── AI Model Manager — hardware assessment + model compatibility (on-prem admin) ── */}
+      <Route
+        path="/admin/ai/models"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <AiModelManagerPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Network Policy — Air-Gap mode + external calls audit (on-prem admin) ── */}
+      <Route
+        path="/admin/network-policy"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <NetworkPolicyPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Database Health — PostgreSQL diagnostics (on-prem admin) ── */}
+      <Route
+        path="/admin/database-health"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <DatabaseHealthPage />
           </ProtectedRoute>
         }
       />

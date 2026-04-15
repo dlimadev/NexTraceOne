@@ -13,6 +13,7 @@ using GetPlatformEventsFeature = NexTraceOne.Governance.Application.Features.Get
 using GetPlatformReadinessFeature = NexTraceOne.Governance.Application.Features.GetPlatformReadiness.GetPlatformReadiness;
 using GetConfigHealthFeature = NexTraceOne.Governance.Application.Features.GetConfigHealth.GetConfigHealth;
 using GetPendingMigrationsFeature = NexTraceOne.Governance.Application.Features.GetPendingMigrations.GetPendingMigrations;
+using GetNetworkPolicyFeature = NexTraceOne.Governance.Application.Features.GetNetworkPolicy.GetNetworkPolicy;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -110,6 +111,16 @@ public sealed class PlatformStatusEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetPendingMigrationsFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/network-policy", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetNetworkPolicyFeature.Query();
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");

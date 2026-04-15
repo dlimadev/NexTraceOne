@@ -79,6 +79,12 @@ builder.Services.AddSingleton<NexTraceOne.Governance.Application.Abstractions.IP
 // [3.3] Preflight check service — verificação pré-arranque sem autenticação
 builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.PreflightCheckService>();
 
+// [3.4] Hardware assessment service — avaliação de hardware para modelos LLM locais
+builder.Services.AddSingleton<NexTraceOne.ApiHost.OnPrem.HardwareAssessmentService>();
+
+// [3.5] Database health service — diagnóstico de saúde do PostgreSQL
+builder.Services.AddSingleton<NexTraceOne.ApiHost.OnPrem.DatabaseHealthService>();
+
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddCatalogGraphModule(builder.Configuration);
@@ -322,6 +328,24 @@ app.MapGet("/preflight", async (
     var statusCode = report.IsReadyToStart ? 200 : 503;
     return Results.Json(report, statusCode: statusCode);
 }).AllowAnonymous();
+
+// ── Hardware Assessment — avaliação de hardware para compatibilidade de modelos LLM ──
+app.MapGet("/api/v1/admin/ai/hardware-assessment", async (
+    NexTraceOne.ApiHost.OnPrem.HardwareAssessmentService hwService,
+    CancellationToken cancellationToken) =>
+{
+    var report = await hwService.AssessAsync(cancellationToken);
+    return Results.Ok(report);
+}).RequireAuthorization("platform:admin:read");
+
+// ── Database Health — diagnóstico de saúde do PostgreSQL ──
+app.MapGet("/api/v1/platform/database-health", async (
+    NexTraceOne.ApiHost.OnPrem.DatabaseHealthService dbService,
+    CancellationToken cancellationToken) =>
+{
+    var report = await dbService.GetHealthAsync(cancellationToken);
+    return Results.Ok(report);
+}).RequireAuthorization("platform:admin:read");
 
 app.Run();
 
