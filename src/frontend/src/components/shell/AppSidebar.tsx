@@ -20,6 +20,7 @@ import {
   BarChart3, Cable, TrendingUp, BookOpen, Briefcase,
   Network, Workflow, StickyNote, BookMarked, Radar,
   CalendarDays, Award, BrainCircuit, Palette, Cpu,
+  Archive, HardDrive,
 } from 'lucide-react';
 
 interface NavItem {
@@ -113,6 +114,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.databaseHealth', to: '/admin/database-health', icon: <Database size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.aiModelManager', to: '/admin/ai/models', icon: <Cpu size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.networkPolicy', to: '/admin/network-policy', icon: <Network size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.supportBundle', to: '/admin/support-bundle', icon: <Archive size={18} />, permission: 'platform:admin:read', section: 'admin' },
+  { labelKey: 'sidebar.backupCoordinator', to: '/admin/backup', icon: <HardDrive size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.platformConfiguration', to: '/platform/configuration', icon: <Settings size={18} />, permission: 'platform:admin:read', section: 'admin' },
   { labelKey: 'sidebar.parameterUsageReport', to: '/platform/configuration/analytics/usage', icon: <BarChart3 size={18} />, permission: 'configuration:analytics:read', section: 'admin' },
   { labelKey: 'sidebar.parameterCompliance', to: '/platform/configuration/analytics/compliance', icon: <ShieldCheck size={18} />, permission: 'configuration:analytics:read', section: 'admin' },

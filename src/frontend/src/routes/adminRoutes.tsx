@@ -63,6 +63,8 @@ const PlatformHealthDashboardPage = lazy(() => import('../features/platform-admi
 const AiModelManagerPage = lazy(() => import('../features/platform-admin/pages/AiModelManagerPage').then(m => ({ default: m.AiModelManagerPage })));
 const NetworkPolicyPage = lazy(() => import('../features/platform-admin/pages/NetworkPolicyPage').then(m => ({ default: m.NetworkPolicyPage })));
 const DatabaseHealthPage = lazy(() => import('../features/platform-admin/pages/DatabaseHealthPage').then(m => ({ default: m.DatabaseHealthPage })));
+const SupportBundlePage = lazy(() => import('../features/platform-admin/pages/SupportBundlePage').then(m => ({ default: m.SupportBundlePage })));
+const BackupCoordinatorPage = lazy(() => import('../features/platform-admin/pages/BackupCoordinatorPage').then(m => ({ default: m.BackupCoordinatorPage })));
 
 export function AdminRoutes() {
   return (
@@ -415,6 +417,26 @@ export function AdminRoutes() {
 
       {/* ── Preflight Check UI — pre-login system check (no auth required) ── */}
       <Route path="/preflight" element={<PreflightPage />} />
+
+      {/* ── Support Bundle Generator — W2-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/support-bundle"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <SupportBundlePage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Backup Coordinator — W3-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/backup"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <BackupCoordinatorPage />
+          </ProtectedRoute>
+        }
+      />
     </>
   );
 }
