@@ -33,6 +33,7 @@ import { PageContainer, PageSection, TableWrapper } from '../../../components/sh
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
+import { ServiceInterfacesTab } from '../components/ServiceInterfacesTab';
 
 /** Mapeia criticidade para variante do Badge. */
 const criticalityBadgeVariant = (level: Criticality): 'danger' | 'warning' | 'default' => {
@@ -79,7 +80,7 @@ const contractLifecycleBadgeVariant = (state: string): 'success' | 'info' | 'war
   }
 };
 
-type ServiceTab = 'overview' | 'apis' | 'contracts';
+type ServiceTab = 'overview' | 'apis' | 'contracts' | 'interfaces';
 
 /** Página de detalhe de um serviço do catálogo — redesenhada com EntityHeader + Tabs. */
 export function ServiceDetailPage() {
@@ -137,6 +138,11 @@ export function ServiceDetailPage() {
       id: 'contracts',
       label: `${t('catalog.detail.contracts')} (${serviceContracts?.totalCount ?? contracts.length})`,
       icon: <FileText size={14} />,
+    },
+    {
+      id: 'interfaces',
+      label: t('serviceDetail.tabInterfaces', 'Interfaces'),
+      icon: <Server size={14} />,
     },
   ];
 
@@ -439,6 +445,13 @@ export function ServiceDetailPage() {
                   )}
                 </CardBody>
               </Card>
+            </PageSection>
+          )}
+
+          {/* INTERFACES TAB */}
+          {activeTab === 'interfaces' && (
+            <PageSection>
+              <ServiceInterfacesTab serviceId={serviceId!} />
             </PageSection>
           )}
         </div>

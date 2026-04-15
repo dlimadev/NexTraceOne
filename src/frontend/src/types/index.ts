@@ -345,9 +345,113 @@ export interface ServiceDetail {
   exposureType: ExposureType;
   documentationUrl: string;
   repositoryUrl: string;
+  subDomain?: string;
+  capability?: string;
+  dataClassification?: string;
+  regulatoryScope?: string;
+  infrastructureProvider?: string;
+  hostingPlatform?: string;
+  runtimeLanguage?: string;
+  runtimeVersion?: string;
+  sloTarget?: string;
+  changeFrequency?: string;
+  productOwner?: string;
+  contactChannel?: string;
+  onCallRotationId?: string;
+  gitRepository?: string;
+  ciPipelineUrl?: string;
+  interfaces?: ServiceInterface[];
   apis: ServiceApiSummary[];
   apiCount: number;
   totalConsumers: number;
+}
+
+/** Tipo de interface de serviço (como o serviço se expõe). */
+export type InterfaceType =
+  | 'RestApi'
+  | 'SoapService'
+  | 'KafkaProducer'
+  | 'KafkaConsumer'
+  | 'GrpcService'
+  | 'GraphqlApi'
+  | 'BackgroundWorker'
+  | 'ScheduledJob'
+  | 'WebhookProducer'
+  | 'WebhookConsumer'
+  | 'ZosConnectApi'
+  | 'MqQueue'
+  | 'IntegrationBridge';
+
+/** Estado de uma interface de serviço. */
+export type InterfaceStatus = 'Active' | 'Deprecated' | 'Sunset' | 'Retired';
+
+/** Esquema de autenticação de uma interface. */
+export type InterfaceAuthScheme = 'None' | 'ApiKey' | 'OAuth2' | 'MutualTls' | 'Saml' | 'OpenIdConnect' | 'Basic';
+
+/** Interface de exposição de um serviço (endpoint, tópico, etc.). */
+export interface ServiceInterface {
+  interfaceId: string;
+  serviceAssetId: string;
+  name: string;
+  description: string;
+  interfaceType: InterfaceType;
+  status: InterfaceStatus;
+  exposureScope: ExposureType;
+  basePath: string;
+  topicName: string;
+  wsdlNamespace: string;
+  grpcServiceName: string;
+  scheduleCron: string;
+  environmentId: string;
+  sloTarget: string;
+  requiresContract: boolean;
+  authScheme: InterfaceAuthScheme;
+  rateLimitPolicy: string;
+  documentationUrl: string;
+  isDeprecated: boolean;
+  deprecationDate?: string;
+  sunsetDate?: string;
+  deprecationNotice?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Estado de uma contrato binding. */
+export type ContractBindingStatus = 'Active' | 'Deprecated' | 'Sunset';
+
+/** Ligação entre uma interface de serviço e uma versão de contrato. */
+export interface ContractBinding {
+  bindingId: string;
+  serviceInterfaceId: string;
+  contractVersionId: string;
+  status: ContractBindingStatus;
+  bindingEnvironment: string;
+  isDefaultVersion: boolean;
+  activatedAt?: string;
+  activatedBy?: string;
+  deactivatedAt?: string;
+  migrationNotes: string;
+}
+
+/** Campos adicionais de ServiceListItem após enriquecimento. */
+export interface ServiceListItemExtended extends ServiceListItem {
+  subDomain?: string;
+  capability?: string;
+  dataClassification?: string;
+  regulatoryScope?: string;
+  infrastructureProvider?: string;
+  hostingPlatform?: string;
+  runtimeLanguage?: string;
+  runtimeVersion?: string;
+  sloTarget?: string;
+  changeFrequency?: string;
+  productOwner?: string;
+  contactChannel?: string;
+  onCallRotationId?: string;
+  gitRepository?: string;
+  ciPipelineUrl?: string;
+  interfaceCount?: number;
+  activeContractCount?: number;
 }
 
 /** Contagem agrupada para resumos. */
