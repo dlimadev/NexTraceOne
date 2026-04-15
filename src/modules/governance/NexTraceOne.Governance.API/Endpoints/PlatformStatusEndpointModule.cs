@@ -11,6 +11,8 @@ using GetPlatformQueuesFeature = NexTraceOne.Governance.Application.Features.Get
 using GetPlatformConfigFeature = NexTraceOne.Governance.Application.Features.GetPlatformConfig.GetPlatformConfig;
 using GetPlatformEventsFeature = NexTraceOne.Governance.Application.Features.GetPlatformEvents.GetPlatformEvents;
 using GetPlatformReadinessFeature = NexTraceOne.Governance.Application.Features.GetPlatformReadiness.GetPlatformReadiness;
+using GetConfigHealthFeature = NexTraceOne.Governance.Application.Features.GetConfigHealth.GetConfigHealth;
+using GetPendingMigrationsFeature = NexTraceOne.Governance.Application.Features.GetPendingMigrations.GetPendingMigrations;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -88,6 +90,26 @@ public sealed class PlatformStatusEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetPlatformReadinessFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/config-health", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetConfigHealthFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/migrations/pending", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetPendingMigrationsFeature.Query();
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");

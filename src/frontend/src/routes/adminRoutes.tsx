@@ -56,6 +56,11 @@ const AdoptionFunnelPage = lazy(() => import('../features/product-analytics/page
 const FeatureHeatmapPage = lazy(() => import('../features/product-analytics/pages/FeatureHeatmapPage').then(m => ({ default: m.FeatureHeatmapPage })));
 const TimeToValuePage = lazy(() => import('../features/product-analytics/pages/TimeToValuePage').then(m => ({ default: m.TimeToValuePage })));
 
+// Platform Admin (on-prem)
+const PreflightPage = lazy(() => import('../features/platform-admin/pages/PreflightPage').then(m => ({ default: m.PreflightPage })));
+const SetupWizardPage = lazy(() => import('../features/platform-admin/pages/SetupWizardPage').then(m => ({ default: m.SetupWizardPage })));
+const PlatformHealthDashboardPage = lazy(() => import('../features/platform-admin/pages/PlatformHealthDashboardPage').then(m => ({ default: m.PlatformHealthDashboardPage })));
+
 export function AdminRoutes() {
   return (
     <>
@@ -361,6 +366,22 @@ export function AdminRoutes() {
           <IntegrationMappingsPage />
         }
       />
+
+      {/* ── Platform Health Dashboard (on-prem admin) ── */}
+      <Route
+        path="/platform/health"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <PlatformHealthDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Setup Wizard — first-run on-prem setup (no auth required) ── */}
+      <Route path="/setup" element={<SetupWizardPage />} />
+
+      {/* ── Preflight Check UI — pre-login system check (no auth required) ── */}
+      <Route path="/preflight" element={<PreflightPage />} />
     </>
   );
 }

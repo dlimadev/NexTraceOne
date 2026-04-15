@@ -8636,7 +8636,8 @@
     "valueTracking": "Value Tracking",
     "waivers": "Waivers & Exceptions",
     "workflow": "Workflow",
-    "navigation": "Main navigation"
+    "navigation": "Main navigation",
+    "platformHealthDashboard": "Platform Health"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -9562,5 +9563,151 @@
     "loading": "Loading telemetry data...",
     "error": "Failed to load telemetry data. Please check the observability provider status.",
     "providerUnavailable": "Observability provider is not available. Ensure Elasticsearch or ClickHouse is running."
+  },
+  "preflight": {
+    "title": "System Preflight Check",
+    "subtitle": "Checking all platform dependencies before login.",
+    "running": "Running preflight checks...",
+    "fetchError": "Could not reach the preflight endpoint. Ensure the API host is running.",
+    "readyToStart": "Platform is ready to start",
+    "notReady": "Platform is not ready — resolve required errors before proceeding",
+    "version": "v{{version}}",
+    "checkedAt": "Checked at {{time}}",
+    "checksTitle": "{{count}} checks performed",
+    "reRun": "Re-run checks",
+    "goToApp": "Go to application",
+    "status": {
+      "ok": "OK",
+      "warning": "Warning",
+      "error": "Error"
+    }
+  },
+  "platformHealth": {
+    "title": "Platform Health Dashboard",
+    "subtitle": "System health, configuration validation and pending database migrations.",
+    "refresh": "Refresh",
+    "fetchError": "Unable to load data. Please try again.",
+    "tabOverview": "Overview",
+    "tabConfig": "Config Health",
+    "tabMigrations": "Migrations",
+    "preflightTitle": "Preflight Checks",
+    "subsystemsTitle": "Subsystems",
+    "status": {
+      "ok": "OK",
+      "warning": "Warning",
+      "error": "Error"
+    },
+    "config": {
+      "ok": "OK",
+      "warning": "Warning",
+      "degraded": "Degraded"
+    },
+    "migrations": {
+      "upToDate": "All migrations are up to date",
+      "pendingCount": "{{count}} pending migration(s)",
+      "safeToApply": "All pending migrations are classified as low risk",
+      "requiresReview": "Some migrations require manual review before applying",
+      "clean": "Up to date",
+      "pending": "pending",
+      "listTitle": "Pending Migrations",
+      "context": "Context",
+      "downtime": "Requires downtime",
+      "irreversible": "Irreversible",
+      "applyTitle": "Apply migrations",
+      "applyHint": "Never use NEXTRACE_AUTO_MIGRATE=true in Production. Use a proper CI/CD pipeline."
+    },
+    "quick": {
+      "preflight": "Preflight Check",
+      "setup": "Setup Wizard",
+      "ai": "AI Model Registry"
+    }
+  },
+  "setup": {
+    "title": "NexTraceOne Setup Wizard",
+    "subtitle": "Configure your on-premises installation in a few steps.",
+    "optional": "Optional",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "finish": "Finish Setup",
+    "progress": "Step {{current}} of {{total}}",
+    "welcome": {
+      "stepLabel": "Welcome",
+      "title": "Welcome to NexTraceOne",
+      "description": "This wizard will guide you through the initial configuration.",
+      "introText": "NexTraceOne is the source of truth for services, contracts, changes and operational knowledge. Complete this wizard to finish your on-premises installation.",
+      "feature_database": "PostgreSQL 16+ connected and migrations applied",
+      "feature_security": "JWT secret and AES encryption key configured",
+      "feature_organization": "First organization and admin user created",
+      "feature_ai": "Local AI (Ollama) configured for AI-assisted operations",
+      "feature_network": "SMTP and CORS configured for notifications and browser access",
+      "prerequisite": "Prerequisites: PostgreSQL 16+ running, Node 20+ and .NET 10 installed."
+    },
+    "database": {
+      "stepLabel": "Database",
+      "title": "Database Configuration",
+      "description": "Configure the PostgreSQL connection for NexTraceOne.",
+      "hostLabel": "Host",
+      "hostHint": "PostgreSQL server hostname or IP address.",
+      "portLabel": "Port",
+      "nameLabel": "Database Name",
+      "usernameLabel": "Username",
+      "passwordLabel": "Password"
+    },
+    "security": {
+      "stepLabel": "Security",
+      "title": "Security Keys",
+      "description": "Configure JWT secret and data encryption key.",
+      "jwtLabel": "JWT Secret",
+      "jwtHint": "Minimum 32 characters. Generate with: openssl rand -base64 48",
+      "encKeyLabel": "Encryption Key (NEXTRACE_ENCRYPTION_KEY)",
+      "encKeyHint": "Base64-encoded 32-byte AES key. Generate with: openssl rand -base64 32",
+      "corsLabel": "Frontend URL (CORS Origin)",
+      "corsHint": "The URL where the NexTraceOne frontend will be served."
+    },
+    "organization": {
+      "stepLabel": "Organization",
+      "title": "Organization & Admin User",
+      "description": "Create the first organization and platform admin account.",
+      "nameLabel": "Organization Name",
+      "adminEmailLabel": "Admin Email",
+      "adminPasswordLabel": "Admin Password"
+    },
+    "ai": {
+      "stepLabel": "AI",
+      "title": "Local AI Configuration",
+      "description": "Configure Ollama for AI-assisted operations and contract generation.",
+      "intro": "NexTraceOne uses Ollama for local, private AI. You can skip this step and configure AI later via Platform Configuration.",
+      "ollamaUrlLabel": "Ollama Base URL",
+      "ollamaUrlHint": "The URL where Ollama is running (default: http://localhost:11434)",
+      "defaultModelLabel": "Default Chat Model"
+    },
+    "network": {
+      "stepLabel": "Network",
+      "title": "Email & Network",
+      "description": "Configure SMTP for notifications.",
+      "smtpHostLabel": "SMTP Host",
+      "smtpHostHint": "SMTP server for email notifications. Leave empty to disable email.",
+      "smtpPortLabel": "SMTP Port",
+      "smtpFromLabel": "From Address"
+    },
+    "review": {
+      "stepLabel": "Review",
+      "title": "Review & Confirm",
+      "description": "Review your configuration before finalising setup.",
+      "intro": "Review your setup configuration below. After finishing, update your appsettings.json or environment variables with these values.",
+      "database": "Database",
+      "organization": "Organization",
+      "adminEmail": "Admin Email",
+      "ai": "Local AI",
+      "smtp": "SMTP",
+      "notConfigured": "Not configured",
+      "appsettingsNote": "This wizard collects configuration details for reference. You must apply them manually to appsettings.json, environment variables or your secrets manager."
+    },
+    "completed": {
+      "title": "Setup Complete",
+      "subtitle": "Your NexTraceOne instance is configured. Run the preflight check to verify all systems are operational.",
+      "runPreflight": "Run Preflight Check"
+    }
   }
 }

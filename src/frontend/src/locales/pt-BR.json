@@ -8599,7 +8599,8 @@
     "valueTracking": "Acompanhamento de Valor",
     "waivers": "Exceções e Isenções",
     "workflow": "Workflow",
-    "navigation": "Navegação principal"
+    "navigation": "Navegação principal",
+    "platformHealthDashboard": "Saúde da Plataforma"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -9525,5 +9526,151 @@
     "loading": "Carregando dados de telemetria...",
     "error": "Falha ao carregar dados de telemetria. Verifique o status do provider de observabilidade.",
     "providerUnavailable": "O provider de observabilidade não está disponível. Verifique se o Elasticsearch ou ClickHouse está em execução."
+  },
+  "preflight": {
+    "title": "Verificação de Pré-arranque",
+    "subtitle": "Verificando todas as dependências da plataforma antes do login.",
+    "running": "Executando verificações de pré-arranque...",
+    "fetchError": "Não foi possível contactar o endpoint de preflight. Certifique-se que o host da API está em execução.",
+    "readyToStart": "A plataforma está pronta para iniciar",
+    "notReady": "A plataforma não está pronta — resolva os erros obrigatórios antes de continuar",
+    "version": "v{{version}}",
+    "checkedAt": "Verificado às {{time}}",
+    "checksTitle": "{{count}} verificações realizadas",
+    "reRun": "Executar novamente",
+    "goToApp": "Ir para a aplicação",
+    "status": {
+      "ok": "OK",
+      "warning": "Aviso",
+      "error": "Erro"
+    }
+  },
+  "platformHealth": {
+    "title": "Dashboard de Saúde da Plataforma",
+    "subtitle": "Saúde do sistema, validação de configurações e migrations de base de dados pendentes.",
+    "refresh": "Atualizar",
+    "fetchError": "Não foi possível carregar os dados. Tente novamente.",
+    "tabOverview": "Visão Geral",
+    "tabConfig": "Saúde da Configuração",
+    "tabMigrations": "Migrations",
+    "preflightTitle": "Verificações de Pré-arranque",
+    "subsystemsTitle": "Subsistemas",
+    "status": {
+      "ok": "OK",
+      "warning": "Aviso",
+      "error": "Erro"
+    },
+    "config": {
+      "ok": "OK",
+      "warning": "Aviso",
+      "degraded": "Degradado"
+    },
+    "migrations": {
+      "upToDate": "Todas as migrations estão atualizadas",
+      "pendingCount": "{{count}} migration(s) pendente(s)",
+      "safeToApply": "Todas as migrations pendentes são de baixo risco",
+      "requiresReview": "Algumas migrations requerem revisão manual antes de aplicar",
+      "clean": "Atualizado",
+      "pending": "pendente(s)",
+      "listTitle": "Migrations Pendentes",
+      "context": "Contexto",
+      "downtime": "Requer interrupção",
+      "irreversible": "Irreversível",
+      "applyTitle": "Aplicar migrations",
+      "applyHint": "Nunca use NEXTRACE_AUTO_MIGRATE=true em Produção. Use um pipeline CI/CD adequado."
+    },
+    "quick": {
+      "preflight": "Verificação de Pré-arranque",
+      "setup": "Assistente de Instalação",
+      "ai": "Registo de Modelos de IA"
+    }
+  },
+  "setup": {
+    "title": "Assistente de Configuração NexTraceOne",
+    "subtitle": "Configure a sua instalação on-premises em poucos passos.",
+    "optional": "Opcional",
+    "back": "Voltar",
+    "next": "Próximo",
+    "skip": "Ignorar",
+    "finish": "Concluir Configuração",
+    "progress": "Passo {{current}} de {{total}}",
+    "welcome": {
+      "stepLabel": "Boas-vindas",
+      "title": "Bem-vindo ao NexTraceOne",
+      "description": "Este assistente irá guiá-lo pela configuração inicial.",
+      "introText": "NexTraceOne é a fonte de verdade para serviços, contratos, mudanças e conhecimento operacional. Complete este assistente para finalizar a sua instalação on-premises.",
+      "feature_database": "PostgreSQL 16+ conectado e migrations aplicadas",
+      "feature_security": "Chave JWT e chave de encriptação AES configuradas",
+      "feature_organization": "Primeira organização e utilizador administrador criados",
+      "feature_ai": "IA local (Ollama) configurada para operações assistidas por IA",
+      "feature_network": "SMTP e CORS configurados para notificações e acesso via browser",
+      "prerequisite": "Pré-requisitos: PostgreSQL 16+ em execução, Node 20+ e .NET 10 instalados."
+    },
+    "database": {
+      "stepLabel": "Base de Dados",
+      "title": "Configuração da Base de Dados",
+      "description": "Configure a ligação PostgreSQL para o NexTraceOne.",
+      "hostLabel": "Host",
+      "hostHint": "Nome do host ou endereço IP do servidor PostgreSQL.",
+      "portLabel": "Porta",
+      "nameLabel": "Nome da Base de Dados",
+      "usernameLabel": "Utilizador",
+      "passwordLabel": "Palavra-passe"
+    },
+    "security": {
+      "stepLabel": "Segurança",
+      "title": "Chaves de Segurança",
+      "description": "Configure a chave JWT e a chave de encriptação de dados.",
+      "jwtLabel": "Chave JWT",
+      "jwtHint": "Mínimo 32 caracteres. Gere com: openssl rand -base64 48",
+      "encKeyLabel": "Chave de Encriptação (NEXTRACE_ENCRYPTION_KEY)",
+      "encKeyHint": "Chave AES de 32 bytes codificada em Base64. Gere com: openssl rand -base64 32",
+      "corsLabel": "URL do Frontend (CORS Origin)",
+      "corsHint": "O URL onde o frontend do NexTraceOne será servido."
+    },
+    "organization": {
+      "stepLabel": "Organização",
+      "title": "Organização e Utilizador Admin",
+      "description": "Crie a primeira organização e conta de administrador da plataforma.",
+      "nameLabel": "Nome da Organização",
+      "adminEmailLabel": "Email do Administrador",
+      "adminPasswordLabel": "Palavra-passe do Administrador"
+    },
+    "ai": {
+      "stepLabel": "IA",
+      "title": "Configuração de IA Local",
+      "description": "Configure o Ollama para operações assistidas por IA e geração de contratos.",
+      "intro": "O NexTraceOne usa o Ollama para IA local e privada. Pode ignorar este passo e configurar a IA mais tarde em Configuração da Plataforma.",
+      "ollamaUrlLabel": "URL Base do Ollama",
+      "ollamaUrlHint": "O URL onde o Ollama está em execução (padrão: http://localhost:11434)",
+      "defaultModelLabel": "Modelo de Chat Padrão"
+    },
+    "network": {
+      "stepLabel": "Rede",
+      "title": "Email e Rede",
+      "description": "Configure o SMTP para notificações.",
+      "smtpHostLabel": "Host SMTP",
+      "smtpHostHint": "Servidor SMTP para notificações por email. Deixe vazio para desativar email.",
+      "smtpPortLabel": "Porta SMTP",
+      "smtpFromLabel": "Endereço de Remetente"
+    },
+    "review": {
+      "stepLabel": "Revisão",
+      "title": "Revisão e Confirmação",
+      "description": "Revise a sua configuração antes de finalizar a instalação.",
+      "intro": "Revise a sua configuração abaixo. Após concluir, aplique os valores ao appsettings.json ou variáveis de ambiente.",
+      "database": "Base de Dados",
+      "organization": "Organização",
+      "adminEmail": "Email Admin",
+      "ai": "IA Local",
+      "smtp": "SMTP",
+      "notConfigured": "Não configurado",
+      "appsettingsNote": "Este assistente recolhe detalhes de configuração para referência. Deve aplicá-los manualmente ao appsettings.json, variáveis de ambiente ou gestor de segredos."
+    },
+    "completed": {
+      "title": "Configuração Concluída",
+      "subtitle": "A sua instância NexTraceOne está configurada. Execute a verificação de pré-arranque para confirmar que todos os sistemas estão operacionais.",
+      "runPreflight": "Executar Verificação de Pré-arranque"
+    }
   }
 }
