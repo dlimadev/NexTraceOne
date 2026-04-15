@@ -9642,12 +9642,22 @@
     },
     "ai": {
       "stepLabel": "IA",
-      "title": "Configuración de IA Local",
-      "description": "Configure Ollama para operaciones asistidas por IA.",
-      "intro": "NexTraceOne usa Ollama para IA local y privada.",
-      "ollamaUrlLabel": "URL Base de Ollama",
+      "title": "Configuración de IA",
+      "description": "Configure cómo NexTraceOne se conecta a Ollama para operaciones asistidas por IA.",
+      "intro": "NexTraceOne usa Ollama para IA local y privada. Elija cómo está desplegado Ollama en su entorno. Puede cambiarlo más tarde en Configuración de la Plataforma.",
+      "deploymentModeLabel": "Modo de Despliegue de Ollama",
+      "modeLocal": "Local (misma máquina)",
+      "modeLocalHint": "Ollama está instalado en este servidor junto a NexTraceOne.",
+      "modeRemote": "Remoto (máquina separada)",
+      "modeRemoteHint": "Ollama se ejecuta en un servidor de IA dedicado en su red.",
+      "modeDisabled": "Desactivado (configurar después)",
+      "modeDisabledHint": "Las funciones de IA no estarán disponibles hasta que se configure Ollama.",
+      "ollamaUrlLabel": "URL de Ollama",
       "ollamaUrlHint": "URL donde Ollama está en ejecución (predeterminado: http://localhost:11434)",
-      "defaultModelLabel": "Modelo de Chat Predeterminado"
+      "remoteUrlLabel": "URL Remota de Ollama",
+      "remoteUrlHint": "URL del servidor Ollama remoto, p.ej. http://ai-server.acme.com:11434",
+      "defaultModelLabel": "Modelo de Chat Predeterminado",
+      "disabledNote": "Las funciones de IA se pueden habilitar en cualquier momento desde Admin de Plataforma → Configuración. No se enviará ningún dato a servicios externos."
     },
     "network": {
       "stepLabel": "Red",

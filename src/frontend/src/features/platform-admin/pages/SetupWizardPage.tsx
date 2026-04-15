@@ -11,6 +11,9 @@ import {
   ArrowRight,
   ArrowLeft,
   AlertTriangle,
+  Wifi,
+  WifiOff,
+  MonitorCheck,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -237,28 +240,93 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
         </div>
       );
 
-    case 'ai':
+    case 'ai': {
+      const aiMode = formData['ai_deployment_mode'] ?? 'local';
       return (
         <div className="space-y-4">
           <div className="bg-accent/5 border border-accent/20 rounded-xl p-3">
             <p className="text-xs text-muted">{t('setup.ai.intro')}</p>
           </div>
-          <FormField label={t('setup.ai.ollamaUrlLabel')} hint={t('setup.ai.ollamaUrlHint')}>
-            <InputField
-              placeholder="http://localhost:11434"
-              value={formData['ollama_url'] ?? 'http://localhost:11434'}
-              onChange={(v) => onFormChange('ollama_url', v)}
-            />
+
+          {/* Deployment mode selector */}
+          <FormField label={t('setup.ai.deploymentModeLabel')}>
+            <div className="grid grid-cols-1 gap-2">
+              {[
+                { id: 'local', icon: <MonitorCheck size={16} />, labelKey: 'setup.ai.modeLocal', hintKey: 'setup.ai.modeLocalHint' },
+                { id: 'remote', icon: <Wifi size={16} />, labelKey: 'setup.ai.modeRemote', hintKey: 'setup.ai.modeRemoteHint' },
+                { id: 'disabled', icon: <WifiOff size={16} />, labelKey: 'setup.ai.modeDisabled', hintKey: 'setup.ai.modeDisabledHint' },
+              ].map((option) => {
+                const selected = aiMode === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => {
+                      onFormChange('ai_deployment_mode', option.id);
+                      if (option.id === 'local') {
+                        onFormChange('ollama_url', 'http://localhost:11434');
+                      } else if (option.id === 'disabled') {
+                        onFormChange('ollama_url', '');
+                      }
+                    }}
+                    className={`flex items-start gap-3 w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${
+                      selected
+                        ? 'border-accent bg-accent/5 text-accent'
+                        : 'border-border bg-surface text-muted hover:border-accent/40'
+                    }`}
+                    aria-pressed={selected}
+                    data-testid={`ai-mode-${option.id}`}
+                  >
+                    <span className={`mt-0.5 shrink-0 ${selected ? 'text-accent' : 'text-muted'}`}>
+                      {option.icon}
+                    </span>
+                    <span className="flex flex-col gap-0.5">
+                      <span className="text-sm font-medium leading-tight">
+                        {t(option.labelKey)}
+                      </span>
+                      <span className="text-xs text-muted leading-tight">
+                        {t(option.hintKey)}
+                      </span>
+                    </span>
+                    {selected && <CheckCircle2 size={14} className="ml-auto mt-0.5 shrink-0 text-accent" />}
+                  </button>
+                );
+              })}
+            </div>
           </FormField>
-          <FormField label={t('setup.ai.defaultModelLabel')}>
-            <InputField
-              placeholder="qwen3.5:9b"
-              value={formData['ollama_model'] ?? 'qwen3.5:9b'}
-              onChange={(v) => onFormChange('ollama_model', v)}
-            />
-          </FormField>
+
+          {/* URL + model fields — shown only for local/remote modes */}
+          {aiMode !== 'disabled' && (
+            <>
+              <FormField
+                label={aiMode === 'remote' ? t('setup.ai.remoteUrlLabel') : t('setup.ai.ollamaUrlLabel')}
+                hint={aiMode === 'remote' ? t('setup.ai.remoteUrlHint') : t('setup.ai.ollamaUrlHint')}
+              >
+                <InputField
+                  placeholder={aiMode === 'remote' ? 'http://ai-server.acme.com:11434' : 'http://localhost:11434'}
+                  value={formData['ollama_url'] ?? (aiMode === 'local' ? 'http://localhost:11434' : '')}
+                  onChange={(v) => onFormChange('ollama_url', v)}
+                />
+              </FormField>
+              <FormField label={t('setup.ai.defaultModelLabel')}>
+                <InputField
+                  placeholder="qwen3.5:9b"
+                  value={formData['ollama_model'] ?? 'qwen3.5:9b'}
+                  onChange={(v) => onFormChange('ollama_model', v)}
+                />
+              </FormField>
+            </>
+          )}
+
+          {aiMode === 'disabled' && (
+            <div className="flex items-start gap-2 bg-warning/10 border border-warning/20 rounded-lg p-3">
+              <AlertTriangle size={14} className="text-warning mt-0.5 shrink-0" />
+              <p className="text-xs text-muted">{t('setup.ai.disabledNote')}</p>
+            </div>
+          )}
         </div>
       );
+    }
 
     case 'network':
       return (
@@ -290,7 +358,11 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
         </div>
       );
 
-    case 'review':
+    case 'review': {
+      const aiMode = formData['ai_deployment_mode'] ?? 'local';
+      const aiValue = aiMode === 'disabled'
+        ? t('setup.ai.modeDisabled')
+        : (formData['ollama_url'] ?? t('setup.review.notConfigured'));
       return (
         <div className="space-y-3">
           <p className="text-sm text-muted">{t('setup.review.intro')}</p>
@@ -298,7 +370,7 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
             { label: t('setup.review.database'), value: formData['db_host'] ? `${formData['db_host']}:${formData['db_port'] ?? '5432'}` : '—' },
             { label: t('setup.review.organization'), value: formData['org_name'] ?? '—' },
             { label: t('setup.review.adminEmail'), value: formData['admin_email'] ?? '—' },
-            { label: t('setup.review.ai'), value: formData['ollama_url'] ?? t('setup.review.notConfigured') },
+            { label: t('setup.review.ai'), value: aiValue },
             { label: t('setup.review.smtp'), value: formData['smtp_host'] ?? t('setup.review.notConfigured') },
           ].map(({ label, value }) => (
             <div key={label} className="flex items-center justify-between py-2 border-b border-border last:border-0">
@@ -312,6 +384,7 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
           </div>
         </div>
       );
+    }
 
     default:
       return null;

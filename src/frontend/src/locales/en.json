@@ -9679,12 +9679,22 @@
     },
     "ai": {
       "stepLabel": "AI",
-      "title": "Local AI Configuration",
-      "description": "Configure Ollama for AI-assisted operations and contract generation.",
-      "intro": "NexTraceOne uses Ollama for local, private AI. You can skip this step and configure AI later via Platform Configuration.",
-      "ollamaUrlLabel": "Ollama Base URL",
-      "ollamaUrlHint": "The URL where Ollama is running (default: http://localhost:11434)",
-      "defaultModelLabel": "Default Chat Model"
+      "title": "AI Configuration",
+      "description": "Configure how NexTraceOne connects to Ollama for AI-assisted operations.",
+      "intro": "NexTraceOne uses Ollama for local, private AI. Choose how Ollama is deployed in your environment. You can change this later via Platform Configuration.",
+      "deploymentModeLabel": "Ollama Deployment Mode",
+      "modeLocal": "Local (same machine)",
+      "modeLocalHint": "Ollama is installed on this server alongside NexTraceOne.",
+      "modeRemote": "Remote (separate machine)",
+      "modeRemoteHint": "Ollama runs on a dedicated AI server in your network.",
+      "modeDisabled": "Disabled (configure later)",
+      "modeDisabledHint": "AI features will be unavailable until Ollama is configured.",
+      "ollamaUrlLabel": "Ollama URL",
+      "ollamaUrlHint": "URL where Ollama is running (default: http://localhost:11434)",
+      "remoteUrlLabel": "Remote Ollama URL",
+      "remoteUrlHint": "URL of the remote Ollama server, e.g. http://ai-server.acme.com:11434",
+      "defaultModelLabel": "Default Chat Model",
+      "disabledNote": "AI features can be enabled at any time from Platform Admin → Configuration. No data will be sent to external services."
     },
     "network": {
       "stepLabel": "Network",
