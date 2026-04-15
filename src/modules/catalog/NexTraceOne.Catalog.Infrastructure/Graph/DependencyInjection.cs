@@ -77,6 +77,10 @@ public static class DependencyInjection
         services.AddScoped<IDxScoreRepository, DxScoreRepository>();
         services.AddScoped<IProductivitySnapshotRepository, ProductivitySnapshotRepository>();
 
+        // ── Interfaces de serviço e vínculos de contrato ─────────────────
+        services.AddScoped<IServiceInterfaceRepository, ServiceInterfaceRepository>();
+        services.AddScoped<IContractBindingRepository, ContractBindingRepository>();
+
         return services;
     }
 }

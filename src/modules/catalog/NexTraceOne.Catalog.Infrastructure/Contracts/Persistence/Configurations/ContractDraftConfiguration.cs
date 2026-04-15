@@ -58,6 +58,7 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
         builder.Property(x => x.AiGenerationPrompt).HasMaxLength(5000);
         builder.Property(x => x.LastEditedAt).HasColumnType("timestamp with time zone");
         builder.Property(x => x.LastEditedBy).HasMaxLength(200);
+        builder.Property(x => x.ServiceInterfaceId);
 
         // Auditoria
         builder.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
@@ -71,6 +72,7 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
         builder.HasIndex(x => x.Author);
         builder.HasIndex(x => x.Protocol);
         builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");
+        builder.HasIndex(x => x.ServiceInterfaceId);
 
         // Concorrência otimista via PostgreSQL xmin
         builder.Property(x => x.RowVersion)

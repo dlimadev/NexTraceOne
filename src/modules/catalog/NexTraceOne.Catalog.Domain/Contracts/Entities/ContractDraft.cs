@@ -65,6 +65,12 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
     public string? LastEditedBy { get; private set; }
 
     /// <summary>
+    /// Identificador da interface de serviço vinculada a este draft (opcional).
+    /// Quando preenchido, este draft está associado a uma interface específica do serviço.
+    /// </summary>
+    public Guid? ServiceInterfaceId { get; private set; }
+
+    /// <summary>
     /// Token de concorrência otimista (PostgreSQL xmin).
     /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
     /// </summary>
@@ -290,6 +296,15 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
 
         _examples.Remove(example);
         return MediatR.Unit.Value;
+    }
+
+    /// <summary>
+    /// Vincula este draft a uma interface de serviço específica.
+    /// Permite que o contrato seja contextualizado no âmbito de uma interface concreta.
+    /// </summary>
+    public void SetServiceInterface(Guid serviceInterfaceId)
+    {
+        ServiceInterfaceId = serviceInterfaceId;
     }
 }
 

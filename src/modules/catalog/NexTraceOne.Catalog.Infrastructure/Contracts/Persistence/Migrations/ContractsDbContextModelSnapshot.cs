@@ -925,6 +925,9 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<Guid?>("ServiceInterfaceId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ProposedVersion")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -981,6 +984,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.HasIndex("Protocol");
 
                     b.HasIndex("ServiceId");
+
+                    b.HasIndex("ServiceInterfaceId");
 
                     b.HasIndex("Status");
 
