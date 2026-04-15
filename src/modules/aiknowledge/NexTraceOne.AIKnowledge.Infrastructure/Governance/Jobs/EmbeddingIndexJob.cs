@@ -98,11 +98,31 @@ internal sealed class EmbeddingIndexJob(
                     continue;
                 }
 
-                source.SetEmbedding(result.Embeddings[0]);
+                var embedding = result.Embeddings[0];
+
+                // Persiste embedding como JSON (fallback para cosine em memória)
+                source.SetEmbedding(embedding);
+
+                // Persiste o vetor real na coluna pgvector (E-A01)
+                // Falha silenciosa se pgvector não estiver instalado
+                try
+                {
+                    await sourceRepository.PersistVectorAsync(source.Id, embedding, cancellationToken);
+                    logger.LogDebug(
+                        "EmbeddingIndexJob: persisted pgvector for source {SourceId} ({Dims} dims).",
+                        source.Id.Value, embedding.Length);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex,
+                        "EmbeddingIndexJob: pgvector persist failed for source {SourceId} — " +
+                        "EmbeddingJson fallback will be used.",
+                        source.Id.Value);
+                }
 
                 logger.LogDebug(
                     "EmbeddingIndexJob: indexed source {SourceId} with {Dims}-dim embedding.",
-                    source.Id.Value, result.Embeddings[0].Length);
+                    source.Id.Value, embedding.Length);
             }
             catch (Exception ex)
             {

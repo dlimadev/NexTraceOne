@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 
@@ -83,7 +84,7 @@ public sealed class DocumentRetrievalService : IDocumentRetrievalService
                 request.Query);
         }
 
-        // ── 2. AI Knowledge Sources (registered source endpoints) ──
+        // ── 2. AI Knowledge Sources — pgvector ANN search with in-memory fallback ──
         try
         {
             var sources = await _sourceRepo.ListAsync(
@@ -96,61 +97,43 @@ public sealed class DocumentRetrievalService : IDocumentRetrievalService
                     s.SourceType.ToString().Equals(request.SourceFilter, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            // Usar similaridade coseno quando embeddings estão disponíveis
-            var hasEmbeddings = sourcesFiltered.Any(s => s.EmbeddingJson is not null);
+            var queryEmbedding = await TryGetQueryEmbeddingAsync(request.Query, ct);
 
-            if (hasEmbeddings)
+            if (queryEmbedding.Length > 0)
             {
-                float[] queryEmbedding;
-                try
-                {
-                    queryEmbedding = await _embeddingCache.GetOrComputeAsync(request.Query, ct);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex,
-                        "Failed to compute query embedding — falling back to string search");
-                    queryEmbedding = [];
-                }
+                // ── Tentativa 1: pgvector ANN via base de dados (E-A01) ──
+                var pgvectorHits = await TryPgVectorSearchAsync(
+                    queryEmbedding, request.MaxResults, sourcesFiltered, ct);
 
-                if (queryEmbedding.Length > 0)
+                if (pgvectorHits.Count > 0)
                 {
-                    var sourceHits = sourcesFiltered
-                        .Select(s =>
-                        {
-                            var emb = s.GetEmbedding();
-                            var score = emb is not null && emb.Length == queryEmbedding.Length
-                                ? CosineSimilarity(queryEmbedding, emb)
-                                : 0.0;
-                            return (Source: s, Score: score);
-                        })
-                        .Where(x => x.Score > 0.1)
-                        .OrderByDescending(x => x.Score)
-                        .Take(request.MaxResults)
-                        .Select(x => new DocumentSearchHit(
-                            SourceId: x.Source.SourceType.ToString(),
-                            DocumentId: x.Source.Id.Value.ToString(),
-                            Title: x.Source.Name,
-                            Snippet: Truncate(x.Source.Description, MaxSnippetLength),
-                            RelevanceScore: x.Score,
-                            Classification: x.Source.SourceType.ToString()))
-                        .ToList();
-
-                    hits.AddRange(sourceHits);
-
+                    hits.AddRange(pgvectorHits);
                     _logger.LogDebug(
-                        "AI knowledge source grounding (semantic): {Count} sources matched query='{Query}'",
-                        sourceHits.Count, request.Query);
+                        "AI knowledge source grounding (pgvector ANN): {Count} matches for query='{Query}'",
+                        pgvectorHits.Count, request.Query);
                 }
                 else
                 {
-                    // Fallback a string search quando embedding falhou
-                    AddStringMatchHits(hits, sourcesFiltered, request);
+                    // ── Tentativa 2: cosine em memória (fallback) ──
+                    var cosineHits = ComputeInMemoryCosineHits(
+                        queryEmbedding, sourcesFiltered, request.MaxResults);
+                    hits.AddRange(cosineHits);
+
+                    if (cosineHits.Count > 0)
+                    {
+                        _logger.LogDebug(
+                            "AI knowledge source grounding (in-memory cosine): {Count} matches for query='{Query}'",
+                            cosineHits.Count, request.Query);
+                    }
+                    else
+                    {
+                        AddStringMatchHits(hits, sourcesFiltered, request);
+                    }
                 }
             }
             else
             {
-                // Fallback a string search quando fontes não têm embeddings
+                // Sem embedding disponível — fallback a string search
                 AddStringMatchHits(hits, sourcesFiltered, request);
             }
         }
@@ -168,9 +151,96 @@ public sealed class DocumentRetrievalService : IDocumentRetrievalService
         return new DocumentSearchResult(Success: true, Hits: hits.Take(request.MaxResults).ToList());
     }
 
+    private async Task<float[]> TryGetQueryEmbeddingAsync(string query, CancellationToken ct)
+    {
+        try
+        {
+            return await _embeddingCache.GetOrComputeAsync(query, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "Failed to compute query embedding for '{Query}' — falling back to string search",
+                query);
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// Tenta busca semântica ANN via pgvector. Retorna lista vazia se pgvector
+    /// não estiver disponível ou se não houver vectores indexados. (E-A01)
+    /// </summary>
+    private async Task<List<DocumentSearchHit>> TryPgVectorSearchAsync(
+        float[] queryEmbedding,
+        int maxResults,
+        List<AIKnowledgeSource> allSources,
+        CancellationToken ct)
+    {
+        try
+        {
+            var pgResults = await _sourceRepo.SearchByVectorAsync(queryEmbedding, maxResults, ct);
+
+            if (pgResults.Count == 0)
+                return [];
+
+            // Mapear IDs para entidades para obter título e snippet
+            var sourceById = allSources.ToDictionary(s => s.Id.Value);
+            var hits = new List<DocumentSearchHit>(pgResults.Count);
+
+            foreach (var (id, score) in pgResults)
+            {
+                if (!sourceById.TryGetValue(id.Value, out var source))
+                    continue;
+                if (score < 0.1)
+                    continue;
+
+                hits.Add(new DocumentSearchHit(
+                    SourceId: source.SourceType.ToString(),
+                    DocumentId: source.Id.Value.ToString(),
+                    Title: source.Name,
+                    Snippet: Truncate(source.Description, MaxSnippetLength),
+                    RelevanceScore: score,
+                    Classification: source.SourceType.ToString()));
+            }
+
+            return hits;
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    private List<DocumentSearchHit> ComputeInMemoryCosineHits(
+        float[] queryEmbedding,
+        List<AIKnowledgeSource> sources,
+        int maxResults)
+    {
+        return sources
+            .Select(s =>
+            {
+                var emb = s.GetEmbedding();
+                var score = emb is not null && emb.Length == queryEmbedding.Length
+                    ? CosineSimilarity(queryEmbedding, emb)
+                    : 0.0;
+                return (Source: s, Score: score);
+            })
+            .Where(x => x.Score > 0.1)
+            .OrderByDescending(x => x.Score)
+            .Take(maxResults)
+            .Select(x => new DocumentSearchHit(
+                SourceId: x.Source.SourceType.ToString(),
+                DocumentId: x.Source.Id.Value.ToString(),
+                Title: x.Source.Name,
+                Snippet: Truncate(x.Source.Description, MaxSnippetLength),
+                RelevanceScore: x.Score,
+                Classification: x.Source.SourceType.ToString()))
+            .ToList();
+    }
+
     private static void AddStringMatchHits(
         List<DocumentSearchHit> hits,
-        List<AIKnowledge.Domain.Governance.Entities.AIKnowledgeSource> sources,
+        List<AIKnowledgeSource> sources,
         DocumentSearchRequest request)
     {
         var query = request.Query;

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Bot,
@@ -12,9 +13,11 @@ import {
   Lightbulb,
   ExternalLink,
   Send,
+  BookOpen,
+  Cpu,
 } from 'lucide-react';
 import { Badge } from '../../../components/Badge';
-import type { ChatMessage, SuggestedAction } from './AssistantPanelTypes';
+import type { ChatMessage, SuggestedAction, ExplainabilityHint } from './AssistantPanelTypes';
 
 interface AssistantMessageBubbleProps {
   message: ChatMessage;
@@ -22,10 +25,39 @@ interface AssistantMessageBubbleProps {
   onToggleMeta: (id: string) => void;
   formatTime: (ts: string) => string;
   onSuggestedAction: (action: SuggestedAction) => void;
+  onExplainResponse?: (msgId: string) => void;
 }
 
-export function AssistantMessageBubble({ message: msg, isExpanded, onToggleMeta, formatTime, onSuggestedAction }: AssistantMessageBubbleProps) {
+/** Formata o score de relevância como percentagem. */
+function formatRelevance(score: number): string {
+  return `${Math.round(score * 100)}%`;
+}
+
+/** Badge de cor para relevância. */
+function relevanceBadgeVariant(score: number): 'success' | 'warning' | 'default' {
+  if (score >= 0.75) return 'success';
+  if (score >= 0.5) return 'warning';
+  return 'default';
+}
+
+export function AssistantMessageBubble({
+  message: msg,
+  isExpanded,
+  onToggleMeta,
+  formatTime,
+  onSuggestedAction,
+  onExplainResponse,
+}: AssistantMessageBubbleProps) {
   const { t } = useTranslation();
+  const [sourcesExpanded, setSourcesExpanded] = useState(false);
+
+  const hasExplainabilityHints =
+    msg.role === 'assistant' &&
+    msg.explainabilityHints &&
+    msg.explainabilityHints.length > 0;
+
+  const hasGroundingSources =
+    msg.groundingSources && msg.groundingSources.length > 0;
 
   return (
     <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -99,16 +131,88 @@ export function AssistantMessageBubble({ message: msg, isExpanded, onToggleMeta,
         {/* Content */}
         <p className="text-xs text-body whitespace-pre-wrap leading-relaxed">{msg.content}</p>
 
-        {/* Grounding Sources */}
-        {msg.groundingSources && msg.groundingSources.length > 0 && (
+        {/* ── Grounding Sources (compact badges) ──────────────────────── */}
+        {hasGroundingSources && !hasExplainabilityHints && (
           <div className="mt-2 flex items-center gap-1 flex-wrap">
             <Database size={10} className="text-muted shrink-0" />
             <span className="text-[10px] text-muted">{t('aiHub.groundingSources')}:</span>
-            {msg.groundingSources.map(src => (
+            {msg.groundingSources!.map(src => (
               <Badge key={src} variant="default">
                 {src}
               </Badge>
             ))}
+          </div>
+        )}
+
+        {/* ── Grounding Sources — View Sources Panel (E-M05) ─────────── */}
+        {hasExplainabilityHints && (
+          <div className="mt-2">
+            <button
+              onClick={() => setSourcesExpanded(prev => !prev)}
+              className="flex items-center gap-1.5 text-[10px] text-muted hover:text-body transition-colors"
+              data-testid={`view-sources-toggle-${msg.id}`}
+              aria-expanded={sourcesExpanded}
+              aria-label={sourcesExpanded ? t('aiHub.hideSources') : t('aiHub.viewSources')}
+            >
+              <BookOpen size={10} />
+              {sourcesExpanded ? t('aiHub.hideSources') : t('aiHub.viewSources')}
+              <span className="bg-elevated border border-edge rounded px-1 text-[9px]">
+                {msg.explainabilityHints!.length}
+              </span>
+              {sourcesExpanded ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+            </button>
+
+            {sourcesExpanded && (
+              <div
+                className="mt-1.5 space-y-1.5 p-2 rounded bg-canvas border border-edge"
+                data-testid={`sources-panel-${msg.id}`}
+              >
+                <p className="text-[10px] font-medium text-muted mb-1">
+                  {t('aiHub.groundingSourcesPanel')}
+                </p>
+                {msg.explainabilityHints!.map((hint: ExplainabilityHint) => (
+                  <div
+                    key={hint.sourceId}
+                    className="flex items-start gap-2 text-[10px] py-1 border-b border-edge last:border-0"
+                  >
+                    <Cpu size={10} className="text-muted mt-0.5 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-body font-medium truncate">{hint.title}</span>
+                        <Badge variant={relevanceBadgeVariant(hint.relevanceScore)}>
+                          {t('aiHub.relevanceScore')}: {formatRelevance(hint.relevanceScore)}
+                        </Badge>
+                      </div>
+                      <span className="text-faded">{hint.sourceType}</span>
+                      {hint.snippet && (
+                        <p className="text-muted mt-0.5 line-clamp-2">{hint.snippet}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {msg.routingRationale && (
+                  <div className="pt-1 border-t border-edge">
+                    <span className="text-[10px] text-muted">{t('aiHub.routingRationaleLabel')}:</span>
+                    <p className="text-[10px] text-body mt-0.5">{msg.routingRationale}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Explain this response (E-M05) ────────────────────────────── */}
+        {msg.role === 'assistant' && onExplainResponse && msg.id && (
+          <div className="mt-1.5">
+            <button
+              onClick={() => onExplainResponse(msg.id)}
+              className="flex items-center gap-1 text-[10px] text-muted hover:text-accent transition-colors"
+              data-testid={`explain-response-${msg.id}`}
+              aria-label={t('aiHub.explainResponse')}
+            >
+              <Lightbulb size={10} />
+              {t('aiHub.explainResponse')}
+            </button>
           </div>
         )}
 

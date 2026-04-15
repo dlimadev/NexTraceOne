@@ -23,6 +23,7 @@ using GenerateAdrFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Fea
 using RecommendTemplateFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.RecommendTemplateForService.RecommendTemplateForService;
 using ReviewContractDraftFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.ReviewContractDraft.ReviewContractDraft;
 using GetAgentMarketplaceFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.GetAgentMarketplace.GetAgentMarketplace;
+using AnalyzeContractBreakingChangesFeature = NexTraceOne.AIKnowledge.Application.Orchestration.Features.AnalyzeContractBreakingChanges.AnalyzeContractBreakingChanges;
 
 namespace NexTraceOne.AIKnowledge.API.Orchestration.Endpoints.Endpoints;
 
@@ -95,6 +96,16 @@ public sealed class AiOrchestrationEndpointModule
 
         group.MapPost("/review", async (
             ReviewContractDraftFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:runtime:write");
+
+        group.MapPost("/analyze-diff", async (
+            AnalyzeContractBreakingChangesFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>

@@ -168,6 +168,16 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
           caveats: baseCaveats,
           contextSummaryText: response.contextSummary,
           contextStrength: response.contextStrength,
+          // E-M05: mapear document search hits para explainability hints
+          explainabilityHints: Array.isArray(response.documentSearchHits)
+            ? response.documentSearchHits.map((h: {documentId?: string; sourceId?: string; title?: string; sourceType?: string; classification?: string; relevanceScore?: number; snippet?: string}) => ({
+                sourceId: h.documentId ?? h.sourceId ?? '',
+                title: h.title ?? '',
+                sourceType: h.classification ?? h.sourceType ?? '',
+                relevanceScore: h.relevanceScore ?? 0,
+                snippet: h.snippet,
+              }))
+            : undefined,
           timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, assistantMsg]);
@@ -373,6 +383,11 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
             onToggleMeta={toggleMeta}
             formatTime={formatTime}
             onSuggestedAction={handleSuggestedAction}
+            onExplainResponse={(msgId) => {
+              const explainPrompt = t('aiHub.explainPrompt');
+              handleSendMessage(explainPrompt);
+              void msgId;
+            }}
           />
         ))}
 
