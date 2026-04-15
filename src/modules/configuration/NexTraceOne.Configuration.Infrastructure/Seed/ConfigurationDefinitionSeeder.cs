@@ -4273,6 +4273,51 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "toggle",
             sortOrder: 7080),
 
+        // ── Service Interface ──────────────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "catalog.service_interface.require_contract_for_types",
+            displayName: "config.catalog.service_interface.require_contract_for_types.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.catalog.service_interface.require_contract_for_types.description",
+            defaultValue: """["RestApi","Soap","GraphQL","Webhook"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 7085),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service_interface.allowed_types",
+            displayName: "config.catalog.service_interface.allowed_types.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.service_interface.allowed_types.description",
+            defaultValue: """["RestApi","Soap","GraphQL","Kafka","AsyncApi","Grpc","Webhook","BackgroundJob","ScheduledJob","WebSocket","ServerSentEvents","Database","InternalEvent"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 7086),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service_interface.deprecation_notice_days",
+            displayName: "config.catalog.service_interface.deprecation_notice_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.service_interface.deprecation_notice_days.description",
+            defaultValue: "30",
+            uiEditorType: "text",
+            sortOrder: 7087),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service_interface.slo_enforcement_enabled",
+            displayName: "config.catalog.service_interface.slo_enforcement_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.catalog.service_interface.slo_enforcement_enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 7088),
+
         // ── Contracts ──────────────────────────────────────────────────────────────
         ConfigurationDefinition.Create(
             key: "catalog.contract.creation.approval_required",

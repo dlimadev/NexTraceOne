@@ -33,7 +33,7 @@ public static class ListContractBindingsByInterface
                     b.ActivatedAt))
                 .ToList();
 
-            return (IReadOnlyList<Response>)result;
+            return Result<IReadOnlyList<Response>>.Success(result);
         }
     }
 

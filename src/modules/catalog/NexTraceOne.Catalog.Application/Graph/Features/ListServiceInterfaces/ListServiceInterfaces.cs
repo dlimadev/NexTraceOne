@@ -34,7 +34,7 @@ public static class ListServiceInterfaces
                     i.IsDeprecated))
                 .ToList();
 
-            return (IReadOnlyList<Response>)result;
+            return Result<IReadOnlyList<Response>>.Success(result);
         }
     }
 
