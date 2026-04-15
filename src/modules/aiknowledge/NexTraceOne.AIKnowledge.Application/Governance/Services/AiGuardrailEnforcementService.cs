@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 
@@ -85,8 +86,8 @@ public sealed class AiGuardrailEnforcementService(
         }
 
         // 3. Active guardrails from repository (input + both)
-        var activeGuardrails = await guardrailRepository.GetByGuardTypeAsync("input", cancellationToken);
-        var bothGuardrails = await guardrailRepository.GetByGuardTypeAsync("both", cancellationToken);
+        var activeGuardrails = await guardrailRepository.GetByGuardTypeAsync(GuardrailType.Input.ToString(), cancellationToken);
+        var bothGuardrails = await guardrailRepository.GetByGuardTypeAsync(GuardrailType.Both.ToString(), cancellationToken);
         var inputGuardrails = activeGuardrails.Concat(bothGuardrails).Where(g => g.IsActive).ToList();
 
         foreach (var guardrail in inputGuardrails)
@@ -98,13 +99,12 @@ public sealed class AiGuardrailEnforcementService(
                 "Guardrail '{GuardrailName}' triggered for tenant {TenantId}: matched '{MatchedText}'",
                 guardrail.Name, tenantId, matchedText);
 
-            if (string.Equals(guardrail.Action, "block", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(guardrail.Action, "warn", StringComparison.OrdinalIgnoreCase))
+            if (guardrail.Action is GuardrailAction.Block or GuardrailAction.Warn)
             {
                 return GuardrailEvaluationResult.Blocked(
                     reason: $"Guardrail '{guardrail.DisplayName}' triggered",
                     pattern: guardrail.Name,
-                    severity: guardrail.Severity,
+                    severity: guardrail.Severity.ToString(),
                     userMessage: guardrail.UserMessage ?? "Your request was blocked by content policy.");
             }
         }
@@ -138,8 +138,8 @@ public sealed class AiGuardrailEnforcementService(
         }
 
         // 2. Active guardrails from repository (output + both)
-        var outputGuardrails = await guardrailRepository.GetByGuardTypeAsync("output", cancellationToken);
-        var bothGuardrails = await guardrailRepository.GetByGuardTypeAsync("both", cancellationToken);
+        var outputGuardrails = await guardrailRepository.GetByGuardTypeAsync(GuardrailType.Output.ToString(), cancellationToken);
+        var bothGuardrails = await guardrailRepository.GetByGuardTypeAsync(GuardrailType.Both.ToString(), cancellationToken);
         var evaluableGuardrails = outputGuardrails.Concat(bothGuardrails).Where(g => g.IsActive).ToList();
 
         foreach (var guardrail in evaluableGuardrails)
@@ -151,12 +151,12 @@ public sealed class AiGuardrailEnforcementService(
                 "Output guardrail '{GuardrailName}' triggered for tenant {TenantId}",
                 guardrail.Name, tenantId);
 
-            if (string.Equals(guardrail.Action, "block", StringComparison.OrdinalIgnoreCase))
+            if (guardrail.Action is GuardrailAction.Block)
             {
                 return GuardrailEvaluationResult.Blocked(
                     reason: $"Output guardrail '{guardrail.DisplayName}' triggered",
                     pattern: guardrail.Name,
-                    severity: guardrail.Severity,
+                    severity: guardrail.Severity.ToString(),
                     userMessage: guardrail.UserMessage ?? "The response was blocked by output policy.");
             }
         }
@@ -165,7 +165,7 @@ public sealed class AiGuardrailEnforcementService(
     }
 
     private static bool TryMatchGuardrail(
-        string patternType,
+        GuardrailPatternType patternType,
         string pattern,
         string text,
         out string? matchedText)
@@ -177,7 +177,7 @@ public sealed class AiGuardrailEnforcementService(
 
         try
         {
-            if (string.Equals(patternType, "regex", StringComparison.OrdinalIgnoreCase))
+            if (patternType == GuardrailPatternType.Regex)
             {
                 var match = Regex.Match(text, pattern,
                     RegexOptions.IgnoreCase | RegexOptions.CultureInvariant,
@@ -192,7 +192,7 @@ public sealed class AiGuardrailEnforcementService(
                 return false;
             }
 
-            if (string.Equals(patternType, "keyword", StringComparison.OrdinalIgnoreCase))
+            if (patternType == GuardrailPatternType.Keyword)
             {
                 var keywords = pattern.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 foreach (var kw in keywords)

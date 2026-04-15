@@ -4,6 +4,7 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.GetGuardrail;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ListGuardrails;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateGuardrail;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Tests.Governance.Application.Features;
 
@@ -237,8 +238,8 @@ public sealed class Phase6GuardrailCrudTests
     private static AiGuardrail CreateTestGuardrail(string name) =>
         AiGuardrail.Create(
             name: name, displayName: $"Test {name}", description: "Test guardrail",
-            category: "security", guardType: "input", pattern: @"\btest\b",
-            patternType: "regex", severity: "medium", action: "warn",
+            category: GuardrailCategory.Security, guardType: GuardrailType.Input, pattern: @"\btest\b",
+            patternType: GuardrailPatternType.Regex, severity: GuardrailSeverity.Medium, action: GuardrailAction.Warn,
             userMessage: null, isActive: true, isOfficial: false,
             agentId: null, modelId: null, priority: 1);
 }

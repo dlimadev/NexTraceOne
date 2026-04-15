@@ -6,7 +6,7 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 
 /// <summary>
 /// Resultado da resolução de roteamento de modelo para uma requisição de assistente.
-/// Contém modelo, provider, caminho e justificativa.
+/// Contém modelo, provider, caminho, justificativa e informação de fallback automático (E-A02).
 /// </summary>
 public sealed record RoutingResolutionResult(
     string SelectedModel,
@@ -16,7 +16,9 @@ public sealed record RoutingResolutionResult(
     string RoutingRationale,
     string CostClass,
     string EscalationReason,
-    AIRoutingStrategy? AppliedStrategy);
+    AIRoutingStrategy? AppliedStrategy,
+    bool UsedFallbackProvider = false,
+    string? FallbackReason = null);
 
 /// <summary>
 /// Serviço responsável por resolver o modelo e provider a usar para uma query,

@@ -77,7 +77,23 @@ export interface ChatMessage {
   suggestedSteps?: string[];
   caveats?: string[];
   contextSummaryText?: string;
+  /** Hints de explicabilidade para o painel "View Sources" (E-M05). */
+  explainabilityHints?: ExplainabilityHint[];
   timestamp: string;
+}
+
+/** Detalhe de uma fonte individual para o painel de explicabilidade (E-M05). */
+export interface ExplainabilityHint {
+  /** Identificador ou nome da fonte. */
+  sourceId: string;
+  /** Título ou nome amigável. */
+  title: string;
+  /** Tipo de fonte (ex: 'ServiceCatalog', 'KnowledgeHub', 'ContractRegistry'). */
+  sourceType: string;
+  /** Score de relevância [0-1]. */
+  relevanceScore: number;
+  /** Trecho ou resumo relevante. */
+  snippet?: string;
 }
 
 export interface SuggestedAction {

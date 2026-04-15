@@ -22,6 +22,14 @@ internal sealed class AIRoutingStrategyConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.PreferredPath).HasMaxLength(100).HasConversion<string>().IsRequired();
         builder.Property(x => x.RegisteredAt).HasColumnType("timestamp with time zone").IsRequired();
 
+        builder.Property(x => x.AutoAdjustedAt)
+            .HasColumnType("timestamp with time zone")
+            .IsRequired(false);
+
+        builder.Property(x => x.AutoAdjustmentReason)
+            .HasColumnType("text")
+            .IsRequired(false);
+
         builder.HasIndex(x => x.Name);
         builder.HasIndex(x => x.IsActive);
         builder.HasIndex(x => x.Priority);

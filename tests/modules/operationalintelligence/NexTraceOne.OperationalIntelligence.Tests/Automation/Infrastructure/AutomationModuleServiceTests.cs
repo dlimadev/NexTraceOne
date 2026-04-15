@@ -244,6 +244,7 @@ public sealed class AutomationModuleServiceTests
         public string Id => "automation-tests-user";
         public string Name => "Automation Tests";
         public string Email => "automation.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

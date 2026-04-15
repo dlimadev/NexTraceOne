@@ -14,4 +14,23 @@ public interface IAiKnowledgeSourceRepository
         KnowledgeSourceType? sourceType,
         bool? isActive,
         CancellationToken ct);
+
+    /// <summary>
+    /// Persiste o vector de embedding na coluna pgvector da base de dados.
+    /// Chamado pelo EmbeddingIndexJob após indexação bem-sucedida. (E-A01)
+    /// </summary>
+    Task PersistVectorAsync(
+        AIKnowledgeSourceId sourceId,
+        float[] embedding,
+        CancellationToken ct);
+
+    /// <summary>
+    /// Executa busca semântica ANN via pgvector (operador coseno &lt;=&gt;).
+    /// Retorna IDs das fontes mais próximas do query embedding, ordenadas por
+    /// distância crescente (mais similar primeiro). (E-A01)
+    /// </summary>
+    Task<IReadOnlyList<(AIKnowledgeSourceId Id, double Score)>> SearchByVectorAsync(
+        float[] queryEmbedding,
+        int maxResults,
+        CancellationToken ct);
 }

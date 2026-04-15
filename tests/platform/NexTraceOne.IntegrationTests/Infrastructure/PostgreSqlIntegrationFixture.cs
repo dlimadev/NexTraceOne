@@ -395,6 +395,7 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
         public string Id { get; } = "integration-user";
         public string Name { get; } = "Integration User";
         public string Email { get; } = "integration.user@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated { get; } = true;
 
         public bool HasPermission(string permission) => true;

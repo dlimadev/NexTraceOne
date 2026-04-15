@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Tests.Governance.Application.Services;
 
@@ -106,10 +107,10 @@ public sealed class AiGuardrailEnforcementServiceTests
     public async Task EvaluateInput_ShouldBlock_WhenRepositoryKeywordGuardrailMatches()
     {
         var repo = Substitute.For<IAiGuardrailRepository>();
-        var guardrail = CreateTestGuardrail("block-profanity", "keyword", "badword1,badword2", "block", "input");
-        repo.GetByGuardTypeAsync("input", Arg.Any<CancellationToken>())
+        var guardrail = CreateTestGuardrail("block-profanity", GuardrailPatternType.Keyword, "badword1,badword2", GuardrailAction.Block, GuardrailType.Input);
+        repo.GetByGuardTypeAsync(GuardrailType.Input.ToString(), Arg.Any<CancellationToken>())
             .Returns(new List<AiGuardrail> { guardrail } as IReadOnlyList<AiGuardrail>);
-        repo.GetByGuardTypeAsync("both", Arg.Any<CancellationToken>())
+        repo.GetByGuardTypeAsync(GuardrailType.Both.ToString(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<AiGuardrail>() as IReadOnlyList<AiGuardrail>);
 
         var service = CreateService(repo);
@@ -125,10 +126,10 @@ public sealed class AiGuardrailEnforcementServiceTests
     public async Task EvaluateInput_ShouldNotBlock_WhenGuardrailActionIsLog()
     {
         var repo = Substitute.For<IAiGuardrailRepository>();
-        var guardrail = CreateTestGuardrail("log-only", "keyword", "sensitive", "log", "input");
-        repo.GetByGuardTypeAsync("input", Arg.Any<CancellationToken>())
+        var guardrail = CreateTestGuardrail("log-only", GuardrailPatternType.Keyword, "sensitive", GuardrailAction.Log, GuardrailType.Input);
+        repo.GetByGuardTypeAsync(GuardrailType.Input.ToString(), Arg.Any<CancellationToken>())
             .Returns(new List<AiGuardrail> { guardrail } as IReadOnlyList<AiGuardrail>);
-        repo.GetByGuardTypeAsync("both", Arg.Any<CancellationToken>())
+        repo.GetByGuardTypeAsync(GuardrailType.Both.ToString(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<AiGuardrail>() as IReadOnlyList<AiGuardrail>);
 
         var service = CreateService(repo);
@@ -198,10 +199,10 @@ public sealed class AiGuardrailEnforcementServiceTests
     public async Task EvaluateOutput_ShouldBlock_WhenRepositoryRegexGuardrailMatches()
     {
         var repo = Substitute.For<IAiGuardrailRepository>();
-        var guardrail = CreateTestGuardrail("ssn-detect", "regex", @"\d{3}-\d{2}-\d{4}", "block", "output");
-        repo.GetByGuardTypeAsync("output", Arg.Any<CancellationToken>())
+        var guardrail = CreateTestGuardrail("ssn-detect", GuardrailPatternType.Regex, @"\d{3}-\d{2}-\d{4}", GuardrailAction.Block, GuardrailType.Output);
+        repo.GetByGuardTypeAsync(GuardrailType.Output.ToString(), Arg.Any<CancellationToken>())
             .Returns(new List<AiGuardrail> { guardrail } as IReadOnlyList<AiGuardrail>);
-        repo.GetByGuardTypeAsync("both", Arg.Any<CancellationToken>())
+        repo.GetByGuardTypeAsync(GuardrailType.Both.ToString(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<AiGuardrail>() as IReadOnlyList<AiGuardrail>);
 
         var service = CreateService(repo);
@@ -217,10 +218,10 @@ public sealed class AiGuardrailEnforcementServiceTests
 
     private static AiGuardrail CreateTestGuardrail(
         string name,
-        string patternType,
+        GuardrailPatternType patternType,
         string pattern,
-        string action,
-        string guardType)
+        GuardrailAction action,
+        GuardrailType guardType)
     {
         // Use reflection to create AiGuardrail since it has a private constructor
         var guardrail = (AiGuardrail)System.Runtime.CompilerServices.RuntimeHelpers
@@ -230,12 +231,12 @@ public sealed class AiGuardrailEnforcementServiceTests
         SetPrivateProperty(guardrail, type, "Name", name);
         SetPrivateProperty(guardrail, type, "DisplayName", name);
         SetPrivateProperty(guardrail, type, "Description", "Test guardrail");
-        SetPrivateProperty(guardrail, type, "Category", "test");
+        SetPrivateProperty(guardrail, type, "Category", GuardrailCategory.Security);
         SetPrivateProperty(guardrail, type, "PatternType", patternType);
         SetPrivateProperty(guardrail, type, "Pattern", pattern);
         SetPrivateProperty(guardrail, type, "Action", action);
         SetPrivateProperty(guardrail, type, "GuardType", guardType);
-        SetPrivateProperty(guardrail, type, "Severity", "high");
+        SetPrivateProperty(guardrail, type, "Severity", GuardrailSeverity.High);
         SetPrivateProperty(guardrail, type, "IsActive", true);
         SetPrivateProperty(guardrail, type, "IsOfficial", false);
 

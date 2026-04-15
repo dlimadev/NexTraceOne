@@ -140,6 +140,7 @@ public sealed class PromotionModuleServiceTests
         public string Id => "prm-module-tests-user";
         public string Name => "Promotion Tests";
         public string Email => "prm.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

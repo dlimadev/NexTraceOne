@@ -1,4 +1,5 @@
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Tests.Governance.Domain.Entities;
 
@@ -13,12 +14,12 @@ public sealed class AiGuardrailTests
             name: "pii-detection",
             displayName: "PII Detection",
             description: "Detects PII in content",
-            category: "privacy",
-            guardType: "both",
+            category: GuardrailCategory.Privacy,
+            guardType: GuardrailType.Both,
             pattern: @"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
-            patternType: "regex",
-            severity: "high",
-            action: "warn",
+            patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High,
+            action: GuardrailAction.Warn,
             userMessage: "PII detected",
             isActive: true,
             isOfficial: true,
@@ -31,11 +32,11 @@ public sealed class AiGuardrailTests
         guardrail.Name.Should().Be("pii-detection");
         guardrail.DisplayName.Should().Be("PII Detection");
         guardrail.Description.Should().Be("Detects PII in content");
-        guardrail.Category.Should().Be("privacy");
-        guardrail.GuardType.Should().Be("both");
-        guardrail.PatternType.Should().Be("regex");
-        guardrail.Severity.Should().Be("high");
-        guardrail.Action.Should().Be("warn");
+        guardrail.Category.Should().Be(GuardrailCategory.Privacy);
+        guardrail.GuardType.Should().Be(GuardrailType.Both);
+        guardrail.PatternType.Should().Be(GuardrailPatternType.Regex);
+        guardrail.Severity.Should().Be(GuardrailSeverity.High);
+        guardrail.Action.Should().Be(GuardrailAction.Warn);
         guardrail.UserMessage.Should().Be("PII detected");
         guardrail.IsActive.Should().BeTrue();
         guardrail.IsOfficial.Should().BeTrue();
@@ -54,12 +55,12 @@ public sealed class AiGuardrailTests
             name: "scoped-guard",
             displayName: "Scoped Guard",
             description: "Agent-specific guard",
-            category: "security",
-            guardType: "input",
+            category: GuardrailCategory.Security,
+            guardType: GuardrailType.Input,
             pattern: "test-pattern",
-            patternType: "keyword",
-            severity: "medium",
-            action: "log",
+            patternType: GuardrailPatternType.Keyword,
+            severity: GuardrailSeverity.Medium,
+            action: GuardrailAction.Log,
             userMessage: null,
             isActive: true,
             isOfficial: false,
@@ -89,12 +90,12 @@ public sealed class AiGuardrailTests
             name: "  trimmed-name  ",
             displayName: "  Trimmed Name  ",
             description: "  desc  ",
-            category: "  security  ",
-            guardType: "  input  ",
+            category: GuardrailCategory.Security,
+            guardType: GuardrailType.Input,
             pattern: "pattern",
-            patternType: "  regex  ",
-            severity: "  high  ",
-            action: "  block  ",
+            patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High,
+            action: GuardrailAction.Block,
             userMessage: "  message  ",
             isActive: true,
             isOfficial: false,
@@ -105,11 +106,6 @@ public sealed class AiGuardrailTests
         guardrail.Name.Should().Be("trimmed-name");
         guardrail.DisplayName.Should().Be("Trimmed Name");
         guardrail.Description.Should().Be("desc");
-        guardrail.Category.Should().Be("security");
-        guardrail.GuardType.Should().Be("input");
-        guardrail.PatternType.Should().Be("regex");
-        guardrail.Severity.Should().Be("high");
-        guardrail.Action.Should().Be("block");
         guardrail.UserMessage.Should().Be("message");
     }
 
@@ -123,8 +119,9 @@ public sealed class AiGuardrailTests
     {
         var act = () => AiGuardrail.Create(
             name: name!, displayName: "Display", description: "Desc",
-            category: "security", guardType: "input", pattern: "p",
-            patternType: "regex", severity: "high", action: "block",
+            category: GuardrailCategory.Security, guardType: GuardrailType.Input,
+            pattern: "p", patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High, action: GuardrailAction.Block,
             userMessage: null, isActive: true, isOfficial: false,
             agentId: null, modelId: null, priority: 1);
 
@@ -139,40 +136,9 @@ public sealed class AiGuardrailTests
     {
         var act = () => AiGuardrail.Create(
             name: "valid", displayName: displayName!, description: "Desc",
-            category: "security", guardType: "input", pattern: "p",
-            patternType: "regex", severity: "high", action: "block",
-            userMessage: null, isActive: true, isOfficial: false,
-            agentId: null, modelId: null, priority: 1);
-
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Create_Rejects_Invalid_Category(string? category)
-    {
-        var act = () => AiGuardrail.Create(
-            name: "valid", displayName: "Display", description: "Desc",
-            category: category!, guardType: "input", pattern: "p",
-            patternType: "regex", severity: "high", action: "block",
-            userMessage: null, isActive: true, isOfficial: false,
-            agentId: null, modelId: null, priority: 1);
-
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Create_Rejects_Invalid_GuardType(string? guardType)
-    {
-        var act = () => AiGuardrail.Create(
-            name: "valid", displayName: "Display", description: "Desc",
-            category: "security", guardType: guardType!, pattern: "p",
-            patternType: "regex", severity: "high", action: "block",
+            category: GuardrailCategory.Security, guardType: GuardrailType.Input,
+            pattern: "p", patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High, action: GuardrailAction.Block,
             userMessage: null, isActive: true, isOfficial: false,
             agentId: null, modelId: null, priority: 1);
 
@@ -187,56 +153,9 @@ public sealed class AiGuardrailTests
     {
         var act = () => AiGuardrail.Create(
             name: "valid", displayName: "Display", description: "Desc",
-            category: "security", guardType: "input", pattern: pattern!,
-            patternType: "regex", severity: "high", action: "block",
-            userMessage: null, isActive: true, isOfficial: false,
-            agentId: null, modelId: null, priority: 1);
-
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Create_Rejects_Invalid_PatternType(string? patternType)
-    {
-        var act = () => AiGuardrail.Create(
-            name: "valid", displayName: "Display", description: "Desc",
-            category: "security", guardType: "input", pattern: "p",
-            patternType: patternType!, severity: "high", action: "block",
-            userMessage: null, isActive: true, isOfficial: false,
-            agentId: null, modelId: null, priority: 1);
-
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Create_Rejects_Invalid_Severity(string? severity)
-    {
-        var act = () => AiGuardrail.Create(
-            name: "valid", displayName: "Display", description: "Desc",
-            category: "security", guardType: "input", pattern: "p",
-            patternType: "regex", severity: severity!, action: "block",
-            userMessage: null, isActive: true, isOfficial: false,
-            agentId: null, modelId: null, priority: 1);
-
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Create_Rejects_Invalid_Action(string? action)
-    {
-        var act = () => AiGuardrail.Create(
-            name: "valid", displayName: "Display", description: "Desc",
-            category: "security", guardType: "input", pattern: "p",
-            patternType: "regex", severity: "high", action: action!,
+            category: GuardrailCategory.Security, guardType: GuardrailType.Input,
+            pattern: pattern!, patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High, action: GuardrailAction.Block,
             userMessage: null, isActive: true, isOfficial: false,
             agentId: null, modelId: null, priority: 1);
 
@@ -248,8 +167,9 @@ public sealed class AiGuardrailTests
     {
         var act = () => AiGuardrail.Create(
             name: "valid", displayName: "Display", description: "Desc",
-            category: "security", guardType: "input", pattern: "p",
-            patternType: "regex", severity: "high", action: "block",
+            category: GuardrailCategory.Security, guardType: GuardrailType.Input,
+            pattern: "p", patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High, action: GuardrailAction.Block,
             userMessage: null, isActive: true, isOfficial: false,
             agentId: null, modelId: null, priority: -1);
 
@@ -261,12 +181,51 @@ public sealed class AiGuardrailTests
     {
         var guardrail = AiGuardrail.Create(
             name: "valid", displayName: "Display", description: "Desc",
-            category: "security", guardType: "input", pattern: "p",
-            patternType: "regex", severity: "high", action: "block",
+            category: GuardrailCategory.Security, guardType: GuardrailType.Input,
+            pattern: "p", patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High, action: GuardrailAction.Block,
             userMessage: null, isActive: true, isOfficial: false,
             agentId: null, modelId: null, priority: 0);
 
         guardrail.Priority.Should().Be(0);
+    }
+
+    // ── Enum coverage ───────────────────────────────────────────────────
+
+    [Fact]
+    public void Create_With_All_GuardrailCategories()
+    {
+        foreach (var category in Enum.GetValues<GuardrailCategory>())
+        {
+            var g = AiGuardrail.Create(
+                name: $"guard-cat-{category}", displayName: category.ToString(),
+                description: string.Empty, category: category,
+                guardType: GuardrailType.Both, pattern: "p",
+                patternType: GuardrailPatternType.Keyword,
+                severity: GuardrailSeverity.Low, action: GuardrailAction.Log,
+                userMessage: null, isActive: true, isOfficial: false,
+                agentId: null, modelId: null, priority: 1);
+
+            g.Category.Should().Be(category);
+        }
+    }
+
+    [Fact]
+    public void Create_With_All_GuardrailActions()
+    {
+        foreach (var action in Enum.GetValues<GuardrailAction>())
+        {
+            var g = AiGuardrail.Create(
+                name: $"guard-act-{action}", displayName: action.ToString(),
+                description: string.Empty, category: GuardrailCategory.Security,
+                guardType: GuardrailType.Input, pattern: "p",
+                patternType: GuardrailPatternType.Regex,
+                severity: GuardrailSeverity.High, action: action,
+                userMessage: null, isActive: true, isOfficial: false,
+                agentId: null, modelId: null, priority: 1);
+
+            g.Action.Should().Be(action);
+        }
     }
 
     // ── State transitions ───────────────────────────────────────────────
@@ -320,12 +279,12 @@ public sealed class AiGuardrailTests
             name: name,
             displayName: $"Display {name}",
             description: "Description",
-            category: "security",
-            guardType: "input",
+            category: GuardrailCategory.Security,
+            guardType: GuardrailType.Input,
             pattern: "test-pattern",
-            patternType: "regex",
-            severity: "high",
-            action: "block",
+            patternType: GuardrailPatternType.Regex,
+            severity: GuardrailSeverity.High,
+            action: GuardrailAction.Block,
             userMessage: null,
             isActive: true,
             isOfficial: false,

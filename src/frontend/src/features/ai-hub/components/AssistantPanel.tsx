@@ -13,6 +13,7 @@ import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { usePersona } from '../../../contexts/PersonaContext';
 import { aiGovernanceApi } from '../api/aiGovernance';
+import { mapAiError } from '../../../utils/apiErrors';
 import { AssistantMessageBubble } from './AssistantMessageBubble';
 import {
   contextGroundingSources,
@@ -167,13 +168,23 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
           caveats: baseCaveats,
           contextSummaryText: response.contextSummary,
           contextStrength: response.contextStrength,
+          // E-M05: mapear document search hits para explainability hints
+          explainabilityHints: Array.isArray(response.documentSearchHits)
+            ? response.documentSearchHits.map((h: {documentId?: string; sourceId?: string; title?: string; sourceType?: string; classification?: string; relevanceScore?: number; snippet?: string}) => ({
+                sourceId: h.documentId ?? h.sourceId ?? '',
+                title: h.title ?? '',
+                sourceType: h.classification ?? h.sourceType ?? '',
+                relevanceScore: h.relevanceScore ?? 0,
+                snippet: h.snippet,
+              }))
+            : undefined,
           timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, assistantMsg]);
         await stopTyping();
         setIsTyping(false);
       })
-      .catch(async () => {
+      .catch(async (err: unknown) => {
         // When contextData is available, generate a local grounded response.
         // This ensures entity-specific data is shown even when the provider is unavailable,
         // without silent mock — the fallback indicator is always explicit.
@@ -195,7 +206,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
           catchContextSummaryText = localResponse.contextSummaryText;
           confidence = localResponse.confidence;
         } else {
-          const unavailableText = t('common.errorLoading');
+          const unavailableText = mapAiError(err, 'chat');
           content = t('assistantPanel.fallbackCaveat');
           caveats = [unavailableText];
           contextRefs = [`${contextType}:${contextSummary.name}`];
@@ -372,6 +383,11 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
             onToggleMeta={toggleMeta}
             formatTime={formatTime}
             onSuggestedAction={handleSuggestedAction}
+            onExplainResponse={(msgId) => {
+              const explainPrompt = t('aiHub.explainPrompt');
+              handleSendMessage(explainPrompt);
+              void msgId;
+            }}
           />
         ))}
 

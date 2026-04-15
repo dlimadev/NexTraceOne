@@ -329,6 +329,7 @@ public sealed class CostIntelligenceModuleServiceTests
         public string Id => "cost-tests-user";
         public string Name => "Cost Tests";
         public string Email => "cost.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

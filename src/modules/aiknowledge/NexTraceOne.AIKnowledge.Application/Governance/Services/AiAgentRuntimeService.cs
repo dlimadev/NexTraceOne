@@ -21,6 +21,7 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 /// 3. Valida acesso do utilizador ao agent
 /// 4. Resolve modelo (override ou preferred do agent)
 /// 5. Valida modelo permitido para o agent
+/// 5a. Pré-valida quota de tokens antes de inferir (E-C01)
 /// 6. Resolve provider
 /// 7. Resolve tools permitidas para o agent
 /// 8. Monta prompt (system + tools + input)
@@ -35,12 +36,15 @@ public sealed class AiAgentRuntimeService(
     IAiAgentRepository agentRepository,
     IAiAgentExecutionRepository executionRepository,
     IAiAgentArtifactRepository artifactRepository,
+    IAiExecutionPlanRepository executionPlanRepository,
     IAiModelCatalogService modelCatalogService,
     IAiProviderFactory providerFactory,
     IToolRegistry toolRegistry,
     IToolExecutor toolExecutor,
     IToolPermissionValidator toolPermissionValidator,
+    IAiTokenQuotaService tokenQuotaService,
     ICurrentUser currentUser,
+    ICurrentTenant currentTenant,
     IDateTimeProvider dateTimeProvider) : IAiAgentRuntimeService
 {
     /// <summary>Número máximo de iterações do loop de tools para prevenir ciclos infinitos.</summary>
@@ -51,6 +55,9 @@ public sealed class AiAgentRuntimeService(
 
     /// <summary>Tokens reservados para a resposta do modelo.</summary>
     private const int ReservedCompletionTokens = 1024;
+
+    /// <summary>Estimativa conservadora de tokens por carácter para pré-validação de quota.</summary>
+    private const double TokensPerCharEstimate = 0.25;
 
     public async Task<Result<AgentExecutionResult>> ExecuteAsync(
         AiAgentId agentId,
@@ -102,6 +109,24 @@ public sealed class AiAgentRuntimeService(
                 resolvedModel.ModelId.ToString(), agent.DisplayName);
         }
 
+        // 5a. Pré-valida quota de tokens antes de consumir recursos de inferência.
+        // Estimativa conservadora: caracteres / 4 + tokens reservados para completion.
+        var estimatedTokens = (int)(input.Length * TokensPerCharEstimate) + ReservedCompletionTokens;
+        var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
+            currentUser.Id,
+            currentTenant.Id,
+            resolvedModel.ProviderId,
+            resolvedModel.ModelId.ToString(),
+            estimatedTokens,
+            cancellationToken);
+
+        if (!quotaResult.IsAllowed)
+        {
+            return AiGovernanceErrors.QuotaExceeded(
+                quotaResult.PolicyName ?? "agent",
+                quotaResult.BlockReason ?? currentUser.Id);
+        }
+
         // 6. Resolve provider
         var chatProvider = providerFactory.GetChatProvider(resolvedModel.ProviderId);
         if (chatProvider is null)
@@ -117,6 +142,7 @@ public sealed class AiAgentRuntimeService(
 
         // 7a. Planning mode — gera plano de execução quando activado
         string? planSummary = null;
+        AIExecutionPlan? executionPlan = null;
         if (agent.UsePlanningMode)
         {
             planSummary = await TryBuildExecutionPlanAsync(agent, input, chatProvider, resolvedModel, cancellationToken);
@@ -134,6 +160,31 @@ public sealed class AiAgentRuntimeService(
             now);
 
         await executionRepository.AddAsync(execution, cancellationToken);
+
+        // E-A04: criar e persistir plano de execução quando em planning mode, ligando-o à execução.
+        if (!string.IsNullOrWhiteSpace(planSummary))
+        {
+            executionPlan = AIExecutionPlan.Create(
+                correlationId: Guid.NewGuid().ToString(),
+                inputQuery: input,
+                persona: currentUser.Id,
+                useCaseType: AIUseCaseType.General,
+                selectedModel: resolvedModel.ModelName,
+                selectedProvider: resolvedModel.ProviderId,
+                isInternal: resolvedModel.IsInternal,
+                routingPath: AIRoutingPath.InternalOnly,
+                selectedSources: string.Empty,
+                sourceWeightingSummary: string.Empty,
+                policyDecision: string.Empty,
+                estimatedCostClass: "low",
+                rationaleSummary: planSummary,
+                confidenceLevel: AIConfidenceLevel.Medium,
+                escalationReason: AIEscalationReason.None,
+                plannedAt: now,
+                executionId: execution.Id);
+            executionPlan.LinkToExecution(execution.Id);
+            await executionPlanRepository.AddAsync(executionPlan, cancellationToken);
+        }
 
         // 9. Monta prompt com contexto e executa inferência (com tool loop)
         var systemPrompt = BuildSystemPrompt(agent, allowedTools, contextJson);
@@ -333,7 +384,8 @@ public sealed class AiAgentRuntimeService(
             artifacts,
             toolResults.Select(tr => new ToolExecutionSummary(
                 tr.ToolName, tr.Success, tr.DurationMs, tr.ErrorMessage)).ToList(),
-            PlanSummary: planSummary);
+            PlanSummary: planSummary,
+            PlanId: executionPlan?.Id.Value);
     }
 
     /// <summary>

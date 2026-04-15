@@ -52,8 +52,8 @@ public static class ListGuardrails
             var items = guardrails
                 .Select(g => new GuardrailItem(
                     g.Id.Value, g.Name, g.DisplayName, g.Description,
-                    g.Category, g.GuardType, g.Pattern, g.PatternType,
-                    g.Severity, g.Action, g.UserMessage,
+                    g.Category.ToString(), g.GuardType.ToString(), g.Pattern, g.PatternType.ToString(),
+                    g.Severity.ToString(), g.Action.ToString(), g.UserMessage,
                     g.IsActive, g.IsOfficial, g.AgentId, g.ModelId, g.Priority))
                 .ToList();
 

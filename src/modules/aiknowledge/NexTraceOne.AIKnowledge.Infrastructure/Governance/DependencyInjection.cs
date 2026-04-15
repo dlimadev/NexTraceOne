@@ -4,8 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.HandleModelFeedbackThresholdExceeded;
 using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
+using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.EventHandlers;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Jobs;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
@@ -13,6 +16,7 @@ using NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance;
@@ -78,7 +82,14 @@ public static class DependencyInjection
         services.AddScoped<IOnboardingSessionRepository, OnboardingSessionRepository>();
         services.AddScoped<IIdeQuerySessionRepository, IdeQuerySessionRepository>();
         services.AddScoped<IAiModelAuthorizationService, AiModelAuthorizationService>();
+        services.AddScoped<IAiExecutionPlanRepository, AiExecutionPlanRepository>();
         services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
+
+        // ── Integration Event Handlers (E-M02) ───────────────────────────
+        services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();
+        services.AddScoped<
+            IIntegrationEventHandler<ModelFeedbackThresholdExceededIntegrationEvent>,
+            ModelFeedbackThresholdExceededEventHandlerAdapter>();
 
         // Cross-module contract — consumed by AiOrchestration for token/model attribution
         services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();

@@ -115,3 +115,33 @@ public interface IKnowledgeDocumentGroundingReader
         int maxResults,
         CancellationToken ct = default);
 }
+
+// ── Contract grounding reader ───────────────────────────────────────────────
+
+/// <summary>Contexto de uma versão de contrato para grounding de IA.</summary>
+public sealed record ContractGroundingContext(
+    string ContractVersionId,
+    string ApiAssetId,
+    string Version,
+    string Protocol,
+    string LifecycleState,
+    bool IsLocked,
+    DateTimeOffset? LockedAt);
+
+/// <summary>
+/// Leitor somente-leitura de versões de contrato para grounding de IA.
+/// Abstrai o acesso cross-módulo ao ContractsDbContext.
+/// </summary>
+public interface IContractGroundingReader
+{
+    /// <summary>
+    /// Retorna versões de contrato filtrando opcionalmente por ID de versão, ID de API asset
+    /// e estado de ciclo de vida; pesquisa textual por semver quando searchTerm for fornecido.
+    /// </summary>
+    Task<IReadOnlyList<ContractGroundingContext>> FindContractVersionsAsync(
+        Guid? contractVersionId,
+        Guid? apiAssetId,
+        string? searchTerm,
+        int maxResults,
+        CancellationToken ct = default);
+}

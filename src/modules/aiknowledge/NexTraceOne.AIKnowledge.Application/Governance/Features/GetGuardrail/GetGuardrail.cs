@@ -43,9 +43,9 @@ public static class GetGuardrail
 
             return new Response(
                 guardrail.Id.Value, guardrail.Name, guardrail.DisplayName,
-                guardrail.Description, guardrail.Category, guardrail.GuardType,
-                guardrail.Pattern, guardrail.PatternType, guardrail.Severity,
-                guardrail.Action, guardrail.UserMessage, guardrail.IsActive,
+                guardrail.Description, guardrail.Category.ToString(), guardrail.GuardType.ToString(),
+                guardrail.Pattern, guardrail.PatternType.ToString(), guardrail.Severity.ToString(),
+                guardrail.Action.ToString(), guardrail.UserMessage, guardrail.IsActive,
                 guardrail.IsOfficial, guardrail.AgentId, guardrail.ModelId,
                 guardrail.Priority);
         }

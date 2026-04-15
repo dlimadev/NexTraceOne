@@ -187,6 +187,7 @@ public sealed class ExternalAiModuleTests
         public string Id => "external-ai-tests-user";
         public string Name => "ExternalAI Tests";
         public string Email => "externalai.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

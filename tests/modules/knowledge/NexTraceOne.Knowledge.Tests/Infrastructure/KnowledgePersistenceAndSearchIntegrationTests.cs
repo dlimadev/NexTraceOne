@@ -177,6 +177,7 @@ public sealed class KnowledgePersistenceAndSearchIntegrationTests : IAsyncLifeti
         public string Id { get; } = "22222222-2222-2222-2222-222222222222";
         public string Name { get; } = "Integration User";
         public string Email { get; } = "integration@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated { get; } = true;
         public bool HasPermission(string permission) => true;
     }

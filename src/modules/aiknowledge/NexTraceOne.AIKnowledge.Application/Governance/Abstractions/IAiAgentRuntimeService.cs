@@ -31,7 +31,8 @@ public sealed record AgentExecutionResult(
     long DurationMs,
     IReadOnlyList<AgentArtifactResult> Artifacts,
     IReadOnlyList<ToolExecutionSummary>? ToolExecutions = null,
-    string? PlanSummary = null);
+    string? PlanSummary = null,
+    Guid? PlanId = null);
 
 /// <summary>Artefacto produzido pela execução.</summary>
 public sealed record AgentArtifactResult(

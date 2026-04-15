@@ -56,6 +56,9 @@ public sealed class AiGovernanceDbContext(
     // ── Phase 8: IDE Query Sessions (AI Pair Programming) ───────
     public DbSet<IdeQuerySession> IdeQuerySessions => Set<IdeQuerySession>();
 
+    // ── E-A04: Execution Plans ───────────────────────────────────
+    public DbSet<AIExecutionPlan> ExecutionPlans => Set<AIExecutionPlan>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

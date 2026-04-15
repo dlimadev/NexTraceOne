@@ -1,5 +1,6 @@
 using Ardalis.GuardClauses;
 
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 
@@ -27,23 +28,23 @@ public sealed class AiGuardrail : AuditableEntity<AiGuardrailId>
     /// <summary>Descrição funcional do guardrail.</summary>
     public string Description { get; private set; } = string.Empty;
 
-    /// <summary>Categoria funcional (ex: "security", "privacy", "compliance", "quality").</summary>
-    public string Category { get; private set; } = string.Empty;
+    /// <summary>Categoria funcional do guardrail.</summary>
+    public GuardrailCategory Category { get; private set; }
 
-    /// <summary>Tipo de guarda: "input", "output", ou "both".</summary>
-    public string GuardType { get; private set; } = string.Empty;
+    /// <summary>Tipo de guarda — fase do pipeline em que actua.</summary>
+    public GuardrailType GuardType { get; private set; }
 
     /// <summary>Padrão de deteção (regex ou expressão de classificação).</summary>
     public string Pattern { get; private set; } = string.Empty;
 
-    /// <summary>Tipo de padrão: "regex", "keyword", "classifier", "semantic".</summary>
-    public string PatternType { get; private set; } = string.Empty;
+    /// <summary>Tipo de padrão de deteção.</summary>
+    public GuardrailPatternType PatternType { get; private set; }
 
-    /// <summary>Severidade: "critical", "high", "medium", "low", "info".</summary>
-    public string Severity { get; private set; } = string.Empty;
+    /// <summary>Severidade de activação.</summary>
+    public GuardrailSeverity Severity { get; private set; }
 
-    /// <summary>Ação quando o guardrail é ativado: "block", "sanitize", "warn", "log".</summary>
-    public string Action { get; private set; } = string.Empty;
+    /// <summary>Acção automática quando o guardrail é activado.</summary>
+    public GuardrailAction Action { get; private set; }
 
     /// <summary>Mensagem apresentada ao utilizador quando o guardrail é ativado.</summary>
     public string? UserMessage { get; private set; }
@@ -70,12 +71,12 @@ public sealed class AiGuardrail : AuditableEntity<AiGuardrailId>
         string name,
         string displayName,
         string description,
-        string category,
-        string guardType,
+        GuardrailCategory category,
+        GuardrailType guardType,
         string pattern,
-        string patternType,
-        string severity,
-        string action,
+        GuardrailPatternType patternType,
+        GuardrailSeverity severity,
+        GuardrailAction action,
         string? userMessage,
         bool isActive,
         bool isOfficial,
@@ -85,12 +86,7 @@ public sealed class AiGuardrail : AuditableEntity<AiGuardrailId>
     {
         Guard.Against.NullOrWhiteSpace(name);
         Guard.Against.NullOrWhiteSpace(displayName);
-        Guard.Against.NullOrWhiteSpace(category);
-        Guard.Against.NullOrWhiteSpace(guardType);
         Guard.Against.NullOrWhiteSpace(pattern);
-        Guard.Against.NullOrWhiteSpace(patternType);
-        Guard.Against.NullOrWhiteSpace(severity);
-        Guard.Against.NullOrWhiteSpace(action);
         Guard.Against.Negative(priority);
 
         return new AiGuardrail
@@ -99,12 +95,12 @@ public sealed class AiGuardrail : AuditableEntity<AiGuardrailId>
             Name = name.Trim(),
             DisplayName = displayName.Trim(),
             Description = description?.Trim() ?? string.Empty,
-            Category = category.Trim(),
-            GuardType = guardType.Trim(),
+            Category = category,
+            GuardType = guardType,
             Pattern = pattern,
-            PatternType = patternType.Trim(),
-            Severity = severity.Trim(),
-            Action = action.Trim(),
+            PatternType = patternType,
+            Severity = severity,
+            Action = action,
             UserMessage = userMessage?.Trim(),
             IsActive = isActive,
             IsOfficial = isOfficial,

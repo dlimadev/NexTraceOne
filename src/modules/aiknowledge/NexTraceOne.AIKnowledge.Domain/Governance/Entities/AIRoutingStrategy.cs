@@ -57,6 +57,12 @@ public sealed class AIRoutingStrategy : AuditableEntity<AIRoutingStrategyId>
     /// <summary>Data/hora UTC em que a estratégia foi registada.</summary>
     public DateTimeOffset RegisteredAt { get; private set; }
 
+    /// <summary>Data/hora UTC do último ajuste automático de prioridade por feedback negativo.</summary>
+    public DateTimeOffset? AutoAdjustedAt { get; private set; }
+
+    /// <summary>Razão do último ajuste automático de prioridade.</summary>
+    public string? AutoAdjustmentReason { get; private set; }
+
     /// <summary>
     /// Cria uma nova estratégia de roteamento com validações de invariantes.
     /// </summary>
@@ -141,6 +147,18 @@ public sealed class AIRoutingStrategy : AuditableEntity<AIRoutingStrategyId>
         var useCaseMatch = TargetUseCase == "*" || string.Equals(TargetUseCase, useCase, StringComparison.OrdinalIgnoreCase);
         var clientMatch = TargetClientType == "*" || string.Equals(TargetClientType, clientType, StringComparison.OrdinalIgnoreCase);
         return personaMatch && useCaseMatch && clientMatch;
+    }
+
+    /// <summary>
+    /// Reduz a prioridade em 1 (prioridade menor = maior precedência, por isso reduzir significa desprioritizar).
+    /// Regista o ajuste automático com motivo e timestamp.
+    /// </summary>
+    public void ReducePriorityDueToNegativeFeedback(string reason, DateTimeOffset adjustedAt)
+    {
+        // Incrementar Priority (valor maior = menor precedência)
+        Priority += 1;
+        AutoAdjustedAt = adjustedAt;
+        AutoAdjustmentReason = reason;
     }
 }
 

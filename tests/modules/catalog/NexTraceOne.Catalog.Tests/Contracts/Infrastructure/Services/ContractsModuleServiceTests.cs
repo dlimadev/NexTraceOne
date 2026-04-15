@@ -207,6 +207,7 @@ public sealed class ContractsModuleServiceTests
         public string Id => "catalog-tests-user";
         public string Name => "Catalog Tests";
         public string Email => "catalog.tests@nextraceone.local";
+        public string? Persona { get; } = null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

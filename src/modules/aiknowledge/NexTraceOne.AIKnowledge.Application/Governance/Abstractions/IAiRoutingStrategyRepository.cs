@@ -18,4 +18,7 @@ public interface IAiRoutingStrategyRepository
 
     /// <summary>Adiciona nova estratégia de roteamento.</summary>
     Task AddAsync(AIRoutingStrategy strategy, CancellationToken ct);
+
+    /// <summary>Actualiza estratégia de roteamento existente.</summary>
+    Task UpdateAsync(AIRoutingStrategy strategy, CancellationToken ct);
 }

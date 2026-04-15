@@ -10,6 +10,9 @@ namespace NexTraceOne.BuildingBlocks.Security.Authentication;
 /// </summary>
 public sealed class HttpContextCurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUser
 {
+    /// <summary>Nome do claim JWT que transporta a persona explícita do utilizador.</summary>
+    private const string PersonaClaimName = "x-nxt-persona";
+
     private ClaimsPrincipal? User => httpContextAccessor.HttpContext?.User;
 
     /// <inheritdoc />
@@ -29,6 +32,10 @@ public sealed class HttpContextCurrentUser(IHttpContextAccessor httpContextAcces
         => User?.FindFirstValue(ClaimTypes.Email)
             ?? User?.FindFirstValue(JwtRegisteredClaimNames.Email)
             ?? string.Empty;
+
+    /// <inheritdoc />
+    public string? Persona
+        => User?.FindFirstValue(PersonaClaimName);
 
     /// <inheritdoc />
     public bool IsAuthenticated => User?.Identity?.IsAuthenticated == true;

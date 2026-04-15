@@ -139,4 +139,38 @@ public sealed class HttpContextCurrentUserTests
 
         user.HasPermission("admin:manage").Should().BeTrue();
     }
+
+    [Fact]
+    public void Persona_WithPersonaClaim_ReturnsPersonaValue()
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, "user-1"),
+            new("x-nxt-persona", "TechLead")
+        };
+        var identity = new ClaimsIdentity(claims, "TestAuth");
+        var principal = new ClaimsPrincipal(identity);
+
+        var user = CreateUser(principal);
+
+        user.Persona.Should().Be("TechLead");
+    }
+
+    [Fact]
+    public void Persona_WithoutPersonaClaim_ReturnsNull()
+    {
+        var user = CreateUser(CreateAuthenticatedPrincipal());
+
+        user.Persona.Should().BeNull();
+    }
+
+    [Fact]
+    public void Persona_WithNoHttpContext_ReturnsNull()
+    {
+        var accessor = Substitute.For<IHttpContextAccessor>();
+        accessor.HttpContext.Returns((HttpContext?)null);
+        var user = new HttpContextCurrentUser(accessor);
+
+        user.Persona.Should().BeNull();
+    }
 }

@@ -1,6 +1,7 @@
 using System.Linq;
 
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Tests.Governance.Domain.Entities;
 
@@ -23,12 +24,12 @@ public sealed class DefaultGuardrailCatalogTests
             guardrail.Name.Should().NotBeNullOrWhiteSpace($"Guardrail must have a name");
             guardrail.DisplayName.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have a display name");
             guardrail.Description.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have a description");
-            guardrail.Category.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have a category");
-            guardrail.GuardType.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have a guard type");
+            Enum.IsDefined(guardrail.Category).Should().BeTrue($"Guardrail '{guardrail.Name}' must have a valid category");
+            Enum.IsDefined(guardrail.GuardType).Should().BeTrue($"Guardrail '{guardrail.Name}' must have a valid guard type");
             guardrail.Pattern.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have a pattern");
-            guardrail.PatternType.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have a pattern type");
-            guardrail.Severity.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have a severity");
-            guardrail.Action.Should().NotBeNullOrWhiteSpace($"Guardrail '{guardrail.Name}' must have an action");
+            Enum.IsDefined(guardrail.PatternType).Should().BeTrue($"Guardrail '{guardrail.Name}' must have a valid pattern type");
+            Enum.IsDefined(guardrail.Severity).Should().BeTrue($"Guardrail '{guardrail.Name}' must have a valid severity");
+            Enum.IsDefined(guardrail.Action).Should().BeTrue($"Guardrail '{guardrail.Name}' must have a valid action");
         }
     }
 
@@ -43,11 +44,9 @@ public sealed class DefaultGuardrailCatalogTests
     [Fact]
     public void All_Guardrails_Have_Valid_Categories()
     {
-        var validCategories = new[] { "security", "privacy", "compliance", "quality" };
-
         foreach (var guardrail in DefaultGuardrailCatalog.GetAll())
         {
-            validCategories.Should().Contain(guardrail.Category,
+            Enum.GetValues<GuardrailCategory>().Should().Contain(guardrail.Category,
                 $"Guardrail '{guardrail.Name}' has invalid category '{guardrail.Category}'");
         }
     }
@@ -55,11 +54,9 @@ public sealed class DefaultGuardrailCatalogTests
     [Fact]
     public void All_Guardrails_Have_Valid_GuardTypes()
     {
-        var validTypes = new[] { "input", "output", "both" };
-
         foreach (var guardrail in DefaultGuardrailCatalog.GetAll())
         {
-            validTypes.Should().Contain(guardrail.GuardType,
+            Enum.GetValues<GuardrailType>().Should().Contain(guardrail.GuardType,
                 $"Guardrail '{guardrail.Name}' has invalid guard type '{guardrail.GuardType}'");
         }
     }
@@ -67,11 +64,9 @@ public sealed class DefaultGuardrailCatalogTests
     [Fact]
     public void All_Guardrails_Have_Valid_Severity()
     {
-        var validSeverity = new[] { "critical", "high", "medium", "low", "info" };
-
         foreach (var guardrail in DefaultGuardrailCatalog.GetAll())
         {
-            validSeverity.Should().Contain(guardrail.Severity,
+            Enum.GetValues<GuardrailSeverity>().Should().Contain(guardrail.Severity,
                 $"Guardrail '{guardrail.Name}' has invalid severity '{guardrail.Severity}'");
         }
     }
@@ -79,11 +74,9 @@ public sealed class DefaultGuardrailCatalogTests
     [Fact]
     public void All_Guardrails_Have_Valid_Actions()
     {
-        var validActions = new[] { "block", "sanitize", "warn", "log" };
-
         foreach (var guardrail in DefaultGuardrailCatalog.GetAll())
         {
-            validActions.Should().Contain(guardrail.Action,
+            Enum.GetValues<GuardrailAction>().Should().Contain(guardrail.Action,
                 $"Guardrail '{guardrail.Name}' has invalid action '{guardrail.Action}'");
         }
     }
@@ -102,7 +95,7 @@ public sealed class DefaultGuardrailCatalogTests
     public void Contains_Security_Guardrails()
     {
         DefaultGuardrailCatalog.GetAll()
-            .Should().Contain(g => g.Category == "security",
+            .Should().Contain(g => g.Category == GuardrailCategory.Security,
                 "catalog must include security guardrails");
     }
 
@@ -110,7 +103,7 @@ public sealed class DefaultGuardrailCatalogTests
     public void Contains_Privacy_Guardrails()
     {
         DefaultGuardrailCatalog.GetAll()
-            .Should().Contain(g => g.Category == "privacy",
+            .Should().Contain(g => g.Category == GuardrailCategory.Privacy,
                 "catalog must include privacy guardrails");
     }
 
@@ -118,7 +111,7 @@ public sealed class DefaultGuardrailCatalogTests
     public void Contains_Compliance_Guardrails()
     {
         DefaultGuardrailCatalog.GetAll()
-            .Should().Contain(g => g.Category == "compliance",
+            .Should().Contain(g => g.Category == GuardrailCategory.Compliance,
                 "catalog must include compliance guardrails");
     }
 
@@ -126,7 +119,7 @@ public sealed class DefaultGuardrailCatalogTests
     public void Contains_Quality_Guardrails()
     {
         DefaultGuardrailCatalog.GetAll()
-            .Should().Contain(g => g.Category == "quality",
+            .Should().Contain(g => g.Category == GuardrailCategory.Quality,
                 "catalog must include quality guardrails");
     }
 
@@ -134,7 +127,7 @@ public sealed class DefaultGuardrailCatalogTests
     public void Contains_Input_Guards()
     {
         DefaultGuardrailCatalog.GetAll()
-            .Should().Contain(g => g.GuardType == "input",
+            .Should().Contain(g => g.GuardType == GuardrailType.Input,
                 "catalog must include input guards");
     }
 
@@ -142,7 +135,7 @@ public sealed class DefaultGuardrailCatalogTests
     public void Contains_Output_Guards()
     {
         DefaultGuardrailCatalog.GetAll()
-            .Should().Contain(g => g.GuardType == "output",
+            .Should().Contain(g => g.GuardType == GuardrailType.Output,
                 "catalog must include output guards");
     }
 

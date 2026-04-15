@@ -24,9 +24,11 @@
 
 services:
 
-  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  # ── PostgreSQL (com pgvector para RAG semântico — E-A01) ────────────────────
+  # Usa a imagem pgvector/pgvector:pg16 que inclui a extensão pgvector pré-instalada.
+  # A extensão é activada por CREATE EXTENSION via EF Core migration.
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-nextraceone}
