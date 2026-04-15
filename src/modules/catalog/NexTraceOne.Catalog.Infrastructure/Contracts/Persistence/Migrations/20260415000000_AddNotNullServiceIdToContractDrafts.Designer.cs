@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
 {
     [DbContext(typeof(ContractsDbContext))]
-    partial class ContractsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415000000_AddNotNullServiceIdToContractDrafts")]
+    partial class AddNotNullServiceIdToContractDrafts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -527,104 +530,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.ToTable("ctr_contract_artifacts", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.ContractChangelog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ApiAssetId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTimeOffset?>("ApprovedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ApprovedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("CommitSha")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("ContractVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Entries")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("FromVersion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<bool>("IsApproved")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("JsonContent")
-                        .HasColumnType("text");
-
-                    b.Property<string>("MarkdownContent")
-                        .HasColumnType("text");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<string>("Source")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("ToVersion")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<Guid?>("VerificationId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApiAssetId");
-
-                    b.HasIndex("IsApproved");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("ApiAssetId", "IsApproved");
-
-                    b.ToTable("ctr_contract_changelogs", (string)null);
-                });
-
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.ContractComplianceGate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -672,7 +577,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -727,7 +631,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasColumnName("xmin");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -986,7 +889,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
 
                     b.ToTable("ctr_contract_drafts", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ctr_contract_drafts_status", "\"Status\" IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published', 'Discarded')");
+                            t.HasCheckConstraint("CK_ctr_contract_drafts_status", "\"Status\" IN ('Editing', 'InReview', 'Approved', 'Rejected', 'Published')");
                         });
                 });
 
@@ -1386,7 +1289,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasColumnType("jsonb");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -1671,109 +1573,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                     b.ToTable("ctr_contract_scorecards", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.ContractVerification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("AdditiveChangesCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ApiAssetId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("BreakingChangesCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("CommitSha")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("ComplianceViolations")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<Guid?>("ContractVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("DiffDetails")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("EnvironmentName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("NonBreakingChangesCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("PipelineId")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<string>("SourceBranch")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("SourceSystem")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("SpecContentHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTimeOffset>("VerifiedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApiAssetId");
-
-                    b.HasIndex("ServiceName");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("ApiAssetId", "Status");
-
-                    b.ToTable("ctr_contract_verifications", (string)null);
-                });
-
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Contracts.Entities.ContractVersion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2045,7 +1844,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -2112,7 +1910,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasColumnName("xmin");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
@@ -2377,7 +2174,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("TenantId")
+                    b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -2460,7 +2257,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Migrations
                         .HasColumnName("xmin");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 

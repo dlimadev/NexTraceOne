@@ -1437,7 +1437,8 @@
       "noLinks": "Sin enlaces agregados aún."
     },
     "services": {
-      "addContract": "Añadir Contrato"
+      "addContract": "Añadir Contrato",
+      "noContractsForType": "Sin contratos públicos para este tipo"
     },
     "subtitle": "Registro central de servicios, propiedad y gobernanza",
     "summary": {
@@ -4021,7 +4022,13 @@
       "bgTriggerCron": "Cron",
       "bgTriggerInterval": "Intervalo",
       "bgTriggerEventTriggered": "Disparado por Evento",
-      "bgTriggerContinuous": "Continuo"
+      "bgTriggerContinuous": "Continuo",
+      "selectService": "Seleccione el servicio para este contrato",
+      "selectServicePlaceholder": "Seleccione un servicio...",
+      "serviceTypeNoContracts": "Este tipo de servicio ({{type}}) no expone contratos de interfaz pública.",
+      "noServiceSelected": "Ningún servicio seleccionado",
+      "missingRequiredFields": "Faltan campos obligatorios. El servicio y el tipo de contrato son obligatorios.",
+      "stepService": "Servicio"
     },
     "createVersion": "Crear Versión",
     "createVersionDescription": "Crear una nueva versión a partir de un contrato existente",
@@ -4088,7 +4095,10 @@
       "transitionFailed": "Error al transicionar estado del ciclo de vida",
       "validateFailed": "La validación falló. Por favor, inténtelo de nuevo.",
       "verifyFailed": "Error al verificar firma del contrato",
-      "violationsFailed": "Error al cargar violaciones de reglas"
+      "violationsFailed": "Error al cargar violaciones de reglas",
+      "draftRequiresServiceId": "Un borrador de contrato debe estar vinculado a un servicio.",
+      "serviceTypeDoesNotSupportContracts": "El tipo de servicio '{{type}}' no admite contratos.",
+      "contractTypeNotAllowedForServiceType": "El tipo de contrato '{{contractType}}' no está permitido para el tipo de servicio '{{serviceType}}'."
     },
     "event": {
       "placeholder": {

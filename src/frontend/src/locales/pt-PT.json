@@ -1437,7 +1437,8 @@
       "noLinks": "Nenhum link adicionado ainda."
     },
     "services": {
-      "addContract": "Adicionar Contrato"
+      "addContract": "Adicionar Contrato",
+      "noContractsForType": "Nenhum contrato público para este tipo"
     },
     "subtitle": "Registo central de serviços, ownership e governança",
     "summary": {
@@ -4021,7 +4022,13 @@
       "bgTriggerCron": "Cron",
       "bgTriggerInterval": "Intervalo",
       "bgTriggerEventTriggered": "Despoletado por Evento",
-      "bgTriggerContinuous": "Cont?nuo"
+      "bgTriggerContinuous": "Cont?nuo",
+      "selectService": "Selecione o serviço para este contrato",
+      "selectServicePlaceholder": "Selecione um serviço...",
+      "serviceTypeNoContracts": "Este tipo de serviço ({{type}}) não expõe contratos de interface pública.",
+      "noServiceSelected": "Nenhum serviço selecionado",
+      "missingRequiredFields": "Campos obrigatórios em falta. Serviço e tipo de contrato são obrigatórios.",
+      "stepService": "Serviço"
     },
     "createVersion": "Criar Versão",
     "createVersionDescription": "Criar uma nova versão a partir de um contrato existente",
@@ -4088,7 +4095,10 @@
       "transitionFailed": "Falha ao transicionar estado do ciclo de vida",
       "validateFailed": "Validação falhou. Por favor, tente novamente.",
       "verifyFailed": "Falha ao verificar assinatura do contrato",
-      "violationsFailed": "Falha ao carregar violações de regras"
+      "violationsFailed": "Falha ao carregar violações de regras",
+      "draftRequiresServiceId": "Um rascunho de contrato deve estar vinculado a um serviço.",
+      "serviceTypeDoesNotSupportContracts": "O tipo de serviço '{{type}}' não suporta contratos.",
+      "contractTypeNotAllowedForServiceType": "O tipo de contrato '{{contractType}}' não é permitido para o tipo de serviço '{{serviceType}}'."
     },
     "event": {
       "placeholder": {

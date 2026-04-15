@@ -263,7 +263,28 @@ export interface ServiceNode {
 }
 
 /** Tipo de serviço no catálogo. */
-export type ServiceType = 'RestApi' | 'SoapService' | 'KafkaProducer' | 'KafkaConsumer' | 'BackgroundService' | 'ScheduledProcess' | 'IntegrationComponent' | 'SharedPlatformService';
+export type ServiceType =
+  | 'RestApi'
+  | 'SoapService'
+  | 'KafkaProducer'
+  | 'KafkaConsumer'
+  | 'BackgroundService'
+  | 'ScheduledProcess'
+  | 'IntegrationComponent'
+  | 'SharedPlatformService'
+  | 'GraphqlApi'
+  | 'GrpcService'
+  | 'LegacySystem'
+  | 'Gateway'
+  | 'ThirdParty'
+  | 'CobolProgram'
+  | 'CicsTransaction'
+  | 'ImsTransaction'
+  | 'BatchJob'
+  | 'MainframeSystem'
+  | 'MqQueueManager'
+  | 'ZosConnectApi'
+  | 'Framework';
 
 /** Nível de criticidade do serviço. */
 export type Criticality = 'Low' | 'Medium' | 'High' | 'Critical';

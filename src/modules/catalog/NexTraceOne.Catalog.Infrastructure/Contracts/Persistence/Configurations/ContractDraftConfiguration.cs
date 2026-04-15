@@ -28,7 +28,7 @@ internal sealed class ContractDraftConfiguration : IEntityTypeConfiguration<Cont
 
         builder.Property(x => x.Title).HasMaxLength(200).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(2000).IsRequired();
-        builder.Property(x => x.ServiceId);
+        builder.Property(x => x.ServiceId).IsRequired();
         builder.Property(x => x.SpecContent).HasColumnType("text").IsRequired();
         builder.Property(x => x.Format).HasMaxLength(10).IsRequired();
         builder.Property(x => x.ProposedVersion).HasMaxLength(50).IsRequired();

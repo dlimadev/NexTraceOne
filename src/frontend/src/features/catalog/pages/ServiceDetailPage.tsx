@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Server,
   Plus,
+  Info,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -27,9 +28,11 @@ import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { ServiceLinksSection } from '../components/ServiceLinksSection';
 import { ServiceLifecyclePanel } from '../components/ServiceLifecyclePanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
+import type { ServiceType } from '../../../types';
 import { PageContainer, PageSection, TableWrapper } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
 
 /** Mapeia criticidade para variante do Badge. */
 const criticalityBadgeVariant = (level: Criticality): 'danger' | 'warning' | 'default' => {
@@ -348,14 +351,21 @@ export function ServiceDetailPage() {
                         {serviceContracts.totalCount} {t('catalog.detail.contractsCount')}
                       </span>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
-                      className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
-                    >
-                      <Plus size={13} aria-hidden="true" />
-                      {t('catalog.services.addContract', 'Add Contract')}
-                    </button>
+                    {service.serviceType && supportsContracts(service.serviceType as ServiceType) ? (
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
+                        className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
+                      >
+                        <Plus size={13} aria-hidden="true" />
+                        {t('catalog.services.addContract', 'Add Contract')}
+                      </button>
+                    ) : service.serviceType ? (
+                      <div className="flex items-center gap-1 text-xs text-muted border border-edge rounded px-2.5 py-1">
+                        <Info size={12} aria-hidden="true" />
+                        {t('catalog.services.noContractsForType', 'No public contracts for this type')}
+                      </div>
+                    ) : null}
                   </div>
                 </CardHeader>
                 <CardBody className="p-0">

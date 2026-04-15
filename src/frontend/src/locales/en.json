@@ -1477,7 +1477,8 @@
       "noLinks": "No links added yet."
     },
     "services": {
-      "addContract": "Add Contract"
+      "addContract": "Add Contract",
+      "noContractsForType": "No public contracts for this type"
     },
     "subtitle": "Central registry of services, ownership and governance",
     "summary": {
@@ -4061,7 +4062,13 @@
       "bgTriggerCron": "Cron",
       "bgTriggerInterval": "Interval",
       "bgTriggerEventTriggered": "Event Triggered",
-      "bgTriggerContinuous": "Continuous"
+      "bgTriggerContinuous": "Continuous",
+      "selectService": "Select the service for this contract",
+      "selectServicePlaceholder": "Select a service...",
+      "serviceTypeNoContracts": "This service type ({{type}}) does not expose public interface contracts.",
+      "noServiceSelected": "No service selected",
+      "missingRequiredFields": "Missing required fields. Service and contract type are mandatory.",
+      "stepService": "Service"
     },
     "createVersion": "Create Version",
     "createVersionDescription": "Create a new version from an existing contract",
@@ -4128,7 +4135,10 @@
       "transitionFailed": "Failed to transition lifecycle state",
       "validateFailed": "Validation failed. Please try again.",
       "verifyFailed": "Failed to verify contract signature",
-      "violationsFailed": "Failed to load rule violations"
+      "violationsFailed": "Failed to load rule violations",
+      "draftRequiresServiceId": "A contract draft must be linked to a service.",
+      "serviceTypeDoesNotSupportContracts": "Service type '{{type}}' does not support contracts.",
+      "contractTypeNotAllowedForServiceType": "Contract type '{{contractType}}' is not allowed for service type '{{serviceType}}'."
     },
     "event": {
       "placeholder": {

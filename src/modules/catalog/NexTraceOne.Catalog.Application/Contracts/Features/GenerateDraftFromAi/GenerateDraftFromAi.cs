@@ -6,8 +6,12 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Policies;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
 
@@ -26,7 +30,7 @@ public static class GenerateDraftFromAi
         ContractType ContractType,
         ContractProtocol Protocol,
         string Prompt,
-        Guid? ServiceId = null) : ICommand<Response>;
+        Guid ServiceId = default) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de geração por IA.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -38,6 +42,7 @@ public static class GenerateDraftFromAi
             RuleFor(x => x.ContractType).IsInEnum();
             RuleFor(x => x.Protocol).IsInEnum();
             RuleFor(x => x.Prompt).NotEmpty().MaximumLength(5000);
+            RuleFor(x => x.ServiceId).NotEqual(Guid.Empty).WithMessage("ServiceId is required.");
         }
     }
 
@@ -48,12 +53,31 @@ public static class GenerateDraftFromAi
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository repository,
+        IServiceAssetRepository serviceAssetRepository,
         IContractsUnitOfWork unitOfWork,
         IAiDraftGenerator? aiGenerator = null) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // Valida existência do serviço
+            var service = await serviceAssetRepository.GetByIdAsync(
+                ServiceAssetId.From(request.ServiceId),
+                cancellationToken);
+
+            if (service is null)
+                return ContractsErrors.CatalogLinkNotFound(request.ServiceId.ToString());
+
+            // Valida que o tipo de serviço suporta contratos
+            if (!ServiceContractPolicy.SupportsContracts(service.ServiceType))
+                return ContractsErrors.ServiceTypeDoesNotSupportContracts(service.ServiceType.ToString());
+
+            // Valida que o tipo de contrato é permitido para o tipo de serviço
+            if (!ServiceContractPolicy.IsContractTypeAllowed(service.ServiceType, request.ContractType))
+                return ContractsErrors.ContractTypeNotAllowedForServiceType(
+                    request.ContractType.ToString(),
+                    service.ServiceType.ToString());
 
             string content;
             string format;
