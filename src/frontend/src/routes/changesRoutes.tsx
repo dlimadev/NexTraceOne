@@ -13,6 +13,7 @@ const ChangeCatalogPage = lazy(() => import('../features/change-governance/pages
 const ChangeDetailPage = lazy(() => import('../features/change-governance/pages/ChangeDetailPage').then(m => ({ default: m.ChangeDetailPage })));
 const ReleaseCalendarPage = lazy(() => import('../features/change-governance/pages/ReleaseCalendarPage').then(m => ({ default: m.ReleaseCalendarPage })));
 const DoraMetricsPage = lazy(() => import('../features/change-governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
+const ChangeAdvisoryPage = lazy(() => import('../features/change-governance/pages/ChangeAdvisoryPage').then(m => ({ default: m.ChangeAdvisoryPage })));
 
 export function ChangesRoutes() {
   return (
@@ -70,6 +71,14 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
             <DoraMetricsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/change-advisory"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ChangeAdvisoryPage />
           </ProtectedRoute>
         }
       />

@@ -120,6 +120,100 @@ export interface FreezeWindowListDto {
   createdAt: string;
 }
 
+// ─── Pre-production Comparison DTOs ─────────────────────────────────────────
+
+export interface MetricDiff {
+  metric: string;
+  preProductionValue: number | null;
+  productionValue: number | null;
+  relativeChangePercent: number | null;
+  trend: 'Improved' | 'Degraded' | 'Stable' | 'Unknown';
+}
+
+export interface PreProdComparisonResponse {
+  preProductionReleaseId: string;
+  productionReleaseId: string;
+  preProductionServiceName: string;
+  productionServiceName: string;
+  hasBaselineData: boolean;
+  overallSignal: 'Positive' | 'Neutral' | 'Concerning';
+  overallRationale: string;
+  errorRate: MetricDiff | null;
+  avgLatencyMs: MetricDiff | null;
+  p95LatencyMs: MetricDiff | null;
+  p99LatencyMs: MetricDiff | null;
+  requestsPerMinute: MetricDiff | null;
+  throughput: MetricDiff | null;
+}
+
+// ─── Deploy Readiness DTOs ───────────────────────────────────────────────────
+
+export interface DeployReadinessCheck {
+  checkId: string;
+  description: string;
+  passed: boolean;
+  message: string;
+}
+
+export interface DeployReadinessResponse {
+  releaseId: string;
+  releaseName: string;
+  isReady: boolean;
+  totalChecks: number;
+  passedChecks: number;
+  failedChecks: number;
+  checks: DeployReadinessCheck[];
+  evaluatedAt: string;
+}
+
+// ─── Release Notes DTOs ──────────────────────────────────────────────────────
+
+export interface ReleaseNotesResponse {
+  releaseNotesId: string;
+  releaseId: string;
+  technicalSummary: string;
+  executiveSummary: string | null;
+  newEndpointsSection: string | null;
+  breakingChangesSection: string | null;
+  affectedServicesSection: string | null;
+  confidenceMetricsSection: string | null;
+  evidenceLinksSection: string | null;
+  modelUsed: string;
+  tokensUsed: number;
+  status: string;
+  generatedAt: string;
+  lastRegeneratedAt: string | null;
+  regenerationCount: number;
+}
+
+// ─── Trace Correlation DTOs ──────────────────────────────────────────────────
+
+export interface TraceCorrelationDto {
+  traceId: string;
+  correlatedAt: string;
+  description: string | null;
+}
+
+export interface TraceCorrelationsResponse {
+  releaseId: string;
+  serviceName: string;
+  correlationCount: number;
+  correlations: TraceCorrelationDto[];
+}
+
+export interface FreezeWindowListDto {
+  id: string;
+  name: string;
+  reason: string;
+  scope: string;
+  scopeValue: string | null;
+  startsAt: string;
+  endsAt: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
 export interface CalendarReleaseDto {
   releaseId: string;
   serviceName: string;
@@ -317,4 +411,44 @@ export const changeIntelligenceApi = {
       .get<ReleaseCalendarResponse>('/release-calendar', { params })
       .then((r) => r.data);
   },
+
+  /** Compara baseline de pré-produção com baseline de produção antes da promoção. */
+  getPreProdComparison: (preProdReleaseId: string, productionReleaseId: string) =>
+    client
+      .get<PreProdComparisonResponse>(`/releases/${preProdReleaseId}/pre-prod-comparison`, {
+        params: { productionReleaseId },
+      })
+      .then((r) => r.data),
+
+  /** Verifica pré-condições de deploy de uma release num ambiente. */
+  getDeployReadiness: (releaseId: string, environmentName?: string) =>
+    client
+      .get<DeployReadinessResponse>(`/releases/${releaseId}/deploy-readiness`, {
+        params: environmentName ? { environmentName } : undefined,
+      })
+      .then((r) => r.data),
+
+  /** Obtém release notes geradas por IA para uma release. */
+  getReleaseNotes: (releaseId: string) =>
+    client
+      .get<ReleaseNotesResponse>(`/releases/${releaseId}/notes`)
+      .then((r) => r.data),
+
+  /** Gera release notes por IA para uma release. */
+  generateReleaseNotes: (releaseId: string, personaMode?: string) =>
+    client
+      .post<{ releaseNotesId: string }>(`/releases/${releaseId}/notes`, { releaseId, personaMode })
+      .then((r) => r.data),
+
+  /** Regenera release notes existentes com dados atualizados. */
+  regenerateReleaseNotes: (releaseId: string) =>
+    client
+      .post(`/releases/${releaseId}/notes/regenerate`)
+      .then((r) => r.data),
+
+  /** Obtém traces correlacionados com uma release. */
+  getTraceCorrelations: (releaseId: string) =>
+    client
+      .get<TraceCorrelationsResponse>(`/releases/${releaseId}/traces`)
+      .then((r) => r.data),
 };

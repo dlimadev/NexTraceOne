@@ -78,6 +78,18 @@ export const changeConfidenceApi = {
   /** Obtém métricas DORA calculadas a partir de dados reais de releases e incidentes. */
   getDoraMetrics: (params?: { serviceName?: string; teamName?: string; environment?: string; days?: number }) =>
     client.get<DoraMetricsResponse>('/changes/dora-metrics', { params }).then((r) => r.data),
+
+  /** Obtém estado de feature flags activas para uma release e sinal de risco associado. */
+  getFeatureFlagAwareness: (changeId: string) =>
+    client.get<FeatureFlagAwarenessResponse>(`/changes/${changeId}/feature-flags`).then((r) => r.data),
+
+  /** Obtém padrão histórico de releases similares para análise de risco comparativo. */
+  getHistoricalPattern: (changeId: string, lookbackDays?: number) =>
+    client
+      .get<HistoricalPatternResponse>(`/changes/${changeId}/historical-pattern`, {
+        params: lookbackDays ? { lookbackDays } : undefined,
+      })
+      .then((r) => r.data),
 };
 
 // ── DORA Metrics Response Types ─────────────────────────────────────
@@ -118,5 +130,39 @@ export interface DoraMetricsResponse {
   serviceName: string | null;
   teamName: string | null;
   environment: string | null;
+  generatedAt: string;
+}
+
+// ── Feature Flag Awareness Types ─────────────────────────────────────
+
+export interface FeatureFlagAwarenessResponse {
+  releaseId: string;
+  hasData: boolean;
+  activeFlagCount: number;
+  criticalFlagCount: number;
+  newFeatureFlagCount: number;
+  flagProvider: string | null;
+  riskLevel: 'High' | 'Medium' | 'Low' | 'Minimal' | 'Unknown';
+  riskRationale: string;
+  recordedAt: string | null;
+}
+
+// ── Historical Pattern Types ──────────────────────────────────────────
+
+export interface HistoricalPatternResponse {
+  releaseId: string;
+  serviceName: string;
+  environment: string;
+  changeLevel: string;
+  lookbackDays: number;
+  windowStart: string;
+  windowEnd: string;
+  totalSamples: number;
+  successRate: number;
+  rollbackRate: number;
+  failureRate: number;
+  averageScore: number;
+  patternRisk: 'High' | 'Moderate' | 'Low' | 'Insufficient';
+  patternRationale: string;
   generatedAt: string;
 }

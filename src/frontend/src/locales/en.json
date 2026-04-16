@@ -1683,7 +1683,31 @@
       "viewIncidentsDescription": "View incidents correlated with this change",
       "viewService": "View Service",
       "viewServiceSot": "View Service in Source of Truth",
-      "workItem": "Work Item"
+      "workItem": "Work Item",
+      "featureFlags": "Feature Flag Awareness",
+      "featureFlagsSubtitle": "Active feature flags at the time of this release and associated risk",
+      "featureFlagsUnavailable": "Feature flag data is not available for this change",
+      "noFeatureFlagData": "No feature flag state has been recorded for this release",
+      "activeFlagCount": "Active Flags",
+      "criticalFlagCount": "Critical Flags",
+      "newFlagCount": "New Flags",
+      "flagRiskLevel": "Risk Level",
+      "flagProvider": "Provider",
+      "historicalPattern": "Historical Pattern Insight",
+      "historicalPatternSubtitle": "Risk signal based on similar past changes for this service and environment",
+      "historicalPatternUnavailable": "Historical pattern data is not available for this change",
+      "noHistoricalData": "Not enough historical samples to calculate a pattern",
+      "historicalSamples": "Samples",
+      "successRate": "Success Rate",
+      "rollbackRate": "Rollback Rate",
+      "failureRate": "Failure Rate",
+      "patternRisk": "Pattern Risk",
+      "lookbackWindow": "Lookback",
+      "traceCorrelations": "Trace Correlations",
+      "traceCorrelationsSubtitle": "Distributed traces correlated with this release window",
+      "traceCorrelationsUnavailable": "Trace correlation data is not available for this change",
+      "noTraceCorrelations": "No trace correlations found for this release",
+      "traceCorrelationsFound": "trace correlations found"
     },
     "filters": {
       "allEnvironments": "All Environments",
@@ -1860,7 +1884,10 @@
     "optional": "Optional",
     "step_completed": "completed",
     "step_active": "active",
-    "step_upcoming": "upcoming"
+    "step_upcoming": "upcoming",
+    "days": "days",
+    "pass": "Pass",
+    "fail": "Fail"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "When enabled, users can create custom specialized AI agents.",
@@ -7832,7 +7859,16 @@
     "status": "Status",
     "subtitle": "Control environment promotion with quality gates",
     "targetEnvironment": "Target Environment",
-    "title": "Promotion"
+    "title": "Promotion",
+    "showGateDetails": "Show gate details",
+    "hideGateDetails": "Hide gate details",
+    "noGateEvaluations": "No detailed gate evaluations available",
+    "overrideWith": "Overridden",
+    "override": "Override",
+    "overrideGateTitle": "Override Gate with Justification",
+    "overrideGateSubtitle": "Provide a documented justification to override this failed gate. This action is audited.",
+    "overrideJustificationPlaceholder": "Provide a clear justification for overriding this gate...",
+    "confirmOverride": "Confirm Override"
   },
   "releaseCalendar": {
     "activeFreezeWindows": "Active Freeze Windows",
@@ -7997,7 +8033,10 @@
       "freeze": "Freeze Calendar",
       "intelligence": "Intelligence",
       "overview": "Overview",
-      "timeline": "Timeline"
+      "timeline": "Timeline",
+      "preProd": "Pre-Prod vs Prod",
+      "releaseNotes": "Release Notes",
+      "readiness": "Deploy Readiness"
     },
     "timeline": {
       "description": "Description",
@@ -10818,5 +10857,107 @@
     "colTenantSlug": "Tenant Slug",
     "colSchemaName": "Schema Name",
     "colSearchPath": "Search Path"
+  },
+  "preProdComparison": {
+    "title": "Pre-Production vs Production Comparison",
+    "subtitle": "Compare baseline metrics between pre-production and production before promoting",
+    "preProdRelease": "Pre-Production Release",
+    "prodRelease": "Production Release",
+    "selectRelease": "Select a release...",
+    "compare": "Compare",
+    "loadFailed": "Failed to load comparison data",
+    "prompt": "Select two releases to compare their baseline metrics",
+    "overallSignal": "Overall Signal",
+    "signal": {
+      "Positive": "Positive",
+      "Neutral": "Neutral",
+      "Concerning": "Concerning"
+    },
+    "metricsTitle": "Metric Comparison",
+    "metric": "Metric",
+    "preProd": "Pre-Prod",
+    "prod": "Prod",
+    "change": "Change %",
+    "trend": "Trend",
+    "trendLabel": {
+      "Improved": "Improved",
+      "Degraded": "Degraded",
+      "Stable": "Stable",
+      "Unknown": "Unknown"
+    },
+    "errorRate": "Error Rate",
+    "avgLatency": "Avg Latency (ms)",
+    "p95Latency": "P95 Latency (ms)",
+    "p99Latency": "P99 Latency (ms)",
+    "rpm": "Requests / min",
+    "throughput": "Throughput",
+    "noBaseline": "No baseline data recorded for these releases yet"
+  },
+  "releaseNotes": {
+    "title": "Release Notes",
+    "selectRelease": "Select a release to view its notes",
+    "notGenerated": "No release notes generated yet",
+    "notGeneratedDescription": "Generate AI-assisted release notes that summarize changes, breaking changes and affected services.",
+    "generate": "Generate Notes",
+    "generateWithAi": "Generate with AI",
+    "regenerate": "Regenerate",
+    "regeneratedAt": "Regenerated",
+    "model": "Model",
+    "tokens": "Tokens",
+    "regenerations": "Regenerations",
+    "sections": {
+      "technical": "Technical Summary",
+      "executive": "Executive Summary",
+      "newEndpoints": "New Endpoints",
+      "breakingChanges": "Breaking Changes",
+      "affectedServices": "Affected Services",
+      "confidenceMetrics": "Confidence Metrics",
+      "evidenceLinks": "Evidence Links"
+    }
+  },
+  "deployReadiness": {
+    "title": "Deploy Readiness",
+    "selectRelease": "Select a release to check deploy readiness",
+    "loadFailed": "Failed to load readiness checks",
+    "ready": "Ready",
+    "notReady": "Not Ready",
+    "passed": "Passed",
+    "failed": "Failed",
+    "total": "Total",
+    "noChecks": "No readiness checks configured",
+    "evaluatedAt": "Evaluated at"
+  },
+  "changeAdvisory": {
+    "title": "Change Advisory Board",
+    "subtitle": "Operational view of changes pending governance review with risk and confidence context",
+    "filters": "Filters",
+    "filterService": "Service",
+    "filterServicePlaceholder": "Filter by service name",
+    "filterEnvironment": "Environment",
+    "filterEnvironmentPlaceholder": "e.g. Production",
+    "filterStatus": "Confidence Status",
+    "allStatuses": "All statuses",
+    "totalChanges": "Total Changes",
+    "highRiskCount": "High Risk",
+    "needsReviewCount": "Needs Review",
+    "pendingReview": "Changes Pending Advisory Review",
+    "loadFailed": "Failed to load changes",
+    "noChanges": "No changes matching the current filters",
+    "col": {
+      "service": "Service / Team",
+      "version": "Version",
+      "environment": "Environment",
+      "confidence": "Confidence",
+      "risk": "Risk Score",
+      "advisory": "Advisory",
+      "created": "Created"
+    },
+    "noAdvisory": "No advisory",
+    "viewDetails": "View Details",
+    "viewAdvisory": "View Advisory",
+    "guidanceTitle": "About Change Advisory",
+    "guidanceDescription": "The Change Advisory Board view provides a consolidated view of all changes requiring governance attention. Review each change's risk score, blast radius and confidence status before approving or rejecting promotions.",
+    "viewCatalog": "Change Catalog",
+    "viewPromotion": "Promotions"
   }
 }

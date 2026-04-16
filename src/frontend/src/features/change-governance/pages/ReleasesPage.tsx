@@ -10,6 +10,9 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
+  GitCompare,
+  FileText,
+  ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -23,11 +26,14 @@ import type { ChangeLevel, DeploymentState } from '../../../types';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { ReleasesIntelligenceTab } from '../components/ReleasesIntelligenceTab';
+import { PreProdComparisonPanel } from '../components/PreProdComparisonPanel';
+import { ReleaseNotesPanel } from '../components/ReleaseNotesPanel';
+import { DeployReadinessPanel } from '../components/DeployReadinessPanel';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ─── Constantes auxiliares ───────────────────────────────────────────────────
 
-type TabId = 'overview' | 'intelligence' | 'timeline' | 'freeze';
+type TabId = 'overview' | 'intelligence' | 'timeline' | 'freeze' | 'pre-prod' | 'release-notes' | 'readiness';
 
 const CHANGE_LEVEL_KEYS = [
   'releases.changeLevels.operational',
@@ -155,6 +161,9 @@ export function ReleasesPage() {
     { id: 'intelligence', icon: Activity, labelKey: 'releases.tabs.intelligence' },
     { id: 'timeline', icon: Clock, labelKey: 'releases.tabs.timeline' },
     { id: 'freeze', icon: Snowflake, labelKey: 'releases.tabs.freeze' },
+    { id: 'pre-prod', icon: GitCompare, labelKey: 'releases.tabs.preProd' },
+    { id: 'release-notes', icon: FileText, labelKey: 'releases.tabs.releaseNotes' },
+    { id: 'readiness', icon: ShieldCheck, labelKey: 'releases.tabs.readiness' },
   ];
 
   const data = releasesQuery.data;
@@ -525,6 +534,34 @@ export function ReleasesPage() {
             </Card>
           )}
         </div>
+      )}
+
+      {/* ═══════════════════ PRE-PROD COMPARISON TAB ═══════════════════ */}
+      {activeTab === 'pre-prod' && (
+        <PreProdComparisonPanel
+          initialPreProdId={selectedReleaseId ?? ''}
+          availableReleases={
+            releasesQuery.data?.items?.map((r) => ({
+              id: r.id,
+              apiAssetId: r.apiAssetId,
+              version: r.version,
+              environment: r.environment ?? '',
+            })) ?? []
+          }
+        />
+      )}
+
+      {/* ═══════════════════ RELEASE NOTES TAB ═══════════════════ */}
+      {activeTab === 'release-notes' && (
+        <ReleaseNotesPanel releaseId={selectedReleaseId} />
+      )}
+
+      {/* ═══════════════════ DEPLOY READINESS TAB ═══════════════════ */}
+      {activeTab === 'readiness' && (
+        <DeployReadinessPanel
+          releaseId={selectedReleaseId}
+          environmentName={form.environment || undefined}
+        />
       )}
     </PageContainer>
   );

@@ -1658,7 +1658,31 @@
       "viewIncidentsDescription": "Ver incidentes correlacionados con este cambio",
       "viewService": "Ver Servicio",
       "viewServiceSot": "Ver Servicio en Source of Truth",
-      "workItem": "Work Item"
+      "workItem": "Work Item",
+      "featureFlags": "Feature Flag Awareness",
+      "featureFlagsSubtitle": "Feature flags activas en el momento de esta release y riesgo asociado",
+      "featureFlagsUnavailable": "Datos de feature flags no disponibles para este cambio",
+      "noFeatureFlagData": "No se ha registrado estado de feature flag para esta release",
+      "activeFlagCount": "Flags Activas",
+      "criticalFlagCount": "Flags Críticas",
+      "newFlagCount": "Nuevas Flags",
+      "flagRiskLevel": "Nivel de Riesgo",
+      "flagProvider": "Proveedor",
+      "historicalPattern": "Insight de Patrón Histórico",
+      "historicalPatternSubtitle": "Señal de riesgo basada en cambios similares del pasado para este servicio y entorno",
+      "historicalPatternUnavailable": "Datos de patrón histórico no disponibles para este cambio",
+      "noHistoricalData": "Muestras históricas insuficientes para calcular un patrón",
+      "historicalSamples": "Muestras",
+      "successRate": "Tasa de Éxito",
+      "rollbackRate": "Tasa de Rollback",
+      "failureRate": "Tasa de Fallo",
+      "patternRisk": "Riesgo del Patrón",
+      "lookbackWindow": "Ventana de Análisis",
+      "traceCorrelations": "Correlaciones de Trace",
+      "traceCorrelationsSubtitle": "Traces distribuidos correlacionados con la ventana de esta release",
+      "traceCorrelationsUnavailable": "Datos de correlación de trace no disponibles para este cambio",
+      "noTraceCorrelations": "No se encontraron correlaciones de trace para esta release",
+      "traceCorrelationsFound": "correlaciones de trace encontradas"
     },
     "filters": {
       "allEnvironments": "Todos los Entornos",
@@ -1835,7 +1859,10 @@
     "optional": "Opcional",
     "step_completed": "completado",
     "step_active": "activo",
-    "step_upcoming": "pendiente"
+    "step_upcoming": "pendiente",
+    "days": "días",
+    "pass": "Aprobado",
+    "fail": "Reprobado"
   },
   "config": {
     "ai.agents.custom_creation.enabled.description": "Cuando está activado, los usuarios pueden crear agentes de IA especializados personalizados.",
@@ -7810,7 +7837,16 @@
     "status": "Estado",
     "subtitle": "Controlar la promoción de entornos con quality gates",
     "targetEnvironment": "Entorno de Destino",
-    "title": "Promoción"
+    "title": "Promoción",
+    "showGateDetails": "Ver detalles de gates",
+    "hideGateDetails": "Ocultar detalles de gates",
+    "noGateEvaluations": "No hay evaluaciones detalladas de gates disponibles",
+    "overrideWith": "Sustituido",
+    "override": "Override",
+    "overrideGateTitle": "Override de Gate con Justificación",
+    "overrideGateSubtitle": "Proporcione una justificación documentada para sustituir este gate fallido. Esta acción es auditada.",
+    "overrideJustificationPlaceholder": "Proporcione una justificación clara para sustituir este gate...",
+    "confirmOverride": "Confirmar Override"
   },
   "releaseCalendar": {
     "activeFreezeWindows": "Ventanas de Freeze Activas",
@@ -7975,7 +8011,10 @@
       "freeze": "Calendario de Freeze",
       "intelligence": "Inteligencia",
       "overview": "Resumen",
-      "timeline": "Timeline"
+      "timeline": "Timeline",
+      "preProd": "Pre-Prod vs Prod",
+      "releaseNotes": "Notas de Release",
+      "readiness": "Preparación para Deploy"
     },
     "timeline": {
       "description": "Descripción",
@@ -10783,5 +10822,107 @@
     "colTenantSlug": "Slug del Tenant",
     "colSchemaName": "Nombre del Schema",
     "colSearchPath": "Search Path"
+  },
+  "preProdComparison": {
+    "title": "Comparación Pre-Producción vs Producción",
+    "subtitle": "Compare métricas de baseline entre pre-producción y producción antes de promover",
+    "preProdRelease": "Release Pre-Producción",
+    "prodRelease": "Release Producción",
+    "selectRelease": "Seleccionar una release...",
+    "compare": "Comparar",
+    "loadFailed": "Error al cargar datos de comparación",
+    "prompt": "Seleccione dos releases para comparar sus métricas de baseline",
+    "overallSignal": "Señal General",
+    "signal": {
+      "Positive": "Positivo",
+      "Neutral": "Neutral",
+      "Concerning": "Preocupante"
+    },
+    "metricsTitle": "Comparación de Métricas",
+    "metric": "Métrica",
+    "preProd": "Pre-Prod",
+    "prod": "Prod",
+    "change": "Variación %",
+    "trend": "Tendencia",
+    "trendLabel": {
+      "Improved": "Mejoró",
+      "Degraded": "Degradó",
+      "Stable": "Estable",
+      "Unknown": "Desconocido"
+    },
+    "errorRate": "Tasa de Error",
+    "avgLatency": "Latencia Media (ms)",
+    "p95Latency": "Latencia P95 (ms)",
+    "p99Latency": "Latencia P99 (ms)",
+    "rpm": "Solicitudes / min",
+    "throughput": "Throughput",
+    "noBaseline": "No hay datos de baseline registrados para estas releases"
+  },
+  "releaseNotes": {
+    "title": "Notas de Release",
+    "selectRelease": "Seleccione una release para ver sus notas",
+    "notGenerated": "No hay notas de release generadas aún",
+    "notGeneratedDescription": "Genere notas de release asistidas por IA con resumen de cambios, breaking changes y servicios afectados.",
+    "generate": "Generar Notas",
+    "generateWithAi": "Generar con IA",
+    "regenerate": "Regenerar",
+    "regeneratedAt": "Regenerado en",
+    "model": "Modelo",
+    "tokens": "Tokens",
+    "regenerations": "Regeneraciones",
+    "sections": {
+      "technical": "Resumen Técnico",
+      "executive": "Resumen Ejecutivo",
+      "newEndpoints": "Nuevos Endpoints",
+      "breakingChanges": "Breaking Changes",
+      "affectedServices": "Servicios Afectados",
+      "confidenceMetrics": "Métricas de Confianza",
+      "evidenceLinks": "Links de Evidencia"
+    }
+  },
+  "deployReadiness": {
+    "title": "Preparación para Deploy",
+    "selectRelease": "Seleccione una release para verificar la preparación",
+    "loadFailed": "Error al cargar verificaciones de preparación",
+    "ready": "Listo",
+    "notReady": "No Listo",
+    "passed": "Aprobados",
+    "failed": "Reprobados",
+    "total": "Total",
+    "noChecks": "No hay verificaciones configuradas",
+    "evaluatedAt": "Evaluado en"
+  },
+  "changeAdvisory": {
+    "title": "Change Advisory Board",
+    "subtitle": "Vista operacional de cambios pendientes de revisión de gobernanza con contexto de riesgo y confianza",
+    "filters": "Filtros",
+    "filterService": "Servicio",
+    "filterServicePlaceholder": "Filtrar por nombre del servicio",
+    "filterEnvironment": "Entorno",
+    "filterEnvironmentPlaceholder": "ej: Production",
+    "filterStatus": "Estado de Confianza",
+    "allStatuses": "Todos los estados",
+    "totalChanges": "Total de Cambios",
+    "highRiskCount": "Alto Riesgo",
+    "needsReviewCount": "Necesita Revisión",
+    "pendingReview": "Cambios Pendientes de Revisión Advisory",
+    "loadFailed": "Error al cargar cambios",
+    "noChanges": "No hay cambios que coincidan con los filtros actuales",
+    "col": {
+      "service": "Servicio / Equipo",
+      "version": "Versión",
+      "environment": "Entorno",
+      "confidence": "Confianza",
+      "risk": "Puntuación de Riesgo",
+      "advisory": "Advisory",
+      "created": "Creado"
+    },
+    "noAdvisory": "Sin advisory",
+    "viewDetails": "Ver Detalles",
+    "viewAdvisory": "Ver Advisory",
+    "guidanceTitle": "Sobre el Change Advisory",
+    "guidanceDescription": "El Change Advisory Board proporciona una vista consolidada de todos los cambios que requieren atención de gobernanza. Revise el score de riesgo, blast radius y estado de confianza antes de aprobar o rechazar promociones.",
+    "viewCatalog": "Catálogo de Cambios",
+    "viewPromotion": "Promociones"
   }
 }
