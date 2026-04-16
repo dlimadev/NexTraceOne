@@ -99,10 +99,13 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Contract Compliance Gate (PA-29) | READY | `EvaluateContractComplianceGate` — verifica se gate de conformidade de contratos está configurado para o ambiente alvo da promoção; `GET /api/v1/promotion/{id}/contract-compliance` |
 | Ruleset Governance | READY | Rulesets, bindings, lint results (Spectral) — reais |
 | Audit Trail / Decision Trail | READY | Trilha de decisão, timeline de mudança, correlation events — reais |
+| Post-Release Review | READY | Frontend `PostReleaseReviewPage` (`/releases/post-review`): inicia/progride revisão pós-deploy, janelas de observação, baseline de performance, confidence score. API: `getPostReleaseReview`, `startPostReleaseReview`, `progressPostReleaseReview` |
+| Rollback Assessment | READY | Frontend `ReleaseRollbackPage` (`/releases/rollback`): avalia viabilidade, readiness score, executa rollback auditado. API: `getRollbackAssessment`, `assessRollbackViability`, `registerRollback` |
+| Release Notes (AI) | READY | Frontend `ReleaseNotesPage` (`/releases/notes`): gera/regenera notas por IA com seleção de persona (Technical/Executive/PM), exibe secções estruturadas. API: `getReleaseNotes`, `generateReleaseNotes`, `regenerateReleaseNotes` |
 
 **DbContexts:** `ChangeIntelligenceDbContext`, `WorkflowDbContext`, `PromotionDbContext`, `RulesetGovernanceDbContext` (4 DbContexts, 4 migrações)
-**Status geral:** READY — módulo mais maduro (95% funcional, fluxo flagship)
-**Testes:** 307 testes unitários (0 falhas)
+**Status geral:** READY — módulo completo (100% funcional, 20 páginas frontend)
+**Testes:** 307 testes unitários backend (0 falhas) + 1771 testes frontend (0 falhas)
 **Evidência:** `src/modules/changegovernance/`
 
 ---

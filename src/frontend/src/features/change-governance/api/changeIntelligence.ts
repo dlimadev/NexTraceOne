@@ -767,4 +767,49 @@ export const changeIntelligenceApi = {
     client
       .delete(`/releases/approval-policies/${policyId}`)
       .then((r) => r.data),
+
+  // ─── Post-Release Review ───────────────────────────────────────────────────
+
+  /** Obtém a review pós-release de uma release. */
+  getPostReleaseReview: (releaseId: string) =>
+    client
+      .get<any>(`/releases/${releaseId}/review`)
+      .then((r) => r.data),
+
+  /** Inicia uma review pós-release para uma release. */
+  startPostReleaseReview: (releaseId: string) =>
+    client
+      .post<{ reviewId: string }>(`/releases/${releaseId}/review/start`, { releaseId })
+      .then((r) => r.data),
+
+  /** Progride a review pós-release para a próxima fase. */
+  progressPostReleaseReview: (releaseId: string) =>
+    client
+      .post<any>(`/releases/${releaseId}/review/progress`, { releaseId })
+      .then((r) => r.data),
+
+  // ─── Rollback Assessment ───────────────────────────────────────────────────
+
+  /** Obtém a avaliação de viabilidade de rollback para uma release. */
+  getRollbackAssessment: (releaseId: string) =>
+    client
+      .get<any>(`/releases/${releaseId}/rollback-assessment`)
+      .then((r) => r.data),
+
+  /** Regista ou actualiza a avaliação de viabilidade de rollback de uma release. */
+  assessRollbackViability: (
+    releaseId: string,
+    data: {
+      isViable: boolean;
+      previousVersion?: string;
+      hasReversibleMigrations: boolean;
+      consumersAlreadyMigrated: number;
+      totalConsumersImpacted: number;
+      inviabilityReason?: string;
+      recommendation: string;
+    },
+  ) =>
+    client
+      .post<any>(`/releases/${releaseId}/rollback-assessment`, { releaseId, ...data })
+      .then((r) => r.data),
 };

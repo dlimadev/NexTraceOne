@@ -22,6 +22,9 @@ const ReleaseImpactReportPage = lazy(() => import('../features/change-governance
 const ExternalReleaseIngestPage = lazy(() => import('../features/change-governance/pages/ExternalReleaseIngestPage').then(m => ({ default: m.ExternalReleaseIngestPage })));
 const ReleaseApprovalPoliciesPage = lazy(() => import('../features/change-governance/pages/ReleaseApprovalPoliciesPage').then(m => ({ default: m.ReleaseApprovalPoliciesPage })));
 const ReleaseControlParametersPage = lazy(() => import('../features/change-governance/pages/ReleaseControlParametersPage').then(m => ({ default: m.ReleaseControlParametersPage })));
+const PostReleaseReviewPage = lazy(() => import('../features/change-governance/pages/PostReleaseReviewPage').then(m => ({ default: m.PostReleaseReviewPage })));
+const ReleaseRollbackPage = lazy(() => import('../features/change-governance/pages/ReleaseRollbackPage').then(m => ({ default: m.ReleaseRollbackPage })));
+const ReleaseNotesPage = lazy(() => import('../features/change-governance/pages/ReleaseNotesPage').then(m => ({ default: m.ReleaseNotesPage })));
 
 export function ChangesRoutes() {
   return (
@@ -151,6 +154,30 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
             <ReleaseControlParametersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/post-review"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <PostReleaseReviewPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/rollback"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseRollbackPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/notes"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseNotesPage />
           </ProtectedRoute>
         }
       />
