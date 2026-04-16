@@ -11122,5 +11122,71 @@
     "resultReleaseId": "ID de la Release en NexTraceOne",
     "resultExtId": "ID de la Release Externa",
     "resultStatus": "Estado"
+  },
+  "approvalPolicies": {
+    "title": "Políticas de Aprobación de Release",
+    "subtitle": "Configure los requisitos de aprobación por entorno y servicio",
+    "newPolicy": "Nueva Política",
+    "newPolicyTitle": "Crear Política de Aprobación",
+    "nameLabel": "Nombre de la Política",
+    "namePlaceholder": "ej: Aprobación Manual para Producción",
+    "approvalTypeLabel": "Tipo de Aprobación",
+    "environmentLabel": "Entorno (opcional)",
+    "environmentPlaceholder": "ej: Production (vacío para todos)",
+    "serviceTagLabel": "Etiqueta de Servicio (opcional)",
+    "serviceTagPlaceholder": "ej: payment-services",
+    "webhookUrlLabel": "URL del Webhook",
+    "minApproversLabel": "Mínimo de Aprobadores",
+    "expirationHoursLabel": "Expiración del Token (horas)",
+    "minRiskScoreLabel": "Puntuación de Riesgo Mínima para Aprobación Manual",
+    "minRiskScorePlaceholder": "ej: 70",
+    "priorityLabel": "Prioridad (menor = más alta)",
+    "requireEvidencePack": "Requerir Evidence Pack",
+    "requireChecklist": "Requerir Checklist Completo",
+    "savePolicy": "Guardar Política",
+    "activePolicies": "Políticas Activas",
+    "noPolicies": "No hay políticas de aprobación configuradas",
+    "deletePolicy": "Eliminar política",
+    "priorityBadge": "Prioridad: {{priority}}",
+    "envLabel": "Env",
+    "serviceTagShort": "Tag",
+    "requiresEvidenceBadge": "Requiere Evidence Pack",
+    "requiresChecklistBadge": "Requiere Checklist",
+    "riskThreshold": "Umbral de riesgo"
+  },
+  "releaseControlParams": {
+    "title": "Parámetros de Control de Release",
+    "subtitle": "Parámetros del sistema que gobiernan el ciclo de vida de los releases",
+    "systemParams": "Parámetros del Sistema",
+    "systemParamsHint": "Estos parámetros se almacenan en la base de datos y surten efecto inmediatamente.",
+    "saveChanges": "Guardar Cambios",
+    "saved": "¡Guardado!",
+    "noDescription": "Sin descripción disponible",
+    "callbackInfo": "Callback de Aprobación Externa",
+    "callbackInfoText1": "Cuando un sistema externo recibe una solicitud de aprobación, debe responder al siguiente endpoint:",
+    "callbackInfoText2": "El token de callback es un UUID v4 único almacenado como hash SHA-256.",
+    "params": {
+      "release_require_release_for_production": {
+        "description": "Toda promoción a Producción requiere una release aprobada con Evidence Pack."
+      },
+      "release_require_release_for_preprod": {
+        "description": "Toda promoción a Pre-Producción requiere una release aprobada."
+      },
+      "release_auto_assign_commits_on_promotion": {
+        "description": "Los commits candidatos se mueven automáticamente a Incluido al crear una release."
+      },
+      "release_allow_external_ingest": {
+        "description": "Aceptar releases creadas por sistemas externos via API de ingestión."
+      },
+      "release_approval_callback_token_expiry_hours": {
+        "description": "Horas hasta que expire el token de callback."
+      },
+      "release_allow_po_remove_workitems": {
+        "description": "Permitir que PO/PM eliminen work items de una release en curso."
+      },
+      "release_block_promotion_if_commits_unassigned": {
+        "description": "Bloquear la promoción si hay commits sin release en el pool del servicio."
+      }
+    }
   }
 }

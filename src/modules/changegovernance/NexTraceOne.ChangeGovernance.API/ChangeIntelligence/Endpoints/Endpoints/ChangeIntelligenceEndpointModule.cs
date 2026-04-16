@@ -36,6 +36,7 @@ public sealed class ChangeIntelligenceEndpointModule
         IntelligenceEndpoints.Map(group);
         TraceCorrelationEndpoints.Map(group);
         ApprovalGatewayEndpoints.Map(group);
+        ApprovalPolicyEndpoints.Map(group);
         ReleaseIngestEndpoints.Map(group);
 
         FreezeEndpoints.Map(app);

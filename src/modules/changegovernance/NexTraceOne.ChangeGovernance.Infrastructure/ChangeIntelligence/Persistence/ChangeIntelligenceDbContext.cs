@@ -76,6 +76,9 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Pedidos de aprovação de releases — internos e externos (via webhook outbound/callback).</summary>
     public DbSet<ReleaseApprovalRequest> ApprovalRequests => Set<ReleaseApprovalRequest>();
 
+    /// <summary>Políticas de aprovação de releases configuráveis por ambiente e serviço.</summary>
+    public DbSet<ReleaseApprovalPolicy> ApprovalPolicies => Set<ReleaseApprovalPolicy>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

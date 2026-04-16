@@ -734,4 +734,37 @@ export const changeIntelligenceApi = {
     client
       .get<ReleaseImpactReport>(`/releases/${releaseId}/impact-report`)
       .then((r) => r.data),
+
+  // ─── Approval Policies ────────────────────────────────────────────────────
+
+  /** Lista políticas de aprovação activas do tenant. */
+  listApprovalPolicies: (environmentId?: string, serviceId?: string) =>
+    client
+      .get<any[]>('/releases/approval-policies', { params: { environmentId, serviceId } })
+      .then((r) => r.data),
+
+  /** Cria uma nova política de aprovação. */
+  createApprovalPolicy: (data: {
+    name: string;
+    approvalType: string;
+    environmentId?: string;
+    serviceId?: string;
+    serviceTag?: string;
+    externalWebhookUrl?: string;
+    minApprovers?: number;
+    expirationHours?: number;
+    requireEvidencePack?: boolean;
+    requireChecklistCompletion?: boolean;
+    minRiskScoreForManualApproval?: number;
+    priority?: number;
+  }) =>
+    client
+      .post<{ policyId: string; name: string }>('/releases/approval-policies', data)
+      .then((r) => r.data),
+
+  /** Desactiva (soft-delete) uma política de aprovação. */
+  deleteApprovalPolicy: (policyId: string) =>
+    client
+      .delete(`/releases/approval-policies/${policyId}`)
+      .then((r) => r.data),
 };

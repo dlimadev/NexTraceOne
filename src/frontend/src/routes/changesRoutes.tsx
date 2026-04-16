@@ -20,6 +20,8 @@ const ReleaseCommitPoolPage = lazy(() => import('../features/change-governance/p
 const ReleaseApprovalGatewayPage = lazy(() => import('../features/change-governance/pages/ReleaseApprovalGatewayPage').then(m => ({ default: m.ReleaseApprovalGatewayPage })));
 const ReleaseImpactReportPage = lazy(() => import('../features/change-governance/pages/ReleaseImpactReportPage').then(m => ({ default: m.ReleaseImpactReportPage })));
 const ExternalReleaseIngestPage = lazy(() => import('../features/change-governance/pages/ExternalReleaseIngestPage').then(m => ({ default: m.ExternalReleaseIngestPage })));
+const ReleaseApprovalPoliciesPage = lazy(() => import('../features/change-governance/pages/ReleaseApprovalPoliciesPage').then(m => ({ default: m.ReleaseApprovalPoliciesPage })));
+const ReleaseControlParametersPage = lazy(() => import('../features/change-governance/pages/ReleaseControlParametersPage').then(m => ({ default: m.ReleaseControlParametersPage })));
 
 export function ChangesRoutes() {
   return (
@@ -133,6 +135,22 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
             <ExternalReleaseIngestPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/approval-policies"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseApprovalPoliciesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/control-parameters"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseControlParametersPage />
           </ProtectedRoute>
         }
       />

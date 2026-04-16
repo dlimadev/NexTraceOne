@@ -27,6 +27,9 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListW
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RemoveWorkItemFromRelease;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RequestExternalApproval;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RespondToApprovalRequest;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CreateApprovalPolicy;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListApprovalPolicies;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.DeleteApprovalPolicy;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision;
@@ -99,6 +102,9 @@ public static class DependencyInjection
         services.AddTransient<IValidator<RequestExternalApproval.Command>, RequestExternalApproval.Validator>();
         services.AddTransient<IValidator<RespondToApprovalRequest.Command>, RespondToApprovalRequest.Validator>();
         services.AddTransient<IValidator<ListApprovalRequests.Query>, ListApprovalRequests.Validator>();
+        services.AddTransient<IValidator<CreateApprovalPolicy.Command>, CreateApprovalPolicy.Validator>();
+        services.AddTransient<IValidator<ListApprovalPolicies.Query>, ListApprovalPolicies.Validator>();
+        services.AddTransient<IValidator<DeleteApprovalPolicy.Command>, DeleteApprovalPolicy.Validator>();
 
         // Phase 4: Ingest Release from External System
         services.AddTransient<IValidator<IngestExternalRelease.Command>, IngestExternalRelease.Validator>();

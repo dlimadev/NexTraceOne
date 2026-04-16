@@ -11157,5 +11157,71 @@
     "resultReleaseId": "NexTraceOne Release ID",
     "resultExtId": "External Release ID",
     "resultStatus": "Status"
+  },
+  "approvalPolicies": {
+    "title": "Release Approval Policies",
+    "subtitle": "Configure approval requirements per environment and service",
+    "newPolicy": "New Policy",
+    "newPolicyTitle": "Create Approval Policy",
+    "nameLabel": "Policy Name",
+    "namePlaceholder": "e.g. Production Manual Approval",
+    "approvalTypeLabel": "Approval Type",
+    "environmentLabel": "Environment (optional)",
+    "environmentPlaceholder": "e.g. Production (leave empty for all)",
+    "serviceTagLabel": "Service Tag (optional)",
+    "serviceTagPlaceholder": "e.g. payment-services (leave empty for all)",
+    "webhookUrlLabel": "Webhook URL",
+    "minApproversLabel": "Minimum Approvers",
+    "expirationHoursLabel": "Token Expiry (hours)",
+    "minRiskScoreLabel": "Min Risk Score for Manual Approval",
+    "minRiskScorePlaceholder": "e.g. 70 (leave empty to disable)",
+    "priorityLabel": "Priority (lower = higher precedence)",
+    "requireEvidencePack": "Require Evidence Pack",
+    "requireChecklist": "Require Checklist Completion",
+    "savePolicy": "Save Policy",
+    "activePolicies": "Active Policies",
+    "noPolicies": "No approval policies configured yet",
+    "deletePolicy": "Delete policy",
+    "priorityBadge": "Priority: {{priority}}",
+    "envLabel": "Env",
+    "serviceTagShort": "Tag",
+    "requiresEvidenceBadge": "Requires Evidence Pack",
+    "requiresChecklistBadge": "Requires Checklist",
+    "riskThreshold": "Risk threshold"
+  },
+  "releaseControlParams": {
+    "title": "Release Control Parameters",
+    "subtitle": "System-level parameters governing the release lifecycle and governance",
+    "systemParams": "System Parameters",
+    "systemParamsHint": "These parameters are stored in the database and take effect immediately — no redeploy required.",
+    "saveChanges": "Save Changes",
+    "saved": "Saved!",
+    "noDescription": "No description available",
+    "callbackInfo": "External Approval Callback",
+    "callbackInfoText1": "When an external system (ServiceNow, Teams, Slack) receives an approval request, it should respond to the following endpoint:",
+    "callbackInfoText2": "The callback token is a one-time UUID v4 stored as a SHA-256 hash. It authenticates the external system's response without requiring user credentials.",
+    "params": {
+      "release_require_release_for_production": {
+        "description": "Every promotion to Production requires an approved release with Evidence Pack."
+      },
+      "release_require_release_for_preprod": {
+        "description": "Every promotion to Pre-Production requires an approved release."
+      },
+      "release_auto_assign_commits_on_promotion": {
+        "description": "Candidate commits are automatically moved to Included status when a release is created."
+      },
+      "release_allow_external_ingest": {
+        "description": "Accept releases created by external systems (AzureDevOps, Jira, Jenkins) via the ingest API."
+      },
+      "release_approval_callback_token_expiry_hours": {
+        "description": "Hours until an approval callback token expires. External approvers must respond within this window."
+      },
+      "release_allow_po_remove_workitems": {
+        "description": "Allow PO/PM to remove work items from an in-progress release."
+      },
+      "release_block_promotion_if_commits_unassigned": {
+        "description": "Block promotion if there are commits in the service's pool with Unassigned status."
+      }
+    }
   }
 }

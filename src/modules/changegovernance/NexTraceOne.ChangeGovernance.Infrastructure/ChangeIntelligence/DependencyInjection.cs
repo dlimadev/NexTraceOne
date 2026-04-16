@@ -70,6 +70,7 @@ public static class DependencyInjection
 
         // Phase 3: External Approval Gateway
         services.AddScoped<IApprovalRequestRepository, ApprovalRequestRepository>();
+        services.AddScoped<IReleaseApprovalPolicyRepository, ReleaseApprovalPolicyRepository>();
         services.AddHttpClient("ExternalApprovalWebhook")
             .ConfigureHttpClient(c => c.Timeout = TimeSpan.FromSeconds(30));
         services.AddScoped<IExternalApprovalWebhookSender, ExternalApprovalWebhookSender>();
