@@ -323,6 +323,160 @@ export interface ReleaseTrainEvaluationResponse {
   evaluatedAt: string;
 }
 
+// ─── Commit Pool & Work Item Association types ───────────────────────────────
+
+export interface CommitAssociationItem {
+  id: string;
+  commitSha: string;
+  commitMessage: string;
+  commitAuthor: string;
+  committedAt: string;
+  branchName: string;
+  serviceName: string;
+  assignmentStatus: string;
+  assignedAt: string | null;
+  assignedBy: string | null;
+  extractedWorkItemRefs: string | null;
+}
+
+export interface CommitsByReleaseResponse {
+  releaseId: string;
+  commits: CommitAssociationItem[];
+}
+
+export interface WorkItemAssociationItem {
+  id: string;
+  externalWorkItemId: string;
+  externalSystem: string;
+  title: string;
+  workItemType: string;
+  externalStatus: string | null;
+  externalUrl: string | null;
+  addedBy: string;
+  addedAt: string;
+  isActive: boolean;
+}
+
+export interface WorkItemsByReleaseResponse {
+  releaseId: string;
+  workItems: WorkItemAssociationItem[];
+}
+
+export interface AddWorkItemRequest {
+  externalWorkItemId: string;
+  externalSystem: string;
+  title: string;
+  workItemType: string;
+  externalStatus?: string;
+  externalUrl?: string;
+}
+
+export interface AddWorkItemResponse {
+  workItemAssociationId: string;
+  releaseId: string;
+}
+
+// ─── External Approval Gateway types ─────────────────────────────────────────
+
+export interface RequestApprovalData {
+  approvalType: string;
+  targetEnvironment: string;
+  externalSystem?: string;
+  webhookUrl?: string;
+  tokenExpiryHours?: number;
+}
+
+export interface RequestApprovalResponse {
+  approvalRequestId: string;
+  releaseId: string;
+  status: string;
+  callbackTokenPlainText: string | null;
+  expiresAt: string;
+  webhookSent: boolean;
+}
+
+export interface ApprovalRequestItem {
+  id: string;
+  approvalType: string;
+  externalSystem: string | null;
+  targetEnvironment: string;
+  status: string;
+  requestedAt: string;
+  respondedAt: string | null;
+  respondedBy: string | null;
+  comments: string | null;
+  externalRequestId: string | null;
+  callbackTokenExpiresAt: string;
+}
+
+export interface ApprovalRequestsResponse {
+  releaseId: string;
+  approvalRequests: ApprovalRequestItem[];
+}
+
+// ─── Ingest Release from External System types ───────────────────────────────
+
+export interface IngestExternalReleaseRequest {
+  externalReleaseId: string;
+  externalSystem: string;
+  serviceName: string;
+  version: string;
+  targetEnvironment: string;
+  description?: string;
+  commitShas?: string[];
+  workItems?: Array<{ id: string; system: string }>;
+  triggerPromotion?: boolean;
+}
+
+export interface IngestExternalReleaseResponse {
+  releaseId: string;
+  externalReleaseId: string;
+  isNew: boolean;
+  status: string;
+}
+
+// ─── Impact Report types ──────────────────────────────────────────────────────
+
+export interface BlastRadiusSectionDto {
+  totalAffectedConsumers: number;
+  directConsumers: string[];
+  transitiveConsumers: string[];
+  calculatedAt: string;
+}
+
+export interface WorkItemsSummaryDto {
+  total: number;
+  stories: number;
+  bugs: number;
+  features: number;
+  others: number;
+}
+
+export interface CommitAuthorGroupDto {
+  author: string;
+  count: number;
+}
+
+export interface CommitsSummaryDto {
+  total: number;
+  byAuthor: CommitAuthorGroupDto[];
+}
+
+export interface ReleaseImpactReport {
+  releaseId: string;
+  serviceName: string;
+  version: string;
+  environment: string;
+  status: string;
+  riskScore: number | null;
+  changeLevel: string;
+  blastRadius: BlastRadiusSectionDto | null;
+  workItemsSummary: WorkItemsSummaryDto;
+  commitsSummary: CommitsSummaryDto;
+  pendingApprovals: number;
+  generatedAt: string;
+}
+
 // ─── API Client ──────────────────────────────────────────────────────────────
 
 export const changeIntelligenceApi = {
@@ -521,5 +675,63 @@ export const changeIntelligenceApi = {
   evaluateReleaseTrain: (data: EvaluateReleaseTrainRequest) =>
     client
       .post<ReleaseTrainEvaluationResponse>('/releases/train-evaluation', data)
+      .then((r) => r.data),
+
+  // ─── Phase 2: Commit Pool & Work Item Association ──────────────────────────
+
+  /** Lista commits associados a uma release. */
+  listCommitsByRelease: (releaseId: string) =>
+    client
+      .get<CommitsByReleaseResponse>(`/releases/${releaseId}/commits`)
+      .then((r) => r.data),
+
+  /** Lista work items activos de uma release. */
+  listWorkItemsByRelease: (releaseId: string, includeRemoved = false) =>
+    client
+      .get<WorkItemsByReleaseResponse>(`/releases/${releaseId}/work-items`, {
+        params: { includeRemoved },
+      })
+      .then((r) => r.data),
+
+  /** Adiciona um work item externo a uma release. */
+  addWorkItemToRelease: (releaseId: string, data: AddWorkItemRequest) =>
+    client
+      .post<AddWorkItemResponse>(`/releases/${releaseId}/work-items`, data)
+      .then((r) => r.data),
+
+  /** Remove (lógico) um work item de uma release. */
+  removeWorkItemFromRelease: (workItemAssociationId: string) =>
+    client
+      .delete(`/releases/work-items-associations/${workItemAssociationId}`)
+      .then((r) => r.data),
+
+  // ─── Phase 3: External Approval Gateway ───────────────────────────────────
+
+  /** Cria um pedido de aprovação de release (interno ou externo). */
+  requestExternalApproval: (releaseId: string, data: RequestApprovalData) =>
+    client
+      .post<RequestApprovalResponse>(`/releases/${releaseId}/approval-requests`, data)
+      .then((r) => r.data),
+
+  /** Lista pedidos de aprovação de uma release. */
+  listApprovalRequests: (releaseId: string) =>
+    client
+      .get<ApprovalRequestsResponse>(`/releases/${releaseId}/approval-requests`)
+      .then((r) => r.data),
+
+  // ─── Phase 4: Ingest Release from External System ─────────────────────────
+
+  /** Ingere uma release criada por um sistema externo. */
+  ingestExternalRelease: (data: IngestExternalReleaseRequest) =>
+    client
+      .post<IngestExternalReleaseResponse>('/releases/ingest', data)
+      .then((r) => r.data),
+
+  // ─── Phase 5: Impact Report ────────────────────────────────────────────────
+
+  /** Obtém o relatório de impacto calculado de uma release. */
+  getReleaseImpactReport: (releaseId: string) =>
+    client
+      .get<ReleaseImpactReport>(`/releases/${releaseId}/impact-report`)
       .then((r) => r.data),
 };

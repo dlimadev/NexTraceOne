@@ -16,6 +16,10 @@ const DoraMetricsPage = lazy(() => import('../features/change-governance/pages/D
 const ChangeAdvisoryPage = lazy(() => import('../features/change-governance/pages/ChangeAdvisoryPage').then(m => ({ default: m.ChangeAdvisoryPage })));
 const ReleaseTrainPage = lazy(() => import('../features/change-governance/pages/ReleaseTrainPage').then(m => ({ default: m.ReleaseTrainPage })));
 const ReleaseChecklistExecutionPage = lazy(() => import('../features/change-governance/pages/ReleaseChecklistExecutionPage').then(m => ({ default: m.ReleaseChecklistExecutionPage })));
+const ReleaseCommitPoolPage = lazy(() => import('../features/change-governance/pages/ReleaseCommitPoolPage').then(m => ({ default: m.ReleaseCommitPoolPage })));
+const ReleaseApprovalGatewayPage = lazy(() => import('../features/change-governance/pages/ReleaseApprovalGatewayPage').then(m => ({ default: m.ReleaseApprovalGatewayPage })));
+const ReleaseImpactReportPage = lazy(() => import('../features/change-governance/pages/ReleaseImpactReportPage').then(m => ({ default: m.ReleaseImpactReportPage })));
+const ExternalReleaseIngestPage = lazy(() => import('../features/change-governance/pages/ExternalReleaseIngestPage').then(m => ({ default: m.ExternalReleaseIngestPage })));
 
 export function ChangesRoutes() {
   return (
@@ -97,6 +101,38 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="workflow:instances:write" redirectTo="/unauthorized">
             <ReleaseChecklistExecutionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/commit-pool"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseCommitPoolPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/approval-gateway"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseApprovalGatewayPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/impact-report"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseImpactReportPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/ingest-external"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ExternalReleaseIngestPage />
           </ProtectedRoute>
         }
       />
