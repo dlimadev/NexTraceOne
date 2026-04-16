@@ -168,7 +168,7 @@ public static class WebApplicationExtensions
 
     /// <summary>
     /// Seeds mandatory configuration definitions in ALL environments.
-    /// The configuration module requires a baseline set of 345+ definitions
+    /// The configuration module requires a baseline set of 533+ definitions
     /// to function correctly. This seeder is idempotent — it only inserts
     /// definitions that do not yet exist (checked by key).
     /// Unlike development seed data, this runs in every environment including Production.
@@ -207,6 +207,49 @@ public static class WebApplicationExtensions
                 "Configuration definitions seeding failed. " +
                 "This may be expected if the Configuration database schema has not been created yet. " +
                 "The application will start without baseline configuration definitions.");
+        }
+    }
+
+    /// <summary>
+    /// Seeds mandatory feature flag definitions in ALL environments.
+    /// Provides all platform feature flags for runtime toggle and governance.
+    /// This seeder is idempotent — only inserts flags that do not yet exist.
+    /// Legacy flags (legacy.*) are inserted via migration W00 and are skipped here.
+    /// </summary>
+    public static async Task SeedFeatureFlagDefinitionsAsync(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+        try
+        {
+            var seeder = scope.ServiceProvider
+                .GetRequiredService<NexTraceOne.Configuration.Application.Abstractions.IFeatureFlagDefinitionSeeder>();
+
+            var result = await seeder.SeedAsync();
+
+            if (result.IsNoOp)
+            {
+                logger.LogInformation(
+                    "Feature flag definitions already up-to-date. " +
+                    "{Skipped} definitions verified (no changes).",
+                    result.Skipped);
+            }
+            else
+            {
+                logger.LogInformation(
+                    "Feature flag definitions seeded. " +
+                    "Added: {Added}, Already existing: {Skipped}, Total: {Total}.",
+                    result.Added, result.Skipped, result.Total);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Feature flag definitions seeding failed. " +
+                "This may be expected if the Configuration database schema has not been created yet. " +
+                "The application will start without baseline feature flag definitions.");
         }
     }
 

@@ -100,7 +100,7 @@ Se nenhum valor for encontrado, usa o `DefaultValue` da definição.
 
 ## ConfigurationDefinitionSeeder (P3.3)
 
-O módulo inclui um seeder idempotente com **345 definições** organizadas em **8 fases**.
+O módulo inclui um seeder idempotente com **533 definições** organizadas em **8 fases**.
 
 ### Execução
 
@@ -132,6 +132,31 @@ SeedingResult result = await seeder.SeedAsync();
 | 7 | AI / Integrations | `ai.*`, `integrations.*` |
 | 8 | Admin / UX | `admin.*` |
 
+## FeatureFlagDefinitionSeeder
+
+O módulo inclui um seeder idempotente separado para feature flags com **48 definições** cobrindo todos os pilares do produto.
+
+### Execução
+
+Executa em **todos os ambientes** durante o arranque via `SeedFeatureFlagDefinitionsAsync()` em `WebApplicationExtensions`. As flags `legacy.*` já são inseridas via migration W00 e são ignoradas (idempotência por chave).
+
+### Grupos de feature flags
+
+| Grupo | Flags | Descrição |
+|---|---|---|
+| AI | `ai.assistant.enabled`, `ai.copilot.enabled`, `ai.agents.enabled`, `ai.model-registry.enabled`, `ai.external-providers.enabled`, `ai.ide-extensions.enabled` | Capacidades de IA governada |
+| Catalog | `catalog.service-topology.enabled`, `catalog.service-scorecard.enabled`, `catalog.service-lifecycle.enabled`, `catalog.custom-fields.enabled` | Catálogo de serviços |
+| Contracts | `contracts.rest.enabled`, `contracts.soap.enabled`, `contracts.events.enabled`, `contracts.semantic-diff.enabled`, `contracts.studio.enabled`, `contracts.publication-center.enabled` | Governança de contratos |
+| Changes | `changes.blast-radius.enabled`, `changes.production-confidence.enabled`, `changes.rollback-intelligence.enabled`, `changes.release-calendar.enabled`, `changes.evidence-pack.enabled` | Change intelligence |
+| Operations | `operations.incident-correlation.enabled`, `operations.runbooks.enabled`, `operations.aiops-insights.enabled`, `operations.post-change-verification.enabled` | Operações |
+| Knowledge | `knowledge.hub.enabled`, `knowledge.search.enabled` | Knowledge hub |
+| Observability | `observability.trace-explorer.enabled`, `observability.log-explorer.enabled`, `observability.dora-metrics.enabled`, `observability.canary-tracking.enabled` | Observabilidade |
+| FinOps | `finops.contextual.enabled`, `finops.waste-detection.enabled`, `finops.greenops.enabled` | FinOps contextual |
+| Governance | `governance.risk-center.enabled`, `governance.compliance-packs.enabled`, `governance.audit-trail.enabled` | Governance / Compliance |
+| Platform | `platform.multi-tenant.enabled`, `platform.saml-sso.enabled`, `platform.mtls.enabled`, `platform.elasticsearch.enabled`, `platform.greenops.carbon-reporting.enabled` | Platform Admin Self-Hosted |
+| Integrations | `integrations.gitlab.enabled`, `integrations.github.enabled`, `integrations.jenkins.enabled`, `integrations.azure-devops.enabled`, `integrations.kafka.enabled`, `integrations.webhooks.enabled` | Integrações externas |
+| Product Analytics | `product-analytics.enabled`, `product-analytics.dora-admin.enabled` | Analytics de produto |
+
 ## Concorrência otimista (P3.4)
 
 Todas as entidades mutáveis usam **PostgreSQL xmin** via `IsRowVersion()`:
@@ -154,6 +179,8 @@ Os handlers de escrita capturam `ConcurrencyException` e retornam:
 
 O `RowVersion` é exposto nos DTOs `ConfigurationEntryDto` e `FeatureFlagEntryDto`.
 
+O frontend trata HTTP 409 explicitamente nos hooks `useSetConfigurationValue`, `useRemoveOverride` e `useToggleConfiguration` via `isConcurrencyConflict()` (axios) — lança um erro com `isConcurrencyConflict: true` para que os componentes possam apresentar mensagem contextual.
+
 ## Segurança
 
 - Valores sensíveis encriptados com AES-256-GCM em repouso (`IsEncrypted`, `IsSensitive`)
@@ -168,21 +195,17 @@ O `RowVersion` é exposto nos DTOs `ConfigurationEntryDto` e `FeatureFlagEntryDt
 - **Prefixo:** `cfg_`
 - **Tabelas:** `cfg_definitions`, `cfg_entries`, `cfg_audit_entries`, `cfg_modules`, `cfg_feature_flag_definitions`, `cfg_feature_flag_entries`, `cfg_outbox_messages`
 - **Concorrência:** xmin via `IsRowVersion()` em Definition, Entry, FeatureFlagEntry, FeatureFlagDefinition
-- **Migration pendente:** P3.1+P3.2 (cfg_modules, cfg_feature_flag_definitions, cfg_feature_flag_entries, module_id)
 
-## Testes
+## Testes frontend
 
-326 testes unitários cobrindo:
-- Entidades de domínio (criação, atualização, invariantes)
-- Seed data (completude, idempotência, `SeedingResult`)
-- Concorrência (todos os 5 handlers → `ConcurrencyException` → 409)
+246 ficheiros de teste, 1.610+ testes, 0 falhas:
+- Todas as 34 páginas platform-admin com test file dedicado
+- Todas as páginas de configuration com cobertura
 
 ## Limitações conhecidas
 
-1. **Migration pendente (P1):** as tabelas de P3.1/P3.2 (`cfg_modules`, `cfg_feature_flag_definitions`, `cfg_feature_flag_entries`, coluna `module_id`) ainda aguardam `dotnet ef migrations add`
-2. **FeatureFlagDefinitionSeeder:** não existe ainda — tabela `cfg_feature_flag_definitions` ficará vazia após migration
-3. **Frontend 409:** o frontend não trata explicitamente HTTP 409 de concorrência
-4. **Catálogo navegável das 345 definições:** documentação detalhada de cada definição fica para fase posterior
+1. **Testes backend:** o módulo configuration não tem projeto de testes `.csproj` no repositório — candidato a fase seguinte
+2. **ConfigurationModule UI linkage:** a navegação por grupo de módulo na `ConfigurationAdminPage` não está exposta — planejado para fase futura
 
 ## Documentação relacionada
 

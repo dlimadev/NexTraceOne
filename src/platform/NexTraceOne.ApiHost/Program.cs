@@ -275,6 +275,9 @@ await app.ApplyDatabaseMigrationsAsync();
 // ── Seed de definições de configuração (idempotente, todos os ambientes) ──
 await app.SeedConfigurationDefinitionsAsync();
 
+// ── Seed de definições de feature flags (idempotente, todos os ambientes) ──
+await app.SeedFeatureFlagDefinitionsAsync();
+
 // ── Seed de dados de autorização (idempotente, todos os ambientes) ──
 // Popula iam_role_permissions e iam_module_access_policies a partir dos catálogos.
 // Necessário para que o pipeline de autorização (cascata JWT → DB → ModuleAccess → JIT)
