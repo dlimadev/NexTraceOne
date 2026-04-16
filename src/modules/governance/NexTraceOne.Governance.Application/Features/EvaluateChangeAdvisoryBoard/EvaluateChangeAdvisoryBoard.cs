@@ -3,6 +3,7 @@ using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
@@ -50,7 +51,7 @@ public static class EvaluateChangeAdvisoryBoard
 
             // Check if CAB is enabled
             var enabledConfig = await configService.ResolveEffectiveValueAsync(
-                "governance.change_advisory_board.enabled",
+                GovernanceConfigKeys.ChangeAdvisoryBoardEnabled,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -70,7 +71,7 @@ public static class EvaluateChangeAdvisoryBoard
 
             // Evaluate trigger conditions
             var triggerConfig = await configService.ResolveEffectiveValueAsync(
-                "governance.change_advisory_board.trigger_conditions",
+                GovernanceConfigKeys.ChangeAdvisoryBoardTriggerConditions,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -121,7 +122,7 @@ public static class EvaluateChangeAdvisoryBoard
 
             // Get CAB members
             var membersConfig = await configService.ResolveEffectiveValueAsync(
-                "governance.change_advisory_board.members",
+                GovernanceConfigKeys.ChangeAdvisoryBoardMembers,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);

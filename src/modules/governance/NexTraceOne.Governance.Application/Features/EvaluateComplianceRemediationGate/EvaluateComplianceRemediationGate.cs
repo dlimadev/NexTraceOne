@@ -3,6 +3,7 @@ using System.Text.Json;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
@@ -36,14 +37,14 @@ public static class EvaluateComplianceRemediationGate
 
             // Check auto-remediation enabled
             var autoRemConfig = await configService.ResolveEffectiveValueAsync(
-                "governance.compliance.auto_remediation.enabled",
+                GovernanceConfigKeys.ComplianceAutoRemediationEnabled,
                 ConfigurationScope.Tenant, null, cancellationToken);
 
             var autoRemEnabled = autoRemConfig?.EffectiveValue == "true";
 
             // Get active frameworks
             var frameworkConfig = await configService.ResolveEffectiveValueAsync(
-                "governance.compliance.framework",
+                GovernanceConfigKeys.ComplianceFramework,
                 ConfigurationScope.Tenant, null, cancellationToken);
 
             var frameworks = new List<string>();

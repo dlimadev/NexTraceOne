@@ -6,7 +6,9 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.ConfigurationKeys;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
@@ -57,7 +59,7 @@ public static class CheckDeployReadiness
 
             // ── Check 1: Release approval required ───────────────────
             var approvalConfig = await configService.ResolveEffectiveValueAsync(
-                "change.deploy.require_release_approval",
+                ChangeConfigKeys.DeployRequireReleaseApproval,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -66,7 +68,7 @@ public static class CheckDeployReadiness
             if (requireApproval)
             {
                 var isApproved = release.ApprovalStatus is not null
-                    && string.Equals(release.ApprovalStatus, "Approved", StringComparison.OrdinalIgnoreCase);
+                    && string.Equals(release.ApprovalStatus, ReleaseApprovalStatus.Approved, StringComparison.OrdinalIgnoreCase);
                 checks.Add(new DeployReadinessCheck(
                     "release_approval",
                     "Release must be approved before deployment",
@@ -76,7 +78,7 @@ public static class CheckDeployReadiness
 
             // ── Check 2: Pre-deploy checks (contract_compliance, security_scan, evidence_pack) ──
             var preDeployConfig = await configService.ResolveEffectiveValueAsync(
-                "change.deploy.pre_deploy_checks",
+                ChangeConfigKeys.DeployPreDeployChecks,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -111,7 +113,7 @@ public static class CheckDeployReadiness
 
             // ── Check 3: Breaking change block ───────────────────
             var breakingChangeConfig = await configService.ResolveEffectiveValueAsync(
-                "catalog.contract.breaking_change.block_deploy",
+                ChangeConfigKeys.CatalogContractBreakingChangeBlockDeploy,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -132,7 +134,7 @@ public static class CheckDeployReadiness
 
             // ── Check 4: External validation ───────────────────
             var externalConfig = await configService.ResolveEffectiveValueAsync(
-                "change.release.external_validation.enabled",
+                ChangeConfigKeys.ReleaseExternalValidationEnabled,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);

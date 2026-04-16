@@ -3,6 +3,7 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.ConfigurationKeys;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
@@ -177,7 +178,7 @@ public static class RegisterServiceAsset
 
             // ── PARAMETERIZATION: approval gate ──────────────────────────────
             var approvalConfig = await configurationService.ResolveEffectiveValueAsync(
-                "catalog.service.creation.approval_required",
+                CatalogConfigKeys.ServiceCreationApprovalRequired,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
