@@ -77,7 +77,7 @@ export function useSetConfigurationValue() {
     },
     onError: (error: unknown) => {
       if (isConcurrencyConflict(error)) {
-        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT'), {
+        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT', { cause: error }), {
           isConcurrencyConflict: true,
         });
       }
@@ -112,7 +112,7 @@ export function useRemoveOverride() {
     },
     onError: (error: unknown) => {
       if (isConcurrencyConflict(error)) {
-        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT'), {
+        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT', { cause: error }), {
           isConcurrencyConflict: true,
         });
       }
@@ -137,7 +137,7 @@ export function useToggleConfiguration() {
     },
     onError: (error: unknown) => {
       if (isConcurrencyConflict(error)) {
-        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT'), {
+        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT', { cause: error }), {
           isConcurrencyConflict: true,
         });
       }
