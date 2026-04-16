@@ -88,6 +88,9 @@ const MigrationPreviewPage = lazy(() => import('../features/platform-admin/pages
 const DoraAdminDashboardPage = lazy(() => import('../features/platform-admin/pages/DoraAdminDashboardPage').then(m => ({ default: m.DoraAdminDashboardPage })));
 const SamlSsoPage = lazy(() => import('../features/platform-admin/pages/SamlSsoPage').then(m => ({ default: m.SamlSsoPage })));
 const MtlsManagerPage = lazy(() => import('../features/platform-admin/pages/MtlsManagerPage').then(m => ({ default: m.MtlsManagerPage })));
+const FeatureFlagsRuntimePage = lazy(() => import('../features/platform-admin/pages/FeatureFlagsRuntimePage').then(m => ({ default: m.FeatureFlagsRuntimePage })));
+const CanaryDashboardPage = lazy(() => import('../features/platform-admin/pages/CanaryDashboardPage').then(m => ({ default: m.CanaryDashboardPage })));
+const MultiTenantSchemaPage = lazy(() => import('../features/platform-admin/pages/MultiTenantSchemaPage').then(m => ({ default: m.MultiTenantSchemaPage })));
 
 export function AdminRoutes() {
   return (
@@ -667,6 +670,33 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
             <MtlsManagerPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Feature Flags Runtime — W8-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/feature-flags-runtime"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <FeatureFlagsRuntimePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Canary Dashboard — W8-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/canary-dashboard"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <CanaryDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Multi-Tenant Schema — W8-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/tenant-schemas"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <MultiTenantSchemaPage />
           </ProtectedRoute>
         }
       />

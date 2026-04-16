@@ -80,6 +80,9 @@ public static class DependencyInjection
         services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
         services.AddSingleton<IConfigurationSecurityService, ConfigurationSecurityService>();
 
+        // Feature Flag Runtime — in-process evaluation with TTL cache
+        services.AddScoped<IFeatureFlagRuntime, FeatureFlagRuntime>();
+
         return services;
     }
 }

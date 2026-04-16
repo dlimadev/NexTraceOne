@@ -14,6 +14,8 @@ using GetPlatformReadinessFeature = NexTraceOne.Governance.Application.Features.
 using GetConfigHealthFeature = NexTraceOne.Governance.Application.Features.GetConfigHealth.GetConfigHealth;
 using GetPendingMigrationsFeature = NexTraceOne.Governance.Application.Features.GetPendingMigrations.GetPendingMigrations;
 using GetNetworkPolicyFeature = NexTraceOne.Governance.Application.Features.GetNetworkPolicy.GetNetworkPolicy;
+using GetTenantSchemasFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.GetTenantSchemas;
+using ProvisionTenantSchemaFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.ProvisionTenantSchema;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -124,5 +126,25 @@ public sealed class PlatformStatusEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/tenant-schemas", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetTenantSchemasFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapPost("/tenant-schemas/provision", async (
+            ProvisionTenantSchemaFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer, statusCode: 201);
+        }).RequirePermission("platform:admin:write");
     }
 }

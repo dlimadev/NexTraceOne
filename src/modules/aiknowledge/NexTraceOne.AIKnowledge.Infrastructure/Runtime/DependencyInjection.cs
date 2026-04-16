@@ -7,6 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Infrastructure.Context;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Anthropic;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.LmStudio;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
@@ -40,6 +41,8 @@ public static class DependencyInjection
             configuration.GetSection(OpenAiOptions.SectionName));
         services.Configure<AnthropicOptions>(
             configuration.GetSection(AnthropicOptions.SectionName));
+        services.Configure<LmStudioOptions>(
+            configuration.GetSection(LmStudioOptions.SectionName));
 
         // Ollama HTTP client (registered via IHttpClientFactory — typed client pattern)
         services.AddHttpClient<OllamaHttpClient>((sp, client) =>
@@ -94,6 +97,24 @@ public static class DependencyInjection
             services.AddScoped<AnthropicProvider>();
             services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<AnthropicProvider>());
             services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<AnthropicProvider>());
+        }
+
+        // LM Studio provider — registered only when Enabled = true in configuration
+        var lmStudioOptions = configuration.GetSection(LmStudioOptions.SectionName).Get<LmStudioOptions>();
+        if (lmStudioOptions?.Enabled == true)
+        {
+            services.AddHttpClient<LmStudioHttpClient>((sp, client) =>
+            {
+                var normalized = lmStudioOptions.BaseUrl.EndsWith("/", StringComparison.Ordinal)
+                    ? lmStudioOptions.BaseUrl
+                    : $"{lmStudioOptions.BaseUrl}/";
+                client.BaseAddress = new Uri(normalized);
+                client.Timeout = TimeSpan.FromSeconds(lmStudioOptions.TimeoutSeconds);
+            });
+
+            services.AddScoped<LmStudioProvider>();
+            services.AddScoped<IAiProvider>(sp => sp.GetRequiredService<LmStudioProvider>());
+            services.AddScoped<IChatCompletionProvider>(sp => sp.GetRequiredService<LmStudioProvider>());
         }
 
         // Factory — scoped to resolve scoped providers

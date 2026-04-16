@@ -5,6 +5,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.SecurityGate.Entities;
+using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence;
 
@@ -85,6 +86,9 @@ public sealed class GovernanceDbContext(
 
     /// <summary>Relatórios de compliance de licenças de dependências.</summary>
     public DbSet<LicenseComplianceReport> LicenseComplianceReports => Set<LicenseComplianceReport>();
+
+    /// <summary>Métricas OpenTelemetry ingeridas pelo OTEL Collector pipeline.</summary>
+    public DbSet<OtelMetricRecord> OtelMetrics => Set<OtelMetricRecord>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;

@@ -984,6 +984,187 @@ export const platformAdminApi = {
       rootCaCertPresent: policy.rootCaCertPresent ?? true,
       rootCaCertExpiry: policy.rootCaCertExpiry,
     }),
+
+  // ── W8-02: Feature Flags Runtime ──────────────────────────────────────────
+
+  /**
+   * GET /api/v1/platform/feature-flags/runtime — requer platform:admin:read.
+   * Retorna todas as feature flags com estado efectivo para o contexto actual.
+   */
+  getFeatureFlagsRuntime: (): Promise<FeatureFlagsRuntimeResponse> =>
+    Promise.resolve({
+      evaluatedAt: new Date().toISOString(),
+      flags: [
+        {
+          key: 'ai.assistant.enabled',
+          displayName: 'AI Assistant',
+          scope: 'Tenant',
+          enabled: true,
+          defaultEnabled: true,
+          hasOverride: false,
+        },
+        {
+          key: 'ai.agent.multi_step.enabled',
+          displayName: 'AI Multi-Step Agents',
+          scope: 'Tenant',
+          enabled: false,
+          defaultEnabled: false,
+          hasOverride: false,
+        },
+        {
+          key: 'contracts.soap.enabled',
+          displayName: 'SOAP Contracts',
+          scope: 'System',
+          enabled: true,
+          defaultEnabled: true,
+          hasOverride: false,
+        },
+        {
+          key: 'changes.canary_tracking.enabled',
+          displayName: 'Canary Deployment Tracking',
+          scope: 'Tenant',
+          enabled: true,
+          defaultEnabled: false,
+          hasOverride: true,
+        },
+        {
+          key: 'finops.waste_detection.enabled',
+          displayName: 'FinOps Waste Detection',
+          scope: 'Tenant',
+          enabled: false,
+          defaultEnabled: false,
+          hasOverride: false,
+        },
+        {
+          key: 'multitenancy.schema_isolation.enabled',
+          displayName: 'Schema-per-Tenant Isolation',
+          scope: 'System',
+          enabled: false,
+          defaultEnabled: false,
+          hasOverride: false,
+        },
+      ],
+    }),
+
+  /**
+   * POST /api/v1/platform/feature-flags/override — requer platform:admin:write.
+   * Define uma override de feature flag para um scope específico.
+   */
+  setFeatureFlagRuntimeOverride: (
+    req: FeatureFlagRuntimeOverrideRequest,
+  ): Promise<FeatureFlagRuntimeEntry> =>
+    Promise.resolve({
+      key: req.key,
+      displayName: req.key,
+      scope: req.scope,
+      enabled: req.enabled,
+      defaultEnabled: false,
+      hasOverride: true,
+    }),
+
+  // ── W8-03: Canary Dashboard ────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/platform/canary/rollouts — requer platform:admin:read.
+   * Retorna todos os canary deployments activos e histórico recente.
+   */
+  getCanaryDashboard: (): Promise<CanaryDashboardResponse> =>
+    Promise.resolve({
+      checkedAt: new Date().toISOString(),
+      rollouts: [
+        {
+          id: 'canary-001',
+          serviceName: 'order-service',
+          stableVersion: 'v2.3.1',
+          canaryVersion: 'v2.4.0',
+          status: 'Active',
+          trafficPercentage: 20,
+          environment: 'Production',
+          stableErrorRate: 0.12,
+          canaryErrorRate: 0.09,
+          stableP99LatencyMs: 145,
+          canaryP99LatencyMs: 138,
+          stableRps: 1200,
+          canaryRps: 300,
+          startedAt: new Date(Date.now() - 7200000).toISOString(),
+        },
+        {
+          id: 'canary-002',
+          serviceName: 'payment-gateway',
+          stableVersion: 'v1.8.4',
+          canaryVersion: 'v1.9.0',
+          status: 'Promoted',
+          trafficPercentage: 100,
+          environment: 'Production',
+          stableErrorRate: 0.05,
+          canaryErrorRate: 0.04,
+          stableP99LatencyMs: 200,
+          canaryP99LatencyMs: 185,
+          stableRps: 800,
+          canaryRps: 800,
+          startedAt: new Date(Date.now() - 86400000).toISOString(),
+        },
+        {
+          id: 'canary-003',
+          serviceName: 'notification-service',
+          stableVersion: 'v3.1.0',
+          canaryVersion: 'v3.2.0-beta',
+          status: 'RolledBack',
+          trafficPercentage: 0,
+          environment: 'Staging',
+          stableErrorRate: 0.08,
+          canaryErrorRate: 2.4,
+          stableP99LatencyMs: 120,
+          canaryP99LatencyMs: 580,
+          stableRps: 500,
+          canaryRps: 0,
+          startedAt: new Date(Date.now() - 3600000).toISOString(),
+        },
+      ],
+    }),
+
+  // ── W8-05: Multi-Tenant Schema Management ─────────────────────────────────
+
+  /**
+   * GET /api/v1/platform/tenant-schemas — requer platform:admin:read.
+   * Lista schemas PostgreSQL criados por tenant.
+   */
+  getTenantSchemas: (): Promise<TenantSchemasResponse> =>
+    Promise.resolve({
+      totalSchemas: 3,
+      checkedAt: new Date().toISOString(),
+      schemas: [
+        {
+          tenantSlug: 'acme-corp',
+          schemaName: 'tenant_acme_corp',
+          searchPath: 'tenant_acme_corp, public',
+        },
+        {
+          tenantSlug: 'globex',
+          schemaName: 'tenant_globex',
+          searchPath: 'tenant_globex, public',
+        },
+        {
+          tenantSlug: 'initech',
+          schemaName: 'tenant_initech',
+          searchPath: 'tenant_initech, public',
+        },
+      ],
+    }),
+
+  /**
+   * POST /api/v1/platform/tenant-schemas/provision — requer platform:admin:write.
+   * Cria o schema PostgreSQL para um novo tenant.
+   */
+  provisionTenantSchema: (
+    req: ProvisionTenantSchemaRequest,
+  ): Promise<ProvisionTenantSchemaResult> =>
+    Promise.resolve({
+      tenantSlug: req.tenantSlug,
+      schemaName: `tenant_${req.tenantSlug.replace(/-/g, '_')}`,
+      wasCreated: true,
+      provisionedAt: new Date().toISOString(),
+    }),
 };
 
 // ── W2-03 Types ───────────────────────────────────────────────────────────────
@@ -1619,4 +1800,79 @@ export interface MtlsManagerResponse {
   certificates: MtlsCertificate[];
   lastSyncAt: string;
   simulatedNote: string;
+}
+
+
+// ── W8-02 Types: Feature Flags Runtime ────────────────────────────────────────
+
+export interface FeatureFlagRuntimeEntry {
+  key: string;
+  displayName: string;
+  scope: string;
+  enabled: boolean;
+  defaultEnabled: boolean;
+  hasOverride: boolean;
+}
+
+export interface FeatureFlagsRuntimeResponse {
+  evaluatedAt: string;
+  flags: FeatureFlagRuntimeEntry[];
+}
+
+export interface FeatureFlagRuntimeOverrideRequest {
+  key: string;
+  enabled: boolean;
+  scope: string;
+  scopeReferenceId?: string;
+}
+
+// ── W8-03 Types: Canary Dashboard ─────────────────────────────────────────────
+
+export type CanaryRolloutStatus = 'Active' | 'Promoted' | 'RolledBack' | 'Paused';
+
+export interface CanaryRolloutEntry {
+  id: string;
+  serviceName: string;
+  stableVersion: string;
+  canaryVersion: string;
+  status: CanaryRolloutStatus;
+  trafficPercentage: number;
+  environment: string;
+  stableErrorRate: number;
+  canaryErrorRate: number;
+  stableP99LatencyMs: number;
+  canaryP99LatencyMs: number;
+  stableRps: number;
+  canaryRps: number;
+  startedAt: string;
+}
+
+export interface CanaryDashboardResponse {
+  checkedAt: string;
+  rollouts: CanaryRolloutEntry[];
+}
+
+// ── W8-05 Types: Multi-Tenant Schema ──────────────────────────────────────────
+
+export interface TenantSchemaEntry {
+  tenantSlug: string;
+  schemaName: string;
+  searchPath: string;
+}
+
+export interface TenantSchemasResponse {
+  totalSchemas: number;
+  checkedAt: string;
+  schemas: TenantSchemaEntry[];
+}
+
+export interface ProvisionTenantSchemaRequest {
+  tenantSlug: string;
+}
+
+export interface ProvisionTenantSchemaResult {
+  tenantSlug: string;
+  schemaName: string;
+  wasCreated: boolean;
+  provisionedAt: string;
 }
