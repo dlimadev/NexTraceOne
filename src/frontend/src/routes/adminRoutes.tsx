@@ -84,6 +84,10 @@ const SessionSecurityPage = lazy(() => import('../features/platform-admin/pages/
 const RightsizingPage = lazy(() => import('../features/platform-admin/pages/RightsizingPage').then(m => ({ default: m.RightsizingPage })));
 const ObservabilityModePage = lazy(() => import('../features/platform-admin/pages/ObservabilityModePage').then(m => ({ default: m.ObservabilityModePage })));
 const CompliancePacksPage = lazy(() => import('../features/platform-admin/pages/CompliancePacksPage').then(m => ({ default: m.CompliancePacksPage })));
+const MigrationPreviewPage = lazy(() => import('../features/platform-admin/pages/MigrationPreviewPage').then(m => ({ default: m.MigrationPreviewPage })));
+const DoraAdminDashboardPage = lazy(() => import('../features/platform-admin/pages/DoraAdminDashboardPage').then(m => ({ default: m.DoraAdminDashboardPage })));
+const SamlSsoPage = lazy(() => import('../features/platform-admin/pages/SamlSsoPage').then(m => ({ default: m.SamlSsoPage })));
+const MtlsManagerPage = lazy(() => import('../features/platform-admin/pages/MtlsManagerPage').then(m => ({ default: m.MtlsManagerPage })));
 
 export function AdminRoutes() {
   return (
@@ -627,6 +631,42 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <CompliancePacksPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Migration Preview — W3-01 (on-prem admin) ── */}
+      <Route
+        path="/admin/migration-preview"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <MigrationPreviewPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── DORA Admin Dashboard — W7-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/dora-dashboard"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <DoraAdminDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── SAML SSO — W8-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/saml-sso"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <SamlSsoPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── mTLS Manager — W5-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/mtls"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <MtlsManagerPage />
           </ProtectedRoute>
         }
       />

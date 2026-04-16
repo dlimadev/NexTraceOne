@@ -756,6 +756,234 @@ export const platformAdminApi = {
     client
       .get<CompliancePacksResponse>('/api/v1/admin/compliance-packs')
       .then((r) => r.data),
+
+  // ── W3-01: Migration Preview ──────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/migration-preview — requer platform:admin:read.
+   * Retorna migrações EF Core pendentes com preview de SQL e indicador de risco.
+   */
+  getMigrationPreview: (): Promise<MigrationPreviewResponse> =>
+    Promise.resolve({
+      pending: [
+        {
+          id: 'mig-001',
+          name: '20260101_AddServiceContractVersion',
+          timestamp: '20260101120000',
+          module: 'Contracts',
+          risk: 'Low',
+          operations: ['AddColumn', 'CreateIndex'],
+          sqlPreview:
+            'ALTER TABLE "ContractVersions" ADD COLUMN "SchemaHash" TEXT;\nCREATE INDEX "IX_ContractVersions_SchemaHash" ON "ContractVersions"("SchemaHash");',
+          estimatedDurationMs: 120,
+        },
+        {
+          id: 'mig-002',
+          name: '20260102_AddChangeBlastRadiusTable',
+          timestamp: '20260102090000',
+          module: 'Changes',
+          risk: 'Medium',
+          operations: ['CreateTable', 'AddForeignKey'],
+          sqlPreview:
+            'CREATE TABLE "ChangeBlastRadius" (\n  "Id" UUID NOT NULL,\n  "ChangeId" UUID NOT NULL,\n  "AffectedServiceCount" INT NOT NULL,\n  PRIMARY KEY ("Id")\n);\nALTER TABLE "ChangeBlastRadius" ADD CONSTRAINT "FK_ChangeBlastRadius_Changes" FOREIGN KEY ("ChangeId") REFERENCES "Changes"("Id");',
+          estimatedDurationMs: 350,
+        },
+        {
+          id: 'mig-003',
+          name: '20260103_DropLegacyMetricsCache',
+          timestamp: '20260103140000',
+          module: 'Operations',
+          risk: 'High',
+          operations: ['DropTable'],
+          sqlPreview: 'DROP TABLE "LegacyMetricsCache";',
+          estimatedDurationMs: 80,
+        },
+      ],
+      appliedCount: 47,
+      generatedAt: new Date().toISOString(),
+      simulatedNote: 'Simulated migration preview — no real schema changes performed.',
+    }),
+
+  // ── W7-05: DORA Admin Dashboard ───────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/dora-metrics — requer platform:admin:read.
+   * Retorna métricas DORA calculadas para o ambiente e janela de tempo seleccionados.
+   */
+  getDoraAdminMetrics: (env: string, days: number): Promise<DoraAdminMetricsResponse> =>
+    Promise.resolve({
+      deploymentFrequency: {
+        name: 'Deployment Frequency',
+        value: days >= 90 ? '3.2' : days >= 30 ? '3.8' : '4.1',
+        unit: 'per day',
+        rating: 'Elite',
+        trend: 5.2,
+        trendDirection: 'up',
+      },
+      leadTime: {
+        name: 'Lead Time for Changes',
+        value: days >= 90 ? '1.4' : days >= 30 ? '1.2' : '0.9',
+        unit: 'hours',
+        rating: 'Elite',
+        trend: -8.3,
+        trendDirection: 'down',
+      },
+      mttr: {
+        name: 'Mean Time to Recovery',
+        value: days >= 90 ? '28' : days >= 30 ? '22' : '18',
+        unit: 'minutes',
+        rating: env === 'production' ? 'High' : 'Elite',
+        trend: -12.1,
+        trendDirection: 'down',
+      },
+      changeFailureRate: {
+        name: 'Change Failure Rate',
+        value: days >= 90 ? '3.1' : days >= 30 ? '2.8' : '2.2',
+        unit: '%',
+        rating: 'Elite',
+        trend: -1.4,
+        trendDirection: 'down',
+      },
+      environment: env,
+      timeRangeDays: days,
+      dataSource: 'PostgreSQL (simulated)',
+      lastUpdatedAt: new Date().toISOString(),
+      simulatedNote: 'Simulated DORA metrics — connect to real change and incident data for live values.',
+    }),
+
+  // ── W8-04: SAML SSO Configuration ────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/saml-sso — requer platform:admin:read.
+   * Retorna configuração actual de SAML SSO.
+   */
+  getSamlSsoConfig: (): Promise<SamlSsoConfig> =>
+    Promise.resolve({
+      status: 'NotConfigured',
+      entityId: '',
+      ssoUrl: '',
+      sloUrl: '',
+      idpCertificate: '',
+      jitProvisioningEnabled: false,
+      defaultRole: 'Engineer',
+      attributeMappings: [
+        { samlAttr: 'email', nxtField: 'email' },
+        { samlAttr: 'displayName', nxtField: 'name' },
+        { samlAttr: 'groups', nxtField: 'groups' },
+        { samlAttr: 'role', nxtField: 'role' },
+      ],
+      lastTestedAt: undefined,
+      testResult: null,
+      simulatedNote: 'Simulated SAML SSO configuration — connect to real identity provider for live config.',
+    }),
+
+  /**
+   * PUT /api/v1/admin/saml-sso — requer platform:admin:write.
+   * Actualiza a configuração de SAML SSO.
+   */
+  updateSamlSsoConfig: (update: SamlSsoConfigUpdate): Promise<SamlSsoConfig> =>
+    Promise.resolve({
+      status: 'Enabled',
+      entityId: update.entityId,
+      ssoUrl: update.ssoUrl,
+      sloUrl: update.sloUrl,
+      idpCertificate: update.idpCertificate,
+      jitProvisioningEnabled: update.jitProvisioningEnabled,
+      defaultRole: update.defaultRole,
+      attributeMappings: update.attributeMappings,
+      lastTestedAt: undefined,
+      testResult: null,
+      simulatedNote: 'Simulated SAML SSO configuration — connect to real identity provider for live config.',
+    }),
+
+  /**
+   * POST /api/v1/admin/saml-sso/test — requer platform:admin:write.
+   * Testa a ligação ao Identity Provider SAML.
+   */
+  testSamlConnection: (): Promise<{ success: boolean; message: string }> =>
+    new Promise((resolve) =>
+      setTimeout(
+        () => resolve({ success: true, message: 'Connection test successful (simulated).' }),
+        1200,
+      ),
+    ),
+
+  // ── W5-04: mTLS Certificate Manager ──────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/mtls — requer platform:admin:read.
+   * Retorna estado do mTLS, política e inventário de certificados.
+   */
+  getMtlsManager: (): Promise<MtlsManagerResponse> =>
+    Promise.resolve({
+      policy: {
+        mode: 'PerService',
+        rootCaCertPresent: true,
+        rootCaCertExpiry: '2027-06-01T00:00:00Z',
+      },
+      certificates: [
+        {
+          id: 'cert-001',
+          serviceName: 'api-gateway',
+          fingerprint: 'AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99',
+          validFrom: '2025-01-01T00:00:00Z',
+          validTo: '2026-01-01T00:00:00Z',
+          status: 'Valid',
+          daysUntilExpiry: 120,
+          issuer: 'NexTraceOne Root CA',
+        },
+        {
+          id: 'cert-002',
+          serviceName: 'order-service',
+          fingerprint: 'BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA',
+          validFrom: '2025-01-01T00:00:00Z',
+          validTo: '2025-12-15T00:00:00Z',
+          status: 'Expiring',
+          daysUntilExpiry: 18,
+          issuer: 'NexTraceOne Root CA',
+        },
+        {
+          id: 'cert-003',
+          serviceName: 'notification-service',
+          fingerprint: 'CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB',
+          validFrom: '2024-01-01T00:00:00Z',
+          validTo: '2025-01-01T00:00:00Z',
+          status: 'Expired',
+          daysUntilExpiry: -30,
+          issuer: 'NexTraceOne Root CA',
+        },
+        {
+          id: 'cert-004',
+          serviceName: 'analytics-worker',
+          fingerprint: 'DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC',
+          validFrom: '2025-03-01T00:00:00Z',
+          validTo: '2026-03-01T00:00:00Z',
+          status: 'Valid',
+          daysUntilExpiry: 200,
+          issuer: 'NexTraceOne Root CA',
+        },
+      ],
+      lastSyncAt: new Date().toISOString(),
+      simulatedNote: 'Simulated mTLS certificate inventory — connect to real PKI for live data.',
+    }),
+
+  /**
+   * POST /api/v1/admin/mtls/certificates/:id/revoke — requer platform:admin:write.
+   * Revoga um certificado mTLS pelo ID.
+   */
+  revokeMtlsCert: (_certId: string): Promise<void> =>
+    new Promise((resolve) => setTimeout(resolve, 600)),
+
+  /**
+   * PUT /api/v1/admin/mtls/policy — requer platform:admin:write.
+   * Actualiza a política mTLS da plataforma.
+   */
+  updateMtlsPolicy: (policy: Partial<MtlsPolicy>): Promise<MtlsPolicy> =>
+    Promise.resolve({
+      mode: policy.mode ?? 'PerService',
+      rootCaCertPresent: policy.rootCaCertPresent ?? true,
+      rootCaCertExpiry: policy.rootCaCertExpiry,
+    }),
 };
 
 // ── W2-03 Types ───────────────────────────────────────────────────────────────
@@ -1284,5 +1512,111 @@ export interface CompliancePack {
 export interface CompliancePacksResponse {
   packs: CompliancePack[];
   generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W3-01 Types ───────────────────────────────────────────────────────────────
+
+export type MigrationRisk = 'Low' | 'Medium' | 'High';
+
+export interface PendingMigration {
+  id: string;
+  name: string;
+  timestamp: string;
+  module: string;
+  risk: MigrationRisk;
+  operations: string[];
+  sqlPreview: string;
+  estimatedDurationMs: number;
+  appliedAt?: string;
+}
+
+export interface MigrationPreviewResponse {
+  pending: PendingMigration[];
+  appliedCount: number;
+  generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W7-05 Types ───────────────────────────────────────────────────────────────
+
+export type DoraRating = 'Elite' | 'High' | 'Medium' | 'Low';
+
+export interface DoraMetric {
+  name: string;
+  value: string;
+  unit: string;
+  rating: DoraRating;
+  trend: number;
+  trendDirection: 'up' | 'down' | 'stable';
+}
+
+export interface DoraAdminMetricsResponse {
+  deploymentFrequency: DoraMetric;
+  leadTime: DoraMetric;
+  mttr: DoraMetric;
+  changeFailureRate: DoraMetric;
+  environment: string;
+  timeRangeDays: number;
+  dataSource: string;
+  lastUpdatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W8-04 Types ───────────────────────────────────────────────────────────────
+
+export type SamlSsoStatus = 'Enabled' | 'Disabled' | 'NotConfigured';
+
+export interface SamlSsoConfig {
+  status: SamlSsoStatus;
+  entityId: string;
+  ssoUrl: string;
+  sloUrl: string;
+  idpCertificate: string;
+  jitProvisioningEnabled: boolean;
+  defaultRole: string;
+  attributeMappings: Array<{ samlAttr: string; nxtField: string }>;
+  lastTestedAt?: string;
+  testResult?: 'Success' | 'Failed' | null;
+  simulatedNote: string;
+}
+
+export interface SamlSsoConfigUpdate {
+  entityId: string;
+  ssoUrl: string;
+  sloUrl: string;
+  idpCertificate: string;
+  jitProvisioningEnabled: boolean;
+  defaultRole: string;
+  attributeMappings: Array<{ samlAttr: string; nxtField: string }>;
+}
+
+// ── W5-04 Types ───────────────────────────────────────────────────────────────
+
+export type CertStatus = 'Valid' | 'Expiring' | 'Expired' | 'Revoked';
+
+export interface MtlsCertificate {
+  id: string;
+  serviceName: string;
+  fingerprint: string;
+  validFrom: string;
+  validTo: string;
+  status: CertStatus;
+  daysUntilExpiry: number;
+  issuer: string;
+}
+
+export type MtlsPolicyMode = 'Required' | 'PerService' | 'Disabled';
+
+export interface MtlsPolicy {
+  mode: MtlsPolicyMode;
+  rootCaCertPresent: boolean;
+  rootCaCertExpiry?: string;
+}
+
+export interface MtlsManagerResponse {
+  policy: MtlsPolicy;
+  certificates: MtlsCertificate[];
+  lastSyncAt: string;
   simulatedNote: string;
 }
