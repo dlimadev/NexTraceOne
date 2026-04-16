@@ -99,6 +99,27 @@ public static class ContractsErrors
 
     // ── ContractDraft ───────────────────────────────────────────────
 
+    /// <summary>Draft de contrato requer um serviço vinculado.</summary>
+    public static Error DraftRequiresServiceId()
+        => Error.Validation(
+            "Contracts.Draft.RequiresServiceId",
+            "A contract draft must be linked to a service.");
+
+    /// <summary>Tipo de serviço não suporta contratos de interface pública.</summary>
+    public static Error ServiceTypeDoesNotSupportContracts(string serviceType)
+        => Error.Validation(
+            "Contracts.Draft.ServiceTypeDoesNotSupportContracts",
+            "Service type '{0}' does not support contracts.",
+            serviceType);
+
+    /// <summary>Tipo de contrato não é permitido para o tipo de serviço informado.</summary>
+    public static Error ContractTypeNotAllowedForServiceType(string contractType, string serviceType)
+        => Error.Validation(
+            "Contracts.Draft.ContractTypeNotAllowedForServiceType",
+            "Contract type '{0}' is not allowed for service type '{1}'.",
+            contractType,
+            serviceType);
+
     /// <summary>Draft de contrato não encontrado.</summary>
     public static Error DraftNotFound(string id)
         => Error.NotFound("Contracts.Draft.NotFound", "Contract draft '{0}' was not found.", id);

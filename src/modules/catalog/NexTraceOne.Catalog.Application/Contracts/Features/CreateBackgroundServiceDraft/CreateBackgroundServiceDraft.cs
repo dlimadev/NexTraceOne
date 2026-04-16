@@ -6,8 +6,12 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Policies;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.CreateBackgroundServiceDraft;
 
@@ -28,7 +32,7 @@ public static class CreateBackgroundServiceDraft
         string ServiceName,
         string Category = "Job",
         string TriggerType = "OnDemand",
-        Guid? ServiceId = null,
+        Guid ServiceId = default,
         string? Description = null,
         string? ScheduleExpression = null,
         string? InputsJson = null,
@@ -45,16 +49,19 @@ public static class CreateBackgroundServiceDraft
             RuleFor(x => x.ServiceName).NotEmpty().MaximumLength(300);
             RuleFor(x => x.Category).NotEmpty().MaximumLength(100);
             RuleFor(x => x.TriggerType).NotEmpty().MaximumLength(50);
+            RuleFor(x => x.ServiceId).NotEqual(Guid.Empty).WithMessage("ServiceId is required.");
         }
     }
 
     /// <summary>
     /// Handler que cria um draft de Background Service Contract:
-    /// 1. Cria ContractDraft com ContractType=BackgroundService
-    /// 2. Cria BackgroundServiceDraftMetadata com os campos do processo
+    /// 1. Valida existência do serviço e compatibilidade do tipo de contrato
+    /// 2. Cria ContractDraft com ContractType=BackgroundService
+    /// 3. Cria BackgroundServiceDraftMetadata com os campos do processo
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository draftRepository,
+        IServiceAssetRepository serviceAssetRepository,
         IBackgroundServiceDraftMetadataRepository metadataRepository,
         IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
@@ -62,6 +69,24 @@ public static class CreateBackgroundServiceDraft
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // Valida existência do serviço
+            var service = await serviceAssetRepository.GetByIdAsync(
+                ServiceAssetId.From(request.ServiceId),
+                cancellationToken);
+
+            if (service is null)
+                return ContractsErrors.CatalogLinkNotFound(request.ServiceId.ToString());
+
+            // Valida que o tipo de serviço suporta contratos
+            if (!ServiceContractPolicy.SupportsContracts(service.ServiceType))
+                return ContractsErrors.ServiceTypeDoesNotSupportContracts(service.ServiceType.ToString());
+
+            // Valida que o tipo de contrato BackgroundService é permitido para o tipo de serviço
+            if (!ServiceContractPolicy.IsContractTypeAllowed(service.ServiceType, ContractType.BackgroundService))
+                return ContractsErrors.ContractTypeNotAllowedForServiceType(
+                    ContractType.BackgroundService.ToString(),
+                    service.ServiceType.ToString());
 
             // 1. Cria ContractDraft com tipo BackgroundService
             var draftResult = ContractDraft.Create(

@@ -6,8 +6,12 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Policies;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.CreateSoapDraft;
 
@@ -28,7 +32,7 @@ public static class CreateSoapDraft
         string ServiceName,
         string TargetNamespace,
         string SoapVersion = "1.1",
-        Guid? ServiceId = null,
+        Guid ServiceId = default,
         string? Description = null,
         string? EndpointUrl = null,
         string? PortTypeName = null,
@@ -48,16 +52,19 @@ public static class CreateSoapDraft
                 .Must(v => v is "1.1" or "1.2")
                 .WithMessage("SOAP version must be '1.1' or '1.2'.");
             RuleFor(x => x.EndpointUrl).MaximumLength(2000).When(x => x.EndpointUrl is not null);
+            RuleFor(x => x.ServiceId).NotEqual(Guid.Empty).WithMessage("ServiceId is required.");
         }
     }
 
     /// <summary>
     /// Handler que cria um draft SOAP/WSDL com metadados específicos:
-    /// 1. Cria ContractDraft com ContractType=Soap e Protocol=Wsdl
-    /// 2. Cria SoapDraftMetadata com os campos SOAP informados
+    /// 1. Valida existência do serviço e compatibilidade do tipo de contrato
+    /// 2. Cria ContractDraft com ContractType=Soap e Protocol=Wsdl
+    /// 3. Cria SoapDraftMetadata com os campos SOAP informados
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository draftRepository,
+        IServiceAssetRepository serviceAssetRepository,
         ISoapDraftMetadataRepository soapMetadataRepository,
         IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
@@ -65,6 +72,24 @@ public static class CreateSoapDraft
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // Valida existência do serviço
+            var service = await serviceAssetRepository.GetByIdAsync(
+                ServiceAssetId.From(request.ServiceId),
+                cancellationToken);
+
+            if (service is null)
+                return ContractsErrors.CatalogLinkNotFound(request.ServiceId.ToString());
+
+            // Valida que o tipo de serviço suporta contratos
+            if (!ServiceContractPolicy.SupportsContracts(service.ServiceType))
+                return ContractsErrors.ServiceTypeDoesNotSupportContracts(service.ServiceType.ToString());
+
+            // Valida que o tipo de contrato Soap é permitido para o tipo de serviço
+            if (!ServiceContractPolicy.IsContractTypeAllowed(service.ServiceType, ContractType.Soap))
+                return ContractsErrors.ContractTypeNotAllowedForServiceType(
+                    ContractType.Soap.ToString(),
+                    service.ServiceType.ToString());
 
             // 1. Cria o ContractDraft com tipo e protocolo SOAP
             var draftResult = ContractDraft.Create(
@@ -117,3 +142,4 @@ public static class CreateSoapDraft
         string SoapVersion,
         DateTimeOffset CreatedAt);
 }
+

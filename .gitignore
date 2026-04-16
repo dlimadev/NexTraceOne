@@ -41,3 +41,7 @@ appsettings.*.local.json
 *.pfx
 node_modules/
 src/frontend/package-lock.json
+
+# Windows build artifacts (backslash-path prevention)
+src/frontend/obj*/
+src/**/obj*/

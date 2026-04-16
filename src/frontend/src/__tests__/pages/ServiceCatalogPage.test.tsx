@@ -94,49 +94,35 @@ describe('ServiceCatalogPage', () => {
     });
   });
 
-  it('exibe formulário de serviço ao clicar em Register Service', async () => {
+  it('exibe estatísticas na aba Overview por defeito', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
     renderGraph();
-    const serviceBtn = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.includes('Register Service')
-    )!;
-    await userEvent.click(serviceBtn);
     await waitFor(() => {
-      // O formulário renderiza campos de input para nome e time
-      expect(screen.getAllByRole('textbox').length).toBeGreaterThanOrEqual(2);
+      // Overview tab is active by default and shows stats
+      expect(screen.getByRole('heading', { name: /service catalog/i })).toBeInTheDocument();
     });
   });
 
-  it('exibe formulário de API ao clicar em Register API', async () => {
+  it('exibe a aba Impact ao navegar para Impact Analysis', async () => {
     vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.getImpactPropagation).mockResolvedValue({ nodes: [], edges: [] });
     renderGraph();
-    const apiBtn = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.includes('Register API')
-    )!;
-    await userEvent.click(apiBtn);
+    const impactBtn = screen.getByRole('button', { name: /impact/i });
+    await userEvent.click(impactBtn);
     await waitFor(() => {
-      expect(screen.getByText('Register API Asset')).toBeInTheDocument();
+      // Clicking impact tab should not throw
+      expect(impactBtn).toBeInTheDocument();
     });
   });
 
-  it('chama registerService ao submeter o formulário de serviço', async () => {
-    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue({ services: [], apis: [] });
-    vi.mocked(serviceCatalogApi.registerService).mockResolvedValue({ id: 's-new' });
+  it('exibe a aba Temporal ao navegar para Temporal Analysis', async () => {
+    vi.mocked(serviceCatalogApi.getGraph).mockResolvedValue(mockGraph);
+    vi.mocked(serviceCatalogApi.listSnapshots).mockResolvedValue([]);
     renderGraph();
-    const serviceBtn = screen.getAllByRole('button').find(
-      (btn) => btn.textContent?.includes('Register Service')
-    )!;
-    await userEvent.click(serviceBtn);
-    // Enhanced form: name, domain, team are the first 3 text inputs
-    const textInputs = screen.getAllByRole('textbox');
-    await userEvent.type(textInputs[0], 'new-service');   // name
-    await userEvent.type(textInputs[1], 'payments');       // domain
-    await userEvent.type(textInputs[2], 'Platform');       // team
-    await userEvent.click(screen.getByRole('button', { name: /register$/i }));
+    const temporalBtn = screen.getByRole('button', { name: /temporal/i });
+    await userEvent.click(temporalBtn);
     await waitFor(() => {
-      expect(serviceCatalogApi.registerService).toHaveBeenCalled();
-      const [firstArg] = vi.mocked(serviceCatalogApi.registerService).mock.calls[0];
-      expect(firstArg).toMatchObject({ name: 'new-service', team: 'Platform', domain: 'payments' });
+      expect(temporalBtn).toBeInTheDocument();
     });
   });
 

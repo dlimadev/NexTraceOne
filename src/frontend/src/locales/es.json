@@ -1329,7 +1329,22 @@
       "placeholder": {
         "documentationUrl": "https://docs.company.com/payment-service",
         "repositoryUrl": "https://github.com/org/payment-service"
-      }
+      },
+      "subDomain": "Sub-dominio",
+      "capability": "Capacidad de Negocio",
+      "dataClassification": "Clasificación de Datos",
+      "regulatoryScope": "Alcance Regulatorio",
+      "sloTarget": "SLO Objetivo",
+      "infrastructureProvider": "Proveedor de Infraestructura",
+      "hostingPlatform": "Plataforma de Alojamiento",
+      "runtimeLanguage": "Lenguaje de Runtime",
+      "runtimeVersion": "Versión de Runtime",
+      "changeFrequency": "Frecuencia de Cambio",
+      "productOwner": "Product Owner",
+      "contactChannel": "Canal de Contacto",
+      "onCallRotationId": "On-Call Rotation",
+      "gitRepository": "Repositorio Git",
+      "ciPipelineUrl": "Pipeline CI"
     },
     "discovery": {
       "actions": {
@@ -1437,7 +1452,8 @@
       "noLinks": "Sin enlaces agregados aún."
     },
     "services": {
-      "addContract": "Añadir Contrato"
+      "addContract": "Añadir Contrato",
+      "noContractsForType": "Sin contratos públicos para este tipo"
     },
     "subtitle": "Registro central de servicios, propiedad y gobernanza",
     "summary": {
@@ -2068,6 +2084,14 @@
     "catalog.service.deactivation.require_dependency_check.label": "Verificar Dependencias Antes de la Desactivación",
     "catalog.service.require_approval_on_registration.description": "Cuando está activado, nuevos registros de servicio (incluyendo todos los contratos y definiciones de eventos) requieren aprobación antes de estar activos.",
     "catalog.service.require_approval_on_registration.label": "Requerir Aprobación para Registro de Servicio",
+    "catalog.service_interface.allowed_types.description": "Tipos de interfaz de servicio que pueden ser registrados en este tenant.",
+    "catalog.service_interface.allowed_types.label": "Tipos de Interfaz Permitidos",
+    "catalog.service_interface.deprecation_notice_days.description": "Número de días de anticipación requeridos para aviso antes de deprecar una interfaz de servicio.",
+    "catalog.service_interface.deprecation_notice_days.label": "Días de Aviso de Deprecación",
+    "catalog.service_interface.require_contract_for_types.description": "Lista de tipos de interfaz de servicio que obligatoriamente deben tener un contrato vinculado.",
+    "catalog.service_interface.require_contract_for_types.label": "Tipos de Interfaz que Requieren Contrato",
+    "catalog.service_interface.slo_enforcement_enabled.description": "Cuando está activado, las interfaces de servicio deben tener SLO definido antes de ser publicadas como activas.",
+    "catalog.service_interface.slo_enforcement_enabled.label": "Aplicar Cumplimiento de SLO en Interfaces",
     "catalog.templates.by_contract_type.description": "Plantillas predeterminadas para usar al crear nuevos contratos por tipo",
     "catalog.templates.by_contract_type.label": "Contrato Plantillas by Tipo",
     "catalog.templates.metadata_defaults.description": "Predeterminado metadata fields pre-filled en new contrato drafts",
@@ -4021,7 +4045,13 @@
       "bgTriggerCron": "Cron",
       "bgTriggerInterval": "Intervalo",
       "bgTriggerEventTriggered": "Disparado por Evento",
-      "bgTriggerContinuous": "Continuo"
+      "bgTriggerContinuous": "Continuo",
+      "selectService": "Seleccione el servicio para este contrato",
+      "selectServicePlaceholder": "Seleccione un servicio...",
+      "serviceTypeNoContracts": "Este tipo de servicio ({{type}}) no expone contratos de interfaz pública.",
+      "noServiceSelected": "Ningún servicio seleccionado",
+      "missingRequiredFields": "Faltan campos obligatorios. El servicio y el tipo de contrato son obligatorios.",
+      "stepService": "Servicio"
     },
     "createVersion": "Crear Versión",
     "createVersionDescription": "Crear una nueva versión a partir de un contrato existente",
@@ -4088,7 +4118,10 @@
       "transitionFailed": "Error al transicionar estado del ciclo de vida",
       "validateFailed": "La validación falló. Por favor, inténtelo de nuevo.",
       "verifyFailed": "Error al verificar firma del contrato",
-      "violationsFailed": "Error al cargar violaciones de reglas"
+      "violationsFailed": "Error al cargar violaciones de reglas",
+      "draftRequiresServiceId": "Un borrador de contrato debe estar vinculado a un servicio.",
+      "serviceTypeDoesNotSupportContracts": "El tipo de servicio '{{type}}' no admite contratos.",
+      "contractTypeNotAllowedForServiceType": "El tipo de contrato '{{contractType}}' no está permitido para el tipo de servicio '{{serviceType}}'."
     },
     "event": {
       "placeholder": {
@@ -8367,7 +8400,31 @@
     "typeSharedPlatformService": "Servicio Compartido de Plataforma",
     "typeSoapService": "Servicio SOAP",
     "typeThirdParty": "Servicio de Terceros",
-    "typeZosConnectApi": "API z/OS Connect"
+    "typeZosConnectApi": "API z/OS Connect",
+    "wizard": {
+      "subDomain": "Subdominio",
+      "subDomainPlaceholder": "fraude, pagos-core",
+      "capability": "Capacidad de Negocio",
+      "capabilityPlaceholder": "Procesamiento de Pagos, Verificación de Identidad",
+      "productOwner": "Product Owner",
+      "productOwnerPlaceholder": "jane.doe@empresa.com",
+      "contactChannel": "Canal de Contacto",
+      "contactChannelPlaceholder": "#soporte-pagos",
+      "dataClassification": "Clasificación de Datos",
+      "regulatoryScope": "Alcance Regulatorio",
+      "infrastructureProvider": "Proveedor de Infraestructura",
+      "infrastructureProviderPlaceholder": "Kubernetes, IIS, VM",
+      "runtimeLanguage": "Lenguaje de Ejecución",
+      "runtimeLanguagePlaceholder": "C#, Java, Python",
+      "step1": "Identidad",
+      "step2": "Clasificación",
+      "step3": "Responsable",
+      "step4": "Referencias",
+      "step5": "Confirmación",
+      "nameRequired": "El nombre es obligatorio",
+      "domainRequired": "El dominio es obligatorio",
+      "teamRequired": "El equipo es obligatorio"
+    }
   },
   "serviceMaturity": {
     "audit": {
@@ -10415,5 +10472,61 @@
     "status.Fail": "Fallido",
     "status.Warning": "Aviso",
     "status.NotApplicable": "N/A"
+  },
+  "serviceInterfaces": {
+    "title": "Interfaces de Servicio",
+    "add": "Agregar Interfaz",
+    "empty": "No hay interfaces registradas para este servicio.",
+    "emptyHint": "Agregue una interfaz para asociar contratos a este servicio.",
+    "name": "Nombre",
+    "type": "Tipo",
+    "exposure": "Exposición",
+    "status": "Estado",
+    "requiresContract": "Requiere Contrato",
+    "basePath": "Ruta Base",
+    "topicName": "Nombre del Tópico",
+    "viewBindings": "Ver Vínculos",
+    "typeRestApi": "REST API",
+    "typeSoapService": "Servicio SOAP",
+    "typeKafkaProducer": "Productor Kafka",
+    "typeKafkaConsumer": "Consumidor Kafka",
+    "typeGrpcService": "Servicio gRPC",
+    "typeGraphqlApi": "API GraphQL",
+    "typeBackgroundWorker": "Worker en Segundo Plano",
+    "typeScheduledJob": "Tarea Programada",
+    "typeWebhookProducer": "Webhook Producer",
+    "typeWebhookConsumer": "Webhook Consumer",
+    "typeZosConnectApi": "API z/OS Connect",
+    "typeMqQueue": "Cola MQ",
+    "typeIntegrationBridge": "Bridge de Integración",
+    "statusActive": "Activo",
+    "statusDeprecated": "Obsoleto",
+    "statusSunset": "Sunset",
+    "statusRetired": "Retirado",
+    "createTitle": "Nueva Interfaz",
+    "createSubtitle": "Registre una nueva interfaz para este servicio",
+    "fieldName": "Nombre de la Interfaz",
+    "fieldNamePlaceholder": "API REST de Pedidos v1",
+    "fieldType": "Tipo de Interfaz",
+    "fieldDescription": "Descripción",
+    "fieldExposure": "Alcance de Exposición",
+    "fieldBasePath": "Ruta Base",
+    "fieldBasePathPlaceholder": "/api/pedidos",
+    "fieldTopicName": "Nombre del Tópico",
+    "fieldTopicNamePlaceholder": "pedidos.eventos.v1",
+    "fieldWsdlNamespace": "Namespace WSDL",
+    "fieldGrpcServiceName": "Nombre del Servicio Proto",
+    "fieldScheduleCron": "Expresión Cron",
+    "fieldDocumentationUrl": "URL de Documentación",
+    "fieldRequiresContract": "Requiere Contrato",
+    "groupPublicApi": "API Pública",
+    "groupEventDriven": "Orientado a Eventos",
+    "groupBackground": "Background",
+    "groupInfrastructure": "Infraestructura",
+    "submit": "Crear Interfaz",
+    "cancel": "Cancelar"
+  },
+  "serviceDetail": {
+    "tabInterfaces": "Interfaces"
   }
 }

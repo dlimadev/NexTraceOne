@@ -9,6 +9,7 @@ import { ProtectedRoute } from '../components/ProtectedRoute';
 const ServiceCatalogPage = lazy(() => import('../features/catalog/pages/ServiceCatalogPage').then(m => ({ default: m.ServiceCatalogPage })));
 const ServiceCatalogListPage = lazy(() => import('../features/catalog/pages/ServiceCatalogListPage').then(m => ({ default: m.ServiceCatalogListPage })));
 const ServiceDetailPage = lazy(() => import('../features/catalog/pages/ServiceDetailPage').then(m => ({ default: m.ServiceDetailPage })));
+const CreateServiceInterfacePage = lazy(() => import('../features/catalog/pages/CreateServiceInterfacePage').then(m => ({ default: m.CreateServiceInterfacePage })));
 const SourceOfTruthExplorerPage = lazy(() => import('../features/catalog/pages/SourceOfTruthExplorerPage').then(m => ({ default: m.SourceOfTruthExplorerPage })));
 const ServiceSourceOfTruthPage = lazy(() => import('../features/catalog/pages/ServiceSourceOfTruthPage').then(m => ({ default: m.ServiceSourceOfTruthPage })));
 const ContractSourceOfTruthPage = lazy(() => import('../features/catalog/pages/ContractSourceOfTruthPage').then(m => ({ default: m.ContractSourceOfTruthPage })));
@@ -86,6 +87,14 @@ export function CatalogRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <ServiceDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/:serviceId/interfaces/new"
+        element={
+          <ProtectedRoute permission="catalog:assets:write" redirectTo="/unauthorized">
+            <CreateServiceInterfacePage />
           </ProtectedRoute>
         }
       />

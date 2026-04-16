@@ -106,10 +106,10 @@ public static class PublishDraft
 
         private async Task<Result<PublishTarget>> ResolvePublishTargetAsync(ContractDraft draft, CancellationToken cancellationToken)
         {
-            if (!draft.ServiceId.HasValue)
+            if (draft.ServiceId == Guid.Empty)
                 return ContractsErrors.DraftMissingCatalogLink(draft.Id.Value.ToString());
 
-            var linkedId = draft.ServiceId.Value;
+            var linkedId = draft.ServiceId;
 
             var existingApiAsset = await apiAssetRepository.GetByIdAsync(ApiAssetId.From(linkedId), cancellationToken);
             if (existingApiAsset is not null)

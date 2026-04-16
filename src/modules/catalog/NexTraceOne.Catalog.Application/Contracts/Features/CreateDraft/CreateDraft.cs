@@ -6,8 +6,12 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Contracts.Errors;
+using NexTraceOne.Catalog.Domain.Contracts.Policies;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft;
 
@@ -23,7 +27,7 @@ public static class CreateDraft
         string Author,
         ContractType ContractType,
         ContractProtocol Protocol,
-        Guid? ServiceId = null,
+        Guid ServiceId,
         string? Description = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando de criação de draft.</summary>
@@ -35,22 +39,41 @@ public static class CreateDraft
             RuleFor(x => x.Author).NotEmpty().MaximumLength(200);
             RuleFor(x => x.ContractType).IsInEnum();
             RuleFor(x => x.Protocol).IsInEnum();
+            RuleFor(x => x.ServiceId).NotEqual(Guid.Empty).WithMessage("ServiceId is required.");
         }
     }
 
     /// <summary>
     /// Handler que cria um novo draft de contrato.
-    /// Delega a criação da entidade ao factory method ContractDraft.Create,
-    /// que aplica todas as regras de domínio e invariantes.
+    /// Valida que o serviço existe e que o tipo de contrato é permitido pelo ServiceContractPolicy.
     /// </summary>
     public sealed class Handler(
         IContractDraftRepository repository,
+        IServiceAssetRepository serviceAssetRepository,
         IContractsUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // Valida existência do serviço
+            var service = await serviceAssetRepository.GetByIdAsync(
+                ServiceAssetId.From(request.ServiceId),
+                cancellationToken);
+
+            if (service is null)
+                return ContractsErrors.CatalogLinkNotFound(request.ServiceId.ToString());
+
+            // Valida que o tipo de serviço suporta contratos
+            if (!ServiceContractPolicy.SupportsContracts(service.ServiceType))
+                return ContractsErrors.ServiceTypeDoesNotSupportContracts(service.ServiceType.ToString());
+
+            // Valida que o tipo de contrato é permitido para o tipo de serviço
+            if (!ServiceContractPolicy.IsContractTypeAllowed(service.ServiceType, request.ContractType))
+                return ContractsErrors.ContractTypeNotAllowedForServiceType(
+                    request.ContractType.ToString(),
+                    service.ServiceType.ToString());
 
             var result = ContractDraft.Create(
                 request.Title,

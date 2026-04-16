@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Server,
   Plus,
+  Info,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -27,9 +28,12 @@ import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { ServiceLinksSection } from '../components/ServiceLinksSection';
 import { ServiceLifecyclePanel } from '../components/ServiceLifecyclePanel';
 import type { Criticality, LifecycleStatus, ServiceApiSummary, ServiceContractItem } from '../../../types';
+import type { ServiceType } from '../../../types';
 import { PageContainer, PageSection, TableWrapper } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { supportsContracts } from '../../contracts/shared/serviceContractPolicy';
+import { ServiceInterfacesTab } from '../components/ServiceInterfacesTab';
 
 /** Mapeia criticidade para variante do Badge. */
 const criticalityBadgeVariant = (level: Criticality): 'danger' | 'warning' | 'default' => {
@@ -76,7 +80,7 @@ const contractLifecycleBadgeVariant = (state: string): 'success' | 'info' | 'war
   }
 };
 
-type ServiceTab = 'overview' | 'apis' | 'contracts';
+type ServiceTab = 'overview' | 'apis' | 'contracts' | 'interfaces';
 
 /** Página de detalhe de um serviço do catálogo — redesenhada com EntityHeader + Tabs. */
 export function ServiceDetailPage() {
@@ -134,6 +138,11 @@ export function ServiceDetailPage() {
       id: 'contracts',
       label: `${t('catalog.detail.contracts')} (${serviceContracts?.totalCount ?? contracts.length})`,
       icon: <FileText size={14} />,
+    },
+    {
+      id: 'interfaces',
+      label: t('serviceDetail.tabInterfaces', 'Interfaces'),
+      icon: <Server size={14} />,
     },
   ];
 
@@ -195,6 +204,51 @@ export function ServiceDetailPage() {
                       label={t('catalog.columns.serviceType')}
                       value={t(`catalog.badges.type.${service.serviceType}`)}
                     />
+                    {service.subDomain && (
+                      <DetailField label={t('catalog.detail.subDomain')} value={service.subDomain} />
+                    )}
+                    {service.capability && (
+                      <DetailField label={t('catalog.detail.capability')} value={service.capability} />
+                    )}
+                    {service.dataClassification && (
+                      <DetailField label={t('catalog.detail.dataClassification')} value={service.dataClassification} />
+                    )}
+                    {service.regulatoryScope && (
+                      <DetailField label={t('catalog.detail.regulatoryScope')} value={service.regulatoryScope} />
+                    )}
+                    {service.sloTarget && (
+                      <DetailField label={t('catalog.detail.sloTarget')} value={service.sloTarget} />
+                    )}
+                    {service.infrastructureProvider && (
+                      <DetailField label={t('catalog.detail.infrastructureProvider')} value={service.infrastructureProvider} />
+                    )}
+                    {service.hostingPlatform && (
+                      <DetailField label={t('catalog.detail.hostingPlatform')} value={service.hostingPlatform} />
+                    )}
+                    {service.runtimeLanguage && (
+                      <DetailField label={t('catalog.detail.runtimeLanguage')} value={service.runtimeLanguage} />
+                    )}
+                    {service.runtimeVersion && (
+                      <DetailField label={t('catalog.detail.runtimeVersion')} value={service.runtimeVersion} />
+                    )}
+                    {service.changeFrequency && (
+                      <DetailField label={t('catalog.detail.changeFrequency')} value={service.changeFrequency} />
+                    )}
+                    {service.productOwner && (
+                      <DetailField label={t('catalog.detail.productOwner')} value={service.productOwner} />
+                    )}
+                    {service.contactChannel && (
+                      <DetailField label={t('catalog.detail.contactChannel')} value={service.contactChannel} />
+                    )}
+                    {service.onCallRotationId && (
+                      <DetailField label={t('catalog.detail.onCallRotationId')} value={service.onCallRotationId} />
+                    )}
+                    {service.gitRepository && (
+                      <DetailField label={t('catalog.detail.gitRepository')} value={service.gitRepository} />
+                    )}
+                    {service.ciPipelineUrl && (
+                      <DetailField label={t('catalog.detail.ciPipelineUrl')} value={service.ciPipelineUrl} />
+                    )}
                   </dl>
                 </CardBody>
               </Card>
@@ -348,14 +402,21 @@ export function ServiceDetailPage() {
                         {serviceContracts.totalCount} {t('catalog.detail.contractsCount')}
                       </span>
                     )}
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
-                      className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
-                    >
-                      <Plus size={13} aria-hidden="true" />
-                      {t('catalog.services.addContract', 'Add Contract')}
-                    </button>
+                    {service.serviceType && supportsContracts(service.serviceType as ServiceType) ? (
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/contracts/new?serviceId=${serviceId}`)}
+                        className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 border border-accent/30 rounded px-2.5 py-1 transition-colors"
+                      >
+                        <Plus size={13} aria-hidden="true" />
+                        {t('catalog.services.addContract', 'Add Contract')}
+                      </button>
+                    ) : service.serviceType ? (
+                      <div className="flex items-center gap-1 text-xs text-muted border border-edge rounded px-2.5 py-1">
+                        <Info size={12} aria-hidden="true" />
+                        {t('catalog.services.noContractsForType', 'No public contracts for this type')}
+                      </div>
+                    ) : null}
                   </div>
                 </CardHeader>
                 <CardBody className="p-0">
@@ -429,6 +490,13 @@ export function ServiceDetailPage() {
                   )}
                 </CardBody>
               </Card>
+            </PageSection>
+          )}
+
+          {/* INTERFACES TAB */}
+          {activeTab === 'interfaces' && (
+            <PageSection>
+              <ServiceInterfacesTab serviceId={serviceId!} />
             </PageSection>
           )}
         </div>

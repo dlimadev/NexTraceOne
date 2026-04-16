@@ -25,8 +25,8 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
     /// <summary>Descrição do objetivo ou contexto do draft.</summary>
     public string Description { get; private set; } = string.Empty;
 
-    /// <summary>Identificador do serviço vinculado ao contrato.</summary>
-    public Guid? ServiceId { get; private set; }
+    /// <summary>Identificador do serviço vinculado ao contrato. Obrigatório desde a criação do draft.</summary>
+    public Guid ServiceId { get; private set; }
 
     /// <summary>Tipo de contrato: REST, SOAP, Event, Background, Schema.</summary>
     public ContractType ContractType { get; private set; }
@@ -65,6 +65,12 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
     public string? LastEditedBy { get; private set; }
 
     /// <summary>
+    /// Identificador da interface de serviço vinculada a este draft (opcional).
+    /// Quando preenchido, este draft está associado a uma interface específica do serviço.
+    /// </summary>
+    public Guid? ServiceInterfaceId { get; private set; }
+
+    /// <summary>
     /// Token de concorrência otimista (PostgreSQL xmin).
     /// Utilizado pelo EF Core para detetar conflitos de escrita concorrente.
     /// </summary>
@@ -81,7 +87,7 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
         string author,
         ContractType contractType,
         ContractProtocol protocol,
-        Guid? serviceId = null,
+        Guid serviceId,
         string? description = null)
     {
         Guard.Against.NullOrWhiteSpace(title);
@@ -114,7 +120,7 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
         string aiPrompt,
         string generatedContent,
         string format,
-        Guid? serviceId = null)
+        Guid serviceId)
     {
         Guard.Against.NullOrWhiteSpace(title);
         Guard.Against.NullOrWhiteSpace(author);
@@ -177,7 +183,7 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
         if (title is not null) Title = title;
         if (description is not null) Description = description;
         if (proposedVersion is not null) ProposedVersion = proposedVersion;
-        if (serviceId.HasValue) ServiceId = serviceId;
+        if (serviceId.HasValue) ServiceId = serviceId.Value;
         LastEditedAt = editedAt;
         LastEditedBy = editedBy;
         return MediatR.Unit.Value;
@@ -290,6 +296,15 @@ public sealed class ContractDraft : AuditableEntity<ContractDraftId>
 
         _examples.Remove(example);
         return MediatR.Unit.Value;
+    }
+
+    /// <summary>
+    /// Vincula este draft a uma interface de serviço específica.
+    /// Permite que o contrato seja contextualizado no âmbito de uma interface concreta.
+    /// </summary>
+    public void SetServiceInterface(Guid serviceInterfaceId)
+    {
+        ServiceInterfaceId = serviceInterfaceId;
     }
 }
 

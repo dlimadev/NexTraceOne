@@ -1,9 +1,9 @@
 /**
  * Wizard multi-etapas para registo de serviço no catálogo.
  *
- * Step 1: Identidade (name, domain)
- * Step 2: Classificação (serviceType, criticality, exposureType) + campos condicionais
- * Step 3: Ownership (team, technicalOwner, businessOwner)
+ * Step 1: Identidade (name, domain, subDomain, capability)
+ * Step 2: Classificação (serviceType, criticality, exposureType, dataClassification, regulatoryScope, infrastructureProvider, runtimeLanguage) + campos condicionais
+ * Step 3: Ownership (team, technicalOwner, businessOwner, productOwner, contactChannel)
  * Step 4: Referências (description, documentationUrl, repositoryUrl)
  * Step 5: Confirmação (resumo)
  */
@@ -16,6 +16,8 @@ import { Button } from '../../../components/Button';
 export interface ServiceFormData {
   name: string;
   domain: string;
+  subDomain: string;
+  capability: string;
   team: string;
   description: string;
   serviceType: string;
@@ -23,8 +25,14 @@ export interface ServiceFormData {
   exposureType: string;
   technicalOwner: string;
   businessOwner: string;
+  productOwner: string;
+  contactChannel: string;
   documentationUrl: string;
   repositoryUrl: string;
+  dataClassification: string;
+  regulatoryScope: string;
+  infrastructureProvider: string;
+  runtimeLanguage: string;
 }
 
 interface ServiceRegistrationWizardProps {
@@ -34,9 +42,12 @@ interface ServiceRegistrationWizardProps {
 }
 
 const INITIAL_FORM: ServiceFormData = {
-  name: '', domain: '', team: '', description: '',
+  name: '', domain: '', subDomain: '', capability: '', team: '', description: '',
   serviceType: 'RestApi', criticality: 'Medium', exposureType: 'Internal',
-  technicalOwner: '', businessOwner: '', documentationUrl: '', repositoryUrl: '',
+  technicalOwner: '', businessOwner: '', productOwner: '', contactChannel: '',
+  documentationUrl: '', repositoryUrl: '',
+  dataClassification: 'Internal', regulatoryScope: 'None',
+  infrastructureProvider: '', runtimeLanguage: '',
 };
 
 const TOTAL_STEPS = 5;
@@ -135,6 +146,16 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
                   placeholder={t('serviceCatalog.domainPlaceholder', 'e.g., payments, identity')} className={inputClass} />
                 {errors.domain && <p className="text-xs text-danger mt-1">{errors.domain}</p>}
               </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.subDomain', 'Sub-Domain')}</label>
+                <input type="text" value={form.subDomain} onChange={(e) => set('subDomain', e.target.value)}
+                  placeholder={t('serviceCatalog.wizard.subDomainPlaceholder', 'fraud, payments-core')} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.capability', 'Business Capability')}</label>
+                <input type="text" value={form.capability} onChange={(e) => set('capability', e.target.value)}
+                  placeholder={t('serviceCatalog.wizard.capabilityPlaceholder', 'Payment Processing, Identity Verification')} className={inputClass} />
+              </div>
             </div>
           </div>
         )}
@@ -195,6 +216,38 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
             </div>
             {/* ── Conditional fields by ServiceType ── */}
             <ConditionalTypeFields serviceType={form.serviceType} />
+            {/* ── Extended classification fields ── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.dataClassification', 'Data Classification')}</label>
+                <select value={form.dataClassification} onChange={(e) => set('dataClassification', e.target.value)} className={selectClass}>
+                  <option value="Public">Public</option>
+                  <option value="Internal">Internal</option>
+                  <option value="Confidential">Confidential</option>
+                  <option value="Restricted">Restricted</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.regulatoryScope', 'Regulatory Scope')}</label>
+                <select value={form.regulatoryScope} onChange={(e) => set('regulatoryScope', e.target.value)} className={selectClass}>
+                  <option value="None">None</option>
+                  <option value="PCI-DSS">PCI-DSS</option>
+                  <option value="LGPD">LGPD</option>
+                  <option value="GDPR">GDPR</option>
+                  <option value="HIPAA">HIPAA</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.infrastructureProvider', 'Infrastructure Provider')}</label>
+                <input type="text" value={form.infrastructureProvider} onChange={(e) => set('infrastructureProvider', e.target.value)}
+                  placeholder={t('serviceCatalog.wizard.infrastructureProviderPlaceholder', 'Kubernetes, IIS, VM')} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.runtimeLanguage', 'Runtime Language')}</label>
+                <input type="text" value={form.runtimeLanguage} onChange={(e) => set('runtimeLanguage', e.target.value)}
+                  placeholder={t('serviceCatalog.wizard.runtimeLanguagePlaceholder', 'C#, Java, Python')} className={inputClass} />
+              </div>
+            </div>
           </div>
         )}
 
@@ -217,6 +270,16 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
                 <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.businessOwner', 'Business Owner')}</label>
                 <input type="text" value={form.businessOwner} onChange={(e) => set('businessOwner', e.target.value)}
                   placeholder={t('serviceCatalog.businessOwnerPlaceholder', 'e.g., Product Manager')} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.productOwner', 'Product Owner')}</label>
+                <input type="text" value={form.productOwner} onChange={(e) => set('productOwner', e.target.value)}
+                  placeholder={t('serviceCatalog.wizard.productOwnerPlaceholder', 'jane.doe@company.com')} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-body mb-1">{t('serviceCatalog.wizard.contactChannel', 'Contact Channel')}</label>
+                <input type="text" value={form.contactChannel} onChange={(e) => set('contactChannel', e.target.value)}
+                  placeholder={t('serviceCatalog.wizard.contactChannelPlaceholder', '#payments-support')} className={inputClass} />
               </div>
             </div>
           </div>
@@ -253,13 +316,21 @@ export function ServiceRegistrationWizard({ onSubmit, onCancel, isSubmitting }: 
             <div className="rounded-lg bg-surface border border-edge p-4 space-y-2 text-sm">
               <SummaryRow label={t('serviceCatalog.name')} value={form.name} mono />
               <SummaryRow label={t('serviceCatalog.domain', 'Domain')} value={form.domain} />
+              {form.subDomain && <SummaryRow label={t('serviceCatalog.wizard.subDomain', 'Sub-Domain')} value={form.subDomain} />}
+              {form.capability && <SummaryRow label={t('serviceCatalog.wizard.capability', 'Business Capability')} value={form.capability} />}
               <SummaryRow label={t('serviceCatalog.team')} value={form.team} />
               <SummaryRow label={t('serviceCatalog.serviceType', 'Service Type')} value={form.serviceType} />
               <SummaryRow label={t('serviceCatalog.criticality', 'Criticality')} value={form.criticality} />
               <SummaryRow label={t('serviceCatalog.exposure', 'Exposure')} value={form.exposureType} />
+              <SummaryRow label={t('serviceCatalog.wizard.dataClassification', 'Data Classification')} value={form.dataClassification} />
+              {form.regulatoryScope && form.regulatoryScope !== 'None' && <SummaryRow label={t('serviceCatalog.wizard.regulatoryScope', 'Regulatory Scope')} value={form.regulatoryScope} />}
               {form.description && <SummaryRow label={t('serviceCatalog.description')} value={form.description} />}
               {form.technicalOwner && <SummaryRow label={t('serviceCatalog.technicalOwner', 'Technical Owner')} value={form.technicalOwner} />}
               {form.businessOwner && <SummaryRow label={t('serviceCatalog.businessOwner', 'Business Owner')} value={form.businessOwner} />}
+              {form.productOwner && <SummaryRow label={t('serviceCatalog.wizard.productOwner', 'Product Owner')} value={form.productOwner} />}
+              {form.contactChannel && <SummaryRow label={t('serviceCatalog.wizard.contactChannel', 'Contact Channel')} value={form.contactChannel} />}
+              {form.infrastructureProvider && <SummaryRow label={t('serviceCatalog.wizard.infrastructureProvider', 'Infrastructure Provider')} value={form.infrastructureProvider} />}
+              {form.runtimeLanguage && <SummaryRow label={t('serviceCatalog.wizard.runtimeLanguage', 'Runtime Language')} value={form.runtimeLanguage} />}
               {form.documentationUrl && <SummaryRow label={t('serviceCatalog.documentationUrl', 'Docs')} value={form.documentationUrl} mono />}
               {form.repositoryUrl && <SummaryRow label={t('serviceCatalog.repositoryUrl', 'Repo')} value={form.repositoryUrl} mono />}
             </div>

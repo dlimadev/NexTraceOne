@@ -22,6 +22,7 @@ import {
   useSpectralRulesets,
   useToggleSpectralRuleset,
   useDeleteSpectralRuleset,
+  useCreateSpectralRuleset,
 } from '../../features/contracts/hooks/useSpectralRulesets';
 
 const emptyData = { items: [], total: 0 };
@@ -53,6 +54,10 @@ describe('SpectralRulesetManagerPage', () => {
       mutate: vi.fn(),
       isPending: false,
     } as ReturnType<typeof useDeleteSpectralRuleset>);
+    vi.mocked(useCreateSpectralRuleset).mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as ReturnType<typeof useCreateSpectralRuleset>);
   });
 
   it('renders page title', () => {

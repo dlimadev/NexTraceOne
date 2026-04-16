@@ -50,10 +50,28 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
         builder.Property(x => x.DocumentationUrl).HasMaxLength(1000).HasDefaultValue(string.Empty);
         builder.Property(x => x.RepositoryUrl).HasMaxLength(1000).HasDefaultValue(string.Empty);
 
+        // ── Metadados estendidos ──────────────────────────────────────
+        builder.Property(x => x.SubDomain).HasMaxLength(200).IsRequired(false);
+        builder.Property(x => x.Capability).HasMaxLength(300).IsRequired(false);
+        builder.Property(x => x.GitRepository).HasMaxLength(1000).HasDefaultValue(string.Empty);
+        builder.Property(x => x.CiPipelineUrl).HasMaxLength(1000).HasDefaultValue(string.Empty);
+        builder.Property(x => x.InfrastructureProvider).HasMaxLength(200).HasDefaultValue(string.Empty);
+        builder.Property(x => x.HostingPlatform).HasMaxLength(200).HasDefaultValue(string.Empty);
+        builder.Property(x => x.RuntimeLanguage).HasMaxLength(100).HasDefaultValue(string.Empty);
+        builder.Property(x => x.RuntimeVersion).HasMaxLength(100).HasDefaultValue(string.Empty);
+        builder.Property(x => x.SloTarget).HasMaxLength(50).HasDefaultValue(string.Empty);
+        builder.Property(x => x.DataClassification).HasMaxLength(100).HasDefaultValue(string.Empty);
+        builder.Property(x => x.RegulatoryScope).HasMaxLength(200).HasDefaultValue(string.Empty);
+        builder.Property(x => x.ChangeFrequency).HasMaxLength(50).HasDefaultValue(string.Empty);
+        builder.Property(x => x.ProductOwner).HasMaxLength(200).HasDefaultValue(string.Empty);
+        builder.Property(x => x.ContactChannel).HasMaxLength(500).HasDefaultValue(string.Empty);
+        builder.Property(x => x.OnCallRotationId).HasMaxLength(200).HasDefaultValue(string.Empty);
+
         // ── Índices ───────────────────────────────────────────────────
         builder.HasIndex(x => x.Name).IsUnique();
         builder.HasIndex(x => x.TeamName);
         builder.HasIndex(x => x.Domain);
+        builder.HasIndex(x => x.SubDomain);
         builder.HasIndex(x => x.ServiceType);
         builder.HasIndex(x => x.Criticality);
         builder.HasIndex(x => x.LifecycleStatus);

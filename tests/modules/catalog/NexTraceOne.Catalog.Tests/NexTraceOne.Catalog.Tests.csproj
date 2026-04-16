@@ -11,6 +11,7 @@
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.API\NexTraceOne.Catalog.API.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\auditcompliance\NexTraceOne.AuditCompliance.Contracts\NexTraceOne.AuditCompliance.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

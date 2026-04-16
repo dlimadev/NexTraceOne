@@ -115,6 +115,13 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<ServiceAsset>> ListBySubDomainAsync(string subDomain, CancellationToken cancellationToken)
+        => await _context.ServiceAssets
+            .AsNoTracking()
+            .Where(s => s.SubDomain == subDomain)
+            .OrderBy(s => s.Name)
+            .ToListAsync(cancellationToken);
+
     public async Task<int> CountByTeamAsync(string teamName, CancellationToken cancellationToken)
         => await _context.ServiceAssets
             .CountAsync(s => s.TeamName == teamName, cancellationToken);
