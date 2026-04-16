@@ -14,6 +14,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { reliabilityApi } from '../api/reliability';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type StatusFilter = 'all' | 'Healthy' | 'Degraded' | 'Unavailable' | 'NeedsAttention';
 
@@ -37,11 +38,12 @@ const trendIcon = (trend: string) => {
 
 export function TeamReliabilityPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['reliability-services', filter, search],
+    queryKey: ['reliability-services', filter, search, activeEnvironmentId],
     queryFn: () => reliabilityApi.listServices({ status: filter !== 'all' ? filter : undefined, search: search || undefined, page: 1, pageSize: 100 }),
     staleTime: 30_000,
   });

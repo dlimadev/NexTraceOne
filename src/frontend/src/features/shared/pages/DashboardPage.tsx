@@ -12,11 +12,13 @@ import { EmptyState } from '../../../components/EmptyState';
 import { StackedProgressBar } from '../../../components/StackedProgressBar';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { usePersona } from '../../../contexts/PersonaContext';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { serviceCatalogApi } from '../../catalog/api/serviceCatalog';
 import { contractsApi } from '../../catalog/api/contracts';
 import { changeConfidenceApi } from '../../change-governance/api/changeConfidence';
 import { incidentsApi } from '../../operations/api/incidents';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 /**
  * Página principal do dashboard — experiência persona-aware com narrativa operacional.
@@ -41,28 +43,29 @@ import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 export function DashboardPage() {
   const { t } = useTranslation();
   const { persona, config } = usePersona();
+  const { activeEnvironmentId } = useEnvironment();
   const showContractsSurface = isRouteAvailableInFinalProductionScope('/contracts');
 
   const { data: graph, isLoading: graphLoading, isError: graphError } = useQuery({
-    queryKey: ['graph'],
+    queryKey: queryKeys.catalog.graph(activeEnvironmentId),
     queryFn: () => serviceCatalogApi.getGraph(),
     staleTime: 30_000,
   });
 
   const { data: contractsSummary, isLoading: contractsLoading } = useQuery({
-    queryKey: ['contracts', 'summary'],
+    queryKey: queryKeys.contracts.summary(activeEnvironmentId),
     queryFn: () => contractsApi.getContractsSummary(),
     staleTime: 30_000,
   });
 
   const { data: changesSummary, isLoading: changesLoading } = useQuery({
-    queryKey: ['changes', 'summary'],
+    queryKey: queryKeys.changes.summary(activeEnvironmentId),
     queryFn: () => changeConfidenceApi.getSummary(),
     staleTime: 30_000,
   });
 
   const { data: incidentsSummary, isLoading: incidentsLoading } = useQuery({
-    queryKey: ['incidents', 'summary'],
+    queryKey: queryKeys.incidents.summary(activeEnvironmentId),
     queryFn: () => incidentsApi.getIncidentSummary(),
     staleTime: 30_000,
   });

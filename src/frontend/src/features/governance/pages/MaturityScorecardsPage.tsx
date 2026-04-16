@@ -11,6 +11,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type MaturityDimension = 'team' | 'domain';
 
@@ -42,11 +43,12 @@ const scoreBarColor = (score: number, maxScore: number): string => {
  */
 export function MaturityScorecardsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [dimension, setDimension] = useState<MaturityDimension>('team');
   const dimensions: MaturityDimension[] = ['team', 'domain'];
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.governance.executive.scorecards(dimension),
+    queryKey: queryKeys.governance.executive.scorecards(dimension, activeEnvironmentId),
     queryFn: () => organizationGovernanceApi.getMaturityScorecards(dimension),
   });
 

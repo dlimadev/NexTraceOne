@@ -15,6 +15,7 @@ import type { CostEfficiencyType } from '../../../types';
 import { finOpsApi } from '../api/finOps';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
@@ -50,10 +51,11 @@ const trendIcon = (dir: string) => {
 export function DomainFinOpsPage() {
   const { t, i18n } = useTranslation();
   const { domainId } = useParams<{ domainId: string }>();
+  const { activeEnvironmentId } = useEnvironment();
   const fmt = (v: number) => formatCurrency(v, i18n.language);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
-    queryKey: queryKeys.governance.finops.domain(domainId!),
+    queryKey: queryKeys.governance.finops.domain(domainId!, activeEnvironmentId),
     queryFn: () => finOpsApi.getDomainFinOps(domainId!),
     staleTime: 30_000,
     enabled: !!domainId,

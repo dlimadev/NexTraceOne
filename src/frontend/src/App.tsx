@@ -1,8 +1,8 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './contexts/AuthContext';
-import { EnvironmentProvider } from './contexts/EnvironmentContext';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { EnvironmentProvider, useEnvironment } from './contexts/EnvironmentContext';
 import { PersonaProvider } from './contexts/PersonaContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { BrandingProvider } from './contexts/BrandingContext';
@@ -44,6 +44,53 @@ const queryClient = new QueryClient({
   },
 });
 
+/**
+ * Componente sem renderização que sincroniza o cache do TanStack Query
+ * com as mudanças de ambiente e tenant.
+ *
+ * Regras:
+ * - Troca de ambiente: invalida todas as queries (dados são ambiente-específicos).
+ *   O API client injeta automaticamente o X-Environment-Id no próximo fetch.
+ * - Troca de tenant: limpa todo o cache (isolamento completo entre tenants).
+ *
+ * DEVE estar dentro de QueryClientProvider, EnvironmentProvider e AuthProvider.
+ */
+function QueryContextSync() {
+  const qc = useQueryClient();
+  const { activeEnvironmentId } = useEnvironment();
+  const { tenantId } = useAuth();
+
+  const prevEnvRef = useRef(activeEnvironmentId);
+  const prevTenantRef = useRef(tenantId);
+
+  useEffect(() => {
+    const prevEnv = prevEnvRef.current;
+    prevEnvRef.current = activeEnvironmentId;
+
+    // Ignorar no primeiro render (seleção inicial de ambiente ao carregar)
+    if (prevEnv === null && activeEnvironmentId !== null) return;
+    if (prevEnv === activeEnvironmentId) return;
+
+    // Ambiente mudou — invalidar todas as queries para que sejam
+    // re-carregadas com o novo X-Environment-Id header
+    qc.invalidateQueries();
+  }, [activeEnvironmentId, qc]);
+
+  useEffect(() => {
+    const prevTenant = prevTenantRef.current;
+    prevTenantRef.current = tenantId;
+
+    // Ignorar no mount inicial
+    if (prevTenant === null) return;
+    if (prevTenant === tenantId) return;
+
+    // Tenant mudou — limpar todo o cache para isolamento de dados entre tenants
+    qc.clear();
+  }, [tenantId, qc]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -53,6 +100,7 @@ export default function App() {
         <EnvironmentProvider>
           <PersonaProvider>
             <ToastProvider>
+            <QueryContextSync />
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>

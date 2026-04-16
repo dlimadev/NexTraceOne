@@ -19,6 +19,8 @@ import { PageHeader } from '../../../components/PageHeader';
 import { incidentsApi, type IncidentListItem } from '../api/incidents';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { resolveApiError } from '../../../utils/apiErrors';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 type StatusFilter = 'all' | 'Open' | 'Investigating' | 'Mitigating' | 'Monitoring' | 'Resolved' | 'Closed';
 
@@ -74,6 +76,7 @@ export function IncidentsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { activeEnvironmentId } = useEnvironment();
   const canCreateIncident = can('operations:incidents:write');
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
@@ -85,7 +88,7 @@ export function IncidentsPage() {
   const [createForm, setCreateForm] = useState(defaultCreateForm);
 
   const incidentsQuery = useQuery({
-    queryKey: ['incidents', filter, search, page, pageSize],
+    queryKey: queryKeys.incidents.list({ filter, search, page, pageSize }, activeEnvironmentId),
     queryFn: () => incidentsApi.listIncidents({
       status: filter !== 'all' ? filter : undefined,
       search: search || undefined,
@@ -95,7 +98,7 @@ export function IncidentsPage() {
   });
 
   const summaryQuery = useQuery({
-    queryKey: ['incidents-summary'],
+    queryKey: queryKeys.incidents.summary(activeEnvironmentId),
     queryFn: () => incidentsApi.getIncidentSummary(),
   });
 

@@ -16,6 +16,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import type { RiskSummaryResponse, RiskLevel } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 
 
@@ -47,10 +48,11 @@ const riskIcon = (level: RiskLevel) => {
  */
 export function RiskCenterPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [filter, setFilter] = useState<RiskFilter>('all');
   const [search, setSearch] = useState('');
   const riskQuery = useQuery<RiskSummaryResponse>({
-    queryKey: queryKeys.governance.risk(),
+    queryKey: queryKeys.governance.risk(activeEnvironmentId),
     queryFn: () => organizationGovernanceApi.getRiskSummary(),
     staleTime: 30_000,
   });

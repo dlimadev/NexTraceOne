@@ -10,6 +10,7 @@ import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { StatCard } from '../../../components/StatCard';
 import { usePersona } from '../../../contexts/PersonaContext';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -51,6 +52,7 @@ const riskBadgeVariant = (level: string): 'success' | 'warning' | 'danger' | 'de
 export function ReportsPage() {
   const { t } = useTranslation();
   const { persona } = usePersona();
+  const { activeEnvironmentId } = useEnvironment();
   const personaKeyMap: Record<string, string> = {
     Engineer: 'engineer', TechLead: 'techLead', Architect: 'architect',
     Product: 'product', Executive: 'executive', PlatformAdmin: 'platformAdmin', Auditor: 'auditor',
@@ -59,7 +61,7 @@ export function ReportsPage() {
   const personaFocusKey = `governance.reports.${personaKey}.focus`;
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.governance.reports(),
+    queryKey: queryKeys.governance.reports(activeEnvironmentId),
     queryFn: () => organizationGovernanceApi.getReportsSummary(),
   });
 

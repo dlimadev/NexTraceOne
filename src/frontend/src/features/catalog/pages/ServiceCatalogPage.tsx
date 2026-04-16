@@ -27,12 +27,15 @@ import type { GraphSnapshotSummary } from '../../../types';
 import { ImpactPanel } from './ImpactPanel';
 import { TemporalPanel } from './TemporalPanel';
 import { ServiceDetailPanel } from './ServiceDetailPanel';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { queryKeys } from '../../../shared/api/queryKeys';
 
 type Tab = 'overview' | 'services' | 'apis' | 'graph' | 'impact' | 'temporal';
 
 export function ServiceCatalogPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { activeEnvironmentId } = useEnvironment();
   const [tab, setTab] = useState<Tab>('overview');
   const [selectedDetailNode, setSelectedDetailNode] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,34 +46,34 @@ export function ServiceCatalogPage() {
 
   // ── Queries principais ──────────────────────────────────────────────
   const { data: graph, isLoading, isError: isGraphError } = useQuery({
-    queryKey: ['graph'],
+    queryKey: queryKeys.catalog.graph(activeEnvironmentId),
     queryFn: () => serviceCatalogApi.getGraph(),
     staleTime: 30_000,
   });
 
   const { data: impactResult, isLoading: impactLoading } = useQuery({
-    queryKey: ['impact', selectedNodeId, impactDepth],
+    queryKey: ['impact', selectedNodeId, impactDepth, activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getImpactPropagation(selectedNodeId!, impactDepth),
     enabled: !!selectedNodeId && tab === 'impact',
     staleTime: 15_000,
   });
 
   const { data: snapshotsData } = useQuery({
-    queryKey: ['snapshots'],
+    queryKey: ['snapshots', activeEnvironmentId],
     queryFn: () => serviceCatalogApi.listSnapshots(20),
     enabled: tab === 'temporal',
     staleTime: 60_000,
   });
 
   const { data: diffResult, isLoading: diffLoading } = useQuery({
-    queryKey: ['temporal-diff', selectedFromSnapshot, selectedToSnapshot],
+    queryKey: ['temporal-diff', selectedFromSnapshot, selectedToSnapshot, activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getTemporalDiff(selectedFromSnapshot, selectedToSnapshot),
     enabled: !!selectedFromSnapshot && !!selectedToSnapshot && selectedFromSnapshot !== selectedToSnapshot,
     staleTime: 30_000,
   });
 
   const { data: healthData } = useQuery({
-    queryKey: ['node-health'],
+    queryKey: ['node-health', activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getNodeHealth('Health'),
     staleTime: 30_000,
   });
