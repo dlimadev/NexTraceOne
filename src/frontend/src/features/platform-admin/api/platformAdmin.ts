@@ -645,6 +645,117 @@ export const platformAdminApi = {
     client
       .get<CapacityForecastResponse>('/api/v1/admin/capacity-forecast')
       .then((r) => r.data),
+
+  // ── W1-04: Demo Seed ──────────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/demo-seed — requer platform:admin:read.
+   * Retorna estado actual do seed de demonstração.
+   */
+  getDemoSeedStatus: () =>
+    client
+      .get<DemoSeedStatus>('/api/v1/admin/demo-seed')
+      .then((r) => r.data),
+
+  /**
+   * POST /api/v1/admin/demo-seed — requer platform:admin:write.
+   * Executa o seed de dados de demonstração.
+   */
+  runDemoSeed: (request: DemoSeedRequest) =>
+    client
+      .post<DemoSeedResult>('/api/v1/admin/demo-seed', request)
+      .then((r) => r.data),
+
+  /**
+   * DELETE /api/v1/admin/demo-seed — requer platform:admin:write.
+   * Remove todos os dados marcados como is_demo=true.
+   */
+  clearDemoData: () =>
+    client
+      .delete<DemoSeedClearResult>('/api/v1/admin/demo-seed')
+      .then((r) => r.data),
+
+  // ── W3-05: Graceful Shutdown ──────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/graceful-shutdown — requer platform:admin:read.
+   * Retorna configuração de graceful shutdown.
+   */
+  getGracefulShutdownConfig: () =>
+    client
+      .get<GracefulShutdownConfig>('/api/v1/admin/graceful-shutdown')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/graceful-shutdown — requer platform:admin:write.
+   * Actualiza configuração de graceful shutdown.
+   */
+  updateGracefulShutdownConfig: (config: GracefulShutdownConfigUpdate) =>
+    client
+      .put<GracefulShutdownConfig>('/api/v1/admin/graceful-shutdown', config)
+      .then((r) => r.data),
+
+  // ── W5-06: Session Security ───────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/session-security — requer platform:admin:read.
+   * Retorna configuração de segurança de sessão.
+   */
+  getSessionSecurityConfig: () =>
+    client
+      .get<SessionSecurityConfig>('/api/v1/admin/session-security')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/session-security — requer platform:admin:write.
+   * Actualiza configuração de segurança de sessão.
+   */
+  updateSessionSecurityConfig: (config: SessionSecurityConfigUpdate) =>
+    client
+      .put<SessionSecurityConfig>('/api/v1/admin/session-security', config)
+      .then((r) => r.data),
+
+  // ── W6-05: Rightsizing ────────────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/rightsizing — requer platform:admin:read.
+   * Retorna recomendações de rightsizing baseadas em percentis reais.
+   */
+  getRightsizingReport: () =>
+    client
+      .get<RightsizingReport>('/api/v1/admin/rightsizing')
+      .then((r) => r.data),
+
+  // ── W7-03: Observability Mode ─────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/observability-mode — requer platform:admin:read.
+   * Retorna modo de observabilidade actual e recursos disponíveis.
+   */
+  getObservabilityMode: () =>
+    client
+      .get<ObservabilityModeConfig>('/api/v1/admin/observability-mode')
+      .then((r) => r.data),
+
+  /**
+   * PUT /api/v1/admin/observability-mode — requer platform:admin:write.
+   * Actualiza o modo de observabilidade (Full/Lite/Minimal).
+   */
+  updateObservabilityMode: (update: ObservabilityModeUpdate) =>
+    client
+      .put<ObservabilityModeConfig>('/api/v1/admin/observability-mode', update)
+      .then((r) => r.data),
+
+  // ── W8-06: Compliance Packs ───────────────────────────────────────────────
+
+  /**
+   * GET /api/v1/admin/compliance-packs — requer platform:admin:read.
+   * Retorna packs de compliance configurados e estado dos controls.
+   */
+  getCompliancePacks: () =>
+    client
+      .get<CompliancePacksResponse>('/api/v1/admin/compliance-packs')
+      .then((r) => r.data),
 };
 
 // ── W2-03 Types ───────────────────────────────────────────────────────────────
@@ -1019,6 +1130,159 @@ export interface CapacityForecastResponse {
   forecasts: CapacityResourceForecast[];
   analysisWeeks: number;
   nextReviewDate: string;
+  generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W1-04 Types ───────────────────────────────────────────────────────────────
+
+export type DemoSeedState = 'NotSeeded' | 'Seeded' | 'Clearing';
+
+export interface DemoSeedStatus {
+  state: DemoSeedState;
+  seededAt?: string;
+  entitiesCount: number;
+  servicesCount: number;
+  changesCount: number;
+  incidentsCount: number;
+  simulatedNote: string;
+}
+
+export interface DemoSeedRequest {
+  tenantId?: string;
+}
+
+export interface DemoSeedResult {
+  success: boolean;
+  durationMs: number;
+  entitiesCreated: number;
+  message: string;
+}
+
+export interface DemoSeedClearResult {
+  success: boolean;
+  entitiesRemoved: number;
+  message: string;
+}
+
+// ── W3-05 Types ───────────────────────────────────────────────────────────────
+
+export interface GracefulShutdownConfig {
+  requestDrainTimeoutSeconds: number;
+  outboxDrainTimeoutSeconds: number;
+  healthCheckReturns503OnShutdown: boolean;
+  auditShutdownEvents: boolean;
+  updatedAt: string;
+}
+
+export interface GracefulShutdownConfigUpdate {
+  requestDrainTimeoutSeconds: number;
+  outboxDrainTimeoutSeconds: number;
+  healthCheckReturns503OnShutdown: boolean;
+  auditShutdownEvents: boolean;
+}
+
+// ── W5-06 Types ───────────────────────────────────────────────────────────────
+
+export interface SessionSecurityConfig {
+  inactivityTimeoutMinutes: number;
+  maxConcurrentSessions: number;
+  requireReauthForSensitiveActions: boolean;
+  detectAnomalousIpChange: boolean;
+  sensitiveActions: string[];
+  updatedAt: string;
+}
+
+export interface SessionSecurityConfigUpdate {
+  inactivityTimeoutMinutes: number;
+  maxConcurrentSessions: number;
+  requireReauthForSensitiveActions: boolean;
+  detectAnomalousIpChange: boolean;
+}
+
+// ── W6-05 Types ───────────────────────────────────────────────────────────────
+
+export type RightsizingImpact = 'Low' | 'Medium' | 'High';
+
+export interface RightsizingRecommendation {
+  serviceId: string;
+  serviceName: string;
+  teamName: string;
+  resource: 'CPU' | 'Memory';
+  currentAllocation: number;
+  recommendedAllocation: number;
+  unit: string;
+  p95Usage: number;
+  p99Usage: number;
+  safetyMarginPercent: number;
+  savingPercent: number;
+  reliabilityImpact: RightsizingImpact;
+  oomEventsLast30Days: number;
+  sloAtRisk: boolean;
+  analysisDays: number;
+}
+
+export interface RightsizingReport {
+  recommendations: RightsizingRecommendation[];
+  totalServicesAnalysed: number;
+  totalSavingEstimateCpuPercent: number;
+  totalSavingEstimateMemoryPercent: number;
+  safetyMarginPercent: number;
+  generatedAt: string;
+  simulatedNote: string;
+}
+
+// ── W7-03 Types ───────────────────────────────────────────────────────────────
+
+export type ObservabilityMode = 'Full' | 'Lite' | 'Minimal';
+
+export interface ObservabilityModeConfig {
+  currentMode: ObservabilityMode;
+  elasticsearchConnected: boolean;
+  elasticsearchVersion?: string;
+  postgresAnalyticsEnabled: boolean;
+  otelCollectorConnected: boolean;
+  additionalRamUsageGb: number;
+  tradeOffs: string[];
+  updatedAt: string;
+  simulatedNote: string;
+}
+
+export interface ObservabilityModeUpdate {
+  mode: ObservabilityMode;
+}
+
+// ── W8-06 Types ───────────────────────────────────────────────────────────────
+
+export type ComplianceControlStatus = 'Pass' | 'Fail' | 'Warning' | 'NotApplicable';
+
+export interface ComplianceControl {
+  id: string;
+  code: string;
+  title: string;
+  description: string;
+  status: ComplianceControlStatus;
+  evidence?: string;
+  actionRequired?: string;
+  moduleLink?: string;
+}
+
+export interface CompliancePack {
+  id: string;
+  name: string;
+  standard: string;
+  version: string;
+  totalControls: number;
+  passingControls: number;
+  failingControls: number;
+  warningControls: number;
+  compliancePercent: number;
+  controls: ComplianceControl[];
+  lastCheckedAt: string;
+}
+
+export interface CompliancePacksResponse {
+  packs: CompliancePack[];
   generatedAt: string;
   simulatedNote: string;
 }

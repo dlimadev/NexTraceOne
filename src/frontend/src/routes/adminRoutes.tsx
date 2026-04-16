@@ -78,6 +78,12 @@ const ExternalHttpAuditPage = lazy(() => import('../features/platform-admin/page
 const EnvironmentPoliciesPage = lazy(() => import('../features/platform-admin/pages/EnvironmentPoliciesPage').then(m => ({ default: m.EnvironmentPoliciesPage })));
 const NonProdSchedulerPage = lazy(() => import('../features/platform-admin/pages/NonProdSchedulerPage').then(m => ({ default: m.NonProdSchedulerPage })));
 const CapacityForecastPage = lazy(() => import('../features/platform-admin/pages/CapacityForecastPage').then(m => ({ default: m.CapacityForecastPage })));
+const DemoSeedPage = lazy(() => import('../features/platform-admin/pages/DemoSeedPage').then(m => ({ default: m.DemoSeedPage })));
+const GracefulShutdownPage = lazy(() => import('../features/platform-admin/pages/GracefulShutdownPage').then(m => ({ default: m.GracefulShutdownPage })));
+const SessionSecurityPage = lazy(() => import('../features/platform-admin/pages/SessionSecurityPage').then(m => ({ default: m.SessionSecurityPage })));
+const RightsizingPage = lazy(() => import('../features/platform-admin/pages/RightsizingPage').then(m => ({ default: m.RightsizingPage })));
+const ObservabilityModePage = lazy(() => import('../features/platform-admin/pages/ObservabilityModePage').then(m => ({ default: m.ObservabilityModePage })));
+const CompliancePacksPage = lazy(() => import('../features/platform-admin/pages/CompliancePacksPage').then(m => ({ default: m.CompliancePacksPage })));
 
 export function AdminRoutes() {
   return (
@@ -567,6 +573,60 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <CapacityForecastPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Demo Seed — W1-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/demo-seed"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <DemoSeedPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Graceful Shutdown — W3-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/graceful-shutdown"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <GracefulShutdownPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Session Security — W5-06 (on-prem admin) ── */}
+      <Route
+        path="/admin/session-security"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <SessionSecurityPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Rightsizing — W6-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/rightsizing"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <RightsizingPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Observability Mode — W7-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/observability-mode"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ObservabilityModePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Compliance Packs — W8-06 (on-prem admin) ── */}
+      <Route
+        path="/admin/compliance-packs"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <CompliancePacksPage />
           </ProtectedRoute>
         }
       />
