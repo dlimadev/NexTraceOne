@@ -13,6 +13,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { changeConfidenceApi } from '../api/changeConfidence';
+import { RiskScoreTrendPanel } from '../components/RiskScoreTrendPanel';
 import type { DoraClassification } from '../api/changeConfidence';
 
 const classificationColor = (c: DoraClassification): string => {
@@ -251,6 +252,11 @@ export function DoraMetricsPage() {
             </Badge>
           </CardBody>
         </Card>
+      </div>
+
+      {/* Risk Score Trend (Gap 12) */}
+      <div className="mt-8">
+        <RiskScoreTrendPanel initialServiceName={serviceName} />
       </div>
     </PageContainer>
   );

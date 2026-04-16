@@ -26,6 +26,29 @@ export interface PromotionStatus {
   notes: string | null;
 }
 
+/** Step no caminho de promoção de uma release entre ambientes (Gap 10). */
+export interface PromotionPathStep {
+  promotionRequestId: string;
+  sourceEnvironment: string;
+  targetEnvironment: string;
+  status: string;
+  requestedBy: string;
+  requestedAt: string;
+  completedAt: string | null;
+  justification: string | null;
+}
+
+/** Resposta do caminho de promoção de uma release (Gap 10). */
+export interface EnvironmentPromotionPathResponse {
+  releaseId: string;
+  steps: PromotionPathStep[];
+  currentEnvironment: string | null;
+  isFullyPromoted: boolean;
+  hasBlockers: boolean;
+  totalSteps: number;
+  completedSteps: number;
+}
+
 export const promotionApi = {
   listRequests: (page = 1, pageSize = 20) =>
     client
@@ -80,5 +103,11 @@ export const promotionApi = {
   evaluateGates: (requestId: string) =>
     client
       .post(`/promotion/requests/${requestId}/evaluate-gates`, { promotionRequestId: requestId })
+      .then((r) => r.data),
+
+  /** Obtém o caminho de promoção de uma release entre ambientes (Gap 10). */
+  getEnvironmentPromotionPath: (releaseId: string) =>
+    client
+      .get<EnvironmentPromotionPathResponse>(`/promotion/releases/${releaseId}/path`)
       .then((r) => r.data),
 };

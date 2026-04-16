@@ -21,6 +21,7 @@ import {
   Network, Workflow, StickyNote, BookMarked, Radar,
   CalendarDays, Award, BrainCircuit, Palette, Cpu,
   Archive, HardDrive, Gauge, Bell, RotateCcw, Leaf, Lock,
+  Train, MapPin,
 } from 'lucide-react';
 
 interface NavItem {
@@ -53,6 +54,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.doraMetrics', to: '/dora-metrics', icon: <BarChart3 size={18} />, permission: 'change-intelligence:read', section: 'changes' },
   { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:instances:read', section: 'changes' },
   { labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={18} />, permission: 'promotion:requests:read', section: 'changes' },
+  { labelKey: 'sidebar.releaseTrain', to: '/release-train', icon: <Train size={18} />, permission: 'change-intelligence:read', section: 'changes' },
+  { labelKey: 'sidebar.releaseChecklist', to: '/workflow/checklist', icon: <MapPin size={18} />, permission: 'workflow:instances:write', section: 'changes' },
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
   { labelKey: 'sidebar.incidentTimeline', to: '/operations/incidents/timeline', icon: <Clock size={18} />, permission: 'operations:incidents:read', section: 'operations' },
   { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={18} />, permission: 'operations:runbooks:read', section: 'operations' },

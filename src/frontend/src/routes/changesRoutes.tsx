@@ -14,6 +14,8 @@ const ChangeDetailPage = lazy(() => import('../features/change-governance/pages/
 const ReleaseCalendarPage = lazy(() => import('../features/change-governance/pages/ReleaseCalendarPage').then(m => ({ default: m.ReleaseCalendarPage })));
 const DoraMetricsPage = lazy(() => import('../features/change-governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
 const ChangeAdvisoryPage = lazy(() => import('../features/change-governance/pages/ChangeAdvisoryPage').then(m => ({ default: m.ChangeAdvisoryPage })));
+const ReleaseTrainPage = lazy(() => import('../features/change-governance/pages/ReleaseTrainPage').then(m => ({ default: m.ReleaseTrainPage })));
+const ReleaseChecklistExecutionPage = lazy(() => import('../features/change-governance/pages/ReleaseChecklistExecutionPage').then(m => ({ default: m.ReleaseChecklistExecutionPage })));
 
 export function ChangesRoutes() {
   return (
@@ -79,6 +81,22 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
             <ChangeAdvisoryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/release-train"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseTrainPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workflow/checklist"
+        element={
+          <ProtectedRoute permission="workflow:instances:write" redirectTo="/unauthorized">
+            <ReleaseChecklistExecutionPage />
           </ProtectedRoute>
         }
       />

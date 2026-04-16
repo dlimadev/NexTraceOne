@@ -270,6 +270,59 @@ export interface UpdateFreezeWindowRequest {
   endsAt: string;
 }
 
+/** Ponto de dado na série temporal de risk score (Gap 12). */
+export interface RiskScoreDataPoint {
+  releaseId: string;
+  version: string;
+  environment: string;
+  changeLevel: string;
+  status: string;
+  score: number | null;
+  createdAt: string;
+}
+
+/** Resposta da série temporal de risk scores por serviço (Gap 12). */
+export interface RiskScoreTrendResponse {
+  serviceName: string;
+  environment: string | null;
+  dataPoints: RiskScoreDataPoint[];
+  generatedAt: string;
+}
+
+/** Item de release dentro de um Release Train (Gap 1). */
+export interface TrainReleaseItem {
+  releaseId: string;
+  serviceName: string;
+  version: string;
+  environment: string;
+  status: string;
+  changeLevel: string;
+  riskScore: number | null;
+  isHighRisk: boolean;
+  totalAffectedConsumers: number;
+  createdAt: string;
+}
+
+/** Request para avaliar um Release Train (Gap 1). */
+export interface EvaluateReleaseTrainRequest {
+  trainName: string;
+  releaseIds: string[];
+}
+
+/** Resposta da avaliação de um Release Train (Gap 1). */
+export interface ReleaseTrainEvaluationResponse {
+  trainName: string;
+  requestedCount: number;
+  foundCount: number;
+  notFoundIds: string[];
+  releases: TrainReleaseItem[];
+  aggregateRiskScore: number | null;
+  combinedAffectedConsumers: number;
+  blockingServices: string[];
+  readiness: string;
+  evaluatedAt: string;
+}
+
 // ─── API Client ──────────────────────────────────────────────────────────────
 
 export const changeIntelligenceApi = {
@@ -450,5 +503,23 @@ export const changeIntelligenceApi = {
   getTraceCorrelations: (releaseId: string) =>
     client
       .get<TraceCorrelationsResponse>(`/releases/${releaseId}/traces`)
+      .then((r) => r.data),
+
+  /** Obtém série temporal de risk scores de um serviço (Gap 12). */
+  getRiskScoreTrend: (serviceName: string, environment?: string, limit?: number) =>
+    client
+      .get<RiskScoreTrendResponse>('/releases/risk-trend', {
+        params: {
+          serviceName,
+          ...(environment ? { environment } : {}),
+          ...(limit ? { limit } : {}),
+        },
+      })
+      .then((r) => r.data),
+
+  /** Avalia um Release Train coordenado entre múltiplos serviços (Gap 1). */
+  evaluateReleaseTrain: (data: EvaluateReleaseTrainRequest) =>
+    client
+      .post<ReleaseTrainEvaluationResponse>('/releases/train-evaluation', data)
       .then((r) => r.data),
 };

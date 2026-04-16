@@ -16,6 +16,7 @@ using GetPromotionStatusFeature = NexTraceOne.ChangeGovernance.Application.Promo
 using ListPromotionRequestsFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests.ListPromotionRequests;
 using OverrideGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.OverrideGateWithJustification.OverrideGateWithJustification;
 using EvaluateContractComplianceGateFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluateContractComplianceGate.EvaluateContractComplianceGate;
+using GetEnvironmentPromotionPathFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetEnvironmentPromotionPath.GetEnvironmentPromotionPath;
 
 namespace NexTraceOne.ChangeGovernance.API.Promotion.Endpoints.Endpoints;
 
@@ -155,5 +156,21 @@ public sealed class PromotionEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("promotion:requests:read");
+
+        // ── GET /api/v1/promotion/releases/{releaseId}/path — Caminho de promoção (Gap 10) ────────
+        group.MapGet("/releases/{releaseId:guid}/path", async (
+            Guid releaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetEnvironmentPromotionPathFeature.Query(releaseId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("promotion:requests:read")
+        .WithName("GetEnvironmentPromotionPath")
+        .WithSummary("Returns the environment promotion path for a release — shows which environments the release has reached and its status at each step");
     }
 }

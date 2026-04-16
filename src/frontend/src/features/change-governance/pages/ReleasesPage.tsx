@@ -13,6 +13,7 @@ import {
   GitCompare,
   FileText,
   ShieldCheck,
+  MapPin,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
@@ -29,11 +30,12 @@ import { ReleasesIntelligenceTab } from '../components/ReleasesIntelligenceTab';
 import { PreProdComparisonPanel } from '../components/PreProdComparisonPanel';
 import { ReleaseNotesPanel } from '../components/ReleaseNotesPanel';
 import { DeployReadinessPanel } from '../components/DeployReadinessPanel';
+import { EnvironmentPromotionPathPanel } from '../components/EnvironmentPromotionPathPanel';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ─── Constantes auxiliares ───────────────────────────────────────────────────
 
-type TabId = 'overview' | 'intelligence' | 'timeline' | 'freeze' | 'pre-prod' | 'release-notes' | 'readiness';
+type TabId = 'overview' | 'intelligence' | 'timeline' | 'freeze' | 'pre-prod' | 'release-notes' | 'readiness' | 'promotion-path';
 
 const CHANGE_LEVEL_KEYS = [
   'releases.changeLevels.operational',
@@ -164,6 +166,7 @@ export function ReleasesPage() {
     { id: 'pre-prod', icon: GitCompare, labelKey: 'releases.tabs.preProd' },
     { id: 'release-notes', icon: FileText, labelKey: 'releases.tabs.releaseNotes' },
     { id: 'readiness', icon: ShieldCheck, labelKey: 'releases.tabs.readiness' },
+    { id: 'promotion-path', icon: MapPin, labelKey: 'releases.tabs.promotionPath' },
   ];
 
   const data = releasesQuery.data;
@@ -562,6 +565,11 @@ export function ReleasesPage() {
           releaseId={selectedReleaseId}
           environmentName={form.environment || undefined}
         />
+      )}
+
+      {/* ═══════════════════ ENVIRONMENT PROMOTION PATH TAB ═══════════════════ */}
+      {activeTab === 'promotion-path' && (
+        <EnvironmentPromotionPathPanel releaseId={selectedReleaseId} />
       )}
     </PageContainer>
   );

@@ -1,6 +1,35 @@
 import client from '../../../api/client';
 import type { WorkflowTemplate, WorkflowInstance, PagedList } from '../../../types';
 
+// ─── Checklist Evidence Types ─────────────────────────────────────────────────
+
+/** Item individual de checklist de release (Gap 11). */
+export interface ChecklistItemInput {
+  name: string;
+  completed: boolean;
+  notes?: string | null;
+}
+
+/** Request para registar evidência de checklist no EvidencePack (Gap 11). */
+export interface RecordChecklistEvidenceRequest {
+  workflowInstanceId: string;
+  checklistName: string;
+  items: ChecklistItemInput[];
+  executedBy: string;
+}
+
+/** Resposta do registo de checklist no EvidencePack (Gap 11). */
+export interface ChecklistEvidenceResponse {
+  evidencePackId: string;
+  workflowInstanceId: string;
+  checklistName: string;
+  totalItems: number;
+  completedItems: number;
+  completionRate: number;
+  evidenceCompletenessPercentage: number;
+  recordedAt: string;
+}
+
 export const workflowApi = {
   listTemplates: () =>
     client.get<WorkflowTemplate[]>('/workflow/templates').then((r) => r.data),
@@ -29,5 +58,14 @@ export const workflowApi = {
   requestChanges: (instanceId: string, stageId: string, comment: string) =>
     client
       .post(`/workflow/instances/${instanceId}/stages/${stageId}/request-changes`, { comment })
+      .then((r) => r.data),
+
+  /** Regista evidência de execução de checklist no EvidencePack (Gap 11). */
+  recordChecklistEvidence: (instanceId: string, data: RecordChecklistEvidenceRequest) =>
+    client
+      .post<ChecklistEvidenceResponse>(`/workflow/instances/${instanceId}/evidence-pack/checklist`, {
+        ...data,
+        workflowInstanceId: instanceId,
+      })
       .then((r) => r.data),
 };
