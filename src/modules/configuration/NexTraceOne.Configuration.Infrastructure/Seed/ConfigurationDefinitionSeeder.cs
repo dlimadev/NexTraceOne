@@ -2924,6 +2924,64 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "text",
             sortOrder: 4690),
 
+        ConfigurationDefinition.Create(
+            key: "change.release.train.max_items_per_train",
+            displayName: "config.change.release.train.max_items_per_train.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.release.train.max_items_per_train.description",
+            defaultValue: "50",
+            validationRules: """{"min":1,"max":500}""",
+            uiEditorType: "text",
+            sortOrder: 4700),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.train.auto_close_on_all_deployed",
+            displayName: "config.change.release.train.auto_close_on_all_deployed.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.release.train.auto_close_on_all_deployed.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 4710),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.notes.ai_generation_model",
+            displayName: "config.change.release.notes.ai_generation_model.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.release.notes.ai_generation_model.description",
+            defaultValue: "local-default",
+            uiEditorType: "text",
+            sortOrder: 4720),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.gates.max_pending_days_before_alert",
+            displayName: "config.change.release.gates.max_pending_days_before_alert.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.change.release.gates.max_pending_days_before_alert.description",
+            defaultValue: "3",
+            validationRules: """{"min":1,"max":30}""",
+            uiEditorType: "text",
+            sortOrder: 4730),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.freeze_window.default_duration_hours",
+            displayName: "config.change.release.freeze_window.default_duration_hours.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.change.release.freeze_window.default_duration_hours.description",
+            defaultValue: "72",
+            validationRules: """{"min":1,"max":720}""",
+            uiEditorType: "text",
+            sortOrder: 4740),
+
         // ═══════════════════════════════════════════════════════════════════
         // PHASE 6 — OPERATIONS, INCIDENTS, FINOPS & BENCHMARKING
         // ═══════════════════════════════════════════════════════════════════

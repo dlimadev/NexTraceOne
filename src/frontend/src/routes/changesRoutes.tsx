@@ -28,6 +28,8 @@ const ReleaseNotesPage = lazy(() => import('../features/change-governance/pages/
 const WorkflowConfigurationPage = lazy(() => import('../features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
 const EvidencePackViewerPage = lazy(() => import('../features/change-governance/pages/EvidencePackViewerPage').then(m => ({ default: m.EvidencePackViewerPage })));
 const ReleaseGatesDashboardPage = lazy(() => import('../features/change-governance/pages/ReleaseGatesDashboardPage').then(m => ({ default: m.ReleaseGatesDashboardPage })));
+const ReleaseParameterAuditPage = lazy(() => import('../features/change-governance/pages/ReleaseParameterAuditPage').then(m => ({ default: m.ReleaseParameterAuditPage })));
+const ReleaseParameterEnvironmentOverridePage = lazy(() => import('../features/change-governance/pages/ReleaseParameterEnvironmentOverridePage').then(m => ({ default: m.ReleaseParameterEnvironmentOverridePage })));
 
 export function ChangesRoutes() {
   return (
@@ -205,6 +207,22 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
             <ReleaseGatesDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/parameter-audit"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseParameterAuditPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/parameter-overrides"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseParameterEnvironmentOverridePage />
           </ProtectedRoute>
         }
       />

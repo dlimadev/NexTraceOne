@@ -64,4 +64,41 @@ public static class ChangeConfigKeys
     /// Score mínimo de blast radius (0.0–1.0) que exige aprovação obrigatória do CAB.
     /// </summary>
     public const string ReleaseBlastRadiusCabApprovalThreshold = "change.release.blast_radius.cab_approval_threshold";
+
+    // ── Parâmetros de Release Train ──────────────────────────────────────────
+
+    /// <summary>
+    /// Número máximo de itens (commits / work items) permitidos numa única Release Train.
+    /// Acima deste limite o sistema avisa o responsável antes de iniciar o trem.
+    /// </summary>
+    public const string ReleaseTrainMaxItemsPerTrain = "change.release.train.max_items_per_train";
+
+    /// <summary>
+    /// Fecha automaticamente a Release Train quando todos os itens tiverem sido deployados.
+    /// </summary>
+    public const string ReleaseTrainAutoCloseOnAllDeployed = "change.release.train.auto_close_on_all_deployed";
+
+    // ── Parâmetros de Release Notes ──────────────────────────────────────────
+
+    /// <summary>
+    /// Identificador do modelo de IA a usar para geração automática de release notes.
+    /// Deve coincidir com um model ID registado no Model Registry.
+    /// </summary>
+    public const string ReleaseNotesAiGenerationModel = "change.release.notes.ai_generation_model";
+
+    // ── Parâmetros de Promotion Gates ────────────────────────────────────────
+
+    /// <summary>
+    /// Número máximo de dias que um gate de promoção pode ficar pendente antes de
+    /// gerar um alerta automático ao responsável pela release.
+    /// </summary>
+    public const string ReleaseGatesMaxPendingDaysBeforeAlert = "change.release.gates.max_pending_days_before_alert";
+
+    // ── Parâmetros de Freeze Window ───────────────────────────────────────────
+
+    /// <summary>
+    /// Duração padrão (em horas) das freeze windows criadas manualmente.
+    /// Pode ser sobreposta por environment override.
+    /// </summary>
+    public const string ReleaseFreezeWindowDefaultDurationHours = "change.release.freeze_window.default_duration_hours";
 }

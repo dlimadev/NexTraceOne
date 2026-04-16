@@ -3116,7 +3116,17 @@
     "change.release.auto_generate_notes_on_review.label": "Gerar Notas Automaticamente ao Iniciar Revisão",
     "change.release.auto_generate_notes_on_review.description": "Gera automaticamente release notes por IA ao iniciar uma revisão pós-release.",
     "change.release.blast_radius.cab_approval_threshold.label": "Limiar de Blast Radius para Aprovação do CAB",
-    "change.release.blast_radius.cab_approval_threshold.description": "Score mínimo de blast radius (0.0–1.0) que exige aprovação obrigatória do Change Advisory Board."
+    "change.release.blast_radius.cab_approval_threshold.description": "Score mínimo de blast radius (0.0–1.0) que exige aprovação obrigatória do Change Advisory Board.",
+    "change.release.train.max_items_per_train.label": "Máximo de Itens por Release Train",
+    "change.release.train.max_items_per_train.description": "Número máximo de commits ou work items permitidos numa única Release Train. Ultrapassar este limite gera um aviso antes do início do trem.",
+    "change.release.train.auto_close_on_all_deployed.label": "Fechar Trem Automaticamente ao Deployar Todos os Itens",
+    "change.release.train.auto_close_on_all_deployed.description": "Fecha automaticamente a Release Train quando todos os seus itens forem deployados com sucesso no ambiente alvo.",
+    "change.release.notes.ai_generation_model.label": "Modelo de IA para Geração de Release Notes",
+    "change.release.notes.ai_generation_model.description": "ID do modelo usado para geração automática de release notes por IA. Deve coincidir com um modelo registado no Model Registry.",
+    "change.release.gates.max_pending_days_before_alert.label": "Dias Máximos de Gate Pendente Antes de Alerta",
+    "change.release.gates.max_pending_days_before_alert.description": "Número máximo de dias que um gate de promoção pode ficar pendente antes de enviar um alerta automático ao responsável pela release.",
+    "change.release.freeze_window.default_duration_hours.label": "Duração Padrão da Freeze Window (horas)",
+    "change.release.freeze_window.default_duration_hours.description": "Duração padrão em horas das freeze windows criadas manualmente. Pode ser sobreposta por override de ambiente."
   },
   "configuration": {
     "actions": {
@@ -8811,7 +8821,9 @@
     "subGroupWorkflowManagement": "Gestão de Workflow",
     "workflowConfiguration": "Configuração de Workflow",
     "releaseGatesDashboard": "Gates de Release",
-    "evidencePackViewer": "Evidence Pack"
+    "evidencePackViewer": "Evidence Pack",
+    "releaseParameterAudit": "Auditoria de Parâmetros",
+    "releaseParameterOverride": "Overrides por Ambiente"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11350,5 +11362,53 @@
     "nonBlocking": "Não bloqueante",
     "inactive": "Inativo",
     "created": "Criado em"
+  },
+  "releaseParameterAudit": {
+    "title": "Auditoria de Parâmetros de Release",
+    "subtitle": "Histórico completo de todas as alterações nos parâmetros de controlo de releases, com utilizador, data e valores anteriores",
+    "loading": "Carregando histórico…",
+    "emptyTitle": "Nenhum registo de auditoria encontrado",
+    "emptyDescription": "Nenhuma alteração de parâmetro foi registada para o escopo selecionado",
+    "errorTitle": "Não foi possível carregar o histórico de auditoria",
+    "errorDescription": "Verifique as suas permissões e tente novamente",
+    "colParameter": "Parâmetro",
+    "colPreviousValue": "Valor Anterior",
+    "colNewValue": "Novo Valor",
+    "colChangedBy": "Alterado Por",
+    "colChangedAt": "Alterado Em",
+    "colScope": "Escopo",
+    "colReason": "Motivo",
+    "filterLabel": "Filtrar por parâmetro…",
+    "exportButton": "Exportar CSV",
+    "scopeFilter": "Escopo",
+    "allScopes": "Todos os escopos"
+  },
+  "releaseParameterOverride": {
+    "title": "Overrides de Parâmetros por Ambiente",
+    "subtitle": "Configure overrides por ambiente para os parâmetros de controlo de releases, permitindo valores diferentes entre Development, Pré-Produção e Produção",
+    "loading": "Carregando overrides…",
+    "emptyTitle": "Nenhum override configurado",
+    "emptyDescription": "Todos os ambientes estão a usar os valores padrão de sistema ou tenant",
+    "errorTitle": "Não foi possível carregar os overrides",
+    "errorDescription": "Verifique as suas permissões e tente novamente",
+    "colParameter": "Parâmetro",
+    "colEnvironment": "Ambiente",
+    "colValue": "Valor",
+    "colScope": "Escopo",
+    "colUpdatedAt": "Atualizado",
+    "colUpdatedBy": "Atualizado Por",
+    "addOverride": "Adicionar Override",
+    "editOverride": "Editar Override",
+    "removeOverride": "Remover Override",
+    "saveButton": "Guardar Override",
+    "cancelButton": "Cancelar",
+    "environmentLabel": "Ambiente",
+    "valueLabel": "Valor",
+    "reasonLabel": "Motivo do override",
+    "reasonPlaceholder": "Descreva brevemente por que este override é necessário…",
+    "confirmRemoveTitle": "Remover override?",
+    "confirmRemoveDescription": "O parâmetro voltará ao seu valor padrão de sistema ou tenant para este ambiente.",
+    "saveSuccess": "Override guardado com sucesso",
+    "removeSuccess": "Override removido com sucesso"
   }
 }

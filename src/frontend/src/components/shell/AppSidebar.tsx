@@ -22,7 +22,7 @@ import {
   CalendarDays, Award, BrainCircuit, Palette, Cpu,
   Archive, HardDrive, Gauge, Bell, RotateCcw, Leaf, Lock,
   Train, MapPin, GitCommit, Target, Download, Sliders, MessageSquare, Eye, BookText,
-  PackageCheck, GitMerge,
+  PackageCheck, GitMerge, History, Layers,
 } from 'lucide-react';
 
 interface NavItem {
@@ -64,6 +64,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.releaseApprovalPolicies', to: '/releases/approval-policies', icon: <ShieldCheck size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
   { labelKey: 'sidebar.releaseControlParameters', to: '/releases/control-parameters', icon: <Sliders size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
   { labelKey: 'sidebar.releaseExternalIngest', to: '/releases/ingest-external', icon: <Download size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
+  { labelKey: 'sidebar.releaseParameterAudit', to: '/releases/parameter-audit', icon: <History size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
+  { labelKey: 'sidebar.releaseParameterOverride', to: '/releases/parameter-overrides', icon: <Layers size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupApprovalGovernance' },
   { labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={18} />, permission: 'workflow:instances:read', section: 'changes', subGroup: 'sidebar.subGroupWorkflowManagement' },
   { labelKey: 'sidebar.workflowConfiguration', to: '/workflow/configuration', icon: <Settings size={18} />, permission: 'workflow:instances:write', section: 'changes', subGroup: 'sidebar.subGroupWorkflowManagement' },
   { labelKey: 'sidebar.releaseChecklist', to: '/workflow/checklist', icon: <MapPin size={18} />, permission: 'workflow:instances:write', section: 'changes', subGroup: 'sidebar.subGroupWorkflowManagement' },

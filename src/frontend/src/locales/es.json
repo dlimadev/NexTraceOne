@@ -3116,7 +3116,17 @@
     "change.release.auto_generate_notes_on_review.label": "Generar Notas Automáticamente al Iniciar Revisión",
     "change.release.auto_generate_notes_on_review.description": "Genera automáticamente release notes con IA al iniciar una revisión post-release.",
     "change.release.blast_radius.cab_approval_threshold.label": "Umbral de Blast Radius para Aprobación del CAB",
-    "change.release.blast_radius.cab_approval_threshold.description": "Puntuación mínima de blast radius (0.0–1.0) que requiere aprobación obligatoria del Change Advisory Board."
+    "change.release.blast_radius.cab_approval_threshold.description": "Puntuación mínima de blast radius (0.0–1.0) que requiere aprobación obligatoria del Change Advisory Board.",
+    "change.release.train.max_items_per_train.label": "Máximo de Elementos por Release Train",
+    "change.release.train.max_items_per_train.description": "Número máximo de commits o work items permitidos en un único Release Train. Superar este límite genera una advertencia antes de iniciar el tren.",
+    "change.release.train.auto_close_on_all_deployed.label": "Cerrar Tren Automáticamente al Desplegar Todos los Elementos",
+    "change.release.train.auto_close_on_all_deployed.description": "Cierra automáticamente el Release Train cuando todos sus elementos se hayan desplegado correctamente en el entorno objetivo.",
+    "change.release.notes.ai_generation_model.label": "Modelo de IA para Generación de Release Notes",
+    "change.release.notes.ai_generation_model.description": "ID del modelo usado para la generación automática de release notes con IA. Debe coincidir con un modelo registrado en el Model Registry.",
+    "change.release.gates.max_pending_days_before_alert.label": "Días Máximos de Gate Pendiente Antes de Alerta",
+    "change.release.gates.max_pending_days_before_alert.description": "Número máximo de días que un gate de promoción puede permanecer pendiente antes de enviar una alerta automática al responsable de la release.",
+    "change.release.freeze_window.default_duration_hours.label": "Duración Predeterminada de Freeze Window (horas)",
+    "change.release.freeze_window.default_duration_hours.description": "Duración predeterminada en horas de las freeze windows creadas manualmente. Puede ser sobreescrita por configuración de entorno."
   },
   "configuration": {
     "actions": {
@@ -8811,7 +8821,9 @@
     "subGroupWorkflowManagement": "Gestión de Workflow",
     "workflowConfiguration": "Configuración de Workflow",
     "releaseGatesDashboard": "Gates de Release",
-    "evidencePackViewer": "Evidence Pack"
+    "evidencePackViewer": "Evidence Pack",
+    "releaseParameterAudit": "Auditoría de Parámetros",
+    "releaseParameterOverride": "Overrides por Entorno"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11347,8 +11359,55 @@
     "emptyTitle": "No se encontraron gates",
     "emptyDescription": "No hay gates de promoción configurados para esta ruta de entorno y filtro",
     "blocking": "Bloqueante",
-    "nonBlocking": "No bloqueante",
     "inactive": "Inactivo",
     "created": "Creado"
+  },
+  "releaseParameterAudit": {
+    "title": "Auditoría de Parámetros de Release",
+    "subtitle": "Historial completo de todos los cambios en los parámetros de control de releases, con usuario, fecha y valores anteriores",
+    "loading": "Cargando historial…",
+    "emptyTitle": "No se encontraron registros de auditoría",
+    "emptyDescription": "No se han registrado cambios de parámetros para el ámbito seleccionado",
+    "errorTitle": "No se pudo cargar el historial de auditoría",
+    "errorDescription": "Verifique sus permisos e intente de nuevo",
+    "colParameter": "Parámetro",
+    "colPreviousValue": "Valor Anterior",
+    "colNewValue": "Nuevo Valor",
+    "colChangedBy": "Cambiado Por",
+    "colChangedAt": "Cambiado El",
+    "colScope": "Ámbito",
+    "colReason": "Motivo",
+    "filterLabel": "Filtrar por parámetro…",
+    "exportButton": "Exportar CSV",
+    "scopeFilter": "Ámbito",
+    "allScopes": "Todos los ámbitos"
+  },
+  "releaseParameterOverride": {
+    "title": "Overrides de Parámetros por Entorno",
+    "subtitle": "Configure overrides por entorno para los parámetros de control de releases, permitiendo valores diferentes entre Development, Pre-Producción y Producción",
+    "loading": "Cargando overrides…",
+    "emptyTitle": "No hay overrides configurados",
+    "emptyDescription": "Todos los entornos utilizan los valores predeterminados de sistema o tenant",
+    "errorTitle": "No se pudieron cargar los overrides",
+    "errorDescription": "Verifique sus permisos e intente de nuevo",
+    "colParameter": "Parámetro",
+    "colEnvironment": "Entorno",
+    "colValue": "Valor",
+    "colScope": "Ámbito",
+    "colUpdatedAt": "Actualizado",
+    "colUpdatedBy": "Actualizado Por",
+    "addOverride": "Agregar Override",
+    "editOverride": "Editar Override",
+    "removeOverride": "Eliminar Override",
+    "saveButton": "Guardar Override",
+    "cancelButton": "Cancelar",
+    "environmentLabel": "Entorno",
+    "valueLabel": "Valor",
+    "reasonLabel": "Motivo del override",
+    "reasonPlaceholder": "Describa brevemente por qué este override es necesario…",
+    "confirmRemoveTitle": "¿Eliminar override?",
+    "confirmRemoveDescription": "El parámetro volverá a su valor predeterminado de sistema o tenant para este entorno.",
+    "saveSuccess": "Override guardado correctamente",
+    "removeSuccess": "Override eliminado correctamente"
   }
 }
