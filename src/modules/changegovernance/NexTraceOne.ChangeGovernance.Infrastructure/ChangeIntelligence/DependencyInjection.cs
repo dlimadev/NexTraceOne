@@ -15,6 +15,7 @@ using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using NexTraceOne.Integrations.Contracts;
 
@@ -62,6 +63,16 @@ public static class DependencyInjection
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();
+
+        // Phase 2: Commit Pool & Work Item Association
+        services.AddScoped<ICommitAssociationRepository, CommitAssociationRepository>();
+        services.AddScoped<IWorkItemAssociationRepository, WorkItemAssociationRepository>();
+
+        // Phase 3: External Approval Gateway
+        services.AddScoped<IApprovalRequestRepository, ApprovalRequestRepository>();
+        services.AddHttpClient("ExternalApprovalWebhook")
+            .ConfigureHttpClient(c => c.Timeout = TimeSpan.FromSeconds(30));
+        services.AddScoped<IExternalApprovalWebhookSender, ExternalApprovalWebhookSender>();
 
         // Analytics writer: correlated traces → Elasticsearch chg_trace_release_mapping
         // Graceful degradation via NullAnalyticsWriter when Analytics:Enabled = false

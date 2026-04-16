@@ -14,6 +14,9 @@ namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoint
 /// - <see cref="TraceCorrelationEndpoints"/> — correlação trace → release (P5.2).
 /// - <see cref="FreezeEndpoints"/> — gestão de janelas de freeze.
 /// - <see cref="ChangeConfidenceEndpoints"/> — catálogo de mudanças, resumo e Change Confidence.
+/// - <see cref="CommitPoolEndpoints"/> — commit pool, work items por release.
+/// - <see cref="ApprovalGatewayEndpoints"/> — approval gateway externo (outbound + callback).
+/// - <see cref="ReleaseIngestEndpoints"/> — ingestão de release externa + relatório de impacto.
 ///
 /// Este padrão segue a mesma abordagem do módulo Identity, reduzindo o tamanho
 /// de cada ficheiro individual e melhorando a navegabilidade do código.
@@ -32,8 +35,13 @@ public sealed class ChangeIntelligenceEndpointModule
         AnalysisEndpoints.Map(group);
         IntelligenceEndpoints.Map(group);
         TraceCorrelationEndpoints.Map(group);
+        ApprovalGatewayEndpoints.Map(group);
+        ReleaseIngestEndpoints.Map(group);
 
         FreezeEndpoints.Map(app);
         ChangeConfidenceEndpoints.Map(app);
+
+        // Commit pool precisa de acesso ao group e ao app raiz (para /api/v1/integrations/commits)
+        CommitPoolEndpoints.Map(group, app);
     }
 }

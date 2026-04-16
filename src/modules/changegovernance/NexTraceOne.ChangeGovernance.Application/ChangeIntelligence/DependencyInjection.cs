@@ -16,7 +16,17 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetCh
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseHistory;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseImpactReport;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetTraceCorrelations;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.IngestCommit;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.IngestExternalRelease;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AddWorkItemToRelease;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListApprovalRequests;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListCommitsByRelease;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListWorkItemsByRelease;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RemoveWorkItemFromRelease;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RequestExternalApproval;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RespondToApprovalRequest;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision;
@@ -78,7 +88,26 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetRiskScoreTrend.Query>, GetRiskScoreTrend.Validator>();
         services.AddTransient<IValidator<EvaluateReleaseTrain.Command>, EvaluateReleaseTrain.Validator>();
 
+        // Phase 2: Commit Pool & Work Item Association
+        services.AddTransient<IValidator<IngestCommit.Command>, IngestCommit.Validator>();
+        services.AddTransient<IValidator<ListCommitsByRelease.Query>, ListCommitsByRelease.Validator>();
+        services.AddTransient<IValidator<AddWorkItemToRelease.Command>, AddWorkItemToRelease.Validator>();
+        services.AddTransient<IValidator<RemoveWorkItemFromRelease.Command>, RemoveWorkItemFromRelease.Validator>();
+        services.AddTransient<IValidator<ListWorkItemsByRelease.Query>, ListWorkItemsByRelease.Validator>();
+
+        // Phase 3: External Approval Gateway
+        services.AddTransient<IValidator<RequestExternalApproval.Command>, RequestExternalApproval.Validator>();
+        services.AddTransient<IValidator<RespondToApprovalRequest.Command>, RespondToApprovalRequest.Validator>();
+        services.AddTransient<IValidator<ListApprovalRequests.Query>, ListApprovalRequests.Validator>();
+
+        // Phase 4: Ingest Release from External System
+        services.AddTransient<IValidator<IngestExternalRelease.Command>, IngestExternalRelease.Validator>();
+
+        // Phase 5: Impact Report
+        services.AddTransient<IValidator<GetReleaseImpactReport.Query>, GetReleaseImpactReport.Validator>();
+
         return services;
     }
 }
+
 
