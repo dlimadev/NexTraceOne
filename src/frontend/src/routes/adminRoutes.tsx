@@ -56,6 +56,42 @@ const AdoptionFunnelPage = lazy(() => import('../features/product-analytics/page
 const FeatureHeatmapPage = lazy(() => import('../features/product-analytics/pages/FeatureHeatmapPage').then(m => ({ default: m.FeatureHeatmapPage })));
 const TimeToValuePage = lazy(() => import('../features/product-analytics/pages/TimeToValuePage').then(m => ({ default: m.TimeToValuePage })));
 
+// Platform Admin (on-prem)
+const PreflightPage = lazy(() => import('../features/platform-admin/pages/PreflightPage').then(m => ({ default: m.PreflightPage })));
+const SetupWizardPage = lazy(() => import('../features/platform-admin/pages/SetupWizardPage').then(m => ({ default: m.SetupWizardPage })));
+const PlatformHealthDashboardPage = lazy(() => import('../features/platform-admin/pages/PlatformHealthDashboardPage').then(m => ({ default: m.PlatformHealthDashboardPage })));
+const AiModelManagerPage = lazy(() => import('../features/platform-admin/pages/AiModelManagerPage').then(m => ({ default: m.AiModelManagerPage })));
+const NetworkPolicyPage = lazy(() => import('../features/platform-admin/pages/NetworkPolicyPage').then(m => ({ default: m.NetworkPolicyPage })));
+const DatabaseHealthPage = lazy(() => import('../features/platform-admin/pages/DatabaseHealthPage').then(m => ({ default: m.DatabaseHealthPage })));
+const SupportBundlePage = lazy(() => import('../features/platform-admin/pages/SupportBundlePage').then(m => ({ default: m.SupportBundlePage })));
+const BackupCoordinatorPage = lazy(() => import('../features/platform-admin/pages/BackupCoordinatorPage').then(m => ({ default: m.BackupCoordinatorPage })));
+const StartupReportPage = lazy(() => import('../features/platform-admin/pages/StartupReportPage').then(m => ({ default: m.StartupReportPage })));
+const ResourceBudgetPage = lazy(() => import('../features/platform-admin/pages/ResourceBudgetPage').then(m => ({ default: m.ResourceBudgetPage })));
+const ElasticsearchManagerPage = lazy(() => import('../features/platform-admin/pages/ElasticsearchManagerPage').then(m => ({ default: m.ElasticsearchManagerPage })));
+const PlatformAlertRulesPage = lazy(() => import('../features/platform-admin/pages/PlatformAlertRulesPage').then(m => ({ default: m.PlatformAlertRulesPage })));
+const RecoveryWizardPage = lazy(() => import('../features/platform-admin/pages/RecoveryWizardPage').then(m => ({ default: m.RecoveryWizardPage })));
+const GreenOpsPage = lazy(() => import('../features/platform-admin/pages/GreenOpsPage').then(m => ({ default: m.GreenOpsPage })));
+const AiResourceGovernorPage = lazy(() => import('../features/platform-admin/pages/AiResourceGovernorPage').then(m => ({ default: m.AiResourceGovernorPage })));
+const AiGovernancePage = lazy(() => import('../features/platform-admin/pages/AiGovernancePage').then(m => ({ default: m.AiGovernancePage })));
+const ProxyConfigPage = lazy(() => import('../features/platform-admin/pages/ProxyConfigPage').then(m => ({ default: m.ProxyConfigPage })));
+const ExternalHttpAuditPage = lazy(() => import('../features/platform-admin/pages/ExternalHttpAuditPage').then(m => ({ default: m.ExternalHttpAuditPage })));
+const EnvironmentPoliciesPage = lazy(() => import('../features/platform-admin/pages/EnvironmentPoliciesPage').then(m => ({ default: m.EnvironmentPoliciesPage })));
+const NonProdSchedulerPage = lazy(() => import('../features/platform-admin/pages/NonProdSchedulerPage').then(m => ({ default: m.NonProdSchedulerPage })));
+const CapacityForecastPage = lazy(() => import('../features/platform-admin/pages/CapacityForecastPage').then(m => ({ default: m.CapacityForecastPage })));
+const DemoSeedPage = lazy(() => import('../features/platform-admin/pages/DemoSeedPage').then(m => ({ default: m.DemoSeedPage })));
+const GracefulShutdownPage = lazy(() => import('../features/platform-admin/pages/GracefulShutdownPage').then(m => ({ default: m.GracefulShutdownPage })));
+const SessionSecurityPage = lazy(() => import('../features/platform-admin/pages/SessionSecurityPage').then(m => ({ default: m.SessionSecurityPage })));
+const RightsizingPage = lazy(() => import('../features/platform-admin/pages/RightsizingPage').then(m => ({ default: m.RightsizingPage })));
+const ObservabilityModePage = lazy(() => import('../features/platform-admin/pages/ObservabilityModePage').then(m => ({ default: m.ObservabilityModePage })));
+const CompliancePacksPage = lazy(() => import('../features/platform-admin/pages/CompliancePacksPage').then(m => ({ default: m.CompliancePacksPage })));
+const MigrationPreviewPage = lazy(() => import('../features/platform-admin/pages/MigrationPreviewPage').then(m => ({ default: m.MigrationPreviewPage })));
+const DoraAdminDashboardPage = lazy(() => import('../features/platform-admin/pages/DoraAdminDashboardPage').then(m => ({ default: m.DoraAdminDashboardPage })));
+const SamlSsoPage = lazy(() => import('../features/platform-admin/pages/SamlSsoPage').then(m => ({ default: m.SamlSsoPage })));
+const MtlsManagerPage = lazy(() => import('../features/platform-admin/pages/MtlsManagerPage').then(m => ({ default: m.MtlsManagerPage })));
+const FeatureFlagsRuntimePage = lazy(() => import('../features/platform-admin/pages/FeatureFlagsRuntimePage').then(m => ({ default: m.FeatureFlagsRuntimePage })));
+const CanaryDashboardPage = lazy(() => import('../features/platform-admin/pages/CanaryDashboardPage').then(m => ({ default: m.CanaryDashboardPage })));
+const MultiTenantSchemaPage = lazy(() => import('../features/platform-admin/pages/MultiTenantSchemaPage').then(m => ({ default: m.MultiTenantSchemaPage })));
+
 export function AdminRoutes() {
   return (
     <>
@@ -359,6 +395,309 @@ export function AdminRoutes() {
         path="/platform/configuration/integration-mappings"
         element={
           <IntegrationMappingsPage />
+        }
+      />
+
+      {/* ── Platform Health Dashboard (on-prem admin) ── */}
+      <Route
+        path="/platform/health"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <PlatformHealthDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── AI Model Manager — hardware assessment + model compatibility (on-prem admin) ── */}
+      <Route
+        path="/admin/ai/models"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <AiModelManagerPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Network Policy — Air-Gap mode + external calls audit (on-prem admin) ── */}
+      <Route
+        path="/admin/network-policy"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <NetworkPolicyPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Database Health — PostgreSQL diagnostics (on-prem admin) ── */}
+      <Route
+        path="/admin/database-health"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <DatabaseHealthPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Setup Wizard — first-run on-prem setup (no auth required) ── */}
+      <Route path="/setup" element={<SetupWizardPage />} />
+
+      {/* ── Preflight Check UI — pre-login system check (no auth required) ── */}
+      <Route path="/preflight" element={<PreflightPage />} />
+
+      {/* ── Support Bundle Generator — W2-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/support-bundle"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <SupportBundlePage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Backup Coordinator — W3-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/backup"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <BackupCoordinatorPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Startup Report — W2-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/startup-report"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <StartupReportPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Resource Budget — W6-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/resource-budget"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ResourceBudgetPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── Elasticsearch Manager — W7-01/02 (on-prem admin) ── */}
+      <Route
+        path="/admin/elasticsearch"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ElasticsearchManagerPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Platform Alert Rules — W2-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/platform-alerts"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <PlatformAlertRulesPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Recovery Wizard — W3-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/recovery"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <RecoveryWizardPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── GreenOps — W6-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/greenops"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <GreenOpsPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── AI Resource Governor — W4-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/ai-governor"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <AiResourceGovernorPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── AI Governance — W4-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/ai-governance"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <AiGovernancePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Proxy Config — W5-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/proxy-config"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ProxyConfigPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── External HTTP Audit — W5-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/external-http-audit"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ExternalHttpAuditPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Environment Policies — W5-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/environment-policies"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <EnvironmentPoliciesPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Non-Prod Scheduler — W6-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/nonprod-scheduler"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <NonProdSchedulerPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Capacity Forecast — W8-01 (on-prem admin) ── */}
+      <Route
+        path="/admin/capacity-forecast"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <CapacityForecastPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Demo Seed — W1-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/demo-seed"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <DemoSeedPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Graceful Shutdown — W3-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/graceful-shutdown"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <GracefulShutdownPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Session Security — W5-06 (on-prem admin) ── */}
+      <Route
+        path="/admin/session-security"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <SessionSecurityPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Rightsizing — W6-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/rightsizing"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <RightsizingPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Observability Mode — W7-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/observability-mode"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <ObservabilityModePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Compliance Packs — W8-06 (on-prem admin) ── */}
+      <Route
+        path="/admin/compliance-packs"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <CompliancePacksPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Migration Preview — W3-01 (on-prem admin) ── */}
+      <Route
+        path="/admin/migration-preview"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <MigrationPreviewPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── DORA Admin Dashboard — W7-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/dora-dashboard"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <DoraAdminDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── SAML SSO — W8-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/saml-sso"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <SamlSsoPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── mTLS Manager — W5-04 (on-prem admin) ── */}
+      <Route
+        path="/admin/mtls"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <MtlsManagerPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Feature Flags Runtime — W8-02 (on-prem admin) ── */}
+      <Route
+        path="/admin/feature-flags-runtime"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <FeatureFlagsRuntimePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Canary Dashboard — W8-03 (on-prem admin) ── */}
+      <Route
+        path="/admin/canary-dashboard"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <CanaryDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── Multi-Tenant Schema — W8-05 (on-prem admin) ── */}
+      <Route
+        path="/admin/tenant-schemas"
+        element={
+          <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
+            <MultiTenantSchemaPage />
+          </ProtectedRoute>
         }
       />
     </>

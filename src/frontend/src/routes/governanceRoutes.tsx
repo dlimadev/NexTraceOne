@@ -37,6 +37,7 @@ const CustomDashboardsPage = lazy(() => import('../features/governance/pages/Cus
 const TechnicalDebtPage = lazy(() => import('../features/governance/pages/TechnicalDebtPage').then(m => ({ default: m.TechnicalDebtPage })));
 const ApiPolicyAsCodePage = lazy(() => import('../features/governance/pages/ApiPolicyAsCodePage').then(m => ({ default: m.ApiPolicyAsCodePage })));
 const GovernanceGatesPage = lazy(() => import('../features/governance/pages/GovernanceGatesPage').then(m => ({ default: m.GovernanceGatesPage })));
+const WasteDetectionPage = lazy(() => import('../features/governance/pages/WasteDetectionPage').then(m => ({ default: m.WasteDetectionPage })));
 
 export function GovernanceRoutes() {
   return (
@@ -294,6 +295,14 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:gates:read" redirectTo="/unauthorized">
             <GovernanceGatesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/waste-detection"
+        element={
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
+            <WasteDetectionPage />
           </ProtectedRoute>
         }
       />

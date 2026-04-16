@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.InProcess;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
 
 namespace NexTraceOne.BuildingBlocks.Infrastructure;
 
@@ -28,6 +29,23 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddScoped<IEventBus, InProcessEventBus>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registra o TenantSchemaManager para isolamento schema-per-tenant no PostgreSQL.
+    /// Requer uma connection string administrativa com permissão para CREATE SCHEMA.
+    /// </summary>
+    public static IServiceCollection AddTenantSchemaManager(
+        this IServiceCollection services,
+        string connectionString)
+    {
+        services.AddSingleton<ITenantSchemaManager>(sp =>
+        {
+            var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<TenantSchemaManager>>();
+            return new TenantSchemaManager(connectionString, logger);
+        });
 
         return services;
     }

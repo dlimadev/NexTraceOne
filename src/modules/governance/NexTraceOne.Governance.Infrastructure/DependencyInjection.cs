@@ -83,6 +83,12 @@ public static class DependencyInjection
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();
         services.AddScoped<IPlatformEventProvider, GovernanceEventProvider>();
 
+        // TenantSchemaManager — schema-per-tenant PostgreSQL isolation
+        services.AddTenantSchemaManager(connectionString);
+
+        // OTEL Metrics — ingestão de métricas do OpenTelemetry Collector
+        services.AddScoped<IOtelMetricRepository, OtelMetricRepository>();
+
         return services;
     }
 }
