@@ -1,5 +1,7 @@
 using FluentValidation;
 
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;

@@ -69,10 +69,10 @@ public static class CreateApprovalPolicy
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             var policy = ReleaseApprovalPolicy.Create(
-                tenantId: currentTenant.TenantId,
+                tenantId: currentTenant.Id,
                 name: request.Name,
                 approvalType: request.ApprovalType,
-                createdBy: currentUser.UserId ?? "system",
+                createdBy: currentUser.Id,
                 createdAt: clock.UtcNow,
                 environmentId: request.EnvironmentId,
                 serviceId: request.ServiceId,
@@ -88,7 +88,7 @@ public static class CreateApprovalPolicy
             policyRepository.Add(policy);
             await unitOfWork.CommitAsync(cancellationToken);
 
-            return Result.Ok(new Response(policy.Id.Value, policy.Name));
+            return Result<Response>.Success(new Response(policy.Id.Value, policy.Name));
         }
     }
 

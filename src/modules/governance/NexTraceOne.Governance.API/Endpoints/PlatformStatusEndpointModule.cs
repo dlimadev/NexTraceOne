@@ -144,7 +144,7 @@ public sealed class PlatformStatusEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToHttpResult(localizer, statusCode: 201);
+            return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:write");
     }
 }

@@ -37,10 +37,10 @@ public static class ListApprovalPolicies
         {
             var policies = request.EnvironmentId is not null || request.ServiceId.HasValue
                 ? await policyRepository.ListByEnvironmentAndServiceAsync(
-                    currentTenant.TenantId, request.EnvironmentId, request.ServiceId, cancellationToken)
-                : await policyRepository.ListActiveAsync(currentTenant.TenantId, cancellationToken);
+                    currentTenant.Id, request.EnvironmentId, request.ServiceId, cancellationToken)
+                : await policyRepository.ListActiveAsync(currentTenant.Id, cancellationToken);
 
-            return Result.Ok<IReadOnlyList<PolicyDto>>(
+            return Result<IReadOnlyList<PolicyDto>>.Success(
                 policies.Select(p => new PolicyDto(
                     p.Id.Value,
                     p.Name,
