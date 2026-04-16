@@ -8804,7 +8804,22 @@
     "sessionSecurity": "Session Security",
     "rightsizing": "Rightsizing",
     "observabilityMode": "Observability Mode",
-    "compliancePacks": "Compliance Packs"
+    "compliancePacks": "Compliance Packs",
+    "changeAdvisory": "Change Advisory",
+    "postReleaseReview": "Post-Release Review",
+    "releaseApprovalGateway": "Approval Gateway",
+    "releaseApprovalPolicies": "Approval Policies",
+    "releaseCommitPool": "Commit Pool",
+    "releaseControlParameters": "Control Parameters",
+    "releaseExternalIngest": "External Ingest",
+    "releaseImpactReport": "Impact Report",
+    "releaseNotes": "Release Notes (AI)",
+    "releaseRollback": "Rollback",
+    "subGroupApprovalGovernance": "Approval & Governance",
+    "subGroupReleaseLifecycle": "Release Lifecycle",
+    "subGroupRiskRollback": "Risk & Rollback",
+    "subGroupWorkflowManagement": "Workflow Management",
+    "workflowConfiguration": "Workflow Configuration"
   },
   "sourceOfTruth": {
     "assetTypes": {

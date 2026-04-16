@@ -102,10 +102,12 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Post-Release Review | READY | Frontend `PostReleaseReviewPage` (`/releases/post-review`): inicia/progride revisão pós-deploy, janelas de observação, baseline de performance, confidence score. API: `getPostReleaseReview`, `startPostReleaseReview`, `progressPostReleaseReview` |
 | Rollback Assessment | READY | Frontend `ReleaseRollbackPage` (`/releases/rollback`): avalia viabilidade, readiness score, executa rollback auditado. API: `getRollbackAssessment`, `assessRollbackViability`, `registerRollback` |
 | Release Notes (AI) | READY | Frontend `ReleaseNotesPage` (`/releases/notes`): gera/regenera notas por IA com seleção de persona (Technical/Executive/PM), exibe secções estruturadas. API: `getReleaseNotes`, `generateReleaseNotes`, `regenerateReleaseNotes` |
+| Workflow Configuration | READY | Frontend `WorkflowConfigurationPage` (`/workflow/configuration`): configuração por scope de workflow e promoção, seções templates/stages/approvers/sla/gates/promotion/freeze, audit history |
+| Navigation — Release Governance | READY | Sidebar com 21 itens de navegação em 4 sub-grupos: Release Lifecycle (Release Train, Commit Pool, Impact Report, Post-Review, Release Notes), Approval & Governance (Promotion, Gateway, Policies, Control Params, External Ingest), Workflow Management (Workflow, Configuration, Checklist), Risk & Rollback (Rollback) |
 
 **DbContexts:** `ChangeIntelligenceDbContext`, `WorkflowDbContext`, `PromotionDbContext`, `RulesetGovernanceDbContext` (4 DbContexts, 4 migrações)
-**Status geral:** READY — módulo completo (100% funcional, 20 páginas frontend)
-**Testes:** 307 testes unitários backend (0 falhas) + 1771 testes frontend (0 falhas)
+**Status geral:** READY — módulo completo com navegação estruturada (21 páginas frontend, 4 sub-grupos de nav)
+**Testes:** 307 testes unitários backend (0 falhas) + 1771 testes frontend (261 ficheiros, 0 falhas)
 **Evidência:** `src/modules/changegovernance/`
 
 ---
