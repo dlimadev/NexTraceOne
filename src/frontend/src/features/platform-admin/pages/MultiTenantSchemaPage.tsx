@@ -109,7 +109,7 @@ export function MultiTenantSchemaPage() {
           </div>
           <button
             onClick={handleProvision}
-            disabled={provisionMutation.isPending || !newSlug.trim()}
+            disabled={provisionMutation.isPending}
             className="flex items-center gap-2 px-4 py-2 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             <Plus size={14} />

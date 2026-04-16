@@ -74,6 +74,7 @@ public static class DependencyInjection
 
         // Seeders — Scoped porque dependem do DbContext (Scoped)
         services.AddScoped<IConfigurationDefinitionSeeder, ConfigurationDefinitionSeeder>();
+        services.AddScoped<IFeatureFlagDefinitionSeeder, FeatureFlagDefinitionSeeder>();
 
         // Services
         services.AddScoped<IConfigurationResolutionService, ConfigurationResolutionService>();

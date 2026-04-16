@@ -3,11 +3,21 @@
  * Segue o padrão de query keys factory e invalidação de cache nas mutations.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { configurationApi } from '../api/configurationApi';
 import type {
   SetConfigurationValueRequest,
   ToggleConfigurationRequest,
 } from '../types';
+
+/**
+ * Verifica se um erro é uma resposta HTTP 409 (conflito de concorrência optimista).
+ * O backend retorna 409 com código CONFIG_CONCURRENCY_CONFLICT ou
+ * FEATURE_FLAG_CONCURRENCY_CONFLICT quando a versão (xmin) do registo diverge.
+ */
+function isConcurrencyConflict(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.response?.status === 409;
+}
 
 export const configurationKeys = {
   all: ['configuration'] as const,
@@ -65,6 +75,13 @@ export function useSetConfigurationValue() {
         queryKey: configurationKeys.all,
       });
     },
+    onError: (error: unknown) => {
+      if (isConcurrencyConflict(error)) {
+        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT'), {
+          isConcurrencyConflict: true,
+        });
+      }
+    },
   });
 }
 
@@ -93,6 +110,13 @@ export function useRemoveOverride() {
         queryKey: configurationKeys.all,
       });
     },
+    onError: (error: unknown) => {
+      if (isConcurrencyConflict(error)) {
+        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT'), {
+          isConcurrencyConflict: true,
+        });
+      }
+    },
   });
 }
 
@@ -110,6 +134,13 @@ export function useToggleConfiguration() {
       await queryClient.invalidateQueries({
         queryKey: configurationKeys.all,
       });
+    },
+    onError: (error: unknown) => {
+      if (isConcurrencyConflict(error)) {
+        throw Object.assign(new Error('CONFIG_CONCURRENCY_CONFLICT'), {
+          isConcurrencyConflict: true,
+        });
+      }
     },
   });
 }
