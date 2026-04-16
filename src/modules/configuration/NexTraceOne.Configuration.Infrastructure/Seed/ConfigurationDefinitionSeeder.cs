@@ -4530,6 +4530,73 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "json-editor",
             sortOrder: 7280),
 
+        // ── Change Governance — Release Intelligence Parameters ─────────────────
+        ConfigurationDefinition.Create(
+            key: "change.release.min_confidence_score_for_promotion",
+            displayName: "config.change.release.min_confidence_score_for_promotion.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.change.release.min_confidence_score_for_promotion.description",
+            defaultValue: "0.6",
+            uiEditorType: "text",
+            sortOrder: 7285),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.observation_window_minutes",
+            displayName: "config.change.release.observation_window_minutes.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.change.release.observation_window_minutes.description",
+            defaultValue: "60",
+            uiEditorType: "text",
+            sortOrder: 7286),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.rollback.max_migrated_consumers_percent",
+            displayName: "config.change.release.rollback.max_migrated_consumers_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.change.release.rollback.max_migrated_consumers_percent.description",
+            defaultValue: "30",
+            uiEditorType: "text",
+            sortOrder: 7287),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.evidence_pack.expiry_days",
+            displayName: "config.change.release.evidence_pack.expiry_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.release.evidence_pack.expiry_days.description",
+            defaultValue: "90",
+            uiEditorType: "text",
+            sortOrder: 7288),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.auto_generate_notes_on_review",
+            displayName: "config.change.release.auto_generate_notes_on_review.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.release.auto_generate_notes_on_review.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 7289),
+
+        ConfigurationDefinition.Create(
+            key: "change.release.blast_radius.cab_approval_threshold",
+            displayName: "config.change.release.blast_radius.cab_approval_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.change.release.blast_radius.cab_approval_threshold.description",
+            defaultValue: "0.7",
+            uiEditorType: "text",
+            sortOrder: 7290),
+
         // ── Change Governance — Deploy ─────────────────────────────────────────────
         ConfigurationDefinition.Create(
             key: "change.deploy.require_release_approval",

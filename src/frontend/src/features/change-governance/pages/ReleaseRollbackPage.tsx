@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   RotateCcw,
-  Search,
   AlertTriangle,
   CheckCircle2,
   XCircle,
@@ -20,6 +19,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
+import { ReleaseSelector } from '../components/ReleaseSelector';
 
 /**
  * ReleaseRollbackPage — avaliação e gestão de rollback de releases.
@@ -34,7 +34,6 @@ export function ReleaseRollbackPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
-  const [inputValue, setInputValue] = useState('');
   const [assessForm, setAssessForm] = useState({
     isViable: true,
     previousVersion: '',
@@ -78,10 +77,6 @@ export function ReleaseRollbackPage() {
     },
   });
 
-  function handleSearch() {
-    setReleaseId(inputValue.trim());
-  }
-
   function readinessBadge(score: number): 'success' | 'warning' | 'danger' {
     if (score >= 70) return 'success';
     if (score >= 40) return 'warning';
@@ -102,25 +97,18 @@ export function ReleaseRollbackPage() {
         )}
       />
 
-      {/* Search */}
+      {/* Release selection */}
       <div className="mb-6">
         <Card>
           <CardBody>
             <p className="text-sm text-muted mb-3">
-              {t('releaseRollback.enterReleaseId', 'Enter a Release ID to load or create a rollback assessment')}
+              {t('releaseRollback.selectRelease', 'Select a release to load or create a rollback assessment')}
             </p>
-            <div className="flex gap-2">
-              <input
-                className={inputCls}
-                placeholder={t('releaseRollback.releaseIdPlaceholder', 'Release ID (UUID)…')}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <Button variant="primary" icon={<Search size={16} />} onClick={handleSearch}>
-                {t('releaseRollback.search', 'Search')}
-              </Button>
-            </div>
+            <ReleaseSelector
+              value={releaseId}
+              onChange={(id) => setReleaseId(id)}
+              placeholder={t('releaseRollback.selectorPlaceholder', 'Select a release…')}
+            />
           </CardBody>
         </Card>
       </div>
@@ -181,7 +169,7 @@ export function ReleaseRollbackPage() {
                   className={inputCls}
                   value={assessForm.previousVersion}
                   onChange={(e) => setAssessForm((f) => ({ ...f, previousVersion: e.target.value }))}
-                  placeholder="e.g. 1.0.4"
+                  placeholder={t('releaseRollback.previousVersionPlaceholder', 'e.g. 1.0.4')}
                 />
               </div>
               <div>

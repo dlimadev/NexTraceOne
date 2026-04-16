@@ -477,6 +477,17 @@ export interface ReleaseImpactReport {
   generatedAt: string;
 }
 
+export interface PromotionGateItem {
+  gateId: string;
+  name: string;
+  description: string | null;
+  environmentFrom: string;
+  environmentTo: string;
+  isActive: boolean;
+  blockOnFailure: boolean;
+  createdAt: string;
+}
+
 // ─── API Client ──────────────────────────────────────────────────────────────
 
 export const changeIntelligenceApi = {
@@ -811,5 +822,21 @@ export const changeIntelligenceApi = {
   ) =>
     client
       .post<any>(`/releases/${releaseId}/rollback-assessment`, { releaseId, ...data })
+      .then((r) => r.data),
+
+  // ─── Promotion Gates ───────────────────────────────────────────────────────
+
+  /** Lista os gates de promoção entre dois ambientes. */
+  listPromotionGatesByEnvironment: (environmentFrom: string, environmentTo: string) =>
+    client
+      .get<{ gates: PromotionGateItem[] }>('/releases/promotion-gates', {
+        params: { environmentFrom, environmentTo },
+      })
+      .then((r) => r.data),
+
+  /** Obtém o estado de um gate de promoção específico e as suas avaliações recentes. */
+  getPromotionGateStatus: (gateId: string) =>
+    client
+      .get<any>(`/releases/promotion-gates/${gateId}/status`)
       .then((r) => r.data),
 };

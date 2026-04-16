@@ -26,6 +26,8 @@ const PostReleaseReviewPage = lazy(() => import('../features/change-governance/p
 const ReleaseRollbackPage = lazy(() => import('../features/change-governance/pages/ReleaseRollbackPage').then(m => ({ default: m.ReleaseRollbackPage })));
 const ReleaseNotesPage = lazy(() => import('../features/change-governance/pages/ReleaseNotesPage').then(m => ({ default: m.ReleaseNotesPage })));
 const WorkflowConfigurationPage = lazy(() => import('../features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
+const EvidencePackViewerPage = lazy(() => import('../features/change-governance/pages/EvidencePackViewerPage').then(m => ({ default: m.EvidencePackViewerPage })));
+const ReleaseGatesDashboardPage = lazy(() => import('../features/change-governance/pages/ReleaseGatesDashboardPage').then(m => ({ default: m.ReleaseGatesDashboardPage })));
 
 export function ChangesRoutes() {
   return (
@@ -187,6 +189,22 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="workflow:instances:write" redirectTo="/unauthorized">
             <WorkflowConfigurationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/evidence-pack"
+        element={
+          <ProtectedRoute permission="workflow:instances:read" redirectTo="/unauthorized">
+            <EvidencePackViewerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/gates"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseGatesDashboardPage />
           </ProtectedRoute>
         }
       />

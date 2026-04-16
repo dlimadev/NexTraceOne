@@ -11,11 +11,28 @@ vi.mock('../../features/change-governance/api/changeIntelligence', () => ({
     getPostReleaseReview: vi.fn(),
     startPostReleaseReview: vi.fn(),
     progressPostReleaseReview: vi.fn(),
+    listRecentReleases: vi.fn().mockResolvedValue({ items: [], totalCount: 0, page: 1, pageSize: 50 }),
   },
 }));
 
 vi.mock('../../api/client', () => ({
   default: { get: vi.fn(), post: vi.fn() },
+}));
+
+vi.mock('../../features/change-governance/components/ReleaseSelector', () => ({
+  ReleaseSelector: ({ onChange, placeholder }: { value: string; onChange: (id: string) => void; placeholder?: string }) => (
+    <select
+      data-testid="release-selector"
+      defaultValue=""
+      onChange={(e) => onChange(e.target.value)}
+      aria-label={placeholder ?? 'Select a release'}
+    >
+      <option value="">{placeholder ?? 'Select a release'}</option>
+      <option value="release-abc">release-abc — payment-service v1.2.0</option>
+      <option value="release-not-found">release-not-found — unknown v0.0.0</option>
+      <option value="release-new">release-new — new-service v1.0.0</option>
+    </select>
+  ),
 }));
 
 import { changeIntelligenceApi } from '../../features/change-governance/api/changeIntelligence';
@@ -74,6 +91,11 @@ function renderPage() {
   );
 }
 
+async function selectRelease(value: string) {
+  const selector = screen.getByTestId('release-selector');
+  await userEvent.selectOptions(selector, value);
+}
+
 describe('PostReleaseReviewPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -87,35 +109,28 @@ describe('PostReleaseReviewPage', () => {
     expect(screen.getAllByText(/Post-Release Review/i).length).toBeGreaterThan(0);
   });
 
-  it('renders search input and button', () => {
+  it('renders release selector', () => {
     renderPage();
-    expect(screen.getByPlaceholderText(/Release ID/i)).toBeTruthy();
-    expect(screen.getByText('Search')).toBeTruthy();
+    expect(screen.getByTestId('release-selector')).toBeTruthy();
   });
 
-  it('shows empty state when no release ID is entered', () => {
+  it('shows empty state when no release is selected', () => {
     renderPage();
     expect(screen.getByText(/No review loaded/i)).toBeTruthy();
   });
 
-  it('loads and shows review data after searching', async () => {
+  it('loads and shows review data after selecting a release', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
-      expect(screen.getByText(/payment-service/i)).toBeTruthy();
+      expect(screen.getAllByText(/payment-service/i).length).toBeGreaterThan(0);
     });
-    expect(screen.getByText(/1\.2\.0/)).toBeTruthy();
+    expect(screen.getAllByText(/1\.2\.0/).length).toBeGreaterThan(0);
   });
 
   it('displays confidence score as percentage', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getByText('87%')).toBeTruthy();
     });
@@ -123,10 +138,7 @@ describe('PostReleaseReviewPage', () => {
 
   it('shows observation windows table', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getAllByText(/Observation Windows/i).length).toBeGreaterThan(0);
     });
@@ -135,10 +147,7 @@ describe('PostReleaseReviewPage', () => {
 
   it('shows baseline performance section', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getAllByText(/Baseline/i).length).toBeGreaterThan(0);
     });
@@ -146,10 +155,7 @@ describe('PostReleaseReviewPage', () => {
 
   it('shows progress review button for incomplete review', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getByText(/Progress Review/i)).toBeTruthy();
     });
@@ -158,10 +164,7 @@ describe('PostReleaseReviewPage', () => {
   it('shows Start Review button when review is not found', async () => {
     vi.mocked(changeIntelligenceApi.getPostReleaseReview).mockRejectedValue(new Error('404'));
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-not-found');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-not-found');
     await waitFor(() => {
       expect(screen.getByText(/Start Post-Release Review/i)).toBeTruthy();
     });
@@ -170,10 +173,7 @@ describe('PostReleaseReviewPage', () => {
   it('calls startPostReleaseReview on button click', async () => {
     vi.mocked(changeIntelligenceApi.getPostReleaseReview).mockRejectedValue(new Error('404'));
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-new');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-new');
     await waitFor(() => {
       expect(screen.getByText(/Start Post-Release Review/i)).toBeTruthy();
     });

@@ -11,11 +11,27 @@ vi.mock('../../features/change-governance/api/changeIntelligence', () => ({
     getReleaseNotes: vi.fn(),
     generateReleaseNotes: vi.fn(),
     regenerateReleaseNotes: vi.fn(),
+    listRecentReleases: vi.fn().mockResolvedValue({ items: [], totalCount: 0, page: 1, pageSize: 50 }),
   },
 }));
 
 vi.mock('../../api/client', () => ({
   default: { get: vi.fn(), post: vi.fn() },
+}));
+
+vi.mock('../../features/change-governance/components/ReleaseSelector', () => ({
+  ReleaseSelector: ({ onChange, placeholder }: { value: string; onChange: (id: string) => void; placeholder?: string }) => (
+    <select
+      data-testid="release-selector"
+      defaultValue=""
+      onChange={(e) => onChange(e.target.value)}
+      aria-label={placeholder ?? 'Select a release'}
+    >
+      <option value="">{placeholder ?? 'Select a release'}</option>
+      <option value="release-abc">release-abc — payment-service v1.2.0</option>
+      <option value="release-new">release-new — new-service v1.0.0</option>
+    </select>
+  ),
 }));
 
 import { changeIntelligenceApi } from '../../features/change-governance/api/changeIntelligence';
@@ -49,6 +65,11 @@ function renderPage() {
   );
 }
 
+async function selectRelease(value: string) {
+  const selector = screen.getByTestId('release-selector');
+  await userEvent.selectOptions(selector, value);
+}
+
 describe('ReleaseNotesPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -62,23 +83,19 @@ describe('ReleaseNotesPage', () => {
     expect(screen.getByText('Release Notes')).toBeTruthy();
   });
 
-  it('renders search input and button', () => {
+  it('renders release selector', () => {
     renderPage();
-    expect(screen.getByPlaceholderText(/Release ID/i)).toBeTruthy();
-    expect(screen.getByText('Search')).toBeTruthy();
+    expect(screen.getByTestId('release-selector')).toBeTruthy();
   });
 
-  it('shows empty state before searching', () => {
+  it('shows empty state before selecting a release', () => {
     renderPage();
     expect(screen.getByText(/No release selected/i)).toBeTruthy();
   });
 
-  it('loads and shows notes after searching', async () => {
+  it('loads and shows notes after selecting a release', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getAllByText(/Generated/i).length).toBeGreaterThan(0);
     });
@@ -86,10 +103,7 @@ describe('ReleaseNotesPage', () => {
 
   it('shows model and token info', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getByText('gpt-4o')).toBeTruthy();
     });
@@ -98,10 +112,7 @@ describe('ReleaseNotesPage', () => {
 
   it('shows technical summary section', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getAllByText(/Technical Summary/i).length).toBeGreaterThan(0);
     });
@@ -110,10 +121,7 @@ describe('ReleaseNotesPage', () => {
 
   it('shows breaking changes section', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getAllByText(/Breaking Changes/i).length).toBeGreaterThan(0);
     });
@@ -121,10 +129,7 @@ describe('ReleaseNotesPage', () => {
 
   it('shows regenerate button', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-abc');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-abc');
     await waitFor(() => {
       expect(screen.getByText('Regenerate')).toBeTruthy();
     });
@@ -133,10 +138,7 @@ describe('ReleaseNotesPage', () => {
   it('shows generate button when notes not found', async () => {
     vi.mocked(changeIntelligenceApi.getReleaseNotes).mockRejectedValue(new Error('404'));
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-new');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-new');
     await waitFor(() => {
       expect(screen.getByText(/Generate with AI/i)).toBeTruthy();
     });
@@ -145,10 +147,7 @@ describe('ReleaseNotesPage', () => {
   it('calls generateReleaseNotes on Generate click', async () => {
     vi.mocked(changeIntelligenceApi.getReleaseNotes).mockRejectedValue(new Error('404'));
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-new');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-new');
     await waitFor(() => {
       expect(screen.getByText(/Generate with AI/i)).toBeTruthy();
     });

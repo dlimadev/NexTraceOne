@@ -22,6 +22,7 @@ import {
   CalendarDays, Award, BrainCircuit, Palette, Cpu,
   Archive, HardDrive, Gauge, Bell, RotateCcw, Leaf, Lock,
   Train, MapPin, GitCommit, Target, Download, Sliders, MessageSquare, Eye, BookText,
+  PackageCheck, GitMerge,
 } from 'lucide-react';
 
 interface NavItem {
@@ -67,6 +68,8 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.workflowConfiguration', to: '/workflow/configuration', icon: <Settings size={18} />, permission: 'workflow:instances:write', section: 'changes', subGroup: 'sidebar.subGroupWorkflowManagement' },
   { labelKey: 'sidebar.releaseChecklist', to: '/workflow/checklist', icon: <MapPin size={18} />, permission: 'workflow:instances:write', section: 'changes', subGroup: 'sidebar.subGroupWorkflowManagement' },
   { labelKey: 'sidebar.releaseRollback', to: '/releases/rollback', icon: <RotateCcw size={18} />, permission: 'change-intelligence:write', section: 'changes', subGroup: 'sidebar.subGroupRiskRollback' },
+  { labelKey: 'sidebar.releaseGatesDashboard', to: '/releases/gates', icon: <GitMerge size={18} />, permission: 'change-intelligence:read', section: 'changes', subGroup: 'sidebar.subGroupRiskRollback' },
+  { labelKey: 'sidebar.evidencePackViewer', to: '/releases/evidence-pack', icon: <PackageCheck size={18} />, permission: 'workflow:instances:read', section: 'changes', subGroup: 'sidebar.subGroupRiskRollback' },
   { labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={18} />, permission: 'operations:incidents:read', section: 'operations' },
   { labelKey: 'sidebar.incidentTimeline', to: '/operations/incidents/timeline', icon: <Clock size={18} />, permission: 'operations:incidents:read', section: 'operations' },
   { labelKey: 'sidebar.runbooks', to: '/operations/runbooks', icon: <FileCode size={18} />, permission: 'operations:runbooks:read', section: 'operations' },

@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using GetPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview.GetPostReleaseReview;
+using GetRollbackAssessmentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRollbackAssessment.GetRollbackAssessment;
 using RecordObservationMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordObservationMetrics.RecordObservationMetrics;
 using RegisterExternalMarkerFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterExternalMarker.RegisterExternalMarker;
 using GetChangeIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
@@ -102,6 +103,16 @@ internal static class IntelligenceEndpoints
             var result = await sender.Send(updatedCommand, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:write");
+
+        group.MapGet("/{releaseId:guid}/rollback-assessment", async (
+            Guid releaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetRollbackAssessmentFeature.Query(releaseId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
 
         // ── Post-change verification endpoints (P5.5) ─────────────────────────
 

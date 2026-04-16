@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   FileText,
-  Search,
   Sparkles,
   RefreshCw,
   Clock,
@@ -19,6 +18,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
+import { ReleaseSelector } from '../components/ReleaseSelector';
 
 const PERSONA_MODES = ['Technical', 'Executive', 'ProductManager'] as const;
 
@@ -35,7 +35,6 @@ export function ReleaseNotesPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
-  const [inputValue, setInputValue] = useState('');
   const [personaMode, setPersonaMode] = useState<string>('Technical');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['technical']));
 
@@ -59,10 +58,6 @@ export function ReleaseNotesPage() {
     mutationFn: () => changeIntelligenceApi.regenerateReleaseNotes(releaseId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['release-notes', releaseId] }),
   });
-
-  function handleSearch() {
-    setReleaseId(inputValue.trim());
-  }
 
   function toggleSection(key: string) {
     setExpandedSections((prev) => {
@@ -115,25 +110,18 @@ export function ReleaseNotesPage() {
         )}
       />
 
-      {/* Search */}
+      {/* Release selection */}
       <div className="mb-6">
         <Card>
           <CardBody>
             <p className="text-sm text-muted mb-3">
-              {t('releaseNotes.selectRelease', 'Enter a Release ID to view or generate its notes')}
+              {t('releaseNotes.selectRelease', 'Select a release to view or generate its notes')}
             </p>
-            <div className="flex gap-2">
-              <input
-                className={inputCls}
-                placeholder={t('releaseNotes.releaseIdPlaceholder', 'Release ID (UUID)…')}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <Button variant="primary" icon={<Search size={16} />} onClick={handleSearch}>
-                {t('releaseNotes.search', 'Search')}
-              </Button>
-            </div>
+            <ReleaseSelector
+              value={releaseId}
+              onChange={(id) => setReleaseId(id)}
+              placeholder={t('releaseNotes.selectorPlaceholder', 'Select a release…')}
+            />
           </CardBody>
         </Card>
       </div>
@@ -142,7 +130,7 @@ export function ReleaseNotesPage() {
         <EmptyState
           icon={<FileText size={40} />}
           title={t('releaseNotes.emptyTitle', 'No release selected')}
-          description={t('releaseNotes.emptyDescription', 'Search for a release ID above to view or generate release notes')}
+          description={t('releaseNotes.emptyDescription', 'Select a release above to view or generate release notes')}
         />
       )}
 

@@ -3104,7 +3104,19 @@
     "workflow.timeout.approval_hours.description": "Hours before an individual aprovação step times out",
     "workflow.timeout.approval_hours.label": "Aprovação Timeout (Hours)",
     "workflow.types.enabled.description": "Lista de ativado fluxo de trabalho tipos (e.g. ReleaseApproval, PromotionApproval, WaiverApproval, GovernanceReview, AccessRequest)",
-    "workflow.types.enabled.label": "Ativado Fluxo de Trabalho Tipos"
+    "workflow.types.enabled.label": "Ativado Fluxo de Trabalho Tipos",
+    "change.release.min_confidence_score_for_promotion.label": "Score Mínimo de Confiança para Promoção",
+    "change.release.min_confidence_score_for_promotion.description": "Score mínimo de confiança (0.0–1.0) exigido para liberar a promoção entre ambientes. Abaixo deste limiar a promoção é bloqueada automaticamente.",
+    "change.release.observation_window_minutes.label": "Janela de Observação Pós-Deploy (minutos)",
+    "change.release.observation_window_minutes.description": "Duração padrão em minutos da janela de observação pós-deploy.",
+    "change.release.rollback.max_migrated_consumers_percent.label": "% Máximo de Consumers Migrados para Rollback Seguro",
+    "change.release.rollback.max_migrated_consumers_percent.description": "Percentual máximo de consumers já migrados que ainda permite rollback seguro.",
+    "change.release.evidence_pack.expiry_days.label": "Expiração do Evidence Pack (dias)",
+    "change.release.evidence_pack.expiry_days.description": "Número de dias antes que um evidence pack não seja mais exportável sem revalidação.",
+    "change.release.auto_generate_notes_on_review.label": "Gerar Notas Automaticamente ao Iniciar Revisão",
+    "change.release.auto_generate_notes_on_review.description": "Gera automaticamente release notes por IA ao iniciar uma revisão pós-release.",
+    "change.release.blast_radius.cab_approval_threshold.label": "Limiar de Blast Radius para Aprovação do CAB",
+    "change.release.blast_radius.cab_approval_threshold.description": "Score mínimo de blast radius (0.0–1.0) que exige aprovação obrigatória do Change Advisory Board."
   },
   "configuration": {
     "actions": {
@@ -8797,7 +8809,9 @@
     "subGroupReleaseLifecycle": "Ciclo de Vida do Release",
     "subGroupRiskRollback": "Risco e Rollback",
     "subGroupWorkflowManagement": "Gestão de Workflow",
-    "workflowConfiguration": "Configuração de Workflow"
+    "workflowConfiguration": "Configuração de Workflow",
+    "releaseGatesDashboard": "Gates de Release",
+    "evidencePackViewer": "Evidence Pack"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -10878,7 +10892,7 @@
   },
   "releaseNotes": {
     "title": "Notas de Release",
-    "selectRelease": "Selecione uma release para ver as notas",
+    "selectRelease": "Selecione uma release para ver ou gerar suas notas",
     "notGenerated": "Nenhuma nota de release gerada ainda",
     "notGeneratedDescription": "Gere notas de release assistidas por IA com resumo de mudanças, breaking changes e serviços afetados.",
     "generate": "Gerar Notas",
@@ -10901,10 +10915,11 @@
     "releaseIdPlaceholder": "ID da Release (UUID)…",
     "search": "Buscar",
     "emptyTitle": "Nenhuma release selecionada",
-    "emptyDescription": "Pesquise um ID de release acima para ver ou gerar as notas",
+    "emptyDescription": "Selecione uma release acima para ver ou gerar as notas",
     "personaMode": "Modo de Persona",
     "generatedNotes": "Notas de Release",
-    "generatedAt": "Gerado em"
+    "generatedAt": "Gerado em",
+    "selectorPlaceholder": "Selecione uma release…"
   },
   "deployReadiness": {
     "title": "Prontidão para Deploy",
@@ -11219,7 +11234,7 @@
     "releaseIdPlaceholder": "ID da Release (UUID)…",
     "search": "Buscar",
     "emptyTitle": "Nenhuma revisão carregada",
-    "emptyDescription": "Pesquise um ID de release acima para ver a revisão pós-release",
+    "emptyDescription": "Selecione uma release acima para ver sua revisão pós-release",
     "notFound": "Nenhuma revisão pós-release encontrada para esta release",
     "notFoundHint": "Você pode iniciar uma nova revisão abaixo",
     "startReview": "Iniciar Revisão Pós-Release",
@@ -11236,7 +11251,9 @@
     "errorRate": "Taxa de Erro",
     "latency": "Latência Média",
     "collected": "Coletado",
-    "baselineTitle": "Baseline de Performance"
+    "baselineTitle": "Baseline de Performance",
+    "selectRelease": "Selecione uma release para carregar sua revisão pós-release",
+    "selectorPlaceholder": "Selecione uma release…"
   },
   "releaseRollback": {
     "title": "Rollback de Release",
@@ -11268,6 +11285,70 @@
     "executeRollback": "Executar Rollback",
     "rollbackConfirmation": "Confirmar Rollback — esta ação será auditada",
     "rollbackReasonPlaceholder": "Descreva o motivo do rollback…",
-    "confirmRollback": "Confirmar Rollback"
+    "confirmRollback": "Confirmar Rollback",
+    "selectRelease": "Selecione uma release para carregar ou criar uma avaliação de rollback",
+    "selectorPlaceholder": "Selecione uma release…",
+    "previousVersionPlaceholder": "ex: 1.0.4"
+  },
+  "releaseSelector": {
+    "placeholder": "Selecione uma release…",
+    "search": "Filtrar por serviço, versão ou ambiente…",
+    "loading": "Carregando releases…",
+    "noResults": "Nenhuma release encontrada"
+  },
+  "evidencePackViewer": {
+    "title": "Visualizador de Evidence Pack",
+    "subtitle": "Inspecione o pacote de evidências gerado ao fim de um workflow — scores, aprovações, CI/CD e diff de contrato",
+    "selectInstance": "Selecione uma instância de workflow para inspecionar seu evidence pack",
+    "selectPlaceholder": "— Selecione uma instância de workflow —",
+    "loading": "Carregando…",
+    "emptyTitle": "Nenhuma instância selecionada",
+    "emptyDescription": "Selecione uma instância de workflow acima para ver seu evidence pack",
+    "notFound": "Nenhum evidence pack encontrado para esta instância",
+    "generateHint": "Gere um evidence pack para capturar os artefatos de auditoria deste workflow",
+    "generate": "Gerar Evidence Pack",
+    "packSummary": "Evidence Pack",
+    "complete": "completo",
+    "generatedAt": "Gerado em",
+    "commitSha": "Commit SHA",
+    "buildId": "ID do Build",
+    "pipeline": "Pipeline",
+    "exportPdf": "Exportar PDF",
+    "scoresTitle": "Scores de Qualidade",
+    "blastRadius": "Score de Blast Radius",
+    "spectral": "Score Spectral",
+    "changeIntelligence": "Score de Change Intelligence",
+    "low": "Baixo Risco",
+    "high": "Alto Risco",
+    "pass": "Aprovado",
+    "warn": "Atenção",
+    "confident": "Confiante",
+    "caution": "Cautela",
+    "na": "N/D",
+    "cicdTitle": "Evidência CI/CD",
+    "pipelineSource": "Pipeline",
+    "ciChecks": "Resultado dos Checks CI",
+    "diffTitle": "Resumo do Diff de Contrato",
+    "contractHash": "Hash do contrato:",
+    "approvalsTitle": "Histórico de Aprovações"
+  },
+  "releaseGatesDashboard": {
+    "title": "Dashboard de Gates de Release",
+    "subtitle": "Monitore os gates de promoção entre ambientes para garantir progressão controlada de releases",
+    "environment": "Caminho de ambiente:",
+    "filterAll": "Todos os gates",
+    "filterActive": "Apenas ativos",
+    "filterInactive": "Apenas inativos",
+    "activeGates": "Gates Ativos",
+    "blockers": "Gates Bloqueadores",
+    "totalGates": "Total de Gates",
+    "errorTitle": "Não foi possível carregar os gates",
+    "errorDescription": "Verifique se gates de promoção foram configurados para este par de ambientes",
+    "emptyTitle": "Nenhum gate encontrado",
+    "emptyDescription": "Nenhum gate de promoção configurado para este caminho de ambiente e filtro",
+    "blocking": "Bloqueante",
+    "nonBlocking": "Não bloqueante",
+    "inactive": "Inativo",
+    "created": "Criado em"
   }
 }

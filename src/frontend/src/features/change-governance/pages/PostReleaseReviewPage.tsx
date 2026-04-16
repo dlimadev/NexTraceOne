@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   ClipboardCheck,
-  Search,
   Play,
   CheckCircle2,
   XCircle,
@@ -20,6 +19,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
+import { ReleaseSelector } from '../components/ReleaseSelector';
 
 /**
  * PostReleaseReviewPage — revisão pós-release de uma release.
@@ -34,7 +34,6 @@ export function PostReleaseReviewPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
-  const [inputValue, setInputValue] = useState('');
 
   const {
     data: review,
@@ -56,10 +55,6 @@ export function PostReleaseReviewPage() {
     mutationFn: (rid: string) => changeIntelligenceApi.progressPostReleaseReview(rid),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['post-release-review', releaseId] }),
   });
-
-  function handleSearch() {
-    setReleaseId(inputValue.trim());
-  }
 
   function outcomeBadge(outcome: string): 'success' | 'danger' | 'warning' | 'default' {
     switch (outcome) {
@@ -101,25 +96,18 @@ export function PostReleaseReviewPage() {
         )}
       />
 
-      {/* Search release */}
+      {/* Release selection */}
       <div className="mb-6">
         <Card>
           <CardBody>
             <p className="text-sm text-muted mb-3">
-              {t('postReleaseReview.enterReleaseId', 'Enter a Release ID to load its post-release review')}
+              {t('postReleaseReview.selectRelease', 'Select a release to load its post-release review')}
             </p>
-            <div className="flex gap-2">
-              <input
-                className={inputCls}
-                placeholder={t('postReleaseReview.releaseIdPlaceholder', 'Release ID (UUID)…')}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <Button variant="primary" icon={<Search size={16} />} onClick={handleSearch}>
-                {t('postReleaseReview.search', 'Search')}
-              </Button>
-            </div>
+            <ReleaseSelector
+              value={releaseId}
+              onChange={(id) => setReleaseId(id)}
+              placeholder={t('postReleaseReview.selectorPlaceholder', 'Select a release…')}
+            />
           </CardBody>
         </Card>
       </div>
@@ -129,7 +117,7 @@ export function PostReleaseReviewPage() {
         <EmptyState
           icon={<ClipboardCheck size={40} />}
           title={t('postReleaseReview.emptyTitle', 'No review loaded')}
-          description={t('postReleaseReview.emptyDescription', 'Search for a release ID above to view its post-release review')}
+          description={t('postReleaseReview.emptyDescription', 'Select a release above to view its post-release review')}
         />
       )}
 

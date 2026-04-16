@@ -11,11 +11,32 @@ vi.mock('../../features/change-governance/api/changeIntelligence', () => ({
     getRollbackAssessment: vi.fn(),
     assessRollbackViability: vi.fn(),
     registerRollback: vi.fn(),
+    listRecentReleases: vi.fn().mockResolvedValue({ items: [], totalCount: 0, page: 1, pageSize: 50 }),
   },
 }));
 
 vi.mock('../../api/client', () => ({
   default: { get: vi.fn(), post: vi.fn() },
+}));
+
+// Mock ReleaseSelector to simplify tests — renders a plain <select>
+let _releaseSelectorOnChange: ((id: string) => void) | null = null;
+vi.mock('../../features/change-governance/components/ReleaseSelector', () => ({
+  ReleaseSelector: ({ onChange, placeholder }: { value: string; onChange: (id: string) => void; placeholder?: string }) => {
+    _releaseSelectorOnChange = onChange;
+    return (
+      <select
+        data-testid="release-selector"
+        defaultValue=""
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={placeholder ?? 'Select a release'}
+      >
+        <option value="">{placeholder ?? 'Select a release'}</option>
+        <option value="release-xyz">release-xyz — v1.2.0 — Production</option>
+        <option value="release-new">release-new — v1.3.0 — Staging</option>
+      </select>
+    );
+  },
 }));
 
 import { changeIntelligenceApi } from '../../features/change-governance/api/changeIntelligence';
@@ -46,6 +67,11 @@ function renderPage() {
   );
 }
 
+async function selectRelease(optionValue: string) {
+  const selector = screen.getByTestId('release-selector');
+  await userEvent.selectOptions(selector, optionValue);
+}
+
 describe('ReleaseRollbackPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,23 +85,19 @@ describe('ReleaseRollbackPage', () => {
     expect(screen.getByText(/Release Rollback/i)).toBeTruthy();
   });
 
-  it('renders search input and button', () => {
+  it('renders release selector', () => {
     renderPage();
-    expect(screen.getByPlaceholderText(/Release ID/i)).toBeTruthy();
-    expect(screen.getByText('Search')).toBeTruthy();
+    expect(screen.getByTestId('release-selector')).toBeTruthy();
   });
 
-  it('shows empty state before searching', () => {
+  it('shows empty state before selecting a release', () => {
     renderPage();
     expect(screen.getByText(/No assessment loaded/i)).toBeTruthy();
   });
 
-  it('loads and shows assessment after searching', async () => {
+  it('loads and shows assessment after selecting a release', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-xyz');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-xyz');
     await waitFor(() => {
       expect(screen.getByText(/Rollback Assessment Result/i)).toBeTruthy();
     });
@@ -84,10 +106,7 @@ describe('ReleaseRollbackPage', () => {
 
   it('shows readiness score in badge', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-xyz');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-xyz');
     await waitFor(() => {
       expect(screen.getByText(/Readiness.*82/i)).toBeTruthy();
     });
@@ -95,10 +114,7 @@ describe('ReleaseRollbackPage', () => {
 
   it('displays recommendation text', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-xyz');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-xyz');
     await waitFor(() => {
       expect(screen.getByText(/Rollback to v1.1.0 is safe/i)).toBeTruthy();
     });
@@ -106,10 +122,7 @@ describe('ReleaseRollbackPage', () => {
 
   it('shows Execute Rollback button for viable assessment', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-xyz');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-xyz');
     await waitFor(() => {
       expect(screen.getByText(/Execute Rollback/i)).toBeTruthy();
     });
@@ -118,10 +131,7 @@ describe('ReleaseRollbackPage', () => {
   it('shows create assessment option when not found', async () => {
     vi.mocked(changeIntelligenceApi.getRollbackAssessment).mockRejectedValue(new Error('404'));
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-new');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-new');
     await waitFor(() => {
       expect(screen.getByText(/Create Rollback Assessment/i)).toBeTruthy();
     });
@@ -130,10 +140,7 @@ describe('ReleaseRollbackPage', () => {
   it('shows assessment form when create button is clicked', async () => {
     vi.mocked(changeIntelligenceApi.getRollbackAssessment).mockRejectedValue(new Error('404'));
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-new');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-new');
     await waitFor(() => {
       expect(screen.getByText(/Create Rollback Assessment/i)).toBeTruthy();
     });
@@ -143,10 +150,7 @@ describe('ReleaseRollbackPage', () => {
 
   it('shows rollback confirmation form on Execute Rollback click', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-xyz');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-xyz');
     await waitFor(() => {
       expect(screen.getByText(/Execute Rollback/i)).toBeTruthy();
     });
@@ -156,10 +160,7 @@ describe('ReleaseRollbackPage', () => {
 
   it('calls registerRollback with reason on confirm', async () => {
     renderPage();
-    const input = screen.getByPlaceholderText(/Release ID/i);
-    await userEvent.type(input, 'release-xyz');
-    await userEvent.click(screen.getByText('Search'));
-
+    await selectRelease('release-xyz');
     await waitFor(() => {
       expect(screen.getByText(/Execute Rollback/i)).toBeTruthy();
     });
@@ -168,7 +169,6 @@ describe('ReleaseRollbackPage', () => {
     const reasonInput = screen.getByPlaceholderText(/reason for rollback/i);
     await userEvent.type(reasonInput, 'Critical bug introduced in v1.2.0');
     const confirmBtns = screen.getAllByText(/Confirm Rollback/i);
-    // Click the button (not the title text which may also match)
     await userEvent.click(confirmBtns[confirmBtns.length - 1]);
 
     await waitFor(() => {
