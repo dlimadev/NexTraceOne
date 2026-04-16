@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
+    <ProjectReference Include="..\..\integrations\NexTraceOne.Integrations.Contracts\NexTraceOne.Integrations.Contracts.csproj" />
     <ProjectReference Include="..\..\operationalintelligence\NexTraceOne.OperationalIntelligence.Contracts\NexTraceOne.OperationalIntelligence.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>

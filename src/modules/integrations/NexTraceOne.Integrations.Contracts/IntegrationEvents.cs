@@ -52,4 +52,18 @@ public static class IntegrationEvents
         string ConnectorName,
         string Reason,
         Guid? TenantId) : IntegrationEventBase("Integrations");
+
+    /// <summary>
+    /// Publicado quando o payload de uma execução de ingestão é processado semanticamente com sucesso.
+    /// Consumidores: Change Intelligence (registar marcador externo na release), Operational Intelligence.
+    /// </summary>
+    public sealed record IngestionPayloadProcessedIntegrationEvent(
+        Guid ExecutionId,
+        string? ServiceName,
+        string? Environment,
+        string? Version,
+        string? CommitSha,
+        string? ChangeType,
+        DateTimeOffset ProcessedAt,
+        Guid? TenantId) : IntegrationEventBase("Integrations");
 }

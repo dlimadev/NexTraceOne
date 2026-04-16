@@ -178,8 +178,8 @@ public static class DependencyInjection
         // ── Tool infrastructure ──────────────────────────────────────────
         services.AddSingleton<IAgentTool, ListServicesInfoTool>();
         services.AddSingleton<IAgentTool, GetServiceHealthTool>();
-        services.AddSingleton<IAgentTool, ListRecentChangesTool>();
         // Scoped tools that depend on scoped repositories/readers
+        services.AddScoped<IAgentTool, ListRecentChangesTool>();
         services.AddScoped<IAgentTool, GetContractDetailsTool>();
         services.AddScoped<IAgentTool, SearchIncidentsTool>();
         services.AddScoped<IAgentTool, GetTokenUsageSummaryTool>();

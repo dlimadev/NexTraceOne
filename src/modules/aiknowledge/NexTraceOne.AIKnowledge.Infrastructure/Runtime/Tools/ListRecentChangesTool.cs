@@ -4,23 +4,27 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
 
 /// <summary>
 /// Tool real: lista mudanças recentes registadas no módulo Change Governance.
-/// Retorna informação sobre deploys, releases e mudanças em produção.
-///
-/// Nota P9.4: Na ausência de integração directa com ChangeGovernance,
-/// esta tool executa a consulta estruturada e retorna contexto para o agent.
-/// Evolução posterior ligará ao ChangeGovernance via integration port.
+/// Retorna informação sobre deploys, releases e mudanças em produção via IChangeGroundingReader.
 /// </summary>
 public sealed class ListRecentChangesTool : IAgentTool
 {
+    private readonly IChangeGroundingReader _changeReader;
+    private readonly IDateTimeProvider _clock;
     private readonly ILogger<ListRecentChangesTool> _logger;
 
-    public ListRecentChangesTool(ILogger<ListRecentChangesTool> logger)
+    public ListRecentChangesTool(
+        IChangeGroundingReader changeReader,
+        IDateTimeProvider clock,
+        ILogger<ListRecentChangesTool> logger)
     {
+        _changeReader = changeReader;
+        _clock = clock;
         _logger = logger;
     }
 
@@ -35,7 +39,7 @@ public sealed class ListRecentChangesTool : IAgentTool
             new ToolParameterDefinition("limit", "Maximum number of results (default: 10)", "integer"),
         ]);
 
-    public Task<ToolExecutionResult> ExecuteAsync(
+    public async Task<ToolExecutionResult> ExecuteAsync(
         string argumentsJson,
         CancellationToken cancellationToken = default)
     {
@@ -49,10 +53,22 @@ public sealed class ListRecentChangesTool : IAgentTool
                 "ListRecentChangesTool executing for service={Service}, env={Environment}, days={Days}",
                 args.ServiceName, args.Environment, args.Days);
 
+            var to = _clock.UtcNow;
+            var from = to.AddDays(-args.Days);
+
+            var releases = await _changeReader.FindRecentReleasesAsync(
+                from,
+                to,
+                serviceId: args.ServiceName,
+                environment: args.Environment ?? "production",
+                tenantId: null,
+                maxResults: args.Limit,
+                ct: cancellationToken);
+
             var result = new
             {
                 tool = "list_recent_changes",
-                status = "executed",
+                status = "success",
                 filters = new
                 {
                     service = args.ServiceName,
@@ -60,22 +76,32 @@ public sealed class ListRecentChangesTool : IAgentTool
                     days = args.Days,
                     limit = args.Limit,
                 },
-                note = "Recent changes query executed. Cross-module integration with ChangeGovernance releases and deployment events will be wired in a subsequent phase.",
-                guidance = "The agent should use the change context to assess blast radius, risk, and correlate with incidents."
+                total = releases.Count,
+                changes = releases.Select(r => new
+                {
+                    releaseId = r.ReleaseId,
+                    serviceName = r.ServiceName,
+                    version = r.Version,
+                    environment = r.Environment,
+                    status = r.Status,
+                    changeLevel = r.ChangeLevel,
+                    changeScore = r.ChangeScore,
+                    description = r.Description,
+                    createdAt = r.CreatedAt,
+                }),
             };
 
             sw.Stop();
             var output = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = false });
 
-            return Task.FromResult(new ToolExecutionResult(
-                true, "list_recent_changes", output, sw.ElapsedMilliseconds));
+            return new ToolExecutionResult(true, "list_recent_changes", output, sw.ElapsedMilliseconds);
         }
         catch (Exception ex)
         {
             sw.Stop();
             _logger.LogError(ex, "ListRecentChangesTool failed");
-            return Task.FromResult(new ToolExecutionResult(
-                false, "list_recent_changes", string.Empty, sw.ElapsedMilliseconds, ex.Message));
+            return new ToolExecutionResult(
+                false, "list_recent_changes", string.Empty, sw.ElapsedMilliseconds, ex.Message);
         }
     }
 

@@ -5,9 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
+using NexTraceOne.Integrations.Contracts;
+using NexTraceOne.Integrations.Domain.Events;
+using NexTraceOne.Integrations.Infrastructure.EventHandlers;
 using NexTraceOne.Integrations.Infrastructure.LegacyTelemetry;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
@@ -50,6 +54,10 @@ public static class DependencyInjection
         services.Configure<ElasticLegacyWriterOptions>(
             configuration.GetSection(ElasticLegacyWriterOptions.SectionName));
         services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>();
+
+        // Domain Event Handlers — converte domain events em integration events para consumidores downstream
+        services.AddScoped<IIntegrationEventHandler<IngestionPayloadProcessedDomainEvent>,
+            IngestionPayloadProcessedDomainEventHandler>();
 
         return services;
     }

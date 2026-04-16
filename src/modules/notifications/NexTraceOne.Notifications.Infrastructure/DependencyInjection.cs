@@ -159,9 +159,9 @@ public static class DependencyInjection
         services.AddScoped<INotificationCatalogGovernance, NotificationCatalogGovernance>();
 
         // ── Domain Event Handlers (via Notifications Outbox → IEventBus) ─────────────
-        // NOTA: O processador do outbox do módulo Notifications (NotificationsOutboxProcessorJob)
-        // está pendente de implementação. Quando implementado, estes handlers serão invocados
-        // automaticamente via IEventBus.PublishAsync<T> para cada evento pendente no outbox.
+        // O outbox do módulo Notifications é processado por ModuleOutboxProcessorJob<NotificationsDbContext>,
+        // registado no BackgroundWorkers. Estes handlers são invocados automaticamente
+        // via IEventBus.PublishAsync<T> para cada evento pendente no outbox.
         services.AddScoped<IIntegrationEventHandler<NotificationCreatedEvent>, NotificationCreatedDomainEventHandler>();
         services.AddScoped<IIntegrationEventHandler<NotificationReadEvent>, NotificationReadDomainEventHandler>();
 
