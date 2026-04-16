@@ -16,6 +16,7 @@ using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
+using NexTraceOne.Integrations.Contracts;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 
@@ -60,6 +61,7 @@ public static class DependencyInjection
         services.AddScoped<IPromotionGateEvaluationRepository, PromotionGateEvaluationRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();
 
         // Analytics writer: correlated traces → Elasticsearch chg_trace_release_mapping
         // Graceful degradation via NullAnalyticsWriter when Analytics:Enabled = false

@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 
 using Npgsql;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+
 namespace NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
 
 /// <summary>
@@ -24,6 +26,8 @@ namespace NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
 /// - Em produção, este manager deve ser invocado durante o provisionamento de tenant,
 ///   não em cada request HTTP
 /// - As migrations são aplicadas via EF Core MigrationsExtensions por schema
+/// - Implementa ITenantSchemaManager definida na camada Application para respeitar
+///   a Dependency Rule da Clean Architecture.
 /// </summary>
 public sealed class TenantSchemaManager(
     string connectionString,

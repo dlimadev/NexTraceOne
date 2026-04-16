@@ -1,6 +1,6 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
 
 namespace NexTraceOne.Governance.Application.Features.GetTenantSchemas;
 

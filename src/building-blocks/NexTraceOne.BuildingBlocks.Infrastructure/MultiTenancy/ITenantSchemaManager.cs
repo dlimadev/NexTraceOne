@@ -1,58 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+// ITenantSchemaManager foi movida para a camada Application para respeitar a Dependency Rule
+// da Clean Architecture: a camada Application não pode depender de Infrastructure.
+//
+// Localização actual: NexTraceOne.BuildingBlocks.Application.Abstractions.ITenantSchemaManager
+//
+// Actualizar imports existentes:
+//   ANTES: using NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
+//   DEPOIS: using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
-namespace NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
-
-/// <summary>
-/// Abstração para gestão de schemas PostgreSQL por tenant.
-/// Permite criar, verificar e manter schemas isolados por tenant
-/// como alternativa ou complemento ao Row-Level Security (RLS).
-/// A abordagem schema-per-tenant oferece isolamento forte: cada tenant
-/// tem as suas próprias tabelas, sem partilha de dados físicos.
-/// </summary>
-public interface ITenantSchemaManager
-{
-    /// <summary>
-    /// Cria o schema PostgreSQL para o tenant se não existir.
-    /// Retorna true se o schema foi criado, false se já existia.
-    /// </summary>
-    Task<bool> EnsureSchemaCreatedAsync(
-        string tenantSlug,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Verifica se o schema do tenant existe na base de dados.
-    /// </summary>
-    Task<bool> SchemaExistsAsync(
-        string tenantSlug,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Aplica todas as migrations pendentes no schema do tenant.
-    /// Equivalente ao dotnet-ef database update para um schema específico.
-    /// </summary>
-    Task MigrateSchemaAsync(
-        string tenantSlug,
-        DbContext context,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Remove o schema do tenant e todas as suas tabelas.
-    /// Operação destrutiva — apenas para desprovisionamento ou testes.
-    /// </summary>
-    Task DropSchemaAsync(
-        string tenantSlug,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Lista todos os schemas de tenants presentes na base de dados.
-    /// Retorna os slugs dos tenants com schema criado.
-    /// </summary>
-    Task<IReadOnlyList<string>> ListTenantSchemasAsync(
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Retorna o search_path PostgreSQL para o schema do tenant.
-    /// Formato: "{schemaName}, public"
-    /// </summary>
-    string GetSearchPath(string tenantSlug);
-}

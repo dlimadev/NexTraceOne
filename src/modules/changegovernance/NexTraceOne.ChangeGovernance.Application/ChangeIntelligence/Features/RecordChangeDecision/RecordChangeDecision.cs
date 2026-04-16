@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordChangeDecision;
@@ -29,7 +30,8 @@ public static class RecordChangeDecision
     /// <summary>Valida a entrada do comando de decisão.</summary>
     public sealed class Validator : AbstractValidator<Command>
     {
-        private static readonly string[] AllowedDecisions = ["Approved", "Rejected", "ApprovedConditionally"];
+        private static readonly string[] AllowedDecisions =
+            [ReleaseApprovalStatus.Approved, ReleaseApprovalStatus.Rejected, ReleaseApprovalStatus.ApprovedConditionally];
 
         public Validator()
         {

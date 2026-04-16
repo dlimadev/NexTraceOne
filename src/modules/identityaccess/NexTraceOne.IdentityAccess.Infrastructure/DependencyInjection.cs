@@ -6,11 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Domain.Events;
 using NexTraceOne.IdentityAccess.Infrastructure.Authorization;
 using NexTraceOne.IdentityAccess.Infrastructure.Context;
+using NexTraceOne.IdentityAccess.Infrastructure.EventHandlers;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 using NexTraceOne.IdentityAccess.Infrastructure.Services;
@@ -115,6 +118,10 @@ public static class DependencyInjection
         // Fase 2 — Authorization handlers
         services.AddScoped<IAuthorizationHandler, EnvironmentAccessAuthorizationHandler>();
         services.AddScoped<IAuthorizationHandler, OperationalContextAuthorizationHandler>();
+
+        // ── Domain Event Handlers (via Outbox → IEventBus) ────────────────────────────
+        services.AddScoped<IIntegrationEventHandler<UserCreatedDomainEvent>, UserCreatedDomainEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<UserLockedDomainEvent>, UserLockedDomainEventHandler>();
 
         return services;
     }

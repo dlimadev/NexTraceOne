@@ -9,6 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.IdentityAccess.Application\NexTraceOne.IdentityAccess.Application.csproj" />
+    <ProjectReference Include="..\NexTraceOne.IdentityAccess.Contracts\NexTraceOne.IdentityAccess.Contracts.csproj" />
     <ProjectReference Include="..\NexTraceOne.IdentityAccess.Domain\NexTraceOne.IdentityAccess.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />

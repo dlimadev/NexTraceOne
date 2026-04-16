@@ -3,6 +3,7 @@ using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
@@ -46,7 +47,7 @@ public static class EvaluateFourEyesPrinciple
 
             // Check if four eyes principle is enabled
             var enabledConfig = await configService.ResolveEffectiveValueAsync(
-                "governance.four_eyes_principle.enabled",
+                GovernanceConfigKeys.FourEyesPrincipleEnabled,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -66,7 +67,7 @@ public static class EvaluateFourEyesPrinciple
 
             // Check if this specific action requires four eyes
             var actionsConfig = await configService.ResolveEffectiveValueAsync(
-                "governance.four_eyes_principle.actions",
+                GovernanceConfigKeys.FourEyesPrincipleActions,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);

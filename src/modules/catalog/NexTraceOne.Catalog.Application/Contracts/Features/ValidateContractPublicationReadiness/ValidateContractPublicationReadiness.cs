@@ -3,6 +3,7 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.ConfigurationKeys;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Contracts.Errors;
@@ -57,7 +58,7 @@ public static class ValidateContractPublicationReadiness
 
             // ── Check: Block on lint errors ──────────────────────
             var lintBlockConfig = await configService.ResolveEffectiveValueAsync(
-                "catalog.contract.validation.block_on_lint_errors",
+                CatalogConfigKeys.ContractValidationBlockOnLintErrors,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -76,7 +77,7 @@ public static class ValidateContractPublicationReadiness
 
             // ── Check: Require examples (via artifacts) ──────────
             var examplesConfig = await configService.ResolveEffectiveValueAsync(
-                "catalog.contract.publication.require_examples",
+                CatalogConfigKeys.ContractPublicationRequireExamples,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);
@@ -98,7 +99,7 @@ public static class ValidateContractPublicationReadiness
 
             // ── Check: Approval required ─────────────────────────
             var approvalConfig = await configService.ResolveEffectiveValueAsync(
-                "catalog.contract.creation.approval_required",
+                CatalogConfigKeys.ContractCreationApprovalRequired,
                 ConfigurationScope.Tenant,
                 null,
                 cancellationToken);

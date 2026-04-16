@@ -9,6 +9,7 @@ using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Application.SourceOfTruth.Abstractions;
 using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Entities;
 using NexTraceOne.Catalog.Domain.SourceOfTruth.Enums;
 using NexTraceOne.Knowledge.Contracts;
@@ -330,8 +331,7 @@ public static class ComputeServiceScorecard
             var factors = new List<string>();
 
             // Active lifecycle implies some operational readiness
-            var lifecycle = service.LifecycleStatus.ToString();
-            if (lifecycle is "Active" or "Deprecating")
+            if (service.LifecycleStatus is LifecycleStatus.Active or LifecycleStatus.Deprecating)
             {
                 score += 0.30m;
                 factors.Add("Service in active lifecycle");
@@ -445,7 +445,7 @@ public static class ComputeServiceScorecard
             var factors = new List<string>();
 
             // Active lifecycle suggests reviewed for security
-            if (service.LifecycleStatus.ToString() is "Active")
+            if (service.LifecycleStatus == LifecycleStatus.Active)
             {
                 score += 0.30m;
                 factors.Add("Active lifecycle (security review implied)");

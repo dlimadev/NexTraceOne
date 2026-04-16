@@ -76,7 +76,17 @@ builder.Services.AddSingleton<NexTraceOne.Governance.Application.Abstractions.IP
 builder.Services.AddSingleton<NexTraceOne.Governance.Application.Abstractions.IPendingMigrationsProvider,
     NexTraceOne.ApiHost.ApiHostPendingMigrationsProvider>();
 
-// [3.3] Preflight check service — verificação pré-arranque sem autenticação
+// [3.3] Preflight checks — verificação pré-arranque sem autenticação (SRP: um check por classe)
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.PostgreSqlPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.JwtSecretPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.ConnectionStringsPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.DiskSpacePreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.RamPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.PortsPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.OllamaPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.SmtpPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.OtelCollectorPreflightCheck>();
+builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.CorsOriginsPreflightCheck>();
 builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.PreflightCheckService>();
 
 // [3.4] Hardware assessment service — avaliação de hardware para modelos LLM locais

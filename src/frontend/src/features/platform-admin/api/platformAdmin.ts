@@ -763,46 +763,43 @@ export const platformAdminApi = {
    * GET /api/v1/admin/migration-preview — requer platform:admin:read.
    * Retorna migrações EF Core pendentes com preview de SQL e indicador de risco.
    */
-  getMigrationPreview: (): Promise<MigrationPreviewResponse> =>
-    Promise.resolve({
-      pending: [
-        {
-          id: 'mig-001',
-          name: '20260101_AddServiceContractVersion',
-          timestamp: '20260101120000',
-          module: 'Contracts',
-          risk: 'Low',
-          operations: ['AddColumn', 'CreateIndex'],
-          sqlPreview:
-            'ALTER TABLE "ContractVersions" ADD COLUMN "SchemaHash" TEXT;\nCREATE INDEX "IX_ContractVersions_SchemaHash" ON "ContractVersions"("SchemaHash");',
-          estimatedDurationMs: 120,
-        },
-        {
-          id: 'mig-002',
-          name: '20260102_AddChangeBlastRadiusTable',
-          timestamp: '20260102090000',
-          module: 'Changes',
-          risk: 'Medium',
-          operations: ['CreateTable', 'AddForeignKey'],
-          sqlPreview:
-            'CREATE TABLE "ChangeBlastRadius" (\n  "Id" UUID NOT NULL,\n  "ChangeId" UUID NOT NULL,\n  "AffectedServiceCount" INT NOT NULL,\n  PRIMARY KEY ("Id")\n);\nALTER TABLE "ChangeBlastRadius" ADD CONSTRAINT "FK_ChangeBlastRadius_Changes" FOREIGN KEY ("ChangeId") REFERENCES "Changes"("Id");',
-          estimatedDurationMs: 350,
-        },
-        {
-          id: 'mig-003',
-          name: '20260103_DropLegacyMetricsCache',
-          timestamp: '20260103140000',
-          module: 'Operations',
-          risk: 'High',
-          operations: ['DropTable'],
-          sqlPreview: 'DROP TABLE "LegacyMetricsCache";',
-          estimatedDurationMs: 80,
-        },
-      ],
-      appliedCount: 47,
-      generatedAt: new Date().toISOString(),
-      simulatedNote: 'Simulated migration preview — no real schema changes performed.',
-    }),
+  getMigrationPreview: async (): Promise<MigrationPreviewResponse> => {
+    const data = await client
+      .get<{
+        totalPending: number;
+        isSafeToApply: boolean;
+        migrations: Array<{
+          migrationId: string;
+          context: string;
+          riskLevel: MigrationRisk;
+          requiresDowntime: boolean;
+          isReversible: boolean;
+        }>;
+        checkedAt: string;
+      }>('/api/v1/platform/migrations/pending')
+      .then((r) => r.data);
+
+    return {
+      pending: data.migrations.map((m) => ({
+        id: m.migrationId,
+        name: m.migrationId,
+        timestamp: m.migrationId.slice(0, 14),
+        module: m.context.replace('DbContext', ''),
+        risk: m.riskLevel,
+        operations: [
+          m.requiresDowntime ? 'RequiresDowntime' : 'Online',
+          m.isReversible ? 'Reversible' : 'Irreversible',
+        ],
+        sqlPreview: '',
+        estimatedDurationMs: 0,
+      })),
+      appliedCount: 0,
+      generatedAt: data.checkedAt,
+      simulatedNote: data.isSafeToApply
+        ? 'All pending migrations are safe to apply.'
+        : 'Review high-risk migrations before applying to production.',
+    };
+  },
 
   // ── W7-05: DORA Admin Dashboard ───────────────────────────────────────────
 
@@ -810,46 +807,44 @@ export const platformAdminApi = {
    * GET /api/v1/admin/dora-metrics — requer platform:admin:read.
    * Retorna métricas DORA calculadas para o ambiente e janela de tempo seleccionados.
    */
-  getDoraAdminMetrics: (env: string, days: number): Promise<DoraAdminMetricsResponse> =>
-    Promise.resolve({
-      deploymentFrequency: {
-        name: 'Deployment Frequency',
-        value: days >= 90 ? '3.2' : days >= 30 ? '3.8' : '4.1',
-        unit: 'per day',
-        rating: 'Elite',
-        trend: 5.2,
-        trendDirection: 'up',
-      },
-      leadTime: {
-        name: 'Lead Time for Changes',
-        value: days >= 90 ? '1.4' : days >= 30 ? '1.2' : '0.9',
-        unit: 'hours',
-        rating: 'Elite',
-        trend: -8.3,
-        trendDirection: 'down',
-      },
-      mttr: {
-        name: 'Mean Time to Recovery',
-        value: days >= 90 ? '28' : days >= 30 ? '22' : '18',
-        unit: 'minutes',
-        rating: env === 'production' ? 'High' : 'Elite',
-        trend: -12.1,
-        trendDirection: 'down',
-      },
-      changeFailureRate: {
-        name: 'Change Failure Rate',
-        value: days >= 90 ? '3.1' : days >= 30 ? '2.8' : '2.2',
-        unit: '%',
-        rating: 'Elite',
-        trend: -1.4,
-        trendDirection: 'down',
-      },
+  getDoraAdminMetrics: async (env: string, days: number): Promise<DoraAdminMetricsResponse> => {
+    const data = await client
+      .get<{
+        deploymentFrequency: { name: string; value: number; unit: string; rating: string };
+        leadTimeForChanges: { name: string; value: number; unit: string; rating: string };
+        changeFailureRate: { name: string; value: number; unit: string; rating: string };
+        meanTimeToRestore: { name: string; value: number; unit: string; rating: string };
+        computedAt: string;
+        periodDays: number;
+      }>(`/api/v1/governance/dora-metrics?periodDays=${days}`)
+      .then((r) => r.data);
+
+    const mapMetric = (m: {
+      name: string;
+      value: number;
+      unit: string;
+      rating: string;
+    }): DoraMetric => ({
+      name: m.name,
+      value: String(m.value),
+      unit: m.unit,
+      rating: m.rating as DoraRating,
+      trend: 0,
+      trendDirection: 'stable',
+    });
+
+    return {
+      deploymentFrequency: mapMetric(data.deploymentFrequency),
+      leadTime: mapMetric(data.leadTimeForChanges),
+      mttr: mapMetric(data.meanTimeToRestore),
+      changeFailureRate: mapMetric(data.changeFailureRate),
       environment: env,
-      timeRangeDays: days,
-      dataSource: 'PostgreSQL (simulated)',
-      lastUpdatedAt: new Date().toISOString(),
-      simulatedNote: 'Simulated DORA metrics — connect to real change and incident data for live values.',
-    }),
+      timeRangeDays: data.periodDays,
+      dataSource: 'PostgreSQL (live)',
+      lastUpdatedAt: data.computedAt,
+      simulatedNote: '',
+    };
+  },
 
   // ── W8-04: SAML SSO Configuration ────────────────────────────────────────
 
@@ -991,76 +986,53 @@ export const platformAdminApi = {
    * GET /api/v1/platform/feature-flags/runtime — requer platform:admin:read.
    * Retorna todas as feature flags com estado efectivo para o contexto actual.
    */
-  getFeatureFlagsRuntime: (): Promise<FeatureFlagsRuntimeResponse> =>
-    Promise.resolve({
+  getFeatureFlagsRuntime: async (): Promise<FeatureFlagsRuntimeResponse> => {
+    const flags = await client
+      .get<
+        Array<{
+          key: string;
+          displayName: string;
+          defaultEnabled: boolean;
+          allowedScopes: string[];
+          isActive: boolean;
+        }>
+      >('/api/v1/configuration/flags')
+      .then((r) => r.data);
+
+    return {
       evaluatedAt: new Date().toISOString(),
-      flags: [
-        {
-          key: 'ai.assistant.enabled',
-          displayName: 'AI Assistant',
-          scope: 'Tenant',
-          enabled: true,
-          defaultEnabled: true,
-          hasOverride: false,
-        },
-        {
-          key: 'ai.agent.multi_step.enabled',
-          displayName: 'AI Multi-Step Agents',
-          scope: 'Tenant',
-          enabled: false,
-          defaultEnabled: false,
-          hasOverride: false,
-        },
-        {
-          key: 'contracts.soap.enabled',
-          displayName: 'SOAP Contracts',
-          scope: 'System',
-          enabled: true,
-          defaultEnabled: true,
-          hasOverride: false,
-        },
-        {
-          key: 'changes.canary_tracking.enabled',
-          displayName: 'Canary Deployment Tracking',
-          scope: 'Tenant',
-          enabled: true,
-          defaultEnabled: false,
-          hasOverride: true,
-        },
-        {
-          key: 'finops.waste_detection.enabled',
-          displayName: 'FinOps Waste Detection',
-          scope: 'Tenant',
-          enabled: false,
-          defaultEnabled: false,
-          hasOverride: false,
-        },
-        {
-          key: 'multitenancy.schema_isolation.enabled',
-          displayName: 'Schema-per-Tenant Isolation',
-          scope: 'System',
-          enabled: false,
-          defaultEnabled: false,
-          hasOverride: false,
-        },
-      ],
-    }),
+      flags: flags.map((f) => ({
+        key: f.key,
+        displayName: f.displayName,
+        scope: f.allowedScopes[0] ?? 'System',
+        enabled: f.defaultEnabled,
+        defaultEnabled: f.defaultEnabled,
+        hasOverride: false,
+      })),
+    };
+  },
 
   /**
    * POST /api/v1/platform/feature-flags/override — requer platform:admin:write.
    * Define uma override de feature flag para um scope específico.
    */
-  setFeatureFlagRuntimeOverride: (
+  setFeatureFlagRuntimeOverride: async (
     req: FeatureFlagRuntimeOverrideRequest,
-  ): Promise<FeatureFlagRuntimeEntry> =>
-    Promise.resolve({
+  ): Promise<FeatureFlagRuntimeEntry> => {
+    await client.put(`/api/v1/configuration/flags/${encodeURIComponent(req.key)}/override`, {
+      scope: req.scope,
+      scopeReferenceId: req.scopeReferenceId,
+      isEnabled: req.enabled,
+    });
+    return {
       key: req.key,
       displayName: req.key,
       scope: req.scope,
       enabled: req.enabled,
       defaultEnabled: false,
       hasOverride: true,
-    }),
+    };
+  },
 
   // ── W8-03: Canary Dashboard ────────────────────────────────────────────────
 
@@ -1130,27 +1102,7 @@ export const platformAdminApi = {
    * Lista schemas PostgreSQL criados por tenant.
    */
   getTenantSchemas: (): Promise<TenantSchemasResponse> =>
-    Promise.resolve({
-      totalSchemas: 3,
-      checkedAt: new Date().toISOString(),
-      schemas: [
-        {
-          tenantSlug: 'acme-corp',
-          schemaName: 'tenant_acme_corp',
-          searchPath: 'tenant_acme_corp, public',
-        },
-        {
-          tenantSlug: 'globex',
-          schemaName: 'tenant_globex',
-          searchPath: 'tenant_globex, public',
-        },
-        {
-          tenantSlug: 'initech',
-          schemaName: 'tenant_initech',
-          searchPath: 'tenant_initech, public',
-        },
-      ],
-    }),
+    client.get<TenantSchemasResponse>('/api/v1/platform/tenant-schemas').then((r) => r.data),
 
   /**
    * POST /api/v1/platform/tenant-schemas/provision — requer platform:admin:write.
@@ -1159,12 +1111,9 @@ export const platformAdminApi = {
   provisionTenantSchema: (
     req: ProvisionTenantSchemaRequest,
   ): Promise<ProvisionTenantSchemaResult> =>
-    Promise.resolve({
-      tenantSlug: req.tenantSlug,
-      schemaName: `tenant_${req.tenantSlug.replace(/-/g, '_')}`,
-      wasCreated: true,
-      provisionedAt: new Date().toISOString(),
-    }),
+    client
+      .post<ProvisionTenantSchemaResult>('/api/v1/platform/tenant-schemas/provision', req)
+      .then((r) => r.data),
 };
 
 // ── W2-03 Types ───────────────────────────────────────────────────────────────

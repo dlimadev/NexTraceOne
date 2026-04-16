@@ -10,6 +10,7 @@ using NexTraceOne.Governance.Contracts;
 using NexTraceOne.IdentityAccess.Contracts.IntegrationEvents;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
+using NexTraceOne.Notifications.Domain.Events;
 using NexTraceOne.Notifications.Infrastructure.Engine;
 using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
@@ -156,6 +157,13 @@ public static class DependencyInjection
         services.AddScoped<INotificationAuditService, NotificationAuditService>();
         services.AddScoped<INotificationHealthProvider, NotificationHealthProvider>();
         services.AddScoped<INotificationCatalogGovernance, NotificationCatalogGovernance>();
+
+        // ── Domain Event Handlers (via Notifications Outbox → IEventBus) ─────────────
+        // O outbox do módulo Notifications é processado por ModuleOutboxProcessorJob<NotificationsDbContext>,
+        // registado no BackgroundWorkers. Estes handlers são invocados automaticamente
+        // via IEventBus.PublishAsync<T> para cada evento pendente no outbox.
+        services.AddScoped<IIntegrationEventHandler<NotificationCreatedEvent>, NotificationCreatedDomainEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<NotificationReadEvent>, NotificationReadDomainEventHandler>();
 
         return services;
     }
