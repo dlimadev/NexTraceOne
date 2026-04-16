@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.Configuration.Domain.Enums;
 
 using GetAuditHistoryFeature = NexTraceOne.Configuration.Application.Features.GetAuditHistory.GetAuditHistory;
+using GetAuditHistoryByPrefixFeature = NexTraceOne.Configuration.Application.Features.GetAuditHistoryByPrefix.GetAuditHistoryByPrefix;
 using GetDefinitionsFeature = NexTraceOne.Configuration.Application.Features.GetDefinitions.GetDefinitions;
 using GetEffectiveFeatureFlagFeature = NexTraceOne.Configuration.Application.Features.GetEffectiveFeatureFlag.GetEffectiveFeatureFlag;
 using GetEffectiveSettingsFeature = NexTraceOne.Configuration.Application.Features.GetEffectiveSettings.GetEffectiveSettings;
@@ -71,10 +72,11 @@ public sealed class ConfigurationEndpointModule
         })
         .RequirePermission("configuration:read");
 
-        // GET /api/v1/configuration/entries?scope={scope}&scopeReferenceId={id}
+        // GET /api/v1/configuration/entries?scope={scope}&scopeReferenceId={id}&keyPrefix={prefix}
         group.MapGet("/entries", async (
             string scope,
             string? scopeReferenceId,
+            string? keyPrefix,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
@@ -86,7 +88,7 @@ public sealed class ConfigurationEndpointModule
                     statusCode: StatusCodes.Status422UnprocessableEntity);
 
             var result = await sender.Send(
-                new GetEntriesFeature.Query(parsedScope, scopeReferenceId),
+                new GetEntriesFeature.Query(parsedScope, scopeReferenceId, keyPrefix),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         })
@@ -199,6 +201,21 @@ public sealed class ConfigurationEndpointModule
         {
             var result = await sender.Send(
                 new GetAuditHistoryFeature.Query(key, limit ?? 50),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("configuration:read");
+
+        // GET /api/v1/configuration/audit-history?keyPrefix={prefix}&limit={limit}
+        group.MapGet("/audit-history", async (
+            string? keyPrefix,
+            int? limit,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAuditHistoryByPrefixFeature.Query(keyPrefix ?? string.Empty, limit ?? 100),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         })

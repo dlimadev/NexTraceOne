@@ -24,4 +24,15 @@ internal sealed class ConfigurationAuditRepository(ConfigurationDbContext contex
             .Take(limit)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<ConfigurationAuditEntry>> GetByKeyPrefixAsync(
+        string keyPrefix,
+        int limit,
+        CancellationToken cancellationToken)
+        => await context.AuditEntries
+            .Where(a => a.Key.StartsWith(keyPrefix))
+            .OrderByDescending(a => a.ChangedAt)
+            .Take(limit)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 }

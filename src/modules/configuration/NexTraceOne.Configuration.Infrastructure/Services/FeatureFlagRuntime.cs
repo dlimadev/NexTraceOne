@@ -161,6 +161,6 @@ public sealed class FeatureFlagRuntime(
         _                              => null // Team, Role, Environment resolvidos externamente
     };
 
-    private static string BuildCacheKey(string flagKey, Guid tenantId, Guid userId)
+    private static string BuildCacheKey(string flagKey, Guid tenantId, string userId)
         => $"ffr:{flagKey}:{tenantId}:{userId}";
 }

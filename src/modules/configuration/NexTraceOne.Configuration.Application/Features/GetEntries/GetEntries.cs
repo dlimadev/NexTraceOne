@@ -12,10 +12,11 @@ namespace NexTraceOne.Configuration.Application.Features.GetEntries;
 /// </summary>
 public static class GetEntries
 {
-    /// <summary>Query to retrieve entries by scope and optional scope reference.</summary>
+    /// <summary>Query to retrieve entries by scope, optional scope reference, and optional key prefix filter.</summary>
     public sealed record Query(
         ConfigurationScope Scope,
-        string? ScopeReferenceId) : IQuery<List<ConfigurationEntryDto>>;
+        string? ScopeReferenceId,
+        string? KeyPrefix = null) : IQuery<List<ConfigurationEntryDto>>;
 
     /// <summary>Handler that fetches entries and masks sensitive values.</summary>
     public sealed class Handler(
@@ -27,10 +28,9 @@ public static class GetEntries
             Query request,
             CancellationToken cancellationToken)
         {
-            var entries = await entryRepository.GetAllByScopeAsync(
-                request.Scope,
-                request.ScopeReferenceId,
-                cancellationToken);
+            var entries = string.IsNullOrWhiteSpace(request.KeyPrefix)
+                ? await entryRepository.GetAllByScopeAsync(request.Scope, request.ScopeReferenceId, cancellationToken)
+                : await entryRepository.GetAllByScopeWithKeyPrefixAsync(request.Scope, request.ScopeReferenceId, request.KeyPrefix, cancellationToken);
 
             var dtos = entries.Select(e => new ConfigurationEntryDto(
                 Id: e.Id.Value,

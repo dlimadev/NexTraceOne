@@ -26,6 +26,16 @@ public interface IConfigurationEntryRepository
         string? scopeReferenceId,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Returns all entries for the given scope and optional key prefix filter.
+    /// When keyPrefix is non-null, only entries whose key starts with the prefix are returned.
+    /// </summary>
+    Task<IReadOnlyList<ConfigurationEntry>> GetAllByScopeWithKeyPrefixAsync(
+        ConfigurationScope scope,
+        string? scopeReferenceId,
+        string? keyPrefix,
+        CancellationToken cancellationToken);
+
     /// <summary>Returns all entries for the given configuration key across all scopes.</summary>
     Task<IReadOnlyList<ConfigurationEntry>> GetAllByKeyAsync(string key, CancellationToken cancellationToken);
 

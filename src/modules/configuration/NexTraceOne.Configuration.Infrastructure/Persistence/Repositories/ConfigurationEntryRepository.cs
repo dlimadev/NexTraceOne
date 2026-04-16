@@ -34,6 +34,18 @@ internal sealed class ConfigurationEntryRepository(ConfigurationDbContext contex
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<ConfigurationEntry>> GetAllByScopeWithKeyPrefixAsync(
+        ConfigurationScope scope,
+        string? scopeReferenceId,
+        string? keyPrefix,
+        CancellationToken cancellationToken)
+    {
+        var query = context.Entries.Where(e => e.Scope == scope && e.ScopeReferenceId == scopeReferenceId);
+        if (!string.IsNullOrWhiteSpace(keyPrefix))
+            query = query.Where(e => e.Key.StartsWith(keyPrefix));
+        return await query.OrderBy(e => e.Key).AsNoTracking().ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<ConfigurationEntry>> GetAllByKeyAsync(string key, CancellationToken cancellationToken)
         => await context.Entries
             .Where(e => e.Key == key)
