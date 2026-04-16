@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
 import {
   ShieldCheck, CheckCircle, AlertTriangle, XCircle, Eye, Lock, RefreshCw,
 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageHeader } from '../../../components/PageHeader';
+import { configurationApi } from '../api/configurationApi';
 
 /**
  * ParameterComplianceDashboardPage — dashboard executivo de compliance de parametrização.
@@ -16,56 +18,26 @@ import { PageHeader } from '../../../components/PageHeader';
  * Persona: Platform Admin, Executive, Auditor.
  */
 
-interface CategoryCompliance {
-  category: string;
-  total: number;
-  withI18n: number;
-  deprecated: number;
-}
-
-interface ComplianceSummary {
-  totalDefinitions: number;
-  withI18nKeys: number;
-  withoutI18nKeys: number;
-  i18nCoveragePercent: number;
-  deprecatedCount: number;
-  sensitiveCount: number;
-  withValidationRules: number;
-  withoutValidationRules: number;
-  validationCoveragePercent: number;
-  editableCount: number;
-  readOnlyCount: number;
-  byCategory: CategoryCompliance[];
-  deprecatedKeys: string[];
-}
-
 export function ParameterComplianceDashboardPage() {
   const { t } = useTranslation();
-  const [summary, setSummary] = useState<ComplianceSummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchSummary = async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const resp = await fetch('/api/v1/configuration/analytics/compliance');
-      if (resp.ok) setSummary(await resp.json());
-      else setError(true);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+  const { data: summary, isLoading, isError } = useQuery({
+    queryKey: ['parameter-compliance-summary'],
+    queryFn: configurationApi.getParameterComplianceSummary,
+  });
+
+  const handleRefresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ['parameter-compliance-summary'] });
   };
-
-  useEffect(() => { void fetchSummary(); }, []);
 
   const getComplianceColor = (pct: number) => {
     if (pct >= 95) return 'text-green-400';
     if (pct >= 80) return 'text-amber-400';
     return 'text-red-400';
   };
+
+  if (isLoading) return <PageLoadingState />;
 
   return (
     <PageContainer>
@@ -75,7 +47,7 @@ export function ParameterComplianceDashboardPage() {
         icon={<ShieldCheck size={24} />}
         actions={
           <button
-            onClick={() => void fetchSummary()}
+            onClick={handleRefresh}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm"
           >
             <RefreshCw size={14} />
@@ -84,17 +56,9 @@ export function ParameterComplianceDashboardPage() {
         }
       />
 
-      {loading && (
-        <div className="text-center py-12 text-slate-400">
-          {t('phase5.compliance.loading', 'Loading compliance summary...')}
-        </div>
-      )}
+      {isError && <PageErrorState />}
 
-      {!loading && error && (
-        <PageErrorState />
-      )}
-
-      {!loading && !error && summary && (
+      {!isError && summary && (
         <>
           {/* Compliance Score Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">

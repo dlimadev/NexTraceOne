@@ -43,14 +43,6 @@ const BRANDING_FIELDS: BrandingField[] = [
   // Identity
   { key: 'instance.name', type: 'text', icon: <Globe size={16} />, section: 'identity' },
   { key: 'instance.commercial_name', type: 'text', icon: <Globe size={16} />, section: 'identity' },
-  // Visual
-  { key: 'branding.logo_url', type: 'url', icon: <Image size={16} />, section: 'visual' },
-  { key: 'branding.logo_dark_url', type: 'url', icon: <Image size={16} />, section: 'visual' },
-  { key: 'branding.accent_color', type: 'color', icon: <Palette size={16} />, section: 'visual' },
-  { key: 'branding.favicon_url', type: 'url', icon: <Image size={16} />, section: 'visual' },
-  // Content
-  { key: 'branding.welcome_message', type: 'textarea', icon: <Type size={16} />, section: 'content' },
-  { key: 'branding.footer_text', type: 'textarea', icon: <Type size={16} />, section: 'content' },
   // Login Page
   { key: 'branding.login_logo_url', type: 'url', icon: <Image size={16} />, section: 'login' },
   { key: 'branding.login_heading', type: 'text', icon: <Type size={16} />, section: 'login' },
@@ -147,16 +139,10 @@ export function BrandingAdminPage() {
   if (isError) return <PageContainer><PageErrorState /></PageContainer>;
 
   const identityFields = BRANDING_FIELDS.filter((f) => f.section === 'identity');
-  const visualFields = BRANDING_FIELDS.filter((f) => f.section === 'visual');
-  const contentFields = BRANDING_FIELDS.filter((f) => f.section === 'content');
   const loginFields = BRANDING_FIELDS.filter((f) => f.section === 'login');
   const protectionFields = BRANDING_FIELDS.filter((f) => f.section === 'protection');
   const linkFields = BRANDING_FIELDS.filter((f) => f.section === 'links');
 
-  const accentColor = values['branding.accent_color'] || '#3B82F6';
-  const logoUrl = previewTheme === 'dark'
-    ? (values['branding.logo_dark_url'] || values['branding.logo_url'])
-    : values['branding.logo_url'];
   const loginLogoUrl = values['branding.login_logo_url'];
 
   return (
@@ -177,7 +163,7 @@ export function BrandingAdminPage() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
-        {/* Column 1: Identity, Visual, Content, Login, Protection, Links */}
+        {/* Column 1: Identity, Login, Protection, Links */}
         <div className="xl:col-span-2 space-y-6">
           {/* Identity Section */}
           <Card>
@@ -188,50 +174,6 @@ export function BrandingAdminPage() {
             <CardBody>
               <div className="space-y-4">
                 {identityFields.map((field) => (
-                  <BrandingFieldEditor
-                    key={field.key}
-                    field={field}
-                    value={values[field.key] ?? ''}
-                    onChange={handleChange}
-                    onReset={handleReset}
-                    t={t}
-                  />
-                ))}
-              </div>
-            </CardBody>
-          </Card>
-
-          {/* Visual Section */}
-          <Card>
-            <CardHeader className="flex items-center gap-2">
-              <Palette size={18} />
-              <span>{t('branding.admin.visual.title')}</span>
-            </CardHeader>
-            <CardBody>
-              <div className="space-y-4">
-                {visualFields.map((field) => (
-                  <BrandingFieldEditor
-                    key={field.key}
-                    field={field}
-                    value={values[field.key] ?? ''}
-                    onChange={handleChange}
-                    onReset={handleReset}
-                    t={t}
-                  />
-                ))}
-              </div>
-            </CardBody>
-          </Card>
-
-          {/* Content Section */}
-          <Card>
-            <CardHeader className="flex items-center gap-2">
-              <Type size={18} />
-              <span>{t('branding.admin.content.title')}</span>
-            </CardHeader>
-            <CardBody>
-              <div className="space-y-4">
-                {contentFields.map((field) => (
                   <BrandingFieldEditor
                     key={field.key}
                     field={field}
@@ -360,70 +302,32 @@ export function BrandingAdminPage() {
                     background: previewTheme === 'dark' ? '#0F1E38' : '#FFFFFF',
                   }}
                 >
-                  {logoUrl ? (
-                    <img
-                      src={logoUrl}
-                      alt="Logo preview"
-                      className="h-6 w-auto max-w-[120px] object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="flex items-center gap-1.5">
-                      <Monitor size={16} style={{ color: accentColor }} />
-                      <span className="text-xs font-bold">
-                        {values['instance.name'] || 'NexTraceOne'}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    <Monitor size={16} className="text-accent" />
+                    <span className="text-xs font-bold">
+                      {values['instance.name'] || 'NexTraceOne'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Mini content area */}
                 <div className="p-4 space-y-3">
-                  {/* Welcome message preview */}
-                  {values['branding.welcome_message'] && (
-                    <div
-                      className="rounded-md px-3 py-2 text-xs"
-                      style={{
-                        background: `${accentColor}15`,
-                        borderLeft: `3px solid ${accentColor}`,
-                      }}
-                    >
-                      {values['branding.welcome_message']}
-                    </div>
-                  )}
-
                   {/* Accent color button preview */}
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      className="px-3 py-1.5 rounded-md text-xs text-white font-medium"
-                      style={{ background: accentColor }}
+                      className="px-3 py-1.5 rounded-md text-xs text-white font-medium bg-accent"
                       disabled
                     >
                       {t('branding.admin.preview.primaryButton')}
                     </button>
                     <button
                       type="button"
-                      className="px-3 py-1.5 rounded-md text-xs font-medium border"
-                      style={{
-                        borderColor: accentColor,
-                        color: accentColor,
-                      }}
+                      className="px-3 py-1.5 rounded-md text-xs font-medium border border-accent text-accent"
                       disabled
                     >
                       {t('branding.admin.preview.secondaryButton')}
                     </button>
-                  </div>
-
-                  {/* Accent color swatch */}
-                  <div className="flex items-center gap-2 text-[10px] opacity-70">
-                    <div
-                      className="w-4 h-4 rounded-full border border-edge"
-                      style={{ background: accentColor }}
-                    />
-                    {accentColor}
                   </div>
                 </div>
 
@@ -435,7 +339,7 @@ export function BrandingAdminPage() {
                   }}
                 >
                   <span className="flex-1 text-center">
-                    {values['branding.footer_text'] || t('footer.default', { name: values['instance.name'] || 'NexTraceOne' })}
+                    {t('footer.default', { name: values['instance.name'] || 'NexTraceOne' })}
                   </span>
                   {(values['branding.powered_by_visible'] ?? 'true') !== 'false' && (
                     <span className="text-[9px] opacity-50 shrink-0 ml-2">Powered by NexTraceOne</span>
@@ -507,8 +411,7 @@ export function BrandingAdminPage() {
                       style={{ borderColor: previewTheme === 'dark' ? 'rgba(129,170,214,0.2)' : 'rgba(15,23,42,0.15)' }}
                     />
                     <div
-                      className="h-7 rounded-md w-full text-center text-[10px] text-white font-medium flex items-center justify-center"
-                      style={{ background: accentColor }}
+                      className="h-7 rounded-md w-full text-center text-[10px] text-white font-medium flex items-center justify-center bg-accent"
                     >
                       Sign In
                     </div>

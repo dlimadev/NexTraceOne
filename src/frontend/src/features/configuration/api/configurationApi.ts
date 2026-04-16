@@ -14,6 +14,8 @@ import type {
   FeatureFlagEntryDto,
   EvaluatedFeatureFlagDto,
   SetFeatureFlagOverrideRequest,
+  ParameterUsageReportDto,
+  ParameterComplianceSummaryDto,
 } from '../types';
 
 export const configurationApi = {
@@ -192,5 +194,21 @@ export const configurationApi = {
       `/configuration/flags/${encodeURIComponent(key)}/override`,
       { params },
     );
+  },
+
+  // ── Analytics ──────────────────────────────────────────────────────────
+
+  getParameterUsageReport: async (): Promise<ParameterUsageReportDto> => {
+    const { data } = await apiClient.get<ParameterUsageReportDto>(
+      '/configuration/analytics/usage',
+    );
+    return data;
+  },
+
+  getParameterComplianceSummary: async (): Promise<ParameterComplianceSummaryDto> => {
+    const { data } = await apiClient.get<ParameterComplianceSummaryDto>(
+      '/configuration/analytics/compliance',
+    );
+    return data;
   },
 };

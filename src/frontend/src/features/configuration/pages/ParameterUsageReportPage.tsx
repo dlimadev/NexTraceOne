@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
 import {
   BarChart3, PieChart, Activity, TrendingUp, Settings, Layers, RefreshCw,
 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageHeader } from '../../../components/PageHeader';
+import { configurationApi } from '../api/configurationApi';
 
 /**
  * ParameterUsageReportPage — relatório de utilização de parâmetros de configuração.
@@ -16,50 +18,20 @@ import { PageHeader } from '../../../components/PageHeader';
  * Persona: Platform Admin, Tech Lead, Auditor.
  */
 
-interface ParameterOverrideSummary {
-  key: string;
-  displayName: string;
-  overrideCount: number;
-  lastChangedAt: string | null;
-}
-
-interface ScopeDistribution {
-  scope: string;
-  count: number;
-}
-
-interface UsageReport {
-  totalDefinitions: number;
-  totalOverrides: number;
-  definitionsWithOverrides: number;
-  definitionsUsingDefault: number;
-  overrideCoveragePercent: number;
-  mostOverridden: ParameterOverrideSummary[];
-  recentlyChanged: ParameterOverrideSummary[];
-  overridesByScope: ScopeDistribution[];
-}
-
 export function ParameterUsageReportPage() {
   const { t } = useTranslation();
-  const [report, setReport] = useState<UsageReport | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchReport = async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const resp = await fetch('/api/v1/configuration/analytics/usage');
-      if (resp.ok) setReport(await resp.json());
-      else setError(true);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+  const { data: report, isLoading, isError } = useQuery({
+    queryKey: ['parameter-usage-report'],
+    queryFn: configurationApi.getParameterUsageReport,
+  });
+
+  const handleRefresh = () => {
+    void queryClient.invalidateQueries({ queryKey: ['parameter-usage-report'] });
   };
 
-  useEffect(() => { void fetchReport(); }, []);
+  if (isLoading) return <PageLoadingState />;
 
   return (
     <PageContainer>
@@ -69,7 +41,7 @@ export function ParameterUsageReportPage() {
         icon={<BarChart3 size={24} />}
         actions={
           <button
-            onClick={() => void fetchReport()}
+            onClick={handleRefresh}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm"
           >
             <RefreshCw size={14} />
@@ -78,17 +50,9 @@ export function ParameterUsageReportPage() {
         }
       />
 
-      {loading && (
-        <div className="text-center py-12 text-slate-400">
-          {t('phase5.usage.loading', 'Loading usage report...')}
-        </div>
-      )}
+      {isError && <PageErrorState />}
 
-      {!loading && error && (
-        <PageErrorState />
-      )}
-
-      {!loading && !error && report && (
+      {!isError && report && (
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">

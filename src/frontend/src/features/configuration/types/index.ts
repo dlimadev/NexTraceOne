@@ -136,3 +136,51 @@ export interface SetFeatureFlagOverrideRequest {
   isEnabled: boolean;
   changeReason?: string;
 }
+
+// ── Analytics ──────────────────────────────────────────────────────────────
+
+export interface ParameterOverrideSummaryDto {
+  key: string;
+  displayName: string;
+  overrideCount: number;
+  lastChangedAt: string | null;
+}
+
+export interface ScopeDistributionDto {
+  scope: string;
+  count: number;
+}
+
+export interface ParameterUsageReportDto {
+  totalDefinitions: number;
+  totalOverrides: number;
+  definitionsWithOverrides: number;
+  definitionsUsingDefault: number;
+  overrideCoveragePercent: number;
+  mostOverridden: ParameterOverrideSummaryDto[];
+  recentlyChanged: ParameterOverrideSummaryDto[];
+  overridesByScope: ScopeDistributionDto[];
+}
+
+export interface CategoryComplianceDto {
+  category: string;
+  total: number;
+  withI18n: number;
+  deprecated: number;
+}
+
+export interface ParameterComplianceSummaryDto {
+  totalDefinitions: number;
+  withI18nKeys: number;
+  withoutI18nKeys: number;
+  i18nCoveragePercent: number;
+  deprecatedCount: number;
+  sensitiveCount: number;
+  withValidationRules: number;
+  withoutValidationRules: number;
+  validationCoveragePercent: number;
+  editableCount: number;
+  readOnlyCount: number;
+  byCategory: CategoryComplianceDto[];
+  deprecatedKeys: string[];
+}
