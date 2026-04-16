@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowUpCircle, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { ArrowUpCircle, CheckCircle, XCircle, Plus, ChevronDown, ChevronUp, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -48,12 +48,77 @@ function translateEnvironment(t: (key: string) => string, env: string): string {
   return translated === key ? env : translated;
 }
 
+// ─── Gate Evaluation Breakdown ───────────────────────────────────────────────
+
+function GateEvaluationBreakdown({
+  requestId,
+  onOverride,
+}: {
+  requestId: string;
+  onOverride: (evaluationId: string) => void;
+}) {
+  const { t } = useTranslation();
+  const { data, isLoading } = useQuery({
+    queryKey: ['gate-evaluations', requestId],
+    queryFn: () => promotionApi.getGateEvaluations(requestId),
+    staleTime: 15_000,
+  });
+
+  if (isLoading) return <p className="text-xs text-muted py-2">{t('common.loading')}</p>;
+  if (!data || data.evaluations.length === 0) {
+    return <p className="text-xs text-muted py-2">{t('promotion.noGateEvaluations')}</p>;
+  }
+
+  return (
+    <ul className="mt-2 space-y-2">
+      {data.evaluations.map((ev) => (
+        <li
+          key={ev.evaluationId}
+          className="p-3 rounded-md border border-edge bg-elevated flex items-start gap-3"
+        >
+          {ev.passed ? (
+            <CheckCircle size={14} className="text-success mt-0.5 shrink-0" />
+          ) : (
+            <XCircle size={14} className="text-critical mt-0.5 shrink-0" />
+          )}
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-muted">{ev.gateId.slice(0, 8)}…</span>
+              <span className="text-xs text-body">{ev.evaluatedBy}</span>
+              <span className="text-xs text-faded">{new Date(ev.evaluatedAt).toLocaleString()}</span>
+            </div>
+            {ev.details && <p className="text-xs text-body mt-0.5">{ev.details}</p>}
+            {ev.overrideJustification && (
+              <p className="text-xs text-warning mt-0.5">
+                <ShieldAlert size={10} className="inline mr-1" />
+                {t('promotion.overrideWith')}: {ev.overrideJustification}
+              </p>
+            )}
+          </div>
+          {!ev.passed && !ev.overrideJustification && (
+            <button
+              type="button"
+              onClick={() => onOverride(ev.evaluationId)}
+              className="text-xs text-accent hover:underline shrink-0"
+            >
+              {t('promotion.override')}
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function PromotionPage() {
   const { t } = useTranslation();
   const { availableEnvironments } = useEnvironment();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CreateForm>(emptyForm);
+  const [expandedGates, setExpandedGates] = useState<Set<string>>(new Set());
+  const [overrideTarget, setOverrideTarget] = useState<{ evaluationId: string; requestId: string } | null>(null);
+  const [overrideJustification, setOverrideJustification] = useState('');
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['promotion', 'requests'],
@@ -88,6 +153,31 @@ export function PromotionPage() {
       promotionApi.reject(id, reason),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['promotion'] }),
   });
+
+  const overrideMutation = useMutation({
+    mutationFn: ({ gateEvaluationId, justification }: { gateEvaluationId: string; justification: string }) =>
+      promotionApi.overrideGate(gateEvaluationId, justification),
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['promotion'] });
+      if (overrideTarget) {
+        queryClient.invalidateQueries({ queryKey: ['gate-evaluations', overrideTarget.requestId] });
+      }
+      setOverrideTarget(null);
+      setOverrideJustification('');
+    },
+  });
+
+  const toggleGates = (requestId: string) => {
+    setExpandedGates((prev) => {
+      const next = new Set(prev);
+      if (next.has(requestId)) {
+        next.delete(requestId);
+      } else {
+        next.add(requestId);
+      }
+      return next;
+    });
+  };
 
   const requests = useMemo(() => data?.items ?? [], [data?.items]);
   const pending = requests.filter((r) => r.status === 'Pending' || r.status === 'Approved');
@@ -275,24 +365,43 @@ export function PromotionPage() {
                       </Button>
                     </div>
                   </div>
-                  {/* Gate results */}
-                  {req.gateResults.length > 0 && (
-                    <ul className="mt-3 space-y-1">
-                      {req.gateResults.map((gate) => (
-                        <li key={gate.gateName} className="flex items-center gap-2">
-                          {gate.passed ? (
-                            <CheckCircle size={12} className="text-success shrink-0" />
-                          ) : (
-                            <XCircle size={12} className="text-critical shrink-0" />
-                          )}
-                          <span className="text-xs text-body">{gate.gateName}</span>
-                          {gate.message && (
-                            <span className="text-xs text-muted">— {gate.message}</span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  {/* Gate results summary + expand for detailed breakdown */}
+                  <div className="mt-3">
+                    {req.gateResults.length > 0 && (
+                      <ul className="space-y-1 mb-2">
+                        {req.gateResults.map((gate) => (
+                          <li key={gate.gateName} className="flex items-center gap-2">
+                            {gate.passed ? (
+                              <CheckCircle size={12} className="text-success shrink-0" />
+                            ) : (
+                              <XCircle size={12} className="text-critical shrink-0" />
+                            )}
+                            <span className="text-xs text-body">{gate.gateName}</span>
+                            {gate.message && (
+                              <span className="text-xs text-muted">— {gate.message}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => toggleGates(req.id)}
+                      className="flex items-center gap-1 text-xs text-accent hover:underline"
+                    >
+                      {expandedGates.has(req.id) ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                      {expandedGates.has(req.id) ? t('promotion.hideGateDetails') : t('promotion.showGateDetails')}
+                    </button>
+                    {expandedGates.has(req.id) && (
+                      <GateEvaluationBreakdown
+                        requestId={req.id}
+                        onOverride={(evalId) => {
+                          setOverrideTarget({ evaluationId: evalId, requestId: req.id });
+                          setOverrideJustification('');
+                        }}
+                      />
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
@@ -359,6 +468,46 @@ export function PromotionPage() {
           )}
         </div>
       </Card>
+
+      {/* Override Gate Dialog */}
+      {overrideTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-canvas rounded-lg border border-edge shadow-xl p-6 w-full max-w-md">
+            <h2 className="text-base font-semibold text-heading mb-1">
+              {t('promotion.overrideGateTitle')}
+            </h2>
+            <p className="text-xs text-muted mb-4">{t('promotion.overrideGateSubtitle')}</p>
+            <textarea
+              value={overrideJustification}
+              onChange={(e) => setOverrideJustification(e.target.value)}
+              rows={4}
+              placeholder={t('promotion.overrideJustificationPlaceholder')}
+              className="w-full rounded-md bg-elevated border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent mb-4 resize-none"
+            />
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => { setOverrideTarget(null); setOverrideJustification(''); }}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                variant="danger"
+                loading={overrideMutation.isPending}
+                disabled={!overrideJustification.trim()}
+                onClick={() =>
+                  overrideMutation.mutate({
+                    gateEvaluationId: overrideTarget.evaluationId,
+                    justification: overrideJustification,
+                  })
+                }
+              >
+                {t('promotion.confirmOverride')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageContainer>
   );
 }

@@ -56,4 +56,8 @@ public static class ChangeIntelligenceErrors
     /// <summary>Já existem release notes para esta release.</summary>
     public static Error ReleaseNotesAlreadyExist(string releaseId)
         => Error.Conflict("ChangeIntelligence.ReleaseNotes.AlreadyExist", "Release notes already exist for release '{0}'.", releaseId);
+
+    /// <summary>Avaliação de rollback não encontrada para a release informada.</summary>
+    public static Error RollbackAssessmentNotFound(string releaseId)
+        => Error.NotFound("ChangeIntelligence.RollbackAssessment.NotFound", "Rollback assessment for release '{0}' was not found.", releaseId);
 }

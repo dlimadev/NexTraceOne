@@ -27,6 +27,8 @@ import {
   ArrowRight,
   BarChart3,
   Clock,
+  Train,
+  MapPin,
 } from 'lucide-react';
 import { usePermissions } from '../hooks/usePermissions';
 import type { Permission } from '../auth/permissions';
@@ -66,6 +68,8 @@ const paletteItems: PaletteItem[] = [
   { id: 'releases', labelKey: 'sidebar.releases', to: '/releases', icon: <Zap size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:read' },
   { id: 'workflow', labelKey: 'sidebar.workflow', to: '/workflow', icon: <CheckSquare size={16} />, group: 'commandPalette.changes', permission: 'workflow:instances:read' },
   { id: 'promotion', labelKey: 'sidebar.promotion', to: '/promotion', icon: <ArrowUpCircle size={16} />, group: 'commandPalette.changes', permission: 'promotion:requests:read' },
+  { id: 'release-train', labelKey: 'sidebar.releaseTrain', to: '/release-train', icon: <Train size={16} />, group: 'commandPalette.changes', permission: 'change-intelligence:read' },
+  { id: 'release-checklist', labelKey: 'sidebar.releaseChecklist', to: '/workflow/checklist', icon: <MapPin size={16} />, group: 'commandPalette.changes', permission: 'workflow:instances:write' },
   // ── Operations ──
   { id: 'incidents', labelKey: 'sidebar.incidents', to: '/operations/incidents', icon: <AlertTriangle size={16} />, group: 'commandPalette.operations', permission: 'operations:incidents:read' },
   { id: 'incident-timeline', labelKey: 'sidebar.incidentTimeline', to: '/operations/incidents/timeline', icon: <Clock size={16} />, group: 'commandPalette.operations', permission: 'operations:incidents:read' },

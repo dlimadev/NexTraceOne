@@ -17,6 +17,7 @@ using NexTraceOne.ChangeGovernance.Application.Workflow.Features.InitiateWorkflo
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.ListPendingApprovals;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.RejectWorkflow;
 using NexTraceOne.ChangeGovernance.Application.Workflow.Features.RequestChanges;
+using NexTraceOne.ChangeGovernance.Application.Workflow.Features.RecordChecklistEvidence;
 
 namespace NexTraceOne.ChangeGovernance.Application.Workflow;
 
@@ -47,6 +48,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListPendingApprovals.Query>, ListPendingApprovals.Validator>();
         services.AddTransient<IValidator<GetEvidencePack.Query>, GetEvidencePack.Validator>();
         services.AddTransient<IValidator<ExportEvidencePackPdf.Query>, ExportEvidencePackPdf.Validator>();
+        services.AddTransient<IValidator<RecordChecklistEvidence.Command>, RecordChecklistEvidence.Validator>();
 
         return services;
     }

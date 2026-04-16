@@ -15,6 +15,8 @@ using ComputeChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.Chang
 using GetChangeScoreFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeScore.GetChangeScore;
 using AttachWorkItemContextFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AttachWorkItemContext.AttachWorkItemContext;
 using GetPreProductionComparisonFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPreProductionComparison.GetPreProductionComparison;
+using GetRiskScoreTrendFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRiskScoreTrend.GetRiskScoreTrend;
+using EvaluateReleaseTrainFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluateReleaseTrain.EvaluateReleaseTrain;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -116,5 +118,37 @@ internal static class AnalysisEndpoints
         .RequirePermission("change-intelligence:read")
         .WithName("GetPreProductionComparison")
         .WithSummary("Compare pre-production baseline metrics against production baseline before promoting a release");
+
+        // ── GET /api/v1/releases/risk-trend — Tendência de risk score por serviço (Gap 12) ───────
+        group.MapGet("/risk-trend", async (
+            string serviceName,
+            string? environment,
+            int? limit,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetRiskScoreTrendFeature.Query(serviceName, environment, limit),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("change-intelligence:read")
+        .WithName("GetRiskScoreTrend")
+        .WithSummary("Returns the time-series of risk scores for a given service, enabling trend visualisation");
+
+        // ── POST /api/v1/releases/train-evaluation — Avaliação de Release Train (Gap 1) ──────────
+        group.MapPost("/train-evaluation", async (
+            EvaluateReleaseTrainFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("change-intelligence:read")
+        .WithName("EvaluateReleaseTrain")
+        .WithSummary("Evaluates a multi-service Release Train: aggregates risk scores, blast radius and readiness signal");
     }
 }

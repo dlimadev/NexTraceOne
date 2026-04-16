@@ -211,4 +211,29 @@ export const configurationApi = {
     );
     return data;
   },
+
+  getReleaseParameterAudit: async (
+    keyPrefix: string,
+    limit?: number,
+  ): Promise<ConfigurationAuditEntryDto[]> => {
+    const params: Record<string, string | number> = { keyPrefix };
+    if (limit) {
+      params.limit = limit;
+    }
+    const { data } = await apiClient.get<ConfigurationAuditEntryDto[]>(
+      '/configuration/audit-history',
+      { params },
+    );
+    return data;
+  },
+
+  getReleaseParameterEnvironmentOverrides: async (
+    keyPrefix: string,
+  ): Promise<ConfigurationEntryDto[]> => {
+    const { data } = await apiClient.get<ConfigurationEntryDto[]>(
+      '/configuration/entries',
+      { params: { scope: 'Environment', keyPrefix } },
+    );
+    return data;
+  },
 };

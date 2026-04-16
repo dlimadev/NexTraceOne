@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using GetPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview.GetPostReleaseReview;
+using GetRollbackAssessmentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRollbackAssessment.GetRollbackAssessment;
 using RecordObservationMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordObservationMetrics.RecordObservationMetrics;
 using RegisterExternalMarkerFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterExternalMarker.RegisterExternalMarker;
 using GetChangeIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
@@ -14,6 +15,9 @@ using RecordReleaseBaselineFeature = NexTraceOne.ChangeGovernance.Application.Ch
 using StartPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.StartPostReleaseReview.StartPostReleaseReview;
 using ProgressPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ProgressPostReleaseReview.ProgressPostReleaseReview;
 using AssessRollbackViabilityFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.AssessRollbackViability.AssessRollbackViability;
+using GetReleaseNotesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleaseNotes.GetReleaseNotes;
+using GenerateReleaseNotesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GenerateReleaseNotes.GenerateReleaseNotes;
+using RegenerateReleaseNotesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegenerateReleaseNotes.RegenerateReleaseNotes;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -100,6 +104,16 @@ internal static class IntelligenceEndpoints
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:write");
 
+        group.MapGet("/{releaseId:guid}/rollback-assessment", async (
+            Guid releaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetRollbackAssessmentFeature.Query(releaseId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
         // ── Post-change verification endpoints (P5.5) ─────────────────────────
 
         group.MapPost("/{releaseId:guid}/observation-window", async (
@@ -123,5 +137,39 @@ internal static class IntelligenceEndpoints
             var result = await sender.Send(new GetPostReleaseReviewFeature.Query(releaseId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
+
+        // ── Release Notes endpoints (AI-assisted) ─────────────────────────────
+
+        group.MapGet("/{releaseId:guid}/notes", async (
+            Guid releaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetReleaseNotesFeature.Query(releaseId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read");
+
+        group.MapPost("/{releaseId:guid}/notes", async (
+            Guid releaseId,
+            GenerateReleaseNotesFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { ReleaseId = releaseId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/releases/{releaseId}/notes", localizer);
+        }).RequirePermission("change-intelligence:write");
+
+        group.MapPost("/{releaseId:guid}/notes/regenerate", async (
+            Guid releaseId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new RegenerateReleaseNotesFeature.Command(releaseId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:write");
     }
 }

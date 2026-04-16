@@ -24,6 +24,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { useAuth } from '../../../contexts/AuthContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
+import { changeIntelligenceApi } from '../api/changeIntelligence';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
 import { KnowledgeContextPanel } from '../../knowledge/components/KnowledgeContextPanel';
 import type { AdvisoryFactorDto, ChangeAdvisoryResponse, DecisionHistoryItemDto } from '../../../types';
@@ -141,6 +142,27 @@ export function ChangeDetailPage() {
     queryKey: ['change-decisions', changeId],
     queryFn: () => changeConfidenceApi.getDecisionHistory(changeId!),
     enabled: !!changeId,
+  });
+
+  const featureFlagsQuery = useQuery({
+    queryKey: ['change-feature-flags', changeId],
+    queryFn: () => changeConfidenceApi.getFeatureFlagAwareness(changeId!),
+    enabled: !!changeId,
+    retry: false,
+  });
+
+  const historicalPatternQuery = useQuery({
+    queryKey: ['change-historical-pattern', changeId],
+    queryFn: () => changeConfidenceApi.getHistoricalPattern(changeId!),
+    enabled: !!changeId,
+    retry: false,
+  });
+
+  const traceCorrelationsQuery = useQuery({
+    queryKey: ['change-traces', changeId],
+    queryFn: () => changeIntelligenceApi.getTraceCorrelations(changeId!),
+    enabled: !!changeId,
+    retry: false,
   });
 
   // ── Decision mutation ──
@@ -763,6 +785,170 @@ export function ChangeDetailPage() {
 
       {/* ── Quick Links ── */}
       <KnowledgeContextPanel targetType="Change" targetEntityId={changeId} />
+
+      {/* ── Feature Flag Awareness ── */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+            <span role="img" aria-label="flag">🚩</span>
+            {t('changeConfidence.detail.featureFlags')}
+          </h2>
+          <p className="text-xs text-muted mt-0.5">{t('changeConfidence.detail.featureFlagsSubtitle')}</p>
+        </CardHeader>
+        <CardBody>
+          {featureFlagsQuery.isLoading && <PageLoadingState />}
+          {featureFlagsQuery.isError && (
+            <p className="text-sm text-muted py-4">{t('changeConfidence.detail.featureFlagsUnavailable')}</p>
+          )}
+          {featureFlagsQuery.data && (
+            featureFlagsQuery.data.hasData ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-3 rounded-md bg-elevated border border-edge">
+                    <p className="text-lg font-bold text-heading">{featureFlagsQuery.data.activeFlagCount}</p>
+                    <p className="text-xs text-muted">{t('changeConfidence.detail.activeFlagCount')}</p>
+                  </div>
+                  <div className="text-center p-3 rounded-md bg-elevated border border-edge">
+                    <p className="text-lg font-bold text-critical">{featureFlagsQuery.data.criticalFlagCount}</p>
+                    <p className="text-xs text-muted">{t('changeConfidence.detail.criticalFlagCount')}</p>
+                  </div>
+                  <div className="text-center p-3 rounded-md bg-elevated border border-edge">
+                    <p className="text-lg font-bold text-info">{featureFlagsQuery.data.newFeatureFlagCount}</p>
+                    <p className="text-xs text-muted">{t('changeConfidence.detail.newFlagCount')}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 p-3 rounded-md bg-elevated border border-edge">
+                  <span className="text-xs font-semibold text-muted min-w-[80px]">{t('changeConfidence.detail.flagRiskLevel')}</span>
+                  <Badge variant={
+                    featureFlagsQuery.data.riskLevel === 'High' ? 'danger' :
+                    featureFlagsQuery.data.riskLevel === 'Medium' ? 'warning' :
+                    featureFlagsQuery.data.riskLevel === 'Low' ? 'info' : 'success'
+                  }>
+                    {featureFlagsQuery.data.riskLevel}
+                  </Badge>
+                  <p className="text-xs text-body">{featureFlagsQuery.data.riskRationale}</p>
+                </div>
+                {featureFlagsQuery.data.flagProvider && (
+                  <p className="text-xs text-muted">
+                    {t('changeConfidence.detail.flagProvider')}: {featureFlagsQuery.data.flagProvider}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted py-4">{t('changeConfidence.detail.noFeatureFlagData')}</p>
+            )
+          )}
+        </CardBody>
+      </Card>
+
+      {/* ── Historical Pattern Insight ── */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+            <History size={16} className="text-info" />
+            {t('changeConfidence.detail.historicalPattern')}
+          </h2>
+          <p className="text-xs text-muted mt-0.5">{t('changeConfidence.detail.historicalPatternSubtitle')}</p>
+        </CardHeader>
+        <CardBody>
+          {historicalPatternQuery.isLoading && <PageLoadingState />}
+          {historicalPatternQuery.isError && (
+            <p className="text-sm text-muted py-4">{t('changeConfidence.detail.historicalPatternUnavailable')}</p>
+          )}
+          {historicalPatternQuery.data && (
+            historicalPatternQuery.data.totalSamples >= 1 ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="text-center p-3 rounded-md bg-elevated border border-edge">
+                    <p className="text-lg font-bold text-heading">{historicalPatternQuery.data.totalSamples}</p>
+                    <p className="text-xs text-muted">{t('changeConfidence.detail.historicalSamples')}</p>
+                  </div>
+                  <div className="text-center p-3 rounded-md bg-elevated border border-edge">
+                    <p className="text-lg font-bold text-success">
+                      {(historicalPatternQuery.data.successRate * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-xs text-muted">{t('changeConfidence.detail.successRate')}</p>
+                  </div>
+                  <div className="text-center p-3 rounded-md bg-elevated border border-edge">
+                    <p className="text-lg font-bold text-warning">
+                      {(historicalPatternQuery.data.rollbackRate * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-xs text-muted">{t('changeConfidence.detail.rollbackRate')}</p>
+                  </div>
+                  <div className="text-center p-3 rounded-md bg-elevated border border-edge">
+                    <p className="text-lg font-bold text-critical">
+                      {(historicalPatternQuery.data.failureRate * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-xs text-muted">{t('changeConfidence.detail.failureRate')}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 p-3 rounded-md bg-elevated border border-edge">
+                  <span className="text-xs font-semibold text-muted min-w-[80px]">{t('changeConfidence.detail.patternRisk')}</span>
+                  <Badge variant={
+                    historicalPatternQuery.data.patternRisk === 'High' ? 'danger' :
+                    historicalPatternQuery.data.patternRisk === 'Moderate' ? 'warning' :
+                    historicalPatternQuery.data.patternRisk === 'Low' ? 'success' : 'default'
+                  }>
+                    {historicalPatternQuery.data.patternRisk}
+                  </Badge>
+                  <p className="text-xs text-body">{historicalPatternQuery.data.patternRationale}</p>
+                </div>
+                <p className="text-xs text-faded">
+                  {t('changeConfidence.detail.lookbackWindow')}: {historicalPatternQuery.data.lookbackDays} {t('common.days')} · {historicalPatternQuery.data.environment}
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted py-4">{t('changeConfidence.detail.noHistoricalData')}</p>
+            )
+          )}
+        </CardBody>
+      </Card>
+
+      {/* ── Trace Correlations ── */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+            <Link2 size={16} className="text-accent" />
+            {t('changeConfidence.detail.traceCorrelations')}
+          </h2>
+          <p className="text-xs text-muted mt-0.5">{t('changeConfidence.detail.traceCorrelationsSubtitle')}</p>
+        </CardHeader>
+        <CardBody>
+          {traceCorrelationsQuery.isLoading && <PageLoadingState />}
+          {traceCorrelationsQuery.isError && (
+            <p className="text-sm text-muted py-4">{t('changeConfidence.detail.traceCorrelationsUnavailable')}</p>
+          )}
+          {traceCorrelationsQuery.data && (
+            traceCorrelationsQuery.data.correlationCount > 0 ? (
+              <div className="space-y-2">
+                <p className="text-xs text-muted mb-3">
+                  {traceCorrelationsQuery.data.correlationCount} {t('changeConfidence.detail.traceCorrelationsFound')}
+                </p>
+                <ul className="space-y-1.5">
+                  {traceCorrelationsQuery.data.correlations.map((trace) => (
+                    <li
+                      key={trace.traceId}
+                      className="flex items-start gap-3 p-2.5 rounded-md bg-elevated border border-edge"
+                    >
+                      <code className="text-xs font-mono text-accent">{trace.traceId}</code>
+                      <div className="flex-1">
+                        {trace.description && (
+                          <p className="text-xs text-body">{trace.description}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-faded whitespace-nowrap">
+                        {new Date(trace.correlatedAt).toLocaleString()}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="text-sm text-muted py-4">{t('changeConfidence.detail.noTraceCorrelations')}</p>
+            )
+          )}
+        </CardBody>
+      </Card>
 
       {/* ── Quick Links ── */}
       <Card>

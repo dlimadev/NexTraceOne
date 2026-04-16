@@ -13,6 +13,7 @@ using NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetGateEvaluat
 using NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetPromotionStatus;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Features.OverrideGateWithJustification;
+using NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetEnvironmentPromotionPath;
 
 namespace NexTraceOne.ChangeGovernance.Application.Promotion;
 
@@ -39,6 +40,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetPromotionStatus.Query>, GetPromotionStatus.Validator>();
         services.AddTransient<IValidator<ListPromotionRequests.Query>, ListPromotionRequests.Validator>();
         services.AddTransient<IValidator<OverrideGateWithJustification.Command>, OverrideGateWithJustification.Validator>();
+        services.AddTransient<IValidator<GetEnvironmentPromotionPath.Query>, GetEnvironmentPromotionPath.Validator>();
 
         return services;
     }

@@ -14,6 +14,8 @@ const segmentLabels: Record<string, string> = {
   'releases': 'sidebar.changeIntelligence',
   'workflow': 'sidebar.workflow',
   'promotion': 'sidebar.promotion',
+  'release-train': 'sidebar.releaseTrain',
+  'checklist': 'sidebar.releaseChecklist',
   'operations': 'sidebar.operations',
   'incidents': 'sidebar.incidents',
   'runbooks': 'sidebar.runbooks',

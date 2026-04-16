@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.Governance.Application.Features.GetIngestedServices;
 using NexTraceOne.Governance.Application.Features.IngestOtelMetrics;
 
 namespace NexTraceOne.Governance.API.Endpoints;

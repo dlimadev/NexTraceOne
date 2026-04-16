@@ -67,6 +67,18 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Avaliações de gates de promoção persistidas no módulo ChangeIntelligence.</summary>
     public DbSet<PromotionGateEvaluation> PromotionGateEvaluations => Set<PromotionGateEvaluation>();
 
+    /// <summary>Commit pool — associações de commits ao ciclo de vida de releases.</summary>
+    public DbSet<CommitAssociation> CommitAssociations => Set<CommitAssociation>();
+
+    /// <summary>Associações de work items externos a releases.</summary>
+    public DbSet<WorkItemAssociation> WorkItemAssociations => Set<WorkItemAssociation>();
+
+    /// <summary>Pedidos de aprovação de releases — internos e externos (via webhook outbound/callback).</summary>
+    public DbSet<ReleaseApprovalRequest> ApprovalRequests => Set<ReleaseApprovalRequest>();
+
+    /// <summary>Políticas de aprovação de releases configuráveis por ambiente e serviço.</summary>
+    public DbSet<ReleaseApprovalPolicy> ApprovalPolicies => Set<ReleaseApprovalPolicy>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

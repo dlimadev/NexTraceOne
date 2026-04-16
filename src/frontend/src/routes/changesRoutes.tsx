@@ -13,6 +13,23 @@ const ChangeCatalogPage = lazy(() => import('../features/change-governance/pages
 const ChangeDetailPage = lazy(() => import('../features/change-governance/pages/ChangeDetailPage').then(m => ({ default: m.ChangeDetailPage })));
 const ReleaseCalendarPage = lazy(() => import('../features/change-governance/pages/ReleaseCalendarPage').then(m => ({ default: m.ReleaseCalendarPage })));
 const DoraMetricsPage = lazy(() => import('../features/change-governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
+const ChangeAdvisoryPage = lazy(() => import('../features/change-governance/pages/ChangeAdvisoryPage').then(m => ({ default: m.ChangeAdvisoryPage })));
+const ReleaseTrainPage = lazy(() => import('../features/change-governance/pages/ReleaseTrainPage').then(m => ({ default: m.ReleaseTrainPage })));
+const ReleaseChecklistExecutionPage = lazy(() => import('../features/change-governance/pages/ReleaseChecklistExecutionPage').then(m => ({ default: m.ReleaseChecklistExecutionPage })));
+const ReleaseCommitPoolPage = lazy(() => import('../features/change-governance/pages/ReleaseCommitPoolPage').then(m => ({ default: m.ReleaseCommitPoolPage })));
+const ReleaseApprovalGatewayPage = lazy(() => import('../features/change-governance/pages/ReleaseApprovalGatewayPage').then(m => ({ default: m.ReleaseApprovalGatewayPage })));
+const ReleaseImpactReportPage = lazy(() => import('../features/change-governance/pages/ReleaseImpactReportPage').then(m => ({ default: m.ReleaseImpactReportPage })));
+const ExternalReleaseIngestPage = lazy(() => import('../features/change-governance/pages/ExternalReleaseIngestPage').then(m => ({ default: m.ExternalReleaseIngestPage })));
+const ReleaseApprovalPoliciesPage = lazy(() => import('../features/change-governance/pages/ReleaseApprovalPoliciesPage').then(m => ({ default: m.ReleaseApprovalPoliciesPage })));
+const ReleaseControlParametersPage = lazy(() => import('../features/change-governance/pages/ReleaseControlParametersPage').then(m => ({ default: m.ReleaseControlParametersPage })));
+const PostReleaseReviewPage = lazy(() => import('../features/change-governance/pages/PostReleaseReviewPage').then(m => ({ default: m.PostReleaseReviewPage })));
+const ReleaseRollbackPage = lazy(() => import('../features/change-governance/pages/ReleaseRollbackPage').then(m => ({ default: m.ReleaseRollbackPage })));
+const ReleaseNotesPage = lazy(() => import('../features/change-governance/pages/ReleaseNotesPage').then(m => ({ default: m.ReleaseNotesPage })));
+const WorkflowConfigurationPage = lazy(() => import('../features/change-governance/pages/WorkflowConfigurationPage').then(m => ({ default: m.WorkflowConfigurationPage })));
+const EvidencePackViewerPage = lazy(() => import('../features/change-governance/pages/EvidencePackViewerPage').then(m => ({ default: m.EvidencePackViewerPage })));
+const ReleaseGatesDashboardPage = lazy(() => import('../features/change-governance/pages/ReleaseGatesDashboardPage').then(m => ({ default: m.ReleaseGatesDashboardPage })));
+const ReleaseParameterAuditPage = lazy(() => import('../features/change-governance/pages/ReleaseParameterAuditPage').then(m => ({ default: m.ReleaseParameterAuditPage })));
+const ReleaseParameterEnvironmentOverridePage = lazy(() => import('../features/change-governance/pages/ReleaseParameterEnvironmentOverridePage').then(m => ({ default: m.ReleaseParameterEnvironmentOverridePage })));
 
 export function ChangesRoutes() {
   return (
@@ -70,6 +87,142 @@ export function ChangesRoutes() {
         element={
           <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
             <DoraMetricsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/change-advisory"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ChangeAdvisoryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/release-train"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseTrainPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workflow/checklist"
+        element={
+          <ProtectedRoute permission="workflow:instances:write" redirectTo="/unauthorized">
+            <ReleaseChecklistExecutionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/commit-pool"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseCommitPoolPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/approval-gateway"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseApprovalGatewayPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/impact-report"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseImpactReportPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/ingest-external"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ExternalReleaseIngestPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/approval-policies"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseApprovalPoliciesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/control-parameters"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseControlParametersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/post-review"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <PostReleaseReviewPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/rollback"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseRollbackPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/notes"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseNotesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workflow/configuration"
+        element={
+          <ProtectedRoute permission="workflow:instances:write" redirectTo="/unauthorized">
+            <WorkflowConfigurationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/evidence-pack"
+        element={
+          <ProtectedRoute permission="workflow:instances:read" redirectTo="/unauthorized">
+            <EvidencePackViewerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/gates"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseGatesDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/parameter-audit"
+        element={
+          <ProtectedRoute permission="change-intelligence:read" redirectTo="/unauthorized">
+            <ReleaseParameterAuditPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/releases/parameter-overrides"
+        element={
+          <ProtectedRoute permission="change-intelligence:write" redirectTo="/unauthorized">
+            <ReleaseParameterEnvironmentOverridePage />
           </ProtectedRoute>
         }
       />

@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using AttachCiCdEvidenceFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.AttachCiCdEvidence.AttachCiCdEvidence;
+using RecordChecklistEvidenceFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.RecordChecklistEvidence.RecordChecklistEvidence;
 using GenerateEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GenerateEvidencePack.GenerateEvidencePack;
 using GetEvidencePackFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.GetEvidencePack.GetEvidencePack;
 using ExportEvidencePackPdfFeature = NexTraceOne.ChangeGovernance.Application.Workflow.Features.ExportEvidencePackPdf.ExportEvidencePackPdf;
@@ -64,6 +65,19 @@ internal static class EvidencePackEndpoints
         group.MapPost("/{instanceId:guid}/evidence-pack/cicd", async (
             Guid instanceId,
             AttachCiCdEvidenceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var updatedCommand = command with { WorkflowInstanceId = instanceId };
+            var result = await sender.Send(updatedCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("workflow:instances:write");
+
+        // ── Endpoint Checklist Evidence (Gap 11) ──────────────────────────────
+        group.MapPost("/{instanceId:guid}/evidence-pack/checklist", async (
+            Guid instanceId,
+            RecordChecklistEvidenceFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
