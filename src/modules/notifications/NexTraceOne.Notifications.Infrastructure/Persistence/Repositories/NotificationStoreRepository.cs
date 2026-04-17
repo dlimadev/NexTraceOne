@@ -65,6 +65,53 @@ internal sealed class NotificationStoreRepository(
                 cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Notification>> ListForEscalationAsync(
+        Guid tenantId,
+        DateTimeOffset olderThan,
+        IReadOnlyList<NotificationSeverity> severities,
+        int skip,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        var query = context.Notifications
+            .Where(n => !n.IsEscalated
+                     && severities.Contains(n.Severity)
+                     && (n.Status == NotificationStatus.Unread || n.Status == NotificationStatus.Read)
+                     && n.CreatedAt < olderThan
+                     && (n.SnoozedUntil == null || n.SnoozedUntil <= DateTimeOffset.UtcNow));
+
+        if (tenantId != Guid.Empty)
+            query = query.Where(n => n.TenantId == tenantId);
+
+        return await query
+            .OrderBy(n => n.CreatedAt)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Notification>> ListForDigestAsync(
+        Guid tenantId,
+        DateTimeOffset since,
+        int skip,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        var query = context.Notifications
+            .Where(n => n.CreatedAt >= since
+                     && (n.Status == NotificationStatus.Unread || n.Status == NotificationStatus.Read)
+                     && (n.Severity == NotificationSeverity.Info || n.Severity == NotificationSeverity.ActionRequired));
+
+        if (tenantId != Guid.Empty)
+            query = query.Where(n => n.TenantId == tenantId);
+
+        return await query
+            .OrderByDescending(n => n.CreatedAt)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task SaveChangesAsync(CancellationToken cancellationToken)
         => context.SaveChangesAsync(cancellationToken);
 }

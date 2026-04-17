@@ -93,7 +93,13 @@ public static class ListNotifications
                     n.ActionUrl,
                     n.RequiresAction,
                     n.CreatedAt,
-                    n.ReadAt))
+                    n.ReadAt,
+                    n.AcknowledgedAt,
+                    n.ArchivedAt,
+                    n.SnoozedUntil,
+                    n.IsEscalated,
+                    n.OccurrenceCount,
+                    n.EnvironmentId))
                 .ToList();
 
             return new Response(dtos, hasMore);
@@ -117,5 +123,11 @@ public static class ListNotifications
         string? ActionUrl,
         bool RequiresAction,
         DateTimeOffset CreatedAt,
-        DateTimeOffset? ReadAt);
+        DateTimeOffset? ReadAt,
+        DateTimeOffset? AcknowledgedAt,
+        DateTimeOffset? ArchivedAt,
+        DateTimeOffset? SnoozedUntil,
+        bool IsEscalated,
+        int OccurrenceCount,
+        Guid? EnvironmentId);
 }

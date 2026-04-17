@@ -141,7 +141,7 @@ internal sealed class EmailNotificationDispatcher(
                     persistedConfig.FromAddress,
                     persistedConfig.FromName,
                     persistedConfig.Username,
-                    persistedConfig.EncryptedPassword, // NOTE: P7.3 — decrypt before use
+                    persistedConfig.EncryptedPassword, // EF Core decripta automaticamente via [EncryptedField]
                     persistedConfig.BaseUrl,
                     true
                 );

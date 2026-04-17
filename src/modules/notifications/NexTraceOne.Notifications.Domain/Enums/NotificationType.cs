@@ -47,6 +47,15 @@ public static class NotificationType
     public const string SyncFailed = "SyncFailed";
     public const string ConnectorAuthFailed = "ConnectorAuthFailed";
 
+    // ── Change Intelligence / Production Change Confidence ──
+    public const string PromotionCompleted = "PromotionCompleted";
+    public const string PromotionBlocked = "PromotionBlocked";
+    public const string RollbackTriggered = "RollbackTriggered";
+    public const string DeploymentCompleted = "DeploymentCompleted";
+    public const string ChangeConfidenceScored = "ChangeConfidenceScored";
+    public const string BlastRadiusHigh = "BlastRadiusHigh";
+    public const string PostChangeVerificationFailed = "PostChangeVerificationFailed";
+
     // ── AI / Plataforma ──
     public const string AiProviderUnavailable = "AiProviderUnavailable";
     public const string TokenBudgetExceeded = "TokenBudgetExceeded";
@@ -87,7 +96,14 @@ public static class NotificationType
         AiProviderUnavailable,
         TokenBudgetExceeded,
         AiGenerationFailed,
-        AiActionBlockedByPolicy
+        AiActionBlockedByPolicy,
+        PromotionCompleted,
+        PromotionBlocked,
+        RollbackTriggered,
+        DeploymentCompleted,
+        ChangeConfidenceScored,
+        BlastRadiusHigh,
+        PostChangeVerificationFailed
     ];
 
     /// <summary>

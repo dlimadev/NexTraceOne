@@ -32,6 +32,32 @@ public interface INotificationStore
     /// <summary>Marca todas as notificações não lidas de um utilizador como lidas.</summary>
     Task MarkAllAsReadAsync(Guid recipientUserId, CancellationToken cancellationToken = default);
 
+    /// <summary>Lista notificações não lidas/não tratadas elegíveis para escalação.</summary>
+    /// <param name="tenantId">Tenant ao qual as notificações pertencem.</param>
+    /// <param name="olderThan">Retornar apenas notificações criadas antes desta data.</param>
+    /// <param name="severities">Severidades alvo para escalação (Critical, ActionRequired).</param>
+    /// <param name="skip">Offset de paginação.</param>
+    /// <param name="take">Número máximo de resultados.</param>
+    Task<IReadOnlyList<Notification>> ListForEscalationAsync(
+        Guid tenantId,
+        DateTimeOffset olderThan,
+        IReadOnlyList<NotificationSeverity> severities,
+        int skip = 0,
+        int take = 100,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Lista notificações não lidas de um tenant num intervalo de tempo, elegíveis para digest.</summary>
+    /// <param name="tenantId">Tenant alvo.</param>
+    /// <param name="since">Retornar apenas notificações criadas desde esta data.</param>
+    /// <param name="skip">Offset de paginação.</param>
+    /// <param name="take">Número máximo de resultados.</param>
+    Task<IReadOnlyList<Notification>> ListForDigestAsync(
+        Guid tenantId,
+        DateTimeOffset since,
+        int skip = 0,
+        int take = 500,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Persiste alterações realizadas na entidade.</summary>
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

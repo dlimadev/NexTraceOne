@@ -4,9 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Engine;
+using NexTraceOne.Notifications.Application.Features.AcknowledgeNotification;
+using NexTraceOne.Notifications.Application.Features.ArchiveNotification;
+using NexTraceOne.Notifications.Application.Features.DismissNotification;
 using NexTraceOne.Notifications.Application.Features.ListNotifications;
 using NexTraceOne.Notifications.Application.Features.MarkNotificationRead;
 using NexTraceOne.Notifications.Application.Features.MarkNotificationUnread;
+using NexTraceOne.Notifications.Application.Features.SnoozeNotification;
 using NexTraceOne.Notifications.Application.Features.UpdatePreference;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 
@@ -29,6 +33,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<MarkNotificationRead.Command>, MarkNotificationRead.Validator>();
         services.AddTransient<IValidator<MarkNotificationUnread.Command>, MarkNotificationUnread.Validator>();
         services.AddTransient<IValidator<UpdatePreference.Command>, UpdatePreference.Validator>();
+        services.AddTransient<IValidator<AcknowledgeNotification.Command>, AcknowledgeNotification.Validator>();
+        services.AddTransient<IValidator<ArchiveNotification.Command>, ArchiveNotification.Validator>();
+        services.AddTransient<IValidator<DismissNotification.Command>, DismissNotification.Validator>();
+        services.AddTransient<IValidator<SnoozeNotification.Command>, SnoozeNotification.Validator>();
 
         // Engine de notificações — Fase 2
         services.AddScoped<INotificationOrchestrator, NotificationOrchestrator>();

@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
@@ -15,12 +17,15 @@ namespace NexTraceOne.Notifications.Application.Engine;
 /// para canais elegíveis (email, Teams) via IExternalDeliveryService.
 /// Ponto único de decisão — nenhum módulo deve criar notificações fora desta engine.
 /// P7.3: regista eventos auditáveis após criação de cada notificação.
+/// env.behavior: respeita <c>env.behavior.notifications.external_channels.enabled</c>
+/// e <c>env.behavior.notifications.minimum_severity</c> por ambiente.
 /// </summary>
 public sealed class NotificationOrchestrator(
     INotificationStore store,
     INotificationTemplateResolver templateResolver,
     INotificationDeduplicationService deduplicationService,
     INotificationAuditService notificationAuditService,
+    IEnvironmentBehaviorService environmentBehaviorService,
     IExternalDeliveryService? externalDeliveryService,
     ILogger<NotificationOrchestrator> logger) : INotificationOrchestrator
 {
@@ -54,6 +59,22 @@ public sealed class NotificationOrchestrator(
         // 3. Resolver template (título, mensagem, categoria, severidade)
         var parameters = ExtractParameters(request);
         var template = ResolveTemplate(request, parameters);
+
+        // 3a. Verificar severidade mínima por ambiente (env.behavior.notifications.minimum_severity)
+        var environmentId = request.EnvironmentId?.ToString();
+        var minSeverityInt = await environmentBehaviorService.GetIntAsync(
+            EnvironmentBehaviorConfigKeys.NotificationsMinimumSeverity,
+            environmentId,
+            defaultValue: 0,
+            cancellationToken);
+
+        if ((int)template.Severity < minSeverityInt)
+        {
+            logger.LogDebug(
+                "Notification {EventType} skipped: severity {Severity} below minimum {MinSeverity} for environment {EnvironmentId}.",
+                request.EventType, template.Severity, (NotificationSeverity)minSeverityInt, environmentId);
+            return new NotificationResult(false, "Notification severity below minimum threshold for this environment.");
+        }
 
         // 4. Criar notificações por destinatário com deduplicação
         var createdIds = new List<Guid>();
@@ -115,19 +136,34 @@ public sealed class NotificationOrchestrator(
                 cancellationToken);
 
             // 4d. Agendar entrega externa (email, Teams) se o serviço estiver disponível
+            // e se o env.behavior.notifications.external_channels.enabled o permitir
             if (externalDeliveryService is not null)
             {
-                try
+                var externalEnabled = await environmentBehaviorService.IsEnabledAsync(
+                    EnvironmentBehaviorConfigKeys.NotificationsExternalChannelsEnabled,
+                    environmentId,
+                    cancellationToken);
+
+                if (externalEnabled)
                 {
-                    await externalDeliveryService.ProcessExternalDeliveryAsync(notification, cancellationToken);
+                    try
+                    {
+                        await externalDeliveryService.ProcessExternalDeliveryAsync(notification, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(
+                            ex,
+                            "External delivery failed for notification {NotificationId}. Internal notification persisted.",
+                            notification.Id.Value);
+                        // Não falhar a notificação interna por causa de falha de entrega externa
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    logger.LogError(
-                        ex,
-                        "External delivery failed for notification {NotificationId}. Internal notification persisted.",
-                        notification.Id.Value);
-                    // Não falhar a notificação interna por causa de falha de entrega externa
+                    logger.LogDebug(
+                        "External delivery skipped for notification {NotificationId}: external channels disabled for environment {EnvironmentId}.",
+                        notification.Id.Value, environmentId);
                 }
             }
 

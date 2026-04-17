@@ -103,6 +103,9 @@ public static class DependencyInjection
         services.AddScoped<IExternalDeliveryService, ExternalDeliveryService>();
         // P7.2: Background retry job para deliveries agendados
         services.AddHostedService<NotificationDeliveryRetryJob>();
+        // Phase 6: Intelligence background jobs — escalação e digest
+        services.AddHostedService<NotificationEscalationScanJob>();
+        services.AddHostedService<NotificationDigestJob>();
 
         // Event Handlers — Fase 2: primeiros eventos automáticos de alto valor
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentNotificationHandler>();
