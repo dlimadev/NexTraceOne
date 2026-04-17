@@ -9,6 +9,10 @@ import {
   EyeOff,
   ExternalLink,
   Settings,
+  CheckCircle2,
+  Archive,
+  X,
+  Clock,
 } from 'lucide-react';
 import { PageContainer } from '../../../components/shell/PageContainer';
 import { PageHeader } from '../../../components/PageHeader';
@@ -21,6 +25,10 @@ import {
   useMarkAsRead,
   useMarkAsUnread,
   useMarkAllAsRead,
+  useAcknowledge,
+  useArchive,
+  useDismiss,
+  useSnooze,
 } from '../hooks/useNotifications';
 import {
   getCategoryKey,
@@ -54,6 +62,10 @@ export function NotificationCenterPage() {
   const markAsRead = useMarkAsRead();
   const markAsUnread = useMarkAsUnread();
   const markAllAsRead = useMarkAllAsRead();
+  const acknowledge = useAcknowledge();
+  const archive = useArchive();
+  const dismiss = useDismiss();
+  const snooze = useSnooze();
 
   const notifications = data?.items ?? [];
   const hasMore = data?.hasMore ?? false;
@@ -66,6 +78,11 @@ export function NotificationCenterPage() {
   const handleSeverityFilter = (filter: SeverityFilter) => {
     setSeverityFilter(filter);
     setPage(1);
+  };
+
+  const handleSnooze1h = (id: string) => {
+    const until = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    snooze.mutate({ id, snoozedUntil: until });
   };
 
   return (
@@ -199,18 +216,29 @@ export function NotificationCenterPage() {
           !isError &&
           notifications.map((n) => {
             const unread = isUnread(n);
+            const isAcknowledged = n.status === 'Acknowledged';
+            const isArchived = n.status === 'Archived';
+            const isDismissed = n.status === 'Dismissed';
+            const isSnoozed = n.snoozedUntil != null && new Date(n.snoozedUntil) > new Date();
+            const isClosed = isArchived || isDismissed;
+            const isEscalated = n.isEscalated;
+
             return (
               <div
                 key={n.id}
                 className={`flex items-start gap-4 rounded-lg border p-4 transition-all hover:border-edge-strong ${
-                  unread
+                  isClosed
+                    ? 'opacity-60 bg-card border-edge/30'
+                    : unread
                     ? 'bg-elevated border-edge shadow-surface'
                     : 'bg-card border-edge/50'
                 }`}
               >
-                {/* Severity dot */}
+                {/* Severity dot with escalation indicator */}
                 <span
-                  className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${getSeverityDotColor(n.severity)}`}
+                  className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${getSeverityDotColor(n.severity)} ${
+                    isEscalated ? 'ring-2 ring-red-500/60' : ''
+                  }`}
                   aria-hidden="true"
                 />
 
@@ -223,6 +251,21 @@ export function NotificationCenterPage() {
                       }`}
                     >
                       {n.title}
+                      {isEscalated && (
+                        <span className="ml-2 inline-flex items-center rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-red-400 border border-red-500/20">
+                          {t('notifications.escalated')}
+                        </span>
+                      )}
+                      {isSnoozed && (
+                        <span className="ml-2 inline-flex items-center rounded bg-yellow-500/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-yellow-400 border border-yellow-500/20">
+                          {t('notifications.snoozed')}
+                        </span>
+                      )}
+                      {n.occurrenceCount > 1 && (
+                        <span className="ml-2 inline-flex items-center rounded bg-panel px-1.5 py-0.5 text-[10px] font-medium text-muted border border-edge">
+                          ×{n.occurrenceCount}
+                        </span>
+                      )}
                     </p>
                     <span className="shrink-0 text-xs text-muted">
                       {timeAgo(n.createdAt)}
@@ -246,12 +289,17 @@ export function NotificationCenterPage() {
                         {n.sourceModule}
                       </span>
                     )}
+                    {isAcknowledged && (
+                      <span className="text-[10px] text-emerald-400">
+                        {t('notifications.acknowledged')}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex shrink-0 items-center gap-1">
-                  {n.actionUrl && (
+                  {n.actionUrl && !isClosed && (
                     <button
                       type="button"
                       onClick={() => navigate(n.actionUrl!)}
@@ -261,7 +309,61 @@ export function NotificationCenterPage() {
                       <ExternalLink className="h-3.5 w-3.5" />
                     </button>
                   )}
-                  {unread ? (
+
+                  {/* Acknowledge — only for unread/read ActionRequired */}
+                  {!isClosed && !isAcknowledged && n.requiresAction && (
+                    <button
+                      type="button"
+                      onClick={() => acknowledge.mutate({ id: n.id })}
+                      disabled={acknowledge.isPending}
+                      className="p-1.5 rounded text-muted hover:text-emerald-400 hover:bg-hover transition-all disabled:opacity-50"
+                      title={t('notifications.acknowledge')}
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+
+                  {/* Snooze 1h */}
+                  {!isClosed && !isSnoozed && (
+                    <button
+                      type="button"
+                      onClick={() => handleSnooze1h(n.id)}
+                      disabled={snooze.isPending}
+                      className="p-1.5 rounded text-muted hover:text-yellow-400 hover:bg-hover transition-all disabled:opacity-50"
+                      title={t('notifications.snooze1h')}
+                    >
+                      <Clock className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+
+                  {/* Archive */}
+                  {!isClosed && !isDismissed && (
+                    <button
+                      type="button"
+                      onClick={() => archive.mutate(n.id)}
+                      disabled={archive.isPending}
+                      className="p-1.5 rounded text-muted hover:text-body hover:bg-hover transition-all disabled:opacity-50"
+                      title={t('notifications.archive')}
+                    >
+                      <Archive className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+
+                  {/* Dismiss — only for unread/read */}
+                  {(unread || n.status === 'Read') && (
+                    <button
+                      type="button"
+                      onClick={() => dismiss.mutate(n.id)}
+                      disabled={dismiss.isPending}
+                      className="p-1.5 rounded text-muted hover:text-red-400 hover:bg-hover transition-all disabled:opacity-50"
+                      title={t('notifications.dismiss')}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+
+                  {/* Read / Unread toggle */}
+                  {unread && !isClosed ? (
                     <button
                       type="button"
                       onClick={() => markAsRead.mutate(n.id)}
@@ -271,7 +373,7 @@ export function NotificationCenterPage() {
                     >
                       <Eye className="h-3.5 w-3.5" />
                     </button>
-                  ) : (
+                  ) : !isClosed && !isAcknowledged ? (
                     <button
                       type="button"
                       onClick={() => markAsUnread.mutate(n.id)}
@@ -281,7 +383,7 @@ export function NotificationCenterPage() {
                     >
                       <EyeOff className="h-3.5 w-3.5" />
                     </button>
-                  )}
+                  ) : null}
                 </div>
               </div>
             );
@@ -303,3 +405,4 @@ export function NotificationCenterPage() {
     </PageContainer>
   );
 }
+

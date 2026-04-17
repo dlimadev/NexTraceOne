@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Engine;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
@@ -14,6 +15,7 @@ public sealed class NotificationOrchestratorTests
     private readonly INotificationTemplateResolver _templateResolver = new NotificationTemplateResolver();
     private readonly INotificationDeduplicationService _dedup = Substitute.For<INotificationDeduplicationService>();
     private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
+    private readonly IEnvironmentBehaviorService _envBehavior = Substitute.For<IEnvironmentBehaviorService>();
     private readonly ILogger<NotificationOrchestrator> _logger = Substitute.For<ILogger<NotificationOrchestrator>>();
     private readonly NotificationOrchestrator _orchestrator;
 
@@ -24,7 +26,13 @@ public sealed class NotificationOrchestratorTests
             Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
-        _orchestrator = new NotificationOrchestrator(_store, _templateResolver, _dedup, _auditService, null, _logger);
+        // Fail-open: external channels enabled, minimum severity = 0 (all pass)
+        _envBehavior.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _envBehavior.GetIntAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(0);
+
+        _orchestrator = new NotificationOrchestrator(_store, _templateResolver, _dedup, _auditService, _envBehavior, null, _logger);
     }
 
     [Fact]

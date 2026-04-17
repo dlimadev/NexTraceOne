@@ -12,6 +12,10 @@ vi.mock('../../features/notifications/hooks/useNotifications', () => ({
   useMarkAsRead: vi.fn(),
   useMarkAsUnread: vi.fn(),
   useMarkAllAsRead: vi.fn(),
+  useAcknowledge: vi.fn(),
+  useArchive: vi.fn(),
+  useDismiss: vi.fn(),
+  useSnooze: vi.fn(),
 }));
 
 vi.mock('../../features/notifications/hooks/useNotificationHelpers', () => ({
@@ -31,6 +35,10 @@ import {
   useMarkAsRead,
   useMarkAsUnread,
   useMarkAllAsRead,
+  useAcknowledge,
+  useArchive,
+  useDismiss,
+  useSnooze,
 } from '../../features/notifications/hooks/useNotifications';
 
 const emptyData = { items: [], totalCount: 0, page: 1, pageSize: 20, hasMore: false };
@@ -58,6 +66,10 @@ describe('NotificationCenterPage', () => {
     vi.mocked(useMarkAsRead).mockReturnValue({ mutate: vi.fn(), isPending: false } as ReturnType<typeof useMarkAsRead>);
     vi.mocked(useMarkAsUnread).mockReturnValue({ mutate: vi.fn(), isPending: false } as ReturnType<typeof useMarkAsUnread>);
     vi.mocked(useMarkAllAsRead).mockReturnValue({ mutate: vi.fn(), isPending: false } as ReturnType<typeof useMarkAllAsRead>);
+    vi.mocked(useAcknowledge).mockReturnValue({ mutate: vi.fn(), isPending: false } as ReturnType<typeof useAcknowledge>);
+    vi.mocked(useArchive).mockReturnValue({ mutate: vi.fn(), isPending: false } as ReturnType<typeof useArchive>);
+    vi.mocked(useDismiss).mockReturnValue({ mutate: vi.fn(), isPending: false } as ReturnType<typeof useDismiss>);
+    vi.mocked(useSnooze).mockReturnValue({ mutate: vi.fn(), isPending: false } as ReturnType<typeof useSnooze>);
   });
 
   it('renders page title', () => {

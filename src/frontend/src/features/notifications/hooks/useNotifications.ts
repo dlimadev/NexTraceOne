@@ -69,3 +69,53 @@ export function useMarkAllAsRead() {
     },
   });
 }
+
+// ── Lifecycle mutations ─────────────────────────────────────────────────────
+
+export function useAcknowledge() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, comment }: { id: string; comment?: string }) =>
+      notificationsApi.acknowledge(id, comment),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
+    },
+  });
+}
+
+export function useArchive() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => notificationsApi.archive(id),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: notificationKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() }),
+      ]);
+    },
+  });
+}
+
+export function useDismiss() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => notificationsApi.dismiss(id),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: notificationKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount() }),
+      ]);
+    },
+  });
+}
+
+export function useSnooze() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, snoozedUntil }: { id: string; snoozedUntil: string }) =>
+      notificationsApi.snooze(id, snoozedUntil),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: notificationKeys.lists() });
+    },
+  });
+}

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Engine;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
@@ -16,6 +17,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
     private readonly INotificationDeduplicationService _dedup = Substitute.For<INotificationDeduplicationService>();
     private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
     private readonly IExternalDeliveryService _externalDelivery = Substitute.For<IExternalDeliveryService>();
+    private readonly IEnvironmentBehaviorService _envBehavior = Substitute.For<IEnvironmentBehaviorService>();
     private readonly ILogger<NotificationOrchestrator> _logger = Substitute.For<ILogger<NotificationOrchestrator>>();
 
     public OrchestratorExternalDeliveryIntegrationTests()
@@ -24,13 +26,19 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
             Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(false);
+
+        // Fail-open: external channels enabled, minimum severity = 0 (all pass)
+        _envBehavior.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _envBehavior.GetIntAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(0);
     }
 
     [Fact]
     public async Task ProcessAsync_WithExternalDeliveryService_TriggersExternalDelivery()
     {
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, _auditService, _externalDelivery, _logger);
+            _store, _templateResolver, _dedup, _auditService, _envBehavior, _externalDelivery, _logger);
 
         var request = new NotificationRequest
         {
@@ -54,7 +62,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
     public async Task ProcessAsync_WithoutExternalDeliveryService_StillSucceeds()
     {
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, _auditService, null, _logger);
+            _store, _templateResolver, _dedup, _auditService, _envBehavior, null, _logger);
 
         var request = new NotificationRequest
         {
@@ -82,7 +90,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
             .Returns<Task>(_ => throw new Exception("External delivery failed"));
 
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, _auditService, _externalDelivery, _logger);
+            _store, _templateResolver, _dedup, _auditService, _envBehavior, _externalDelivery, _logger);
 
         var request = new NotificationRequest
         {
@@ -108,7 +116,7 @@ public sealed class OrchestratorExternalDeliveryIntegrationTests
     public async Task ProcessAsync_MultipleRecipients_TriggersExternalDeliveryForEach()
     {
         var orchestrator = new NotificationOrchestrator(
-            _store, _templateResolver, _dedup, _auditService, _externalDelivery, _logger);
+            _store, _templateResolver, _dedup, _auditService, _envBehavior, _externalDelivery, _logger);
 
         var request = new NotificationRequest
         {

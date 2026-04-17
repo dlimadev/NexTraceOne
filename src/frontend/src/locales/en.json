@@ -7185,6 +7185,13 @@
     "markAllRead": "Mark all as read",
     "markRead": "Mark as read",
     "markUnread": "Mark as unread",
+    "acknowledge": "Acknowledge",
+    "archive": "Archive",
+    "dismiss": "Dismiss",
+    "snooze1h": "Snooze for 1 hour",
+    "acknowledged": "Acknowledged",
+    "snoozed": "Snoozed",
+    "escalated": "Escalated",
     "noNotifications": "No notifications",
     "noNotificationsDescription": "You're all caught up! New notifications will appear here.",
     "preferences": {

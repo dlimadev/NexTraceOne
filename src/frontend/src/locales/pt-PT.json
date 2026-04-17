@@ -7160,6 +7160,13 @@
     "markAllRead": "Marcar todas como lidas",
     "markRead": "Marcar como lida",
     "markUnread": "Marcar como não lida",
+    "acknowledge": "Reconhecer",
+    "archive": "Arquivar",
+    "dismiss": "Descartar",
+    "snooze1h": "Adiar por 1 hora",
+    "acknowledged": "Reconhecido",
+    "snoozed": "Adiado",
+    "escalated": "Escalado",
     "noNotifications": "Sem notificações",
     "noNotificationsDescription": "Está tudo em dia! Novas notificações aparecerão aqui.",
     "preferences": {

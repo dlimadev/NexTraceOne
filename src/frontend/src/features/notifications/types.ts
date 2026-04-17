@@ -12,6 +12,12 @@ export interface NotificationDto {
   requiresAction: boolean;
   createdAt: string;
   readAt: string | null;
+  acknowledgedAt: string | null;
+  archivedAt: string | null;
+  snoozedUntil: string | null;
+  isEscalated: boolean;
+  occurrenceCount: number;
+  environmentId: string | null;
 }
 
 export interface NotificationListResponse {

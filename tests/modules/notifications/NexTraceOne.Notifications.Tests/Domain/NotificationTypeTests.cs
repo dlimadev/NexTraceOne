@@ -7,7 +7,7 @@ public sealed class NotificationTypeTests
     [Fact]
     public void All_ShouldContainAllDeclaredTypes()
     {
-        NotificationType.All.Should().HaveCount(29);
+        NotificationType.All.Should().HaveCount(36);
     }
 
     [Theory]
@@ -40,6 +40,14 @@ public sealed class NotificationTypeTests
     [InlineData(NotificationType.TokenBudgetExceeded)]
     [InlineData(NotificationType.AiGenerationFailed)]
     [InlineData(NotificationType.AiActionBlockedByPolicy)]
+    // Change Intelligence types
+    [InlineData(NotificationType.PromotionCompleted)]
+    [InlineData(NotificationType.PromotionBlocked)]
+    [InlineData(NotificationType.RollbackTriggered)]
+    [InlineData(NotificationType.DeploymentCompleted)]
+    [InlineData(NotificationType.ChangeConfidenceScored)]
+    [InlineData(NotificationType.BlastRadiusHigh)]
+    [InlineData(NotificationType.PostChangeVerificationFailed)]
     public void IsValid_ShouldReturnTrue_ForCatalogTypes(string eventType)
     {
         NotificationType.IsValid(eventType).Should().BeTrue();

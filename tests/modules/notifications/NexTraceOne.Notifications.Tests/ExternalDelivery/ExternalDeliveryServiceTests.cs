@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
+using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Domain.Entities;
@@ -20,6 +21,7 @@ public sealed class ExternalDeliveryServiceTests
     private readonly INotificationChannelDispatcher _teamsDispatcher = Substitute.For<INotificationChannelDispatcher>();
     private readonly INotificationDeliveryStore _deliveryStore = Substitute.For<INotificationDeliveryStore>();
     private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
+    private readonly IEnvironmentBehaviorService _envBehavior = Substitute.For<IEnvironmentBehaviorService>();
     private readonly IOptions<DeliveryRetryOptions> _retryOptions;
     private readonly ILogger<ExternalDeliveryService> _logger =
         NullLoggerFactory.Instance.CreateLogger<ExternalDeliveryService>();
@@ -39,11 +41,16 @@ public sealed class ExternalDeliveryServiceTests
             BaseDelaySeconds = 0 // Zero delay in tests
         });
 
+        // Fail-open: external channels enabled
+        _envBehavior.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+
         _service = new ExternalDeliveryService(
             _routingEngine,
             [_emailDispatcher, _teamsDispatcher],
             _deliveryStore,
             _auditService,
+            _envBehavior,
             _retryOptions,
             _logger);
     }
