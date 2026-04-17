@@ -11486,5 +11486,13 @@
     "confirmRemoveDescription": "El parámetro volverá a su valor predeterminado de sistema o tenant para este entorno.",
     "saveSuccess": "Override guardado correctamente",
     "removeSuccess": "Override eliminado correctamente"
+  },
+  "platformAdmin": {
+    "demoSeed": "Semilla de Demostración",
+    "gracefulShutdown": "Apagado Controlado",
+    "sessionSecurity": "Seguridad de Sesión",
+    "rightsizing": "Dimensionamiento Correcto",
+    "observabilityMode": "Modo de Observabilidad",
+    "compliancePacks": "Paquetes de Conformidad"
   }
 }

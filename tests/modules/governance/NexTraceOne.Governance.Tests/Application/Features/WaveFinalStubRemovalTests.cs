@@ -55,7 +55,7 @@ public sealed class WaveFinalStubRemovalTests
         versionRepo.GetLatestByPackIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>()).Returns(version);
 
         var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command(
@@ -81,7 +81,7 @@ public sealed class WaveFinalStubRemovalTests
         var packRepo = Substitute.For<IGovernancePackRepository>();
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
         var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command("not-a-guid", "Team", "scope", "Advisory", "user@test.com");
@@ -101,7 +101,7 @@ public sealed class WaveFinalStubRemovalTests
 
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
         var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command(Guid.NewGuid().ToString(), "Team", "scope", "Advisory", "user@test.com");
@@ -124,7 +124,7 @@ public sealed class WaveFinalStubRemovalTests
             .Returns((GovernancePackVersion?)null);
 
         var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command(pack.Id.Value.ToString(), "Team", "scope", "Advisory", "user@test.com");
@@ -144,7 +144,7 @@ public sealed class WaveFinalStubRemovalTests
 
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
         var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command(
@@ -165,7 +165,7 @@ public sealed class WaveFinalStubRemovalTests
 
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
         var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command(
@@ -187,7 +187,7 @@ public sealed class WaveFinalStubRemovalTests
         packRepo.GetByIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>()).Returns(pack);
 
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new CreatePackVersion.Handler(packRepo, versionRepo, unitOfWork);
         var command = new CreatePackVersion.Command(
@@ -211,7 +211,7 @@ public sealed class WaveFinalStubRemovalTests
     {
         var packRepo = Substitute.For<IGovernancePackRepository>();
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new CreatePackVersion.Handler(packRepo, versionRepo, unitOfWork);
         var command = new CreatePackVersion.Command("not-a-guid", "1.0.0", "Advisory", null, "user@test.com");
@@ -230,7 +230,7 @@ public sealed class WaveFinalStubRemovalTests
             .Returns((GovernancePack?)null);
 
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new CreatePackVersion.Handler(packRepo, versionRepo, unitOfWork);
         var command = new CreatePackVersion.Command(Guid.NewGuid().ToString(), "1.0.0", "Advisory", null, "user@test.com");
@@ -249,7 +249,7 @@ public sealed class WaveFinalStubRemovalTests
         packRepo.GetByIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>()).Returns(pack);
 
         var versionRepo = Substitute.For<IGovernancePackVersionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new CreatePackVersion.Handler(packRepo, versionRepo, unitOfWork);
         var command = new CreatePackVersion.Command(pack.Id.Value.ToString(), "1.0.0", "InvalidMode", null, "user@test.com");

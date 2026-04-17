@@ -20,7 +20,7 @@ namespace NexTraceOne.Governance.Tests.Application.SecurityGate;
 public sealed class SecurityGateTests
 {
     private readonly ISecurityScanRepository _repo = Substitute.For<ISecurityScanRepository>();
-    private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _uow = Substitute.For<IGovernanceUnitOfWork>();
 
     // ── InternalSastScanner ───────────────────────────────────────────────
 

@@ -39,7 +39,7 @@ public sealed class WorkflowApplicationTests
     public async Task CreateWorkflowTemplate_Handle_WithValidCommand_ShouldCreateTemplate()
     {
         var repository = Substitute.For<IWorkflowTemplateRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
         var sut = new CreateWorkflowTemplateFeature.Handler(repository, unitOfWork, dateTimeProvider);
@@ -79,7 +79,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -117,7 +117,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         templateRepository.GetByIdAsync(Arg.Any<WorkflowTemplateId>(), Arg.Any<CancellationToken>())
@@ -149,7 +149,7 @@ public sealed class WorkflowApplicationTests
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -179,7 +179,7 @@ public sealed class WorkflowApplicationTests
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         stageRepository.GetByIdAsync(Arg.Any<WorkflowStageId>(), Arg.Any<CancellationToken>())
@@ -209,7 +209,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -282,7 +282,7 @@ public sealed class WorkflowApplicationTests
 
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -319,7 +319,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -366,7 +366,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
@@ -396,7 +396,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -430,7 +430,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var decisionRepository = Substitute.For<IApprovalDecisionRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
@@ -616,7 +616,7 @@ public sealed class WorkflowApplicationTests
 
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
 
         instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
             .Returns(instance);
@@ -649,7 +649,7 @@ public sealed class WorkflowApplicationTests
     {
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
 
         instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
             .Returns((WorkflowInstance?)null);
@@ -670,7 +670,7 @@ public sealed class WorkflowApplicationTests
         var instance = CreateInstance();
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var evidencePackRepository = Substitute.For<IEvidencePackRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
 
         instanceRepository.GetByIdAsync(Arg.Any<WorkflowInstanceId>(), Arg.Any<CancellationToken>())
             .Returns(instance);
@@ -699,7 +699,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var slaPolicyRepository = Substitute.For<ISlaPolicyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -735,7 +735,7 @@ public sealed class WorkflowApplicationTests
         var instanceRepository = Substitute.For<IWorkflowInstanceRepository>();
         var stageRepository = Substitute.For<IWorkflowStageRepository>();
         var slaPolicyRepository = Substitute.For<ISlaPolicyRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IWorkflowUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 

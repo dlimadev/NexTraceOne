@@ -20,7 +20,7 @@ public sealed class CostAttributionHandlerTests
 
     private readonly ICostAttributionRepository _repository =
         Substitute.For<ICostAttributionRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public CostAttributionHandlerTests()

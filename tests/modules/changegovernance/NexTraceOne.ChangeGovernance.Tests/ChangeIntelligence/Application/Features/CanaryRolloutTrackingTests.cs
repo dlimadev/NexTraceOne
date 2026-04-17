@@ -18,7 +18,7 @@ public sealed class CanaryRolloutTrackingTests
 
     private readonly IReleaseRepository _releaseRepo = Substitute.For<IReleaseRepository>();
     private readonly ICanaryRolloutRepository _canaryRepo = Substitute.For<ICanaryRolloutRepository>();
-    private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
+    private readonly IChangeIntelligenceUnitOfWork _uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     private static Release CreateRelease(string service = "svc-payments")

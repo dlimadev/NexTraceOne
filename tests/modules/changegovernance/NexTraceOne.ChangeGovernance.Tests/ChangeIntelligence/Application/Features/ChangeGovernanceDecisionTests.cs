@@ -162,7 +162,7 @@ public sealed class ChangeGovernanceDecisionTests
     {
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var changeEventRepo = Substitute.For<IChangeEventRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -190,7 +190,7 @@ public sealed class ChangeGovernanceDecisionTests
     {
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var changeEventRepo = Substitute.For<IChangeEventRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())

@@ -28,7 +28,7 @@ public sealed class RecordConfidenceEventTests
         var release = CreateRelease();
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var confRepo = Substitute.For<IChangeConfidenceEventRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -64,7 +64,7 @@ public sealed class RecordConfidenceEventTests
         var release = CreateRelease();
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var confRepo = Substitute.For<IChangeConfidenceEventRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         var previousEvent = ChangeConfidenceEvent.Create(
@@ -98,7 +98,7 @@ public sealed class RecordConfidenceEventTests
     {
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var confRepo = Substitute.For<IChangeConfidenceEventRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())

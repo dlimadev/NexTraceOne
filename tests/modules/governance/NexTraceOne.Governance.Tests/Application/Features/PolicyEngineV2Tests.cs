@@ -19,7 +19,7 @@ public sealed class PolicyEngineV2Tests
 
     private readonly IPolicyAsCodeRepository _policyRepo = Substitute.For<IPolicyAsCodeRepository>();
     private readonly IGovernanceWaiverRepository _waiverRepo = Substitute.For<IGovernanceWaiverRepository>();
-    private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
+    private readonly IUnitOfWork _uow = Substitute.For<IGovernanceUnitOfWork>();
     private readonly ICurrentTenant _tenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 

@@ -19,7 +19,7 @@ public sealed class ServiceMaturityHandlerTests
 
     private readonly IServiceMaturityAssessmentRepository _repository =
         Substitute.For<IServiceMaturityAssessmentRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public ServiceMaturityHandlerTests()

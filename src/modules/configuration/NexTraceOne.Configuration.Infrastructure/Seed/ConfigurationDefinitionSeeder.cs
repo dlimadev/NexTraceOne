@@ -6545,5 +6545,17 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             isInheritable: true,
             uiEditorType: "toggle",
             sortOrder: 9870),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.jobs.non_prod_scheduler.enabled",
+            displayName: "config.env.behavior.jobs.non_prod_scheduler.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.jobs.non_prod_scheduler.enabled.description",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9880),
     ];
 }

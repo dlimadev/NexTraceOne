@@ -17,7 +17,7 @@ public sealed class WaiverFeatureTests
     private readonly IGovernanceWaiverRepository _waiverRepository = Substitute.For<IGovernanceWaiverRepository>();
     private readonly IGovernancePackRepository _packRepository = Substitute.For<IGovernancePackRepository>();
     private readonly IGovernancePackVersionRepository _versionRepository = Substitute.For<IGovernancePackVersionRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     // ── CreateGovernanceWaiver ──
 

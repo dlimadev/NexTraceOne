@@ -114,7 +114,7 @@ public sealed class PostChangeVerificationTests
         var baselineRepo = Substitute.For<IReleaseBaselineRepository>();
         var windowRepo = Substitute.For<IObservationWindowRepository>();
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -155,7 +155,7 @@ public sealed class PostChangeVerificationTests
         var baselineRepo = Substitute.For<IReleaseBaselineRepository>();
         var windowRepo = Substitute.For<IObservationWindowRepository>();
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -193,7 +193,7 @@ public sealed class PostChangeVerificationTests
             Substitute.For<IObservationWindowRepository>(),
             Substitute.For<IPostReleaseReviewRepository>(),
             new PostChangeVerificationService(),
-            Substitute.For<IUnitOfWork>(),
+            Substitute.For<IChangeIntelligenceUnitOfWork>(),
             Substitute.For<IDateTimeProvider>());
 
         var result = await sut.Handle(
@@ -219,7 +219,7 @@ public sealed class PostChangeVerificationTests
             Substitute.For<IObservationWindowRepository>(),
             Substitute.For<IPostReleaseReviewRepository>(),
             new PostChangeVerificationService(),
-            Substitute.For<IUnitOfWork>(),
+            Substitute.For<IChangeIntelligenceUnitOfWork>(),
             Substitute.For<IDateTimeProvider>());
 
         var result = await sut.Handle(

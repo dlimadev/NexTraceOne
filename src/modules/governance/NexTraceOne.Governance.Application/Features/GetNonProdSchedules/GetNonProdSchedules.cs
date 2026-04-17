@@ -2,6 +2,7 @@ using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 
 namespace NexTraceOne.Governance.Application.Features.GetNonProdSchedules;
 
@@ -35,8 +36,8 @@ public static class GetNonProdSchedules
     {
         public async Task<Result<NonProdSchedulesResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var governanceWaiverEnabled = await behaviorService.IsEnabledAsync(
-                "env.behavior.jobs.governance_waiver_expiry.enabled", null, cancellationToken);
+            var nonProdSchedulerEnabled = await behaviorService.IsEnabledAsync(
+                EnvironmentBehaviorConfigKeys.JobsNonProdSchedulerEnabled, null, cancellationToken);
 
             var schedules = new List<NonProdScheduleDto>
             {
@@ -65,7 +66,7 @@ public static class GetNonProdSchedules
             var response = new NonProdSchedulesResponse(
                 Schedules: schedules,
                 TotalEstimatedSavingPercent: 36,
-                GovernanceWaiverExpiryEnabled: governanceWaiverEnabled,
+                GovernanceWaiverExpiryEnabled: nonProdSchedulerEnabled,
                 GeneratedAt: DateTimeOffset.UtcNow,
                 SimulatedNote: "Non-prod schedule data is in-memory. Real environment scheduling integration pending.");
 
