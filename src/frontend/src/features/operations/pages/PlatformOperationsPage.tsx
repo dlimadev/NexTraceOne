@@ -13,6 +13,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { platformOpsApi } from '../api/platformOps';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import type {
   PlatformSubsystemStatus,
   BackgroundJobStatus,
@@ -70,30 +71,31 @@ const formatDate = (iso: string | null | undefined) => {
 
 export function PlatformOperationsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [activeTab, setActiveTab] = useState<Tab>('health');
   const [jobFilter, setJobFilter] = useState<'all' | BackgroundJobStatus>('all');
   const [severityFilter, setSeverityFilter] = useState<'all' | PlatformEventSeverity>('all');
 
   const healthQuery = useQuery({
-    queryKey: ['platform-health'],
+    queryKey: ['platform-health', activeEnvironmentId],
     queryFn: () => platformOpsApi.getHealth(),
     staleTime: 15_000,
   });
 
   const jobsQuery = useQuery({
-    queryKey: ['platform-jobs', jobFilter],
+    queryKey: ['platform-jobs', jobFilter, activeEnvironmentId],
     queryFn: () => platformOpsApi.getJobs(jobFilter !== 'all' ? { status: jobFilter } : {}),
     staleTime: 15_000,
   });
 
   const queuesQuery = useQuery({
-    queryKey: ['platform-queues'],
+    queryKey: ['platform-queues', activeEnvironmentId],
     queryFn: () => platformOpsApi.getQueues(),
     staleTime: 15_000,
   });
 
   const eventsQuery = useQuery({
-    queryKey: ['platform-events', severityFilter],
+    queryKey: ['platform-events', severityFilter, activeEnvironmentId],
     queryFn: () => platformOpsApi.getEvents(severityFilter !== 'all' ? { severity: severityFilter } : {}),
     staleTime: 15_000,
   });

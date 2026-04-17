@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi, type RunbookStepDto } from '../api/incidents';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 interface RunbookDetailResponse {
   runbookId: string;
@@ -53,6 +54,7 @@ const emptyState: RunbookFormState = {
  */
 export function RunbookBuilderPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const navigate = useNavigate();
   const { runbookId } = useParams<{ runbookId?: string }>();
   const queryClient = useQueryClient();
@@ -63,7 +65,7 @@ export function RunbookBuilderPage() {
 
   // Fetch existing runbook for edit mode
   const { data: runbookData, isLoading, isError, refetch } = useQuery({
-    queryKey: ['runbooks', 'detail', runbookId],
+    queryKey: ['runbooks', 'detail', runbookId, activeEnvironmentId],
     queryFn: () => incidentsApi.getRunbookDetail(runbookId!),
     enabled: isEditing,
   });

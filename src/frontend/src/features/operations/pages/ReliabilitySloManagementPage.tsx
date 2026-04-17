@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { reliabilityApi, type BurnRateWindow, type ServiceSloItem, type SloType } from '../api/reliability';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const WINDOWS: BurnRateWindow[] = ['OneHour', 'SixHours', 'TwentyFourHours', 'SevenDays'];
 const SLO_TYPES: SloType[] = ['Availability', 'Latency', 'ErrorRate', 'Throughput'];
@@ -31,13 +32,14 @@ function statusVariant(status: string): 'success' | 'warning' | 'danger' | 'defa
 
 export function ReliabilitySloManagementPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [selectedService, setSelectedService] = useState('');
   const [selectedSloId, setSelectedSloId] = useState('');
   const [burnWindow, setBurnWindow] = useState<BurnRateWindow>('SixHours');
   const [createForm, setCreateForm] = useState(defaultCreateForm);
 
   const servicesQuery = useQuery({
-    queryKey: ['reliability-services-for-slo'],
+    queryKey: ['reliability-services-for-slo', activeEnvironmentId],
     queryFn: () => reliabilityApi.listServices({ page: 1, pageSize: 200 }),
     staleTime: 30_000,
   });
@@ -48,7 +50,7 @@ export function ReliabilitySloManagementPage() {
   }, [selectedService, servicesQuery.data?.items]);
 
   const slosQuery = useQuery({
-    queryKey: ['reliability-service-slos', resolvedSelectedService],
+    queryKey: ['reliability-service-slos', resolvedSelectedService, activeEnvironmentId],
     queryFn: () => reliabilityApi.listServiceSlos(resolvedSelectedService),
     enabled: !!resolvedSelectedService,
   });
@@ -63,13 +65,13 @@ export function ReliabilitySloManagementPage() {
   }, [slosQuery.data?.items, resolvedSelectedSloId]);
 
   const errorBudgetQuery = useQuery({
-    queryKey: ['reliability-error-budget', resolvedSelectedSloId],
+    queryKey: ['reliability-error-budget', resolvedSelectedSloId, activeEnvironmentId],
     queryFn: () => reliabilityApi.getErrorBudget(resolvedSelectedSloId),
     enabled: !!resolvedSelectedSloId,
   });
 
   const burnRateQuery = useQuery({
-    queryKey: ['reliability-burn-rate', resolvedSelectedSloId, burnWindow],
+    queryKey: ['reliability-burn-rate', resolvedSelectedSloId, burnWindow, activeEnvironmentId],
     queryFn: () => reliabilityApi.getBurnRate(resolvedSelectedSloId, burnWindow),
     enabled: !!resolvedSelectedSloId,
   });

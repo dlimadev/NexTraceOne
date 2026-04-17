@@ -13,6 +13,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { automationApi, type AutomationActionsResponse, type AuditTrailResponse } from '../api/automation';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const actionIcon = (actionType: string) => {
   switch (actionType) {
@@ -45,14 +46,15 @@ const riskBadgeVariant = (risk: string): 'success' | 'warning' | 'danger' | 'def
  */
 export function AutomationAdminPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
   const { data: actionsData, isLoading: actionsLoading, isError: actionsError, refetch: refetchActions } = useQuery<AutomationActionsResponse>({
-    queryKey: ['automation-actions'],
+    queryKey: ['automation-actions', activeEnvironmentId],
     queryFn: () => automationApi.listActions(),
   });
 
   const { data: auditData } = useQuery<AuditTrailResponse>({
-    queryKey: ['automation-audit'],
+    queryKey: ['automation-audit', activeEnvironmentId],
     queryFn: () => automationApi.getAuditTrail(),
   });
 

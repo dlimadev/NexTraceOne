@@ -22,6 +22,7 @@ import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { runtimeIntelligenceApi } from '../api/runtimeIntelligence';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -96,11 +97,12 @@ const defaultForm: CompareForm = {
 
 export const EnvironmentComparisonPage: React.FC = () => {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [form, setForm] = useState<CompareForm>(defaultForm);
   const [submitted, setSubmitted] = useState<CompareForm | null>(null);
 
   const compareQuery = useQuery({
-    queryKey: ['runtime-compare', submitted],
+    queryKey: ['runtime-compare', submitted, activeEnvironmentId],
     queryFn: () =>
       submitted
         ? runtimeIntelligenceApi.compareReleaseRuntime({
@@ -117,7 +119,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
   });
 
   const driftQuery = useQuery({
-    queryKey: ['runtime-drift', submitted?.serviceName, submitted?.environment],
+    queryKey: ['runtime-drift', submitted?.serviceName, submitted?.environment, activeEnvironmentId],
     queryFn: () =>
       submitted
         ? runtimeIntelligenceApi.getDriftFindings({
@@ -132,7 +134,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
   });
 
   const scoreQuery = useQuery({
-    queryKey: ['runtime-score', submitted?.serviceName, submitted?.environment],
+    queryKey: ['runtime-score', submitted?.serviceName, submitted?.environment, activeEnvironmentId],
     queryFn: () =>
       submitted?.serviceName && submitted?.environment
         ? runtimeIntelligenceApi.getObservabilityScore({
@@ -145,7 +147,7 @@ export const EnvironmentComparisonPage: React.FC = () => {
   });
 
   const timelineQuery = useQuery({
-    queryKey: ['runtime-timeline', submitted?.serviceName, submitted?.environment],
+    queryKey: ['runtime-timeline', submitted?.serviceName, submitted?.environment, activeEnvironmentId],
     queryFn: () =>
       submitted?.serviceName && submitted?.environment
         ? runtimeIntelligenceApi.getReleaseHealthTimeline({

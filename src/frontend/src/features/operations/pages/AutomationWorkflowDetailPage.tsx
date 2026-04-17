@@ -12,6 +12,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { automationApi, type AutomationWorkflowDetail } from '../api/automation';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
   switch (status) {
@@ -50,10 +51,11 @@ const stepStatusIcon = (status: string) => {
  */
 export function AutomationWorkflowDetailPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const { workflowId } = useParams<{ workflowId: string }>();
 
   const { data: workflow, isLoading, isError, refetch } = useQuery<AutomationWorkflowDetail>({
-    queryKey: ['automation-workflow', workflowId],
+    queryKey: ['automation-workflow', workflowId, activeEnvironmentId],
     queryFn: () => automationApi.getWorkflow(workflowId!),
     enabled: !!workflowId,
   });
