@@ -65,7 +65,7 @@ public static class GetNonProdSchedules
             var response = new NonProdSchedulesResponse(
                 Schedules: schedules,
                 TotalEstimatedSavingPercent: 36,
-                GovernanceWaiverExpiryEnabled: nonProdSchedulerEnabled,
+                NonProdSchedulerEnabled: nonProdSchedulerEnabled,
                 GeneratedAt: DateTimeOffset.UtcNow,
                 SimulatedNote: "Non-prod schedule data is in-memory. Real environment scheduling integration pending.");
 
@@ -92,7 +92,7 @@ public static class GetNonProdSchedules
             var response = new NonProdSchedulesResponse(
                 Schedules: [updated],
                 TotalEstimatedSavingPercent: 0,
-                GovernanceWaiverExpiryEnabled: true,
+                NonProdSchedulerEnabled: true,
                 GeneratedAt: DateTimeOffset.UtcNow,
                 SimulatedNote: string.Empty);
 
@@ -129,7 +129,7 @@ public static class GetNonProdSchedules
     public sealed record NonProdSchedulesResponse(
         IReadOnlyList<NonProdScheduleDto> Schedules,
         double TotalEstimatedSavingPercent,
-        bool GovernanceWaiverExpiryEnabled,
+        bool NonProdSchedulerEnabled,
         DateTimeOffset GeneratedAt,
         string SimulatedNote);
 
