@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Enums;
@@ -18,11 +20,18 @@ namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 /// Regras de segurança:
 ///   - Notificações Critical nunca são suprimidas
 ///   - Notificações obrigatórias (BreakGlass, Approval, Compliance) nunca são suprimidas
+///
+/// O estado do feature (<c>notifications.suppress.enabled</c>) e a janela de
+/// acknowledged (<c>notifications.suppress.acknowledged_window_minutes</c>) são lidos
+/// de <see cref="IConfigurationResolutionService"/> com fallback para 30 minutos.
 /// </summary>
 internal sealed class NotificationSuppressionService(
     NotificationsDbContext context,
-    IMandatoryNotificationPolicy mandatoryPolicy) : INotificationSuppressionService
+    IMandatoryNotificationPolicy mandatoryPolicy,
+    IConfigurationResolutionService configResolution) : INotificationSuppressionService
 {
+    private const int DefaultAcknowledgedWindowMinutes = 30;
+
     /// <inheritdoc/>
     public async Task<SuppressionResult> EvaluateAsync(
         NotificationRequest request,
@@ -46,10 +55,35 @@ internal sealed class NotificationSuppressionService(
 
         var tenantId = request.TenantId.Value;
 
-        // Regra 1: Já acknowledged para mesma entidade recentemente (últimos 30 min)
+        // Verificar se a supressão está habilitada (default: habilitada)
+        var enabledDto = await configResolution.ResolveEffectiveValueAsync(
+            "notifications.suppress.enabled",
+            ConfigurationScope.Tenant,
+            tenantId.ToString(),
+            cancellationToken);
+
+        if (enabledDto is not null
+            && bool.TryParse(enabledDto.EffectiveValue, out var enabled)
+            && !enabled)
+            return SuppressionResult.Allow();
+
+        // Ler janela de acknowledged configurada; fallback para 30 minutos
+        var windowMinutes = DefaultAcknowledgedWindowMinutes;
+        var windowDto = await configResolution.ResolveEffectiveValueAsync(
+            "notifications.suppress.acknowledged_window_minutes",
+            ConfigurationScope.Tenant,
+            tenantId.ToString(),
+            cancellationToken);
+
+        if (windowDto is not null
+            && int.TryParse(windowDto.EffectiveValue, out var configuredWindow)
+            && configuredWindow > 0)
+            windowMinutes = configuredWindow;
+
+        // Regra 1: Já acknowledged para mesma entidade recentemente
         if (!string.IsNullOrWhiteSpace(request.SourceEntityId))
         {
-            var cutoff = DateTimeOffset.UtcNow.AddMinutes(-30);
+            var cutoff = DateTimeOffset.UtcNow.AddMinutes(-windowMinutes);
             var alreadyAcknowledged = await context.Notifications
                 .AnyAsync(n => n.TenantId == tenantId
                             && n.RecipientUserId == recipientUserId
@@ -60,7 +94,8 @@ internal sealed class NotificationSuppressionService(
                     cancellationToken);
 
             if (alreadyAcknowledged)
-                return SuppressionResult.SuppressWith("Already acknowledged for same entity within 30 minutes");
+                return SuppressionResult.SuppressWith(
+                    $"Already acknowledged for same entity within {windowMinutes} minutes");
         }
 
         // Regra 2: Snoozed activa para o mesmo tipo/entidade

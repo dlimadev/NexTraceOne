@@ -585,6 +585,54 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "text",
             sortOrder: 201),
 
+        // ── PHASE 2: Retenção e Rate Limiting ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "notifications.retention.days",
+            displayName: "config.notifications.retention.days.label",
+            category: ConfigurationCategory.Operational,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.notifications.retention.days.description",
+            defaultValue: "90",
+            validationRules: """{"min":7,"max":730}""",
+            uiEditorType: "text",
+            sortOrder: 202),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.retention.purge_enabled",
+            displayName: "config.notifications.retention.purge_enabled.label",
+            category: ConfigurationCategory.Operational,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.notifications.retention.purge_enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 203),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.rate_limit.enabled",
+            displayName: "config.notifications.rate_limit.enabled.label",
+            category: ConfigurationCategory.Operational,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.notifications.rate_limit.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 204),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.rate_limit.max_per_user_per_hour",
+            displayName: "config.notifications.rate_limit.max_per_user_per_hour.label",
+            category: ConfigurationCategory.Operational,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.notifications.rate_limit.max_per_user_per_hour.description",
+            defaultValue: "100",
+            validationRules: """{"min":1,"max":1000}""",
+            uiEditorType: "text",
+            sortOrder: 205),
+
         // ── END PHASE 2 ───────────────────────────────────────────────────
 
         ConfigurationDefinition.Create(
@@ -6557,5 +6605,29 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             isInheritable: true,
             uiEditorType: "toggle",
             sortOrder: 9880),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.notifications.escalation.enabled",
+            displayName: "config.env.behavior.notifications.escalation.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.notifications.escalation.enabled.description",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9890),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.notifications.digest.enabled",
+            displayName: "config.env.behavior.notifications.digest.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.notifications.digest.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9900),
     ];
 }

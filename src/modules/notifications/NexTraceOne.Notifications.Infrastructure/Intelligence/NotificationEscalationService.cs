@@ -9,20 +9,25 @@ namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 /// <summary>
 /// Implementação do serviço de escalação para notificações críticas não tratadas.
 ///
-/// Critérios de escalação:
-///   - Critical + não acknowledged + mais de 30 minutos → escalável
-///   - ActionRequired + não acknowledged + mais de 2 horas → escalável
+/// Os thresholds são recebidos como parâmetros opcionais por <see cref="ShouldEscalate"/>,
+/// permitindo que o caller (ex: <see cref="NotificationEscalationScanJob"/>) os leia de
+/// configuração e os passe dinamicamente.
+/// Os defaults (30 min para Critical, 120 min para ActionRequired) são usados quando
+/// os valores de configuração não estão disponíveis.
 ///
-/// A escalação marca a notificação e pode acionar reenvio por canal mais forte.
+/// A escalação marca a notificação e pode accionar reenvio por canal mais forte.
 /// </summary>
 internal sealed class NotificationEscalationService(
     ILogger<NotificationEscalationService> logger) : INotificationEscalationService
 {
-    private static readonly TimeSpan CriticalThreshold = TimeSpan.FromMinutes(30);
-    private static readonly TimeSpan ActionRequiredThreshold = TimeSpan.FromHours(2);
+    private const int DefaultCriticalThresholdMinutes = 30;
+    private const int DefaultActionRequiredThresholdMinutes = 120;
 
     /// <inheritdoc/>
-    public bool ShouldEscalate(Notification notification)
+    public bool ShouldEscalate(
+        Notification notification,
+        int criticalThresholdMinutes = DefaultCriticalThresholdMinutes,
+        int actionRequiredThresholdMinutes = DefaultActionRequiredThresholdMinutes)
     {
         // Já escalada, acknowledged, ou arquivada — não escalável
         if (notification.IsEscalated
@@ -39,8 +44,9 @@ internal sealed class NotificationEscalationService(
 
         return notification.Severity switch
         {
-            NotificationSeverity.Critical => age > CriticalThreshold,
-            NotificationSeverity.ActionRequired when notification.RequiresAction => age > ActionRequiredThreshold,
+            NotificationSeverity.Critical => age > TimeSpan.FromMinutes(criticalThresholdMinutes),
+            NotificationSeverity.ActionRequired when notification.RequiresAction
+                => age > TimeSpan.FromMinutes(actionRequiredThresholdMinutes),
             _ => false
         };
     }

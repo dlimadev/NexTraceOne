@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
@@ -24,8 +25,11 @@ public sealed class NotificationOrchestrator(
     INotificationStore store,
     INotificationTemplateResolver templateResolver,
     INotificationDeduplicationService deduplicationService,
+    INotificationSuppressionService suppressionService,
+    INotificationGroupingService groupingService,
     INotificationAuditService notificationAuditService,
     IEnvironmentBehaviorService environmentBehaviorService,
+    IConfigurationResolutionService configResolution,
     IExternalDeliveryService? externalDeliveryService,
     ILogger<NotificationOrchestrator> logger) : INotificationOrchestrator
 {
@@ -76,11 +80,24 @@ public sealed class NotificationOrchestrator(
             return new NotificationResult(false, "Notification severity below minimum threshold for this environment.");
         }
 
-        // 4. Criar notificações por destinatário com deduplicação
+        // 4. Criar notificações por destinatário com deduplicação e supressão
         var createdIds = new List<Guid>();
+
+        // Ler janela de agrupamento da configuração (fallback: 60 min)
+        var groupingWindowMinutes = 60;
+        var groupingWindowDto = await configResolution.ResolveEffectiveValueAsync(
+            "notifications.grouping.window_minutes",
+            ConfigurationScope.Tenant,
+            request.TenantId.Value.ToString(),
+            cancellationToken);
+        if (groupingWindowDto is not null
+            && int.TryParse(groupingWindowDto.EffectiveValue, out var gw)
+            && gw > 0)
+            groupingWindowMinutes = gw;
+
         foreach (var recipientId in recipientIds)
         {
-            // 4a. Deduplicação básica
+            // 4a. Deduplicação básica (janela e estado lidos de config internamente)
             var isDuplicate = await deduplicationService.IsDuplicateAsync(
                 request.TenantId.Value,
                 recipientId,
@@ -97,7 +114,17 @@ public sealed class NotificationOrchestrator(
                 continue;
             }
 
-            // 4b. Criar notificação com rastreabilidade completa
+            // 4b. Supressão (acknowledged recente, snooze activo — lidos de config internamente)
+            var suppression = await suppressionService.EvaluateAsync(request, recipientId, cancellationToken);
+            if (suppression.ShouldSuppress)
+            {
+                logger.LogDebug(
+                    "Suppressing notification {EventType} for user {UserId}: {Reason}",
+                    request.EventType, recipientId, suppression.Reason);
+                continue;
+            }
+
+            // 4c. Criar notificação com rastreabilidade completa
             var notification = Notification.Create(
                 tenantId: request.TenantId.Value,
                 recipientUserId: recipientId,
@@ -116,10 +143,26 @@ public sealed class NotificationOrchestrator(
                 expiresAt: request.ExpiresAt,
                 sourceEventId: request.SourceEventId);
 
+            // 4d. Correlação e agrupamento
+            var correlationKey = groupingService.GenerateCorrelationKey(
+                request.TenantId.Value,
+                request.EventType,
+                request.SourceModule,
+                request.SourceEntityType,
+                request.SourceEntityId);
+
+            var groupId = await groupingService.ResolveGroupAsync(
+                request.TenantId.Value,
+                correlationKey,
+                groupingWindowMinutes,
+                cancellationToken);
+
+            notification.SetCorrelation(correlationKey, groupId);
+
             await store.AddAsync(notification, cancellationToken);
             createdIds.Add(notification.Id.Value);
 
-            // 4c. Registar evento auditável — criação de notificação (P7.3)
+            // 4e. Registar evento auditável — criação de notificação (P7.3)
             await RecordAuditAsync(
                 entry: new NotificationAuditEntry
                 {
@@ -135,7 +178,7 @@ public sealed class NotificationOrchestrator(
                 },
                 cancellationToken);
 
-            // 4d. Agendar entrega externa (email, Teams) se o serviço estiver disponível
+            // 4f. Agendar entrega externa (email, Teams) se o serviço estiver disponível
             // e se o env.behavior.notifications.external_channels.enabled o permitir
             if (externalDeliveryService is not null)
             {

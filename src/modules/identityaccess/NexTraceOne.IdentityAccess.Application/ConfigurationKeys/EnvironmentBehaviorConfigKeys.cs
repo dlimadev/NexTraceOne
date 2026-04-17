@@ -79,7 +79,6 @@ public static class EnvironmentBehaviorConfigKeys
     public const string JobsNonProdSchedulerEnabled = "env.behavior.jobs.non_prod_scheduler.enabled";
 
     // ── Retenção de Dados ──────────────────────────────────────────────────
-
     /// <summary>
     /// Número de dias para reter dados de telemetria neste ambiente.
     /// Ambientes de desenvolvimento tipicamente têm retenção menor.
@@ -136,4 +135,18 @@ public static class EnvironmentBehaviorConfigKeys
     /// Habilita a verificação pós-mudança automática neste ambiente.
     /// </summary>
     public const string ChangePostChangeVerificationEnabled = "env.behavior.change.post_change_verification.enabled";
+
+    // ── Notificações Avançadas ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Habilita o processo de escalação automática de notificações não tratadas
+    /// neste ambiente. Quando desabilitado, o job de escalação não actua.
+    /// </summary>
+    public const string NotificationsEscalationEnabled = "env.behavior.notifications.escalation.enabled";
+
+    /// <summary>
+    /// Habilita a geração e envio de digest periódico de notificações
+    /// neste ambiente. Quando desabilitado, o job de digest não actua.
+    /// </summary>
+    public const string NotificationsDigestEnabled = "env.behavior.notifications.digest.enabled";
 }

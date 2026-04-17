@@ -145,6 +145,8 @@ export type Permission =
   | 'notifications:configuration:read'
   | 'notifications:configuration:write'
   | 'notifications:delivery:read'
+  | 'notifications:admin:read'
+  | 'notifications:admin:write'
   // ── Environment Management ──
   | 'env:environments:read'
   | 'env:environments:write'

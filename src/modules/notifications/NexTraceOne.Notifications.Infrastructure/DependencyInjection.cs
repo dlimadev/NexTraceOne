@@ -70,7 +70,7 @@ public static class DependencyInjection
 
         // ── Phase 6: Intelligence & Automation ──
         services.AddScoped<INotificationGroupingService, NotificationGroupingService>();
-        services.AddSingleton<IQuietHoursService, QuietHoursService>();
+        services.AddScoped<IQuietHoursService, QuietHoursService>();
         services.AddScoped<INotificationEscalationService, NotificationEscalationService>();
         services.AddScoped<INotificationSuppressionService, NotificationSuppressionService>();
         services.AddScoped<INotificationDigestService, NotificationDigestService>();

@@ -2,6 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Domain.Enums;
 
@@ -11,9 +13,10 @@ namespace NexTraceOne.Notifications.Infrastructure.Intelligence;
 /// Job de background que varre periodicamente notificações críticas e ActionRequired
 /// não tratadas, e invoca o serviço de escalação quando os thresholds são excedidos.
 ///
-/// Critérios (configuráveis via NotificationEscalationService):
-///   - Critical + não acknowledged + mais de 30 min → escalada
-///   - ActionRequired + não acknowledged + mais de 2h → escalada
+/// Os thresholds de escalação são lidos de <c>notifications.escalation.*</c> via
+/// <see cref="IConfigurationResolutionService"/> em cada ciclo, permitindo ajuste
+/// sem redeploy. Caso a feature <c>notifications.escalation.enabled</c> esteja
+/// desactivada, o ciclo é ignorado completamente.
 ///
 /// Design:
 ///   - Executa a cada 5 minutos via PeriodicTimer.
@@ -28,6 +31,8 @@ internal sealed class NotificationEscalationScanJob(
     private static readonly TimeSpan ScanInterval = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(30);
     private const int BatchSize = 200;
+    private const int DefaultCriticalThresholdMinutes = 30;
+    private const int DefaultActionRequiredThresholdMinutes = 120;
 
     internal const string HealthCheckName = "notification-escalation-scan";
 
@@ -73,9 +78,47 @@ internal sealed class NotificationEscalationScanJob(
         using var scope = serviceScopeFactory.CreateScope();
         var store = scope.ServiceProvider.GetRequiredService<INotificationStore>();
         var escalationService = scope.ServiceProvider.GetRequiredService<INotificationEscalationService>();
+        var configResolution = scope.ServiceProvider.GetRequiredService<IConfigurationResolutionService>();
 
-        // Varrer notificações com mais de 30 minutos (threshold mais baixo — Critical)
-        var olderThan = DateTimeOffset.UtcNow.AddMinutes(-30);
+        // Ler estado do feature e thresholds da configuração
+        var escalationEnabledDto = await configResolution.ResolveEffectiveValueAsync(
+            "notifications.escalation.enabled",
+            ConfigurationScope.System,
+            null,
+            cancellationToken);
+
+        if (escalationEnabledDto is not null
+            && bool.TryParse(escalationEnabledDto.EffectiveValue, out var escalationEnabled)
+            && !escalationEnabled)
+        {
+            logger.LogDebug("Escalation scan skipped: notifications.escalation.enabled is false.");
+            return;
+        }
+
+        var criticalMinutes = DefaultCriticalThresholdMinutes;
+        var criticalDto = await configResolution.ResolveEffectiveValueAsync(
+            "notifications.escalation.critical_threshold_minutes",
+            ConfigurationScope.System,
+            null,
+            cancellationToken);
+        if (criticalDto is not null
+            && int.TryParse(criticalDto.EffectiveValue, out var cm)
+            && cm > 0)
+            criticalMinutes = cm;
+
+        var actionRequiredMinutes = DefaultActionRequiredThresholdMinutes;
+        var arDto = await configResolution.ResolveEffectiveValueAsync(
+            "notifications.escalation.action_required_threshold_minutes",
+            ConfigurationScope.System,
+            null,
+            cancellationToken);
+        if (arDto is not null
+            && int.TryParse(arDto.EffectiveValue, out var arm)
+            && arm > 0)
+            actionRequiredMinutes = arm;
+
+        // Varrer com o threshold mais baixo (Critical)
+        var olderThan = DateTimeOffset.UtcNow.AddMinutes(-criticalMinutes);
         var skip = 0;
         var totalEscalated = 0;
 
@@ -99,7 +142,7 @@ internal sealed class NotificationEscalationScanJob(
             var escalatedInBatch = 0;
             foreach (var notification in batch)
             {
-                if (!escalationService.ShouldEscalate(notification))
+                if (!escalationService.ShouldEscalate(notification, criticalMinutes, actionRequiredMinutes))
                     continue;
 
                 try
