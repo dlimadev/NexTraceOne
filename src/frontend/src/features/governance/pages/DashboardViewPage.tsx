@@ -89,7 +89,7 @@ const useRenderData = (dashboardId: string, tenantId: string, environmentId?: st
     enabled: Boolean(dashboardId),
   });
 
-const useShareDashboard = (dashboardId: string, tenantId: string) => {
+const useShareDashboard = (dashboardId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () =>
@@ -153,7 +153,7 @@ export function DashboardViewPage() {
     timeRange,
   );
 
-  const shareMutation = useShareDashboard(dashboardId ?? '', TENANT_ID);
+  const shareMutation = useShareDashboard(dashboardId ?? '');
 
   // ── Auto-refresh ──────────────────────────────────────────────────────
   const doRefresh = useCallback(() => {

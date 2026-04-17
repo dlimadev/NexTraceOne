@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Activity } from 'lucide-react';
 import { Skeleton } from '../../../components/Skeleton';
 import client from '../../../api/client';
+import { timeRangeToDays } from './WidgetRegistry';
 import type { WidgetProps } from './WidgetRegistry';
 
 interface DoraMetric {
@@ -95,15 +96,4 @@ export function WidgetError({ title }: { title: string }) {
       </span>
     </div>
   );
-}
-
-function timeRangeToDays(timeRange: string): number {
-  switch (timeRange) {
-    case '1h': return 1;
-    case '6h': return 1;
-    case '24h': return 1;
-    case '7d': return 7;
-    case '30d': return 30;
-    default: return 1;
-  }
 }

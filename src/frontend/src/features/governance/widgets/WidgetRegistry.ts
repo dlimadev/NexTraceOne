@@ -133,6 +133,18 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
   },
 };
 
+/** Convert a time range string (e.g. '7d') to an approximate number of days for API calls */
+export function timeRangeToDays(timeRange: string): number {
+  switch (timeRange) {
+    case '1h': return 1;
+    case '6h': return 1;
+    case '24h': return 1;
+    case '7d': return 7;
+    case '30d': return 30;
+    default: return 1;
+  }
+}
+
 /** Time range options available for global and per-widget selection */
 export const TIME_RANGE_OPTIONS = [
   { value: '1h', labelKey: 'governance.dashboardView.timeRange.1h' },

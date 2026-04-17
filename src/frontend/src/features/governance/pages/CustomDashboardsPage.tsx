@@ -265,7 +265,7 @@ export function CustomDashboardsPage() {
                   >
                     {LAYOUTS.map((l) => (
                       <option key={l} value={l}>
-                        {t(`governance.customDashboards.${l.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())}`)}
+                        {t(`governance.customDashboards.${l.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}`)}
                       </option>
                     ))}
                   </select>
