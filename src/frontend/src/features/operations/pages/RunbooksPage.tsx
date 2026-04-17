@@ -12,6 +12,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi } from '../api/incidents';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 interface RunbookSummaryDto {
   runbookId: string;
@@ -33,11 +34,12 @@ interface RunbooksResponse {
  */
 export function RunbooksPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
 
   const { data, isLoading, isError, refetch } = useQuery<RunbooksResponse>({
-    queryKey: ['runbooks', search],
+    queryKey: ['runbooks', search, activeEnvironmentId],
     queryFn: () => incidentsApi.listRunbooks(search ? { search } : undefined),
   });
 

@@ -17,6 +17,7 @@ import type {
   MaturityLevelType, GovernanceTrendDirection,
 } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const dimensionIcon = (dim: ControlDimensionType) => {
   switch (dim) {
@@ -63,8 +64,9 @@ const coverageColor = (pct: number): string => {
  */
 export function EnterpriseControlsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.governance.executive.controls(),
+    queryKey: queryKeys.governance.executive.controls(activeEnvironmentId),
     queryFn: () => organizationGovernanceApi.getControlsSummary(),
   });
 

@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Domain.Entities;
@@ -21,6 +23,7 @@ internal sealed class ExternalDeliveryService(
     IEnumerable<INotificationChannelDispatcher> dispatchers,
     INotificationDeliveryStore deliveryStore,
     INotificationAuditService notificationAuditService,
+    IEnvironmentBehaviorService environmentBehaviorService,
     IOptions<DeliveryRetryOptions> retryOptions,
     ILogger<ExternalDeliveryService> logger) : IExternalDeliveryService
 {
@@ -32,6 +35,20 @@ internal sealed class ExternalDeliveryService(
         Notification notification,
         CancellationToken cancellationToken = default)
     {
+        // ── Gate: verificar se canais externos estão habilitados ──────────
+        var externalChannelsEnabled = await environmentBehaviorService.IsEnabledAsync(
+            EnvironmentBehaviorConfigKeys.NotificationsExternalChannelsEnabled,
+            environmentId: null,
+            cancellationToken);
+
+        if (!externalChannelsEnabled)
+        {
+            logger.LogDebug(
+                "External notification channels disabled by configuration — skipping delivery for notification {NotificationId}",
+                notification.Id.Value);
+            return;
+        }
+
         // 1. Resolver canais elegíveis
         var channels = await routingEngine.ResolveChannelsAsync(
             notification.RecipientUserId,

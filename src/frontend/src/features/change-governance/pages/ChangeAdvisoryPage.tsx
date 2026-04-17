@@ -14,6 +14,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeConfidenceApi } from '../api/changeConfidence';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const INPUT_CLS =
   'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
@@ -45,13 +46,14 @@ function confidenceVariant(status: string): 'default' | 'success' | 'warning' | 
  */
 export function ChangeAdvisoryPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [serviceName, setServiceName] = useState('');
   const [environment, setEnvironment] = useState('');
   const [confidenceStatus, setConfidenceStatus] = useState('');
   const [page] = useState(1);
 
   const changesQuery = useQuery({
-    queryKey: ['changes-advisory', serviceName, environment, confidenceStatus, page],
+    queryKey: ['changes-advisory', serviceName, environment, confidenceStatus, page, activeEnvironmentId],
     queryFn: () =>
       changeConfidenceApi.listChanges({
         serviceName: serviceName || undefined,

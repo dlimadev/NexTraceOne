@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   BarChart3, TrendingUp, Shield, Activity, RefreshCw,
   Award, DollarSign,
@@ -48,10 +49,11 @@ const criticalityBadgeVariant = (crit: string): 'success' | 'warning' | 'danger'
  */
 export function BenchmarkingPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [dimension, setDimension] = useState<BenchmarkDimension>('teams');
 
   const { data: d, isLoading, isError, refetch } = useQuery({
-    queryKey: ['executive-benchmarking', dimension],
+    queryKey: ['executive-benchmarking', dimension, activeEnvironmentId],
     queryFn: () => executiveApi.getBenchmarking(dimension),
     staleTime: 30_000,
   });

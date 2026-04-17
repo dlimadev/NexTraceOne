@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   AlertTriangle,
   TrendingDown,
@@ -13,9 +14,10 @@ import { finOpsApi, type WasteSignalDetail } from '../api/finOps';
 
 export function WasteDetectionPage() {
   const { t } = useTranslation('wasteDetection');
+  const { activeEnvironmentId } = useEnvironment();
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['waste-signals'],
+    queryKey: ['waste-signals', activeEnvironmentId],
     queryFn: () => finOpsApi.getWasteSignals(),
   });
 

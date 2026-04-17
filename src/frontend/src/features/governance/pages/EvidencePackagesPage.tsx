@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Package, Search, Lock, Download, FileCheck, FileText,
 } from 'lucide-react';
@@ -34,18 +35,19 @@ const statusBadge = (st: EvidencePackageStatusType): 'success' | 'warning' | 'in
  */
 export function EvidencePackagesPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
-    queryKey: queryKeys.governance.evidence.list(),
+    queryKey: [...queryKeys.governance.evidence.list(), activeEnvironmentId],
     queryFn: () => evidenceApi.listPackages(),
     staleTime: 30_000,
   });
 
   useQuery({
-    queryKey: queryKeys.governance.evidence.detail(selectedPackageId!),
+    queryKey: [...queryKeys.governance.evidence.detail(selectedPackageId!), activeEnvironmentId],
     queryFn: () => evidenceApi.getPackage(selectedPackageId!),
     staleTime: 30_000,
     enabled: !!selectedPackageId,

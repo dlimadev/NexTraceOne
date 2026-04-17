@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { Activity, TrendingDown, RefreshCw, Minus } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -63,18 +64,18 @@ interface DoraMetricsTrendResponse {
   };
 }
 
-const useDoraMetrics = (periodDays: number) =>
+const useDoraMetrics = (periodDays: number, envId?: string | null) =>
   useQuery({
-    queryKey: ['dora-metrics', periodDays],
+    queryKey: ['dora-metrics', periodDays, envId],
     queryFn: () =>
       client
         .get<DoraMetricsResponse>('/executive/dora-metrics', { params: { periodDays } })
         .then((r) => r.data),
   });
 
-const useDoraMetricsTrend = (periodDays: number) =>
+const useDoraMetricsTrend = (periodDays: number, envId?: string | null) =>
   useQuery({
-    queryKey: ['dora-metrics-trend', periodDays],
+    queryKey: ['dora-metrics-trend', periodDays, envId],
     queryFn: () =>
       client
         .get<DoraMetricsTrendResponse>('/executive/dora-metrics/trend', { params: { periodDays } })
@@ -103,9 +104,10 @@ const TrendIcon = ({ trend }: { trend: string }) => {
 
 export function DoraMetricsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [periodDays, setPeriodDays] = useState(30);
-  const { data, isLoading, isError, refetch } = useDoraMetrics(periodDays);
-  const { data: trendData } = useDoraMetricsTrend(periodDays);
+  const { data, isLoading, isError, refetch } = useDoraMetrics(periodDays, activeEnvironmentId);
+  const { data: trendData } = useDoraMetricsTrend(periodDays, activeEnvironmentId);
 
   if (isLoading) return <PageLoadingState message={t('governance.dora.loading')} />;
   if (isError) return <PageErrorState message={t('governance.dora.error')} onRetry={() => refetch()} />;

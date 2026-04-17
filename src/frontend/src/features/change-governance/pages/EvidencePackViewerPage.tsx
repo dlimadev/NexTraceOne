@@ -22,6 +22,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { workflowApi } from '../api/workflow';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /**
  * EvidencePackViewerPage — visualização de Evidence Packs de instâncias de workflow.
@@ -37,12 +38,13 @@ import { workflowApi } from '../api/workflow';
  */
 export function EvidencePackViewerPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const qc = useQueryClient();
   const [instanceId, setInstanceId] = useState('');
   const [expandedSection, setExpandedSection] = useState<string | null>('scores');
 
   const { data: instances, isLoading: loadingInstances } = useQuery({
-    queryKey: ['workflow-instances-selector'],
+    queryKey: ['workflow-instances-selector', activeEnvironmentId],
     queryFn: () => workflowApi.listInstances(1, 50),
     staleTime: 60_000,
   });
@@ -52,7 +54,7 @@ export function EvidencePackViewerPage() {
     isLoading: loadingPack,
     isError: packError,
   } = useQuery({
-    queryKey: ['evidence-pack', instanceId],
+    queryKey: ['evidence-pack', instanceId, activeEnvironmentId],
     queryFn: () => workflowApi.getEvidencePack(instanceId),
     enabled: !!instanceId,
     retry: false,

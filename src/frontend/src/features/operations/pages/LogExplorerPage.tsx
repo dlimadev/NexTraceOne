@@ -31,6 +31,7 @@ import { Button } from '../../../components/Button';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { queryLogs, type LogEntry } from '../api/telemetry';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -81,11 +82,12 @@ function getDefaultTimeRange(): { from: string; until: string } {
 
 export function LogExplorerPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const navigate = useNavigate();
   const defaults = getDefaultTimeRange();
 
   // Filter state
-  const [environment, setEnvironment] = useState('production');
+  const [environment, setEnvironment] = useState(activeEnvironmentId ?? 'production');
   const [serviceName, setServiceName] = useState('');
   const [level, setLevel] = useState('');
   const [messageContains, setMessageContains] = useState('');

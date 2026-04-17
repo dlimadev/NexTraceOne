@@ -15,6 +15,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { automationApi, type AutomationWorkflowsResponse } from '../api/automation';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type StatusFilter = 'all' | 'Created' | 'PendingApproval' | 'Approved' | 'Executing' | 'Completed' | 'Failed' | 'Cancelled' | 'Rejected';
 
@@ -46,11 +47,12 @@ const riskBadge = (risk: string): 'success' | 'warning' | 'danger' | 'default' =
  */
 export function AutomationWorkflowsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
 
   const { data, isLoading, isError, refetch } = useQuery<AutomationWorkflowsResponse>({
-    queryKey: ['automation-workflows', statusFilter],
+    queryKey: ['automation-workflows', statusFilter, activeEnvironmentId],
     queryFn: () => automationApi.listWorkflows(statusFilter !== 'all' ? { status: statusFilter } : undefined),
   });
 

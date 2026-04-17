@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   TrendingUp, ShieldAlert, AlertTriangle, BarChart3, Activity,
   CheckCircle, RefreshCw, Clock, Target, AlertCircle,
@@ -48,9 +49,10 @@ const trendBadgeVariant = (dir: GovernanceTrendDirection): 'success' | 'info' | 
  */
 export function ExecutiveOverviewPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['executive-overview'],
+    queryKey: ['executive-overview', activeEnvironmentId],
     queryFn: () => organizationGovernanceApi.getExecutiveOverview(),
     staleTime: 60_000,
   });

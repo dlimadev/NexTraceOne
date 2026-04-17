@@ -21,6 +21,7 @@ import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
 import type { SourceOfTruthReferenceItem } from '../../../types';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
@@ -46,10 +47,11 @@ const lifecycleColors: Record<string, string> = {
 /** Página consolidada de Source of Truth de um contrato. */
 export function ContractSourceOfTruthPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const { contractVersionId } = useParams<{ contractVersionId: string }>();
 
   const { data: sot, isLoading, isError } = useQuery({
-    queryKey: ['sot-contract', contractVersionId],
+    queryKey: ['sot-contract', contractVersionId, activeEnvironmentId],
     queryFn: () => sourceOfTruthApi.getContractSot(contractVersionId!),
     enabled: !!contractVersionId,
     staleTime: 15_000,

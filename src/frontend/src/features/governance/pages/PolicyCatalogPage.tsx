@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Shield, Search, ShieldCheck, ShieldAlert, FileText, AlertTriangle,
   Settings, BookOpen, Bot, Lock,
@@ -58,11 +59,12 @@ const categoryIcon = (cat: PolicyCategoryType) => {
  */
 export function PolicyCatalogPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
   const policyQuery = useQuery<PolicyListResponse>({
-    queryKey: [...queryKeys.governance.all, 'policies'],
+    queryKey: [...queryKeys.governance.all, 'policies', activeEnvironmentId],
     queryFn: () => organizationGovernanceApi.listPolicies(),
     staleTime: 30_000,
   });

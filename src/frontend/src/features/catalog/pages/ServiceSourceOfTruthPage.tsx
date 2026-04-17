@@ -20,6 +20,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import type { CoverageIndicators, ContractVersionDetail, SourceOfTruthReferenceItem, ServiceApiSummary } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<string, string> = {
@@ -65,17 +66,18 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 /** Página consolidada de Source of Truth de um serviço. */
 export function ServiceSourceOfTruthPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const { serviceId } = useParams<{ serviceId: string }>();
 
   const { data: sot, isLoading, isError } = useQuery({
-    queryKey: ['sot-service', serviceId],
+    queryKey: ['sot-service', serviceId, activeEnvironmentId],
     queryFn: () => sourceOfTruthApi.getServiceSot(serviceId!),
     enabled: !!serviceId,
     staleTime: 15_000,
   });
 
   const { data: coverage } = useQuery({
-    queryKey: ['sot-service-coverage', serviceId],
+    queryKey: ['sot-service-coverage', serviceId, activeEnvironmentId],
     queryFn: () => sourceOfTruthApi.getServiceCoverage(serviceId!),
     enabled: !!serviceId,
     staleTime: 15_000,

@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { incidentsApi } from '../api/incidents';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type SourceFilter = 'all' | 'incident' | 'observability';
 
@@ -26,8 +27,9 @@ function formatDate(dateStr: string): string {
 
 export function IncidentTimelinePage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
-  const [environment, setEnvironment] = useState('');
+  const [environment, setEnvironment] = useState(activeEnvironmentId ?? '');
   const [serviceName, setServiceName] = useState('');
   const [page] = useState(1);
   const [pageSize] = useState(80);

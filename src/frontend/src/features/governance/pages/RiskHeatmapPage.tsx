@@ -14,6 +14,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type HeatmapDimension = 'category' | 'domain' | 'team';
 
@@ -46,11 +47,12 @@ const riskBorderClass = (level: RiskLevel): string => {
  */
 export function RiskHeatmapPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [dimension, setDimension] = useState<HeatmapDimension>('category');
   const dimensions: HeatmapDimension[] = ['category', 'domain', 'team'];
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.governance.executive.heatmap(dimension),
+    queryKey: queryKeys.governance.executive.heatmap(dimension, activeEnvironmentId),
     queryFn: () => organizationGovernanceApi.getRiskHeatmap(dimension),
   });
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Activity, Search, CheckCircle, AlertTriangle, XCircle, RefreshCw,
 } from 'lucide-react';
@@ -41,13 +42,14 @@ function formatDuration(ms: number): string {
 
 export function IngestionExecutionsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [search, setSearch] = useState('');
   const [connectorFilter, setConnectorFilter] = useState<ConnectorFilter>('all');
   const [resultFilter, setResultFilter] = useState<ResultFilter>('all');
   const queryClient = useQueryClient();
 
   const { data: response, isLoading, isError, refetch } = useQuery({
-    queryKey: ['integrations', 'executions'],
+    queryKey: ['integrations', 'executions', activeEnvironmentId],
     queryFn: () => integrationsApi.listExecutions(),
     staleTime: 30_000,
   });

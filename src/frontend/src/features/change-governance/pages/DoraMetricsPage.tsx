@@ -12,6 +12,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { queryKeys } from '../../../shared/api/queryKeys';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import { RiskScoreTrendPanel } from '../components/RiskScoreTrendPanel';
 import type { DoraClassification } from '../api/changeConfidence';
@@ -54,6 +55,7 @@ const classificationIcon = (c: DoraClassification) => {
  */
 export function DoraMetricsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [serviceName, setServiceName] = useState('');
   const [teamName, setTeamName] = useState('');
   const [environment, setEnvironment] = useState('Production');
@@ -67,7 +69,7 @@ export function DoraMetricsPage() {
   };
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.changes.dora(queryParams as Record<string, unknown>),
+    queryKey: [...queryKeys.changes.dora(queryParams as Record<string, unknown>), activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getDoraMetrics(queryParams),
     staleTime: 60_000,
   });

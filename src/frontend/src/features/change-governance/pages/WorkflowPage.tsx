@@ -10,6 +10,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { workflowApi } from '../api';
 import type { WorkflowInstance } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type InstanceStatus = WorkflowInstance['status'];
 
@@ -31,6 +32,7 @@ const TEMPLATE_LEVEL_VARIANTS = ['default', 'success', 'info', 'danger', 'warnin
 
 export function WorkflowPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
   const [rejectReason, setRejectReason] = useState('');
   const [rejectTarget, setRejectTarget] = useState<{ instanceId: string; stageId: string } | null>(null);
@@ -39,7 +41,7 @@ export function WorkflowPage() {
     data: templates,
     isLoading: templatesLoading,
   } = useQuery({
-    queryKey: ['workflow', 'templates'],
+    queryKey: ['workflow', 'templates', activeEnvironmentId],
     queryFn: () => workflowApi.listTemplates(),
     staleTime: 60_000,
   });
@@ -49,7 +51,7 @@ export function WorkflowPage() {
     isLoading: instancesLoading,
     isError: instancesError,
   } = useQuery({
-    queryKey: ['workflow', 'instances'],
+    queryKey: ['workflow', 'instances', activeEnvironmentId],
     queryFn: () => workflowApi.listInstances(1, 20),
     staleTime: 15_000,
   });

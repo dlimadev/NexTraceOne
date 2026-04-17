@@ -15,10 +15,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import type { ComplianceSummaryResponse, ComplianceStatusType, CompliancePackRowDto } from '../../../types';
 import { organizationGovernanceApi } from '../api/organizationGovernance';
 import { queryKeys } from '../../../shared/api/queryKeys';
-
-
-
-type ComplianceFilter = 'all' | 'NonCompliant' | 'PartiallyCompliant';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';type ComplianceFilter = 'all' | 'NonCompliant' | 'PartiallyCompliant';
 
 const statusBadgeVariant = (status: ComplianceStatusType): 'success' | 'warning' | 'danger' | 'default' => {
   switch (status) {
@@ -35,10 +32,11 @@ const statusBadgeVariant = (status: ComplianceStatusType): 'success' | 'warning'
  */
 export function CompliancePage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [filter, setFilter] = useState<ComplianceFilter>('all');
   const [search, setSearch] = useState('');
   const complianceQuery = useQuery<ComplianceSummaryResponse>({
-    queryKey: queryKeys.governance.compliance(),
+    queryKey: queryKeys.governance.compliance(activeEnvironmentId),
     queryFn: () => organizationGovernanceApi.getComplianceSummary(),
     staleTime: 30_000,
   });

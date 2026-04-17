@@ -25,6 +25,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import type { ScorecardDimensionDto } from '../api/sourceOfTruth';
 import { queryKeys } from '../../../shared/api/queryKeys';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Constantes ──────────────────────────────────────────────────────
 
@@ -150,6 +151,7 @@ function DimensionCard({
  */
 export function ServiceScorecardPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [serviceName, setServiceName] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [environment, setEnvironment] = useState('Production');
@@ -160,7 +162,7 @@ export function ServiceScorecardPage() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: queryKeys.catalog.services.scorecard(serviceName, environment),
+    queryKey: [...queryKeys.catalog.services.scorecard(serviceName, environment), activeEnvironmentId],
     queryFn: () => sourceOfTruthApi.getServiceScorecard(serviceName, environment),
     enabled: serviceName.length > 0,
     staleTime: 60_000,

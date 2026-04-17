@@ -38,6 +38,7 @@ import {
   type TraceDetail,
   type SpanDetail,
 } from '../api/telemetry';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,10 +77,11 @@ function getDefaultTimeRange(): { from: string; until: string } {
 
 export function TraceExplorerPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const defaults = getDefaultTimeRange();
 
   // Filter state
-  const [environment, setEnvironment] = useState('production');
+  const [environment, setEnvironment] = useState(activeEnvironmentId ?? 'production');
   const [serviceName, setServiceName] = useState('');
   const [operationName, setOperationName] = useState('');
   const [minDurationMs, setMinDurationMs] = useState('');

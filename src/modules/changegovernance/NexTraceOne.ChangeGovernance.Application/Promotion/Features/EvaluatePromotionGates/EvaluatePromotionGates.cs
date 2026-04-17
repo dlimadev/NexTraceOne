@@ -2,6 +2,8 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -9,11 +11,20 @@ using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Errors;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 
 namespace NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluatePromotionGates;
 
 /// <summary>
 /// Feature: EvaluatePromotionGates — avalia os gates de promoção e decide sobre aprovação ou rejeição automática.
+///
+/// A aplicação dos gates é controlada por <c>env.behavior.change.promotion_gates.enabled</c>
+/// (scope: Environment). Quando desabilitado para o ambiente alvo, todos os gates são
+/// automaticamente marcados como aprovados (bypass mode) e a promoção é aprovada.
+/// Este comportamento permite que ambientes não produtivos sejam promovidos sem barreiras
+/// sem necessidade de alterar os gates configurados.
+///
 /// Estrutura VSA: Command + Validator + Handler + Response em um único arquivo.
 /// </summary>
 public static class EvaluatePromotionGates
@@ -47,7 +58,9 @@ public static class EvaluatePromotionGates
         IPromotionGateRepository gateRepository,
         IGateEvaluationRepository evaluationRepository,
         IPromotionUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEnvironmentBehaviorService environmentBehaviorService,
+        ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -64,13 +77,65 @@ public static class EvaluatePromotionGates
 
             var now = dateTimeProvider.UtcNow;
 
+            // ── Gate: verificar se promotion gates estão habilitados para este ambiente ──
+            var environmentId = promotionRequest.TargetEnvironmentId.Value.ToString();
+            var gatesEnabled = await environmentBehaviorService.IsEnabledAsync(
+                EnvironmentBehaviorConfigKeys.ChangePromotionGatesEnabled,
+                environmentId,
+                cancellationToken);
+
+            if (!gatesEnabled)
+            {
+                // Bypass mode: registar que gates foram ignorados e aprovar automaticamente
+                logger.LogInformation(
+                    "Promotion gates bypassed for environment {EnvironmentId} — env.behavior.change.promotion_gates.enabled is false. Auto-approving request {RequestId}.",
+                    environmentId, request.PromotionRequestId);
+
+                var allGates = await gateRepository.ListByEnvironmentIdAsync(
+                    promotionRequest.TargetEnvironmentId, cancellationToken);
+
+                // Registar avaliações com bypass para rastreabilidade
+                foreach (var gate in allGates)
+                {
+                    var bypassEval = GateEvaluation.Create(
+                        promotionRequest.Id,
+                        gate.Id,
+                        passed: true,
+                        request.EvaluatedBy,
+                        details: "Bypassed — promotion gates disabled for this environment",
+                        now);
+                    evaluationRepository.Add(bypassEval);
+                }
+
+                var startBypassResult = promotionRequest.StartEvaluation();
+                if (startBypassResult.IsFailure)
+                    return startBypassResult.Error;
+
+                var approveBypassResult = promotionRequest.Approve(now);
+                if (approveBypassResult.IsFailure)
+                    return approveBypassResult.Error;
+
+                requestRepository.Update(promotionRequest);
+                await unitOfWork.CommitAsync(cancellationToken);
+
+                return new Response(
+                    promotionRequest.Id.Value,
+                    promotionRequest.Status.ToString(),
+                    TotalGates: allGates.Count,
+                    PassedGates: allGates.Count,
+                    AllRequiredPassed: true,
+                    Results: allGates.Select(g => new GateResultItem(
+                        g.Id.Value, g.GateName, Passed: true, IsRequired: g.IsRequired)).ToList());
+            }
+
+            // ── Fluxo normal: avaliar gates conforme configurado ──
             var requiredGates = await gateRepository.ListRequiredByEnvironmentIdAsync(
                 promotionRequest.TargetEnvironmentId, cancellationToken);
 
-            var allGates = await gateRepository.ListByEnvironmentIdAsync(
+            var allGatesForEval = await gateRepository.ListByEnvironmentIdAsync(
                 promotionRequest.TargetEnvironmentId, cancellationToken);
 
-            var gateMap = allGates.ToDictionary(g => g.Id.Value);
+            var gateMap = allGatesForEval.ToDictionary(g => g.Id.Value);
 
             var evaluations = new List<GateEvaluation>();
             foreach (var input in request.Evaluations)

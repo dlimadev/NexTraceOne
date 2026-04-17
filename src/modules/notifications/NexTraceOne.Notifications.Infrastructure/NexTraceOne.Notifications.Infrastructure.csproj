@@ -12,6 +12,8 @@
     <ProjectReference Include="..\NexTraceOne.Notifications.Domain\NexTraceOne.Notifications.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
+    <ProjectReference Include="..\..\configuration\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />
+    <ProjectReference Include="..\..\identityaccess\NexTraceOne.IdentityAccess.Application\NexTraceOne.IdentityAccess.Application.csproj" />
   </ItemGroup>
   <ItemGroup Label="Cross-module Contracts for Event Handlers (Phase 2)">
     <ProjectReference Include="..\..\changegovernance\NexTraceOne.ChangeGovernance.Contracts\NexTraceOne.ChangeGovernance.Contracts.csproj" />

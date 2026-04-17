@@ -18,6 +18,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { contractsApi } from '../api/contracts';
 import type { ContractListItem } from '../../../types';
 import { PageContainer } from '../../../components/shell';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Variantes visuais para badges de protocolo. */
 const protocolColors: Record<string, string> = {
@@ -66,6 +67,7 @@ const SEARCH_DEBOUNCE_MS = 350;
 /** Página principal de governança de contratos. */
 export function ContractListPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [filters, setFilters] = useState<ContractFilters>(emptyFilters);
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -89,12 +91,12 @@ export function ContractListPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['contract-governance-list', queryParams],
+    queryKey: ['contract-governance-list', queryParams, activeEnvironmentId],
     queryFn: () => contractsApi.listContracts(queryParams),
   });
 
   const summaryQuery = useQuery({
-    queryKey: ['contract-governance-summary'],
+    queryKey: ['contract-governance-summary', activeEnvironmentId],
     queryFn: () => contractsApi.getContractsSummary(),
   });
 

@@ -3,6 +3,7 @@ import {
   ShieldCheck, CheckCircle, AlertTriangle, XCircle, Eye, Lock, RefreshCw,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
@@ -20,10 +21,11 @@ import { configurationApi } from '../api/configurationApi';
 
 export function ParameterComplianceDashboardPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
 
   const { data: summary, isLoading, isError } = useQuery({
-    queryKey: ['parameter-compliance-summary'],
+    queryKey: ['parameter-compliance-summary', activeEnvironmentId],
     queryFn: configurationApi.getParameterComplianceSummary,
   });
 

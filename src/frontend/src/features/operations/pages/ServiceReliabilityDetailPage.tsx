@@ -13,6 +13,7 @@ import { PageContainer } from '../../../components/shell';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { reliabilityApi } from '../api/reliability';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const statusBadge = (status: string): { variant: 'success' | 'warning' | 'danger' | 'default'; icon: React.ReactNode } => {
   switch (status) {
@@ -35,9 +36,10 @@ const trendIcon = (dir: string) => {
 export function ServiceReliabilityDetailPage() {
   const { serviceId } = useParams<{ serviceId: string }>();
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['reliability-detail', serviceId],
+    queryKey: ['reliability-detail', serviceId, activeEnvironmentId],
     queryFn: () => reliabilityApi.getServiceDetail(serviceId!),
     enabled: !!serviceId,
     staleTime: 30_000,

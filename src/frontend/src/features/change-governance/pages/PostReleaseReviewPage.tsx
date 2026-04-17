@@ -20,6 +20,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
 import { ReleaseSelector } from '../components/ReleaseSelector';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /**
  * PostReleaseReviewPage — revisão pós-release de uma release.
@@ -32,6 +33,7 @@ import { ReleaseSelector } from '../components/ReleaseSelector';
  */
 export function PostReleaseReviewPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const qc = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
 
@@ -40,7 +42,7 @@ export function PostReleaseReviewPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['post-release-review', releaseId],
+    queryKey: ['post-release-review', releaseId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.getPostReleaseReview(releaseId),
     enabled: !!releaseId,
     retry: false,

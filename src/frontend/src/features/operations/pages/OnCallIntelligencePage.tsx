@@ -10,6 +10,7 @@ import { PageContainer, StatsGrid, PageSection } from '../../../components/shell
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import client from '../../../api/client';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 interface IncidentDistribution {
   hour: number;
@@ -38,9 +39,10 @@ interface OnCallIntelligenceResponse {
   teamFatigue: OnCallFatigue[];
 }
 
-const useOnCallIntelligence = (periodDays: number, teamId?: string) =>
-  useQuery({
-    queryKey: ['on-call-intelligence', periodDays, teamId],
+const useOnCallIntelligence = (periodDays: number, teamId?: string) => {
+  const { activeEnvironmentId } = useEnvironment();
+  return useQuery({
+    queryKey: ['on-call-intelligence', periodDays, teamId, activeEnvironmentId],
     queryFn: () =>
       client
         .get<OnCallIntelligenceResponse>('/incidents/on-call-intelligence', {
@@ -48,6 +50,7 @@ const useOnCallIntelligence = (periodDays: number, teamId?: string) =>
         })
         .then((r) => r.data),
   });
+};
 
 const FATIGUE_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'secondary'> = {
   Low: 'success',

@@ -10,6 +10,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import client from '../../../api/client';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 interface CreateChaosExperimentRequest {
   serviceName: string;
@@ -71,14 +72,16 @@ const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'seconda
   Cancelled: 'secondary',
 };
 
-const useListChaosExperiments = () =>
-  useQuery({
-    queryKey: ['chaos-experiments'],
+const useListChaosExperiments = () => {
+  const { activeEnvironmentId } = useEnvironment();
+  return useQuery({
+    queryKey: ['chaos-experiments', activeEnvironmentId],
     queryFn: () =>
       client
         .get<ListChaosExperimentsResponse>('/runtime/chaos/experiments')
         .then((r) => r.data),
   });
+};
 
 const initialForm: CreateChaosExperimentRequest = {
   serviceName: '',

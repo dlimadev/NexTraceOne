@@ -70,4 +70,11 @@ public static class PromotionErrors
             "Promotion.Environment.DuplicateName",
             "A deployment environment with the name '{0}' already exists.",
             name);
+
+    /// <summary>Avaliação de promotion gates desabilitada para este ambiente por configuração.</summary>
+    public static Error PromotionGatesDisabledForEnvironment(string environmentId)
+        => Error.Business(
+            "Promotion.Gate.DisabledForEnvironment",
+            "Promotion gate evaluation is disabled for environment '{0}'. Update 'env.behavior.change.promotion_gates.enabled' to re-enable.",
+            environmentId);
 }

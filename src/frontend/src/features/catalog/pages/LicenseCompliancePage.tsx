@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import client from '../../../api/client';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -71,6 +72,7 @@ const severityVariant = (
  */
 export function LicenseCompliancePage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
   const [serviceId, setServiceId] = useState('');
   const [activeServiceId, setActiveServiceId] = useState('');
@@ -85,7 +87,7 @@ export function LicenseCompliancePage() {
     isError: isLicenseError,
     refetch: refetchLicense,
   } = useQuery({
-    queryKey: ['license-compliance', activeServiceId],
+    queryKey: ['license-compliance', activeServiceId, activeEnvironmentId],
     queryFn: () =>
       client
         .get<LicenseResult>(`/catalog/dependencies/${activeServiceId}/licenses`)
@@ -103,7 +105,7 @@ export function LicenseCompliancePage() {
     isError: isUpgradesError,
     refetch: refetchUpgrades,
   } = useQuery({
-    queryKey: ['dependency-upgrades', activeServiceId],
+    queryKey: ['dependency-upgrades', activeServiceId, activeEnvironmentId],
     queryFn: () =>
       client
         .get<UpgradeResult>(`/catalog/dependencies/${activeServiceId}/upgrades`)

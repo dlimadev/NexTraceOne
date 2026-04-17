@@ -16,6 +16,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi, type PromotionGateItem } from '../api/changeIntelligence';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // Pares de ambientes padrão cobertos pelo produto
 const ENV_PAIRS = [
@@ -37,6 +38,7 @@ const ENV_PAIRS = [
  */
 export function ReleaseGatesDashboardPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [selectedPair, setSelectedPair] = useState(ENV_PAIRS[0]);
   const [filterActive, setFilterActive] = useState<boolean | null>(null);
 
@@ -45,7 +47,7 @@ export function ReleaseGatesDashboardPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['promotion-gates', selectedPair.from, selectedPair.to],
+    queryKey: ['promotion-gates', selectedPair.from, selectedPair.to, activeEnvironmentId],
     queryFn: () =>
       changeIntelligenceApi.listPromotionGatesByEnvironment(selectedPair.from, selectedPair.to),
     staleTime: 30_000,

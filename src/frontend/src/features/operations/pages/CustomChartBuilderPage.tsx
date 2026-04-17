@@ -12,6 +12,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import client from '../../../api/client';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -51,14 +52,16 @@ const CHART_TYPE_COLORS: Record<ChartType, 'primary' | 'secondary' | 'success' |
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 
-const useListCharts = (userId: string, tenantId: string) =>
-  useQuery({
-    queryKey: ['custom-charts', userId, tenantId],
+const useListCharts = (userId: string, tenantId: string) => {
+  const { activeEnvironmentId } = useEnvironment();
+  return useQuery({
+    queryKey: ['custom-charts', userId, tenantId, activeEnvironmentId],
     queryFn: () =>
       client
         .get<ListChartsResponse>('/custom-charts', { params: { userId, tenantId } })
         .then((r) => r.data),
   });
+};
 
 const useCreateChart = () => {
   const qc = useQueryClient();

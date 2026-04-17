@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { Star, Grid3x3, BarChart2, RefreshCw, Search } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -48,9 +49,9 @@ interface ListScorecardsResponse {
   distributionByLevel: Record<string, number>;
 }
 
-const useServiceScorecard = (serviceName: string, periodDays: number) =>
+const useServiceScorecard = (serviceName: string, periodDays: number, envId?: string | null) =>
   useQuery({
-    queryKey: ['service-scorecard', serviceName, periodDays],
+    queryKey: ['service-scorecard', serviceName, periodDays, envId],
     queryFn: () =>
       client
         .get<ServiceScorecardResponse>(`/executive/service-scorecards/${serviceName}`, {
@@ -60,9 +61,9 @@ const useServiceScorecard = (serviceName: string, periodDays: number) =>
     enabled: serviceName.length > 0,
   });
 
-const useListScorecards = (teamName: string, maturityLevel: string, page: number) =>
+const useListScorecards = (teamName: string, maturityLevel: string, page: number, envId?: string | null) =>
   useQuery({
-    queryKey: ['list-service-scorecards', teamName, maturityLevel, page],
+    queryKey: ['list-service-scorecards', teamName, maturityLevel, page, envId],
     queryFn: () =>
       client
         .get<ListScorecardsResponse>('/executive/service-scorecards', {

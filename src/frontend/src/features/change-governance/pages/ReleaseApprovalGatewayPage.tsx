@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const INPUT_CLS =
   'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
@@ -41,6 +42,7 @@ function approvalStatusVariant(
  */
 export function ReleaseApprovalGatewayPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
 
@@ -52,7 +54,7 @@ export function ReleaseApprovalGatewayPage() {
   const [tokenExpiryHours, setTokenExpiryHours] = useState(48);
 
   const approvalsQuery = useQuery({
-    queryKey: ['release-approvals', releaseId],
+    queryKey: ['release-approvals', releaseId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.listApprovalRequests(releaseId),
     enabled: !!releaseId,
   });

@@ -20,6 +20,7 @@ import {
   Lock,
 } from 'lucide-react';
 import axios from 'axios';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -209,6 +210,7 @@ function SummaryCard({ label, value, color }: { label: string; value: number; co
 
 export function SecurityGateDashboardPage() {
   const { t } = useTranslation('securityGate');
+  const { activeEnvironmentId } = useEnvironment();
   const [activeTab, setActiveTab] = useState<'scan' | 'dashboard'>('scan');
   const [codeInput, setCodeInput] = useState('');
   const [filePathInput, setFilePathInput] = useState('Program.cs');
@@ -217,7 +219,7 @@ export function SecurityGateDashboardPage() {
 
   // Dashboard data
   const dashboardQuery = useQuery({
-    queryKey: ['security-dashboard'],
+    queryKey: ['security-dashboard', activeEnvironmentId],
     queryFn: securityApi.getDashboard,
     enabled: activeTab === 'dashboard',
     retry: false,

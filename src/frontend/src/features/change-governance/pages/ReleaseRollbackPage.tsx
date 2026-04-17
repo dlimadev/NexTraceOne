@@ -20,6 +20,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
 import { ReleaseSelector } from '../components/ReleaseSelector';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /**
  * ReleaseRollbackPage — avaliação e gestão de rollback de releases.
@@ -32,6 +33,7 @@ import { ReleaseSelector } from '../components/ReleaseSelector';
  */
 export function ReleaseRollbackPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const qc = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
   const [assessForm, setAssessForm] = useState({
@@ -52,7 +54,7 @@ export function ReleaseRollbackPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['rollback-assessment', releaseId],
+    queryKey: ['rollback-assessment', releaseId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.getRollbackAssessment(releaseId),
     enabled: !!releaseId,
     retry: false,

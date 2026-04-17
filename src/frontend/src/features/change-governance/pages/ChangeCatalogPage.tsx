@@ -83,7 +83,7 @@ function scoreColor(score: number): string {
 export function ChangeCatalogPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { availableEnvironments } = useEnvironment();
+  const { availableEnvironments, activeEnvironmentId } = useEnvironment();
 
   // ── Filtros ──
   const [serviceName, setServiceName] = useState('');
@@ -122,12 +122,12 @@ export function ChangeCatalogPage() {
 
   // ── Queries ──
   const summaryQuery = useQuery({
-    queryKey: ['change-confidence-summary', environment],
+    queryKey: ['change-confidence-summary', environment, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getSummary(environment ? { environment } : undefined),
   });
 
   const changesQuery = useQuery({
-    queryKey: ['change-confidence-list', filterParams],
+    queryKey: ['change-confidence-list', filterParams, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.listChanges(filterParams),
   });
 

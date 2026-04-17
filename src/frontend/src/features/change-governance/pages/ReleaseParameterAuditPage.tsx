@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { configurationApi } from '../../configuration/api/configurationApi';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /**
  * ReleaseParameterAuditPage — trilha de auditoria dos parâmetros de controlo de release.
@@ -25,11 +26,12 @@ import { configurationApi } from '../../configuration/api/configurationApi';
  */
 export function ReleaseParameterAuditPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [filterKey, setFilterKey] = useState('');
   const [scopeFilter, setScopeFilter] = useState('all');
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['release-parameter-audit', scopeFilter],
+    queryKey: ['release-parameter-audit', scopeFilter, activeEnvironmentId],
     queryFn: () => configurationApi.getReleaseParameterAudit('change.release.', 200),
   });
 

@@ -56,6 +56,17 @@ function wrapper(children: React.ReactNode) {
 
 import { configurationApi } from '../../features/configuration/api/configurationApi';
 
+vi.mock('../../contexts/EnvironmentContext', () => ({
+  useEnvironment: vi.fn().mockReturnValue({
+    activeEnvironmentId: 'env-prod-001',
+    activeEnvironment: { id: 'env-prod-001', name: 'Production', profile: 'production', isProductionLike: true },
+    availableEnvironments: [{ id: 'env-prod-001', name: 'Production', profile: 'production', isProductionLike: true }],
+    isLoadingEnvironments: false,
+    selectEnvironment: vi.fn(),
+    clearEnvironment: vi.fn(),
+  }),
+}));
+
 describe('ReleaseParameterEnvironmentOverridePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();

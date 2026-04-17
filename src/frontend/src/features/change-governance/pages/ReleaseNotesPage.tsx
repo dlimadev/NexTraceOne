@@ -19,6 +19,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
 import { ReleaseSelector } from '../components/ReleaseSelector';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const PERSONA_MODES = ['Technical', 'Executive', 'ProductManager'] as const;
 
@@ -33,6 +34,7 @@ const PERSONA_MODES = ['Technical', 'Executive', 'ProductManager'] as const;
  */
 export function ReleaseNotesPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const qc = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
   const [personaMode, setPersonaMode] = useState<string>('Technical');
@@ -43,7 +45,7 @@ export function ReleaseNotesPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['release-notes', releaseId],
+    queryKey: ['release-notes', releaseId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.getReleaseNotes(releaseId),
     enabled: !!releaseId,
     retry: false,

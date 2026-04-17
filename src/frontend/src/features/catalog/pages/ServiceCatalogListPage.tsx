@@ -23,6 +23,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { PageContainer, PageSection, ContentGrid } from '../../../components/shell';
 import { serviceCatalogApi } from '../api';
 import type { ServiceListItem, Criticality, LifecycleStatus } from '../../../types';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Variantes visuais para badges de criticidade. */
 const criticalityColors: Record<Criticality, string> = {
@@ -99,6 +100,7 @@ const SEARCH_DEBOUNCE_MS = 350;
 /** Página principal de listagem do catálogo de serviços. */
 export function ServiceCatalogListPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<ServiceFilters>(emptyFilters);
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -146,12 +148,12 @@ export function ServiceCatalogListPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['catalog-services', queryParams],
+    queryKey: ['catalog-services', queryParams, activeEnvironmentId],
     queryFn: () => serviceCatalogApi.listServices(queryParams),
   });
 
   const summaryQuery = useQuery({
-    queryKey: ['catalog-services-summary'],
+    queryKey: ['catalog-services-summary', activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getServicesSummary(),
   });
 

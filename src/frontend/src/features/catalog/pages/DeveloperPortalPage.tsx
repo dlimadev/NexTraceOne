@@ -37,6 +37,7 @@ import type {
 import { DevPortalSubscriptionsTab } from './DevPortalSubscriptionsTab';
 import { DevPortalPlaygroundTab } from './DevPortalPlaygroundTab';
 import { DevPortalMyConsumptionTab, DevPortalInboxTab } from './DevPortalInboxTab';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type Tab = 'catalog' | 'subscriptions' | 'playground' | 'analytics' | 'myConsumption' | 'inbox';
 
@@ -87,6 +88,7 @@ const emptyPlayForm: PlaygroundForm = {
 export function DeveloperPortalPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { activeEnvironmentId } = useEnvironment();
   const [activeTab, setActiveTab] = useState<Tab>('catalog');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSubForm, setShowSubForm] = useState(false);
@@ -97,28 +99,28 @@ export function DeveloperPortalPage() {
   // ── Queries ─────────────────────────────────────────────────────────────────
 
   const catalogQuery = useQuery({
-    queryKey: ['developerPortal', 'catalog', searchQuery],
+    queryKey: ['developerPortal', 'catalog', searchQuery, activeEnvironmentId],
     queryFn: () => developerPortalApi.searchCatalog(searchQuery, 1, 20),
     enabled: activeTab === 'catalog' && searchQuery.length > 0,
     staleTime: 15_000,
   });
 
   const subscriptionsQuery = useQuery({
-    queryKey: ['developerPortal', 'subscriptions'],
+    queryKey: ['developerPortal', 'subscriptions', activeEnvironmentId],
     queryFn: () => developerPortalApi.listSubscriptions(),
     enabled: activeTab === 'subscriptions',
     staleTime: 15_000,
   });
 
   const historyQuery = useQuery({
-    queryKey: ['developerPortal', 'playground', 'history'],
+    queryKey: ['developerPortal', 'playground', 'history', activeEnvironmentId],
     queryFn: () => developerPortalApi.getPlaygroundHistory(1, 20),
     enabled: activeTab === 'playground',
     staleTime: 15_000,
   });
 
   const analyticsQuery = useQuery({
-    queryKey: ['developerPortal', 'analytics'],
+    queryKey: ['developerPortal', 'analytics', activeEnvironmentId],
     queryFn: () => {
       const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       return developerPortalApi.getAnalytics(since);
@@ -132,7 +134,7 @@ export function DeveloperPortalPage() {
    * Usa endpoint getConsuming que retorna APIs filtradas pelo consumidor autenticado.
    */
   const consumingQuery = useQuery({
-    queryKey: ['developerPortal', 'consuming'],
+    queryKey: ['developerPortal', 'consuming', activeEnvironmentId],
     queryFn: () => developerPortalApi.getConsuming(1, 50),
     enabled: activeTab === 'myConsumption',
     staleTime: 15_000,
@@ -143,7 +145,7 @@ export function DeveloperPortalPage() {
    * Reutilizada tanto no catálogo "My APIs" como na aba de consumo cruzado.
    */
   const myApisQuery = useQuery({
-    queryKey: ['developerPortal', 'myApis'],
+    queryKey: ['developerPortal', 'myApis', activeEnvironmentId],
     queryFn: () => developerPortalApi.getMyApis(1, 50),
     enabled: activeTab === 'myConsumption',
     staleTime: 15_000,

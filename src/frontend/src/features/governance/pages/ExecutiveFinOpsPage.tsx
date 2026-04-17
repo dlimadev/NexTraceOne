@@ -13,6 +13,7 @@ import { finOpsApi } from '../api/finOps';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 function formatCurrency(value: number, locale = 'en-US'): string {
   return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
@@ -20,10 +21,11 @@ function formatCurrency(value: number, locale = 'en-US'): string {
 
 export function ExecutiveFinOpsPage() {
   const { t, i18n } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const fmt = (v: number) => formatCurrency(v, i18n.language);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
-    queryKey: queryKeys.governance.finops.summary(),
+    queryKey: queryKeys.governance.finops.summary(undefined, activeEnvironmentId),
     queryFn: () => finOpsApi.getSummary(),
     staleTime: 30_000,
   });
