@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { LayoutDashboard, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Plus, Eye, Settings } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -22,6 +23,8 @@ interface DashboardSummary {
   widgetCount: number;
   layout: string;
   isShared: boolean;
+  teamId?: string | null;
+  isSystem: boolean;
   createdAt: string;
 }
 
@@ -30,13 +33,26 @@ interface ListDashboardsResponse {
   totalCount: number;
 }
 
+interface WidgetInput {
+  existingWidgetId?: string | null;
+  type: string;
+  posX: number;
+  posY: number;
+  width: number;
+  height: number;
+  serviceId?: string | null;
+  teamId?: string | null;
+  timeRange?: string | null;
+  customTitle?: string | null;
+}
+
 interface CreateDashboardRequest {
   tenantId: string;
   userId: string;
   name: string;
   description: string;
   layout: string;
-  widgetIds: string[];
+  widgets: WidgetInput[];
   persona: string;
 }
 
@@ -68,6 +84,17 @@ const WIDGET_IDS = [
   'knowledge-graph',
   'on-call-status',
 ] as const;
+
+const WIDGET_DEFAULT_SIZE: Record<string, { w: number; h: number }> = {
+  'dora-metrics':      { w: 2, h: 2 },
+  'service-scorecard': { w: 2, h: 2 },
+  'incident-summary':  { w: 2, h: 2 },
+  'change-confidence': { w: 2, h: 2 },
+  'cost-trend':        { w: 2, h: 2 },
+  'reliability-slo':   { w: 2, h: 2 },
+  'knowledge-graph':   { w: 3, h: 3 },
+  'on-call-status':    { w: 2, h: 1 },
+};
 
 const PERSONA_VARIANT: Record<string, 'primary' | 'secondary' | 'success' | 'warning'> = {
   Executive: 'primary',
@@ -120,6 +147,7 @@ const WIDGET_KEY_MAP: Record<string, string> = {
 
 export function CustomDashboardsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { activeEnvironmentId } = useEnvironment();
   const TENANT_ID = 'default';
 
@@ -140,6 +168,19 @@ export function CustomDashboardsPage() {
     );
   };
 
+  /** Build widget inputs with automatic grid positions */
+  const buildWidgetInputs = (widgetIds: string[]): WidgetInput[] =>
+    widgetIds.map((id, index) => {
+      const size = WIDGET_DEFAULT_SIZE[id] ?? { w: 2, h: 2 };
+      return {
+        type: id,
+        posX: 0,
+        posY: index * size.h,
+        width: size.w,
+        height: size.h,
+      };
+    });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
@@ -152,7 +193,7 @@ export function CustomDashboardsPage() {
         name,
         description,
         layout,
-        widgetIds: selectedWidgets,
+        widgets: buildWidgetInputs(selectedWidgets),
         persona,
       });
       setFormSuccess(true);
@@ -224,7 +265,7 @@ export function CustomDashboardsPage() {
                   >
                     {LAYOUTS.map((l) => (
                       <option key={l} value={l}>
-                        {t(`governance.customDashboards.${l.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}`)}
+                        {t(`governance.customDashboards.${l.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())}`)}
                       </option>
                     ))}
                   </select>
@@ -320,10 +361,32 @@ export function CustomDashboardsPage() {
                     <span>
                       {dashboard.widgetCount} {t('governance.customDashboards.widgets')}
                     </span>
+                    {dashboard.isShared && (
+                      <Badge variant="secondary">{t('governance.dashboardView.shared', 'Shared')}</Badge>
+                    )}
+                    {dashboard.isSystem && (
+                      <Badge variant="warning">{t('governance.dashboardView.system', 'System')}</Badge>
+                    )}
                   </div>
-                  <Button size="sm" variant="secondary" onClick={() => undefined}>
-                    {t('governance.customDashboards.viewDashboard')}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => navigate(`/governance/dashboards/${dashboard.dashboardId}`)}
+                    >
+                      <Eye size={12} className="mr-1" />
+                      {t('governance.customDashboards.viewDashboard')}
+                    </Button>
+                    {!dashboard.isSystem && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => navigate(`/governance/dashboards/${dashboard.dashboardId}/edit`)}
+                      >
+                        <Settings size={12} />
+                      </Button>
+                    )}
+                  </div>
                 </CardBody>
               </Card>
             ))}

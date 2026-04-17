@@ -34,6 +34,8 @@ const GovernanceConfigurationPage = lazy(() => import('../features/governance/pa
 const DoraMetricsPage = lazy(() => import('../features/governance/pages/DoraMetricsPage').then(m => ({ default: m.DoraMetricsPage })));
 const ServiceScorecardPage = lazy(() => import('../features/governance/pages/ServiceScorecardPage').then(m => ({ default: m.ServiceScorecardPage })));
 const CustomDashboardsPage = lazy(() => import('../features/governance/pages/CustomDashboardsPage').then(m => ({ default: m.CustomDashboardsPage })));
+const DashboardViewPage = lazy(() => import('../features/governance/pages/DashboardViewPage').then(m => ({ default: m.DashboardViewPage })));
+const DashboardBuilderPage = lazy(() => import('../features/governance/pages/DashboardBuilderPage').then(m => ({ default: m.DashboardBuilderPage })));
 const TechnicalDebtPage = lazy(() => import('../features/governance/pages/TechnicalDebtPage').then(m => ({ default: m.TechnicalDebtPage })));
 const ApiPolicyAsCodePage = lazy(() => import('../features/governance/pages/ApiPolicyAsCodePage').then(m => ({ default: m.ApiPolicyAsCodePage })));
 const GovernanceGatesPage = lazy(() => import('../features/governance/pages/GovernanceGatesPage').then(m => ({ default: m.GovernanceGatesPage })));
@@ -271,6 +273,22 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
             <CustomDashboardsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/dashboards/:dashboardId"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <DashboardViewPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/dashboards/:dashboardId/edit"
+        element={
+          <ProtectedRoute permission="governance:reports:write" redirectTo="/unauthorized">
+            <DashboardBuilderPage />
           </ProtectedRoute>
         }
       />

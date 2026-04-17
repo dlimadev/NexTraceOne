@@ -20,6 +20,8 @@ const mockListResponse = {
       widgetCount: 6,
       layout: 'grid',
       isShared: true,
+      isSystem: false,
+      teamId: null,
       createdAt: '2026-01-01T00:00:00Z',
     },
     {
@@ -29,6 +31,8 @@ const mockListResponse = {
       widgetCount: 5,
       layout: 'two-column',
       isShared: false,
+      isSystem: false,
+      teamId: null,
       createdAt: '2026-02-01T00:00:00Z',
     },
   ],
