@@ -35,7 +35,7 @@ internal sealed class SmtpConfigurationEntityConfiguration
             .HasMaxLength(500);
 
         builder.Property(x => x.EncryptedPassword)
-            .HasMaxLength(2000);
+            .HasMaxLength(4000); // Extra space for AES-256-GCM ciphertext overhead
 
         builder.Property(x => x.FromAddress)
             .HasMaxLength(500)

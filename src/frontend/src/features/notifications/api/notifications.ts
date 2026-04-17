@@ -1,6 +1,7 @@
 import client from '../../../api/client';
 import type {
   NotificationDto,
+  NotificationDetailResponse,
   NotificationListParams,
   NotificationListResponse,
   NotificationPreferencesResponse,
@@ -27,6 +28,11 @@ export const notificationsApi = {
       .get<NotificationListResponse>('/notifications', { params })
       .then((r) => r.data),
 
+  getById: (id: string) =>
+    client
+      .get<NotificationDetailResponse>(`/notifications/${id}`)
+      .then((r) => r.data),
+
   getUnreadCount: () =>
     client
       .get<UnreadCountResponse>('/notifications/unread-count')
@@ -40,6 +46,20 @@ export const notificationsApi = {
 
   markAllAsRead: () =>
     client.post('/notifications/mark-all-read').then((r) => r.data),
+
+  // ── Lifecycle: Acknowledge, Archive, Dismiss, Snooze ─────────────────────
+
+  acknowledge: (id: string, comment?: string) =>
+    client.post(`/notifications/${id}/acknowledge`, { notificationId: id, comment: comment ?? null }).then((r) => r.data),
+
+  archive: (id: string) =>
+    client.post(`/notifications/${id}/archive`).then((r) => r.data),
+
+  dismiss: (id: string) =>
+    client.post(`/notifications/${id}/dismiss`).then((r) => r.data),
+
+  snooze: (id: string, snoozedUntil: string) =>
+    client.post(`/notifications/${id}/snooze`, { notificationId: id, snoozedUntil }).then((r) => r.data),
 
   getPreferences: () =>
     client

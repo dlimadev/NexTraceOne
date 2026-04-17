@@ -25,6 +25,7 @@ const NotificationCenterPage = lazy(() => import('../features/notifications/page
 const NotificationAnalyticsPage = lazy(() => import('../features/notifications/pages/NotificationAnalyticsPage').then(m => ({ default: m.NotificationAnalyticsPage })));
 const NotificationPreferencesPage = lazy(() => import('../features/notifications/pages/NotificationPreferencesPage').then(m => ({ default: m.NotificationPreferencesPage })));
 const NotificationConfigurationPage = lazy(() => import('../features/notifications/pages/NotificationConfigurationPage').then(m => ({ default: m.NotificationConfigurationPage })));
+const NotificationDetailPage = lazy(() => import('../features/notifications/pages/NotificationDetailPage').then(m => ({ default: m.NotificationDetailPage })));
 
 // Configuration Admin
 const ConfigurationAdminPage = lazy(() => import('../features/configuration/pages/ConfigurationAdminPage').then(m => ({ default: m.ConfigurationAdminPage })));
@@ -195,6 +196,14 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="notifications:configuration:read" redirectTo="/unauthorized">
             <NotificationAnalyticsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications/:notificationId"
+        element={
+          <ProtectedRoute permission="notifications:inbox:read" redirectTo="/unauthorized">
+            <NotificationDetailPage />
           </ProtectedRoute>
         }
       />

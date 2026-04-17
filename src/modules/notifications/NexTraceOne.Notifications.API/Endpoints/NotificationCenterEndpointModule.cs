@@ -16,6 +16,11 @@ using UpdatePreferenceFeature = NexTraceOne.Notifications.Application.Features.U
 using GetDeliveryHistoryFeature = NexTraceOne.Notifications.Application.Features.GetDeliveryHistory.GetDeliveryHistory;
 using GetDeliveryStatusFeature = NexTraceOne.Notifications.Application.Features.GetDeliveryStatus.GetDeliveryStatus;
 using GetNotificationTrailFeature = NexTraceOne.Notifications.Application.Features.GetNotificationTrail.GetNotificationTrail;
+using GetNotificationByIdFeature = NexTraceOne.Notifications.Application.Features.GetNotificationById.GetNotificationById;
+using AcknowledgeNotificationFeature = NexTraceOne.Notifications.Application.Features.AcknowledgeNotification.AcknowledgeNotification;
+using ArchiveNotificationFeature = NexTraceOne.Notifications.Application.Features.ArchiveNotification.ArchiveNotification;
+using DismissNotificationFeature = NexTraceOne.Notifications.Application.Features.DismissNotification.DismissNotification;
+using SnoozeNotificationFeature = NexTraceOne.Notifications.Application.Features.SnoozeNotification.SnoozeNotification;
 
 namespace NexTraceOne.Notifications.API.Endpoints;
 
@@ -108,6 +113,69 @@ public sealed class NotificationCenterEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("notifications:preferences:write");
+
+        // ── Lifecycle: Acknowledge, Archive, Dismiss, Snooze ─────────────────
+
+        group.MapPost("/{id:guid}/acknowledge", async (
+            Guid id,
+            AcknowledgeNotificationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var effectiveCommand = command with { NotificationId = id };
+            var result = await sender.Send(effectiveCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:inbox:write");
+
+        group.MapPost("/{id:guid}/archive", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ArchiveNotificationFeature.Command(id), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:inbox:write");
+
+        group.MapPost("/{id:guid}/dismiss", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DismissNotificationFeature.Command(id), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:inbox:write");
+
+        group.MapPost("/{id:guid}/snooze", async (
+            Guid id,
+            SnoozeNotificationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var effectiveCommand = command with { NotificationId = id };
+            var result = await sender.Send(effectiveCommand, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:inbox:write");
+
+        // ── P7.4: Notification Detail ─────────────────────────────────────────
+
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetNotificationByIdFeature.Query(id), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("notifications:inbox:read");
 
         // ── P7.2: Delivery History & Status ───────────────────────────────────
 

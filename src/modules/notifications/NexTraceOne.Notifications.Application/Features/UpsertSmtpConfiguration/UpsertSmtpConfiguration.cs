@@ -10,7 +10,8 @@ namespace NexTraceOne.Notifications.Application.Features.UpsertSmtpConfiguration
 
 /// <summary>
 /// Feature: UpsertSmtpConfiguration — cria ou atualiza a configuração SMTP do tenant.
-/// A senha é recebida em claro e deve ser cifrada pela camada de infraestrutura antes da persistência.
+/// A senha é recebida em claro; a cifra AES-256-GCM é aplicada automaticamente
+/// pelo EF Core via [EncryptedField] em SmtpConfiguration.EncryptedPassword.
 /// </summary>
 public static class UpsertSmtpConfiguration
 {
@@ -52,8 +53,8 @@ public static class UpsertSmtpConfiguration
         {
             Guard.Against.Null(request);
 
-            // Nota: em produção, a senha deve ser cifrada antes de persistir.
-            // Nesta fase, a infraestrutura é responsável por aplicar cifra se necessário.
+            // A senha é passada em texto claro. O EF Core aplica cifra AES-256-GCM
+            // automaticamente via [EncryptedField] em SmtpConfiguration.EncryptedPassword.
             var encryptedPassword = request.Password;
 
             var existing = await store.GetByTenantAsync(tenant.Id, cancellationToken);

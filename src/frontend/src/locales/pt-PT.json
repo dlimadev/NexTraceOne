@@ -7160,6 +7160,13 @@
     "markAllRead": "Marcar todas como lidas",
     "markRead": "Marcar como lida",
     "markUnread": "Marcar como não lida",
+    "acknowledge": "Reconhecer",
+    "archive": "Arquivar",
+    "dismiss": "Descartar",
+    "snooze1h": "Adiar por 1 hora",
+    "acknowledged": "Reconhecido",
+    "snoozed": "Adiado",
+    "escalated": "Escalado",
     "noNotifications": "Sem notificações",
     "noNotificationsDescription": "Está tudo em dia! Novas notificações aparecerão aqui.",
     "preferences": {
@@ -7192,7 +7199,44 @@
       "minutesAgo": "{{count}}min atrás"
     },
     "title": "Central de Notificações",
-    "viewAll": "Ver todas as notificações"
+    "viewAll": "Ver todas as notificações",
+    "detail": {
+      "title": "Detalhe da Notificação",
+      "backToInbox": "Voltar à caixa de entrada",
+      "loading": "A carregar notificação...",
+      "errorLoading": "Falha ao carregar notificação",
+      "notFound": "Notificação não encontrada",
+      "requiresActionBanner": "Esta notificação requer a sua confirmação.",
+      "eventType": "Tipo de evento",
+      "sourceModule": "Módulo de origem",
+      "sourceEntity": "Entidade de origem",
+      "sourceEntityId": "ID da entidade",
+      "sourceEventId": "ID do evento de origem",
+      "environment": "Ambiente",
+      "occurrences": "Ocorrências",
+      "readAt": "Lida em",
+      "acknowledgedAt": "Confirmada em",
+      "archivedAt": "Arquivada em",
+      "snoozedUntil": "Silenciada até",
+      "deliveries": "Canais de entrega",
+      "noDeliveries": "Nenhum registo de entrega encontrado.",
+      "deliveryChannel": "Canal",
+      "deliveryStatus": "Estado",
+      "retries": "Tentativas",
+      "deliveredAt": "Entregue em",
+      "nextRetry": "Próxima tentativa",
+      "errorMessage": "Erro",
+      "deliveryTrail": "Trilha de entregas",
+      "actions": "Ações",
+      "actionFailed": "Ação falhou. Tente novamente.",
+      "viewSourceAction": "Ir para a origem",
+      "deliveryOutcome": {
+        "delivered": "Entregue em todos os canais",
+        "failed": "Falha permanente num ou mais canais",
+        "retrying": "A tentar entregar novamente...",
+        "pending": "Entrega pendente"
+      }
+    }
   },
   "onboarding": {
     "aiHub": {

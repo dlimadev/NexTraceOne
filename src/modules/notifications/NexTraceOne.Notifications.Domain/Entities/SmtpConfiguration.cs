@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Core.Attributes;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.Notifications.Domain.StronglyTypedIds;
 
@@ -58,8 +59,10 @@ public sealed class SmtpConfiguration : Entity<SmtpConfigurationId>
 
     /// <summary>
     /// Senha cifrada para autenticação SMTP.
-    /// A cifra/decifra é responsabilidade da camada de infraestrutura.
+    /// Encriptada em repouso via AES-256-GCM (EncryptedStringConverter — aplicado automaticamente pelo NexTraceDbContextBase).
+    /// A camada de Application passa o valor em texto claro; o EF Core aplica cifra/decifra de forma transparente.
     /// </summary>
+    [EncryptedField]
     public string? EncryptedPassword { get; private set; }
 
     /// <summary>Endereço de email do remetente (ex.: noreply@empresa.com).</summary>

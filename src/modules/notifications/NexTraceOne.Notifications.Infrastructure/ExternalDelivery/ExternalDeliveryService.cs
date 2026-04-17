@@ -17,6 +17,7 @@ namespace NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 /// NotificationDelivery.ScheduleRetry(nextRetryAt), que são processados pelo
 /// NotificationDeliveryRetryJob em background.
 /// P7.3: regista eventos auditáveis após entrega concluída/falhada.
+/// Verifica quiet hours do destinatário antes de despachar canais externos.
 /// </summary>
 internal sealed class ExternalDeliveryService(
     INotificationRoutingEngine routingEngine,
@@ -24,6 +25,8 @@ internal sealed class ExternalDeliveryService(
     INotificationDeliveryStore deliveryStore,
     INotificationAuditService notificationAuditService,
     IEnvironmentBehaviorService environmentBehaviorService,
+    IQuietHoursService quietHoursService,
+    IMandatoryNotificationPolicy mandatoryPolicy,
     IOptions<DeliveryRetryOptions> retryOptions,
     ILogger<ExternalDeliveryService> logger) : IExternalDeliveryService
 {
@@ -46,6 +49,23 @@ internal sealed class ExternalDeliveryService(
             logger.LogDebug(
                 "External notification channels disabled by configuration — skipping delivery for notification {NotificationId}",
                 notification.Id.Value);
+            return;
+        }
+
+        // ── Gate: verificar quiet hours do destinatário ───────────────────
+        var isMandatory = mandatoryPolicy.IsMandatory(
+            notification.EventType, notification.Category, notification.Severity);
+
+        var shouldDefer = await quietHoursService.ShouldDeferAsync(
+            notification.RecipientUserId,
+            isMandatory,
+            cancellationToken);
+
+        if (shouldDefer)
+        {
+            logger.LogDebug(
+                "External delivery deferred for notification {NotificationId}: quiet hours active for user {UserId}.",
+                notification.Id.Value, notification.RecipientUserId);
             return;
         }
 

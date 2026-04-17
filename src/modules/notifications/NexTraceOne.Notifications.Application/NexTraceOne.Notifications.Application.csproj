@@ -7,5 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.Notifications.Domain\NexTraceOne.Notifications.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\configuration\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />
+    <ProjectReference Include="..\..\identityaccess\NexTraceOne.IdentityAccess.Application\NexTraceOne.IdentityAccess.Application.csproj" />
   </ItemGroup>
 </Project>

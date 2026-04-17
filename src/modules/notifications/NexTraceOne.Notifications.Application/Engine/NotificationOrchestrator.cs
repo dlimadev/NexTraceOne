@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
@@ -15,12 +18,18 @@ namespace NexTraceOne.Notifications.Application.Engine;
 /// para canais elegíveis (email, Teams) via IExternalDeliveryService.
 /// Ponto único de decisão — nenhum módulo deve criar notificações fora desta engine.
 /// P7.3: regista eventos auditáveis após criação de cada notificação.
+/// env.behavior: respeita <c>env.behavior.notifications.external_channels.enabled</c>
+/// e <c>env.behavior.notifications.minimum_severity</c> por ambiente.
 /// </summary>
 public sealed class NotificationOrchestrator(
     INotificationStore store,
     INotificationTemplateResolver templateResolver,
     INotificationDeduplicationService deduplicationService,
+    INotificationSuppressionService suppressionService,
+    INotificationGroupingService groupingService,
     INotificationAuditService notificationAuditService,
+    IEnvironmentBehaviorService environmentBehaviorService,
+    IConfigurationResolutionService configResolution,
     IExternalDeliveryService? externalDeliveryService,
     ILogger<NotificationOrchestrator> logger) : INotificationOrchestrator
 {
@@ -55,11 +64,40 @@ public sealed class NotificationOrchestrator(
         var parameters = ExtractParameters(request);
         var template = ResolveTemplate(request, parameters);
 
-        // 4. Criar notificações por destinatário com deduplicação
+        // 3a. Verificar severidade mínima por ambiente (env.behavior.notifications.minimum_severity)
+        var environmentId = request.EnvironmentId?.ToString();
+        var minSeverityInt = await environmentBehaviorService.GetIntAsync(
+            EnvironmentBehaviorConfigKeys.NotificationsMinimumSeverity,
+            environmentId,
+            defaultValue: 0,
+            cancellationToken);
+
+        if ((int)template.Severity < minSeverityInt)
+        {
+            logger.LogDebug(
+                "Notification {EventType} skipped: severity {Severity} below minimum {MinSeverity} for environment {EnvironmentId}.",
+                request.EventType, template.Severity, (NotificationSeverity)minSeverityInt, environmentId);
+            return new NotificationResult(false, "Notification severity below minimum threshold for this environment.");
+        }
+
+        // 4. Criar notificações por destinatário com deduplicação e supressão
         var createdIds = new List<Guid>();
+
+        // Ler janela de agrupamento da configuração (fallback: 60 min)
+        var groupingWindowMinutes = 60;
+        var groupingWindowDto = await configResolution.ResolveEffectiveValueAsync(
+            "notifications.grouping.window_minutes",
+            ConfigurationScope.Tenant,
+            request.TenantId.Value.ToString(),
+            cancellationToken);
+        if (groupingWindowDto is not null
+            && int.TryParse(groupingWindowDto.EffectiveValue, out var gw)
+            && gw > 0)
+            groupingWindowMinutes = gw;
+
         foreach (var recipientId in recipientIds)
         {
-            // 4a. Deduplicação básica
+            // 4a. Deduplicação básica (janela e estado lidos de config internamente)
             var isDuplicate = await deduplicationService.IsDuplicateAsync(
                 request.TenantId.Value,
                 recipientId,
@@ -76,7 +114,17 @@ public sealed class NotificationOrchestrator(
                 continue;
             }
 
-            // 4b. Criar notificação com rastreabilidade completa
+            // 4b. Supressão (acknowledged recente, snooze activo — lidos de config internamente)
+            var suppression = await suppressionService.EvaluateAsync(request, recipientId, cancellationToken);
+            if (suppression.ShouldSuppress)
+            {
+                logger.LogDebug(
+                    "Suppressing notification {EventType} for user {UserId}: {Reason}",
+                    request.EventType, recipientId, suppression.Reason);
+                continue;
+            }
+
+            // 4c. Criar notificação com rastreabilidade completa
             var notification = Notification.Create(
                 tenantId: request.TenantId.Value,
                 recipientUserId: recipientId,
@@ -95,10 +143,26 @@ public sealed class NotificationOrchestrator(
                 expiresAt: request.ExpiresAt,
                 sourceEventId: request.SourceEventId);
 
+            // 4d. Correlação e agrupamento
+            var correlationKey = groupingService.GenerateCorrelationKey(
+                request.TenantId.Value,
+                request.EventType,
+                request.SourceModule,
+                request.SourceEntityType,
+                request.SourceEntityId);
+
+            var groupId = await groupingService.ResolveGroupAsync(
+                request.TenantId.Value,
+                correlationKey,
+                groupingWindowMinutes,
+                cancellationToken);
+
+            notification.SetCorrelation(correlationKey, groupId);
+
             await store.AddAsync(notification, cancellationToken);
             createdIds.Add(notification.Id.Value);
 
-            // 4c. Registar evento auditável — criação de notificação (P7.3)
+            // 4e. Registar evento auditável — criação de notificação (P7.3)
             await RecordAuditAsync(
                 entry: new NotificationAuditEntry
                 {
@@ -114,20 +178,35 @@ public sealed class NotificationOrchestrator(
                 },
                 cancellationToken);
 
-            // 4d. Agendar entrega externa (email, Teams) se o serviço estiver disponível
+            // 4f. Agendar entrega externa (email, Teams) se o serviço estiver disponível
+            // e se o env.behavior.notifications.external_channels.enabled o permitir
             if (externalDeliveryService is not null)
             {
-                try
+                var externalEnabled = await environmentBehaviorService.IsEnabledAsync(
+                    EnvironmentBehaviorConfigKeys.NotificationsExternalChannelsEnabled,
+                    environmentId,
+                    cancellationToken);
+
+                if (externalEnabled)
                 {
-                    await externalDeliveryService.ProcessExternalDeliveryAsync(notification, cancellationToken);
+                    try
+                    {
+                        await externalDeliveryService.ProcessExternalDeliveryAsync(notification, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(
+                            ex,
+                            "External delivery failed for notification {NotificationId}. Internal notification persisted.",
+                            notification.Id.Value);
+                        // Não falhar a notificação interna por causa de falha de entrega externa
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    logger.LogError(
-                        ex,
-                        "External delivery failed for notification {NotificationId}. Internal notification persisted.",
-                        notification.Id.Value);
-                    // Não falhar a notificação interna por causa de falha de entrega externa
+                    logger.LogDebug(
+                        "External delivery skipped for notification {NotificationId}: external channels disabled for environment {EnvironmentId}.",
+                        notification.Id.Value, environmentId);
                 }
             }
 

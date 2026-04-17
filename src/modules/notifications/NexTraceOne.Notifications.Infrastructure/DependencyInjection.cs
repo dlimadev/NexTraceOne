@@ -70,7 +70,7 @@ public static class DependencyInjection
 
         // ── Phase 6: Intelligence & Automation ──
         services.AddScoped<INotificationGroupingService, NotificationGroupingService>();
-        services.AddSingleton<IQuietHoursService, QuietHoursService>();
+        services.AddScoped<IQuietHoursService, QuietHoursService>();
         services.AddScoped<INotificationEscalationService, NotificationEscalationService>();
         services.AddScoped<INotificationSuppressionService, NotificationSuppressionService>();
         services.AddScoped<INotificationDigestService, NotificationDigestService>();
@@ -103,6 +103,9 @@ public static class DependencyInjection
         services.AddScoped<IExternalDeliveryService, ExternalDeliveryService>();
         // P7.2: Background retry job para deliveries agendados
         services.AddHostedService<NotificationDeliveryRetryJob>();
+        // Phase 6: Intelligence background jobs — escalação e digest
+        services.AddHostedService<NotificationEscalationScanJob>();
+        services.AddHostedService<NotificationDigestJob>();
 
         // Event Handlers — Fase 2: primeiros eventos automáticos de alto valor
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentNotificationHandler>();
@@ -139,6 +142,15 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.PolicyViolatedIntegrationEvent>, ComplianceNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.EvidenceExpiringIntegrationEvent>, ComplianceNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.BudgetThresholdReachedIntegrationEvent>, ComplianceNotificationHandler>();
+
+        // ── Change Intelligence ──
+        services.AddScoped<IIntegrationEventHandler<PromotionCompletedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<PromotionBlockedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<RollbackTriggeredIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<DeploymentCompletedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<ChangeConfidenceScoredIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<BlastRadiusHighIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<PostChangeVerificationFailedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
 
         // AI Governance
         services.AddScoped<IIntegrationEventHandler<AiProviderUnavailableIntegrationEvent>, AiGovernanceNotificationHandler>();

@@ -104,6 +104,16 @@ export function useUpsertSmtpConfiguration() {
   });
 }
 
+// ── P7.4: Notification Detail ─────────────────────────────────────────────────
+
+export function useNotificationById(notificationId: string, enabled = true) {
+  return useQuery({
+    queryKey: ['notifications', 'detail', notificationId] as const,
+    queryFn: () => notificationsApi.getById(notificationId),
+    enabled: enabled && !!notificationId,
+  });
+}
+
 // ── P7.2: Delivery History & Status ──────────────────────────────────────────
 
 export function useDeliveryHistory(notificationId: string, enabled = true) {
