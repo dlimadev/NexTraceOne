@@ -15,16 +15,24 @@ import apiClient from '../api/client';
 // ── Types ───────────────────────────────────────────────────────────────────
 
 /**
- * Perfil do ambiente — determina a UX contextual sem depender de nomes fixos.
- * Mapeado a partir de dados retornados pelo backend.
+ * Perfil do ambiente — classificação operacional armazenada no banco de dados.
+ * Determina a UX contextual (ícone, cor, comportamento) sem depender do nome livre
+ * definido pelo utilizador.
+ *
+ * Mapeado a partir do enum EnvironmentProfile do backend (serializado como lowercase):
+ *   Development=1, Validation=2, Staging=3, Production=4, Sandbox=5,
+ *   DisasterRecovery=6, Training=7, UserAcceptanceTesting=8, PerformanceTesting=9
  */
 export type EnvironmentProfile =
   | 'production'
   | 'staging'
-  | 'uat'
-  | 'qa'
+  | 'useracceptancetesting'
+  | 'validation'
   | 'development'
   | 'sandbox'
+  | 'disasterrecovery'
+  | 'training'
+  | 'performancetesting'
   | 'unknown';
 
 /** Descrição de um ambiente disponível para o tenant ativo. */
@@ -79,26 +87,38 @@ export const EnvironmentContext = createContext<EnvironmentContextValue | null>(
 
 /**
  * Infere o perfil do ambiente a partir do slug ou nome quando o backend
- * ainda não retorna o campo `profile` (antes da migração AddEnvironmentProfileFields).
- * Usa correspondência por palavra-limite para evitar falsos positivos como "product-catalog".
+ * ainda não retorna o campo `profile` (fallback de compatibilidade anterior à
+ * migração AddEnvironmentProfileFields).
+ *
+ * Importante: o perfil correto vem sempre do banco de dados. Esta inferência é
+ * apenas um fallback para ambientes criados antes do campo profile ser persistido.
+ * O nome do ambiente é livre (ex: "Dev Teste", "QA-EUROPA") e NÃO determina o perfil.
  */
 function inferProfile(slug: string, name: string): EnvironmentProfile {
   const text = `${slug} ${name}`.toLowerCase();
-  // Word-boundary matching using \b to avoid matching 'prod' in 'product-catalog'
   if (/\bprod(?:uction)?\b/.test(text)) return 'production';
-  if (/\bstag(?:ing|e)?\b/.test(text)) return 'staging';
-  if (/\buat\b/.test(text)) return 'uat';
-  if (/\bqa\b|\btest\b/.test(text)) return 'qa';
+  if (/\bdr\b|\bdisaster\b/.test(text)) return 'disasterrecovery';
+  if (/\bstag(?:ing|e)?\b|\bhomolog/.test(text)) return 'staging';
+  if (/\buat\b/.test(text)) return 'useracceptancetesting';
+  if (/\bperf\b|\bperformance\b|\bload\b/.test(text)) return 'performancetesting';
+  if (/\bqa\b|\bvalid/.test(text)) return 'validation';
   if (/\bdev(?:elopment)?\b/.test(text)) return 'development';
   if (/\bsandbox\b|\bdemo\b/.test(text)) return 'sandbox';
+  if (/\btrain(?:ing)?\b/.test(text)) return 'training';
   return 'unknown';
 }
 
 /**
  * Infere isProductionLike a partir do perfil quando o backend não retorna o campo.
+ * Espelha a lógica do domínio: Production, DisasterRecovery, Staging, UAT são production-like.
  */
 function inferIsProductionLike(profile: EnvironmentProfile): boolean {
-  return profile === 'production' || profile === 'staging';
+  return (
+    profile === 'production' ||
+    profile === 'disasterrecovery' ||
+    profile === 'staging' ||
+    profile === 'useracceptancetesting'
+  );
 }
 
 /**

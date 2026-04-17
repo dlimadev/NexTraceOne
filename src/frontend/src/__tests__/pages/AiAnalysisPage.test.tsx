@@ -29,12 +29,12 @@ vi.mock('../../contexts/EnvironmentContext', () => ({
     activeEnvironment: {
       id: 'env-qa-001',
       name: 'QA',
-      profile: 'qa',
+      profile: 'validation',
       isProductionLike: false,
       isDefault: true,
     },
     availableEnvironments: [
-      { id: 'env-qa-001', name: 'QA', profile: 'qa', isProductionLike: false },
+      { id: 'env-qa-001', name: 'QA', profile: 'validation', isProductionLike: false },
       { id: 'env-prod-001', name: 'Production', profile: 'production', isProductionLike: true },
       { id: 'env-staging-001', name: 'Staging', profile: 'staging', isProductionLike: true },
     ],

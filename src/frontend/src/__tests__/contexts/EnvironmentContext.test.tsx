@@ -38,7 +38,7 @@ vi.mock('../../api/client', () => ({
 const mockEnvironments = [
   { id: 'env-prod-001', name: 'Production', slug: 'prod', sortOrder: 0, isActive: true, profile: 'production', isProductionLike: true },
   { id: 'env-staging-001', name: 'Staging', slug: 'staging', sortOrder: 1, isActive: true, profile: 'staging', isProductionLike: true },
-  { id: 'env-qa-001', name: 'QA', slug: 'qa', sortOrder: 2, isActive: true, profile: 'qa', isProductionLike: false, isDefault: true },
+  { id: 'env-qa-001', name: 'QA', slug: 'qa', sortOrder: 2, isActive: true, profile: 'validation', isProductionLike: false, isDefault: true },
   { id: 'env-dev-001', name: 'Development', slug: 'dev', sortOrder: 3, isActive: true, profile: 'development', isProductionLike: false },
 ];
 

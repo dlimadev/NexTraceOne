@@ -12,7 +12,12 @@ import { identityApi } from '../api';
 import type { EnvironmentItem, CreateEnvironmentRequest } from '../api/identity';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { getProfileBadgeVariant } from '../../../lib/environmentProfile';
 
+/**
+ * Valores de classificação de perfil alinhados com o enum EnvironmentProfile do backend.
+ * O nome do ambiente é livre — o perfil é a classificação operacional armazenada no banco.
+ */
 const PROFILE_OPTIONS = [
   'Development',
   'Validation',
@@ -146,15 +151,6 @@ export function EnvironmentsPage() {
   const handleSetPrimary = (env: EnvironmentItem) => {
     if (window.confirm(t('environments.confirmSetPrimary', { name: env.name }))) {
       setPrimaryMutation.mutate(env.id);
-    }
-  };
-
-  const getProfileBadgeVariant = (profile: string): 'default' | 'warning' | 'danger' | 'success' => {
-    switch (profile.toLowerCase()) {
-      case 'production': return 'danger';
-      case 'staging': case 'useracceptancetesting': return 'warning';
-      case 'development': case 'sandbox': return 'default';
-      default: return 'default';
     }
   };
 

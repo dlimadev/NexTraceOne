@@ -1,35 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Building2, Check, AlertTriangle, Server, Shield, Beaker, Code, Box, HelpCircle, ArrowRightLeft } from 'lucide-react';
+import { ChevronDown, Building2, Check, AlertTriangle, ArrowRightLeft } from 'lucide-react';
 import { cn } from '../../lib/cn';
-import { useEnvironment, type EnvironmentProfile } from '../../contexts/EnvironmentContext';
+import { useEnvironment } from '../../contexts/EnvironmentContext';
 import { useAuth } from '../../contexts/AuthContext';
-
-/** Retorna classe de cor do dot indicador + badge por perfil de ambiente. */
-function getProfileColor(profile: EnvironmentProfile): { dot: string; badge: string; bg: string } {
-  switch (profile) {
-    case 'production': return { dot: 'bg-critical', badge: 'text-critical border-critical/25 bg-critical/15', bg: 'bg-critical/10' };
-    case 'staging': return { dot: 'bg-warning', badge: 'text-warning border-warning/25 bg-warning/15', bg: 'bg-warning/10' };
-    case 'uat': return { dot: 'bg-warning', badge: 'text-warning border-warning/25 bg-warning/15', bg: 'bg-warning/10' };
-    case 'qa': return { dot: 'bg-info', badge: 'text-info border-info/25 bg-info/15', bg: 'bg-info/10' };
-    case 'development': return { dot: 'bg-success', badge: 'text-success border-success/25 bg-success/15', bg: 'bg-success/10' };
-    case 'sandbox': return { dot: 'bg-cyan', badge: 'text-cyan border-cyan/25 bg-cyan/15', bg: 'bg-cyan/10' };
-    default: return { dot: 'bg-faded', badge: 'text-faded border-edge', bg: 'bg-elevated' };
-  }
-}
-
-/** Ícone contextual para cada perfil de ambiente. */
-function getProfileIcon(profile: EnvironmentProfile) {
-  switch (profile) {
-    case 'production': return Shield;
-    case 'staging': return Server;
-    case 'uat': return Beaker;
-    case 'qa': return Beaker;
-    case 'development': return Code;
-    case 'sandbox': return Box;
-    default: return HelpCircle;
-  }
-}
+import { getProfileColor, getProfileIcon } from '../../lib/environmentProfile';
 
 export function WorkspaceSwitcher() {
   const { t } = useTranslation();

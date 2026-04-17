@@ -5527,11 +5527,14 @@
     "profile": {
       "development": "Desenvolvimento",
       "production": "Produção",
-      "qa": "QA",
       "sandbox": "Sandbox",
       "staging": "Homologação",
-      "uat": "UAT",
-      "unknown": "Desconhecido"
+      "unknown": "Desconhecido",
+      "useracceptancetesting": "UAT",
+      "validation": "Validação / QA",
+      "disasterrecovery": "Recuperação de Desastre",
+      "training": "Treinamento",
+      "performancetesting": "Teste de Performance"
     },
     "select": "Selecionar Ambiente"
   },
@@ -5623,7 +5626,17 @@
       "Staging": "Homologação / Staging",
       "Training": "Treinamento",
       "UserAcceptanceTesting": "Teste de Aceite (UAT)",
-      "Validation": "Validação / QA"
+      "Validation": "Validação / QA",
+      "development": "Desenvolvimento",
+      "validation": "Validação / QA",
+      "staging": "Homologação",
+      "production": "Produção",
+      "sandbox": "Sandbox",
+      "disasterrecovery": "Recuperação de Desastre",
+      "training": "Treinamento",
+      "useracceptancetesting": "UAT — Aceite do Usuário",
+      "performancetesting": "Teste de Performance",
+      "unknown": "Desconhecido"
     },
     "region": "Região",
     "setAsPrimary": "Definir como Produção Principal",
