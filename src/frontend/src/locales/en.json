@@ -5549,11 +5549,14 @@
     "profile": {
       "development": "Development",
       "production": "Production",
-      "qa": "QA",
       "sandbox": "Sandbox",
       "staging": "Staging",
-      "uat": "UAT",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "useracceptancetesting": "UAT",
+      "validation": "Validation / QA",
+      "disasterrecovery": "Disaster Recovery",
+      "training": "Training",
+      "performancetesting": "Performance Testing"
     },
     "select": "Select Environment"
   },
@@ -5611,6 +5614,7 @@
     "active": "Active",
     "code": "Code",
     "codeHelp": "Short internal code (e.g. PROD, QA-EU)",
+    "confirmDeactivate": "Are you sure you want to deactivate \"{{name}}\"? It will no longer be available for use.",
     "confirmSetPrimary": "Set {{name}} as the primary production environment? The current primary production will be revoked.",
     "createEnvironment": "Create Environment",
     "createNewEnvironment": "Create New Environment",
@@ -5624,6 +5628,7 @@
     "deactivate": "Deactivate",
     "description": "Description",
     "editEnvironment": "Edit Environment",
+    "environmentDeactivated": "Environment deactivated successfully.",
     "environmentCreated": "Environment created successfully.",
     "environmentUpdated": "Environment updated successfully.",
     "inactive": "Inactive",
@@ -5645,7 +5650,17 @@
       "Staging": "Staging / Homologation",
       "Training": "Training",
       "UserAcceptanceTesting": "User Acceptance Testing (UAT)",
-      "Validation": "Validation / QA"
+      "Validation": "Validation / QA",
+      "development": "Development",
+      "validation": "Validation / QA",
+      "staging": "Staging / Homologation",
+      "production": "Production",
+      "sandbox": "Sandbox",
+      "disasterrecovery": "Disaster Recovery",
+      "training": "Training",
+      "useracceptancetesting": "User Acceptance Testing (UAT)",
+      "performancetesting": "Performance Testing",
+      "unknown": "Unknown"
     },
     "region": "Region",
     "setAsPrimary": "Set as Primary Production",
@@ -8881,7 +8896,8 @@
     "subGroupReleaseLifecycle": "Release Lifecycle",
     "subGroupRiskRollback": "Risk & Rollback",
     "subGroupWorkflowManagement": "Workflow Management",
-    "workflowConfiguration": "Workflow Configuration"
+    "workflowConfiguration": "Workflow Configuration",
+    "tenants": "Tenants"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -9165,7 +9181,32 @@
     "role": "Role",
     "selectTenant": "Select Organization",
     "selectTenantDescription": "Choose the organization you want to work with.",
-    "switchTenant": "Switch Organization"
+    "switchTenant": "Switch Organization",
+    "admin": {
+      "title": "Tenant Management",
+      "subtitle": "Manage all organizations registered on the NexTraceOne platform.",
+      "createTenant": "Create Tenant",
+      "editTenant": "Edit Tenant",
+      "createNewTenant": "Create New Tenant",
+      "noTenantsFound": "No tenants found.",
+      "searchPlaceholder": "Search by name, slug or legal name...",
+      "filterAll": "All",
+      "filterActive": "Active only",
+      "filterInactive": "Inactive only",
+      "name": "Name",
+      "slug": "Slug",
+      "slugHelp": "Lowercase alphanumeric, hyphens allowed. Immutable after creation.",
+      "slugImmutable": "Slug cannot be changed after creation.",
+      "tenantType": "Type",
+      "parentTenantId": "Parent Tenant ID",
+      "legalName": "Legal Name",
+      "taxId": "Tax ID / CNPJ",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "confirmDeactivate": "Are you sure you want to deactivate \"{{name}}\"? All users will lose access.",
+      "confirmActivate": "Are you sure you want to reactivate \"{{name}}\"?",
+      "showingCount": "Showing {{count}} of {{total}} tenants"
+    }
   },
   "users": {
     "activate": "Activate",

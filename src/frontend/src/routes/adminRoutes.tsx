@@ -8,6 +8,7 @@ import { ProtectedRoute } from '../components/ProtectedRoute';
 
 // Identity-access
 const UsersPage = lazy(() => import('../features/identity-access/pages/UsersPage').then(m => ({ default: m.UsersPage })));
+const TenantsPage = lazy(() => import('../features/identity-access/pages/TenantsPage').then(m => ({ default: m.TenantsPage })));
 const EnvironmentsPage = lazy(() => import('../features/identity-access/pages/EnvironmentsPage').then(m => ({ default: m.EnvironmentsPage })));
 const BreakGlassPage = lazy(() => import('../features/identity-access/pages/BreakGlassPage').then(m => ({ default: m.BreakGlassPage })));
 const JitAccessPage = lazy(() => import('../features/identity-access/pages/JitAccessPage').then(m => ({ default: m.JitAccessPage })));
@@ -101,6 +102,14 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="identity:users:read" redirectTo="/unauthorized">
             <UsersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tenants"
+        element={
+          <ProtectedRoute permission="identity:tenants:admin" redirectTo="/unauthorized">
+            <TenantsPage />
           </ProtectedRoute>
         }
       />

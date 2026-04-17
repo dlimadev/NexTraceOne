@@ -71,6 +71,8 @@ public static class UpdateEnvironment
     /// </summary>
     public sealed class Handler(
         ICurrentTenant currentTenant,
+        ICurrentUser currentUser,
+        IDateTimeProvider dateTimeProvider,
         IEnvironmentRepository environmentRepository) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
@@ -93,6 +95,7 @@ public static class UpdateEnvironment
             environment.UpdateBasicInfo(request.Name, request.SortOrder);
             environment.UpdateProfile(profile, criticality, request.IsProductionLike);
             environment.UpdateLocationInfo(request.Code, request.Region, request.Description);
+            environment.SetUpdated(currentUser.Id, dateTimeProvider.UtcNow);
 
             return Result<Response>.Success(new Response(
                 environment.Id.Value,

@@ -7,6 +7,7 @@ export { MfaPage } from './pages/MfaPage';
 export { InvitationPage } from './pages/InvitationPage';
 export { TenantSelectionPage } from './pages/TenantSelectionPage';
 export { UsersPage } from './pages/UsersPage';
+export { TenantsPage } from './pages/TenantsPage';
 export { BreakGlassPage } from './pages/BreakGlassPage';
 export { JitAccessPage } from './pages/JitAccessPage';
 export { DelegationPage } from './pages/DelegationPage';

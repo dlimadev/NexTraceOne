@@ -42,6 +42,7 @@ export interface CurrentUserProfile {
   isActive: boolean;
   lastLoginAt: string | null;
   tenantId: string;
+  tenantName: string;
   roleName: string;
   permissions: string[];
 }

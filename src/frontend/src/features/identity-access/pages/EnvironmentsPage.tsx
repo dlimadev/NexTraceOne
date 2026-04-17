@@ -12,7 +12,12 @@ import { identityApi } from '../api';
 import type { EnvironmentItem, CreateEnvironmentRequest } from '../api/identity';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
+import { getProfileBadgeVariant } from '../../../lib/environmentProfile';
 
+/**
+ * Valores de classificação de perfil alinhados com o enum EnvironmentProfile do backend.
+ * O nome do ambiente é livre — o perfil é a classificação operacional armazenada no banco.
+ */
 const PROFILE_OPTIONS = [
   'Development',
   'Validation',
@@ -106,6 +111,13 @@ export function EnvironmentsPage() {
     },
   });
 
+  const deactivateMutation = useMutation({
+    mutationFn: (envId: string) => identityApi.deactivateEnvironment(envId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['environments'] });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload: CreateEnvironmentRequest = {
@@ -149,12 +161,9 @@ export function EnvironmentsPage() {
     }
   };
 
-  const getProfileBadgeVariant = (profile: string): 'default' | 'warning' | 'danger' | 'success' => {
-    switch (profile.toLowerCase()) {
-      case 'production': return 'danger';
-      case 'staging': case 'useracceptancetesting': return 'warning';
-      case 'development': case 'sandbox': return 'default';
-      default: return 'default';
+  const handleDeactivate = (env: EnvironmentItem) => {
+    if (window.confirm(t('environments.confirmDeactivate', { name: env.name }))) {
+      deactivateMutation.mutate(env.id);
     }
   };
 
@@ -415,6 +424,16 @@ export function EnvironmentsPage() {
                       <Button type="button" onClick={() => handleEdit(env)}>
                         {t('common.edit')}
                       </Button>
+                      {env.isActive && !env.isPrimaryProduction && (
+                        <Button
+                          type="button"
+                          onClick={() => handleDeactivate(env)}
+                          disabled={deactivateMutation.isPending}
+                          title={t('environments.deactivate')}
+                        >
+                          {t('environments.deactivate')}
+                        </Button>
+                      )}
                     </div>
                   </div>
                   {env.description && (

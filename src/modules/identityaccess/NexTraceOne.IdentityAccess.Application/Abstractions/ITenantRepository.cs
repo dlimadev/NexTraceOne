@@ -24,4 +24,14 @@ public interface ITenantRepository
 
     /// <summary>Adiciona um novo tenant para persistência.</summary>
     void Add(Tenant tenant);
+
+    /// <summary>
+    /// Lista todos os tenants com paginação e filtros opcionais (uso administrativo).
+    /// </summary>
+    Task<(IReadOnlyList<Tenant> Items, int TotalCount)> ListAsync(
+        string? search,
+        bool? isActive,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken);
 }

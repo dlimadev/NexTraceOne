@@ -5527,11 +5527,14 @@
     "profile": {
       "development": "Desenvolvimento",
       "production": "Produção",
-      "qa": "QA",
       "sandbox": "Sandbox",
       "staging": "Homologação",
-      "uat": "UAT",
-      "unknown": "Desconhecido"
+      "unknown": "Desconhecido",
+      "useracceptancetesting": "UAT",
+      "validation": "Validação / QA",
+      "disasterrecovery": "Recuperação de Desastre",
+      "training": "Treinamento",
+      "performancetesting": "Teste de Performance"
     },
     "select": "Selecionar Ambiente"
   },
@@ -5589,6 +5592,7 @@
     "active": "Ativo",
     "code": "Código",
     "codeHelp": "Código interno curto (ex.: PROD, QA-EU)",
+    "confirmDeactivate": "Tem certeza que deseja desativar \"{{name}}\"? Ele não estará mais disponível para uso.",
     "confirmSetPrimary": "Definir {{name}} como ambiente de produção principal? A produção principal atual será revogada.",
     "createEnvironment": "Criar Ambiente",
     "createNewEnvironment": "Criar Novo Ambiente",
@@ -5602,6 +5606,7 @@
     "deactivate": "Desativar",
     "description": "Descrição",
     "editEnvironment": "Editar Ambiente",
+    "environmentDeactivated": "Ambiente desativado com sucesso.",
     "environmentCreated": "Ambiente criado com sucesso.",
     "environmentUpdated": "Ambiente atualizado com sucesso.",
     "inactive": "Inativo",
@@ -5623,7 +5628,17 @@
       "Staging": "Homologação / Staging",
       "Training": "Treinamento",
       "UserAcceptanceTesting": "Teste de Aceite (UAT)",
-      "Validation": "Validação / QA"
+      "Validation": "Validação / QA",
+      "development": "Desenvolvimento",
+      "validation": "Validação / QA",
+      "staging": "Homologação",
+      "production": "Produção",
+      "sandbox": "Sandbox",
+      "disasterrecovery": "Recuperação de Desastre",
+      "training": "Treinamento",
+      "useracceptancetesting": "UAT — Aceite do Usuário",
+      "performancetesting": "Teste de Performance",
+      "unknown": "Desconhecido"
     },
     "region": "Região",
     "setAsPrimary": "Definir como Produção Principal",
@@ -8859,7 +8874,8 @@
     "releaseGatesDashboard": "Gates de Release",
     "evidencePackViewer": "Evidence Pack",
     "releaseParameterAudit": "Auditoria de Parâmetros",
-    "releaseParameterOverride": "Overrides por Ambiente"
+    "releaseParameterOverride": "Overrides por Ambiente",
+    "tenants": "Tenants"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -9143,7 +9159,32 @@
     "role": "Papel",
     "selectTenant": "Selecionar Organização",
     "selectTenantDescription": "Escolha a organização com a qual deseja trabalhar.",
-    "switchTenant": "Trocar Organização"
+    "switchTenant": "Trocar Organização",
+    "admin": {
+      "title": "Gestão de Tenants",
+      "subtitle": "Gerencie todas as organizações registradas na plataforma NexTraceOne.",
+      "createTenant": "Criar Tenant",
+      "editTenant": "Editar Tenant",
+      "createNewTenant": "Criar Novo Tenant",
+      "noTenantsFound": "Nenhum tenant encontrado.",
+      "searchPlaceholder": "Pesquisar por nome, slug ou razão social...",
+      "filterAll": "Todos",
+      "filterActive": "Apenas ativos",
+      "filterInactive": "Apenas inativos",
+      "name": "Nome",
+      "slug": "Slug",
+      "slugHelp": "Alfanumérico em minúsculas, hífens permitidos. Imutável após criação.",
+      "slugImmutable": "O slug não pode ser alterado após a criação.",
+      "tenantType": "Tipo",
+      "parentTenantId": "ID do Tenant Pai",
+      "legalName": "Razão Social",
+      "taxId": "CNPJ / Tax ID",
+      "deactivate": "Desativar",
+      "activate": "Ativar",
+      "confirmDeactivate": "Tem certeza que deseja desativar \"{{name}}\"? Todos os usuários perderão o acesso.",
+      "confirmActivate": "Tem certeza que deseja reativar \"{{name}}\"?",
+      "showingCount": "Exibindo {{count}} de {{total}} tenants"
+    }
   },
   "users": {
     "activate": "Ativar",

@@ -20,6 +20,7 @@ public static class GetCurrentUser
     /// <summary>Handler que obtém dados do usuário autenticado a partir do ICurrentUser.</summary>
     public sealed class Handler(
         ICurrentUser currentUser,
+        ICurrentTenant currentTenant,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         ILoginResponseBuilder responseBuilder,
@@ -56,6 +57,12 @@ public static class GetCurrentUser
                 }
             }
 
+            // Resolve tenant name from the current tenant context (JWT claims — no extra DB query).
+            // Falls back to empty string when no tenant context is active.
+            string tenantName = currentTenant.Id != Guid.Empty
+                ? currentTenant.Name
+                : string.Empty;
+
             return new Response(
                 user.Id.Value,
                 user.Email.Value,
@@ -65,6 +72,7 @@ public static class GetCurrentUser
                 user.IsActive,
                 user.LastLoginAt,
                 membership?.TenantId.Value ?? Guid.Empty,
+                tenantName,
                 roleName,
                 permissions);
         }
@@ -80,6 +88,7 @@ public static class GetCurrentUser
         bool IsActive,
         DateTimeOffset? LastLoginAt,
         Guid TenantId,
+        string TenantName,
         string RoleName,
         IReadOnlyList<string> Permissions);
 }
