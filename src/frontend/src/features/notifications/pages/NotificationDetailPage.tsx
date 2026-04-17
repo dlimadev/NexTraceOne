@@ -294,7 +294,7 @@ export function NotificationDetailPage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => navigate(notification.actionUrl!)}
+                    onClick={() => notification.actionUrl && navigate(notification.actionUrl)}
                   >
                     <ExternalLink className="h-4 w-4 mr-1.5" />
                     {t('notifications.detail.viewSourceAction')}
