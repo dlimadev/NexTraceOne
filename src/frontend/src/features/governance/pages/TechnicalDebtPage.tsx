@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { AlertTriangle } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -83,9 +84,9 @@ const DEBT_TYPE_VARIANT: Record<string, 'danger' | 'warning' | 'secondary' | 'pr
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 
-const useTechnicalDebtSummary = () =>
+const useTechnicalDebtSummary = (envId?: string | null) =>
   useQuery({
-    queryKey: ['technical-debt-summary'],
+    queryKey: ['technical-debt-summary', envId],
     queryFn: () =>
       client
         .get<TechnicalDebtSummaryResponse>('/governance/technical-debt/summary', {
@@ -109,8 +110,9 @@ const useRecordDebt = () => {
 
 export function TechnicalDebtPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
-  const { data, isLoading, isError, refetch } = useTechnicalDebtSummary();
+  const { data, isLoading, isError, refetch } = useTechnicalDebtSummary(activeEnvironmentId);
   const recordMutation = useRecordDebt();
 
   const [serviceName, setServiceName] = useState('');

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Crosshair, ShieldAlert, Award, BarChart3, AlertTriangle,
   AlertCircle,
@@ -58,10 +59,11 @@ const maturityBadgeVariant = (level: MaturityLevelType): 'success' | 'warning' |
  */
 export function ExecutiveDrillDownPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const { entityType, entityId } = useParams<{ entityType: string; entityId: string }>();
 
   const { data: d, isLoading, isError, refetch } = useQuery({
-    queryKey: queryKeys.governance.executive.drillDown(entityType ?? '', entityId ?? ''),
+    queryKey: [...queryKeys.governance.executive.drillDown(entityType ?? '', entityId ?? ''), activeEnvironmentId],
     queryFn: () => executiveApi.getDrillDown(entityType!, entityId!),
     staleTime: 30_000,
     enabled: !!entityType && !!entityId,
