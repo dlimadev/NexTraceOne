@@ -10,6 +10,7 @@ namespace NexTraceOne.Governance.Application.Features.GetDemoSeedStatus;
 /// </summary>
 public static class GetDemoSeedStatus
 {
+    private static readonly object _lock = new();
     private static string _state = "NotSeeded";
     private static DateTimeOffset? _seededAt;
     private static int _entitiesCount;
@@ -28,10 +29,21 @@ public static class GetDemoSeedStatus
     {
         public Task<Result<DemoSeedStatus>> Handle(Query request, CancellationToken cancellationToken)
         {
+            string state;
+            DateTimeOffset? seededAt;
+            int entitiesCount;
+
+            lock (_lock)
+            {
+                state = _state;
+                seededAt = _seededAt;
+                entitiesCount = _entitiesCount;
+            }
+
             var status = new DemoSeedStatus(
-                State: _state,
-                SeededAt: _seededAt,
-                EntitiesCount: _entitiesCount,
+                State: state,
+                SeededAt: seededAt,
+                EntitiesCount: entitiesCount,
                 SimulatedNote: "Demo seed state is managed in-memory. Real demo seed implementation pending.");
 
             return Task.FromResult(Result<DemoSeedStatus>.Success(status));
@@ -43,14 +55,20 @@ public static class GetDemoSeedStatus
     {
         public Task<Result<DemoSeedResult>> Handle(RunDemoSeed request, CancellationToken cancellationToken)
         {
-            _state = "Seeded";
-            _seededAt = DateTimeOffset.UtcNow;
-            _entitiesCount = 42;
+            DateTimeOffset seededAt;
+
+            lock (_lock)
+            {
+                _state = "Seeded";
+                _seededAt = DateTimeOffset.UtcNow;
+                _entitiesCount = 42;
+                seededAt = _seededAt.Value;
+            }
 
             var result = new DemoSeedResult(
                 Success: true,
                 EntitiesCreated: 42,
-                SeededAt: _seededAt.Value,
+                SeededAt: seededAt,
                 Message: "Demo data seeded successfully.");
 
             return Task.FromResult(Result<DemoSeedResult>.Success(result));
@@ -62,9 +80,12 @@ public static class GetDemoSeedStatus
     {
         public Task<Result<DemoSeedClearResult>> Handle(ClearDemoSeed request, CancellationToken cancellationToken)
         {
-            _state = "NotSeeded";
-            _seededAt = null;
-            _entitiesCount = 0;
+            lock (_lock)
+            {
+                _state = "NotSeeded";
+                _seededAt = null;
+                _entitiesCount = 0;
+            }
 
             var result = new DemoSeedClearResult(
                 Success: true,

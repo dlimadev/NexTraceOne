@@ -34,9 +34,13 @@ public static class GetHardwareAssessment
                 if (drive.IsReady)
                     diskFreeGb = Math.Round(drive.AvailableFreeSpace / (1024.0 * 1024 * 1024), 2);
             }
-            catch
+            catch (System.IO.IOException)
             {
                 // Ambiente sem acesso a disco — ignorar
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Sem permissão para ler informação de disco — ignorar
             }
 
             var models = new List<AiModelHardwareDto>
