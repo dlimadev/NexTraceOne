@@ -8856,7 +8856,8 @@
     "releaseGatesDashboard": "Gates de Release",
     "evidencePackViewer": "Evidence Pack",
     "releaseParameterAudit": "Auditoria de Parâmetros",
-    "releaseParameterOverride": "Overrides por Ambiente"
+    "releaseParameterOverride": "Overrides por Ambiente",
+    "tenants": "Tenants"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -9140,7 +9141,32 @@
     "role": "Função",
     "selectTenant": "Selecionar Organização",
     "selectTenantDescription": "Escolha a organização com a qual pretende trabalhar.",
-    "switchTenant": "Mudar de Organização"
+    "switchTenant": "Mudar de Organização",
+    "admin": {
+      "title": "Gestão de Tenants",
+      "subtitle": "Gira todas as organizações registadas na plataforma NexTraceOne.",
+      "createTenant": "Criar Tenant",
+      "editTenant": "Editar Tenant",
+      "createNewTenant": "Criar Novo Tenant",
+      "noTenantsFound": "Nenhum tenant encontrado.",
+      "searchPlaceholder": "Pesquisar por nome, slug ou razão social...",
+      "filterAll": "Todos",
+      "filterActive": "Apenas ativos",
+      "filterInactive": "Apenas inativos",
+      "name": "Nome",
+      "slug": "Slug",
+      "slugHelp": "Alfanumérico em minúsculas, hífens permitidos. Imutável após criação.",
+      "slugImmutable": "O slug não pode ser alterado após a criação.",
+      "tenantType": "Tipo",
+      "parentTenantId": "ID do Tenant Pai",
+      "legalName": "Razão Social",
+      "taxId": "NIF / Tax ID",
+      "deactivate": "Desativar",
+      "activate": "Ativar",
+      "confirmDeactivate": "Tem a certeza que pretende desativar \"{{name}}\"? Todos os utilizadores perderão o acesso.",
+      "confirmActivate": "Tem a certeza que pretende reativar \"{{name}}\"?",
+      "showingCount": "A mostrar {{count}} de {{total}} tenants"
+    }
   },
   "users": {
     "activate": "Ativar",

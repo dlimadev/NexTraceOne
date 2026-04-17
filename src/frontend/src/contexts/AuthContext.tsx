@@ -199,6 +199,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isActive: true,
         lastLoginAt: null,
         tenantId: data.user.tenantId,
+        tenantName: '',
         roleName: data.user.roleName,
         permissions: data.user.permissions,
       };
@@ -240,6 +241,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isActive: true,
         lastLoginAt: null,
         tenantId: response.tenantId,
+        tenantName: response.tenantName,
         roleName: response.roleName,
         permissions: response.permissions,
       };

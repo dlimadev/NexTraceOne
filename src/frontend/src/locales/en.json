@@ -8881,7 +8881,8 @@
     "subGroupReleaseLifecycle": "Release Lifecycle",
     "subGroupRiskRollback": "Risk & Rollback",
     "subGroupWorkflowManagement": "Workflow Management",
-    "workflowConfiguration": "Workflow Configuration"
+    "workflowConfiguration": "Workflow Configuration",
+    "tenants": "Tenants"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -9165,7 +9166,32 @@
     "role": "Role",
     "selectTenant": "Select Organization",
     "selectTenantDescription": "Choose the organization you want to work with.",
-    "switchTenant": "Switch Organization"
+    "switchTenant": "Switch Organization",
+    "admin": {
+      "title": "Tenant Management",
+      "subtitle": "Manage all organizations registered on the NexTraceOne platform.",
+      "createTenant": "Create Tenant",
+      "editTenant": "Edit Tenant",
+      "createNewTenant": "Create New Tenant",
+      "noTenantsFound": "No tenants found.",
+      "searchPlaceholder": "Search by name, slug or legal name...",
+      "filterAll": "All",
+      "filterActive": "Active only",
+      "filterInactive": "Inactive only",
+      "name": "Name",
+      "slug": "Slug",
+      "slugHelp": "Lowercase alphanumeric, hyphens allowed. Immutable after creation.",
+      "slugImmutable": "Slug cannot be changed after creation.",
+      "tenantType": "Type",
+      "parentTenantId": "Parent Tenant ID",
+      "legalName": "Legal Name",
+      "taxId": "Tax ID / CNPJ",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "confirmDeactivate": "Are you sure you want to deactivate \"{{name}}\"? All users will lose access.",
+      "confirmActivate": "Are you sure you want to reactivate \"{{name}}\"?",
+      "showingCount": "Showing {{count}} of {{total}} tenants"
+    }
   },
   "users": {
     "activate": "Activate",

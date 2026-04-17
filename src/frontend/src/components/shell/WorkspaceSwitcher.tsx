@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Building2, Check, AlertTriangle, Server, Shield, Beaker, Code, Box, HelpCircle } from 'lucide-react';
+import { ChevronDown, Building2, Check, AlertTriangle, Server, Shield, Beaker, Code, Box, HelpCircle, ArrowRightLeft } from 'lucide-react';
 import { cn } from '../../lib/cn';
 import { useEnvironment, type EnvironmentProfile } from '../../contexts/EnvironmentContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 /** Retorna classe de cor do dot indicador + badge por perfil de ambiente. */
 function getProfileColor(profile: EnvironmentProfile): { dot: string; badge: string; bg: string } {
@@ -34,8 +35,13 @@ export function WorkspaceSwitcher() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { activeEnvironment, availableEnvironments, selectEnvironment } = useEnvironment();
+  const { user, availableTenants, selectTenant } = useAuth();
 
-  const tenantName = t('shell.defaultWorkspace');
+  // Use real tenant name from current user profile
+  const tenantName = user?.tenantName || user?.tenantId || t('shell.defaultWorkspace');
+
+  // Show tenant switcher only when user has more than one tenant
+  const hasMultipleTenants = availableTenants.length > 1;
 
   // Close on Escape key
   useEffect(() => {
@@ -65,7 +71,7 @@ export function WorkspaceSwitcher() {
         aria-label={t('shell.workspaceSwitcher')}
       >
         <Building2 size={14} className="text-muted shrink-0" />
-        <span className="truncate max-w-[100px] font-medium">{tenantName}</span>
+        <span className="truncate max-w-[120px] font-medium">{tenantName}</span>
         {activeEnvironment && (
           <span className="flex items-center gap-1.5">
             <span className={cn('w-2 h-2 rounded-full shrink-0 ring-2 ring-canvas', activeColors?.dot)} aria-hidden="true" />
@@ -100,6 +106,8 @@ export function WorkspaceSwitcher() {
             <div className="px-4 pb-2 mb-2 border-b border-edge">
               <p className="type-overline text-faded">{t('shell.workspace')}</p>
             </div>
+
+            {/* Current tenant */}
             <button
               className="w-full text-left px-4 py-2.5 text-sm text-body hover:bg-hover transition-colors flex items-center justify-between gap-2"
               role="option"
@@ -110,10 +118,50 @@ export function WorkspaceSwitcher() {
                 <div className="w-8 h-8 rounded-lg bg-accent/15 flex items-center justify-center shrink-0">
                   <Building2 size={14} className="text-cyan" />
                 </div>
-                <span className="truncate font-medium">{tenantName}</span>
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{tenantName}</div>
+                  {user?.roleName && (
+                    <div className="text-[10px] text-muted truncate">{user.roleName}</div>
+                  )}
+                </div>
               </div>
               <Check size={14} className="text-cyan shrink-0" />
             </button>
+
+            {/* Switch tenant option — only when user has multiple tenants */}
+            {hasMultipleTenants && (
+              <div className="px-4 pt-2 border-t border-edge mt-1">
+                <p className="type-overline text-faded mb-2">{t('tenants.switchTenant')}</p>
+                <div className="flex flex-col gap-1">
+                  {availableTenants
+                    .filter((t) => t.id !== user?.tenantId && t.isActive)
+                    .map((tenant) => (
+                      <button
+                        key={tenant.id}
+                        role="option"
+                        aria-selected={false}
+                        onClick={() => {
+                          void selectTenant(tenant.id);
+                          setOpen(false);
+                        }}
+                        className={cn(
+                          'flex items-center gap-2.5 w-full text-left text-sm px-3 py-2 rounded-lg border',
+                          'border-edge hover:border-edge-strong hover:bg-hover transition-all cursor-pointer',
+                        )}
+                      >
+                        <div className="w-7 h-7 rounded-md bg-elevated flex items-center justify-center shrink-0 font-bold text-xs text-muted border border-edge">
+                          {tenant.name[0]?.toUpperCase() ?? 'T'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium truncate">{tenant.name}</div>
+                          <div className="text-[10px] text-muted truncate">{tenant.roleName}</div>
+                        </div>
+                        <ArrowRightLeft size={12} className="text-faded shrink-0" />
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
 
             {/* Environment section */}
             <div className="px-4 pt-3 mt-2 border-t border-edge">
@@ -173,6 +221,7 @@ export function WorkspaceSwitcher() {
               </div>
             </div>
           </div>
+
         </>
       )}
     </div>

@@ -22,7 +22,7 @@ import {
   CalendarDays, Award, BrainCircuit, Palette, Cpu,
   Archive, HardDrive, Gauge, Bell, RotateCcw, Leaf, Lock,
   Train, MapPin, GitCommit, Target, Download, Sliders, MessageSquare, Eye, BookText,
-  PackageCheck, GitMerge, History, Layers,
+  PackageCheck, GitMerge, History, Building2,
 } from 'lucide-react';
 
 interface NavItem {
@@ -121,6 +121,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.integrationHub', to: '/integrations', icon: <Cable size={18} />, permission: 'integrations:read', section: 'integrations' },
   { labelKey: 'sidebar.productAnalytics', to: '/analytics', icon: <BarChart3 size={18} />, permission: 'analytics:read', section: 'admin' },
   { labelKey: 'sidebar.users', to: '/users', icon: <Users size={18} />, permission: 'identity:users:read', section: 'admin' },
+  { labelKey: 'sidebar.tenants', to: '/tenants', icon: <Building2 size={18} />, permission: 'identity:tenants:admin', section: 'admin' },
   { labelKey: 'sidebar.breakGlass', to: '/break-glass', icon: <AlertTriangle size={18} />, permission: 'identity:sessions:read', section: 'admin' },
   { labelKey: 'sidebar.jitAccess', to: '/jit-access', icon: <Clock size={18} />, permission: 'identity:users:read', section: 'admin' },
   { labelKey: 'sidebar.delegations', to: '/delegations', icon: <UserCheck size={18} />, permission: 'identity:users:read', section: 'admin' },

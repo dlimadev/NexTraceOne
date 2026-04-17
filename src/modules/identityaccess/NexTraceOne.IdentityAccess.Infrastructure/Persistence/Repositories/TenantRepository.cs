@@ -95,4 +95,46 @@ internal sealed class TenantRepository(
     /// <inheritdoc />
     public void Add(Tenant tenant)
         => context.Tenants.Add(tenant);
+
+    /// <inheritdoc />
+    public async Task<(IReadOnlyList<Tenant> Items, int TotalCount)> ListAsync(
+        string? search,
+        bool? isActive,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = context.Tenants.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var normalized = search.Trim().ToLowerInvariant();
+                query = query.Where(t =>
+                    t.Name.ToLower().Contains(normalized) ||
+                    t.Slug.Contains(normalized) ||
+                    (t.LegalName != null && t.LegalName.ToLower().Contains(normalized)));
+            }
+
+            if (isActive.HasValue)
+                query = query.Where(t => t.IsActive == isActive.Value);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .OrderBy(t => t.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (items, totalCount);
+        }
+        catch (PostgresException ex) when (ex.SqlState == "42703")
+        {
+            logger.LogWarning(ex,
+                "Bootstrap: tenant column missing (42703) for ListAsync. Migration may not have been applied.");
+            return (Array.Empty<Tenant>(), 0);
+        }
+    }
 }

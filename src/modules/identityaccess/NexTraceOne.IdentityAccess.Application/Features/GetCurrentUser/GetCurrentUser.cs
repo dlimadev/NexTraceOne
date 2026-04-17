@@ -20,8 +20,10 @@ public static class GetCurrentUser
     /// <summary>Handler que obtém dados do usuário autenticado a partir do ICurrentUser.</summary>
     public sealed class Handler(
         ICurrentUser currentUser,
+        ICurrentTenant currentTenant,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
+        ITenantRepository tenantRepository,
         ILoginResponseBuilder responseBuilder,
         IPermissionResolver permissionResolver) : IQueryHandler<Query, Response>
     {
@@ -56,6 +58,15 @@ public static class GetCurrentUser
                 }
             }
 
+            // Resolve tenant name for the current tenant context
+            string tenantName = string.Empty;
+            if (currentTenant.Id != Guid.Empty)
+            {
+                var tenant = await tenantRepository.GetByIdAsync(
+                    TenantId.From(currentTenant.Id), cancellationToken);
+                tenantName = tenant?.Name ?? string.Empty;
+            }
+
             return new Response(
                 user.Id.Value,
                 user.Email.Value,
@@ -65,6 +76,7 @@ public static class GetCurrentUser
                 user.IsActive,
                 user.LastLoginAt,
                 membership?.TenantId.Value ?? Guid.Empty,
+                tenantName,
                 roleName,
                 permissions);
         }
@@ -80,6 +92,7 @@ public static class GetCurrentUser
         bool IsActive,
         DateTimeOffset? LastLoginAt,
         Guid TenantId,
+        string TenantName,
         string RoleName,
         IReadOnlyList<string> Permissions);
 }

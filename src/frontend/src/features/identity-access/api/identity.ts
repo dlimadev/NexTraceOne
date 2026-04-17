@@ -67,6 +67,37 @@ export interface UpdateEnvironmentRequest {
   isProductionLike?: boolean;
 }
 
+/** Tenant na listagem administrativa da plataforma. */
+export interface TenantAdminItem {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  tenantType: string;
+  legalName?: string;
+  taxId?: string;
+  parentTenantId?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/** Payload para criação de tenant (Platform Admin). */
+export interface CreateTenantRequest {
+  name: string;
+  slug: string;
+  tenantType: string;
+  legalName?: string;
+  taxId?: string;
+  parentTenantId?: string;
+}
+
+/** Payload para atualização de tenant (Platform Admin). */
+export interface UpdateTenantRequest {
+  name: string;
+  legalName?: string;
+  taxId?: string;
+}
+
 /**
  * Cliente de API do módulo Identity.
  * Cobre autenticação, gestão de usuários, papéis, permissões, sessões,
@@ -289,4 +320,27 @@ export const identityApi = {
 
   setPrimaryProductionEnvironment: (environmentId: string) =>
     client.patch(`/identity/environments/${encodeURIComponent(environmentId)}/primary-production`).then((r) => r.data),
+
+  // ── Admin: Gestão de Tenants (Platform Admin) ─────────────────
+  listTenantsAdmin: (params?: { search?: string; isActive?: boolean; page?: number; pageSize?: number }) =>
+    client
+      .get<import('../../../types').PagedList<TenantAdminItem>>('/identity/admin/tenants', { params })
+      .then((r) => r.data),
+
+  getTenantAdmin: (tenantId: string) =>
+    client.get<TenantAdminItem>(`/identity/admin/tenants/${encodeURIComponent(tenantId)}`).then((r) => r.data),
+
+  createTenantAdmin: (data: CreateTenantRequest) =>
+    client
+      .post<{ tenantId: string; name: string; slug: string }>('/identity/admin/tenants', data)
+      .then((r) => r.data),
+
+  updateTenantAdmin: (tenantId: string, data: UpdateTenantRequest) =>
+    client.put(`/identity/admin/tenants/${encodeURIComponent(tenantId)}`, data).then((r) => r.data),
+
+  deactivateTenantAdmin: (tenantId: string) =>
+    client.delete(`/identity/admin/tenants/${encodeURIComponent(tenantId)}`).then((r) => r.data),
+
+  activateTenantAdmin: (tenantId: string) =>
+    client.patch(`/identity/admin/tenants/${encodeURIComponent(tenantId)}/activate`).then((r) => r.data),
 };
