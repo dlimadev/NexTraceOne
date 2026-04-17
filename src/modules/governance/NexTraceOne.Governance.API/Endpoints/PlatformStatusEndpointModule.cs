@@ -16,6 +16,8 @@ using GetPendingMigrationsFeature = NexTraceOne.Governance.Application.Features.
 using GetNetworkPolicyFeature = NexTraceOne.Governance.Application.Features.GetNetworkPolicy.GetNetworkPolicy;
 using GetTenantSchemasFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.GetTenantSchemas;
 using ProvisionTenantSchemaFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.ProvisionTenantSchema;
+using GetDatabaseHealthFeature = NexTraceOne.Governance.Application.Features.GetDatabaseHealth.GetDatabaseHealth;
+using GetCanaryRolloutsFeature = NexTraceOne.Governance.Application.Features.GetCanaryRollouts.GetCanaryRollouts;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -146,5 +148,26 @@ public sealed class PlatformStatusEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:write");
+
+        platform.MapGet("/database-health", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetDatabaseHealthFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        platform.MapGet("/canary/rollouts", async (
+            string? environment,
+            string? status,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetCanaryRolloutsFeature.Query(environment, status);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
     }
 }
