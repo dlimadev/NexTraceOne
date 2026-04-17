@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Entities;
@@ -187,7 +189,16 @@ public sealed class NotificationSuppressionServiceTests
     // ── Helpers ────────────────────────────────────────────────────────────
 
     private static NotificationSuppressionService CreateSut(NotificationsDbContext context)
-        => new(context, new MandatoryNotificationPolicy());
+    {
+        var configResolution = Substitute.For<IConfigurationResolutionService>();
+        configResolution.ResolveEffectiveValueAsync(
+                Arg.Any<string>(),
+                Arg.Any<ConfigurationScope>(),
+                Arg.Any<string?>(),
+                Arg.Any<CancellationToken>())
+            .Returns((NexTraceOne.Configuration.Contracts.DTOs.EffectiveConfigurationDto?)null);
+        return new NotificationSuppressionService(context, new MandatoryNotificationPolicy(), configResolution);
+    }
 
     private static NotificationsDbContext CreateContext()
     {

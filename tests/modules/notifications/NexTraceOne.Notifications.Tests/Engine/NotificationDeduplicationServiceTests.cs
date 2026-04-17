@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Domain.Entities;
 using NexTraceOne.Notifications.Domain.Enums;
 using NexTraceOne.Notifications.Infrastructure.Engine;
@@ -16,13 +18,29 @@ namespace NexTraceOne.Notifications.Tests.Engine;
 /// </summary>
 public sealed class NotificationDeduplicationServiceTests
 {
+    /// <summary>
+    /// Cria um mock de IConfigurationResolutionService que devolve null para todas as chaves.
+    /// Isto simula ausência de configuração → fallback para defaults do serviço.
+    /// </summary>
+    private static IConfigurationResolutionService CreateConfigResolution()
+    {
+        var mock = Substitute.For<IConfigurationResolutionService>();
+        mock.ResolveEffectiveValueAsync(
+                Arg.Any<string>(),
+                Arg.Any<ConfigurationScope>(),
+                Arg.Any<string?>(),
+                Arg.Any<CancellationToken>())
+            .Returns((NexTraceOne.Configuration.Contracts.DTOs.EffectiveConfigurationDto?)null);
+        return mock;
+    }
+
     // ── Pure logic paths (sem acesso ao DB) ───────────────────────────────
 
     [Fact]
     public async Task WhenWindowIsZero_ReturnsFalseImmediately()
     {
         await using var context = CreateContext();
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         var result = await sut.IsDuplicateAsync(
             Guid.NewGuid(), Guid.NewGuid(), "IncidentCreated",
@@ -36,7 +54,7 @@ public sealed class NotificationDeduplicationServiceTests
     public async Task WhenWindowIsNegative_ReturnsFalseImmediately()
     {
         await using var context = CreateContext();
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         var result = await sut.IsDuplicateAsync(
             Guid.NewGuid(), Guid.NewGuid(), "IncidentCreated",
@@ -52,7 +70,7 @@ public sealed class NotificationDeduplicationServiceTests
     public async Task WhenNoMatchingNotifications_ReturnsFalse()
     {
         await using var context = CreateContext();
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         var result = await sut.IsDuplicateAsync(
             Guid.NewGuid(), Guid.NewGuid(), "IncidentCreated", "entity-1");
@@ -75,7 +93,7 @@ public sealed class NotificationDeduplicationServiceTests
         await context.Notifications.AddAsync(notification);
         await context.SaveChangesAsync();
 
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         var result = await sut.IsDuplicateAsync(
             tenantId, userId, eventType, entityId, windowMinutes: 5);
@@ -99,7 +117,7 @@ public sealed class NotificationDeduplicationServiceTests
         await context.Notifications.AddAsync(notification);
         await context.SaveChangesAsync();
 
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         var result = await sut.IsDuplicateAsync(
             tenantId, userId, eventType, entityId, windowMinutes: 5);
@@ -123,7 +141,7 @@ public sealed class NotificationDeduplicationServiceTests
         await context.Notifications.AddAsync(notification);
         await context.SaveChangesAsync();
 
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         var result = await sut.IsDuplicateAsync(
             tenantId, userId, eventType, entityId);
@@ -147,7 +165,7 @@ public sealed class NotificationDeduplicationServiceTests
         await context.Notifications.AddAsync(notification);
         await context.SaveChangesAsync();
 
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         var result = await sut.IsDuplicateAsync(
             tenantId, userId, eventType, entityId);
@@ -169,7 +187,7 @@ public sealed class NotificationDeduplicationServiceTests
         await context.Notifications.AddAsync(notification);
         await context.SaveChangesAsync();
 
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         // Check duplication for "release-B" → different entity → not a duplicate
         var result = await sut.IsDuplicateAsync(
@@ -191,7 +209,7 @@ public sealed class NotificationDeduplicationServiceTests
         await context.Notifications.AddAsync(notification);
         await context.SaveChangesAsync();
 
-        var sut = new NotificationDeduplicationService(context);
+        var sut = new NotificationDeduplicationService(context, CreateConfigResolution());
 
         // Null sourceEntityId → no entity filter → matches any recent notification for the event type
         var result = await sut.IsDuplicateAsync(

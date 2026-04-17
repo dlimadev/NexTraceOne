@@ -1,56 +1,95 @@
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Infrastructure.Intelligence;
 
 namespace NexTraceOne.Notifications.Tests.Intelligence;
 
 /// <summary>
 /// Testes para o QuietHoursService da Fase 6.
-/// Valida lógica de quiet hours e override obrigatório.
+/// Valida lógica de quiet hours, override obrigatório e configuração por utilizador.
 /// </summary>
 public sealed class QuietHoursServiceTests
 {
-    private readonly QuietHoursService _service = new();
+    /// <summary>
+    /// Cria um mock de IConfigurationResolutionService que devolve null para todas as chaves.
+    /// Simula utilizador sem preferências configuradas → usa defaults do serviço.
+    /// </summary>
+    private static IConfigurationResolutionService CreateDefaultConfigResolution()
+    {
+        var mock = Substitute.For<IConfigurationResolutionService>();
+        mock.ResolveEffectiveValueAsync(
+                Arg.Any<string>(), Arg.Any<ConfigurationScope>(),
+                Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
+        return mock;
+    }
+
+    /// <summary>
+    /// Cria um mock que simula quiet hours desabilitadas para o utilizador.
+    /// </summary>
+    private static IConfigurationResolutionService CreateDisabledQuietHoursConfig()
+    {
+        var mock = Substitute.For<IConfigurationResolutionService>();
+        mock.ResolveEffectiveValueAsync(
+                "notifications.quiet_hours.enabled",
+                Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(new EffectiveConfigurationDto(
+                "notifications.quiet_hours.enabled", "false",
+                "User", null, false, false, "notifications.quiet_hours.enabled", "Boolean", false, 1));
+
+        mock.ResolveEffectiveValueAsync(
+                Arg.Is<string>(k => k != "notifications.quiet_hours.enabled"),
+                Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
+        return mock;
+    }
 
     [Fact]
     public async Task ShouldDeferAsync_MandatoryNotification_ReturnsFalse()
     {
+        var service = new QuietHoursService(CreateDefaultConfigResolution());
+
         // Mandatory notifications should NEVER be deferred
-        var result = await _service.ShouldDeferAsync(
+        var result = await service.ShouldDeferAsync(
             Guid.NewGuid(), isMandatory: true);
 
         result.Should().BeFalse();
     }
 
     [Fact]
-    public async Task ShouldDeferAsync_NonMandatory_DuringQuietHours_ReturnsTrue()
+    public async Task ShouldDeferAsync_NonMandatory_DuringQuietHours_ReturnsValidBool()
     {
-        // Quiet hours: 22:00-08:00 UTC
-        // We can't control DateTimeOffset.UtcNow directly without a clock abstraction,
-        // but we verify the service respects the mandatory override
-        var result = await _service.ShouldDeferAsync(
-            Guid.NewGuid(), isMandatory: false);
+        var service = new QuietHoursService(CreateDefaultConfigResolution());
 
-        // Result depends on current UTC hour - just verify it returns without error
-        _ = result; // valid boolean result
+        // Result depends on current UTC hour and default quiet hours window (22:00-08:00)
+        var result = await service.ShouldDeferAsync(Guid.NewGuid(), isMandatory: false);
+
+        // Valid boolean result - no exception
+        _ = result;
     }
 
     [Fact]
-    public async Task ShouldDeferAsync_DifferentUsers_SameResult()
+    public async Task ShouldDeferAsync_QuietHoursDisabledByConfig_ReturnsFalse()
     {
-        var result1 = await _service.ShouldDeferAsync(Guid.NewGuid(), isMandatory: false);
-        var result2 = await _service.ShouldDeferAsync(Guid.NewGuid(), isMandatory: false);
+        var service = new QuietHoursService(CreateDisabledQuietHoursConfig());
 
-        // Same time = same quiet hours result
-        result1.Should().Be(result2);
+        // Quiet hours disabled via config → never defer
+        var result = await service.ShouldDeferAsync(Guid.NewGuid(), isMandatory: false);
+
+        result.Should().BeFalse();
     }
 
     [Fact]
     public async Task ShouldDeferAsync_MandatoryAlwaysFalse_RegardlessOfTime()
     {
+        var service = new QuietHoursService(CreateDefaultConfigResolution());
+
         // Multiple calls - mandatory always returns false
         for (var i = 0; i < 5; i++)
         {
-            var result = await _service.ShouldDeferAsync(Guid.NewGuid(), isMandatory: true);
-            result.Should().BeFalse();
+            var r = await service.ShouldDeferAsync(Guid.NewGuid(), isMandatory: true);
+            r.Should().BeFalse();
         }
     }
 }

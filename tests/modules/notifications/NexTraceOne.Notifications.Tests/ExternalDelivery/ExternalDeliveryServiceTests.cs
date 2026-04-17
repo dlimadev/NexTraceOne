@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
+using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.Notifications.Domain.Entities;
 using NexTraceOne.Notifications.Domain.Enums;
 using NexTraceOne.Notifications.Domain.StronglyTypedIds;
@@ -22,6 +23,8 @@ public sealed class ExternalDeliveryServiceTests
     private readonly INotificationDeliveryStore _deliveryStore = Substitute.For<INotificationDeliveryStore>();
     private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
     private readonly IEnvironmentBehaviorService _envBehavior = Substitute.For<IEnvironmentBehaviorService>();
+    private readonly IQuietHoursService _quietHours = Substitute.For<IQuietHoursService>();
+    private readonly IMandatoryNotificationPolicy _mandatoryPolicy = Substitute.For<IMandatoryNotificationPolicy>();
     private readonly IOptions<DeliveryRetryOptions> _retryOptions;
     private readonly ILogger<ExternalDeliveryService> _logger =
         NullLoggerFactory.Instance.CreateLogger<ExternalDeliveryService>();
@@ -45,12 +48,22 @@ public sealed class ExternalDeliveryServiceTests
         _envBehavior.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(true);
 
+        // Fail-open: not in quiet hours (always deliver)
+        _quietHours.ShouldDeferAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Default mandatory policy: nothing is mandatory
+        _mandatoryPolicy.IsMandatory(Arg.Any<string>(), Arg.Any<NotificationCategory>(), Arg.Any<NotificationSeverity>())
+            .Returns(false);
+
         _service = new ExternalDeliveryService(
             _routingEngine,
             [_emailDispatcher, _teamsDispatcher],
             _deliveryStore,
             _auditService,
             _envBehavior,
+            _quietHours,
+            _mandatoryPolicy,
             _retryOptions,
             _logger);
     }

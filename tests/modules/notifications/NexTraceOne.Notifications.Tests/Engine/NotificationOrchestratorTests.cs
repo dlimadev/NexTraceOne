@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Engine;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
@@ -14,8 +15,11 @@ public sealed class NotificationOrchestratorTests
     private readonly INotificationStore _store = Substitute.For<INotificationStore>();
     private readonly INotificationTemplateResolver _templateResolver = new NotificationTemplateResolver();
     private readonly INotificationDeduplicationService _dedup = Substitute.For<INotificationDeduplicationService>();
+    private readonly INotificationSuppressionService _suppression = Substitute.For<INotificationSuppressionService>();
+    private readonly INotificationGroupingService _grouping = Substitute.For<INotificationGroupingService>();
     private readonly INotificationAuditService _auditService = Substitute.For<INotificationAuditService>();
     private readonly IEnvironmentBehaviorService _envBehavior = Substitute.For<IEnvironmentBehaviorService>();
+    private readonly IConfigurationResolutionService _configResolution = Substitute.For<IConfigurationResolutionService>();
     private readonly ILogger<NotificationOrchestrator> _logger = Substitute.For<ILogger<NotificationOrchestrator>>();
     private readonly NotificationOrchestrator _orchestrator;
 
@@ -26,13 +30,33 @@ public sealed class NotificationOrchestratorTests
             Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
+        // Suppression fail-open: allow all notifications
+        _suppression.EvaluateAsync(Arg.Any<NotificationRequest>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(SuppressionResult.Allow());
+
+        // Grouping: return deterministic correlation key and null group (no active group)
+        _grouping.GenerateCorrelationKey(
+                Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string?>(),
+                Arg.Any<string?>(), Arg.Any<string?>())
+            .Returns("test-correlation-key");
+        _grouping.ResolveGroupAsync(
+                Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((Guid?)null);
+
+        // Config resolution fail-open: return null (use service defaults)
+        _configResolution.ResolveEffectiveValueAsync(
+                Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((NexTraceOne.Configuration.Contracts.DTOs.EffectiveConfigurationDto?)null);
+
         // Fail-open: external channels enabled, minimum severity = 0 (all pass)
         _envBehavior.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(true);
         _envBehavior.GetIntAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(0);
 
-        _orchestrator = new NotificationOrchestrator(_store, _templateResolver, _dedup, _auditService, _envBehavior, null, _logger);
+        _orchestrator = new NotificationOrchestrator(
+            _store, _templateResolver, _dedup, _suppression, _grouping,
+            _auditService, _envBehavior, _configResolution, null, _logger);
     }
 
     [Fact]
