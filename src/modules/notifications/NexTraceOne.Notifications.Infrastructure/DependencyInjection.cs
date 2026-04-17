@@ -143,6 +143,15 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.EvidenceExpiringIntegrationEvent>, ComplianceNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.BudgetThresholdReachedIntegrationEvent>, ComplianceNotificationHandler>();
 
+        // ── Change Intelligence ──
+        services.AddScoped<IIntegrationEventHandler<PromotionCompletedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<PromotionBlockedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<RollbackTriggeredIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<DeploymentCompletedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<ChangeConfidenceScoredIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<BlastRadiusHighIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+        services.AddScoped<IIntegrationEventHandler<PostChangeVerificationFailedIntegrationEvent>, ChangeIntelligenceNotificationHandler>();
+
         // AI Governance
         services.AddScoped<IIntegrationEventHandler<AiProviderUnavailableIntegrationEvent>, AiGovernanceNotificationHandler>();
         services.AddScoped<IIntegrationEventHandler<TokenBudgetExceededIntegrationEvent>, AiGovernanceNotificationHandler>();
