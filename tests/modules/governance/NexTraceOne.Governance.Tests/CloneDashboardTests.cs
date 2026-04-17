@@ -11,7 +11,7 @@ public sealed class CloneDashboardTests
 
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ICustomDashboardRepository _repository = Substitute.For<ICustomDashboardRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     public CloneDashboardTests()
     {

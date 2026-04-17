@@ -20,7 +20,7 @@ public sealed class ChangeCostImpactHandlerTests
 
     private readonly IChangeCostImpactRepository _repository =
         Substitute.For<IChangeCostImpactRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public ChangeCostImpactHandlerTests()

@@ -11,6 +11,8 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordObservationMetrics;
 
@@ -74,11 +76,32 @@ public static class RecordObservationMetrics
         IPostReleaseReviewRepository reviewRepository,
         IPostChangeVerificationService verificationService,
         IChangeIntelligenceUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEnvironmentBehaviorService environmentBehaviorService) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // ── Gate: verificar se verificação pós-mudança está habilitada ──
+            var postChangeEnabled = await environmentBehaviorService.IsEnabledAsync(
+                EnvironmentBehaviorConfigKeys.ChangePostChangeVerificationEnabled,
+                environmentId: null,
+                cancellationToken);
+
+            if (!postChangeEnabled)
+                return Result<Response>.Success(new Response(
+                    ObservationWindowId: Guid.Empty,
+                    ReviewId: Guid.Empty,
+                    Phase: request.Phase.ToString(),
+                    Outcome: "Skipped",
+                    ConfidenceScore: 0m,
+                    Summary: "Post-change verification is disabled for this environment.",
+                    ErrorRateDelta: 0m,
+                    AvgLatencyDelta: 0m,
+                    P95LatencyDelta: 0m,
+                    ReviewCompleted: false,
+                    IsNewWindow: false));
 
             var releaseId = ReleaseId.From(request.ReleaseId);
 

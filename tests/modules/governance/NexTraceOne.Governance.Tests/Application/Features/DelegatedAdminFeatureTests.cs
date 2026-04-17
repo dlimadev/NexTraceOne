@@ -15,7 +15,7 @@ public sealed class DelegatedAdminFeatureTests
     private readonly IDelegatedAdministrationRepository _delegationRepository = Substitute.For<IDelegatedAdministrationRepository>();
     private readonly ITeamRepository _teamRepository = Substitute.For<ITeamRepository>();
     private readonly IGovernanceDomainRepository _domainRepository = Substitute.For<IGovernanceDomainRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     // ── CreateDelegatedAdministration ──
 

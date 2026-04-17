@@ -4,6 +4,7 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
+using NexTraceOne.Configuration.Application.Abstractions;
 
 using CalculateBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius.CalculateBlastRadius;
 using ClassifyChangeLevelFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel.ClassifyChangeLevel;
@@ -33,7 +34,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var markerRepository = Substitute.For<IExternalMarkerRepository>();
         var scoreRepository = Substitute.For<IChangeScoreRepository>();
         var scoreCalculator = new ChangeScoreCalculator();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, Substitute.For<ICurrentTenant>(), unitOfWork, dateTimeProvider);
 
@@ -68,7 +69,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var markerRepository = Substitute.For<IExternalMarkerRepository>();
         var scoreRepository = Substitute.For<IChangeScoreRepository>();
         var scoreCalculator = new ChangeScoreCalculator();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, Substitute.For<ICurrentTenant>(), unitOfWork, dateTimeProvider);
 
@@ -99,7 +100,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var markerRepository = Substitute.For<IExternalMarkerRepository>();
         var scoreRepository = Substitute.For<IChangeScoreRepository>();
         var scoreCalculator = new ChangeScoreCalculator();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new NotifyDeploymentFeature.Handler(repository, changeEventRepository, markerRepository, scoreRepository, scoreCalculator, Substitute.For<ICurrentTenant>(), unitOfWork, dateTimeProvider);
 
@@ -128,7 +129,7 @@ public sealed class ChangeIntelligenceApplicationTests
     {
         var release = CreateRelease();
         var repository = Substitute.For<IReleaseRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var sut = new ClassifyChangeLevelFeature.Handler(repository, unitOfWork);
 
         repository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -147,7 +148,7 @@ public sealed class ChangeIntelligenceApplicationTests
     public async Task ClassifyChangeLevel_Should_ReturnError_WhenReleaseNotFound()
     {
         var repository = Substitute.For<IReleaseRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var sut = new ClassifyChangeLevelFeature.Handler(repository, unitOfWork);
 
         repository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -171,9 +172,9 @@ public sealed class ChangeIntelligenceApplicationTests
         var blastRadiusRepository = Substitute.For<IBlastRadiusRepository>();
         var scoreRepository = Substitute.For<IChangeScoreRepository>();
         var scoreCalculator = new ChangeScoreCalculator();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new CalculateBlastRadiusFeature.Handler(releaseRepository, blastRadiusRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
+        var sut = new CalculateBlastRadiusFeature.Handler(releaseRepository, blastRadiusRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService());
 
         releaseRepository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns(release);
@@ -202,7 +203,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var release = CreateRelease();
         var releaseRepository = Substitute.For<IReleaseRepository>();
         var scoreRepository = Substitute.For<IChangeScoreRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new ComputeChangeScoreFeature.Handler(releaseRepository, scoreRepository, unitOfWork, dateTimeProvider);
 
@@ -265,7 +266,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var repository = Substitute.For<IReleaseRepository>();
         var changeEventRepository = Substitute.For<IChangeEventRepository>();
         var traceWriter = Substitute.For<ITraceCorrelationWriter>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -305,7 +306,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var repository = Substitute.For<IReleaseRepository>();
         var changeEventRepository = Substitute.For<IChangeEventRepository>();
         var traceWriter = Substitute.For<ITraceCorrelationWriter>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         var sut = new RecordTraceCorrelationFeature.Handler(
@@ -380,4 +381,11 @@ public sealed class ChangeIntelligenceApplicationTests
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("Release.NotFound");
     }
+    private static IEnvironmentBehaviorService CreateEnabledBehaviorService()
+    {
+        var svc = Substitute.For<IEnvironmentBehaviorService>();
+        svc.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).Returns(true);
+        return svc;
+    }
+
 }

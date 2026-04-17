@@ -16,6 +16,7 @@ using GetPendingMigrationsFeature = NexTraceOne.Governance.Application.Features.
 using GetNetworkPolicyFeature = NexTraceOne.Governance.Application.Features.GetNetworkPolicy.GetNetworkPolicy;
 using GetTenantSchemasFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.GetTenantSchemas;
 using ProvisionTenantSchemaFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.ProvisionTenantSchema;
+using GetCanaryRolloutsFeature = NexTraceOne.Governance.Application.Features.GetCanaryRollouts.GetCanaryRollouts;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -146,5 +147,20 @@ public sealed class PlatformStatusEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:write");
+
+        // NOTA: GET /api/v1/platform/database-health está registado directamente em Program.cs
+        // usando DatabaseHealthService (diagnóstico real via pg_stat_*). Não duplicar aqui.
+
+        platform.MapGet("/canary/rollouts", async (
+            string? environment,
+            string? status,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetCanaryRolloutsFeature.Query(environment, status);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
     }
 }

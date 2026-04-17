@@ -1,8 +1,10 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
+using NexTraceOne.Configuration.Application.Abstractions;
 
 using GetPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview.GetPostReleaseReview;
 using RecordObservationMetricsFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordObservationMetrics.RecordObservationMetrics;
@@ -114,7 +116,7 @@ public sealed class PostChangeVerificationTests
         var baselineRepo = Substitute.For<IReleaseBaselineRepository>();
         var windowRepo = Substitute.For<IObservationWindowRepository>();
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -125,7 +127,8 @@ public sealed class PostChangeVerificationTests
 
         var sut = new RecordObservationMetricsFeature.Handler(
             releaseRepo, baselineRepo, windowRepo, reviewRepo,
-            new PostChangeVerificationService(), uow, dateTimeProvider);
+            new PostChangeVerificationService(), uow, dateTimeProvider,
+            CreateEnabledBehaviorService());
 
         var command = new RecordObservationMetricsFeature.Command(
             release.Id.Value,
@@ -155,7 +158,7 @@ public sealed class PostChangeVerificationTests
         var baselineRepo = Substitute.For<IReleaseBaselineRepository>();
         var windowRepo = Substitute.For<IObservationWindowRepository>();
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -166,7 +169,8 @@ public sealed class PostChangeVerificationTests
 
         var sut = new RecordObservationMetricsFeature.Handler(
             releaseRepo, baselineRepo, windowRepo, reviewRepo,
-            new PostChangeVerificationService(), uow, dateTimeProvider);
+            new PostChangeVerificationService(), uow, dateTimeProvider,
+            CreateEnabledBehaviorService());
 
         var command = new RecordObservationMetricsFeature.Command(
             release.Id.Value,
@@ -193,8 +197,9 @@ public sealed class PostChangeVerificationTests
             Substitute.For<IObservationWindowRepository>(),
             Substitute.For<IPostReleaseReviewRepository>(),
             new PostChangeVerificationService(),
-            Substitute.For<IUnitOfWork>(),
-            Substitute.For<IDateTimeProvider>());
+            Substitute.For<IChangeIntelligenceUnitOfWork>(),
+            Substitute.For<IDateTimeProvider>(),
+            CreateEnabledBehaviorService());
 
         var result = await sut.Handle(
             new RecordObservationMetricsFeature.Command(Guid.NewGuid(), ObservationPhase.InitialObservation,
@@ -219,8 +224,9 @@ public sealed class PostChangeVerificationTests
             Substitute.For<IObservationWindowRepository>(),
             Substitute.For<IPostReleaseReviewRepository>(),
             new PostChangeVerificationService(),
-            Substitute.For<IUnitOfWork>(),
-            Substitute.For<IDateTimeProvider>());
+            Substitute.For<IChangeIntelligenceUnitOfWork>(),
+            Substitute.For<IDateTimeProvider>(),
+            CreateEnabledBehaviorService());
 
         var result = await sut.Handle(
             new RecordObservationMetricsFeature.Command(release.Id.Value, ObservationPhase.InitialObservation,
@@ -298,4 +304,11 @@ public sealed class PostChangeVerificationTests
         window.RecordMetrics(500m, errorRate, avgLatency, p95Latency, p95Latency * 1.3m, 10240m, FixedNow);
         return window;
     }
+    private static IEnvironmentBehaviorService CreateEnabledBehaviorService()
+    {
+        var svc = Substitute.For<IEnvironmentBehaviorService>();
+        svc.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).Returns(true);
+        return svc;
+    }
+
 }

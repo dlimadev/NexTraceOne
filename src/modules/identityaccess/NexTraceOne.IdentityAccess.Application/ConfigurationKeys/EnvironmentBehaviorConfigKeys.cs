@@ -71,6 +71,13 @@ public static class EnvironmentBehaviorConfigKeys
     /// </summary>
     public const string JobsGovernanceWaiverExpiryEnabled = "env.behavior.jobs.governance_waiver_expiry.enabled";
 
+    /// <summary>
+    /// Indica se o scheduler de ambientes não produtivos (ex: suspensão nocturna, limpeza de dados,
+    /// rotação de segredos) está habilitado para este ambiente.
+    /// Deve ser false em ambientes de produção.
+    /// </summary>
+    public const string JobsNonProdSchedulerEnabled = "env.behavior.jobs.non_prod_scheduler.enabled";
+
     // ── Retenção de Dados ──────────────────────────────────────────────────
 
     /// <summary>

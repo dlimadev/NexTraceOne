@@ -32,7 +32,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var release = CreateRelease();
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var markerRepo = Substitute.For<IExternalMarkerRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -58,7 +58,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
     {
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var markerRepo = Substitute.For<IExternalMarkerRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -80,7 +80,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
     public async Task CreateFreezeWindow_Should_Succeed_WithValidData()
     {
         var freezeRepo = Substitute.For<IFreezeWindowRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         var currentUser = Substitute.For<ICurrentUser>();
         clock.UtcNow.Returns(FixedNow);
@@ -149,7 +149,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var release = CreateRelease();
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var baselineRepo = Substitute.For<IReleaseBaselineRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -174,7 +174,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
     {
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var baselineRepo = Substitute.For<IReleaseBaselineRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -198,7 +198,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var release = CreateRelease();
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -226,7 +226,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var existing = PostReleaseReview.Start(release.Id, FixedNow);
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -248,7 +248,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
     {
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -271,7 +271,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var release = CreateRelease();
         var review = PostReleaseReview.Start(release.Id, FixedNow);
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -295,7 +295,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
     public async Task ProgressPostReleaseReview_Should_Fail_WhenNoReview()
     {
         var reviewRepo = Substitute.For<IPostReleaseReviewRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         reviewRepo.GetByReleaseIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
@@ -320,7 +320,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var release = CreateRelease();
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var rollbackRepo = Substitute.For<IRollbackAssessmentRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -346,7 +346,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
         var release = CreateRelease();
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var rollbackRepo = Substitute.For<IRollbackAssessmentRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -370,7 +370,7 @@ public sealed class ChangeIntelligenceExtendedApplicationTests
     {
         var releaseRepo = Substitute.For<IReleaseRepository>();
         var rollbackRepo = Substitute.For<IRollbackAssessmentRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
 
         releaseRepo.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())

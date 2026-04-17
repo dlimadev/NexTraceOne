@@ -17,7 +17,7 @@ public sealed class GovernancePackFeatureTests
     private readonly IGovernancePackRepository _packRepository = Substitute.For<IGovernancePackRepository>();
     private readonly IGovernancePackVersionRepository _versionRepository = Substitute.For<IGovernancePackVersionRepository>();
     private readonly IGovernanceRolloutRecordRepository _rolloutRecordRepository = Substitute.For<IGovernanceRolloutRecordRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     // ── CreateGovernancePack ──
 

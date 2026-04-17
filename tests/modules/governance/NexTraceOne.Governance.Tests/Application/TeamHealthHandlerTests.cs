@@ -17,7 +17,7 @@ public sealed class TeamHealthHandlerTests
 
     private readonly ITeamHealthSnapshotRepository _repository =
         Substitute.For<ITeamHealthSnapshotRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public TeamHealthHandlerTests()

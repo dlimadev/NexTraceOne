@@ -1,4 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ExpireGovernanceWaivers;
 using NexTraceOne.Governance.Application.Features.GetPolicyAsCode;
@@ -19,7 +20,7 @@ public sealed class PolicyEngineV2Tests
 
     private readonly IPolicyAsCodeRepository _policyRepo = Substitute.For<IPolicyAsCodeRepository>();
     private readonly IGovernanceWaiverRepository _waiverRepo = Substitute.For<IGovernanceWaiverRepository>();
-    private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _uow = Substitute.For<IGovernanceUnitOfWork>();
     private readonly ICurrentTenant _tenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
@@ -268,7 +269,9 @@ public sealed class PolicyEngineV2Tests
         _waiverRepo.ListAsync(null, WaiverStatus.Approved, Arg.Any<CancellationToken>())
             .Returns(new List<GovernanceWaiver> { expired1, expired2, notExpired });
 
-        var handler = new ExpireGovernanceWaivers.Handler(_waiverRepo, _uow, _clock);
+        var behaviorService = Substitute.For<IEnvironmentBehaviorService>();
+        behaviorService.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).Returns(true);
+        var handler = new ExpireGovernanceWaivers.Handler(_waiverRepo, _uow, _clock, behaviorService);
 
         var result = await handler.Handle(
             new ExpireGovernanceWaivers.Command("system:waiver-expiry-job"),
@@ -291,7 +294,7 @@ public sealed class PolicyEngineV2Tests
         _waiverRepo.ListAsync(null, WaiverStatus.Approved, Arg.Any<CancellationToken>())
             .Returns(new List<GovernanceWaiver> { active });
 
-        var handler = new ExpireGovernanceWaivers.Handler(_waiverRepo, _uow, _clock);
+        var handler = new ExpireGovernanceWaivers.Handler(_waiverRepo, _uow, _clock, Substitute.For<IEnvironmentBehaviorService>());
 
         var result = await handler.Handle(
             new ExpireGovernanceWaivers.Command("system:waiver-expiry-job"),

@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
@@ -36,7 +38,7 @@ public sealed class PromotionApplicationTests
         var targetEnv = CreateActiveEnvironment("Production");
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var envRepo = Substitute.For<IDeploymentEnvironmentRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPromotionUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -62,7 +64,7 @@ public sealed class PromotionApplicationTests
     {
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var envRepo = Substitute.For<IDeploymentEnvironmentRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPromotionUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         envRepo.GetByIdAsync(Arg.Any<DeploymentEnvironmentId>(), Arg.Any<CancellationToken>())
@@ -104,7 +106,7 @@ public sealed class PromotionApplicationTests
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var gateRepo = Substitute.For<IPromotionGateRepository>();
         var evalRepo = Substitute.For<IGateEvaluationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPromotionUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -115,7 +117,7 @@ public sealed class PromotionApplicationTests
         gateRepo.ListByEnvironmentIdAsync(Arg.Any<DeploymentEnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(new List<PromotionGate> { gate });
 
-        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider);
+        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
         var command = new EvaluatePromotionGatesFeature.Command(
             request.Id.Value,
             "ci@system.com",
@@ -144,7 +146,7 @@ public sealed class PromotionApplicationTests
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var gateRepo = Substitute.For<IPromotionGateRepository>();
         var evalRepo = Substitute.For<IGateEvaluationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPromotionUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -155,7 +157,7 @@ public sealed class PromotionApplicationTests
         gateRepo.ListByEnvironmentIdAsync(Arg.Any<DeploymentEnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(new List<PromotionGate> { gate });
 
-        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider);
+        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
         var command = new EvaluatePromotionGatesFeature.Command(
             request.Id.Value,
             "ci@system.com",
@@ -177,13 +179,13 @@ public sealed class PromotionApplicationTests
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var gateRepo = Substitute.For<IPromotionGateRepository>();
         var evalRepo = Substitute.For<IGateEvaluationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPromotionUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         requestRepo.GetByIdAsync(Arg.Any<PromotionRequestId>(), Arg.Any<CancellationToken>())
             .Returns((PromotionRequest?)null);
 
-        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider);
+        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
         var command = new EvaluatePromotionGatesFeature.Command(
             Guid.NewGuid(), "ci@system.com",
             new List<EvaluatePromotionGatesFeature.GateEvaluationInput>());
@@ -210,7 +212,7 @@ public sealed class PromotionApplicationTests
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var gateRepo = Substitute.For<IPromotionGateRepository>();
         var evalRepo = Substitute.For<IGateEvaluationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPromotionUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
@@ -245,7 +247,7 @@ public sealed class PromotionApplicationTests
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var gateRepo = Substitute.For<IPromotionGateRepository>();
         var evalRepo = Substitute.For<IGateEvaluationRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IPromotionUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         requestRepo.GetByIdAsync(Arg.Any<PromotionRequestId>(), Arg.Any<CancellationToken>())
@@ -305,4 +307,11 @@ public sealed class PromotionApplicationTests
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("Request.NotFound");
     }
+    private static IEnvironmentBehaviorService CreateEnabledBehaviorService()
+    {
+        var svc = Substitute.For<IEnvironmentBehaviorService>();
+        svc.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).Returns(true);
+        return svc;
+    }
+
 }

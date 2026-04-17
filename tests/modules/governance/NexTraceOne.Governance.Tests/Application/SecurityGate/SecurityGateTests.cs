@@ -1,4 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.SecurityGate.Features.AcknowledgeFinding;
 using NexTraceOne.Governance.Application.SecurityGate.Features.EvaluateSecurityGate;
 using NexTraceOne.Governance.Application.SecurityGate.Features.GenerateSecurityReport;
@@ -20,7 +21,7 @@ namespace NexTraceOne.Governance.Tests.Application.SecurityGate;
 public sealed class SecurityGateTests
 {
     private readonly ISecurityScanRepository _repo = Substitute.For<ISecurityScanRepository>();
-    private readonly IUnitOfWork _uow = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _uow = Substitute.For<IGovernanceUnitOfWork>();
 
     // ── InternalSastScanner ───────────────────────────────────────────────
 

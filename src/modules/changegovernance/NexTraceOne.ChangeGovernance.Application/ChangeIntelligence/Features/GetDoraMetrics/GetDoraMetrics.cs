@@ -8,6 +8,8 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDoraMetrics;
@@ -46,11 +48,34 @@ public static class GetDoraMetrics
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         IIncidentModule incidentModule,
-        ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
+        ICurrentTenant currentTenant,
+        IEnvironmentBehaviorService environmentBehaviorService) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // ── Gate: verificar se cálculo DORA está habilitado para o ambiente ──
+            var doraEnabled = await environmentBehaviorService.IsEnabledAsync(
+                EnvironmentBehaviorConfigKeys.MetricsDoraEnabled,
+                environmentId: null,
+                cancellationToken);
+
+            if (!doraEnabled)
+            {
+                var empty = new Response(
+                    DeploymentFrequency: new DeploymentFrequencyDto(0m, 0, DoraClassification.Low),
+                    LeadTimeForChanges: new LeadTimeDto(0m, DoraClassification.Low),
+                    ChangeFailureRate: new ChangeFailureRateDto(0m, 0, 0, 0, DoraClassification.Low),
+                    TimeToRestoreService: new TimeToRestoreDto(0m, DoraClassification.Low),
+                    OverallClassification: DoraClassification.Low,
+                    PeriodDays: request.Days,
+                    ServiceName: request.ServiceName,
+                    TeamName: request.TeamName,
+                    Environment: request.Environment,
+                    GeneratedAt: DateTimeOffset.UtcNow);
+                return Result<Response>.Success(empty);
+            }
 
             var to = DateTimeOffset.UtcNow;
             var from = to.AddDays(-request.Days);

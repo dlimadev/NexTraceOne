@@ -39,7 +39,7 @@ public sealed class UncoveredGovernanceFeaturesTests
     private readonly ITeamDomainLinkRepository _teamDomainLinkRepo = Substitute.For<ITeamDomainLinkRepository>();
     private readonly IGovernanceAnalyticsRepository _analyticsRepo = Substitute.For<IGovernanceAnalyticsRepository>();
     private readonly IIncidentModule _incidentModule = Substitute.For<IIncidentModule>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
 

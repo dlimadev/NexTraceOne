@@ -21,7 +21,7 @@ public sealed class ExecutiveBriefingHandlerTests
 
     private readonly IExecutiveBriefingRepository _repository =
         Substitute.For<IExecutiveBriefingRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     public ExecutiveBriefingHandlerTests()

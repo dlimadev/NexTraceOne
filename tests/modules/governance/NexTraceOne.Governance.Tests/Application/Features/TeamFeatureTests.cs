@@ -21,7 +21,7 @@ public sealed class TeamFeatureTests
     private readonly ITeamRepository _teamRepository = Substitute.For<ITeamRepository>();
     private readonly ITeamDomainLinkRepository _teamDomainLinkRepository = Substitute.For<ITeamDomainLinkRepository>();
     private readonly ICatalogGraphModule _catalogGraph = Substitute.For<ICatalogGraphModule>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     // ── CreateTeam ──
 

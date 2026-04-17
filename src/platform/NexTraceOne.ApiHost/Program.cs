@@ -89,10 +89,7 @@ builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightChe
 builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.Checks.IPreflightCheck, NexTraceOne.ApiHost.Preflight.Checks.CorsOriginsPreflightCheck>();
 builder.Services.AddSingleton<NexTraceOne.ApiHost.Preflight.PreflightCheckService>();
 
-// [3.4] Hardware assessment service — avaliação de hardware para modelos LLM locais
-builder.Services.AddSingleton<NexTraceOne.ApiHost.OnPrem.HardwareAssessmentService>();
-
-// [3.5] Database health service — diagnóstico de saúde do PostgreSQL
+// [3.4] Database health service — diagnóstico de saúde do PostgreSQL via pg_stat_*
 builder.Services.AddSingleton<NexTraceOne.ApiHost.OnPrem.DatabaseHealthService>();
 
 // [4] Módulos — cada um registra sua Application + Infrastructure + DI
@@ -299,6 +296,7 @@ app.UseCookieSessionCsrfProtection();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseMiddleware<EnvironmentResolutionMiddleware>();
+app.UseMiddleware<MaintenanceModeMiddleware>();
 app.UseAuthorization();
 
 // ── Endpoints ──
@@ -342,16 +340,11 @@ app.MapGet("/preflight", async (
     return Results.Json(report, statusCode: statusCode);
 }).AllowAnonymous();
 
-// ── Hardware Assessment — avaliação de hardware para compatibilidade de modelos LLM ──
-app.MapGet("/api/v1/admin/ai/hardware-assessment", async (
-    NexTraceOne.ApiHost.OnPrem.HardwareAssessmentService hwService,
-    CancellationToken cancellationToken) =>
-{
-    var report = await hwService.AssessAsync(cancellationToken);
-    return Results.Ok(report);
-}).RequireAuthorization("platform:admin:read");
+// NOTA: GET /api/v1/admin/ai/hardware-assessment está registado em PlatformAdminEndpointModule
+// (descoberto automaticamente via MapAllModuleEndpoints). Não duplicar aqui.
 
-// ── Database Health — diagnóstico de saúde do PostgreSQL ──
+// ── Database Health — diagnóstico de saúde do PostgreSQL via pg_stat_* ──
+// Rota canónica — PlatformStatusEndpointModule não a duplica (feature fake foi removida).
 app.MapGet("/api/v1/platform/database-health", async (
     NexTraceOne.ApiHost.OnPrem.DatabaseHealthService dbService,
     CancellationToken cancellationToken) =>

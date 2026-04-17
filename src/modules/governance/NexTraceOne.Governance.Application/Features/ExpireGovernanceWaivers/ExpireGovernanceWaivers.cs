@@ -3,6 +3,7 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Enums;
 
@@ -30,11 +31,21 @@ public static class ExpireGovernanceWaivers
     public sealed class Handler(
         IGovernanceWaiverRepository waiverRepository,
         IGovernanceUnitOfWork unitOfWork,
-        IDateTimeProvider clock) : ICommandHandler<Command, Response>
+        IDateTimeProvider clock,
+        IEnvironmentBehaviorService environmentBehaviorService) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // ── Gate: verificar se expiração de waivers está habilitada ──
+            var expiryEnabled = await environmentBehaviorService.IsEnabledAsync(
+                "env.behavior.jobs.governance_waiver_expiry.enabled",
+                environmentId: null,
+                cancellationToken);
+
+            if (!expiryEnabled)
+                return Result<Response>.Success(new Response(0, [], clock.UtcNow));
 
             var now = clock.UtcNow;
 

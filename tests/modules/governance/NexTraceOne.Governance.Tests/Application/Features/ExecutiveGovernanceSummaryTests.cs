@@ -142,7 +142,7 @@ public sealed class ExecutiveGovernanceSummaryTests
         versionRepo.GetLatestByPackIdAsync(Arg.Any<GovernancePackId>(), Arg.Any<CancellationToken>()).Returns(version);
 
         var rolloutRepo = Substitute.For<IGovernanceRolloutRecordRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
         var handler = new ApplyGovernancePack.Handler(packRepo, versionRepo, rolloutRepo, unitOfWork);
         var command = new ApplyGovernancePack.Command(
