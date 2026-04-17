@@ -4,6 +4,7 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
+using NexTraceOne.Configuration.Application.Abstractions;
 
 using CalculateBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius.CalculateBlastRadius;
 using ClassifyChangeLevelFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ClassifyChangeLevel.ClassifyChangeLevel;
@@ -173,7 +174,7 @@ public sealed class ChangeIntelligenceApplicationTests
         var scoreCalculator = new ChangeScoreCalculator();
         var unitOfWork = Substitute.For<IChangeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new CalculateBlastRadiusFeature.Handler(releaseRepository, blastRadiusRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider);
+        var sut = new CalculateBlastRadiusFeature.Handler(releaseRepository, blastRadiusRepository, scoreRepository, scoreCalculator, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService());
 
         releaseRepository.GetByIdAsync(Arg.Any<ReleaseId>(), Arg.Any<CancellationToken>())
             .Returns(release);
@@ -380,4 +381,11 @@ public sealed class ChangeIntelligenceApplicationTests
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("Release.NotFound");
     }
+    private static IEnvironmentBehaviorService CreateEnabledBehaviorService()
+    {
+        var svc = Substitute.For<IEnvironmentBehaviorService>();
+        svc.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).Returns(true);
+        return svc;
+    }
+
 }

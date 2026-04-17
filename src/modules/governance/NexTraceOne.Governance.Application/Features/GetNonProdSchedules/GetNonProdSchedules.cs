@@ -2,7 +2,6 @@ using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
-using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 
 namespace NexTraceOne.Governance.Application.Features.GetNonProdSchedules;
 
@@ -37,7 +36,7 @@ public static class GetNonProdSchedules
         public async Task<Result<NonProdSchedulesResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
             var nonProdSchedulerEnabled = await behaviorService.IsEnabledAsync(
-                EnvironmentBehaviorConfigKeys.JobsNonProdSchedulerEnabled, null, cancellationToken);
+                "env.behavior.jobs.non_prod_scheduler.enabled", null, cancellationToken);
 
             var schedules = new List<NonProdScheduleDto>
             {

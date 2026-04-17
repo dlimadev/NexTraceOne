@@ -18,7 +18,7 @@ public sealed class RecordConfidenceEventTests
     private static RecordConfidenceEventFeature.Handler CreateHandler(
         IReleaseRepository releaseRepository,
         IChangeConfidenceEventRepository confidenceEventRepository,
-        IUnitOfWork unitOfWork,
+        IChangeIntelligenceUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider)
         => new(releaseRepository, confidenceEventRepository, unitOfWork, dateTimeProvider);
 

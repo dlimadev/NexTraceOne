@@ -1,4 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.SecurityGate.Features.AcknowledgeFinding;
 using NexTraceOne.Governance.Application.SecurityGate.Features.EvaluateSecurityGate;
 using NexTraceOne.Governance.Application.SecurityGate.Features.GenerateSecurityReport;

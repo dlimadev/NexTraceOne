@@ -18,7 +18,7 @@ public sealed class CustomDashboardTests
 
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ICustomDashboardRepository _repository = Substitute.For<ICustomDashboardRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     public CustomDashboardTests()
     {

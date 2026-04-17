@@ -16,7 +16,7 @@ public sealed class TechnicalDebtTests
 
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ITechnicalDebtRepository _repository = Substitute.For<ITechnicalDebtRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
+    private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     public TechnicalDebtTests()
     {

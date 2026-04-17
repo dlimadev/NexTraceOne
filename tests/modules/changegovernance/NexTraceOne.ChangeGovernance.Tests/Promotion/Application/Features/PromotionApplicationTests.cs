@@ -117,7 +117,7 @@ public sealed class PromotionApplicationTests
         gateRepo.ListByEnvironmentIdAsync(Arg.Any<DeploymentEnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(new List<PromotionGate> { gate });
 
-        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, Substitute.For<IEnvironmentBehaviorService>(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
+        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
         var command = new EvaluatePromotionGatesFeature.Command(
             request.Id.Value,
             "ci@system.com",
@@ -157,7 +157,7 @@ public sealed class PromotionApplicationTests
         gateRepo.ListByEnvironmentIdAsync(Arg.Any<DeploymentEnvironmentId>(), Arg.Any<CancellationToken>())
             .Returns(new List<PromotionGate> { gate });
 
-        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, Substitute.For<IEnvironmentBehaviorService>(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
+        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
         var command = new EvaluatePromotionGatesFeature.Command(
             request.Id.Value,
             "ci@system.com",
@@ -185,7 +185,7 @@ public sealed class PromotionApplicationTests
         requestRepo.GetByIdAsync(Arg.Any<PromotionRequestId>(), Arg.Any<CancellationToken>())
             .Returns((PromotionRequest?)null);
 
-        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, Substitute.For<IEnvironmentBehaviorService>(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
+        var sut = new EvaluatePromotionGatesFeature.Handler(requestRepo, gateRepo, evalRepo, unitOfWork, dateTimeProvider, CreateEnabledBehaviorService(), NullLogger<EvaluatePromotionGatesFeature.Handler>.Instance);
         var command = new EvaluatePromotionGatesFeature.Command(
             Guid.NewGuid(), "ci@system.com",
             new List<EvaluatePromotionGatesFeature.GateEvaluationInput>());
@@ -307,4 +307,11 @@ public sealed class PromotionApplicationTests
         result.IsFailure.Should().BeTrue();
         result.Error.Code.Should().Contain("Request.NotFound");
     }
+    private static IEnvironmentBehaviorService CreateEnabledBehaviorService()
+    {
+        var svc = Substitute.For<IEnvironmentBehaviorService>();
+        svc.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).Returns(true);
+        return svc;
+    }
+
 }
