@@ -110,11 +110,11 @@ internal sealed class TenantRepository(
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                var normalized = search.Trim().ToLowerInvariant();
+                var pattern = $"%{search.Trim()}%";
                 query = query.Where(t =>
-                    t.Name.ToLower().Contains(normalized) ||
-                    t.Slug.Contains(normalized) ||
-                    (t.LegalName != null && t.LegalName.ToLower().Contains(normalized)));
+                    EF.Functions.ILike(t.Name, pattern) ||
+                    EF.Functions.ILike(t.Slug, pattern) ||
+                    (t.LegalName != null && EF.Functions.ILike(t.LegalName, pattern)));
             }
 
             if (isActive.HasValue)

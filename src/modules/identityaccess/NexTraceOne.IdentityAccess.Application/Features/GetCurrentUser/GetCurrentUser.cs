@@ -23,7 +23,6 @@ public static class GetCurrentUser
         ICurrentTenant currentTenant,
         IUserRepository userRepository,
         IRoleRepository roleRepository,
-        ITenantRepository tenantRepository,
         ILoginResponseBuilder responseBuilder,
         IPermissionResolver permissionResolver) : IQueryHandler<Query, Response>
     {
@@ -58,14 +57,11 @@ public static class GetCurrentUser
                 }
             }
 
-            // Resolve tenant name for the current tenant context
-            string tenantName = string.Empty;
-            if (currentTenant.Id != Guid.Empty)
-            {
-                var tenant = await tenantRepository.GetByIdAsync(
-                    TenantId.From(currentTenant.Id), cancellationToken);
-                tenantName = tenant?.Name ?? string.Empty;
-            }
+            // Resolve tenant name from the current tenant context (JWT claims — no extra DB query).
+            // Falls back to empty string when no tenant context is active.
+            string tenantName = currentTenant.Id != Guid.Empty
+                ? currentTenant.Name
+                : string.Empty;
 
             return new Response(
                 user.Id.Value,
