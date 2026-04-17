@@ -204,13 +204,16 @@ internal sealed class ChangeIntelligenceNotificationHandler(
             ConfidenceScore = (double)@event.ConfidenceScore
         });
 
+        // ConfidenceScore is expected in decimal format (0.0–1.0), e.g. 0.42 = 42%.
+        var scorePercent = (double)@event.ConfidenceScore * 100;
+
         await notificationModule.SubmitAsync(new NotificationRequest
         {
             EventType = NotificationType.ChangeConfidenceScored,
             Category = nameof(NotificationCategory.Change),
             Severity = nameof(NotificationSeverity.Warning),
             Title = $"Low change confidence — {@event.ServiceName}",
-            Message = $"Change confidence for service {@event.ServiceName} in {@event.EnvironmentName} scored {(double)@event.ConfidenceScore * 100:F0}%. Review before promoting.",
+            Message = $"Change confidence for service {@event.ServiceName} in {@event.EnvironmentName} scored {scorePercent:F0}%. Review before promoting.",
             SourceModule = "ChangeGovernance",
             SourceEntityType = "Change",
             SourceEntityId = @event.ChangeId.ToString(),
