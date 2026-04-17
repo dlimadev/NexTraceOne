@@ -299,6 +299,7 @@ app.UseCookieSessionCsrfProtection();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseMiddleware<EnvironmentResolutionMiddleware>();
+app.UseMiddleware<MaintenanceModeMiddleware>();
 app.UseAuthorization();
 
 // ── Endpoints ──

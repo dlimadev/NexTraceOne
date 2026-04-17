@@ -853,55 +853,23 @@ export const platformAdminApi = {
    * Retorna configuração actual de SAML SSO.
    */
   getSamlSsoConfig: (): Promise<SamlSsoConfig> =>
-    Promise.resolve({
-      status: 'NotConfigured',
-      entityId: '',
-      ssoUrl: '',
-      sloUrl: '',
-      idpCertificate: '',
-      jitProvisioningEnabled: false,
-      defaultRole: 'Engineer',
-      attributeMappings: [
-        { samlAttr: 'email', nxtField: 'email' },
-        { samlAttr: 'displayName', nxtField: 'name' },
-        { samlAttr: 'groups', nxtField: 'groups' },
-        { samlAttr: 'role', nxtField: 'role' },
-      ],
-      lastTestedAt: undefined,
-      testResult: null,
-      simulatedNote: 'Simulated SAML SSO configuration — connect to real identity provider for live config.',
-    }),
+    client.get<SamlSsoConfig>('/api/v1/admin/saml-sso').then((r) => r.data),
 
   /**
    * PUT /api/v1/admin/saml-sso — requer platform:admin:write.
    * Actualiza a configuração de SAML SSO.
    */
   updateSamlSsoConfig: (update: SamlSsoConfigUpdate): Promise<SamlSsoConfig> =>
-    Promise.resolve({
-      status: 'Enabled',
-      entityId: update.entityId,
-      ssoUrl: update.ssoUrl,
-      sloUrl: update.sloUrl,
-      idpCertificate: update.idpCertificate,
-      jitProvisioningEnabled: update.jitProvisioningEnabled,
-      defaultRole: update.defaultRole,
-      attributeMappings: update.attributeMappings,
-      lastTestedAt: undefined,
-      testResult: null,
-      simulatedNote: 'Simulated SAML SSO configuration — connect to real identity provider for live config.',
-    }),
+    client.put<SamlSsoConfig>('/api/v1/admin/saml-sso', update).then((r) => r.data),
 
   /**
    * POST /api/v1/admin/saml-sso/test — requer platform:admin:write.
    * Testa a ligação ao Identity Provider SAML.
    */
   testSamlConnection: (): Promise<{ success: boolean; message: string }> =>
-    new Promise((resolve) =>
-      setTimeout(
-        () => resolve({ success: true, message: 'Connection test successful (simulated).' }),
-        1200,
-      ),
-    ),
+    client
+      .post<{ success: boolean; message: string }>('/api/v1/admin/saml-sso/test', {})
+      .then((r) => r.data),
 
   // ── W5-04: mTLS Certificate Manager ──────────────────────────────────────
 
@@ -910,75 +878,21 @@ export const platformAdminApi = {
    * Retorna estado do mTLS, política e inventário de certificados.
    */
   getMtlsManager: (): Promise<MtlsManagerResponse> =>
-    Promise.resolve({
-      policy: {
-        mode: 'PerService',
-        rootCaCertPresent: true,
-        rootCaCertExpiry: '2027-06-01T00:00:00Z',
-      },
-      certificates: [
-        {
-          id: 'cert-001',
-          serviceName: 'api-gateway',
-          fingerprint: 'AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99',
-          validFrom: '2025-01-01T00:00:00Z',
-          validTo: '2026-01-01T00:00:00Z',
-          status: 'Valid',
-          daysUntilExpiry: 120,
-          issuer: 'NexTraceOne Root CA',
-        },
-        {
-          id: 'cert-002',
-          serviceName: 'order-service',
-          fingerprint: 'BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA',
-          validFrom: '2025-01-01T00:00:00Z',
-          validTo: '2025-12-15T00:00:00Z',
-          status: 'Expiring',
-          daysUntilExpiry: 18,
-          issuer: 'NexTraceOne Root CA',
-        },
-        {
-          id: 'cert-003',
-          serviceName: 'notification-service',
-          fingerprint: 'CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB',
-          validFrom: '2024-01-01T00:00:00Z',
-          validTo: '2025-01-01T00:00:00Z',
-          status: 'Expired',
-          daysUntilExpiry: -30,
-          issuer: 'NexTraceOne Root CA',
-        },
-        {
-          id: 'cert-004',
-          serviceName: 'analytics-worker',
-          fingerprint: 'DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC',
-          validFrom: '2025-03-01T00:00:00Z',
-          validTo: '2026-03-01T00:00:00Z',
-          status: 'Valid',
-          daysUntilExpiry: 200,
-          issuer: 'NexTraceOne Root CA',
-        },
-      ],
-      lastSyncAt: new Date().toISOString(),
-      simulatedNote: 'Simulated mTLS certificate inventory — connect to real PKI for live data.',
-    }),
+    client.get<MtlsManagerResponse>('/api/v1/admin/mtls').then((r) => r.data),
 
   /**
    * POST /api/v1/admin/mtls/certificates/:id/revoke — requer platform:admin:write.
    * Revoga um certificado mTLS pelo ID.
    */
-  revokeMtlsCert: (_certId: string): Promise<void> =>
-    new Promise((resolve) => setTimeout(resolve, 600)),
+  revokeMtlsCert: (certId: string): Promise<void> =>
+    client.post(`/api/v1/admin/mtls/certificates/${encodeURIComponent(certId)}/revoke`, {}).then(() => undefined),
 
   /**
    * PUT /api/v1/admin/mtls/policy — requer platform:admin:write.
    * Actualiza a política mTLS da plataforma.
    */
   updateMtlsPolicy: (policy: Partial<MtlsPolicy>): Promise<MtlsPolicy> =>
-    Promise.resolve({
-      mode: policy.mode ?? 'PerService',
-      rootCaCertPresent: policy.rootCaCertPresent ?? true,
-      rootCaCertExpiry: policy.rootCaCertExpiry,
-    }),
+    client.put<MtlsPolicy>('/api/v1/admin/mtls/policy', policy).then((r) => r.data),
 
   // ── W8-02: Feature Flags Runtime ──────────────────────────────────────────
 
@@ -1041,59 +955,7 @@ export const platformAdminApi = {
    * Retorna todos os canary deployments activos e histórico recente.
    */
   getCanaryDashboard: (): Promise<CanaryDashboardResponse> =>
-    Promise.resolve({
-      checkedAt: new Date().toISOString(),
-      rollouts: [
-        {
-          id: 'canary-001',
-          serviceName: 'order-service',
-          stableVersion: 'v2.3.1',
-          canaryVersion: 'v2.4.0',
-          status: 'Active',
-          trafficPercentage: 20,
-          environment: 'Production',
-          stableErrorRate: 0.12,
-          canaryErrorRate: 0.09,
-          stableP99LatencyMs: 145,
-          canaryP99LatencyMs: 138,
-          stableRps: 1200,
-          canaryRps: 300,
-          startedAt: new Date(Date.now() - 7200000).toISOString(),
-        },
-        {
-          id: 'canary-002',
-          serviceName: 'payment-gateway',
-          stableVersion: 'v1.8.4',
-          canaryVersion: 'v1.9.0',
-          status: 'Promoted',
-          trafficPercentage: 100,
-          environment: 'Production',
-          stableErrorRate: 0.05,
-          canaryErrorRate: 0.04,
-          stableP99LatencyMs: 200,
-          canaryP99LatencyMs: 185,
-          stableRps: 800,
-          canaryRps: 800,
-          startedAt: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          id: 'canary-003',
-          serviceName: 'notification-service',
-          stableVersion: 'v3.1.0',
-          canaryVersion: 'v3.2.0-beta',
-          status: 'RolledBack',
-          trafficPercentage: 0,
-          environment: 'Staging',
-          stableErrorRate: 0.08,
-          canaryErrorRate: 2.4,
-          stableP99LatencyMs: 120,
-          canaryP99LatencyMs: 580,
-          stableRps: 500,
-          canaryRps: 0,
-          startedAt: new Date(Date.now() - 3600000).toISOString(),
-        },
-      ],
-    }),
+    client.get<CanaryDashboardResponse>('/api/v1/platform/canary/rollouts').then((r) => r.data),
 
   // ── W8-05: Multi-Tenant Schema Management ─────────────────────────────────
 
@@ -1242,7 +1104,7 @@ export interface GreenOpsReport {
   config: GreenOpsConfig;
   topServices: ServiceCarbonEntry[];
   trend: GreenOpsTrend[];
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 
@@ -1328,7 +1190,7 @@ export interface AiGovernanceDashboard {
   negativeFeedbackPercent: number;
   topHallucinationPatterns: string[];
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W5-02 Types ───────────────────────────────────────────────────────────────
@@ -1397,7 +1259,7 @@ export interface ExternalHttpAuditResponse {
   page: number;
   pageSize: number;
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W5-05 Types ───────────────────────────────────────────────────────────────
@@ -1426,7 +1288,7 @@ export interface EnvironmentPoliciesResponse {
   policies: EnvironmentAccessPolicy[];
   availableEnvironments: string[];
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W6-02 Types ───────────────────────────────────────────────────────────────
@@ -1465,7 +1327,7 @@ export interface NonProdSchedulesResponse {
   schedules: NonProdScheduleEntry[];
   totalEstimatedSavingPercent: number;
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W8-01 Types ───────────────────────────────────────────────────────────────
@@ -1489,7 +1351,7 @@ export interface CapacityForecastResponse {
   analysisWeeks: number;
   nextReviewDate: string;
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W1-04 Types ───────────────────────────────────────────────────────────────
@@ -1503,7 +1365,7 @@ export interface DemoSeedStatus {
   servicesCount: number;
   changesCount: number;
   incidentsCount: number;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 export interface DemoSeedRequest {
@@ -1587,7 +1449,7 @@ export interface RightsizingReport {
   totalSavingEstimateMemoryPercent: number;
   safetyMarginPercent: number;
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W7-03 Types ───────────────────────────────────────────────────────────────
@@ -1603,7 +1465,7 @@ export interface ObservabilityModeConfig {
   additionalRamUsageGb: number;
   tradeOffs: string[];
   updatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 export interface ObservabilityModeUpdate {
@@ -1642,7 +1504,7 @@ export interface CompliancePack {
 export interface CompliancePacksResponse {
   packs: CompliancePack[];
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W3-01 Types ───────────────────────────────────────────────────────────────
@@ -1665,7 +1527,7 @@ export interface MigrationPreviewResponse {
   pending: PendingMigration[];
   appliedCount: number;
   generatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W7-05 Types ───────────────────────────────────────────────────────────────
@@ -1690,7 +1552,7 @@ export interface DoraAdminMetricsResponse {
   timeRangeDays: number;
   dataSource: string;
   lastUpdatedAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 // ── W8-04 Types ───────────────────────────────────────────────────────────────
@@ -1708,7 +1570,7 @@ export interface SamlSsoConfig {
   attributeMappings: Array<{ samlAttr: string; nxtField: string }>;
   lastTestedAt?: string;
   testResult?: 'Success' | 'Failed' | null;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 export interface SamlSsoConfigUpdate {
@@ -1748,7 +1610,7 @@ export interface MtlsManagerResponse {
   policy: MtlsPolicy;
   certificates: MtlsCertificate[];
   lastSyncAt: string;
-  simulatedNote: string;
+  simulatedNote?: string;
 }
 
 

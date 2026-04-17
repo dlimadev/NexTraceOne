@@ -8,6 +8,8 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.CalculateBlastRadius;
 
@@ -41,11 +43,23 @@ public static class CalculateBlastRadius
         IChangeScoreRepository scoreRepository,
         IChangeScoreCalculator scoreCalculator,
         IChangeIntelligenceUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEnvironmentBehaviorService environmentBehaviorService) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // ── Gate: verificar se análise de blast radius está habilitada ──
+            var blastRadiusEnabled = await environmentBehaviorService.IsEnabledAsync(
+                EnvironmentBehaviorConfigKeys.MetricsBlastRadiusEnabled,
+                environmentId: null,
+                cancellationToken);
+
+            if (!blastRadiusEnabled)
+                return Error.Validation(
+                    "ChangeIntelligence.BlastRadius.Disabled",
+                    "Blast radius analysis is disabled for this environment.");
 
             var release = await releaseRepository.GetByIdAsync(ReleaseId.From(request.ReleaseId), cancellationToken);
             if (release is null)
