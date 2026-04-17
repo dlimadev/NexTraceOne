@@ -41,4 +41,10 @@ internal sealed class CustomDashboardRepository(GovernanceDbContext context) : I
         context.CustomDashboards.Update(dashboard);
         return Task.CompletedTask;
     }
+
+    public Task DeleteAsync(CustomDashboard dashboard, CancellationToken ct)
+    {
+        context.CustomDashboards.Remove(dashboard);
+        return Task.CompletedTask;
+    }
 }

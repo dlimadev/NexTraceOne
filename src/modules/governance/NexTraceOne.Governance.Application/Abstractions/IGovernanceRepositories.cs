@@ -373,6 +373,9 @@ public interface ICustomDashboardRepository
 
     /// <summary>Atualiza um dashboard existente.</summary>
     Task UpdateAsync(CustomDashboard dashboard, CancellationToken ct);
+
+    /// <summary>Remove um dashboard do repositório.</summary>
+    Task DeleteAsync(CustomDashboard dashboard, CancellationToken ct);
 }
 
 /// <summary>

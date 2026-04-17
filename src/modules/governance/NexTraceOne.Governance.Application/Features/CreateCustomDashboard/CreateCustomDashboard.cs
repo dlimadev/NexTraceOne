@@ -10,12 +10,25 @@ namespace NexTraceOne.Governance.Application.Features.CreateCustomDashboard;
 /// <summary>
 /// Feature: CreateCustomDashboard — cria um dashboard customizado persistido.
 /// Cada dashboard é associado a um tenant, utilizador e persona.
+/// Os widgets incluem posição no grid e configuração contextual (serviço, equipa, período).
 ///
 /// Owner: módulo Governance.
 /// Pilar: Governance — Source of Truth para dashboards de governance por persona.
 /// </summary>
 public static class CreateCustomDashboard
 {
+    /// <summary>Input para um widget individual com posição e configuração contextual.</summary>
+    public sealed record WidgetInput(
+        string Type,
+        int PosX,
+        int PosY,
+        int Width,
+        int Height,
+        string? ServiceId = null,
+        string? TeamId = null,
+        string? TimeRange = null,
+        string? CustomTitle = null);
+
     /// <summary>Comando para criar um novo dashboard customizado.</summary>
     public sealed record Command(
         string TenantId,
@@ -23,8 +36,10 @@ public static class CreateCustomDashboard
         string Name,
         string? Description,
         string Layout,
-        IReadOnlyList<string> WidgetIds,
-        string Persona) : ICommand<Response>;
+        IReadOnlyList<WidgetInput> Widgets,
+        string Persona,
+        string? TeamId = null,
+        bool IsSystem = false) : ICommand<Response>;
 
     /// <summary>Validação do comando de criação de dashboard customizado.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -46,10 +61,10 @@ public static class CreateCustomDashboard
             RuleFor(x => x.Persona).NotEmpty().MaximumLength(50)
                 .Must(p => ValidPersonas.Contains(p))
                 .WithMessage($"Persona must be one of: {string.Join(", ", ValidPersonas)}");
-            RuleFor(x => x.WidgetIds).NotEmpty()
+            RuleFor(x => x.Widgets).NotEmpty()
                 .WithMessage("At least one widget must be selected.");
-            RuleFor(x => x.WidgetIds.Count).LessThanOrEqualTo(20)
-                .When(x => x.WidgetIds is not null)
+            RuleFor(x => x.Widgets.Count).LessThanOrEqualTo(20)
+                .When(x => x.Widgets is not null)
                 .WithMessage("A dashboard may contain at most 20 widgets.");
         }
     }
@@ -64,15 +79,24 @@ public static class CreateCustomDashboard
         {
             var now = clock.UtcNow;
 
+            var widgets = request.Widgets.Select(w => new DashboardWidget(
+                WidgetId: Guid.NewGuid().ToString(),
+                Type: w.Type,
+                Position: new WidgetPosition(w.PosX, w.PosY, w.Width, w.Height),
+                Config: new WidgetConfig(w.ServiceId, w.TeamId, w.TimeRange, w.CustomTitle)))
+                .ToList();
+
             var dashboard = CustomDashboard.Create(
                 name: request.Name,
                 description: request.Description,
                 layout: request.Layout,
                 persona: request.Persona,
-                widgetIds: request.WidgetIds,
+                widgets: widgets,
                 tenantId: request.TenantId,
                 userId: request.UserId,
-                now: now);
+                now: now,
+                teamId: request.TeamId,
+                isSystem: request.IsSystem);
 
             await repository.AddAsync(dashboard, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -81,7 +105,7 @@ public static class CreateCustomDashboard
                 DashboardId: dashboard.Id.Value,
                 Name: dashboard.Name,
                 Layout: dashboard.Layout,
-                WidgetCount: dashboard.WidgetIds.Count,
+                WidgetCount: dashboard.WidgetCount,
                 Persona: dashboard.Persona,
                 CreatedAt: dashboard.CreatedAt));
         }

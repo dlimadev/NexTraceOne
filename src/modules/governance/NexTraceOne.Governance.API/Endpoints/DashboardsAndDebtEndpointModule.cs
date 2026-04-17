@@ -7,8 +7,11 @@ using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 using CloneDashboardFeature = NexTraceOne.Governance.Application.Features.CloneDashboard.CloneDashboard;
 using CreateCustomDashboardFeature = NexTraceOne.Governance.Application.Features.CreateCustomDashboard.CreateCustomDashboard;
+using DeleteCustomDashboardFeature = NexTraceOne.Governance.Application.Features.DeleteCustomDashboard.DeleteCustomDashboard;
 using GetCustomDashboardFeature = NexTraceOne.Governance.Application.Features.GetCustomDashboard.GetCustomDashboard;
+using GetDashboardRenderDataFeature = NexTraceOne.Governance.Application.Features.GetDashboardRenderData.GetDashboardRenderData;
 using ListCustomDashboardsFeature = NexTraceOne.Governance.Application.Features.ListCustomDashboards.ListCustomDashboards;
+using UpdateCustomDashboardFeature = NexTraceOne.Governance.Application.Features.UpdateCustomDashboard.UpdateCustomDashboard;
 using RecordTechnicalDebtFeature = NexTraceOne.Governance.Application.Features.RecordTechnicalDebt.RecordTechnicalDebt;
 using GetTechnicalDebtSummaryFeature = NexTraceOne.Governance.Application.Features.GetTechnicalDebtSummary.GetTechnicalDebtSummary;
 
@@ -69,6 +72,48 @@ public sealed class DashboardsAndDebtEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");
+
+        // ── Render data de dashboard (estrutura para o frontend renderizar) ──
+        group.MapGet("/{dashboardId:guid}/render-data", async (
+            Guid dashboardId,
+            string tenantId,
+            string? environmentId,
+            string? timeRange,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetDashboardRenderDataFeature.Query(
+                dashboardId, tenantId, environmentId, timeRange);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        // ── Atualizar dashboard customizado ──
+        group.MapPut("/{dashboardId:guid}", async (
+            Guid dashboardId,
+            UpdateCustomDashboardFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { DashboardId = dashboardId };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // ── Eliminar dashboard customizado ──
+        group.MapDelete("/{dashboardId:guid}", async (
+            Guid dashboardId,
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = new DeleteCustomDashboardFeature.Command(dashboardId, tenantId);
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
 
         // ── Clonar dashboard ──
         group.MapPost("/{dashboardId:guid}/clone", async (

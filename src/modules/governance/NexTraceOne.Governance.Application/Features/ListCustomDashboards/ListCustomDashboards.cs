@@ -46,9 +46,11 @@ public static class ListCustomDashboards
                     DashboardId: d.Id.Value,
                     Name: d.Name,
                     Persona: d.Persona,
-                    WidgetCount: d.WidgetIds.Count,
+                    WidgetCount: d.WidgetCount,
                     Layout: d.Layout,
                     IsShared: d.IsShared,
+                    TeamId: d.TeamId,
+                    IsSystem: d.IsSystem,
                     CreatedAt: d.CreatedAt))
                 .ToList();
 
@@ -71,5 +73,7 @@ public static class ListCustomDashboards
         int WidgetCount,
         string Layout,
         bool IsShared,
+        string? TeamId,
+        bool IsSystem,
         DateTimeOffset CreatedAt);
 }
