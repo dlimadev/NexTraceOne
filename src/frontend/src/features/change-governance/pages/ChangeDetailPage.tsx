@@ -23,6 +23,7 @@ import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { changeConfidenceApi } from '../api/changeConfidence';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
 import { AssistantPanel } from '../../ai-hub/components/AssistantPanel';
@@ -109,6 +110,7 @@ function FactorStatusIcon({ status }: { status: string }) {
 export function ChangeDetailPage() {
   const { changeId } = useParams<{ changeId: string }>();
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -121,45 +123,45 @@ export function ChangeDetailPage() {
 
   // ── Queries ──
   const changeQuery = useQuery({
-    queryKey: ['change-detail', changeId],
+    queryKey: ['change-detail', changeId, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getChange(changeId!),
     enabled: !!changeId,
   });
 
   const intelligenceQuery = useQuery({
-    queryKey: ['change-intelligence', changeId],
+    queryKey: ['change-intelligence', changeId, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getIntelligence(changeId!),
     enabled: !!changeId,
   });
 
   const advisoryQuery = useQuery({
-    queryKey: ['change-advisory', changeId],
+    queryKey: ['change-advisory', changeId, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getAdvisory(changeId!),
     enabled: !!changeId,
   });
 
   const historyQuery = useQuery({
-    queryKey: ['change-decisions', changeId],
+    queryKey: ['change-decisions', changeId, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getDecisionHistory(changeId!),
     enabled: !!changeId,
   });
 
   const featureFlagsQuery = useQuery({
-    queryKey: ['change-feature-flags', changeId],
+    queryKey: ['change-feature-flags', changeId, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getFeatureFlagAwareness(changeId!),
     enabled: !!changeId,
     retry: false,
   });
 
   const historicalPatternQuery = useQuery({
-    queryKey: ['change-historical-pattern', changeId],
+    queryKey: ['change-historical-pattern', changeId, activeEnvironmentId],
     queryFn: () => changeConfidenceApi.getHistoricalPattern(changeId!),
     enabled: !!changeId,
     retry: false,
   });
 
   const traceCorrelationsQuery = useQuery({
-    queryKey: ['change-traces', changeId],
+    queryKey: ['change-traces', changeId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.getTraceCorrelations(changeId!),
     enabled: !!changeId,
     retry: false,

@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const INPUT_CLS =
   'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
@@ -29,11 +30,12 @@ function riskVariant(score: number | null | undefined): 'success' | 'warning' | 
  */
 export function ReleaseImpactReportPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [releaseId, setReleaseId] = useState('');
   const [submittedId, setSubmittedId] = useState('');
 
   const reportQuery = useQuery({
-    queryKey: ['release-impact-report', submittedId],
+    queryKey: ['release-impact-report', submittedId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.getReleaseImpactReport(submittedId),
     enabled: !!submittedId,
   });

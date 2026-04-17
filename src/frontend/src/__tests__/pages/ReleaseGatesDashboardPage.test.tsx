@@ -62,6 +62,17 @@ function wrapper(children: React.ReactNode) {
 
 import { changeIntelligenceApi } from '../../features/change-governance/api/changeIntelligence';
 
+vi.mock('../../contexts/EnvironmentContext', () => ({
+  useEnvironment: vi.fn().mockReturnValue({
+    activeEnvironmentId: 'env-prod-001',
+    activeEnvironment: { id: 'env-prod-001', name: 'Production', profile: 'production', isProductionLike: true },
+    availableEnvironments: [{ id: 'env-prod-001', name: 'Production', profile: 'production', isProductionLike: true }],
+    isLoadingEnvironments: false,
+    selectEnvironment: vi.fn(),
+    clearEnvironment: vi.fn(),
+  }),
+}));
+
 describe('ReleaseGatesDashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();

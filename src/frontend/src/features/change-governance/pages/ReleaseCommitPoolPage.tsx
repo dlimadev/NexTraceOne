@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const INPUT_CLS =
   'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
@@ -37,6 +38,7 @@ function statusVariant(
  */
 export function ReleaseCommitPoolPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
   const [releaseId, setReleaseId] = useState('');
   const [activeTab, setActiveTab] = useState<'commits' | 'workitems'>('commits');
@@ -48,13 +50,13 @@ export function ReleaseCommitPoolPage() {
   const [wiType, setWiType] = useState('Story');
 
   const commitsQuery = useQuery({
-    queryKey: ['release-commits', releaseId],
+    queryKey: ['release-commits', releaseId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.listCommitsByRelease(releaseId),
     enabled: !!releaseId,
   });
 
   const workItemsQuery = useQuery({
-    queryKey: ['release-work-items', releaseId],
+    queryKey: ['release-work-items', releaseId, activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.listWorkItemsByRelease(releaseId),
     enabled: !!releaseId,
   });

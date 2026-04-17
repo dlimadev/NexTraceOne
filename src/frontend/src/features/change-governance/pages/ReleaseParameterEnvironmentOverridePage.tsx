@@ -10,6 +10,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { EmptyState } from '../../../components/EmptyState';
 import { configurationApi } from '../../configuration/api/configurationApi';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const ENVIRONMENTS = ['Development', 'Pre-Production', 'Production'] as const;
 type Environment = (typeof ENVIRONMENTS)[number];
@@ -47,12 +48,13 @@ const EMPTY_FORM: OverrideFormState = {
  */
 export function ReleaseParameterEnvironmentOverridePage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<OverrideFormState>(EMPTY_FORM);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; key: string } | null>(null);
 
   const { data: overrides, isLoading, isError } = useQuery({
-    queryKey: ['release-parameter-env-overrides'],
+    queryKey: ['release-parameter-env-overrides', activeEnvironmentId],
     queryFn: () => configurationApi.getReleaseParameterEnvironmentOverrides('change.release.'),
   });
 

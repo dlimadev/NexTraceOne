@@ -20,6 +20,7 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   changeIntelligenceApi,
   type CalendarReleaseDto,
@@ -102,6 +103,7 @@ const emptyFreezeForm: FreezeForm = {
 
 export function ReleaseCalendarPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
 
   const defaults = defaultDateRange();
@@ -121,14 +123,14 @@ export function ReleaseCalendarPage() {
   // ── Queries ────────────────────────────────────────────────────────────────
 
   const calendarQuery = useQuery({
-    queryKey: ['release-calendar', from, to, envFilter],
+    queryKey: ['release-calendar', from, to, envFilter, activeEnvironmentId],
     queryFn: () =>
       changeIntelligenceApi.getReleaseCalendar(fromIso, toIso, envFilter || undefined),
     enabled: !!from && !!to,
   });
 
   const freezeListQuery = useQuery({
-    queryKey: ['freeze-windows', from, to, envFilter],
+    queryKey: ['freeze-windows', from, to, envFilter, activeEnvironmentId],
     queryFn: () =>
       changeIntelligenceApi.listFreezeWindows(fromIso, toIso, envFilter || undefined),
     enabled: activeTab === 'freezeWindows' && !!from && !!to,

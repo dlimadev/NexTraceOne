@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 const INPUT_CLS =
   'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
@@ -41,6 +42,7 @@ function approvalTypeBadge(type: string): 'default' | 'info' | 'success' | 'warn
  */
 export function ReleaseApprovalPoliciesPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
 
   const [showForm, setShowForm] = useState(false);
@@ -59,7 +61,7 @@ export function ReleaseApprovalPoliciesPage() {
   });
 
   const { data: policies, isLoading, error } = useQuery({
-    queryKey: ['release-approval-policies'],
+    queryKey: ['release-approval-policies', activeEnvironmentId],
     queryFn: () => changeIntelligenceApi.listApprovalPolicies(),
   });
 
