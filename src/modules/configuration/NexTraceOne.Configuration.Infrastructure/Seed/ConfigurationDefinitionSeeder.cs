@@ -3656,7 +3656,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             displayName: "config.ai.usage.allow_external.label",
             category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.Boolean,
-            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.ai.usage.allow_external.description",
             defaultValue: "true",
             uiEditorType: "toggle",
@@ -6302,5 +6302,248 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "false",
             uiEditorType: "toggle",
             sortOrder: 9600),
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ENVIRONMENT BEHAVIOR PARAMETERS
+        // Parâmetros que controlam o comportamento operacional da plataforma
+        // por ambiente cadastrado pelo utilizador.
+        // Regra: IA NÃO é parametrizada por ambiente (scope System/Tenant apenas).
+        // O ambiente é passado como contexto de execução à IA, nunca como
+        // configuração de modelo, budget ou política.
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ── Notificações por Ambiente ──────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.notifications.external_channels.enabled",
+            displayName: "config.env.behavior.notifications.external_channels.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.notifications.external_channels.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9700),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.notifications.minimum_severity",
+            displayName: "config.env.behavior.notifications.minimum_severity.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.notifications.minimum_severity.description",
+            defaultValue: "Warning",
+            validationRules: """{"enum":["Info","ActionRequired","Warning","Critical"]}""",
+            isInheritable: true,
+            uiEditorType: "select",
+            sortOrder: 9710),
+
+        // ── Métricas e DORA por Ambiente ───────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.metrics.dora.enabled",
+            displayName: "config.env.behavior.metrics.dora.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.metrics.dora.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9720),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.metrics.slo.enabled",
+            displayName: "config.env.behavior.metrics.slo.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.metrics.slo.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9730),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.metrics.change_confidence.enabled",
+            displayName: "config.env.behavior.metrics.change_confidence.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.metrics.change_confidence.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9740),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.metrics.blast_radius.enabled",
+            displayName: "config.env.behavior.metrics.blast_radius.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.metrics.blast_radius.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9750),
+
+        // ── Background Jobs por Ambiente ───────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.jobs.telemetry_retention.enabled",
+            displayName: "config.env.behavior.jobs.telemetry_retention.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.jobs.telemetry_retention.enabled.description",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9760),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.jobs.scheduled_reports.enabled",
+            displayName: "config.env.behavior.jobs.scheduled_reports.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.jobs.scheduled_reports.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9770),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.jobs.governance_waiver_expiry.enabled",
+            displayName: "config.env.behavior.jobs.governance_waiver_expiry.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.jobs.governance_waiver_expiry.enabled.description",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9780),
+
+        // ── Retenção de Dados por Ambiente ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.data.telemetry_retention_days",
+            displayName: "config.env.behavior.data.telemetry_retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.data.telemetry_retention_days.description",
+            defaultValue: "30",
+            validationRules: """{"min":1,"max":730}""",
+            isInheritable: true,
+            uiEditorType: "text",
+            sortOrder: 9790),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.data.change_history_days",
+            displayName: "config.env.behavior.data.change_history_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.data.change_history_days.description",
+            defaultValue: "90",
+            validationRules: """{"min":1,"max":1825}""",
+            isInheritable: true,
+            uiEditorType: "text",
+            sortOrder: 9800),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.data.incident_history_days",
+            displayName: "config.env.behavior.data.incident_history_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.data.incident_history_days.description",
+            defaultValue: "90",
+            validationRules: """{"min":1,"max":1825}""",
+            isInheritable: true,
+            uiEditorType: "text",
+            sortOrder: 9810),
+
+        // ── Alertas Operacionais por Ambiente ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.alerts.slo_breach.enabled",
+            displayName: "config.env.behavior.alerts.slo_breach.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.alerts.slo_breach.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9820),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.alerts.anomaly_detection.enabled",
+            displayName: "config.env.behavior.alerts.anomaly_detection.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.alerts.anomaly_detection.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9830),
+
+        // ── Webhooks e Integrações Externas por Ambiente ───────────────────
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.webhooks.outbound.enabled",
+            displayName: "config.env.behavior.webhooks.outbound.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.webhooks.outbound.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9840),
+
+        // ── Pipeline de Mudanças por Ambiente ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.change.promotion_gates.enabled",
+            displayName: "config.env.behavior.change.promotion_gates.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.change.promotion_gates.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9850),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.change.ingest.enabled",
+            displayName: "config.env.behavior.change.ingest.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.change.ingest.enabled.description",
+            defaultValue: "true",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9860),
+
+        ConfigurationDefinition.Create(
+            key: "env.behavior.change.post_change_verification.enabled",
+            displayName: "config.env.behavior.change.post_change_verification.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.Environment, ConfigurationScope.System],
+            description: "config.env.behavior.change.post_change_verification.enabled.description",
+            defaultValue: "false",
+            isInheritable: true,
+            uiEditorType: "toggle",
+            sortOrder: 9870),
     ];
 }
