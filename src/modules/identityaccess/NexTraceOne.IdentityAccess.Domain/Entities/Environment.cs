@@ -42,34 +42,29 @@ public sealed class Environment : Entity<EnvironmentId>
     /// Perfil operacional do ambiente.
     /// Define a natureza base do ambiente (Development, Validation, Staging, Production, etc.)
     /// independente do nome livre dado pelo tenant.
-    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
     /// </summary>
     public EnvironmentProfile Profile { get; private set; } = EnvironmentProfile.Development;
 
     /// <summary>
     /// Código curto definido pelo tenant para identificação rápida (ex.: "DEV", "QA-EU", "PROD-BR").
     /// Diferente do Slug (que é URL-friendly), o Code é livre e de uso interno.
-    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
     /// </summary>
     public string? Code { get; private set; }
 
     /// <summary>
     /// Descrição livre do ambiente, usada para fins informativos e de documentação interna.
-    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
     /// </summary>
     public string? Description { get; private set; }
 
     /// <summary>
     /// Criticidade operacional do ambiente.
     /// Determina nível de proteção, auditoria e rigor em mudanças.
-    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
     /// </summary>
     public EnvironmentCriticality Criticality { get; private set; } = EnvironmentCriticality.Low;
 
     /// <summary>
     /// Região ou localização do ambiente (ex.: "br-east", "eu-west-1", "on-prem-sp").
     /// Informação opcional para contexto geográfico e roteamento.
-    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
     /// </summary>
     public string? Region { get; private set; }
 
@@ -77,7 +72,6 @@ public sealed class Environment : Entity<EnvironmentId>
     /// Indica se este ambiente tem comportamento e políticas similares ao de produção.
     /// Verdadeiro para Production, DisasterRecovery e ambientes de alta criticidade.
     /// Influencia decisões de IA, políticas de promoção e auditoria.
-    /// Fase 2: persistido via migration AddEnvironmentProfileFields.
     /// </summary>
     public bool IsProductionLike { get; private set; }
 

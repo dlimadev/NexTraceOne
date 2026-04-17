@@ -42,7 +42,6 @@ export interface EnvironmentOption {
   profile: EnvironmentProfile;
   isProductionLike: boolean;
   isPrimaryProduction?: boolean;
-  isDefault?: boolean;
 }
 
 /** Shape da resposta da API GET /api/v1/identity/environments */
@@ -52,13 +51,10 @@ interface ApiEnvironmentResponse {
   slug: string;
   sortOrder: number;
   isActive: boolean;
-  /** Presente quando a migração AddEnvironmentProfileFields estiver aplicada. */
   profile?: string;
-  /** Presente quando a migração AddEnvironmentProfileFields estiver aplicada. */
   isProductionLike?: boolean;
   /** Indica se este é o ambiente produtivo principal do tenant. */
   isPrimaryProduction?: boolean;
-  isDefault?: boolean;
 }
 
 interface EnvironmentState {
@@ -134,7 +130,6 @@ function mapApiEnvironment(env: ApiEnvironmentResponse): EnvironmentOption {
     profile,
     isProductionLike,
     isPrimaryProduction: env.isPrimaryProduction === true,
-    isDefault: env.isDefault === true,
   };
 }
 
@@ -188,10 +183,10 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
 
         setAvailableEnvironments(environments);
 
-        // Restore persisted environment or select the default one
+        // Restore persisted environment or select the primary production / first environment
         const persisted = getEnvironmentId();
         const persistedEnv = persisted ? environments.find((e) => e.id === persisted) : null;
-        const defaultEnv = environments.find((e) => e.isDefault) ?? environments[0];
+        const defaultEnv = environments.find((e) => e.isPrimaryProduction) ?? environments[0];
         const resolved = persistedEnv ?? defaultEnv ?? null;
 
         if (resolved) {

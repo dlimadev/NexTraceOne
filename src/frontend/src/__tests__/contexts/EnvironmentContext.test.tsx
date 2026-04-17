@@ -37,8 +37,8 @@ vi.mock('../../api/client', () => ({
 
 const mockEnvironments = [
   { id: 'env-prod-001', name: 'Production', slug: 'prod', sortOrder: 0, isActive: true, profile: 'production', isProductionLike: true },
-  { id: 'env-staging-001', name: 'Staging', slug: 'staging', sortOrder: 1, isActive: true, profile: 'staging', isProductionLike: true },
-  { id: 'env-qa-001', name: 'QA', slug: 'qa', sortOrder: 2, isActive: true, profile: 'validation', isProductionLike: false, isDefault: true },
+  { id: 'env-staging-001', name: 'Staging', slug: 'staging', sortOrder: 1, isActive: true, profile: 'staging', isProductionLike: true, isPrimaryProduction: true },
+  { id: 'env-qa-001', name: 'QA', slug: 'qa', sortOrder: 2, isActive: true, profile: 'validation', isProductionLike: false },
   { id: 'env-dev-001', name: 'Development', slug: 'dev', sortOrder: 3, isActive: true, profile: 'development', isProductionLike: false },
 ];
 
@@ -126,7 +126,7 @@ describe('EnvironmentContext', () => {
     expect(mockGet).not.toHaveBeenCalled();
   });
 
-  it('should auto-select default environment (isDefault=true)', async () => {
+  it('should auto-select primary production environment when no persisted selection', async () => {
     render(
       <Wrapper tenantId="tenant-123" isAuthenticated={true}>
         <TestConsumer />
@@ -134,9 +134,9 @@ describe('EnvironmentContext', () => {
     );
 
     await waitFor(() => {
-      // The QA environment has isDefault: true and sortOrder: 2
+      // The Staging environment has isPrimaryProduction: true and sortOrder: 1
       const activeEnv = screen.getByTestId('active-env').textContent;
-      expect(activeEnv).toBe('QA');
+      expect(activeEnv).toBe('Staging');
     });
   });
 

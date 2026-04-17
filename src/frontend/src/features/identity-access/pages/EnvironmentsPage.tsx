@@ -111,6 +111,13 @@ export function EnvironmentsPage() {
     },
   });
 
+  const deactivateMutation = useMutation({
+    mutationFn: (envId: string) => identityApi.deactivateEnvironment(envId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['environments'] });
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload: CreateEnvironmentRequest = {
@@ -151,6 +158,12 @@ export function EnvironmentsPage() {
   const handleSetPrimary = (env: EnvironmentItem) => {
     if (window.confirm(t('environments.confirmSetPrimary', { name: env.name }))) {
       setPrimaryMutation.mutate(env.id);
+    }
+  };
+
+  const handleDeactivate = (env: EnvironmentItem) => {
+    if (window.confirm(t('environments.confirmDeactivate', { name: env.name }))) {
+      deactivateMutation.mutate(env.id);
     }
   };
 
@@ -411,6 +424,16 @@ export function EnvironmentsPage() {
                       <Button type="button" onClick={() => handleEdit(env)}>
                         {t('common.edit')}
                       </Button>
+                      {env.isActive && (
+                        <Button
+                          type="button"
+                          onClick={() => handleDeactivate(env)}
+                          disabled={deactivateMutation.isPending}
+                          title={t('environments.deactivate')}
+                        >
+                          {t('environments.deactivate')}
+                        </Button>
+                      )}
                     </div>
                   </div>
                   {env.description && (

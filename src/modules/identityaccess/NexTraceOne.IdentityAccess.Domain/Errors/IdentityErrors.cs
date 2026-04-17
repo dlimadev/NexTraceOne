@@ -208,6 +208,10 @@ public static class IdentityErrors
     public static Error CannotDesignateInactiveAsPrimaryProduction(Guid environmentId)
         => Error.Validation("Identity.Environment.CannotDesignateInactiveAsPrimaryProduction", "Environment '{0}' is not active and cannot be designated as the primary production environment.", environmentId);
 
+    /// <summary>Ambiente de produção principal não pode ser desativado sem revogar a designação primeiro.</summary>
+    public static Error CannotDeactivatePrimaryProduction(Guid environmentId)
+        => Error.Validation("Identity.Environment.CannotDeactivatePrimaryProduction", "Environment '{0}' is the primary production environment and cannot be deactivated. Remove the primary production designation first.", environmentId);
+
     // ── MFA ──────────────────────────────────────────────────────────────
 
     /// <summary>Token de desafio MFA inválido ou expirado.</summary>

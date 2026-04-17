@@ -321,6 +321,9 @@ export const identityApi = {
   setPrimaryProductionEnvironment: (environmentId: string) =>
     client.patch(`/identity/environments/${encodeURIComponent(environmentId)}/primary-production`).then((r) => r.data),
 
+  deactivateEnvironment: (environmentId: string) =>
+    client.patch(`/identity/environments/${encodeURIComponent(environmentId)}/deactivate`).then((r) => r.data),
+
   // ── Admin: Gestão de Tenants (Platform Admin) ─────────────────
   listTenantsAdmin: (params?: { search?: string; isActive?: boolean; page?: number; pageSize?: number }) =>
     client

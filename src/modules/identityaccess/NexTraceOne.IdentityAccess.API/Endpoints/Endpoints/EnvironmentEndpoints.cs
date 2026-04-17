@@ -12,6 +12,7 @@ using CreateEnvironmentFeature = NexTraceOne.IdentityAccess.Application.Features
 using UpdateEnvironmentFeature = NexTraceOne.IdentityAccess.Application.Features.UpdateEnvironment.UpdateEnvironment;
 using SetPrimaryProductionFeature = NexTraceOne.IdentityAccess.Application.Features.SetPrimaryProductionEnvironment.SetPrimaryProductionEnvironment;
 using GetPrimaryProductionFeature = NexTraceOne.IdentityAccess.Application.Features.GetPrimaryProductionEnvironment.GetPrimaryProductionEnvironment;
+using DeactivateEnvironmentFeature = NexTraceOne.IdentityAccess.Application.Features.DeactivateEnvironment.DeactivateEnvironment;
 
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
@@ -25,7 +26,8 @@ namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 /// Permissões seguem o namespace env:* (separado do identity:*):
 /// - env:environments:read — listar e consultar ambientes
 /// - env:environments:write — criar e editar ambientes
-/// - env:environments:admin — designar produção principal, soft-delete
+/// - env:environments:admin — designar produção principal, ativar/desativar
+/// - env:environments:production:admin — designar produção principal
 /// - env:access:read — consultar acessos
 /// - env:access:admin — conceder e revogar acessos
 /// </summary>
@@ -94,6 +96,19 @@ internal static class EnvironmentEndpoints
             var result = await sender.Send(new SetPrimaryProductionFeature.Command(environmentId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("env:environments:production:admin");
+
+        // Desativa um ambiente — requer permissão administrativa de ambiente
+        // Idempotente: ambiente já inativo retorna sucesso sem erro.
+        // Regra: ambiente de produção principal não pode ser desativado sem revogar a designação primeiro.
+        envGroup.MapPatch("/{environmentId:guid}/deactivate", async (
+            Guid environmentId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DeactivateEnvironmentFeature.Command(environmentId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("env:environments:admin");
 
         // Concede acesso a um ambiente para um utilizador — requer permissão administrativa de acesso
         envGroup.MapPost("/access", async (
