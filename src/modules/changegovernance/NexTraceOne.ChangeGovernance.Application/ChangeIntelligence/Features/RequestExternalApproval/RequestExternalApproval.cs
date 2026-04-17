@@ -2,12 +2,16 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Enums;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RequestExternalApproval;
 
@@ -51,6 +55,7 @@ public static class RequestExternalApproval
     /// <summary>
     /// Handler que cria o ReleaseApprovalRequest, gera o callback token
     /// e envia o webhook outbound quando o tipo for ExternalWebhook.
+    /// O envio de webhooks é controlado por <c>env.behavior.webhooks.outbound.enabled</c>.
     /// </summary>
     public sealed class Handler(
         IReleaseRepository releaseRepository,
@@ -58,7 +63,9 @@ public static class RequestExternalApproval
         IExternalApprovalWebhookSender webhookSender,
         ICurrentTenant currentTenant,
         IChangeIntelligenceUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEnvironmentBehaviorService environmentBehaviorService,
+        ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -98,19 +105,34 @@ public static class RequestExternalApproval
             bool webhookSent = false;
             if (approvalType == ExternalApprovalType.ExternalWebhook && !string.IsNullOrWhiteSpace(request.WebhookUrl))
             {
-                var callbackUrl = $"/api/v1/releases/{request.ReleaseId}/approvals/{callbackToken}/respond";
-                var payload = new ApprovalWebhookPayload(
-                    CallbackUrl: callbackUrl,
-                    ApprovalRequestId: approvalRequest.Id.Value.ToString(),
-                    ReleaseId: request.ReleaseId.ToString(),
-                    ServiceName: release.ServiceName,
-                    Version: release.Version,
-                    TargetEnvironment: request.TargetEnvironment,
-                    RiskScore: (double)release.ChangeScore,
-                    ImpactSummary: $"Service: {release.ServiceName} v{release.Version} → {request.TargetEnvironment}",
-                    ExpiresAt: expiresAt);
+                // ── Gate: verificar se webhooks outbound estão habilitados ──────
+                var webhooksEnabled = await environmentBehaviorService.IsEnabledAsync(
+                    EnvironmentBehaviorConfigKeys.WebhooksOutboundEnabled,
+                    null,
+                    cancellationToken);
 
-                webhookSent = await webhookSender.SendAsync(request.WebhookUrl, payload, cancellationToken);
+                if (!webhooksEnabled)
+                {
+                    logger.LogInformation(
+                        "Outbound webhook skipped for approval request {ApprovalRequestId} — env.behavior.webhooks.outbound.enabled is false.",
+                        approvalRequest.Id.Value);
+                }
+                else
+                {
+                    var callbackUrl = $"/api/v1/releases/{request.ReleaseId}/approvals/{callbackToken}/respond";
+                    var payload = new ApprovalWebhookPayload(
+                        CallbackUrl: callbackUrl,
+                        ApprovalRequestId: approvalRequest.Id.Value.ToString(),
+                        ReleaseId: request.ReleaseId.ToString(),
+                        ServiceName: release.ServiceName,
+                        Version: release.Version,
+                        TargetEnvironment: request.TargetEnvironment,
+                        RiskScore: (double)release.ChangeScore,
+                        ImpactSummary: $"Service: {release.ServiceName} v{release.Version} → {request.TargetEnvironment}",
+                        ExpiresAt: expiresAt);
+
+                    webhookSent = await webhookSender.SendAsync(request.WebhookUrl, payload, cancellationToken);
+                }
             }
 
             // Para AutoApprove: aprova imediatamente

@@ -78,6 +78,7 @@ public static class DependencyInjection
 
         // Services
         services.AddScoped<IConfigurationResolutionService, ConfigurationResolutionService>();
+        services.AddScoped<IEnvironmentBehaviorService, EnvironmentBehaviorService>();
         services.AddSingleton<IConfigurationCacheService, ConfigurationCacheService>();
         services.AddSingleton<IConfigurationSecurityService, ConfigurationSecurityService>();
 

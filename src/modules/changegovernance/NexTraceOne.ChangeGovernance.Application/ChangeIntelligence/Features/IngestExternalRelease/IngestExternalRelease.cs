@@ -7,6 +7,9 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Errors;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Application.ConfigurationKeys;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.IngestExternalRelease;
 
@@ -18,6 +21,10 @@ namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.I
 /// Commits e work items fornecidos são associados automaticamente.
 ///
 /// A release é criada em estado Pending aguardando promoção.
+///
+/// A ingestão é controlada pelo parâmetro <c>env.behavior.change.ingest.enabled</c>.
+/// Quando o ambiente alvo está com ingestão desabilitada, o comando retorna erro de negócio.
+///
 /// Estrutura VSA: Command + Validator + Handler + Response num único ficheiro.
 /// </summary>
 public static class IngestExternalRelease
@@ -35,7 +42,14 @@ public static class IngestExternalRelease
         string? Description = null,
         IReadOnlyList<string>? CommitShas = null,
         IReadOnlyList<ExternalWorkItemRef>? WorkItems = null,
-        bool TriggerPromotion = false) : ICommand<Response>;
+        bool TriggerPromotion = false,
+        /// <summary>
+        /// Identificador do ambiente alvo (opcional).
+        /// Quando fornecido, a verificação de <c>env.behavior.change.ingest.enabled</c>
+        /// é feita ao nível do ambiente específico.
+        /// Quando nulo, resolve ao nível de sistema (padrão habilitado).
+        /// </summary>
+        Guid? EnvironmentId = null) : ICommand<Response>;
 
     /// <summary>Valida a entrada do comando.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -53,16 +67,28 @@ public static class IngestExternalRelease
     /// <summary>
     /// Handler que cria uma Release internamente a partir dos dados do sistema externo.
     /// É idempotente: re-ingestão do mesmo ExternalReleaseId retorna o existente.
+    /// Gateado por <c>env.behavior.change.ingest.enabled</c>.
     /// </summary>
     public sealed class Handler(
         IReleaseRepository releaseRepository,
         ICurrentTenant currentTenant,
         IChangeIntelligenceUnitOfWork unitOfWork,
-        IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
+        IDateTimeProvider dateTimeProvider,
+        IEnvironmentBehaviorService environmentBehaviorService) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
+
+            // ── Gate: verificar se ingestão está habilitada para este ambiente ──
+            var environmentIdStr = request.EnvironmentId?.ToString();
+            var ingestEnabled = await environmentBehaviorService.IsEnabledAsync(
+                EnvironmentBehaviorConfigKeys.ChangeIngestEnabled,
+                environmentIdStr,
+                cancellationToken);
+
+            if (!ingestEnabled)
+                return ChangeIntelligenceErrors.IngestDisabledForEnvironment(request.TargetEnvironment);
 
             // Idempotência: verifica se já existe release com mesmo externalId
             var existing = await releaseRepository.GetByServiceNameVersionEnvironmentAsync(

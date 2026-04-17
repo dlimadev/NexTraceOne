@@ -60,4 +60,11 @@ public static class ChangeIntelligenceErrors
     /// <summary>Avaliação de rollback não encontrada para a release informada.</summary>
     public static Error RollbackAssessmentNotFound(string releaseId)
         => Error.NotFound("ChangeIntelligence.RollbackAssessment.NotFound", "Rollback assessment for release '{0}' was not found.", releaseId);
+
+    /// <summary>Ingestão de evento desabilitada para este ambiente por configuração.</summary>
+    public static Error IngestDisabledForEnvironment(string environment)
+        => Error.Business(
+            "ChangeIntelligence.Ingest.DisabledForEnvironment",
+            "Change event ingest is disabled for environment '{0}'. Update 'env.behavior.change.ingest.enabled' to re-enable.",
+            environment);
 }
