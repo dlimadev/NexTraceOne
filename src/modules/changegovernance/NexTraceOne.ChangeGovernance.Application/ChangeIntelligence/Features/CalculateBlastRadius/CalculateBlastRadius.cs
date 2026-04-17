@@ -57,9 +57,15 @@ public static class CalculateBlastRadius
                 cancellationToken);
 
             if (!blastRadiusEnabled)
-                return Error.Validation(
-                    "ChangeIntelligence.BlastRadius.Disabled",
-                    "Blast radius analysis is disabled for this environment.");
+                return Result<Response>.Success(new Response(
+                    ReleaseId: request.ReleaseId,
+                    BlastRadiusReportId: Guid.Empty,
+                    TotalAffectedConsumers: 0,
+                    DirectConsumers: [],
+                    TransitiveConsumers: [],
+                    CalculatedAt: dateTimeProvider.UtcNow,
+                    UpdatedScore: 0m,
+                    ScoreSource: "disabled"));
 
             var release = await releaseRepository.GetByIdAsync(ReleaseId.From(request.ReleaseId), cancellationToken);
             if (release is null)

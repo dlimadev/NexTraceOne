@@ -77,9 +77,11 @@ public sealed class MaintenanceModeMiddleware(RequestDelegate next, ILogger<Main
 
             return string.Equals(dto.EffectiveValue, "true", StringComparison.OrdinalIgnoreCase);
         }
-        catch
+        catch (Exception ex)
         {
-            return false; // fail-open
+            // Fail-open: log para diagnóstico mas não bloqueia a requisição
+            logger.LogWarning(ex, "Failed to read platform.maintenance_mode configuration — failing open.");
+            return false;
         }
     }
 }

@@ -90,9 +90,18 @@ public static class RecordObservationMetrics
                 cancellationToken);
 
             if (!postChangeEnabled)
-                return Error.Validation(
-                    "ChangeIntelligence.PostChange.Disabled",
-                    "Post-change verification is disabled for this environment.");
+                return Result<Response>.Success(new Response(
+                    ObservationWindowId: Guid.Empty,
+                    ReviewId: Guid.Empty,
+                    Phase: request.Phase.ToString(),
+                    Outcome: "Skipped",
+                    ConfidenceScore: 0m,
+                    Summary: "Post-change verification is disabled for this environment.",
+                    ErrorRateDelta: 0m,
+                    AvgLatencyDelta: 0m,
+                    P95LatencyDelta: 0m,
+                    ReviewCompleted: false,
+                    IsNewWindow: false));
 
             var releaseId = ReleaseId.From(request.ReleaseId);
 
