@@ -14,6 +14,8 @@ internal sealed class TenantRepository(
     IdentityDbContext context,
     ILogger<TenantRepository> logger) : ITenantRepository
 {
+    /// <summary>PostgreSQL error code for undefined_column — column does not exist in the table.</summary>
+    private const string PgUndefinedColumn = "42703";
     /// <inheritdoc />
     public async Task<Tenant?> GetByIdAsync(TenantId id, CancellationToken cancellationToken)
     {
@@ -22,7 +24,7 @@ internal sealed class TenantRepository(
             return await context.Tenants
                 .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
         }
-        catch (PostgresException ex) when (ex.SqlState == "42703")
+        catch (PostgresException ex) when (ex.SqlState == PgUndefinedColumn)
         {
             // Column missing in database schema (migration not applied). In development
             // scenarios return null to allow the application to continue and let
@@ -42,7 +44,7 @@ internal sealed class TenantRepository(
             return await context.Tenants
                 .FirstOrDefaultAsync(t => t.Slug == slug, cancellationToken);
         }
-        catch (PostgresException ex) when (ex.SqlState == "42703")
+        catch (PostgresException ex) when (ex.SqlState == PgUndefinedColumn)
         {
             logger.LogWarning(ex,
                 "Bootstrap: tenant column missing (42703) for GetBySlugAsync {Slug}. Migration may not have been applied.",
@@ -64,7 +66,7 @@ internal sealed class TenantRepository(
 
             return tenants.ToDictionary(t => t.Id, t => t);
         }
-        catch (PostgresException ex) when (ex.SqlState == "42703")
+        catch (PostgresException ex) when (ex.SqlState == PgUndefinedColumn)
         {
             // Schema missing columns expected by the entity mapping. Return an
             // empty dictionary to avoid crashing development flows while
@@ -83,7 +85,7 @@ internal sealed class TenantRepository(
         {
             return await context.Tenants.AnyAsync(t => t.Slug == slug, cancellationToken);
         }
-        catch (PostgresException ex) when (ex.SqlState == "42703")
+        catch (PostgresException ex) when (ex.SqlState == PgUndefinedColumn)
         {
             logger.LogWarning(ex,
                 "Bootstrap: tenant column missing (42703) for SlugExistsAsync {Slug}. Migration may not have been applied.",
@@ -130,7 +132,7 @@ internal sealed class TenantRepository(
 
             return (items, totalCount);
         }
-        catch (PostgresException ex) when (ex.SqlState == "42703")
+        catch (PostgresException ex) when (ex.SqlState == PgUndefinedColumn)
         {
             logger.LogWarning(ex,
                 "Bootstrap: tenant column missing (42703) for ListAsync. Migration may not have been applied.");
