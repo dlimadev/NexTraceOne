@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Package, Search, FileText, Shield, Zap, Bot, AlertTriangle,
   Activity, Settings, CheckCircle, Archive,
@@ -49,12 +50,13 @@ const categoryIcon = (cat: string) => {
  */
 export function GovernancePacksOverviewPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.governance.packs(),
+    queryKey: [...queryKeys.governance.packs(), activeEnvironmentId],
     queryFn: () => organizationGovernanceApi.listGovernancePacks(),
     staleTime: 30_000,
   });

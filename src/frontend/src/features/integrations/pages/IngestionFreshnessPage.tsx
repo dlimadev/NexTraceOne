@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Gauge, CheckCircle, AlertTriangle, XCircle, Clock, Activity, Shield,
 } from 'lucide-react';
@@ -95,15 +96,16 @@ function computeLagMinutes(latestIngestionAt: string): number {
 
 export function IngestionFreshnessPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
   const { data: freshnessResponse, isLoading: loadingFreshness, isError: errorFreshness, refetch: refetchFreshness } = useQuery({
-    queryKey: ['integrations', 'freshness'],
+    queryKey: ['integrations', 'freshness', activeEnvironmentId],
     queryFn: () => integrationsApi.getFreshness(),
     staleTime: 30_000,
   });
 
   const { data: health } = useQuery({
-    queryKey: ['integrations', 'health'],
+    queryKey: ['integrations', 'health', activeEnvironmentId],
     queryFn: () => integrationsApi.getHealth(),
     staleTime: 30_000,
   });

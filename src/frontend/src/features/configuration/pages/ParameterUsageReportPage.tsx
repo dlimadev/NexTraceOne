@@ -3,6 +3,7 @@ import {
   BarChart3, PieChart, Activity, TrendingUp, Settings, Layers, RefreshCw,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageContainer } from '../../../components/shell';
@@ -20,10 +21,11 @@ import { configurationApi } from '../api/configurationApi';
 
 export function ParameterUsageReportPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const queryClient = useQueryClient();
 
   const { data: report, isLoading, isError } = useQuery({
-    queryKey: ['parameter-usage-report'],
+    queryKey: ['parameter-usage-report', activeEnvironmentId],
     queryFn: configurationApi.getParameterUsageReport,
   });
 

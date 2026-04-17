@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Zap, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Card, CardBody } from '../../../components/Card';
@@ -32,9 +33,9 @@ interface RuleSummary {
 
 // ── Hooks ──────────────────────────────────────────────────────────────────────
 
-const useAutomationRules = () =>
+const useAutomationRules = (envId?: string | null) =>
   useQuery({
-    queryKey: ['automation-rules'],
+    queryKey: ['automation-rules', envId],
     queryFn: () =>
       client
         .get<{ items: RuleSummary[]; totalCount: number }>('/api/v1/automation-rules')
@@ -96,7 +97,8 @@ const TRIGGER_BADGE: Record<Trigger, 'info' | 'warning' | 'success' | 'neutral'>
  */
 export function AutomationRulesPage() {
   const { t } = useTranslation();
-  const { data, isLoading, isError } = useAutomationRules();
+  const { activeEnvironmentId } = useEnvironment();
+  const { data, isLoading, isError } = useAutomationRules(activeEnvironmentId);
   const createRule = useCreateRule();
   const toggleRule = useToggleRule();
   const deleteRule = useDeleteRule();

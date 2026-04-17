@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LayoutDashboard, Plus } from 'lucide-react';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -80,9 +81,9 @@ const PERSONA_VARIANT: Record<string, 'primary' | 'secondary' | 'success' | 'war
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
 
-const useListDashboards = (tenantId: string) =>
+const useListDashboards = (tenantId: string, envId?: string | null) =>
   useQuery({
-    queryKey: ['governance-dashboards', tenantId],
+    queryKey: ['governance-dashboards', tenantId, envId],
     queryFn: () =>
       client
         .get<ListDashboardsResponse>('/governance/dashboards', {
@@ -119,9 +120,10 @@ const WIDGET_KEY_MAP: Record<string, string> = {
 
 export function CustomDashboardsPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const TENANT_ID = 'default';
 
-  const { data, isLoading, isError, refetch } = useListDashboards(TENANT_ID);
+  const { data, isLoading, isError, refetch } = useListDashboards(TENANT_ID, activeEnvironmentId);
   const createMutation = useCreateDashboard();
 
   const [name, setName] = useState('');

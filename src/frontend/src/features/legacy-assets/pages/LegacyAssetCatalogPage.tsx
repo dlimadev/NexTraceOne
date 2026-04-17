@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import {
   Search,
   Database,
@@ -75,6 +76,7 @@ const SEARCH_DEBOUNCE_MS = 350;
 /** Página principal de listagem do catálogo de ativos legacy. */
 export function LegacyAssetCatalogPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [filters, setFilters] = useState<Filters>(emptyFilters);
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -100,7 +102,7 @@ export function LegacyAssetCatalogPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['legacy-assets', queryParams],
+    queryKey: ['legacy-assets', queryParams, activeEnvironmentId],
     queryFn: () => legacyAssetsApi.list(queryParams),
   });
 
