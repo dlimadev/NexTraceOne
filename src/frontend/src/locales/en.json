@@ -7224,7 +7224,44 @@
       "minutesAgo": "{{count}}m ago"
     },
     "title": "Notification Center",
-    "viewAll": "View all notifications"
+    "viewAll": "View all notifications",
+    "detail": {
+      "title": "Notification Detail",
+      "backToInbox": "Back to inbox",
+      "loading": "Loading notification...",
+      "errorLoading": "Failed to load notification",
+      "notFound": "Notification not found",
+      "requiresActionBanner": "This notification requires your acknowledgement.",
+      "eventType": "Event type",
+      "sourceModule": "Source module",
+      "sourceEntity": "Source entity",
+      "sourceEntityId": "Entity ID",
+      "sourceEventId": "Source event ID",
+      "environment": "Environment",
+      "occurrences": "Occurrences",
+      "readAt": "Read at",
+      "acknowledgedAt": "Acknowledged at",
+      "archivedAt": "Archived at",
+      "snoozedUntil": "Snoozed until",
+      "deliveries": "Delivery channels",
+      "noDeliveries": "No delivery records found.",
+      "deliveryChannel": "Channel",
+      "deliveryStatus": "Status",
+      "retries": "Retries",
+      "deliveredAt": "Delivered at",
+      "nextRetry": "Next retry",
+      "errorMessage": "Error",
+      "deliveryTrail": "Delivery trail",
+      "actions": "Actions",
+      "actionFailed": "Action failed. Please try again.",
+      "viewSourceAction": "Go to source",
+      "deliveryOutcome": {
+        "delivered": "Delivered to all channels",
+        "failed": "Permanent failure on one or more channels",
+        "retrying": "Retrying delivery...",
+        "pending": "Pending delivery"
+      }
+    }
   },
   "onboarding": {
     "aiHub": {

@@ -2,6 +2,7 @@ export { NotificationCenterPage } from './pages/NotificationCenterPage';
 export { NotificationAnalyticsPage } from './pages/NotificationAnalyticsPage';
 export { NotificationPreferencesPage } from './pages/NotificationPreferencesPage';
 export { NotificationConfigurationPage } from './pages/NotificationConfigurationPage';
+export { NotificationDetailPage } from './pages/NotificationDetailPage';
 export { NotificationBell } from './components/NotificationBell';
 export { notificationsApi } from './api/notifications';
 export {
@@ -15,6 +16,7 @@ export {
   useDeliveryHistory,
   useDeliveryStatus,
   useNotificationTrail,
+  useNotificationById,
 } from './hooks/useNotificationConfiguration';
 export type {
   NotificationAnalyticsResponse,
@@ -36,4 +38,6 @@ export type {
   NotificationTrailResponse,
   NotificationCorrelationDto,
   DeliveryTrailEntryDto,
+  NotificationDetailDto,
+  NotificationDetailResponse,
 } from './types';

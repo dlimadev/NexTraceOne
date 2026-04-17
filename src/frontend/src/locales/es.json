@@ -7202,7 +7202,44 @@
       "minutesAgo": "hace {{count}}min"
     },
     "title": "Centro de Notificaciones",
-    "viewAll": "Ver todas las notificaciones"
+    "viewAll": "Ver todas las notificaciones",
+    "detail": {
+      "title": "Detalle de Notificación",
+      "backToInbox": "Volver a la bandeja de entrada",
+      "loading": "Cargando notificación...",
+      "errorLoading": "Error al cargar la notificación",
+      "notFound": "Notificación no encontrada",
+      "requiresActionBanner": "Esta notificación requiere su confirmación.",
+      "eventType": "Tipo de evento",
+      "sourceModule": "Módulo de origen",
+      "sourceEntity": "Entidad de origen",
+      "sourceEntityId": "ID de entidad",
+      "sourceEventId": "ID de evento de origen",
+      "environment": "Entorno",
+      "occurrences": "Ocurrencias",
+      "readAt": "Leída a las",
+      "acknowledgedAt": "Confirmada a las",
+      "archivedAt": "Archivada a las",
+      "snoozedUntil": "Pospuesta hasta",
+      "deliveries": "Canales de entrega",
+      "noDeliveries": "No se encontraron registros de entrega.",
+      "deliveryChannel": "Canal",
+      "deliveryStatus": "Estado",
+      "retries": "Reintentos",
+      "deliveredAt": "Entregado a las",
+      "nextRetry": "Próximo reintento",
+      "errorMessage": "Error",
+      "deliveryTrail": "Historial de entregas",
+      "actions": "Acciones",
+      "actionFailed": "Acción fallida. Inténtelo de nuevo.",
+      "viewSourceAction": "Ir al origen",
+      "deliveryOutcome": {
+        "delivered": "Entregado en todos los canales",
+        "failed": "Fallo permanente en uno o más canales",
+        "retrying": "Reintentando entrega...",
+        "pending": "Entrega pendiente"
+      }
+    }
   },
   "onboarding": {
     "aiHub": {

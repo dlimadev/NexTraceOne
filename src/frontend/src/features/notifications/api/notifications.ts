@@ -1,6 +1,7 @@
 import client from '../../../api/client';
 import type {
   NotificationDto,
+  NotificationDetailResponse,
   NotificationListParams,
   NotificationListResponse,
   NotificationPreferencesResponse,
@@ -25,6 +26,11 @@ export const notificationsApi = {
   list: (params?: NotificationListParams) =>
     client
       .get<NotificationListResponse>('/notifications', { params })
+      .then((r) => r.data),
+
+  getById: (id: string) =>
+    client
+      .get<NotificationDetailResponse>(`/notifications/${id}`)
       .then((r) => r.data),
 
   getUnreadCount: () =>

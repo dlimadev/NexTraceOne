@@ -20,6 +20,37 @@ export interface NotificationDto {
   environmentId: string | null;
 }
 
+// ── P7.4: Notification Detail ────────────────────────────────────────────────
+
+export interface NotificationDetailDto {
+  id: string;
+  title: string;
+  message: string;
+  category: string;
+  severity: string;
+  status: string;
+  eventType: string;
+  sourceModule: string;
+  sourceEntityType: string | null;
+  sourceEntityId: string | null;
+  sourceEventId: string | null;
+  actionUrl: string | null;
+  requiresAction: boolean;
+  createdAt: string;
+  readAt: string | null;
+  acknowledgedAt: string | null;
+  archivedAt: string | null;
+  snoozedUntil: string | null;
+  isEscalated: boolean;
+  occurrenceCount: number;
+  environmentId: string | null;
+}
+
+export interface NotificationDetailResponse {
+  notification: NotificationDetailDto;
+}
+}
+
 export interface NotificationListResponse {
   items: NotificationDto[];
   hasMore: boolean;
