@@ -183,7 +183,9 @@ export function EnvironmentProvider({ children }: { children: ReactNode }) {
 
         setAvailableEnvironments(environments);
 
-        // Restore persisted environment or select the primary production / first environment
+        // Restore persisted environment or select the primary production / first environment.
+        // Note: `environments` only contains active entries (filtered above), so a persisted ID
+        // for a now-deactivated environment will not be found and falls through to the default.
         const persisted = getEnvironmentId();
         const persistedEnv = persisted ? environments.find((e) => e.id === persisted) : null;
         const defaultEnv = environments.find((e) => e.isPrimaryProduction) ?? environments[0];

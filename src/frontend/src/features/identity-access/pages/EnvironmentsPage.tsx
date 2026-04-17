@@ -424,7 +424,7 @@ export function EnvironmentsPage() {
                       <Button type="button" onClick={() => handleEdit(env)}>
                         {t('common.edit')}
                       </Button>
-                      {env.isActive && (
+                      {env.isActive && !env.isPrimaryProduction && (
                         <Button
                           type="button"
                           onClick={() => handleDeactivate(env)}
