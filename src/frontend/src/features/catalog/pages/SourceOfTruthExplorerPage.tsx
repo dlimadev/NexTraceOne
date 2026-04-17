@@ -16,6 +16,7 @@ import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { sourceOfTruthApi } from '../api/sourceOfTruth';
 import { PageContainer } from '../../../components/shell';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Delay de debounce para a pesquisa (ms). */
 const SEARCH_DEBOUNCE_MS = 350;
@@ -50,6 +51,7 @@ const protocolColors: Record<string, string> = {
 /** Página de exploração e descoberta do Source of Truth — pesquisa unificada. */
 export function SourceOfTruthExplorerPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [rawQuery, setRawQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [scope, setScope] = useState('');
@@ -61,7 +63,7 @@ export function SourceOfTruthExplorerPage() {
   }, [rawQuery]);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['source-of-truth-search', debouncedQuery, scope],
+    queryKey: ['source-of-truth-search', debouncedQuery, scope, activeEnvironmentId],
     queryFn: () =>
       sourceOfTruthApi.search({
         q: debouncedQuery,

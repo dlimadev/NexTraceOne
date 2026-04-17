@@ -19,6 +19,7 @@ import type {
   ContractLifecycleState, ContractProtocol, ContractVersion,
   ContractVersionDetail, SemanticDiff,
 } from '../../../types';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /**
  * Retorna a variante visual do Badge conforme o estado do lifecycle.
@@ -64,6 +65,7 @@ function changeLevelBadgeVariant(level: string): 'danger' | 'success' | 'warning
 export function ContractsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { activeEnvironmentId } = useEnvironment();
 
   // Estado do filtro e formulário de importação
   const [apiAssetId, setApiAssetId] = useState('');
@@ -125,20 +127,20 @@ export function ContractsPage() {
 
   /** Fetch available API assets for the entity picker (replaces raw GUID text inputs). */
   const { data: graph } = useQuery({
-    queryKey: ['graph'],
+    queryKey: ['graph', activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getGraph(),
     staleTime: 60_000,
   });
   const availableApis = graph?.apis ?? [];
 
   const { data: history, isLoading, isError: isHistoryError } = useQuery({
-    queryKey: ['contracts', 'history', apiAssetId],
+    queryKey: ['contracts', 'history', apiAssetId, activeEnvironmentId],
     queryFn: () => contractsApi.getHistory(apiAssetId),
     enabled: !!apiAssetId,
   });
 
   const { data: detail, isLoading: detailLoading } = useQuery<ContractVersionDetail>({
-    queryKey: ['contracts', 'detail', selectedVersionId],
+    queryKey: ['contracts', 'detail', selectedVersionId, activeEnvironmentId],
     queryFn: () => contractsApi.getDetail(selectedVersionId!),
     enabled: !!selectedVersionId,
   });

@@ -18,6 +18,7 @@ import type { SearchResultItem } from '../api/globalSearch';
 import { PageContainer } from '../../../components/shell';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { isRouteAvailableInFinalProductionScope } from '../../../releaseScope';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /** Intervalo de debounce para pesquisa (ms). */
 const SEARCH_DEBOUNCE_MS = 350;
@@ -56,6 +57,7 @@ const statusColors: Record<string, string> = {
 /** Página de resultados de pesquisa global — acessível via /search?q={query}. */
 export function GlobalSearchPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialQuery = searchParams.get('q') ?? '';
@@ -79,7 +81,7 @@ export function GlobalSearchPage() {
   const searchEnabled = debouncedQuery.trim().length >= 1;
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['globalSearch-page', debouncedQuery, scope],
+    queryKey: ['globalSearch-page', debouncedQuery, scope, activeEnvironmentId],
     queryFn: () =>
       globalSearchApi.search({
         q: debouncedQuery.trim(),

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { serviceCatalogApi, type DiscoveredServiceItem, type DiscoveryStatus } from '../api/serviceCatalog';
 import { PageErrorState } from '../../../components/PageErrorState';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 /**
  * Página de Service Discovery Automático.
@@ -25,7 +26,7 @@ import { PageErrorState } from '../../../components/PageErrorState';
 export default function ServiceDiscoveryPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-
+  const { activeEnvironmentId } = useEnvironment();
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [envFilter, setEnvFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,12 +35,12 @@ export default function ServiceDiscoveryPage() {
 
   // ── Queries ──────────────────────────────────────────────────────
   const { data: dashboard, isLoading: dashLoading, isError: dashError } = useQuery({
-    queryKey: ['discovery-dashboard'],
+    queryKey: ['discovery-dashboard', activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getDiscoveryDashboard(),
   });
 
   const { data: services, isLoading: servicesLoading, isError: servicesError } = useQuery({
-    queryKey: ['discovered-services', statusFilter, envFilter, searchTerm],
+    queryKey: ['discovered-services', statusFilter, envFilter, searchTerm, activeEnvironmentId],
     queryFn: () =>
       serviceCatalogApi.listDiscoveredServices({
         status: statusFilter || undefined,

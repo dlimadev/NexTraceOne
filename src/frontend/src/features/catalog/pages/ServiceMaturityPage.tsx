@@ -28,6 +28,7 @@ import type {
   ServiceMaturityItemDto,
   AuditFindingDto,
 } from '../api/serviceCatalog';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 type TabKey = 'maturity' | 'audit';
 
@@ -133,10 +134,11 @@ export function ServiceMaturityPage() {
 
 function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string }) {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery<MaturityDashboardResponse>({
-    queryKey: ['maturity-dashboard', teamName, domain],
+    queryKey: ['maturity-dashboard', teamName, domain, activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getMaturityDashboard({ teamName, domain }),
   });
 
@@ -254,9 +256,10 @@ function MaturityTab({ teamName, domain }: { teamName?: string; domain?: string 
 
 function AuditTab({ teamName, domain }: { teamName?: string; domain?: string }) {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
   const { data, isLoading, error } = useQuery<OwnershipAuditResponse>({
-    queryKey: ['ownership-audit', teamName, domain],
+    queryKey: ['ownership-audit', teamName, domain, activeEnvironmentId],
     queryFn: () => serviceCatalogApi.getOwnershipAudit({ teamName, domain }),
   });
 

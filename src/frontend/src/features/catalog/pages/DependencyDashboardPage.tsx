@@ -9,6 +9,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import client from '../../../api/client';
+import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -77,6 +78,7 @@ const healthScoreColor = (score: number): string => {
  */
 export function DependencyDashboardPage() {
   const { t } = useTranslation();
+  const { activeEnvironmentId } = useEnvironment();
 
   // Scanner form state
   const [scanServiceId, setScanServiceId] = useState('');
@@ -107,7 +109,7 @@ export function DependencyDashboardPage() {
     isError: isHealthError,
     refetch: refetchHealth,
   } = useQuery({
-    queryKey: ['dependency-health', fetchHealthId],
+    queryKey: ['dependency-health', fetchHealthId, activeEnvironmentId],
     queryFn: () =>
       client
         .get<ServiceHealthResult>(`/catalog/dependencies/${fetchHealthId}/health`)
@@ -125,7 +127,7 @@ export function DependencyDashboardPage() {
     isError: isVulnerableError,
     refetch: refetchVulnerable,
   } = useQuery({
-    queryKey: ['dependency-vulnerable'],
+    queryKey: ['dependency-vulnerable', activeEnvironmentId],
     queryFn: () =>
       client.get<VulnerableService[]>('/catalog/dependencies/vulnerable').then((r) => r.data),
     enabled: loadVulnerable,
