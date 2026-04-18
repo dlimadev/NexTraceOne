@@ -86,6 +86,15 @@ public sealed record ExternalWorkItemRefRequest(string Id, string System);
 /// <summary>Request para registo do estado de feature flags no momento da release.</summary>
 public sealed record RecordFeatureFlagStateRequest(
     string? CorrelationId,
+    /// <summary>
+    /// Identificador interno da release no NexTraceOne.
+    /// Mutuamente exclusivo com ExternalReleaseId + ExternalSystem.
+    /// </summary>
+    Guid? ReleaseId,
+    /// <summary>Identificador da release no sistema de origem externo (ex: "jenkins-build-42").</summary>
+    string? ExternalReleaseId,
+    /// <summary>Nome do sistema externo de origem (ex: "jenkins", "github", "azuredevops").</summary>
+    string? ExternalSystem,
     int ActiveFlagCount,
     int CriticalFlagCount,
     int NewFeatureFlagCount,
@@ -97,6 +106,15 @@ public sealed record RecordFeatureFlagStateRequest(
 /// <summary>Request para registo do progresso de um canary deployment.</summary>
 public sealed record RecordCanaryRolloutRequest(
     string? CorrelationId,
+    /// <summary>
+    /// Identificador interno da release no NexTraceOne.
+    /// Mutuamente exclusivo com ExternalReleaseId + ExternalSystem.
+    /// </summary>
+    Guid? ReleaseId,
+    /// <summary>Identificador da release no sistema de origem externo (ex: "argo-rollout-42").</summary>
+    string? ExternalReleaseId,
+    /// <summary>Nome do sistema externo de origem (ex: "argorollouts", "flagger").</summary>
+    string? ExternalSystem,
     decimal RolloutPercentage,
     int ActiveInstances,
     int TotalInstances,
@@ -109,6 +127,15 @@ public sealed record RecordCanaryRolloutRequest(
 /// <summary>Request para ingestão de métricas observadas numa janela pós-release.</summary>
 public sealed record RecordObservationMetricsRequest(
     string? CorrelationId,
+    /// <summary>
+    /// Identificador interno da release no NexTraceOne.
+    /// Mutuamente exclusivo com ExternalReleaseId + ExternalSystem.
+    /// </summary>
+    Guid? ReleaseId,
+    /// <summary>Identificador da release no sistema de origem externo.</summary>
+    string? ExternalReleaseId,
+    /// <summary>Nome do sistema externo de origem (ex: "datadog", "newrelic", "otel-collector").</summary>
+    string? ExternalSystem,
     ObservationPhase Phase,
     DateTimeOffset WindowStartsAt,
     DateTimeOffset WindowEndsAt,
@@ -124,7 +151,22 @@ public sealed record RecordObservationMetricsRequest(
 /// <summary>Request para registo de um rollback de release para a release original.</summary>
 public sealed record RegisterRollbackRequest(
     string? CorrelationId,
-    Guid OriginalReleaseId);
+    /// <summary>
+    /// Identificador interno da release que está a ser revertida (a release do rollback).
+    /// Mutuamente exclusivo com ExternalReleaseId + ExternalSystem.
+    /// </summary>
+    Guid? ReleaseId,
+    /// <summary>Identificador externo da release que está a ser revertida.</summary>
+    string? ExternalReleaseId,
+    /// <summary>Nome do sistema externo de origem.</summary>
+    string? ExternalSystem,
+    /// <summary>
+    /// Identificador interno da release original para a qual se faz rollback.
+    /// Mutuamente exclusivo com OriginalExternalReleaseId + ExternalSystem.
+    /// </summary>
+    Guid? OriginalReleaseId,
+    /// <summary>Identificador externo da release original para a qual se faz rollback.</summary>
+    string? OriginalExternalReleaseId);
 
 // ── Operational Intelligence — runtime snapshot ──────────────────────────────
 

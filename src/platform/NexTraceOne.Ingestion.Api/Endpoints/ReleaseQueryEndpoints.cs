@@ -5,6 +5,7 @@ using GetChangeAdvisoryFeature = NexTraceOne.ChangeGovernance.Application.Change
 using GetPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview.GetPostReleaseReview;
 using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
 using ListReleasesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases.ListReleases;
+using ResolveReleaseByExternalKeyFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ResolveReleaseByExternalKey.ResolveReleaseByExternalKey;
 
 namespace NexTraceOne.Ingestion.Api.Endpoints;
 
@@ -26,6 +27,11 @@ internal static class ReleaseQueryEndpoints
         MapGetChangeAdvisory(group);
         MapGetBlastRadius(group);
         MapGetPostReleaseReview(group);
+        MapResolveByExternalKey(group);
+        MapGetReleaseByExternalKey(group);
+        MapGetAdvisoryByExternalKey(group);
+        MapGetBlastRadiusByExternalKey(group);
+        MapGetPostReleaseReviewByExternalKey(group);
     }
 
     private static void MapListReleases(RouteGroupBuilder group)
@@ -244,6 +250,263 @@ internal static class ReleaseQueryEndpoints
             "Returns the automatic post-change verification review for a release: current phase, " +
             "outcome, confidence score and observation windows. " +
             "Used by external monitoring systems to check if a deployed release has passed post-change verification.")
+        .Produces<GetPostReleaseReviewFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    // ── Natural Key Routing endpoints ─────────────────────────────────────────
+
+    private static void MapResolveByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/resolve", async (
+            HttpContext httpContext,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            string externalReleaseId,
+            string externalSystem,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var query = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, externalReleaseId, externalSystem });
+
+                logger.LogWarning("ResolveByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error resolving release {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("ResolveReleaseByExternalKey")
+        .WithSummary("Resolve a NexTraceOne release ID from an external system's natural key")
+        .WithDescription(
+            "Returns the internal NexTraceOne release identifier and status for a release identified by " +
+            "its external system natural key (externalReleaseId + externalSystem). " +
+            "Use this endpoint to bootstrap a pipeline session: call it once to obtain the internal 'releaseId', " +
+            "then use the GUID-based routes for subsequent calls within the same pipeline execution.")
+        .Produces<ResolveReleaseByExternalKeyFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetReleaseByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/by-external/{externalSystem}/{externalReleaseId}", async (
+            HttpContext httpContext,
+            string externalSystem,
+            string externalReleaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var resolveQuery = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var resolveResult = await sender.Send(resolveQuery, ct);
+
+                if (!resolveResult.IsSuccess)
+                    return Results.NotFound(new { message = resolveResult.Error?.Message, externalReleaseId, externalSystem });
+
+                var query = new GetReleaseFeature.Query(resolveResult.Value.ReleaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                logger.LogWarning("GetReleaseByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error getting release {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetReleaseByExternalKey")
+        .WithSummary("Get release details using the external system's natural key")
+        .WithDescription(
+            "Returns the details of a release identified by the external system natural key " +
+            "(externalSystem + externalReleaseId). Intended for CI/CD pipelines and external tools " +
+            "that do not have access to the internal NexTraceOne release GUID.")
+        .Produces<GetReleaseFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetAdvisoryByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/by-external/{externalSystem}/{externalReleaseId}/advisory", async (
+            HttpContext httpContext,
+            string externalSystem,
+            string externalReleaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var resolveQuery = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var resolveResult = await sender.Send(resolveQuery, ct);
+
+                if (!resolveResult.IsSuccess)
+                    return Results.NotFound(new { message = resolveResult.Error?.Message, externalReleaseId, externalSystem });
+
+                var query = new GetChangeAdvisoryFeature.Query(resolveResult.Value.ReleaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, externalReleaseId, externalSystem });
+
+                logger.LogWarning("GetAdvisoryByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error getting advisory {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetChangeAdvisoryByExternalKey")
+        .WithSummary("Get the change advisory for a release using the external system's natural key")
+        .WithDescription(
+            "Returns the Change Advisory for a release identified by the external system natural key. " +
+            "Used by CI/CD pipelines to implement promotion gates without knowledge of the NexTraceOne internal ID.")
+        .Produces<GetChangeAdvisoryFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetBlastRadiusByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/by-external/{externalSystem}/{externalReleaseId}/blast-radius", async (
+            HttpContext httpContext,
+            string externalSystem,
+            string externalReleaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var resolveQuery = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var resolveResult = await sender.Send(resolveQuery, ct);
+
+                if (!resolveResult.IsSuccess)
+                    return Results.NotFound(new { message = resolveResult.Error?.Message, externalReleaseId, externalSystem });
+
+                var query = new GetBlastRadiusFeature.Query(resolveResult.Value.ReleaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, externalReleaseId, externalSystem });
+
+                logger.LogWarning("GetBlastRadiusByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error getting blast radius {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetBlastRadiusReportByExternalKey")
+        .WithSummary("Get the blast radius report for a release using the external system's natural key")
+        .WithDescription(
+            "Returns the blast radius analysis for a release identified by the external system natural key. " +
+            "Used by external systems to assess the impact scope of a planned change without knowing the internal ID.")
+        .Produces<GetBlastRadiusFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetPostReleaseReviewByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/by-external/{externalSystem}/{externalReleaseId}/post-release-review", async (
+            HttpContext httpContext,
+            string externalSystem,
+            string externalReleaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var resolveQuery = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var resolveResult = await sender.Send(resolveQuery, ct);
+
+                if (!resolveResult.IsSuccess)
+                    return Results.NotFound(new { message = resolveResult.Error?.Message, externalReleaseId, externalSystem });
+
+                var query = new GetPostReleaseReviewFeature.Query(resolveResult.Value.ReleaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, externalReleaseId, externalSystem });
+
+                logger.LogWarning("GetPostReleaseReviewByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error getting post-release review {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetPostReleaseReviewByExternalKey")
+        .WithSummary("Get the post-release review for a release using the external system's natural key")
+        .WithDescription(
+            "Returns the automatic post-change verification review for a release identified by the external " +
+            "system natural key. Used by external monitoring systems to check post-change verification status " +
+            "without knowledge of the internal NexTraceOne release GUID.")
         .Produces<GetPostReleaseReviewFeature.Response>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status401Unauthorized)

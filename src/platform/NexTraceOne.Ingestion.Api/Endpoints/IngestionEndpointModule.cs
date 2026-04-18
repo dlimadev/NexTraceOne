@@ -16,10 +16,10 @@ namespace NexTraceOne.Ingestion.Api.Endpoints;
 /// - <see cref="ContractSyncEndpoints"/>     — POST /api/v1/contracts/sync
 /// - <see cref="CommitIngestEndpoints"/>     — POST /api/v1/commits
 /// - <see cref="ReleaseIngestEndpoints"/>    — POST /api/v1/releases
-///                                              POST /api/v1/releases/{id}/feature-flags
-///                                              POST /api/v1/releases/{id}/canary
-///                                              POST /api/v1/releases/{id}/observations
-///                                              POST /api/v1/releases/{id}/rollback
+///                                              POST /api/v1/releases/feature-flags    (externalReleaseId no body)
+///                                              POST /api/v1/releases/canary           (externalReleaseId no body)
+///                                              POST /api/v1/releases/observations     (externalReleaseId no body)
+///                                              POST /api/v1/releases/rollback         (externalReleaseId no body)
 /// - <see cref="CostIngestEndpoints"/>       — POST /api/v1/costs/snapshots
 /// - <see cref="IncidentEndpoints"/>         — POST /api/v1/incidents
 ///
@@ -29,6 +29,11 @@ namespace NexTraceOne.Ingestion.Api.Endpoints;
 ///                                              GET  /api/v1/releases/{id}/advisory
 ///                                              GET  /api/v1/releases/{id}/blast-radius
 ///                                              GET  /api/v1/releases/{id}/post-release-review
+///                                              GET  /api/v1/releases/resolve?externalReleaseId=X&amp;externalSystem=Y
+///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}
+///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}/advisory
+///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}/blast-radius
+///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}/post-release-review
 /// - <see cref="ServiceHealthQueryEndpoints"/> — GET /api/v1/services/{serviceName}/health
 /// - <see cref="IncidentEndpoints"/>          — GET /api/v1/incidents
 ///                                              GET /api/v1/incidents/{id}

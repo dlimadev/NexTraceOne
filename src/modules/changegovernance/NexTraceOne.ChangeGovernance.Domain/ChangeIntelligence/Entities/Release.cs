@@ -87,6 +87,21 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// </summary>
     public Guid? EnvironmentId { get; private set; }
 
+    // ── Chave natural externa ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Identificador da release no sistema de origem externo (ex: "jenkins-build-42", "gh-run-9987123").
+    /// Indexado — permite lookup por chave natural sem expor o GUID interno a consumidores externos.
+    /// Nullable por retrocompatibilidade com releases criadas antes deste campo existir.
+    /// </summary>
+    public string? ExternalReleaseId { get; private set; }
+
+    /// <summary>
+    /// Nome do sistema externo que originou esta release (ex: "jenkins", "github", "azuredevops").
+    /// Combinado com <see cref="ExternalReleaseId"/> forma a chave natural única por tenant.
+    /// </summary>
+    public string? ExternalSystem { get; private set; }
+
     // ── Fase 5: Deploy Readiness ──────────────────────────────────────────
 
     /// <summary>
@@ -123,6 +138,12 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// O campo <paramref name="apiAssetId"/> pode ser <see cref="Guid.Empty"/> quando a release
     /// é criada a partir de um evento externo de ingestão ainda não correlacionado ao catálogo.
     /// </para>
+    /// <para>
+    /// Os campos <paramref name="externalReleaseId"/> e <paramref name="externalSystem"/> são opcionais
+    /// e devem ser fornecidos quando a release provém de um sistema externo (Jenkins, GitHub, Azure DevOps).
+    /// Juntos formam a chave natural que permite que consumidores externos consultem a release sem
+    /// conhecerem o GUID interno do NexTraceOne.
+    /// </para>
     /// </summary>
     public static Release Create(
         Guid tenantId,
@@ -132,7 +153,9 @@ public sealed class Release : AggregateRoot<ReleaseId>
         string environment,
         string pipelineSource,
         string commitSha,
-        DateTimeOffset createdAt)
+        DateTimeOffset createdAt,
+        string? externalReleaseId = null,
+        string? externalSystem = null)
     {
         Guard.Against.NullOrWhiteSpace(serviceName);
         Guard.Against.NullOrWhiteSpace(version);
@@ -154,7 +177,9 @@ public sealed class Release : AggregateRoot<ReleaseId>
             ChangeLevel = ChangeLevel.Operational,
             ChangeScore = 0m,
             ReleaseName = $"{serviceName} {version}",
-            CreatedAt = createdAt
+            CreatedAt = createdAt,
+            ExternalReleaseId = externalReleaseId,
+            ExternalSystem = externalSystem
         };
     }
 

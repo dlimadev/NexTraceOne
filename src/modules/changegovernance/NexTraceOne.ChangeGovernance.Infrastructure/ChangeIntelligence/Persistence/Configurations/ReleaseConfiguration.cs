@@ -53,6 +53,13 @@ internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
         builder.HasIndex(x => x.TenantId).HasDatabaseName("ix_chg_releases_tenant_id");
         builder.HasIndex(x => new { x.TenantId, x.EnvironmentId }).HasDatabaseName("ix_chg_releases_tenant_environment");
 
+        // Chave natural externa — lookup sem GUID interno
+        builder.Property(x => x.ExternalReleaseId).HasMaxLength(500);
+        builder.Property(x => x.ExternalSystem).HasMaxLength(200);
+        builder.HasIndex(x => new { x.ExternalReleaseId, x.ExternalSystem })
+            .HasDatabaseName("ix_chg_releases_external_key")
+            .HasFilter("\"ExternalReleaseId\" IS NOT NULL AND \"ExternalSystem\" IS NOT NULL");
+
         // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
         builder.Property(x => x.RowVersion).IsRowVersion();
     }
