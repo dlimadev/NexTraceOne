@@ -9960,6 +9960,9 @@
       "hasErrors": "Com Erros",
       "errorsOnly": "Apenas Erros",
       "minDuration": "Duração Mínima (ms)",
+      "serviceKind": "Tipo de Serviço",
+      "statusOk": "OK",
+      "statusError": "Erro",
       "noTraces": "Nenhum trace encontrado",
       "noTracesDescription": "Ajuste os filtros ou o intervalo de tempo para encontrar traces.",
       "detail": {
@@ -9968,10 +9971,12 @@
         "totalDuration": "Duração Total",
         "spans": "Spans",
         "spanDetail": "Detalhe do Span",
+        "selectSpanHint": "Clique num span do waterfall para ver os detalhes",
         "spanId": "Span ID",
         "parentSpan": "Span Pai",
         "operationName": "Operação",
         "serviceName": "Serviço",
+        "spanKind": "Tipo de Span",
         "statusCode": "Código de Status",
         "statusMessage": "Mensagem de Status",
         "startTime": "Hora de Início",
@@ -9987,6 +9992,26 @@
         "waterfall": "Cascata",
         "timeline": "Linha do Tempo"
       }
+    },
+    "serviceKind": {
+      "all": "Todos os Tipos",
+      "rest": "REST / HTTP",
+      "soap": "SOAP / RPC",
+      "kafka": "Kafka",
+      "background": "Background",
+      "db": "Banco de Dados",
+      "grpc": "gRPC",
+      "messaging": "Mensageria",
+      "unknown": "Desconhecido"
+    },
+    "context": {
+      "http": { "title": "Contexto HTTP" },
+      "kafka": { "title": "Contexto Kafka" },
+      "soap": { "title": "Contexto SOAP / RPC" },
+      "db": { "title": "Contexto de Banco de Dados" },
+      "background": { "title": "Contexto Background" },
+      "messaging": { "title": "Contexto de Mensageria" },
+      "generic": { "title": "Contexto" }
     },
     "logs": {
       "title": "Explorador de Logs",

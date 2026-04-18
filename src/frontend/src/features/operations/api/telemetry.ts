@@ -37,6 +37,8 @@ export interface TraceSummary {
   environment: string;
   spanCount: number;
   hasErrors: boolean;
+  /** Tipo de serviço inferido do span raiz (REST, SOAP, Kafka, Background, DB, gRPC, Unknown). */
+  rootServiceKind: string;
 }
 
 export interface SpanEvent {
@@ -57,6 +59,10 @@ export interface SpanDetail {
   statusCode?: string;
   statusMessage?: string;
   environment: string;
+  /** SpanKind OTel: Internal, Server, Client, Producer, Consumer. */
+  spanKind?: string;
+  /** Tipo de serviço inferido: REST, SOAP, Kafka, Background, DB, gRPC, Unknown. */
+  serviceKind?: string;
   resourceAttributes?: Record<string, string>;
   spanAttributes?: Record<string, string>;
   events?: SpanEvent[];
@@ -131,6 +137,8 @@ export interface TraceQueryParams {
   operationName?: string;
   minDurationMs?: number;
   hasErrors?: boolean;
+  /** Filtrar por tipo de serviço (REST, SOAP, Kafka, Background, DB, gRPC). */
+  serviceKind?: string;
   limit?: number;
 }
 

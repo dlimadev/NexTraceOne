@@ -85,6 +85,7 @@ public sealed class TelemetryEndpointModule
             string? operationName = null,
             double? minDurationMs = null,
             bool? hasErrors = null,
+            string? serviceKind = null,
             int limit = 50) =>
         {
             if (limit is < 1 or > MaxTraceResults) limit = 50;
@@ -98,6 +99,7 @@ public sealed class TelemetryEndpointModule
                 OperationName = operationName,
                 MinDurationMs = minDurationMs,
                 HasErrors = hasErrors,
+                ServiceKind = serviceKind,
                 Limit = limit
             };
 
