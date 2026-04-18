@@ -17,6 +17,8 @@
     <ProjectReference Include="..\..\modules\integrations\NexTraceOne.Integrations.Infrastructure\NexTraceOne.Integrations.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
     <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>
 </Project>
