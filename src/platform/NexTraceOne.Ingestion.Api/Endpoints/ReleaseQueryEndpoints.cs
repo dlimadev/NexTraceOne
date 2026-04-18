@@ -1,7 +1,10 @@
 using MediatR;
 using NexTraceOne.Ingestion.Api.Security;
 using GetBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetBlastRadiusReport.GetBlastRadiusReport;
+using GetCanaryRolloutStatusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetCanaryRolloutStatus.GetCanaryRolloutStatus;
 using GetChangeAdvisoryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeAdvisory.GetChangeAdvisory;
+using GetChangeIntelligenceSummaryFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeIntelligenceSummary.GetChangeIntelligenceSummary;
+using GetHistoricalPatternInsightFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetHistoricalPatternInsight.GetHistoricalPatternInsight;
 using GetPostReleaseReviewFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPostReleaseReview.GetPostReleaseReview;
 using GetReleaseFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRelease.GetRelease;
 using ListReleasesFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ListReleases.ListReleases;
@@ -27,6 +30,9 @@ internal static class ReleaseQueryEndpoints
         MapGetChangeAdvisory(group);
         MapGetBlastRadius(group);
         MapGetPostReleaseReview(group);
+        MapGetChangeIntelligenceSummary(group);
+        MapGetCanaryRolloutStatus(group);
+        MapGetHistoricalPatternInsight(group);
         MapResolveByExternalKey(group);
         MapGetReleaseByExternalKey(group);
         MapGetAdvisoryByExternalKey(group);
@@ -257,6 +263,150 @@ internal static class ReleaseQueryEndpoints
     }
 
     // ── Natural Key Routing endpoints ─────────────────────────────────────────
+
+    private static void MapGetChangeIntelligenceSummary(RouteGroupBuilder group)
+    {
+        group.MapGet("/{releaseId:guid}/intelligence", async (
+            HttpContext httpContext,
+            Guid releaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var query = new GetChangeIntelligenceSummaryFeature.Query(releaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, releaseId });
+
+                logger.LogWarning("GetChangeIntelligenceSummary failed for {ReleaseId}: {Error}",
+                    releaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error getting change intelligence summary for {ReleaseId}", releaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetChangeIntelligenceSummary")
+        .WithSummary("Get the complete change intelligence record for a release")
+        .WithDescription(
+            "Returns the full change intelligence record for a release: release metadata, risk score, " +
+            "blast radius, external markers, performance baseline, post-release review, rollback assessment " +
+            "and change event timeline. " +
+            "This is the single most complete view of a change in NexTraceOne — " +
+            "ideal for ITSM integrations, audit exports, evidence packs and governance portals.")
+        .Produces<GetChangeIntelligenceSummaryFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetCanaryRolloutStatus(RouteGroupBuilder group)
+    {
+        group.MapGet("/{releaseId:guid}/canary", async (
+            HttpContext httpContext,
+            Guid releaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var query = new GetCanaryRolloutStatusFeature.Query(releaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, releaseId });
+
+                logger.LogWarning("GetCanaryRolloutStatus failed for {ReleaseId}: {Error}",
+                    releaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error getting canary rollout status for {ReleaseId}", releaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetCanaryRolloutStatus")
+        .WithSummary("Get the canary rollout status and confidence boost for a release")
+        .WithDescription(
+            "Returns the current canary deployment state for a release: rollout percentage, " +
+            "active/total instances, promoted/aborted flags, and a confidence boost signal " +
+            "(High / Medium / Low / Negative) used by the change advisory engine. " +
+            "Useful for CI/CD orchestrators implementing progressive delivery gates and " +
+            "for monitoring dashboards tracking canary health before full rollout.")
+        .Produces<GetCanaryRolloutStatusFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetHistoricalPatternInsight(RouteGroupBuilder group)
+    {
+        group.MapGet("/{releaseId:guid}/historical-pattern", async (
+            HttpContext httpContext,
+            Guid releaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            int? lookbackDays,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var query = new GetHistoricalPatternInsightFeature.Query(releaseId, lookbackDays);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, releaseId });
+
+                logger.LogWarning("GetHistoricalPatternInsight failed for {ReleaseId}: {Error}",
+                    releaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error getting historical pattern insight for {ReleaseId}", releaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetHistoricalPatternInsight")
+        .WithSummary("Get historical pattern analysis for similar releases")
+        .WithDescription(
+            "Analyses the historical pattern of releases similar to the given release " +
+            "(same service, environment and change level) within a configurable lookback window. " +
+            "Returns: total samples, success rate, rollback rate, failure rate, average change score, " +
+            "pattern risk signal (Low / Moderate / High / Insufficient) and a human-readable rationale. " +
+            "Use lookbackDays to override the default 90-day window (min 7, max 365). " +
+            "Ideal for risk assessment tools, deployment gates and AI-assisted advisory enrichment.")
+        .Produces<GetHistoricalPatternInsightFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
 
     private static void MapResolveByExternalKey(RouteGroupBuilder group)
     {

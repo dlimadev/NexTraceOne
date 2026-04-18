@@ -30,6 +30,9 @@ namespace NexTraceOne.Ingestion.Api.Endpoints;
 ///                                              GET  /api/v1/releases/{id}/advisory
 ///                                              GET  /api/v1/releases/{id}/blast-radius
 ///                                              GET  /api/v1/releases/{id}/post-release-review
+///                                              GET  /api/v1/releases/{id}/intelligence
+///                                              GET  /api/v1/releases/{id}/canary
+///                                              GET  /api/v1/releases/{id}/historical-pattern
 ///                                              GET  /api/v1/releases/resolve?externalReleaseId=X&amp;externalSystem=Y
 ///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}
 ///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}/advisory
@@ -40,6 +43,8 @@ namespace NexTraceOne.Ingestion.Api.Endpoints;
 ///                                              GET /api/v1/services/{serviceName}/releases
 /// - <see cref="IncidentEndpoints"/>          — GET /api/v1/incidents
 ///                                              GET /api/v1/incidents/{id}
+/// - <see cref="ReportEndpoints"/>            — GET /api/v1/reports/dora
+///                                              GET /api/v1/reports/changes-summary
 /// </summary>
 internal static class IngestionEndpointModule
 {
@@ -111,5 +116,10 @@ internal static class IngestionEndpointModule
 
         // Shared incident endpoints: POST uses write policy, GET uses read policy
         IncidentEndpoints.Map(incidentsWrite, incidentsRead);
+
+        var reports = app.MapGroup("/api/v1/reports")
+            .WithTags("Reports")
+            .RequireAuthorization(IngestionApiSecurity.ReadPolicyName);
+        ReportEndpoints.Map(reports);
     }
 }
