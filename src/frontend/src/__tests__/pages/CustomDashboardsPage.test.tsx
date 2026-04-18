@@ -9,6 +9,13 @@ vi.mock('../../api/client', () => ({
   default: { get: vi.fn(), post: vi.fn(), delete: vi.fn() },
 }));
 
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: vi.fn().mockReturnValue({
+    user: { id: 'user-001', email: 'test@example.com' },
+    isAuthenticated: true,
+  }),
+}));
+
 vi.mock('../../contexts/EnvironmentContext', () => ({
   useEnvironment: vi.fn().mockReturnValue({
     activeEnvironmentId: 'env-prod-001',

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Plus, Eye, Settings, Copy, Trash2, Layout as LayoutIcon } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -182,7 +183,9 @@ export function CustomDashboardsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { activeEnvironmentId } = useEnvironment();
+  const { user } = useAuth();
   const TENANT_ID = 'default';
+  const USER_ID = user?.id ?? 'current-user';
 
   const { data, isLoading, isError, refetch } = useListDashboards(TENANT_ID, activeEnvironmentId);
   const createMutation = useCreateDashboard();
@@ -235,7 +238,7 @@ export function CustomDashboardsPage() {
     if (!cloneTargetId) return;
     setCloneError(null);
     try {
-      await cloneMutation.mutateAsync({ dashboardId: cloneTargetId, newName: cloneName, userId: 'current-user' });
+      await cloneMutation.mutateAsync({ dashboardId: cloneTargetId, newName: cloneName, userId: USER_ID });
       setCloneTargetId(null);
       setCloneName('');
     } catch {
@@ -280,7 +283,7 @@ export function CustomDashboardsPage() {
     try {
       await createMutation.mutateAsync({
         tenantId: TENANT_ID,
-        userId: 'current-user',
+        userId: USER_ID,
         name,
         description,
         layout,

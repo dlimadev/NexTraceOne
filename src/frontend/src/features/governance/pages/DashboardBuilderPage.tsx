@@ -158,11 +158,13 @@ function GridPreview({ slots, layout }: { slots: BuilderSlot[]; layout: string }
     >
       {slots.map((slot) => {
         const meta = WIDGET_META[slot.type];
+        const clampedPosX = Math.min(Math.max(slot.posX, 0), cols - 1);
+        const clampedWidth = Math.min(slot.width, cols - clampedPosX);
         return (
           <div
             key={slot.tempId}
             style={{
-              gridColumn: `${slot.posX + 1} / span ${Math.min(slot.width, cols - slot.posX)}`,
+              gridColumn: `${clampedPosX + 1} / span ${clampedWidth}`,
               gridRow: `${slot.posY + 1} / span ${slot.height}`,
             }}
             className="rounded bg-accent/10 border border-accent/30 flex flex-col items-center justify-center p-1 overflow-hidden"
