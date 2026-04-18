@@ -272,3 +272,84 @@ export async function getSreTopQueries(params: SreParams & { top?: number }): Pr
   const { data } = await client.get<SreTopQuery[]>('/telemetry/sre/top-queries', { params });
   return data;
 }
+
+// ── Request Explorer types ────────────────────────────────────────────────────
+
+export type RequestViewMode = 'requests' | 'spans';
+export type RequestStatus = 'Success' | 'Failure';
+export type SpanStatusFilter = 'Ok' | 'Error';
+export type SpanKindFilter = 'client' | 'server' | 'consumer' | 'producer' | 'internal' | 'link';
+export type ChartMode = 'timeseries' | 'histogram';
+
+export interface RequestSpan {
+  startTime: string;
+  endpoint: string;
+  service: string;
+  durationMs: number;
+  requestStatus: RequestStatus;
+  httpCode?: number;
+  processGroup?: string;
+  k8sWorkload?: string;
+  k8sNamespace?: string;
+  spanKind?: string;
+  spanStatus?: string;
+  traceId?: string;
+  spanId?: string;
+}
+
+export interface RequestHistogramBucket {
+  durationLabel: string;
+  successCount: number;
+  failureCount: number;
+}
+
+export interface RequestFacets {
+  services: string[];
+  endpoints: string[];
+  processGroups: string[];
+  k8sNamespaces: string[];
+  k8sWorkloads: string[];
+}
+
+export interface RequestsResult {
+  items: RequestSpan[];
+  total: number;
+  page: number;
+  pageSize: number;
+  histogram: RequestHistogramBucket[];
+}
+
+export interface RequestQueryParams {
+  environment: string;
+  from: string;
+  until: string;
+  viewMode?: RequestViewMode;
+  service?: string;
+  endpoint?: string;
+  requestStatus?: RequestStatus;
+  spanStatus?: SpanStatusFilter;
+  spanKind?: SpanKindFilter;
+  httpMethod?: string;
+  durationMin?: number;
+  durationMax?: number;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
+}
+
+export async function getRequests(params: RequestQueryParams): Promise<RequestsResult> {
+  const { data } = await client.get<RequestsResult>('/telemetry/requests', { params });
+  return data;
+}
+
+export async function getRequestFacets(
+  environment: string,
+  from: string,
+  until: string,
+): Promise<RequestFacets> {
+  const { data } = await client.get<RequestFacets>('/telemetry/requests/facets', {
+    params: { environment, from, until },
+  });
+  return data;
+}

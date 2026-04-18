@@ -9118,7 +9118,8 @@
     "subGroupWorkflowManagement": "Workflow Management",
     "workflowConfiguration": "Workflow Configuration",
     "tenants": "Tenants",
-    "sreDashboard": "SRE Dashboard"
+    "sreDashboard": "SRE Dashboard",
+    "requestExplorer": "Request Explorer"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11863,6 +11864,67 @@
       "count": "Count",
       "latency": "Latency",
       "errors": "Errors"
+    }
+  },
+  "requestExplorer": {
+    "title": "Request Explorer",
+    "subtitle": "Browse and filter requests and spans with faceted search",
+    "loading": "Loading Request Explorer…",
+    "loadError": "Failed to load requests. Please try again.",
+    "noRecords": "No records found. Adjust your filters or time range.",
+    "noFacets": "No values available",
+    "viewRequests": "Requests",
+    "viewSpans": "Spans",
+    "searchFacets": "Search facets",
+    "removeFilter": "Remove filter",
+    "clearAll": "Clear all",
+    "refresh": "Refresh",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "facets": {
+      "core": "Core",
+      "duration": "Duration",
+      "min": "Min",
+      "max": "Max",
+      "durationMin": "Min Duration",
+      "durationMax": "Max Duration",
+      "service": "Service",
+      "endpoint": "Endpoint",
+      "requestStatus": "Request status",
+      "spanStatus": "Span status",
+      "spanKind": "Span kind",
+      "httpNote": "HTTP filters available after applying service filter"
+    },
+    "status": {
+      "success": "Success",
+      "failure": "Failure"
+    },
+    "chart": {
+      "timeseries": "Timeseries",
+      "histogram": "Histogram",
+      "failedRequests": "Failed requests",
+      "successfulRequests": "Successful requests",
+      "durationLabel": "Duration"
+    },
+    "table": {
+      "startTime": "Start time",
+      "endpoint": "Endpoint",
+      "service": "Service",
+      "duration": "Duration",
+      "requestStatus": "Request status",
+      "httpCode": "HTTP",
+      "processGroup": "Process group",
+      "k8sWorkload": "K8s workload",
+      "k8sNamespace": "K8s namespace"
+    },
+    "pagination": {
+      "showing": "Showing {{from}}–{{to}} of {{total}}",
+      "prev": "Previous",
+      "next": "Next"
     }
   }
 }

@@ -9093,7 +9093,8 @@
     "releaseParameterAudit": "Auditoria de Parâmetros",
     "releaseParameterOverride": "Overrides por Ambiente",
     "tenants": "Tenants",
-    "sreDashboard": "Painel SRE"
+    "sreDashboard": "Painel SRE",
+    "requestExplorer": "Explorador de Pedidos"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11833,6 +11834,67 @@
       "count": "Contagem",
       "latency": "Latência",
       "errors": "Erros"
+    }
+  },
+  "requestExplorer": {
+    "title": "Explorador de Pedidos",
+    "subtitle": "Navegue e filtre pedidos e spans com pesquisa facetada",
+    "loading": "A carregar explorador de pedidos…",
+    "loadError": "Falha ao carregar os pedidos. Por favor, tente novamente.",
+    "noRecords": "Sem registos. Ajuste os filtros ou o intervalo de tempo.",
+    "noFacets": "Sem valores disponíveis",
+    "viewRequests": "Pedidos",
+    "viewSpans": "Spans",
+    "searchFacets": "Pesquisar facetas",
+    "removeFilter": "Remover filtro",
+    "clearAll": "Limpar tudo",
+    "refresh": "Atualizar",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "facets": {
+      "core": "Principal",
+      "duration": "Duração",
+      "min": "Mín",
+      "max": "Máx",
+      "durationMin": "Duração mínima",
+      "durationMax": "Duração máxima",
+      "service": "Serviço",
+      "endpoint": "Endpoint",
+      "requestStatus": "Estado do pedido",
+      "spanStatus": "Estado do span",
+      "spanKind": "Tipo de span",
+      "httpNote": "Filtros HTTP disponíveis após aplicar filtro de serviço"
+    },
+    "status": {
+      "success": "Sucesso",
+      "failure": "Falha"
+    },
+    "chart": {
+      "timeseries": "Série temporal",
+      "histogram": "Histograma",
+      "failedRequests": "Pedidos com falha",
+      "successfulRequests": "Pedidos bem-sucedidos",
+      "durationLabel": "Duração"
+    },
+    "table": {
+      "startTime": "Hora de início",
+      "endpoint": "Endpoint",
+      "service": "Serviço",
+      "duration": "Duração",
+      "requestStatus": "Estado do pedido",
+      "httpCode": "HTTP",
+      "processGroup": "Grupo de processo",
+      "k8sWorkload": "Carga K8s",
+      "k8sNamespace": "Namespace K8s"
+    },
+    "pagination": {
+      "showing": "A mostrar {{from}}–{{to}} de {{total}}",
+      "prev": "Anterior",
+      "next": "Seguinte"
     }
   }
 }

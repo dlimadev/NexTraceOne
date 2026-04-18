@@ -78,6 +78,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.reliability', to: '/operations/reliability', icon: <Activity size={18} />, permission: 'operations:reliability:read', section: 'operations' },
   { labelKey: 'sidebar.sloManagement', to: '/operations/reliability/slos', icon: <ShieldCheck size={18} />, permission: 'operations:reliability:read', section: 'operations' },
   { labelKey: 'sidebar.sreDashboard', to: '/operations/sre-dashboard', icon: <Gauge size={18} />, permission: 'operations:reliability:read', section: 'operations' },
+  { labelKey: 'sidebar.requestExplorer', to: '/operations/request-explorer', icon: <Activity size={18} />, permission: 'operations:telemetry:read', section: 'operations' },
   { labelKey: 'sidebar.automation', to: '/operations/automation', icon: <Workflow size={18} />, permission: 'operations:automation:read', section: 'operations' },
   { labelKey: 'sidebar.runtimeIntelligence', to: '/operations/runtime-comparison', icon: <BarChart3 size={18} />, permission: 'operations:runtime:read', section: 'operations' },
   { labelKey: 'sidebar.predictiveIntelligence', to: '/operations/predictive-intelligence', icon: <BrainCircuit size={18} />, permission: 'operations:runtime:read', section: 'operations' },

@@ -25,6 +25,7 @@ const PlatformOperationsPage = lazy(() => import('../features/operations/pages/P
 const TraceExplorerPage = lazy(() => import('../features/operations/pages/TraceExplorerPage').then(m => ({ default: m.TraceExplorerPage })));
 const LogExplorerPage = lazy(() => import('../features/operations/pages/LogExplorerPage').then(m => ({ default: m.LogExplorerPage })));
 const SreDashboardPage = lazy(() => import('../features/operations/pages/SreDashboardPage').then(m => ({ default: m.SreDashboardPage })));
+const RequestExplorerPage = lazy(() => import('../features/operations/pages/RequestExplorerPage').then(m => ({ default: m.RequestExplorerPage })));
 
 export function OperationsRoutes() {
   return (
@@ -186,6 +187,14 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
             <SreDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/request-explorer"
+        element={
+          <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
+            <RequestExplorerPage />
           </ProtectedRoute>
         }
       />
