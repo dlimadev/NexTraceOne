@@ -2954,3 +2954,25 @@ export interface CreateKnowledgeRelationRequest {
   targetEntityType: KnowledgeRelationType;
   relationType: string;
 }
+
+// ── Contract Migration Patch ───────────────────────────────────────────────
+
+export interface MigrationSuggestion {
+  kind: string;
+  side: 'provider' | 'consumer';
+  description: string;
+  codeHint?: string;
+  severity: 'high' | 'medium' | 'low';
+}
+
+export interface MigrationPatchResult {
+  baseVersionId: string;
+  targetVersionId: string;
+  protocol: string;
+  language: string;
+  changeLevel: string;
+  breakingChangeCount: number;
+  providerSuggestions: MigrationSuggestion[];
+  consumerSuggestions: MigrationSuggestion[];
+  generatedAt: string;
+}

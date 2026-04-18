@@ -311,5 +311,11 @@ public static class ContractsErrors
     /// <summary>Entrada de changelog já se encontra aprovada.</summary>
     public static Error ChangelogAlreadyApproved(string id)
         => Error.Conflict("Contracts.Changelog.AlreadyApproved", "Contract changelog '{0}' is already approved.", id);
+
+    // ── MigrationPatch ────────────────────────────────────────────────
+
+    /// <summary>Versões base e alvo do patch de migração são iguais.</summary>
+    public static Error MigrationPatchVersionsIdentical()
+        => Error.Validation("Contracts.MigrationPatch.VersionsIdentical", "Base and target versions must be different to generate a migration patch.");
 }
 

@@ -12,7 +12,8 @@ namespace NexTraceOne.VisualStudio;
 /// <summary>
 /// AsyncPackage principal da extensão NexTraceOne para Visual Studio 2022.
 /// Regista o Tool Window de Chat AI, o Tool Window de Service Catalog,
-/// menus contextuais, a página de opções e o provider da Error List.
+/// menus contextuais, a página de opções, o provider da Error List
+/// e o comando de geração de patches de migração de contratos.
 /// </summary>
 [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 [Guid(PackageGuids.PackageGuidString)]
@@ -37,6 +38,7 @@ public sealed class NexTraceOnePackage : AsyncPackage
         await NexAiAskAboutSelectionCommand.InitializeAsync(this);
         await NexAiScaffoldCommand.InitializeAsync(this);
         await NexCatalogWindowCommand.InitializeAsync(this);
+        await NexContractMigrationCommand.InitializeAsync(this);
 
         // Initialise the Error List provider (non-fatal if it fails)
         try

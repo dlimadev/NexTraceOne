@@ -69,6 +69,8 @@ export function activate(context: vscode.ExtensionContext): void {
       void chatViewProvider.sendQuery(`Show service context, ownership, contracts and recent changes for: ${serviceName}`);
       void vscode.commands.executeCommand('nextraceone.chatView.focus');
     }),
+    vscode.commands.registerCommand('nextraceone.migrateContract', () =>
+      handleMigrateContractCommand(chatViewProvider)),
   );
 
   // Reload catalog when settings change
@@ -646,6 +648,10 @@ function registerChatParticipant(context: vscode.ExtensionContext): void {
           case 'generate':
             queryType = 'CodeGeneration';
             prefix = `[Code generation] `;
+            break;
+          case 'migrate':
+            queryType = 'CodeGeneration';
+            prefix = `[Contract migration patch — generate code update hints for provider and consumers] `;
             break;
         }
 
@@ -1235,8 +1241,50 @@ async function handleOpenServiceDashboardCommand(serviceName: string): Promise<v
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Scaffold Wizard
+// Contract Migration Patch Command
 // ═══════════════════════════════════════════════════════════════════════════════
+
+async function handleMigrateContractCommand(chatViewProvider: NexChatViewProvider): Promise<void> {
+  const baseId = await vscode.window.showInputBox({
+    title: 'NexTraceOne: Contract Migration Patch',
+    prompt: 'Enter the BASE contract version ID (GUID)',
+    placeHolder: 'e.g. 00000000-0000-0000-0000-000000000001',
+    validateInput: (v) => (v && v.trim().length > 0 ? null : 'Base version ID is required'),
+  });
+  if (!baseId) return;
+
+  const targetId = await vscode.window.showInputBox({
+    title: 'NexTraceOne: Contract Migration Patch',
+    prompt: 'Enter the TARGET contract version ID (GUID)',
+    placeHolder: 'e.g. 00000000-0000-0000-0000-000000000002',
+    validateInput: (v) => (v && v.trim().length > 0 ? null : 'Target version ID is required'),
+  });
+  if (!targetId) return;
+
+  const sideChoice = await vscode.window.showQuickPick(
+    [
+      { label: 'All (Provider + Consumer)', value: 'all' },
+      { label: 'Provider only', value: 'provider' },
+      { label: 'Consumer only', value: 'consumer' },
+    ],
+    { title: 'NexTraceOne: Migration target side', placeHolder: 'Select which side to generate for' },
+  );
+  if (!sideChoice) return;
+
+  const langChoice = await vscode.window.showQuickPick(
+    ['C#', 'TypeScript', 'JavaScript', 'Java', 'Python'],
+    { title: 'NexTraceOne: Implementation language', placeHolder: 'Select language for code hints' },
+  );
+  const language = langChoice ?? 'C#';
+
+  const prompt =
+    `/migrate Generate contract migration patch from version ${baseId} to ${targetId}. ` +
+    `Target: ${sideChoice.value}. Language: ${language}. ` +
+    `Show code hints for breaking changes and how to update both provider implementation and consumer clients.`;
+
+  void chatViewProvider.sendQuery(prompt);
+  void vscode.commands.executeCommand('nextraceone.chatView.focus');
+}
 
 interface ScaffoldTemplateSummary {
   templateId: string;

@@ -2,7 +2,7 @@
   "name": "nextraceone-copilot",
   "displayName": "NexTraceOne Copilot",
   "description": "AI-assisted operations, contract governance and change intelligence for NexTraceOne — Copilot Chat-like experience with code editing, scaffold wizard, service catalog and service intelligence",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "nextraceone",
   "engines": {
     "vscode": "^1.90.0"
@@ -68,6 +68,11 @@
         "command": "nextraceone.askAboutService",
         "title": "NexTraceOne: Ask AI about this Service",
         "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "nextraceone.migrateContract",
+        "title": "NexTraceOne: Generate Contract Migration Patch",
+        "icon": "$(arrow-swap)"
       }
     ],
     "menus": {
@@ -194,6 +199,10 @@
           {
             "name": "generate",
             "description": "Generate code based on a service contract or description"
+          },
+          {
+            "name": "migrate",
+            "description": "Generate code migration hints for provider and consumers when a contract changes"
           }
         ]
       }

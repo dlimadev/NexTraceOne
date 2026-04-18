@@ -8,7 +8,7 @@ namespace NexTraceOne.CLI.Commands;
 
 /// <summary>
 /// Comandos de verificação de conformidade de contratos.
-/// Subcomandos: verify, diff, changelog, sync.
+/// Subcomandos: verify, diff, changelog, sync, migrate.
 /// </summary>
 public static class ContractCommand
 {
@@ -36,6 +36,7 @@ public static class ContractCommand
         command.Add(CreateDiffCommand());
         command.Add(CreateChangelogCommand());
         command.Add(CreateSyncCommand());
+        command.Add(CreateMigrateCommand());
         return command;
     }
 
@@ -899,6 +900,213 @@ public static class ContractCommand
 
         [JsonPropertyName("updatedAt")]
         public DateTimeOffset? UpdatedAt { get; init; }
+    }
+
+    // === MIGRATE subcommand ===
+
+    private static Command CreateMigrateCommand()
+    {
+        var baseOpt = new Option<string>("--base") { Description = "Base contract version ID (GUID).", Required = true };
+        var targetOpt = new Option<string>("--target-version") { Description = "Target contract version ID (GUID).", Required = true };
+        var targetSideOpt = new Option<string>("--target-side")
+        {
+            Description = "Side to generate for: provider, consumer, all (default: all).",
+            DefaultValueFactory = _ => "all"
+        };
+        var langOpt = new Option<string>("--language")
+        {
+            Description = "Implementation language for code hints (e.g. C#, Java, TypeScript, Python).",
+            DefaultValueFactory = _ => "C#"
+        };
+        var urlOpt = CreateUrlOption();
+        var tokenOpt = CreateTokenOption();
+        var formatOpt = CreateFormatOption();
+
+        var command = new Command("migrate", "Generate code migration hints for a contract change (provider/consumer).");
+        command.Options.Add(baseOpt);
+        command.Options.Add(targetOpt);
+        command.Options.Add(targetSideOpt);
+        command.Options.Add(langOpt);
+        command.Options.Add(urlOpt);
+        command.Options.Add(tokenOpt);
+        command.Options.Add(formatOpt);
+
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var baseId = parseResult.GetValue(baseOpt)!;
+            var targetId = parseResult.GetValue(targetOpt)!;
+            var side = parseResult.GetValue(targetSideOpt) ?? "all";
+            var language = parseResult.GetValue(langOpt) ?? "C#";
+            var url = parseResult.GetValue(urlOpt)!;
+            var token = parseResult.GetValue(tokenOpt);
+            var format = parseResult.GetValue(formatOpt) ?? "text";
+
+            return await MigrateAsync(baseId, targetId, side, language, url, token, format, cancellationToken)
+                .ConfigureAwait(false);
+        });
+
+        return command;
+    }
+
+    private static async Task<int> MigrateAsync(
+        string baseId,
+        string targetId,
+        string side,
+        string language,
+        string url,
+        string? token,
+        string format,
+        CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(baseId, out _) || !Guid.TryParse(targetId, out _))
+        {
+            AnsiConsole.MarkupLine("[red]Error:[/] --base and --target-version must be valid GUIDs.");
+            return ExitError;
+        }
+
+        using var client = new HttpClient { BaseAddress = new Uri(url) };
+        var resolved = Services.CliConfig.ResolveToken(token);
+        if (!string.IsNullOrWhiteSpace(resolved))
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {resolved}");
+
+        try
+        {
+            var payload = new
+            {
+                baseVersionId = baseId,
+                targetVersionId = targetId,
+                target = side,
+                language
+            };
+
+            var response = await client
+                .PostAsJsonAsync("/api/v1/contracts/migration-patch", payload, cancellationToken)
+                .ConfigureAwait(false);
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                AnsiConsole.MarkupLine($"[red]Error {(int)response.StatusCode}:[/] {body.EscapeMarkup()}");
+                return ExitError;
+            }
+
+            if (format == "json")
+            {
+                Console.WriteLine(body);
+                return ExitSuccess;
+            }
+
+            RenderMigrationPatch(body);
+            return ExitSuccess;
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message.EscapeMarkup()}");
+            return ExitError;
+        }
+    }
+
+    private static void RenderMigrationPatch(string body)
+    {
+        MigrationPatchResponse? patch = null;
+        try { patch = JsonSerializer.Deserialize<MigrationPatchResponse>(body, JsonReadOptions); }
+        catch { /* fallback */ }
+
+        if (patch is null)
+        {
+            Console.WriteLine(body);
+            return;
+        }
+
+        AnsiConsole.MarkupLine(
+            $"\n  [bold cyan]Contract Migration Patch[/]" +
+            $"  Protocol: [yellow]{patch.Protocol.EscapeMarkup()}[/]" +
+            $"  Language: [yellow]{patch.Language.EscapeMarkup()}[/]" +
+            $"  Change Level: [red]{patch.ChangeLevel.EscapeMarkup()}[/]" +
+            $"  Breaking Changes: [red]{patch.BreakingChangeCount}[/]\n");
+
+        if (patch.ProviderSuggestions.Count > 0)
+        {
+            AnsiConsole.MarkupLine("  [bold green]Provider Suggestions[/]");
+            foreach (var s in patch.ProviderSuggestions)
+            {
+                var severity = s.Severity?.ToLowerInvariant() switch
+                {
+                    "high" => "[red]HIGH[/]",
+                    "medium" => "[yellow]MEDIUM[/]",
+                    _ => "[grey]LOW[/]"
+                };
+                AnsiConsole.MarkupLine($"  {severity} [{s.Kind.EscapeMarkup()}] {s.Description.EscapeMarkup()}");
+                if (!string.IsNullOrWhiteSpace(s.CodeHint))
+                {
+                    AnsiConsole.MarkupLine($"  [grey]{s.CodeHint.EscapeMarkup()}[/]");
+                }
+            }
+        }
+
+        if (patch.ConsumerSuggestions.Count > 0)
+        {
+            AnsiConsole.MarkupLine("\n  [bold yellow]Consumer Suggestions[/]");
+            foreach (var s in patch.ConsumerSuggestions)
+            {
+                var severity = s.Severity?.ToLowerInvariant() switch
+                {
+                    "high" => "[red]HIGH[/]",
+                    "medium" => "[yellow]MEDIUM[/]",
+                    _ => "[grey]LOW[/]"
+                };
+                AnsiConsole.MarkupLine($"  {severity} [{s.Kind.EscapeMarkup()}] {s.Description.EscapeMarkup()}");
+                if (!string.IsNullOrWhiteSpace(s.CodeHint))
+                {
+                    AnsiConsole.MarkupLine($"  [grey]{s.CodeHint.EscapeMarkup()}[/]");
+                }
+            }
+        }
+
+        if (patch.ProviderSuggestions.Count == 0 && patch.ConsumerSuggestions.Count == 0)
+        {
+            AnsiConsole.MarkupLine("  [grey]No migration suggestions generated (no detectable changes).[/]");
+        }
+    }
+
+    private sealed class MigrationPatchResponse
+    {
+        [JsonPropertyName("protocol")]
+        public string Protocol { get; init; } = string.Empty;
+
+        [JsonPropertyName("language")]
+        public string Language { get; init; } = string.Empty;
+
+        [JsonPropertyName("changeLevel")]
+        public string ChangeLevel { get; init; } = string.Empty;
+
+        [JsonPropertyName("breakingChangeCount")]
+        public int BreakingChangeCount { get; init; }
+
+        [JsonPropertyName("providerSuggestions")]
+        public IReadOnlyList<MigrationSuggestionItem> ProviderSuggestions { get; init; } = [];
+
+        [JsonPropertyName("consumerSuggestions")]
+        public IReadOnlyList<MigrationSuggestionItem> ConsumerSuggestions { get; init; } = [];
+    }
+
+    private sealed class MigrationSuggestionItem
+    {
+        [JsonPropertyName("kind")]
+        public string Kind { get; init; } = string.Empty;
+
+        [JsonPropertyName("side")]
+        public string Side { get; init; } = string.Empty;
+
+        [JsonPropertyName("description")]
+        public string Description { get; init; } = string.Empty;
+
+        [JsonPropertyName("codeHint")]
+        public string? CodeHint { get; init; }
+
+        [JsonPropertyName("severity")]
+        public string Severity { get; init; } = string.Empty;
     }
 
     // === Changelog renderer ===
