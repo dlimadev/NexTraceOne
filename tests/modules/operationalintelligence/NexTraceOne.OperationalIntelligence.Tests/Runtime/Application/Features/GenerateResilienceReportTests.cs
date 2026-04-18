@@ -15,7 +15,7 @@ public sealed class GenerateResilienceReportTests
     private static readonly Guid ExperimentId = Guid.NewGuid();
 
     private readonly IResilienceReportRepository _repository = Substitute.For<IResilienceReportRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IRuntimeIntelligenceUnitOfWork _unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
     private readonly ICurrentTenant _tenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 

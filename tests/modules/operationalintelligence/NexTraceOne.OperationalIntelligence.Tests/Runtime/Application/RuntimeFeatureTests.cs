@@ -27,7 +27,7 @@ public sealed class RuntimeFeatureTests
         var snapshotRepo = Substitute.For<IRuntimeSnapshotRepository>();
         var baselineRepo = Substitute.For<IRuntimeBaselineRepository>();
         var findingRepo = Substitute.For<IDriftFindingRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         dateTimeProvider.UtcNow.Returns(FixedNow);
@@ -66,7 +66,7 @@ public sealed class RuntimeFeatureTests
         var snapshotRepo = Substitute.For<IRuntimeSnapshotRepository>();
         var baselineRepo = Substitute.For<IRuntimeBaselineRepository>();
         var findingRepo = Substitute.For<IDriftFindingRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         dateTimeProvider.UtcNow.Returns(FixedNow);
@@ -89,7 +89,7 @@ public sealed class RuntimeFeatureTests
         var snapshotRepo = Substitute.For<IRuntimeSnapshotRepository>();
         var baselineRepo = Substitute.For<IRuntimeBaselineRepository>();
         var findingRepo = Substitute.For<IDriftFindingRepository>();
-        var unitOfWork = Substitute.For<IUnitOfWork>();
+        var unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         dateTimeProvider.UtcNow.Returns(FixedNow);

@@ -165,7 +165,7 @@ public sealed class CostIntelligenceV2Tests
             .Returns((ServiceCostProfile?)null);
 
         var forecastRepo = Substitute.For<IBudgetForecastRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new ForecastBudget.Handler(forecastRepo, profileRepo, snapshotRepo, uow, MockClock());
@@ -192,7 +192,7 @@ public sealed class CostIntelligenceV2Tests
             .Returns((ServiceCostProfile?)null);
 
         var forecastRepo = Substitute.For<IBudgetForecastRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new ForecastBudget.Handler(forecastRepo, profileRepo, snapshotRepo, uow, MockClock());
@@ -222,7 +222,7 @@ public sealed class CostIntelligenceV2Tests
             .Returns(profile);
 
         var forecastRepo = Substitute.For<IBudgetForecastRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new ForecastBudget.Handler(forecastRepo, profileRepo, snapshotRepo, uow, MockClock());
@@ -287,7 +287,7 @@ public sealed class CostIntelligenceV2Tests
             .Returns(records);
 
         var recRepo = Substitute.For<IEfficiencyRecommendationRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new GenerateEfficiencyRecommendations.Handler(recordRepo, recRepo, uow, MockClock());
@@ -310,7 +310,7 @@ public sealed class CostIntelligenceV2Tests
             .Returns(new List<CostRecord>());
 
         var recRepo = Substitute.For<IEfficiencyRecommendationRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
 
         var handler = new GenerateEfficiencyRecommendations.Handler(recordRepo, recRepo, uow, MockClock());
         var result = await handler.Handle(
@@ -337,7 +337,7 @@ public sealed class CostIntelligenceV2Tests
             .Returns(records);
 
         var recRepo = Substitute.For<IEfficiencyRecommendationRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new GenerateEfficiencyRecommendations.Handler(recordRepo, recRepo, uow, MockClock());

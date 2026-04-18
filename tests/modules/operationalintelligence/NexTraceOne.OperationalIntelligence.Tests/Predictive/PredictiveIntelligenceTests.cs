@@ -140,7 +140,7 @@ public sealed class PredictiveIntelligenceTests
     public async Task PredictServiceFailure_WhenHighRisk_ShouldReturnCriticalRecommendation()
     {
         var repo = Substitute.For<IServiceFailurePredictionRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IReliabilityUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -162,7 +162,7 @@ public sealed class PredictiveIntelligenceTests
     public async Task PredictServiceFailure_WhenLowRisk_ShouldReturnRoutineRecommendation()
     {
         var repo = Substitute.For<IServiceFailurePredictionRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IReliabilityUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -182,7 +182,7 @@ public sealed class PredictiveIntelligenceTests
     public async Task PredictServiceFailure_WithAdditionalContext_ShouldIncludeInCausalFactors()
     {
         var repo = Substitute.For<IServiceFailurePredictionRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IReliabilityUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -203,7 +203,7 @@ public sealed class PredictiveIntelligenceTests
     public async Task GetCapacityForecast_WhenGrowthRatePositive_ShouldComputeDaysToSaturation()
     {
         var repo = Substitute.For<ICapacityForecastRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IReliabilityUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 
@@ -223,7 +223,7 @@ public sealed class PredictiveIntelligenceTests
     public async Task GetCapacityForecast_WhenZeroGrowthRate_ShouldNotComputeDays()
     {
         var repo = Substitute.For<ICapacityForecastRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IReliabilityUnitOfWork>();
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
 

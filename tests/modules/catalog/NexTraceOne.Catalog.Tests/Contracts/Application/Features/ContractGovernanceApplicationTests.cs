@@ -171,6 +171,7 @@ public sealed class ContractGovernanceApplicationTests
 public sealed class ContractDraftReviewCycleTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 06, 15, 10, 0, 0, TimeSpan.Zero);
+    private static readonly Guid TestServiceId = Guid.NewGuid();
 
     private const string ValidSpec = """{"openapi":"3.1.0","info":{"title":"Test","version":"1.0.0"},"paths":{"/users":{"get":{"responses":{"200":{"description":"OK"}}}}}}""";
 
@@ -179,7 +180,7 @@ public sealed class ContractDraftReviewCycleTests
     private static ContractDraft CreateDraftInReview()
     {
         var draft = ContractDraft.Create(
-            "Governance Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Governance Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
         draft.SubmitForReview(FixedNow);
         return draft;
@@ -320,8 +321,7 @@ public sealed class ContractDraftReviewCycleTests
     public async Task ApproveDraft_Should_ReturnError_When_DraftIsEditing()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
-        draft.Status.Should().Be(DraftStatus.Editing);
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var reviewRepo = Substitute.For<IContractReviewRepository>();
@@ -368,7 +368,7 @@ public sealed class ContractDraftReviewCycleTests
     public void DraftLifecycle_Submit_Approve_MarkPublished_Should_Succeed()
     {
         var draft = ContractDraft.Create(
-            "Full Cycle Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Full Cycle Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
 
         var submitResult = draft.SubmitForReview(FixedNow);

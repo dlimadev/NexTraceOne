@@ -58,6 +58,7 @@ using GetContractHealthTimelineFeature = NexTraceOne.Catalog.Application.Contrac
 using GetCanonicalEntityImpactCascadeFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetCanonicalEntityImpactCascade.GetCanonicalEntityImpactCascade;
 using ValidatePublicationReadinessFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractPublicationReadiness.ValidateContractPublicationReadiness;
 using ValidateDraftSpecFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateDraftSpec.ValidateDraftSpec;
+using GetContractEnvironmentVersionDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractEnvironmentVersionDrift.GetContractEnvironmentVersionDrift;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -689,6 +690,20 @@ public sealed class ContractsEndpointModule
         {
             var result = await sender.Send(
                 new DetectContractDriftFeature.Query(apiAssetId, observedOperations ?? []),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
+
+        // GET /{apiAssetId}/environment-version-drift — compara versões activas entre ambientes
+        // Resolve INOVACAO-ROADMAP.md §1.1 — Contract Drift Detection entre ambientes.
+        group.MapGet("/{apiAssetId:guid}/environment-version-drift", async (
+            Guid apiAssetId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetContractEnvironmentVersionDriftFeature.Query(apiAssetId),
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");

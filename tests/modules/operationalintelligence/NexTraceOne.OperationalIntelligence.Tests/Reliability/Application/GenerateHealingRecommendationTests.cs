@@ -15,7 +15,7 @@ public sealed class GenerateHealingRecommendationTests
     private readonly IHealingRecommendationRepository _repository = Substitute.For<IHealingRecommendationRepository>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IReliabilityUnitOfWork _unitOfWork = Substitute.For<IReliabilityUnitOfWork>();
 
     public GenerateHealingRecommendationTests()
     {

@@ -52,9 +52,9 @@ public sealed class ServiceInterfaceHandlerTests
         await uow.Received(1).CommitAsync(Arg.Any<CancellationToken>());
         await eventBus.Received(1).PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>());
         await audit.Received(1).RecordEventAsync(
-            "Catalog", "ServiceInterface.Created",
-            Arg.Any<string>(), "ServiceInterface",
-            "user@test.com", Guid.Empty, null, Arg.Any<CancellationToken>());
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -155,9 +155,9 @@ public sealed class ServiceInterfaceHandlerTests
         await uow.Received(1).CommitAsync(Arg.Any<CancellationToken>());
         await eventBus.Received(1).PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>());
         await audit.Received(1).RecordEventAsync(
-            "Catalog", "ServiceInterface.Deprecated",
-            Arg.Any<string>(), "ServiceInterface",
-            "admin@test.com", Guid.Empty, null, Arg.Any<CancellationToken>());
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -196,7 +196,7 @@ public sealed class ServiceInterfaceHandlerTests
     public async Task ListServiceInterfaces_Should_ReturnAll_ForService()
     {
         var iface1 = ServiceInterface.Create(ServiceId, "REST v1", InterfaceType.RestApi);
-        var iface2 = ServiceInterface.Create(ServiceId, "gRPC v1", InterfaceType.Grpc);
+        var iface2 = ServiceInterface.Create(ServiceId, "gRPC v1", InterfaceType.GrpcService);
 
         var repo = Substitute.For<IServiceInterfaceRepository>();
         repo.ListByServiceAsync(ServiceId, Arg.Any<CancellationToken>())

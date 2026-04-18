@@ -71,7 +71,8 @@ public sealed class MitigationPersistenceIntegrationTests : IDisposable
             OwnerTeam: "payments-team",
             ImpactedDomain: "Finance",
             Environment: "Production",
-            DetectedAtUtc: DateTimeOffset.UtcNow.AddHours(-1)));
+            DetectedAtUtc: DateTimeOffset.UtcNow.AddHours(-1),
+            TenantId: _currentTenant.Id));
 
         return result.IncidentId.ToString();
     }

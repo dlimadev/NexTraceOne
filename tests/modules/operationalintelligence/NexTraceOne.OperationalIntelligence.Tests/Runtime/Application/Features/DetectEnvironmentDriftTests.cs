@@ -18,7 +18,7 @@ public sealed class DetectEnvironmentDriftTests
     private readonly IEnvironmentDriftReportRepository _reportRepo = Substitute.For<IEnvironmentDriftReportRepository>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IRuntimeIntelligenceUnitOfWork _unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
 
     public DetectEnvironmentDriftTests()
     {

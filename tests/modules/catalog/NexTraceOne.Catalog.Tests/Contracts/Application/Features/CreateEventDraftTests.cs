@@ -1,7 +1,10 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 using CreateEventDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateEventDraft.CreateEventDraft;
 
@@ -18,6 +21,16 @@ public sealed class CreateEventDraftTests
 
     private static IContractDraftRepository CreateDraftRepo() => Substitute.For<IContractDraftRepository>();
     private static IEventDraftMetadataRepository CreateMetaRepo() => Substitute.For<IEventDraftMetadataRepository>();
+    private static readonly Guid TestServiceId = Guid.NewGuid();
+    private static IServiceAssetRepository CreateServiceRepo()
+    {
+        var service = ServiceAsset.Create("TestService", "test-domain", "test-team");
+        service.UpdateDetails("TestService", "", ServiceType.KafkaProducer, "", Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
+        var repo = Substitute.For<IServiceAssetRepository>();
+        repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
+            .Returns(service);
+        return repo;
+    }
     private static IContractsUnitOfWork CreateUow() => Substitute.For<IContractsUnitOfWork>();
     private static IDateTimeProvider CreateDt()
     {
@@ -31,7 +44,7 @@ public sealed class CreateEventDraftTests
     {
         var draftRepo = CreateDraftRepo();
         var metaRepo = CreateMetaRepo();
-        var sut = new CreateEventDraftFeature.Handler(draftRepo, metaRepo, CreateUow(), CreateDt());
+        var sut = new CreateEventDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, CreateUow(), CreateDt());
 
         var result = await sut.Handle(new CreateEventDraftFeature.Command(
             Title: "Payment Events", Author: "dev@example.com"), CancellationToken.None);
@@ -48,7 +61,7 @@ public sealed class CreateEventDraftTests
     {
         var draftRepo = CreateDraftRepo();
         var metaRepo = CreateMetaRepo();
-        var sut = new CreateEventDraftFeature.Handler(draftRepo, metaRepo, CreateUow(), CreateDt());
+        var sut = new CreateEventDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, CreateUow(), CreateDt());
 
         await sut.Handle(new CreateEventDraftFeature.Command(
             Title: "Order Events", Author: "dev@example.com",
@@ -66,7 +79,7 @@ public sealed class CreateEventDraftTests
     {
         var draftRepo = CreateDraftRepo();
         var metaRepo = CreateMetaRepo();
-        var sut = new CreateEventDraftFeature.Handler(draftRepo, metaRepo, CreateUow(), CreateDt());
+        var sut = new CreateEventDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, CreateUow(), CreateDt());
 
         var result = await sut.Handle(new CreateEventDraftFeature.Command(
             Title: "Test Events", Author: "dev@example.com",
@@ -82,7 +95,7 @@ public sealed class CreateEventDraftTests
     public async Task Handle_Should_Commit_UnitOfWork()
     {
         var uow = CreateUow();
-        var sut = new CreateEventDraftFeature.Handler(CreateDraftRepo(), CreateMetaRepo(), uow, CreateDt());
+        var sut = new CreateEventDraftFeature.Handler(CreateDraftRepo(), CreateServiceRepo(), CreateMetaRepo(), uow, CreateDt());
 
         await sut.Handle(new CreateEventDraftFeature.Command(
             Title: "Test", Author: "dev@example.com"), CancellationToken.None);
@@ -96,7 +109,8 @@ public sealed class CreateEventDraftTests
         var validator = new CreateEventDraftFeature.Validator();
         var result = validator.Validate(new CreateEventDraftFeature.Command(
             Title: "Payment Events", Author: "dev@example.com",
-            AsyncApiVersion: "2.6.0", DefaultContentType: "application/json"));
+            AsyncApiVersion: "2.6.0", DefaultContentType: "application/json",
+            ServiceId: TestServiceId));
 
         result.IsValid.Should().BeTrue();
     }

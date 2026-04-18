@@ -12,7 +12,7 @@ public sealed class CreateOperationalPlaybookTests
     private static readonly DateTimeOffset FixedNow = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IOperationalPlaybookRepository _repository = Substitute.For<IOperationalPlaybookRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IRuntimeIntelligenceUnitOfWork _unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
     private readonly ICurrentTenant _tenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentUser _user = Substitute.For<ICurrentUser>();
 

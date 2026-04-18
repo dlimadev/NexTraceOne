@@ -34,7 +34,7 @@ public sealed class OperationalConsistencyHandlerTests
     public async Task EstablishRuntimeBaseline_NewBaseline_CreatesAndPersists()
     {
         var repo = Substitute.For<IRuntimeBaselineRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
 
@@ -63,7 +63,7 @@ public sealed class OperationalConsistencyHandlerTests
         var existing = RuntimeBaseline.Establish("svc-api", "production", 100m, 200m, 0.01m, 50m, FixedNow.AddDays(-7), 10, 0.4m);
 
         var repo = Substitute.For<IRuntimeBaselineRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
 
@@ -90,7 +90,7 @@ public sealed class OperationalConsistencyHandlerTests
     public async Task EstablishRuntimeBaseline_LowConfidence_ReturnedInResponse()
     {
         var repo = Substitute.For<IRuntimeBaselineRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
 
@@ -121,7 +121,7 @@ public sealed class OperationalConsistencyHandlerTests
         snapRepo.GetLatestByServiceAsync("svc-api", "production", Arg.Any<CancellationToken>()).Returns(prodSnap);
 
         var driftRepo = Substitute.For<IDriftFindingRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
@@ -150,7 +150,7 @@ public sealed class OperationalConsistencyHandlerTests
         snapRepo.GetLatestByServiceAsync("svc-api", "production", Arg.Any<CancellationToken>()).Returns(prodSnap);
 
         var driftRepo = Substitute.For<IDriftFindingRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
@@ -175,7 +175,7 @@ public sealed class OperationalConsistencyHandlerTests
             .Returns((RuntimeSnapshot?)null);
 
         var driftRepo = Substitute.For<IDriftFindingRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
 
         var handler = new CompareEnvironments.Handler(snapRepo, driftRepo, uow, dt);
@@ -199,7 +199,7 @@ public sealed class OperationalConsistencyHandlerTests
             .Returns((RuntimeSnapshot?)null);
 
         var driftRepo = Substitute.For<IDriftFindingRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
 
         var handler = new CompareEnvironments.Handler(snapRepo, driftRepo, uow, dt);
@@ -228,7 +228,7 @@ public sealed class OperationalConsistencyHandlerTests
         driftRepo.When(r => r.Add(Arg.Any<DriftFinding>()))
             .Do(ci => capturedFinding = ci.Arg<DriftFinding>());
 
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
@@ -255,7 +255,7 @@ public sealed class OperationalConsistencyHandlerTests
         snapRepo.GetLatestByServiceAsync("svc-api", "production", Arg.Any<CancellationToken>()).Returns(prodSnap);
 
         var driftRepo = Substitute.For<IDriftFindingRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
@@ -282,7 +282,7 @@ public sealed class OperationalConsistencyHandlerTests
         snapRepo.GetLatestByServiceAsync("svc-api", "production", Arg.Any<CancellationToken>()).Returns(prodSnap);
 
         var driftRepo = Substitute.For<IDriftFindingRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
         var dt = Substitute.For<IDateTimeProvider>();
         dt.UtcNow.Returns(FixedNow);
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);

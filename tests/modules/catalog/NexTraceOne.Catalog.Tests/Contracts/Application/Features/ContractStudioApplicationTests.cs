@@ -4,6 +4,7 @@ using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 using CreateDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateDraft.CreateDraft;
 using ExportDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ExportDraft.ExportDraft;
@@ -23,10 +24,21 @@ namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 public sealed class ContractStudioApplicationTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 06, 15, 10, 0, 0, TimeSpan.Zero);
+    private static readonly Guid TestServiceId = Guid.NewGuid();
 
     private const string ValidSpec = """{"openapi":"3.1.0","info":{"title":"Test","version":"1.0.0"},"paths":{"/users":{"get":{"responses":{"200":{"description":"OK"}}}}}}""";
 
     private static IContractsUnitOfWork CreateUnitOfWork() => Substitute.For<IContractsUnitOfWork>();
+
+    private static IServiceAssetRepository CreateServiceRepo()
+    {
+        var service = ServiceAsset.Create("TestService", "test-domain", "test-team");
+        service.UpdateDetails("TestService", "", ServiceType.IntegrationComponent, "", Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
+        var repo = Substitute.For<IServiceAssetRepository>();
+        repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
+            .Returns(service);
+        return repo;
+    }
 
     // ── CreateDraft ─────────────────────────────────────────────────────
 
@@ -38,10 +50,10 @@ public sealed class ContractStudioApplicationTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
-        var sut = new CreateDraftFeature.Handler(draftRepo, unitOfWork, dateTimeProvider);
+        var sut = new CreateDraftFeature.Handler(draftRepo, CreateServiceRepo(), unitOfWork, dateTimeProvider);
 
         var result = await sut.Handle(
-            new CreateDraftFeature.Command("My API Contract", "engineer@company.com", ContractType.RestApi, ContractProtocol.OpenApi, null, null),
+            new CreateDraftFeature.Command("My API Contract", "engineer@company.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -58,10 +70,10 @@ public sealed class ContractStudioApplicationTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
-        var sut = new CreateDraftFeature.Handler(draftRepo, unitOfWork, dateTimeProvider);
+        var sut = new CreateDraftFeature.Handler(draftRepo, CreateServiceRepo(), unitOfWork, dateTimeProvider);
 
         var result = await sut.Handle(
-            new CreateDraftFeature.Command("Event Contract", "lead@company.com", ContractType.Event, ContractProtocol.AsyncApi),
+            new CreateDraftFeature.Command("Event Contract", "lead@company.com", ContractType.Event, ContractProtocol.AsyncApi, TestServiceId),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -77,7 +89,7 @@ public sealed class ContractStudioApplicationTests
     public async Task GetDraft_Should_ReturnDraft_When_DraftExists()
     {
         var draft = ContractDraft.Create(
-            "Existing Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Existing Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
@@ -120,7 +132,7 @@ public sealed class ContractStudioApplicationTests
     public async Task UpdateDraftContent_Should_Succeed_When_DraftExists()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var unitOfWork = CreateUnitOfWork();
@@ -168,9 +180,9 @@ public sealed class ContractStudioApplicationTests
     public async Task ListDrafts_Should_ReturnPaginatedList()
     {
         var draft1 = ContractDraft.Create(
-            "Draft One", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft One", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         var draft2 = ContractDraft.Create(
-            "Draft Two", "author@test.com", ContractType.Event, ContractProtocol.AsyncApi).Value;
+            "Draft Two", "author@test.com", ContractType.Event, ContractProtocol.AsyncApi, TestServiceId).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         draftRepo.ListAsync(null, null, null, 1, 20, Arg.Any<CancellationToken>())
@@ -197,7 +209,7 @@ public sealed class ContractStudioApplicationTests
     public async Task SubmitDraftForReview_Should_Succeed_When_DraftHasContent()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
@@ -245,7 +257,7 @@ public sealed class ContractStudioApplicationTests
     public async Task ApproveDraft_Should_Succeed_When_DraftIsInReview()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
         draft.SubmitForReview(FixedNow);
 
@@ -297,7 +309,7 @@ public sealed class ContractStudioApplicationTests
     public async Task RejectDraft_Should_Succeed_When_DraftIsInReview()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
         draft.SubmitForReview(FixedNow);
 
@@ -409,7 +421,7 @@ public sealed class ContractStudioApplicationTests
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var unitOfWork = CreateUnitOfWork();
 
-        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork);
+        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, CreateServiceRepo(), unitOfWork);
 
         var result = await sut.Handle(
             new GenerateDraftFromAiFeature.Command(
@@ -438,7 +450,7 @@ public sealed class ContractStudioApplicationTests
                 Arg.Any<ContractProtocol>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(("openapi: '3.1.0'\ninfo:\n  title: 'Test'\n  version: '1.0.0'\npaths: {}", "yaml"));
 
-        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork, aiGenerator);
+        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, CreateServiceRepo(), unitOfWork, aiGenerator);
 
         var result = await sut.Handle(
             new GenerateDraftFromAiFeature.Command(
@@ -463,7 +475,7 @@ public sealed class ContractStudioApplicationTests
                 Arg.Any<ContractProtocol>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(((string Content, string Format)?)null);
 
-        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork, aiGenerator);
+        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, CreateServiceRepo(), unitOfWork, aiGenerator);
 
         var result = await sut.Handle(
             new GenerateDraftFromAiFeature.Command(
@@ -484,7 +496,7 @@ public sealed class ContractStudioApplicationTests
     public async Task AddDraftExample_Should_ReturnExampleId()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var unitOfWork = CreateUnitOfWork();
@@ -519,7 +531,7 @@ public sealed class ContractStudioApplicationTests
     public async Task ExportDraft_Should_ReturnSpecContent_When_DraftExists()
     {
         var draft = ContractDraft.Create(
-            "Export Test API", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Export Test API", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
 
@@ -564,7 +576,7 @@ public sealed class ContractStudioApplicationTests
     public async Task ExportDraft_Should_ReturnEmptySpecContent_When_DraftHasNoContent()
     {
         var draft = ContractDraft.Create(
-            "Empty Draft", "author@test.com", ContractType.Soap, ContractProtocol.Wsdl).Value;
+            "Empty Draft", "author@test.com", ContractType.Soap, ContractProtocol.Wsdl, TestServiceId).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
@@ -600,10 +612,10 @@ public sealed class ContractStudioApplicationTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
-        var sut = new CreateDraftFeature.Handler(draftRepo, unitOfWork, dateTimeProvider);
+        var sut = new CreateDraftFeature.Handler(draftRepo, CreateServiceRepo(), unitOfWork, dateTimeProvider);
 
         var result = await sut.Handle(
-            new CreateDraftFeature.Command($"Test {expectedProtocol} Contract", "engineer@test.com", contractType, protocol, null, null),
+            new CreateDraftFeature.Command($"Test {expectedProtocol} Contract", "engineer@test.com", contractType, protocol, TestServiceId),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -622,7 +634,7 @@ public sealed class ContractStudioApplicationTests
         ContractProtocol protocol)
     {
         var draft = ContractDraft.Create(
-            $"Draft {protocol}", "author@test.com", contractType, protocol).Value;
+            $"Draft {protocol}", "author@test.com", contractType, protocol, TestServiceId).Value;
 
         var draftRepo = Substitute.For<IContractDraftRepository>();
         draftRepo.GetByIdAsync(Arg.Any<ContractDraftId>(), Arg.Any<CancellationToken>())
@@ -651,7 +663,7 @@ public sealed class ContractStudioApplicationTests
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var unitOfWork = CreateUnitOfWork();
 
-        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, unitOfWork);
+        var sut = new GenerateDraftFromAiFeature.Handler(draftRepo, CreateServiceRepo(), unitOfWork);
 
         var result = await sut.Handle(
             new GenerateDraftFromAiFeature.Command(

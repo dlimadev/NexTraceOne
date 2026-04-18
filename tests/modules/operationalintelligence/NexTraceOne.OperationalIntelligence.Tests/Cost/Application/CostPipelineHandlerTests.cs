@@ -45,7 +45,7 @@ public sealed class CostPipelineHandlerTests
             .Returns(new List<CostSnapshot> { snapshot, snapshot2 });
 
         var trendRepo = Substitute.For<ICostTrendRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new ComputeCostTrend.Handler(snapshotRepo, trendRepo, uow);
@@ -72,7 +72,7 @@ public sealed class CostPipelineHandlerTests
             .Returns(new List<CostSnapshot>());
 
         var trendRepo = Substitute.For<ICostTrendRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new ComputeCostTrend.Handler(snapshotRepo, trendRepo, uow);
@@ -99,7 +99,7 @@ public sealed class CostPipelineHandlerTests
         profileRepo.GetByServiceAndEnvironmentAsync("svc-api", "production", Arg.Any<CancellationToken>())
             .Returns((ServiceCostProfile?)null);
 
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new CreateServiceCostProfile.Handler(profileRepo, uow, MockClock());
@@ -129,7 +129,7 @@ public sealed class CostPipelineHandlerTests
         profileRepo.GetByServiceAndEnvironmentAsync("svc-api", "production", Arg.Any<CancellationToken>())
             .Returns(existing);
 
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
 
         var handler = new CreateServiceCostProfile.Handler(profileRepo, uow, MockClock());
 
@@ -152,7 +152,7 @@ public sealed class CostPipelineHandlerTests
         profileRepo.GetByServiceAndEnvironmentAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns((ServiceCostProfile?)null);
 
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new CreateServiceCostProfile.Handler(profileRepo, uow, MockClock());
