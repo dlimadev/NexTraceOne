@@ -5,6 +5,7 @@ import type {
   TeamFinOpsResponse,
   DomainFinOpsResponse,
   FinOpsTrendsResponse,
+  EfficiencyIndicatorsResponse,
 } from '../../../types';
 
 export interface WasteSignalDetail {
@@ -56,5 +57,8 @@ export const finOpsApi = {
     client.get<FinOpsTrendsResponse>('/finops/trends', { params }).then((r) => r.data),
 
   getWasteSignals: (params?: { serviceId?: string; teamId?: string; domainId?: string }) =>
-    client.get<WasteSignalsResponse>('/api/v1/finops/waste', { params }).then((r) => r.data),
+    client.get<WasteSignalsResponse>('/finops/waste', { params }).then((r) => r.data),
+
+  getEfficiency: (params?: { serviceId?: string; teamId?: string }) =>
+    client.get<EfficiencyIndicatorsResponse>('/finops/efficiency', { params }).then((r) => r.data),
 };

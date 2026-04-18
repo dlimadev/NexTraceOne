@@ -81,11 +81,16 @@ public static class GetFinOpsSummary
 
             var optimizationOpportunities = services
                 .Where(s => s.Efficiency is CostEfficiency.Wasteful or CostEfficiency.Inefficient)
-                .Select(s => new OptimizationOpportunityDto(
-                    s.ServiceId, s.ServiceName,
-                    0m,
-                    s.Efficiency == CostEfficiency.Wasteful ? "High" : "Medium",
-                    $"Review cost allocation for {s.ServiceName}"))
+                .Select(s =>
+                {
+                    var waste = s.WasteSignals.Sum(w => w.EstimatedWaste);
+                    var potentialSavings = Math.Round(waste * 0.35m, 2);
+                    return new OptimizationOpportunityDto(
+                        s.ServiceId, s.ServiceName,
+                        potentialSavings,
+                        s.Efficiency == CostEfficiency.Wasteful ? "High" : "Medium",
+                        $"Review cost allocation for {s.ServiceName}");
+                })
                 .ToList();
 
             var overallEfficiency = services.Count == 0

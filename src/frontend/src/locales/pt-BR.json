@@ -5989,7 +5989,12 @@
       "totalMonthlyCost": "Custo mensal total",
       "totalWaste": "Desperdício total",
       "wasteAmount": "Valor de desperdício",
-      "wasteSignals": "Sinais de desperdício"
+      "wasteSignals": "Sinais de desperdício",
+      "costTrends": "Tendências de Custo",
+      "filterAcceptable": "Aceitável",
+      "filterEfficient": "Eficiente",
+      "filterInefficient": "Ineficiente",
+      "filterWasteful": "Desperdício"
     },
     "finopsSubtitle": "Inteligência contextual de custos por serviço, domínio, equipa, ambiente e operação.",
     "finopsTitle": "FinOps",

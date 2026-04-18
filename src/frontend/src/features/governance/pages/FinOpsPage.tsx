@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  DollarSign, Search, TrendingUp, TrendingDown, Minus,
-  AlertTriangle, CheckCircle, AlertCircle, XCircle,
-  Activity, Zap, ArrowRight, Target, PieChart,
+  DollarSign, Search,
+  AlertTriangle, XCircle,
+  Activity, Zap, ArrowRight, Target, PieChart, TrendingUp,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -18,39 +18,15 @@ import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import {
+  formatCurrency,
+  efficiencyBadgeVariant,
+  efficiencyIcon,
+  trendIcon,
+} from '../utils/finOpsFormatters';
 
-function formatCurrency(value: number, locale = 'en-US'): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-}
+
 type EfficiencyFilter = 'all' | CostEfficiencyType;
-
-const efficiencyBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' | 'danger' | 'default' => {
-  switch (eff) {
-    case 'Efficient': return 'success';
-    case 'Acceptable': return 'default';
-    case 'Inefficient': return 'warning';
-    case 'Wasteful': return 'danger';
-    default: return 'default';
-  }
-};
-
-const efficiencyIcon = (eff: CostEfficiencyType) => {
-  switch (eff) {
-    case 'Efficient': return <CheckCircle size={14} className="text-success" />;
-    case 'Acceptable': return <AlertCircle size={14} className="text-muted" />;
-    case 'Inefficient': return <AlertTriangle size={14} className="text-warning" />;
-    case 'Wasteful': return <XCircle size={14} className="text-critical" />;
-    default: return null;
-  }
-};
-
-const trendIcon = (dir: string) => {
-  switch (dir) {
-    case 'Improving': return <TrendingUp size={14} className="text-success" />;
-    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
-    default: return <Minus size={14} className="text-muted" />;
-  }
-};
 
 export function FinOpsPage() {
   const { t, i18n } = useTranslation();
@@ -63,6 +39,13 @@ export function FinOpsPage() {
     queryKey: queryKeys.governance.finops.summary(undefined, activeEnvironmentId),
     queryFn: () => finOpsApi.getSummary(),
     staleTime: 30_000,
+  });
+
+  const { data: trendsData } = useQuery({
+    queryKey: queryKeys.governance.finops.trends(undefined, activeEnvironmentId),
+    queryFn: () => finOpsApi.getTrends(),
+    staleTime: 60_000,
+    enabled: !!d,
   });
 
   if (isLoading) return (<PageContainer><PageLoadingState /></PageContainer>);
@@ -239,6 +222,44 @@ export function FinOpsPage() {
           </div>
         </CardBody>
       </Card>
+
+      {/* Cost Trends */}
+      {trendsData && trendsData.aggregatedTrend.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <h2 className="text-sm font-semibold text-heading flex items-center gap-2">
+              <TrendingUp size={16} className="text-accent" />
+              {t('governance.finops.costTrends')}
+              <span className="ml-auto text-xs font-normal text-muted">
+                {t(`governance.finops.trend.${trendsData.overallDirection}`)}
+                {' '}
+                {trendsData.overallChangePercent > 0 ? '+' : ''}
+                {trendsData.overallChangePercent.toFixed(1)}%
+              </span>
+            </h2>
+          </CardHeader>
+          <CardBody>
+            <div className="flex items-end gap-1 h-20">
+              {trendsData.aggregatedTrend.map((pt, i) => {
+                const max = Math.max(...trendsData.aggregatedTrend.map(p => p.cost));
+                const heightPct = max > 0 ? (pt.cost / max) * 100 : 0;
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
+                    <div
+                      className="w-full bg-accent/60 rounded-sm hover:bg-accent transition-colors"
+                      style={{ height: `${heightPct}%`, minHeight: 4 }}
+                      title={`${pt.period}: ${fmt(pt.cost)}`}
+                    />
+                    <span className="text-[9px] text-muted rotate-45 origin-left hidden md:block">
+                      {pt.period}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       {/* Waste signals */}
       {allWasteSignals.length > 0 && (

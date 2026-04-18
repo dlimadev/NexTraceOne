@@ -6011,7 +6011,12 @@
       "totalMonthlyCost": "Total monthly cost",
       "totalWaste": "Total waste",
       "wasteAmount": "Waste amount",
-      "wasteSignals": "Waste signals"
+      "wasteSignals": "Waste signals",
+      "costTrends": "Cost Trends",
+      "filterAcceptable": "Acceptable",
+      "filterEfficient": "Efficient",
+      "filterInefficient": "Inefficient",
+      "filterWasteful": "Wasteful"
     },
     "finopsSubtitle": "Contextual cost intelligence by service, domain, team, environment and operation.",
     "finopsTitle": "FinOps",

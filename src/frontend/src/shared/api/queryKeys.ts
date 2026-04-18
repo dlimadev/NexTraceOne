@@ -92,6 +92,10 @@ export const queryKeys = {
         [...queryKeys.governance.finops.all(), 'domain', id, envId] as const,
       trends: (params?: Record<string, unknown>, envId?: string | null) =>
         [...queryKeys.governance.finops.all(), 'trends', params, envId] as const,
+      waste: (params?: Record<string, unknown>, envId?: string | null) =>
+        [...queryKeys.governance.finops.all(), 'waste', params, envId] as const,
+      efficiency: (params?: Record<string, unknown>, envId?: string | null) =>
+        [...queryKeys.governance.finops.all(), 'efficiency', params, envId] as const,
     },
     evidence: {
       all: () => [...queryKeys.governance.all, 'evidence'] as const,

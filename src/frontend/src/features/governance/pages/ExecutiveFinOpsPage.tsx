@@ -14,10 +14,7 @@ import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
-
-function formatCurrency(value: number, locale = 'en-US'): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-}
+import { formatCurrency } from '../utils/finOpsFormatters';
 
 export function ExecutiveFinOpsPage() {
   const { t, i18n } = useTranslation();
