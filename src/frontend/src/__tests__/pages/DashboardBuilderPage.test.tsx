@@ -189,4 +189,13 @@ describe('DashboardBuilderPage', () => {
       expect(allText).toMatch(/alert-status|Alert Status|Deployment Frequency|SLO Gauge|Change Timeline/i);
     });
   });
+
+  it('stat and text-markdown appear in widget type selector', async () => {
+    renderPage();
+    await waitFor(() => {
+      const selects = Array.from(document.querySelectorAll('select'));
+      const allText = selects.map((s) => s.innerHTML).join('');
+      expect(allText).toMatch(/stat|text-markdown/i);
+    });
+  });
 });

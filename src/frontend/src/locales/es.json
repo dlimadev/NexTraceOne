@@ -5766,7 +5766,9 @@
         "alertStatus": "Estado de Alertas",
         "changeTimeline": "Línea de Tiempo de Cambios",
         "sloGauge": "Gauge de SLO",
-        "deploymentFrequency": "Frecuencia de Despliegue"
+        "deploymentFrequency": "Frecuencia de Despliegue",
+        "stat": "Estadística KPI",
+        "textMarkdown": "Nota / Texto"
       },
       "cloneDashboard": "Clonar",
       "cloneTitle": "Clonar Dashboard",
@@ -5781,7 +5783,16 @@
       "searchPlaceholder": "Buscar dashboards por nombre…",
       "searchLabel": "Buscar dashboards",
       "noResults": "Ningún dashboard coincide con la búsqueda",
-      "noResultsHint": "Prueba otro término o limpia la búsqueda."
+      "noResultsHint": "Prueba otro término o limpia la búsqueda.",
+      "statMetric": {
+        "incidentsOpen": "Incidentes Abiertos",
+        "alertsCritical": "Alertas Críticas",
+        "alertsTotal": "Total de Alertas",
+        "doraDeployFreq": "Frecuencia de Despliegue",
+        "doraCfr": "Tasa de Fallo en Cambios",
+        "doraMttr": "MTTR",
+        "changesToday": "Cambios Hoy"
+      }
     },
     "dashboards": {
       "empty": "Sin dashboards personalizados",
@@ -5822,7 +5833,10 @@
       "clearVars": "Limpiar",
       "varsHint": "Los valores de variables reemplazan los filtros de servicio/equipo por widget",
       "alertTotal": "Total",
-      "noChanges": "Sin cambios recientes"
+      "noChanges": "Sin cambios recientes",
+      "tvMode": "Modo TV",
+      "exitKiosk": "Salir del Modo TV",
+      "noContent": "Sin contenido configurado. Edite este widget para añadir una nota."
     },
     "dashboardBuilder": {
       "addWidget": "Agregar Widget",
@@ -5859,7 +5873,10 @@
       "exportJson": "Exportar JSON",
       "importJson": "Importar JSON",
       "importError": "Archivo JSON de dashboard inválido.",
-      "autoArrange": "Organizar automáticamente"
+      "autoArrange": "Organizar automáticamente",
+      "statMetric": "Métrica KPI",
+      "textContent": "Contenido (Markdown)",
+      "textContentPlaceholder": "Admite **negrita**, *cursiva*, # títulos, - listas, [etiqueta](url)"
     },
     "dora": {
       "cfr": "CFR",

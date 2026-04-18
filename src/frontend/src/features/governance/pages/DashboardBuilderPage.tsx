@@ -1,7 +1,8 @@
 /**
- * DashboardBuilderPage — editor de dashboard por slots (Fase 3, Opção A).
+ * DashboardBuilderPage — editor de dashboard por slots (Fase 4, melhorias de UX).
  * Interface slot-based: utilizador seleciona posição num grid fixo e atribui um widget.
- * Cada slot tem: tipo, serviço alvo, time range override, título personalizado.
+ * Cada slot tem: tipo, serviço alvo, time range override, título personalizado,
+ * e para StatWidget: metric selector; para TextMarkdownWidget: content textarea.
  * Preview em tempo real à direita. Guarda via PUT /governance/dashboards/{id}.
  * Suporta Export/Import JSON (compatível com Grafana-like portability) e Auto-arrange.
  */
@@ -31,6 +32,7 @@ import {
   ALL_WIDGET_TYPES,
   WIDGET_META,
   TIME_RANGE_OPTIONS,
+  STAT_METRIC_OPTIONS,
   type WidgetType,
   type WidgetSlot,
 } from '../widgets/WidgetRegistry';
@@ -99,6 +101,8 @@ interface BuilderSlot {
   teamId: string;
   timeRange: string;
   customTitle: string;
+  metric: string;
+  content: string;
 }
 
 function makeSlotId() {
@@ -118,6 +122,8 @@ function widgetFromDetail(w: WidgetSlot): BuilderSlot {
     teamId: '',
     timeRange: w.timeRange ?? '24h',
     customTitle: w.customTitle ?? '',
+    metric: w.metric ?? '',
+    content: w.content ?? '',
   };
 }
 
@@ -233,6 +239,8 @@ export function DashboardBuilderPage() {
         teamId: '',
         timeRange: '24h',
         customTitle: '',
+        metric: 'incidents-open',
+        content: '',
       },
     ]);
   };
@@ -283,6 +291,8 @@ export function DashboardBuilderPage() {
         teamId: s.teamId || null,
         timeRange: s.timeRange || null,
         customTitle: s.customTitle || null,
+        metric: s.metric || null,
+        content: s.content || null,
       })),
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -320,6 +330,8 @@ export function DashboardBuilderPage() {
             teamId: String(w.teamId ?? ''),
             timeRange: String(w.timeRange ?? '24h'),
             customTitle: String(w.customTitle ?? ''),
+            metric: String(w.metric ?? ''),
+            content: String(w.content ?? ''),
           }))
         );
       } catch {
@@ -352,6 +364,8 @@ export function DashboardBuilderPage() {
           teamId: s.teamId || null,
           timeRange: s.timeRange || null,
           customTitle: s.customTitle || null,
+          metric: s.metric || null,
+          content: s.content || null,
         })),
       });
       setSaveSuccess(true);
@@ -677,6 +691,48 @@ export function DashboardBuilderPage() {
                             className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
                           />
                         </div>
+
+                         {/* Stat metric selector — only for 'stat' widget type */}
+                         {slot.type === 'stat' && (
+                           <div>
+                             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                               {t('governance.dashboardBuilder.statMetric', 'KPI Metric')}
+                             </label>
+                             <select
+                               value={slot.metric || 'incidents-open'}
+                               onChange={(e) => updateSlot(slot.tempId, { metric: e.target.value })}
+                               disabled={isReadOnly}
+                               className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                             >
+                               {STAT_METRIC_OPTIONS.map((opt) => (
+                                 <option key={opt.value} value={opt.value}>
+                                   {t(opt.labelKey, opt.value)}
+                                 </option>
+                               ))}
+                             </select>
+                           </div>
+                         )}
+
+                         {/* Content textarea — only for 'text-markdown' widget type */}
+                         {slot.type === 'text-markdown' && (
+                           <div className="sm:col-span-3">
+                             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                               {t('governance.dashboardBuilder.textContent', 'Content (Markdown)')}
+                             </label>
+                             <textarea
+                               value={slot.content}
+                               onChange={(e) => updateSlot(slot.tempId, { content: e.target.value })}
+                               disabled={isReadOnly}
+                               rows={4}
+                               maxLength={2000}
+                               placeholder={t('governance.dashboardBuilder.textContentPlaceholder', 'Supports **bold**, *italic*, # headings, - lists, [label](url)')}
+                               className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white font-mono disabled:opacity-50 resize-y"
+                             />
+                             <p className="mt-1 text-[10px] text-gray-400">
+                               {slot.content.length}/2000
+                             </p>
+                           </div>
+                         )}
                       </div>
 
                       {!isReadOnly && (

@@ -193,4 +193,59 @@ describe('DashboardViewPage', () => {
       expect(placeholders.some((p) => p.includes('All services') || p.includes('service'))).toBe(true);
     });
   });
+
+  it('shows TV Mode button', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('TV Mode');
+    });
+  });
+});
+
+// ── Kiosk mode tests ─────────────────────────────────────────────────────────
+
+function renderPageKiosk() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[`/governance/dashboards/${DASHBOARD_ID}?kiosk=tv`]}>
+        <Routes>
+          <Route path="/governance/dashboards/:dashboardId" element={<DashboardViewPage />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
+describe('DashboardViewPage — Kiosk mode', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(client.get).mockImplementation((url: string) => {
+      if (url.includes('dora-metrics')) return Promise.resolve({ data: mockDoraData });
+      if (url.includes('incidents')) return Promise.resolve({ data: mockIncidentData });
+      return Promise.resolve({ data: mockRenderData });
+    });
+    vi.mocked(client.put).mockResolvedValue({ data: {} });
+  });
+
+  it('shows Exit TV Mode button in kiosk mode', async () => {
+    renderPageKiosk();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Exit TV Mode');
+    });
+  });
+
+  it('does not show back link in kiosk mode', async () => {
+    renderPageKiosk();
+    await waitFor(() => {
+      expect(document.body.textContent).not.toContain('Back to Dashboards');
+    });
+  });
+
+  it('shows dashboard name in kiosk mode', async () => {
+    renderPageKiosk();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('My Test Dashboard');
+    });
+  });
 });

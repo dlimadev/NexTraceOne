@@ -5766,7 +5766,9 @@
         "alertStatus": "Estado de Alertas",
         "changeTimeline": "Linha do Tempo de Mudanças",
         "sloGauge": "Gauge de SLO",
-        "deploymentFrequency": "Frequência de Deploy"
+        "deploymentFrequency": "Frequência de Deploy",
+        "stat": "Estatística KPI",
+        "textMarkdown": "Nota / Texto"
       },
       "cloneDashboard": "Clonar",
       "cloneTitle": "Clonar Dashboard",
@@ -5781,7 +5783,16 @@
       "searchPlaceholder": "Pesquisar dashboards por nome…",
       "searchLabel": "Pesquisar dashboards",
       "noResults": "Nenhum dashboard corresponde à pesquisa",
-      "noResultsHint": "Tente outro termo ou limpe a pesquisa."
+      "noResultsHint": "Tente outro termo ou limpe a pesquisa.",
+      "statMetric": {
+        "incidentsOpen": "Incidentes Abertos",
+        "alertsCritical": "Alertas Críticos",
+        "alertsTotal": "Total de Alertas",
+        "doraDeployFreq": "Frequência de Deploy",
+        "doraCfr": "Taxa de Falha em Mudanças",
+        "doraMttr": "MTTR",
+        "changesToday": "Mudanças Hoje"
+      }
     },
     "dashboards": {
       "empty": "Sem dashboards personalizados",
@@ -5822,7 +5833,10 @@
       "clearVars": "Limpar",
       "varsHint": "Os valores das variáveis substituem os filtros de serviço/equipa por widget",
       "alertTotal": "Total",
-      "noChanges": "Sem mudanças recentes"
+      "noChanges": "Sem mudanças recentes",
+      "tvMode": "Modo TV",
+      "exitKiosk": "Sair do Modo TV",
+      "noContent": "Nenhum conteúdo configurado. Edite este widget para adicionar uma nota."
     },
     "dashboardBuilder": {
       "addWidget": "Adicionar Widget",
@@ -5859,7 +5873,10 @@
       "exportJson": "Exportar JSON",
       "importJson": "Importar JSON",
       "importError": "Ficheiro JSON de dashboard inválido.",
-      "autoArrange": "Organizar automaticamente"
+      "autoArrange": "Organizar automaticamente",
+      "statMetric": "Métrica KPI",
+      "textContent": "Conteúdo (Markdown)",
+      "textContentPlaceholder": "Suporta **negrito**, *itálico*, # títulos, - listas, [label](url)"
     },
     "dora": {
       "cfr": "CFR",

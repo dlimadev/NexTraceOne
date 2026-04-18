@@ -5788,7 +5788,9 @@
         "alertStatus": "Alert Status",
         "changeTimeline": "Change Timeline",
         "sloGauge": "SLO Gauge",
-        "deploymentFrequency": "Deployment Frequency"
+        "deploymentFrequency": "Deployment Frequency",
+        "stat": "KPI Stat",
+        "textMarkdown": "Note / Text"
       },
       "cloneDashboard": "Clone",
       "cloneTitle": "Clone Dashboard",
@@ -5803,7 +5805,16 @@
       "searchPlaceholder": "Search dashboards by name…",
       "searchLabel": "Search dashboards",
       "noResults": "No dashboards match your search",
-      "noResultsHint": "Try a different search term or clear the search."
+      "noResultsHint": "Try a different search term or clear the search.",
+      "statMetric": {
+        "incidentsOpen": "Open Incidents",
+        "alertsCritical": "Critical Alerts",
+        "alertsTotal": "Total Alerts",
+        "doraDeployFreq": "Deploy Frequency",
+        "doraCfr": "Change Failure Rate",
+        "doraMttr": "MTTR",
+        "changesToday": "Changes Today"
+      }
     },
     "dashboards": {
       "empty": "No custom dashboards",
@@ -5844,7 +5855,10 @@
       "clearVars": "Clear",
       "varsHint": "Variable values override per-widget service/team filters",
       "alertTotal": "Total",
-      "noChanges": "No recent changes"
+      "noChanges": "No recent changes",
+      "tvMode": "TV Mode",
+      "exitKiosk": "Exit TV Mode",
+      "noContent": "No content configured. Edit this widget to add a note."
     },
     "dashboardBuilder": {
       "addWidget": "Add Widget",
@@ -5881,7 +5895,10 @@
       "exportJson": "Export JSON",
       "importJson": "Import JSON",
       "importError": "Invalid dashboard JSON file.",
-      "autoArrange": "Auto-arrange"
+      "autoArrange": "Auto-arrange",
+      "statMetric": "KPI Metric",
+      "textContent": "Content (Markdown)",
+      "textContentPlaceholder": "Supports **bold**, *italic*, # headings, - lists, [label](url)"
     },
     "dora": {
       "cfr": "CFR",

@@ -19,7 +19,9 @@ export type WidgetType =
   | 'alert-status'
   | 'change-timeline'
   | 'slo-gauge'
-  | 'deployment-frequency';
+  | 'deployment-frequency'
+  | 'stat'
+  | 'text-markdown';
 
 export const ALL_WIDGET_TYPES: WidgetType[] = [
   'dora-metrics',
@@ -34,6 +36,8 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'change-timeline',
   'slo-gauge',
   'deployment-frequency',
+  'stat',
+  'text-markdown',
 ];
 
 export interface WidgetConfig {
@@ -41,6 +45,10 @@ export interface WidgetConfig {
   teamId?: string | null;
   timeRange?: string | null;
   customTitle?: string | null;
+  /** StatWidget: which KPI metric to display */
+  metric?: string | null;
+  /** TextMarkdownWidget: markdown content stored in widget config */
+  content?: string | null;
 }
 
 export interface WidgetSlot {
@@ -54,6 +62,8 @@ export interface WidgetSlot {
   teamId?: string | null;
   timeRange?: string | null;
   customTitle?: string | null;
+  metric?: string | null;
+  content?: string | null;
 }
 
 export interface WidgetProps {
@@ -167,6 +177,20 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Executive', 'Product'],
   },
+  'stat': {
+    type: 'stat',
+    labelKey: 'governance.customDashboards.widgets.stat',
+    defaultWidth: 1,
+    defaultHeight: 1,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'Auditor'],
+  },
+  'text-markdown': {
+    type: 'text-markdown',
+    labelKey: 'governance.customDashboards.widgets.textMarkdown',
+    defaultWidth: 2,
+    defaultHeight: 1,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
+  },
 };
 
 /** Convert a time range string (e.g. '7d') to an approximate number of days for API calls */
@@ -180,6 +204,19 @@ export function timeRangeToDays(timeRange: string): number {
     default: return 1;
   }
 }
+
+/** StatWidget: available KPI metric options */
+export const STAT_METRIC_OPTIONS = [
+  { value: 'incidents-open',    labelKey: 'governance.customDashboards.statMetric.incidentsOpen' },
+  { value: 'alerts-critical',   labelKey: 'governance.customDashboards.statMetric.alertsCritical' },
+  { value: 'alerts-total',      labelKey: 'governance.customDashboards.statMetric.alertsTotal' },
+  { value: 'dora-deploy-freq',  labelKey: 'governance.customDashboards.statMetric.doraDeployFreq' },
+  { value: 'dora-cfr',          labelKey: 'governance.customDashboards.statMetric.doraCfr' },
+  { value: 'dora-mttr',         labelKey: 'governance.customDashboards.statMetric.doraMttr' },
+  { value: 'changes-today',     labelKey: 'governance.customDashboards.statMetric.changesToday' },
+] as const;
+
+export type StatMetric = (typeof STAT_METRIC_OPTIONS)[number]['value'];
 
 /** Time range options available for global and per-widget selection */
 export const TIME_RANGE_OPTIONS = [

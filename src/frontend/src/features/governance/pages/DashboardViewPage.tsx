@@ -4,11 +4,12 @@
  * Suporta seletor de período global, seletor de ambiente, auto-refresh, partilha e
  * variáveis de dashboard (estilo Grafana template variables) que sobrepõem serviceId/teamId
  * em todos os widgets.
+ * Kiosk/NOC mode: ?kiosk=tv oculta toda a navegação e toolbar para ecrã panorâmico.
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   RefreshCw,
@@ -20,6 +21,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
+  Tv,
+  X,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -41,6 +44,8 @@ import { AlertStatusWidget } from '../widgets/AlertStatusWidget';
 import { ChangeTimelineWidget } from '../widgets/ChangeTimelineWidget';
 import { SloGaugeWidget } from '../widgets/SloGaugeWidget';
 import { DeploymentFrequencyWidget } from '../widgets/DeploymentFrequencyWidget';
+import { StatWidget } from '../widgets/StatWidget';
+import { TextMarkdownWidget } from '../widgets/TextMarkdownWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
@@ -60,6 +65,8 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'change-timeline': ChangeTimelineWidget,
   'slo-gauge': SloGaugeWidget,
   'deployment-frequency': DeploymentFrequencyWidget,
+  'stat': StatWidget,
+  'text-markdown': TextMarkdownWidget,
 };
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -75,6 +82,8 @@ interface WidgetSlot {
   effectiveTeamId?: string | null;
   effectiveTimeRange: string;
   customTitle?: string | null;
+  metric?: string | null;
+  content?: string | null;
 }
 
 interface RenderDataResponse {
@@ -150,8 +159,11 @@ export function DashboardViewPage() {
   const { t } = useTranslation();
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { activeEnvironmentId } = useEnvironment();
   const TENANT_ID = 'default';
+
+  const isKiosk = searchParams.get('kiosk') === 'tv';
 
   const [timeRange, setTimeRange] = useState('24h');
   const [autoRefreshSeconds, setAutoRefreshSeconds] = useState(0);
@@ -197,6 +209,18 @@ export function DashboardViewPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleToggleKiosk = () => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (isKiosk) {
+        next.delete('kiosk');
+      } else {
+        next.set('kiosk', 'tv');
+      }
+      return next;
+    });
+  };
+
   if (!dashboardId) {
     return <PageErrorState message={t('governance.dashboardView.notFound', 'Dashboard not found')} onRetry={() => navigate('/governance/custom-dashboards')} />;
   }
@@ -207,6 +231,95 @@ export function DashboardViewPage() {
   }
 
   const gridColsClass = layoutToGridCols(data.layout);
+
+  // ── Kiosk/NOC mode: full-screen widget grid with minimal chrome ────────────
+  if (isKiosk) {
+    return (
+      <div className="min-h-screen bg-gray-950 p-4">
+        {/* Kiosk toolbar — only time range + exit */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-semibold text-white flex items-center gap-2">
+            <Tv size={16} className="text-accent" />
+            {data.name}
+          </span>
+          <div className="flex items-center gap-2">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="text-xs rounded border border-gray-700 bg-gray-900 text-gray-300 px-2 py-1 focus:outline-none"
+              aria-label={t('governance.dashboardView.timeRangeLabel', 'Time range')}
+            >
+              {TIME_RANGE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {t(opt.labelKey, opt.value)}
+                </option>
+              ))}
+            </select>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => refetch()}
+              aria-label={t('governance.dashboardView.refresh', 'Refresh')}
+            >
+              <RefreshCw size={12} />
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={handleToggleKiosk}
+              aria-label={t('governance.dashboardView.exitKiosk', 'Exit TV Mode')}
+            >
+              <X size={12} />
+              <span className="ml-1">{t('governance.dashboardView.exitKiosk', 'Exit TV Mode')}</span>
+            </Button>
+          </div>
+        </div>
+
+        {data.widgets.length === 0 ? (
+          <div className="flex items-center justify-center h-48 text-sm text-gray-500">
+            {t('governance.dashboardView.noWidgets', 'No widgets configured. Click Edit to add widgets.')}
+          </div>
+        ) : (
+          <div className={`grid gap-3 auto-rows-[180px] ${gridColsClass}`}>
+            {data.widgets.map((slot) => {
+              const WidgetComponent = WIDGET_MAP[slot.type as WidgetType];
+              const style = widgetGridStyle(slot);
+              const resolvedServiceId = varService || slot.effectiveServiceId;
+              const resolvedTeamId = varTeam || slot.effectiveTeamId;
+              return (
+                <div
+                  key={slot.widgetId}
+                  style={style}
+                  className="rounded-lg border border-gray-700 bg-gray-900 shadow overflow-hidden"
+                >
+                  {WidgetComponent ? (
+                    <WidgetComponent
+                      widgetId={slot.widgetId}
+                      config={{
+                        serviceId: resolvedServiceId,
+                        teamId: resolvedTeamId,
+                        timeRange: slot.effectiveTimeRange,
+                        customTitle: slot.customTitle,
+                        metric: slot.metric,
+                        content: slot.content,
+                      }}
+                      environmentId={activeEnvironmentId}
+                      timeRange={slot.effectiveTimeRange}
+                      title={slot.customTitle}
+                    />
+                  ) : (
+                    <div className="h-full flex items-center justify-center p-2">
+                      <Skeleton variant="rectangular" className="h-full w-full" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <PageContainer>
@@ -295,6 +408,17 @@ export function DashboardViewPage() {
               <span className="ml-1">{t('governance.dashboardView.edit', 'Edit')}</span>
             </Button>
 
+            {/* TV / Kiosk mode */}
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={handleToggleKiosk}
+              aria-label={t('governance.dashboardView.tvMode', 'TV Mode')}
+            >
+              <Tv size={12} />
+              <span className="ml-1">{t('governance.dashboardView.tvMode', 'TV Mode')}</span>
+            </Button>
+
             {/* Variables toggle */}
             <Button
               size="sm"
@@ -381,6 +505,8 @@ export function DashboardViewPage() {
                       teamId: resolvedTeamId,
                       timeRange: slot.effectiveTimeRange,
                       customTitle: slot.customTitle,
+                      metric: slot.metric,
+                      content: slot.content,
                     }}
                     environmentId={activeEnvironmentId}
                     timeRange={slot.effectiveTimeRange}
