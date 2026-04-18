@@ -10,7 +10,7 @@ namespace NexTraceOne.CLI.Services;
 public sealed class CliConfig
 {
     private static readonly string ConfigDir =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nex");
+        Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), ".nex");
 
     private static readonly string ConfigPath = Path.Combine(ConfigDir, "config.json");
 
@@ -28,6 +28,14 @@ public sealed class CliConfig
     /// <summary>Token de autenticação API.</summary>
     [JsonPropertyName("token")]
     public string? Token { get; set; }
+
+    /// <summary>Ambiente padrão (ex: production, staging, development).</summary>
+    [JsonPropertyName("environment")]
+    public string? Environment { get; set; }
+
+    /// <summary>Persona padrão do utilizador (ex: Engineer, TechLead, Architect).</summary>
+    [JsonPropertyName("persona")]
+    public string? Persona { get; set; }
 
     // ── Static helpers ─────────────────────────────────────────────────────────
 
@@ -62,7 +70,7 @@ public sealed class CliConfig
         if (!string.IsNullOrWhiteSpace(explicitValue))
             return explicitValue;
 
-        var fromEnv = Environment.GetEnvironmentVariable("NEX_API_URL");
+        var fromEnv = System.Environment.GetEnvironmentVariable("NEX_API_URL");
         if (!string.IsNullOrWhiteSpace(fromEnv))
             return fromEnv;
 
@@ -79,10 +87,36 @@ public sealed class CliConfig
         if (!string.IsNullOrWhiteSpace(explicitValue))
             return explicitValue;
 
-        var fromEnv = Environment.GetEnvironmentVariable("NEXTRACE_TOKEN");
+        var fromEnv = System.Environment.GetEnvironmentVariable("NEXTRACE_TOKEN");
         if (!string.IsNullOrWhiteSpace(fromEnv))
             return fromEnv;
 
         return Load().Token;
+    }
+
+    /// <summary>Resolve o ambiente: usa o valor fornecido explicitamente, depois env var, depois config.</summary>
+    public static string? ResolveEnvironment(string? explicitValue)
+    {
+        if (!string.IsNullOrWhiteSpace(explicitValue))
+            return explicitValue;
+
+        var fromEnv = System.Environment.GetEnvironmentVariable("NEX_ENVIRONMENT");
+        if (!string.IsNullOrWhiteSpace(fromEnv))
+            return fromEnv;
+
+        return Load().Environment;
+    }
+
+    /// <summary>Resolve a persona: usa o valor fornecido explicitamente, depois env var, depois config.</summary>
+    public static string? ResolvePersona(string? explicitValue)
+    {
+        if (!string.IsNullOrWhiteSpace(explicitValue))
+            return explicitValue;
+
+        var fromEnv = System.Environment.GetEnvironmentVariable("NEX_PERSONA");
+        if (!string.IsNullOrWhiteSpace(fromEnv))
+            return fromEnv;
+
+        return Load().Persona;
     }
 }

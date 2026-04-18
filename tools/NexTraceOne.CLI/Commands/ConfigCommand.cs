@@ -25,7 +25,7 @@ public static class ConfigCommand
     {
         var keyArg = new Argument<string>("key")
         {
-            Description = "Configuration key: url | token"
+            Description = "Configuration key: url | token | environment | persona"
         };
         var valueArg = new Argument<string>("value")
         {
@@ -57,8 +57,20 @@ public static class ConfigCommand
                     AnsiConsole.MarkupLine("[green]✓[/] [bold]token[/] saved to [grey]~/.nex/config.json[/]");
                     break;
 
+                case "environment":
+                    config.Environment = value;
+                    config.Save();
+                    AnsiConsole.MarkupLine($"[green]✓[/] [bold]environment[/] set to [yellow]{value.EscapeMarkup()}[/]");
+                    break;
+
+                case "persona":
+                    config.Persona = value;
+                    config.Save();
+                    AnsiConsole.MarkupLine($"[green]✓[/] [bold]persona[/] set to [yellow]{value.EscapeMarkup()}[/]");
+                    break;
+
                 default:
-                    AnsiConsole.MarkupLine($"[red]Error:[/] Unknown key [yellow]{key.EscapeMarkup()}[/]. Valid keys: [bold]url[/], [bold]token[/]");
+                    AnsiConsole.MarkupLine($"[red]Error:[/] Unknown key [yellow]{key.EscapeMarkup()}[/]. Valid keys: [bold]url[/], [bold]token[/], [bold]environment[/], [bold]persona[/]");
                     return Task.FromResult(1);
             }
 
@@ -103,6 +115,14 @@ public static class ConfigCommand
                 !string.IsNullOrWhiteSpace(tokenEnv) ? "[dim]NEXTRACE_TOKEN[/]"
                 : !string.IsNullOrWhiteSpace(config.Token) ? "[dim]~/.nex/config.json[/]"
                 : "[grey]none[/]");
+
+            AddConfigRow(table, "environment", config.Environment,
+                Environment.GetEnvironmentVariable("NEX_ENVIRONMENT"),
+                "(not set)");
+
+            AddConfigRow(table, "persona", config.Persona,
+                Environment.GetEnvironmentVariable("NEX_PERSONA"),
+                "(not set)");
 
             AnsiConsole.Write(table);
             AnsiConsole.MarkupLine($"\n[grey]Config file: ~/.nex/config.json[/]");

@@ -14,6 +14,7 @@ rootCommand.Add(ValidateCommand.Create());
 rootCommand.Add(CatalogCommand.Create());
 rootCommand.Add(ContractCommand.Create());
 rootCommand.Add(ChangeCommand.Create());
+rootCommand.Add(IncidentCommand.Create());
 rootCommand.Add(HealthCommand.Create());
 rootCommand.Add(ConfigCommand.Create());
 rootCommand.Add(McpCommand.Create());

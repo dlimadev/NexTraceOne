@@ -26,17 +26,20 @@ public static class CatalogCommand
     private static Command CreateListCommand()
     {
         var urlOption = CreateUrlOption();
+        var tokenOption = CreateTokenOption();
         var formatOption = CreateFormatOption();
 
         var command = new Command("list", "List all services in the catalog.");
         command.Add(urlOption);
+        command.Add(tokenOption);
         command.Add(formatOption);
 
         command.SetAction((parseResult, cancellationToken) =>
         {
-            var url = parseResult.GetValue(urlOption)!;
+            var url = CliConfig.ResolveUrl(parseResult.GetValue(urlOption));
+            var token = CliConfig.ResolveToken(parseResult.GetValue(tokenOption));
             var format = parseResult.GetValue(formatOption) ?? "text";
-            return ListAsync(url, format, cancellationToken);
+            return ListAsync(url, token, format, cancellationToken);
         });
 
         return command;
@@ -50,29 +53,32 @@ public static class CatalogCommand
         };
 
         var urlOption = CreateUrlOption();
+        var tokenOption = CreateTokenOption();
         var formatOption = CreateFormatOption();
 
         var command = new Command("get", "Get details of a specific service from the catalog.");
         command.Add(idArgument);
         command.Add(urlOption);
+        command.Add(tokenOption);
         command.Add(formatOption);
 
         command.SetAction((parseResult, cancellationToken) =>
         {
             var id = parseResult.GetValue(idArgument)!;
-            var url = parseResult.GetValue(urlOption)!;
+            var url = CliConfig.ResolveUrl(parseResult.GetValue(urlOption));
+            var token = CliConfig.ResolveToken(parseResult.GetValue(tokenOption));
             var format = parseResult.GetValue(formatOption) ?? "text";
-            return GetAsync(id, url, format, cancellationToken);
+            return GetAsync(id, url, token, format, cancellationToken);
         });
 
         return command;
     }
 
-    private static async Task<int> ListAsync(string apiUrl, string format, CancellationToken cancellationToken)
+    private static async Task<int> ListAsync(string apiUrl, string? token, string format, CancellationToken cancellationToken)
     {
         try
         {
-            using var client = new CatalogApiClient(apiUrl);
+            using var client = new CatalogApiClient(apiUrl, token);
             var response = await client.ListServicesAsync(cancellationToken).ConfigureAwait(false);
 
             if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase))
@@ -131,11 +137,11 @@ public static class CatalogCommand
         }
     }
 
-    private static async Task<int> GetAsync(string serviceId, string apiUrl, string format, CancellationToken cancellationToken)
+    private static async Task<int> GetAsync(string serviceId, string apiUrl, string? token, string format, CancellationToken cancellationToken)
     {
         try
         {
-            using var client = new CatalogApiClient(apiUrl);
+            using var client = new CatalogApiClient(apiUrl, token);
             var service = await client.GetServiceAsync(serviceId, cancellationToken).ConfigureAwait(false);
 
             if (service is null)
@@ -234,21 +240,21 @@ public static class CatalogCommand
             _ => (criticality ?? "-").EscapeMarkup()
         };
 
-    private static Option<string> CreateUrlOption()
+    private static Option<string> CreateUrlOption() => new("--url")
     {
-        return new Option<string>("--url")
-        {
-            Description = "NexTraceOne API base URL (default: NEX_API_URL env var or http://localhost:8080).",
-            DefaultValueFactory = _ => Environment.GetEnvironmentVariable("NEX_API_URL") ?? "http://localhost:8080"
-        };
-    }
+        Description = "NexTraceOne API base URL.",
+        DefaultValueFactory = _ => CliConfig.ResolveUrl(null)
+    };
 
-    private static Option<string> CreateFormatOption()
+    private static Option<string> CreateTokenOption() => new("--token")
     {
-        return new Option<string>("--format")
-        {
-            Description = "Output format: text (default) or json.",
-            DefaultValueFactory = _ => "text"
-        };
-    }
+        Description = "API authentication token (or set NEXTRACE_TOKEN env var)."
+    };
+
+    private static Option<string> CreateFormatOption() => new("--format")
+    {
+        Description = "Output format: text (default) or json.",
+        DefaultValueFactory = _ => "text"
+    };
 }
+

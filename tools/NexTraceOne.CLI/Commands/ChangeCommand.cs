@@ -72,6 +72,12 @@ public static class ChangeCommand
         var branchOpt = new Option<string>("--branch", "Git branch name.");
         var pipelineIdOpt = new Option<string>("--pipeline-id", "CI/CD pipeline run identifier.");
         var notesOpt = new Option<string>("--notes", "Additional release notes.");
+        var externalIdOpt = new Option<string>("--external-id", "External release/deployment identifier (e.g., GitHub run ID, GitLab pipeline ID).");
+        var externalSystemOpt = new Option<string>("--external-system")
+        {
+            Description = "Source system that owns the external ID (e.g., github, gitlab, jenkins, azuredevops).",
+            DefaultValueFactory = _ => "cli"
+        };
         var urlOpt = CreateUrlOption();
         var tokenOpt = CreateTokenOption();
         var formatOpt = CreateFormatOption();
@@ -85,6 +91,8 @@ public static class ChangeCommand
         command.Add(branchOpt);
         command.Add(pipelineIdOpt);
         command.Add(notesOpt);
+        command.Add(externalIdOpt);
+        command.Add(externalSystemOpt);
         command.Add(urlOpt);
         command.Add(tokenOpt);
         command.Add(formatOpt);
@@ -99,12 +107,14 @@ public static class ChangeCommand
             var branch = parseResult.GetValue(branchOpt);
             var pipelineId = parseResult.GetValue(pipelineIdOpt);
             var notes = parseResult.GetValue(notesOpt);
+            var externalId = parseResult.GetValue(externalIdOpt);
+            var externalSystem = parseResult.GetValue(externalSystemOpt) ?? "cli";
             var url = CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
             var token = CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
             var format = parseResult.GetValue(formatOpt) ?? "text";
 
             return await ReportChangeAsync(service, version, environment, changeType, commitSha, branch,
-                pipelineId, notes, url, token, format, cancellationToken).ConfigureAwait(false);
+                pipelineId, notes, externalId, externalSystem, url, token, format, cancellationToken).ConfigureAwait(false);
         });
 
         return command;
@@ -113,6 +123,7 @@ public static class ChangeCommand
     private static async Task<int> ReportChangeAsync(
         string service, string version, string environment, string changeType,
         string? commitSha, string? branch, string? pipelineId, string? notes,
+        string? externalId, string externalSystem,
         string url, string? token, string format, CancellationToken cancellationToken)
     {
         var payload = new
@@ -125,6 +136,8 @@ public static class ChangeCommand
             branch,
             pipelineRunId = pipelineId,
             releaseNotes = notes,
+            externalReleaseId = externalId,
+            externalSystem,
             reportedFrom = "cli",
             reportedAt = DateTimeOffset.UtcNow
         };
