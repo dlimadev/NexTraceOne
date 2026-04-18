@@ -3,8 +3,9 @@
  * Interface slot-based: utilizador seleciona posição num grid fixo e atribui um widget.
  * Cada slot tem: tipo, serviço alvo, time range override, título personalizado.
  * Preview em tempo real à direita. Guarda via PUT /governance/dashboards/{id}.
+ * Suporta Export/Import JSON (compatível com Grafana-like portability) e Auto-arrange.
  */
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -15,6 +16,9 @@ import {
   Save,
   LayoutGrid,
   Eye,
+  Download,
+  Upload,
+  Shuffle,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -188,6 +192,7 @@ export function DashboardBuilderPage() {
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const navigate = useNavigate();
   const TENANT_ID = 'default';
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const { data, isLoading, isError, refetch } = useGetDashboard(dashboardId ?? '', TENANT_ID);
   const updateMutation = useUpdateDashboard(dashboardId ?? '');
@@ -200,6 +205,7 @@ export function DashboardBuilderPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
+  const [importError, setImportError] = useState<string | null>(null);
 
   // Initialize state from loaded dashboard
   if (data && !initialized) {
@@ -237,6 +243,92 @@ export function DashboardBuilderPage() {
 
   const updateSlot = (tempId: string, patch: Partial<BuilderSlot>) => {
     setSlots((prev) => prev.map((s) => (s.tempId === tempId ? { ...s, ...patch } : s)));
+  };
+
+  /** Auto-arrange: reflows all slots into a tidy grid with no position overlaps */
+  const handleAutoArrange = () => {
+    const cols = maxCols;
+    let curX = 0;
+    let curY = 0;
+    let rowH = 0;
+    const arranged = slots.map((slot) => {
+      const w = Math.min(slot.width, cols);
+      if (curX + w > cols) {
+        curX = 0;
+        curY += rowH;
+        rowH = 0;
+      }
+      const placed = { ...slot, posX: curX, posY: curY, width: w };
+      curX += w;
+      rowH = Math.max(rowH, slot.height);
+      return placed;
+    });
+    setSlots(arranged);
+  };
+
+  /** Export: downloads current dashboard config as a JSON file */
+  const handleExportJson = () => {
+    const payload = {
+      version: 1,
+      name,
+      description,
+      layout,
+      widgets: slots.map((s) => ({
+        type: s.type,
+        posX: s.posX,
+        posY: s.posY,
+        width: s.width,
+        height: s.height,
+        serviceId: s.serviceId || null,
+        teamId: s.teamId || null,
+        timeRange: s.timeRange || null,
+        customTitle: s.customTitle || null,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name.replace(/\s+/g, '_').toLowerCase() || 'dashboard'}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  /** Import: parses a JSON file and populates slots */
+  const handleImportJson = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImportError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const json = JSON.parse(ev.target?.result as string);
+        if (!Array.isArray(json.widgets)) throw new Error('Invalid format');
+        if (json.name) setName(json.name);
+        if (json.description) setDescription(json.description);
+        if (json.layout) setLayout(json.layout);
+        setSlots(
+          json.widgets.map((w: Record<string, unknown>) => ({
+            tempId: makeSlotId(),
+            existingWidgetId: null,
+            type: (w.type as WidgetType) ?? 'dora-metrics',
+            posX: Number(w.posX ?? 0),
+            posY: Number(w.posY ?? 0),
+            width: Number(w.width ?? 2),
+            height: Number(w.height ?? 2),
+            serviceId: String(w.serviceId ?? ''),
+            teamId: String(w.teamId ?? ''),
+            timeRange: String(w.timeRange ?? '24h'),
+            customTitle: String(w.customTitle ?? ''),
+          }))
+        );
+      } catch {
+        setImportError(t('governance.dashboardBuilder.importError', 'Invalid dashboard JSON file.'));
+      }
+    };
+    reader.readAsText(file);
+    // reset file input so the same file can be re-imported
+    e.target.value = '';
   };
 
   const handleSave = async () => {
@@ -296,7 +388,7 @@ export function DashboardBuilderPage() {
               {t('governance.dashboardBuilder.title', 'Edit Dashboard')}
             </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               size="sm"
               variant="secondary"
@@ -308,6 +400,56 @@ export function DashboardBuilderPage() {
                 ? t('governance.dashboardBuilder.hidePreview', 'Hide Preview')
                 : t('governance.dashboardBuilder.showPreview', 'Show Preview')}
             </Button>
+
+            {/* Export JSON */}
+            {!isReadOnly && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleExportJson}
+                aria-label={t('governance.dashboardBuilder.exportJson', 'Export JSON')}
+              >
+                <Download size={14} className="mr-1" />
+                {t('governance.dashboardBuilder.exportJson', 'Export JSON')}
+              </Button>
+            )}
+
+            {/* Import JSON — hidden file input triggered by button */}
+            {!isReadOnly && (
+              <>
+                <input
+                  ref={importInputRef}
+                  type="file"
+                  accept="application/json,.json"
+                  className="hidden"
+                  aria-hidden="true"
+                  onChange={handleImportJson}
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => importInputRef.current?.click()}
+                  aria-label={t('governance.dashboardBuilder.importJson', 'Import JSON')}
+                >
+                  <Upload size={14} className="mr-1" />
+                  {t('governance.dashboardBuilder.importJson', 'Import JSON')}
+                </Button>
+              </>
+            )}
+
+            {/* Auto-arrange */}
+            {!isReadOnly && slots.length > 0 && (
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleAutoArrange}
+                aria-label={t('governance.dashboardBuilder.autoArrange', 'Auto-arrange')}
+              >
+                <Shuffle size={14} className="mr-1" />
+                {t('governance.dashboardBuilder.autoArrange', 'Auto-arrange')}
+              </Button>
+            )}
+
             {!isReadOnly && (
               <Button onClick={handleSave} disabled={updateMutation.isPending}>
                 <Save size={14} className="mr-1" />
@@ -371,6 +513,17 @@ export function DashboardBuilderPage() {
       )}
 
       {/* Widget slots + live preview */}
+      {importError && (
+        <div className="mb-4 rounded border border-red-300 bg-red-50 dark:bg-red-900/20 px-4 py-2 text-sm text-red-700 dark:text-red-300" role="alert">
+          {importError}
+        </div>
+      )}
+      {saveError && (
+        <div className="mb-4 rounded border border-red-300 bg-red-50 dark:bg-red-900/20 px-4 py-2 text-sm text-red-700 dark:text-red-300" role="alert">
+          {saveError}
+        </div>
+      )}
+
       <div className={`flex gap-6 ${showPreview ? 'lg:flex-row' : ''} flex-col`}>
         {/* Left: slot editor */}
         <div className="flex-1 min-w-0">
@@ -543,7 +696,7 @@ export function DashboardBuilderPage() {
           )}
         </div>
 
-        {/* Right: live preview */}
+      {/* Right: live preview */}
         {showPreview && (
           <div className="lg:w-72 shrink-0">
             <div className="sticky top-4">
@@ -559,9 +712,6 @@ export function DashboardBuilderPage() {
         )}
       </div>
 
-      {saveError && (
-        <p className="mt-4 text-sm text-red-600 dark:text-red-400">{saveError}</p>
-      )}
       {saveSuccess && (
         <p className="mt-4 text-sm text-green-600 dark:text-green-400">
           {t('governance.dashboardBuilder.saveSuccess', 'Dashboard saved successfully.')}

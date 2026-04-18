@@ -15,7 +15,11 @@ export type WidgetType =
   | 'cost-trend'
   | 'reliability-slo'
   | 'knowledge-graph'
-  | 'on-call-status';
+  | 'on-call-status'
+  | 'alert-status'
+  | 'change-timeline'
+  | 'slo-gauge'
+  | 'deployment-frequency';
 
 export const ALL_WIDGET_TYPES: WidgetType[] = [
   'dora-metrics',
@@ -26,6 +30,10 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'reliability-slo',
   'knowledge-graph',
   'on-call-status',
+  'alert-status',
+  'change-timeline',
+  'slo-gauge',
+  'deployment-frequency',
 ];
 
 export interface WidgetConfig {
@@ -130,6 +138,34 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 1,
     personas: ['Engineer', 'TechLead'],
+  },
+  'alert-status': {
+    type: 'alert-status',
+    labelKey: 'governance.customDashboards.widgets.alertStatus',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Executive', 'Auditor'],
+  },
+  'change-timeline': {
+    type: 'change-timeline',
+    labelKey: 'governance.customDashboards.widgets.changeTimeline',
+    defaultWidth: 3,
+    defaultHeight: 3,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Auditor'],
+  },
+  'slo-gauge': {
+    type: 'slo-gauge',
+    labelKey: 'governance.customDashboards.widgets.sloGauge',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Executive', 'Product'],
+  },
+  'deployment-frequency': {
+    type: 'deployment-frequency',
+    labelKey: 'governance.customDashboards.widgets.deploymentFrequency',
+    defaultWidth: 3,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Executive', 'Product'],
   },
 };
 

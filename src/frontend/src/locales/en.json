@@ -5784,7 +5784,11 @@
         "knowledgeGraph": "Knowledge Graph",
         "onCallStatus": "On-Call Status",
         "reliabilitySlo": "Reliability SLO",
-        "serviceScorecard": "Service Scorecard"
+        "serviceScorecard": "Service Scorecard",
+        "alertStatus": "Alert Status",
+        "changeTimeline": "Change Timeline",
+        "sloGauge": "SLO Gauge",
+        "deploymentFrequency": "Deployment Frequency"
       },
       "cloneDashboard": "Clone",
       "cloneTitle": "Clone Dashboard",
@@ -5795,7 +5799,11 @@
       "confirmDelete": "This action cannot be undone. Are you sure you want to delete this dashboard?",
       "deleteError": "Failed to delete dashboard.",
       "fromTemplate": "Use Template",
-      "editDashboard": "Edit"
+      "editDashboard": "Edit",
+      "searchPlaceholder": "Search dashboards by name…",
+      "searchLabel": "Search dashboards",
+      "noResults": "No dashboards match your search",
+      "noResultsHint": "Try a different search term or clear the search."
     },
     "dashboards": {
       "empty": "No custom dashboards",
@@ -5827,7 +5835,16 @@
         "24h": "Last 24h",
         "7d": "Last 7d",
         "30d": "Last 30d"
-      }
+      },
+      "toggleVars": "Toggle variables",
+      "variables": "Variables",
+      "variablesLabel": "Variables",
+      "varServicePlaceholder": "All services",
+      "varTeamPlaceholder": "All teams",
+      "clearVars": "Clear",
+      "varsHint": "Variable values override per-widget service/team filters",
+      "alertTotal": "Total",
+      "noChanges": "No recent changes"
     },
     "dashboardBuilder": {
       "addWidget": "Add Widget",
@@ -5860,7 +5877,11 @@
       "previewTitle": "Live Preview",
       "previewHint": "Updates as you configure widgets",
       "previewEmpty": "No widgets yet",
-      "previewLabel": "Dashboard preview"
+      "previewLabel": "Dashboard preview",
+      "exportJson": "Export JSON",
+      "importJson": "Import JSON",
+      "importError": "Invalid dashboard JSON file.",
+      "autoArrange": "Auto-arrange"
     },
     "dora": {
       "cfr": "CFR",
@@ -6071,6 +6092,22 @@
       "testing": "Testing",
       "title": "Technical Debt",
       "totalScore": "Total Debt Score"
+    },
+    "alertSeverity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "sloStatus": {
+      "met": "Met",
+      "atRisk": "At Risk",
+      "breached": "Breached",
+      "target": "Target"
+    },
+    "deploymentFreq": {
+      "chartLabel": "Deployment frequency chart",
+      "deploys": "deploys"
     }
   },
   "governanceConfig": {

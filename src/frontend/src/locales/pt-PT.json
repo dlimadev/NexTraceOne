@@ -5759,7 +5759,11 @@
         "knowledgeGraph": "Grafo de Conhecimento",
         "onCallStatus": "Estado On-Call",
         "reliabilitySlo": "SLO de Fiabilidade",
-        "serviceScorecard": "Scorecard de Serviço"
+        "serviceScorecard": "Scorecard de Serviço",
+        "alertStatus": "Estado de Alertas",
+        "changeTimeline": "Linha do Tempo de Mudanças",
+        "sloGauge": "Gauge de SLO",
+        "deploymentFrequency": "Frequência de Deploy"
       },
       "cloneDashboard": "Clonar",
       "cloneTitle": "Clonar Dashboard",
@@ -5770,7 +5774,11 @@
       "confirmDelete": "Esta ação não pode ser revertida. Tem a certeza que deseja eliminar este dashboard?",
       "deleteError": "Falha ao eliminar o dashboard.",
       "fromTemplate": "Usar Template",
-      "editDashboard": "Editar"
+      "editDashboard": "Editar",
+      "searchPlaceholder": "Pesquisar dashboards por nome…",
+      "searchLabel": "Pesquisar dashboards",
+      "noResults": "Nenhum dashboard corresponde à pesquisa",
+      "noResultsHint": "Tente outro termo ou limpe a pesquisa."
     },
     "dashboards": {
       "empty": "Sem dashboards personalizados",
@@ -5802,7 +5810,16 @@
         "24h": "Últimas 24h",
         "7d": "Últimos 7d",
         "30d": "Últimos 30d"
-      }
+      },
+      "toggleVars": "Alternar variáveis",
+      "variables": "Variáveis",
+      "variablesLabel": "Variáveis",
+      "varServicePlaceholder": "Todos os serviços",
+      "varTeamPlaceholder": "Todas as equipas",
+      "clearVars": "Limpar",
+      "varsHint": "Os valores das variáveis substituem os filtros de serviço/equipa por widget",
+      "alertTotal": "Total",
+      "noChanges": "Sem mudanças recentes"
     },
     "dashboardBuilder": {
       "addWidget": "Adicionar Widget",
@@ -5835,7 +5852,11 @@
       "previewTitle": "Pré-visualização",
       "previewHint": "Atualiza à medida que configura os widgets",
       "previewEmpty": "Sem widgets ainda",
-      "previewLabel": "Pré-visualização do dashboard"
+      "previewLabel": "Pré-visualização do dashboard",
+      "exportJson": "Exportar JSON",
+      "importJson": "Importar JSON",
+      "importError": "Ficheiro JSON de dashboard inválido.",
+      "autoArrange": "Organizar automaticamente"
     },
     "dora": {
       "cfr": "CFR",
@@ -6046,6 +6067,22 @@
       "testing": "Testes",
       "title": "Dívida Técnica",
       "totalScore": "Pontuação Total de Dívida"
+    },
+    "alertSeverity": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio",
+      "low": "Baixo"
+    },
+    "sloStatus": {
+      "met": "Cumprido",
+      "atRisk": "Em Risco",
+      "breached": "Violado",
+      "target": "Meta"
+    },
+    "deploymentFreq": {
+      "chartLabel": "Gráfico de frequência de deploy",
+      "deploys": "deploys"
     }
   },
   "governanceConfig": {

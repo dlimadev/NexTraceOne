@@ -159,13 +159,34 @@ describe('DashboardBuilderPage', () => {
     });
   });
 
-  it('preview renders widget slot cell when slots exist', async () => {
+  it('shows Export JSON button', async () => {
     renderPage();
     await waitFor(() => {
-      expect(document.body.textContent).toContain('Live Preview');
-      // The preview grid should exist
-      const previewGrid = document.querySelector('[aria-label="Dashboard preview"]');
-      expect(previewGrid).toBeDefined();
+      expect(document.body.textContent).toContain('Export JSON');
+    });
+  });
+
+  it('shows Import JSON button', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Import JSON');
+    });
+  });
+
+  it('shows Auto-arrange button when slots exist', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Auto-arrange');
+    });
+  });
+
+  it('new widget types appear in the type selector', async () => {
+    renderPage();
+    await waitFor(() => {
+      // One of the 4 new widget types should appear in the select
+      const selects = Array.from(document.querySelectorAll('select'));
+      const allText = selects.map((s) => s.innerHTML).join('');
+      expect(allText).toMatch(/alert-status|Alert Status|Deployment Frequency|SLO Gauge|Change Timeline/i);
     });
   });
 });

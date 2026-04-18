@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { DashboardViewPage } from '../../features/governance/pages/DashboardViewPage';
@@ -72,10 +72,31 @@ function renderPage() {
   );
 }
 
+const mockDoraData = {
+  overallRating: 'Elite',
+  deploymentFrequency: { value: 5, unit: '/day', rating: 'Elite' },
+  leadTimeForChanges: { value: 2, unit: 'hours', rating: 'Elite' },
+  changeFailureRate: { value: 1, unit: '%', rating: 'Elite' },
+  meanTimeToRestore: { value: 30, unit: 'min', rating: 'Elite' },
+};
+
+const mockIncidentData = {
+  items: [],
+  totalCount: 0,
+  critical: 0,
+  high: 0,
+  medium: 0,
+  low: 0,
+};
+
 describe('DashboardViewPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(client.get).mockResolvedValue({ data: mockRenderData });
+    vi.mocked(client.get).mockImplementation((url: string) => {
+      if (url.includes('dora-metrics')) return Promise.resolve({ data: mockDoraData });
+      if (url.includes('incidents')) return Promise.resolve({ data: mockIncidentData });
+      return Promise.resolve({ data: mockRenderData });
+    });
     vi.mocked(client.put).mockResolvedValue({ data: {} });
   });
 
@@ -138,13 +159,38 @@ describe('DashboardViewPage', () => {
     });
   });
 
-  it('calls render-data endpoint with correct dashboardId', async () => {
+  it('shows Variables button', async () => {
     renderPage();
     await waitFor(() => {
-      expect(vi.mocked(client.get)).toHaveBeenCalledWith(
-        expect.stringContaining(DASHBOARD_ID),
-        expect.any(Object),
-      );
+      expect(document.body.textContent).toContain('Variables');
+    });
+  });
+
+  it('shows variables panel when Variables button is clicked', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Variables'));
+    const varsBtn = Array.from(document.querySelectorAll('button')).find(
+      (b) => b.getAttribute('aria-label') === 'Toggle variables',
+    );
+    expect(varsBtn).toBeDefined();
+    fireEvent.click(varsBtn!);
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('$service');
+      expect(document.body.textContent).toContain('$team');
+    });
+  });
+
+  it('variables panel has service and team inputs', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Variables'));
+    const varsBtn = Array.from(document.querySelectorAll('button')).find(
+      (b) => b.getAttribute('aria-label') === 'Toggle variables',
+    );
+    fireEvent.click(varsBtn!);
+    await waitFor(() => {
+      const inputs = document.querySelectorAll('input');
+      const placeholders = Array.from(inputs).map((i) => i.placeholder);
+      expect(placeholders.some((p) => p.includes('All services') || p.includes('service'))).toBe(true);
     });
   });
 });

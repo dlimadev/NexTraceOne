@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Plus, Eye, Settings, Copy, Trash2, Layout as LayoutIcon } from 'lucide-react';
+import { LayoutDashboard, Plus, Eye, Settings, Copy, Trash2, Layout as LayoutIcon, Search } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -199,6 +199,7 @@ export function CustomDashboardsPage() {
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Template picker
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
@@ -304,6 +305,10 @@ export function CustomDashboardsPage() {
   if (isLoading) return <PageLoadingState message={t('governance.customDashboards.loading')} />;
   if (isError)
     return <PageErrorState message={t('governance.customDashboards.error')} onRetry={() => refetch()} />;
+
+  const filteredDashboards = (data?.items ?? []).filter((d) =>
+    !searchQuery || d.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <PageContainer>
@@ -514,15 +519,28 @@ export function CustomDashboardsPage() {
       <PageSection
         title={`${t('governance.customDashboards.title')} (${data?.totalCount ?? 0})`}
       >
-        {data?.items.length === 0 ? (
+        {/* Search bar */}
+        <div className="mb-4 relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('governance.customDashboards.searchPlaceholder', 'Search dashboards by name…')}
+            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm pl-8 pr-3 py-2 text-gray-900 dark:text-white"
+            aria-label={t('governance.customDashboards.searchLabel', 'Search dashboards')}
+          />
+        </div>
+
+        {filteredDashboards.length === 0 ? (
           <EmptyState
-            title={t('governance.customDashboards.empty', 'No dashboards yet')}
-            description={t('governance.customDashboards.emptyDescription', 'Create a custom dashboard using the form above to get started.')}
+            title={searchQuery ? t('governance.customDashboards.noResults', 'No dashboards match your search') : t('governance.customDashboards.empty', 'No dashboards yet')}
+            description={searchQuery ? t('governance.customDashboards.noResultsHint', 'Try a different search term or clear the search.') : t('governance.customDashboards.emptyDescription', 'Create a custom dashboard using the form above to get started.')}
             size="compact"
           />
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {data?.items.map((dashboard) => (
+            {filteredDashboards.map((dashboard) => (
               <Card key={dashboard.dashboardId}>
                 <CardHeader className="pb-0">
                   <div className="flex items-start justify-between gap-2">

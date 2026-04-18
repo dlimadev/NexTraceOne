@@ -1,7 +1,9 @@
 /**
  * DashboardViewPage — renderiza um dashboard customizado a partir do registry de widgets.
  * Layout via CSS Grid baseado em position.x, position.y, width, height dos widgets.
- * Suporta seletor de período global, seletor de ambiente, auto-refresh e partilha.
+ * Suporta seletor de período global, seletor de ambiente, auto-refresh, partilha e
+ * variáveis de dashboard (estilo Grafana template variables) que sobrepõem serviceId/teamId
+ * em todos os widgets.
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +17,9 @@ import {
   Share2,
   Check,
   LayoutDashboard,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -32,6 +37,10 @@ import { CostTrendWidget } from '../widgets/CostTrendWidget';
 import { ReliabilitySloWidget } from '../widgets/ReliabilitySloWidget';
 import { KnowledgeGraphWidget } from '../widgets/KnowledgeGraphWidget';
 import { OnCallStatusWidget } from '../widgets/OnCallStatusWidget';
+import { AlertStatusWidget } from '../widgets/AlertStatusWidget';
+import { ChangeTimelineWidget } from '../widgets/ChangeTimelineWidget';
+import { SloGaugeWidget } from '../widgets/SloGaugeWidget';
+import { DeploymentFrequencyWidget } from '../widgets/DeploymentFrequencyWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
@@ -47,6 +56,10 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'reliability-slo': ReliabilitySloWidget,
   'knowledge-graph': KnowledgeGraphWidget,
   'on-call-status': OnCallStatusWidget,
+  'alert-status': AlertStatusWidget,
+  'change-timeline': ChangeTimelineWidget,
+  'slo-gauge': SloGaugeWidget,
+  'deployment-frequency': DeploymentFrequencyWidget,
 };
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -143,6 +156,10 @@ export function DashboardViewPage() {
   const [timeRange, setTimeRange] = useState('24h');
   const [autoRefreshSeconds, setAutoRefreshSeconds] = useState(0);
   const [copied, setCopied] = useState(false);
+  // Dashboard variables — Grafana-style global overrides applied to all widgets
+  const [varService, setVarService] = useState('');
+  const [varTeam, setVarTeam] = useState('');
+  const [showVars, setShowVars] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const qc = useQueryClient();
 
@@ -277,9 +294,64 @@ export function DashboardViewPage() {
               <Settings size={12} />
               <span className="ml-1">{t('governance.dashboardView.edit', 'Edit')}</span>
             </Button>
+
+            {/* Variables toggle */}
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setShowVars((v) => !v)}
+              aria-label={t('governance.dashboardView.toggleVars', 'Toggle variables')}
+              aria-expanded={showVars}
+            >
+              <SlidersHorizontal size={12} />
+              <span className="ml-1">{t('governance.dashboardView.variables', 'Variables')}</span>
+              {showVars ? <ChevronUp size={10} className="ml-0.5" /> : <ChevronDown size={10} className="ml-0.5" />}
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* Dashboard Variables panel — Grafana-style global overrides */}
+      {showVars && (
+        <div className="mb-4 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 flex flex-wrap items-center gap-4">
+          <span className="text-xs font-semibold text-accent flex items-center gap-1">
+            <SlidersHorizontal size={12} />
+            {t('governance.dashboardView.variablesLabel', 'Variables')}
+          </span>
+          <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+            <span className="font-medium text-accent">$service</span>
+            <input
+              type="text"
+              value={varService}
+              onChange={(e) => setVarService(e.target.value)}
+              placeholder={t('governance.dashboardView.varServicePlaceholder', 'All services')}
+              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white w-36"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+            <span className="font-medium text-accent">$team</span>
+            <input
+              type="text"
+              value={varTeam}
+              onChange={(e) => setVarTeam(e.target.value)}
+              placeholder={t('governance.dashboardView.varTeamPlaceholder', 'All teams')}
+              className="rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1 text-gray-900 dark:text-white w-36"
+            />
+          </label>
+          {(varService || varTeam) && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => { setVarService(''); setVarTeam(''); }}
+            >
+              {t('governance.dashboardView.clearVars', 'Clear')}
+            </Button>
+          )}
+          <span className="text-[10px] text-gray-400 ml-auto">
+            {t('governance.dashboardView.varsHint', 'Variable values override per-widget service/team filters')}
+          </span>
+        </div>
+      )}
 
       {/* Widget grid */}
       {data.widgets.length === 0 ? (
@@ -291,6 +363,9 @@ export function DashboardViewPage() {
           {data.widgets.map((slot) => {
             const WidgetComponent = WIDGET_MAP[slot.type as WidgetType];
             const style = widgetGridStyle(slot);
+            // Variables override: if a variable is set it takes precedence over the slot's effectiveServiceId/TeamId
+            const resolvedServiceId = varService || slot.effectiveServiceId;
+            const resolvedTeamId = varTeam || slot.effectiveTeamId;
 
             return (
               <div
@@ -302,8 +377,8 @@ export function DashboardViewPage() {
                   <WidgetComponent
                     widgetId={slot.widgetId}
                     config={{
-                      serviceId: slot.effectiveServiceId,
-                      teamId: slot.effectiveTeamId,
+                      serviceId: resolvedServiceId,
+                      teamId: resolvedTeamId,
                       timeRange: slot.effectiveTimeRange,
                       customTitle: slot.customTitle,
                     }}
