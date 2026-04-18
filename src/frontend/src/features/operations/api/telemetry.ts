@@ -206,3 +206,69 @@ export async function getTelemetryHealth(): Promise<TelemetryHealthStatus> {
   const { data } = await client.get<TelemetryHealthStatus>('/telemetry/health');
   return data;
 }
+
+// ── SRE Dashboard types ───────────────────────────────────────────────────────
+
+export interface SreSummary {
+  problems: { open: number; total: number };
+  slo: { errorCompliancePct: number; latencyCompliancePct: number };
+  traffic: { requestCount: number; queryCount: number };
+  latency: { requestAvgMs: number; queryAvgMs: number };
+  errors: { http5xx: number; http4xx: number; queryErrors: number; logErrors: number };
+}
+
+export interface SreTimeSeriesPoint {
+  timestamp: string;
+  value: number;
+}
+
+export interface SreTimeSeries {
+  requests: SreTimeSeriesPoint[];
+  requestLatency: SreTimeSeriesPoint[];
+  requestErrors: SreTimeSeriesPoint[];
+  queries: SreTimeSeriesPoint[];
+  queryLatency: SreTimeSeriesPoint[];
+  queryErrors: SreTimeSeriesPoint[];
+}
+
+export interface SreTopRequest {
+  service: string;
+  request: string;
+  count: number;
+  avgLatencyMs: number;
+  errors: number;
+}
+
+export interface SreTopQuery {
+  database: string;
+  query: string;
+  count: number;
+  avgLatencyMs: number;
+}
+
+export interface SreParams {
+  environment: string;
+  from: string;
+  until: string;
+  serviceId?: string;
+}
+
+export async function getSreSummary(params: SreParams): Promise<SreSummary> {
+  const { data } = await client.get<SreSummary>('/telemetry/sre/summary', { params });
+  return data;
+}
+
+export async function getSreTimeSeries(params: SreParams): Promise<SreTimeSeries> {
+  const { data } = await client.get<SreTimeSeries>('/telemetry/sre/timeseries', { params });
+  return data;
+}
+
+export async function getSreTopRequests(params: SreParams & { top?: number }): Promise<SreTopRequest[]> {
+  const { data } = await client.get<SreTopRequest[]>('/telemetry/sre/top-requests', { params });
+  return data;
+}
+
+export async function getSreTopQueries(params: SreParams & { top?: number }): Promise<SreTopQuery[]> {
+  const { data } = await client.get<SreTopQuery[]>('/telemetry/sre/top-queries', { params });
+  return data;
+}

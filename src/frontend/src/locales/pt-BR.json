@@ -9095,7 +9095,8 @@
     "evidencePackViewer": "Evidence Pack",
     "releaseParameterAudit": "Auditoria de Parâmetros",
     "releaseParameterOverride": "Overrides por Ambiente",
-    "tenants": "Tenants"
+    "tenants": "Tenants",
+    "sreDashboard": "Painel SRE"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11781,5 +11782,60 @@
     "rightsizing": "Dimensionamento Correto",
     "observabilityMode": "Modo de Observabilidade",
     "compliancePacks": "Pacotes de Conformidade"
+  },
+  "sreDashboard": {
+    "title": "Painel SRE",
+    "subtitle": "Confiabilidade, tráfego, latência e erros dos serviços em um único lugar",
+    "loading": "Carregando painel SRE…",
+    "loadError": "Falha ao carregar os dados do painel SRE. Por favor, tente novamente.",
+    "noRecords": "Não há registros. Tente alterar o intervalo de tempo ou outro parâmetro.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "hero": {
+      "status": "Status",
+      "problems": "Problemas",
+      "noProblems": "Sem problemas abertos",
+      "hasProblems": "Problemas abertos",
+      "sloStatus": "Status SLO",
+      "sloError": "Erro",
+      "sloLatency": "Latência",
+      "traffic": "Tráfego",
+      "latency": "Latência",
+      "request": "Requisição",
+      "query": "Consulta",
+      "errors": "Erros",
+      "queryErrors": "Consulta",
+      "log": "Log"
+    },
+    "chart": {
+      "requests": "Requisições",
+      "requestLatency": "Latência de Requisições",
+      "requestErrors": "Erros de Requisições",
+      "queries": "Consultas",
+      "queryLatency": "Latência de Consultas",
+      "queryErrors": "Erros de Consultas",
+      "noErrorsMessage": "Não há registros. Tente alterar o intervalo de tempo ou outro parâmetro."
+    },
+    "serviceAnalysis": {
+      "title": "Análise de Serviços — Requisições, Latência e Erros por Endpoint",
+      "subtitle": "Principais requisições ordenadas por volume"
+    },
+    "dbAnalysis": {
+      "title": "Análise de Banco de Dados — Consultas, Latência e Erros por Query",
+      "subtitle": "Consultas mais frequentes ao banco de dados"
+    },
+    "table": {
+      "service": "Serviço",
+      "request": "Endpoint",
+      "database": "Banco de Dados",
+      "query": "Consulta",
+      "count": "Contagem",
+      "latency": "Latência",
+      "errors": "Erros"
+    }
   }
 }

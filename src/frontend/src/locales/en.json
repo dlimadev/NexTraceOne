@@ -9117,7 +9117,8 @@
     "subGroupRiskRollback": "Risk & Rollback",
     "subGroupWorkflowManagement": "Workflow Management",
     "workflowConfiguration": "Workflow Configuration",
-    "tenants": "Tenants"
+    "tenants": "Tenants",
+    "sreDashboard": "SRE Dashboard"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11808,5 +11809,60 @@
     "confirmRemoveDescription": "The parameter will revert to its default system or tenant value for this environment.",
     "saveSuccess": "Override saved successfully",
     "removeSuccess": "Override removed successfully"
+  },
+  "sreDashboard": {
+    "title": "SRE Dashboard",
+    "subtitle": "Service reliability, traffic, latency and errors at a glance",
+    "loading": "Loading SRE Dashboard…",
+    "loadError": "Failed to load SRE Dashboard data. Please try again.",
+    "noRecords": "There are no records. Try changing the timeframe or another parameter.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "hero": {
+      "status": "Status",
+      "problems": "Problems",
+      "noProblems": "No open problems",
+      "hasProblems": "Open problems",
+      "sloStatus": "SLO Status",
+      "sloError": "Error",
+      "sloLatency": "Latency",
+      "traffic": "Traffic",
+      "latency": "Latency",
+      "request": "Request",
+      "query": "Query",
+      "errors": "Errors",
+      "queryErrors": "Query",
+      "log": "Log"
+    },
+    "chart": {
+      "requests": "Requests",
+      "requestLatency": "Request Latency",
+      "requestErrors": "Request Errors",
+      "queries": "Queries",
+      "queryLatency": "Query Latency",
+      "queryErrors": "Query Errors",
+      "noErrorsMessage": "There are no records. Try changing the timeframe or another parameter."
+    },
+    "serviceAnalysis": {
+      "title": "Service Analysis — Requests, Latency and Errors by Request",
+      "subtitle": "Top requests sorted by volume"
+    },
+    "dbAnalysis": {
+      "title": "Database Analysis — Queries, Latency and Errors by Query",
+      "subtitle": "Most frequent database queries"
+    },
+    "table": {
+      "service": "Service",
+      "request": "Request",
+      "database": "Database",
+      "query": "Query",
+      "count": "Count",
+      "latency": "Latency",
+      "errors": "Errors"
+    }
   }
 }
