@@ -8,6 +8,7 @@ using NexTraceOne.OperationalIntelligence.Domain.Incidents.Enums;
 using CreateIncidentFeature = NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateIncident.CreateIncident;
 using GetIncidentDetailFeature = NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetIncidentDetail.GetIncidentDetail;
 using ListIncidentsFeature = NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListIncidents.ListIncidents;
+using ResolveIncidentFeature = NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ResolveIncident.ResolveIncident;
 
 namespace NexTraceOne.Ingestion.Api.Endpoints;
 
@@ -26,6 +27,7 @@ internal static class IncidentEndpoints
     internal static void Map(RouteGroupBuilder writeGroup, RouteGroupBuilder readGroup)
     {
         MapCreateIncident(writeGroup);
+        MapResolveIncident(writeGroup);
         MapListIncidents(readGroup);
         MapGetIncidentDetail(readGroup);
     }
@@ -160,6 +162,121 @@ internal static class IncidentEndpoints
             "Prometheus Alertmanager, APM alert). " +
             "Automatic change correlation is computed on creation to surface related recent changes.")
         .Produces(StatusCodes.Status202Accepted)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapResolveIncident(RouteGroupBuilder group)
+    {
+        group.MapPatch("/{incidentId}/resolve", async (
+            HttpContext httpContext,
+            string incidentId,
+            ResolveIncidentRequest request,
+            IIntegrationConnectorRepository connectorRepo,
+            IIngestionExecutionRepository executionRepo,
+            ISender sender,
+            IUnitOfWork unitOfWork,
+            IDateTimeProvider clock,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            var logger = loggerFactory.CreateLogger(nameof(IncidentEndpoints));
+            var correlationId = IngestionCorrelationHelper.ResolveCorrelationId(httpContext, request.CorrelationId);
+
+            const string connectorName = "external-incident-source";
+            var connector = await connectorRepo.GetByNameAsync(connectorName, ct);
+            if (connector is null)
+            {
+                connector = IntegrationConnector.Create(
+                    name: connectorName,
+                    connectorType: "Alerting",
+                    description: "External alerting and incident management systems",
+                    provider: "External",
+                    endpoint: null,
+                    environment: null,
+                    authenticationMode: null,
+                    pollingMode: null,
+                    allowedTeams: null,
+                    utcNow: clock.UtcNow);
+                await connectorRepo.AddAsync(connector, ct);
+            }
+
+            var execution = IngestionExecution.Start(connector.Id, null, correlationId, clock.UtcNow);
+
+            object? resolveResult = null;
+            string processingStatus;
+
+            try
+            {
+                var command = new ResolveIncidentFeature.Command(
+                    IncidentId: incidentId,
+                    ResolvedAtUtc: request.ResolvedAtUtc,
+                    ResolutionNote: request.ResolutionNote);
+
+                var result = await sender.Send(command, ct);
+
+                if (result.IsSuccess)
+                {
+                    resolveResult = new
+                    {
+                        incidentId = result.Value.IncidentId,
+                        status = result.Value.Status.ToString(),
+                        resolvedAt = result.Value.ResolvedAt,
+                        resolutionNote = result.Value.ResolutionNote
+                    };
+                    processingStatus = "incident_resolved";
+                    execution.CompleteSuccess(itemsProcessed: 1, itemsSucceeded: 1, utcNow: clock.UtcNow);
+                }
+                else if (result.Error?.Code?.Contains("not_found") == true)
+                {
+                    execution.CompleteFailed(result.Error.Message, null, clock.UtcNow);
+                    connector.RecordSuccess(clock.UtcNow);
+                    await executionRepo.AddAsync(execution, ct);
+                    await connectorRepo.UpdateAsync(connector, ct);
+                    await unitOfWork.CommitAsync(ct);
+                    return Results.NotFound(new { message = result.Error.Message, incidentId });
+                }
+                else
+                {
+                    processingStatus = "domain_rejected";
+                    execution.CompleteFailed(result.Error?.Message ?? "Domain rejected incident resolution", null, clock.UtcNow);
+                    logger.LogWarning(
+                        "ResolveIncident rejected for {IncidentId}: {Error}",
+                        incidentId, result.Error?.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                processingStatus = "ingest_error";
+                execution.CompleteFailed(ex.Message, null, clock.UtcNow);
+                logger.LogError(ex, "Unexpected error resolving incident {IncidentId}", incidentId);
+            }
+
+            connector.RecordSuccess(clock.UtcNow);
+            await executionRepo.AddAsync(execution, ct);
+            await connectorRepo.UpdateAsync(connector, ct);
+            await unitOfWork.CommitAsync(ct);
+
+            return Results.Accepted(null, new
+            {
+                message = "Incident resolution accepted",
+                status = "accepted",
+                processingStatus,
+                correlationId,
+                executionId = execution.Id.Value,
+                incident = resolveResult
+            });
+        })
+        .WithName("PatchResolveIncident")
+        .WithSummary("Mark an incident as resolved from an external remediation system")
+        .WithDescription(
+            "Marks an incident as Resolved in NexTraceOne. " +
+            "Intended for PagerDuty, OpsGenie, Alertmanager and automated remediation pipelines " +
+            "to confirm service restoration. The operation is idempotent — incidents already " +
+            "Resolved or Closed are not modified. Accepts an optional resolution timestamp and note.")
+        .Produces(StatusCodes.Status202Accepted)
+        .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status403Forbidden);

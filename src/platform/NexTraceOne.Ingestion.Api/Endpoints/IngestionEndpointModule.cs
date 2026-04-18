@@ -22,6 +22,7 @@ namespace NexTraceOne.Ingestion.Api.Endpoints;
 ///                                              POST /api/v1/releases/rollback         (externalReleaseId no body)
 /// - <see cref="CostIngestEndpoints"/>       — POST /api/v1/costs/snapshots
 /// - <see cref="IncidentEndpoints"/>         — POST /api/v1/incidents
+///                                              PATCH /api/v1/incidents/{id}/resolve
 ///
 /// Domínios cobertos — leitura (integrations:read):
 /// - <see cref="ReleaseQueryEndpoints"/>     — GET  /api/v1/releases
@@ -35,6 +36,8 @@ namespace NexTraceOne.Ingestion.Api.Endpoints;
 ///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}/blast-radius
 ///                                              GET  /api/v1/releases/by-external/{externalSystem}/{externalReleaseId}/post-release-review
 /// - <see cref="ServiceHealthQueryEndpoints"/> — GET /api/v1/services/{serviceName}/health
+///                                              GET /api/v1/services/{serviceName}/health/history
+///                                              GET /api/v1/services/{serviceName}/releases
 /// - <see cref="IncidentEndpoints"/>          — GET /api/v1/incidents
 ///                                              GET /api/v1/incidents/{id}
 /// </summary>

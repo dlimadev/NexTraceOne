@@ -32,6 +32,13 @@ public interface IIncidentStore
     /// <summary>Verifica se o incidente existe.</summary>
     bool IncidentExists(string incidentId);
 
+    /// <summary>
+    /// Marca o incidente como resolvido com a data/hora informada.
+    /// Retorna <c>true</c> se o incidente foi encontrado e actualizado, <c>false</c> se não encontrado.
+    /// A operação é idempotente — incidentes já resolvidos/encerrados não são alterados.
+    /// </summary>
+    bool MarkIncidentResolved(string incidentId, DateTimeOffset resolvedAt);
+
     /// <summary>Retorna itens da listagem de incidentes (já como DTOs do handler).</summary>
     IReadOnlyList<ListIncidents.IncidentListItem> GetIncidentListItems();
 

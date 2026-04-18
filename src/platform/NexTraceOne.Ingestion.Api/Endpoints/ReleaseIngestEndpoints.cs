@@ -548,7 +548,7 @@ internal static class ReleaseIngestEndpoints
             }
 
             // ── Resolução da release original por GUID interno ou chave natural externa ──
-            var resolvedOriginalReleaseId = await ResolveReleaseIdAsync(sender, request.OriginalReleaseId, request.OriginalExternalReleaseId, request.ExternalSystem, ct);
+            var resolvedOriginalReleaseId = await ResolveReleaseIdAsync(sender, request.OriginalReleaseId, request.OriginalExternalReleaseId, request.OriginalExternalSystem ?? request.ExternalSystem, ct);
             if (resolvedOriginalReleaseId is null)
             {
                 logger.LogWarning("Rollback rejected: could not resolve original release from provided identifiers");
@@ -644,7 +644,8 @@ internal static class ReleaseIngestEndpoints
             "Records that a release has been rolled back to a previous release. " +
             "Used to feed Rollback Intelligence and Change-to-Incident correlation data. " +
             "Accepts either the internal NexTraceOne 'releaseId'/'originalReleaseId' (GUIDs) or the external " +
-            "'externalReleaseId'/'originalExternalReleaseId' + 'externalSystem' pairs.")
+            "'externalReleaseId'/'originalExternalReleaseId' + 'externalSystem' pairs. " +
+            "Use 'originalExternalSystem' when the original release belongs to a different CI/CD system than the rollback release.")
         .Produces(StatusCodes.Status202Accepted)
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized)

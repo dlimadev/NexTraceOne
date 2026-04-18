@@ -158,15 +158,21 @@ public sealed record RegisterRollbackRequest(
     Guid? ReleaseId,
     /// <summary>Identificador externo da release que está a ser revertida.</summary>
     string? ExternalReleaseId,
-    /// <summary>Nome do sistema externo de origem.</summary>
+    /// <summary>Nome do sistema externo de origem para a release do rollback.</summary>
     string? ExternalSystem,
     /// <summary>
     /// Identificador interno da release original para a qual se faz rollback.
-    /// Mutuamente exclusivo com OriginalExternalReleaseId + ExternalSystem.
+    /// Mutuamente exclusivo com OriginalExternalReleaseId + OriginalExternalSystem (ou ExternalSystem se omitido).
     /// </summary>
     Guid? OriginalReleaseId,
     /// <summary>Identificador externo da release original para a qual se faz rollback.</summary>
-    string? OriginalExternalReleaseId);
+    string? OriginalExternalReleaseId,
+    /// <summary>
+    /// Nome do sistema externo de origem para a release original.
+    /// Quando omitido, usa o mesmo valor de ExternalSystem.
+    /// Permite rollback entre sistemas diferentes — ex: reverter de GitHub Actions para Jenkins.
+    /// </summary>
+    string? OriginalExternalSystem);
 
 // ── Operational Intelligence — runtime snapshot ──────────────────────────────
 
@@ -217,3 +223,15 @@ public sealed record CreateIncidentRequest(
     string? ImpactedDomain,
     string Environment,
     DateTimeOffset? DetectedAtUtc);
+
+/// <summary>
+/// Request para resolução de incidente via Ingestion API.
+/// Enviado por PagerDuty, OpsGenie, Alertmanager ou pipelines de remediação automática
+/// quando o serviço é confirmado como restaurado.
+/// </summary>
+public sealed record ResolveIncidentRequest(
+    string? CorrelationId,
+    /// <summary>Data/hora UTC em que o serviço foi confirmado como restaurado. Usa UtcNow quando omitido.</summary>
+    DateTimeOffset? ResolvedAtUtc,
+    /// <summary>Nota de resolução opcional (ex: causa raiz identificada, acção tomada).</summary>
+    string? ResolutionNote);

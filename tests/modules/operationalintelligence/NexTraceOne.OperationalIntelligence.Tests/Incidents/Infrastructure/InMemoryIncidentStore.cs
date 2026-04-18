@@ -82,6 +82,14 @@ internal sealed class InMemoryIncidentStore : IIncidentStore
 
     public bool IncidentExists(string incidentId) => FindIncident(incidentId) is not null;
 
+    public bool MarkIncidentResolved(string incidentId, DateTimeOffset resolvedAt)
+    {
+        var incident = FindIncident(incidentId);
+        if (incident is null) return false;
+        incident.MarkResolved(resolvedAt);
+        return true;
+    }
+
     public IReadOnlyList<ListIncidents.IncidentListItem> GetIncidentListItems()
     {
         return _incidents

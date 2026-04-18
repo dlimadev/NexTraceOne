@@ -173,6 +173,20 @@ internal sealed class EfIncidentStore(
         return db.Incidents.Any(i => i.Id == IncidentRecordId.From(guid));
     }
 
+    public bool MarkIncidentResolved(string incidentId, DateTimeOffset resolvedAt)
+    {
+        if (!Guid.TryParse(incidentId, out var guid))
+            return false;
+
+        var incident = db.Incidents.SingleOrDefault(i => i.Id == IncidentRecordId.From(guid));
+        if (incident is null)
+            return false;
+
+        incident.MarkResolved(resolvedAt);
+        db.SaveChanges();
+        return true;
+    }
+
     public IReadOnlyList<ListIncidents.IncidentListItem> GetIncidentListItems()
     {
         return db.Incidents
