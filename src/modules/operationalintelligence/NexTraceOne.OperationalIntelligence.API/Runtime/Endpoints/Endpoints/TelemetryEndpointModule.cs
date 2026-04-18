@@ -198,13 +198,18 @@ public sealed class TelemetryEndpointModule
 
         group.MapGet("/health", async (
             IObservabilityProvider provider,
+            ICollectionModeStrategy collectionMode,
             CancellationToken ct) =>
         {
-            var healthy = await provider.IsHealthyAsync(ct);
+            var providerHealthy = await provider.IsHealthyAsync(ct);
+            var collectionModeHealthy = await collectionMode.IsHealthyAsync(ct);
             return Results.Ok(new
             {
                 provider = provider.ProviderName,
-                healthy
+                providerHealthy,
+                collectionMode = collectionMode.ModeName,
+                collectionModeHealthy,
+                healthy = providerHealthy
             });
         })
         .RequirePermission("operations:telemetry:read");

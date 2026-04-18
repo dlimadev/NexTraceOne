@@ -172,6 +172,13 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         if (filter.HasErrors == true)
             AppendCondition(sb, "StatusCode", "Error");
 
+        if (!string.IsNullOrWhiteSpace(filter.ServiceKind))
+        {
+            var serviceKindClause = BuildServiceKindWhereClause(filter.ServiceKind);
+            if (serviceKindClause is not null)
+                sb.Append(CultureInfo.InvariantCulture, $" AND {serviceKindClause}");
+        }
+
         // Root spans only for summaries
         sb.Append(" AND ParentSpanId = ''");
 
@@ -445,6 +452,16 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
     /// </summary>
     private static void AppendCondition(StringBuilder sb, string column, string value)
         => sb.Append(CultureInfo.InvariantCulture, $" AND {column} = '{EscapeSqlString(value)}'");
+
+    /// <summary>
+    /// Traduz um ServiceKind (REST, SOAP, Kafka, etc.) em cláusula WHERE SQL para ClickHouse,
+    /// baseada nos atributos OTel armazenados na coluna SpanAttributes (Map(String, String)).
+    ///
+    /// Em ClickHouse, SpanAttributes['key'] retorna string vazia quando a chave não existe.
+    /// A lógica espelha as regras do SpanKindResolver para consistência.
+    /// </summary>
+    private static string? BuildServiceKindWhereClause(string serviceKind)
+        => ClickHouseServiceKindFilter.Build(serviceKind);
 
     private static string? NullIfEmpty(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value;

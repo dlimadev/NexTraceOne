@@ -168,6 +168,13 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
         if (filter.HasErrors == true)
             musts.Add(new { term = new Dictionary<string, object> { ["status.code"] = "Error" } });
 
+        if (!string.IsNullOrWhiteSpace(filter.ServiceKind))
+        {
+            var kindCondition = ElasticServiceKindFilter.Build(filter.ServiceKind);
+            if (kindCondition is not null)
+                musts.Add(kindCondition);
+        }
+
         // Query root spans only (no parent span) for trace summaries
         var mustNots = new List<object>
         {
