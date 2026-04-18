@@ -8216,7 +8216,22 @@
     "overrideGateTitle": "Override Gate with Justification",
     "overrideGateSubtitle": "Provide a documented justification to override this failed gate. This action is audited.",
     "overrideJustificationPlaceholder": "Provide a clear justification for overriding this gate...",
-    "confirmOverride": "Confirm Override"
+    "confirmOverride": "Confirm Override",
+    "budgetGate": {
+      "warnTitle": "Budget Warning — Proceed with Caution",
+      "blockTitle": "Promotion Blocked — Budget Exceeded",
+      "approvalSentTitle": "Approval Required — Request Submitted",
+      "costDelta": "Cost Delta",
+      "environment": "Target Environment",
+      "warnConfirmMessage": "The promotion will proceed but the budget overrun will be recorded for audit. Confirm to continue.",
+      "blockMessage": "This promotion is blocked because the release exceeds the configured budget threshold and the gate is set to block mode. Please review the FinOps configuration or contact the platform admin.",
+      "approvalSentMessage": "A budget approval request has been submitted automatically. The promotion will only proceed after an approver reviews and approves the request.",
+      "confirmPromoteAnyway": "Promote Anyway",
+      "goToApprovals": "View Approval Request",
+      "goToFinOpsConfig": "FinOps Configuration",
+      "approvalId": "Approval Request ID",
+      "autoJustification": "Auto-created by promotion flow — release exceeds configured budget threshold."
+    }
   },
   "releaseCalendar": {
     "activeFreezeWindows": "Active Freeze Windows",

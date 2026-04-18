@@ -8194,7 +8194,22 @@
     "overrideGateTitle": "Override de Gate con Justificación",
     "overrideGateSubtitle": "Proporcione una justificación documentada para sustituir este gate fallido. Esta acción es auditada.",
     "overrideJustificationPlaceholder": "Proporcione una justificación clara para sustituir este gate...",
-    "confirmOverride": "Confirmar Override"
+    "confirmOverride": "Confirmar Override",
+    "budgetGate": {
+      "warnTitle": "Advertencia de Presupuesto — Proceder con Precaución",
+      "blockTitle": "Promoción Bloqueada — Presupuesto Excedido",
+      "approvalSentTitle": "Aprobación Requerida — Solicitud Enviada",
+      "costDelta": "Variación de Costo",
+      "environment": "Entorno Destino",
+      "warnConfirmMessage": "La promoción continuará pero el exceso de presupuesto quedará registrado para auditoría. Confirme para continuar.",
+      "blockMessage": "Esta promoción está bloqueada porque la versión supera el límite de presupuesto configurado y la compuerta está en modo de bloqueo. Revise la configuración de FinOps o contacte al administrador de plataforma.",
+      "approvalSentMessage": "Se ha enviado automáticamente una solicitud de aprobación de presupuesto. La promoción solo continuará tras la revisión y aprobación por parte de un aprobador.",
+      "confirmPromoteAnyway": "Promover de Todas Formas",
+      "goToApprovals": "Ver Solicitud de Aprobación",
+      "goToFinOpsConfig": "Configuración FinOps",
+      "approvalId": "ID de Solicitud de Aprobación",
+      "autoJustification": "Creado automáticamente por el flujo de promoción — la versión supera el límite de presupuesto configurado."
+    }
   },
   "releaseCalendar": {
     "activeFreezeWindows": "Ventanas de Freeze Activas",

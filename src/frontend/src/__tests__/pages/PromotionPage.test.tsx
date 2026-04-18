@@ -11,9 +11,17 @@ vi.mock('../../features/change-governance/api', () => ({
     createRequest: vi.fn(),
     promote: vi.fn(),
     reject: vi.fn(),
+    overrideGate: vi.fn(),
   },
   changeIntelligenceApi: {
     listRecentReleases: vi.fn(),
+  },
+}));
+
+vi.mock('../../features/governance/api/finOps', () => ({
+  finOpsApi: {
+    evaluateReleaseBudgetGate: vi.fn(),
+    createBudgetApproval: vi.fn(),
   },
 }));
 
@@ -33,6 +41,7 @@ vi.mock('../../contexts/EnvironmentContext', () => ({
 }));
 
 import { promotionApi, changeIntelligenceApi } from '../../features/change-governance/api';
+import { finOpsApi } from '../../features/governance/api/finOps';
 
 const mockRequests: PagedList<PromotionRequest> = {
   items: [
@@ -183,5 +192,112 @@ describe('PromotionPage', () => {
     await waitFor(() => {
       expect(screen.getByText('2 total')).toBeInTheDocument();
     });
+  });
+});
+
+// ── Budget Gate Integration Tests ────────────────────────────────────────────
+
+const baseGateResponse = {
+  releaseId: 'rel-001-0000-0000',
+  serviceName: 'rel-001-0000-0000',
+  environment: 'production',
+  actualTotalCost: 0,
+  baselineTotalCost: 0,
+  costDelta: 0,
+  costDeltaPct: 0,
+  currency: 'USD',
+  reason: 'Cost is within budget.',
+  evaluatedAt: '2024-01-15T10:00:00Z',
+};
+
+describe('PromotionPage — Budget Gate integration', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(changeIntelligenceApi.listRecentReleases).mockResolvedValue({
+      items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 1,
+    });
+    vi.mocked(promotionApi.listRequests).mockResolvedValue(mockRequests);
+    vi.mocked(promotionApi.promote).mockResolvedValue({ id: 'pr-1' });
+  });
+
+  it('promotes directly when gate returns Allow', async () => {
+    vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mockResolvedValue({
+      ...baseGateResponse, action: 'Allow',
+    });
+
+    renderPromotion();
+    await waitFor(() => expect(screen.getAllByText(/staging → production/i).length).toBeGreaterThan(0));
+
+    const promoteBtns = screen.getAllByRole('button', { name: /^promote$/i });
+    await userEvent.click(promoteBtns[0]);
+
+    await waitFor(() => {
+      expect(finOpsApi.evaluateReleaseBudgetGate).toHaveBeenCalledTimes(1);
+      expect(promotionApi.promote).toHaveBeenCalledWith('pr-1');
+    });
+  });
+
+  it('shows warn dialog when gate returns Warn and allows proceed', async () => {
+    vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mockResolvedValue({
+      ...baseGateResponse, action: 'Warn', costDeltaPct: 85,
+      reason: 'Cost delta 85.0% exceeds alert threshold. Gate is in warning-only mode.',
+    });
+
+    renderPromotion();
+    await waitFor(() => expect(screen.getAllByText(/staging → production/i).length).toBeGreaterThan(0));
+
+    const promoteBtns = screen.getAllByRole('button', { name: /^promote$/i });
+    await userEvent.click(promoteBtns[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('budget-gate-warn-dialog')).toBeInTheDocument();
+      expect(screen.getByText(/budget warning/i)).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /promote anyway/i }));
+
+    await waitFor(() => expect(promotionApi.promote).toHaveBeenCalledWith('pr-1'));
+  });
+
+  it('shows block dialog when gate returns Block', async () => {
+    vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mockResolvedValue({
+      ...baseGateResponse, action: 'Block', costDeltaPct: 120,
+      reason: 'Cost delta 120.0% exceeds threshold. Promotion is blocked.',
+    });
+
+    renderPromotion();
+    await waitFor(() => expect(screen.getAllByText(/staging → production/i).length).toBeGreaterThan(0));
+
+    const promoteBtns = screen.getAllByRole('button', { name: /^promote$/i });
+    await userEvent.click(promoteBtns[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('budget-gate-block-dialog')).toBeInTheDocument();
+      expect(screen.getByText(/promotion blocked/i)).toBeInTheDocument();
+    });
+
+    expect(promotionApi.promote).not.toHaveBeenCalled();
+  });
+
+  it('shows approval dialog and creates approval when gate returns RequireApproval', async () => {
+    vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mockResolvedValue({
+      ...baseGateResponse, action: 'RequireApproval', costDeltaPct: 95,
+      reason: 'Cost delta 95.0% exceeds threshold. Promotion is blocked pending budget approval.',
+    });
+    vi.mocked(finOpsApi.createBudgetApproval).mockResolvedValue({ approvalId: 'appr-001' });
+
+    renderPromotion();
+    await waitFor(() => expect(screen.getAllByText(/staging → production/i).length).toBeGreaterThan(0));
+
+    const promoteBtns = screen.getAllByRole('button', { name: /^promote$/i });
+    await userEvent.click(promoteBtns[0]);
+
+    await waitFor(() => {
+      expect(finOpsApi.createBudgetApproval).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('budget-gate-approval-dialog')).toBeInTheDocument();
+      expect(screen.getByText(/approval required/i)).toBeInTheDocument();
+    });
+
+    expect(promotionApi.promote).not.toHaveBeenCalled();
   });
 });

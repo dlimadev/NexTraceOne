@@ -91,6 +91,31 @@ export interface ResolveApprovalRequest {
   comment?: string;
 }
 
+/** Payload para avaliação do gate de orçamento antes de promover uma release. */
+export interface EvaluateReleaseBudgetGateRequest {
+  releaseId: string;
+  serviceName: string;
+  environment: string;
+  actualCostPerDay: number;
+  baselineCostPerDay: number;
+  measurementDays: number;
+}
+
+/** Resultado da avaliação do gate de orçamento. */
+export interface EvaluateReleaseBudgetGateResponse {
+  releaseId: string;
+  serviceName: string;
+  environment: string;
+  actualTotalCost: number;
+  baselineTotalCost: number;
+  costDelta: number;
+  costDeltaPct: number;
+  currency: string;
+  action: 'Allow' | 'Warn' | 'Block' | 'RequireApproval';
+  reason: string;
+  evaluatedAt: string;
+}
+
 /** Cliente de API para FinOps contextual do módulo Governance. */
 export const finOpsApi = {
   getSummary: (params?: { teamId?: string; domainId?: string; serviceId?: string; range?: string }) =>
@@ -125,4 +150,7 @@ export const finOpsApi = {
 
   resolveApproval: (approvalId: string, data: ResolveApprovalRequest) =>
     client.put(`/finops/budget-approvals/${approvalId}/resolve`, data).then((r) => r.data),
+
+  evaluateReleaseBudgetGate: (data: EvaluateReleaseBudgetGateRequest) =>
+    client.post<EvaluateReleaseBudgetGateResponse>('/finops/releases/evaluate-budget-gate', data).then((r) => r.data),
 };
