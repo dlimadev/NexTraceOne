@@ -90,10 +90,17 @@ public static class EvaluateReleaseBudgetGate
                     EvaluatedAt: dateTimeProvider.UtcNow));
             }
 
-            // ── Threshold de alerta ──
-            var thresholdConfig = await configService.ResolveEffectiveValueAsync(
-                "finops.budget_alert_threshold", ConfigurationScope.Tenant, null, cancellationToken);
-            var alertThresholdPct = decimal.TryParse(thresholdConfig?.EffectiveValue, out var tp) ? tp : 80m;
+            // ── Threshold de alerta: usa chave multi-tier; cai na chave legada se não configurada ──
+            var multiTierConfig = await configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsBudgetAlertThresholds, ConfigurationScope.Tenant, null, cancellationToken);
+            var resolvedThreshold = ResolveAlertThreshold(multiTierConfig?.EffectiveValue);
+            if (resolvedThreshold == null)
+            {
+                var legacyConfig = await configService.ResolveEffectiveValueAsync(
+                    "finops.budget_alert_threshold", ConfigurationScope.Tenant, null, cancellationToken);
+                resolvedThreshold = decimal.TryParse(legacyConfig?.EffectiveValue, out var tp) ? tp : 80m;
+            }
+            var alertThresholdPct = resolvedThreshold.Value;
 
             // ── Dentro do threshold → Allow ──
             if (baselineTotalCost == 0 || costDeltaPct <= alertThresholdPct)
@@ -154,6 +161,29 @@ public static class EvaluateReleaseBudgetGate
                 Action: action,
                 Reason: reason,
                 EvaluatedAt: dateTimeProvider.UtcNow));
+        }
+
+        /// <summary>
+        /// Extrai o threshold de alerta (%) da chave multi-tier <c>finops.budget.alert_thresholds</c>.
+        /// Retorna o menor percent encontrado, ou null se o JSON for inválido/vazio.
+        /// </summary>
+        private static decimal? ResolveAlertThreshold(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return null;
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                if (root.ValueKind != System.Text.Json.JsonValueKind.Array) return null;
+                decimal? min = null;
+                foreach (var tier in root.EnumerateArray())
+                {
+                    if (tier.TryGetProperty("percent", out var p) && p.TryGetDecimal(out var pv))
+                        min = min == null ? pv : Math.Min(min.Value, pv);
+                }
+                return min;
+            }
+            catch { return null; }
         }
     }
 

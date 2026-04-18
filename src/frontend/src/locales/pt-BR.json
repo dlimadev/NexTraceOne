@@ -12744,5 +12744,60 @@
       "viewRunbook": "Ver Runbook",
       "createRunbook": "Criar Runbook"
     }
+  },
+  "finops": {
+    "config": {
+      "title": "FinOps Configuration",
+      "subtitle": "Configure currency, budget gate behaviour, anomaly detection, waste detection, and approval workflow.",
+      "currency": {
+        "title": "Default Currency",
+        "description": "ISO 4217 currency code.",
+        "selectLabel": "Select currency"
+      },
+      "gate": {
+        "title": "Release Budget Gate",
+        "description": "Controls what happens when a release exceeds the configured budget threshold.",
+        "enabled": "Enable budget gate",
+        "blockOnExceed": "Block when exceeded",
+        "requireApproval": "Allow approval override",
+        "alertThreshold": "Alert threshold (%)"
+      },
+      "gateDisabled": "Disabled",
+      "gateWarn": "Warn only",
+      "gateBlock": "Blocked",
+      "gateRequireApproval": "Approval required",
+      "approvers": {
+        "title": "Budget Approvers",
+        "description": "Users authorised to approve budget overrides.",
+        "placeholder": "user@company.com",
+        "add": "Add",
+        "remove": "Remove {{email}}",
+        "empty": "No approvers configured.",
+        "inactiveNote": "Approvers only active in 'Approval required' gate mode."
+      },
+      "anomaly": {
+        "title": "Anomaly Detection",
+        "description": "Automatic cost anomaly detection settings.",
+        "enabled": "Detection enabled",
+        "comparisonWindow": "Comparison window"
+      },
+      "waste": {
+        "title": "Waste Detection",
+        "description": "Identifies over-provisioned or idle resources.",
+        "enabled": "Detection enabled",
+        "categories": "Active categories"
+      },
+      "recommendations": {
+        "title": "Recommendation Policy",
+        "description": "Controls how FinOps recommendations are generated.",
+        "notConfigured": "Using system defaults."
+      },
+      "showback": {
+        "title": "Showback & Chargeback",
+        "description": "Showback visibility and chargeback allocation settings.",
+        "showbackEnabled": "Showback",
+        "chargebackEnabled": "Chargeback"
+      }
+    }
   }
 }

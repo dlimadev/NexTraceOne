@@ -39,6 +39,16 @@ const mockConfig = {
   requireApproval: true,
   approvers: ['alice@corp.com', 'bob@corp.com'],
   alertThresholdPct: 80,
+  anomalyDetectionEnabled: true,
+  anomalyThresholds: '{"warning":20,"high":50,"critical":100}',
+  comparisonWindowDays: 30,
+  wasteDetectionEnabled: true,
+  wasteThresholds: null,
+  wasteCategories: ['IdleResources', 'Overprovisioned'],
+  recommendationPolicy: null,
+  notificationPolicy: null,
+  showbackEnabled: false,
+  chargebackEnabled: false,
   resolvedAt: '2026-04-18T12:00:00Z',
 };
 
@@ -111,7 +121,7 @@ describe('FinOpsConfigurationPage', () => {
   it('renders page title', async () => {
     renderConfigPage();
     await waitFor(() => {
-      expect(screen.getByText('finops.config.title')).toBeTruthy();
+      expect(screen.getByText('FinOps Configuration')).toBeTruthy();
     });
   });
 
@@ -142,7 +152,7 @@ describe('FinOpsConfigurationPage', () => {
   it('shows gate badge with correct status', async () => {
     renderConfigPage();
     await waitFor(() => {
-      expect(screen.getByText('finops.config.gateRequireApproval')).toBeTruthy();
+      expect(screen.getByText('Approval required')).toBeTruthy();
     });
   });
 
@@ -150,6 +160,31 @@ describe('FinOpsConfigurationPage', () => {
     renderConfigPage();
     await waitFor(() => {
       expect(screen.getAllByRole('checkbox').length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  it('shows anomaly detection section', async () => {
+    renderConfigPage();
+    await waitFor(() => {
+      expect(screen.getByText('Anomaly Detection')).toBeTruthy();
+      // comparisonWindowDays = 30 days
+      expect(screen.getByText((_, el) => el?.textContent?.includes('30') === true && el?.tagName === 'DD')).toBeTruthy();
+    });
+  });
+
+  it('shows waste detection section with categories', async () => {
+    renderConfigPage();
+    await waitFor(() => {
+      expect(screen.getByText('Waste Detection')).toBeTruthy();
+      expect(screen.getByText('IdleResources')).toBeTruthy();
+      expect(screen.getByText('Overprovisioned')).toBeTruthy();
+    });
+  });
+
+  it('shows showback and chargeback section', async () => {
+    renderConfigPage();
+    await waitFor(() => {
+      expect(screen.getByText('Showback & Chargeback')).toBeTruthy();
     });
   });
 });

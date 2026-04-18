@@ -1,8 +1,12 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Contracts.Reliability.ServiceInterfaces;
+using System.Text.Json;
 using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetServiceFinOps;
@@ -31,15 +35,30 @@ public static class GetServiceFinOps
     {
         private readonly ICostIntelligenceModule _costModule;
         private readonly IReliabilityModule _reliabilityModule;
+        private readonly IConfigurationResolutionService _configService;
 
-        public Handler(ICostIntelligenceModule costModule, IReliabilityModule reliabilityModule)
+        public Handler(ICostIntelligenceModule costModule, IReliabilityModule reliabilityModule, IConfigurationResolutionService configService)
         {
             _costModule = costModule;
             _reliabilityModule = reliabilityModule;
+            _configService = configService;
         }
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // ── Ler configurações de eficiência ──
+            var recommendationCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsRecommendationPolicy, ConfigurationScope.Tenant, null, cancellationToken);
+            var savingsRatePct = ParseSavingsRatePct(recommendationCfg?.EffectiveValue);
+
+            var costBandsCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsEfficiencyCostBands, ConfigurationScope.Tenant, null, cancellationToken);
+            var (wastefulBand, inefficientBand, acceptableBand) = ParseCostBands(costBandsCfg?.EffectiveValue);
+
+            var burnRateCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsEfficiencyBurnRateThresholds, ConfigurationScope.Tenant, null, cancellationToken);
+            var (elevatedBurnRate, criticalBurnRate) = ParseBurnRateThresholds(burnRateCfg?.EffectiveValue);
+
             var record = await _costModule.GetServiceCostAsync(request.ServiceId, cancellationToken: cancellationToken);
             var allRecords = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
@@ -70,7 +89,7 @@ public static class GetServiceFinOps
                 }
                 : Array.Empty<WasteSignalDto>();
 
-            var potentialSavings = Math.Round(waste * 0.35m, 2);
+            var potentialSavings = Math.Round(waste * (savingsRatePct / 100m), 2);
             var optimizations = potentialSavings > 0m
                 ? new[]
                 {
@@ -91,13 +110,13 @@ public static class GetServiceFinOps
 
             var reliabilityScore = errorBudget.HasValue ? Math.Round(errorBudget.Value * 100m, 1) : 0m;
             var reliabilityTrend = burnRate.HasValue
-                ? burnRate.Value > 1.5m ? TrendDirection.Declining
-                : burnRate.Value < 0.5m ? TrendDirection.Improving
+                ? burnRate.Value > criticalBurnRate ? TrendDirection.Declining
+                : burnRate.Value < elevatedBurnRate * 0.5m ? TrendDirection.Improving
                 : TrendDirection.Stable
                 : TrendDirection.Stable;
 
             // Efficiency indicators derived from cost and reliability data
-            var efficiencyIndicators = BuildEfficiencyIndicators(currentRecord.TotalCost, averageServiceCost, reliabilityScore, burnRate);
+            var efficiencyIndicators = BuildEfficiencyIndicators(currentRecord.TotalCost, averageServiceCost, reliabilityScore, burnRate, elevatedBurnRate, criticalBurnRate);
 
             var response = new Response(
                 ServiceId: record.ServiceId,
@@ -107,7 +126,7 @@ public static class GetServiceFinOps
                 MonthlyCost: currentRecord.TotalCost,
                 PreviousMonthCost: previousMonthCost,
                 CostTrend: costTrend,
-                Efficiency: ComputeEfficiency(currentRecord.TotalCost),
+                Efficiency: ComputeEfficiency(currentRecord.TotalCost, wastefulBand, inefficientBand, acceptableBand),
                 WasteSignals: wasteSignals,
                 TotalWaste: Math.Round(waste, 2),
                 EfficiencyIndicators: efficiencyIndicators,
@@ -124,8 +143,54 @@ public static class GetServiceFinOps
             return Result<Response>.Success(response);
         }
 
+        private static decimal ParseSavingsRatePct(string? json)
+        {
+            const decimal defaultRate = 35m;
+            if (string.IsNullOrWhiteSpace(json)) return defaultRate;
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                return root.TryGetProperty("savingsRatePct", out var p) && p.TryGetDecimal(out var v)
+                    ? Math.Clamp(v, 1m, 100m) : defaultRate;
+            }
+            catch { return defaultRate; }
+        }
+
+        private static (decimal wasteful, decimal inefficient, decimal acceptable) ParseCostBands(string? json)
+        {
+            const decimal dw = 15000m, di = 10000m, da = 5000m;
+            if (string.IsNullOrWhiteSpace(json)) return (dw, di, da);
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                var w = root.TryGetProperty("Wasteful", out var wp) && wp.TryGetDecimal(out var wv) ? wv : dw;
+                var i = root.TryGetProperty("Inefficient", out var ip) && ip.TryGetDecimal(out var iv) ? iv : di;
+                var a = root.TryGetProperty("Acceptable", out var ap) && ap.TryGetDecimal(out var av) ? av : da;
+                return (w, i, a);
+            }
+            catch { return (dw, di, da); }
+        }
+
+        private static (decimal elevated, decimal critical) ParseBurnRateThresholds(string? json)
+        {
+            const decimal de = 1.5m, dc = 2.0m;
+            if (string.IsNullOrWhiteSpace(json)) return (de, dc);
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                var e = root.TryGetProperty("elevated", out var ep) && ep.TryGetDecimal(out var ev) ? ev : de;
+                var c = root.TryGetProperty("critical", out var cp) && cp.TryGetDecimal(out var cv) ? cv : dc;
+                return (Math.Max(e, 0.1m), Math.Max(c, 0.1m));
+            }
+            catch { return (de, dc); }
+        }
+
         private static List<EfficiencyIndicatorDto> BuildEfficiencyIndicators(
-            decimal currentCost, decimal averageCost, decimal reliabilityScore, decimal? burnRate)
+            decimal currentCost, decimal averageCost, decimal reliabilityScore, decimal? burnRate,
+            decimal elevatedBurnRate, decimal criticalBurnRate)
         {
             var indicators = new List<EfficiencyIndicatorDto>();
 
@@ -155,17 +220,19 @@ public static class GetServiceFinOps
                     Category: EfficiencyCategory.ErrorRate,
                     CurrentValue: Math.Round(burnRate.Value, 2),
                     TargetValue: 1.0m,
-                    Assessment: burnRate.Value <= 1.0m ? "Healthy" : burnRate.Value <= 2.0m ? "Elevated" : "Critical"));
+                    Assessment: burnRate.Value <= elevatedBurnRate ? "Healthy"
+                        : burnRate.Value <= criticalBurnRate ? "Elevated"
+                        : "Critical"));
             }
 
             return indicators;
         }
 
-        private static CostEfficiency ComputeEfficiency(decimal cost) => cost switch
+        private static CostEfficiency ComputeEfficiency(decimal cost, decimal wasteful, decimal inefficient, decimal acceptable) => cost switch
         {
-            > 15000m => CostEfficiency.Wasteful,
-            > 10000m => CostEfficiency.Inefficient,
-            > 5000m => CostEfficiency.Acceptable,
+            _ when cost > wasteful => CostEfficiency.Wasteful,
+            _ when cost > inefficient => CostEfficiency.Inefficient,
+            _ when cost > acceptable => CostEfficiency.Acceptable,
             _ => CostEfficiency.Efficient
         };
 

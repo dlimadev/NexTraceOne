@@ -47,6 +47,16 @@ export interface FinOpsConfigurationResponse {
   requireApproval: boolean;
   approvers: string[];
   alertThresholdPct: number;
+  anomalyDetectionEnabled: boolean;
+  anomalyThresholds: string | null;
+  comparisonWindowDays: number;
+  wasteDetectionEnabled: boolean;
+  wasteThresholds: string | null;
+  wasteCategories: string[];
+  recommendationPolicy: string | null;
+  notificationPolicy: string | null;
+  showbackEnabled: boolean;
+  chargebackEnabled: boolean;
   resolvedAt: string;
 }
 

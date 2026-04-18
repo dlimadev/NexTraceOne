@@ -50,4 +50,58 @@ public static class GovernanceConfigKeys
 
     /// <summary>Lista JSON de utilizadores/grupos com permissão para aprovar overrides de orçamento FinOps.</summary>
     public const string FinOpsBudgetGateApprovers = "finops.release.budget_gate.approvers";
+
+    /// <summary>
+    /// Thresholds de alerta de orçamento multi-tier (JSON array com percent, severity, action).
+    /// Substitui a chave simples <c>finops.budget_alert_threshold</c>.
+    /// </summary>
+    public const string FinOpsBudgetAlertThresholds = "finops.budget.alert_thresholds";
+
+    /// <summary>Orçamento mensal por equipa (JSON object: teamId → {monthlyBudget, currency}).</summary>
+    public const string FinOpsBudgetByTeam = "finops.budget.by_team";
+
+    /// <summary>Restrições de orçamento por ambiente (JSON object: environment → {monthlyBudget, currency}).</summary>
+    public const string FinOpsBudgetByEnvironment = "finops.budget.by_environment";
+
+    /// <summary>Habilita a detecção de anomalias de custo.</summary>
+    public const string FinOpsAnomalyDetectionEnabled = "finops.anomaly.detection_enabled";
+
+    /// <summary>Thresholds de detecção de anomalias (JSON: {warning, high, critical} em % de desvio).</summary>
+    public const string FinOpsAnomalyThresholds = "finops.anomaly.thresholds";
+
+    /// <summary>Janela de comparação em dias para deteção de anomalias de custo.</summary>
+    public const string FinOpsAnomalyComparisonWindowDays = "finops.anomaly.comparison_window_days";
+
+    /// <summary>Habilita a detecção de sinais de desperdício operacional.</summary>
+    public const string FinOpsWasteDetectionEnabled = "finops.waste.detection_enabled";
+
+    /// <summary>Thresholds para deteção de desperdício (JSON: percentileThreshold, overProvisionedCostRatio, idleCostlyRatio).</summary>
+    public const string FinOpsWasteThresholds = "finops.waste.thresholds";
+
+    /// <summary>Categorias de desperdício activas para classificação (JSON array de strings).</summary>
+    public const string FinOpsWasteCategories = "finops.waste.categories";
+
+    /// <summary>Política de recomendações financeiras (JSON: minSavingsThreshold, savingsRatePct, showInDashboard, notifyOnHighSavings).</summary>
+    public const string FinOpsRecommendationPolicy = "finops.recommendation.policy";
+
+    /// <summary>Política de notificações FinOps (JSON: notifyOnAnomaly, digestFrequency, recipients).</summary>
+    public const string FinOpsNotificationPolicy = "finops.notification.policy";
+
+    /// <summary>Habilita a apresentação de custos por serviço, equipa e domínio (showback).</summary>
+    public const string FinOpsShowbackEnabled = "finops.showback.enabled";
+
+    /// <summary>Habilita o modelo de chargeback — custos debitados às equipas responsáveis.</summary>
+    public const string FinOpsChargebackEnabled = "finops.chargeback.enabled";
+
+    /// <summary>
+    /// Percentagem de variação de custo que classifica a tendência como Declining ou Improving.
+    /// Default: 5.0 (variação &gt; 5% → Declining; &lt; -5% → Improving).
+    /// </summary>
+    public const string FinOpsEfficiencyTrendThresholdPct = "finops.efficiency.trend_threshold_pct";
+
+    /// <summary>Bandas monetárias absolutas para classificação de eficiência de custo por serviço (JSON: {Wasteful, Inefficient, Acceptable}).</summary>
+    public const string FinOpsEfficiencyCostBands = "finops.efficiency.cost_bands";
+
+    /// <summary>Thresholds de burn rate para classificação de confiabilidade (JSON: {elevated, critical}).</summary>
+    public const string FinOpsEfficiencyBurnRateThresholds = "finops.efficiency.burn_rate_thresholds";
 }

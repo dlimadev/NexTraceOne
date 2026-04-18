@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using System.Text.Json;
 using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetEfficiencyIndicators;
@@ -32,10 +36,15 @@ public static class GetEfficiencyIndicators
         }
     }
 
-    public sealed class Handler(ICostIntelligenceModule costModule) : IQueryHandler<Query, Response>
+    public sealed class Handler(ICostIntelligenceModule costModule, IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // ── Ler thresholds de anomalia para derivar bandas de eficiência ──
+            var anomalyThresholdsCfg = await configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsAnomalyThresholds, ConfigurationScope.Tenant, null, cancellationToken);
+            var (wastefulRatio, inefficientRatio) = ParseAnomalyThresholds(anomalyThresholdsCfg?.EffectiveValue);
+
             var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             if (records.Count == 0)
@@ -53,7 +62,7 @@ public static class GetEfficiencyIndicators
 
             var indicators = records.Select(r =>
             {
-                var efficiency = ClassifyEfficiency(r.TotalCost, avgCost);
+                var efficiency = ClassifyEfficiency(r.TotalCost, avgCost, wastefulRatio, inefficientRatio);
                 var costRatio = avgCost > 0 ? r.TotalCost / avgCost : 1m;
                 var costScore = Math.Max(0m, Math.Min(200m, (1m / Math.Max(costRatio, 0.01m)) * 100m));
 
@@ -108,14 +117,34 @@ public static class GetEfficiencyIndicators
                 DataSource: "cost-intelligence"));
         }
 
-        private static CostEfficiency ClassifyEfficiency(decimal cost, decimal avgCost)
+        private static (decimal wastefulRatio, decimal inefficientRatio) ParseAnomalyThresholds(string? json)
+        {
+            const decimal defaultWasteful = 2.0m;
+            const decimal defaultInefficient = 1.5m;
+            if (string.IsNullOrWhiteSpace(json)) return (defaultWasteful, defaultInefficient);
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                // critical deviation % → ratio (e.g., 100% deviation = 2.0 ratio)
+                var wasteful = root.TryGetProperty("critical", out var c) && c.TryGetDecimal(out var cv)
+                    ? 1m + cv / 100m : defaultWasteful;
+                // high deviation % → ratio (e.g., 50% deviation = 1.5 ratio)
+                var inefficient = root.TryGetProperty("high", out var h) && h.TryGetDecimal(out var hv)
+                    ? 1m + hv / 100m : defaultInefficient;
+                return (Math.Max(wasteful, 1.1m), Math.Max(inefficient, 1.1m));
+            }
+            catch { return (defaultWasteful, defaultInefficient); }
+        }
+
+        private static CostEfficiency ClassifyEfficiency(decimal cost, decimal avgCost, decimal wastefulRatio, decimal inefficientRatio)
         {
             if (avgCost == 0) return CostEfficiency.Efficient;
             var ratio = cost / avgCost;
             return ratio switch
             {
-                > 2.0m => CostEfficiency.Wasteful,
-                > 1.5m => CostEfficiency.Inefficient,
+                _ when ratio > wastefulRatio => CostEfficiency.Wasteful,
+                _ when ratio > inefficientRatio => CostEfficiency.Inefficient,
                 > 0.8m => CostEfficiency.Acceptable,
                 _ => CostEfficiency.Efficient
             };

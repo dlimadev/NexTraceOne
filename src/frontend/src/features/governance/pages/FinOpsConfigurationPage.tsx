@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings, DollarSign, Shield, CheckCircle, AlertTriangle, Plus, X, Save } from 'lucide-react';
+import { Settings, DollarSign, Shield, CheckCircle, AlertTriangle, Plus, X, Activity, Trash2, BookOpen, Eye } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -247,6 +247,115 @@ export function FinOpsConfigurationPage() {
                 {t('finops.config.approvers.add')}
               </button>
             </div>
+          </CardBody>
+        </Card>
+
+        {/* ── Detecção de anomalias ─────────────────────────── */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Activity size={16} className="text-accent" />
+              <span className="font-semibold text-sm">{t('finops.config.anomaly.title')}</span>
+              <Badge variant={data.anomalyDetectionEnabled ? 'success' : 'default'} size="sm">
+                {data.anomalyDetectionEnabled ? t('common.active') : t('common.inactive')}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <p className="text-xs text-muted mb-3">{t('finops.config.anomaly.description')}</p>
+            <dl className="space-y-2 text-xs">
+              <div className="flex justify-between">
+                <dt className="text-muted">{t('finops.config.anomaly.enabled')}</dt>
+                <dd>{data.anomalyDetectionEnabled ? t('common.yes') : t('common.no')}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-muted">{t('finops.config.anomaly.comparisonWindow')}</dt>
+                <dd>{data.comparisonWindowDays} {t('common.days')}</dd>
+              </div>
+            </dl>
+          </CardBody>
+        </Card>
+
+        {/* ── Detecção de desperdício ───────────────────────── */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Trash2 size={16} className="text-accent" />
+              <span className="font-semibold text-sm">{t('finops.config.waste.title')}</span>
+              <Badge variant={data.wasteDetectionEnabled ? 'success' : 'default'} size="sm">
+                {data.wasteDetectionEnabled ? t('common.active') : t('common.inactive')}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <p className="text-xs text-muted mb-3">{t('finops.config.waste.description')}</p>
+            <dl className="space-y-2 text-xs">
+              <div className="flex justify-between">
+                <dt className="text-muted">{t('finops.config.waste.enabled')}</dt>
+                <dd>{data.wasteDetectionEnabled ? t('common.yes') : t('common.no')}</dd>
+              </div>
+              {data.wasteCategories.length > 0 && (
+                <div>
+                  <dt className="text-muted mb-1">{t('finops.config.waste.categories')}</dt>
+                  <dd className="flex flex-wrap gap-1">
+                    {data.wasteCategories.map((cat) => (
+                      <Badge key={cat} variant="default" size="sm">{cat}</Badge>
+                    ))}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </CardBody>
+        </Card>
+
+        {/* ── Recomendações ─────────────────────────────────── */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <BookOpen size={16} className="text-accent" />
+              <span className="font-semibold text-sm">{t('finops.config.recommendations.title')}</span>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <p className="text-xs text-muted mb-3">{t('finops.config.recommendations.description')}</p>
+            {data.recommendationPolicy ? (
+              <pre className="text-xs bg-surface-hover rounded p-2 overflow-x-auto whitespace-pre-wrap">
+                {(() => { try { return JSON.stringify(JSON.parse(data.recommendationPolicy), null, 2); } catch { return data.recommendationPolicy; } })()}
+              </pre>
+            ) : (
+              <p className="text-xs text-muted italic">{t('finops.config.recommendations.notConfigured')}</p>
+            )}
+          </CardBody>
+        </Card>
+
+        {/* ── Showback / Chargeback ─────────────────────────── */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Eye size={16} className="text-accent" />
+              <span className="font-semibold text-sm">{t('finops.config.showback.title')}</span>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <p className="text-xs text-muted mb-3">{t('finops.config.showback.description')}</p>
+            <dl className="space-y-2 text-xs">
+              <div className="flex justify-between">
+                <dt className="text-muted">{t('finops.config.showback.showbackEnabled')}</dt>
+                <dd>
+                  <Badge variant={data.showbackEnabled ? 'success' : 'default'} size="sm">
+                    {data.showbackEnabled ? t('common.active') : t('common.inactive')}
+                  </Badge>
+                </dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-muted">{t('finops.config.showback.chargebackEnabled')}</dt>
+                <dd>
+                  <Badge variant={data.chargebackEnabled ? 'warning' : 'default'} size="sm">
+                    {data.chargebackEnabled ? t('common.active') : t('common.inactive')}
+                  </Badge>
+                </dd>
+              </div>
+            </dl>
           </CardBody>
         </Card>
 

@@ -333,4 +333,101 @@ public sealed class FinOpsConfigAndApprovalTests
         result.Value.Items[0].ServiceName.Should().Be("svc-a");
         result.Value.Items[1].Currency.Should().Be("EUR");
     }
+
+    // ── GetFinOpsConfiguration — Extended Fields ──────────────────────
+
+    [Fact]
+    public async Task GetFinOpsConfig_Returns_Extended_Defaults_When_No_Config()
+    {
+        var (cfg, dt) = CreateMocks();
+        cfg.ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
+
+        var sut = new GetFinOpsConfigFeature.Handler(cfg, dt);
+        var result = await sut.Handle(new GetFinOpsConfigFeature.Query(), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.AnomalyDetectionEnabled.Should().BeTrue();
+        result.Value.WasteDetectionEnabled.Should().BeTrue();
+        result.Value.ComparisonWindowDays.Should().Be(30);
+        result.Value.WasteCategories.Should().BeEmpty();
+        result.Value.ShowbackEnabled.Should().BeFalse();
+        result.Value.ChargebackEnabled.Should().BeFalse();
+        result.Value.RecommendationPolicy.Should().BeNull();
+        result.Value.NotificationPolicy.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetFinOpsConfig_Returns_Configured_Extended_Fields()
+    {
+        var (cfg, dt) = CreateMocks();
+        cfg.ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
+        cfg.ResolveEffectiveValueAsync("finops.anomaly.detection_enabled", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.anomaly.detection_enabled", "false"));
+        cfg.ResolveEffectiveValueAsync("finops.anomaly.comparison_window_days", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.anomaly.comparison_window_days", "14"));
+        cfg.ResolveEffectiveValueAsync("finops.waste.detection_enabled", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.waste.detection_enabled", "false"));
+        cfg.ResolveEffectiveValueAsync("finops.waste.categories", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.waste.categories", """["IdleResources","Overprovisioned"]"""));
+        cfg.ResolveEffectiveValueAsync("finops.showback.enabled", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.showback.enabled", "true"));
+        cfg.ResolveEffectiveValueAsync("finops.chargeback.enabled", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.chargeback.enabled", "true"));
+
+        var sut = new GetFinOpsConfigFeature.Handler(cfg, dt);
+        var result = await sut.Handle(new GetFinOpsConfigFeature.Query(), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.AnomalyDetectionEnabled.Should().BeFalse();
+        result.Value.ComparisonWindowDays.Should().Be(14);
+        result.Value.WasteDetectionEnabled.Should().BeFalse();
+        result.Value.WasteCategories.Should().HaveCount(2).And.Contain("IdleResources");
+        result.Value.ShowbackEnabled.Should().BeTrue();
+        result.Value.ChargebackEnabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GetFinOpsConfig_Uses_MultiTier_Alert_Threshold_When_Configured()
+    {
+        var (cfg, dt) = CreateMocks();
+        cfg.ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
+        cfg.ResolveEffectiveValueAsync("finops.budget.alert_thresholds", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.budget.alert_thresholds",
+                """[{"percent":70,"severity":"Medium","action":"Notify"},{"percent":100,"severity":"High","action":"NotifyAndBlock"}]"""));
+
+        var sut = new GetFinOpsConfigFeature.Handler(cfg, dt);
+        var result = await sut.Handle(new GetFinOpsConfigFeature.Query(), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        // Should use the minimum percent from the multi-tier array
+        result.Value.AlertThresholdPct.Should().Be(70m);
+    }
+
+    // ── EvaluateReleaseBudgetGate — Multi-tier threshold ─────────────
+
+    [Fact]
+    public async Task EvaluateGate_Uses_MultiTier_Threshold_When_Configured()
+    {
+        var (cfg, dt) = CreateMocks();
+        cfg.ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
+        cfg.ResolveEffectiveValueAsync("finops.release.budget_gate.enabled", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.release.budget_gate.enabled", "true"));
+        cfg.ResolveEffectiveValueAsync("finops.budget.alert_thresholds", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.budget.alert_thresholds",
+                """[{"percent":15,"severity":"Medium","action":"Notify"},{"percent":50,"severity":"High","action":"NotifyAndBlock"}]"""));
+        cfg.ResolveEffectiveValueAsync("finops.release.budget_gate.block_on_exceed", Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Cfg("finops.release.budget_gate.block_on_exceed", "false"));
+
+        var sut = new EvaluateGateFeature.Handler(cfg, dt);
+        // 60 vs 50 = 20% delta, which is above the 15% threshold from multi-tier
+        var query = new EvaluateGateFeature.Query(SampleReleaseId, "payment-api", "Production", 60m, 50m, 7);
+        var result = await sut.Handle(query, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Action.Should().Be(EvaluateGateFeature.BudgetGateAction.Warn);
+    }
 }

@@ -12771,5 +12771,60 @@
       "viewRunbook": "View Runbook",
       "createRunbook": "Create Runbook"
     }
+  },
+  "finops": {
+    "config": {
+      "title": "FinOps Configuration",
+      "subtitle": "Configure currency, budget gate behaviour, anomaly detection, waste detection, and approval workflow for release promotions.",
+      "currency": {
+        "title": "Default Currency",
+        "description": "ISO 4217 currency code used to display all cost values across FinOps dashboards.",
+        "selectLabel": "Select currency"
+      },
+      "gate": {
+        "title": "Release Budget Gate",
+        "description": "Controls what happens when a release exceeds the configured budget threshold before promotion to Production.",
+        "enabled": "Enable budget gate for release promotions",
+        "blockOnExceed": "Block promotion when budget is exceeded",
+        "requireApproval": "Allow approval override when blocked",
+        "alertThreshold": "Alert threshold (%)"
+      },
+      "gateDisabled": "Disabled",
+      "gateWarn": "Warn only",
+      "gateBlock": "Blocked",
+      "gateRequireApproval": "Approval required",
+      "approvers": {
+        "title": "Budget Approvers",
+        "description": "Users or groups authorised to approve budget override requests. Only used when 'Approval required' gate mode is active.",
+        "placeholder": "user@company.com",
+        "add": "Add",
+        "remove": "Remove {{email}}",
+        "empty": "No approvers configured.",
+        "inactiveNote": "Approvers are only active when the gate is in 'Approval required' mode."
+      },
+      "anomaly": {
+        "title": "Anomaly Detection",
+        "description": "Settings for automatic cost anomaly detection. When enabled, the platform alerts on unusual spending patterns.",
+        "enabled": "Detection enabled",
+        "comparisonWindow": "Comparison window"
+      },
+      "waste": {
+        "title": "Waste Detection",
+        "description": "Identifies over-provisioned, idle or costly resources. Categories control which waste signals are emitted.",
+        "enabled": "Detection enabled",
+        "categories": "Active categories"
+      },
+      "recommendations": {
+        "title": "Recommendation Policy",
+        "description": "Controls how FinOps recommendations are generated, shown and notified.",
+        "notConfigured": "Using system defaults."
+      },
+      "showback": {
+        "title": "Showback & Chargeback",
+        "description": "Showback makes costs visible per service and team. Chargeback allocates costs to responsible teams.",
+        "showbackEnabled": "Showback",
+        "chargebackEnabled": "Chargeback"
+      }
+    }
   }
 }
