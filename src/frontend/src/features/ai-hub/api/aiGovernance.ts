@@ -52,6 +52,22 @@ export const aiGovernanceApi = {
   getIdeCapabilities: (params: { clientType: string; persona?: string | null }) =>
     client.get('/ai/ide/capabilities', { params }).then(r => r.data),
 
+  // ── IDE Query Sessions (audit/history) ────────────────────────────
+  submitIdeQuery: (data: {
+    clientType?: string;
+    clientVersion?: string;
+    queryType?: string;
+    queryText: string;
+    context?: string;
+    modelPreference?: string;
+    serviceContext?: string;
+    persona?: string;
+  }) => client.post('/ai/ide/query', data).then(r => r.data),
+  getIdeQuerySession: (sessionId: string) =>
+    client.get(`/ai/ide/query/${sessionId}`).then(r => r.data),
+  listIdeQuerySessions: (params?: { clientType?: string; status?: string }) =>
+    client.get('/ai/ide/query', { params }).then(r => r.data),
+
   // ── Token usage (runtime) ─────────────────────────────────────────
   getTokenUsage: (params: { userId?: string; tenantId?: string }) =>
     client.get('/ai/token-usage', { params }).then(r => r.data),

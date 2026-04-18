@@ -2,7 +2,9 @@ using System.Linq;
 
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Tests.Runtime.Tools;
 
@@ -67,8 +69,13 @@ public sealed class RealToolTests
     [Fact]
     public async Task ListRecentChangesTool_ShouldExecuteSuccessfully()
     {
+        var changeReader = Substitute.For<IChangeGroundingReader>();
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        changeReader.FindRecentReleasesAsync(default, default, default, default, default, default, default)
+            .ReturnsForAnyArgs(new List<ReleaseGroundingContext>().AsReadOnly());
         var logger = Substitute.For<ILogger<ListRecentChangesTool>>();
-        var tool = new ListRecentChangesTool(logger);
+        var tool = new ListRecentChangesTool(changeReader, clock, logger);
 
         tool.Definition.Name.Should().Be("list_recent_changes");
         tool.Definition.Category.Should().Be("change_intelligence");
@@ -83,24 +90,31 @@ public sealed class RealToolTests
     [Fact]
     public async Task ListRecentChangesTool_ShouldHandleInvalidJson()
     {
+        var changeReader = Substitute.For<IChangeGroundingReader>();
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        changeReader.FindRecentReleasesAsync(default, default, default, default, default, default, default)
+            .ReturnsForAnyArgs(new List<ReleaseGroundingContext>().AsReadOnly());
         var logger = Substitute.For<ILogger<ListRecentChangesTool>>();
-        var tool = new ListRecentChangesTool(logger);
+        var tool = new ListRecentChangesTool(changeReader, clock, logger);
 
         var result = await tool.ExecuteAsync("not-json", CancellationToken.None);
 
         result.Success.Should().BeTrue();
         result.Output.Should().Contain("list_recent_changes");
-        result.Output.Should().Contain("executed");
+        result.Output.Should().Contain("success");
     }
 
     [Fact]
     public void AllThreeTools_ShouldHaveUniqueNames()
     {
+        var changeReader = Substitute.For<IChangeGroundingReader>();
+        var clock = Substitute.For<IDateTimeProvider>();
         var tools = new IAgentTool[]
         {
             new ListServicesInfoTool(Substitute.For<ILogger<ListServicesInfoTool>>()),
             new GetServiceHealthTool(Substitute.For<ILogger<GetServiceHealthTool>>()),
-            new ListRecentChangesTool(Substitute.For<ILogger<ListRecentChangesTool>>()),
+            new ListRecentChangesTool(changeReader, clock, Substitute.For<ILogger<ListRecentChangesTool>>()),
         };
 
         var names = tools.Select(t => t.Definition.Name).ToList();
@@ -111,11 +125,13 @@ public sealed class RealToolTests
     [Fact]
     public void AllThreeTools_ShouldHaveNonEmptyDescriptions()
     {
+        var changeReader = Substitute.For<IChangeGroundingReader>();
+        var clock = Substitute.For<IDateTimeProvider>();
         var tools = new IAgentTool[]
         {
             new ListServicesInfoTool(Substitute.For<ILogger<ListServicesInfoTool>>()),
             new GetServiceHealthTool(Substitute.For<ILogger<GetServiceHealthTool>>()),
-            new ListRecentChangesTool(Substitute.For<ILogger<ListRecentChangesTool>>()),
+            new ListRecentChangesTool(changeReader, clock, Substitute.For<ILogger<ListRecentChangesTool>>()),
         };
 
         foreach (var tool in tools)

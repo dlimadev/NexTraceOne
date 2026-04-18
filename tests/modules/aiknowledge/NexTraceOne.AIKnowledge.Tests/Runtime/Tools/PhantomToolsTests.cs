@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Tests.Runtime.Tools;
 
@@ -251,12 +252,14 @@ public sealed class PhantomToolsTests
         var contractReader = Substitute.For<IContractGroundingReader>();
         var incidentReader = Substitute.For<IIncidentGroundingReader>();
         var ledger = Substitute.For<IAiTokenUsageLedgerRepository>();
+        var changeReader = Substitute.For<IChangeGroundingReader>();
+        var clock = Substitute.For<IDateTimeProvider>();
 
         var tools = new IAgentTool[]
         {
             new ListServicesInfoTool(Substitute.For<ILogger<ListServicesInfoTool>>()),
             new GetServiceHealthTool(Substitute.For<ILogger<GetServiceHealthTool>>()),
-            new ListRecentChangesTool(Substitute.For<ILogger<ListRecentChangesTool>>()),
+            new ListRecentChangesTool(changeReader, clock, Substitute.For<ILogger<ListRecentChangesTool>>()),
             new GetContractDetailsTool(interfaceReader, contractReader, Substitute.For<ILogger<GetContractDetailsTool>>()),
             new SearchIncidentsTool(incidentReader, Substitute.For<ILogger<SearchIncidentsTool>>()),
             new GetTokenUsageSummaryTool(ledger, Substitute.For<ILogger<GetTokenUsageSummaryTool>>()),

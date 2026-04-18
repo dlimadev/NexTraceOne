@@ -11,6 +11,7 @@ vi.mock('../../features/ai-hub/api/aiGovernance', () => ({
     listIdeClients: vi.fn(),
     listIdeCapabilityPolicies: vi.fn(),
     getIdeCapabilities: vi.fn(),
+    listIdeQuerySessions: vi.fn(),
   },
 }));
 
@@ -75,6 +76,37 @@ const mockCapabilities = {
   allowedCommands: ['Chat', 'ServiceLookup', 'ContractLookup', 'ContractGenerate', 'IncidentLookup'],
 };
 
+const mockQuerySessions = {
+  items: [
+    {
+      sessionId: 'session-001',
+      userId: 'user-001',
+      ideClient: 'vscode',
+      ideClientVersion: '1.90.0',
+      queryType: 'ContractSuggestion',
+      queryText: 'Suggest a REST contract for OrderService',
+      status: 'Responded',
+      modelUsed: 'llama3.2:3b',
+      tokensUsed: 350,
+      responseTimeMs: 1200,
+      submittedAt: new Date(Date.now() - 300000).toISOString(),
+    },
+    {
+      sessionId: 'session-002',
+      userId: 'user-002',
+      ideClient: 'visualstudio',
+      ideClientVersion: '17.10',
+      queryType: 'GeneralQuery',
+      queryText: 'What services depend on PaymentService?',
+      status: 'Processing',
+      modelUsed: 'llama3.2:3b',
+      tokensUsed: 0,
+      responseTimeMs: null,
+      submittedAt: new Date(Date.now() - 60000).toISOString(),
+    },
+  ],
+};
+
 function renderPage() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -100,6 +132,7 @@ describe('IdeIntegrationsPage', () => {
     vi.mocked(aiGovernanceApi.listIdeClients).mockReturnValue(new Promise(() => {}));
     vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockReturnValue(new Promise(() => {}));
     vi.mocked(aiGovernanceApi.getIdeCapabilities).mockReturnValue(new Promise(() => {}));
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockReturnValue(new Promise(() => {}));
     renderPage();
     expect(screen.queryByText('Alice Engineer')).not.toBeInTheDocument();
   });
@@ -109,6 +142,7 @@ describe('IdeIntegrationsPage', () => {
     vi.mocked(aiGovernanceApi.listIdeClients).mockResolvedValue(mockClients);
     vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockResolvedValue(mockPolicies);
     vi.mocked(aiGovernanceApi.getIdeCapabilities).mockResolvedValue(mockCapabilities);
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockResolvedValue({ items: [] });
     renderPage();
     await waitFor(() => {
       expect(screen.getByText('Alice Engineer')).toBeInTheDocument();
@@ -121,6 +155,7 @@ describe('IdeIntegrationsPage', () => {
     vi.mocked(aiGovernanceApi.listIdeClients).mockRejectedValue(new Error('Server error'));
     vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockRejectedValue(new Error('Server error'));
     vi.mocked(aiGovernanceApi.getIdeCapabilities).mockResolvedValue(mockCapabilities);
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockResolvedValue({ items: [] });
     renderPage();
     await waitFor(() => {
       expect(screen.getByText(/error/i)).toBeInTheDocument();
@@ -132,6 +167,7 @@ describe('IdeIntegrationsPage', () => {
     vi.mocked(aiGovernanceApi.listIdeClients).mockResolvedValue({ items: [] });
     vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockResolvedValue({ items: [] });
     vi.mocked(aiGovernanceApi.getIdeCapabilities).mockResolvedValue(mockCapabilities);
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockResolvedValue({ items: [] });
     renderPage();
     await waitFor(() => {
       expect(screen.getByText(/no.*client/i)).toBeInTheDocument();
@@ -143,6 +179,7 @@ describe('IdeIntegrationsPage', () => {
     vi.mocked(aiGovernanceApi.listIdeClients).mockResolvedValue(mockClients);
     vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockResolvedValue(mockPolicies);
     vi.mocked(aiGovernanceApi.getIdeCapabilities).mockResolvedValue(mockCapabilities);
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockResolvedValue({ items: [] });
     renderPage();
     await waitFor(() => {
       expect(screen.getByText('Alice Engineer')).toBeInTheDocument();
@@ -156,6 +193,7 @@ describe('IdeIntegrationsPage', () => {
     vi.mocked(aiGovernanceApi.listIdeClients).mockResolvedValue(mockClients);
     vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockResolvedValue(mockPolicies);
     vi.mocked(aiGovernanceApi.getIdeCapabilities).mockResolvedValue(mockCapabilities);
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockResolvedValue({ items: [] });
     renderPage();
     await waitFor(() => {
       expect(screen.getByText('Alice Engineer')).toBeInTheDocument();
@@ -163,5 +201,34 @@ describe('IdeIntegrationsPage', () => {
     // VsCode should be displayed in policy section
     const vscodeElements = screen.getAllByText('VsCode');
     expect(vscodeElements.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('displays query sessions audit table', async () => {
+    vi.mocked(aiGovernanceApi.getIdeSummary).mockResolvedValue(mockSummary);
+    vi.mocked(aiGovernanceApi.listIdeClients).mockResolvedValue(mockClients);
+    vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockResolvedValue(mockPolicies);
+    vi.mocked(aiGovernanceApi.getIdeCapabilities).mockResolvedValue(mockCapabilities);
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockResolvedValue(mockQuerySessions);
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Alice Engineer')).toBeInTheDocument();
+    });
+    expect(screen.getByText('ContractSuggestion')).toBeInTheDocument();
+    expect(screen.getByText('GeneralQuery')).toBeInTheDocument();
+    const modelCells = screen.getAllByText('llama3.2:3b');
+    expect(modelCells.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows empty state for query sessions when none available', async () => {
+    vi.mocked(aiGovernanceApi.getIdeSummary).mockResolvedValue(mockSummary);
+    vi.mocked(aiGovernanceApi.listIdeClients).mockResolvedValue(mockClients);
+    vi.mocked(aiGovernanceApi.listIdeCapabilityPolicies).mockResolvedValue(mockPolicies);
+    vi.mocked(aiGovernanceApi.getIdeCapabilities).mockResolvedValue(mockCapabilities);
+    vi.mocked(aiGovernanceApi.listIdeQuerySessions).mockResolvedValue({ items: [] });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Alice Engineer')).toBeInTheDocument();
+    });
+    expect(screen.getByText('No query sessions found.')).toBeInTheDocument();
   });
 });
