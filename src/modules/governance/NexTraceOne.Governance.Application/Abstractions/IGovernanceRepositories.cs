@@ -540,3 +540,25 @@ public interface ILicenseComplianceReportRepository
     /// <summary>Adiciona um novo relatório de compliance ao repositório.</summary>
     Task AddAsync(LicenseComplianceReport report, CancellationToken ct);
 }
+
+/// <summary>
+/// Interface do repositório de FinOpsBudgetApproval para o módulo Governance.
+/// Define operações para gerir pedidos de aprovação de override de orçamento FinOps.
+/// </summary>
+public interface IFinOpsBudgetApprovalRepository
+{
+    /// <summary>Obtém um pedido de aprovação pelo seu identificador.</summary>
+    Task<FinOpsBudgetApproval?> GetByIdAsync(Guid id, CancellationToken ct);
+
+    /// <summary>Lista pedidos de aprovação com filtros opcionais por status e serviço.</summary>
+    Task<IReadOnlyList<FinOpsBudgetApproval>> ListAsync(
+        FinOpsBudgetApprovalStatus? status,
+        string? serviceName,
+        CancellationToken ct);
+
+    /// <summary>Adiciona um novo pedido de aprovação ao repositório.</summary>
+    Task AddAsync(FinOpsBudgetApproval approval, CancellationToken ct);
+
+    /// <summary>Atualiza um pedido de aprovação existente.</summary>
+    void Update(FinOpsBudgetApproval approval);
+}

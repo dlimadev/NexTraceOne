@@ -17,6 +17,8 @@ const FinOpsPage = lazy(() => import('../features/governance/pages/FinOpsPage').
 const ServiceFinOpsPage = lazy(() => import('../features/governance/pages/ServiceFinOpsPage').then(m => ({ default: m.ServiceFinOpsPage })));
 const TeamFinOpsPage = lazy(() => import('../features/governance/pages/TeamFinOpsPage').then(m => ({ default: m.TeamFinOpsPage })));
 const DomainFinOpsPage = lazy(() => import('../features/governance/pages/DomainFinOpsPage').then(m => ({ default: m.DomainFinOpsPage })));
+const FinOpsConfigurationPage = lazy(() => import('../features/governance/pages/FinOpsConfigurationPage').then(m => ({ default: m.FinOpsConfigurationPage })));
+const FinOpsBudgetApprovalsPage = lazy(() => import('../features/governance/pages/FinOpsBudgetApprovalsPage').then(m => ({ default: m.FinOpsBudgetApprovalsPage })));
 const PolicyCatalogPage = lazy(() => import('../features/governance/pages/PolicyCatalogPage').then(m => ({ default: m.PolicyCatalogPage })));
 const EnterpriseControlsPage = lazy(() => import('../features/governance/pages/EnterpriseControlsPage').then(m => ({ default: m.EnterpriseControlsPage })));
 const EvidencePackagesPage = lazy(() => import('../features/governance/pages/EvidencePackagesPage').then(m => ({ default: m.EvidencePackagesPage })));
@@ -129,6 +131,22 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
             <DomainFinOpsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/finops/configuration"
+        element={
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
+            <FinOpsConfigurationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/finops/approvals"
+        element={
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
+            <FinOpsBudgetApprovalsPage />
           </ProtectedRoute>
         }
       />

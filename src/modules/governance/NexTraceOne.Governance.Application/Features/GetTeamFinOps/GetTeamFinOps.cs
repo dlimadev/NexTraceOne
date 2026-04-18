@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using System.Text.Json;
 using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetTeamFinOps;
@@ -29,14 +33,29 @@ public static class GetTeamFinOps
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;
+        private readonly IConfigurationResolutionService _configService;
 
-        public Handler(ICostIntelligenceModule costModule)
+        public Handler(ICostIntelligenceModule costModule, IConfigurationResolutionService configService)
         {
             _costModule = costModule;
+            _configService = configService;
         }
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // ── Ler configurações de eficiência e orçamento por equipa ──
+            var costBandsCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsEfficiencyCostBands, ConfigurationScope.Tenant, null, cancellationToken);
+            var (wastefulBand, inefficientBand, acceptableBand) = ParseCostBands(costBandsCfg?.EffectiveValue);
+
+            var trendThresholdCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsEfficiencyTrendThresholdPct, ConfigurationScope.Tenant, null, cancellationToken);
+            var trendThresholdPct = decimal.TryParse(trendThresholdCfg?.EffectiveValue, out var tt) ? Math.Max(tt, 0.1m) : 5m;
+
+            var teamBudgetCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsBudgetByTeam, ConfigurationScope.Tenant, null, cancellationToken);
+            var teamMonthlyBudget = ParseTeamBudget(teamBudgetCfg?.EffectiveValue, request.TeamId);
+
             var records = await _costModule.GetCostsByTeamAsync(request.TeamId, cancellationToken: cancellationToken) ?? [];
             var allRecords = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
@@ -55,13 +74,18 @@ public static class GetTeamFinOps
             var teamAverageCost = latestRecordsByService.Count == 0 ? 0m : latestRecordsByService.Average(r => r.TotalCost);
             var tenantAverageCost = allRecords.Count == 0 ? teamAverageCost : allRecords.Average(r => r.TotalCost);
 
+            // Quando existe orçamento configurado para a equipa, as bandas de eficiência são relativas ao orçamento
+            var effectiveBand = teamMonthlyBudget > 0
+                ? (wasteful: teamMonthlyBudget, inefficient: teamMonthlyBudget * 0.8m, acceptable: teamMonthlyBudget * 0.5m)
+                : (wasteful: wastefulBand, inefficient: inefficientBand, acceptable: acceptableBand);
+
             var services = latestRecordsByService
                 .Select(r => new TeamServiceCostDto(
                     r.ServiceId,
                     r.ServiceName,
-                    ComputeEfficiency(r.TotalCost),
+                    ComputeEfficiency(r.TotalCost, effectiveBand.wasteful, effectiveBand.inefficient, effectiveBand.acceptable),
                     r.TotalCost,
-                    GetTrendDirection(previousRecordsByService.GetValueOrDefault(r.ServiceId)?.TotalCost ?? 0m, r.TotalCost),
+                    GetTrendDirection(previousRecordsByService.GetValueOrDefault(r.ServiceId)?.TotalCost ?? 0m, r.TotalCost, trendThresholdPct),
                     Math.Round(Math.Max(0m, r.TotalCost - tenantAverageCost), 2),
                     0m))
                 .ToList();
@@ -70,7 +94,7 @@ public static class GetTeamFinOps
             var previousMonthCost = previousRecordsByService.Values.Sum(v => v.TotalCost);
             var overallEfficiency = services.Count == 0
                 ? CostEfficiency.Efficient
-                : ComputeEfficiency(services.Average(s => s.MonthlyCost));
+                : ComputeEfficiency(services.Average(s => s.MonthlyCost), effectiveBand.wasteful, effectiveBand.inefficient, effectiveBand.acceptable);
 
             var topFocus = services.Count == 0
                 ? string.Empty
@@ -82,7 +106,7 @@ public static class GetTeamFinOps
                 Domain: records.FirstOrDefault()?.Domain ?? string.Empty,
                 TotalMonthlyCost: totalCost,
                 PreviousMonthCost: previousMonthCost,
-                CostTrend: GetTrendDirection(previousMonthCost, totalCost),
+                CostTrend: GetTrendDirection(previousMonthCost, totalCost, trendThresholdPct),
                 OverallEfficiency: overallEfficiency,
                 TotalWaste: services.Sum(s => s.WasteAmount),
                 ServiceCount: services.Count,
@@ -98,22 +122,55 @@ public static class GetTeamFinOps
             return Result<Response>.Success(response);
         }
 
-        private static CostEfficiency ComputeEfficiency(decimal cost) => cost switch
+        private static (decimal wasteful, decimal inefficient, decimal acceptable) ParseCostBands(string? json)
         {
-            > 15000m => CostEfficiency.Wasteful,
-            > 10000m => CostEfficiency.Inefficient,
-            > 5000m => CostEfficiency.Acceptable,
+            const decimal dw = 15000m, di = 10000m, da = 5000m;
+            if (string.IsNullOrWhiteSpace(json)) return (dw, di, da);
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                var w = root.TryGetProperty("Wasteful", out var wp) && wp.TryGetDecimal(out var wv) ? wv : dw;
+                var i = root.TryGetProperty("Inefficient", out var ip) && ip.TryGetDecimal(out var iv) ? iv : di;
+                var a = root.TryGetProperty("Acceptable", out var ap) && ap.TryGetDecimal(out var av) ? av : da;
+                return (w, i, a);
+            }
+            catch { return (dw, di, da); }
+        }
+
+        private static decimal ParseTeamBudget(string? json, string teamId)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return 0m;
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                if (root.TryGetProperty(teamId, out var teamEntry))
+                {
+                    if (teamEntry.TryGetProperty("monthlyBudget", out var mb) && mb.TryGetDecimal(out var bv))
+                        return bv;
+                }
+                return 0m;
+            }
+            catch { return 0m; }
+        }
+
+        private static CostEfficiency ComputeEfficiency(decimal cost, decimal wasteful, decimal inefficient, decimal acceptable) => cost switch
+        {
+            _ when cost > wasteful => CostEfficiency.Wasteful,
+            _ when cost > inefficient => CostEfficiency.Inefficient,
+            _ when cost > acceptable => CostEfficiency.Acceptable,
             _ => CostEfficiency.Efficient
         };
 
-        private static TrendDirection GetTrendDirection(decimal previous, decimal current)
+        private static TrendDirection GetTrendDirection(decimal previous, decimal current, decimal thresholdPct)
         {
             if (previous <= 0m) return TrendDirection.Stable;
             var deltaPercent = (current - previous) / previous * 100m;
             return deltaPercent switch
             {
-                > 5m => TrendDirection.Declining,
-                < -5m => TrendDirection.Improving,
+                _ when deltaPercent > thresholdPct => TrendDirection.Declining,
+                _ when deltaPercent < -thresholdPct => TrendDirection.Improving,
                 _ => TrendDirection.Stable
             };
         }

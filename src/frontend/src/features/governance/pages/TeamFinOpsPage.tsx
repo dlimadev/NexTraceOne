@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  DollarSign, TrendingUp, TrendingDown, Minus, AlertTriangle,
-  CheckCircle, AlertCircle, XCircle, Activity, ArrowLeft,
+  DollarSign, AlertTriangle,
+  XCircle, Activity, ArrowLeft,
   Users, ArrowRight,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -16,43 +16,20 @@ import { finOpsApi } from '../api/finOps';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import {
+  formatCurrency,
+  efficiencyBadgeVariant,
+  efficiencyIcon,
+  trendIcon,
+} from '../utils/finOpsFormatters';
+import { useFinOpsCurrency } from '../hooks/useFinOpsConfig';
 
-function formatCurrency(value: number, locale = 'en-US'): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-}
-
-const efficiencyBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' | 'danger' | 'default' => {
-  switch (eff) {
-    case 'Efficient': return 'success';
-    case 'Acceptable': return 'default';
-    case 'Inefficient': return 'warning';
-    case 'Wasteful': return 'danger';
-    default: return 'default';
-  }
-};
-
-const efficiencyIcon = (eff: CostEfficiencyType) => {
-  switch (eff) {
-    case 'Efficient': return <CheckCircle size={14} className="text-success" />;
-    case 'Acceptable': return <AlertCircle size={14} className="text-muted" />;
-    case 'Inefficient': return <AlertTriangle size={14} className="text-warning" />;
-    case 'Wasteful': return <XCircle size={14} className="text-critical" />;
-    default: return null;
-  }
-};
-
-const trendIcon = (dir: string) => {
-  switch (dir) {
-    case 'Improving': return <TrendingUp size={14} className="text-success" />;
-    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
-    default: return <Minus size={14} className="text-muted" />;
-  }
-};
 export function TeamFinOpsPage() {
   const { t, i18n } = useTranslation();
   const { teamId } = useParams<{ teamId: string }>();
   const { activeEnvironmentId } = useEnvironment();
-  const fmt = (v: number) => formatCurrency(v, i18n.language);
+  const currency = useFinOpsCurrency();
+  const fmt = (v: number) => formatCurrency(v, i18n.language, currency);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.governance.finops.team(teamId!, activeEnvironmentId),

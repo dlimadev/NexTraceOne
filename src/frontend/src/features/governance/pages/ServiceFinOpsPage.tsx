@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  DollarSign, TrendingUp, TrendingDown, Minus, AlertTriangle,
+  DollarSign, AlertTriangle,
   XCircle, Activity, ArrowLeft,
   Zap, Target,
 } from 'lucide-react';
@@ -16,33 +16,19 @@ import { finOpsApi } from '../api/finOps';
 import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import {
+  formatCurrency,
+  efficiencyBadgeVariant,
+  trendIcon,
+} from '../utils/finOpsFormatters';
+import { useFinOpsCurrency } from '../hooks/useFinOpsConfig';
 
-function formatCurrency(value: number, locale = 'en-US'): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-}
-
-const efficiencyBadgeVariant = (eff: CostEfficiencyType): 'success' | 'warning' | 'danger' | 'default' => {
-  switch (eff) {
-    case 'Efficient': return 'success';
-    case 'Acceptable': return 'default';
-    case 'Inefficient': return 'warning';
-    case 'Wasteful': return 'danger';
-    default: return 'default';
-  }
-};
-
-const trendIcon = (dir: string) => {
-  switch (dir) {
-    case 'Improving': return <TrendingUp size={14} className="text-success" />;
-    case 'Declining': return <TrendingDown size={14} className="text-critical" />;
-    default: return <Minus size={14} className="text-muted" />;
-  }
-};
 export function ServiceFinOpsPage() {
   const { t, i18n } = useTranslation();
   const { serviceId } = useParams<{ serviceId: string }>();
   const { activeEnvironmentId } = useEnvironment();
-  const fmt = (v: number) => formatCurrency(v, i18n.language);
+  const currency = useFinOpsCurrency();
+  const fmt = (v: number) => formatCurrency(v, i18n.language, currency);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.governance.finops.service(serviceId!, activeEnvironmentId),

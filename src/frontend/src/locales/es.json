@@ -5989,7 +5989,62 @@
       "totalMonthlyCost": "Costo mensual total",
       "totalWaste": "Desperdicio total",
       "wasteAmount": "Monto de desperdicio",
-      "wasteSignals": "Señales de desperdicio"
+      "wasteSignals": "Señales de desperdicio",
+      "costTrends": "Tendencias de Costos",
+      "filterAcceptable": "Aceptable",
+      "filterEfficient": "Eficiente",
+      "filterInefficient": "Ineficiente",
+      "filterWasteful": "Derrochador",
+      "config": {
+        "title": "Configuración de FinOps",
+        "subtitle": "Configure la moneda, el comportamiento del gate de presupuesto y el flujo de aprobación para promociones de release.",
+        "currency": {
+          "title": "Moneda Predeterminada",
+          "description": "Código ISO 4217 utilizado para mostrar todos los valores de coste en los paneles de FinOps.",
+          "selectLabel": "Seleccionar moneda"
+        },
+        "gate": {
+          "title": "Gate de Presupuesto por Release",
+          "description": "Controla lo que ocurre cuando una release supera el umbral de presupuesto configurado antes de ser promovida a Producción.",
+          "enabled": "Habilitar gate de presupuesto para promociones de release",
+          "blockOnExceed": "Bloquear promoción cuando se supere el presupuesto",
+          "requireApproval": "Permitir override por aprobación cuando esté bloqueado",
+          "alertThreshold": "Umbral de alerta (%)"
+        },
+        "gateDisabled": "Desactivado",
+        "gateWarn": "Solo aviso",
+        "gateBlock": "Bloqueado",
+        "gateRequireApproval": "Aprobación requerida",
+        "approvers": {
+          "title": "Aprobadores de Presupuesto",
+          "description": "Usuarios o grupos autorizados para aprobar solicitudes de override de presupuesto. Solo activo en modo 'Aprobación requerida'.",
+          "placeholder": "usuario@empresa.com",
+          "add": "Añadir",
+          "remove": "Eliminar {{email}}",
+          "empty": "No hay aprobadores configurados.",
+          "inactiveNote": "Los aprobadores solo están activos cuando el gate está en modo 'Aprobación requerida'."
+        }
+      },
+      "approvals": {
+        "title": "Solicitudes de Aprobación de Presupuesto",
+        "subtitle": "Revise y resuelva solicitudes pendientes de override de presupuesto para releases que superaron el umbral configurado.",
+        "results": "solicitudes",
+        "empty": "No se encontraron solicitudes de aprobación.",
+        "actualCost": "Coste real",
+        "baselineCost": "Coste base",
+        "requestedBy": "Solicitado por",
+        "requestedAt": "Solicitado el",
+        "justification": "Justificación",
+        "comment": "Comentario de la decisión",
+        "commentPlaceholder": "Comentario opcional explicando la decisión...",
+        "approve": "Aprobar",
+        "reject": "Rechazar",
+        "status": {
+          "pending": "Pendiente",
+          "approved": "Aprobado",
+          "rejected": "Rechazado"
+        }
+      }
     },
     "finopsSubtitle": "Inteligencia contextual de costos por servicio, dominio, equipo, entorno y operación.",
     "finopsTitle": "FinOps",
@@ -8139,7 +8194,22 @@
     "overrideGateTitle": "Override de Gate con Justificación",
     "overrideGateSubtitle": "Proporcione una justificación documentada para sustituir este gate fallido. Esta acción es auditada.",
     "overrideJustificationPlaceholder": "Proporcione una justificación clara para sustituir este gate...",
-    "confirmOverride": "Confirmar Override"
+    "confirmOverride": "Confirmar Override",
+    "budgetGate": {
+      "warnTitle": "Advertencia de Presupuesto — Proceder con Precaución",
+      "blockTitle": "Promoción Bloqueada — Presupuesto Excedido",
+      "approvalSentTitle": "Aprobación Requerida — Solicitud Enviada",
+      "costDelta": "Variación de Costo",
+      "environment": "Entorno Destino",
+      "warnConfirmMessage": "La promoción continuará pero el exceso de presupuesto quedará registrado para auditoría. Confirme para continuar.",
+      "blockMessage": "Esta promoción está bloqueada porque la versión supera el límite de presupuesto configurado y la compuerta está en modo de bloqueo. Revise la configuración de FinOps o contacte al administrador de plataforma.",
+      "approvalSentMessage": "Se ha enviado automáticamente una solicitud de aprobación de presupuesto. La promoción solo continuará tras la revisión y aprobación por parte de un aprobador.",
+      "confirmPromoteAnyway": "Promover de Todas Formas",
+      "goToApprovals": "Ver Solicitud de Aprobación",
+      "goToFinOpsConfig": "Configuración FinOps",
+      "approvalId": "ID de Solicitud de Aprobación",
+      "autoJustification": "Creado automáticamente por el flujo de promoción — la versión supera el límite de presupuesto configurado."
+    }
   },
   "releaseCalendar": {
     "activeFreezeWindows": "Ventanas de Freeze Activas",
@@ -8982,6 +9052,8 @@
     "executiveFinOps": "FinOps Ejecutivo",
     "executiveOverview": "Visión Ejecutiva",
     "finops": "FinOps",
+    "finopsConfiguration": "Configuración de FinOps",
+    "finopsBudgetApprovals": "Aprobaciones de Presupuesto",
     "governance": "Gobernanza",
     "governancePacks": "Packs de Gobernanza",
     "ide": "Integraciones IDE",
@@ -12670,6 +12742,61 @@
       "reject": "Rechazar",
       "viewRunbook": "Ver Runbook",
       "createRunbook": "Crear Runbook"
+    }
+  },
+  "finops": {
+    "config": {
+      "title": "FinOps Configuration",
+      "subtitle": "Configure currency, budget gate behaviour, anomaly detection, waste detection, and approval workflow.",
+      "currency": {
+        "title": "Default Currency",
+        "description": "ISO 4217 currency code.",
+        "selectLabel": "Select currency"
+      },
+      "gate": {
+        "title": "Release Budget Gate",
+        "description": "Controls what happens when a release exceeds the configured budget threshold.",
+        "enabled": "Enable budget gate",
+        "blockOnExceed": "Block when exceeded",
+        "requireApproval": "Allow approval override",
+        "alertThreshold": "Alert threshold (%)"
+      },
+      "gateDisabled": "Disabled",
+      "gateWarn": "Warn only",
+      "gateBlock": "Blocked",
+      "gateRequireApproval": "Approval required",
+      "approvers": {
+        "title": "Budget Approvers",
+        "description": "Users authorised to approve budget overrides.",
+        "placeholder": "user@company.com",
+        "add": "Add",
+        "remove": "Remove {{email}}",
+        "empty": "No approvers configured.",
+        "inactiveNote": "Approvers only active in 'Approval required' gate mode."
+      },
+      "anomaly": {
+        "title": "Anomaly Detection",
+        "description": "Automatic cost anomaly detection settings.",
+        "enabled": "Detection enabled",
+        "comparisonWindow": "Comparison window"
+      },
+      "waste": {
+        "title": "Waste Detection",
+        "description": "Identifies over-provisioned or idle resources.",
+        "enabled": "Detection enabled",
+        "categories": "Active categories"
+      },
+      "recommendations": {
+        "title": "Recommendation Policy",
+        "description": "Controls how FinOps recommendations are generated.",
+        "notConfigured": "Using system defaults."
+      },
+      "showback": {
+        "title": "Showback & Chargeback",
+        "description": "Showback visibility and chargeback allocation settings.",
+        "showbackEnabled": "Showback",
+        "chargebackEnabled": "Chargeback"
+      }
     }
   }
 }

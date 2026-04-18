@@ -6011,7 +6011,62 @@
       "totalMonthlyCost": "Total monthly cost",
       "totalWaste": "Total waste",
       "wasteAmount": "Waste amount",
-      "wasteSignals": "Waste signals"
+      "wasteSignals": "Waste signals",
+      "costTrends": "Cost Trends",
+      "filterAcceptable": "Acceptable",
+      "filterEfficient": "Efficient",
+      "filterInefficient": "Inefficient",
+      "filterWasteful": "Wasteful",
+      "config": {
+        "title": "FinOps Configuration",
+        "subtitle": "Configure currency, budget gate behaviour, and approval workflow for release promotions.",
+        "currency": {
+          "title": "Default Currency",
+          "description": "ISO 4217 currency code used to display all cost values across FinOps dashboards.",
+          "selectLabel": "Select currency"
+        },
+        "gate": {
+          "title": "Release Budget Gate",
+          "description": "Controls what happens when a release exceeds the configured budget threshold before promotion to Production.",
+          "enabled": "Enable budget gate for release promotions",
+          "blockOnExceed": "Block promotion when budget is exceeded",
+          "requireApproval": "Allow approval override when blocked",
+          "alertThreshold": "Alert threshold (%)"
+        },
+        "gateDisabled": "Disabled",
+        "gateWarn": "Warn only",
+        "gateBlock": "Blocked",
+        "gateRequireApproval": "Approval required",
+        "approvers": {
+          "title": "Budget Approvers",
+          "description": "Users or groups authorised to approve budget override requests. Only used when 'Approval required' gate mode is active.",
+          "placeholder": "user@company.com",
+          "add": "Add",
+          "remove": "Remove {{email}}",
+          "empty": "No approvers configured.",
+          "inactiveNote": "Approvers are only active when the gate is in 'Approval required' mode."
+        }
+      },
+      "approvals": {
+        "title": "Budget Approval Requests",
+        "subtitle": "Review and resolve pending budget override requests for releases that exceeded the configured threshold.",
+        "results": "requests",
+        "empty": "No approval requests found.",
+        "actualCost": "Actual cost",
+        "baselineCost": "Baseline cost",
+        "requestedBy": "Requested by",
+        "requestedAt": "Requested at",
+        "justification": "Justification",
+        "comment": "Decision comment",
+        "commentPlaceholder": "Optional comment explaining your decision...",
+        "approve": "Approve",
+        "reject": "Reject",
+        "status": {
+          "pending": "Pending",
+          "approved": "Approved",
+          "rejected": "Rejected"
+        }
+      }
     },
     "finopsSubtitle": "Contextual cost intelligence by service, domain, team, environment and operation.",
     "finopsTitle": "FinOps",
@@ -8161,7 +8216,22 @@
     "overrideGateTitle": "Override Gate with Justification",
     "overrideGateSubtitle": "Provide a documented justification to override this failed gate. This action is audited.",
     "overrideJustificationPlaceholder": "Provide a clear justification for overriding this gate...",
-    "confirmOverride": "Confirm Override"
+    "confirmOverride": "Confirm Override",
+    "budgetGate": {
+      "warnTitle": "Budget Warning — Proceed with Caution",
+      "blockTitle": "Promotion Blocked — Budget Exceeded",
+      "approvalSentTitle": "Approval Required — Request Submitted",
+      "costDelta": "Cost Delta",
+      "environment": "Target Environment",
+      "warnConfirmMessage": "The promotion will proceed but the budget overrun will be recorded for audit. Confirm to continue.",
+      "blockMessage": "This promotion is blocked because the release exceeds the configured budget threshold and the gate is set to block mode. Please review the FinOps configuration or contact the platform admin.",
+      "approvalSentMessage": "A budget approval request has been submitted automatically. The promotion will only proceed after an approver reviews and approves the request.",
+      "confirmPromoteAnyway": "Promote Anyway",
+      "goToApprovals": "View Approval Request",
+      "goToFinOpsConfig": "FinOps Configuration",
+      "approvalId": "Approval Request ID",
+      "autoJustification": "Auto-created by promotion flow — release exceeds configured budget threshold."
+    }
   },
   "releaseCalendar": {
     "activeFreezeWindows": "Active Freeze Windows",
@@ -9004,6 +9074,8 @@
     "executiveFinOps": "Executive FinOps",
     "executiveOverview": "Executive Overview",
     "finops": "FinOps",
+    "finopsConfiguration": "FinOps Configuration",
+    "finopsBudgetApprovals": "Budget Approvals",
     "governance": "Governance",
     "governancePacks": "Governance Packs",
     "ide": "IDE Integrations",
@@ -12698,6 +12770,61 @@
       "reject": "Reject",
       "viewRunbook": "View Runbook",
       "createRunbook": "Create Runbook"
+    }
+  },
+  "finops": {
+    "config": {
+      "title": "FinOps Configuration",
+      "subtitle": "Configure currency, budget gate behaviour, anomaly detection, waste detection, and approval workflow for release promotions.",
+      "currency": {
+        "title": "Default Currency",
+        "description": "ISO 4217 currency code used to display all cost values across FinOps dashboards.",
+        "selectLabel": "Select currency"
+      },
+      "gate": {
+        "title": "Release Budget Gate",
+        "description": "Controls what happens when a release exceeds the configured budget threshold before promotion to Production.",
+        "enabled": "Enable budget gate for release promotions",
+        "blockOnExceed": "Block promotion when budget is exceeded",
+        "requireApproval": "Allow approval override when blocked",
+        "alertThreshold": "Alert threshold (%)"
+      },
+      "gateDisabled": "Disabled",
+      "gateWarn": "Warn only",
+      "gateBlock": "Blocked",
+      "gateRequireApproval": "Approval required",
+      "approvers": {
+        "title": "Budget Approvers",
+        "description": "Users or groups authorised to approve budget override requests. Only used when 'Approval required' gate mode is active.",
+        "placeholder": "user@company.com",
+        "add": "Add",
+        "remove": "Remove {{email}}",
+        "empty": "No approvers configured.",
+        "inactiveNote": "Approvers are only active when the gate is in 'Approval required' mode."
+      },
+      "anomaly": {
+        "title": "Anomaly Detection",
+        "description": "Settings for automatic cost anomaly detection. When enabled, the platform alerts on unusual spending patterns.",
+        "enabled": "Detection enabled",
+        "comparisonWindow": "Comparison window"
+      },
+      "waste": {
+        "title": "Waste Detection",
+        "description": "Identifies over-provisioned, idle or costly resources. Categories control which waste signals are emitted.",
+        "enabled": "Detection enabled",
+        "categories": "Active categories"
+      },
+      "recommendations": {
+        "title": "Recommendation Policy",
+        "description": "Controls how FinOps recommendations are generated, shown and notified.",
+        "notConfigured": "Using system defaults."
+      },
+      "showback": {
+        "title": "Showback & Chargeback",
+        "description": "Showback makes costs visible per service and team. Chargeback allocates costs to responsible teams.",
+        "showbackEnabled": "Showback",
+        "chargebackEnabled": "Chargeback"
+      }
     }
   }
 }
