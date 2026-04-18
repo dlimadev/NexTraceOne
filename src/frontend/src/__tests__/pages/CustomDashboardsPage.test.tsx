@@ -177,5 +177,28 @@ describe('CustomDashboardsPage', () => {
     const deleteBtns = Array.from(document.querySelectorAll('button[aria-label="Delete"]'));
     expect(deleteBtns.length).toBe(0);
   });
+
+  it('shows sort controls (Name / Persona / Widgets)', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Sort by');
+    });
+  });
+
+  it('sort button toggles direction when clicked twice', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Executive KPI Overview'));
+    const sortBtns = Array.from(document.querySelectorAll('button[aria-pressed]'));
+    // Should have 3 sort buttons (name, persona, widgetCount)
+    expect(sortBtns.length).toBeGreaterThanOrEqual(3);
+    // Click the currently active one to toggle direction
+    const activeBtn = sortBtns.find((b) => b.getAttribute('aria-pressed') === 'true');
+    expect(activeBtn).toBeDefined();
+    fireEvent.click(activeBtn!);
+    await waitFor(() => {
+      // Descending indicator (↓) should appear
+      expect(document.body.textContent).toContain('↓');
+    });
+  });
 });
 

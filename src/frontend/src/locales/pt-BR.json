@@ -5768,7 +5768,10 @@
         "sloGauge": "Gauge de SLO",
         "deploymentFrequency": "Frequência de Deploy",
         "stat": "Estatística KPI",
-        "textMarkdown": "Nota / Texto"
+        "textMarkdown": "Nota / Texto",
+        "topServices": "Top Serviços",
+        "contractCoverage": "Cobertura de Contratos",
+        "blastRadius": "Blast Radius"
       },
       "cloneDashboard": "Clonar",
       "cloneTitle": "Clonar Dashboard",
@@ -5792,6 +5795,26 @@
         "doraCfr": "Taxa de Falha em Mudanças",
         "doraMttr": "MTTR",
         "changesToday": "Mudanças Hoje"
+      },
+      "sortBy": "Ordenar por",
+      "sortField": {
+        "name": "Nome",
+        "persona": "Persona",
+        "widgetCount": "Widgets"
+      },
+      "topServices": {
+        "header": "incidentes",
+        "noData": "Sem dados de serviços disponíveis"
+      },
+      "contractCoverage": {
+        "event": "Evento",
+        "progressLabel": "Cobertura de contratos",
+        "servicesWithContracts": "serviços com contratos"
+      },
+      "blastRadius": {
+        "affectedServices": "Afetados",
+        "risk": "Risco",
+        "confidence": "Confiança"
       }
     },
     "dashboards": {
@@ -5836,7 +5859,10 @@
       "noChanges": "Sem mudanças recentes",
       "tvMode": "Modo TV",
       "exitKiosk": "Sair do Modo TV",
-      "noContent": "Nenhum conteúdo configurado. Edite este widget para adicionar uma nota."
+      "noContent": "Nenhum conteúdo configurado. Edite este widget para adicionar uma nota.",
+      "expandWidget": "Expandir widget",
+      "closeExpanded": "Fechar visualização expandida",
+      "expandedWidget": "Widget expandido"
     },
     "dashboardBuilder": {
       "addWidget": "Adicionar Widget",
@@ -5876,7 +5902,8 @@
       "autoArrange": "Organizar automaticamente",
       "statMetric": "Métrica KPI",
       "textContent": "Conteúdo (Markdown)",
-      "textContentPlaceholder": "Suporta **negrito**, *itálico*, # títulos, - listas, [label](url)"
+      "textContentPlaceholder": "Suporta **negrito**, *itálico*, # títulos, - listas, [label](url)",
+      "duplicateWidget": "Duplicar widget"
     },
     "dora": {
       "cfr": "CFR",

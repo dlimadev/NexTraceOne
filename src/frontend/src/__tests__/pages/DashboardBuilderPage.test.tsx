@@ -198,4 +198,22 @@ describe('DashboardBuilderPage', () => {
       expect(allText).toMatch(/stat|text-markdown/i);
     });
   });
+
+  it('new Phase 5 widget types appear in the type selector', async () => {
+    renderPage();
+    await waitFor(() => {
+      const selects = Array.from(document.querySelectorAll('select'));
+      const allText = selects.map((s) => s.innerHTML).join('');
+      expect(allText).toMatch(/top-services|contract-coverage|blast-radius/i);
+    });
+  });
+
+  it('shows Duplicate widget button for editable widget slots', async () => {
+    renderPage();
+    await waitFor(() => {
+      // Duplicate button has aria-label "Duplicate widget"
+      const dupBtn = document.querySelector('[aria-label="Duplicate widget"]');
+      expect(dupBtn).not.toBeNull();
+    });
+  });
 });

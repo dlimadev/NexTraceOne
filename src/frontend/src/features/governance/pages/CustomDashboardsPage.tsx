@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Plus, Eye, Settings, Copy, Trash2, Layout as LayoutIcon, Search } from 'lucide-react';
+import { LayoutDashboard, Plus, Eye, Settings, Copy, Trash2, Layout as LayoutIcon, Search, ArrowUpDown } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
@@ -200,6 +200,8 @@ export function CustomDashboardsPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'persona' | 'widgetCount'>('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   // Template picker
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
@@ -306,9 +308,19 @@ export function CustomDashboardsPage() {
   if (isError)
     return <PageErrorState message={t('governance.customDashboards.error')} onRetry={() => refetch()} />;
 
-  const filteredDashboards = (data?.items ?? []).filter((d) =>
-    !searchQuery || d.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredDashboards = (data?.items ?? [])
+    .filter((d) => !searchQuery || d.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      let cmp = 0;
+      if (sortBy === 'name') {
+        cmp = a.name.localeCompare(b.name);
+      } else if (sortBy === 'persona') {
+        cmp = a.persona.localeCompare(b.persona);
+      } else if (sortBy === 'widgetCount') {
+        cmp = a.widgetCount - b.widgetCount;
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
 
   return (
     <PageContainer>
@@ -530,6 +542,38 @@ export function CustomDashboardsPage() {
             className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm pl-8 pr-3 py-2 text-gray-900 dark:text-white"
             aria-label={t('governance.customDashboards.searchLabel', 'Search dashboards')}
           />
+        </div>
+
+        {/* Sort controls */}
+        <div className="mb-4 flex items-center gap-2 flex-wrap">
+          <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+            <ArrowUpDown size={12} />
+            {t('governance.customDashboards.sortBy', 'Sort by')}:
+          </span>
+          {(['name', 'persona', 'widgetCount'] as const).map((field) => (
+            <button
+              key={field}
+              onClick={() => {
+                if (sortBy === field) {
+                  setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+                } else {
+                  setSortBy(field);
+                  setSortDir('asc');
+                }
+              }}
+              className={`text-xs rounded px-2 py-1 border transition-colors ${
+                sortBy === field
+                  ? 'border-accent bg-accent/10 text-accent font-semibold'
+                  : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-accent/50'
+              }`}
+              aria-pressed={sortBy === field}
+            >
+              {t(`governance.customDashboards.sortField.${field}`, field)}
+              {sortBy === field && (
+                <span className="ml-0.5">{sortDir === 'asc' ? ' ↑' : ' ↓'}</span>
+              )}
+            </button>
+          ))}
         </div>
 
         {filteredDashboards.length === 0 ? (

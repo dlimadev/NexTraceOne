@@ -5790,7 +5790,10 @@
         "sloGauge": "SLO Gauge",
         "deploymentFrequency": "Deployment Frequency",
         "stat": "KPI Stat",
-        "textMarkdown": "Note / Text"
+        "textMarkdown": "Note / Text",
+        "topServices": "Top Services",
+        "contractCoverage": "Contract Coverage",
+        "blastRadius": "Blast Radius"
       },
       "cloneDashboard": "Clone",
       "cloneTitle": "Clone Dashboard",
@@ -5814,6 +5817,26 @@
         "doraCfr": "Change Failure Rate",
         "doraMttr": "MTTR",
         "changesToday": "Changes Today"
+      },
+      "sortBy": "Sort by",
+      "sortField": {
+        "name": "Name",
+        "persona": "Persona",
+        "widgetCount": "Widgets"
+      },
+      "topServices": {
+        "header": "incidents",
+        "noData": "No service data available"
+      },
+      "contractCoverage": {
+        "event": "Event",
+        "progressLabel": "Contract coverage",
+        "servicesWithContracts": "services with contracts"
+      },
+      "blastRadius": {
+        "affectedServices": "Affected",
+        "risk": "Risk",
+        "confidence": "Confidence"
       }
     },
     "dashboards": {
@@ -5858,7 +5881,10 @@
       "noChanges": "No recent changes",
       "tvMode": "TV Mode",
       "exitKiosk": "Exit TV Mode",
-      "noContent": "No content configured. Edit this widget to add a note."
+      "noContent": "No content configured. Edit this widget to add a note.",
+      "expandWidget": "Expand widget",
+      "closeExpanded": "Close expanded view",
+      "expandedWidget": "Expanded widget"
     },
     "dashboardBuilder": {
       "addWidget": "Add Widget",
@@ -5898,7 +5924,8 @@
       "autoArrange": "Auto-arrange",
       "statMetric": "KPI Metric",
       "textContent": "Content (Markdown)",
-      "textContentPlaceholder": "Supports **bold**, *italic*, # headings, - lists, [label](url)"
+      "textContentPlaceholder": "Supports **bold**, *italic*, # headings, - lists, [label](url)",
+      "duplicateWidget": "Duplicate widget"
     },
     "dora": {
       "cfr": "CFR",

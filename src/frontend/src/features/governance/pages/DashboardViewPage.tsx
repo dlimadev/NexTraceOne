@@ -23,6 +23,7 @@ import {
   ChevronUp,
   Tv,
   X,
+  Maximize2,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -46,6 +47,9 @@ import { SloGaugeWidget } from '../widgets/SloGaugeWidget';
 import { DeploymentFrequencyWidget } from '../widgets/DeploymentFrequencyWidget';
 import { StatWidget } from '../widgets/StatWidget';
 import { TextMarkdownWidget } from '../widgets/TextMarkdownWidget';
+import { TopServicesWidget } from '../widgets/TopServicesWidget';
+import { ContractCoverageWidget } from '../widgets/ContractCoverageWidget';
+import { BlastRadiusWidget } from '../widgets/BlastRadiusWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
@@ -67,6 +71,9 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'deployment-frequency': DeploymentFrequencyWidget,
   'stat': StatWidget,
   'text-markdown': TextMarkdownWidget,
+  'top-services': TopServicesWidget,
+  'contract-coverage': ContractCoverageWidget,
+  'blast-radius': BlastRadiusWidget,
 };
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -172,6 +179,8 @@ export function DashboardViewPage() {
   const [varService, setVarService] = useState('');
   const [varTeam, setVarTeam] = useState('');
   const [showVars, setShowVars] = useState(false);
+  // Fullscreen expand: stores the widgetId of the widget being expanded (null = closed)
+  const [expandedWidgetId, setExpandedWidgetId] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const qc = useQueryClient();
 
@@ -495,7 +504,7 @@ export function DashboardViewPage() {
               <div
                 key={slot.widgetId}
                 style={style}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden"
+                className="group relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm overflow-hidden"
               >
                 {WidgetComponent ? (
                   <WidgetComponent
@@ -517,11 +526,69 @@ export function DashboardViewPage() {
                     <Skeleton variant="rectangular" className="h-full w-full" />
                   </div>
                 )}
+                {/* Fullscreen expand button — visible on hover */}
+                <button
+                  onClick={() => setExpandedWidgetId(slot.widgetId)}
+                  className="absolute top-1 right-1 p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
+                  aria-label={t('governance.dashboardView.expandWidget', 'Expand widget')}
+                >
+                  <Maximize2 size={12} />
+                </button>
               </div>
             );
           })}
         </div>
       )}
+
+      {/* Fullscreen widget overlay modal */}
+      {expandedWidgetId && (() => {
+        const slot = data.widgets.find((w) => w.widgetId === expandedWidgetId);
+        if (!slot) return null;
+        const WidgetComponent = WIDGET_MAP[slot.type as WidgetType];
+        const resolvedServiceId = varService || slot.effectiveServiceId;
+        const resolvedTeamId = varTeam || slot.effectiveTeamId;
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('governance.dashboardView.expandedWidget', 'Expanded widget')}
+            onClick={(e) => { if (e.target === e.currentTarget) setExpandedWidgetId(null); }}
+          >
+            <div className="relative w-full max-w-3xl max-h-[80vh] rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl overflow-auto">
+              <button
+                onClick={() => setExpandedWidgetId(null)}
+                className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors z-10"
+                aria-label={t('governance.dashboardView.closeExpanded', 'Close expanded view')}
+              >
+                <X size={16} />
+              </button>
+              <div className="p-6 min-h-[320px]">
+                {WidgetComponent ? (
+                  <WidgetComponent
+                    widgetId={slot.widgetId}
+                    config={{
+                      serviceId: resolvedServiceId,
+                      teamId: resolvedTeamId,
+                      timeRange: slot.effectiveTimeRange,
+                      customTitle: slot.customTitle,
+                      metric: slot.metric,
+                      content: slot.content,
+                    }}
+                    environmentId={activeEnvironmentId}
+                    timeRange={slot.effectiveTimeRange}
+                    title={slot.customTitle}
+                  />
+                ) : (
+                  <div className="h-full flex items-center justify-center p-2">
+                    <Skeleton variant="rectangular" className="h-64 w-full" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <p className="mt-4 text-xs text-gray-400 text-right">
         {t('governance.dashboardView.generatedAt', 'Generated at')}{' '}

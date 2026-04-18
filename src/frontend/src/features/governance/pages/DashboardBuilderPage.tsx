@@ -20,6 +20,7 @@ import {
   Download,
   Upload,
   Shuffle,
+  Copy,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -247,6 +248,20 @@ export function DashboardBuilderPage() {
 
   const removeSlot = (tempId: string) => {
     setSlots((prev) => prev.filter((s) => s.tempId !== tempId));
+  };
+
+  const duplicateSlot = (tempId: string) => {
+    setSlots((prev) => {
+      const source = prev.find((s) => s.tempId === tempId);
+      if (!source) return prev;
+      const newSlot: BuilderSlot = {
+        ...source,
+        tempId: makeSlotId(),
+        existingWidgetId: null,
+        posY: source.posY + source.height,
+      };
+      return [...prev, newSlot];
+    });
   };
 
   const updateSlot = (tempId: string, patch: Partial<BuilderSlot>) => {
@@ -736,13 +751,23 @@ export function DashboardBuilderPage() {
                       </div>
 
                       {!isReadOnly && (
-                        <button
-                          onClick={() => removeSlot(slot.tempId)}
-                          className="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0 mt-1"
-                          aria-label={t('governance.dashboardBuilder.removeWidget', 'Remove widget')}
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div className="flex flex-col gap-1 shrink-0 mt-1">
+                          <button
+                            onClick={() => duplicateSlot(slot.tempId)}
+                            className="p-1 text-gray-400 hover:text-accent transition-colors"
+                            aria-label={t('governance.dashboardBuilder.duplicateWidget', 'Duplicate widget')}
+                            title={t('governance.dashboardBuilder.duplicateWidget', 'Duplicate widget')}
+                          >
+                            <Copy size={14} />
+                          </button>
+                          <button
+                            onClick={() => removeSlot(slot.tempId)}
+                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                            aria-label={t('governance.dashboardBuilder.removeWidget', 'Remove widget')}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </CardBody>

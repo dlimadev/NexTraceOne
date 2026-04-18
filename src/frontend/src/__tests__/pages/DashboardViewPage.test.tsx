@@ -200,6 +200,49 @@ describe('DashboardViewPage', () => {
       expect(document.body.textContent).toContain('TV Mode');
     });
   });
+
+  it('shows Expand widget buttons on widget cards', async () => {
+    renderPage();
+    await waitFor(() => {
+      const expandBtns = Array.from(document.querySelectorAll('button')).filter(
+        (b) => b.getAttribute('aria-label') === 'Expand widget',
+      );
+      // Should have one expand button per widget
+      expect(expandBtns.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('opens fullscreen overlay when Expand button is clicked', async () => {
+    renderPage();
+    await waitFor(() => {
+      const expandBtns = Array.from(document.querySelectorAll('button')).filter(
+        (b) => b.getAttribute('aria-label') === 'Expand widget',
+      );
+      expect(expandBtns.length).toBeGreaterThan(0);
+    });
+    const expandBtn = document.querySelector('[aria-label="Expand widget"]');
+    fireEvent.click(expandBtn!);
+    await waitFor(() => {
+      // Dialog role should appear
+      expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+    });
+  });
+
+  it('closes fullscreen overlay when Close button is clicked', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(document.querySelector('[aria-label="Expand widget"]')).not.toBeNull();
+    });
+    fireEvent.click(document.querySelector('[aria-label="Expand widget"]')!);
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+    });
+    const closeBtn = document.querySelector('[aria-label="Close expanded view"]');
+    fireEvent.click(closeBtn!);
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeNull();
+    });
+  });
 });
 
 // ── Kiosk mode tests ─────────────────────────────────────────────────────────

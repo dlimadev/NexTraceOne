@@ -21,7 +21,10 @@ export type WidgetType =
   | 'slo-gauge'
   | 'deployment-frequency'
   | 'stat'
-  | 'text-markdown';
+  | 'text-markdown'
+  | 'top-services'
+  | 'contract-coverage'
+  | 'blast-radius';
 
 export const ALL_WIDGET_TYPES: WidgetType[] = [
   'dora-metrics',
@@ -38,6 +41,9 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'deployment-frequency',
   'stat',
   'text-markdown',
+  'top-services',
+  'contract-coverage',
+  'blast-radius',
 ];
 
 export interface WidgetConfig {
@@ -190,6 +196,27 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 1,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
+  },
+  'top-services': {
+    type: 'top-services',
+    labelKey: 'governance.customDashboards.widgets.topServices',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Executive', 'Auditor'],
+  },
+  'contract-coverage': {
+    type: 'contract-coverage',
+    labelKey: 'governance.customDashboards.widgets.contractCoverage',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Architect', 'TechLead', 'PlatformAdmin', 'Auditor', 'Executive'],
+  },
+  'blast-radius': {
+    type: 'blast-radius',
+    labelKey: 'governance.customDashboards.widgets.blastRadius',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
   },
 };
 
