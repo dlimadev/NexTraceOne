@@ -43,7 +43,7 @@ public static class ContractCommand
     private static Option<string> CreateUrlOption() => new("--url")
     {
         Description = "NexTraceOne API base URL.",
-        Required = true
+        DefaultValueFactory = _ => Services.CliConfig.ResolveUrl(null)
     };
 
     private static Option<string> CreateFormatOption() => new("--format")
@@ -102,7 +102,7 @@ public static class ContractCommand
         {
             var spec = parseResult.GetValue(specOpt)!;
             var service = parseResult.GetValue(serviceOpt)!;
-            var url = parseResult.GetValue(urlOpt)!;
+            var url = Services.CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
             var apiAssetId = parseResult.GetValue(apiAssetOpt) ?? service;
             var env = parseResult.GetValue(envOpt);
             var sourceSystem = parseResult.GetValue(sourceSystemOpt) ?? "cli";
@@ -110,7 +110,7 @@ public static class ContractCommand
             var branch = parseResult.GetValue(branchOpt);
             var pipelineId = parseResult.GetValue(pipelineIdOpt);
             var format = parseResult.GetValue(formatOpt) ?? "text";
-            var token = parseResult.GetValue(tokenOpt) ?? Environment.GetEnvironmentVariable("NEXTRACE_TOKEN");
+            var token = Services.CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
             var strict = parseResult.GetValue(strictOpt);
             var failOnBreaking = parseResult.GetValue(failOnBreakingOpt);
             var failOnAny = parseResult.GetValue(failOnAnyOpt);
@@ -229,6 +229,7 @@ public static class ContractCommand
         var toOpt = new Option<string>("--to", "Target version (e.g., 1.3.0).");
         var formatOpt = CreateFormatOption();
         var tokenOpt = CreateTokenOption();
+        var outputOpt = new Option<string>("--output", "Output file path.");
 
         var command = new Command("diff", "Compare contract versions or local spec against NexTraceOne.");
         command.Add(specOpt);
@@ -238,25 +239,158 @@ public static class ContractCommand
         command.Add(toOpt);
         command.Add(formatOpt);
         command.Add(tokenOpt);
+        command.Add(outputOpt);
 
-        command.SetAction((parseResult, cancellationToken) =>
+        command.SetAction(async (parseResult, cancellationToken) =>
         {
             var spec = parseResult.GetValue(specOpt);
             var service = parseResult.GetValue(serviceOpt)!;
             var from = parseResult.GetValue(fromOpt);
             var to = parseResult.GetValue(toOpt);
+            var url = Services.CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
+            var token = Services.CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
+            var format = parseResult.GetValue(formatOpt) ?? "text";
+            var output = parseResult.GetValue(outputOpt);
 
-            AnsiConsole.MarkupLine($"[blue]Contract diff[/] for service [green]{service.EscapeMarkup()}[/]");
-            if (spec is not null)
-                AnsiConsole.MarkupLine($"  Local spec: [yellow]{spec.FullName.EscapeMarkup()}[/]");
-            if (from is not null)
-                AnsiConsole.MarkupLine($"  From: [yellow]{from.EscapeMarkup()}[/] → To: [yellow]{(to ?? "latest").EscapeMarkup()}[/]");
-
-            AnsiConsole.MarkupLine("[dim]Hint: Use 'nex contract verify' for full compliance check with diff.[/]");
-            return Task.FromResult(ExitSuccess);
+            return await DiffAsync(spec, service, from, to, url, token, format, output, cancellationToken)
+                .ConfigureAwait(false);
         });
 
         return command;
+    }
+
+    private static async Task<int> DiffAsync(
+        FileInfo? spec, string service, string? from, string? to,
+        string url, string? token, string format, string? output,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var client = CreateHttpClient(url, token);
+
+            DiffResult? result;
+
+            if (spec is not null)
+            {
+                // POST local spec for inline diff
+                if (!spec.Exists)
+                {
+                    AnsiConsole.MarkupLine($"[red]Error:[/] Spec file not found: [yellow]{spec.FullName.EscapeMarkup()}[/]");
+                    return ExitError;
+                }
+
+                var specContent = await File.ReadAllTextAsync(spec.FullName, cancellationToken).ConfigureAwait(false);
+                var specFormat = DetectSpecFormat(spec.Name, specContent);
+
+                var payload = new
+                {
+                    apiAssetId = service,
+                    specContent,
+                    specFormat,
+                    fromVersion = from,
+                    toVersion = to
+                };
+
+                var response = await client.PostAsJsonAsync("/api/v1/contracts/diff", payload, cancellationToken)
+                    .ConfigureAwait(false);
+                var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    AnsiConsole.MarkupLine($"[red]Error:[/] API returned {(int)response.StatusCode}: [yellow]{body.EscapeMarkup()}[/]");
+                    return ExitError;
+                }
+
+                result = JsonSerializer.Deserialize<DiffResult>(body, JsonReadOptions);
+            }
+            else
+            {
+                // GET version-to-version diff
+                var query = $"service={Uri.EscapeDataString(service)}";
+                if (!string.IsNullOrWhiteSpace(from))
+                    query += $"&from={Uri.EscapeDataString(from)}";
+                if (!string.IsNullOrWhiteSpace(to))
+                    query += $"&to={Uri.EscapeDataString(to)}";
+
+                var response = await client.GetAsync($"/api/v1/contracts/diff?{query}", cancellationToken)
+                    .ConfigureAwait(false);
+                var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    AnsiConsole.MarkupLine($"[red]Error:[/] API returned {(int)response.StatusCode}: [yellow]{body.EscapeMarkup()}[/]");
+                    return ExitError;
+                }
+
+                result = JsonSerializer.Deserialize<DiffResult>(body, JsonReadOptions);
+            }
+
+            if (result is null)
+            {
+                AnsiConsole.MarkupLine("[red]Error:[/] Empty response from API.");
+                return ExitError;
+            }
+
+            var serialized = JsonSerializer.Serialize(result, JsonPrintOptions);
+
+            if (output is not null)
+                await File.WriteAllTextAsync(output, serialized, cancellationToken).ConfigureAwait(false);
+
+            if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine(serialized);
+                return ExitSuccess;
+            }
+
+            RenderDiffText(result, service, from, to);
+            return ExitSuccess;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] Cannot connect to NexTraceOne API: [yellow]{ex.Message.EscapeMarkup()}[/]");
+            return ExitError;
+        }
+    }
+
+    private static void RenderDiffText(DiffResult result, string service, string? from, string? to)
+    {
+        var fromLabel = from ?? "baseline";
+        var toLabel = to ?? "current";
+        AnsiConsole.MarkupLine($"\n  [bold cyan]Contract Diff[/] — {service.EscapeMarkup()} [grey]{fromLabel.EscapeMarkup()} → {toLabel.EscapeMarkup()}[/]\n");
+
+        var table = new Table()
+            .Border(TableBorder.Rounded)
+            .AddColumn("[bold]Type[/]")
+            .AddColumn("[bold]Change[/]")
+            .AddColumn("[bold]Path[/]")
+            .AddColumn("[bold]Details[/]");
+
+        foreach (var change in result.Changes ?? [])
+        {
+            var (icon, color) = change.ChangeType?.ToLowerInvariant() switch
+            {
+                "breaking" => ("[red]✗[/]", "red"),
+                "non-breaking" or "nonbreaking" => ("[yellow]~[/]", "yellow"),
+                "additive" or "new" => ("[green]+[/]", "green"),
+                "removed" => ("[red]-[/]", "red"),
+                _ => ("·", "grey")
+            };
+            table.AddRow(
+                $"[{color}]{(change.ChangeType ?? "-").EscapeMarkup()}[/{color}]",
+                icon,
+                (change.Path ?? "-").EscapeMarkup(),
+                (change.Description ?? "-").EscapeMarkup());
+        }
+
+        if (result.Changes?.Count > 0)
+            AnsiConsole.Write(table);
+        else
+            AnsiConsole.MarkupLine("  [green]No differences found.[/]");
+
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine($"  Breaking: [red]{result.BreakingCount}[/]  " +
+            $"Non-Breaking: [yellow]{result.NonBreakingCount}[/]  " +
+            $"Additive: [green]{result.AdditiveCount}[/]");
     }
 
     // === CHANGELOG subcommand ===
@@ -279,8 +413,9 @@ public static class ContractCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var service = parseResult.GetValue(serviceOpt)!;
-            var url = parseResult.GetValue(urlOpt)!;
-            var token = parseResult.GetValue(tokenOpt) ?? Environment.GetEnvironmentVariable("NEXTRACE_TOKEN");
+            var url = Services.CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
+            var token = Services.CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
+            var format = parseResult.GetValue(formatOpt) ?? "text";
             var output = parseResult.GetValue(outputOpt);
 
             try
@@ -297,11 +432,17 @@ public static class ContractCommand
                 }
 
                 var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                Console.WriteLine(body);
 
                 if (output is not null)
                     await File.WriteAllTextAsync(output, body, cancellationToken).ConfigureAwait(false);
 
+                if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine(body);
+                    return ExitSuccess;
+                }
+
+                RenderChangelogText(service, body);
                 return ExitSuccess;
             }
             catch (HttpRequestException ex)
@@ -340,10 +481,10 @@ public static class ContractCommand
             var spec = parseResult.GetValue(specOpt)!;
             var service = parseResult.GetValue(serviceOpt)!;
             var version = parseResult.GetValue(versionOpt)!;
-            var url = parseResult.GetValue(urlOpt)!;
+            var url = Services.CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
             var sourceSystem = parseResult.GetValue(sourceSystemOpt) ?? "cli";
             var format = parseResult.GetValue(formatOpt) ?? "text";
-            var token = parseResult.GetValue(tokenOpt) ?? Environment.GetEnvironmentVariable("NEXTRACE_TOKEN");
+            var token = Services.CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
 
             if (!spec.Exists)
             {
@@ -527,5 +668,111 @@ public static class ContractCommand
         public IReadOnlyList<string>? NewEndpoints { get; init; }
         public string Message { get; init; } = string.Empty;
         public DateTimeOffset VerifiedAt { get; init; }
+    }
+
+    private sealed class DiffResult
+    {
+        [JsonPropertyName("changes")]
+        public IReadOnlyList<DiffEntry>? Changes { get; init; }
+
+        [JsonPropertyName("breakingCount")]
+        public int BreakingCount { get; init; }
+
+        [JsonPropertyName("nonBreakingCount")]
+        public int NonBreakingCount { get; init; }
+
+        [JsonPropertyName("additiveCount")]
+        public int AdditiveCount { get; init; }
+    }
+
+    private sealed class DiffEntry
+    {
+        [JsonPropertyName("changeType")]
+        public string? ChangeType { get; init; }
+
+        [JsonPropertyName("path")]
+        public string? Path { get; init; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; init; }
+    }
+
+    private sealed class ChangelogResponse
+    {
+        [JsonPropertyName("items")]
+        public IReadOnlyList<ChangelogEntry>? Items { get; init; }
+    }
+
+    private sealed class ChangelogEntry
+    {
+        [JsonPropertyName("version")]
+        public string? Version { get; init; }
+
+        [JsonPropertyName("semVer")]
+        public string? SemVer { get; init; }
+
+        [JsonPropertyName("changeType")]
+        public string? ChangeType { get; init; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; init; }
+
+        [JsonPropertyName("publishedAt")]
+        public DateTimeOffset? PublishedAt { get; init; }
+
+        [JsonPropertyName("createdAt")]
+        public DateTimeOffset? CreatedAt { get; init; }
+    }
+
+    // === Changelog renderer ===
+
+    private static void RenderChangelogText(string service, string body)
+    {
+        AnsiConsole.MarkupLine($"\n  [bold cyan]Contract Changelog[/] — {service.EscapeMarkup()}\n");
+
+        ChangelogResponse? changelog = null;
+        try { changelog = JsonSerializer.Deserialize<ChangelogResponse>(body, JsonReadOptions); }
+        catch { /* fallback to raw output */ }
+
+        if (changelog?.Items is null)
+        {
+            Console.WriteLine(body);
+            return;
+        }
+
+        if (changelog.Items.Count == 0)
+        {
+            AnsiConsole.MarkupLine("  [grey]No changelog entries found.[/]");
+            return;
+        }
+
+        var table = new Table()
+            .Border(TableBorder.Rounded)
+            .AddColumn("[bold]Version[/]")
+            .AddColumn("[bold]Type[/]")
+            .AddColumn("[bold]Description[/]")
+            .AddColumn("[bold]Date[/]");
+
+        foreach (var entry in changelog.Items)
+        {
+            var ver = (entry.SemVer ?? entry.Version ?? "-").EscapeMarkup();
+            var typeColor = entry.ChangeType?.ToLowerInvariant() switch
+            {
+                "breaking" => "red",
+                "non-breaking" or "nonbreaking" or "improvement" => "yellow",
+                "additive" or "feature" or "new" => "green",
+                _ => "grey"
+            };
+            var date = (entry.PublishedAt ?? entry.CreatedAt)?
+                .ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) ?? "-";
+
+            table.AddRow(
+                ver,
+                $"[{typeColor}]{(entry.ChangeType ?? "-").EscapeMarkup()}[/{typeColor}]",
+                (entry.Description ?? "-").EscapeMarkup(),
+                date.EscapeMarkup());
+        }
+
+        AnsiConsole.Write(table);
     }
 }

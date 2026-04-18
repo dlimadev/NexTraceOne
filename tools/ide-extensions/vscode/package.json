@@ -1,17 +1,73 @@
 {
   "name": "nextraceone-copilot",
   "displayName": "NexTraceOne Copilot",
-  "description": "AI-assisted operations and contract governance for NexTraceOne",
-  "version": "0.1.0",
+  "description": "AI-assisted operations, contract governance and change intelligence for NexTraceOne — Copilot Chat-like experience",
+  "version": "0.2.0",
   "publisher": "nextraceone",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Other"],
-  "activationEvents": ["onCommand:nextraceone.chat", "onCommand:nextraceone.configure"],
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Other", "AI"],
+  "activationEvents": ["onStartupFinished"],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       { "command": "nextraceone.chat", "title": "NexTraceOne: Ask AI" },
-      { "command": "nextraceone.configure", "title": "NexTraceOne: Configure" }
+      { "command": "nextraceone.configure", "title": "NexTraceOne: Configure" },
+      { "command": "nextraceone.inspectService", "title": "NexTraceOne: Inspect Service Context" },
+      { "command": "nextraceone.askAboutSelection", "title": "NexTraceOne: Ask AI about this" },
+      { "command": "nextraceone.mcpConfigure", "title": "NexTraceOne: Configure MCP Server" },
+      { "command": "nextraceone.openChatPanel", "title": "NexTraceOne: Open AI Chat Panel" }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "nextraceone.askAboutSelection",
+          "group": "nextraceone@1"
+        },
+        {
+          "command": "nextraceone.inspectService",
+          "group": "nextraceone@2"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "nextraceone.inspectService",
+          "group": "nextraceone@1"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "nextraceone-sidebar",
+          "title": "NexTraceOne",
+          "icon": "$(rocket)"
+        }
+      ]
+    },
+    "views": {
+      "nextraceone-sidebar": [
+        {
+          "type": "webview",
+          "id": "nextraceone.chatView",
+          "name": "NexTraceOne AI Chat"
+        }
+      ]
+    },
+    "chatParticipants": [
+      {
+        "id": "nextraceone",
+        "name": "nextraceone",
+        "fullName": "NexTraceOne AI",
+        "description": "Ask about services, contracts, changes and incidents in NexTraceOne",
+        "isSticky": true,
+        "commands": [
+          { "name": "service", "description": "Lookup a service in the catalog" },
+          { "name": "change", "description": "Check recent changes for a service" },
+          { "name": "contract", "description": "Query contract information" },
+          { "name": "incident", "description": "Get incident context and runbooks" }
+        ]
+      }
     ],
     "configuration": {
       "title": "NexTraceOne",
@@ -25,6 +81,17 @@
           "type": "string",
           "default": "",
           "description": "NexTraceOne IDE API Key"
+        },
+        "nextraceone.persona": {
+          "type": "string",
+          "default": "Engineer",
+          "enum": ["Engineer", "TechLead", "Architect", "Product", "Executive", "PlatformAdmin"],
+          "description": "Your persona in NexTraceOne (affects AI context and responses)"
+        },
+        "nextraceone.defaultEnvironment": {
+          "type": "string",
+          "default": "production",
+          "description": "Default environment context for queries"
         }
       }
     }
@@ -34,7 +101,7 @@
     "watch": "tsc -watch -p ."
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.90.0",
     "typescript": "^5.0.0"
   }
 }
