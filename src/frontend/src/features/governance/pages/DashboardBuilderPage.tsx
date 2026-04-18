@@ -21,6 +21,8 @@ import {
   Upload,
   Shuffle,
   Copy,
+  ChevronDown,
+  Search,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -188,6 +190,184 @@ function GridPreview({ slots, layout }: { slots: BuilderSlot[]; layout: string }
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Size presets ───────────────────────────────────────────────────────────
+
+const SIZE_PRESETS = [
+  { label: 'S', labelKey: 'governance.dashboardBuilder.sizePreset.s', width: 1, height: 1 },
+  { label: 'M', labelKey: 'governance.dashboardBuilder.sizePreset.m', width: 2, height: 2 },
+  { label: 'W', labelKey: 'governance.dashboardBuilder.sizePreset.w', width: 3, height: 2 },
+  { label: 'L', labelKey: 'governance.dashboardBuilder.sizePreset.l', width: 3, height: 3 },
+] as const;
+
+// ── Widget Picker Panel ────────────────────────────────────────────────────
+
+const PICKER_PERSONAS = [
+  'Engineer',
+  'TechLead',
+  'Architect',
+  'Executive',
+  'Product',
+  'PlatformAdmin',
+  'Auditor',
+] as const;
+
+interface WidgetPickerPanelProps {
+  selected: WidgetType;
+  onSelect: (type: WidgetType) => void;
+  disabled?: boolean;
+}
+
+function WidgetPickerPanel({ selected, onSelect, disabled }: WidgetPickerPanelProps) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [personaFilter, setPersonaFilter] = useState('');
+
+  const filtered = ALL_WIDGET_TYPES.filter((wt) => {
+    const meta = WIDGET_META[wt];
+    const label = t(meta.labelKey, wt).toLowerCase();
+    const matchesSearch = !search || label.includes(search.toLowerCase());
+    const matchesPersona = !personaFilter || meta.personas.includes(personaFilter);
+    return matchesSearch && matchesPersona;
+  });
+
+  if (disabled) {
+    return (
+      <button
+        type="button"
+        disabled
+        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white text-left opacity-50 flex items-center justify-between"
+      >
+        <span className="truncate">{t(WIDGET_META[selected].labelKey, selected)}</span>
+        <ChevronDown size={12} className="shrink-0 ml-1 text-gray-400" />
+      </button>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white text-left flex items-center justify-between hover:border-accent transition-colors"
+        aria-label={t('governance.dashboardBuilder.widgetPickerOpen', 'Open widget picker')}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+      >
+        <span className="truncate">{t(WIDGET_META[selected].labelKey, selected)}</span>
+        <ChevronDown
+          size={12}
+          className={`shrink-0 ml-1 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <div
+          className="absolute top-full left-0 z-50 mt-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl p-3 w-72"
+          role="dialog"
+          aria-label={t('governance.dashboardBuilder.widgetPickerPanel', 'Widget picker')}
+        >
+          {/* Search input */}
+          <div className="relative mb-2">
+            <Search
+              size={11}
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            />
+            <input
+              autoFocus
+              type="text"
+              placeholder={t('governance.dashboardBuilder.widgetSearch', 'Search widgets…')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs pl-6 pr-2 py-1.5 text-gray-900 dark:text-white focus:outline-none focus:border-accent"
+            />
+          </div>
+
+          {/* Persona filter chips */}
+          <div className="flex flex-wrap gap-1 mb-2">
+            <button
+              type="button"
+              onClick={() => setPersonaFilter('')}
+              className={`rounded-full px-2 py-0.5 text-[9px] font-medium transition-colors ${
+                !personaFilter
+                  ? 'bg-accent text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
+              }`}
+            >
+              {t('governance.dashboardBuilder.allPersonas', 'All')}
+            </button>
+            {PICKER_PERSONAS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPersonaFilter(personaFilter === p ? '' : p)}
+                className={`rounded-full px-2 py-0.5 text-[9px] font-medium transition-colors ${
+                  personaFilter === p
+                    ? 'bg-accent text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+
+          {/* Widget cards grid */}
+          <div
+            className="max-h-52 overflow-y-auto grid grid-cols-2 gap-1"
+            role="listbox"
+            aria-label={t('governance.dashboardBuilder.widgetPickerPanel', 'Widget picker')}
+          >
+            {filtered.map((wt) => {
+              const meta = WIDGET_META[wt];
+              const isSelected = wt === selected;
+              return (
+                <button
+                  key={wt}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    onSelect(wt);
+                    setOpen(false);
+                    setSearch('');
+                    setPersonaFilter('');
+                  }}
+                  className={`text-left rounded p-2 text-xs transition-colors border ${
+                    isSelected
+                      ? 'bg-accent text-white border-accent'
+                      : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-transparent hover:border-accent/30 hover:bg-accent/5'
+                  }`}
+                  title={meta.personas.join(', ')}
+                >
+                  <div className="font-medium truncate leading-tight">
+                    {t(meta.labelKey, wt)}
+                  </div>
+                  <div
+                    className={`text-[8px] mt-0.5 truncate ${
+                      isSelected ? 'text-white/70' : 'text-gray-400'
+                    }`}
+                  >
+                    {meta.defaultWidth}×{meta.defaultHeight} ·{' '}
+                    {meta.personas.slice(0, 2).join(', ')}
+                    {meta.personas.length > 2 ? ` +${meta.personas.length - 2}` : ''}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center text-xs text-gray-400 py-3">
+              {t('governance.dashboardBuilder.noWidgetsFound', 'No widgets match the filter')}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -579,24 +759,24 @@ export function DashboardBuilderPage() {
                   <CardBody>
                     <div className="flex items-start gap-2">
                       <span className="text-xs font-mono text-gray-400 pt-2 w-5 shrink-0">{index + 1}</span>
-                      <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        {/* Widget type */}
+                      <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-4">
+                        {/* Widget type — visual picker */}
                         <div>
                           <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                             {t('governance.dashboardBuilder.widgetType', 'Widget Type')}
                           </label>
-                          <select
-                            value={slot.type}
-                            onChange={(e) => updateSlot(slot.tempId, { type: e.target.value as WidgetType })}
+                          <WidgetPickerPanel
+                            selected={slot.type}
+                            onSelect={(type) => {
+                              const meta = WIDGET_META[type];
+                              updateSlot(slot.tempId, {
+                                type,
+                                width: meta.defaultWidth,
+                                height: meta.defaultHeight,
+                              });
+                            }}
                             disabled={isReadOnly}
-                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          >
-                            {ALL_WIDGET_TYPES.map((wt) => (
-                              <option key={wt} value={wt}>
-                                {t(WIDGET_META[wt].labelKey, wt)}
-                              </option>
-                            ))}
-                          </select>
+                          />
                         </div>
 
                         {/* Position */}
@@ -654,6 +834,44 @@ export function DashboardBuilderPage() {
                               className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
                               aria-label={t('governance.dashboardBuilder.height', 'Height')}
                             />
+                          </div>
+                        </div>
+
+                        {/* Size presets */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {t('governance.dashboardBuilder.sizePresets', 'Quick Size')}
+                          </label>
+                          <div className="flex gap-1 flex-wrap">
+                            {SIZE_PRESETS.map((preset) => {
+                              const isActive =
+                                slot.width === preset.width && slot.height === preset.height;
+                              return (
+                                <button
+                                  key={preset.label}
+                                  type="button"
+                                  onClick={() =>
+                                    updateSlot(slot.tempId, {
+                                      width: preset.width,
+                                      height: preset.height,
+                                    })
+                                  }
+                                  disabled={isReadOnly}
+                                  aria-pressed={isActive}
+                                  className={`rounded px-2 py-0.5 text-[10px] font-semibold transition-colors disabled:opacity-50 ${
+                                    isActive
+                                      ? 'bg-accent text-white'
+                                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-accent/20'
+                                  }`}
+                                  title={`${preset.width}×${preset.height}`}
+                                >
+                                  {t(preset.labelKey, preset.label)}{' '}
+                                  <span className="font-normal opacity-70">
+                                    {preset.width}×{preset.height}
+                                  </span>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
 

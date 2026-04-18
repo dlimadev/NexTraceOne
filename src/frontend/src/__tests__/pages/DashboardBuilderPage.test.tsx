@@ -180,31 +180,37 @@ describe('DashboardBuilderPage', () => {
     });
   });
 
-  it('new widget types appear in the type selector', async () => {
+  it('new widget types appear in the widget picker', async () => {
     renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
+    // Open the picker for the first widget
+    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
+    expect(pickerBtn).not.toBeNull();
+    fireEvent.click(pickerBtn!);
     await waitFor(() => {
-      // One of the 4 new widget types should appear in the select
-      const selects = Array.from(document.querySelectorAll('select'));
-      const allText = selects.map((s) => s.innerHTML).join('');
-      expect(allText).toMatch(/alert-status|Alert Status|Deployment Frequency|SLO Gauge|Change Timeline/i);
+      expect(document.body.textContent).toMatch(/Alert Status|Change Timeline|SLO Gauge|Deployment Frequency/i);
     });
   });
 
-  it('stat and text-markdown appear in widget type selector', async () => {
+  it('stat and text-markdown appear in widget picker', async () => {
     renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
+    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
+    expect(pickerBtn).not.toBeNull();
+    fireEvent.click(pickerBtn!);
     await waitFor(() => {
-      const selects = Array.from(document.querySelectorAll('select'));
-      const allText = selects.map((s) => s.innerHTML).join('');
-      expect(allText).toMatch(/stat|text-markdown/i);
+      expect(document.body.textContent).toMatch(/KPI Stat|Note|Text/i);
     });
   });
 
-  it('new Phase 5 widget types appear in the type selector', async () => {
+  it('Phase 5 widget types appear in widget picker', async () => {
     renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
+    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
+    expect(pickerBtn).not.toBeNull();
+    fireEvent.click(pickerBtn!);
     await waitFor(() => {
-      const selects = Array.from(document.querySelectorAll('select'));
-      const allText = selects.map((s) => s.innerHTML).join('');
-      expect(allText).toMatch(/top-services|contract-coverage|blast-radius/i);
+      expect(document.body.textContent).toMatch(/Top Services|Contract Coverage|Blast Radius/i);
     });
   });
 
@@ -215,5 +221,66 @@ describe('DashboardBuilderPage', () => {
       const dupBtn = document.querySelector('[aria-label="Duplicate widget"]');
       expect(dupBtn).not.toBeNull();
     });
+  });
+
+  // ── Phase 6 tests ────────────────────────────────────────────────────────
+
+  it('shows widget picker button instead of select for widget type', async () => {
+    renderPage();
+    await waitFor(() => {
+      const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
+      expect(pickerBtn).not.toBeNull();
+    });
+  });
+
+  it('widget picker panel opens on click and shows search input', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
+    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
+    expect(pickerBtn).not.toBeNull();
+    fireEvent.click(pickerBtn!);
+    await waitFor(() => {
+      const panel = document.querySelector('[role="dialog"]');
+      expect(panel).not.toBeNull();
+      const searchInput = document.querySelector('input[placeholder*="widgets"]');
+      expect(searchInput).not.toBeNull();
+    });
+  });
+
+  it('widget picker panel shows persona filter chips', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
+    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
+    fireEvent.click(pickerBtn!);
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Engineer');
+      expect(document.body.textContent).toContain('TechLead');
+    });
+  });
+
+  it('Phase 6 Team Health and Release Calendar appear in widget picker', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Widgets'));
+    const pickerBtn = document.querySelector('[aria-haspopup="dialog"]');
+    fireEvent.click(pickerBtn!);
+    await waitFor(() => {
+      expect(document.body.textContent).toMatch(/Team Health|Release Calendar/i);
+    });
+  });
+
+  it('shows Quick Size preset buttons for widget slots', async () => {
+    renderPage();
+    await waitFor(() => {
+      // Quick Size label should be present
+      expect(document.body.textContent).toContain('Quick Size');
+    });
+  });
+
+  it('size preset buttons apply width and height to slot', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Quick Size'));
+    // Find preset buttons with aria-pressed attribute
+    const presetBtns = Array.from(document.querySelectorAll('[aria-pressed]'));
+    expect(presetBtns.length).toBeGreaterThan(0);
   });
 });

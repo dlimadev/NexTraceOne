@@ -5771,7 +5771,9 @@
         "textMarkdown": "Nota / Texto",
         "topServices": "Top Servicios",
         "contractCoverage": "Cobertura de Contratos",
-        "blastRadius": "Blast Radius"
+        "blastRadius": "Blast Radius",
+        "teamHealth": "Salud del Equipo",
+        "releaseCalendar": "Calendario de Releases"
       },
       "cloneDashboard": "Clonar",
       "cloneTitle": "Clonar Dashboard",
@@ -5815,6 +5817,16 @@
         "affectedServices": "Afectados",
         "risk": "Riesgo",
         "confidence": "Confianza"
+      },
+      "teamHealth": {
+        "noTeam": "Seleccione un equipo en la configuración del widget",
+        "p1Incidents": "Incidentes P1",
+        "p2Incidents": "Incidentes P2",
+        "lastDeploy": "Último despliegue"
+      },
+      "releaseCalendar": {
+        "changes": "cambios",
+        "noChanges": "No hay cambios programados"
       }
     },
     "dashboards": {
@@ -5903,7 +5915,19 @@
       "statMetric": "Métrica KPI",
       "textContent": "Contenido (Markdown)",
       "textContentPlaceholder": "Admite **negrita**, *cursiva*, # títulos, - listas, [etiqueta](url)",
-      "duplicateWidget": "Duplicar widget"
+      "duplicateWidget": "Duplicar widget",
+      "widgetPickerOpen": "Abrir selector de widgets",
+      "widgetPickerPanel": "Selector de widgets",
+      "widgetSearch": "Buscar widgets…",
+      "allPersonas": "Todos",
+      "noWidgetsFound": "Ningún widget coincide con el filtro",
+      "sizePresets": "Tamaño rápido",
+      "sizePreset": {
+        "s": "P",
+        "m": "M",
+        "w": "G",
+        "l": "XG"
+      }
     },
     "dora": {
       "cfr": "CFR",

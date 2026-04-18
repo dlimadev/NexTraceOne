@@ -24,7 +24,9 @@ export type WidgetType =
   | 'text-markdown'
   | 'top-services'
   | 'contract-coverage'
-  | 'blast-radius';
+  | 'blast-radius'
+  | 'team-health'
+  | 'release-calendar';
 
 export const ALL_WIDGET_TYPES: WidgetType[] = [
   'dora-metrics',
@@ -44,6 +46,8 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'top-services',
   'contract-coverage',
   'blast-radius',
+  'team-health',
+  'release-calendar',
 ];
 
 export interface WidgetConfig {
@@ -217,6 +221,20 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
+  },
+  'team-health': {
+    type: 'team-health',
+    labelKey: 'governance.customDashboards.widgets.teamHealth',
+    defaultWidth: 2,
+    defaultHeight: 2,
+    personas: ['TechLead', 'Engineer', 'Executive', 'PlatformAdmin'],
+  },
+  'release-calendar': {
+    type: 'release-calendar',
+    labelKey: 'governance.customDashboards.widgets.releaseCalendar',
+    defaultWidth: 3,
+    defaultHeight: 2,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Product'],
   },
 };
 

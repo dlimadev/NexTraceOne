@@ -5793,7 +5793,9 @@
         "textMarkdown": "Note / Text",
         "topServices": "Top Services",
         "contractCoverage": "Contract Coverage",
-        "blastRadius": "Blast Radius"
+        "blastRadius": "Blast Radius",
+        "teamHealth": "Team Health",
+        "releaseCalendar": "Release Calendar"
       },
       "cloneDashboard": "Clone",
       "cloneTitle": "Clone Dashboard",
@@ -5837,6 +5839,16 @@
         "affectedServices": "Affected",
         "risk": "Risk",
         "confidence": "Confidence"
+      },
+      "teamHealth": {
+        "noTeam": "Select a team in widget settings",
+        "p1Incidents": "P1 Incidents",
+        "p2Incidents": "P2 Incidents",
+        "lastDeploy": "Last deploy"
+      },
+      "releaseCalendar": {
+        "changes": "changes",
+        "noChanges": "No changes scheduled"
       }
     },
     "dashboards": {
@@ -5925,7 +5937,19 @@
       "statMetric": "KPI Metric",
       "textContent": "Content (Markdown)",
       "textContentPlaceholder": "Supports **bold**, *italic*, # headings, - lists, [label](url)",
-      "duplicateWidget": "Duplicate widget"
+      "duplicateWidget": "Duplicate widget",
+      "widgetPickerOpen": "Open widget picker",
+      "widgetPickerPanel": "Widget picker",
+      "widgetSearch": "Search widgets…",
+      "allPersonas": "All",
+      "noWidgetsFound": "No widgets match the filter",
+      "sizePresets": "Quick Size",
+      "sizePreset": {
+        "s": "S",
+        "m": "M",
+        "w": "W",
+        "l": "L"
+      }
     },
     "dora": {
       "cfr": "CFR",

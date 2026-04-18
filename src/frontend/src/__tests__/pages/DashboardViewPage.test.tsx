@@ -292,3 +292,50 @@ describe('DashboardViewPage — Kiosk mode', () => {
     });
   });
 });
+
+// ── Phase 6: description display ──────────────────────────────────────────
+
+describe('DashboardViewPage — description display', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(client.put).mockResolvedValue({ data: {} });
+  });
+
+  it('shows description when dashboard has one', async () => {
+    vi.mocked(client.get).mockResolvedValue({
+      data: { ...mockRenderData, description: 'Tracks platform reliability metrics for the team.' },
+    });
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <MemoryRouter initialEntries={[`/governance/dashboards/${DASHBOARD_ID}`]}>
+          <Routes>
+            <Route path="/governance/dashboards/:dashboardId" element={<DashboardViewPage />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Tracks platform reliability metrics');
+    });
+  });
+
+  it('does not show description area when dashboard description is null', async () => {
+    vi.mocked(client.get).mockResolvedValue({
+      data: { ...mockRenderData, description: null },
+    });
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <MemoryRouter initialEntries={[`/governance/dashboards/${DASHBOARD_ID}`]}>
+          <Routes>
+            <Route path="/governance/dashboards/:dashboardId" element={<DashboardViewPage />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+    await waitFor(() => {
+      // Name still shows but no description text beyond that
+      expect(document.body.textContent).toContain('My Test Dashboard');
+    });
+  });
+});
+

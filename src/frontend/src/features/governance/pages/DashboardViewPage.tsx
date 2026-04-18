@@ -50,6 +50,8 @@ import { TextMarkdownWidget } from '../widgets/TextMarkdownWidget';
 import { TopServicesWidget } from '../widgets/TopServicesWidget';
 import { ContractCoverageWidget } from '../widgets/ContractCoverageWidget';
 import { BlastRadiusWidget } from '../widgets/BlastRadiusWidget';
+import { TeamHealthWidget } from '../widgets/TeamHealthWidget';
+import { ReleaseCalendarWidget } from '../widgets/ReleaseCalendarWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
@@ -74,6 +76,8 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'top-services': TopServicesWidget,
   'contract-coverage': ContractCoverageWidget,
   'blast-radius': BlastRadiusWidget,
+  'team-health': TeamHealthWidget,
+  'release-calendar': ReleaseCalendarWidget,
 };
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -96,6 +100,7 @@ interface WidgetSlot {
 interface RenderDataResponse {
   dashboardId: string;
   name: string;
+  description?: string | null;
   layout: string;
   persona: string;
   environmentId?: string | null;
@@ -343,10 +348,17 @@ export function DashboardViewPage() {
         </Link>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <LayoutDashboard size={20} className="text-accent" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">{data.name}</h1>
-            <Badge variant="secondary">{data.persona}</Badge>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <LayoutDashboard size={20} className="text-accent" />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">{data.name}</h1>
+              <Badge variant="secondary">{data.persona}</Badge>
+            </div>
+            {data.description && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 ml-7 leading-snug">
+                {data.description}
+              </p>
+            )}
           </div>
 
           {/* Global controls */}
