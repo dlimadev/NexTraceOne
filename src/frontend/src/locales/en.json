@@ -10012,7 +10012,26 @@
         "rootSpan": "Root Span",
         "childSpan": "Child Span",
         "waterfall": "Waterfall",
-        "timeline": "Timeline"
+        "timeline": "Timeline",
+        "closeDetails": "Close details",
+        "responseTime": "Response time",
+        "traceIdLabel": "Trace ID",
+        "searchSpans": "Search name, endpoint, service, or attributes",
+        "searchDetails": "Search details",
+        "endpoint": "Endpoint",
+        "spanStatus": "Span status",
+        "failure": "Failure",
+        "section": {
+          "core": "Core",
+          "http": "HTTP",
+          "httpHeaders": "HTTP headers",
+          "requestAttributes": "Request attributes",
+          "codeAttributes": "Code attributes",
+          "networking": "Networking",
+          "host": "Host",
+          "deployment": "Deployment information",
+          "other": "Other"
+        }
       }
     },
     "serviceKind": {

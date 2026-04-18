@@ -9990,7 +9990,26 @@
         "rootSpan": "Span Raíz",
         "childSpan": "Span Hijo",
         "waterfall": "Cascada",
-        "timeline": "Línea de Tiempo"
+        "timeline": "Línea de Tiempo",
+        "closeDetails": "Cerrar detalles",
+        "responseTime": "Tiempo de respuesta",
+        "traceIdLabel": "ID del trace",
+        "searchSpans": "Buscar nombre, endpoint, servicio o atributos",
+        "searchDetails": "Buscar detalles",
+        "endpoint": "Endpoint",
+        "spanStatus": "Estado del span",
+        "failure": "Error",
+        "section": {
+          "core": "Principal",
+          "http": "HTTP",
+          "httpHeaders": "Cabeceras HTTP",
+          "requestAttributes": "Atributos de solicitud",
+          "codeAttributes": "Atributos de código",
+          "networking": "Red",
+          "host": "Host",
+          "deployment": "Información de despliegue",
+          "other": "Otros"
+        }
       }
     },
     "serviceKind": {
@@ -10005,13 +10024,27 @@
       "unknown": "Desconocido"
     },
     "context": {
-      "http": { "title": "Contexto HTTP" },
-      "kafka": { "title": "Contexto Kafka" },
-      "soap": { "title": "Contexto SOAP / RPC" },
-      "db": { "title": "Contexto de Base de Datos" },
-      "background": { "title": "Contexto Background" },
-      "messaging": { "title": "Contexto de Mensajería" },
-      "generic": { "title": "Contexto" }
+      "http": {
+        "title": "Contexto HTTP"
+      },
+      "kafka": {
+        "title": "Contexto Kafka"
+      },
+      "soap": {
+        "title": "Contexto SOAP / RPC"
+      },
+      "db": {
+        "title": "Contexto de Base de Datos"
+      },
+      "background": {
+        "title": "Contexto Background"
+      },
+      "messaging": {
+        "title": "Contexto de Mensajería"
+      },
+      "generic": {
+        "title": "Contexto"
+      }
     },
     "logs": {
       "title": "Explorador de Logs",
