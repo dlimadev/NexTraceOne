@@ -33,6 +33,9 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('nextraceone.askAboutSelection', handleAskAboutSelectionCommand),
     vscode.commands.registerCommand('nextraceone.mcpConfigure', handleMcpConfigureCommand),
     vscode.commands.registerCommand('nextraceone.openDashboard', handleOpenDashboardCommand),
+    vscode.commands.registerCommand('nextraceone.scaffold', () => handleScaffoldCommand()),
+    vscode.commands.registerCommand('nextraceone.applyCode', (code: string, filename?: string) =>
+      handleApplyCodeCommand(code, filename)),
     vscode.commands.registerCommand('nextraceone.openChatPanel', () =>
       vscode.commands.executeCommand('nextraceone.chatView.focus')),
   );
@@ -77,7 +80,7 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlContent(webviewView.webview);
 
     // Handle messages from the webview
-    webviewView.webview.onDidReceiveMessage(async (message: { type: string; text?: string }) => {
+    webviewView.webview.onDidReceiveMessage(async (message: { type: string; text?: string; code?: string; filename?: string }) => {
       switch (message.type) {
         case 'sendMessage':
           if (message.text) {
@@ -92,6 +95,11 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
           // Restore history on panel re-open
           if (this._history.length > 0) {
             this._postMessage({ type: 'restoreHistory', messages: this._history });
+          }
+          break;
+        case 'applyCode':
+          if (message.code) {
+            await vscode.commands.executeCommand('nextraceone.applyCode', message.code, message.filename);
           }
           break;
       }
@@ -222,7 +230,6 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
       border-radius: 2px 12px 12px 12px;
       padding: 8px 12px; max-width: 92%;
       font-size: 12px; line-height: 1.5;
-      white-space: pre-wrap;
       position: relative;
     }
     .copy-btn {
@@ -235,6 +242,41 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
     }
     .message.assistant:hover .copy-btn { opacity: 1; }
     .copy-btn:hover { background: var(--vscode-button-secondaryHoverBackground, rgba(128,128,128,0.3)); }
+    .msg-text { white-space: pre-wrap; word-wrap: break-word; }
+    .code-block {
+      margin: 6px 0;
+      border: 1px solid var(--vscode-panel-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .code-block-header {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--vscode-titleBar-activeBackground, rgba(60,60,60,0.5));
+      padding: 2px 8px; font-size: 10px;
+      color: var(--vscode-descriptionForeground);
+    }
+    .code-block-lang { font-family: monospace; }
+    .code-block-actions { display: flex; gap: 4px; }
+    .code-action-btn {
+      background: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: none; border-radius: 3px;
+      padding: 2px 7px; font-size: 10px; cursor: pointer;
+      white-space: nowrap;
+    }
+    .code-action-btn:hover { background: var(--vscode-button-hoverBackground); }
+    .code-action-btn.secondary {
+      background: var(--vscode-button-secondaryBackground, rgba(128,128,128,0.2));
+      color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+    }
+    .code-action-btn.secondary:hover { background: var(--vscode-button-secondaryHoverBackground, rgba(128,128,128,0.35)); }
+    .code-block pre {
+      margin: 0; padding: 8px 10px; overflow-x: auto;
+      background: var(--vscode-editor-background);
+      font-family: var(--vscode-editor-font-family, monospace);
+      font-size: 11px; line-height: 1.4;
+      white-space: pre; tab-size: 2;
+    }
     .message.system {
       align-self: center; text-align: center;
       color: var(--vscode-descriptionForeground);
@@ -314,29 +356,115 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
     const loadingEl = document.getElementById('loading');
     const clearBtn = document.getElementById('clear-btn');
 
+    function escapeHtmlStr(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /**
+     * Parses message content into segments: plain text and code blocks.
+     * Returns array of {type:'text',content} | {type:'code',lang,content}
+     */
+    function parseContent(raw) {
+      const segments = [];
+      const codeBlockRe = /\x60\x60\x60([a-zA-Z0-9_\-]*)\n?([\s\S]*?)\x60\x60\x60/g;
+      let last = 0;
+      let match;
+      while ((match = codeBlockRe.exec(raw)) !== null) {
+        if (match.index > last) {
+          segments.push({ type: 'text', content: raw.slice(last, match.index) });
+        }
+        segments.push({ type: 'code', lang: match[1] || 'text', content: match[2] || '' });
+        last = match.index + match[0].length;
+      }
+      if (last < raw.length) segments.push({ type: 'text', content: raw.slice(last) });
+      return segments;
+    }
+
     function appendMessage(msg) {
       const div = document.createElement('div');
       div.className = 'message ' + msg.role;
 
-      const contentSpan = document.createElement('span');
-      contentSpan.textContent = msg.content;
-      div.appendChild(contentSpan);
-
-      // Copy button for assistant messages
       if (msg.role === 'assistant') {
+        // Parse content for code blocks
+        const segments = parseContent(msg.content);
+        segments.forEach(seg => {
+          if (seg.type === 'text') {
+            if (seg.content.trim()) {
+              const span = document.createElement('span');
+              span.className = 'msg-text';
+              span.textContent = seg.content;
+              div.appendChild(span);
+            }
+          } else {
+            // Code block with action buttons
+            const block = document.createElement('div');
+            block.className = 'code-block';
+
+            const header = document.createElement('div');
+            header.className = 'code-block-header';
+
+            const langSpan = document.createElement('span');
+            langSpan.className = 'code-block-lang';
+            langSpan.textContent = seg.lang || 'text';
+            header.appendChild(langSpan);
+
+            const actions = document.createElement('div');
+            actions.className = 'code-block-actions';
+
+            // Insert at cursor button
+            const insertBtn = document.createElement('button');
+            insertBtn.className = 'code-action-btn';
+            insertBtn.title = 'Insert code at cursor position in the active editor';
+            insertBtn.textContent = '↓ Insert at Cursor';
+            const capturedCode = seg.content;
+            const capturedLang = seg.lang;
+            insertBtn.addEventListener('click', () => {
+              vscode.postMessage({ type: 'applyCode', code: capturedCode, filename: null });
+              insertBtn.textContent = '✓ Applied';
+              setTimeout(() => { insertBtn.textContent = '↓ Insert at Cursor'; }, 2000);
+            });
+            actions.appendChild(insertBtn);
+
+            // Copy code button
+            const copyCodeBtn = document.createElement('button');
+            copyCodeBtn.className = 'code-action-btn secondary';
+            copyCodeBtn.title = 'Copy code to clipboard';
+            copyCodeBtn.textContent = 'Copy';
+            copyCodeBtn.addEventListener('click', () => {
+              navigator.clipboard.writeText(capturedCode).then(() => {
+                copyCodeBtn.textContent = '✓';
+                setTimeout(() => { copyCodeBtn.textContent = 'Copy'; }, 1500);
+              });
+            });
+            actions.appendChild(copyCodeBtn);
+
+            header.appendChild(actions);
+            block.appendChild(header);
+
+            const pre = document.createElement('pre');
+            pre.innerHTML = escapeHtmlStr(capturedCode);
+            block.appendChild(pre);
+
+            div.appendChild(block);
+          }
+        });
+
+        // Overall copy button
         const copyBtn = document.createElement('button');
         copyBtn.className = 'copy-btn';
-        copyBtn.title = 'Copy to clipboard';
+        copyBtn.title = 'Copy full response to clipboard';
         copyBtn.textContent = 'Copy';
         copyBtn.addEventListener('click', () => {
           navigator.clipboard.writeText(msg.content).then(() => {
             copyBtn.textContent = '✓ Copied';
             setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
-          }).catch(() => {
-            copyBtn.textContent = 'Copy';
-          });
+          }).catch(() => { copyBtn.textContent = 'Copy'; });
         });
         div.appendChild(copyBtn);
+      } else {
+        const contentSpan = document.createElement('span');
+        contentSpan.textContent = msg.content;
+        div.appendChild(contentSpan);
       }
 
       const timeEl = document.createElement('div');
@@ -466,6 +594,14 @@ function registerChatParticipant(context: vscode.ExtensionContext): void {
           case 'blast-radius':
             queryType = 'BreakingChangeAlert';
             prefix = `[Blast radius analysis] `;
+            break;
+          case 'scaffold':
+            queryType = 'CodeGeneration';
+            prefix = `[Scaffold/code generation] `;
+            break;
+          case 'generate':
+            queryType = 'CodeGeneration';
+            prefix = `[Code generation] `;
             break;
         }
 
@@ -729,6 +865,393 @@ async function handleOpenDashboardCommand(): Promise<void> {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     await vscode.window.showErrorMessage(`NexTraceOne: Failed to open dashboard: ${message}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Scaffold Wizard
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface ScaffoldTemplateSummary {
+  templateId: string;
+  slug: string;
+  displayName: string;
+  description: string;
+  version: string;
+  serviceType: string;
+  language: string;
+  defaultDomain: string;
+  defaultTeam: string;
+  hasBaseContract: boolean;
+  hasScaffoldingManifest: boolean;
+  usageCount: number;
+}
+
+interface ScaffoldedFile {
+  path: string;
+  content: string;
+}
+
+interface ScaffoldPlan {
+  scaffoldingId: string;
+  serviceName: string;
+  templateSlug: string;
+  templateVersion: string;
+  serviceType: string;
+  language: string;
+  domain: string;
+  teamName: string;
+  baseContractSpec?: string;
+  files: ScaffoldedFile[];
+  repositoryUrl?: string;
+}
+
+/**
+ * Handles "NexTraceOne: Scaffold New Service" command.
+ * Multi-step wizard: pick template → enter service name → configure → generate files.
+ */
+async function handleScaffoldCommand(): Promise<void> {
+  const config = getConfig();
+
+  if (!config.apiKey) {
+    const action = await vscode.window.showWarningMessage(
+      'NexTraceOne: No API key configured.',
+      'Configure',
+    );
+    if (action === 'Configure') await handleConfigureCommand();
+    return;
+  }
+
+  // Step 1: Fetch available templates
+  let templates: ScaffoldTemplateSummary[] = [];
+  await vscode.window.withProgress(
+    { location: vscode.ProgressLocation.Notification, title: 'NexTraceOne: Loading templates…' },
+    async () => {
+      try {
+        templates = await fetchTemplates(config.serverUrl, config.apiKey);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        await vscode.window.showErrorMessage(`NexTraceOne: Could not fetch templates: ${msg}`);
+      }
+    },
+  );
+
+  if (templates.length === 0) {
+    await vscode.window.showWarningMessage(
+      'NexTraceOne: No active service templates found. Configure templates in the NexTraceOne platform.',
+    );
+    return;
+  }
+
+  // Step 2: Pick template
+  const templateItems = templates.map((t) => ({
+    label: `$(symbol-class) ${t.displayName}`,
+    description: `${t.serviceType} · ${t.language} · v${t.version}`,
+    detail: `${t.description}${t.hasBaseContract ? '  $(file-code) Contract' : ''}${t.hasScaffoldingManifest ? '  $(list-tree) Manifest' : ''}`,
+    template: t,
+  }));
+
+  const picked = await vscode.window.showQuickPick(templateItems, {
+    placeHolder: 'Select a service template',
+    title: 'NexTraceOne: Scaffold New Service (1/4)',
+    matchOnDescription: true,
+    matchOnDetail: true,
+  });
+  if (!picked) return;
+
+  const selectedTemplate = picked.template;
+
+  // Step 3: Enter service name
+  const serviceName = await vscode.window.showInputBox({
+    prompt: 'Service name (lowercase kebab-case)',
+    placeHolder: 'e.g. payment-service',
+    title: 'NexTraceOne: Scaffold New Service (2/4)',
+    validateInput: (v) => {
+      if (!v) return 'Service name is required';
+      if (!/^[a-z0-9][a-z0-9\-]{0,62}[a-z0-9]$/.test(v))
+        return 'Must be lowercase kebab-case (e.g. payment-service)';
+      return null;
+    },
+  });
+  if (!serviceName) return;
+
+  // Step 4: Configure team / domain
+  const team = await vscode.window.showInputBox({
+    prompt: 'Team name (optional)',
+    placeHolder: selectedTemplate.defaultTeam || 'e.g. platform-team',
+    title: 'NexTraceOne: Scaffold New Service (3/4)',
+    value: selectedTemplate.defaultTeam,
+  });
+
+  const domain = await vscode.window.showInputBox({
+    prompt: 'Domain (optional)',
+    placeHolder: selectedTemplate.defaultDomain || 'e.g. payments',
+    title: 'NexTraceOne: Scaffold New Service (4/4)',
+    value: selectedTemplate.defaultDomain,
+  });
+
+  // Step 5: Pick output directory
+  const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const defaultOutputDir = workspaceRoot ? path.join(workspaceRoot, serviceName) : serviceName;
+
+  const outputDirResult = await vscode.window.showInputBox({
+    prompt: 'Output directory',
+    value: defaultOutputDir,
+    title: 'NexTraceOne: Output Directory',
+  });
+  if (!outputDirResult) return;
+
+  // Step 6: Call scaffold API and write files
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: `NexTraceOne: Scaffolding ${serviceName}…`,
+      cancellable: false,
+    },
+    async (progress) => {
+      progress.report({ increment: 20, message: 'Calling scaffold API…' });
+
+      let plan: ScaffoldPlan;
+      try {
+        plan = await callScaffoldApi(
+          config.serverUrl, config.apiKey,
+          selectedTemplate.slug, serviceName,
+          team || undefined, domain || undefined,
+        );
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        await vscode.window.showErrorMessage(`NexTraceOne Scaffold: ${msg}`);
+        return;
+      }
+
+      progress.report({ increment: 40, message: 'Writing files…' });
+
+      let filesWritten = 0;
+      const errorFiles: string[] = [];
+
+      for (const file of plan.files) {
+        if (!file.path) continue;
+        try {
+          const fullPath = path.join(outputDirResult, file.path.replace(/\//g, path.sep));
+          const fileDir = path.dirname(fullPath);
+          await fs.promises.mkdir(fileDir, { recursive: true });
+          await fs.promises.writeFile(fullPath, file.content ?? '', 'utf-8');
+          filesWritten++;
+        } catch {
+          errorFiles.push(file.path);
+        }
+      }
+
+      // Write base contract spec if available
+      if (plan.baseContractSpec) {
+        const ext = plan.serviceType?.toLowerCase().includes('rest') ? 'openapi.json'
+          : plan.serviceType?.toLowerCase().includes('kafka') ? 'asyncapi.yaml'
+          : plan.serviceType?.toLowerCase().includes('soap') ? 'service.wsdl'
+          : 'contract.json';
+        const contractPath = path.join(outputDirResult, `${serviceName}-${ext}`);
+        try {
+          await fs.promises.writeFile(contractPath, plan.baseContractSpec, 'utf-8');
+          filesWritten++;
+        } catch { /* non-fatal */ }
+      }
+
+      progress.report({ increment: 90, message: 'Opening project…' });
+
+      // Open the output folder in a new workspace window or add to workspace
+      const outputUri = vscode.Uri.file(outputDirResult);
+      const action = await vscode.window.showInformationMessage(
+        `✓ ${serviceName} scaffolded! ${filesWritten} file(s) created.`,
+        'Open Folder',
+        'Add to Workspace',
+        'Register in Catalog',
+      );
+
+      if (action === 'Open Folder') {
+        await vscode.commands.executeCommand('vscode.openFolder', outputUri, { forceNewWindow: true });
+      } else if (action === 'Add to Workspace') {
+        vscode.workspace.updateWorkspaceFolders(
+          vscode.workspace.workspaceFolders?.length ?? 0, 0,
+          { uri: outputUri, name: serviceName },
+        );
+      } else if (action === 'Register in Catalog') {
+        await registerScaffoldedService(config.serverUrl, config.apiKey, plan);
+        await vscode.window.showInformationMessage(`✓ ${serviceName} registered in NexTraceOne catalog.`);
+      }
+    },
+  );
+}
+
+/** Fetches active service templates from the NexTraceOne catalog API. */
+function fetchTemplates(serverUrl: string, apiKey: string): Promise<ScaffoldTemplateSummary[]> {
+  return new Promise((resolve, reject) => {
+    const parsedUrl = new URL('/api/v1/catalog/templates?isActive=true', serverUrl);
+    const transport = parsedUrl.protocol === 'https:' ? https : http;
+
+    const req = transport.request(
+      {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port,
+        path: parsedUrl.pathname + parsedUrl.search,
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' },
+        timeout: 15000,
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => {
+          const body = Buffer.concat(chunks).toString('utf-8');
+          if (res.statusCode && res.statusCode >= 400) { reject(new Error(`Server ${res.statusCode}: ${body}`)); return; }
+          try {
+            const parsed = JSON.parse(body) as { items?: ScaffoldTemplateSummary[] };
+            resolve(parsed.items ?? []);
+          } catch { reject(new Error('Invalid response from templates API')); }
+        });
+      },
+    );
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
+    req.end();
+  });
+}
+
+/** Calls the scaffold API and returns the scaffolding plan. */
+function callScaffoldApi(
+  serverUrl: string, apiKey: string,
+  templateSlug: string, serviceName: string,
+  team?: string, domain?: string,
+): Promise<ScaffoldPlan> {
+  return new Promise((resolve, reject) => {
+    const bodyStr = JSON.stringify({ serviceName, teamName: team, domain });
+    const parsedUrl = new URL(`/api/v1/catalog/templates/slug/${encodeURIComponent(templateSlug)}/scaffold`, serverUrl);
+    const transport = parsedUrl.protocol === 'https:' ? https : http;
+
+    const req = transport.request(
+      {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port,
+        path: parsedUrl.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(bodyStr),
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        timeout: 30000,
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => {
+          const body = Buffer.concat(chunks).toString('utf-8');
+          if (res.statusCode === 404) { reject(new Error(`Template '${templateSlug}' not found`)); return; }
+          if (res.statusCode && res.statusCode >= 400) { reject(new Error(`Server ${res.statusCode}: ${body}`)); return; }
+          try { resolve(JSON.parse(body) as ScaffoldPlan); }
+          catch { reject(new Error('Invalid scaffold response')); }
+        });
+      },
+    );
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Scaffold request timed out')); });
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+/** Registers a scaffolded service in the NexTraceOne catalog. */
+function registerScaffoldedService(serverUrl: string, apiKey: string, plan: ScaffoldPlan): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const bodyStr = JSON.stringify({
+      serviceName: plan.serviceName,
+      domain: plan.domain,
+      teamName: plan.teamName,
+      templateSlug: plan.templateSlug,
+      scaffoldingId: plan.scaffoldingId,
+    });
+    const parsedUrl = new URL('/api/v1/catalog/scaffold/register', serverUrl);
+    const transport = parsedUrl.protocol === 'https:' ? https : http;
+
+    const req = transport.request(
+      {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port,
+        path: parsedUrl.pathname,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(bodyStr),
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        timeout: 15000,
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => {
+          if (res.statusCode && res.statusCode >= 400) {
+            const body = Buffer.concat(chunks).toString('utf-8');
+            reject(new Error(`Registration failed ${res.statusCode}: ${body}`));
+          } else {
+            resolve();
+          }
+        });
+      },
+    );
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Registration request timed out')); });
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Code Apply
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Handles "NexTraceOne: Apply Code" command.
+ * Inserts the given code at the active editor cursor position.
+ * If no editor is active, offers to create a new file.
+ */
+async function handleApplyCodeCommand(code: string, filename?: string | null): Promise<void> {
+  const editor = vscode.window.activeTextEditor;
+
+  if (editor) {
+    // Insert code at current cursor position
+    const selection = editor.selection;
+    await editor.edit((editBuilder) => {
+      if (!selection.isEmpty) {
+        editBuilder.replace(selection, code);
+      } else {
+        editBuilder.insert(selection.active, code);
+      }
+    });
+    await vscode.window.showInformationMessage('✓ Code applied to editor.');
+    return;
+  }
+
+  // No active editor — offer to create a new file
+  const targetFilename = filename
+    ?? await vscode.window.showInputBox({
+      prompt: 'Enter filename to create',
+      placeHolder: 'e.g. MyService.cs or index.ts',
+    });
+
+  if (!targetFilename) return;
+
+  const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const filePath = workspaceRoot
+    ? path.join(workspaceRoot, targetFilename)
+    : targetFilename;
+
+  try {
+    await fs.promises.writeFile(filePath, code, 'utf-8');
+    const doc = await vscode.workspace.openTextDocument(filePath);
+    await vscode.window.showTextDocument(doc);
+    await vscode.window.showInformationMessage(`✓ Code written to ${path.basename(filePath)}.`);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    await vscode.window.showErrorMessage(`NexTraceOne: Could not write file: ${msg}`);
   }
 }
 

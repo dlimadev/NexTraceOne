@@ -28,6 +28,7 @@ public sealed class NexTraceOnePackage : AsyncPackage
 
         await NexAiChatWindowCommand.InitializeAsync(this);
         await NexAiAskAboutSelectionCommand.InitializeAsync(this);
+        await NexAiScaffoldCommand.InitializeAsync(this);
     }
 }
 

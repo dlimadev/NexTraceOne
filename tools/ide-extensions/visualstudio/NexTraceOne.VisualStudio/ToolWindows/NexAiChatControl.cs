@@ -1,8 +1,10 @@
 using Microsoft.VisualStudio.Shell;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,12 +17,16 @@ namespace NexTraceOne.VisualStudio.ToolWindows;
 /// Controlo WPF do chat AI do NexTraceOne.
 /// Interface minimalista com histórico de mensagens, caixa de input, botão de envio,
 /// botão de limpar histórico e cópia de mensagens do assistente.
+/// Respostas com blocos de código são renderizadas com botões "Insert at Cursor" e "Copy".
 /// </summary>
 public sealed partial class NexAiChatControl : UserControl
 {
     private readonly ToolWindowPane _parentWindow;
     private readonly HttpClient _httpClient;
     private CancellationTokenSource? _cts;
+
+    private static readonly Regex CodeBlockPattern =
+        new(@"```([a-zA-Z0-9_\-]*)\n?([\s\S]*?)```", RegexOptions.Compiled);
 
     private string? _pendingQuery;
 
@@ -121,7 +127,7 @@ public sealed partial class NexAiChatControl : UserControl
 
         Content = rootGrid;
 
-        AppendSystemMessage("NexTraceOne AI Chat ready. Ask about services, contracts or changes.");
+        AppendSystemMessage("NexTraceOne AI Chat ready. Ask about services, contracts, changes or generate code.");
     }
 
     private StackPanel MessagesPanel { get; set; } = null!;
@@ -215,7 +221,7 @@ public sealed partial class NexAiChatControl : UserControl
         {
             queryText = query,
             clientType = "visualstudio",
-            clientVersion = "0.2.0",
+            clientVersion = "0.3.0",
             queryType = "GeneralQuery",
             persona = options.Persona,
             context = solutionContext
@@ -267,64 +273,221 @@ public sealed partial class NexAiChatControl : UserControl
         ScrollToBottom();
     }
 
+    /// <summary>
+    /// Renderiza uma mensagem do assistente.
+    /// Blocos de código (``` fences) são renderizados com cabeçalho de linguagem,
+    /// botão "Insert at Cursor" e botão "Copy".
+    /// Texto simples é renderizado como TextBlock com wrap.
+    /// </summary>
     private void AppendAssistantMessage(string text)
     {
-        // Container with message + copy button
-        var container = new Grid { Margin = new Thickness(0, 4, 0, 4) };
-        container.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        container.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-        var tb = new TextBlock
+        var outerContainer = new Border
         {
-            Text = text,
-            Padding = new Thickness(8),
-            Background = new SolidColorBrush(Color.FromRgb(43, 43, 43)),
-            Foreground = Brushes.WhiteSmoke,
-            TextWrapping = TextWrapping.Wrap,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            MaxWidth = 440
+            Margin = new Thickness(0, 4, 0, 4),
+            MaxWidth = 460,
+            HorizontalAlignment = HorizontalAlignment.Left
         };
-        Grid.SetColumn(tb, 0);
-        container.Children.Add(tb);
 
+        var contentStack = new StackPanel();
+
+        // Parse code blocks from the response
+        var segments = ParseCodeBlocks(text);
+
+        foreach (var segment in segments)
+        {
+            if (segment.IsCode)
+            {
+                contentStack.Children.Add(BuildCodeBlock(segment.Language, segment.Content));
+            }
+            else if (!string.IsNullOrWhiteSpace(segment.Content))
+            {
+                var container = new Grid { Margin = new Thickness(0, 2, 0, 2) };
+                container.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                container.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                var tb = new TextBlock
+                {
+                    Text = segment.Content,
+                    Padding = new Thickness(8),
+                    Background = new SolidColorBrush(Color.FromRgb(43, 43, 43)),
+                    Foreground = Brushes.WhiteSmoke,
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 11
+                };
+                Grid.SetColumn(tb, 0);
+                container.Children.Add(tb);
+
+                // Copy button for plain text segments
+                var copyBtn = BuildCopyButton(segment.Content);
+                Grid.SetColumn(copyBtn, 1);
+                container.Children.Add(copyBtn);
+
+                contentStack.Children.Add(container);
+            }
+        }
+
+        outerContainer.Child = contentStack;
+        MessagesPanel.Children.Add(outerContainer);
+        ScrollToBottom();
+    }
+
+    /// <summary>Constrói um bloco de código com cabeçalho de linguagem e botões de ação.</summary>
+    private FrameworkElement BuildCodeBlock(string language, string code)
+    {
+        var border = new Border
+        {
+            BorderBrush = new SolidColorBrush(Color.FromRgb(70, 70, 70)),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(3),
+            Margin = new Thickness(0, 4, 0, 4)
+        };
+
+        var stack = new StackPanel();
+
+        // Header bar: language label + action buttons
+        var headerPanel = new DockPanel
+        {
+            Background = new SolidColorBrush(Color.FromRgb(50, 50, 50)),
+            Margin = new Thickness(0)
+        };
+
+        var actionsPanel = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Margin = new Thickness(4, 2, 4, 2)
+        };
+
+        // "Insert at Cursor" button
+        var insertBtn = new Button
+        {
+            Content = "↓ Insert at Cursor",
+            FontSize = 9,
+            Height = 20,
+            Margin = new Thickness(0, 0, 4, 0),
+            Padding = new Thickness(6, 1, 6, 1),
+            Background = new SolidColorBrush(Color.FromRgb(0, 120, 212)),
+            Foreground = Brushes.White,
+            BorderThickness = new Thickness(0),
+            Cursor = System.Windows.Input.Cursors.Hand,
+            ToolTip = "Insert this code at the current cursor position in the active editor"
+        };
+        var capturedCode = code;
+        var capturedInsertBtn = insertBtn;
+        insertBtn.Click += (_, _) =>
+        {
+            InsertCodeAtCursor(capturedCode);
+            capturedInsertBtn.Content = "✓ Inserted";
+            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            timer.Tick += (_, _) => { capturedInsertBtn.Content = "↓ Insert at Cursor"; timer.Stop(); };
+            timer.Start();
+        };
+        actionsPanel.Children.Add(insertBtn);
+
+        // "Copy" button
+        var copyCodeBtn = BuildCopyButton(code, fontSize: 9);
+        copyCodeBtn.Height = 20;
+        actionsPanel.Children.Add(copyCodeBtn);
+
+        DockPanel.SetDock(actionsPanel, Dock.Right);
+        headerPanel.Children.Add(actionsPanel);
+
+        if (!string.IsNullOrWhiteSpace(language))
+        {
+            var langLabel = new TextBlock
+            {
+                Text = language,
+                Foreground = new SolidColorBrush(Color.FromRgb(160, 160, 160)),
+                FontSize = 9,
+                FontFamily = new FontFamily("Consolas, Courier New"),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(8, 0, 0, 0)
+            };
+            headerPanel.Children.Add(langLabel);
+        }
+
+        stack.Children.Add(headerPanel);
+
+        // Code content
+        var codeBlock = new TextBox
+        {
+            Text = code,
+            IsReadOnly = true,
+            Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
+            Foreground = new SolidColorBrush(Color.FromRgb(220, 220, 170)),
+            FontFamily = new FontFamily("Consolas, Courier New"),
+            FontSize = 10,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(8),
+            TextWrapping = TextWrapping.NoWrap,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            AcceptsReturn = true
+        };
+        stack.Children.Add(codeBlock);
+
+        border.Child = stack;
+        return border;
+    }
+
+    /// <summary>Constrói um botão de cópia para o clipboard.</summary>
+    private static Button BuildCopyButton(string content, double fontSize = 9)
+    {
         var copyBtn = new Button
         {
             Content = "Copy",
-            Width = 40,
+            FontSize = fontSize,
             Height = 18,
-            FontSize = 9,
-            VerticalAlignment = VerticalAlignment.Top,
-            Margin = new Thickness(4, 0, 0, 0),
+            Padding = new Thickness(6, 1, 6, 1),
             Background = new SolidColorBrush(Color.FromRgb(60, 60, 60)),
             Foreground = Brushes.LightGray,
             BorderThickness = new Thickness(0),
             Cursor = System.Windows.Input.Cursors.Hand,
             ToolTip = "Copy to clipboard"
         };
-
-        var capturedText = text;
         var capturedBtn = copyBtn;
         copyBtn.Click += (_, _) =>
         {
-            Clipboard.SetText(capturedText);
+            Clipboard.SetText(content);
             capturedBtn.Content = "✓";
-            var timer = new System.Windows.Threading.DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(1.5)
-            };
-            timer.Tick += (_, _) =>
-            {
-                capturedBtn.Content = "Copy";
-                timer.Stop();
-            };
+            var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
+            timer.Tick += (_, _) => { capturedBtn.Content = "Copy"; timer.Stop(); };
             timer.Start();
         };
+        return copyBtn;
+    }
 
-        Grid.SetColumn(copyBtn, 1);
-        container.Children.Add(copyBtn);
-
-        MessagesPanel.Children.Add(container);
-        ScrollToBottom();
+    /// <summary>Insere código na posição do cursor do editor activo no Visual Studio.</summary>
+    private static void InsertCodeAtCursor(string code)
+    {
+        ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            try
+            {
+                var dte = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+                if (dte?.ActiveDocument?.Object("TextDocument") is EnvDTE.TextDocument textDoc)
+                {
+                    var editPoint = textDoc.Selection.ActivePoint.CreateEditPoint();
+                    editPoint.Insert(code);
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show(
+                        "No active text editor found. Open a file and place the cursor where you want to insert the code.",
+                        "NexTraceOne AI",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(
+                    $"Could not insert code: {ex.Message}",
+                    "NexTraceOne AI",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+        });
     }
 
     private void AppendSystemMessage(string text)
@@ -370,6 +533,34 @@ public sealed partial class NexAiChatControl : UserControl
             : new NexOptions("http://localhost:5000", string.Empty, "Engineer");
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Code block parsing
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private sealed record MessageSegment(bool IsCode, string Language, string Content);
+
+    private static IReadOnlyList<MessageSegment> ParseCodeBlocks(string text)
+    {
+        var segments = new List<MessageSegment>();
+        var last = 0;
+
+        foreach (Match match in CodeBlockPattern.Matches(text))
+        {
+            if (match.Index > last)
+                segments.Add(new MessageSegment(false, string.Empty, text[last..match.Index]));
+
+            var lang = match.Groups[1].Value;
+            var code = match.Groups[2].Value;
+            if (code.EndsWith('\n')) code = code[..^1]; // trim trailing newline
+            segments.Add(new MessageSegment(true, lang, code));
+            last = match.Index + match.Length;
+        }
+
+        if (last < text.Length)
+            segments.Add(new MessageSegment(false, string.Empty, text[last..]));
+
+        return segments;
+    }
+
     private sealed record NexOptions(string ServerUrl, string ApiKey, string Persona);
 }
-

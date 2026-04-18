@@ -19,6 +19,7 @@ rootCommand.Add(HealthCommand.Create());
 rootCommand.Add(ConfigCommand.Create());
 rootCommand.Add(McpCommand.Create());
 rootCommand.Add(ReportCommand.Create());
+rootCommand.Add(ScaffoldCommand.Create());
 rootCommand.Add(CompletionCommand.Create());
 
 // Show banner only when invoked with no arguments

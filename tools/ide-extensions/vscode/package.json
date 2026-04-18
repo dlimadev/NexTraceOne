@@ -1,22 +1,59 @@
 {
   "name": "nextraceone-copilot",
   "displayName": "NexTraceOne Copilot",
-  "description": "AI-assisted operations, contract governance and change intelligence for NexTraceOne — Copilot Chat-like experience",
-  "version": "0.3.0",
+  "description": "AI-assisted operations, contract governance and change intelligence for NexTraceOne — Copilot Chat-like experience with code editing, scaffold wizard and service intelligence",
+  "version": "0.4.0",
   "publisher": "nextraceone",
-  "engines": { "vscode": "^1.90.0" },
-  "categories": ["Other", "AI"],
-  "activationEvents": ["onStartupFinished"],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      { "command": "nextraceone.chat", "title": "NexTraceOne: Ask AI" },
-      { "command": "nextraceone.configure", "title": "NexTraceOne: Configure" },
-      { "command": "nextraceone.inspectService", "title": "NexTraceOne: Inspect Service Context" },
-      { "command": "nextraceone.askAboutSelection", "title": "NexTraceOne: Ask AI about this" },
-      { "command": "nextraceone.mcpConfigure", "title": "NexTraceOne: Configure MCP Server" },
-      { "command": "nextraceone.openDashboard", "title": "NexTraceOne: Open Dashboard" },
-      { "command": "nextraceone.openChatPanel", "title": "NexTraceOne: Open AI Chat Panel" }
+      {
+        "command": "nextraceone.chat",
+        "title": "NexTraceOne: Ask AI"
+      },
+      {
+        "command": "nextraceone.configure",
+        "title": "NexTraceOne: Configure"
+      },
+      {
+        "command": "nextraceone.inspectService",
+        "title": "NexTraceOne: Inspect Service Context"
+      },
+      {
+        "command": "nextraceone.askAboutSelection",
+        "title": "NexTraceOne: Ask AI about this"
+      },
+      {
+        "command": "nextraceone.mcpConfigure",
+        "title": "NexTraceOne: Configure MCP Server"
+      },
+      {
+        "command": "nextraceone.openDashboard",
+        "title": "NexTraceOne: Open Dashboard"
+      },
+      {
+        "command": "nextraceone.openChatPanel",
+        "title": "NexTraceOne: Open AI Chat Panel"
+      },
+      {
+        "command": "nextraceone.scaffold",
+        "title": "NexTraceOne: Scaffold New Service",
+        "icon": "$(symbol-class)"
+      },
+      {
+        "command": "nextraceone.applyCode",
+        "title": "NexTraceOne: Apply Code to Editor"
+      }
     ],
     "menus": {
       "editor/context": [
@@ -34,6 +71,19 @@
         {
           "command": "nextraceone.inspectService",
           "group": "nextraceone@1"
+        },
+        {
+          "command": "nextraceone.scaffold",
+          "group": "nextraceone@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "nextraceone.scaffold"
+        },
+        {
+          "command": "nextraceone.applyCode",
+          "when": "false"
         }
       ]
     },
@@ -60,15 +110,41 @@
         "id": "nextraceone",
         "name": "nextraceone",
         "fullName": "NexTraceOne AI",
-        "description": "Ask about services, contracts, changes and incidents in NexTraceOne",
+        "description": "Ask about services, contracts, changes and incidents. Generate and apply code from NexTraceOne context.",
         "isSticky": true,
         "commands": [
-          { "name": "service", "description": "Lookup a service in the catalog" },
-          { "name": "change", "description": "Check recent changes for a service" },
-          { "name": "contract", "description": "Query contract information" },
-          { "name": "incident", "description": "Get incident context and runbooks" },
-          { "name": "report", "description": "Get DORA metrics or changes summary report" },
-          { "name": "blast-radius", "description": "Analyse the blast radius of a change" }
+          {
+            "name": "service",
+            "description": "Lookup a service in the catalog"
+          },
+          {
+            "name": "change",
+            "description": "Check recent changes for a service"
+          },
+          {
+            "name": "contract",
+            "description": "Query contract information"
+          },
+          {
+            "name": "incident",
+            "description": "Get incident context and runbooks"
+          },
+          {
+            "name": "report",
+            "description": "Get DORA metrics or changes summary report"
+          },
+          {
+            "name": "blast-radius",
+            "description": "Analyse the blast radius of a change"
+          },
+          {
+            "name": "scaffold",
+            "description": "Generate project scaffolding from a service template"
+          },
+          {
+            "name": "generate",
+            "description": "Generate code based on a service contract or description"
+          }
         ]
       }
     ],
@@ -88,7 +164,14 @@
         "nextraceone.persona": {
           "type": "string",
           "default": "Engineer",
-          "enum": ["Engineer", "TechLead", "Architect", "Product", "Executive", "PlatformAdmin"],
+          "enum": [
+            "Engineer",
+            "TechLead",
+            "Architect",
+            "Product",
+            "Executive",
+            "PlatformAdmin"
+          ],
           "description": "Your persona in NexTraceOne (affects AI context and responses)"
         },
         "nextraceone.defaultEnvironment": {
@@ -104,6 +187,7 @@
     "watch": "tsc -watch -p ."
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "@types/vscode": "^1.90.0",
     "typescript": "^5.0.0"
   }
