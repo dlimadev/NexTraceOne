@@ -1,11 +1,11 @@
 import { CheckCircle, AlertCircle, AlertTriangle, XCircle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { CostEfficiencyType } from '../../../types';
 
-/** Formata um valor monetário com o locale indicado. */
-export function formatCurrency(value: number, locale = 'en-US'): string {
+/** Formata um valor monetário com o locale e moeda indicados. */
+export function formatCurrency(value: number, locale = 'en-US', currency = 'USD'): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'USD',
+    currency,
     maximumFractionDigits: 0,
   }).format(value);
 }

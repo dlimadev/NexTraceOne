@@ -5994,7 +5994,57 @@
       "filterAcceptable": "Aceitável",
       "filterEfficient": "Eficiente",
       "filterInefficient": "Ineficiente",
-      "filterWasteful": "Desperdício"
+      "filterWasteful": "Desperdício",
+      "config": {
+        "title": "Configuração de FinOps",
+        "subtitle": "Configure a moeda, o comportamento do gate de orçamento e o fluxo de aprovação para promoções de release.",
+        "currency": {
+          "title": "Moeda Padrão",
+          "description": "Código ISO 4217 usado para exibir todos os valores de custo nos painéis de FinOps.",
+          "selectLabel": "Selecionar moeda"
+        },
+        "gate": {
+          "title": "Gate de Orçamento por Release",
+          "description": "Controla o que acontece quando uma release ultrapassa o limiar de orçamento configurado antes de ser promovida a Produção.",
+          "enabled": "Habilitar gate de orçamento para promoções de release",
+          "blockOnExceed": "Bloquear promoção quando o orçamento for excedido",
+          "requireApproval": "Permitir override por aprovação quando bloqueado",
+          "alertThreshold": "Limiar de alerta (%)"
+        },
+        "gateDisabled": "Desabilitado",
+        "gateWarn": "Apenas aviso",
+        "gateBlock": "Bloqueado",
+        "gateRequireApproval": "Aprovação necessária",
+        "approvers": {
+          "title": "Aprovadores de Orçamento",
+          "description": "Utilizadores ou grupos autorizados a aprovar pedidos de override de orçamento. Apenas ativo no modo 'Aprovação necessária'.",
+          "placeholder": "utilizador@empresa.com",
+          "add": "Adicionar",
+          "remove": "Remover {{email}}",
+          "empty": "Nenhum aprovador configurado.",
+          "inactiveNote": "Os aprovadores só estão ativos quando o gate está em modo 'Aprovação necessária'."
+        }
+      },
+      "approvals": {
+        "title": "Pedidos de Aprovação de Orçamento",
+        "subtitle": "Revise e resolva pedidos pendentes de override de orçamento para releases que ultrapassaram o limiar configurado.",
+        "results": "pedidos",
+        "empty": "Nenhum pedido de aprovação encontrado.",
+        "actualCost": "Custo real",
+        "baselineCost": "Custo base",
+        "requestedBy": "Solicitado por",
+        "requestedAt": "Solicitado em",
+        "justification": "Justificativa",
+        "comment": "Comentário da decisão",
+        "commentPlaceholder": "Comentário opcional explicando a decisão...",
+        "approve": "Aprovar",
+        "reject": "Rejeitar",
+        "status": {
+          "pending": "Pendente",
+          "approved": "Aprovado",
+          "rejected": "Rejeitado"
+        }
+      }
     },
     "finopsSubtitle": "Inteligência contextual de custos por serviço, domínio, equipa, ambiente e operação.",
     "finopsTitle": "FinOps",
@@ -8987,6 +9037,8 @@
     "executiveFinOps": "FinOps Executivo",
     "executiveOverview": "Visão Executiva",
     "finops": "FinOps",
+    "finopsConfiguration": "Configuração de FinOps",
+    "finopsBudgetApprovals": "Aprovações de Orçamento",
     "governance": "Governança",
     "governancePacks": "Packs de Governança",
     "ide": "Integrações IDE",

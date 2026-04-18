@@ -22,12 +22,14 @@ import {
   efficiencyIcon,
   trendIcon,
 } from '../utils/finOpsFormatters';
+import { useFinOpsCurrency } from '../hooks/useFinOpsConfig';
 
 export function TeamFinOpsPage() {
   const { t, i18n } = useTranslation();
   const { teamId } = useParams<{ teamId: string }>();
   const { activeEnvironmentId } = useEnvironment();
-  const fmt = (v: number) => formatCurrency(v, i18n.language);
+  const currency = useFinOpsCurrency();
+  const fmt = (v: number) => formatCurrency(v, i18n.language, currency);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.governance.finops.team(teamId!, activeEnvironmentId),

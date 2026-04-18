@@ -15,11 +15,13 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { formatCurrency } from '../utils/finOpsFormatters';
+import { useFinOpsCurrency } from '../hooks/useFinOpsConfig';
 
 export function ExecutiveFinOpsPage() {
   const { t, i18n } = useTranslation();
   const { activeEnvironmentId } = useEnvironment();
-  const fmt = (v: number) => formatCurrency(v, i18n.language);
+  const currency = useFinOpsCurrency();
+  const fmt = (v: number) => formatCurrency(v, i18n.language, currency);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.governance.finops.summary(undefined, activeEnvironmentId),

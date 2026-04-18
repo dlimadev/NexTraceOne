@@ -24,6 +24,7 @@ import {
   efficiencyIcon,
   trendIcon,
 } from '../utils/finOpsFormatters';
+import { useFinOpsCurrency } from '../hooks/useFinOpsConfig';
 
 
 type EfficiencyFilter = 'all' | CostEfficiencyType;
@@ -33,7 +34,8 @@ export function FinOpsPage() {
   const { activeEnvironmentId } = useEnvironment();
   const [filter, setFilter] = useState<EfficiencyFilter>('all');
   const [search, setSearch] = useState('');
-  const fmt = (v: number) => formatCurrency(v, i18n.language);
+  const currency = useFinOpsCurrency();
+  const fmt = (v: number) => formatCurrency(v, i18n.language, currency);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.governance.finops.summary(undefined, activeEnvironmentId),

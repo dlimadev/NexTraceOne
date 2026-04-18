@@ -96,6 +96,9 @@ export const queryKeys = {
         [...queryKeys.governance.finops.all(), 'waste', params, envId] as const,
       efficiency: (params?: Record<string, unknown>, envId?: string | null) =>
         [...queryKeys.governance.finops.all(), 'efficiency', params, envId] as const,
+      configuration: () => [...queryKeys.governance.finops.all(), 'configuration'] as const,
+      budgetApprovals: (status?: string, serviceName?: string) =>
+        [...queryKeys.governance.finops.all(), 'budget-approvals', status, serviceName] as const,
     },
     evidence: {
       all: () => [...queryKeys.governance.all, 'evidence'] as const,

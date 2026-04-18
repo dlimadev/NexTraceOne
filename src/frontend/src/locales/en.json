@@ -6016,7 +6016,57 @@
       "filterAcceptable": "Acceptable",
       "filterEfficient": "Efficient",
       "filterInefficient": "Inefficient",
-      "filterWasteful": "Wasteful"
+      "filterWasteful": "Wasteful",
+      "config": {
+        "title": "FinOps Configuration",
+        "subtitle": "Configure currency, budget gate behaviour, and approval workflow for release promotions.",
+        "currency": {
+          "title": "Default Currency",
+          "description": "ISO 4217 currency code used to display all cost values across FinOps dashboards.",
+          "selectLabel": "Select currency"
+        },
+        "gate": {
+          "title": "Release Budget Gate",
+          "description": "Controls what happens when a release exceeds the configured budget threshold before promotion to Production.",
+          "enabled": "Enable budget gate for release promotions",
+          "blockOnExceed": "Block promotion when budget is exceeded",
+          "requireApproval": "Allow approval override when blocked",
+          "alertThreshold": "Alert threshold (%)"
+        },
+        "gateDisabled": "Disabled",
+        "gateWarn": "Warn only",
+        "gateBlock": "Blocked",
+        "gateRequireApproval": "Approval required",
+        "approvers": {
+          "title": "Budget Approvers",
+          "description": "Users or groups authorised to approve budget override requests. Only used when 'Approval required' gate mode is active.",
+          "placeholder": "user@company.com",
+          "add": "Add",
+          "remove": "Remove {{email}}",
+          "empty": "No approvers configured.",
+          "inactiveNote": "Approvers are only active when the gate is in 'Approval required' mode."
+        }
+      },
+      "approvals": {
+        "title": "Budget Approval Requests",
+        "subtitle": "Review and resolve pending budget override requests for releases that exceeded the configured threshold.",
+        "results": "requests",
+        "empty": "No approval requests found.",
+        "actualCost": "Actual cost",
+        "baselineCost": "Baseline cost",
+        "requestedBy": "Requested by",
+        "requestedAt": "Requested at",
+        "justification": "Justification",
+        "comment": "Decision comment",
+        "commentPlaceholder": "Optional comment explaining your decision...",
+        "approve": "Approve",
+        "reject": "Reject",
+        "status": {
+          "pending": "Pending",
+          "approved": "Approved",
+          "rejected": "Rejected"
+        }
+      }
     },
     "finopsSubtitle": "Contextual cost intelligence by service, domain, team, environment and operation.",
     "finopsTitle": "FinOps",
@@ -9009,6 +9059,8 @@
     "executiveFinOps": "Executive FinOps",
     "executiveOverview": "Executive Overview",
     "finops": "FinOps",
+    "finopsConfiguration": "FinOps Configuration",
+    "finopsBudgetApprovals": "Budget Approvals",
     "governance": "Governance",
     "governancePacks": "Governance Packs",
     "ide": "IDE Integrations",

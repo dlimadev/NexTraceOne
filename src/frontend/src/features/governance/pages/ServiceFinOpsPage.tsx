@@ -21,12 +21,14 @@ import {
   efficiencyBadgeVariant,
   trendIcon,
 } from '../utils/finOpsFormatters';
+import { useFinOpsCurrency } from '../hooks/useFinOpsConfig';
 
 export function ServiceFinOpsPage() {
   const { t, i18n } = useTranslation();
   const { serviceId } = useParams<{ serviceId: string }>();
   const { activeEnvironmentId } = useEnvironment();
-  const fmt = (v: number) => formatCurrency(v, i18n.language);
+  const currency = useFinOpsCurrency();
+  const fmt = (v: number) => formatCurrency(v, i18n.language, currency);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.governance.finops.service(serviceId!, activeEnvironmentId),

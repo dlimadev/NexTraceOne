@@ -5994,7 +5994,57 @@
       "filterAcceptable": "Aceptable",
       "filterEfficient": "Eficiente",
       "filterInefficient": "Ineficiente",
-      "filterWasteful": "Derrochador"
+      "filterWasteful": "Derrochador",
+      "config": {
+        "title": "Configuración de FinOps",
+        "subtitle": "Configure la moneda, el comportamiento del gate de presupuesto y el flujo de aprobación para promociones de release.",
+        "currency": {
+          "title": "Moneda Predeterminada",
+          "description": "Código ISO 4217 utilizado para mostrar todos los valores de coste en los paneles de FinOps.",
+          "selectLabel": "Seleccionar moneda"
+        },
+        "gate": {
+          "title": "Gate de Presupuesto por Release",
+          "description": "Controla lo que ocurre cuando una release supera el umbral de presupuesto configurado antes de ser promovida a Producción.",
+          "enabled": "Habilitar gate de presupuesto para promociones de release",
+          "blockOnExceed": "Bloquear promoción cuando se supere el presupuesto",
+          "requireApproval": "Permitir override por aprobación cuando esté bloqueado",
+          "alertThreshold": "Umbral de alerta (%)"
+        },
+        "gateDisabled": "Desactivado",
+        "gateWarn": "Solo aviso",
+        "gateBlock": "Bloqueado",
+        "gateRequireApproval": "Aprobación requerida",
+        "approvers": {
+          "title": "Aprobadores de Presupuesto",
+          "description": "Usuarios o grupos autorizados para aprobar solicitudes de override de presupuesto. Solo activo en modo 'Aprobación requerida'.",
+          "placeholder": "usuario@empresa.com",
+          "add": "Añadir",
+          "remove": "Eliminar {{email}}",
+          "empty": "No hay aprobadores configurados.",
+          "inactiveNote": "Los aprobadores solo están activos cuando el gate está en modo 'Aprobación requerida'."
+        }
+      },
+      "approvals": {
+        "title": "Solicitudes de Aprobación de Presupuesto",
+        "subtitle": "Revise y resuelva solicitudes pendientes de override de presupuesto para releases que superaron el umbral configurado.",
+        "results": "solicitudes",
+        "empty": "No se encontraron solicitudes de aprobación.",
+        "actualCost": "Coste real",
+        "baselineCost": "Coste base",
+        "requestedBy": "Solicitado por",
+        "requestedAt": "Solicitado el",
+        "justification": "Justificación",
+        "comment": "Comentario de la decisión",
+        "commentPlaceholder": "Comentario opcional explicando la decisión...",
+        "approve": "Aprobar",
+        "reject": "Rechazar",
+        "status": {
+          "pending": "Pendiente",
+          "approved": "Aprobado",
+          "rejected": "Rechazado"
+        }
+      }
     },
     "finopsSubtitle": "Inteligencia contextual de costos por servicio, dominio, equipo, entorno y operación.",
     "finopsTitle": "FinOps",
@@ -8987,6 +9037,8 @@
     "executiveFinOps": "FinOps Ejecutivo",
     "executiveOverview": "Visión Ejecutiva",
     "finops": "FinOps",
+    "finopsConfiguration": "Configuración de FinOps",
+    "finopsBudgetApprovals": "Aprobaciones de Presupuesto",
     "governance": "Gobernanza",
     "governancePacks": "Packs de Gobernanza",
     "ide": "Integraciones IDE",
