@@ -12,6 +12,12 @@ using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Ingestion.Api;
 using NexTraceOne.Ingestion.Api.Endpoints;
 using NexTraceOne.Ingestion.Api.Security;
+using NexTraceOne.Integrations.Application;
+using NexTraceOne.Integrations.Infrastructure;
+using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
+using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
+using NexTraceOne.OperationalIntelligence.Application.Incidents;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Diagnostics;
@@ -23,8 +29,12 @@ using System.Diagnostics;
 /// - Eventos de deployment (GitHub, GitLab, Jenkins, Azure DevOps)
 /// - Eventos de promoção entre ambientes
 /// - Atualizações de consumidores e dependências
-/// - Sinais de runtime e marcadores operacionais
+/// - Sinais de runtime e snapshots estruturados de saúde
 /// - Sincronização de contratos de fontes externas
+/// - Ingestão de commits de repositórios VCS
+/// - Ingestão de releases, feature flags, canary rollouts e observações pós-release
+/// - Ingestão de snapshots de custo de infraestrutura (FinOps)
+/// - Criação e consulta de incidentes operacionais
 ///
 /// Separado do ApiHost principal para:
 /// 1. Isolamento de carga — integrações externas não afetam o portal interno
@@ -53,18 +63,32 @@ builder.Services.AddOpenApi("ingestion", options =>
             Entry point oficial para integrações externas com o NexTraceOne.
 
             Permite que pipelines CI/CD, agentes de runtime e sistemas externos
-            notifiquem o NexTraceOne sobre eventos relevantes:
+            notifiquem o NexTraceOne sobre eventos relevantes e consultem dados operacionais:
+
+            ## Escrita (integrations:write)
 
             - **Deployments**: eventos de deploy originados em GitHub, GitLab, Jenkins, Azure DevOps
             - **Promotions**: promoções de release entre ambientes (ex: staging → production)
-            - **Runtime Signals**: sinais e marcadores operacionais de serviços em execução
+            - **Runtime Signals**: sinais genéricos de serviços em execução
+            - **Runtime Snapshots**: snapshots estruturados de saúde (latência, CPU, memória, error rate)
             - **Consumers**: atualizações de dependências e consumidores de contratos
             - **Contracts**: sincronização de contratos de APIs e eventos de fontes externas
+            - **Commits**: ingestão de commits de repositórios VCS (GitHub, GitLab, Azure DevOps)
+            - **Releases**: ingestão de releases externas, feature flags, canary rollouts, observações e rollbacks
+            - **FinOps**: snapshots de custo de infraestrutura (AWS, Azure, GCP)
+            - **Incidents**: criação de incidentes a partir de sistemas externos de alerta
+
+            ## Leitura (integrations:read)
+
+            - **Releases**: listar e consultar releases, advisories, blast radius e post-release reviews
+            - **Services**: saúde de runtime por serviço e ambiente
+            - **Incidents**: listar e consultar detalhe de incidentes
 
             ## Autenticação
 
             Todas as rotas requerem autenticação via **API Key** no header `X-Api-Key`.
-            A API Key deve ter a permissão `integrations:write`.
+            - Operações de escrita requerem a permissão `integrations:write`.
+            - Operações de leitura requerem a permissão `integrations:read`.
             """;
         return System.Threading.Tasks.Task.CompletedTask;
     });
@@ -77,6 +101,7 @@ builder.Services.AddHealthChecks()
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 builder.Services.AddAuthorization(options =>
 {
+    // Política de escrita — usada por endpoints de ingestão (POST)
     options.AddPolicy(IngestionApiSecurity.PolicyName, policy =>
     {
         policy.AuthenticationSchemes.Add(ApiKeyAuthenticationOptions.SchemeName);
@@ -84,13 +109,32 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("auth_method", "api_key");
         policy.RequireClaim("permissions", IngestionApiSecurity.RequiredPermission);
     });
+
+    // Política de leitura — usada por endpoints de consulta (GET)
+    options.AddPolicy(IngestionApiSecurity.ReadPolicyName, policy =>
+    {
+        policy.AuthenticationSchemes.Add(ApiKeyAuthenticationOptions.SchemeName);
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("auth_method", "api_key");
+        policy.RequireClaim("permissions", IngestionApiSecurity.RequiredReadPermission);
+    });
 });
 
 // Add Governance Infrastructure for persistence
 builder.Services.AddGovernanceInfrastructure(builder.Configuration);
 
-// Add ChangeGovernance module so deploy events are automatically correlated to Releases
+// Add Integrations module — repositórios de conectores, execuções e fontes de ingestão
+builder.Services.AddIntegrationsApplication(builder.Configuration);
+builder.Services.AddIntegrationsInfrastructure(builder.Configuration);
+
+// Add ChangeGovernance module — correlação de deploys, Change Intelligence e advisories
 builder.Services.AddChangeIntelligenceModule(builder.Configuration);
+
+// Add OperationalIntelligence modules — runtime snapshots, custo e incidentes
+builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
+builder.Services.AddCostIntelligenceModule(builder.Configuration);
+builder.Services.AddIncidentsApplication(builder.Configuration);
+builder.Services.AddIncidentsInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
