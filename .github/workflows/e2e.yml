@@ -109,3 +109,69 @@ jobs:
       - name: Stop local stack
         if: always()
         run: docker compose down -v 2>/dev/null || true
+
+  # ── load-smoke ──────────────────────────────────────────────────────────────
+  # Executa o cenário mixed-load do k6 como smoke de performance.
+  # Apenas em nightly (schedule) ou dispatch manual — não bloqueia PRs.
+  # Resolve gap GAPS-TESTES.md §3 — k6 não integrado em CI.
+  load-smoke:
+    name: Load Test (k6 smoke)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Build backend
+        run: dotnet build NexTraceOne.sln --configuration Release
+
+      - name: Start local stack
+        run: |
+          cp .env.example .env
+          sed -i 's/POSTGRES_PASSWORD=change-me-in-production/POSTGRES_PASSWORD=k6_test_pass/' .env
+          sed -i 's/JWT_SECRET=REPLACE-WITH-AT-LEAST-32-CHAR-SECRET-KEY/JWT_SECRET=K6-Test-SecretKey-AtLeast32BytesLong-2024!/' .env
+          sed -i 's/NEXTRACE_AUTO_MIGRATE=false/NEXTRACE_AUTO_MIGRATE=true/' .env
+          sed -i 's/ASPNETCORE_ENVIRONMENT=Staging/ASPNETCORE_ENVIRONMENT=Development/' .env
+          docker compose up -d 2>&1 | tail -20
+          echo "Waiting for stack to be ready..."
+          sleep 60
+
+      - name: Run k6 mixed-load smoke
+        run: |
+          mkdir -p tests/load/results
+          k6 run \
+            --env K6_ENVIRONMENT=local \
+            --vus 5 \
+            --duration 60s \
+            --out json=tests/load/results/smoke-$(date +%Y%m%d-%H%M%S).json \
+            tests/load/scenarios/mixed-load.js
+        env:
+          K6_ENVIRONMENT: local
+
+      - name: Upload k6 results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-load-results
+          path: tests/load/results/
+          retention-days: 14
+
+      - name: Stop local stack
+        if: always()
+        run: docker compose down -v 2>/dev/null || true

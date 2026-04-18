@@ -57,8 +57,10 @@ public sealed class IncidentAlertHandler(
         }
         catch (Exception ex)
         {
-            // Log with structured context to enable dead-letter analysis and manual retry.
-            // TODO: Migrate to outbox pattern or Quartz retry job for at-least-once delivery.
+            // NOTE: Outbox pattern migration is tracked as a known gap (GAPS-BACKEND.md).
+            // Current behavior: failed alert-to-incident conversions are logged with full context
+            // for operational recovery. A dead-letter review process should monitor for these log entries.
+            // When the outbox pattern is implemented, this catch block will enqueue a retry record.
             logger.LogError(
                 ex,
                 "Failed to create incident from alert '{Title}' [{Severity}]. " +

@@ -1,7 +1,10 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 using CreateBackgroundServiceDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateBackgroundServiceDraft.CreateBackgroundServiceDraft;
 
@@ -18,6 +21,16 @@ public sealed class CreateBackgroundServiceDraftTests
 
     private static IContractDraftRepository CreateDraftRepo() => Substitute.For<IContractDraftRepository>();
     private static IBackgroundServiceDraftMetadataRepository CreateMetaRepo() => Substitute.For<IBackgroundServiceDraftMetadataRepository>();
+    private static readonly Guid TestServiceId = Guid.NewGuid();
+    private static IServiceAssetRepository CreateServiceRepo()
+    {
+        var service = ServiceAsset.Create("TestService", "test-domain", "test-team");
+        service.UpdateDetails("TestService", "", ServiceType.BackgroundService, "", Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
+        var repo = Substitute.For<IServiceAssetRepository>();
+        repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
+            .Returns(service);
+        return repo;
+    }
     private static IContractsUnitOfWork CreateUow() => Substitute.For<IContractsUnitOfWork>();
     private static IDateTimeProvider CreateDt()
     {
@@ -31,7 +44,7 @@ public sealed class CreateBackgroundServiceDraftTests
     {
         var draftRepo = CreateDraftRepo();
         var metaRepo = CreateMetaRepo();
-        var sut = new CreateBackgroundServiceDraftFeature.Handler(draftRepo, metaRepo, CreateUow(), CreateDt());
+        var sut = new CreateBackgroundServiceDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, CreateUow(), CreateDt());
 
         var result = await sut.Handle(new CreateBackgroundServiceDraftFeature.Command(
             Title: "Order Expiration Job", Author: "dev@example.com",
@@ -48,7 +61,7 @@ public sealed class CreateBackgroundServiceDraftTests
     {
         var draftRepo = CreateDraftRepo();
         var metaRepo = CreateMetaRepo();
-        var sut = new CreateBackgroundServiceDraftFeature.Handler(draftRepo, metaRepo, CreateUow(), CreateDt());
+        var sut = new CreateBackgroundServiceDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, CreateUow(), CreateDt());
 
         await sut.Handle(new CreateBackgroundServiceDraftFeature.Command(
             Title: "Report Worker", Author: "dev@example.com",
@@ -64,7 +77,7 @@ public sealed class CreateBackgroundServiceDraftTests
     [Fact]
     public async Task Handle_Should_Return_DraftId_ServiceName_Category_In_Response()
     {
-        var sut = new CreateBackgroundServiceDraftFeature.Handler(CreateDraftRepo(), CreateMetaRepo(), CreateUow(), CreateDt());
+        var sut = new CreateBackgroundServiceDraftFeature.Handler(CreateDraftRepo(), CreateServiceRepo(), CreateMetaRepo(), CreateUow(), CreateDt());
 
         var result = await sut.Handle(new CreateBackgroundServiceDraftFeature.Command(
             Title: "Nightly Exporter", Author: "dev@example.com",
@@ -82,7 +95,7 @@ public sealed class CreateBackgroundServiceDraftTests
     public async Task Handle_Should_Commit_UnitOfWork()
     {
         var uow = CreateUow();
-        var sut = new CreateBackgroundServiceDraftFeature.Handler(CreateDraftRepo(), CreateMetaRepo(), uow, CreateDt());
+        var sut = new CreateBackgroundServiceDraftFeature.Handler(CreateDraftRepo(), CreateServiceRepo(), CreateMetaRepo(), uow, CreateDt());
 
         await sut.Handle(new CreateBackgroundServiceDraftFeature.Command(
             Title: "Test", Author: "dev@example.com",
@@ -107,7 +120,8 @@ public sealed class CreateBackgroundServiceDraftTests
         var validator = new CreateBackgroundServiceDraftFeature.Validator();
         var result = validator.Validate(new CreateBackgroundServiceDraftFeature.Command(
             Title: "Order Expiration", Author: "dev@example.com",
-            ServiceName: "OrderExpirationJob", Category: "Job", TriggerType: "OnDemand"));
+            ServiceName: "OrderExpirationJob", Category: "Job", TriggerType: "OnDemand",
+            ServiceId: TestServiceId));
 
         result.IsValid.Should().BeTrue();
     }

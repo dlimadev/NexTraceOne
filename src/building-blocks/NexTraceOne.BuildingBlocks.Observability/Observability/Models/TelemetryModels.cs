@@ -1,6 +1,37 @@
 namespace NexTraceOne.BuildingBlocks.Observability.Observability.Models;
 
 /// <summary>
+/// Constantes para os valores de ServiceKind inferidos pelo SpanKindResolver.
+/// Baseados nas convenções semânticas OpenTelemetry.
+/// </summary>
+public static class ServiceKindValues
+{
+    /// <summary>HTTP/REST — presença de http.method ou http.request.method nas SpanAttributes.</summary>
+    public const string Rest = "REST";
+
+    /// <summary>SOAP/WS — presença de rpc.system = "soap" nas SpanAttributes.</summary>
+    public const string Soap = "SOAP";
+
+    /// <summary>Apache Kafka — presença de messaging.system = "kafka" nas SpanAttributes.</summary>
+    public const string Kafka = "Kafka";
+
+    /// <summary>Processamento em background ou lotes (SpanKind = Internal sem atributos de rede).</summary>
+    public const string Background = "Background";
+
+    /// <summary>Base de dados — presença de db.system nas SpanAttributes.</summary>
+    public const string Db = "DB";
+
+    /// <summary>gRPC — presença de rpc.system = "grpc" nas SpanAttributes.</summary>
+    public const string GRpc = "gRPC";
+
+    /// <summary>Mensageria genérica (RabbitMQ, etc.) — messaging.system != kafka.</summary>
+    public const string Messaging = "Messaging";
+
+    /// <summary>Tipo não determinado ou instrumentação incompleta.</summary>
+    public const string Unknown = "Unknown";
+}
+
+/// <summary>
 /// Entrada de log orientada ao produto NexTraceOne.
 /// Modelagem independente do provider (ClickHouse ou Elastic).
 /// </summary>
@@ -83,6 +114,12 @@ public sealed record TraceSummary
 
     /// <summary>Indica se o trace contém erros.</summary>
     public bool HasErrors { get; init; }
+
+    /// <summary>
+    /// Tipo de serviço inferido do span raiz (REST, SOAP, Kafka, Background, DB, gRPC, Unknown).
+    /// Deriva das convenções semânticas OpenTelemetry dos atributos do span.
+    /// </summary>
+    public string RootServiceKind { get; init; } = ServiceKindValues.Unknown;
 }
 
 /// <summary>
@@ -140,6 +177,18 @@ public sealed record SpanDetail
 
     /// <summary>Ambiente.</summary>
     public required string Environment { get; init; }
+
+    /// <summary>
+    /// Tipo de span OpenTelemetry (Internal, Server, Client, Producer, Consumer).
+    /// Mapeado diretamente do campo span_kind no storage.
+    /// </summary>
+    public string? SpanKind { get; init; }
+
+    /// <summary>
+    /// Tipo de serviço inferido das convenções semânticas OTel (REST, SOAP, Kafka, Background, DB, gRPC, Unknown).
+    /// Calculado pelo SpanKindResolver a partir de SpanAttributes e SpanKind.
+    /// </summary>
+    public string ServiceKind { get; init; } = ServiceKindValues.Unknown;
 
     /// <summary>Atributos de recurso (service.name, host.name, etc.).</summary>
     public IReadOnlyDictionary<string, string>? ResourceAttributes { get; init; }
@@ -245,6 +294,12 @@ public sealed record TraceQueryFilter
 
     /// <summary>Filtrar apenas traces com erro.</summary>
     public bool? HasErrors { get; init; }
+
+    /// <summary>
+    /// Filtrar por tipo de serviço inferido (REST, SOAP, Kafka, Background, DB, gRPC).
+    /// Quando null, retorna todos os tipos.
+    /// </summary>
+    public string? ServiceKind { get; init; }
 
     /// <summary>Número máximo de resultados.</summary>
     public int Limit { get; init; } = 50;

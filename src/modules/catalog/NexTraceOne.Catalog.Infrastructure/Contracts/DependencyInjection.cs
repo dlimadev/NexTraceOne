@@ -5,13 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Features.GenerateDraftFromAi;
 using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
+using NexTraceOne.Catalog.Infrastructure.Contracts.EventHandlers;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Services;
+using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts;
 
@@ -68,6 +71,12 @@ public static class DependencyInjection
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();
         services.AddScoped<IContractsModule, ContractsModuleService>();
+
+        // ── Integration event handler — Change-to-Contract Impact (INOVACAO-ROADMAP §1.2) ──
+        // Regista automaticamente deployments de contrato quando um deploy é concluído com sucesso.
+        // Alimenta a detecção de drift entre ambientes (GetContractEnvironmentVersionDrift).
+        services.AddScoped<IIntegrationEventHandler<DeploymentCompletedIntegrationEvent>,
+            DeploymentCompletedContractImpactHandler>();
 
         return services;
     }

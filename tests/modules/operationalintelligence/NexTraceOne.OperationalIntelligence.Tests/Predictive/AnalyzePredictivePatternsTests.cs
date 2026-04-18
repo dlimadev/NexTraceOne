@@ -17,14 +17,14 @@ public sealed class AnalyzePredictivePatternsTests
 
     private static (AnalyzePredictivePatterns.Handler handler,
         IIncidentPredictionPatternRepository repo,
-        IUnitOfWork uow) CreateHandler()
+        IReliabilityUnitOfWork uow) CreateHandler()
     {
         var repo = Substitute.For<IIncidentPredictionPatternRepository>();
         var tenant = Substitute.For<ICurrentTenant>();
         tenant.Id.Returns(TenantId);
         var clock = Substitute.For<IDateTimeProvider>();
         clock.UtcNow.Returns(FixedNow);
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IReliabilityUnitOfWork>();
 
         var handler = new AnalyzePredictivePatterns.Handler(repo, tenant, clock, uow);
         return (handler, repo, uow);

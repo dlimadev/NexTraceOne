@@ -1,7 +1,10 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 using AddDraftExampleFeature = NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample.AddDraftExample;
 using ApproveDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft.ApproveDraft;
@@ -18,15 +21,24 @@ namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 public sealed class ContractDraftCrudTests
 {
     private static readonly DateTimeOffset FixedNow = new(2025, 06, 01, 10, 0, 0, TimeSpan.Zero);
+    private static readonly Guid TestServiceId = Guid.NewGuid();
 
     private static IContractsUnitOfWork CreateUnitOfWork() => Substitute.For<IContractsUnitOfWork>();
+
+    private static IServiceAssetRepository CreateServiceRepo()
+    {
+        var repo = Substitute.For<IServiceAssetRepository>();
+        repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
+            .Returns(ServiceAsset.Create("TestService", "test-domain", "test-team"));
+        return repo;
+    }
 
     // ── Helper: cria um draft em estado InReview para testes de aprovação ──
 
     private static ContractDraft CreateDraftInReview()
     {
         var draft = ContractDraft.Create(
-            "Review Draft", "author", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Review Draft", "author", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent("openapi: 3.0.0", "yaml", "author", FixedNow);
         draft.SubmitForReview(FixedNow);
         return draft;
@@ -40,7 +52,7 @@ public sealed class ContractDraftCrudTests
         var repository = Substitute.For<IContractDraftRepository>();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
-        var sut = new CreateDraftFeature.Handler(repository, unitOfWork, dateTimeProvider);
+        var sut = new CreateDraftFeature.Handler(repository, CreateServiceRepo(), unitOfWork, dateTimeProvider);
 
         repository.ListAsync(
                 Arg.Any<DraftStatus?>(), Arg.Any<Guid?>(), Arg.Any<string?>(),
@@ -49,7 +61,7 @@ public sealed class ContractDraftCrudTests
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
         var result = await sut.Handle(
-            new CreateDraftFeature.Command("My API", "author", ContractType.RestApi, ContractProtocol.OpenApi),
+            new CreateDraftFeature.Command("My API", "author", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -65,7 +77,7 @@ public sealed class ContractDraftCrudTests
         var validator = new CreateDraftFeature.Validator();
 
         var validationResult = await validator.ValidateAsync(
-            new CreateDraftFeature.Command("", "author", ContractType.RestApi, ContractProtocol.OpenApi));
+            new CreateDraftFeature.Command("", "author", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId));
 
         validationResult.IsValid.Should().BeFalse();
         validationResult.Errors.Should().Contain(e => e.PropertyName == "Title");
@@ -124,7 +136,7 @@ public sealed class ContractDraftCrudTests
     public async Task ExportDraft_Should_ReturnContent_When_DraftExists()
     {
         var draft = ContractDraft.Create(
-            "Export Test", "author", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Export Test", "author", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent("openapi: 3.0.0", "yaml", "author", FixedNow);
 
         var repository = Substitute.For<IContractDraftRepository>();
@@ -168,7 +180,7 @@ public sealed class ContractDraftCrudTests
     public async Task AddDraftExample_Should_ReturnResponse_When_DraftExists()
     {
         var draft = ContractDraft.Create(
-            "Example Draft", "author", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Example Draft", "author", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         var repository = Substitute.For<IContractDraftRepository>();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
@@ -210,6 +222,17 @@ public sealed class ContractDraftCrudTests
         await unitOfWork.DidNotReceive().CommitAsync(Arg.Any<CancellationToken>());
     }
 
+    private static IServiceAssetRepository CreateSoapServiceRepo()
+    {
+        var service = ServiceAsset.Create("TestSoapService", "test-domain", "test-team");
+        service.UpdateDetails("TestSoapService", "", ServiceType.SoapService, "",
+            Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
+        var repo = Substitute.For<IServiceAssetRepository>();
+        repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
+            .Returns(service);
+        return repo;
+    }
+
     // ── CreateSoapDraft ───────────────────────────────────────────────────
 
     [Fact]
@@ -220,7 +243,7 @@ public sealed class ContractDraftCrudTests
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateSoapDraftFeature.Handler(
-            draftRepository, soapMetadataRepository, unitOfWork, dateTimeProvider);
+            draftRepository, CreateSoapServiceRepo(), soapMetadataRepository, unitOfWork, dateTimeProvider);
 
         dateTimeProvider.UtcNow.Returns(FixedNow);
 

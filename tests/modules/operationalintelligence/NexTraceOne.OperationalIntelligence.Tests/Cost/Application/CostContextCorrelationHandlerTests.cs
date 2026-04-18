@@ -203,7 +203,7 @@ public sealed class CostContextCorrelationHandlerTests
         repo.ListByServiceAsync("svc-api", "2026-03", Arg.Any<CancellationToken>())
             .Returns(new List<CostRecord> { r1, r2 });
 
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
 
         var handler = new EnrichCostRecordWithRelease.Handler(repo, uow);
@@ -230,7 +230,7 @@ public sealed class CostContextCorrelationHandlerTests
         repo.ListByServiceAsync("svc-api", "2026-03", Arg.Any<CancellationToken>())
             .Returns(new List<CostRecord> { r1 });
 
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
 
         var handler = new EnrichCostRecordWithRelease.Handler(repo, uow);
         var command = new EnrichCostRecordWithRelease.Command(ReleaseId, "svc-api", "production", "2026-03");
@@ -249,7 +249,7 @@ public sealed class CostContextCorrelationHandlerTests
         repo.ListByServiceAsync("svc-unknown", "2026-03", Arg.Any<CancellationToken>())
             .Returns(new List<CostRecord>());
 
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<ICostIntelligenceUnitOfWork>();
 
         var handler = new EnrichCostRecordWithRelease.Handler(repo, uow);
         var command = new EnrichCostRecordWithRelease.Command(ReleaseId, "svc-unknown", "production", "2026-03");

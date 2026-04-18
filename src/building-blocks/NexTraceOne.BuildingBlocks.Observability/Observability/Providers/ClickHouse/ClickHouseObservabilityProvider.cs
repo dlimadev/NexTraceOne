@@ -149,7 +149,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         var sb = new StringBuilder();
         sb.Append(CultureInfo.InvariantCulture,
             $"SELECT TraceId, ServiceName, SpanName, Timestamp, Duration, " +
-            $"StatusCode, ResourceAttributes, SpanAttributes, ParentSpanId " +
+            $"StatusCode, ResourceAttributes, SpanAttributes, ParentSpanId, SpanKind " +
             $"FROM {db}.otel_traces " +
             $"WHERE Timestamp >= '{FormatDateTime(filter.From)}' " +
             $"AND Timestamp <= '{FormatDateTime(filter.Until)}'");
@@ -172,6 +172,13 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
         if (filter.HasErrors == true)
             AppendCondition(sb, "StatusCode", "Error");
 
+        if (!string.IsNullOrWhiteSpace(filter.ServiceKind))
+        {
+            var serviceKindClause = BuildServiceKindWhereClause(filter.ServiceKind);
+            if (serviceKindClause is not null)
+                sb.Append(CultureInfo.InvariantCulture, $" AND {serviceKindClause}");
+        }
+
         // Root spans only for summaries
         sb.Append(" AND ParentSpanId = ''");
 
@@ -186,6 +193,8 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
             var durationNanos = GetLong(row, "Duration");
             var durationMs = durationNanos / 1_000_000.0;
             var statusCode = GetString(row, "StatusCode");
+            var spanKind = GetString(row, "SpanKind");
+            var spanAttrs = GetStringDictionary(row, "SpanAttributes");
 
             results.Add(new TraceSummary
             {
@@ -196,7 +205,8 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
                 DurationMs = durationMs,
                 StatusCode = statusCode,
                 Environment = filter.Environment,
-                HasErrors = string.Equals(statusCode, "Error", StringComparison.OrdinalIgnoreCase)
+                HasErrors = string.Equals(statusCode, "Error", StringComparison.OrdinalIgnoreCase),
+                RootServiceKind = SpanKindResolver.Resolve(spanAttrs, spanKind)
             });
         }
 
@@ -213,7 +223,7 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
 
         var db = _database;
         var query = $"SELECT TraceId, SpanId, ParentSpanId, ServiceName, SpanName, " +
-                    $"Timestamp, Duration, StatusCode, StatusMessage, " +
+                    $"Timestamp, Duration, StatusCode, StatusMessage, SpanKind, " +
                     $"ResourceAttributes, SpanAttributes, Events.Name, Events.Timestamp " +
                     $"FROM {db}.otel_traces " +
                     $"WHERE TraceId = '{EscapeSqlString(traceId)}' " +
@@ -244,6 +254,9 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
             if (resourceAttrs != null && resourceAttrs.TryGetValue("deployment.environment", out var env))
                 environment = env;
 
+            var spanKind = GetString(row, "SpanKind");
+            var spanAttrs = GetStringDictionary(row, "SpanAttributes");
+
             spans.Add(new SpanDetail
             {
                 TraceId = traceId,
@@ -257,8 +270,10 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
                 StatusCode = GetString(row, "StatusCode"),
                 StatusMessage = GetString(row, "StatusMessage"),
                 Environment = environment,
+                SpanKind = spanKind,
+                ServiceKind = SpanKindResolver.Resolve(spanAttrs, spanKind),
                 ResourceAttributes = resourceAttrs,
-                SpanAttributes = GetStringDictionary(row, "SpanAttributes"),
+                SpanAttributes = spanAttrs,
                 Events = ParseClickHouseSpanEvents(row)
             });
 
@@ -437,6 +452,16 @@ public sealed class ClickHouseObservabilityProvider : IObservabilityProvider
     /// </summary>
     private static void AppendCondition(StringBuilder sb, string column, string value)
         => sb.Append(CultureInfo.InvariantCulture, $" AND {column} = '{EscapeSqlString(value)}'");
+
+    /// <summary>
+    /// Traduz um ServiceKind (REST, SOAP, Kafka, etc.) em cláusula WHERE SQL para ClickHouse,
+    /// baseada nos atributos OTel armazenados na coluna SpanAttributes (Map(String, String)).
+    ///
+    /// Em ClickHouse, SpanAttributes['key'] retorna string vazia quando a chave não existe.
+    /// A lógica espelha as regras do SpanKindResolver para consistência.
+    /// </summary>
+    private static string? BuildServiceKindWhereClause(string serviceKind)
+        => ClickHouseServiceKindFilter.Build(serviceKind);
 
     private static string? NullIfEmpty(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value;

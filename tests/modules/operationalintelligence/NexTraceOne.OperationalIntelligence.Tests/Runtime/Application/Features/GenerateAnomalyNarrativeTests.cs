@@ -20,7 +20,7 @@ public sealed class GenerateAnomalyNarrativeTests
 
     private readonly IDriftFindingRepository _driftRepo = Substitute.For<IDriftFindingRepository>();
     private readonly IAnomalyNarrativeRepository _narrativeRepo = Substitute.For<IAnomalyNarrativeRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IRuntimeIntelligenceUnitOfWork _unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
 

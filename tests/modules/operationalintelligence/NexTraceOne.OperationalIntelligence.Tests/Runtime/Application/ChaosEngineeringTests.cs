@@ -15,7 +15,7 @@ public sealed class ChaosEngineeringTests
     private static readonly DateTimeOffset FixedNow = new(2026, 4, 6, 12, 0, 0, TimeSpan.Zero);
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IChaosExperimentRepository _repository = Substitute.For<IChaosExperimentRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IRuntimeIntelligenceUnitOfWork _unitOfWork = Substitute.For<IRuntimeIntelligenceUnitOfWork>();
     private readonly ICurrentTenant _tenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentUser _user = Substitute.For<ICurrentUser>();
 

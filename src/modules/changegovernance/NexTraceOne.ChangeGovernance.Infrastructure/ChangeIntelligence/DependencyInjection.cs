@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Correlation;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
@@ -82,6 +83,10 @@ public static class DependencyInjection
 
         // Cross-module public interface — outros módulos consomem IChangeIntelligenceModule
         services.AddScoped<IChangeIntelligenceModule, ChangeIntelligenceModule>();
+
+        // Distributed signal correlation and promotion risk signals for AI-assisted analysis
+        services.AddScoped<IDistributedSignalCorrelationService, DistributedSignalCorrelationService>();
+        services.AddScoped<IPromotionRiskSignalProvider, PromotionRiskSignalProvider>();
 
         return services;
     }

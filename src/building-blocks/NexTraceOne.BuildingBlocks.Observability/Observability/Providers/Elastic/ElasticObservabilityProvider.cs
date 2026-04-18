@@ -168,6 +168,13 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
         if (filter.HasErrors == true)
             musts.Add(new { term = new Dictionary<string, object> { ["status.code"] = "Error" } });
 
+        if (!string.IsNullOrWhiteSpace(filter.ServiceKind))
+        {
+            var kindCondition = ElasticServiceKindFilter.Build(filter.ServiceKind);
+            if (kindCondition is not null)
+                musts.Add(kindCondition);
+        }
+
         // Query root spans only (no parent span) for trace summaries
         var mustNots = new List<object>
         {
@@ -190,6 +197,9 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
             if (!hit.TryGetProperty("_source", out var src))
                 continue;
 
+            var spanKind = GetString(src, "span_kind");
+            var spanAttrs = GetStringDictionary(src, "attributes");
+
             results.Add(new TraceSummary
             {
                 TraceId = GetString(src, "trace_id") ?? "",
@@ -200,7 +210,8 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
                 StatusCode = GetString(src, "status.code") ?? GetNestedString(src, "status", "code"),
                 Environment = filter.Environment,
                 SpanCount = GetInt(src, "span_count"),
-                HasErrors = (GetString(src, "status.code") ?? GetNestedString(src, "status", "code")) == "Error"
+                HasErrors = (GetString(src, "status.code") ?? GetNestedString(src, "status", "code")) == "Error",
+                RootServiceKind = SpanKindResolver.Resolve(spanAttrs, spanKind)
             });
         }
 
@@ -247,6 +258,9 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
             if (durationMs <= 0 && endTime > startTime)
                 durationMs = (endTime - startTime).TotalMilliseconds;
 
+            var spanKind = GetString(src, "span_kind");
+            var spanAttrs = GetStringDictionary(src, "attributes");
+
             spans.Add(new SpanDetail
             {
                 TraceId = traceId,
@@ -260,8 +274,10 @@ public sealed class ElasticObservabilityProvider : IObservabilityProvider
                 StatusCode = GetString(src, "status.code") ?? GetNestedString(src, "status", "code"),
                 StatusMessage = GetString(src, "status.message") ?? GetNestedString(src, "status", "message"),
                 Environment = GetNestedString(src, "resource", "environment") ?? "",
+                SpanKind = spanKind,
+                ServiceKind = SpanKindResolver.Resolve(spanAttrs, spanKind),
                 ResourceAttributes = GetStringDictionary(src, "resource"),
-                SpanAttributes = GetStringDictionary(src, "attributes"),
+                SpanAttributes = spanAttrs,
                 Events = ParseSpanEvents(src)
             });
 

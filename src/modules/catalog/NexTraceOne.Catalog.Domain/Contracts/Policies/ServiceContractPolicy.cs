@@ -34,9 +34,9 @@ public static class ServiceContractPolicy
             [ServiceType.SharedPlatformService]  = [ContractType.SharedSchema],
             [ServiceType.Framework]              = [ContractType.SharedSchema],
             // Sem contrato de interface pública
-            [ServiceType.BackgroundService]      = [],
-            [ServiceType.ScheduledProcess]       = [],
-            [ServiceType.BatchJob]               = [],
+            [ServiceType.BackgroundService]      = [ContractType.BackgroundService],
+            [ServiceType.ScheduledProcess]       = [ContractType.BackgroundService],
+            [ServiceType.BatchJob]               = [ContractType.BackgroundService],
             [ServiceType.MainframeSystem]        = [],
             [ServiceType.ImsTransaction]         = [],
         };

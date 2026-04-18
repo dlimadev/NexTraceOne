@@ -1,7 +1,10 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 using CreateSoapDraftFeature = NexTraceOne.Catalog.Application.Contracts.Features.CreateSoapDraft.CreateSoapDraft;
 
@@ -25,6 +28,16 @@ public sealed class CreateSoapDraftTests
     private static IContractsUnitOfWork CreateUnitOfWork() =>
         Substitute.For<IContractsUnitOfWork>();
 
+    private static readonly Guid TestServiceId = System.Guid.NewGuid();
+    private static IServiceAssetRepository CreateServiceRepo()
+    {
+        var service = ServiceAsset.Create("TestService", "test-domain", "test-team");
+        service.UpdateDetails("TestService", "", ServiceType.SoapService, "", Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
+        var repo = Substitute.For<IServiceAssetRepository>();
+        repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
+            .Returns(service);
+        return repo;
+    }
     private static IDateTimeProvider CreateDateTimeProvider()
     {
         var provider = Substitute.For<IDateTimeProvider>();
@@ -39,7 +52,7 @@ public sealed class CreateSoapDraftTests
         var metaRepo = CreateMetadataRepository();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = CreateDateTimeProvider();
-        var sut = new CreateSoapDraftFeature.Handler(draftRepo, metaRepo, unitOfWork, dateTimeProvider);
+        var sut = new CreateSoapDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, unitOfWork, dateTimeProvider);
 
         var command = new CreateSoapDraftFeature.Command(
             Title: "Payment Service Contract",
@@ -63,7 +76,7 @@ public sealed class CreateSoapDraftTests
         var metaRepo = CreateMetadataRepository();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = CreateDateTimeProvider();
-        var sut = new CreateSoapDraftFeature.Handler(draftRepo, metaRepo, unitOfWork, dateTimeProvider);
+        var sut = new CreateSoapDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, unitOfWork, dateTimeProvider);
 
         var command = new CreateSoapDraftFeature.Command(
             Title: "Payment Service Contract",
@@ -87,7 +100,7 @@ public sealed class CreateSoapDraftTests
         var metaRepo = CreateMetadataRepository();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = CreateDateTimeProvider();
-        var sut = new CreateSoapDraftFeature.Handler(draftRepo, metaRepo, unitOfWork, dateTimeProvider);
+        var sut = new CreateSoapDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, unitOfWork, dateTimeProvider);
 
         var command = new CreateSoapDraftFeature.Command(
             Title: "Test Contract",
@@ -113,7 +126,7 @@ public sealed class CreateSoapDraftTests
         var metaRepo = CreateMetadataRepository();
         var unitOfWork = CreateUnitOfWork();
         var dateTimeProvider = CreateDateTimeProvider();
-        var sut = new CreateSoapDraftFeature.Handler(draftRepo, metaRepo, unitOfWork, dateTimeProvider);
+        var sut = new CreateSoapDraftFeature.Handler(draftRepo, CreateServiceRepo(), metaRepo, unitOfWork, dateTimeProvider);
 
         var command = new CreateSoapDraftFeature.Command(
             Title: "Test",
@@ -156,7 +169,8 @@ public sealed class CreateSoapDraftTests
             Author: "dev@example.com",
             ServiceName: "PaymentService",
             TargetNamespace: "http://example.com/payments",
-            SoapVersion: "1.1");
+            SoapVersion: "1.1",
+            ServiceId: TestServiceId);
 
         var result = validator.Validate(command);
 

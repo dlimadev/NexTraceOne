@@ -135,7 +135,7 @@ public sealed class ImportCostBatchHandlerTests
 {
     private readonly ICostImportBatchRepository _batchRepository = Substitute.For<ICostImportBatchRepository>();
     private readonly ICostRecordRepository _recordRepository = Substitute.For<ICostRecordRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly ICostIntelligenceUnitOfWork _unitOfWork = Substitute.For<ICostIntelligenceUnitOfWork>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ILogger<ImportCostBatch.Handler> _logger = Substitute.For<ILogger<ImportCostBatch.Handler>>();
 

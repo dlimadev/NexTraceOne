@@ -291,6 +291,7 @@ public sealed class ProductAnalyticsModuleServiceTests
         public string Id => "pa-tests-user";
         public string Name => "ProductAnalytics Tests";
         public string Email => "pa.tests@nextraceone.local";
+        public string? Persona => null;
         public bool IsAuthenticated => true;
         public bool HasPermission(string permission) => true;
     }

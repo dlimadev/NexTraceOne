@@ -9,6 +9,7 @@ namespace NexTraceOne.Catalog.Tests.Contracts.Domain.Entities;
 /// </summary>
 public sealed class ContractDraftTests
 {
+    private static readonly Guid TestServiceId = Guid.NewGuid();
     private static readonly DateTimeOffset FixedNow = new(2025, 06, 15, 10, 0, 0, TimeSpan.Zero);
 
     // ── Create ──────────────────────────────────────────────────────────
@@ -20,7 +21,8 @@ public sealed class ContractDraftTests
             "My API Contract",
             "engineer@company.com",
             ContractType.RestApi,
-            ContractProtocol.OpenApi);
+            ContractProtocol.OpenApi,
+            TestServiceId);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Title.Should().Be("My API Contract");
@@ -40,7 +42,8 @@ public sealed class ContractDraftTests
             "Draft Title",
             "author@test.com",
             ContractType.Event,
-            ContractProtocol.AsyncApi);
+            ContractProtocol.AsyncApi,
+            TestServiceId);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Status.Should().Be(DraftStatus.Editing);
@@ -58,7 +61,8 @@ public sealed class ContractDraftTests
             ContractProtocol.OpenApi,
             "Generate a REST API for user management",
             """openapi: '3.1.0'""",
-            "yaml");
+            "yaml",
+            TestServiceId);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Title.Should().Be("AI Generated Contract");
@@ -78,7 +82,8 @@ public sealed class ContractDraftTests
             ContractProtocol.OpenApi,
             "Generate API",
             """{"openapi":"3.1.0"}""",
-            "JSON");
+            "JSON",
+            TestServiceId);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.IsAiGenerated.Should().BeTrue();
@@ -92,7 +97,7 @@ public sealed class ContractDraftTests
     public void UpdateContent_Should_Succeed_When_DraftIsEditing()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var result = draft.UpdateContent(
             """{"openapi":"3.1.0","paths":{}}""", "json", "editor@test.com", FixedNow);
@@ -122,7 +127,7 @@ public sealed class ContractDraftTests
     public void UpdateMetadata_Should_Succeed_When_DraftIsEditing()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         var serviceId = Guid.NewGuid();
 
         var result = draft.UpdateMetadata(
@@ -155,7 +160,7 @@ public sealed class ContractDraftTests
     public void SubmitForReview_Should_Fail_When_SpecContentIsEmpty()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var result = draft.SubmitForReview(FixedNow);
 
@@ -194,7 +199,7 @@ public sealed class ContractDraftTests
     public void Approve_Should_Fail_When_DraftIsNotInReview()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var result = draft.Approve("reviewer@test.com", FixedNow);
 
@@ -221,7 +226,7 @@ public sealed class ContractDraftTests
     public void Reject_Should_Fail_When_DraftIsNotInReview()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var result = draft.Reject("reviewer@test.com", FixedNow);
 
@@ -260,7 +265,7 @@ public sealed class ContractDraftTests
     public void Discard_Should_TransitionToDiscarded_When_DraftIsEditing()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var result = draft.Discard(FixedNow);
 
@@ -287,7 +292,7 @@ public sealed class ContractDraftTests
     public void AddExample_Should_AddToCollection()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var example = ContractExample.CreateForDraft(
             draft.Id, "Success Response", """{"status":"ok"}""",
@@ -303,7 +308,7 @@ public sealed class ContractDraftTests
     public void RemoveExample_Should_RemoveFromCollection()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
 
         var example = ContractExample.CreateForDraft(
             draft.Id, "To Remove", """{"data":"test"}""",
@@ -322,7 +327,7 @@ public sealed class ContractDraftTests
     private static ContractDraft CreateDraftWithContent()
     {
         var draft = ContractDraft.Create(
-            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi).Value;
+            "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, TestServiceId).Value;
         draft.UpdateContent("""{"openapi":"3.1.0","paths":{}}""", "json", "author@test.com", FixedNow);
         return draft;
     }

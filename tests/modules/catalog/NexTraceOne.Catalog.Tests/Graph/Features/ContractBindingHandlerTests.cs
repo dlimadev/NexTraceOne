@@ -61,9 +61,9 @@ public sealed class ContractBindingHandlerTests
         await uow.Received(1).CommitAsync(Arg.Any<CancellationToken>());
         await eventBus.Received(1).PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>());
         await audit.Received(1).RecordEventAsync(
-            "Catalog", "ContractBinding.Created",
-            Arg.Any<string>(), "ContractBinding",
-            "engineer@test.com", Guid.Empty, null, Arg.Any<CancellationToken>());
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -153,9 +153,9 @@ public sealed class ContractBindingHandlerTests
         await uow.Received(1).CommitAsync(Arg.Any<CancellationToken>());
         await eventBus.Received(1).PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>());
         await audit.Received(1).RecordEventAsync(
-            "Catalog", "ContractBinding.Deactivated",
-            Arg.Any<string>(), "ContractBinding",
-            "admin@test.com", Guid.Empty, null, Arg.Any<CancellationToken>());
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]

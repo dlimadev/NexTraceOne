@@ -85,6 +85,7 @@ public sealed class TelemetryEndpointModule
             string? operationName = null,
             double? minDurationMs = null,
             bool? hasErrors = null,
+            string? serviceKind = null,
             int limit = 50) =>
         {
             if (limit is < 1 or > MaxTraceResults) limit = 50;
@@ -98,6 +99,7 @@ public sealed class TelemetryEndpointModule
                 OperationName = operationName,
                 MinDurationMs = minDurationMs,
                 HasErrors = hasErrors,
+                ServiceKind = serviceKind,
                 Limit = limit
             };
 
@@ -196,13 +198,18 @@ public sealed class TelemetryEndpointModule
 
         group.MapGet("/health", async (
             IObservabilityProvider provider,
+            ICollectionModeStrategy collectionMode,
             CancellationToken ct) =>
         {
-            var healthy = await provider.IsHealthyAsync(ct);
+            var providerHealthy = await provider.IsHealthyAsync(ct);
+            var collectionModeHealthy = await collectionMode.IsHealthyAsync(ct);
             return Results.Ok(new
             {
                 provider = provider.ProviderName,
-                healthy
+                providerHealthy,
+                collectionMode = collectionMode.ModeName,
+                collectionModeHealthy,
+                healthy = providerHealthy
             });
         })
         .RequirePermission("operations:telemetry:read");
