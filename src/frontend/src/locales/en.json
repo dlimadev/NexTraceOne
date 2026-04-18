@@ -5784,12 +5784,172 @@
         "knowledgeGraph": "Knowledge Graph",
         "onCallStatus": "On-Call Status",
         "reliabilitySlo": "Reliability SLO",
-        "serviceScorecard": "Service Scorecard"
+        "serviceScorecard": "Service Scorecard",
+        "alertStatus": "Alert Status",
+        "changeTimeline": "Change Timeline",
+        "sloGauge": "SLO Gauge",
+        "deploymentFrequency": "Deployment Frequency",
+        "stat": "KPI Stat",
+        "textMarkdown": "Note / Text",
+        "topServices": "Top Services",
+        "contractCoverage": "Contract Coverage",
+        "blastRadius": "Blast Radius",
+        "teamHealth": "Team Health",
+        "releaseCalendar": "Release Calendar"
+      },
+      "cloneDashboard": "Clone",
+      "cloneTitle": "Clone Dashboard",
+      "cloneName": "New Dashboard Name",
+      "cloneError": "Failed to clone dashboard.",
+      "deleteDashboard": "Delete",
+      "confirmDeleteTitle": "Delete Dashboard",
+      "confirmDelete": "This action cannot be undone. Are you sure you want to delete this dashboard?",
+      "deleteError": "Failed to delete dashboard.",
+      "fromTemplate": "Use Template",
+      "editDashboard": "Edit",
+      "searchPlaceholder": "Search dashboards by name…",
+      "searchLabel": "Search dashboards",
+      "noResults": "No dashboards match your search",
+      "noResultsHint": "Try a different search term or clear the search.",
+      "statMetric": {
+        "incidentsOpen": "Open Incidents",
+        "alertsCritical": "Critical Alerts",
+        "alertsTotal": "Total Alerts",
+        "doraDeployFreq": "Deploy Frequency",
+        "doraCfr": "Change Failure Rate",
+        "doraMttr": "MTTR",
+        "changesToday": "Changes Today"
+      },
+      "sortBy": "Sort by",
+      "sortField": {
+        "name": "Name",
+        "persona": "Persona",
+        "widgetCount": "Widgets"
+      },
+      "topServices": {
+        "header": "incidents",
+        "noData": "No service data available"
+      },
+      "contractCoverage": {
+        "event": "Event",
+        "progressLabel": "Contract coverage",
+        "servicesWithContracts": "services with contracts"
+      },
+      "blastRadius": {
+        "affectedServices": "Affected",
+        "risk": "Risk",
+        "confidence": "Confidence"
+      },
+      "teamHealth": {
+        "noTeam": "Select a team in widget settings",
+        "p1Incidents": "P1 Incidents",
+        "p2Incidents": "P2 Incidents",
+        "lastDeploy": "Last deploy"
+      },
+      "releaseCalendar": {
+        "changes": "changes",
+        "noChanges": "No changes scheduled"
       }
     },
     "dashboards": {
       "empty": "No custom dashboards",
       "emptyDescription": "Create your first custom dashboard to get started."
+    },
+    "dashboardView": {
+      "autoRefreshEvery": "Every",
+      "autoRefreshLabel": "Auto-refresh",
+      "autoRefreshOff": "Auto-refresh Off",
+      "backToDashboards": "Back to Dashboards",
+      "avgScore": "Avg",
+      "copied": "Copied!",
+      "edit": "Edit",
+      "error": "Failed to load dashboard",
+      "generatedAt": "Generated at",
+      "loading": "Loading dashboard...",
+      "noIncidents": "No open incidents",
+      "noWidgets": "No widgets configured. Click Edit to add widgets.",
+      "notFound": "Dashboard not found",
+      "refresh": "Refresh",
+      "share": "Share",
+      "shared": "Shared",
+      "system": "System",
+      "timeRangeLabel": "Time range",
+      "widgetError": "Could not load data",
+      "timeRange": {
+        "1h": "Last 1h",
+        "6h": "Last 6h",
+        "24h": "Last 24h",
+        "7d": "Last 7d",
+        "30d": "Last 30d"
+      },
+      "toggleVars": "Toggle variables",
+      "variables": "Variables",
+      "variablesLabel": "Variables",
+      "varServicePlaceholder": "All services",
+      "varTeamPlaceholder": "All teams",
+      "clearVars": "Clear",
+      "varsHint": "Variable values override per-widget service/team filters",
+      "alertTotal": "Total",
+      "noChanges": "No recent changes",
+      "tvMode": "TV Mode",
+      "exitKiosk": "Exit TV Mode",
+      "noContent": "No content configured. Edit this widget to add a note.",
+      "expandWidget": "Expand widget",
+      "closeExpanded": "Close expanded view",
+      "expandedWidget": "Expanded widget"
+    },
+    "dashboardBuilder": {
+      "addWidget": "Add Widget",
+      "backToView": "Back to Dashboard",
+      "col": "Column",
+      "customTitle": "Custom Title",
+      "customTitlePlaceholder": "Optional override",
+      "error": "Failed to load dashboard",
+      "height": "Height",
+      "loading": "Loading dashboard editor...",
+      "noWidgets": "No widgets yet. Click \"Add Widget\" to start building.",
+      "position": "Position (col, row)",
+      "removeWidget": "Remove widget",
+      "row": "Row",
+      "save": "Save Dashboard",
+      "saveError": "Failed to save dashboard.",
+      "saveSuccess": "Dashboard saved successfully.",
+      "serviceFilter": "Service Filter",
+      "serviceFilterPlaceholder": "All services",
+      "size": "Size (w × h)",
+      "systemReadOnly": "This is a system dashboard and cannot be edited.",
+      "timeRangeOverride": "Time Range Override",
+      "title": "Edit Dashboard",
+      "widgetType": "Widget Type",
+      "widgets": "Widgets",
+      "width": "Width",
+      "togglePreview": "Toggle preview",
+      "showPreview": "Show Preview",
+      "hidePreview": "Hide Preview",
+      "previewTitle": "Live Preview",
+      "previewHint": "Updates as you configure widgets",
+      "previewEmpty": "No widgets yet",
+      "previewLabel": "Dashboard preview",
+      "exportJson": "Export JSON",
+      "importJson": "Import JSON",
+      "importError": "Invalid dashboard JSON file.",
+      "autoArrange": "Auto-arrange",
+      "statMetric": "KPI Metric",
+      "textContent": "Content (Markdown)",
+      "textContentPlaceholder": "Supports **bold**, *italic*, # headings, - lists, [label](url)",
+      "duplicateWidget": "Duplicate widget",
+      "widgetPickerOpen": "Open widget picker",
+      "widgetPickerPanel": "Widget picker",
+      "widgetSearch": "Search widgets…",
+      "allPersonas": "All",
+      "noWidgetsFound": "No widgets match the filter",
+      "sizePresets": "Quick Size",
+      "sizePreset": {
+        "s": "S",
+        "m": "M",
+        "w": "W",
+        "l": "L"
+      }
     },
     "dora": {
       "cfr": "CFR",
@@ -6000,6 +6160,22 @@
       "testing": "Testing",
       "title": "Technical Debt",
       "totalScore": "Total Debt Score"
+    },
+    "alertSeverity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "sloStatus": {
+      "met": "Met",
+      "atRisk": "At Risk",
+      "breached": "Breached",
+      "target": "Target"
+    },
+    "deploymentFreq": {
+      "chartLabel": "Deployment frequency chart",
+      "deploys": "deploys"
     }
   },
   "governanceConfig": {
@@ -9590,6 +9766,14 @@
     "platformAdmin": {
       "title": "Platform Admin",
       "description": "AI usage, security findings, audit activity, system health"
+    },
+    "auditor": {
+      "title": "Auditor",
+      "description": "Change confidence, incident summary, service scorecard, cost trend"
+    },
+    "product": {
+      "title": "Product",
+      "description": "DORA metrics, cost trend, reliability SLO, incident summary"
     }
   },
   "digestSettings": {

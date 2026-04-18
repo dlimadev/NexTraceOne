@@ -25,7 +25,10 @@ public sealed class CloneDashboardTests
         var sourceId = Guid.NewGuid();
         var source = CustomDashboard.Create(
             "Original", "desc", "grid", "Engineer",
-            ["widget-1", "widget-2"], "tenant1", "user1", FixedNow.AddDays(-10));
+            [
+                new DashboardWidget(Guid.NewGuid().ToString(), "widget-1", new WidgetPosition(0, 0, 2, 2), new WidgetConfig()),
+                new DashboardWidget(Guid.NewGuid().ToString(), "widget-2", new WidgetPosition(2, 0, 2, 2), new WidgetConfig())
+            ], "tenant1", "user1", FixedNow.AddDays(-10));
 
         _repository.GetByIdAsync(Arg.Any<CustomDashboardId>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<CustomDashboard?>(source));

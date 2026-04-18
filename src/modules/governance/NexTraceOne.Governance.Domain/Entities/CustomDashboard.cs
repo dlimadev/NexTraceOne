@@ -10,6 +10,30 @@ namespace NexTraceOne.Governance.Domain.Entities;
 public sealed record CustomDashboardId(Guid Value) : TypedIdBase(Value);
 
 /// <summary>
+/// Posição e dimensão de um widget no grid do dashboard.
+/// </summary>
+public sealed record WidgetPosition(int X, int Y, int Width, int Height);
+
+/// <summary>
+/// Configuração específica de um widget: filtros contextuais, escopo e período.
+/// </summary>
+public sealed record WidgetConfig(
+    string? ServiceId = null,
+    string? TeamId = null,
+    string? TimeRange = null,
+    string? CustomTitle = null);
+
+/// <summary>
+/// Widget configurado de um dashboard: tipo, posição no grid e config contextual.
+/// Value object serializado como JSONB no PostgreSQL.
+/// </summary>
+public sealed record DashboardWidget(
+    string WidgetId,
+    string Type,
+    WidgetPosition Position,
+    WidgetConfig Config);
+
+/// <summary>
 /// Representa um dashboard customizado associado a uma persona e tenant.
 /// Permite que cada utilizador ou equipa configure vistas personalizadas
 /// de métricas, scorecards, change confidence e governança.
@@ -29,11 +53,17 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     /// <summary>Persona alvo do dashboard.</summary>
     public string Persona { get; private set; } = string.Empty;
 
-    /// <summary>Lista de widget IDs configurados no dashboard (JSONB).</summary>
-    public IReadOnlyList<string> WidgetIds { get; private set; } = [];
+    /// <summary>Widgets configurados no dashboard com posição e config contextual (JSONB).</summary>
+    public IReadOnlyList<DashboardWidget> Widgets { get; private set; } = [];
 
     /// <summary>Indica se o dashboard é partilhado com a equipa.</summary>
     public bool IsShared { get; private set; }
+
+    /// <summary>Indica se é um dashboard de sistema criado pelo PlatformAdmin (não editável por outros).</summary>
+    public bool IsSystem { get; private init; }
+
+    /// <summary>Identificador opcional da equipa proprietária do dashboard.</summary>
+    public string? TeamId { get; private set; }
 
     /// <summary>Identificador do tenant proprietário.</summary>
     public string TenantId { get; private init; } = string.Empty;
@@ -50,6 +80,9 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
+    /// <summary>Número de widgets configurados no dashboard.</summary>
+    public int WidgetCount => Widgets.Count;
+
     /// <summary>Construtor privado para EF Core.</summary>
     private CustomDashboard() { }
 
@@ -61,10 +94,12 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
         string? description,
         string layout,
         string persona,
-        IReadOnlyList<string> widgetIds,
+        IReadOnlyList<DashboardWidget> widgets,
         string tenantId,
         string userId,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        string? teamId = null,
+        bool isSystem = false)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name));
         Guard.Against.StringTooLong(name, 100, nameof(name));
@@ -83,8 +118,10 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
             Description = description?.Trim(),
             Layout = layout.Trim(),
             Persona = persona.Trim(),
-            WidgetIds = widgetIds,
+            Widgets = widgets,
             IsShared = false,
+            IsSystem = isSystem,
+            TeamId = teamId,
             TenantId = tenantId,
             CreatedByUserId = userId,
             CreatedAt = now,
@@ -107,8 +144,10 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
             Description = Description,
             Layout = Layout,
             Persona = Persona,
-            WidgetIds = WidgetIds.ToList(),
+            Widgets = Widgets.ToList(),
             IsShared = false,
+            IsSystem = false,
+            TeamId = TeamId,
             TenantId = TenantId,
             CreatedByUserId = userId,
             CreatedAt = now,
@@ -117,9 +156,15 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     }
 
     /// <summary>
-    /// Atualiza os dados mutáveis do dashboard.
+    /// Atualiza os dados mutáveis do dashboard incluindo widgets com configuração contextual.
     /// </summary>
-    public void Update(string name, string? description, string layout, DateTimeOffset now)
+    public void Update(
+        string name,
+        string? description,
+        string layout,
+        IReadOnlyList<DashboardWidget> widgets,
+        string? teamId,
+        DateTimeOffset now)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name));
         Guard.Against.StringTooLong(name, 100, nameof(name));
@@ -131,6 +176,8 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
         Name = name.Trim();
         Description = description?.Trim();
         Layout = layout.Trim();
+        Widgets = widgets;
+        TeamId = teamId;
         UpdatedAt = now;
     }
 

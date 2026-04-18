@@ -5762,12 +5762,172 @@
         "knowledgeGraph": "Grafo de Conocimiento",
         "onCallStatus": "Estado On-Call",
         "reliabilitySlo": "SLO de Fiabilidad",
-        "serviceScorecard": "Scorecard de Servicio"
+        "serviceScorecard": "Scorecard de Servicio",
+        "alertStatus": "Estado de Alertas",
+        "changeTimeline": "Línea de Tiempo de Cambios",
+        "sloGauge": "Gauge de SLO",
+        "deploymentFrequency": "Frecuencia de Despliegue",
+        "stat": "Estadística KPI",
+        "textMarkdown": "Nota / Texto",
+        "topServices": "Top Servicios",
+        "contractCoverage": "Cobertura de Contratos",
+        "blastRadius": "Blast Radius",
+        "teamHealth": "Salud del Equipo",
+        "releaseCalendar": "Calendario de Releases"
+      },
+      "cloneDashboard": "Clonar",
+      "cloneTitle": "Clonar Dashboard",
+      "cloneName": "Nombre del nuevo dashboard",
+      "cloneError": "Error al clonar el dashboard.",
+      "deleteDashboard": "Eliminar",
+      "confirmDeleteTitle": "Eliminar Dashboard",
+      "confirmDelete": "Esta acción no se puede deshacer. ¿Está seguro de que desea eliminar este dashboard?",
+      "deleteError": "Error al eliminar el dashboard.",
+      "fromTemplate": "Usar Plantilla",
+      "editDashboard": "Editar",
+      "searchPlaceholder": "Buscar dashboards por nombre…",
+      "searchLabel": "Buscar dashboards",
+      "noResults": "Ningún dashboard coincide con la búsqueda",
+      "noResultsHint": "Prueba otro término o limpia la búsqueda.",
+      "statMetric": {
+        "incidentsOpen": "Incidentes Abiertos",
+        "alertsCritical": "Alertas Críticas",
+        "alertsTotal": "Total de Alertas",
+        "doraDeployFreq": "Frecuencia de Despliegue",
+        "doraCfr": "Tasa de Fallo en Cambios",
+        "doraMttr": "MTTR",
+        "changesToday": "Cambios Hoy"
+      },
+      "sortBy": "Ordenar por",
+      "sortField": {
+        "name": "Nombre",
+        "persona": "Persona",
+        "widgetCount": "Widgets"
+      },
+      "topServices": {
+        "header": "incidentes",
+        "noData": "Sin datos de servicios disponibles"
+      },
+      "contractCoverage": {
+        "event": "Evento",
+        "progressLabel": "Cobertura de contratos",
+        "servicesWithContracts": "servicios con contratos"
+      },
+      "blastRadius": {
+        "affectedServices": "Afectados",
+        "risk": "Riesgo",
+        "confidence": "Confianza"
+      },
+      "teamHealth": {
+        "noTeam": "Seleccione un equipo en la configuración del widget",
+        "p1Incidents": "Incidentes P1",
+        "p2Incidents": "Incidentes P2",
+        "lastDeploy": "Último despliegue"
+      },
+      "releaseCalendar": {
+        "changes": "cambios",
+        "noChanges": "No hay cambios programados"
       }
     },
     "dashboards": {
       "empty": "Sin dashboards personalizados",
       "emptyDescription": "Cree su primer dashboard personalizado para comenzar."
+    },
+    "dashboardView": {
+      "autoRefreshEvery": "Cada",
+      "autoRefreshLabel": "Auto-actualización",
+      "autoRefreshOff": "Auto-actualización desactivada",
+      "backToDashboards": "Volver a Dashboards",
+      "avgScore": "Prom",
+      "copied": "¡Copiado!",
+      "edit": "Editar",
+      "error": "Error al cargar el dashboard",
+      "generatedAt": "Generado a las",
+      "loading": "Cargando dashboard...",
+      "noIncidents": "Sin incidentes abiertos",
+      "noWidgets": "Sin widgets configurados. Haga clic en Editar para agregar widgets.",
+      "notFound": "Dashboard no encontrado",
+      "refresh": "Actualizar",
+      "share": "Compartir",
+      "shared": "Compartido",
+      "system": "Sistema",
+      "timeRangeLabel": "Período",
+      "widgetError": "No se pudo cargar los datos",
+      "timeRange": {
+        "1h": "Última 1h",
+        "6h": "Últimas 6h",
+        "24h": "Últimas 24h",
+        "7d": "Últimos 7d",
+        "30d": "Últimos 30d"
+      },
+      "toggleVars": "Alternar variables",
+      "variables": "Variables",
+      "variablesLabel": "Variables",
+      "varServicePlaceholder": "Todos los servicios",
+      "varTeamPlaceholder": "Todos los equipos",
+      "clearVars": "Limpiar",
+      "varsHint": "Los valores de variables reemplazan los filtros de servicio/equipo por widget",
+      "alertTotal": "Total",
+      "noChanges": "Sin cambios recientes",
+      "tvMode": "Modo TV",
+      "exitKiosk": "Salir del Modo TV",
+      "noContent": "Sin contenido configurado. Edite este widget para añadir una nota.",
+      "expandWidget": "Expandir widget",
+      "closeExpanded": "Cerrar vista expandida",
+      "expandedWidget": "Widget expandido"
+    },
+    "dashboardBuilder": {
+      "addWidget": "Agregar Widget",
+      "backToView": "Volver al Dashboard",
+      "col": "Columna",
+      "customTitle": "Título Personalizado",
+      "customTitlePlaceholder": "Anulación opcional",
+      "error": "Error al cargar el dashboard",
+      "height": "Alto",
+      "loading": "Cargando editor de dashboard...",
+      "noWidgets": "Sin widgets aún. Haga clic en \"Agregar Widget\" para comenzar.",
+      "position": "Posición (col, fila)",
+      "removeWidget": "Eliminar widget",
+      "row": "Fila",
+      "save": "Guardar Dashboard",
+      "saveError": "Error al guardar el dashboard.",
+      "saveSuccess": "Dashboard guardado correctamente.",
+      "serviceFilter": "Filtro de Servicio",
+      "serviceFilterPlaceholder": "Todos los servicios",
+      "size": "Tamaño (a × h)",
+      "systemReadOnly": "Este es un dashboard del sistema y no puede editarse.",
+      "timeRangeOverride": "Anulación de Período",
+      "title": "Editar Dashboard",
+      "widgetType": "Tipo de Widget",
+      "widgets": "Widgets",
+      "width": "Ancho",
+      "togglePreview": "Alternar vista previa",
+      "showPreview": "Mostrar vista previa",
+      "hidePreview": "Ocultar vista previa",
+      "previewTitle": "Vista previa en vivo",
+      "previewHint": "Se actualiza al configurar los widgets",
+      "previewEmpty": "Sin widgets aún",
+      "previewLabel": "Vista previa del dashboard",
+      "exportJson": "Exportar JSON",
+      "importJson": "Importar JSON",
+      "importError": "Archivo JSON de dashboard inválido.",
+      "autoArrange": "Organizar automáticamente",
+      "statMetric": "Métrica KPI",
+      "textContent": "Contenido (Markdown)",
+      "textContentPlaceholder": "Admite **negrita**, *cursiva*, # títulos, - listas, [etiqueta](url)",
+      "duplicateWidget": "Duplicar widget",
+      "widgetPickerOpen": "Abrir selector de widgets",
+      "widgetPickerPanel": "Selector de widgets",
+      "widgetSearch": "Buscar widgets…",
+      "allPersonas": "Todos",
+      "noWidgetsFound": "Ningún widget coincide con el filtro",
+      "sizePresets": "Tamaño rápido",
+      "sizePreset": {
+        "s": "P",
+        "m": "M",
+        "w": "G",
+        "l": "XG"
+      }
     },
     "dora": {
       "cfr": "CFR",
@@ -5978,6 +6138,22 @@
       "testing": "Pruebas",
       "title": "Deuda Técnica",
       "totalScore": "Puntuación Total de Deuda"
+    },
+    "alertSeverity": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "sloStatus": {
+      "met": "Cumplido",
+      "atRisk": "En Riesgo",
+      "breached": "Incumplido",
+      "target": "Meta"
+    },
+    "deploymentFreq": {
+      "chartLabel": "Gráfico de frecuencia de despliegue",
+      "deploys": "despliegues"
     }
   },
   "governanceConfig": {
@@ -9568,6 +9744,14 @@
     "platformAdmin": {
       "title": "Admin de Plataforma",
       "description": "Uso de IA, hallazgos de seguridad, actividad de auditoría, salud del sistema"
+    },
+    "auditor": {
+      "title": "Auditor",
+      "description": "Confianza en cambios, incidentes, scorecard de servicios, tendencia de costo"
+    },
+    "product": {
+      "title": "Product",
+      "description": "Métricas DORA, tendencia de costo, SLO de confiabilidad, incidentes"
     }
   },
   "digestSettings": {

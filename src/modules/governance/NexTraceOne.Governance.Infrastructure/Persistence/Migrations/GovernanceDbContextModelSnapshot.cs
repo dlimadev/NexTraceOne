@@ -319,6 +319,10 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsShared")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsSystem")
+                        .HasDefaultValue(false)
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Layout")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -340,6 +344,10 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
+                    b.Property<string>("TeamId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -349,7 +357,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("WidgetIds")
+                    b.Property<string>("Widgets")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
@@ -360,6 +368,9 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("Persona");
+
+                    b.HasIndex("TeamId")
+                        .HasDatabaseName("IX_gov_custom_dashboards_TeamId");
 
                     b.HasIndex("TenantId");
 
