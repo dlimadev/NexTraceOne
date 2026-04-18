@@ -6,7 +6,7 @@
  * Preview em tempo real à direita. Guarda via PUT /governance/dashboards/{id}.
  * Suporta Export/Import JSON (compatível com Grafana-like portability) e Auto-arrange.
  */
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -226,6 +226,29 @@ function WidgetPickerPanel({ selected, onSelect, disabled }: WidgetPickerPanelPr
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [personaFilter, setPersonaFilter] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close panel when clicking outside
+  useEffect(() => {
+    if (!open) return;
+    const handleMouseDown = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [open]);
+
+  // Close panel on Escape key
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open]);
 
   const filtered = ALL_WIDGET_TYPES.filter((wt) => {
     const meta = WIDGET_META[wt];
@@ -249,7 +272,7 @@ function WidgetPickerPanel({ selected, onSelect, disabled }: WidgetPickerPanelPr
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
