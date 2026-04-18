@@ -14,6 +14,7 @@ using NexTraceOne.Governance.Infrastructure;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Domain.Entities;
+using Scalar.AspNetCore;
 using Serilog;
 using System.Diagnostics;
 using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
@@ -44,6 +45,34 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddBuildingBlocksApplication(builder.Configuration);
 builder.Services.AddNexTraceHealthChecks();
+
+// OpenAPI — documentação do serviço de ingestão para consumidores externos
+builder.Services.AddOpenApi("ingestion", options =>
+{
+    options.AddDocumentTransformer((document, context, _) =>
+    {
+        document.Info.Title = "NexTraceOne Ingestion API";
+        document.Info.Version = "v1";
+        document.Info.Description = """
+            Entry point oficial para integrações externas com o NexTraceOne.
+
+            Permite que pipelines CI/CD, agentes de runtime e sistemas externos
+            notifiquem o NexTraceOne sobre eventos relevantes:
+
+            - **Deployments**: eventos de deploy originados em GitHub, GitLab, Jenkins, Azure DevOps
+            - **Promotions**: promoções de release entre ambientes (ex: staging → production)
+            - **Runtime Signals**: sinais e marcadores operacionais de serviços em execução
+            - **Consumers**: atualizações de dependências e consumidores de contratos
+            - **Contracts**: sincronização de contratos de APIs e eventos de fontes externas
+
+            ## Autenticação
+
+            Todas as rotas requerem autenticação via **API Key** no header `X-Api-Key`.
+            A API Key deve ter a permissão `integrations:write`.
+            """;
+        return System.Threading.Tasks.Task.CompletedTask;
+    });
+});
 builder.Services.AddHealthChecks()
     .AddCheck<DbContextConnectivityHealthCheck<GovernanceDbContext>>(
         "governance-db",
@@ -129,6 +158,15 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseAuthorization();
+
+// OpenAPI + Scalar — disponível em todos os ambientes (Ingestion API é consumida por sistemas externos)
+app.MapOpenApi("/openapi/{documentName}.json");
+app.MapScalarApiReference(options =>
+{
+    options.Title = "NexTraceOne Ingestion API";
+    options.Theme = ScalarTheme.BluePlanet;
+    options.DefaultOpenAllTags = true;
+});
 
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
@@ -309,7 +347,13 @@ deployments.MapPost("/events", async (
         isNewRelease
     });
 })
-.WithDescription("Receives deployment event notifications from CI/CD platforms");
+.WithName("PostDeploymentEvent")
+.WithSummary("Notify a deployment event from a CI/CD pipeline")
+.WithDescription("Receives deployment event notifications from CI/CD platforms")
+.Produces(StatusCodes.Status202Accepted)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden);
 
 // ============================================================
 // Promotion Events — recebe eventos de promoção entre ambientes
@@ -387,7 +431,13 @@ promotions.MapPost("/events", async (
         executionId = execution.Id.Value
     });
 })
-.WithDescription("Receives promotion event notifications");
+.WithName("PostPromotionEvent")
+.WithSummary("Notify a promotion event between environments")
+.WithDescription("Receives promotion event notifications")
+.Produces(StatusCodes.Status202Accepted)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden);
 
 // ============================================================
 // Runtime Signals — recebe sinais operacionais
@@ -446,7 +496,13 @@ runtime.MapPost("/signals", async (
         executionId = execution.Id.Value
     });
 })
-.WithDescription("Receives runtime signals and markers from monitored services");
+.WithName("PostRuntimeSignal")
+.WithSummary("Submit a runtime signal or operational marker from a monitored service")
+.WithDescription("Receives runtime signals and markers from monitored services")
+.Produces(StatusCodes.Status202Accepted)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden);
 
 
 // ============================================================
@@ -509,7 +565,13 @@ consumers.MapPost("/sync", async (
         executionId = execution.Id.Value
     });
 })
-.WithDescription("Receives consumer/dependency update notifications");
+.WithName("PostConsumerSync")
+.WithSummary("Synchronize service consumers and dependency declarations")
+.WithDescription("Receives consumer/dependency update notifications")
+.Produces(StatusCodes.Status202Accepted)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden);
 
 // ============================================================
 // Contract Sync — recebe contratos de fontes externas
@@ -571,7 +633,13 @@ contracts.MapPost("/sync", async (
         executionId = execution.Id.Value
     });
 })
-.WithDescription("Receives contract synchronization from external sources");
+.WithName("PostContractSync")
+.WithSummary("Synchronize API or event contracts from an external source")
+.WithDescription("Receives contract synchronization from external sources")
+.Produces(StatusCodes.Status202Accepted)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status401Unauthorized)
+.Produces(StatusCodes.Status403Forbidden);
 
 app.Run();
 
