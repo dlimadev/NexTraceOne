@@ -98,6 +98,12 @@ export default defineConfig(({ mode }) => {
           '*.config.*',
           'src/main.tsx',
         ],
+        thresholds: {
+          lines: 5,
+          functions: 5,
+          branches: 5,
+          statements: 5,
+        },
       },
     },
   }
