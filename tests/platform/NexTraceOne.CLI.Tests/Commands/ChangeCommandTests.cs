@@ -145,6 +145,81 @@ public sealed class ChangeCommandTests
         result.GetProperty("items").GetArrayLength().Should().Be(1);
         result.GetProperty("totalCount").GetInt32().Should().Be(1);
     }
+
+    // ── PROMOTE subcommand ───────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ChangePromote_WhenApiReturnsCreated_ResponseContainsRequestId()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            promotionRequestId = Guid.NewGuid().ToString(),
+            status = "Pending"
+        });
+
+        using var handler = new FakeHttpMessageHandler(HttpStatusCode.Created, json);
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("http://nex.test") };
+
+        var payload = new
+        {
+            releaseId = Guid.NewGuid().ToString(),
+            targetEnvironment = "production",
+            justification = "Approved by change board",
+            requestedBy = "engineer@company.com",
+            source = "cli"
+        };
+
+        var response = await client.PostAsync(
+            "/api/v1/promotion/requests",
+            new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"),
+            CancellationToken.None);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var body = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<JsonElement>(body);
+        result.GetProperty("status").GetString().Should().Be("Pending");
+    }
+
+    [Fact]
+    public async Task ChangePromote_PayloadContainsTargetEnvironment()
+    {
+        var capturedBody = string.Empty;
+        var json = JsonSerializer.Serialize(new { promotionRequestId = Guid.NewGuid(), status = "Pending" });
+
+        using var handler = new ChangeCapturingHandler(HttpStatusCode.Created, json, body => capturedBody = body);
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("http://nex.test") };
+
+        var payload = new
+        {
+            releaseId = "abc-123",
+            targetEnvironment = "staging",
+            justification = "Feature ready",
+            requestedBy = "tech-lead",
+            source = "cli"
+        };
+
+        await client.PostAsync(
+            "/api/v1/promotion/requests",
+            new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"),
+            CancellationToken.None);
+
+        capturedBody.Should().Contain("staging");
+        capturedBody.Should().Contain("abc-123");
+    }
+
+    [Fact]
+    public async Task ChangePromote_WhenApiReturns400_ReturnsError()
+    {
+        using var handler = new FakeHttpMessageHandler(HttpStatusCode.BadRequest, "{\"error\":\"Release not found\"}");
+        using var client = new HttpClient(handler) { BaseAddress = new Uri("http://nex.test") };
+
+        var response = await client.PostAsync(
+            "/api/v1/promotion/requests",
+            new StringContent("{\"releaseId\":\"missing\"}", Encoding.UTF8, "application/json"),
+            CancellationToken.None);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
 }
 
 /// <summary>HttpMessageHandler de captura para ChangeCommand tests.</summary>

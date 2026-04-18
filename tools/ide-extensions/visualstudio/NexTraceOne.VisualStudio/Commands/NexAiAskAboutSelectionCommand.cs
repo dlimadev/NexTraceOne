@@ -66,13 +66,28 @@ internal sealed class NexAiAskAboutSelectionCommand
 
             if (window is NexAiChatWindow chatWindow)
             {
-                var query = $"Analyse and explain this code in the context of NexTraceOne services and contracts:\n\n{selectedText}";
+                var projectContext = GetActiveProjectName();
+                var projectPrefix = projectContext is { Length: > 0 }
+                    ? $"[Project: {projectContext}] "
+                    : string.Empty;
+                var query = $"{projectPrefix}Analyse and explain this code in the context of NexTraceOne services and contracts:\n\n{selectedText}";
                 chatWindow.SendQuery(query);
             }
 
             if (window?.Frame is IVsWindowFrame windowFrame)
                 Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         });
+    }
+
+    private static string? GetActiveProjectName()
+    {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        try
+        {
+            var dte = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+            return dte?.ActiveDocument?.ProjectItem?.ContainingProject?.Name;
+        }
+        catch { return null; }
     }
 
     private static string? GetSelectedText()

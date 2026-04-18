@@ -31,6 +31,7 @@ public static class ContractCommand
     public static Command Create()
     {
         var command = new Command("contract", "Contract compliance verification commands.");
+        command.Add(CreateListCommand());
         command.Add(CreateVerifyCommand());
         command.Add(CreateDiffCommand());
         command.Add(CreateChangelogCommand());
@@ -722,6 +723,182 @@ public static class ContractCommand
 
         [JsonPropertyName("createdAt")]
         public DateTimeOffset? CreatedAt { get; init; }
+    }
+
+    // === Changelog renderer ===
+
+    private static Command CreateListCommand()
+    {
+        var urlOpt = CreateUrlOption();
+        var tokenOpt = CreateTokenOption();
+        var formatOpt = CreateFormatOption();
+        var protocolOpt = new Option<string>("--protocol", "Filter by protocol: REST, SOAP, Kafka, AsyncAPI.");
+        var stateOpt = new Option<string>("--state", "Filter by lifecycle state: Active, Deprecated, Draft.");
+        var searchOpt = new Option<string>("--search", "Free-text search term.");
+        var pageOpt = new Option<int>("--page") { DefaultValueFactory = _ => 1, Description = "Page number (default: 1)." };
+        var pageSizeOpt = new Option<int>("--page-size") { DefaultValueFactory = _ => 20, Description = "Results per page (default: 20)." };
+
+        var command = new Command("list", "List contracts registered in NexTraceOne.");
+        command.Add(urlOpt);
+        command.Add(tokenOpt);
+        command.Add(formatOpt);
+        command.Add(protocolOpt);
+        command.Add(stateOpt);
+        command.Add(searchOpt);
+        command.Add(pageOpt);
+        command.Add(pageSizeOpt);
+
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var url = Services.CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
+            var token = Services.CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
+            var format = parseResult.GetValue(formatOpt) ?? "text";
+            var protocol = parseResult.GetValue(protocolOpt);
+            var state = parseResult.GetValue(stateOpt);
+            var search = parseResult.GetValue(searchOpt);
+            var page = parseResult.GetValue(pageOpt);
+            var pageSize = parseResult.GetValue(pageSizeOpt);
+
+            return await ListContractsAsync(url, token, format, protocol, state, search, page, pageSize, cancellationToken).ConfigureAwait(false);
+        });
+
+        return command;
+    }
+
+    private static async Task<int> ListContractsAsync(
+        string apiUrl, string? token, string format,
+        string? protocol, string? lifecycleState, string? searchTerm,
+        int page, int pageSize, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var client = CreateHttpClient(apiUrl, token);
+
+            var queryParts = new List<string>
+            {
+                $"page={page}",
+                $"pageSize={pageSize}"
+            };
+            if (!string.IsNullOrWhiteSpace(protocol)) queryParts.Add($"protocol={Uri.EscapeDataString(protocol)}");
+            if (!string.IsNullOrWhiteSpace(lifecycleState)) queryParts.Add($"lifecycleState={Uri.EscapeDataString(lifecycleState)}");
+            if (!string.IsNullOrWhiteSpace(searchTerm)) queryParts.Add($"searchTerm={Uri.EscapeDataString(searchTerm)}");
+
+            var query = string.Join("&", queryParts);
+            var response = await client.GetAsync($"/api/v1/contracts/list?{query}", cancellationToken).ConfigureAwait(false);
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                AnsiConsole.MarkupLine($"[red]Error:[/] API returned {(int)response.StatusCode}: [yellow]{body.EscapeMarkup()}[/]");
+                return ExitError;
+            }
+
+            if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    var el = JsonSerializer.Deserialize<JsonElement>(body, JsonReadOptions);
+                    Console.WriteLine(JsonSerializer.Serialize(el, JsonPrintOptions));
+                }
+                catch { Console.WriteLine(body); }
+                return ExitSuccess;
+            }
+
+            ContractListResponse? result = null;
+            try { result = JsonSerializer.Deserialize<ContractListResponse>(body, JsonReadOptions); }
+            catch { /* fallback */ }
+
+            if (result is null || result.Items.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[yellow]No contracts found.[/]");
+                return ExitSuccess;
+            }
+
+            var table = new Table()
+                .Border(TableBorder.Rounded)
+                .Title("[bold cyan]Contracts[/]")
+                .AddColumn("[bold]Name[/]")
+                .AddColumn("[bold]Protocol[/]")
+                .AddColumn("[bold]Version[/]")
+                .AddColumn("[bold]Service[/]")
+                .AddColumn("[bold]State[/]")
+                .AddColumn("[bold]Updated[/]");
+
+            foreach (var item in result.Items)
+            {
+                var stateColor = item.LifecycleState?.ToLowerInvariant() switch
+                {
+                    "active" => "green",
+                    "deprecated" => "yellow",
+                    "draft" => "blue",
+                    _ => "grey"
+                };
+                var protocolColor = item.Protocol?.ToLowerInvariant() switch
+                {
+                    "rest" => "cyan",
+                    "kafka" or "asyncapi" => "magenta",
+                    "soap" => "yellow",
+                    _ => "grey"
+                };
+
+                table.AddRow(
+                    (item.Name ?? "-").EscapeMarkup(),
+                    $"[{protocolColor}]{(item.Protocol ?? "-").EscapeMarkup()}[/{protocolColor}]",
+                    (item.SemVer ?? "-").EscapeMarkup(),
+                    (item.ServiceName ?? "-").EscapeMarkup(),
+                    $"[{stateColor}]{(item.LifecycleState ?? "-").EscapeMarkup()}[/{stateColor}]",
+                    item.UpdatedAt?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) ?? "-");
+            }
+
+            AnsiConsole.Write(table);
+            AnsiConsole.MarkupLine($"\n[grey]Page {page} — Showing {result.Items.Count} of {result.TotalCount} contract(s)[/]");
+            return ExitSuccess;
+        }
+        catch (UriFormatException)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] Invalid API URL: [yellow]{apiUrl.EscapeMarkup()}[/]");
+            return ExitError;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] Cannot connect to NexTraceOne API: [yellow]{ex.Message.EscapeMarkup()}[/]");
+            return ExitError;
+        }
+        catch (TaskCanceledException)
+        {
+            AnsiConsole.MarkupLine("[red]Error:[/] Request timed out.");
+            return ExitError;
+        }
+    }
+
+    private sealed class ContractListResponse
+    {
+        [JsonPropertyName("items")]
+        public IReadOnlyList<ContractListItem> Items { get; init; } = [];
+
+        [JsonPropertyName("totalCount")]
+        public int TotalCount { get; init; }
+    }
+
+    private sealed class ContractListItem
+    {
+        [JsonPropertyName("name")]
+        public string? Name { get; init; }
+
+        [JsonPropertyName("protocol")]
+        public string? Protocol { get; init; }
+
+        [JsonPropertyName("semVer")]
+        public string? SemVer { get; init; }
+
+        [JsonPropertyName("serviceName")]
+        public string? ServiceName { get; init; }
+
+        [JsonPropertyName("lifecycleState")]
+        public string? LifecycleState { get; init; }
+
+        [JsonPropertyName("updatedAt")]
+        public DateTimeOffset? UpdatedAt { get; init; }
     }
 
     // === Changelog renderer ===

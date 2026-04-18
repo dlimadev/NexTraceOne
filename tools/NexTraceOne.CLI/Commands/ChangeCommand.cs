@@ -34,6 +34,7 @@ public static class ChangeCommand
         command.Add(CreateReportCommand());
         command.Add(CreateBlastRadiusCommand());
         command.Add(CreateListCommand());
+        command.Add(CreatePromoteCommand());
         return command;
     }
 
@@ -423,6 +424,115 @@ public static class ChangeCommand
     }
 
     // ── HTTP helper ────────────────────────────────────────────────────────────
+
+    private static Command CreatePromoteCommand()
+    {
+        var releaseIdOpt = new Option<string>("--release-id", "The release/change ID (UUID) to promote.") { Required = true };
+        var targetEnvOpt = new Option<string>("--target-environment", "Target environment to promote to (e.g., staging, production).") { Required = true };
+        var justificationOpt = new Option<string>("--justification", "Justification/notes for the promotion.");
+        var requestedByOpt = new Option<string>("--requested-by", "Identity of the requester (defaults to current user).");
+        var urlOpt = CreateUrlOption();
+        var tokenOpt = CreateTokenOption();
+        var formatOpt = CreateFormatOption();
+
+        var command = new Command("promote", "Create a promotion request to move a release to the next environment.");
+        command.Add(releaseIdOpt);
+        command.Add(targetEnvOpt);
+        command.Add(justificationOpt);
+        command.Add(requestedByOpt);
+        command.Add(urlOpt);
+        command.Add(tokenOpt);
+        command.Add(formatOpt);
+
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var releaseId = parseResult.GetValue(releaseIdOpt)!;
+            var targetEnv = parseResult.GetValue(targetEnvOpt)!;
+            var justification = parseResult.GetValue(justificationOpt);
+            var requestedBy = parseResult.GetValue(requestedByOpt) ?? System.Environment.UserName;
+            var url = CliConfig.ResolveUrl(parseResult.GetValue(urlOpt));
+            var token = CliConfig.ResolveToken(parseResult.GetValue(tokenOpt));
+            var format = parseResult.GetValue(formatOpt) ?? "text";
+
+            return await PromoteReleaseAsync(releaseId, targetEnv, justification, requestedBy, url, token, format, cancellationToken).ConfigureAwait(false);
+        });
+
+        return command;
+    }
+
+    private static async Task<int> PromoteReleaseAsync(
+        string releaseId, string targetEnvironment,
+        string? justification, string requestedBy,
+        string url, string? token, string format,
+        CancellationToken cancellationToken)
+    {
+        var payload = new
+        {
+            releaseId,
+            targetEnvironment,
+            justification,
+            requestedBy,
+            source = "cli"
+        };
+
+        try
+        {
+            using var client = CreateHttpClient(url, token);
+            var response = await client.PostAsJsonAsync(
+                "/api/v1/promotion/requests", payload, cancellationToken).ConfigureAwait(false);
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                AnsiConsole.MarkupLine($"[red]Error:[/] API returned {(int)response.StatusCode}: [yellow]{body.EscapeMarkup()}[/]");
+                return ExitError;
+            }
+
+            if (string.Equals(format, "json", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    var element = JsonSerializer.Deserialize<JsonElement>(body, JsonReadOptions);
+                    Console.WriteLine(JsonSerializer.Serialize(element, JsonPrintOptions));
+                }
+                catch { Console.WriteLine(body); }
+                return ExitSuccess;
+            }
+
+            PromotionResponse? result = null;
+            try { result = JsonSerializer.Deserialize<PromotionResponse>(body, JsonReadOptions); }
+            catch { /* fallback */ }
+
+            AnsiConsole.MarkupLine($"[green]✓[/] Promotion request created for release [bold]{releaseId.EscapeMarkup()}[/] → [yellow]{targetEnvironment.EscapeMarkup()}[/]");
+
+            if (result?.PromotionRequestId is not null)
+                AnsiConsole.MarkupLine($"  [dim]Request ID:[/] {result.PromotionRequestId.EscapeMarkup()}");
+            if (!string.IsNullOrWhiteSpace(result?.Status))
+                AnsiConsole.MarkupLine($"  [dim]Status:[/] {result.Status.EscapeMarkup()}");
+
+            AnsiConsole.WriteLine();
+            return ExitSuccess;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Error:[/] Cannot connect to NexTraceOne API: [yellow]{ex.Message.EscapeMarkup()}[/]");
+            return ExitError;
+        }
+        catch (TaskCanceledException)
+        {
+            AnsiConsole.MarkupLine("[red]Error:[/] Request timed out.");
+            return ExitError;
+        }
+    }
+
+    private sealed class PromotionResponse
+    {
+        [JsonPropertyName("promotionRequestId")]
+        public string? PromotionRequestId { get; init; }
+
+        [JsonPropertyName("status")]
+        public string? Status { get; init; }
+    }
 
     private static HttpClient CreateHttpClient(string baseUrl, string? token)
     {

@@ -13,7 +13,8 @@ namespace NexTraceOne.VisualStudio.ToolWindows;
 
 /// <summary>
 /// Controlo WPF do chat AI do NexTraceOne.
-/// Interface minimalista com histórico de mensagens, caixa de input e botão de envio.
+/// Interface minimalista com histórico de mensagens, caixa de input, botão de envio,
+/// botão de limpar histórico e cópia de mensagens do assistente.
 /// </summary>
 public sealed partial class NexAiChatControl : UserControl
 {
@@ -43,9 +44,45 @@ public sealed partial class NexAiChatControl : UserControl
 
     private void InitializeComponent()
     {
-        var grid = new Grid();
-        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        var rootGrid = new Grid();
+        rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+        // Header with title and Clear button
+        var headerPanel = new DockPanel
+        {
+            Background = new SolidColorBrush(Color.FromRgb(30, 30, 30)),
+            Margin = new Thickness(0, 0, 0, 0)
+        };
+        var clearBtn = new Button
+        {
+            Content = "Clear",
+            Width = 50,
+            Height = 22,
+            FontSize = 10,
+            Margin = new Thickness(4),
+            Background = new SolidColorBrush(Color.FromRgb(60, 60, 60)),
+            Foreground = Brushes.LightGray,
+            BorderThickness = new Thickness(0),
+            Cursor = System.Windows.Input.Cursors.Hand
+        };
+        clearBtn.Click += OnClearClick;
+        DockPanel.SetDock(clearBtn, Dock.Right);
+        headerPanel.Children.Add(clearBtn);
+
+        var titleLabel = new TextBlock
+        {
+            Text = "🚀 NexTraceOne AI",
+            FontWeight = FontWeights.SemiBold,
+            FontSize = 11,
+            Foreground = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(8, 4, 0, 4)
+        };
+        headerPanel.Children.Add(titleLabel);
+        Grid.SetRow(headerPanel, 0);
+        rootGrid.Children.Add(headerPanel);
 
         // Messages area
         var scrollViewer = new ScrollViewer
@@ -55,8 +92,8 @@ public sealed partial class NexAiChatControl : UserControl
         };
         MessagesPanel = new StackPanel { Margin = new Thickness(8) };
         scrollViewer.Content = MessagesPanel;
-        Grid.SetRow(scrollViewer, 0);
-        grid.Children.Add(scrollViewer);
+        Grid.SetRow(scrollViewer, 1);
+        rootGrid.Children.Add(scrollViewer);
 
         // Input area
         var inputPanel = new DockPanel { Margin = new Thickness(8, 4, 8, 8) };
@@ -79,16 +116,22 @@ public sealed partial class NexAiChatControl : UserControl
         InputBox.KeyDown += OnInputKeyDown;
         inputPanel.Children.Add(InputBox);
 
-        Grid.SetRow(inputPanel, 1);
-        grid.Children.Add(inputPanel);
+        Grid.SetRow(inputPanel, 2);
+        rootGrid.Children.Add(inputPanel);
 
-        Content = grid;
+        Content = rootGrid;
 
         AppendSystemMessage("NexTraceOne AI Chat ready. Ask about services, contracts or changes.");
     }
 
     private StackPanel MessagesPanel { get; set; } = null!;
     private TextBox InputBox { get; set; } = null!;
+
+    private void OnClearClick(object sender, RoutedEventArgs e)
+    {
+        MessagesPanel.Children.Clear();
+        AppendSystemMessage("Conversation cleared.");
+    }
 
     private void OnSendClick(object sender, RoutedEventArgs e)
     {
@@ -126,9 +169,12 @@ public sealed partial class NexAiChatControl : UserControl
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
 
+        // Capture solution/project context on the UI thread before async operation
+        var solutionContext = GetSolutionContext();
+
         try
         {
-            var response = await CallIdeQueryApiAsync(options, query, _cts.Token);
+            var response = await CallIdeQueryApiAsync(options, query, solutionContext, _cts.Token);
             RemoveLastSystemMessage();
             AppendAssistantMessage(response);
         }
@@ -143,16 +189,36 @@ public sealed partial class NexAiChatControl : UserControl
         }
     }
 
+    private static string? GetSolutionContext()
+    {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        try
+        {
+            var dte = Package.GetGlobalService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+            if (dte?.Solution is { FullName.Length: > 0 } solution)
+            {
+                var solutionName = System.IO.Path.GetFileNameWithoutExtension(solution.FullName);
+                var activeProjectName = dte.ActiveDocument?.ProjectItem?.ContainingProject?.Name;
+                return activeProjectName is { Length: > 0 }
+                    ? $"{solutionName}/{activeProjectName}"
+                    : solutionName;
+            }
+        }
+        catch { /* solution context is best-effort */ }
+        return null;
+    }
+
     private async Task<string> CallIdeQueryApiAsync(
-        NexOptions options, string query, CancellationToken cancellationToken)
+        NexOptions options, string query, string? solutionContext, CancellationToken cancellationToken)
     {
         var payload = JsonSerializer.Serialize(new
         {
             queryText = query,
             clientType = "visualstudio",
-            clientVersion = "0.1.0",
+            clientVersion = "0.2.0",
             queryType = "GeneralQuery",
-            persona = options.Persona
+            persona = options.Persona,
+            context = solutionContext
         });
 
         using var request = new HttpRequestMessage(
@@ -203,10 +269,14 @@ public sealed partial class NexAiChatControl : UserControl
 
     private void AppendAssistantMessage(string text)
     {
+        // Container with message + copy button
+        var container = new Grid { Margin = new Thickness(0, 4, 0, 4) };
+        container.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        container.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
         var tb = new TextBlock
         {
             Text = text,
-            Margin = new Thickness(0, 4, 0, 4),
             Padding = new Thickness(8),
             Background = new SolidColorBrush(Color.FromRgb(43, 43, 43)),
             Foreground = Brushes.WhiteSmoke,
@@ -214,7 +284,46 @@ public sealed partial class NexAiChatControl : UserControl
             HorizontalAlignment = HorizontalAlignment.Left,
             MaxWidth = 440
         };
-        MessagesPanel.Children.Add(tb);
+        Grid.SetColumn(tb, 0);
+        container.Children.Add(tb);
+
+        var copyBtn = new Button
+        {
+            Content = "Copy",
+            Width = 40,
+            Height = 18,
+            FontSize = 9,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(4, 0, 0, 0),
+            Background = new SolidColorBrush(Color.FromRgb(60, 60, 60)),
+            Foreground = Brushes.LightGray,
+            BorderThickness = new Thickness(0),
+            Cursor = System.Windows.Input.Cursors.Hand,
+            ToolTip = "Copy to clipboard"
+        };
+
+        var capturedText = text;
+        var capturedBtn = copyBtn;
+        copyBtn.Click += (_, _) =>
+        {
+            Clipboard.SetText(capturedText);
+            capturedBtn.Content = "✓";
+            var timer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1.5)
+            };
+            timer.Tick += (_, _) =>
+            {
+                capturedBtn.Content = "Copy";
+                timer.Stop();
+            };
+            timer.Start();
+        };
+
+        Grid.SetColumn(copyBtn, 1);
+        container.Children.Add(copyBtn);
+
+        MessagesPanel.Children.Add(container);
         ScrollToBottom();
     }
 
@@ -263,3 +372,4 @@ public sealed partial class NexAiChatControl : UserControl
 
     private sealed record NexOptions(string ServerUrl, string ApiKey, string Persona);
 }
+

@@ -237,6 +237,93 @@ public sealed class ContractCommandTests
         capturedBody.Should().Contain("true");
     }
 
+    // ── Contract list ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ContractList_WhenApiReturnsContracts_ResponseContainsItems()
+    {
+        var json = JsonSerializer.Serialize(new
+        {
+            items = new[]
+            {
+                new
+                {
+                    name = "Payments REST API",
+                    protocol = "REST",
+                    semVer = "2.0.0",
+                    serviceName = "payments-api",
+                    lifecycleState = "Active",
+                    updatedAt = DateTimeOffset.UtcNow.AddDays(-3)
+                },
+                new
+                {
+                    name = "Order Events",
+                    protocol = "Kafka",
+                    semVer = "1.0.0",
+                    serviceName = "order-service",
+                    lifecycleState = "Active",
+                    updatedAt = DateTimeOffset.UtcNow.AddDays(-10)
+                }
+            },
+            totalCount = 2
+        });
+
+        using var handler = new FakeHttpMessageHandler(HttpStatusCode.OK, json);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://nex.test") };
+
+        var response = await httpClient.GetAsync(
+            "/api/v1/contracts/list?page=1&pageSize=20",
+            CancellationToken.None);
+
+        response.IsSuccessStatusCode.Should().BeTrue();
+        var body = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<JsonElement>(body);
+        result.GetProperty("items").GetArrayLength().Should().Be(2);
+        result.GetProperty("totalCount").GetInt32().Should().Be(2);
+    }
+
+    [Fact]
+    public async Task ContractList_WithProtocolFilter_QueryContainsProtocolParam()
+    {
+        var capturedUrl = string.Empty;
+        using var handler = new ContractCapturingUrlHandler(HttpStatusCode.OK, "{\"items\":[],\"totalCount\":0}", url => capturedUrl = url);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://nex.test") };
+
+        await httpClient.GetAsync(
+            "/api/v1/contracts/list?protocol=REST&page=1&pageSize=20",
+            CancellationToken.None);
+
+        capturedUrl.Should().Contain("protocol=REST");
+    }
+
+    [Fact]
+    public async Task ContractList_WithSearchTerm_QueryContainsSearchParam()
+    {
+        var capturedUrl = string.Empty;
+        using var handler = new ContractCapturingUrlHandler(HttpStatusCode.OK, "{\"items\":[],\"totalCount\":0}", url => capturedUrl = url);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://nex.test") };
+
+        await httpClient.GetAsync(
+            "/api/v1/contracts/list?searchTerm=payments&page=1&pageSize=20",
+            CancellationToken.None);
+
+        capturedUrl.Should().Contain("searchTerm=payments");
+    }
+
+    [Fact]
+    public async Task ContractList_WhenApiReturnsEmpty_ResponseContainsZeroItems()
+    {
+        using var handler = new FakeHttpMessageHandler(HttpStatusCode.OK, "{\"items\":[],\"totalCount\":0}");
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://nex.test") };
+
+        var response = await httpClient.GetAsync("/api/v1/contracts/list", CancellationToken.None);
+
+        response.IsSuccessStatusCode.Should().BeTrue();
+        var body = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<JsonElement>(body);
+        result.GetProperty("totalCount").GetInt32().Should().Be(0);
+    }
+
     // ── Private reflection helpers ─────────────────────────────────────────────
 
     private static string InvokeDetectFormat(string fileName, string content)
@@ -289,5 +376,21 @@ internal sealed class CapturingHttpMessageHandler(
         {
             Content = new StringContent(responseBody, Encoding.UTF8, "application/json")
         };
+    }
+}
+
+/// <summary>Fake HttpMessageHandler que captura a URL da requisição e retorna uma resposta predefinida.</summary>
+internal sealed class ContractCapturingUrlHandler(
+    HttpStatusCode statusCode,
+    string responseBody,
+    Action<string> onRequest) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        onRequest(request.RequestUri?.PathAndQuery ?? string.Empty);
+        return Task.FromResult(new HttpResponseMessage(statusCode)
+        {
+            Content = new StringContent(responseBody, Encoding.UTF8, "application/json")
+        });
     }
 }

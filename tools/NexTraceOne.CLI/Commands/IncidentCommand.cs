@@ -284,7 +284,7 @@ public static class IncidentCommand
             void AddRow(string label, string? value) =>
                 grid.AddRow(new Markup($"[bold]{label.EscapeMarkup()}:[/]"), new Markup((value ?? "-").EscapeMarkup()));
 
-            AddRow("ID", incident.IncidentId.ToString());
+            AddRow("ID", incident.IncidentId.ToString("D"));
             AddRow("Title", incident.Title);
             AddRow("Service", incident.ServiceName);
             AddRow("Severity", incident.Severity);
@@ -296,7 +296,7 @@ public static class IncidentCommand
             if (incident.ResolvedAt.HasValue)
                 AddRow("Resolved At", incident.ResolvedAt.Value.ToString("yyyy-MM-dd HH:mm:ss 'UTC'", System.Globalization.CultureInfo.InvariantCulture));
             if (incident.CorrelatedChangesCount > 0)
-                AddRow("Correlated Changes", incident.CorrelatedChangesCount.ToString());
+                AddRow("Correlated Changes", incident.CorrelatedChangesCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
 
             var panel = new Panel(grid)
                 .Header($"[bold cyan]Incident: [{sevColor}]{(incident.Severity ?? "").EscapeMarkup()}[/{sevColor}] — [{statusColor}]{(incident.Status ?? "").EscapeMarkup()}[/{statusColor}][/]")

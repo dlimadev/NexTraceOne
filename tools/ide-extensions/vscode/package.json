@@ -2,7 +2,7 @@
   "name": "nextraceone-copilot",
   "displayName": "NexTraceOne Copilot",
   "description": "AI-assisted operations, contract governance and change intelligence for NexTraceOne — Copilot Chat-like experience",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "nextraceone",
   "engines": { "vscode": "^1.90.0" },
   "categories": ["Other", "AI"],
@@ -15,6 +15,7 @@
       { "command": "nextraceone.inspectService", "title": "NexTraceOne: Inspect Service Context" },
       { "command": "nextraceone.askAboutSelection", "title": "NexTraceOne: Ask AI about this" },
       { "command": "nextraceone.mcpConfigure", "title": "NexTraceOne: Configure MCP Server" },
+      { "command": "nextraceone.openDashboard", "title": "NexTraceOne: Open Dashboard" },
       { "command": "nextraceone.openChatPanel", "title": "NexTraceOne: Open AI Chat Panel" }
     ],
     "menus": {
@@ -65,7 +66,9 @@
           { "name": "service", "description": "Lookup a service in the catalog" },
           { "name": "change", "description": "Check recent changes for a service" },
           { "name": "contract", "description": "Query contract information" },
-          { "name": "incident", "description": "Get incident context and runbooks" }
+          { "name": "incident", "description": "Get incident context and runbooks" },
+          { "name": "report", "description": "Get DORA metrics or changes summary report" },
+          { "name": "blast-radius", "description": "Analyse the blast radius of a change" }
         ]
       }
     ],

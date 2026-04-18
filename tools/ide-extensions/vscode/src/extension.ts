@@ -32,6 +32,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('nextraceone.inspectService', handleInspectServiceCommand),
     vscode.commands.registerCommand('nextraceone.askAboutSelection', handleAskAboutSelectionCommand),
     vscode.commands.registerCommand('nextraceone.mcpConfigure', handleMcpConfigureCommand),
+    vscode.commands.registerCommand('nextraceone.openDashboard', handleOpenDashboardCommand),
     vscode.commands.registerCommand('nextraceone.openChatPanel', () =>
       vscode.commands.executeCommand('nextraceone.chatView.focus')),
   );
@@ -222,7 +223,18 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
       padding: 8px 12px; max-width: 92%;
       font-size: 12px; line-height: 1.5;
       white-space: pre-wrap;
+      position: relative;
     }
+    .copy-btn {
+      position: absolute; top: 4px; right: 4px;
+      background: var(--vscode-button-secondaryBackground, rgba(128,128,128,0.15));
+      color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+      border: none; border-radius: 3px;
+      padding: 1px 6px; font-size: 10px; cursor: pointer;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .message.assistant:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { background: var(--vscode-button-secondaryHoverBackground, rgba(128,128,128,0.3)); }
     .message.system {
       align-self: center; text-align: center;
       color: var(--vscode-descriptionForeground);
@@ -288,7 +300,7 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
     <div class="dot"></div>
     <div class="dot"></div>
   </div>
-  <div class="slash-hint">Tip: use /service, /change, /contract, /incident</div>
+  <div class="slash-hint">Tip: use /service, /change, /contract, /incident, /report, /blast-radius</div>
   <div id="input-area">
     <textarea id="input" rows="1" placeholder="Ask NexTraceOne AI…"></textarea>
     <button id="send-btn">Send</button>
@@ -305,7 +317,28 @@ class NexChatViewProvider implements vscode.WebviewViewProvider {
     function appendMessage(msg) {
       const div = document.createElement('div');
       div.className = 'message ' + msg.role;
-      div.textContent = msg.content;
+
+      const contentSpan = document.createElement('span');
+      contentSpan.textContent = msg.content;
+      div.appendChild(contentSpan);
+
+      // Copy button for assistant messages
+      if (msg.role === 'assistant') {
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.title = 'Copy to clipboard';
+        copyBtn.textContent = 'Copy';
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(msg.content).then(() => {
+            copyBtn.textContent = '✓ Copied';
+            setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
+          }).catch(() => {
+            copyBtn.textContent = 'Copy';
+          });
+        });
+        div.appendChild(copyBtn);
+      }
+
       const timeEl = document.createElement('div');
       timeEl.className = 'message-time';
       timeEl.textContent = new Date(msg.timestamp).toLocaleTimeString();
@@ -425,6 +458,14 @@ function registerChatParticipant(context: vscode.ExtensionContext): void {
           case 'incident':
             queryType = 'GeneralQuery';
             prefix = `[Incident context] `;
+            break;
+          case 'report':
+            queryType = 'GeneralQuery';
+            prefix = `[DORA/report query] `;
+            break;
+          case 'blast-radius':
+            queryType = 'BreakingChangeAlert';
+            prefix = `[Blast radius analysis] `;
             break;
         }
 
@@ -617,6 +658,17 @@ async function handleMcpConfigureCommand(): Promise<void> {
   const config = getConfig();
   const mcpServerUrl = config.serverUrl.replace(/\/$/, '') + '/api/v1/ai/mcp';
 
+  // Ask user whether to configure globally (~/.vscode/mcp.json) or at workspace level (.vscode/mcp.json)
+  const scope = await vscode.window.showQuickPick(
+    [
+      { label: '$(home) Global', description: 'Write to ~/.vscode/mcp.json (all workspaces)', value: 'global' },
+      { label: '$(folder) Workspace', description: 'Write to .vscode/mcp.json in current workspace', value: 'workspace' },
+    ],
+    { placeHolder: 'Choose MCP configuration scope', title: 'NexTraceOne MCP Configuration' },
+  );
+
+  if (!scope) return;
+
   const mcpConfig = {
     servers: {
       nextraceone: {
@@ -627,20 +679,34 @@ async function handleMcpConfigureCommand(): Promise<void> {
     },
   };
 
-  const vscodeDir = path.join(os.homedir(), '.vscode');
-  const mcpConfigPath = path.join(vscodeDir, 'mcp.json');
+  let mcpConfigPath: string;
+
+  if (scope.value === 'workspace') {
+    const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!workspaceRoot) {
+      await vscode.window.showWarningMessage('NexTraceOne: No workspace folder open. Using global configuration.');
+      const vscodeDir = path.join(os.homedir(), '.vscode');
+      mcpConfigPath = path.join(vscodeDir, 'mcp.json');
+    } else {
+      mcpConfigPath = path.join(workspaceRoot, '.vscode', 'mcp.json');
+    }
+  } else {
+    const vscodeDir = path.join(os.homedir(), '.vscode');
+    mcpConfigPath = path.join(vscodeDir, 'mcp.json');
+  }
 
   try {
-    if (!fs.existsSync(vscodeDir)) {
-      fs.mkdirSync(vscodeDir, { recursive: true });
+    const dir = path.dirname(mcpConfigPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
     }
     fs.writeFileSync(mcpConfigPath, JSON.stringify(mcpConfig, null, 2), 'utf-8');
     await vscode.window.showInformationMessage(
       `✓ MCP config written to ${mcpConfigPath}. Restart VS Code to apply.`,
       'Open File',
-    ).then(async (action) => {
+    ).then(async (action: string | undefined) => {
       if (action === 'Open File') {
-        await vscode.workspace.openTextDocument(mcpConfigPath).then(doc =>
+        await vscode.workspace.openTextDocument(mcpConfigPath).then((doc: vscode.TextDocument) =>
           vscode.window.showTextDocument(doc));
       }
     });
@@ -649,6 +715,20 @@ async function handleMcpConfigureCommand(): Promise<void> {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     await vscode.window.showErrorMessage(`NexTraceOne: Failed to write MCP config: ${message}`);
+  }
+}
+
+/** Handles "NexTraceOne: Open Dashboard" command — opens the web UI in the default browser. */
+async function handleOpenDashboardCommand(): Promise<void> {
+  const config = getConfig();
+  const dashboardUrl = config.serverUrl.replace(/\/$/, '');
+
+  try {
+    await vscode.env.openExternal(vscode.Uri.parse(dashboardUrl));
+    outputChannel.appendLine(`Opened NexTraceOne dashboard: ${dashboardUrl}`);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    await vscode.window.showErrorMessage(`NexTraceOne: Failed to open dashboard: ${message}`);
   }
 }
 
