@@ -3409,7 +3409,53 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "toggle",
             sortOrder: 5370),
 
-        // ── Block E — Anomaly, Waste & Financial Recommendations ───────
+        // ── Block E2 — Release Budget Gate ─────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.enabled",
+            displayName: "config.finops.release.budget_gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.finops.release.budget_gate.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 5380),
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.block_on_exceed",
+            displayName: "config.finops.release.budget_gate.block_on_exceed.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.finops.release.budget_gate.block_on_exceed.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5382),
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.require_approval",
+            displayName: "config.finops.release.budget_gate.require_approval.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.finops.release.budget_gate.require_approval.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5384),
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.approvers",
+            displayName: "config.finops.release.budget_gate.approvers.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.release.budget_gate.approvers.description",
+            defaultValue: "[]",
+            uiEditorType: "json-editor",
+            sortOrder: 5386),
+
+        // ── Block F — Anomaly, Waste & Financial Recommendations ───────
 
         ConfigurationDefinition.Create(
             key: "finops.anomaly.detection_enabled",

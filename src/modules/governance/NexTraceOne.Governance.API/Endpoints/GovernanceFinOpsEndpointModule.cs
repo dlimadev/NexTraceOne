@@ -13,6 +13,11 @@ using GetDomainFinOpsFeature = NexTraceOne.Governance.Application.Features.GetDo
 using GetWasteSignalsFeature = NexTraceOne.Governance.Application.Features.GetWasteSignals.GetWasteSignals;
 using GetEfficiencyIndicatorsFeature = NexTraceOne.Governance.Application.Features.GetEfficiencyIndicators.GetEfficiencyIndicators;
 using GetFinOpsTrendsFeature = NexTraceOne.Governance.Application.Features.GetFinOpsTrends.GetFinOpsTrends;
+using GetFinOpsConfigurationFeature = NexTraceOne.Governance.Application.Features.GetFinOpsConfiguration.GetFinOpsConfiguration;
+using EvaluateReleaseBudgetGateFeature = NexTraceOne.Governance.Application.Features.EvaluateReleaseBudgetGate.EvaluateReleaseBudgetGate;
+using CreateFinOpsBudgetApprovalFeature = NexTraceOne.Governance.Application.Features.CreateFinOpsBudgetApproval.CreateFinOpsBudgetApproval;
+using ResolveFinOpsBudgetApprovalFeature = NexTraceOne.Governance.Application.Features.ResolveFinOpsBudgetApproval.ResolveFinOpsBudgetApproval;
+using ListFinOpsBudgetApprovalsFeature = NexTraceOne.Governance.Application.Features.ListFinOpsBudgetApprovals.ListFinOpsBudgetApprovals;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -118,5 +123,64 @@ public sealed class GovernanceFinOpsEndpointModule
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:finops:read");
+
+        // ── Configuração FinOps (moeda, gate de orçamento, aprovadores) ──
+        group.MapGet("/configuration", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetFinOpsConfigurationFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:finops:read");
+
+        // ── Gate de orçamento por release ──
+        group.MapPost("/releases/evaluate-budget-gate", async (
+            EvaluateReleaseBudgetGateFeature.Query query,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:finops:read");
+
+        // ── Pedidos de aprovação de orçamento ──
+        group.MapGet("/budget-approvals", async (
+            string? status,
+            string? serviceName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ListFinOpsBudgetApprovalsFeature.Query(status, serviceName);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:finops:read");
+
+        group.MapPost("/budget-approvals", async (
+            CreateFinOpsBudgetApprovalFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:finops:write");
+
+        group.MapPut("/budget-approvals/{approvalId:guid}/resolve", async (
+            Guid approvalId,
+            ResolveApprovalRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ResolveFinOpsBudgetApprovalFeature.Command(
+                approvalId, body.Approved, body.ResolvedBy, body.Comment);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:finops:write");
     }
+
+    private sealed record ResolveApprovalRequest(bool Approved, string ResolvedBy, string? Comment);
 }

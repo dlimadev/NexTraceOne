@@ -78,6 +78,9 @@ public static class DependencyInjection
         // License Compliance Reports
         services.AddScoped<ILicenseComplianceReportRepository, LicenseComplianceReportRepository>();
 
+        // FinOps Budget Approvals
+        services.AddScoped<IFinOpsBudgetApprovalRepository, FinOpsBudgetApprovalRepository>();
+
         // Platform runtime providers — real data for P03.5 platform status handlers
         services.AddScoped<IPlatformQueueMetricsProvider, GovernanceOutboxQueueMetricsProvider>();
         services.AddScoped<IPlatformJobStatusProvider, KnownJobsStatusProvider>();
