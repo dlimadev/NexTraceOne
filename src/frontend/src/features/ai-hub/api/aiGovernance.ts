@@ -322,4 +322,13 @@ export const aiGovernanceApi = {
     preferredProvider?: string | null;
   }) =>
     client.post('/aiorchestration/analysis/promotion-readiness', data).then(r => r.data),
+
+  // ── MCP Server ────────────────────────────────────────────────────────
+  /** Retorna metadados do servidor MCP nativo: versão do protocolo, capacidades e tool count. */
+  getMcpServerInfo: () =>
+    client.get('/ai/mcp').then(r => r.data),
+
+  /** Lista todas as tools disponíveis no servidor MCP no formato JSON Schema. */
+  listMcpTools: (params?: { category?: string }) =>
+    client.get('/ai/mcp/tools', { params }).then(r => r.data),
 };

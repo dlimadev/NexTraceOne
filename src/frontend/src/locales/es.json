@@ -9112,7 +9112,8 @@
     "serviceMaturitySre": "Madurez de Servicio (SRE)",
     "aiAnomaly": "Anomalía IA",
     "aiIncidentSummarizer": "Resumidor IA de Incidentes",
-    "aiRunbookSuggester": "Sugeridor IA de Runbook"
+    "aiRunbookSuggester": "Sugeridor IA de Runbook",
+    "aiMcp": "Servidor MCP"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -12670,6 +12671,43 @@
       "reject": "Rechazar",
       "viewRunbook": "Ver Runbook",
       "createRunbook": "Crear Runbook"
+    }
+  },
+  "mcpServer": {
+    "title": "Servidor MCP",
+    "subtitle": "Servidor del Protocolo de Contexto de Modelo que expone las herramientas operativas del NexTraceOne a agentes externos y entornos de desarrollo",
+    "refresh": "Actualizar",
+    "errorTitle": "Error al cargar el servidor MCP",
+    "errorMessage": "No fue posible cargar la información del servidor MCP. Verifique que el módulo AI Runtime esté operativo.",
+    "stats": {
+      "protocolVersion": "Versión del Protocolo",
+      "serverVersion": "Versión del Servidor",
+      "toolCount": "Herramientas Disponibles",
+      "categories": "Categorías de Herramientas"
+    },
+    "serverInfo": {
+      "title": "Información del Servidor",
+      "name": "Nombre del Servidor",
+      "protocol": "Protocolo",
+      "capabilities": "Capacidades",
+      "capTools": "Herramientas"
+    },
+    "connection": {
+      "title": "Conexión",
+      "description": "Conecte cualquier cliente MCP compatible utilizando la URL del endpoint a continuación. Autentíquese con un bearer token con el permiso ai:runtime:read.",
+      "copyAriaLabel": "Copiar URL del endpoint",
+      "getDescription": "Devuelve metadatos y capacidades del servidor",
+      "postDescription": "JSON-RPC 2.0 — initialize, tools/list, tools/call",
+      "specLink": "Especificación MCP 2024-11-05"
+    },
+    "tools": {
+      "title": "Herramientas Disponibles ({{count}})",
+      "emptyTitle": "Sin herramientas registradas",
+      "emptyMessage": "No hay herramientas registradas en el servidor MCP. Inicialice las definiciones predeterminadas para poblar el catálogo.",
+      "requiredBadge": "{{count}} requeridos",
+      "noParams": "sin parámetros",
+      "required": "requerido",
+      "parameters": "Parámetros"
     }
   }
 }

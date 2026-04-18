@@ -9109,7 +9109,8 @@
     "serviceMaturitySre": "Maturidade de Serviço (SRE)",
     "aiAnomaly": "Anomalia IA",
     "aiIncidentSummarizer": "Sumarizador IA de Incidentes",
-    "aiRunbookSuggester": "Sugestor IA de Runbook"
+    "aiRunbookSuggester": "Sugestor IA de Runbook",
+    "aiMcp": "Servidor MCP"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -12668,6 +12669,43 @@
       "reject": "Rejeitar",
       "viewRunbook": "Ver Runbook",
       "createRunbook": "Criar Runbook"
+    }
+  },
+  "mcpServer": {
+    "title": "Servidor MCP",
+    "subtitle": "Servidor do Protocolo de Contexto de Modelo que expõe as tools operacionais do NexTraceOne a agentes externos e ambientes de desenvolvimento",
+    "refresh": "Atualizar",
+    "errorTitle": "Erro ao carregar servidor MCP",
+    "errorMessage": "Não foi possível carregar as informações do servidor MCP. Verifique se o módulo AI Runtime está operacional.",
+    "stats": {
+      "protocolVersion": "Versão do Protocolo",
+      "serverVersion": "Versão do Servidor",
+      "toolCount": "Tools Disponíveis",
+      "categories": "Categorias de Tools"
+    },
+    "serverInfo": {
+      "title": "Informação do Servidor",
+      "name": "Nome do Servidor",
+      "protocol": "Protocolo",
+      "capabilities": "Capacidades",
+      "capTools": "Tools"
+    },
+    "connection": {
+      "title": "Ligação",
+      "description": "Ligue qualquer cliente MCP compatível usando o URL do endpoint abaixo. Autentique com um bearer token com a permissão ai:runtime:read.",
+      "copyAriaLabel": "Copiar URL do endpoint",
+      "getDescription": "Retorna metadados e capacidades do servidor",
+      "postDescription": "JSON-RPC 2.0 — initialize, tools/list, tools/call",
+      "specLink": "Especificação MCP 2024-11-05"
+    },
+    "tools": {
+      "title": "Tools Disponíveis ({{count}})",
+      "emptyTitle": "Nenhuma tool registada",
+      "emptyMessage": "Não existem tools registadas no servidor MCP. Faça o seed das definições padrão para popular o catálogo.",
+      "requiredBadge": "{{count}} obrigatórios",
+      "noParams": "sem parâmetros",
+      "required": "obrigatório",
+      "parameters": "Parâmetros"
     }
   }
 }
