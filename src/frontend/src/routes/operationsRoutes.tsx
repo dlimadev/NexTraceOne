@@ -26,6 +26,21 @@ const TraceExplorerPage = lazy(() => import('../features/operations/pages/TraceE
 const LogExplorerPage = lazy(() => import('../features/operations/pages/LogExplorerPage').then(m => ({ default: m.LogExplorerPage })));
 const SreDashboardPage = lazy(() => import('../features/operations/pages/SreDashboardPage').then(m => ({ default: m.SreDashboardPage })));
 const RequestExplorerPage = lazy(() => import('../features/operations/pages/RequestExplorerPage').then(m => ({ default: m.RequestExplorerPage })));
+const ProfilingExplorerPage = lazy(() => import('../features/operations/pages/ProfilingExplorerPage').then(m => ({ default: m.ProfilingExplorerPage })));
+const ErrorTrackingPage = lazy(() => import('../features/operations/pages/ErrorTrackingPage').then(m => ({ default: m.ErrorTrackingPage })));
+const SyntheticMonitoringPage = lazy(() => import('../features/operations/pages/SyntheticMonitoringPage').then(m => ({ default: m.SyntheticMonitoringPage })));
+const DbExplorerPage = lazy(() => import('../features/operations/pages/DbExplorerPage').then(m => ({ default: m.DbExplorerPage })));
+const SloBurnRatePage = lazy(() => import('../features/operations/pages/SloBurnRatePage').then(m => ({ default: m.SloBurnRatePage })));
+const PostIncidentPage = lazy(() => import('../features/operations/pages/PostIncidentPage').then(m => ({ default: m.PostIncidentPage })));
+const OnCallSchedulePage = lazy(() => import('../features/operations/pages/OnCallSchedulePage').then(m => ({ default: m.OnCallSchedulePage })));
+const ApiRegressionPage = lazy(() => import('../features/operations/pages/ApiRegressionPage').then(m => ({ default: m.ApiRegressionPage })));
+const SloMarketplacePage = lazy(() => import('../features/operations/pages/SloMarketplacePage').then(m => ({ default: m.SloMarketplacePage })));
+const DependencyRiskPage = lazy(() => import('../features/operations/pages/DependencyRiskPage').then(m => ({ default: m.DependencyRiskPage })));
+const LoadTestingPage = lazy(() => import('../features/operations/pages/LoadTestingPage').then(m => ({ default: m.LoadTestingPage })));
+const ServiceMaturitySrePage = lazy(() => import('../features/operations/pages/ServiceMaturitySrePage').then(m => ({ default: m.ServiceMaturitySrePage })));
+const AiAnomalyPage = lazy(() => import('../features/operations/pages/AiAnomalyPage').then(m => ({ default: m.AiAnomalyPage })));
+const AiIncidentSummarizerPage = lazy(() => import('../features/operations/pages/AiIncidentSummarizerPage').then(m => ({ default: m.AiIncidentSummarizerPage })));
+const AiRunbookSuggesterPage = lazy(() => import('../features/operations/pages/AiRunbookSuggesterPage').then(m => ({ default: m.AiRunbookSuggesterPage })));
 
 export function OperationsRoutes() {
   return (
@@ -195,6 +210,126 @@ export function OperationsRoutes() {
         element={
           <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
             <RequestExplorerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/profiling-explorer"
+        element={
+          <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
+            <ProfilingExplorerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/error-tracking"
+        element={
+          <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+            <ErrorTrackingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/synthetic-monitoring"
+        element={
+          <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+            <SyntheticMonitoringPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/db-explorer"
+        element={
+          <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
+            <DbExplorerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/slo-burn-rate"
+        element={
+          <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+            <SloBurnRatePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/post-incident"
+        element={
+          <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+            <PostIncidentPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/on-call-schedule"
+        element={
+          <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+            <OnCallSchedulePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/api-regression"
+        element={
+          <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
+            <ApiRegressionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/slo-marketplace"
+        element={
+          <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+            <SloMarketplacePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/dependency-risk"
+        element={
+          <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+            <DependencyRiskPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/load-testing"
+        element={
+          <ProtectedRoute permission="operations:telemetry:read" redirectTo="/unauthorized">
+            <LoadTestingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/service-maturity-sre"
+        element={
+          <ProtectedRoute permission="operations:reliability:read" redirectTo="/unauthorized">
+            <ServiceMaturitySrePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/ai-anomaly"
+        element={
+          <ProtectedRoute permission="operations:runtime:read" redirectTo="/unauthorized">
+            <AiAnomalyPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/ai-incident-summarizer"
+        element={
+          <ProtectedRoute permission="operations:incidents:read" redirectTo="/unauthorized">
+            <AiIncidentSummarizerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/operations/ai-runbook-suggester"
+        element={
+          <ProtectedRoute permission="operations:runbooks:read" redirectTo="/unauthorized">
+            <AiRunbookSuggesterPage />
           </ProtectedRoute>
         }
       />

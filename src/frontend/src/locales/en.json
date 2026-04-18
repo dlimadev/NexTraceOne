@@ -9119,7 +9119,22 @@
     "workflowConfiguration": "Workflow Configuration",
     "tenants": "Tenants",
     "sreDashboard": "SRE Dashboard",
-    "requestExplorer": "Request Explorer"
+    "requestExplorer": "Request Explorer",
+    "profilingExplorer": "Profiling Explorer",
+    "errorTracking": "Error Tracking",
+    "syntheticMonitoring": "Synthetic Monitoring",
+    "dbExplorer": "DB Performance Explorer",
+    "sloBurnRate": "SLO Burn Rate",
+    "postIncident": "Post-Incident Learning",
+    "onCallSchedule": "On-Call Schedule",
+    "apiRegression": "API Regression",
+    "sloMarketplace": "SLO Marketplace",
+    "dependencyRisk": "Dependency Risk",
+    "loadTesting": "Load Testing",
+    "serviceMaturitySre": "Service Maturity (SRE)",
+    "aiAnomaly": "AI Anomaly Baseline",
+    "aiIncidentSummarizer": "AI Incident Summarizer",
+    "aiRunbookSuggester": "AI Runbook Suggester"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11925,6 +11940,764 @@
       "showing": "Showing {{from}}–{{to}} of {{total}}",
       "prev": "Previous",
       "next": "Next"
+    }
+  },
+  "profilingExplorer": {
+    "title": "Continuous Profiling Explorer",
+    "subtitle": "CPU, memory and heap profiling by service, version and environment",
+    "loading": "Loading profiling sessions…",
+    "loadError": "Failed to load profiling data. Please try again.",
+    "noRecords": "No profiling sessions found for the selected filters.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "filters": {
+      "service": "Service",
+      "version": "Version",
+      "environment": "Environment",
+      "profileType": "Profile Type",
+      "all": "All"
+    },
+    "profileTypes": {
+      "cpu": "CPU",
+      "memory": "Memory",
+      "heap": "Heap"
+    },
+    "comparison": {
+      "title": "Before / After Deploy Comparison",
+      "before": "Before Deploy",
+      "after": "After Deploy",
+      "delta": "Delta",
+      "noDeploy": "Select two sessions to compare"
+    },
+    "table": {
+      "service": "Service",
+      "version": "Version",
+      "environment": "Environment",
+      "cpu": "CPU %",
+      "memory": "Memory (MB)",
+      "heap": "Heap (MB)",
+      "samples": "Samples",
+      "duration": "Duration",
+      "deploy": "Deploy",
+      "deployCorrelated": "Correlated"
+    },
+    "stats": {
+      "totalSessions": "Total Sessions",
+      "avgCpu": "Avg CPU",
+      "avgMemory": "Avg Memory",
+      "regressions": "Regressions"
+    }
+  },
+  "errorTracking": {
+    "title": "Error Tracking & Exception Management",
+    "subtitle": "Error groups, fingerprints, user impact and deploy correlation",
+    "loading": "Loading error groups…",
+    "loadError": "Failed to load error tracking data. Please try again.",
+    "noRecords": "No error groups found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "status": {
+      "new": "New",
+      "regressing": "Regressing",
+      "resolved": "Resolved",
+      "ignored": "Ignored"
+    },
+    "table": {
+      "fingerprint": "Fingerprint",
+      "message": "Message",
+      "service": "Service",
+      "count": "Count",
+      "users": "Affected Users",
+      "status": "Status",
+      "lastSeen": "Last Seen",
+      "deploy": "Deploy"
+    },
+    "detail": {
+      "title": "Error Detail",
+      "stackTrace": "Stack Trace",
+      "timeline": "Timeline",
+      "occurrences": "Occurrences",
+      "firstSeen": "First Seen",
+      "lastSeen": "Last Seen",
+      "deployCorrelation": "Deploy Correlation",
+      "noDeploy": "No correlated deploy found"
+    },
+    "stats": {
+      "totalGroups": "Error Groups",
+      "newErrors": "New",
+      "regressing": "Regressing",
+      "affectedUsers": "Affected Users"
+    },
+    "actions": {
+      "resolve": "Resolve",
+      "ignore": "Ignore",
+      "createIncident": "Create Incident"
+    }
+  },
+  "syntheticMonitoring": {
+    "title": "Synthetic Monitoring",
+    "subtitle": "HTTP probes, uptime monitoring and contract schema validation",
+    "loading": "Loading synthetic probes…",
+    "loadError": "Failed to load synthetic monitoring data. Please try again.",
+    "noRecords": "No probes configured.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "probeTypes": {
+      "httpSingle": "HTTP Single",
+      "httpMultiStep": "HTTP Multi-Step"
+    },
+    "status": {
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "down": "Down"
+    },
+    "table": {
+      "name": "Probe Name",
+      "type": "Type",
+      "target": "Target",
+      "status": "Status",
+      "uptime": "Uptime %",
+      "lastCheck": "Last Check",
+      "lastResult": "Last Result",
+      "schedule": "Schedule",
+      "contractValidation": "Contract Validation"
+    },
+    "contractValidation": {
+      "pass": "Pass",
+      "fail": "Fail",
+      "skipped": "Skipped"
+    },
+    "stats": {
+      "totalProbes": "Total Probes",
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "down": "Down"
+    },
+    "actions": {
+      "createProbe": "Create Probe",
+      "runNow": "Run Now",
+      "editProbe": "Edit",
+      "deleteProbe": "Delete"
+    }
+  },
+  "dbExplorer": {
+    "title": "Database Performance Explorer",
+    "subtitle": "Slow queries, index misses and lock contention analysis",
+    "loading": "Loading database performance data…",
+    "loadError": "Failed to load database performance data. Please try again.",
+    "noRecords": "No slow queries found for the selected period.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "tabs": {
+      "totalTime": "By Total Time",
+      "executions": "By Executions",
+      "lockWait": "By Lock Wait"
+    },
+    "table": {
+      "fingerprint": "Query Fingerprint",
+      "database": "Database",
+      "avgDuration": "Avg Duration",
+      "maxDuration": "Max Duration",
+      "count": "Executions",
+      "totalTime": "Total Time",
+      "lockWait": "Lock Wait",
+      "indexMiss": "Index Miss"
+    },
+    "indexWarnings": {
+      "title": "Index Miss Warnings",
+      "message": "{{count}} queries without proper index coverage detected",
+      "details": "Query Fingerprint",
+      "misses": "Miss Count",
+      "recommendation": "Recommendation"
+    },
+    "stats": {
+      "slowQueries": "Slow Queries",
+      "avgDuration": "Avg Duration",
+      "maxDuration": "Max Duration",
+      "indexMisses": "Index Misses"
+    }
+  },
+  "sloBurnRate": {
+    "title": "SLO Error Budget Burn Rate",
+    "subtitle": "Fast and slow burn rate windows with budget projection",
+    "loading": "Loading burn rate data…",
+    "loadError": "Failed to load SLO burn rate data. Please try again.",
+    "noRecords": "No SLOs found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "windows": {
+      "fast1h": "1h",
+      "fast6h": "6h",
+      "slow24h": "24h",
+      "slow72h": "72h"
+    },
+    "table": {
+      "slo": "SLO Name",
+      "service": "Service",
+      "budgetRemaining": "Budget Remaining",
+      "burnRate1h": "Burn Rate 1h",
+      "burnRate6h": "Burn Rate 6h",
+      "burnRate24h": "Burn Rate 24h",
+      "burnRate72h": "Burn Rate 72h",
+      "depleted": "Depleted In",
+      "alertThreshold": "Alert Threshold"
+    },
+    "status": {
+      "critical": "Critical",
+      "warning": "Warning",
+      "healthy": "Healthy"
+    },
+    "projection": {
+      "depletedIn": "Budget depleted in {{hours}}h",
+      "safe": "Budget safe for {{days}} days",
+      "depleted": "Budget depleted"
+    },
+    "stats": {
+      "totalSlos": "Total SLOs",
+      "critical": "Critical",
+      "warning": "Warning",
+      "healthy": "Healthy"
+    },
+    "actions": {
+      "configure": "Configure Alert",
+      "viewSlo": "View SLO"
+    }
+  },
+  "postIncident": {
+    "title": "Post-Incident Learning Hub",
+    "subtitle": "Post-mortems, action items and recurring pattern detection",
+    "loading": "Loading post-mortems…",
+    "loadError": "Failed to load post-incident data. Please try again.",
+    "noRecords": "No post-mortems found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "status": {
+      "draft": "Draft",
+      "review": "In Review",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "table": {
+      "title": "Post-Mortem",
+      "incident": "Incident",
+      "status": "Status",
+      "author": "Author",
+      "actionItems": "Action Items",
+      "severity": "Severity",
+      "createdAt": "Created"
+    },
+    "sections": {
+      "timeline": "Timeline",
+      "rootCause": "Root Cause",
+      "contributing": "Contributing Factors",
+      "actionItems": "Action Items",
+      "prevention": "Prevention"
+    },
+    "patternDetection": {
+      "title": "Pattern Detection",
+      "message": "This type of incident occurred {{count}} times in the last {{days}} days",
+      "viewAll": "View All Occurrences"
+    },
+    "stats": {
+      "total": "Post-Mortems",
+      "open": "Open Action Items",
+      "patterns": "Detected Patterns",
+      "mttr": "Avg MTTR"
+    },
+    "actions": {
+      "createPostMortem": "New Post-Mortem",
+      "export": "Export PDF"
+    }
+  },
+  "onCallSchedule": {
+    "title": "On-Call Schedule Management",
+    "subtitle": "Rotation schedules, escalation policies and current on-call status",
+    "loading": "Loading on-call schedules…",
+    "loadError": "Failed to load on-call data. Please try again.",
+    "noRecords": "No on-call schedules configured.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "rotationTypes": {
+      "weekly": "Weekly",
+      "followTheSun": "Follow-the-Sun",
+      "custom": "Custom"
+    },
+    "table": {
+      "schedule": "Schedule",
+      "team": "Team",
+      "service": "Service",
+      "currentOnCall": "Current On-Call",
+      "nextOnCall": "Next On-Call",
+      "rotationType": "Rotation",
+      "timezone": "Timezone"
+    },
+    "escalation": {
+      "title": "Escalation Policy",
+      "level": "Level {{n}}",
+      "notifyAfter": "Notify after {{min}} min",
+      "noPolicy": "No escalation policy defined"
+    },
+    "overrides": {
+      "title": "Overrides",
+      "table": {
+        "user": "User",
+        "from": "From",
+        "until": "Until",
+        "reason": "Reason"
+      },
+      "add": "Add Override"
+    },
+    "stats": {
+      "activeSchedules": "Active Schedules",
+      "onCallNow": "On-Call Now",
+      "overrides": "Active Overrides",
+      "escalations": "Escalation Policies"
+    }
+  },
+  "apiRegression": {
+    "title": "API Performance Regression Detection",
+    "subtitle": "Endpoint latency baseline comparison with deploy correlation",
+    "loading": "Loading regression data…",
+    "loadError": "Failed to load API regression data. Please try again.",
+    "noRecords": "No regression data found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "table": {
+      "endpoint": "Endpoint",
+      "service": "Service",
+      "p50Baseline": "p50 Baseline",
+      "p50Current": "p50 Current",
+      "p95Baseline": "p95 Baseline",
+      "p95Current": "p95 Current",
+      "p99Baseline": "p99 Baseline",
+      "p99Current": "p99 Current",
+      "regression": "Regression %",
+      "deploy": "Correlated Deploy",
+      "confidence": "Change Confidence"
+    },
+    "status": {
+      "regressed": "Regressed",
+      "improved": "Improved",
+      "stable": "Stable"
+    },
+    "heatmap": {
+      "title": "Regression Heatmap",
+      "subtitle": "Endpoints vs time windows"
+    },
+    "stats": {
+      "totalEndpoints": "Monitored Endpoints",
+      "regressions": "Regressions",
+      "improved": "Improved",
+      "avgRegression": "Avg Regression"
+    },
+    "confidence": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    }
+  },
+  "sloMarketplace": {
+    "title": "SLO Template Marketplace",
+    "subtitle": "Ready-to-use SLO templates by service type and compliance preset",
+    "loading": "Loading SLO templates…",
+    "loadError": "Failed to load SLO templates. Please try again.",
+    "noRecords": "No templates found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "categories": {
+      "all": "All",
+      "restApi": "REST API",
+      "kafka": "Kafka / Events",
+      "database": "Database",
+      "backgroundJob": "Background Job"
+    },
+    "compliancePresets": {
+      "title": "Compliance Presets",
+      "lgpd": "LGPD Latency",
+      "financialSla": "Financial SLA 99.99%",
+      "gdpr": "GDPR Response Time",
+      "internal": "Internal SLA"
+    },
+    "table": {
+      "name": "Template Name",
+      "type": "Service Type",
+      "sli": "SLI Type",
+      "target": "Target",
+      "window": "Window",
+      "preset": "Compliance Preset",
+      "uses": "Uses",
+      "author": "Author"
+    },
+    "actions": {
+      "import": "Import Template",
+      "export": "Export",
+      "applyToService": "Apply to Service",
+      "preview": "Preview"
+    },
+    "stats": {
+      "totalTemplates": "Templates",
+      "categories": "Categories",
+      "compliancePresets": "Compliance Presets",
+      "communityTemplates": "Community"
+    }
+  },
+  "dependencyRisk": {
+    "title": "Dependency Risk Scoring",
+    "subtitle": "Risk score per service with failure history, SLO and blast radius analysis",
+    "loading": "Loading dependency risk scores…",
+    "loadError": "Failed to load dependency risk data. Please try again.",
+    "noRecords": "No services found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "table": {
+      "service": "Service",
+      "riskScore": "Risk Score",
+      "failureHistory": "Failure History",
+      "sloHealth": "SLO Health",
+      "blastRadius": "Blast Radius",
+      "deployFrequency": "Deploy Freq",
+      "dependents": "Dependents",
+      "trend": "Trend"
+    },
+    "riskLevel": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "impactMatrix": {
+      "title": "What breaks if X degrades?",
+      "service": "If {{service}} degrades…",
+      "downstream": "Downstream Impact",
+      "severity": "Severity",
+      "probability": "Probability"
+    },
+    "factors": {
+      "title": "Risk Factors",
+      "failureHistory": "Failure History (30d)",
+      "sloCompliance": "SLO Compliance",
+      "blastRadius": "Blast Radius",
+      "deployFrequency": "Deploy Frequency"
+    },
+    "stats": {
+      "totalServices": "Services",
+      "critical": "Critical Risk",
+      "high": "High Risk",
+      "avgScore": "Avg Risk Score"
+    }
+  },
+  "loadTesting": {
+    "title": "Load Test Correlation",
+    "subtitle": "Load test results correlated with traces, metrics and capacity estimation",
+    "loading": "Loading load test runs…",
+    "loadError": "Failed to load load test data. Please try again.",
+    "noRecords": "No load test runs found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "sources": {
+      "k6": "k6",
+      "gatling": "Gatling",
+      "jmeter": "JMeter"
+    },
+    "status": {
+      "running": "Running",
+      "passed": "Passed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "table": {
+      "name": "Test Name",
+      "service": "Service",
+      "source": "Tool",
+      "status": "Status",
+      "vus": "VUs",
+      "duration": "Duration",
+      "p95": "p95 Latency",
+      "errorRate": "Error Rate",
+      "date": "Date",
+      "capacity": "Capacity Est."
+    },
+    "correlation": {
+      "title": "Trace & Metrics Correlation",
+      "subtitle": "Load test timeline aligned with observed traces and metrics",
+      "traces": "Traces",
+      "metrics": "Metrics"
+    },
+    "capacity": {
+      "title": "Max Capacity Estimation",
+      "service": "Service",
+      "maxVus": "Max VUs",
+      "throughput": "Max RPS",
+      "degradationPoint": "Degradation Point",
+      "saturationPoint": "Saturation Point"
+    },
+    "stats": {
+      "totalRuns": "Total Runs",
+      "passed": "Passed",
+      "failed": "Failed",
+      "avgDuration": "Avg Duration"
+    }
+  },
+  "serviceMaturitySre": {
+    "title": "Service Maturity Score (SRE)",
+    "subtitle": "SRE maturity assessment per service with actionable recommendations",
+    "loading": "Loading maturity scores…",
+    "loadError": "Failed to load maturity data. Please try again.",
+    "noRecords": "No services found.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "criteria": {
+      "slo": "SLO Defined",
+      "runbook": "Runbook",
+      "onCall": "On-Call",
+      "alerts": "Alerts",
+      "profiling": "Profiling",
+      "postMortem": "Post-Mortem < 90d"
+    },
+    "maturityLevel": {
+      "advanced": "Advanced",
+      "intermediate": "Intermediate",
+      "basic": "Basic",
+      "initial": "Initial"
+    },
+    "table": {
+      "service": "Service",
+      "team": "Team",
+      "score": "Score",
+      "slo": "SLO",
+      "runbook": "Runbook",
+      "onCall": "On-Call",
+      "alerts": "Alerts",
+      "profiling": "Profiling",
+      "postMortem": "Post-Mortem",
+      "level": "Level"
+    },
+    "recommendations": {
+      "title": "Recommendations",
+      "for": "For {{service}}",
+      "noRec": "Service meets all SRE maturity criteria"
+    },
+    "teamDashboard": {
+      "title": "Domain / Team Maturity",
+      "team": "Team",
+      "services": "Services",
+      "avgScore": "Avg Score",
+      "fullyMature": "Fully Mature"
+    },
+    "stats": {
+      "totalServices": "Services",
+      "advanced": "Advanced",
+      "initial": "Initial",
+      "avgScore": "Avg Score"
+    }
+  },
+  "aiAnomaly": {
+    "title": "AI Anomaly Baseline",
+    "subtitle": "ML-powered anomaly detection with baseline comparison and audit trail",
+    "loading": "Loading anomaly detections…",
+    "loadError": "Failed to load anomaly data. Please try again.",
+    "noRecords": "No anomalies detected in this period.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "table": {
+      "service": "Service",
+      "metric": "Metric",
+      "value": "Observed Value",
+      "baseline": "Baseline",
+      "sigma": "σ Deviation",
+      "severity": "Severity",
+      "explanation": "Explanation",
+      "detectedAt": "Detected At",
+      "status": "Status"
+    },
+    "severity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "status": {
+      "open": "Open",
+      "acknowledged": "Acknowledged",
+      "resolved": "Resolved"
+    },
+    "baseline": {
+      "title": "Baseline Visualization",
+      "subtitle": "Expected range per service / endpoint / hour-of-day",
+      "expected": "Expected",
+      "observed": "Observed",
+      "upperBound": "Upper Bound",
+      "lowerBound": "Lower Bound"
+    },
+    "audit": {
+      "title": "Detection Audit Trail",
+      "model": "Model",
+      "version": "Version",
+      "trainedOn": "Trained On",
+      "detectionId": "Detection ID",
+      "context": "Context Used"
+    },
+    "stats": {
+      "totalAnomalies": "Anomalies",
+      "critical": "Critical",
+      "acknowledged": "Acknowledged",
+      "avgSigma": "Avg σ"
+    }
+  },
+  "aiIncidentSummarizer": {
+    "title": "AI Incident Summarizer",
+    "subtitle": "AI-generated incident summaries with timeline, services and change correlation",
+    "loading": "Loading incident summaries…",
+    "loadError": "Failed to load AI incident summaries. Please try again.",
+    "noRecords": "No incidents available for summarization.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "table": {
+      "incident": "Incident",
+      "severity": "Severity",
+      "service": "Service",
+      "summary": "AI Summary",
+      "generatedAt": "Generated",
+      "model": "Model",
+      "confidence": "Confidence"
+    },
+    "detail": {
+      "title": "Incident Summary",
+      "timeline": "Timeline",
+      "affectedServices": "Affected Services",
+      "correlatedChanges": "Correlated Changes",
+      "rootCause": "Probable Root Cause",
+      "recommendation": "Recommendation"
+    },
+    "draftPostMortem": {
+      "title": "Post-Mortem Draft",
+      "generate": "Generate Draft",
+      "download": "Download Draft",
+      "sections": "Sections included"
+    },
+    "audit": {
+      "title": "Audit Context",
+      "dataUsed": "Data Used",
+      "model": "Model",
+      "tokens": "Tokens Used",
+      "timestamp": "Generated At",
+      "requestedBy": "Requested By"
+    },
+    "stats": {
+      "summarized": "Summarized",
+      "avgConfidence": "Avg Confidence",
+      "draftsGenerated": "Drafts Generated",
+      "avgTokens": "Avg Tokens"
+    },
+    "actions": {
+      "summarize": "Summarize",
+      "generateDraft": "Generate Post-Mortem",
+      "viewAudit": "View Audit"
+    }
+  },
+  "aiRunbookSuggester": {
+    "title": "AI Runbook Suggester",
+    "subtitle": "Context-aware runbook suggestions for active incidents with confidence scoring",
+    "loading": "Loading runbook suggestions…",
+    "loadError": "Failed to load runbook suggestions. Please try again.",
+    "noRecords": "No active incidents require runbook suggestions.",
+    "timeRange": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days"
+    },
+    "table": {
+      "incident": "Incident",
+      "service": "Service",
+      "environment": "Environment",
+      "version": "Version",
+      "runbook": "Suggested Runbook",
+      "confidence": "Confidence",
+      "reasoning": "Reasoning",
+      "model": "Model",
+      "suggestedAt": "Suggested At"
+    },
+    "context": {
+      "title": "Pre-filled Context",
+      "service": "Service",
+      "environment": "Environment",
+      "version": "Version",
+      "symptoms": "Symptoms Detected"
+    },
+    "audit": {
+      "title": "Suggestion Audit",
+      "suggestedByModel": "Suggested by model {{model}} with confidence {{confidence}} because {{reason}}",
+      "tokensUsed": "Tokens used",
+      "knowledgeSources": "Knowledge sources"
+    },
+    "stats": {
+      "activeSuggestions": "Active Suggestions",
+      "avgConfidence": "Avg Confidence",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "actions": {
+      "accept": "Accept",
+      "reject": "Reject",
+      "viewRunbook": "View Runbook",
+      "createRunbook": "Create Runbook"
     }
   }
 }

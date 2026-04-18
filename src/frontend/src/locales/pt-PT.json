@@ -9094,7 +9094,22 @@
     "releaseParameterOverride": "Overrides por Ambiente",
     "tenants": "Tenants",
     "sreDashboard": "Painel SRE",
-    "requestExplorer": "Explorador de Pedidos"
+    "requestExplorer": "Explorador de Pedidos",
+    "profilingExplorer": "Explorador de Profiling",
+    "errorTracking": "Rastreio de Erros",
+    "syntheticMonitoring": "Monitorização Sintética",
+    "dbExplorer": "Explorador de BD",
+    "sloBurnRate": "Taxa de Consumo SLO",
+    "postIncident": "Aprendizagem Pós-Incidente",
+    "onCallSchedule": "Escala de Chamada",
+    "apiRegression": "Regressão de API",
+    "sloMarketplace": "Marketplace de SLO",
+    "dependencyRisk": "Risco de Dependência",
+    "loadTesting": "Teste de Carga",
+    "serviceMaturitySre": "Maturidade de Serviço (SRE)",
+    "aiAnomaly": "Anomalia IA",
+    "aiIncidentSummarizer": "Sumarizador IA de Incidentes",
+    "aiRunbookSuggester": "Sugestor IA de Runbook"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -11895,6 +11910,764 @@
       "showing": "A mostrar {{from}}–{{to}} de {{total}}",
       "prev": "Anterior",
       "next": "Seguinte"
+    }
+  },
+  "profilingExplorer": {
+    "title": "Explorador de Profiling Contínuo",
+    "subtitle": "Profiling de CPU, memória e heap por serviço, versão e ambiente",
+    "loading": "A carregar sessões de profiling…",
+    "loadError": "Falha ao carregar dados de profiling. Tente novamente.",
+    "noRecords": "Nenhuma sessão de profiling encontrada para os filtros selecionados.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "filters": {
+      "service": "Serviço",
+      "version": "Versão",
+      "environment": "Ambiente",
+      "profileType": "Tipo de Perfil",
+      "all": "Todos"
+    },
+    "profileTypes": {
+      "cpu": "CPU",
+      "memory": "Memória",
+      "heap": "Heap"
+    },
+    "comparison": {
+      "title": "Comparação Antes / Depois do Deploy",
+      "before": "Antes do Deploy",
+      "after": "Depois do Deploy",
+      "delta": "Delta",
+      "noDeploy": "Selecione duas sessões para comparar"
+    },
+    "table": {
+      "service": "Serviço",
+      "version": "Versão",
+      "environment": "Ambiente",
+      "cpu": "CPU %",
+      "memory": "Memória (MB)",
+      "heap": "Heap (MB)",
+      "samples": "Amostras",
+      "duration": "Duração",
+      "deploy": "Deploy",
+      "deployCorrelated": "Correlacionado"
+    },
+    "stats": {
+      "totalSessions": "Total de Sessões",
+      "avgCpu": "CPU Média",
+      "avgMemory": "Memória Média",
+      "regressions": "Regressões"
+    }
+  },
+  "errorTracking": {
+    "title": "Rastreio de Erros e Exceções",
+    "subtitle": "Grupos de erros, fingerprints, impacto em utilizadores e correlação com deploys",
+    "loading": "A carregar grupos de erros…",
+    "loadError": "Falha ao carregar dados de rastreio de erros. Tente novamente.",
+    "noRecords": "Nenhum grupo de erros encontrado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "status": {
+      "new": "Novo",
+      "regressing": "Em Regressão",
+      "resolved": "Resolvido",
+      "ignored": "Ignorado"
+    },
+    "table": {
+      "fingerprint": "Fingerprint",
+      "message": "Mensagem",
+      "service": "Serviço",
+      "count": "Contagem",
+      "users": "Utilizadores Afetados",
+      "status": "Estado",
+      "lastSeen": "Visto por Último",
+      "deploy": "Deploy"
+    },
+    "detail": {
+      "title": "Detalhe do Erro",
+      "stackTrace": "Stack Trace",
+      "timeline": "Linha do Tempo",
+      "occurrences": "Ocorrências",
+      "firstSeen": "Primeira Ocorrência",
+      "lastSeen": "Última Ocorrência",
+      "deployCorrelation": "Correlação com Deploy",
+      "noDeploy": "Nenhum deploy correlacionado encontrado"
+    },
+    "stats": {
+      "totalGroups": "Grupos de Erros",
+      "newErrors": "Novos",
+      "regressing": "Em Regressão",
+      "affectedUsers": "Utilizadores Afetados"
+    },
+    "actions": {
+      "resolve": "Resolver",
+      "ignore": "Ignorar",
+      "createIncident": "Criar Incidente"
+    }
+  },
+  "syntheticMonitoring": {
+    "title": "Monitorização Sintética",
+    "subtitle": "Probes HTTP, monitorização de uptime e validação de schema de contratos",
+    "loading": "A carregar probes sintéticas…",
+    "loadError": "Falha ao carregar dados de monitorização sintética. Tente novamente.",
+    "noRecords": "Nenhuma probe configurada.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "probeTypes": {
+      "httpSingle": "HTTP Simples",
+      "httpMultiStep": "HTTP Multi-Passo"
+    },
+    "status": {
+      "healthy": "Saudável",
+      "degraded": "Degradado",
+      "down": "Fora de Serviço"
+    },
+    "table": {
+      "name": "Nome da Probe",
+      "type": "Tipo",
+      "target": "Alvo",
+      "status": "Estado",
+      "uptime": "Uptime %",
+      "lastCheck": "Última Verificação",
+      "lastResult": "Último Resultado",
+      "schedule": "Agendamento",
+      "contractValidation": "Validação de Contrato"
+    },
+    "contractValidation": {
+      "pass": "Aprovado",
+      "fail": "Reprovado",
+      "skipped": "Ignorado"
+    },
+    "stats": {
+      "totalProbes": "Total de Probes",
+      "healthy": "Saudável",
+      "degraded": "Degradado",
+      "down": "Fora de Serviço"
+    },
+    "actions": {
+      "createProbe": "Criar Probe",
+      "runNow": "Executar Agora",
+      "editProbe": "Editar",
+      "deleteProbe": "Eliminar"
+    }
+  },
+  "dbExplorer": {
+    "title": "Explorador de Performance de Base de Dados",
+    "subtitle": "Queries lentas, índices em falta e análise de contenção de lock",
+    "loading": "A carregar dados de performance da base de dados…",
+    "loadError": "Falha ao carregar dados de performance. Tente novamente.",
+    "noRecords": "Nenhuma query lenta encontrada no período selecionado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "tabs": {
+      "totalTime": "Por Tempo Total",
+      "executions": "Por Execuções",
+      "lockWait": "Por Espera de Lock"
+    },
+    "table": {
+      "fingerprint": "Fingerprint da Query",
+      "database": "Base de Dados",
+      "avgDuration": "Duração Média",
+      "maxDuration": "Duração Máxima",
+      "count": "Execuções",
+      "totalTime": "Tempo Total",
+      "lockWait": "Espera de Lock",
+      "indexMiss": "Índice em Falta"
+    },
+    "indexWarnings": {
+      "title": "Alertas de Índice em Falta",
+      "message": "{{count}} queries sem cobertura de índice detetadas",
+      "details": "Fingerprint da Query",
+      "misses": "Contagem de Falhas",
+      "recommendation": "Recomendação"
+    },
+    "stats": {
+      "slowQueries": "Queries Lentas",
+      "avgDuration": "Duração Média",
+      "maxDuration": "Duração Máxima",
+      "indexMisses": "Índices em Falta"
+    }
+  },
+  "sloBurnRate": {
+    "title": "Taxa de Consumo de Error Budget SLO",
+    "subtitle": "Janelas de burn rate rápido e lento com projeção de esgotamento",
+    "loading": "A carregar dados de burn rate…",
+    "loadError": "Falha ao carregar dados de burn rate SLO. Tente novamente.",
+    "noRecords": "Nenhum SLO encontrado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "windows": {
+      "fast1h": "1h",
+      "fast6h": "6h",
+      "slow24h": "24h",
+      "slow72h": "72h"
+    },
+    "table": {
+      "slo": "Nome do SLO",
+      "service": "Serviço",
+      "budgetRemaining": "Budget Restante",
+      "burnRate1h": "Burn Rate 1h",
+      "burnRate6h": "Burn Rate 6h",
+      "burnRate24h": "Burn Rate 24h",
+      "burnRate72h": "Burn Rate 72h",
+      "depleted": "Esgota Em",
+      "alertThreshold": "Limiar de Alerta"
+    },
+    "status": {
+      "critical": "Crítico",
+      "warning": "Aviso",
+      "healthy": "Saudável"
+    },
+    "projection": {
+      "depletedIn": "Budget esgota em {{hours}}h",
+      "safe": "Budget seguro por {{days}} dias",
+      "depleted": "Budget esgotado"
+    },
+    "stats": {
+      "totalSlos": "Total de SLOs",
+      "critical": "Crítico",
+      "warning": "Aviso",
+      "healthy": "Saudável"
+    },
+    "actions": {
+      "configure": "Configurar Alerta",
+      "viewSlo": "Ver SLO"
+    }
+  },
+  "postIncident": {
+    "title": "Hub de Aprendizagem Pós-Incidente",
+    "subtitle": "Post-mortems, itens de ação e deteção de padrões recorrentes",
+    "loading": "A carregar post-mortems…",
+    "loadError": "Falha ao carregar dados pós-incidente. Tente novamente.",
+    "noRecords": "Nenhum post-mortem encontrado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "status": {
+      "draft": "Rascunho",
+      "review": "Em Revisão",
+      "published": "Publicado",
+      "archived": "Arquivado"
+    },
+    "table": {
+      "title": "Post-Mortem",
+      "incident": "Incidente",
+      "status": "Estado",
+      "author": "Autor",
+      "actionItems": "Itens de Ação",
+      "severity": "Severidade",
+      "createdAt": "Criado Em"
+    },
+    "sections": {
+      "timeline": "Linha do Tempo",
+      "rootCause": "Causa Raiz",
+      "contributing": "Fatores Contribuintes",
+      "actionItems": "Itens de Ação",
+      "prevention": "Prevenção"
+    },
+    "patternDetection": {
+      "title": "Deteção de Padrões",
+      "message": "Este tipo de incidente ocorreu {{count}} vezes nos últimos {{days}} dias",
+      "viewAll": "Ver Todas as Ocorrências"
+    },
+    "stats": {
+      "total": "Post-Mortems",
+      "open": "Itens de Ação Abertos",
+      "patterns": "Padrões Detetados",
+      "mttr": "MTTR Médio"
+    },
+    "actions": {
+      "createPostMortem": "Novo Post-Mortem",
+      "export": "Exportar PDF"
+    }
+  },
+  "onCallSchedule": {
+    "title": "Gestão de Escala de Chamada",
+    "subtitle": "Rotações, políticas de escalação e estado atual de chamada",
+    "loading": "A carregar escalas de chamada…",
+    "loadError": "Falha ao carregar dados de escala. Tente novamente.",
+    "noRecords": "Nenhuma escala de chamada configurada.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "rotationTypes": {
+      "weekly": "Semanal",
+      "followTheSun": "Follow-the-Sun",
+      "custom": "Personalizado"
+    },
+    "table": {
+      "schedule": "Escala",
+      "team": "Equipa",
+      "service": "Serviço",
+      "currentOnCall": "Chamada Atual",
+      "nextOnCall": "Próxima Chamada",
+      "rotationType": "Rotação",
+      "timezone": "Fuso Horário"
+    },
+    "escalation": {
+      "title": "Política de Escalação",
+      "level": "Nível {{n}}",
+      "notifyAfter": "Notificar após {{min}} min",
+      "noPolicy": "Nenhuma política de escalação definida"
+    },
+    "overrides": {
+      "title": "Substituições",
+      "table": {
+        "user": "Utilizador",
+        "from": "De",
+        "until": "Até",
+        "reason": "Motivo"
+      },
+      "add": "Adicionar Substituição"
+    },
+    "stats": {
+      "activeSchedules": "Escalas Ativas",
+      "onCallNow": "Em Chamada Agora",
+      "overrides": "Substituições Ativas",
+      "escalations": "Políticas de Escalação"
+    }
+  },
+  "apiRegression": {
+    "title": "Deteção de Regressão de Performance de API",
+    "subtitle": "Comparação de latência baseline vs atual com correlação de deploy",
+    "loading": "A carregar dados de regressão…",
+    "loadError": "Falha ao carregar dados de regressão de API. Tente novamente.",
+    "noRecords": "Nenhum dado de regressão encontrado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "table": {
+      "endpoint": "Endpoint",
+      "service": "Serviço",
+      "p50Baseline": "p50 Baseline",
+      "p50Current": "p50 Atual",
+      "p95Baseline": "p95 Baseline",
+      "p95Current": "p95 Atual",
+      "p99Baseline": "p99 Baseline",
+      "p99Current": "p99 Atual",
+      "regression": "Regressão %",
+      "deploy": "Deploy Correlacionado",
+      "confidence": "Confiança na Mudança"
+    },
+    "status": {
+      "regressed": "Regredido",
+      "improved": "Melhorado",
+      "stable": "Estável"
+    },
+    "heatmap": {
+      "title": "Mapa de Calor de Regressão",
+      "subtitle": "Endpoints vs janelas de tempo"
+    },
+    "stats": {
+      "totalEndpoints": "Endpoints Monitorizados",
+      "regressions": "Regressões",
+      "improved": "Melhorados",
+      "avgRegression": "Regressão Média"
+    },
+    "confidence": {
+      "high": "Alta",
+      "medium": "Média",
+      "low": "Baixa"
+    }
+  },
+  "sloMarketplace": {
+    "title": "Marketplace de Templates de SLO",
+    "subtitle": "Templates SLO prontos por tipo de serviço e preset de compliance",
+    "loading": "A carregar templates de SLO…",
+    "loadError": "Falha ao carregar templates de SLO. Tente novamente.",
+    "noRecords": "Nenhum template encontrado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "categories": {
+      "all": "Todos",
+      "restApi": "REST API",
+      "kafka": "Kafka / Eventos",
+      "database": "Base de Dados",
+      "backgroundJob": "Job em Background"
+    },
+    "compliancePresets": {
+      "title": "Presets de Compliance",
+      "lgpd": "Latência LGPD",
+      "financialSla": "SLA Financeiro 99,99%",
+      "gdpr": "Tempo de Resposta GDPR",
+      "internal": "SLA Interno"
+    },
+    "table": {
+      "name": "Nome do Template",
+      "type": "Tipo de Serviço",
+      "sli": "Tipo de SLI",
+      "target": "Meta",
+      "window": "Janela",
+      "preset": "Preset de Compliance",
+      "uses": "Usos",
+      "author": "Autor"
+    },
+    "actions": {
+      "import": "Importar Template",
+      "export": "Exportar",
+      "applyToService": "Aplicar ao Serviço",
+      "preview": "Pré-visualizar"
+    },
+    "stats": {
+      "totalTemplates": "Templates",
+      "categories": "Categorias",
+      "compliancePresets": "Presets de Compliance",
+      "communityTemplates": "Comunidade"
+    }
+  },
+  "dependencyRisk": {
+    "title": "Score de Risco de Dependências",
+    "subtitle": "Score de risco por serviço com histórico de falhas, SLO e análise de blast radius",
+    "loading": "A carregar scores de risco de dependências…",
+    "loadError": "Falha ao carregar dados de risco. Tente novamente.",
+    "noRecords": "Nenhum serviço encontrado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "table": {
+      "service": "Serviço",
+      "riskScore": "Score de Risco",
+      "failureHistory": "Histórico de Falhas",
+      "sloHealth": "Saúde do SLO",
+      "blastRadius": "Blast Radius",
+      "deployFrequency": "Freq. de Deploy",
+      "dependents": "Dependentes",
+      "trend": "Tendência"
+    },
+    "riskLevel": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio",
+      "low": "Baixo"
+    },
+    "impactMatrix": {
+      "title": "O que falha se X degradar?",
+      "service": "Se {{service}} degradar…",
+      "downstream": "Impacto Downstream",
+      "severity": "Severidade",
+      "probability": "Probabilidade"
+    },
+    "factors": {
+      "title": "Fatores de Risco",
+      "failureHistory": "Histórico de Falhas (30d)",
+      "sloCompliance": "Conformidade de SLO",
+      "blastRadius": "Blast Radius",
+      "deployFrequency": "Frequência de Deploy"
+    },
+    "stats": {
+      "totalServices": "Serviços",
+      "critical": "Risco Crítico",
+      "high": "Risco Alto",
+      "avgScore": "Score Médio de Risco"
+    }
+  },
+  "loadTesting": {
+    "title": "Correlação de Testes de Carga",
+    "subtitle": "Resultados de testes de carga correlacionados com traces, métricas e estimativa de capacidade",
+    "loading": "A carregar execuções de teste de carga…",
+    "loadError": "Falha ao carregar dados de teste de carga. Tente novamente.",
+    "noRecords": "Nenhuma execução de teste de carga encontrada.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "sources": {
+      "k6": "k6",
+      "gatling": "Gatling",
+      "jmeter": "JMeter"
+    },
+    "status": {
+      "running": "Em Execução",
+      "passed": "Aprovado",
+      "failed": "Reprovado",
+      "cancelled": "Cancelado"
+    },
+    "table": {
+      "name": "Nome do Teste",
+      "service": "Serviço",
+      "source": "Ferramenta",
+      "status": "Estado",
+      "vus": "VUs",
+      "duration": "Duração",
+      "p95": "Latência p95",
+      "errorRate": "Taxa de Erros",
+      "date": "Data",
+      "capacity": "Est. de Capacidade"
+    },
+    "correlation": {
+      "title": "Correlação de Traces e Métricas",
+      "subtitle": "Linha do tempo do teste alinhada com traces e métricas observadas",
+      "traces": "Traces",
+      "metrics": "Métricas"
+    },
+    "capacity": {
+      "title": "Estimativa de Capacidade Máxima",
+      "service": "Serviço",
+      "maxVus": "VUs Máximos",
+      "throughput": "RPS Máximo",
+      "degradationPoint": "Ponto de Degradação",
+      "saturationPoint": "Ponto de Saturação"
+    },
+    "stats": {
+      "totalRuns": "Total de Execuções",
+      "passed": "Aprovados",
+      "failed": "Reprovados",
+      "avgDuration": "Duração Média"
+    }
+  },
+  "serviceMaturitySre": {
+    "title": "Score de Maturidade de Serviço (SRE)",
+    "subtitle": "Avaliação de maturidade SRE por serviço com recomendações acionáveis",
+    "loading": "A carregar scores de maturidade…",
+    "loadError": "Falha ao carregar dados de maturidade. Tente novamente.",
+    "noRecords": "Nenhum serviço encontrado.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "criteria": {
+      "slo": "SLO Definido",
+      "runbook": "Runbook",
+      "onCall": "Chamada",
+      "alerts": "Alertas",
+      "profiling": "Profiling",
+      "postMortem": "Post-Mortem < 90d"
+    },
+    "maturityLevel": {
+      "advanced": "Avançado",
+      "intermediate": "Intermédio",
+      "basic": "Básico",
+      "initial": "Inicial"
+    },
+    "table": {
+      "service": "Serviço",
+      "team": "Equipa",
+      "score": "Score",
+      "slo": "SLO",
+      "runbook": "Runbook",
+      "onCall": "Chamada",
+      "alerts": "Alertas",
+      "profiling": "Profiling",
+      "postMortem": "Post-Mortem",
+      "level": "Nível"
+    },
+    "recommendations": {
+      "title": "Recomendações",
+      "for": "Para {{service}}",
+      "noRec": "O serviço cumpre todos os critérios de maturidade SRE"
+    },
+    "teamDashboard": {
+      "title": "Maturidade por Domínio / Equipa",
+      "team": "Equipa",
+      "services": "Serviços",
+      "avgScore": "Score Médio",
+      "fullyMature": "Totalmente Maduro"
+    },
+    "stats": {
+      "totalServices": "Serviços",
+      "advanced": "Avançado",
+      "initial": "Inicial",
+      "avgScore": "Score Médio"
+    }
+  },
+  "aiAnomaly": {
+    "title": "Baseline de Anomalias por IA",
+    "subtitle": "Deteção de anomalias por ML com comparação de baseline e trilha de auditoria",
+    "loading": "A carregar deteções de anomalias…",
+    "loadError": "Falha ao carregar dados de anomalias. Tente novamente.",
+    "noRecords": "Nenhuma anomalia detetada neste período.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "table": {
+      "service": "Serviço",
+      "metric": "Métrica",
+      "value": "Valor Observado",
+      "baseline": "Baseline",
+      "sigma": "Desvio σ",
+      "severity": "Severidade",
+      "explanation": "Explicação",
+      "detectedAt": "Detetado Em",
+      "status": "Estado"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio",
+      "low": "Baixo"
+    },
+    "status": {
+      "open": "Aberto",
+      "acknowledged": "Reconhecido",
+      "resolved": "Resolvido"
+    },
+    "baseline": {
+      "title": "Visualização de Baseline",
+      "subtitle": "Faixa esperada por serviço / endpoint / hora do dia",
+      "expected": "Esperado",
+      "observed": "Observado",
+      "upperBound": "Limite Superior",
+      "lowerBound": "Limite Inferior"
+    },
+    "audit": {
+      "title": "Trilha de Auditoria de Deteção",
+      "model": "Modelo",
+      "version": "Versão",
+      "trainedOn": "Treinado Em",
+      "detectionId": "ID de Deteção",
+      "context": "Contexto Usado"
+    },
+    "stats": {
+      "totalAnomalies": "Anomalias",
+      "critical": "Crítico",
+      "acknowledged": "Reconhecido",
+      "avgSigma": "σ Médio"
+    }
+  },
+  "aiIncidentSummarizer": {
+    "title": "Sumarizador IA de Incidentes",
+    "subtitle": "Resumos de incidentes gerados por IA com linha do tempo e correlação de mudanças",
+    "loading": "A carregar resumos de incidentes…",
+    "loadError": "Falha ao carregar resumos de incidentes. Tente novamente.",
+    "noRecords": "Nenhum incidente disponível para sumarização.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "table": {
+      "incident": "Incidente",
+      "severity": "Severidade",
+      "service": "Serviço",
+      "summary": "Resumo IA",
+      "generatedAt": "Gerado Em",
+      "model": "Modelo",
+      "confidence": "Confiança"
+    },
+    "detail": {
+      "title": "Resumo do Incidente",
+      "timeline": "Linha do Tempo",
+      "affectedServices": "Serviços Afetados",
+      "correlatedChanges": "Mudanças Correlacionadas",
+      "rootCause": "Causa Raiz Provável",
+      "recommendation": "Recomendação"
+    },
+    "draftPostMortem": {
+      "title": "Rascunho de Post-Mortem",
+      "generate": "Gerar Rascunho",
+      "download": "Descarregar Rascunho",
+      "sections": "Secções incluídas"
+    },
+    "audit": {
+      "title": "Contexto de Auditoria",
+      "dataUsed": "Dados Usados",
+      "model": "Modelo",
+      "tokens": "Tokens Usados",
+      "timestamp": "Gerado Em",
+      "requestedBy": "Solicitado Por"
+    },
+    "stats": {
+      "summarized": "Sumarizados",
+      "avgConfidence": "Confiança Média",
+      "draftsGenerated": "Rascunhos Gerados",
+      "avgTokens": "Tokens Médios"
+    },
+    "actions": {
+      "summarize": "Sumarizar",
+      "generateDraft": "Gerar Post-Mortem",
+      "viewAudit": "Ver Auditoria"
+    }
+  },
+  "aiRunbookSuggester": {
+    "title": "Sugestor IA de Runbook",
+    "subtitle": "Sugestões de runbook contextuais para incidentes ativos com score de confiança",
+    "loading": "A carregar sugestões de runbook…",
+    "loadError": "Falha ao carregar sugestões de runbook. Tente novamente.",
+    "noRecords": "Nenhum incidente ativo requer sugestões de runbook.",
+    "timeRange": {
+      "1h": "Última 1 hora",
+      "6h": "Últimas 6 horas",
+      "24h": "Últimas 24 horas",
+      "7d": "Últimos 7 dias"
+    },
+    "table": {
+      "incident": "Incidente",
+      "service": "Serviço",
+      "environment": "Ambiente",
+      "version": "Versão",
+      "runbook": "Runbook Sugerido",
+      "confidence": "Confiança",
+      "reasoning": "Raciocínio",
+      "model": "Modelo",
+      "suggestedAt": "Sugerido Em"
+    },
+    "context": {
+      "title": "Contexto Pré-preenchido",
+      "service": "Serviço",
+      "environment": "Ambiente",
+      "version": "Versão",
+      "symptoms": "Sintomas Detetados"
+    },
+    "audit": {
+      "title": "Auditoria de Sugestão",
+      "suggestedByModel": "Sugerido pelo modelo {{model}} com confiança {{confidence}} porque {{reason}}",
+      "tokensUsed": "Tokens usados",
+      "knowledgeSources": "Fontes de conhecimento"
+    },
+    "stats": {
+      "activeSuggestions": "Sugestões Ativas",
+      "avgConfidence": "Confiança Média",
+      "accepted": "Aceites",
+      "rejected": "Rejeitadas"
+    },
+    "actions": {
+      "accept": "Aceitar",
+      "reject": "Rejeitar",
+      "viewRunbook": "Ver Runbook",
+      "createRunbook": "Criar Runbook"
     }
   }
 }
