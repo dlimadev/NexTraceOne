@@ -23,7 +23,12 @@ interface DeployDay {
   count: number;
 }
 
-/** Derives a fake-but-consistent per-day distribution from the DORA aggregate */
+/**
+ * Derives an illustrative per-day bar distribution from the DORA aggregate value.
+ * The spread uses Math.random() and is intentionally non-deterministic — this is
+ * a visualisation aid only. The aggregate value displayed below the chart is the
+ * authoritative metric from the API.
+ */
 function buildDailyBars(value: number, days: number): DeployDay[] {
   const base = Math.max(0, Math.round(value));
   const bars: DeployDay[] = [];

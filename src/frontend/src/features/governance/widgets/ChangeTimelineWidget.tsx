@@ -35,7 +35,8 @@ function defaultIcon() {
   return <GitCommit size={12} className="text-gray-400 shrink-0" />;
 }
 
-function relativeTime(iso: string): string {
+/** Formats a timestamp as a human-readable relative time string (e.g. "5m ago") */
+function formatRelativeTime(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60_000);
   if (mins < 60) return `${mins}m ago`;
@@ -109,7 +110,7 @@ export function ChangeTimelineWidget({ config, timeRange, title }: WidgetProps) 
                 </span>
               </div>
               <span className="text-[10px] text-gray-400 shrink-0 tabular-nums whitespace-nowrap">
-                {relativeTime(ev.occurredAt)}
+                {formatRelativeTime(ev.occurredAt)}
               </span>
             </div>
           ))}
