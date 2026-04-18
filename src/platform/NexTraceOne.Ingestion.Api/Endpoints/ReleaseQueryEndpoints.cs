@@ -38,6 +38,9 @@ internal static class ReleaseQueryEndpoints
         MapGetAdvisoryByExternalKey(group);
         MapGetBlastRadiusByExternalKey(group);
         MapGetPostReleaseReviewByExternalKey(group);
+        MapGetChangeIntelligenceSummaryByExternalKey(group);
+        MapGetCanaryRolloutStatusByExternalKey(group);
+        MapGetHistoricalPatternInsightByExternalKey(group);
     }
 
     private static void MapListReleases(RouteGroupBuilder group)
@@ -659,6 +662,180 @@ internal static class ReleaseQueryEndpoints
             "without knowledge of the internal NexTraceOne release GUID.")
         .Produces<GetPostReleaseReviewFeature.Response>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    // ── NEW: natural-key variants for intelligence, canary, historical-pattern ──────────
+
+    private static void MapGetChangeIntelligenceSummaryByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/by-external/{externalSystem}/{externalReleaseId}/intelligence", async (
+            HttpContext httpContext,
+            string externalSystem,
+            string externalReleaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var resolveQuery = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var resolveResult = await sender.Send(resolveQuery, ct);
+
+                if (!resolveResult.IsSuccess)
+                    return Results.NotFound(new { message = resolveResult.Error?.Message, externalReleaseId, externalSystem });
+
+                var query = new GetChangeIntelligenceSummaryFeature.Query(resolveResult.Value.ReleaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, externalReleaseId, externalSystem });
+
+                logger.LogWarning(
+                    "GetChangeIntelligenceSummaryByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex,
+                    "Unexpected error getting change intelligence summary for {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetChangeIntelligenceSummaryByExternalKey")
+        .WithSummary("Get the full change intelligence record for a release using the external system's natural key")
+        .WithDescription(
+            "Returns the complete change intelligence aggregate (release metadata, confidence score, blast radius, " +
+            "external markers, baseline, post-release review, rollback assessment and event timeline) identified by " +
+            "the external system natural key. " +
+            "Intended for CI/CD pipelines, ITSM tools and governance portals that do not hold the internal NexTraceOne release GUID.")
+        .Produces<GetChangeIntelligenceSummaryFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetCanaryRolloutStatusByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/by-external/{externalSystem}/{externalReleaseId}/canary", async (
+            HttpContext httpContext,
+            string externalSystem,
+            string externalReleaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var resolveQuery = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var resolveResult = await sender.Send(resolveQuery, ct);
+
+                if (!resolveResult.IsSuccess)
+                    return Results.NotFound(new { message = resolveResult.Error?.Message, externalReleaseId, externalSystem });
+
+                var query = new GetCanaryRolloutStatusFeature.Query(resolveResult.Value.ReleaseId);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, externalReleaseId, externalSystem });
+
+                logger.LogWarning(
+                    "GetCanaryRolloutStatusByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex,
+                    "Unexpected error getting canary rollout status for {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetCanaryRolloutStatusByExternalKey")
+        .WithSummary("Get the canary rollout status for a release using the external system's natural key")
+        .WithDescription(
+            "Returns the canary deployment status and confidence signal (High / Medium / Low / Negative) for a release " +
+            "identified by the external system natural key. " +
+            "Used by canary controllers and deployment orchestrators that do not hold the internal NexTraceOne release GUID " +
+            "to decide whether to proceed with a full rollout.")
+        .Produces<GetCanaryRolloutStatusFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status403Forbidden);
+    }
+
+    private static void MapGetHistoricalPatternInsightByExternalKey(RouteGroupBuilder group)
+    {
+        group.MapGet("/by-external/{externalSystem}/{externalReleaseId}/historical-pattern", async (
+            HttpContext httpContext,
+            string externalSystem,
+            string externalReleaseId,
+            ISender sender,
+            ILoggerFactory loggerFactory,
+            int? lookbackDays,
+            CancellationToken ct) =>
+        {
+            IngestionCorrelationHelper.ResolveCorrelationId(httpContext);
+            var logger = loggerFactory.CreateLogger(nameof(ReleaseQueryEndpoints));
+
+            try
+            {
+                var resolveQuery = new ResolveReleaseByExternalKeyFeature.Query(externalReleaseId, externalSystem);
+                var resolveResult = await sender.Send(resolveQuery, ct);
+
+                if (!resolveResult.IsSuccess)
+                    return Results.NotFound(new { message = resolveResult.Error?.Message, externalReleaseId, externalSystem });
+
+                var query = new GetHistoricalPatternInsightFeature.Query(resolveResult.Value.ReleaseId, lookbackDays);
+                var result = await sender.Send(query, ct);
+
+                if (result.IsSuccess)
+                    return Results.Ok(result.Value);
+
+                if (result.Error?.Code?.Contains("not_found") == true)
+                    return Results.NotFound(new { message = result.Error.Message, externalReleaseId, externalSystem });
+
+                logger.LogWarning(
+                    "GetHistoricalPatternInsightByExternalKey failed for {ExternalSystem}/{ExternalReleaseId}: {Error}",
+                    externalSystem, externalReleaseId, result.Error?.Message);
+                return Results.Problem(result.Error?.Message ?? "Query failed", statusCode: StatusCodes.Status422UnprocessableEntity);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex,
+                    "Unexpected error getting historical pattern insight for {ExternalSystem}/{ExternalReleaseId}",
+                    externalSystem, externalReleaseId);
+                return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
+            }
+        })
+        .WithName("GetHistoricalPatternInsightByExternalKey")
+        .WithSummary("Get historical pattern analysis for a release using the external system's natural key")
+        .WithDescription(
+            "Analyses the historical pattern of releases similar to the given release (same service, environment " +
+            "and change level) identified by the external system natural key. " +
+            "Returns: total samples, success rate, rollback rate, failure rate, average change score, " +
+            "pattern risk signal (Low / Moderate / High / Insufficient) and a human-readable rationale. " +
+            "Use lookbackDays to override the default 90-day window (min 7, max 365). " +
+            "Ideal for risk assessment tools and deployment gates that do not hold the internal NexTraceOne release GUID.")
+        .Produces<GetHistoricalPatternInsightFeature.Response>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status404NotFound)
+        .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status401Unauthorized)
         .Produces(StatusCodes.Status403Forbidden);
     }
