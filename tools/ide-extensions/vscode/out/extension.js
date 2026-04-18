@@ -52,10 +52,43 @@ function activate(context) {
     // Register sidebar Chat Panel
     const chatViewProvider = new NexChatViewProvider(context);
     context.subscriptions.push(vscode.window.registerWebviewViewProvider('nextraceone.chatView', chatViewProvider));
+    // Register Service Catalog Tree View
+    const catalogProvider = new ServiceCatalogTreeProvider();
+    context.subscriptions.push(vscode.window.registerTreeDataProvider('nextraceone.catalogView', catalogProvider));
+    // Auto-load catalog on activation when API key is set
+    const initialConfig = getConfig();
+    if (initialConfig.apiKey) {
+        void catalogProvider.load(initialConfig.serverUrl, initialConfig.apiKey);
+    }
     // Register Chat Participant (@nextraceone)
     registerChatParticipant(context);
+    // Register LanguageModel tools (VS Code ≥ 1.113)
+    registerLanguageModelTools(context);
+    // Status bar
+    createStatusBar(context);
     // Register commands
-    context.subscriptions.push(vscode.commands.registerCommand('nextraceone.chat', () => handleChatCommand(context)), vscode.commands.registerCommand('nextraceone.configure', handleConfigureCommand), vscode.commands.registerCommand('nextraceone.inspectService', handleInspectServiceCommand), vscode.commands.registerCommand('nextraceone.askAboutSelection', handleAskAboutSelectionCommand), vscode.commands.registerCommand('nextraceone.mcpConfigure', handleMcpConfigureCommand), vscode.commands.registerCommand('nextraceone.openDashboard', handleOpenDashboardCommand), vscode.commands.registerCommand('nextraceone.scaffold', () => handleScaffoldCommand()), vscode.commands.registerCommand('nextraceone.applyCode', (code, filename) => handleApplyCodeCommand(code, filename)), vscode.commands.registerCommand('nextraceone.openChatPanel', () => vscode.commands.executeCommand('nextraceone.chatView.focus')));
+    context.subscriptions.push(vscode.commands.registerCommand('nextraceone.chat', () => handleChatCommand(context)), vscode.commands.registerCommand('nextraceone.configure', handleConfigureCommand), vscode.commands.registerCommand('nextraceone.inspectService', handleInspectServiceCommand), vscode.commands.registerCommand('nextraceone.askAboutSelection', handleAskAboutSelectionCommand), vscode.commands.registerCommand('nextraceone.mcpConfigure', handleMcpConfigureCommand), vscode.commands.registerCommand('nextraceone.openDashboard', handleOpenDashboardCommand), vscode.commands.registerCommand('nextraceone.scaffold', () => handleScaffoldCommand()), vscode.commands.registerCommand('nextraceone.applyCode', (code, filename) => handleApplyCodeCommand(code, filename)), vscode.commands.registerCommand('nextraceone.openChatPanel', () => vscode.commands.executeCommand('nextraceone.chatView.focus')), vscode.commands.registerCommand('nextraceone.refreshCatalog', () => {
+        const cfg = getConfig();
+        if (cfg.apiKey) {
+            void catalogProvider.load(cfg.serverUrl, cfg.apiKey);
+        }
+        else {
+            void vscode.window.showWarningMessage('NexTraceOne: Configure your API key first.');
+        }
+    }), vscode.commands.registerCommand('nextraceone.openServiceDashboard', (serviceName) => handleOpenServiceDashboardCommand(serviceName)), vscode.commands.registerCommand('nextraceone.askAboutService', (serviceName) => {
+        void chatViewProvider.sendQuery(`Show service context, ownership, contracts and recent changes for: ${serviceName}`);
+        void vscode.commands.executeCommand('nextraceone.chatView.focus');
+    }));
+    // Reload catalog when settings change
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((e) => {
+        if (e.affectsConfiguration('nextraceone')) {
+            updateStatusBar();
+            const cfg = getConfig();
+            if (cfg.apiKey) {
+                void catalogProvider.load(cfg.serverUrl, cfg.apiKey);
+            }
+        }
+    }));
 }
 function deactivate() {
     outputChannel?.dispose();
@@ -601,6 +634,277 @@ function registerChatParticipant(context) {
     }
 }
 // ═══════════════════════════════════════════════════════════════════════════════
+// Status Bar
+// ═══════════════════════════════════════════════════════════════════════════════
+let _statusBarItem;
+function createStatusBar(context) {
+    _statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    updateStatusBar();
+    _statusBarItem.show();
+    context.subscriptions.push(_statusBarItem);
+}
+function updateStatusBar() {
+    if (!_statusBarItem)
+        return;
+    const config = getConfig();
+    const env = config.defaultEnvironment || 'production';
+    const workspaceService = path.basename(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '');
+    if (!config.apiKey) {
+        _statusBarItem.text = '$(warning) NexTraceOne';
+        _statusBarItem.tooltip = 'NexTraceOne: API key not configured. Click to configure.';
+        _statusBarItem.command = 'nextraceone.configure';
+        _statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+    }
+    else if (workspaceService) {
+        _statusBarItem.text = `$(rocket) ${workspaceService} [${env}]`;
+        _statusBarItem.tooltip = `NexTraceOne: ${workspaceService} · ${env}\nClick to open AI Chat`;
+        _statusBarItem.command = 'nextraceone.openChatPanel';
+        _statusBarItem.backgroundColor = undefined;
+    }
+    else {
+        _statusBarItem.text = `$(rocket) NexTraceOne [${env}]`;
+        _statusBarItem.tooltip = `NexTraceOne · ${env}\nClick to open AI Chat`;
+        _statusBarItem.command = 'nextraceone.openChatPanel';
+        _statusBarItem.backgroundColor = undefined;
+    }
+}
+class CatalogNode extends vscode.TreeItem {
+    constructor(label, collapsibleState, contextValue, serviceItem) {
+        super(label, collapsibleState);
+        this.contextValue = contextValue;
+        this.serviceItem = serviceItem;
+        this.contextValue = contextValue;
+    }
+}
+class ServiceCatalogTreeProvider {
+    constructor() {
+        this._onDidChangeTreeData = new vscode.EventEmitter();
+        this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+        this._services = [];
+        this._loading = false;
+    }
+    refresh() {
+        this._onDidChangeTreeData.fire();
+    }
+    async load(serverUrl, apiKey) {
+        this._loading = true;
+        this._error = undefined;
+        this._onDidChangeTreeData.fire();
+        try {
+            this._services = await fetchCatalogServices(serverUrl, apiKey);
+        }
+        catch (err) {
+            this._error = err instanceof Error ? err.message : String(err);
+            this._services = [];
+            outputChannel.appendLine(`[Catalog] Failed to load: ${this._error}`);
+        }
+        finally {
+            this._loading = false;
+            this._onDidChangeTreeData.fire();
+        }
+    }
+    getTreeItem(element) {
+        return element;
+    }
+    getChildren(element) {
+        if (!element) {
+            if (this._loading) {
+                const n = new CatalogNode('Loading catalog…', vscode.TreeItemCollapsibleState.None, 'loading');
+                n.iconPath = new vscode.ThemeIcon('loading~spin');
+                return [n];
+            }
+            if (this._error) {
+                const n = new CatalogNode(`Error: ${this._error}`, vscode.TreeItemCollapsibleState.None, 'error');
+                n.iconPath = new vscode.ThemeIcon('error');
+                return [n];
+            }
+            if (this._services.length === 0) {
+                const n = new CatalogNode('No services found — check API key', vscode.TreeItemCollapsibleState.None, 'empty');
+                n.iconPath = new vscode.ThemeIcon('info');
+                return [n];
+            }
+            return this._services.map((s) => {
+                const node = new CatalogNode(s.name, vscode.TreeItemCollapsibleState.Collapsed, 'service', s);
+                node.description = s.teamName ?? '';
+                node.tooltip = [s.name, s.domain, s.type, s.language].filter(Boolean).join(' · ');
+                node.iconPath = new vscode.ThemeIcon('server');
+                return node;
+            });
+        }
+        if (element.contextValue === 'service' && element.serviceItem) {
+            const s = element.serviceItem;
+            const items = [];
+            const addInfo = (label, icon) => {
+                const n = new CatalogNode(label, vscode.TreeItemCollapsibleState.None, 'info');
+                n.iconPath = new vscode.ThemeIcon(icon);
+                items.push(n);
+            };
+            if (s.description)
+                addInfo(s.description, 'quote');
+            if (s.teamName)
+                addInfo(`Team: ${s.teamName}`, 'organization');
+            if (s.domain)
+                addInfo(`Domain: ${s.domain}`, 'symbol-namespace');
+            if (s.type)
+                addInfo(`Type: ${s.type}`, 'symbol-class');
+            if (s.language)
+                addInfo(`Language: ${s.language}`, 'code');
+            if (s.status)
+                addInfo(`Status: ${s.status}`, 'circle-filled');
+            const dashNode = new CatalogNode('Open in Dashboard', vscode.TreeItemCollapsibleState.None, 'action');
+            dashNode.iconPath = new vscode.ThemeIcon('link-external');
+            dashNode.command = { command: 'nextraceone.openServiceDashboard', title: 'Open in Dashboard', arguments: [s.name] };
+            items.push(dashNode);
+            const aiNode = new CatalogNode('Ask AI about this service', vscode.TreeItemCollapsibleState.None, 'action');
+            aiNode.iconPath = new vscode.ThemeIcon('comment-discussion');
+            aiNode.command = { command: 'nextraceone.askAboutService', title: 'Ask AI', arguments: [s.name] };
+            items.push(aiNode);
+            return items;
+        }
+        return [];
+    }
+}
+function fetchCatalogServices(serverUrl, apiKey) {
+    return new Promise((resolve, reject) => {
+        const parsedUrl = new url_1.URL('/api/v1/catalog/services?pageSize=100', serverUrl);
+        const transport = parsedUrl.protocol === 'https:' ? https : http;
+        const req = transport.request({
+            hostname: parsedUrl.hostname,
+            port: parsedUrl.port,
+            path: parsedUrl.pathname + parsedUrl.search,
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/json' },
+            timeout: 15000,
+        }, (res) => {
+            const chunks = [];
+            res.on('data', (c) => chunks.push(c));
+            res.on('end', () => {
+                const body = Buffer.concat(chunks).toString('utf-8');
+                if (res.statusCode && res.statusCode >= 400) {
+                    reject(new Error(`Server ${res.statusCode}: ${body.slice(0, 200)}`));
+                    return;
+                }
+                try {
+                    const parsed = JSON.parse(body);
+                    resolve(Array.isArray(parsed) ? parsed : (parsed.items ?? []));
+                }
+                catch {
+                    reject(new Error('Invalid catalog response'));
+                }
+            });
+        });
+        req.on('error', reject);
+        req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
+        req.end();
+    });
+}
+// ═══════════════════════════════════════════════════════════════════════════════
+// LanguageModel Tools (VS Code ≥ 1.113)
+// ═══════════════════════════════════════════════════════════════════════════════
+function registerLanguageModelTools(context) {
+    // vscode.lm.registerTool is available in VS Code ≥ 1.113; guard for older versions
+    const lmApi = vscode['lm'];
+    if (typeof lmApi?.registerTool !== 'function') {
+        outputChannel.appendLine('LanguageModelTool API not available (requires VS Code ≥ 1.113).');
+        return;
+    }
+    const registerTool = lmApi.registerTool.bind(lmApi);
+    function makeResult(text) {
+        try {
+            // Use the proper LanguageModelToolResult API when available
+            const vscAny = vscode;
+            const TextPart = vscAny['LanguageModelTextPart'];
+            const ToolResult = vscAny['LanguageModelToolResult'];
+            if (TextPart && ToolResult) {
+                return new ToolResult([new TextPart(text)]);
+            }
+        }
+        catch { /* fall through */ }
+        return { content: [{ value: text }] };
+    }
+    const tools = [
+        {
+            name: 'nextraceone_get_service',
+            invoke: async (input) => {
+                const config = getConfig();
+                if (!config.apiKey)
+                    return 'NexTraceOne API key not configured.';
+                return callIdeQueryApi(config.serverUrl, config.apiKey, {
+                    queryText: `Show service context, ownership, contracts and reliability for: ${input['serviceName']}`,
+                    clientType: 'vscode-tool', clientVersion: '0.5.0',
+                    queryType: 'OwnershipLookup', serviceContext: input['serviceName'], persona: config.persona,
+                });
+            },
+        },
+        {
+            name: 'nextraceone_get_contract',
+            invoke: async (input) => {
+                const config = getConfig();
+                if (!config.apiKey)
+                    return 'NexTraceOne API key not configured.';
+                const q = input['version']
+                    ? `Show contract details for: ${input['contractName']} version ${input['version']}`
+                    : `Show contract details, schema and examples for: ${input['contractName']}`;
+                return callIdeQueryApi(config.serverUrl, config.apiKey, {
+                    queryText: q,
+                    clientType: 'vscode-tool', clientVersion: '0.5.0',
+                    queryType: 'ContractSuggestion', persona: config.persona,
+                });
+            },
+        },
+        {
+            name: 'nextraceone_blast_radius',
+            invoke: async (input) => {
+                const config = getConfig();
+                if (!config.apiKey)
+                    return 'NexTraceOne API key not configured.';
+                const env = input['environment'] ?? config.defaultEnvironment ?? 'production';
+                return callIdeQueryApi(config.serverUrl, config.apiKey, {
+                    queryText: `Analyse blast radius for service: ${input['serviceName']} in environment: ${env}. List dependent services and potential impact.`,
+                    clientType: 'vscode-tool', clientVersion: '0.5.0',
+                    queryType: 'BreakingChangeAlert', serviceContext: input['serviceName'], persona: config.persona,
+                });
+            },
+        },
+        {
+            name: 'nextraceone_get_incident',
+            invoke: async (input) => {
+                const config = getConfig();
+                if (!config.apiKey)
+                    return 'NexTraceOne API key not configured.';
+                const q = input['serviceName']
+                    ? `[Incident context] ${input['query']} for service: ${input['serviceName']}`
+                    : `[Incident context] ${input['query']}`;
+                return callIdeQueryApi(config.serverUrl, config.apiKey, {
+                    queryText: q,
+                    clientType: 'vscode-tool', clientVersion: '0.5.0',
+                    queryType: 'GeneralQuery', serviceContext: input['serviceName'], persona: config.persona,
+                });
+            },
+        },
+    ];
+    for (const tool of tools) {
+        try {
+            const disposable = registerTool(tool.name, {
+                invoke: async (opts, _token) => {
+                    try {
+                        const text = await tool.invoke(opts.input);
+                        return makeResult(text);
+                    }
+                    catch (err) {
+                        return makeResult(`Error: ${err instanceof Error ? err.message : String(err)}`);
+                    }
+                },
+            });
+            context.subscriptions.push(disposable);
+            outputChannel.appendLine(`Registered LanguageModelTool: ${tool.name}`);
+        }
+        catch (err) {
+            outputChannel.appendLine(`Could not register tool ${tool.name}: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    }
+}
+// ═══════════════════════════════════════════════════════════════════════════════
 // Commands
 // ═══════════════════════════════════════════════════════════════════════════════
 /** Handles the "NexTraceOne: Ask AI" command — quick-input fallback. */
@@ -784,6 +1088,19 @@ async function handleOpenDashboardCommand() {
     catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         await vscode.window.showErrorMessage(`NexTraceOne: Failed to open dashboard: ${message}`);
+    }
+}
+/** Handles opening a specific service page in the NexTraceOne dashboard. */
+async function handleOpenServiceDashboardCommand(serviceName) {
+    const config = getConfig();
+    const serviceUrl = `${config.serverUrl.replace(/\/$/, '')}/services/${encodeURIComponent(serviceName)}`;
+    try {
+        await vscode.env.openExternal(vscode.Uri.parse(serviceUrl));
+        outputChannel.appendLine(`Opened service dashboard: ${serviceUrl}`);
+    }
+    catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        await vscode.window.showErrorMessage(`NexTraceOne: Failed to open service dashboard: ${message}`);
     }
 }
 /**
