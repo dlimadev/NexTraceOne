@@ -14,6 +14,7 @@ import {
   Trash2,
   Save,
   LayoutGrid,
+  Eye,
 } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { PageContainer } from '../../../components/shell';
@@ -116,6 +117,68 @@ function widgetFromDetail(w: WidgetSlot): BuilderSlot {
   };
 }
 
+// ── Grid Preview ────────────────────────────────────────────────────────────
+
+/** Derives grid columns count from layout string */
+function layoutCols(layout: string): number {
+  switch (layout) {
+    case 'single-column': return 1;
+    case 'two-column': return 2;
+    case 'three-column': return 3;
+    default: return 4;
+  }
+}
+
+/** Visual preview of the current slot layout */
+function GridPreview({ slots, layout }: { slots: BuilderSlot[]; layout: string }) {
+  const { t } = useTranslation();
+  const cols = layoutCols(layout);
+
+  if (slots.length === 0) {
+    return (
+      <div className="h-40 flex items-center justify-center text-xs text-gray-400 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+        {t('governance.dashboardBuilder.previewEmpty', 'No widgets yet')}
+      </div>
+    );
+  }
+
+  // Compute grid height: max (posY + height) across all slots
+  const gridRows = Math.max(...slots.map((s) => s.posY + s.height), 2);
+
+  return (
+    <div
+      className="border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-900/50"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${gridRows}, 40px)`,
+        gap: '4px',
+      }}
+      aria-label={t('governance.dashboardBuilder.previewLabel', 'Dashboard preview')}
+    >
+      {slots.map((slot) => {
+        const meta = WIDGET_META[slot.type];
+        return (
+          <div
+            key={slot.tempId}
+            style={{
+              gridColumn: `${slot.posX + 1} / span ${Math.min(slot.width, cols - slot.posX)}`,
+              gridRow: `${slot.posY + 1} / span ${slot.height}`,
+            }}
+            className="rounded bg-accent/10 border border-accent/30 flex flex-col items-center justify-center p-1 overflow-hidden"
+            title={slot.customTitle || t(meta?.labelKey ?? slot.type, slot.type)}
+          >
+            <span className="text-[9px] font-semibold text-accent truncate w-full text-center leading-tight">
+              {slot.customTitle || t(meta?.labelKey ?? slot.type, slot.type)}
+            </span>
+            <span className="text-[8px] text-gray-400 tabular-nums">{slot.width}×{slot.height}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────────────────
 
 export function DashboardBuilderPage() {
@@ -134,6 +197,7 @@ export function DashboardBuilderPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   // Initialize state from loaded dashboard
   if (data && !initialized) {
@@ -230,12 +294,25 @@ export function DashboardBuilderPage() {
               {t('governance.dashboardBuilder.title', 'Edit Dashboard')}
             </h1>
           </div>
-          {!isReadOnly && (
-            <Button onClick={handleSave} disabled={updateMutation.isPending}>
-              <Save size={14} className="mr-1" />
-              {t('governance.dashboardBuilder.save', 'Save Dashboard')}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setShowPreview((v) => !v)}
+              aria-label={t('governance.dashboardBuilder.togglePreview', 'Toggle preview')}
+            >
+              <Eye size={14} className="mr-1" />
+              {showPreview
+                ? t('governance.dashboardBuilder.hidePreview', 'Hide Preview')
+                : t('governance.dashboardBuilder.showPreview', 'Show Preview')}
             </Button>
-          )}
+            {!isReadOnly && (
+              <Button onClick={handleSave} disabled={updateMutation.isPending}>
+                <Save size={14} className="mr-1" />
+                {t('governance.dashboardBuilder.save', 'Save Dashboard')}
+              </Button>
+            )}
+          </div>
         </div>
         {isReadOnly && (
           <p className="text-sm text-yellow-600 dark:text-yellow-400">
@@ -291,174 +368,194 @@ export function DashboardBuilderPage() {
         </Card>
       )}
 
-      {/* Widget slots */}
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {t('governance.dashboardBuilder.widgets', 'Widgets')} ({slots.length})
-        </h2>
-        {!isReadOnly && (
-          <Button size="sm" variant="secondary" onClick={addSlot} disabled={slots.length >= 20}>
-            <Plus size={14} className="mr-1" />
-            {t('governance.dashboardBuilder.addWidget', 'Add Widget')}
-          </Button>
+      {/* Widget slots + live preview */}
+      <div className={`flex gap-6 ${showPreview ? 'lg:flex-row' : ''} flex-col`}>
+        {/* Left: slot editor */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+              {t('governance.dashboardBuilder.widgets', 'Widgets')} ({slots.length})
+            </h2>
+            {!isReadOnly && (
+              <Button size="sm" variant="secondary" onClick={addSlot} disabled={slots.length >= 20}>
+                <Plus size={14} className="mr-1" />
+                {t('governance.dashboardBuilder.addWidget', 'Add Widget')}
+              </Button>
+            )}
+          </div>
+
+          {slots.length === 0 ? (
+            <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center text-sm text-gray-400">
+              {t('governance.dashboardBuilder.noWidgets', 'No widgets yet. Click "Add Widget" to start building.')}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {slots.map((slot, index) => (
+                <Card key={slot.tempId}>
+                  <CardBody>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs font-mono text-gray-400 pt-2 w-5 shrink-0">{index + 1}</span>
+                      <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        {/* Widget type */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {t('governance.dashboardBuilder.widgetType', 'Widget Type')}
+                          </label>
+                          <select
+                            value={slot.type}
+                            onChange={(e) => updateSlot(slot.tempId, { type: e.target.value as WidgetType })}
+                            disabled={isReadOnly}
+                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                          >
+                            {ALL_WIDGET_TYPES.map((wt) => (
+                              <option key={wt} value={wt}>
+                                {t(WIDGET_META[wt].labelKey, wt)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Position */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {t('governance.dashboardBuilder.position', 'Position (col, row)')}
+                          </label>
+                          <div className="flex gap-1">
+                            <input
+                              type="number"
+                              min={0}
+                              max={maxCols - 1}
+                              value={slot.posX}
+                              onChange={(e) => updateSlot(slot.tempId, { posX: Number(e.target.value) })}
+                              disabled={isReadOnly}
+                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                              placeholder="Col"
+                              aria-label={t('governance.dashboardBuilder.col', 'Column')}
+                            />
+                            <input
+                              type="number"
+                              min={0}
+                              value={slot.posY}
+                              onChange={(e) => updateSlot(slot.tempId, { posY: Number(e.target.value) })}
+                              disabled={isReadOnly}
+                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                              placeholder="Row"
+                              aria-label={t('governance.dashboardBuilder.row', 'Row')}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Size */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {t('governance.dashboardBuilder.size', 'Size (w × h)')}
+                          </label>
+                          <div className="flex gap-1">
+                            <input
+                              type="number"
+                              min={1}
+                              max={maxCols}
+                              value={slot.width}
+                              onChange={(e) => updateSlot(slot.tempId, { width: Number(e.target.value) })}
+                              disabled={isReadOnly}
+                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                              aria-label={t('governance.dashboardBuilder.width', 'Width')}
+                            />
+                            <input
+                              type="number"
+                              min={1}
+                              value={slot.height}
+                              onChange={(e) => updateSlot(slot.tempId, { height: Number(e.target.value) })}
+                              disabled={isReadOnly}
+                              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                              aria-label={t('governance.dashboardBuilder.height', 'Height')}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Custom title */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {t('governance.dashboardBuilder.customTitle', 'Custom Title')}
+                          </label>
+                          <input
+                            type="text"
+                            value={slot.customTitle}
+                            onChange={(e) => updateSlot(slot.tempId, { customTitle: e.target.value })}
+                            disabled={isReadOnly}
+                            maxLength={80}
+                            placeholder={t('governance.dashboardBuilder.customTitlePlaceholder', 'Optional override')}
+                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                          />
+                        </div>
+
+                        {/* Time range override */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {t('governance.dashboardBuilder.timeRangeOverride', 'Time Range Override')}
+                          </label>
+                          <select
+                            value={slot.timeRange}
+                            onChange={(e) => updateSlot(slot.tempId, { timeRange: e.target.value })}
+                            disabled={isReadOnly}
+                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                          >
+                            {TIME_RANGE_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {t(opt.labelKey, opt.value)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Service filter */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                            {t('governance.dashboardBuilder.serviceFilter', 'Service Filter')}
+                          </label>
+                          <input
+                            type="text"
+                            value={slot.serviceId}
+                            onChange={(e) => updateSlot(slot.tempId, { serviceId: e.target.value })}
+                            disabled={isReadOnly}
+                            placeholder={t('governance.dashboardBuilder.serviceFilterPlaceholder', 'All services')}
+                            className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
+                          />
+                        </div>
+                      </div>
+
+                      {!isReadOnly && (
+                        <button
+                          onClick={() => removeSlot(slot.tempId)}
+                          className="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0 mt-1"
+                          aria-label={t('governance.dashboardBuilder.removeWidget', 'Remove widget')}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right: live preview */}
+        {showPreview && (
+          <div className="lg:w-72 shrink-0">
+            <div className="sticky top-4">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                {t('governance.dashboardBuilder.previewTitle', 'Live Preview')}
+              </h2>
+              <GridPreview slots={slots} layout={layout} />
+              <p className="mt-1 text-xs text-gray-400">
+                {t('governance.dashboardBuilder.previewHint', 'Updates as you configure widgets')}
+              </p>
+            </div>
+          </div>
         )}
       </div>
-
-      {slots.length === 0 ? (
-        <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center text-sm text-gray-400">
-          {t('governance.dashboardBuilder.noWidgets', 'No widgets yet. Click "Add Widget" to start building.')}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {slots.map((slot, index) => (
-            <Card key={slot.tempId}>
-              <CardBody>
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-mono text-gray-400 pt-2 w-5 shrink-0">{index + 1}</span>
-                  <div className="flex-1 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    {/* Widget type */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                        {t('governance.dashboardBuilder.widgetType', 'Widget Type')}
-                      </label>
-                      <select
-                        value={slot.type}
-                        onChange={(e) => updateSlot(slot.tempId, { type: e.target.value as WidgetType })}
-                        disabled={isReadOnly}
-                        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                      >
-                        {ALL_WIDGET_TYPES.map((wt) => (
-                          <option key={wt} value={wt}>
-                            {t(WIDGET_META[wt].labelKey, wt)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Position */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                        {t('governance.dashboardBuilder.position', 'Position (col, row)')}
-                      </label>
-                      <div className="flex gap-1">
-                        <input
-                          type="number"
-                          min={0}
-                          max={maxCols - 1}
-                          value={slot.posX}
-                          onChange={(e) => updateSlot(slot.tempId, { posX: Number(e.target.value) })}
-                          disabled={isReadOnly}
-                          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          placeholder="Col"
-                          aria-label={t('governance.dashboardBuilder.col', 'Column')}
-                        />
-                        <input
-                          type="number"
-                          min={0}
-                          value={slot.posY}
-                          onChange={(e) => updateSlot(slot.tempId, { posY: Number(e.target.value) })}
-                          disabled={isReadOnly}
-                          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          placeholder="Row"
-                          aria-label={t('governance.dashboardBuilder.row', 'Row')}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Size */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                        {t('governance.dashboardBuilder.size', 'Size (w × h)')}
-                      </label>
-                      <div className="flex gap-1">
-                        <input
-                          type="number"
-                          min={1}
-                          max={maxCols}
-                          value={slot.width}
-                          onChange={(e) => updateSlot(slot.tempId, { width: Number(e.target.value) })}
-                          disabled={isReadOnly}
-                          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          aria-label={t('governance.dashboardBuilder.width', 'Width')}
-                        />
-                        <input
-                          type="number"
-                          min={1}
-                          value={slot.height}
-                          onChange={(e) => updateSlot(slot.tempId, { height: Number(e.target.value) })}
-                          disabled={isReadOnly}
-                          className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                          aria-label={t('governance.dashboardBuilder.height', 'Height')}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Custom title */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                        {t('governance.dashboardBuilder.customTitle', 'Custom Title')}
-                      </label>
-                      <input
-                        type="text"
-                        value={slot.customTitle}
-                        onChange={(e) => updateSlot(slot.tempId, { customTitle: e.target.value })}
-                        disabled={isReadOnly}
-                        maxLength={80}
-                        placeholder={t('governance.dashboardBuilder.customTitlePlaceholder', 'Optional override')}
-                        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                      />
-                    </div>
-
-                    {/* Time range override */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                        {t('governance.dashboardBuilder.timeRangeOverride', 'Time Range Override')}
-                      </label>
-                      <select
-                        value={slot.timeRange}
-                        onChange={(e) => updateSlot(slot.tempId, { timeRange: e.target.value })}
-                        disabled={isReadOnly}
-                        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                      >
-                        {TIME_RANGE_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {t(opt.labelKey, opt.value)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Service filter */}
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                        {t('governance.dashboardBuilder.serviceFilter', 'Service Filter')}
-                      </label>
-                      <input
-                        type="text"
-                        value={slot.serviceId}
-                        onChange={(e) => updateSlot(slot.tempId, { serviceId: e.target.value })}
-                        disabled={isReadOnly}
-                        placeholder={t('governance.dashboardBuilder.serviceFilterPlaceholder', 'All services')}
-                        className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs px-2 py-1.5 text-gray-900 dark:text-white disabled:opacity-50"
-                      />
-                    </div>
-                  </div>
-
-                  {!isReadOnly && (
-                    <button
-                      onClick={() => removeSlot(slot.tempId)}
-                      className="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0 mt-1"
-                      aria-label={t('governance.dashboardBuilder.removeWidget', 'Remove widget')}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  )}
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      )}
 
       {saveError && (
         <p className="mt-4 text-sm text-red-600 dark:text-red-400">{saveError}</p>

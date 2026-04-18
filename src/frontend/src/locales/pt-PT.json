@@ -5760,7 +5760,17 @@
         "onCallStatus": "Estado On-Call",
         "reliabilitySlo": "SLO de Fiabilidade",
         "serviceScorecard": "Scorecard de Serviço"
-      }
+      },
+      "cloneDashboard": "Clonar",
+      "cloneTitle": "Clonar Dashboard",
+      "cloneName": "Nome do novo dashboard",
+      "cloneError": "Falha ao clonar o dashboard.",
+      "deleteDashboard": "Eliminar",
+      "confirmDeleteTitle": "Eliminar Dashboard",
+      "confirmDelete": "Esta ação não pode ser revertida. Tem a certeza que deseja eliminar este dashboard?",
+      "deleteError": "Falha ao eliminar o dashboard.",
+      "fromTemplate": "Usar Template",
+      "editDashboard": "Editar"
     },
     "dashboards": {
       "empty": "Sem dashboards personalizados",
@@ -5818,7 +5828,14 @@
       "title": "Editar Dashboard",
       "widgetType": "Tipo de Widget",
       "widgets": "Widgets",
-      "width": "Largura"
+      "width": "Largura",
+      "togglePreview": "Alternar pré-visualização",
+      "showPreview": "Mostrar pré-visualização",
+      "hidePreview": "Ocultar pré-visualização",
+      "previewTitle": "Pré-visualização",
+      "previewHint": "Atualiza à medida que configura os widgets",
+      "previewEmpty": "Sem widgets ainda",
+      "previewLabel": "Pré-visualização do dashboard"
     },
     "dora": {
       "cfr": "CFR",
@@ -9619,6 +9636,14 @@
     "platformAdmin": {
       "title": "Admin de Plataforma",
       "description": "Uso de IA, resultados de segurança, actividade de auditoria, saúde do sistema"
+    },
+    "auditor": {
+      "title": "Auditor",
+      "description": "Confiança em mudanças, incidentes, scorecard de serviços, tendência de custo"
+    },
+    "product": {
+      "title": "Product",
+      "description": "Métricas DORA, tendência de custo, SLO de fiabilidade, incidentes"
     }
   },
   "digestSettings": {

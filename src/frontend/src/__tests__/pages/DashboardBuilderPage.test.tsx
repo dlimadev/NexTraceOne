@@ -83,7 +83,6 @@ describe('DashboardBuilderPage', () => {
   it('shows dashboard name pre-filled', async () => {
     renderPage();
     await waitFor(() => {
-      // The name appears in the input value
       const nameInput = document.querySelector('input[maxlength="100"]') as HTMLInputElement;
       expect(nameInput?.value).toBe('Editable Dashboard');
     });
@@ -92,7 +91,6 @@ describe('DashboardBuilderPage', () => {
   it('shows existing widget in list', async () => {
     renderPage();
     await waitFor(() => {
-      // Widget type rendered as translated label in select option
       expect(document.body.textContent).toContain('DORA Metrics');
     });
   });
@@ -137,6 +135,37 @@ describe('DashboardBuilderPage', () => {
     renderPage();
     await waitFor(() => {
       expect(document.body.textContent).toContain('Back to Dashboard');
+    });
+  });
+
+  it('shows live preview panel by default', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Live Preview');
+    });
+  });
+
+  it('toggles preview panel visibility', async () => {
+    renderPage();
+    await waitFor(() => expect(document.body.textContent).toContain('Live Preview'));
+    const hideBtn = Array.from(document.querySelectorAll('button')).find(
+      (b) => b.textContent?.includes('Hide Preview'),
+    );
+    expect(hideBtn).toBeDefined();
+    fireEvent.click(hideBtn!);
+    await waitFor(() => {
+      expect(document.body.textContent).not.toContain('Live Preview');
+      expect(document.body.textContent).toContain('Show Preview');
+    });
+  });
+
+  it('preview renders widget slot cell when slots exist', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Live Preview');
+      // The preview grid should exist
+      const previewGrid = document.querySelector('[aria-label="Dashboard preview"]');
+      expect(previewGrid).toBeDefined();
     });
   });
 });

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Plus, Eye, Settings } from 'lucide-react';
+import { LayoutDashboard, Plus, Eye, Settings, Copy, Trash2, Layout as LayoutIcon } from 'lucide-react';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -12,6 +12,8 @@ import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
+import { DashboardTemplatePicker } from '../../../components/DashboardTemplatePicker';
+import type { TemplatePreview } from '../../../components/DashboardTemplatePicker';
 import client from '../../../api/client';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -130,6 +132,37 @@ const useCreateDashboard = () => {
   });
 };
 
+const useCloneDashboard = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ dashboardId, newName, userId }: { dashboardId: string; newName: string; userId: string }) =>
+      client
+        .post(`/governance/dashboards/${dashboardId}/clone`, {
+          newName,
+          tenantId: 'default',
+          userId,
+          sourceDashboardId: dashboardId,
+        })
+        .then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['governance-dashboards'] });
+    },
+  });
+};
+
+const useDeleteDashboard = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (dashboardId: string) =>
+      client
+        .delete(`/governance/dashboards/${dashboardId}`, { params: { tenantId: 'default' } })
+        .then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['governance-dashboards'] });
+    },
+  });
+};
+
 // ── Widget label key map ───────────────────────────────────────────────────
 
 const WIDGET_KEY_MAP: Record<string, string> = {
@@ -153,6 +186,8 @@ export function CustomDashboardsPage() {
 
   const { data, isLoading, isError, refetch } = useListDashboards(TENANT_ID, activeEnvironmentId);
   const createMutation = useCreateDashboard();
+  const cloneMutation = useCloneDashboard();
+  const deleteMutation = useDeleteDashboard();
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -162,10 +197,66 @@ export function CustomDashboardsPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState(false);
 
+  // Template picker
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+
+  // Clone dialog state
+  const [cloneTargetId, setCloneTargetId] = useState<string | null>(null);
+  const [cloneName, setCloneName] = useState('');
+  const [cloneError, setCloneError] = useState<string | null>(null);
+
+  // Delete confirm state
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const toggleWidget = (widgetId: string) => {
     setSelectedWidgets((prev) =>
       prev.includes(widgetId) ? prev.filter((w) => w !== widgetId) : [...prev, widgetId],
     );
+  };
+
+  /** Apply a template to the create form */
+  const applyTemplate = (tpl: TemplatePreview) => {
+    setName(t(tpl.titleKey, tpl.persona));
+    setLayout(tpl.layout);
+    setPersona(tpl.persona);
+    setSelectedWidgets(tpl.widgets as string[]);
+    setFormSuccess(false);
+    setFormError(null);
+  };
+
+  const handleCloneOpen = (dashboardId: string, dashboardName: string) => {
+    setCloneTargetId(dashboardId);
+    setCloneName(`${dashboardName} (copy)`);
+    setCloneError(null);
+  };
+
+  const handleCloneConfirm = async () => {
+    if (!cloneTargetId) return;
+    setCloneError(null);
+    try {
+      await cloneMutation.mutateAsync({ dashboardId: cloneTargetId, newName: cloneName, userId: 'current-user' });
+      setCloneTargetId(null);
+      setCloneName('');
+    } catch {
+      setCloneError(t('governance.customDashboards.cloneError', 'Failed to clone dashboard.'));
+    }
+  };
+
+  const handleDeleteOpen = (dashboardId: string) => {
+    setDeleteTargetId(dashboardId);
+    setDeleteError(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTargetId) return;
+    setDeleteError(null);
+    try {
+      await deleteMutation.mutateAsync(deleteTargetId);
+      setDeleteTargetId(null);
+    } catch {
+      setDeleteError(t('governance.customDashboards.deleteError', 'Failed to delete dashboard.'));
+    }
   };
 
   /** Build widget inputs with automatic grid positions */
@@ -219,10 +310,95 @@ export function CustomDashboardsPage() {
         icon={<LayoutDashboard size={24} />}
       />
 
+      {/* Template Picker Modal */}
+      <DashboardTemplatePicker
+        open={templatePickerOpen}
+        onClose={() => setTemplatePickerOpen(false)}
+        onSelect={(tpl) => { applyTemplate(tpl); setTemplatePickerOpen(false); }}
+      />
+
+      {/* Clone Dialog */}
+      {cloneTargetId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
+              {t('governance.customDashboards.cloneTitle', 'Clone Dashboard')}
+            </h2>
+            <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+              {t('governance.customDashboards.cloneName', 'New Dashboard Name')}
+            </label>
+            <input
+              type="text"
+              value={cloneName}
+              onChange={(e) => setCloneName(e.target.value)}
+              maxLength={100}
+              className="w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-2 text-gray-900 dark:text-white mb-3"
+              autoFocus
+            />
+            {cloneError && (
+              <p className="text-sm text-red-600 dark:text-red-400 mb-2">{cloneError}</p>
+            )}
+            <div className="flex gap-2 justify-end">
+              <Button variant="secondary" size="sm" onClick={() => setCloneTargetId(null)}>
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleCloneConfirm}
+                disabled={cloneMutation.isPending || !cloneName.trim()}
+              >
+                {t('governance.customDashboards.cloneDashboard', 'Clone')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Dialog */}
+      {deleteTargetId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+              {t('governance.customDashboards.confirmDeleteTitle', 'Delete Dashboard')}
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {t('governance.customDashboards.confirmDelete', 'This action cannot be undone. Are you sure you want to delete this dashboard?')}
+            </p>
+            {deleteError && (
+              <p className="text-sm text-red-600 dark:text-red-400 mb-2">{deleteError}</p>
+            )}
+            <div className="flex gap-2 justify-end">
+              <Button variant="secondary" size="sm" onClick={() => setDeleteTargetId(null)}>
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleDeleteConfirm}
+                disabled={deleteMutation.isPending}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {t('governance.customDashboards.deleteDashboard', 'Delete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create Dashboard Form */}
       <PageSection title={t('governance.customDashboards.createDashboard')}>
         <Card>
           <CardBody>
+            <div className="flex justify-end mb-3">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setTemplatePickerOpen(true)}
+                aria-label={t('governance.customDashboards.fromTemplate', 'Use Template')}
+              >
+                <LayoutIcon size={14} className="mr-1" />
+                {t('governance.customDashboards.fromTemplate', 'Use Template')}
+              </Button>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div>
@@ -368,7 +544,7 @@ export function CustomDashboardsPage() {
                       <Badge variant="warning">{t('governance.dashboardView.system', 'System')}</Badge>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       size="sm"
                       variant="secondary"
@@ -382,8 +558,28 @@ export function CustomDashboardsPage() {
                         size="sm"
                         variant="secondary"
                         onClick={() => navigate(`/governance/dashboards/${dashboard.dashboardId}/edit`)}
+                        aria-label={t('governance.customDashboards.editDashboard', 'Edit')}
                       >
                         <Settings size={12} />
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleCloneOpen(dashboard.dashboardId, dashboard.name)}
+                      aria-label={t('governance.customDashboards.cloneDashboard', 'Clone')}
+                    >
+                      <Copy size={12} />
+                    </Button>
+                    {!dashboard.isSystem && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleDeleteOpen(dashboard.dashboardId)}
+                        aria-label={t('governance.customDashboards.deleteDashboard', 'Delete')}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 size={12} />
                       </Button>
                     )}
                   </div>

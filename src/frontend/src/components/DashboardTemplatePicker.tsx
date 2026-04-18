@@ -1,21 +1,76 @@
 import { useTranslation } from 'react-i18next';
 import { X, Layout } from 'lucide-react';
 import { Button } from './Button';
+import type { WidgetType } from '../features/governance/widgets/WidgetRegistry';
 
-interface TemplatePreview {
+export interface TemplatePreview {
   id: string;
   titleKey: string;
   descKey: string;
-  widgets: string[];
+  /** Real WidgetType values used to pre-fill the dashboard create form */
+  widgets: WidgetType[];
   persona: string;
+  layout: string;
 }
 
+/** All persona templates. Widget IDs match WidgetType values in WidgetRegistry. */
 const TEMPLATES: TemplatePreview[] = [
-  { id: 'engineer', titleKey: 'dashboardTemplates.engineer.title', descKey: 'dashboardTemplates.engineer.description', widgets: ['team-services', 'recent-changes', 'active-incidents', 'dora-metrics'], persona: 'Engineer' },
-  { id: 'tech_lead', titleKey: 'dashboardTemplates.techLead.title', descKey: 'dashboardTemplates.techLead.description', widgets: ['team-services', 'change-risk', 'pending-approvals', 'slo-status'], persona: 'TechLead' },
-  { id: 'architect', titleKey: 'dashboardTemplates.architect.title', descKey: 'dashboardTemplates.architect.description', widgets: ['contract-health', 'dependency-map', 'compliance-status', 'reliability-trend'], persona: 'Architect' },
-  { id: 'executive', titleKey: 'dashboardTemplates.executive.title', descKey: 'dashboardTemplates.executive.description', widgets: ['finops-summary', 'compliance-status', 'incident-overview', 'dora-metrics'], persona: 'Executive' },
-  { id: 'platform_admin', titleKey: 'dashboardTemplates.platformAdmin.title', descKey: 'dashboardTemplates.platformAdmin.description', widgets: ['ai-usage', 'security-findings', 'audit-activity', 'system-health'], persona: 'PlatformAdmin' },
+  {
+    id: 'engineer',
+    titleKey: 'dashboardTemplates.engineer.title',
+    descKey: 'dashboardTemplates.engineer.description',
+    widgets: ['service-scorecard', 'change-confidence', 'incident-summary', 'dora-metrics'],
+    persona: 'Engineer',
+    layout: 'two-column',
+  },
+  {
+    id: 'tech_lead',
+    titleKey: 'dashboardTemplates.techLead.title',
+    descKey: 'dashboardTemplates.techLead.description',
+    widgets: ['service-scorecard', 'change-confidence', 'reliability-slo', 'dora-metrics'],
+    persona: 'TechLead',
+    layout: 'two-column',
+  },
+  {
+    id: 'architect',
+    titleKey: 'dashboardTemplates.architect.title',
+    descKey: 'dashboardTemplates.architect.description',
+    widgets: ['service-scorecard', 'knowledge-graph', 'reliability-slo', 'change-confidence'],
+    persona: 'Architect',
+    layout: 'grid',
+  },
+  {
+    id: 'executive',
+    titleKey: 'dashboardTemplates.executive.title',
+    descKey: 'dashboardTemplates.executive.description',
+    widgets: ['cost-trend', 'incident-summary', 'dora-metrics', 'reliability-slo'],
+    persona: 'Executive',
+    layout: 'two-column',
+  },
+  {
+    id: 'platform_admin',
+    titleKey: 'dashboardTemplates.platformAdmin.title',
+    descKey: 'dashboardTemplates.platformAdmin.description',
+    widgets: ['dora-metrics', 'incident-summary', 'change-confidence', 'reliability-slo'],
+    persona: 'PlatformAdmin',
+    layout: 'grid',
+  },
+  {
+    id: 'product',
+    titleKey: 'dashboardTemplates.product.title',
+    descKey: 'dashboardTemplates.product.description',
+    widgets: ['dora-metrics', 'cost-trend', 'reliability-slo', 'incident-summary'],
+    persona: 'Product',
+    layout: 'two-column',
+  },
+  {
+    id: 'auditor',
+    titleKey: 'dashboardTemplates.auditor.title',
+    descKey: 'dashboardTemplates.auditor.description',
+    widgets: ['change-confidence', 'incident-summary', 'service-scorecard', 'cost-trend'],
+    persona: 'Auditor',
+    layout: 'two-column',
+  },
 ];
 
 interface Props {
