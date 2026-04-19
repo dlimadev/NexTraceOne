@@ -63,7 +63,7 @@ O módulo implementa cadeia de integridade SHA-256:
 - Cada link contém: SequenceNumber, CurrentHash, PreviousHash
 - Verificação de integridade via endpoint `GET /api/v1/audit/verify-chain`
 
-## Endpoints (16)
+## Endpoints (22)
 
 | Método | Rota | Permissão |
 |--------|------|-----------|
@@ -79,9 +79,15 @@ O módulo implementa cadeia de integridade SHA-256:
 | POST | `/api/v1/audit/compliance/policies` | `audit:compliance:write` |
 | GET | `/api/v1/audit/compliance/policies` | `audit:compliance:read` |
 | GET | `/api/v1/audit/compliance/policies/{id}` | `audit:compliance:read` |
+| **PUT** | **`/api/v1/audit/compliance/policies/{id}`** | `audit:compliance:write` |
+| **PATCH** | **`/api/v1/audit/compliance/policies/{id}/activate`** | `audit:compliance:write` |
+| **PATCH** | **`/api/v1/audit/compliance/policies/{id}/deactivate`** | `audit:compliance:write` |
 | POST | `/api/v1/audit/campaigns` | `audit:compliance:write` |
 | GET | `/api/v1/audit/campaigns` | `audit:compliance:read` |
 | GET | `/api/v1/audit/campaigns/{id}` | `audit:compliance:read` |
+| **PATCH** | **`/api/v1/audit/campaigns/{id}/start`** | `audit:compliance:write` |
+| **PATCH** | **`/api/v1/audit/campaigns/{id}/complete`** | `audit:compliance:write` |
+| **PATCH** | **`/api/v1/audit/campaigns/{id}/cancel`** | `audit:compliance:write` |
 | POST | `/api/v1/audit/compliance/results` | `audit:compliance:write` |
 
 ## Permissões
@@ -96,4 +102,18 @@ O módulo implementa cadeia de integridade SHA-256:
 
 ## Testes
 
-113 testes cobrindo: Domain entities, Application features, Chain integrity, Compliance.
+194 testes cobrindo: Domain entities, Application features, Chain integrity, Compliance lifecycle, SearchWithResource+paginação, TransitionAuditCampaign, ActivateCompliancePolicy, DeactivateCompliancePolicy, UpdateCompliancePolicy, GenerateAuditReadyReport com IDateTimeProvider.
+
+## Melhorias recentes
+
+| Área | Melhoria |
+|------|----------|
+| Paginação | `SearchAuditLog.Response` agora inclui `TotalCount`, `Page`, `PageSize`, `TotalPages` vindos da API — sem estimativas no frontend |
+| Repository | `CountAsync` e `CountWithResourceAsync` adicionados a `IAuditEventRepository` |
+| ResourceType/ResourceId filter | `SearchAuditLog` usa `SearchWithResourceAsync` quando filtros de recurso estão presentes |
+| IDateTimeProvider | `GenerateAuditReadyReport` e `ExportComplianceEvidences` injetam `IDateTimeProvider` em vez de `DateTimeOffset.UtcNow` |
+| CorrelationId | `IAuditModule.RecordEventAsync` aceita `correlationId?` opcional |
+| Lifecycle features | `UpdateCompliancePolicy`, `ActivateCompliancePolicy`, `DeactivateCompliancePolicy`, `TransitionAuditCampaign` (Start/Complete/Cancel) |
+| DB Indexes | Migration `20260419164300_AddAuditIndexesAndFk`: indexes compostos `(TenantId,OccurredAt)`, `(ResourceType,ResourceId)` |
+| FK | `aud_compliance_results.PolicyId → aud_compliance_policies.Id` com `RESTRICT` |
+| Frontend | `AuditPage` — filtros ResourceType/ResourceId; i18n `integrityValid/Violation/Truncated` |
