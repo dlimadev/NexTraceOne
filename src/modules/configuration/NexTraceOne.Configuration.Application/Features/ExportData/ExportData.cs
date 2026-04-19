@@ -20,7 +20,7 @@ public static class ExportData
     /// <summary>Valida o comando de exportação de dados.</summary>
     public sealed class Validator : AbstractValidator<Command>
     {
-        private static readonly string[] SupportedEntities = ["contracts", "releases", "audit_events"];
+        private static readonly string[] SupportedEntities = ["contracts", "scheduled_reports", "audit_events"];
         private static readonly string[] SupportedFormats = ["csv", "json"];
 
         public Validator()
@@ -28,7 +28,7 @@ public static class ExportData
             RuleFor(x => x.Entity)
                 .NotEmpty()
                 .Must(e => SupportedEntities.Contains(e, StringComparer.OrdinalIgnoreCase))
-                .WithMessage("Entity must be one of: contracts, releases, audit_events.");
+                .WithMessage("Entity must be one of: contracts, scheduled_reports, audit_events.");
 
             RuleFor(x => x.Format)
                 .NotEmpty()

@@ -20,7 +20,7 @@ internal sealed class EfExportDataRepository(ConfigurationDbContext context) : I
         {
             "audit_events" => await GetAuditEventsAsync(columns, cancellationToken),
             "contracts" => await GetContractTemplatesAsync(columns, cancellationToken),
-            "releases" => await GetScheduledReportsAsync(columns, cancellationToken),
+            "scheduled_reports" => await GetScheduledReportsAsync(columns, cancellationToken),
             _ => []
         };
     }

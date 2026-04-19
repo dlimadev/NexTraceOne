@@ -16,6 +16,7 @@ public static class GetRightsizingReport
     /// <summary>Handler que gera recomendações de rightsizing a partir de registos de custo reais.</summary>
     public sealed class Handler(ICostIntelligenceModule costModule) : IQueryHandler<Query, RightsizingReport>
     {
+        private const decimal SavingEstimatePercentage = 0.2m;
         public async Task<Result<RightsizingReport>> Handle(Query request, CancellationToken cancellationToken)
         {
             var costRecords = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken);
@@ -38,8 +39,8 @@ public static class GetRightsizingReport
                     ServiceName: r.ServiceName,
                     ResourceType: "cost",
                     CurrentSpec: $"{r.TotalCost:C2}/{r.Period}",
-                    RecommendedSpec: $"{r.TotalCost * 0.8m:C2}/{r.Period}",
-                    EstimatedMonthlySaving: (double)(r.TotalCost * 0.2m),
+                    RecommendedSpec: $"{r.TotalCost * (1 - SavingEstimatePercentage):C2}/{r.Period}",
+                    EstimatedMonthlySaving: (double)(r.TotalCost * SavingEstimatePercentage),
                     Reason: "Cost optimization based on current usage patterns."))
                 .ToList();
 
