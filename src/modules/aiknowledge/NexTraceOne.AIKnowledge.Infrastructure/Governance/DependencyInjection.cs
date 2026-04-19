@@ -85,6 +85,11 @@ public static class DependencyInjection
         services.AddScoped<IAiExecutionPlanRepository, AiExecutionPlanRepository>();
         services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
 
+        // ── Phase 9: Skills System ────────────────────────────────────────
+        services.AddScoped<IAiSkillRepository, AiSkillRepository>();
+        services.AddScoped<IAiSkillExecutionRepository, AiSkillExecutionRepository>();
+        services.AddScoped<IAiSkillFeedbackRepository, AiSkillFeedbackRepository>();
+
         // ── Integration Event Handlers (E-M02) ───────────────────────────
         services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();
         services.AddScoped<

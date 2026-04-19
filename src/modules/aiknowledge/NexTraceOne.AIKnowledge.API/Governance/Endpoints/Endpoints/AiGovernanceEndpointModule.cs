@@ -61,6 +61,15 @@ using ListEvaluationsFeature = NexTraceOne.AIKnowledge.Application.Governance.Fe
 using GetEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluation.GetEvaluation;
 using SubmitEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitEvaluation.SubmitEvaluation;
 using GetAiUsageDashboardFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiUsageDashboard.GetAiUsageDashboard;
+using ListSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListSkills.ListSkills;
+using GetSkillDetailsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetSkillDetails.GetSkillDetails;
+using RegisterSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterSkill.RegisterSkill;
+using UpdateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateSkill.UpdateSkill;
+using PublishSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.PublishSkill.PublishSkill;
+using DeprecateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.DeprecateSkill.DeprecateSkill;
+using ExecuteSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteSkill.ExecuteSkill;
+using RateSkillExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RateSkillExecution.RateSkillExecution;
+using SeedDefaultSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultSkills.SeedDefaultSkills;
 
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
@@ -99,6 +108,7 @@ public sealed class AiGovernanceEndpointModule
         MapToolDefinitionEndpoints(app);
         MapEvaluationEndpoints(app);
         MapSeedEndpoints(app);
+        MapSkillsEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -716,6 +726,16 @@ public sealed class AiGovernanceEndpointModule
                 new SeedDefaultToolDefinitionsFeature.Command(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/skills", async (
+            SeedDefaultSkillsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
     }
 
     // ── Guardrails ──────────────────────────────────────────────────────
@@ -920,6 +940,130 @@ public sealed class AiGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:write");
     }
+
+    // ── Skills System (Phase 9) ─────────────────────────────────────────
+
+    private static void MapSkillsEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/skills");
+
+        group.MapGet("/", async (
+            string? status,
+            string? ownershipType,
+            Guid? tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListSkillsFeature.Query(status, ownershipType, tenantId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:read");
+
+        group.MapGet("/{skillId:guid}", async (
+            Guid skillId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetSkillDetailsFeature.Query(skillId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:read");
+
+        group.MapPost("/", async (
+            RegisterSkillFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPut("/{skillId:guid}", async (
+            Guid skillId,
+            UpdateSkillRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdateSkillFeature.Command(
+                skillId,
+                body.DisplayName,
+                body.Description,
+                body.SkillContent,
+                body.Tags,
+                body.RequiredTools,
+                body.PreferredModels,
+                body.InputSchema,
+                body.OutputSchema,
+                body.IsComposable);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPost("/{skillId:guid}/publish", async (
+            Guid skillId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new PublishSkillFeature.Command(skillId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPost("/{skillId:guid}/deprecate", async (
+            Guid skillId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new DeprecateSkillFeature.Command(skillId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPost("/{skillId:guid}/execute", async (
+            Guid skillId,
+            ExecuteSkillRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ExecuteSkillFeature.Command(
+                skillId,
+                body.InputJson,
+                body.ModelOverride,
+                body.AgentId,
+                body.ExecutedBy,
+                TenantId: Guid.Empty);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute");
+
+        group.MapPost("/executions/{executionId:guid}/feedback", async (
+            Guid executionId,
+            RateSkillExecutionRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new RateSkillExecutionFeature.Command(
+                executionId,
+                body.Rating,
+                body.Outcome,
+                body.Comment,
+                body.ActualOutcome,
+                body.WasCorrect,
+                body.SubmittedBy,
+                TenantId: Guid.Empty);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute");
+    }
 }
 
 // ── Request DTOs para endpoints PATCH ───────────────────────────────────
@@ -990,3 +1134,31 @@ public sealed record UpdatePromptTemplateRequest(bool? IsActive);
 
 /// <summary>Corpo de pedido para atualização de uma definição de ferramenta.</summary>
 public sealed record UpdateToolDefinitionRequest(bool? IsActive);
+
+/// <summary>Corpo de pedido para atualização de uma skill de IA.</summary>
+public sealed record UpdateSkillRequest(
+    string DisplayName,
+    string Description,
+    string SkillContent,
+    string[]? Tags,
+    string[]? RequiredTools,
+    string[]? PreferredModels,
+    string? InputSchema,
+    string? OutputSchema,
+    bool? IsComposable);
+
+/// <summary>Corpo de pedido para execução de uma skill de IA.</summary>
+public sealed record ExecuteSkillRequest(
+    string InputJson,
+    string? ModelOverride,
+    Guid? AgentId,
+    string ExecutedBy);
+
+/// <summary>Corpo de pedido para feedback de execução de skill.</summary>
+public sealed record RateSkillExecutionRequest(
+    int Rating,
+    string Outcome,
+    string? Comment,
+    string? ActualOutcome,
+    bool WasCorrect,
+    string SubmittedBy);

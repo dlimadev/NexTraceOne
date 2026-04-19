@@ -59,6 +59,11 @@ public sealed class AiGovernanceDbContext(
     // ── E-A04: Execution Plans ───────────────────────────────────
     public DbSet<AIExecutionPlan> ExecutionPlans => Set<AIExecutionPlan>();
 
+    // ── Phase 9: Skills System ───────────────────────────────────────────────
+    public DbSet<AiSkill> Skills => Set<AiSkill>();
+    public DbSet<AiSkillExecution> SkillExecutions => Set<AiSkillExecution>();
+    public DbSet<AiSkillFeedback> SkillFeedbacks => Set<AiSkillFeedback>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 
