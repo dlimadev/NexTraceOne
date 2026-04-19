@@ -306,4 +306,65 @@ public static class AiGovernanceErrors
             "AiGovernance.IdeQuerySession.NotFound",
             "IDE query session '{0}' was not found.",
             id);
+
+    // ── Skills System (Phase 9) ─────────────────────────────────────────
+
+    /// <summary>Skill de IA não encontrada pelo identificador informado.</summary>
+    public static Error SkillNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.Skill.NotFound",
+            $"Skill '{id}' not found.");
+
+    /// <summary>Já existe uma skill com o nome especificado.</summary>
+    public static Error SkillNameAlreadyExists(string name)
+        => Error.Business(
+            "AiGovernance.Skill.NameAlreadyExists",
+            $"Skill '{name}' already exists.");
+
+    /// <summary>Skill não está ativa para execução.</summary>
+    public static Error SkillNotActive(string name)
+        => Error.Business(
+            "AiGovernance.Skill.NotActive",
+            $"Skill '{name}' is not active.");
+
+    /// <summary>Execução de skill não encontrada pelo identificador informado.</summary>
+    public static Error SkillExecutionNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.Skill.ExecutionNotFound",
+            $"Skill execution '{id}' not found.");
+
+    // ── Agent Lightning (Phase 10) ──────────────────────────────────────
+
+    /// <summary>Já existe feedback de trajectória para a execução especificada.</summary>
+    public static Error TrajectoryFeedbackAlreadyExists(string executionId)
+        => Error.Business(
+            "AiGovernance.Trajectory.FeedbackAlreadyExists",
+            $"Feedback for execution '{executionId}' already exists.");
+
+    // ── Enterprise Capabilities (Phase 11) ─────────────────────────────
+
+    /// <summary>War Room não encontrada pelo identificador informado.</summary>
+    public static Error WarRoomNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.WarRoom.NotFound",
+            $"War room '{id}' not found.");
+
+    /// <summary>Alerta do Guardian não encontrado pelo identificador informado.</summary>
+    public static Error GuardianAlertNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.Guardian.AlertNotFound",
+            $"Guardian alert '{id}' not found.");
+
+    /// <summary>Nó de memória organizacional não encontrado pelo identificador informado.</summary>
+    public static Error MemoryNodeNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.Memory.NodeNotFound",
+            $"Memory node '{id}' not found.");
+
+    /// <summary>Acção de auto-remediação não encontrada pelo identificador informado.</summary>
+    public static Error SelfHealingActionNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.SelfHealingAction.NotFound",
+            "Self-healing action '{0}' was not found.",
+            id);
 }

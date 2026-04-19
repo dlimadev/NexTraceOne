@@ -1794,6 +1794,21 @@
     "services": "Serviços",
     "title": "Paleta de Comandos"
   },
+  "ai": {
+    "feedback": {
+      "submitted": "Feedback enviado — obrigado!",
+      "prompt": "Esta resposta foi útil?",
+      "ratingLabel": "Avaliar esta resposta",
+      "star": "{{count}} estrela",
+      "commentPlaceholder": "Opcional: adicionar comentário...",
+      "submit": "Enviar Feedback",
+      "outcome": {
+        "resolved": "✓ Resolvido",
+        "partial": "~ Parcial",
+        "incorrect": "✗ Incorreto"
+      }
+    }
+  },
   "common": {
     "actions": "Ações",
     "allStatuses": "Todos os status",

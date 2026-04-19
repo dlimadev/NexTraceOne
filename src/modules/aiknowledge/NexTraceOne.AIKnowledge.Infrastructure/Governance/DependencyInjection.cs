@@ -85,6 +85,27 @@ public static class DependencyInjection
         services.AddScoped<IAiExecutionPlanRepository, AiExecutionPlanRepository>();
         services.AddScoped<IAiAgentRuntimeService, AiAgentRuntimeService>();
 
+        // ── Phase 9: Skills System ────────────────────────────────────────
+        services.AddScoped<IAiSkillRepository, AiSkillRepository>();
+        services.AddScoped<IAiSkillExecutionRepository, AiSkillExecutionRepository>();
+        services.AddScoped<IAiSkillFeedbackRepository, AiSkillFeedbackRepository>();
+
+        // ── Phase 10: Agent Lightning (Reinforcement Learning) ────────────
+        services.AddScoped<IAiAgentTrajectoryFeedbackRepository, AiAgentTrajectoryFeedbackRepository>();
+        services.AddScoped<IAiAgentPerformanceMetricRepository, AiAgentPerformanceMetricRepository>();
+        services.AddHostedService<TrajectoryExporterJob>();
+
+        // ── Phase 11: Enterprise Capabilities ─────────────────────────────
+        services.AddScoped<ISkillLoader, SkillLoader>();
+        services.AddScoped<ISkillRegistry, SkillRegistry>();
+        services.AddScoped<ISkillContextInjector, SkillContextInjector>();
+        services.AddScoped<IAiWarRoomRepository, WarRoomRepository>();
+        services.AddScoped<IAiChangeConfidenceRepository, ChangeConfidenceRepository>();
+        services.AddScoped<IGuardianAlertRepository, GuardianAlertRepository>();
+        services.AddScoped<IOrganizationalMemoryRepository, OrganizationalMemoryRepository>();
+        services.AddHostedService<ProactiveArchitectureGuardianJob>();
+        services.AddScoped<ISelfHealingActionRepository, SelfHealingActionRepository>();
+
         // ── Integration Event Handlers (E-M02) ───────────────────────────
         services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();
         services.AddScoped<

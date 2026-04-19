@@ -109,56 +109,64 @@ public sealed class ContextGroundingService(
     {
         var augmentation = new List<string>();
 
-        try
+        var entityFilter = useCaseType switch
         {
-            var docResult = await documentRetrievalService.SearchAsync(
-                new DocumentSearchRequest(query, MaxResults: 3), cancellationToken);
+            AIUseCaseType.ContractExplanation or AIUseCaseType.ContractGeneration => "Contract",
+            AIUseCaseType.ServiceLookup or AIUseCaseType.DependencyReasoning => "Service",
+            _ => (string?)null
+        };
 
-            if (docResult.Success && docResult.Hits.Count > 0)
-            {
-                augmentation.Add("RetrievedDocuments:");
-                foreach (var hit in docResult.Hits)
-                    augmentation.Add($"  - [{hit.Classification}] {hit.Title}: {hit.Snippet}");
-            }
-        }
-        catch (Exception ex)
+        bool includeTelemetry = useCaseType is AIUseCaseType.IncidentExplanation or AIUseCaseType.MitigationGuidance
+            or AIUseCaseType.ChangeAnalysis or AIUseCaseType.FinOpsExplanation;
+
+        var docTask = documentRetrievalService.SearchAsync(
+            new DocumentSearchRequest(query, MaxResults: 3), cancellationToken);
+        var dbTask = databaseRetrievalService.SearchAsync(
+            new DatabaseSearchRequest(query, EntityType: entityFilter, MaxResults: 3), cancellationToken);
+
+        if (includeTelemetry)
         {
-            logger.LogDebug(ex, "Document retrieval augmentation failed — continuing without");
-        }
+            var telTask = telemetryRetrievalService.SearchAsync(
+                new TelemetrySearchRequest(query, MaxResults: 5), cancellationToken);
 
-        try
-        {
-            var entityFilter = useCaseType switch
-            {
-                AIUseCaseType.ContractExplanation or AIUseCaseType.ContractGeneration => "Contract",
-                AIUseCaseType.ServiceLookup or AIUseCaseType.DependencyReasoning => "Service",
-                _ => (string?)null
-            };
+            await Task.WhenAll(
+                docTask.ContinueWith(_ => { }, CancellationToken.None),
+                dbTask.ContinueWith(_ => { }, CancellationToken.None),
+                telTask.ContinueWith(_ => { }, CancellationToken.None));
 
-            var dbResult = await databaseRetrievalService.SearchAsync(
-                new DatabaseSearchRequest(query, EntityType: entityFilter, MaxResults: 3),
-                cancellationToken);
-
-            if (dbResult.Success && dbResult.Hits.Count > 0)
-            {
-                augmentation.Add("RetrievedData:");
-                foreach (var hit in dbResult.Hits)
-                    augmentation.Add($"  - [{hit.EntityType}] {hit.DisplayName}: {hit.Summary}");
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogDebug(ex, "Database retrieval augmentation failed — continuing without");
-        }
-
-        if (useCaseType is AIUseCaseType.IncidentExplanation or AIUseCaseType.MitigationGuidance
-            or AIUseCaseType.ChangeAnalysis or AIUseCaseType.FinOpsExplanation)
-        {
             try
             {
-                var telResult = await telemetryRetrievalService.SearchAsync(
-                    new TelemetrySearchRequest(query, MaxResults: 5), cancellationToken);
+                var docResult = await docTask;
+                if (docResult.Success && docResult.Hits.Count > 0)
+                {
+                    augmentation.Add("RetrievedDocuments:");
+                    foreach (var hit in docResult.Hits)
+                        augmentation.Add($"  - [{hit.Classification}] {hit.Title}: {hit.Snippet}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Document retrieval augmentation failed — continuing without");
+            }
 
+            try
+            {
+                var dbResult = await dbTask;
+                if (dbResult.Success && dbResult.Hits.Count > 0)
+                {
+                    augmentation.Add("RetrievedData:");
+                    foreach (var hit in dbResult.Hits)
+                        augmentation.Add($"  - [{hit.EntityType}] {hit.DisplayName}: {hit.Summary}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Database retrieval augmentation failed — continuing without");
+            }
+
+            try
+            {
+                var telResult = await telTask;
                 if (telResult.Success && telResult.Hits.Count > 0)
                 {
                     augmentation.Add("RetrievedTelemetry:");
@@ -170,6 +178,42 @@ public sealed class ContextGroundingService(
             catch (Exception ex)
             {
                 logger.LogDebug(ex, "Telemetry retrieval augmentation failed — continuing without");
+            }
+        }
+        else
+        {
+            await Task.WhenAll(
+                docTask.ContinueWith(_ => { }, CancellationToken.None),
+                dbTask.ContinueWith(_ => { }, CancellationToken.None));
+
+            try
+            {
+                var docResult = await docTask;
+                if (docResult.Success && docResult.Hits.Count > 0)
+                {
+                    augmentation.Add("RetrievedDocuments:");
+                    foreach (var hit in docResult.Hits)
+                        augmentation.Add($"  - [{hit.Classification}] {hit.Title}: {hit.Snippet}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Document retrieval augmentation failed — continuing without");
+            }
+
+            try
+            {
+                var dbResult = await dbTask;
+                if (dbResult.Success && dbResult.Hits.Count > 0)
+                {
+                    augmentation.Add("RetrievedData:");
+                    foreach (var hit in dbResult.Hits)
+                        augmentation.Add($"  - [{hit.EntityType}] {hit.DisplayName}: {hit.Summary}");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogDebug(ex, "Database retrieval augmentation failed — continuing without");
             }
         }
 

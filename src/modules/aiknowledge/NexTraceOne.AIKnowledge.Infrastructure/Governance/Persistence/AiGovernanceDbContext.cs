@@ -59,6 +59,22 @@ public sealed class AiGovernanceDbContext(
     // ── E-A04: Execution Plans ───────────────────────────────────
     public DbSet<AIExecutionPlan> ExecutionPlans => Set<AIExecutionPlan>();
 
+    // ── Phase 9: Skills System ───────────────────────────────────────────────
+    public DbSet<AiSkill> Skills => Set<AiSkill>();
+    public DbSet<AiSkillExecution> SkillExecutions => Set<AiSkillExecution>();
+    public DbSet<AiSkillFeedback> SkillFeedbacks => Set<AiSkillFeedback>();
+
+    // ── Phase 10: Agent Lightning (Reinforcement Learning) ───────────────────
+    public DbSet<AiAgentTrajectoryFeedback> AgentTrajectoryFeedbacks => Set<AiAgentTrajectoryFeedback>();
+    public DbSet<AiAgentPerformanceMetric> AgentPerformanceMetrics => Set<AiAgentPerformanceMetric>();
+
+    // ── Phase 11: Enterprise Capabilities ────────────────────────────────────
+    public DbSet<WarRoomSession> WarRooms => Set<WarRoomSession>();
+    public DbSet<ChangeConfidenceScore> ChangeConfidenceScores => Set<ChangeConfidenceScore>();
+    public DbSet<GuardianAlert> GuardianAlerts => Set<GuardianAlert>();
+    public DbSet<OrganizationalMemoryNode> MemoryNodes => Set<OrganizationalMemoryNode>();
+    public DbSet<SelfHealingAction> SelfHealingActions => Set<SelfHealingAction>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

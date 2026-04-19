@@ -61,6 +61,38 @@ using ListEvaluationsFeature = NexTraceOne.AIKnowledge.Application.Governance.Fe
 using GetEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluation.GetEvaluation;
 using SubmitEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitEvaluation.SubmitEvaluation;
 using GetAiUsageDashboardFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiUsageDashboard.GetAiUsageDashboard;
+using ListSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListSkills.ListSkills;
+using GetSkillDetailsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetSkillDetails.GetSkillDetails;
+using RegisterSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterSkill.RegisterSkill;
+using UpdateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateSkill.UpdateSkill;
+using PublishSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.PublishSkill.PublishSkill;
+using DeprecateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.DeprecateSkill.DeprecateSkill;
+using ExecuteSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteSkill.ExecuteSkill;
+using RateSkillExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RateSkillExecution.RateSkillExecution;
+using SeedDefaultSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultSkills.SeedDefaultSkills;
+
+using SubmitAgentExecutionFeedbackFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitAgentExecutionFeedback.SubmitAgentExecutionFeedback;
+using GetAgentPerformanceDashboardFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentPerformanceDashboard.GetAgentPerformanceDashboard;
+
+using LoadSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.LoadSkill.LoadSkill;
+using CreateWarRoomFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateWarRoom.CreateWarRoom;
+using GetWarRoomFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetWarRoom.GetWarRoom;
+using ListWarRoomsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListWarRooms.ListWarRooms;
+using ResolveWarRoomFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ResolveWarRoom.ResolveWarRoom;
+using CalculateChangeConfidenceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CalculateChangeConfidence.CalculateChangeConfidence;
+using ProcessNaturalLanguageQueryFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ProcessNaturalLanguageQuery.ProcessNaturalLanguageQuery;
+using AcknowledgeGuardianAlertFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.AcknowledgeGuardianAlert.AcknowledgeGuardianAlert;
+using DismissGuardianAlertFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.DismissGuardianAlert.DismissGuardianAlert;
+using ListGuardianAlertsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListGuardianAlerts.ListGuardianAlerts;
+using RecordMemoryNodeFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RecordMemoryNode.RecordMemoryNode;
+using QueryOrganizationalMemoryFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.QueryOrganizationalMemory.QueryOrganizationalMemory;
+using GetMemoryNodeDetailsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetMemoryNodeDetails.GetMemoryNodeDetails;
+
+using QuantifyTechDebtFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.QuantifyTechDebt.QuantifyTechDebt;
+using GetSlaIntelligenceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetSlaIntelligence.GetSlaIntelligence;
+using ProposeSelfHealingActionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ProposeSelfHealingAction.ProposeSelfHealingAction;
+using ApproveSelfHealingActionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ApproveSelfHealingAction.ApproveSelfHealingAction;
+using ListSelfHealingActionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListSelfHealingActions.ListSelfHealingActions;
 
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
@@ -99,6 +131,15 @@ public sealed class AiGovernanceEndpointModule
         MapToolDefinitionEndpoints(app);
         MapEvaluationEndpoints(app);
         MapSeedEndpoints(app);
+        MapSkillsEndpoints(app);
+        MapAgentLightningEndpoints(app);
+        MapWarRoomEndpoints(app);
+        MapChangeConfidenceEndpoints(app);
+        MapNaturalLanguageQueryEndpoints(app);
+        MapGuardianAlertEndpoints(app);
+        MapOrganizationalMemoryEndpoints(app);
+        MapAnalyticsEndpoints(app);
+        MapSelfHealingEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -716,6 +757,16 @@ public sealed class AiGovernanceEndpointModule
                 new SeedDefaultToolDefinitionsFeature.Command(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/skills", async (
+            SeedDefaultSkillsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
     }
 
     // ── Guardrails ──────────────────────────────────────────────────────
@@ -920,6 +971,403 @@ public sealed class AiGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:write");
     }
+
+    // ── Skills System (Phase 9) ─────────────────────────────────────────
+
+    private static void MapSkillsEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/skills");
+
+        group.MapGet("/", async (
+            string? status,
+            string? ownershipType,
+            Guid? tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListSkillsFeature.Query(status, ownershipType, tenantId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:read");
+
+        group.MapGet("/{skillId:guid}", async (
+            Guid skillId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetSkillDetailsFeature.Query(skillId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:read");
+
+        group.MapPost("/", async (
+            RegisterSkillFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPut("/{skillId:guid}", async (
+            Guid skillId,
+            UpdateSkillRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new UpdateSkillFeature.Command(
+                skillId,
+                body.DisplayName,
+                body.Description,
+                body.SkillContent,
+                body.Tags,
+                body.RequiredTools,
+                body.PreferredModels,
+                body.InputSchema,
+                body.OutputSchema,
+                body.IsComposable);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPost("/{skillId:guid}/publish", async (
+            Guid skillId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new PublishSkillFeature.Command(skillId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPost("/{skillId:guid}/deprecate", async (
+            Guid skillId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new DeprecateSkillFeature.Command(skillId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:write");
+
+        group.MapPost("/{skillId:guid}/execute", async (
+            Guid skillId,
+            ExecuteSkillRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ExecuteSkillFeature.Command(
+                skillId,
+                body.InputJson,
+                body.ModelOverride,
+                body.AgentId,
+                body.ExecutedBy,
+                TenantId: Guid.Empty);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute");
+
+        group.MapPost("/executions/{executionId:guid}/feedback", async (
+            Guid executionId,
+            RateSkillExecutionRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new RateSkillExecutionFeature.Command(
+                executionId,
+                body.Rating,
+                body.Outcome,
+                body.Comment,
+                body.ActualOutcome,
+                body.WasCorrect,
+                body.SubmittedBy,
+                TenantId: Guid.Empty);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute");
+
+        group.MapGet("/{skillName}/load", async (
+            string skillName,
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new LoadSkillFeature.Query(skillName, tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:read");
+    }
+
+    // ── Agent Lightning ─────────────────────────────────────────────────
+
+    private static void MapAgentLightningEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/executions/{executionId:guid}/feedback", async (
+            Guid executionId,
+            SubmitFeedbackRequest request,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new SubmitAgentExecutionFeedbackFeature.Command(
+                executionId, request.Rating, request.Outcome,
+                request.Comment, request.ActualOutcome, request.WasCorrect,
+                request.TimeToResolveMinutes, request.SubmittedBy, request.TenantId);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:agents:execute");
+
+        app.MapGet("/api/v1/ai/agent-performance", async (
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAgentPerformanceDashboardFeature.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
+
+    // ── War Rooms (Phase 11) ─────────────────────────────────────────────
+
+    private static void MapWarRoomEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/war-rooms");
+
+        group.MapGet("/", async (
+            Guid tenantId,
+            string? status,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListWarRoomsFeature.Query(tenantId, status), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{warRoomId:guid}", async (
+            Guid warRoomId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetWarRoomFeature.Query(warRoomId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/", async (
+            CreateWarRoomFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/{warRoomId:guid}/resolve", async (
+            Guid warRoomId,
+            ResolveWarRoomRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ResolveWarRoomFeature.Command(warRoomId, body.PostMortemDraft), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Change Confidence (Phase 11) ─────────────────────────────────────
+
+    private static void MapChangeConfidenceEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/change-confidence");
+
+        group.MapPost("/calculate", async (
+            CalculateChangeConfidenceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Natural Language Query (Phase 11) ────────────────────────────────
+
+    private static void MapNaturalLanguageQueryEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/nlq/process", async (
+            ProcessNaturalLanguageQueryFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
+
+    // ── Guardian Alerts (Phase 11) ───────────────────────────────────────
+
+    private static void MapGuardianAlertEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/guardian-alerts");
+
+        group.MapGet("/", async (
+            Guid tenantId,
+            string? serviceName,
+            string? status,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListGuardianAlertsFeature.Query(tenantId, serviceName, status), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/{alertId:guid}/acknowledge", async (
+            Guid alertId,
+            AcknowledgeAlertRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new AcknowledgeGuardianAlertFeature.Command(alertId, body.AcknowledgedBy), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/{alertId:guid}/dismiss", async (
+            Guid alertId,
+            DismissAlertRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DismissGuardianAlertFeature.Command(alertId, body.Reason), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Organizational Memory (Phase 11) ─────────────────────────────────
+
+    private static void MapOrganizationalMemoryEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/memory");
+
+        group.MapPost("/", async (
+            RecordMemoryNodeFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapGet("/search", async (
+            string subject,
+            Guid tenantId,
+            int? limit,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new QueryOrganizationalMemoryFeature.Query(subject, tenantId, limit ?? 10), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{nodeId:guid}", async (
+            Guid nodeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetMemoryNodeDetailsFeature.Query(nodeId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
+
+    private static void MapAnalyticsEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/tech-debt/quantify",
+            async (QuantifyTechDebtRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new QuantifyTechDebtFeature.Query(
+                    req.ServiceName, req.TenantId, req.IncidentCountLast90Days,
+                    req.TestCoveragePercent, req.CircularDependencies, req.AveragePrSizeLines,
+                    req.AverageMttrMinutes, req.HourlyEngineeringRate);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:read")
+            .WithTags("AI Analytics")
+            .WithSummary("Quantify tech debt with financial impact");
+
+        app.MapPost("/api/v1/ai/sla/intelligence",
+            async (GetSlaIntelligenceRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new GetSlaIntelligenceFeature.Query(
+                    req.ServiceName, req.TenantId, req.CurrentSlaTarget,
+                    req.ActualAvailabilityPercent, req.MaintenanceWindowMinutesPerMonth,
+                    req.DeploymentFailuresLast12m, req.FridayDeployCount,
+                    req.EstimatedPenaltyPerBreachMonth);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:read")
+            .WithTags("AI Analytics")
+            .WithSummary("Get SLA intelligence and breach analysis");
+    }
+
+    private static void MapSelfHealingEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/self-healing/actions",
+            async (ProposeSelfHealingActionRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var command = new ProposeSelfHealingActionFeature.Command(
+                    req.IncidentId, req.ServiceName, req.ActionType,
+                    req.ActionDescription, req.Confidence, req.RiskLevel, req.TenantId);
+                var result = await mediator.Send(command, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:write")
+            .WithTags("AI Self-Healing")
+            .WithSummary("Propose a self-healing remediation action");
+
+        app.MapGet("/api/v1/ai/self-healing/actions",
+            async (Guid tenantId, string? incidentId, bool pendingOnly, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new ListSelfHealingActionsFeature.Query(tenantId, incidentId, pendingOnly);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:read")
+            .WithTags("AI Self-Healing")
+            .WithSummary("List self-healing actions");
+
+        app.MapPost("/api/v1/ai/self-healing/actions/{actionId:guid}/approve",
+            async (Guid actionId, ApproveSelfHealingActionRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var command = new ApproveSelfHealingActionFeature.Command(actionId, req.ApprovedBy);
+                var result = await mediator.Send(command, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:write")
+            .WithTags("AI Self-Healing")
+            .WithSummary("Approve a pending self-healing action");
+    }
 }
 
 // ── Request DTOs para endpoints PATCH ───────────────────────────────────
@@ -990,3 +1438,86 @@ public sealed record UpdatePromptTemplateRequest(bool? IsActive);
 
 /// <summary>Corpo de pedido para atualização de uma definição de ferramenta.</summary>
 public sealed record UpdateToolDefinitionRequest(bool? IsActive);
+
+/// <summary>Corpo de pedido para atualização de uma skill de IA.</summary>
+public sealed record UpdateSkillRequest(
+    string DisplayName,
+    string Description,
+    string SkillContent,
+    string[]? Tags,
+    string[]? RequiredTools,
+    string[]? PreferredModels,
+    string? InputSchema,
+    string? OutputSchema,
+    bool? IsComposable);
+
+/// <summary>Corpo de pedido para execução de uma skill de IA.</summary>
+public sealed record ExecuteSkillRequest(
+    string InputJson,
+    string? ModelOverride,
+    Guid? AgentId,
+    string ExecutedBy);
+
+/// <summary>Corpo de pedido para feedback de execução de skill.</summary>
+public sealed record RateSkillExecutionRequest(
+    int Rating,
+    string Outcome,
+    string? Comment,
+    string? ActualOutcome,
+    bool WasCorrect,
+    string SubmittedBy);
+
+/// <summary>Corpo de pedido para feedback de trajectória de agent (Agent Lightning).</summary>
+public sealed record SubmitFeedbackRequest(
+    int Rating,
+    string Outcome,
+    string? Comment,
+    string? ActualOutcome,
+    bool WasCorrect,
+    int? TimeToResolveMinutes,
+    string SubmittedBy,
+    Guid TenantId);
+
+/// <summary>Corpo de pedido para resolução de uma War Room.</summary>
+public sealed record ResolveWarRoomRequest(string PostMortemDraft);
+
+/// <summary>Corpo de pedido para reconhecimento de um alerta do Guardian.</summary>
+public sealed record AcknowledgeAlertRequest(string AcknowledgedBy);
+
+/// <summary>Corpo de pedido para descarte de um alerta do Guardian.</summary>
+public sealed record DismissAlertRequest(string Reason);
+
+/// <summary>Corpo de pedido para quantificação de dívida técnica.</summary>
+public sealed record QuantifyTechDebtRequest(
+    string ServiceName,
+    Guid TenantId,
+    int IncidentCountLast90Days,
+    double TestCoveragePercent,
+    int CircularDependencies,
+    double AveragePrSizeLines,
+    double AverageMttrMinutes,
+    decimal HourlyEngineeringRate);
+
+/// <summary>Corpo de pedido para inteligência de SLA.</summary>
+public sealed record GetSlaIntelligenceRequest(
+    string ServiceName,
+    Guid TenantId,
+    double CurrentSlaTarget,
+    double ActualAvailabilityPercent,
+    int MaintenanceWindowMinutesPerMonth,
+    int DeploymentFailuresLast12m,
+    int FridayDeployCount,
+    decimal EstimatedPenaltyPerBreachMonth);
+
+/// <summary>Corpo de pedido para proposta de acção de auto-remediação.</summary>
+public sealed record ProposeSelfHealingActionRequest(
+    string IncidentId,
+    string ServiceName,
+    string ActionType,
+    string ActionDescription,
+    double Confidence,
+    string RiskLevel,
+    Guid TenantId);
+
+/// <summary>Corpo de pedido para aprovação de acção de auto-remediação.</summary>
+public sealed record ApproveSelfHealingActionRequest(string ApprovedBy);
