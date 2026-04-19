@@ -7,6 +7,8 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Features.ExportData;
+using NexTraceOne.Configuration.Infrastructure.Export;
 using NexTraceOne.Configuration.Infrastructure.Persistence;
 using NexTraceOne.Configuration.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Configuration.Infrastructure.Seed;
@@ -84,6 +86,9 @@ public static class DependencyInjection
 
         // Feature Flag Runtime — in-process evaluation with TTL cache
         services.AddScoped<IFeatureFlagRuntime, FeatureFlagRuntime>();
+
+        // Export
+        services.AddScoped<IExportDataRepository, EfExportDataRepository>();
 
         return services;
     }

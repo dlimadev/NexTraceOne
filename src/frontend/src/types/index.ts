@@ -1778,6 +1778,7 @@ export interface PromotionGateResult {
 export interface PromotionRequest {
   id: string;
   releaseId: string;
+  serviceName?: string;
   sourceEnvironment: string;
   targetEnvironment: string;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Promoted';

@@ -75,8 +75,8 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Contracts (REST/SOAP/Event/Background) | READY | CRUD, versões, compatibilidade, scorecard — 35 features, 100% real |
 | Contract Studio | READY | Backend real; 10/10 contract types com visual builders (REST, SOAP, Event, BackgroundService, SharedSchema, Webhook, Copybook, MqMessage, FixedLayout, CicsCommarea) |
 | Semantic Diff | READY | `ComputeSemanticDiff`, `EvaluateCompatibility` reais |
-| Developer Portal | PARTIAL | `RecordAnalyticsEvent`, `CreateSubscription`, `ExecutePlayground` reais; `SearchCatalog` é stub |
-| Global Search | PARTIAL | `GlobalSearch` endpoint real (PostgreSQL FTS); `SearchCatalog` é stub intencional aguardando integração cross-module |
+| Developer Portal | READY | `RecordAnalyticsEvent`, `CreateSubscription`, `ExecutePlayground` reais; SearchCatalog: Implemented — combines PostgreSQL FTS/LIKE search across contracts and services with faceting. (April 2026) |
+| Global Search | READY | `GlobalSearch` endpoint real (PostgreSQL FTS); SearchCatalog: Implemented — combines PostgreSQL FTS/LIKE search across contracts and services with faceting. (April 2026) |
 | Contract Drift Detection (PA-25) | READY | `DetectContractDrift` — detecta desvios entre contrato publicado e traces OTel; ghost endpoints + endpoints não declarados; `GET /api/v1/catalog/contracts/{id}/drift` |
 | Contract Health Score Timeline (PA-27) | READY | `GetContractHealthTimeline` — evolução temporal do health score com correlação de changes; `GET /api/v1/catalog/contracts/{id}/health/timeline`; frontend `ContractHealthTimelinePage` |
 | Service Maturity Benchmark (PA-28) | READY | `GetServiceMaturityBenchmark` — comparação de maturidade entre serviços, equipas e domínios; `GET /api/v1/catalog/services/maturity-benchmark` |

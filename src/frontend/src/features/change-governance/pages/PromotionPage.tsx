@@ -145,7 +145,7 @@ export function PromotionPage() {
     try {
       gateResult = await evaluateBudgetGateMutation.mutateAsync({
         releaseId: req.releaseId,
-        serviceName: req.releaseId, // TODO: replace with actual service name once PromotionRequest carries service metadata
+        serviceName: req.serviceName ?? req.releaseId,
         environment: req.targetEnvironment,
         actualCostPerDay: 0,    // placeholder; real data comes from telemetry/FinOps context
         baselineCostPerDay: 0,
@@ -172,7 +172,7 @@ export function PromotionPage() {
         try {
           const approval = await createBudgetApprovalMutation.mutateAsync({
             releaseId: req.releaseId,
-            serviceName: req.releaseId, // TODO: replace with actual service name once PromotionRequest carries service metadata
+            serviceName: req.serviceName ?? req.releaseId,
             environment: req.targetEnvironment,
             actualCost: gateResult.actualTotalCost,
             baselineCost: gateResult.baselineTotalCost,
