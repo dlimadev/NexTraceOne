@@ -64,6 +64,10 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AiSkillExecution> SkillExecutions => Set<AiSkillExecution>();
     public DbSet<AiSkillFeedback> SkillFeedbacks => Set<AiSkillFeedback>();
 
+    // ── Phase 10: Agent Lightning (Reinforcement Learning) ───────────────────
+    public DbSet<AiAgentTrajectoryFeedback> AgentTrajectoryFeedbacks => Set<AiAgentTrajectoryFeedback>();
+    public DbSet<AiAgentPerformanceMetric> AgentPerformanceMetrics => Set<AiAgentPerformanceMetric>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

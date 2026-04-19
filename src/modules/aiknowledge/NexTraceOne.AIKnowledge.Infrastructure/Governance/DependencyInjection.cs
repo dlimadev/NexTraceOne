@@ -90,6 +90,11 @@ public static class DependencyInjection
         services.AddScoped<IAiSkillExecutionRepository, AiSkillExecutionRepository>();
         services.AddScoped<IAiSkillFeedbackRepository, AiSkillFeedbackRepository>();
 
+        // ── Phase 10: Agent Lightning (Reinforcement Learning) ────────────
+        services.AddScoped<IAiAgentTrajectoryFeedbackRepository, AiAgentTrajectoryFeedbackRepository>();
+        services.AddScoped<IAiAgentPerformanceMetricRepository, AiAgentPerformanceMetricRepository>();
+        services.AddHostedService<TrajectoryExporterJob>();
+
         // ── Integration Event Handlers (E-M02) ───────────────────────────
         services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();
         services.AddScoped<

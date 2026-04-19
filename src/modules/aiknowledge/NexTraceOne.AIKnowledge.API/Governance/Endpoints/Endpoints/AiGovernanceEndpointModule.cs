@@ -71,6 +71,9 @@ using ExecuteSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Featu
 using RateSkillExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RateSkillExecution.RateSkillExecution;
 using SeedDefaultSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultSkills.SeedDefaultSkills;
 
+using SubmitAgentExecutionFeedbackFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitAgentExecutionFeedback.SubmitAgentExecutionFeedback;
+using GetAgentPerformanceDashboardFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentPerformanceDashboard.GetAgentPerformanceDashboard;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -109,6 +112,7 @@ public sealed class AiGovernanceEndpointModule
         MapEvaluationEndpoints(app);
         MapSeedEndpoints(app);
         MapSkillsEndpoints(app);
+        MapAgentLightningEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1064,6 +1068,37 @@ public sealed class AiGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:skills:execute");
     }
+
+    // ── Agent Lightning ─────────────────────────────────────────────────
+
+    private static void MapAgentLightningEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/executions/{executionId:guid}/feedback", async (
+            Guid executionId,
+            SubmitFeedbackRequest request,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new SubmitAgentExecutionFeedbackFeature.Command(
+                executionId, request.Rating, request.Outcome,
+                request.Comment, request.ActualOutcome, request.WasCorrect,
+                request.TimeToResolveMinutes, request.SubmittedBy, request.TenantId);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:agents:execute");
+
+        app.MapGet("/api/v1/ai/agent-performance", async (
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAgentPerformanceDashboardFeature.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
 }
 
 // ── Request DTOs para endpoints PATCH ───────────────────────────────────
@@ -1162,3 +1197,14 @@ public sealed record RateSkillExecutionRequest(
     string? ActualOutcome,
     bool WasCorrect,
     string SubmittedBy);
+
+/// <summary>Corpo de pedido para feedback de trajectória de agent (Agent Lightning).</summary>
+public sealed record SubmitFeedbackRequest(
+    int Rating,
+    string Outcome,
+    string? Comment,
+    string? ActualOutcome,
+    bool WasCorrect,
+    int? TimeToResolveMinutes,
+    string SubmittedBy,
+    Guid TenantId);

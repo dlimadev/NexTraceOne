@@ -332,4 +332,12 @@ public static class AiGovernanceErrors
         => Error.NotFound(
             "AiGovernance.Skill.ExecutionNotFound",
             $"Skill execution '{id}' not found.");
+
+    // ── Agent Lightning (Phase 10) ──────────────────────────────────────
+
+    /// <summary>Já existe feedback de trajectória para a execução especificada.</summary>
+    public static Error TrajectoryFeedbackAlreadyExists(string executionId)
+        => Error.Business(
+            "AiGovernance.Trajectory.FeedbackAlreadyExists",
+            $"Feedback for execution '{executionId}' already exists.");
 }
