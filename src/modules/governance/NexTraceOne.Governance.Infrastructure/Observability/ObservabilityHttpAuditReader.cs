@@ -25,7 +25,8 @@ internal sealed class ObservabilityHttpAuditReader(
 
             var from = filter.From ?? DateTimeOffset.UtcNow.AddHours(-24);
             var to = filter.To ?? DateTimeOffset.UtcNow;
-            var fetchLimit = Math.Min(filter.Page * filter.PageSize + filter.PageSize, 1000);
+            // Fetch enough records to cover the full current page, capped at 1000.
+            var fetchLimit = Math.Min((filter.Page + 1) * filter.PageSize, 1000);
 
             var traceFilter = new TraceQueryFilter
             {

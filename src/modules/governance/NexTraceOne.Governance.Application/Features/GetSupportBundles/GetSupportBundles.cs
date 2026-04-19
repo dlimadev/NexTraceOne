@@ -183,8 +183,10 @@ public static class GetSupportBundles
             key.Contains("connectionstring", StringComparison.OrdinalIgnoreCase) ||
             key.Contains("apikey", StringComparison.OrdinalIgnoreCase) ||
             key.Contains("token", StringComparison.OrdinalIgnoreCase) ||
-            key.Contains("certificate", StringComparison.OrdinalIgnoreCase) ||
-            key.Contains("privatekey", StringComparison.OrdinalIgnoreCase);
+            key.Contains("credentials", StringComparison.OrdinalIgnoreCase) ||
+            key.Contains("clientsecret", StringComparison.OrdinalIgnoreCase) ||
+            key.Contains("privatekey", StringComparison.OrdinalIgnoreCase) ||
+            key.Contains("privatecert", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>Handler de download de bundle de suporte.</summary>
