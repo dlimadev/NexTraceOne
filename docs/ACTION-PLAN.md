@@ -328,10 +328,10 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-015 — SAML 2.0 Protocol Handlers completos
+### ACT-015 — SAML 2.0 Protocol Handlers completos ✅ RESOLVIDO (Abril 2026)
 
-**Ficheiros:** `src/modules/identityaccess/NexTraceOne.IdentityAccess.Infrastructure/`, `src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/FederatedLogin/`  
-**Estado atual:** `FederatedLogin` aceita tokens OIDC genéricos; domínio SAML (entidades `SsoGroupMapping`, `ExternalIdentity`) existe mas não tem protocolo SAML 2.0 implementado.
+**Ficheiros:** `src/modules/identityaccess/NexTraceOne.IdentityAccess.Infrastructure/Services/SamlService.cs`, `src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/StartSamlLogin/`, `src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/SamlAcsCallback/`  
+**Estado:** `ISamlService` (BCL-only: deflate/base64 AuthnRequest, SignedXml validation), `ISamlConfigProvider` (lê `Saml:*` de IConfiguration), `StartSamlLogin` (IQuery → redirect URL), `SamlAcsCallback` (ICommand → chama FederatedLogin), endpoints `GET /auth/saml/sso` + `POST /auth/saml/acs`. 4 testes unitários passam. 466/466 IdentityAccess tests passing.
 
 **Solução:**
 
@@ -347,38 +347,19 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-016 — Kafka Real Producer/Consumer
+### ACT-016 — Kafka Real Producer/Consumer ✅ RESOLVIDO (Abril 2026)
 
-**Ficheiros:** `src/modules/integrations/`, `src/platform/NexTraceOne.BackgroundWorkers/`  
-**Estado atual parcial (Abril 2026):** `IKafkaEventProducer` interface criada em `Integrations.Domain` com `KafkaMessage` record. `NullKafkaEventProducer` implementado em `Integrations.Infrastructure/Kafka/` e registado via DI como singleton. Testes unitários: 6/6 passam.
+**Ficheiros:** `src/modules/integrations/NexTraceOne.Integrations.Infrastructure/Kafka/ConfluentKafkaEventProducer.cs`, `KafkaConsumerWorker.cs`  
+**Estado:** `ConfluentKafkaEventProducer` (Confluent.Kafka 2.8.0, Acks.All, headers `event-type`) + `KafkaConsumerWorker` (BackgroundService, subscreve `Kafka:Topics:Inbound`). DI condicional: quando `Kafka:Enabled=true` e `Kafka:BootstrapServers` configurado, usa Confluent; caso contrário usa Null. 122/122 Integrations tests passing.
 
-**Pendente (requer Kafka cluster):**
-
-1. Criar `ConfluentKafkaEventProducer` em pacote `NexTraceOne.Integrations.Kafka` usando `Confluent.Kafka` NuGet.
-2. `KafkaEventConsumer` (BackgroundService) consome tópicos configurados e chama `ProcessIngestionPayload`.
-3. Configurar topics via `IConfiguration "Kafka:Topics:*"`.
-4. Feature flag `integrations.kafka.enabled` controla ativação.
-
-**Pré-requisito:** Cluster Kafka disponível (dev: Docker Compose, prod: MSK/Confluent Cloud/self-hosted).  
-**Esforço restante:** Médio (6–10h)
+**Pré-requisito para ativação:** Cluster Kafka disponível (dev: Docker Compose com `Kafka:Enabled=true`, prod: MSK/Confluent Cloud/self-hosted).
 
 ---
 
-### ACT-017 — FinOps com dados de cloud billing reais (AWS/Azure/GCP)
+### ACT-017 — FinOps com dados de cloud billing reais (AWS/Azure/GCP) ✅ RESOLVIDO (framework, Abril 2026)
 
-**Ficheiros:** `src/modules/operationalintelligence/` (CostIntelligence), `src/modules/governance/` (FinOps)  
-**Estado atual:** `CostIntelligenceDbContext` persiste custo mas os dados são inseridos manualmente ou via seed.
-
-**Solução:**
-
-1. Criar interface `ICloudBillingProvider` em `Integrations.Domain`.
-2. Criar implementações: `AwsCostExplorerProvider`, `AzureCostManagementProvider`, `GcpBillingProvider`.
-3. Registar via feature flag `finops.billing.provider` (valores: `aws`, `azure`, `gcp`, `manual`).
-4. Quartz job `CloudBillingIngestionJob` executa diariamente: chama provider, normaliza para `CostRecord` domain entity, persiste via `ICostIntelligenceModule`.
-5. Mapear custos cloud por `resource_tag` → `service_name` com regras configuráveis.
-
-**Pré-requisito:** Credenciais cloud + decisão sobre qual cloud provider suportar primeiro.  
-**Esforço estimado:** Muito Alto (20–30h por provider)
+**Ficheiros:** `src/modules/integrations/NexTraceOne.Integrations.Domain/ICloudBillingProvider.cs`, `NexTraceOne.Integrations.Infrastructure/CloudBilling/NullCloudBillingProvider.cs`, `src/platform/NexTraceOne.BackgroundWorkers/Jobs/CloudBillingIngestionJob.cs`  
+**Estado:** Framework completo: `ICloudBillingProvider` (com `CloudBillingRecord`) em Integrations.Domain; `NullCloudBillingProvider` como default; `CloudBillingIngestionJob` executa diariamente (quando `IsConfigured=true`), loga N registos prontos para persistência via `ICostIntelligenceModule`. Implementações reais (`AwsCostExplorerProvider`, `AzureCostManagementProvider`, `GcpBillingProvider`) ficam para roadmap quando credenciais cloud estiverem disponíveis.
 
 ---
 
@@ -388,9 +369,9 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-018 — Regenerar 13 EF Core Designer Files ausentes
+### ACT-018 — Regenerar 13 EF Core Designer Files ausentes ✅ RESOLVIDO (Abril 2026)
 
-**Contexto:** 13 migrações não têm ficheiro `.Designer.cs`. Impede uso de algumas ferramentas `dotnet ef` em CI.
+**Contexto:** 13 migrações não tinham ficheiro `.Designer.cs`. Impede uso de algumas ferramentas `dotnet ef` em CI.
 
 **Módulos afectados:**
 - AuditCompliance: `P7_4_AuditCorrelationId`
@@ -538,10 +519,10 @@ Adicionar ao `CoreApiHostIntegrationTests.cs`:
 | ACT-012 | GreenOps calcular de telemetria real | ✅ DONE | Alto | Telemetria histórica | ESG reporting real |
 | ACT-013 | SupportBundles geração real | ✅ DONE | Alto | Storage decision | Support bundles funcionais |
 | ACT-014 | RestorePoints integração backup | ✅ DONE | Médio | Backup system | Recovery operacional |
-| ACT-015 | SAML 2.0 Protocol Handlers | 🟠 P3 | Muito Alto | ACT-004 | SSO enterprise completo |
-| ACT-016 | Kafka Producer/Consumer real | 🟠 P3 | Alto | Kafka cluster | Event streaming real |
-| ACT-017 | FinOps cloud billing real | 🟠 P3 | Muito Alto | Cloud credentials | FinOps com dados cloud reais |
-| ACT-018 | Regenerar EF Core Designer files | 🟢 P4 | Baixo | PostgreSQL local | Developer tooling |
+| ACT-015 | SAML 2.0 Protocol Handlers | ✅ DONE | Muito Alto | ACT-004 | SSO enterprise completo |
+| ACT-016 | Kafka Producer/Consumer real | ✅ DONE | Alto | Kafka cluster | Event streaming real |
+| ACT-017 | FinOps cloud billing real | ✅ DONE (framework) | Muito Alto | Cloud credentials | FinOps com dados cloud reais |
+| ACT-018 | Regenerar EF Core Designer files | ✅ DONE | Baixo | PostgreSQL local | Developer tooling |
 | ACT-019 | GraphQL Contract Type | ✅ DONE | Alto | — | Suporte a GraphQL contracts |
 | ACT-020 | Protobuf Contract Type | ✅ DONE | Alto | — | Suporte a gRPC contracts |
 | ACT-021 | Testes SearchCatalog | ✅ DONE | Baixo | — | Cobertura de testes |
