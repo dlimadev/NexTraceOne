@@ -154,6 +154,19 @@ public sealed class PlatformAdminEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:write");
 
+        admin.MapGet("/support-bundles/{bundleId:guid}/download", async (
+            Guid bundleId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetSupportBundlesFeature.DownloadBundle(bundleId), cancellationToken);
+            if (result.IsFailure)
+                return result.ToHttpResult(localizer);
+
+            return Results.File(result.Value.Content, "application/zip", result.Value.FileName);
+        }).RequirePermission("platform:admin:read");
+
         // ── Startup Report ────────────────────────────────────────────────────────
         admin.MapGet("/startup-report", async (
             ISender sender,

@@ -227,21 +227,23 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-010 — GetExternalHttpAudit: ligar ao Elasticsearch
+### ACT-010 — GetExternalHttpAudit: ligar ao Elasticsearch ✅ RESOLVIDO (Abril 2026)
 
-**Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetExternalHttpAudit/GetExternalHttpAudit.cs`  
-**Dependência:** Elasticsearch deve estar configurado e a receber spans do OTel Collector.
+**Solução implementada:**
 
-**Solução:**
+1. Criada interface `IHttpAuditReader` em `Governance.Application/Abstractions` com `QueryAsync(filter, ct)` e DTOs `HttpAuditFilter`, `HttpAuditPage`, `HttpAuditEntry`.
+2. Implementado `ObservabilityHttpAuditReader` em `Governance.Infrastructure/Observability` que usa `IObservabilityProvider.IsHealthyAsync()` + `QueryTracesAsync(filter, ct)` com `ServiceKind=REST`.
+3. Handler `GetExternalHttpAudit.Handler` agora injeta `IHttpAuditReader`; retorna `SimulatedNote` quando provider não está disponível (fallback gracioso), sem nota quando há dados reais.
+4. Registado `services.AddScoped<IHttpAuditReader, ObservabilityHttpAuditReader>()` em `GovernanceInfrastructure.DependencyInjection`.
+5. Adicionada referência `BuildingBlocks.Observability` ao `Governance.Infrastructure.csproj`.
+6. Testes: 13 novos testes em `HttpAuditAndSupportBundleTests.cs`.
 
-1. Criar `IElasticsearchAuditReader` em `BuildingBlocks.Observability` com método `QueryHttpAuditAsync(filters, page, pageSize, ct)`.
-2. Implementar com cliente Elasticsearch (NEST ou Elastic.Clients.Elasticsearch) a fazer query no índice `nextraceone-http-audit-*`.
-3. Injetar no `Handler` via DI. Fallback para lista vazia + `SimulatedNote` quando Elasticsearch não estiver configurado.
-4. Remover `SimulatedNote` quando Elasticsearch estiver conectado.
-5. Configurar o OTel Collector para exportar spans HTTP para Elasticsearch via `elasticsearchexporter`.
-
-**Pré-requisito:** Elasticsearch configurado e healthcheck a passar.  
-**Esforço estimado:** Alto (8–12h)
+**Ficheiros afetados:**
+- `Governance.Application/Abstractions/IHttpAuditReader.cs` (novo)
+- `Governance.Application/Features/GetExternalHttpAudit/GetExternalHttpAudit.cs` (actualizado)
+- `Governance.Infrastructure/Observability/ObservabilityHttpAuditReader.cs` (novo)
+- `Governance.Infrastructure/DependencyInjection.cs` (actualizado)
+- `Governance.Infrastructure/NexTraceOne.Governance.Infrastructure.csproj` (referência adicionada)
 
 ---
 
@@ -282,21 +284,29 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-013 — GetSupportBundles: geração real de bundles de suporte
+### ACT-013 — GetSupportBundles: geração real de bundles de suporte ✅ RESOLVIDO (Abril 2026)
 
-**Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetSupportBundles/GetSupportBundles.cs`  
-**Dependência:** Acesso a logs, configuração exportável e dump de schema de base de dados.
+**Solução implementada:**
 
-**Solução mínima (sem Quartz):**
+1. Entidade `SupportBundle` com ID fortemente tipado, estados Pending/Generating/Ready/Failed, `ZipContent` (byte[]) inline.
+2. Migration `20260419130000_AddSupportBundles` e tabela `gov_support_bundles` no PostgreSQL.
+3. `ISupportBundleRepository` com ListAsync/GetByIdAsync/AddAsync/Update + implementação EF `SupportBundleRepository`.
+4. Handler `GetSupportBundles.Handler` agora lê do repositório real e calcula `download_url`.
+5. Handler `GetSupportBundles.GenerateHandler` gera ZIP real em memória (System.IO.Compression) com: platform-summary.json, config-summary.json (sanitizado, sem segredos), governance-summary.json (teams, domains, packs).
+6. Novo handler `GetSupportBundles.DownloadHandler` (query `DownloadBundle`) para download de ficheiro ZIP.
+7. Endpoint `GET /platform/support-bundles/{bundleId:guid}/download` adicionado em `PlatformAdminEndpointModule`.
+8. Testes: 10 testes adicionados em `HttpAuditAndSupportBundleTests.cs`.
 
-1. Criar tabela `gov_support_bundles` via migration: `id`, `status`, `requested_at`, `completed_at`, `size_mb`, `download_url`, `tenant_id`.
-2. `GenerateSupportBundle` persiste entrada com status `Pending` e dispara `BackgroundService` inline via `IHostedService` ou `IBackgroundTaskQueue`.
-3. O worker gera ZIP em memória com: 1) export JSON de `AuditDbContext` (últimas 1000 entradas), 2) config summary (sem segredos), 3) versão da build e estado dos DbContexts.
-4. Guarda ZIP em `wwwroot/bundles/{id}.zip` (ou storage configurável) e actualiza status para `Ready` com `download_url`.
-5. `ListBundles` consulta repositório real.
-
-**Pré-requisito:** Decisão sobre storage de bundles (filesystem vs. blob storage).  
-**Esforço estimado:** Alto (10–14h)
+**Ficheiros afetados:**
+- `Governance.Domain/Entities/SupportBundle.cs` (novo)
+- `Governance.Application/Abstractions/ISupportBundleRepository.cs` (novo)
+- `Governance.Application/Features/GetSupportBundles/GetSupportBundles.cs` (actualizado)
+- `Governance.Infrastructure/Persistence/Repositories/SupportBundleRepository.cs` (novo)
+- `Governance.Infrastructure/Persistence/Configurations/SupportBundleEntityConfiguration.cs` (novo)
+- `Governance.Infrastructure/Persistence/Migrations/20260419130000_AddSupportBundles.cs` (novo)
+- `Governance.Infrastructure/Persistence/GovernanceDbContext.cs` (DbSet adicionado)
+- `Governance.Infrastructure/DependencyInjection.cs` (registo adicionado)
+- `Governance.API/Endpoints/PlatformAdminEndpointModule.cs` (endpoint download adicionado)
 
 ---
 
@@ -540,10 +550,10 @@ Adicionar ao `CoreApiHostIntegrationTests.cs`:
 | ACT-007 | NonProdSchedules persistir em BD | 🟡 P2 | Médio | — | Agendas não perdidas após restart |
 | ACT-008 | DemoSeedStatus substituir campo estático | 🟡 P2 | Médio | — | Estado persistente em multi-instância |
 | ACT-009 | SearchCatalog documentar como READY | 🟢 P2 | Baixo | — | Correcção de documentação |
-| ACT-010 | ExternalHttpAudit ligar Elasticsearch | 🟡 P2 | Alto | ES ativo | Auditoria HTTP real |
+| ACT-010 | ExternalHttpAudit ligar Elasticsearch | ✅ DONE | Alto | ES ativo | Auditoria HTTP real |
 | ACT-011 | CanaryRollouts integração canary externo | 🟡 P2 | Médio | Sistema canary | Dashboard canary real |
 | ACT-012 | GreenOps calcular de telemetria real | 🟡 P2 | Alto | Telemetria histórica | ESG reporting real |
-| ACT-013 | SupportBundles geração real | 🟡 P2 | Alto | Storage decision | Support bundles funcionais |
+| ACT-013 | SupportBundles geração real | ✅ DONE | Alto | Storage decision | Support bundles funcionais |
 | ACT-014 | RestorePoints integração backup | 🟠 P3 | Médio | Backup system | Recovery operacional |
 | ACT-015 | SAML 2.0 Protocol Handlers | 🟠 P3 | Muito Alto | ACT-004 | SSO enterprise completo |
 | ACT-016 | Kafka Producer/Consumer real | 🟠 P3 | Alto | Kafka cluster | Event streaming real |

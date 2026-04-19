@@ -105,6 +105,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Configuração GreenOps por tenant (factor de intensidade, meta ESG, região).</summary>
     public DbSet<GreenOpsConfiguration> GreenOpsConfigurations => Set<GreenOpsConfiguration>();
 
+    /// <summary>Bundles de suporte gerados pela plataforma.</summary>
+    public DbSet<SupportBundle> SupportBundles => Set<SupportBundle>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 
