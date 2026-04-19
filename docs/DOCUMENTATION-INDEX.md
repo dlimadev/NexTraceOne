@@ -184,17 +184,11 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 
 ---
 
-## 14. Análise e Diagnóstico — `docs/analysis/`
+## 14. Roadmap e Inovação — `docs/analysis/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`analysis/ESTADO-ATUAL-DO-PRODUTO.md`](analysis/ESTADO-ATUAL-DO-PRODUTO.md) | Estado actual do produto — diagnóstico completo |
-| [`analysis/GAPS-BACKEND.md`](analysis/GAPS-BACKEND.md) | Gaps identificados no backend |
-| [`analysis/GAPS-BANCO-DE-DADOS.md`](analysis/GAPS-BANCO-DE-DADOS.md) | Gaps na base de dados |
-| [`analysis/GAPS-FRONTEND.md`](analysis/GAPS-FRONTEND.md) | Gaps no frontend |
-| [`analysis/GAPS-TESTES.md`](analysis/GAPS-TESTES.md) | Gaps de cobertura de testes |
-| [`analysis/GAPS-DOCUMENTACAO.md`](analysis/GAPS-DOCUMENTACAO.md) | Gaps de documentação |
-| [`analysis/INOVACAO-ROADMAP.md`](analysis/INOVACAO-ROADMAP.md) | Roadmap de inovação |
+| [`analysis/INOVACAO-ROADMAP.md`](analysis/INOVACAO-ROADMAP.md) | Roadmap de inovação e propostas de novas funcionalidades |
 
 ---
 
