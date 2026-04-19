@@ -15,7 +15,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`NEXTRACEONE-PRESENTATION.md`](NEXTRACEONE-PRESENTATION.md) | **Documento formal de apresentação** — O que é, que problemas resolve, diferenciação, proposta de valor e ROI |
-| [`MODULES-AND-PAGES.md`](MODULES-AND-PAGES.md) | Módulos e páginas do produto |
 | [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
 
 ---
@@ -25,7 +24,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`ARCHITECTURE-OVERVIEW.md`](ARCHITECTURE-OVERVIEW.md) | Visão geral da arquitectura |
-| [`DOMAIN-BOUNDARIES.md`](DOMAIN-BOUNDARIES.md) | Fronteiras de domínio |
 | [`DATA-ARCHITECTURE.md`](DATA-ARCHITECTURE.md) | Arquitectura de dados |
 | [`SECURITY-ARCHITECTURE.md`](SECURITY-ARCHITECTURE.md) | Arquitectura de segurança |
 | [`FRONTEND-ARCHITECTURE.md`](FRONTEND-ARCHITECTURE.md) | Arquitectura frontend |
@@ -125,7 +123,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`deployment/DOCKER-AND-COMPOSE.md`](deployment/DOCKER-AND-COMPOSE.md) | Docker e Docker Compose |
 | [`deployment/ENVIRONMENT-CONFIGURATION.md`](deployment/ENVIRONMENT-CONFIGURATION.md) | Configuração de ambientes |
 | [`deployment/MIGRATION-STRATEGY.md`](deployment/MIGRATION-STRATEGY.md) | Estratégia de migrações |
-| [`deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md`](deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md) | Delivery e deployment |
 
 ---
 
@@ -157,8 +154,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`observability/DRIFT-DETECTION-PIPELINE.md`](observability/DRIFT-DETECTION-PIPELINE.md) | Pipeline de detecção de drift |
 | [`observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md`](observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md) | Comparação de ambientes |
 | [`observability/INGESTION-API-ROLE-AND-FLOW.md`](observability/INGESTION-API-ROLE-AND-FLOW.md) | API de ingestão |
-| [`observability/PHASE-6-OBSERVABILITY-COMPLETION.md`](observability/PHASE-6-OBSERVABILITY-COMPLETION.md) | Conclusão de observabilidade |
-| [`observability/pipeline-validation-report.md`](observability/pipeline-validation-report.md) | Relatório de validação do pipeline |
 | [`observability/troubleshooting.md`](observability/troubleshooting.md) | Troubleshooting |
 | [`observability/configuration/`](observability/configuration/) | Configuração de observabilidade |
 | [`observability/collection/`](observability/collection/) | Colecção (IIS/CLR, Kafka, K8s) |
