@@ -25,6 +25,8 @@ internal sealed class WorkerCurrentUser : ICurrentUser
 
     public bool IsAuthenticated => true;
 
+    public string? Persona => null;
+
     public bool HasPermission(string permission) => true;
 }
 

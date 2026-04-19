@@ -22,7 +22,7 @@ public sealed class ComplianceAsCodeTests
     private readonly IComplianceResultRepository _resultRepository = Substitute.For<IComplianceResultRepository>();
     private readonly IAuditEventRepository _auditEventRepository = Substitute.For<IAuditEventRepository>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IAuditComplianceUnitOfWork _unitOfWork = Substitute.For<IAuditComplianceUnitOfWork>();
 
     private readonly Guid _tenantId = Guid.NewGuid();
 

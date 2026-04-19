@@ -332,21 +332,30 @@ public sealed class PromotionApplicationTests
         var requestRepo = Substitute.For<IPromotionRequestRepository>();
         var releaseRepo = Substitute.For<IReleaseRepository>();
 
+        var release = Release.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "my-service",
+            "1.0.0",
+            "staging",
+            "jenkins/pipeline",
+            "abc123def456",
+            FixedNow);
+
+        // Set the release Id to match the promotionRequest.ReleaseId so the handler's releaseMap lookup succeeds
+        typeof(Release)
+            .BaseType! // AggregateRoot<ReleaseId>
+            .BaseType! // Entity<ReleaseId>
+            .GetProperty("Id")!
+            .SetValue(release, ReleaseId.From(releaseId));
+
         requestRepo.ListByStatusAsync(Arg.Any<PromotionStatus>(), Arg.Any<CancellationToken>())
             .Returns(new List<PromotionRequest> { promotionRequest });
 
-        releaseRepo.GetByIdAsync(
-            Arg.Is<ReleaseId>(id => id.Value == releaseId),
+        releaseRepo.ListByIdsAsync(
+            Arg.Any<IEnumerable<ReleaseId>>(),
             Arg.Any<CancellationToken>())
-            .Returns(Release.Create(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                "my-service",
-                "1.0.0",
-                "staging",
-                "jenkins/pipeline",
-                "abc123def456",
-                FixedNow));
+            .Returns(new List<Release> { release });
 
         var sut = new ListPromotionRequestsFeature.Handler(requestRepo, releaseRepo);
         var query = new ListPromotionRequestsFeature.Query(null, 1, 20);

@@ -25,7 +25,7 @@ public sealed class RetentionAndComplianceTests
     private readonly ICompliancePolicyRepository _compliancePolicyRepository = Substitute.For<ICompliancePolicyRepository>();
     private readonly IComplianceResultRepository _complianceResultRepository = Substitute.For<IComplianceResultRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IAuditComplianceUnitOfWork _unitOfWork = Substitute.For<IAuditComplianceUnitOfWork>();
     private readonly ILogger<ApplyRetention.Handler> _applyRetentionLogger = Substitute.For<ILogger<ApplyRetention.Handler>>();
 
     private static readonly DateTimeOffset FixedNow = new(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
