@@ -104,6 +104,7 @@ public static class DependencyInjection
         services.AddScoped<IGuardianAlertRepository, GuardianAlertRepository>();
         services.AddScoped<IOrganizationalMemoryRepository, OrganizationalMemoryRepository>();
         services.AddHostedService<ProactiveArchitectureGuardianJob>();
+        services.AddScoped<ISelfHealingActionRepository, SelfHealingActionRepository>();
 
         // ── Integration Event Handlers (E-M02) ───────────────────────────
         services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();

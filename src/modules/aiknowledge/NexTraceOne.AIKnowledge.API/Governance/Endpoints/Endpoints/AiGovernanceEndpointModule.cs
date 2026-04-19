@@ -88,6 +88,12 @@ using RecordMemoryNodeFeature = NexTraceOne.AIKnowledge.Application.Governance.F
 using QueryOrganizationalMemoryFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.QueryOrganizationalMemory.QueryOrganizationalMemory;
 using GetMemoryNodeDetailsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetMemoryNodeDetails.GetMemoryNodeDetails;
 
+using QuantifyTechDebtFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.QuantifyTechDebt.QuantifyTechDebt;
+using GetSlaIntelligenceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetSlaIntelligence.GetSlaIntelligence;
+using ProposeSelfHealingActionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ProposeSelfHealingAction.ProposeSelfHealingAction;
+using ApproveSelfHealingActionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ApproveSelfHealingAction.ApproveSelfHealingAction;
+using ListSelfHealingActionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListSelfHealingActions.ListSelfHealingActions;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -132,6 +138,8 @@ public sealed class AiGovernanceEndpointModule
         MapNaturalLanguageQueryEndpoints(app);
         MapGuardianAlertEndpoints(app);
         MapOrganizationalMemoryEndpoints(app);
+        MapAnalyticsEndpoints(app);
+        MapSelfHealingEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1290,6 +1298,76 @@ public sealed class AiGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:read");
     }
+
+    private static void MapAnalyticsEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/tech-debt/quantify",
+            async (QuantifyTechDebtRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new QuantifyTechDebtFeature.Query(
+                    req.ServiceName, req.TenantId, req.IncidentCountLast90Days,
+                    req.TestCoveragePercent, req.CircularDependencies, req.AveragePrSizeLines,
+                    req.AverageMttrMinutes, req.HourlyEngineeringRate);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:read")
+            .WithTags("AI Analytics")
+            .WithSummary("Quantify tech debt with financial impact");
+
+        app.MapPost("/api/v1/ai/sla/intelligence",
+            async (GetSlaIntelligenceRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new GetSlaIntelligenceFeature.Query(
+                    req.ServiceName, req.TenantId, req.CurrentSlaTarget,
+                    req.ActualAvailabilityPercent, req.MaintenanceWindowMinutesPerMonth,
+                    req.DeploymentFailuresLast12m, req.FridayDeployCount,
+                    req.EstimatedPenaltyPerBreachMonth);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:read")
+            .WithTags("AI Analytics")
+            .WithSummary("Get SLA intelligence and breach analysis");
+    }
+
+    private static void MapSelfHealingEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/self-healing/actions",
+            async (ProposeSelfHealingActionRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var command = new ProposeSelfHealingActionFeature.Command(
+                    req.IncidentId, req.ServiceName, req.ActionType,
+                    req.ActionDescription, req.Confidence, req.RiskLevel, req.TenantId);
+                var result = await mediator.Send(command, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:write")
+            .WithTags("AI Self-Healing")
+            .WithSummary("Propose a self-healing remediation action");
+
+        app.MapGet("/api/v1/ai/self-healing/actions",
+            async (Guid tenantId, string? incidentId, bool pendingOnly, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new ListSelfHealingActionsFeature.Query(tenantId, incidentId, pendingOnly);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:read")
+            .WithTags("AI Self-Healing")
+            .WithSummary("List self-healing actions");
+
+        app.MapPost("/api/v1/ai/self-healing/actions/{actionId:guid}/approve",
+            async (Guid actionId, ApproveSelfHealingActionRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var command = new ApproveSelfHealingActionFeature.Command(actionId, req.ApprovedBy);
+                var result = await mediator.Send(command, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:governance:write")
+            .WithTags("AI Self-Healing")
+            .WithSummary("Approve a pending self-healing action");
+    }
 }
 
 // ── Request DTOs para endpoints PATCH ───────────────────────────────────
@@ -1408,3 +1486,38 @@ public sealed record AcknowledgeAlertRequest(string AcknowledgedBy);
 
 /// <summary>Corpo de pedido para descarte de um alerta do Guardian.</summary>
 public sealed record DismissAlertRequest(string Reason);
+
+/// <summary>Corpo de pedido para quantificação de dívida técnica.</summary>
+public sealed record QuantifyTechDebtRequest(
+    string ServiceName,
+    Guid TenantId,
+    int IncidentCountLast90Days,
+    double TestCoveragePercent,
+    int CircularDependencies,
+    double AveragePrSizeLines,
+    double AverageMttrMinutes,
+    decimal HourlyEngineeringRate);
+
+/// <summary>Corpo de pedido para inteligência de SLA.</summary>
+public sealed record GetSlaIntelligenceRequest(
+    string ServiceName,
+    Guid TenantId,
+    double CurrentSlaTarget,
+    double ActualAvailabilityPercent,
+    int MaintenanceWindowMinutesPerMonth,
+    int DeploymentFailuresLast12m,
+    int FridayDeployCount,
+    decimal EstimatedPenaltyPerBreachMonth);
+
+/// <summary>Corpo de pedido para proposta de acção de auto-remediação.</summary>
+public sealed record ProposeSelfHealingActionRequest(
+    string IncidentId,
+    string ServiceName,
+    string ActionType,
+    string ActionDescription,
+    double Confidence,
+    string RiskLevel,
+    Guid TenantId);
+
+/// <summary>Corpo de pedido para aprovação de acção de auto-remediação.</summary>
+public sealed record ApproveSelfHealingActionRequest(string ApprovedBy);

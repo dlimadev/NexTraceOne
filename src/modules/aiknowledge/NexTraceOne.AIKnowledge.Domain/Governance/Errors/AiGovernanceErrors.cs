@@ -360,4 +360,11 @@ public static class AiGovernanceErrors
         => Error.NotFound(
             "AiGovernance.Memory.NodeNotFound",
             $"Memory node '{id}' not found.");
+
+    /// <summary>Acção de auto-remediação não encontrada pelo identificador informado.</summary>
+    public static Error SelfHealingActionNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.SelfHealingAction.NotFound",
+            "Self-healing action '{0}' was not found.",
+            id);
 }

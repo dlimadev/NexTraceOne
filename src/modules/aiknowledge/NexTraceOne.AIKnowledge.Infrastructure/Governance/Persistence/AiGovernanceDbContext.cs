@@ -73,6 +73,7 @@ public sealed class AiGovernanceDbContext(
     public DbSet<ChangeConfidenceScore> ChangeConfidenceScores => Set<ChangeConfidenceScore>();
     public DbSet<GuardianAlert> GuardianAlerts => Set<GuardianAlert>();
     public DbSet<OrganizationalMemoryNode> MemoryNodes => Set<OrganizationalMemoryNode>();
+    public DbSet<SelfHealingAction> SelfHealingActions => Set<SelfHealingAction>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
