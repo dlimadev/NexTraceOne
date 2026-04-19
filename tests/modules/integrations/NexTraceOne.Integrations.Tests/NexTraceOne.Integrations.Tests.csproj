@@ -6,6 +6,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\modules\integrations\NexTraceOne.Integrations.Domain\NexTraceOne.Integrations.Domain.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\integrations\NexTraceOne.Integrations.Application\NexTraceOne.Integrations.Application.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\integrations\NexTraceOne.Integrations.Infrastructure\NexTraceOne.Integrations.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

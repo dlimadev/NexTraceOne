@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Integrations.Domain;
 using NexTraceOne.BuildingBlocks.Application.Integrations;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -12,8 +13,10 @@ using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
 using NexTraceOne.Integrations.Contracts;
 using NexTraceOne.Integrations.Domain.Events;
+using NexTraceOne.Integrations.Infrastructure.CloudBilling;
 using NexTraceOne.Integrations.Infrastructure.EventHandlers;
 using NexTraceOne.Integrations.Infrastructure.Integrations;
+using NexTraceOne.Integrations.Infrastructure.Kafka;
 using NexTraceOne.Integrations.Infrastructure.LegacyTelemetry;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
@@ -63,6 +66,32 @@ public static class DependencyInjection
         // Domain Event Handlers — converte domain events em integration events para consumidores downstream
         services.AddScoped<IIntegrationEventHandler<IngestionPayloadProcessedDomainEvent>,
             IngestionPayloadProcessedDomainEventHandler>();
+
+        // Canary Provider — NullCanaryProvider por default; substituir por implementação real quando sistema canary estiver disponível
+        services.AddSingleton<ICanaryProvider, NullCanaryProvider>();
+
+        // Backup Provider — NullBackupProvider por default; substituir por implementação real (pg_dump, pgBackRest, Barman)
+        // quando sistema de backup estiver configurado no ambiente.
+        services.AddSingleton<IBackupProvider, NullBackupProvider>();
+
+        // Kafka Event Producer — activa ConfluentKafkaEventProducer quando Kafka:Enabled = true e BootstrapServers configurados.
+        // Caso contrário, usa NullKafkaEventProducer que descarta silenciosamente todos os eventos.
+        var kafkaEnabled = configuration.GetValue<bool>("Kafka:Enabled");
+        var kafkaBootstrap = configuration["Kafka:BootstrapServers"];
+        if (kafkaEnabled && !string.IsNullOrWhiteSpace(kafkaBootstrap))
+        {
+            services.AddSingleton<IKafkaEventProducer, ConfluentKafkaEventProducer>();
+            services.AddHostedService<KafkaConsumerWorker>();
+        }
+        else
+        {
+            services.AddSingleton<IKafkaEventProducer, NullKafkaEventProducer>();
+        }
+
+        // Cloud Billing Provider — NullCloudBillingProvider por default.
+        // Substituir por AwsCloudBillingProvider, AzureCloudBillingProvider, etc.
+        // quando FinOps:Billing:Provider estiver configurado.
+        services.AddSingleton<ICloudBillingProvider, NullCloudBillingProvider>();
 
         return services;
     }

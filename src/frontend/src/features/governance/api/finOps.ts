@@ -126,6 +126,14 @@ export interface EvaluateReleaseBudgetGateResponse {
   evaluatedAt: string;
 }
 
+export interface CostContextPerDayResponse {
+  serviceName: string;
+  environment: string;
+  actualCostPerDay: number;
+  baselineCostPerDay: number;
+  currency: string;
+}
+
 /** Cliente de API para FinOps contextual do módulo Governance. */
 export const finOpsApi = {
   getSummary: (params?: { teamId?: string; domainId?: string; serviceId?: string; range?: string }) =>
@@ -163,4 +171,11 @@ export const finOpsApi = {
 
   evaluateReleaseBudgetGate: (data: EvaluateReleaseBudgetGateRequest) =>
     client.post<EvaluateReleaseBudgetGateResponse>('/finops/releases/evaluate-budget-gate', data).then((r) => r.data),
+
+  getCostContextPerDay: (serviceName: string, environment: string) =>
+    client
+      .get<CostContextPerDayResponse>(`/finops/service/${encodeURIComponent(serviceName)}/cost-context`, {
+        params: { environment },
+      })
+      .then((r) => r.data),
 };

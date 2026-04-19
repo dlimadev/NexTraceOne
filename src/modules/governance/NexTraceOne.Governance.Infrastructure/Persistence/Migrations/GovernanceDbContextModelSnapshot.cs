@@ -934,6 +934,81 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.GreenOpsConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("IntensityFactorKgPerKwh")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("EsgTargetKgCo2PerMonth")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("DatacenterRegion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_greenops_configurations");
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.SupportBundle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("SizeMb")
+                        .HasColumnType("double precision");
+
+                    b.Property<byte[]>("ZipContent")
+                        .HasColumnType("bytea");
+
+                    b.Property<bool>("IncludesLogs")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IncludesConfig")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IncludesDb")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status");
+                    b.HasIndex("TenantId");
+                    b.HasIndex("RequestedAt");
+
+                    b.ToTable("gov_support_bundles");
+                });
+
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.LicenseComplianceReport", b =>
                 {
                     b.Property<Guid>("Id")

@@ -15,10 +15,10 @@ namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 /// </summary>
 public sealed class RoleCrudTests
 {
-    private static (IRoleRepository repo, IUnitOfWork uow) CreateMocks()
+    private static (IRoleRepository repo, IIdentityAccessUnitOfWork uow) CreateMocks()
     {
         var repo = Substitute.For<IRoleRepository>();
-        var uow = Substitute.For<IUnitOfWork>();
+        var uow = Substitute.For<IIdentityAccessUnitOfWork>();
         uow.CommitAsync(Arg.Any<CancellationToken>()).Returns(1);
         return (repo, uow);
     }

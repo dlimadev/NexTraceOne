@@ -12,7 +12,7 @@ namespace NexTraceOne.AuditCompliance.Tests.Application.Features;
 public sealed class ConfigureRetentionTests
 {
     private readonly IRetentionPolicyRepository _retentionPolicyRepository = Substitute.For<IRetentionPolicyRepository>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IAuditComplianceUnitOfWork _unitOfWork = Substitute.For<IAuditComplianceUnitOfWork>();
 
     private ConfigureRetention.Handler CreateHandler() => new(_retentionPolicyRepository, _unitOfWork);
 

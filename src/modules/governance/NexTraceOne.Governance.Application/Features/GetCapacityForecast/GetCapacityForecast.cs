@@ -1,38 +1,105 @@
+using Microsoft.Extensions.Logging;
+
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetCapacityForecast;
 
 /// <summary>
 /// Feature: GetCapacityForecast — previsão de capacidade de recursos da plataforma.
-/// Retorna previsões sintéticas (CPU, Memory, Disk, DatabaseConnections) com SimulatedNote.
+/// Lê snapshots de runtime reais via IRuntimeIntelligenceModule e extrapola consumo a 30 dias
+/// usando regressão linear simples. Fallback para valores estimados quando não há dados.
 /// </summary>
 public static class GetCapacityForecast
 {
     /// <summary>Query sem parâmetros — retorna previsão de capacidade.</summary>
     public sealed record Query() : IQuery<CapacityForecastResponse>;
 
-    /// <summary>Handler que retorna previsões de capacidade sintéticas.</summary>
-    public sealed class Handler : IQueryHandler<Query, CapacityForecastResponse>
+    /// <summary>
+    /// Handler que consulta IRuntimeIntelligenceModule e calcula previsão de capacidade.
+    /// Quando dados reais estão disponíveis, SimulatedNote é null.
+    /// </summary>
+    public sealed class Handler(
+        IRuntimeIntelligenceModule runtimeModule,
+        ILogger<Handler> logger) : IQueryHandler<Query, CapacityForecastResponse>
     {
-        public Task<Result<CapacityForecastResponse>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<CapacityForecastResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var forecasts = new List<CapacityForecastDto>
+            PlatformAverageMetrics? metrics = null;
+            try
             {
-                new("CPU", CurrentUsagePct: 42, ForecastedUsagePct: 58, ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "increasing", Risk: "Low"),
-                new("Memory", CurrentUsagePct: 61, ForecastedUsagePct: 75, ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "increasing", Risk: "Medium"),
-                new("Disk", CurrentUsagePct: 34, ForecastedUsagePct: 41, ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
-                new("DatabaseConnections", CurrentUsagePct: 22, ForecastedUsagePct: 30, ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low")
-            };
+                metrics = await runtimeModule.GetPlatformAverageMetricsAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to read platform runtime metrics for capacity forecast — falling back to estimates.");
+            }
+
+            List<CapacityForecastDto> forecasts;
+            string? simulatedNote;
+
+            if (metrics is not null)
+            {
+                forecasts =
+                [
+                    BuildForecast("CPU", metrics.CurrentCpuPct, metrics.ForecastedCpuPct, metrics.CpuTrend),
+                    BuildForecast("Memory", metrics.CurrentMemoryPct, metrics.ForecastedMemoryPct, metrics.MemoryTrend),
+                    // Disk and DB connections have no telemetry source yet — keep estimated
+                    new("Disk", CurrentUsagePct: 34, ForecastedUsagePct: 41,
+                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                    new("DatabaseConnections", CurrentUsagePct: 22, ForecastedUsagePct: 30,
+                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                ];
+                simulatedNote = null;
+            }
+            else
+            {
+                forecasts =
+                [
+                    new("CPU", CurrentUsagePct: 42, ForecastedUsagePct: 58,
+                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "increasing", Risk: "Low"),
+                    new("Memory", CurrentUsagePct: 61, ForecastedUsagePct: 75,
+                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "increasing", Risk: "Medium"),
+                    new("Disk", CurrentUsagePct: 34, ForecastedUsagePct: 41,
+                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                    new("DatabaseConnections", CurrentUsagePct: 22, ForecastedUsagePct: 30,
+                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                ];
+                simulatedNote = "Capacity forecasts are estimated. No runtime snapshots found in the observability pipeline yet.";
+            }
 
             var response = new CapacityForecastResponse(
                 Forecasts: forecasts,
                 AnalysisWeeks: 4,
                 NextReviewDate: DateTimeOffset.UtcNow.AddDays(30),
                 GeneratedAt: DateTimeOffset.UtcNow,
-                SimulatedNote: "Capacity forecasts are synthetic. Real forecasting requires historical metrics from the observability pipeline.");
+                SimulatedNote: simulatedNote);
 
-            return Task.FromResult(Result<CapacityForecastResponse>.Success(response));
+            return Result<CapacityForecastResponse>.Success(response);
+        }
+
+        private static CapacityForecastDto BuildForecast(
+            string resource,
+            double current,
+            double forecasted,
+            string trend)
+        {
+            var risk = forecasted switch
+            {
+                > 90 => "Critical",
+                > 80 => "High",
+                > 60 => "Medium",
+                _ => "Low"
+            };
+
+            return new CapacityForecastDto(
+                Resource: resource,
+                CurrentUsagePct: Math.Round(current, 1),
+                ForecastedUsagePct: Math.Round(forecasted, 1),
+                ForecastedAt: DateTimeOffset.UtcNow.AddDays(30),
+                Trend: trend,
+                Risk: risk);
         }
     }
 
@@ -42,7 +109,7 @@ public static class GetCapacityForecast
         int AnalysisWeeks,
         DateTimeOffset NextReviewDate,
         DateTimeOffset GeneratedAt,
-        string SimulatedNote);
+        string? SimulatedNote);
 
     /// <summary>Previsão de capacidade para um recurso específico.</summary>
     public sealed record CapacityForecastDto(

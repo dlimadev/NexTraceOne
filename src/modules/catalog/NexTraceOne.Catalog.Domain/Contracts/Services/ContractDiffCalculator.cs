@@ -8,9 +8,7 @@ namespace NexTraceOne.Catalog.Domain.Contracts.Services;
 /// <summary>
 /// Orquestrador de diff semântico multi-protocolo que delega ao calculador específico
 /// do protocolo do contrato. Ponto de entrada único para computar diffs independentemente
-/// do formato da especificação (OpenAPI, Swagger, AsyncAPI, WSDL).
-/// Para protocolos ainda não suportados (Protobuf, GraphQL), retorna resultado vazio
-/// com nível NonBreaking para não bloquear o fluxo de governança.
+/// do formato da especificação (OpenAPI, Swagger, AsyncAPI, WSDL, GraphQL, Protobuf).
 /// </summary>
 public static class ContractDiffCalculator
 {
@@ -33,12 +31,14 @@ public static class ContractDiffCalculator
             ContractProtocol.Wsdl => WsdlDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             ContractProtocol.WorkerService => WorkerServiceDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             ContractProtocol.Copybook => CopybookDiffAdapter.ComputeDiff(baseSpec, targetSpec),
+            ContractProtocol.GraphQl => GraphQlDiffCalculator.ComputeDiff(baseSpec, targetSpec),
+            ContractProtocol.Protobuf => ProtobufDiffCalculator.ComputeDiff(baseSpec, targetSpec),
             _ => EmptyResult()
         };
     }
 
     /// <summary>
-    /// Retorna resultado vazio para protocolos sem suporte a diff semântico (Protobuf, GraphQL).
+    /// Retorna resultado vazio para protocolos legacy sem suporte a diff semântico.
     /// Utiliza nível NonBreaking para não bloquear o fluxo de governança.
     /// </summary>
     private static OpenApiDiffCalculator.DiffResult EmptyResult()

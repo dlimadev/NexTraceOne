@@ -20,6 +20,16 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
             .SingleOrDefaultAsync(r => r.Id == id, ct);
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Release>> ListByIdsAsync(IEnumerable<ReleaseId> ids, CancellationToken cancellationToken = default)
+    {
+        var guids = ids.Select(id => id.Value).ToList();
+        return await context.Releases
+            .Where(r => guids.Contains(r.Id.Value))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<Release?> GetByExternalKeyAsync(string externalReleaseId, string externalSystem, CancellationToken cancellationToken = default)
         => await context.Releases
             .SingleOrDefaultAsync(r => r.ExternalReleaseId == externalReleaseId

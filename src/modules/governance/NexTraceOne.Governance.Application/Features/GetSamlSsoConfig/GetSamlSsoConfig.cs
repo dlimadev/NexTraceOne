@@ -1,13 +1,16 @@
 using Microsoft.Extensions.Configuration;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.GetSamlSsoConfig;
 
 /// <summary>
 /// Feature: GetSamlSsoConfig — gestão da configuração SAML SSO da plataforma.
 /// Expõe leitura, atualização e teste da integração SAML.
-/// Lê de IConfiguration "Saml:*"; retorna defaults NotConfigured quando não configurado.
+/// Lê da base de dados com fallback para IConfiguration "Saml:*".
 /// </summary>
 public static class GetSamlSsoConfig
 {
@@ -28,16 +31,39 @@ public static class GetSamlSsoConfig
     public sealed record TestSamlConnection() : ICommand<TestSamlConnectionResult>;
 
     /// <summary>Handler de leitura da configuração SAML.</summary>
-    public sealed class Handler(IConfiguration configuration) : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        ISamlSsoConfigurationRepository repository,
+        IConfiguration configuration) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var entityId = configuration["Saml:EntityId"];
-            var ssoUrl = configuration["Saml:SsoUrl"];
-            var sloUrl = configuration["Saml:SloUrl"];
-            var idpCert = configuration["Saml:IdpCertificate"];
-            var jit = bool.TryParse(configuration["Saml:JitProvisioningEnabled"], out var jitVal) && jitVal;
-            var defaultRole = configuration["Saml:DefaultRole"] ?? "viewer";
+            var dbConfig = await repository.GetActiveAsync(null, cancellationToken);
+
+            string entityId, ssoUrl, sloUrl, idpCert, defaultRole;
+            bool jit;
+            IReadOnlyList<AttributeMappingDto> attributeMappings;
+
+            if (dbConfig is not null)
+            {
+                entityId = dbConfig.EntityId;
+                ssoUrl = dbConfig.SsoUrl;
+                sloUrl = dbConfig.SloUrl;
+                idpCert = dbConfig.IdpCertificate;
+                jit = dbConfig.JitProvisioningEnabled;
+                defaultRole = dbConfig.DefaultRole;
+                attributeMappings = System.Text.Json.JsonSerializer.Deserialize<IReadOnlyList<AttributeMappingDto>>(
+                    dbConfig.AttributeMappingsJson) ?? [];
+            }
+            else
+            {
+                entityId = configuration["Saml:EntityId"] ?? string.Empty;
+                ssoUrl = configuration["Saml:SsoUrl"] ?? string.Empty;
+                sloUrl = configuration["Saml:SloUrl"] ?? string.Empty;
+                idpCert = configuration["Saml:IdpCertificate"] ?? string.Empty;
+                jit = bool.TryParse(configuration["Saml:JitProvisioningEnabled"], out var jitVal) && jitVal;
+                defaultRole = configuration["Saml:DefaultRole"] ?? "viewer";
+                attributeMappings = [];
+            }
 
             var status = string.IsNullOrWhiteSpace(entityId) || string.IsNullOrWhiteSpace(ssoUrl)
                 ? SamlSsoStatus.NotConfigured
@@ -45,28 +71,64 @@ public static class GetSamlSsoConfig
 
             var response = new Response(
                 Status: status,
-                EntityId: entityId ?? string.Empty,
-                SsoUrl: ssoUrl ?? string.Empty,
-                SloUrl: sloUrl ?? string.Empty,
-                IdpCertificate: idpCert ?? string.Empty,
+                EntityId: entityId,
+                SsoUrl: ssoUrl,
+                SloUrl: sloUrl,
+                IdpCertificate: idpCert,
                 JitProvisioningEnabled: jit,
                 DefaultRole: defaultRole,
-                AttributeMappings: [],
+                AttributeMappings: attributeMappings,
                 LastTestedAt: null,
                 TestResult: null,
                 SimulatedNote: string.Empty);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 
     /// <summary>Handler de atualização da configuração SAML SSO.</summary>
-    public sealed class UpdateHandler(IConfiguration configuration) : ICommandHandler<UpdateSamlSsoConfig, Response>
+    public sealed class UpdateHandler(
+        ISamlSsoConfigurationRepository repository,
+        IGovernanceUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<UpdateSamlSsoConfig, Response>
     {
-        public Task<Result<Response>> Handle(UpdateSamlSsoConfig request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(UpdateSamlSsoConfig request, CancellationToken cancellationToken)
         {
-            // Configuração SAML é gerida via appsettings / variáveis de ambiente.
-            // Retorna os valores recebidos como confirmação (write-through via infra não implementado neste stub).
+            var now = clock.UtcNow;
+            var mappingsJson = System.Text.Json.JsonSerializer.Serialize(request.AttributeMappings);
+
+            var existing = await repository.GetActiveAsync(null, cancellationToken);
+
+            if (existing is not null)
+            {
+                existing.Update(
+                    entityId: request.EntityId,
+                    ssoUrl: request.SsoUrl,
+                    sloUrl: request.SloUrl,
+                    idpCertificate: request.IdpCertificate,
+                    jitProvisioningEnabled: request.JitProvisioningEnabled,
+                    defaultRole: request.DefaultRole,
+                    attributeMappingsJson: mappingsJson,
+                    now: now);
+                repository.Update(existing);
+            }
+            else
+            {
+                var created = SamlSsoConfiguration.Create(
+                    entityId: request.EntityId,
+                    ssoUrl: request.SsoUrl,
+                    sloUrl: request.SloUrl,
+                    idpCertificate: request.IdpCertificate,
+                    jitProvisioningEnabled: request.JitProvisioningEnabled,
+                    defaultRole: request.DefaultRole,
+                    attributeMappingsJson: mappingsJson,
+                    tenantId: null,
+                    now: now);
+                await repository.AddAsync(created, cancellationToken);
+            }
+
+            await unitOfWork.CommitAsync(cancellationToken);
+
             var response = new Response(
                 Status: SamlSsoStatus.Enabled,
                 EntityId: request.EntityId,
@@ -80,7 +142,7 @@ public static class GetSamlSsoConfig
                 TestResult: null,
                 SimulatedNote: string.Empty);
 
-            return Task.FromResult(Result<Response>.Success(response));
+            return Result<Response>.Success(response);
         }
     }
 
@@ -125,3 +187,4 @@ public static class GetSamlSsoConfig
     /// <summary>Estado de configuração SAML SSO.</summary>
     public enum SamlSsoStatus { NotConfigured, Enabled, Disabled }
 }
+

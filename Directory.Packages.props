@@ -65,6 +65,9 @@
     <!-- Override transitive SixLabors.ImageSharp from PdfSharpCore: 1.0.4 → 2.1.11 (Apache-2.0, no CVEs) -->
     <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.11" />
   </ItemGroup>
+  <ItemGroup Label="Mensageria">
+    <PackageVersion Include="Confluent.Kafka" Version="2.8.0" />
+  </ItemGroup>
   <ItemGroup Label="Testes">
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />

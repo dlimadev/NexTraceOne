@@ -53,6 +53,13 @@ public interface ICostIntelligenceModule
     /// Lista recomendações de eficiência não reconhecidas para consumo por outros módulos.
     /// </summary>
     Task<IReadOnlyList<EfficiencyRecommendationSummary>> GetUnacknowledgedRecommendationsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém o contexto de custo por dia (actual e baseline) para um serviço num ambiente.
+    /// Usado pelo gate de budget na promoção de releases para comparar custo da release vs baseline.
+    /// Retorna null se nenhum dado de custo estiver disponível.
+    /// </summary>
+    Task<CostContextPerDay?> GetCostContextPerDayAsync(string serviceName, string environment, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -87,3 +94,16 @@ public sealed record EfficiencyRecommendationSummary(
     decimal DeviationPercent,
     string RecommendationText,
     string Priority);
+
+/// <summary>
+/// Contexto de custo por dia para um serviço num ambiente.
+/// ActualCostPerDay: custo médio diário do mês corrente.
+/// BaselineCostPerDay: custo médio diário do mês anterior (usado como baseline de comparação).
+/// Currency: moeda do custo (ex: "USD").
+/// </summary>
+public sealed record CostContextPerDay(
+    decimal ActualCostPerDay,
+    decimal BaselineCostPerDay,
+    string Currency,
+    string ServiceName,
+    string Environment);

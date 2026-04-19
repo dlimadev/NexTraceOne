@@ -93,6 +93,24 @@ public sealed class GovernanceDbContext(
     /// <summary>Métricas OpenTelemetry ingeridas pelo OTEL Collector pipeline.</summary>
     public DbSet<OtelMetricRecord> OtelMetrics => Set<OtelMetricRecord>();
 
+    /// <summary>Agendas de ambientes não produtivos.</summary>
+    public DbSet<NonProdSchedule> NonProdSchedules => Set<NonProdSchedule>();
+
+    /// <summary>Estado do seed de demonstração por tenant.</summary>
+    public DbSet<DemoSeedState> DemoSeedStates => Set<DemoSeedState>();
+
+    /// <summary>Configurações SAML SSO por tenant.</summary>
+    public DbSet<SamlSsoConfiguration> SamlSsoConfigurations => Set<SamlSsoConfiguration>();
+
+    /// <summary>Configuração GreenOps por tenant (factor de intensidade, meta ESG, região).</summary>
+    public DbSet<GreenOpsConfiguration> GreenOpsConfigurations => Set<GreenOpsConfiguration>();
+
+    /// <summary>Bundles de suporte gerados pela plataforma.</summary>
+    public DbSet<SupportBundle> SupportBundles => Set<SupportBundle>();
+
+    /// <summary>Jobs de recovery de dados iniciados via plataforma.</summary>
+    public DbSet<RecoveryJob> RecoveryJobs => Set<RecoveryJob>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

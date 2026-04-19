@@ -324,6 +324,7 @@ builder.Services.AddHostedService<ModuleOutboxProcessorJob<ConfigurationDbContex
 
 builder.Services.AddHostedService<IdentityExpirationJob>();
 builder.Services.AddHostedService<DriftDetectionJob>();
+builder.Services.AddHostedService<CloudBillingIngestionJob>();
 
 var app = builder.Build();
 

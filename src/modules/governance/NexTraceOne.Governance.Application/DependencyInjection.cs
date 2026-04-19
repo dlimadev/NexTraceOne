@@ -8,6 +8,7 @@ using NexTraceOne.Governance.Application.Features.GetCustomDashboard;
 using NexTraceOne.Governance.Application.Features.ListCustomDashboards;
 using NexTraceOne.Governance.Application.Features.RecordTechnicalDebt;
 using NexTraceOne.Governance.Application.Features.GetTechnicalDebtSummary;
+using NexTraceOne.Governance.Application.Features.GetCostContextPerDay;
 using NexTraceOne.Governance.Application.Features.ApproveGovernanceWaiver;
 using NexTraceOne.Governance.Application.Features.CreateDelegatedAdministration;
 using NexTraceOne.Governance.Application.Features.CreateDomain;
@@ -168,6 +169,8 @@ public static class DependencyInjection
         // Technical Debt
         services.AddTransient<IValidator<RecordTechnicalDebt.Command>, RecordTechnicalDebt.Validator>();
         services.AddTransient<IValidator<GetTechnicalDebtSummary.Query>, GetTechnicalDebtSummary.Validator>();
+
+        services.AddTransient<IValidator<GetCostContextPerDay.Query>, GetCostContextPerDay.Validator>();
 
         return services;
     }

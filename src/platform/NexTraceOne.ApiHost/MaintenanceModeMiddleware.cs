@@ -58,7 +58,7 @@ public sealed class MaintenanceModeMiddleware(RequestDelegate next, ILogger<Main
         return false;
     }
 
-    private static async Task<bool> IsMaintenanceModeEnabledAsync(HttpContext context)
+    private async Task<bool> IsMaintenanceModeEnabledAsync(HttpContext context)
     {
         try
         {

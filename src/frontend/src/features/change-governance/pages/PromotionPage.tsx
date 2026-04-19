@@ -139,16 +139,31 @@ export function PromotionPage() {
 
   /** Called when user clicks "Promote". Evaluates the FinOps budget gate first. */
   const handlePromote = async (req: PromotionRequest) => {
-    // Use a best-effort evaluation: if no cost data is available (baseline = 0, actual = 0)
-    // the backend will return Allow (no meaningful data to gate on).
+    // Fetch real cost context (actualCostPerDay + baselineCostPerDay) before evaluating the gate.
+    // Falls back to zero if no cost data is available — gate will return Allow (no data to gate on).
+    let actualCostPerDay = 0;
+    let baselineCostPerDay = 0;
+    try {
+      const costCtx = await finOpsApi.getCostContextPerDay(
+        req.serviceName ?? req.releaseId,
+        req.targetEnvironment,
+      );
+      if (costCtx) {
+        actualCostPerDay = costCtx.actualCostPerDay;
+        baselineCostPerDay = costCtx.baselineCostPerDay;
+      }
+    } catch {
+      // Cost context unavailable — proceed with zeros (fail-open)
+    }
+
     let gateResult: EvaluateReleaseBudgetGateResponse | null = null;
     try {
       gateResult = await evaluateBudgetGateMutation.mutateAsync({
         releaseId: req.releaseId,
-        serviceName: req.releaseId, // TODO: replace with actual service name once PromotionRequest carries service metadata
+        serviceName: req.serviceName ?? req.releaseId,
         environment: req.targetEnvironment,
-        actualCostPerDay: 0,    // placeholder; real data comes from telemetry/FinOps context
-        baselineCostPerDay: 0,
+        actualCostPerDay,
+        baselineCostPerDay,
         measurementDays: 7,
       });
     } catch {
@@ -172,7 +187,7 @@ export function PromotionPage() {
         try {
           const approval = await createBudgetApprovalMutation.mutateAsync({
             releaseId: req.releaseId,
-            serviceName: req.releaseId, // TODO: replace with actual service name once PromotionRequest carries service metadata
+            serviceName: req.serviceName ?? req.releaseId,
             environment: req.targetEnvironment,
             actualCost: gateResult.actualTotalCost,
             baselineCost: gateResult.baselineTotalCost,

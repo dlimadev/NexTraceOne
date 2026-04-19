@@ -57,6 +57,7 @@ services:
     restart: unless-stopped
     environment:
       discovery.type: single-node
+      # WARNING: Security disabled for local development only. NEVER use in staging/production.
       xpack.security.enabled: "false"   # APENAS para dev local — ativar em produção
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
     volumes:

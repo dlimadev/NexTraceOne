@@ -14,7 +14,7 @@ public sealed class RecordAuditEventTests
     private readonly IAuditEventRepository _eventRepository = Substitute.For<IAuditEventRepository>();
     private readonly IAuditChainRepository _chainRepository = Substitute.For<IAuditChainRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
-    private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
+    private readonly IAuditComplianceUnitOfWork _unitOfWork = Substitute.For<IAuditComplianceUnitOfWork>();
 
     public RecordAuditEventTests()
     {

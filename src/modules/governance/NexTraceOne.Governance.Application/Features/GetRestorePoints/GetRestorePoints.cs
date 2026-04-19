@@ -1,11 +1,17 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
+using NexTraceOne.Integrations.Domain;
 
 namespace NexTraceOne.Governance.Application.Features.GetRestorePoints;
 
 /// <summary>
 /// Feature: GetRestorePoints — listagem de pontos de restauro e iniciação de recovery.
-/// Integração real com sistema de backup é pendente. Retorna lista vazia com SimulatedNote.
+/// Delega para IBackupProvider. Quando nenhum sistema de backup está configurado,
+/// IBackupProvider.IsConfigured é false e a lista retornada é vazia com SimulatedNote.
+/// Histórico de jobs de recovery é persistido em base de dados via IRecoveryJobRepository.
 /// </summary>
 public static class GetRestorePoints
 {
@@ -17,38 +23,80 @@ public static class GetRestorePoints
         string RestorePointId,
         string Scope,
         IReadOnlyList<string>? Schemas,
-        bool DryRun) : ICommand<RecoveryInitiationResult>;
+        bool DryRun,
+        string? InitiatedBy = null) : ICommand<RecoveryInitiationResult>;
 
-    /// <summary>Handler de listagem de pontos de restauro.</summary>
-    public sealed class Handler : IQueryHandler<Query, RestorePointsResponse>
+    /// <summary>Handler de listagem de pontos de restauro via IBackupProvider.</summary>
+    public sealed class Handler(IBackupProvider backupProvider) : IQueryHandler<Query, RestorePointsResponse>
     {
-        public Task<Result<RestorePointsResponse>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<RestorePointsResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = new RestorePointsResponse(
-                RestorePoints: [],
-                Total: 0,
-                Oldest: null,
-                Latest: null,
-                SimulatedNote: "Real backup integration pending. Restore points will be populated once a backup provider is configured.");
+            var points = await backupProvider.ListRestorePointsAsync(cancellationToken);
 
-            return Task.FromResult(Result<RestorePointsResponse>.Success(response));
+            var dtos = points.Select(p => new RestorePointDto(
+                Id: p.Id,
+                CreatedAt: p.CreatedAt,
+                SizeMb: p.SizeMb,
+                Status: p.Status,
+                StorageProvider: p.StorageProvider)).ToList();
+
+            var simulatedNote = backupProvider.IsConfigured
+                ? string.Empty
+                : "No backup provider configured. Restore points will be available once a backup system (pg_dump, pgBackRest, Barman) is set up.";
+
+            var response = new RestorePointsResponse(
+                RestorePoints: dtos,
+                Total: dtos.Count,
+                Oldest: dtos.Count > 0 ? dtos.Min(p => p.CreatedAt) : null,
+                Latest: dtos.Count > 0 ? dtos.Max(p => p.CreatedAt) : null,
+                SimulatedNote: simulatedNote);
+
+            return Result<RestorePointsResponse>.Success(response);
         }
     }
 
-    /// <summary>Handler de iniciação de recovery.</summary>
-    public sealed class InitiateHandler : ICommandHandler<InitiateRecovery, RecoveryInitiationResult>
+    /// <summary>Handler de iniciação de recovery — persiste job auditável em base de dados.</summary>
+    public sealed class InitiateHandler(
+        IBackupProvider backupProvider,
+        IRecoveryJobRepository jobRepository,
+        IGovernanceUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<InitiateRecovery, RecoveryInitiationResult>
     {
-        public Task<Result<RecoveryInitiationResult>> Handle(InitiateRecovery request, CancellationToken cancellationToken)
+        public async Task<Result<RecoveryInitiationResult>> Handle(InitiateRecovery request, CancellationToken cancellationToken)
         {
-            var result = new RecoveryInitiationResult(
-                JobId: Guid.NewGuid().ToString(),
-                DryRun: request.DryRun,
-                Status: request.DryRun ? "DryRunCompleted" : "Initiated",
-                Message: request.DryRun
-                    ? "Dry run completed. No changes applied."
-                    : "Recovery job initiated. Monitor progress via platform jobs.");
+            var now = clock.UtcNow;
 
-            return Task.FromResult(Result<RecoveryInitiationResult>.Success(result));
+            // When the provider is configured, verify the restore point exists before creating a job.
+            if (backupProvider.IsConfigured)
+            {
+                var point = await backupProvider.GetRestorePointAsync(request.RestorePointId, cancellationToken);
+                if (point is null)
+                    return Error.NotFound("RecoveryJob.RestorePointNotFound",
+                        $"Restore point '{request.RestorePointId}' was not found.");
+            }
+
+            var schemasJson = request.Schemas is { Count: > 0 }
+                ? System.Text.Json.JsonSerializer.Serialize(request.Schemas)
+                : null;
+
+            var job = RecoveryJob.Create(
+                restorePointId: request.RestorePointId,
+                scope: request.Scope,
+                schemasJson: schemasJson,
+                dryRun: request.DryRun,
+                initiatedBy: request.InitiatedBy,
+                now: now);
+
+            await jobRepository.AddAsync(job, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            var result = new RecoveryInitiationResult(
+                JobId: job.Id.Value.ToString(),
+                DryRun: request.DryRun,
+                Status: job.Status,
+                Message: job.Message);
+
+            return Result<RecoveryInitiationResult>.Success(result);
         }
     }
 

@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.SecurityGate.Ports;
+using NexTraceOne.Governance.Infrastructure.Observability;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Providers;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
@@ -91,6 +92,25 @@ public static class DependencyInjection
 
         // OTEL Metrics — ingestão de métricas do OpenTelemetry Collector
         services.AddScoped<IOtelMetricRepository, OtelMetricRepository>();
+
+        // Non-Prod Schedules
+        services.AddScoped<INonProdScheduleRepository, NonProdScheduleRepository>();
+
+        // Demo Seed State
+        services.AddScoped<IDemoSeedStateRepository, DemoSeedStateRepository>();
+
+        // SAML SSO Configuration
+        services.AddScoped<ISamlSsoConfigurationRepository, SamlSsoConfigurationRepository>();
+
+        // GreenOps Configuration
+        services.AddScoped<IGreenOpsConfigurationRepository, GreenOpsConfigurationRepository>();
+
+        // Support Bundles — geração real de bundles de diagnóstico
+        services.AddScoped<ISupportBundleRepository, SupportBundleRepository>();
+        services.AddScoped<IRecoveryJobRepository, RecoveryJobRepository>();
+
+        // HTTP Audit Reader — consulta IObservabilityProvider para auditoria de chamadas HTTP externas
+        services.AddScoped<IHttpAuditReader, ObservabilityHttpAuditReader>();
 
         return services;
     }
