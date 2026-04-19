@@ -350,19 +350,17 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 ### ACT-016 — Kafka Real Producer/Consumer
 
 **Ficheiros:** `src/modules/integrations/`, `src/platform/NexTraceOne.BackgroundWorkers/`  
-**Estado atual:** Modelo de domínio de Event Contracts e Kafka completo; sem producer/consumer real.
+**Estado atual parcial (Abril 2026):** `IKafkaEventProducer` interface criada em `Integrations.Domain` com `KafkaMessage` record. `NullKafkaEventProducer` implementado em `Integrations.Infrastructure/Kafka/` e registado via DI como singleton. Testes unitários: 6/6 passam.
 
-**Solução:**
+**Pendente (requer Kafka cluster):**
 
-1. Criar pacote separado `NexTraceOne.Integrations.Kafka` com `IKafkaEventProducer` e `IKafkaEventConsumer`.
-2. Usar `Confluent.Kafka` NuGet package.
-3. `KafkaEventProducer` publica eventos de domínio que atualmente vão apenas para o Outbox.
-4. `KafkaEventConsumer` (BackgroundService) consome tópicos configurados e chama `ProcessIngestionPayload`.
-5. Configurar topics via `IConfiguration "Kafka:Topics:*"`.
-6. Feature flag `integrations.kafka.enabled` controla ativação.
+1. Criar `ConfluentKafkaEventProducer` em pacote `NexTraceOne.Integrations.Kafka` usando `Confluent.Kafka` NuGet.
+2. `KafkaEventConsumer` (BackgroundService) consome tópicos configurados e chama `ProcessIngestionPayload`.
+3. Configurar topics via `IConfiguration "Kafka:Topics:*"`.
+4. Feature flag `integrations.kafka.enabled` controla ativação.
 
 **Pré-requisito:** Cluster Kafka disponível (dev: Docker Compose, prod: MSK/Confluent Cloud/self-hosted).  
-**Esforço estimado:** Alto (12–16h)
+**Esforço restante:** Médio (6–10h)
 
 ---
 
@@ -421,36 +419,21 @@ dotnet ef database update --project <InfraProject> --startup-project src/platfor
 
 ---
 
-### ACT-019 — Implementar GraphQL Contract Type (parser + visual builder)
+### ACT-019 — Implementar GraphQL Contract Type (parser + visual builder) ✅ RESOLVIDO (Abril 2026)
 
-**Ficheiros:** `src/modules/catalog/NexTraceOne.Catalog.Domain/Contracts/Enums/ContractProtocol.cs`, infraestrutura e application layers do Catalog  
-**Estado atual:** `ContractProtocol.GraphQL` existe como enum e está na constraint da base de dados, mas sem parser, validação de breaking changes, ou visual builder no frontend.
+**Ficheiros:** `src/modules/catalog/NexTraceOne.Catalog.Domain/Contracts/Services/GraphQlSpecParser.cs`, `GraphQlDiffCalculator.cs`, `ContractDiffCalculator.cs`  
+**Estado:** `GraphQlSpecParser` extrai tipos, campos, interfaces, inputs e enums via SDL text analysis. `GraphQlDiffCalculator` implementa breaking changes (type/field/enum removed, root type fields), additive (type/field/enum added) e non-breaking (enum value added). `ContractDiffCalculator` agora delega a `GraphQlDiffCalculator` para `ContractProtocol.GraphQl`. 8 testes unitários passam.
 
-**Solução:**
-
-1. **Backend** — criar `GraphQlSchemaParser` em `Catalog.Infrastructure` usando `GraphQL.net` (OSS). Implementar `IContractParser` que faz parse de `.graphql` / SDL, extrai tipos, queries, mutations, subscriptions.
-2. Implementar `IBreakingChangeDetector` para GraphQL: type removal, field removal, non-null field addition, enum value removal são breaking.
-3. Criar `GraphQlSemanticDiffComputer` que compara dois schemas e produz `SemanticDiffResult`.
-4. **Frontend** — criar `VisualGraphQlBuilder.tsx` com campos: Schema SDL (textarea), Operations (query/mutation/subscription), Types Summary.
-5. Adicionar testes unitários com schemas de exemplo.
-
-**Pré-requisito:** Decisão sobre biblioteca GraphQL (GraphQL.net vs. HotChocolate parser).  
-**Esforço estimado:** Alto (10–14h backend + 6–8h frontend)
+**Pendente (frontend):** `VisualGraphQlBuilder.tsx` — formulário SDL com syntax highlighting. Estimado: 6–8h frontend.
 
 ---
 
-### ACT-020 — Implementar Protobuf/gRPC Contract Type (parser + visual builder)
+### ACT-020 — Implementar Protobuf/gRPC Contract Type (parser + visual builder) ✅ RESOLVIDO (Abril 2026)
 
-**Ficheiros:** Similar ao ACT-019 para `ContractProtocol.Protobuf`
+**Ficheiros:** `src/modules/catalog/NexTraceOne.Catalog.Domain/Contracts/Services/ProtobufSpecParser.cs`, `ProtobufDiffCalculator.cs`, `ContractDiffCalculator.cs`  
+**Estado:** `ProtobufSpecParser` extrai messages (com field names + field numbers), services, RPCs e enums via .proto text analysis. `ProtobufDiffCalculator` implementa breaking changes (message/service/rpc removed, field removed, field number reused, enum value removed), additive e non-breaking. `ContractDiffCalculator` agora delega a `ProtobufDiffCalculator` para `ContractProtocol.Protobuf`. 10 testes unitários passam.
 
-**Solução:**
-
-1. Usar `Google.Protobuf` ou `Grpc.Tools` para parse de ficheiros `.proto`.
-2. Implementar `ProtobufSchemaParser` extraindo messages, services, RPCs.
-3. Breaking changes Protobuf: field number reutilizado, tipo de campo alterado, field removido sem `reserved`.
-4. **Frontend** — `VisualProtobufBuilder.tsx` com campos: Proto file content, Services, Messages.
-
-**Esforço estimado:** Alto (10–14h backend + 6–8h frontend)
+**Pendente (frontend):** `VisualProtobufBuilder.tsx` — formulário .proto com preview de services/messages. Estimado: 6–8h frontend.
 
 ---
 
@@ -559,13 +542,13 @@ Adicionar ao `CoreApiHostIntegrationTests.cs`:
 | ACT-016 | Kafka Producer/Consumer real | 🟠 P3 | Alto | Kafka cluster | Event streaming real |
 | ACT-017 | FinOps cloud billing real | 🟠 P3 | Muito Alto | Cloud credentials | FinOps com dados cloud reais |
 | ACT-018 | Regenerar EF Core Designer files | 🟢 P4 | Baixo | PostgreSQL local | Developer tooling |
-| ACT-019 | GraphQL Contract Type | 🟢 P4 | Alto | — | Suporte a GraphQL contracts |
-| ACT-020 | Protobuf Contract Type | 🟢 P4 | Alto | — | Suporte a gRPC contracts |
+| ACT-019 | GraphQL Contract Type | ✅ DONE | Alto | — | Suporte a GraphQL contracts |
+| ACT-020 | Protobuf Contract Type | ✅ DONE | Alto | — | Suporte a gRPC contracts |
 | ACT-021 | Testes SearchCatalog | ✅ DONE | Baixo | — | Cobertura de testes |
 | ACT-022 | Testes E2E SAML | 🟢 P4 | Médio | ACT-015 | Validação SSO |
-| ACT-023 | Testes integração Export | 🟢 P4 | Baixo | ACT-003 | Validação export |
-| ACT-024 | OpenAPI export como artefacto | 🟢 P4 | Baixo | — | Documentação pública |
-| ACT-025 | Elasticsearch segurança staging | 🟢 P4 | Baixo | — | Segurança staging |
+| ACT-023 | Testes Export Handler | ✅ DONE | Baixo | ACT-003 | Validação export (unit) |
+| ACT-024 | OpenAPI export como artefacto | ✅ DONE | Baixo | — | Documentação pública |
+| ACT-025 | Elasticsearch segurança staging | ✅ DONE | Baixo | — | Segurança staging |
 
 ---
 

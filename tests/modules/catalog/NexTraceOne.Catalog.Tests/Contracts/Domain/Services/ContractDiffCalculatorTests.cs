@@ -127,16 +127,52 @@ public sealed class ContractDiffCalculatorTests
     }
 
     [Fact]
-    public void ComputeDiff_Should_ReturnEmptyResult_When_ProtocolIsGraphQl()
+    public void ComputeDiff_Should_DelegateToGraphQl_When_ProtocolIsGraphQl()
     {
-        // Act
-        var result = ContractDiffCalculator.ComputeDiff("graphql content", "graphql content", ContractProtocol.GraphQl);
+        // Arrange — schema base tem tipo User; target remove-o
+        var baseSchema = """
+            type Query {
+              user(id: ID!): User
+            }
+            type User {
+              id: ID!
+              name: String!
+            }
+            """;
+        var targetSchema = """
+            type Query {
+              user(id: ID!): User
+            }
+            """;
 
-        // Assert
-        result.BreakingChanges.Should().BeEmpty();
-        result.AdditiveChanges.Should().BeEmpty();
-        result.NonBreakingChanges.Should().BeEmpty();
-        result.ChangeLevel.Should().Be(ChangeLevel.NonBreaking);
+        // Act
+        var result = ContractDiffCalculator.ComputeDiff(baseSchema, targetSchema, ContractProtocol.GraphQl);
+
+        // Assert — deve detectar remoção de type User como breaking
+        result.ChangeLevel.Should().Be(ChangeLevel.Breaking);
+        result.BreakingChanges.Should().ContainSingle(c => c.ChangeType == "TypeRemoved" && c.Path == "User");
+    }
+
+    [Fact]
+    public void ComputeDiff_Should_DelegateToProtobuf_When_ProtocolIsProtobuf()
+    {
+        // Arrange — proto base tem service UserService; target remove-o
+        var baseProto = """
+            syntax = "proto3";
+            message User { int64 id = 1; }
+            service UserService { rpc GetUser(User) returns (User); }
+            """;
+        var targetProto = """
+            syntax = "proto3";
+            message User { int64 id = 1; }
+            """;
+
+        // Act
+        var result = ContractDiffCalculator.ComputeDiff(baseProto, targetProto, ContractProtocol.Protobuf);
+
+        // Assert — deve detectar remoção de service como breaking
+        result.ChangeLevel.Should().Be(ChangeLevel.Breaking);
+        result.BreakingChanges.Should().ContainSingle(c => c.ChangeType == "ServiceRemoved" && c.Path == "UserService");
     }
 
     [Fact]

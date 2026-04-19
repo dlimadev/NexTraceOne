@@ -15,6 +15,7 @@ using NexTraceOne.Integrations.Contracts;
 using NexTraceOne.Integrations.Domain.Events;
 using NexTraceOne.Integrations.Infrastructure.EventHandlers;
 using NexTraceOne.Integrations.Infrastructure.Integrations;
+using NexTraceOne.Integrations.Infrastructure.Kafka;
 using NexTraceOne.Integrations.Infrastructure.LegacyTelemetry;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
@@ -71,6 +72,10 @@ public static class DependencyInjection
         // Backup Provider — NullBackupProvider por default; substituir por implementação real (pg_dump, pgBackRest, Barman)
         // quando sistema de backup estiver configurado no ambiente.
         services.AddSingleton<IBackupProvider, NullBackupProvider>();
+
+        // Kafka Event Producer — NullKafkaEventProducer por default; substituir por ConfluentKafkaEventProducer
+        // quando Kafka:Enabled = true e Kafka:BootstrapServers estiverem configurados.
+        services.AddSingleton<IKafkaEventProducer, NullKafkaEventProducer>();
 
         return services;
     }
