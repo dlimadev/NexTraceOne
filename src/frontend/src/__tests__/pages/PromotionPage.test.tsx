@@ -22,6 +22,7 @@ vi.mock('../../features/governance/api/finOps', () => ({
   finOpsApi: {
     evaluateReleaseBudgetGate: vi.fn(),
     createBudgetApproval: vi.fn(),
+    getCostContextPerDay: vi.fn().mockResolvedValue(null),
   },
 }));
 
@@ -299,5 +300,89 @@ describe('PromotionPage — Budget Gate integration', () => {
     });
 
     expect(promotionApi.promote).not.toHaveBeenCalled();
+  });
+});
+
+// ── ACT-001: serviceName enrichment ──────────────────────────────────────────
+
+describe('PromotionPage — serviceName enrichment in budget gate', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(changeIntelligenceApi.listRecentReleases).mockResolvedValue({
+      items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 1,
+    });
+    vi.mocked(promotionApi.promote).mockResolvedValue({ id: 'pr-svc' });
+    vi.mocked(finOpsApi.getCostContextPerDay).mockResolvedValue(null);
+  });
+
+  it('passes real serviceName (not releaseId) to evaluateReleaseBudgetGate when serviceName is available', async () => {
+    const requestWithServiceName: PromotionRequest = {
+      id: 'pr-svc',
+      releaseId: 'release-guid-1234-5678',
+      serviceName: 'order-service',
+      sourceEnvironment: 'staging',
+      targetEnvironment: 'production',
+      status: 'Approved',
+      gateResults: [],
+      createdAt: '2024-01-15T10:00:00Z',
+    };
+
+    vi.mocked(promotionApi.listRequests).mockResolvedValue({
+      items: [requestWithServiceName],
+      totalCount: 1, page: 1, pageSize: 20, totalPages: 1,
+    });
+    vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mockResolvedValue({
+      ...baseGateResponse,
+      releaseId: 'release-guid-1234-5678',
+      serviceName: 'order-service',
+      action: 'Allow',
+    });
+
+    renderPromotion();
+    await waitFor(() => expect(screen.getAllByText(/staging → production/i).length).toBeGreaterThan(0));
+
+    const promoteBtns = screen.getAllByRole('button', { name: /^promote$/i });
+    await userEvent.click(promoteBtns[0]);
+
+    await waitFor(() => expect(finOpsApi.evaluateReleaseBudgetGate).toHaveBeenCalledTimes(1));
+
+    const gatePayload = vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mock.calls[0][0];
+    expect(gatePayload.serviceName).toBe('order-service');
+    expect(gatePayload.serviceName).not.toBe('release-guid-1234-5678');
+  });
+
+  it('falls back to releaseId as serviceName when serviceName is absent', async () => {
+    const requestWithoutServiceName: PromotionRequest = {
+      id: 'pr-no-svc',
+      releaseId: 'release-guid-no-name',
+      // serviceName intentionally omitted
+      sourceEnvironment: 'staging',
+      targetEnvironment: 'production',
+      status: 'Approved',
+      gateResults: [],
+      createdAt: '2024-01-15T10:00:00Z',
+    };
+
+    vi.mocked(promotionApi.listRequests).mockResolvedValue({
+      items: [requestWithoutServiceName],
+      totalCount: 1, page: 1, pageSize: 20, totalPages: 1,
+    });
+    vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mockResolvedValue({
+      ...baseGateResponse,
+      releaseId: 'release-guid-no-name',
+      serviceName: 'release-guid-no-name',
+      action: 'Allow',
+    });
+
+    renderPromotion();
+    await waitFor(() => expect(screen.getAllByText(/staging → production/i).length).toBeGreaterThan(0));
+
+    const promoteBtns = screen.getAllByRole('button', { name: /^promote$/i });
+    await userEvent.click(promoteBtns[0]);
+
+    await waitFor(() => expect(finOpsApi.evaluateReleaseBudgetGate).toHaveBeenCalledTimes(1));
+
+    const gatePayload = vi.mocked(finOpsApi.evaluateReleaseBudgetGate).mock.calls[0][0];
+    expect(gatePayload.serviceName).toBe('release-guid-no-name');
   });
 });

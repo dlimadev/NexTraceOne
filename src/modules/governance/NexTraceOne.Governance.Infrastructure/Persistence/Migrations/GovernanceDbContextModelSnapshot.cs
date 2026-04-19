@@ -934,6 +934,35 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.GreenOpsConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("IntensityFactorKgPerKwh")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("EsgTargetKgCo2PerMonth")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("DatacenterRegion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_greenops_configurations");
+                });
+
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.LicenseComplianceReport", b =>
                 {
                     b.Property<Guid>("Id")

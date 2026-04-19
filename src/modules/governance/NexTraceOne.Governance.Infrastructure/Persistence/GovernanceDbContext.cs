@@ -102,6 +102,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Configurações SAML SSO por tenant.</summary>
     public DbSet<SamlSsoConfiguration> SamlSsoConfigurations => Set<SamlSsoConfiguration>();
 
+    /// <summary>Configuração GreenOps por tenant (factor de intensidade, meta ESG, região).</summary>
+    public DbSet<GreenOpsConfiguration> GreenOpsConfigurations => Set<GreenOpsConfiguration>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

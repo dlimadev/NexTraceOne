@@ -1,0 +1,119 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# NexTraceOne — Docker Compose Staging Override
+#
+# Ambiente de staging / pré-produção com segurança Elasticsearch activa
+# (autenticação por API key, sem TLS obrigatório) e variáveis de ambiente
+# de staging.
+#
+# Diferenças face ao docker-compose.yml de desenvolvimento:
+#   - Elasticsearch: xpack.security.enabled=true, autenticação obrigatória
+#   - ASPNETCORE_ENVIRONMENT: Staging
+#   - Auto-migração activa (NEXTRACE_AUTO_MIGRATE=true)
+#   - Portas internas apenas (sem bind de 9200 para exterior por defeito)
+#   - Limites de memória moderados (inferiores aos de produção)
+#
+# Pré-requisitos:
+#   1. Definir POSTGRES_PASSWORD, ELASTIC_PASSWORD e NEXTRACE_JWT_SECRET em .env.staging
+#   2. Arrancar com:
+#        docker compose -f docker-compose.yml -f docker-compose.staging.yml \
+#          --env-file .env.staging up -d
+#
+# NOTA SEGURANÇA: Este ficheiro NÃO activa TLS/HTTPS no Elasticsearch.
+# Para produção, usar docker-compose.production.yml que inclui TLS completo.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ── Elasticsearch — autenticação activa, sem TLS (adequado para staging interno) ──
+  elasticsearch:
+    environment:
+      xpack.security.enabled: "true"
+      # TLS desactivado em staging (comunicação interna dentro da rede Docker).
+      # Activar em produção via docker-compose.production.yml.
+      xpack.security.http.ssl.enabled: "false"
+      xpack.security.transport.ssl.enabled: "false"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:?ELASTIC_PASSWORD is required for staging}
+      ES_JAVA_OPTS: "-Xms512m -Xmx1g"
+    healthcheck:
+      # Staging usa autenticação mas sem TLS — healthcheck com credenciais.
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf -u elastic:$$ELASTIC_PASSWORD http://localhost:9200/_cluster/health || exit 1",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    # Não expor o porto 9200 externamente em staging.
+    ports: !reset []
+    deploy:
+      resources:
+        limits:
+          memory: 1500M
+          cpus: "1.5"
+        reservations:
+          memory: 768M
+
+  # ── PostgreSQL — limites moderados para staging ─────────────────────────────
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+          cpus: "1.5"
+        reservations:
+          memory: 256M
+
+  # ── ApiHost — ambiente Staging, auto-migração activa ────────────────────────
+  apihost:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
+      # Auto-migração activa em staging para facilitar deploy contínuo.
+      NEXTRACE_AUTO_MIGRATE: "true"
+      Telemetry__ObservabilityProvider__Elastic__Endpoint: "http://elasticsearch:9200"
+      Telemetry__ObservabilityProvider__Elastic__Username: "elastic"
+      Telemetry__ObservabilityProvider__Elastic__Password: ${ELASTIC_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+          cpus: "1.5"
+        reservations:
+          memory: 256M
+
+  # ── BackgroundWorkers — ambiente Staging ────────────────────────────────────
+  workers:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
+      Telemetry__ObservabilityProvider__Elastic__Endpoint: "http://elasticsearch:9200"
+      Telemetry__ObservabilityProvider__Elastic__Username: "elastic"
+      Telemetry__ObservabilityProvider__Elastic__Password: ${ELASTIC_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 128M
+
+  # ── Ingestion API — ambiente Staging ────────────────────────────────────────
+  ingestion:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
+      Telemetry__ObservabilityProvider__Elastic__Endpoint: "http://elasticsearch:9200"
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: "0.75"
+        reservations:
+          memory: 128M
+
+  # ── Frontend — limites leves ─────────────────────────────────────────────────
+  frontend:
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"

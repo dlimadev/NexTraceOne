@@ -101,6 +101,9 @@ public static class DependencyInjection
         // SAML SSO Configuration
         services.AddScoped<ISamlSsoConfigurationRepository, SamlSsoConfigurationRepository>();
 
+        // GreenOps Configuration
+        services.AddScoped<IGreenOpsConfigurationRepository, GreenOpsConfigurationRepository>();
+
         return services;
     }
 }
