@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-10 — Wave G completa: Ideias 4, 5, 9, 11, 21, 22, 23 (Wave G — Visualization & Marketplace) concluídas. Total: **29 ideias implementadas** (Waves A–G todas ✅). RLS actualizado para 100 tabelas.
+> **Última actualização:** 2026-04-19
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -11,10 +11,7 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
-| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** — 6.1 Unit Tests ✅, 6.2 E2E Tests ✅ |
-| [`BRAINSTORMING-INNOVATIVE-IDEAS.md`](BRAINSTORMING-INNOVATIVE-IDEAS.md) | **29 ideias inovadoras** — todas ✅ implementadas (Waves A–G completas) |
-| [`DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md`](DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md) | **Plano de desenvolvimento** — 29 ideias em 7 Waves (A–G todas ✅) |
-| [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](PLATFORM-CUSTOMIZATION-EVOLUTION.md) | **Plano de evolução de customização da plataforma** — Fases 1-8 ✅ COMPLETO |
+| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | Roadmap de funcionalidades futuras |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`NEXTRACEONE-PRESENTATION.md`](NEXTRACEONE-PRESENTATION.md) | **Documento formal de apresentação** — O que é, que problemas resolve, diferenciação, proposta de valor e ROI |
@@ -192,13 +189,18 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 
 ---
 
-## 14. Legacy / Mainframe — `docs/legacy/`
+## 14. Análise e Diagnóstico — `docs/analysis/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`LEGACY-MAINFRAME-WAVES.md`](LEGACY-MAINFRAME-WAVES.md) | **Documento mestre** — visão geral das 13 ondas |
-| [`legacy/WAVE-00-STRATEGY.md`](legacy/WAVE-00-STRATEGY.md) – [`legacy/WAVE-12-SECURITY-READINESS.md`](legacy/WAVE-12-SECURITY-READINESS.md) | Ondas 0–12 |
+| [`analysis/ESTADO-ATUAL-DO-PRODUTO.md`](analysis/ESTADO-ATUAL-DO-PRODUTO.md) | Estado actual do produto — diagnóstico completo |
+| [`analysis/GAPS-BACKEND.md`](analysis/GAPS-BACKEND.md) | Gaps identificados no backend |
+| [`analysis/GAPS-BANCO-DE-DADOS.md`](analysis/GAPS-BANCO-DE-DADOS.md) | Gaps na base de dados |
+| [`analysis/GAPS-FRONTEND.md`](analysis/GAPS-FRONTEND.md) | Gaps no frontend |
+| [`analysis/GAPS-TESTES.md`](analysis/GAPS-TESTES.md) | Gaps de cobertura de testes |
+| [`analysis/GAPS-DOCUMENTACAO.md`](analysis/GAPS-DOCUMENTACAO.md) | Gaps de documentação |
+| [`analysis/INOVACAO-ROADMAP.md`](analysis/INOVACAO-ROADMAP.md) | Roadmap de inovação |
 
 ---
 
-*Última consolidação: 2026-04-10*
+*Última consolidação: 2026-04-19*
