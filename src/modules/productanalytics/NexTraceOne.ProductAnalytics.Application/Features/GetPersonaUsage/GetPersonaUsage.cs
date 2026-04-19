@@ -18,11 +18,13 @@ namespace NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
 /// </summary>
 public static class GetPersonaUsage
 {
-    /// <summary>Query para uso por persona com filtro opcional.</summary>
+    /// <summary>Query para uso por persona com filtro opcional e paginação.</summary>
     public sealed record Query(
         string? Persona,
         string? TeamId,
-        string? Range) : IQuery<Response>;
+        string? Range,
+        int Page = 1,
+        int PageSize = 20) : IQuery<Response>;
 
     /// <summary>Handler que calcula e retorna o perfil de uso por persona a partir de dados reais.</summary>
     public sealed class Handler(
@@ -47,7 +49,11 @@ public static class GetPersonaUsage
                     TotalPersonas: 0,
                     MostActivePersona: string.Empty,
                     DeepestAdoptionPersona: string.Empty,
-                    PeriodLabel: periodLabel));
+                    PeriodLabel: periodLabel,
+                    Page: 1,
+                    PageSize: request.PageSize,
+                    TotalCount: 0,
+                    TotalPages: 0));
             }
 
             if (!string.IsNullOrWhiteSpace(request.Persona))
@@ -127,12 +133,22 @@ public static class GetPersonaUsage
             var mostActive = profiles.OrderByDescending(p => p.TotalActions).FirstOrDefault()?.Persona ?? string.Empty;
             var deepest = profiles.OrderByDescending(p => p.AdoptionDepth).FirstOrDefault()?.Persona ?? string.Empty;
 
+            var totalCount = profiles.Count;
+            var page = Math.Max(1, request.Page);
+            var pageSize = Math.Clamp(request.PageSize, 1, 100);
+            var totalPages = pageSize > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 0;
+            var pagedProfiles = profiles.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
             return Result<Response>.Success(new Response(
-                Profiles: profiles,
-                TotalPersonas: profiles.Count,
+                Profiles: pagedProfiles,
+                TotalPersonas: totalCount,
                 MostActivePersona: mostActive,
                 DeepestAdoptionPersona: deepest,
-                PeriodLabel: periodLabel));
+                PeriodLabel: periodLabel,
+                Page: page,
+                PageSize: pageSize,
+                TotalCount: totalCount,
+                TotalPages: Math.Max(1, totalPages)));
         }
 
         private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
@@ -177,13 +193,17 @@ public static class GetPersonaUsage
         };
     }
 
-    /// <summary>Resposta com perfis de uso por persona.</summary>
+    /// <summary>Resposta com perfis de uso por persona e metadados de paginação.</summary>
     public sealed record Response(
         IReadOnlyList<PersonaUsageProfileDto> Profiles,
         int TotalPersonas,
         string MostActivePersona,
         string DeepestAdoptionPersona,
-        string PeriodLabel);
+        string PeriodLabel,
+        int Page,
+        int PageSize,
+        int TotalCount,
+        int TotalPages);
 
     /// <summary>Perfil de uso de uma persona específica.</summary>
     public sealed record PersonaUsageProfileDto(

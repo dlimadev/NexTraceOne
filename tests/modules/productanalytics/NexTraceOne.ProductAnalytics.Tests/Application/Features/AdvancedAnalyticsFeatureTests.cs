@@ -58,7 +58,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(sessionEvents);
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
         var query = new GetAdoptionFunnel.Query(null, null, null, null);
 
         // Act
@@ -88,7 +88,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<SessionEventTypeRow>());
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetAdoptionFunnel.Query(null, null, null, null), CancellationToken.None);
@@ -113,7 +113,7 @@ public sealed class AdvancedAnalyticsFeatureTests
                 new("s1", AnalyticsEventType.AssistantPromptSubmitted, Now.AddMinutes(-30)),
             });
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
         var query = new GetAdoptionFunnel.Query(Module: "AiAssistant", Persona: null, TeamId: null, Range: null);
 
         // Act
@@ -135,7 +135,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<SessionEventTypeRow>());
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(

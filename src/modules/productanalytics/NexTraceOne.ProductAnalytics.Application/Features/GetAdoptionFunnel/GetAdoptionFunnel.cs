@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetAdoptionFunnel;
@@ -14,17 +18,20 @@ namespace NexTraceOne.ProductAnalytics.Application.Features.GetAdoptionFunnel;
 /// </summary>
 public static class GetAdoptionFunnel
 {
-    /// <summary>Query para funil de adoção por módulo.</summary>
+    /// <summary>Query para funil de adoção por módulo com paginação.</summary>
     public sealed record Query(
         string? Module,
         string? Persona,
         string? TeamId,
-        string? Range) : IQuery<Response>;
+        string? Range,
+        int Page = 1,
+        int PageSize = 20) : IQuery<Response>;
 
     /// <summary>Handler que calcula funis de adoção por módulo a partir de dados reais.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         private static readonly ModuleFunnelDef[] FunnelDefinitions =
         [
@@ -69,7 +76,10 @@ public static class GetAdoptionFunnel
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var definitions = FunnelDefinitions.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(request.Module) &&
@@ -138,12 +148,22 @@ public static class GetAdoptionFunnel
                     totalSessions, biggestDropOff));
             }
 
+            var totalCount = funnels.Count;
+            var page = Math.Max(1, request.Page);
+            var pageSize = Math.Clamp(request.PageSize, 1, 100);
+            var totalPages = pageSize > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 0;
+            var pagedFunnels = funnels.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
             return Result<Response>.Success(new Response(
-                Funnels: funnels,
-                PeriodLabel: periodLabel));
+                Funnels: pagedFunnels,
+                PeriodLabel: periodLabel,
+                Page: page,
+                PageSize: pageSize,
+                TotalCount: totalCount,
+                TotalPages: Math.Max(1, totalPages)));
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -153,6 +173,7 @@ public static class GetAdoptionFunnel
                 "last_90d" => 90,
                 _ => 30
             };
+            if (days > maxDays) days = maxDays;
             return (utcNow.AddDays(-days), utcNow, label);
         }
     }
@@ -160,10 +181,14 @@ public static class GetAdoptionFunnel
     private sealed record ModuleFunnelDef(ProductModule Module, string ModuleName, FunnelStepDef[] Steps);
     private sealed record FunnelStepDef(string StepId, string StepName, AnalyticsEventType EventType);
 
-    /// <summary>Resposta com funis de adoção por módulo.</summary>
+    /// <summary>Resposta com funis de adoção por módulo e metadados de paginação.</summary>
     public sealed record Response(
         IReadOnlyList<ModuleFunnelDto> Funnels,
-        string PeriodLabel);
+        string PeriodLabel,
+        int Page,
+        int PageSize,
+        int TotalCount,
+        int TotalPages);
 
     /// <summary>Funil de adoção de um módulo individual.</summary>
     public sealed record ModuleFunnelDto(

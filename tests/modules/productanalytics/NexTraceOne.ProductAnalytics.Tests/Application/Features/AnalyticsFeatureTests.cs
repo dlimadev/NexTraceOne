@@ -406,7 +406,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(20);
 
-        var handler = new GetAdoptionFunnel.Handler(_analyticsRepository, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetAdoptionFunnel.Query(null, null, null, null);
 
         // Act

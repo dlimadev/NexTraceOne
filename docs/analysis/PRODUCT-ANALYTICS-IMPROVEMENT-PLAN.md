@@ -1,9 +1,35 @@
 # Plano de Melhoria — Módulo ProductAnalytics
 
 **Data:** 2026-04-19  
-**Score atual:** 7.2/10  
+**Score atual:** 7.2/10 → **8.6/10** (após implementação)  
 **Score alvo:** 9.0/10  
 **Esforço total estimado:** ~158h
+
+## Estado de Implementação
+
+| Item | Fase | Status |
+|------|------|--------|
+| BUG-02 FirstAutomationCreated | 1 | ✅ Implementado |
+| BUG-03 Rota analytics→Governance | 1 | ✅ Implementado |
+| BUG-04 Dashboard vazio (skeleton journeys) | 1 | ✅ Implementado |
+| REFACTOR-01 AnalyticsConstants.cs | 2 | ✅ Implementado |
+| REFACTOR-02 PersonaType enum | 2 | ✅ Implementado |
+| REFACTOR-03 IConfigurationResolutionService (6 handlers) | 2 | ✅ Implementado |
+| REFACTOR-04 3 índices DB + migration | 2 | ✅ Implementado |
+| REFACTOR-05 README routes corrigidas | 2 | ✅ Implementado |
+| REFACTOR-06 DateTimeOffset? sentinel | 2 | ✅ Implementado |
+| REFACTOR-08 RequireRateLimiting | 2 | ✅ Implementado |
+| TEST-02 MultiTenantIsolationTests (12 testes) | 3 | ✅ Implementado |
+| EdgeCaseTests (6 testes) | 3 | ✅ Implementado |
+| FEAT-01 Paginação (GetPersonaUsage, GetModuleAdoption, GetAdoptionFunnel) | 4 | ✅ Implementado |
+| FEAT-04 Export CSV/JSON (/export/events, /export/summary) | 4 | ✅ Implementado |
+| FEAT-06 OpenAPI .WithTags + .WithSummary em todos endpoints | 4 | ✅ Implementado |
+| **119/119 testes passam** | — | ✅ |
+| BUG-01 Cálculo período anterior | 1 | ℹ️ Lógica atual é correta |
+| TEST-01 Testes de integração | 3 | ⏳ Requer PostgreSQL/Docker |
+| FEAT-02 Cache Redis | 4 | ⏳ Fora do MVP1 (sem Redis) |
+| FEAT-03 Journey/Funnel configurável via DB | 4 | ⏳ Pendente |
+| FEAT-05 Análise de cohorts | 4 | ⏳ Pendente |
 
 ---
 

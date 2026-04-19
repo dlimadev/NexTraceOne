@@ -17,11 +17,13 @@ namespace NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
 /// </summary>
 public static class GetModuleAdoption
 {
-    /// <summary>Query para métricas de adoção de módulos.</summary>
+    /// <summary>Query para métricas de adoção de módulos com paginação.</summary>
     public sealed record Query(
         string? Persona,
         string? TeamId,
-        string? Range) : IQuery<Response>;
+        string? Range,
+        int Page = 1,
+        int PageSize = 20) : IQuery<Response>;
 
     /// <summary>Handler que calcula e retorna adoção por módulo.</summary>
     public sealed class Handler(
@@ -66,7 +68,7 @@ public static class GetModuleAdoption
 
             var maxActionsPerUser = actionsPerUserByModule.Count == 0 ? 0m : actionsPerUserByModule.Values.Max();
 
-            var modules = rows
+            var allModules = rows
                 .Select(r =>
                 {
                     var adoptionPercent = totalUniqueUsers == 0 ? 0 : (int)Math.Round((r.UniqueUsers / (decimal)totalUniqueUsers) * 100m);
@@ -93,10 +95,16 @@ public static class GetModuleAdoption
                 .OrderByDescending(m => m.TotalActions)
                 .ToArray();
 
-            var overallAdoptionScore = modules.Length == 0 ? 0m : Math.Round(modules.Average(m => (decimal)m.AdoptionPercent), 1);
+            var totalCount = allModules.Length;
+            var page = Math.Max(1, request.Page);
+            var pageSize = Math.Clamp(request.PageSize, 1, 100);
+            var totalPages = pageSize > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 0;
+            var modules = allModules.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
-            var mostAdopted = modules.OrderByDescending(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
-            var leastAdopted = modules.OrderBy(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
+            var overallAdoptionScore = allModules.Length == 0 ? 0m : Math.Round(allModules.Average(m => (decimal)m.AdoptionPercent), 1);
+
+            var mostAdopted = allModules.OrderByDescending(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
+            var leastAdopted = allModules.OrderBy(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
 
             var response = new Response(
                 Modules: modules,
@@ -104,7 +112,11 @@ public static class GetModuleAdoption
                 MostAdopted: mostAdopted,
                 LeastAdopted: leastAdopted,
                 BiggestGrowth: mostAdopted,
-                PeriodLabel: periodLabel);
+                PeriodLabel: periodLabel,
+                Page: page,
+                PageSize: pageSize,
+                TotalCount: totalCount,
+                TotalPages: Math.Max(1, totalPages));
 
             return response;
         }
@@ -137,14 +149,18 @@ public static class GetModuleAdoption
             };
     }
 
-    /// <summary>Resposta com adoção por módulo.</summary>
+    /// <summary>Resposta com adoção por módulo e metadados de paginação.</summary>
     public sealed record Response(
         IReadOnlyList<ModuleAdoptionDto> Modules,
         decimal OverallAdoptionScore,
         ProductModule MostAdopted,
         ProductModule LeastAdopted,
         ProductModule BiggestGrowth,
-        string PeriodLabel);
+        string PeriodLabel,
+        int Page,
+        int PageSize,
+        int TotalCount,
+        int TotalPages);
 
     /// <summary>Métricas de adoção de um módulo individual.</summary>
     public sealed record ModuleAdoptionDto(
