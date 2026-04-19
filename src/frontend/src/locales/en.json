@@ -385,6 +385,20 @@
     "ideVsCodeClients": "VS Code clients",
     "ideVsCodeDescription": "NexTraceOne AI Assistant for Visual Studio Code",
     "ideVsCodeTitle": "VS Code Extension",
+    "ideQuerySessions": "Query Sessions",
+    "ideQuerySessionsSubtitle": "Recent AI queries submitted from IDE extensions",
+    "ideQuerySessionsNoData": "No query sessions found.",
+    "ideQueryStatusProcessing": "Processing",
+    "ideQueryStatusResponded": "Responded",
+    "ideQueryStatusBlocked": "Blocked",
+    "ideQueryStatusFailed": "Failed",
+    "ideQueryUser": "User",
+    "ideQueryClient": "Client",
+    "ideQueryType": "Type",
+    "ideQueryModel": "Model",
+    "ideQueryTokens": "Tokens",
+    "ideQueryResponseTime": "Response time",
+    "ideQueryTime": "Time",
     "inputPlaceholder": "Ask about services, contracts, incidents, changes...",
     "internal": "Internal",
     "internalAi": "Internal AI",
@@ -5182,7 +5196,35 @@
         "path": "/api/v1/resource",
         "body": "{}"
       }
-    }
+    },
+    "migrate": "Migrate Contract",
+    "migrationPatch": "Migration Patch",
+    "migrationTitle": "Contract Migration Patch",
+    "migrationDescription": "Generate code update hints for providers and consumers when a contract version changes.",
+    "migrationBaseVersion": "Base Version",
+    "migrationTargetVersion": "Target Version",
+    "migrationTargetSide": "Target Side",
+    "migrationLanguage": "Implementation Language",
+    "migrationGenerate": "Generate Migration Patch",
+    "migrationLoading": "Generating migration patch…",
+    "migrationEmpty": "No migration suggestions. No breaking or additive changes detected between the selected versions.",
+    "migrationProviderSuggestions": "Provider Suggestions",
+    "migrationConsumerSuggestions": "Consumer Suggestions",
+    "migrationSeverityHigh": "High",
+    "migrationSeverityMedium": "Medium",
+    "migrationSeverityLow": "Low",
+    "migrationChangeLevel": "Change Level",
+    "migrationBreakingCount": "Breaking Changes",
+    "migrationProtocol": "Protocol",
+    "migrationGeneratedAt": "Generated At",
+    "migrationSelectBaseVersion": "Select base version",
+    "migrationSelectTargetVersion": "Select target version",
+    "migrationSideAll": "All (Provider + Consumer)",
+    "migrationSideProvider": "Provider only",
+    "migrationSideConsumer": "Consumer only",
+    "migrationCodeHint": "Code Hint",
+    "migrationCopyHint": "Copy code hint",
+    "migrationApplyHint": "Apply in editor"
   },
   "dashboard": {
     "activeNow": "active now",
@@ -9206,7 +9248,8 @@
     "serviceMaturitySre": "Service Maturity (SRE)",
     "aiAnomaly": "AI Anomaly Baseline",
     "aiIncidentSummarizer": "AI Incident Summarizer",
-    "aiRunbookSuggester": "AI Runbook Suggester"
+    "aiRunbookSuggester": "AI Runbook Suggester",
+    "aiMcp": "MCP Server"
   },
   "sourceOfTruth": {
     "assetTypes": {
@@ -12772,6 +12815,41 @@
       "createRunbook": "Create Runbook"
     }
   },
+  "mcpServer": {
+    "title": "MCP Server",
+    "subtitle": "Model Context Protocol server exposing NexTraceOne operational tools to external agents and developer environments",
+    "refresh": "Refresh",
+    "errorTitle": "Failed to load MCP server",
+    "errorMessage": "Unable to load MCP server information. Ensure the AI runtime module is operational.",
+    "stats": {
+      "protocolVersion": "Protocol Version",
+      "serverVersion": "Server Version",
+      "toolCount": "Available Tools",
+      "categories": "Tool Categories"
+    },
+    "serverInfo": {
+      "title": "Server Information",
+      "name": "Server Name",
+      "protocol": "Protocol",
+      "capabilities": "Capabilities",
+      "capTools": "Tools"
+    },
+    "connection": {
+      "title": "Connection",
+      "description": "Connect any MCP-compatible client using the endpoint URL below. Authenticate with a bearer token with the ai:runtime:read permission.",
+      "copyAriaLabel": "Copy endpoint URL",
+      "getDescription": "Returns server metadata and capabilities",
+      "postDescription": "JSON-RPC 2.0 — initialize, tools/list, tools/call",
+      "specLink": "MCP Specification 2024-11-05"
+    },
+    "tools": {
+      "title": "Available Tools ({{count}})",
+      "emptyTitle": "No tools registered",
+      "emptyMessage": "No tools are registered in the MCP server. Seed the default tool definitions to populate the catalog.",
+      "requiredBadge": "{{count}} required",
+      "noParams": "no params",
+      "required": "required",
+      "parameters": "Parameters"
   "finops": {
     "config": {
       "title": "FinOps Configuration",

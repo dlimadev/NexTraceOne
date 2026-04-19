@@ -470,4 +470,20 @@ export const contractsApi = {
   /** Análise em cascata de impacto de entidade canónica (multi-nível). */
   getCanonicalEntityImpactCascade: (entityId: string, maxDepth?: number) =>
     client.get(`/catalog/canonical-entities/${entityId}/impact/cascade`, { params: { maxDepth } }).then((r) => r.data),
+
+  // ── Contract Migration Patch ───────────────────────────────────────
+
+  /** Gera sugestões de código para migrar provedor e/ou consumidores quando um contrato muda de versão. */
+  generateMigrationPatch: (data: {
+    baseVersionId: string;
+    targetVersionId: string;
+    target?: 'provider' | 'consumer' | 'all';
+    language?: string;
+  }) =>
+    client.post(`/contracts/migration-patch`, {
+      baseVersionId: data.baseVersionId,
+      targetVersionId: data.targetVersionId,
+      target: data.target ?? 'all',
+      language: data.language ?? 'C#',
+    }).then((r) => r.data as MigrationPatchResult),
 };

@@ -18,6 +18,7 @@ const AiAgentsPage = lazy(() => import('../features/ai-hub/pages/AiAgentsPage').
 const AgentDetailPage = lazy(() => import('../features/ai-hub/pages/AgentDetailPage').then(m => ({ default: m.AgentDetailPage })));
 const AgentMarketplacePage = lazy(() => import('../features/ai-hub/pages/AgentMarketplacePage').then(m => ({ default: m.AgentMarketplacePage })));
 const AiIntegrationsConfigurationPage = lazy(() => import('../features/ai-hub/pages/AiIntegrationsConfigurationPage').then(m => ({ default: m.AiIntegrationsConfigurationPage })));
+const McpServerPage = lazy(() => import('../features/ai-hub/pages/McpServerPage').then(m => ({ default: m.McpServerPage })));
 
 export function AiHubRoutes() {
   return (
@@ -115,6 +116,14 @@ export function AiHubRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <AiIntegrationsConfigurationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ai/mcp"
+        element={
+          <ProtectedRoute permission="ai:runtime:read" redirectTo="/unauthorized">
+            <McpServerPage />
           </ProtectedRoute>
         }
       />

@@ -13,6 +13,14 @@ var rootCommand = new RootCommand("NexTraceOne CLI — Sovereign Change Intellig
 rootCommand.Add(ValidateCommand.Create());
 rootCommand.Add(CatalogCommand.Create());
 rootCommand.Add(ContractCommand.Create());
+rootCommand.Add(ChangeCommand.Create());
+rootCommand.Add(IncidentCommand.Create());
+rootCommand.Add(HealthCommand.Create());
+rootCommand.Add(ConfigCommand.Create());
+rootCommand.Add(McpCommand.Create());
+rootCommand.Add(ReportCommand.Create());
+rootCommand.Add(ScaffoldCommand.Create());
+rootCommand.Add(CompletionCommand.Create());
 
 // Show banner only when invoked with no arguments
 if (args.Length == 0)

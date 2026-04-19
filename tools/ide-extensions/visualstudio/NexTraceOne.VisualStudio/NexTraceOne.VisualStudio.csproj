@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>NexTraceOne.VisualStudio</RootNamespace>
+    <AssemblyName>NexTraceOne.VisualStudio</AssemblyName>
+    <Description>NexTraceOne AI Copilot for Visual Studio 2022</Description>
+    <OutputType>Library</OutputType>
+    <UseCodebase>true</UseCodebase>
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+    <StartAction>Program</StartAction>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Visual Studio SDK — these references come from the VSIX SDK installer -->
+    <!-- For a full build, install the "Visual Studio extension development" workload -->
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.6.36556.113" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.6.2167" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+</Project>

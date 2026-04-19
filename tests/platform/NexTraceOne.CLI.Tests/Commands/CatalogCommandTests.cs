@@ -33,6 +33,33 @@ public sealed class CatalogCommandTests
     }
 
     [Fact]
+    public void CatalogApiClient_WithToken_ConstructsWithoutThrowing()
+    {
+        const string baseUrl = "https://api.nex.local/";
+        const string token = "test-token-123";
+
+        using var client = new CatalogApiClient(baseUrl, token);
+
+        client.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void CatalogApiClient_WithNullToken_ConstructsWithoutThrowing()
+    {
+        using var client = new CatalogApiClient("https://api.nex.local", null);
+
+        client.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void CatalogApiClient_WithEmptyToken_ConstructsWithoutThrowing()
+    {
+        using var client = new CatalogApiClient("https://api.nex.local", string.Empty);
+
+        client.Should().NotBeNull();
+    }
+
+    [Fact]
     public async Task CatalogApiClient_ListServices_HandlesConnectionFailure()
     {
         // Use a non-routable address to simulate connection failure

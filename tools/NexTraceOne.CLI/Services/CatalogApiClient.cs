@@ -17,13 +17,16 @@ public sealed class CatalogApiClient : IDisposable
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public CatalogApiClient(string baseUrl)
+    public CatalogApiClient(string baseUrl, string? token = null)
     {
         _httpClient = new HttpClient
         {
             BaseAddress = new Uri(baseUrl.TrimEnd('/')),
             Timeout = TimeSpan.FromSeconds(30)
         };
+        if (!string.IsNullOrWhiteSpace(token))
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
     }
 
     public async Task<CatalogListResponse> ListServicesAsync(CancellationToken cancellationToken = default)

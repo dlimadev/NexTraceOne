@@ -104,6 +104,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.aiPolicies', to: '/ai/policies', icon: <Shield size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiRouting', to: '/ai/routing', icon: <Share2 size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiIde', to: '/ai/ide', icon: <Monitor size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
+  { labelKey: 'sidebar.aiMcp', to: '/ai/mcp', icon: <Cpu size={18} />, permission: 'ai:runtime:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiBudgets', to: '/ai/budgets', icon: <BarChart3 size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiAudit', to: '/ai/audit', icon: <ClipboardList size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.aiAnalysis', to: '/ai/analysis', icon: <BarChart3 size={18} />, permission: 'ai:runtime:read', section: 'aiHub' },

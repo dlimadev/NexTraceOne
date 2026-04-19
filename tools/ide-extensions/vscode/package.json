@@ -1,17 +1,293 @@
 {
   "name": "nextraceone-copilot",
   "displayName": "NexTraceOne Copilot",
-  "description": "AI-assisted operations and contract governance for NexTraceOne",
-  "version": "0.1.0",
+  "description": "AI-assisted operations, contract governance and change intelligence for NexTraceOne — Copilot Chat-like experience with code editing, scaffold wizard, service catalog and service intelligence",
+  "version": "0.6.0",
   "publisher": "nextraceone",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Other"],
-  "activationEvents": ["onCommand:nextraceone.chat", "onCommand:nextraceone.configure"],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      { "command": "nextraceone.chat", "title": "NexTraceOne: Ask AI" },
-      { "command": "nextraceone.configure", "title": "NexTraceOne: Configure" }
+      {
+        "command": "nextraceone.chat",
+        "title": "NexTraceOne: Ask AI"
+      },
+      {
+        "command": "nextraceone.configure",
+        "title": "NexTraceOne: Configure"
+      },
+      {
+        "command": "nextraceone.inspectService",
+        "title": "NexTraceOne: Inspect Service Context"
+      },
+      {
+        "command": "nextraceone.askAboutSelection",
+        "title": "NexTraceOne: Ask AI about this"
+      },
+      {
+        "command": "nextraceone.mcpConfigure",
+        "title": "NexTraceOne: Configure MCP Server"
+      },
+      {
+        "command": "nextraceone.openDashboard",
+        "title": "NexTraceOne: Open Dashboard"
+      },
+      {
+        "command": "nextraceone.openChatPanel",
+        "title": "NexTraceOne: Open AI Chat Panel"
+      },
+      {
+        "command": "nextraceone.scaffold",
+        "title": "NexTraceOne: Scaffold New Service",
+        "icon": "$(symbol-class)"
+      },
+      {
+        "command": "nextraceone.applyCode",
+        "title": "NexTraceOne: Apply Code to Editor"
+      },
+      {
+        "command": "nextraceone.refreshCatalog",
+        "title": "NexTraceOne: Refresh Service Catalog",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "nextraceone.openServiceDashboard",
+        "title": "NexTraceOne: Open Service in Dashboard",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "nextraceone.askAboutService",
+        "title": "NexTraceOne: Ask AI about this Service",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "nextraceone.migrateContract",
+        "title": "NexTraceOne: Generate Contract Migration Patch",
+        "icon": "$(arrow-swap)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "nextraceone.askAboutSelection",
+          "group": "nextraceone@1"
+        },
+        {
+          "command": "nextraceone.inspectService",
+          "group": "nextraceone@2"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "nextraceone.inspectService",
+          "group": "nextraceone@1"
+        },
+        {
+          "command": "nextraceone.scaffold",
+          "group": "nextraceone@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "nextraceone.scaffold"
+        },
+        {
+          "command": "nextraceone.refreshCatalog"
+        },
+        {
+          "command": "nextraceone.applyCode",
+          "when": "false"
+        },
+        {
+          "command": "nextraceone.openServiceDashboard",
+          "when": "false"
+        },
+        {
+          "command": "nextraceone.askAboutService",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "nextraceone.refreshCatalog",
+          "when": "view == nextraceone.catalogView",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "nextraceone.openServiceDashboard",
+          "when": "view == nextraceone.catalogView && viewItem == service",
+          "group": "nextraceone@1"
+        },
+        {
+          "command": "nextraceone.askAboutService",
+          "when": "view == nextraceone.catalogView && viewItem == service",
+          "group": "nextraceone@2"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "nextraceone-sidebar",
+          "title": "NexTraceOne",
+          "icon": "$(rocket)"
+        }
+      ]
+    },
+    "views": {
+      "nextraceone-sidebar": [
+        {
+          "type": "webview",
+          "id": "nextraceone.chatView",
+          "name": "NexTraceOne AI Chat"
+        },
+        {
+          "type": "tree",
+          "id": "nextraceone.catalogView",
+          "name": "Service Catalog"
+        }
+      ]
+    },
+    "chatParticipants": [
+      {
+        "id": "nextraceone",
+        "name": "nextraceone",
+        "fullName": "NexTraceOne AI",
+        "description": "Ask about services, contracts, changes and incidents. Generate and apply code from NexTraceOne context.",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "service",
+            "description": "Lookup a service in the catalog"
+          },
+          {
+            "name": "change",
+            "description": "Check recent changes for a service"
+          },
+          {
+            "name": "contract",
+            "description": "Query contract information"
+          },
+          {
+            "name": "incident",
+            "description": "Get incident context and runbooks"
+          },
+          {
+            "name": "report",
+            "description": "Get DORA metrics or changes summary report"
+          },
+          {
+            "name": "blast-radius",
+            "description": "Analyse the blast radius of a change"
+          },
+          {
+            "name": "scaffold",
+            "description": "Generate project scaffolding from a service template"
+          },
+          {
+            "name": "generate",
+            "description": "Generate code based on a service contract or description"
+          },
+          {
+            "name": "migrate",
+            "description": "Generate code migration hints for provider and consumers when a contract changes"
+          }
+        ]
+      }
+    ],
+    "languageModelTools": [
+      {
+        "name": "nextraceone_get_service",
+        "tags": ["nextraceone", "catalog", "service", "ownership"],
+        "displayName": "Get NexTraceOne Service Info",
+        "modelDescription": "Retrieves service ownership, team, domain, contracts, recent changes, and reliability information from NexTraceOne for a given service name. Use this when you need to understand who owns a service, what contracts it exposes, or its recent change history.",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "serviceName": {
+              "type": "string",
+              "description": "The name of the service to look up in the NexTraceOne catalog"
+            }
+          },
+          "required": ["serviceName"]
+        }
+      },
+      {
+        "name": "nextraceone_get_contract",
+        "tags": ["nextraceone", "contract", "api", "schema"],
+        "displayName": "Get NexTraceOne Contract Details",
+        "modelDescription": "Retrieves API contract details, schema, examples and versioning information from NexTraceOne. Use this when generating code that calls an API, when validating a contract, or when checking for breaking changes.",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "contractName": {
+              "type": "string",
+              "description": "The name or identifier of the API/event contract"
+            },
+            "version": {
+              "type": "string",
+              "description": "Contract version (optional, defaults to latest)"
+            }
+          },
+          "required": ["contractName"]
+        }
+      },
+      {
+        "name": "nextraceone_blast_radius",
+        "tags": ["nextraceone", "change", "impact", "risk"],
+        "displayName": "NexTraceOne Blast Radius Analysis",
+        "modelDescription": "Analyses the blast radius of a change to a service — lists dependent services, consumers, potential impact areas and risk assessment. Use this before promoting a change or understanding the scope of a deployment.",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "serviceName": {
+              "type": "string",
+              "description": "The name of the service being changed"
+            },
+            "environment": {
+              "type": "string",
+              "description": "Target environment (optional, defaults to production)"
+            }
+          },
+          "required": ["serviceName"]
+        }
+      },
+      {
+        "name": "nextraceone_get_incident",
+        "tags": ["nextraceone", "incident", "operations", "runbook"],
+        "displayName": "Get NexTraceOne Incident Info",
+        "modelDescription": "Retrieves incident context, runbooks, mitigation guidance and change-to-incident correlation from NexTraceOne operational intelligence. Use this when investigating production issues or looking for runbooks.",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Description of the incident or the operational query"
+            },
+            "serviceName": {
+              "type": "string",
+              "description": "Related service name (optional)"
+            }
+          },
+          "required": ["query"]
+        }
+      }
     ],
     "configuration": {
       "title": "NexTraceOne",
@@ -25,6 +301,24 @@
           "type": "string",
           "default": "",
           "description": "NexTraceOne IDE API Key"
+        },
+        "nextraceone.persona": {
+          "type": "string",
+          "default": "Engineer",
+          "enum": [
+            "Engineer",
+            "TechLead",
+            "Architect",
+            "Product",
+            "Executive",
+            "PlatformAdmin"
+          ],
+          "description": "Your persona in NexTraceOne (affects AI context and responses)"
+        },
+        "nextraceone.defaultEnvironment": {
+          "type": "string",
+          "default": "production",
+          "description": "Default environment context for queries"
         }
       }
     }
@@ -34,7 +328,8 @@
     "watch": "tsc -watch -p ."
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
+    "@types/node": "^25.6.0",
+    "@types/vscode": "^1.90.0",
     "typescript": "^5.0.0"
   }
 }

@@ -59,6 +59,7 @@ using GetCanonicalEntityImpactCascadeFeature = NexTraceOne.Catalog.Application.C
 using ValidatePublicationReadinessFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractPublicationReadiness.ValidateContractPublicationReadiness;
 using ValidateDraftSpecFeature = NexTraceOne.Catalog.Application.Contracts.Features.ValidateDraftSpec.ValidateDraftSpec;
 using GetContractEnvironmentVersionDriftFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractEnvironmentVersionDrift.GetContractEnvironmentVersionDrift;
+using GenerateMigrationPatchFeature = NexTraceOne.Catalog.Application.Contracts.Features.GenerateMigrationPatch.GenerateMigrationPatch;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -734,5 +735,36 @@ public sealed class ContractsEndpointModule
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("contracts:read");
+
+        // ── Migration Patch ────────────────────────────────────────────
+
+        group.MapPost("/migration-patch", async (
+            MigrationPatchRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var target = body.Target?.ToUpperInvariant() switch
+            {
+                "PROVIDER" => GenerateMigrationPatchFeature.PatchTarget.Provider,
+                "CONSUMER" => GenerateMigrationPatchFeature.PatchTarget.Consumer,
+                _ => GenerateMigrationPatchFeature.PatchTarget.All,
+            };
+            var result = await sender.Send(
+                new GenerateMigrationPatchFeature.Command(
+                    body.BaseVersionId,
+                    body.TargetVersionId,
+                    target,
+                    body.Language),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("contracts:read");
     }
 }
+
+/// <summary>Request body para o endpoint de geração de patch de migração de contrato.</summary>
+internal sealed record MigrationPatchRequest(
+    Guid BaseVersionId,
+    Guid TargetVersionId,
+    string? Target,
+    string? Language);

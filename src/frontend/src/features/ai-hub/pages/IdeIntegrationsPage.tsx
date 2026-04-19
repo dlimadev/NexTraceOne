@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
   Monitor, Code, Search, Shield, ShieldCheck, Plug,
-  Clock, FileText, AlertTriangle, Zap,
+  Clock, FileText, AlertTriangle, Zap, Activity,
 } from 'lucide-react';
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -15,6 +15,20 @@ import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
 import { Button } from '../../../components/Button';
 import { aiGovernanceApi } from '../api';
+
+interface IdeQuerySession {
+  sessionId: string;
+  userId: string;
+  ideClient: string;
+  ideClientVersion: string;
+  queryType: string;
+  queryText: string;
+  status: string;
+  modelUsed: string;
+  tokensUsed: number;
+  responseTimeMs: number | null;
+  submittedAt: string;
+}
 
 interface IdeClient {
   id: string;
@@ -106,6 +120,41 @@ export function IdeIntegrationsPage() {
     queryFn: () => aiGovernanceApi.getIdeCapabilities({ clientType: 'VisualStudio', persona: null }),
     staleTime: 60_000,
   });
+
+  const { data: querySessionsData } = useQuery({
+    queryKey: ['ai-governance', 'ide', 'query-sessions'],
+    queryFn: () => aiGovernanceApi.listIdeQuerySessions(),
+    staleTime: 30_000,
+  });
+
+  const querySessions: IdeQuerySession[] = useMemo(() => {
+    const items = (querySessionsData?.items ?? []) as Array<{
+      sessionId: string;
+      userId: string;
+      ideClient: string;
+      ideClientVersion: string;
+      queryType: string;
+      queryText: string;
+      status: string;
+      modelUsed: string;
+      tokensUsed: number;
+      responseTimeMs?: number | null;
+      submittedAt: string;
+    }>;
+    return items.map((s) => ({
+      sessionId: s.sessionId,
+      userId: s.userId,
+      ideClient: s.ideClient,
+      ideClientVersion: s.ideClientVersion,
+      queryType: s.queryType,
+      queryText: s.queryText,
+      status: s.status,
+      modelUsed: s.modelUsed,
+      tokensUsed: s.tokensUsed,
+      responseTimeMs: s.responseTimeMs ?? null,
+      submittedAt: s.submittedAt,
+    }));
+  }, [querySessionsData]);
 
   const clients: IdeClient[] = useMemo(() => {
     const items = (clientsData?.items ?? []) as Array<{
@@ -402,6 +451,63 @@ export function IdeIntegrationsPage() {
                 </Card>
               ))}
             </div>
+          </div>
+
+          {/* Query Sessions Audit */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-heading mb-3">
+              <Activity size={18} className="inline mr-2 text-accent" />
+              {t('aiHub.ideQuerySessions')}
+            </h2>
+            <p className="text-xs text-muted mb-4">{t('aiHub.ideQuerySessionsSubtitle')}</p>
+            {querySessions.length === 0 ? (
+              <EmptyState icon={<FileText size={32} />} description={t('aiHub.ideQuerySessionsNoData')} />
+            ) : (
+              <Card>
+                <CardBody className="p-0 overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-edge text-left">
+                        <th className="px-4 py-2 text-muted font-medium">{t('aiHub.ideQueryUser')}</th>
+                        <th className="px-4 py-2 text-muted font-medium">{t('aiHub.ideQueryClient')}</th>
+                        <th className="px-4 py-2 text-muted font-medium">{t('aiHub.ideQueryType')}</th>
+                        <th className="px-4 py-2 text-muted font-medium">{t('aiHub.ideQueryModel')}</th>
+                        <th className="px-4 py-2 text-muted font-medium">{t('aiHub.ideQueryTokens')}</th>
+                        <th className="px-4 py-2 text-muted font-medium">{t('aiHub.ideQueryResponseTime')}</th>
+                        <th className="px-4 py-2 text-muted font-medium">Status</th>
+                        <th className="px-4 py-2 text-muted font-medium">{t('aiHub.ideQueryTime')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {querySessions.map((s) => (
+                        <tr key={s.sessionId} className="border-b border-edge last:border-0 hover:bg-elevated/40">
+                          <td className="px-4 py-2 text-heading">{s.userId}</td>
+                          <td className="px-4 py-2 text-muted">
+                            {s.ideClient === 'vscode' ? <Code size={12} className="inline mr-1" /> : <Monitor size={12} className="inline mr-1" />}
+                            {s.ideClient}
+                          </td>
+                          <td className="px-4 py-2 text-muted">{s.queryType}</td>
+                          <td className="px-4 py-2 text-muted">{s.modelUsed}</td>
+                          <td className="px-4 py-2 text-muted">{s.tokensUsed > 0 ? s.tokensUsed.toLocaleString() : '—'}</td>
+                          <td className="px-4 py-2 text-muted">
+                            {s.responseTimeMs != null ? `${s.responseTimeMs}ms` : '—'}
+                          </td>
+                          <td className="px-4 py-2">
+                            {s.status === 'Responded' && <Badge variant="success">{t('aiHub.ideQueryStatusResponded')}</Badge>}
+                            {s.status === 'Processing' && <Badge variant="info">{t('aiHub.ideQueryStatusProcessing')}</Badge>}
+                            {s.status === 'Blocked' && <Badge variant="warning">{t('aiHub.ideQueryStatusBlocked')}</Badge>}
+                            {s.status === 'Failed' && <Badge variant="error">{t('aiHub.ideQueryStatusFailed')}</Badge>}
+                          </td>
+                          <td className="px-4 py-2 text-muted">
+                            <Clock size={10} className="inline mr-1" />{timeAgo(s.submittedAt)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </CardBody>
+              </Card>
+            )}
           </div>
 
           {/* Governance Notice */}
