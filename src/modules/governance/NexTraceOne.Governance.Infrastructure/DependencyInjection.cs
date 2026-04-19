@@ -92,6 +92,15 @@ public static class DependencyInjection
         // OTEL Metrics — ingestão de métricas do OpenTelemetry Collector
         services.AddScoped<IOtelMetricRepository, OtelMetricRepository>();
 
+        // Non-Prod Schedules
+        services.AddScoped<INonProdScheduleRepository, NonProdScheduleRepository>();
+
+        // Demo Seed State
+        services.AddScoped<IDemoSeedStateRepository, DemoSeedStateRepository>();
+
+        // SAML SSO Configuration
+        services.AddScoped<ISamlSsoConfigurationRepository, SamlSsoConfigurationRepository>();
+
         return services;
     }
 }

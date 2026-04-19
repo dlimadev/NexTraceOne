@@ -590,7 +590,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "notifications.retention.days",
             displayName: "config.notifications.retention.days.label",
-            category: ConfigurationCategory.Operational,
+            category: ConfigurationCategory.SensitiveOperational,
             valueType: ConfigurationValueType.Integer,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.notifications.retention.days.description",
@@ -602,7 +602,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "notifications.retention.purge_enabled",
             displayName: "config.notifications.retention.purge_enabled.label",
-            category: ConfigurationCategory.Operational,
+            category: ConfigurationCategory.SensitiveOperational,
             valueType: ConfigurationValueType.Boolean,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.notifications.retention.purge_enabled.description",
@@ -613,7 +613,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "notifications.rate_limit.enabled",
             displayName: "config.notifications.rate_limit.enabled.label",
-            category: ConfigurationCategory.Operational,
+            category: ConfigurationCategory.SensitiveOperational,
             valueType: ConfigurationValueType.Boolean,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.notifications.rate_limit.enabled.description",
@@ -624,7 +624,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "notifications.rate_limit.max_per_user_per_hour",
             displayName: "config.notifications.rate_limit.max_per_user_per_hour.label",
-            category: ConfigurationCategory.Operational,
+            category: ConfigurationCategory.SensitiveOperational,
             valueType: ConfigurationValueType.Integer,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.notifications.rate_limit.max_per_user_per_hour.description",
