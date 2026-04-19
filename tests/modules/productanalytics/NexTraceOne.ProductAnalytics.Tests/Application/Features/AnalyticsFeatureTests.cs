@@ -466,7 +466,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 50, 10) });
 
-        var handler = new GetFrictionIndicators.Handler(_analyticsRepository);
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock);
         var query = new GetFrictionIndicators.Query(null, null, null);
 
         // Act
@@ -498,7 +498,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ContractStudio, 40, 8) });
 
-        var handler = new GetFrictionIndicators.Handler(_analyticsRepository);
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock);
         var query = new GetFrictionIndicators.Query(Persona: "Engineer", Module: null, Range: "last_7d");
 
         // Act
@@ -529,7 +529,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 80, 15) });
 
-        var handler = new GetFrictionIndicators.Handler(_analyticsRepository);
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock);
         var query = new GetFrictionIndicators.Query(Persona: null, Module: "ServiceCatalog", Range: null);
 
         // Act

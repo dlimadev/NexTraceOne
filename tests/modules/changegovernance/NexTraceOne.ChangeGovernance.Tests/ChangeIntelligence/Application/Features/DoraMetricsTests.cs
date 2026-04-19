@@ -22,6 +22,12 @@ public sealed class DoraMetricsTests
     private readonly IIncidentModule _incidentModule = Substitute.For<IIncidentModule>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IEnvironmentBehaviorService _envBehavior = Substitute.For<IEnvironmentBehaviorService>();
+    private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+
+    public DoraMetricsTests()
+    {
+        _clock.UtcNow.Returns(FixedNow);
+    }
 
     private static Release CreateRelease(
         string service = "svc-payments",
@@ -55,7 +61,7 @@ public sealed class DoraMetricsTests
     }
 
     private GetDoraMetricsFeature.Handler CreateHandler() =>
-        new(_releaseRepo, _incidentModule, _currentTenant, _envBehavior);
+        new(_releaseRepo, _incidentModule, _currentTenant, _envBehavior, _clock);
 
     // ── DORA disabled gate ──────────────────────────────────────────────────
 
@@ -72,6 +78,20 @@ public sealed class DoraMetricsTests
         result.IsSuccess.Should().BeTrue();
         result.Value.DeploymentFrequency.TotalDeploys.Should().Be(0);
         result.Value.OverallClassification.Should().Be(GetDoraMetricsFeature.DoraClassification.Low);
+    }
+
+    [Fact]
+    public async Task GetDoraMetrics_WhenDoraDisabled_GeneratedAt_ShouldUseClockUtcNow()
+    {
+        _envBehavior.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+        _currentTenant.Id.Returns(Guid.NewGuid());
+
+        var sut = CreateHandler();
+        var result = await sut.Handle(new GetDoraMetricsFeature.Query(Days: 30), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.GeneratedAt.Should().Be(FixedNow);
     }
 
     // ── Deployment Frequency ───────────────────────────────────────────────
@@ -102,6 +122,38 @@ public sealed class DoraMetricsTests
         result.IsSuccess.Should().BeTrue();
         result.Value.DeploymentFrequency.Classification.Should().Be(GetDoraMetricsFeature.DoraClassification.Elite);
         result.Value.DeploymentFrequency.TotalDeploys.Should().Be(31);
+    }
+
+    [Fact]
+    public async Task GetDoraMetrics_Enabled_TimeWindow_ShouldDeriveFromClockUtcNow()
+    {
+        // Arrange — verify that the query window ends at FixedNow
+        _envBehavior.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _currentTenant.Id.Returns(Guid.NewGuid());
+
+        SetupCountFiltered(DeploymentStatus.Succeeded, 0);
+        SetupCountFiltered(DeploymentStatus.Failed, 0);
+        SetupCountFiltered(DeploymentStatus.RolledBack, 0);
+        _releaseRepo.ListInRangeAsync(
+            Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<string?>(),
+            Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(new List<Release>());
+        _incidentModule.GetAverageResolutionHoursAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(0m);
+
+        var sut = CreateHandler();
+        var result = await sut.Handle(new GetDoraMetricsFeature.Query(Days: 30), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.GeneratedAt.Should().Be(FixedNow);
+
+        // ListInRangeAsync must have been called with [FixedNow-30d, FixedNow]
+        await _releaseRepo.Received(1).ListInRangeAsync(
+            Arg.Is<DateTimeOffset>(d => d == FixedNow.AddDays(-30)),
+            Arg.Is<DateTimeOffset>(d => d == FixedNow),
+            Arg.Any<string?>(),
+            Arg.Any<Guid>(),
+            Arg.Any<CancellationToken>());
     }
 
     // ── Change Failure Rate ────────────────────────────────────────────────

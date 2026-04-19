@@ -49,7 +49,8 @@ public static class GetDoraMetrics
         IReleaseRepository releaseRepository,
         IIncidentModule incidentModule,
         ICurrentTenant currentTenant,
-        IEnvironmentBehaviorService environmentBehaviorService) : IQueryHandler<Query, Response>
+        IEnvironmentBehaviorService environmentBehaviorService,
+        IDateTimeProvider clock) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -73,11 +74,11 @@ public static class GetDoraMetrics
                     ServiceName: request.ServiceName,
                     TeamName: request.TeamName,
                     Environment: request.Environment,
-                    GeneratedAt: DateTimeOffset.UtcNow);
+                    GeneratedAt: clock.UtcNow);
                 return Result<Response>.Success(empty);
             }
 
-            var to = DateTimeOffset.UtcNow;
+            var to = clock.UtcNow;
             var from = to.AddDays(-request.Days);
 
             // ── 1. Deployment Frequency ──────────────────────────────
@@ -201,7 +202,7 @@ public static class GetDoraMetrics
                 ServiceName: request.ServiceName,
                 TeamName: request.TeamName,
                 Environment: request.Environment,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: clock.UtcNow);
         }
 
         /// <summary>Classifica performance geral com base nos 4 indicadores DORA.</summary>

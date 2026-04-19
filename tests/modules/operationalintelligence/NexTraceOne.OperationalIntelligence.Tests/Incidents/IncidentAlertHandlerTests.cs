@@ -174,6 +174,96 @@ public sealed class IncidentAlertHandlerTests
             input.Title.StartsWith("[Alert]")));
     }
 
+    // ── MapAlertSourceToIncidentType ──────────────────────────────────────
+
+    [Theory]
+    [InlineData("health", IncidentType.AvailabilityIssue)]
+    [InlineData("health-check", IncidentType.AvailabilityIssue)]
+    [InlineData("platform-health", IncidentType.AvailabilityIssue)]
+    [InlineData("worker", IncidentType.BackgroundProcessingIssue)]
+    [InlineData("background-jobs", IncidentType.BackgroundProcessingIssue)]
+    [InlineData("scheduler", IncidentType.BackgroundProcessingIssue)]
+    [InlineData("ingestion", IncidentType.ServiceDegradation)]
+    [InlineData("pipeline", IncidentType.ServiceDegradation)]
+    [InlineData("ai", IncidentType.DependencyFailure)]
+    [InlineData("ai-provider", IncidentType.DependencyFailure)]
+    [InlineData("drift", IncidentType.OperationalRegression)]
+    [InlineData("anomaly", IncidentType.OperationalRegression)]
+    [InlineData("change-intelligence", IncidentType.OperationalRegression)]
+    [InlineData("unknown-source", IncidentType.ServiceDegradation)]
+    public async Task HandleAlertAsync_MapsSourceToCorrectIncidentType(string source, IncidentType expectedType)
+    {
+        var payload = CreateAlertPayload(AlertSeverity.Error, source: source);
+        var dispatch = CreateDispatchResult();
+
+        await _handler.HandleAlertAsync(payload, dispatch, CancellationToken.None);
+
+        _store.Received(1).CreateIncident(Arg.Is<CreateIncidentInput>(input =>
+            input.IncidentType == expectedType));
+    }
+
+    [Fact]
+    public async Task HandleAlertAsync_MapsSourceCaseInsensitive()
+    {
+        // Source matching is case-insensitive
+        var payload = CreateAlertPayload(AlertSeverity.Error, source: "HEALTH");
+        var dispatch = CreateDispatchResult();
+
+        await _handler.HandleAlertAsync(payload, dispatch, CancellationToken.None);
+
+        _store.Received(1).CreateIncident(Arg.Is<CreateIncidentInput>(input =>
+            input.IncidentType == IncidentType.AvailabilityIssue));
+    }
+
+    // ── Description building ──────────────────────────────────────────────
+
+    [Fact]
+    public async Task HandleAlertAsync_Description_ContainsSourceSeverityAndTimestamp()
+    {
+        var payload = CreateAlertPayload(AlertSeverity.Critical, source: "pipeline");
+        var dispatch = CreateDispatchResult();
+
+        await _handler.HandleAlertAsync(payload, dispatch, CancellationToken.None);
+
+        _store.Received(1).CreateIncident(Arg.Is<CreateIncidentInput>(input =>
+            input.Description.Contains("pipeline") &&
+            input.Description.Contains("Critical") &&
+            input.Description.Contains("channels")));
+    }
+
+    [Fact]
+    public async Task HandleAlertAsync_Description_IncludesContextEntries_WhenPresent()
+    {
+        var payload = CreateAlertPayload(AlertSeverity.Critical, context: new Dictionary<string, string>
+        {
+            ["Domain"] = "payments",
+            ["Environment"] = "production"
+        });
+        var dispatch = CreateDispatchResult();
+
+        await _handler.HandleAlertAsync(payload, dispatch, CancellationToken.None);
+
+        _store.Received(1).CreateIncident(Arg.Is<CreateIncidentInput>(input =>
+            input.Description.Contains("Domain") &&
+            input.Description.Contains("payments") &&
+            input.Description.Contains("Environment")));
+    }
+
+    [Fact]
+    public async Task HandleAlertAsync_Description_IncludesCorrelationId_WhenPresent()
+    {
+        var correlationId = "corr-123-abc";
+        var payload = CreateAlertPayload(AlertSeverity.Error);
+        // Set a known correlation ID via reflection isn't needed — just use the helper
+        var payloadWithCorrelation = payload with { CorrelationId = correlationId };
+        var dispatch = CreateDispatchResult();
+
+        await _handler.HandleAlertAsync(payloadWithCorrelation, dispatch, CancellationToken.None);
+
+        _store.Received(1).CreateIncident(Arg.Is<CreateIncidentInput>(input =>
+            input.Description.Contains(correlationId)));
+    }
+
     private static AlertPayload CreateAlertPayload(
         AlertSeverity severity,
         string title = "Test Alert",
