@@ -5593,6 +5593,72 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "toggle",
             sortOrder: 8610),
 
+        ConfigurationDefinition.Create(
+            key: "analytics.max_range_days",
+            displayName: "config.analytics.max_range_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.analytics.max_range_days.description",
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 8620),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.top_modules_limit",
+            displayName: "config.analytics.top_modules_limit.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.analytics.top_modules_limit.description",
+            defaultValue: "6",
+            uiEditorType: "number",
+            sortOrder: 8625),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.top_features_limit",
+            displayName: "config.analytics.top_features_limit.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.analytics.top_features_limit.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 8630),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.trend_threshold_percent",
+            displayName: "config.analytics.trend_threshold_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.analytics.trend_threshold_percent.description",
+            defaultValue: "0.05",
+            uiEditorType: "number",
+            sortOrder: 8635),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.default_range",
+            displayName: "config.analytics.default_range.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.analytics.default_range.description",
+            defaultValue: "last_30d",
+            uiEditorType: "text",
+            sortOrder: 8640),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.retention_days",
+            displayName: "config.analytics.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.analytics.retention_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 8645),
+
         // ── Best Practices — DORA ──────────────────────────────────────────────────
         ConfigurationDefinition.Create(
             key: "governance.dora.tracking.enabled",

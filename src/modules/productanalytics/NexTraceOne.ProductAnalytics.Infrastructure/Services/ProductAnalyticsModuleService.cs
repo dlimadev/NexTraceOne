@@ -81,7 +81,7 @@ internal sealed class ProductAnalyticsModuleService(
             .CountAsync(cancellationToken);
 
         // Adoption rate: proportion of available personas that used this module
-        const int totalKnownPersonas = 7; // Engineer, TechLead, Architect, Product, Executive, PlatformAdmin, Auditor
+        var totalKnownPersonas = Enum.GetValues<PersonaType>().Length;
         var adoptionRate = totalKnownPersonas > 0
             ? Math.Round((decimal)uniquePersonas / totalKnownPersonas * 100, 2)
             : 0m;

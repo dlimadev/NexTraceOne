@@ -1,4 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Features.GetAnalyticsSummary;
 using NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
 using NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
@@ -24,6 +27,7 @@ public sealed class AnalyticsFeatureTests
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
 
     public AnalyticsFeatureTests()
     {
@@ -31,6 +35,9 @@ public sealed class AnalyticsFeatureTests
         _currentTenant.Id.Returns(Guid.NewGuid());
         _currentUser.IsAuthenticated.Returns(true);
         _currentUser.Id.Returns("user-123");
+        _configService
+            .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
     }
 
     // ── RecordAnalyticsEvent ──
@@ -115,7 +122,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<SessionEventRow>());
 
-        var handler = new GetAnalyticsSummary.Handler(_analyticsRepository, _clock);
+        var handler = new GetAnalyticsSummary.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetAnalyticsSummary.Query(null, null, null, null, null);
 
         // Act
@@ -153,7 +160,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<SessionEventRow>());
 
-        var handler = new GetAnalyticsSummary.Handler(_analyticsRepository, _clock);
+        var handler = new GetAnalyticsSummary.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetAnalyticsSummary.Query(null, null, null, null, null);
 
         // Act
@@ -192,7 +199,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<AnalyticsEventType>());
 
-        var handler = new GetPersonaUsage.Handler(_analyticsRepository, _clock);
+        var handler = new GetPersonaUsage.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetPersonaUsage.Query(null, null, null);
 
         // Act
@@ -228,7 +235,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<AnalyticsEventType>());
 
-        var handler = new GetPersonaUsage.Handler(_analyticsRepository, _clock);
+        var handler = new GetPersonaUsage.Handler(_analyticsRepository, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetPersonaUsage.Query("Engineer", null, null), CancellationToken.None);
@@ -262,7 +269,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleFeatureCountRow>());
 
-        var handler = new GetModuleAdoption.Handler(_analyticsRepository, _clock);
+        var handler = new GetModuleAdoption.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetModuleAdoption.Query(null, null, null);
 
         // Act
@@ -288,7 +295,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(50);
 
-        var handler = new GetJourneys.Handler(_analyticsRepository, _clock);
+        var handler = new GetJourneys.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetJourneys.Query(null, null, null);
 
         // Act
@@ -296,8 +303,7 @@ public sealed class AnalyticsFeatureTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        // With no session data, handler returns empty journeys
-        result.Value.Journeys.Should().BeEmpty();
+        // With no session data, handler returns skeleton journeys (BUG-04 fix)
         result.Value.AverageCompletionRate.Should().Be(0);
     }
 
@@ -313,7 +319,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(0);
 
-        var handler = new GetJourneys.Handler(_analyticsRepository, _clock);
+        var handler = new GetJourneys.Handler(_analyticsRepository, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetJourneys.Query(null, null, null), CancellationToken.None);
@@ -345,7 +351,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<UserFirstEventRow>());
 
-        var handler = new GetValueMilestones.Handler(_analyticsRepository, _clock);
+        var handler = new GetValueMilestones.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetValueMilestones.Query(null, null, null);
 
         // Act
@@ -373,7 +379,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<UserFirstEventRow>());
 
-        var handler = new GetValueMilestones.Handler(_analyticsRepository, _clock);
+        var handler = new GetValueMilestones.Handler(_analyticsRepository, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetValueMilestones.Query(null, null, null), CancellationToken.None);
@@ -435,7 +441,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(40);
 
-        var handler = new GetFeatureHeatmap.Handler(_analyticsRepository, _clock);
+        var handler = new GetFeatureHeatmap.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetFeatureHeatmap.Query(null, null, null);
 
         // Act
@@ -466,7 +472,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 50, 10) });
 
-        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock);
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetFrictionIndicators.Query(null, null, null);
 
         // Act
@@ -498,7 +504,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ContractStudio, 40, 8) });
 
-        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock);
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetFrictionIndicators.Query(Persona: "Engineer", Module: null, Range: "last_7d");
 
         // Act
@@ -529,7 +535,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 80, 15) });
 
-        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock);
+        var handler = new GetFrictionIndicators.Handler(_analyticsRepository, _clock, _configService);
         var query = new GetFrictionIndicators.Query(Persona: null, Module: "ServiceCatalog", Range: null);
 
         // Act

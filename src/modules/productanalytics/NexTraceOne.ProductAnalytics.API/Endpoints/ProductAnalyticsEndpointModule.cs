@@ -41,7 +41,7 @@ public sealed class ProductAnalyticsEndpointModule
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:write");
+        }).RequirePermission("analytics:write").RequireRateLimiting("data-intensive");
 
         // ────────────────────────────────────────
         // Resumo consolidado

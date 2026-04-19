@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
@@ -22,11 +26,15 @@ public static class GetModuleAdoption
     /// <summary>Handler que calcula e retorna adoção por módulo.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var rows = await repository.GetModuleAdoptionAsync(
                 persona: request.Persona,
@@ -101,7 +109,7 @@ public static class GetModuleAdoption
             return response;
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -111,7 +119,7 @@ public static class GetModuleAdoption
                 "last_90d" => 90,
                 _ => 30
             };
-
+            if (days > maxDays) days = maxDays;
             return (utcNow.AddDays(-days), utcNow, label);
         }
 

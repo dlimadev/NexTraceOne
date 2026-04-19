@@ -1,4 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
@@ -15,13 +18,17 @@ public sealed class GetJourneysRicherTests
 
     private readonly IAnalyticsEventRepository _repo = Substitute.For<IAnalyticsEventRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
 
     public GetJourneysRicherTests()
     {
         _clock.UtcNow.Returns(FixedNow);
+        _configService
+            .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
     }
 
-    private GetJourneys.Handler CreateHandler() => new(_repo, _clock);
+    private GetJourneys.Handler CreateHandler() => new(_repo, _clock, _configService);
 
     private void SetupNoSessionData()
     {

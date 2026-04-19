@@ -8,6 +8,8 @@
     <ProjectReference Include="..\..\..\..\src\modules\productanalytics\NexTraceOne.ProductAnalytics.Application\NexTraceOne.ProductAnalytics.Application.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\productanalytics\NexTraceOne.ProductAnalytics.Contracts\NexTraceOne.ProductAnalytics.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\productanalytics\NexTraceOne.ProductAnalytics.Infrastructure\NexTraceOne.ProductAnalytics.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\configuration\NexTraceOne.Configuration.Contracts\NexTraceOne.Configuration.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\configuration\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

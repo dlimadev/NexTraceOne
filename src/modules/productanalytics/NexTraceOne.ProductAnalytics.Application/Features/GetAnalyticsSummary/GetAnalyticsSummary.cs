@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetAnalyticsSummary;
@@ -24,11 +28,21 @@ public static class GetAnalyticsSummary
     /// <summary>Handler que compila e retorna o resumo de analytics.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var topModulesCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.TopModulesLimit, ConfigurationScope.System, null, cancellationToken);
+            var topModulesLimit = int.TryParse(topModulesCfg?.EffectiveValue, out var tml) ? tml : AnalyticsConstants.TopModulesLimit;
+
+            var trendCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.TrendThresholdPercent, ConfigurationScope.System, null, cancellationToken);
+            var trendThreshold = decimal.TryParse(trendCfg?.EffectiveValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var tt) ? tt : AnalyticsConstants.TrendThreshold;
+
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             ProductModule? moduleFilter = null;
             if (!string.IsNullOrWhiteSpace(request.Module) && Enum.TryParse<ProductModule>(request.Module, ignoreCase: true, out var moduleValue))
@@ -68,10 +82,10 @@ public static class GetAnalyticsSummary
                 domainId: request.DomainId,
                 from,
                 to,
-                top: 6,
+                top: topModulesLimit,
                 cancellationToken);
 
-            var (previousFrom, previousTo, _) = ResolveRange(from, request.Range);
+            var (previousFrom, previousTo, _) = ResolveRange(from, request.Range, maxRangeDays);
             var previousEvents = await repository.CountAsync(
                 persona: request.Persona,
                 module: moduleFilter,
@@ -81,7 +95,7 @@ public static class GetAnalyticsSummary
                 to: previousTo,
                 cancellationToken);
 
-            var overallTrend = CompareTrend(totalEvents, previousEvents);
+            var overallTrend = CompareTrend(totalEvents, previousEvents, trendThreshold);
             var adoptionScore = uniqueUsers == 0 ? 0m : Math.Min(100m, totalEvents / (decimal)uniqueUsers);
 
             var sessionEvents = await repository.ListSessionEventsAsync(
@@ -116,7 +130,7 @@ public static class GetAnalyticsSummary
             return response;
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -127,17 +141,19 @@ public static class GetAnalyticsSummary
                 _ => 30
             };
 
+            if (days > maxDays) days = maxDays;
+
             return (utcNow.AddDays(-days), utcNow, label);
         }
 
-        private static TrendDirection CompareTrend(long current, long previous)
+        private static TrendDirection CompareTrend(long current, long previous, decimal threshold = AnalyticsConstants.TrendThreshold)
         {
             if (previous == 0)
                 return current == 0 ? TrendDirection.Stable : TrendDirection.Improving;
 
             var delta = (current - previous) / (decimal)previous;
-            if (delta >= 0.05m) return TrendDirection.Improving;
-            if (delta <= -0.05m) return TrendDirection.Declining;
+            if (delta >= threshold) return TrendDirection.Improving;
+            if (delta <= -threshold) return TrendDirection.Declining;
             return TrendDirection.Stable;
         }
 
@@ -148,26 +164,9 @@ public static class GetAnalyticsSummary
             if (totalEvents <= 0 || sessionEvents.Count == 0)
                 return (0m, 0m, 0m, 0m);
 
-            var valueEvents = new HashSet<AnalyticsEventType>
-            {
-                AnalyticsEventType.ContractPublished,
-                AnalyticsEventType.OnboardingStepCompleted,
-                AnalyticsEventType.AssistantResponseUsed,
-                AnalyticsEventType.MitigationWorkflowCompleted
-            };
-
-            var coreValueEvents = new HashSet<AnalyticsEventType>
-            {
-                AnalyticsEventType.ContractPublished,
-                AnalyticsEventType.MitigationWorkflowCompleted
-            };
-
-            var frictionEvents = new HashSet<AnalyticsEventType>
-            {
-                AnalyticsEventType.ZeroResultSearch,
-                AnalyticsEventType.EmptyStateEncountered,
-                AnalyticsEventType.JourneyAbandoned
-            };
+            var valueEvents = AnalyticsConstants.ValueEventTypes.ToHashSet();
+            var coreValueEvents = AnalyticsConstants.CoreValueEventTypes.ToHashSet();
+            var frictionEvents = AnalyticsConstants.FrictionEventTypes.ToHashSet();
 
             var valueCount = sessionEvents.Count(e => valueEvents.Contains(e.EventType));
             var frictionCount = sessionEvents.Count(e => frictionEvents.Contains(e.EventType));

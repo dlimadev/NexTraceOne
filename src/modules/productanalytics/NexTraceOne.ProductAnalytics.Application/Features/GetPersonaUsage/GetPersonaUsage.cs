@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
@@ -23,37 +27,15 @@ public static class GetPersonaUsage
     /// <summary>Handler que calcula e retorna o perfil de uso por persona a partir de dados reais.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
-        private static readonly HashSet<AnalyticsEventType> FrictionEventTypes =
-        [
-            AnalyticsEventType.ZeroResultSearch,
-            AnalyticsEventType.EmptyStateEncountered,
-            AnalyticsEventType.JourneyAbandoned
-        ];
-
-        private static readonly (ValueMilestoneType Milestone, AnalyticsEventType EventType)[] MilestoneMap =
-        [
-            (ValueMilestoneType.FirstSearchSuccess, AnalyticsEventType.SearchResultClicked),
-            (ValueMilestoneType.FirstServiceLookup, AnalyticsEventType.EntityViewed),
-            (ValueMilestoneType.FirstContractView, AnalyticsEventType.EntityViewed),
-            (ValueMilestoneType.FirstContractDraftCreated, AnalyticsEventType.ContractDraftCreated),
-            (ValueMilestoneType.FirstContractPublished, AnalyticsEventType.ContractPublished),
-            (ValueMilestoneType.FirstAiUsefulInteraction, AnalyticsEventType.AssistantResponseUsed),
-            (ValueMilestoneType.FirstIncidentInvestigation, AnalyticsEventType.IncidentInvestigated),
-            (ValueMilestoneType.FirstMitigationCompleted, AnalyticsEventType.MitigationWorkflowCompleted),
-            (ValueMilestoneType.FirstExecutiveOverviewConsumed, AnalyticsEventType.ExecutiveOverviewViewed),
-            (ValueMilestoneType.FirstRunbookConsulted, AnalyticsEventType.RunbookViewed),
-            (ValueMilestoneType.FirstSourceOfTruthUsed, AnalyticsEventType.SourceOfTruthQueried),
-            (ValueMilestoneType.FirstEvidenceExported, AnalyticsEventType.EvidencePackageExported),
-            (ValueMilestoneType.FirstReportGenerated, AnalyticsEventType.ReportGenerated),
-            (ValueMilestoneType.FirstReliabilityViewed, AnalyticsEventType.ReliabilityDashboardViewed),
-            (ValueMilestoneType.FirstAutomationCreated, AnalyticsEventType.OnboardingStepCompleted)
-        ];
-
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var personas = await repository.GetPersonaBreakdownAsync(
                 request.TeamId, domainId: null, from, to, cancellationToken);
@@ -104,14 +86,15 @@ public static class GetPersonaUsage
                 var adoptionDepth = Math.Round(Math.Min(100m, (actionsPerUser / maxActionsPerUser) * 100m), 1);
 
                 var frictionPoints = topEventTypes
-                    .Where(e => FrictionEventTypes.Contains(e.EventType))
+                    .Where(e => AnalyticsConstants.FrictionEventTypes.Contains(e.EventType))
                     .Select(e => MapFrictionLabel(e.EventType))
                     .ToArray();
 
                 var distinctSet = distinctEventTypes.ToHashSet();
-                var milestonesReached = MilestoneMap
+                var milestoneMap = AnalyticsConstants.MilestoneDefs.Select(d => (d.Type, d.EventType)).ToArray();
+                var milestonesReached = milestoneMap
                     .Where(m => distinctSet.Contains(m.EventType))
-                    .Select(m => m.Milestone)
+                    .Select(m => m.Type)
                     .Distinct()
                     .ToArray();
 
@@ -125,7 +108,7 @@ public static class GetPersonaUsage
                     .ToArray();
 
                 var topActions = topEventTypes
-                    .Where(e => !FrictionEventTypes.Contains(e.EventType))
+                    .Where(e => !AnalyticsConstants.FrictionEventTypes.Contains(e.EventType))
                     .Take(4)
                     .Select(e => MapEventTypeLabel(e.EventType))
                     .ToArray();
@@ -152,7 +135,7 @@ public static class GetPersonaUsage
                 PeriodLabel: periodLabel));
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -162,6 +145,7 @@ public static class GetPersonaUsage
                 "last_90d" => 90,
                 _ => 30
             };
+            if (days > maxDays) days = maxDays;
             return (utcNow.AddDays(-days), utcNow, label);
         }
 

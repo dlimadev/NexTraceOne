@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetValueMilestones;
@@ -23,44 +27,15 @@ public static class GetValueMilestones
     /// <summary>Handler que calcula e retorna marcos de valor a partir de dados reais.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
-        private static readonly (ValueMilestoneType Type, string Name, AnalyticsEventType EventType)[] MilestoneDefs =
-        [
-            (ValueMilestoneType.FirstSearchSuccess, "First Search Success", AnalyticsEventType.SearchResultClicked),
-            (ValueMilestoneType.FirstServiceLookup, "First Service Lookup", AnalyticsEventType.EntityViewed),
-            (ValueMilestoneType.FirstContractView, "First Contract View", AnalyticsEventType.EntityViewed),
-            (ValueMilestoneType.FirstContractDraftCreated, "First Contract Draft Created", AnalyticsEventType.ContractDraftCreated),
-            (ValueMilestoneType.FirstContractPublished, "First Contract Published", AnalyticsEventType.ContractPublished),
-            (ValueMilestoneType.FirstAiUsefulInteraction, "First AI Useful Interaction", AnalyticsEventType.AssistantResponseUsed),
-            (ValueMilestoneType.FirstIncidentInvestigation, "First Incident Investigation", AnalyticsEventType.IncidentInvestigated),
-            (ValueMilestoneType.FirstMitigationCompleted, "First Mitigation Completed", AnalyticsEventType.MitigationWorkflowCompleted),
-            (ValueMilestoneType.FirstExecutiveOverviewConsumed, "First Executive Overview", AnalyticsEventType.ExecutiveOverviewViewed),
-            (ValueMilestoneType.FirstRunbookConsulted, "First Runbook Consulted", AnalyticsEventType.RunbookViewed),
-            (ValueMilestoneType.FirstSourceOfTruthUsed, "First Source of Truth Used", AnalyticsEventType.SourceOfTruthQueried),
-            (ValueMilestoneType.FirstEvidenceExported, "First Evidence Exported", AnalyticsEventType.EvidencePackageExported),
-            (ValueMilestoneType.FirstReportGenerated, "First Report Generated", AnalyticsEventType.ReportGenerated),
-            (ValueMilestoneType.FirstReliabilityViewed, "First Reliability Viewed", AnalyticsEventType.ReliabilityDashboardViewed),
-            (ValueMilestoneType.FirstAutomationCreated, "First Automation Created", AnalyticsEventType.OnboardingStepCompleted)
-        ];
-
-        private static readonly AnalyticsEventType[] FirstValueEventTypes =
-        [
-            AnalyticsEventType.SearchResultClicked,
-            AnalyticsEventType.EntityViewed,
-            AnalyticsEventType.AssistantResponseUsed,
-            AnalyticsEventType.OnboardingStepCompleted
-        ];
-
-        private static readonly AnalyticsEventType[] CoreValueEventTypes =
-        [
-            AnalyticsEventType.ContractPublished,
-            AnalyticsEventType.MitigationWorkflowCompleted
-        ];
-
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var totalUsers = await repository.CountUniqueUsersAsync(
                 persona: request.Persona, module: null, teamId: request.TeamId, domainId: null,
@@ -68,7 +43,7 @@ public static class GetValueMilestones
 
             if (totalUsers == 0)
             {
-                var emptyMilestones = MilestoneDefs
+                var emptyMilestones = AnalyticsConstants.MilestoneDefs
                     .Select(d => new MilestoneDto(d.Type, d.Name, 0m, 0m, 0, TrendDirection.Stable))
                     .ToArray();
 
@@ -82,7 +57,7 @@ public static class GetValueMilestones
                     PeriodLabel: periodLabel));
             }
 
-            var allEventTypes = MilestoneDefs.Select(d => d.EventType).Distinct().ToArray();
+            var allEventTypes = AnalyticsConstants.MilestoneDefs.Select(d => d.EventType).Distinct().ToArray();
 
             var userCounts = await repository.CountUsersByEventTypeAsync(
                 allEventTypes, request.Persona, request.TeamId, from, to, cancellationToken);
@@ -92,7 +67,7 @@ public static class GetValueMilestones
             var userFirstEvents = await repository.GetUserFirstEventTimesAsync(
                 allEventTypes, request.Persona, request.TeamId, from, to, cancellationToken);
 
-            var (previousFrom, previousTo, _) = ResolveRange(from, request.Range);
+            var (previousFrom, previousTo, _) = ResolveRange(from, request.Range, maxRangeDays);
             var previousUserCounts = await repository.CountUsersByEventTypeAsync(
                 allEventTypes, request.Persona, request.TeamId, previousFrom, previousTo, cancellationToken);
 
@@ -116,20 +91,20 @@ public static class GetValueMilestones
                         {
                             var userGlobalFirst = allUserFirstTimes
                                 .Where(t => userFirstEvents.Any(x => x.UserId == userId))
-                                .DefaultIfEmpty(DateTimeOffset.MinValue)
+                                .Select(t => (DateTimeOffset?)t)
                                 .Min();
 
-                            if (userGlobalFirst == DateTimeOffset.MinValue) continue;
+                            if (userGlobalFirst is null) continue;
 
                             var milestoneFirst = g.Where(x => x.UserId == userId).Min(x => x.FirstOccurrence);
-                            var delta = (decimal)(milestoneFirst - userGlobalFirst).TotalMinutes;
+                            var delta = (decimal)(milestoneFirst - userGlobalFirst.Value).TotalMinutes;
                             if (delta >= 0) deltas.Add(delta);
                         }
 
                         return deltas.Count > 0 ? Math.Round(deltas.Average(), 1) : 0m;
                     });
 
-            var milestones = MilestoneDefs.Select(def =>
+            var milestones = AnalyticsConstants.MilestoneDefs.Select(def =>
             {
                 var usersReached = userCountDict.GetValueOrDefault(def.EventType, 0);
                 var completionRate = totalUsers > 0
@@ -145,14 +120,14 @@ public static class GetValueMilestones
             }).ToArray();
 
             var firstValueTimes = userFirstEvents
-                .Where(e => FirstValueEventTypes.Contains(e.EventType))
+                .Where(e => AnalyticsConstants.ValueEventTypes.Contains(e.EventType))
                 .GroupBy(e => e.UserId)
                 .Select(g => (decimal)(g.Min(x => x.FirstOccurrence) - from).TotalMinutes)
                 .Where(t => t >= 0)
                 .ToList();
 
             var coreValueTimes = userFirstEvents
-                .Where(e => CoreValueEventTypes.Contains(e.EventType))
+                .Where(e => AnalyticsConstants.CoreValueEventTypes.Contains(e.EventType))
                 .GroupBy(e => e.UserId)
                 .Select(g => (decimal)(g.Min(x => x.FirstOccurrence) - from).TotalMinutes)
                 .Where(t => t >= 0)
@@ -194,7 +169,7 @@ public static class GetValueMilestones
             return TrendDirection.Stable;
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -204,6 +179,7 @@ public static class GetValueMilestones
                 "last_90d" => 90,
                 _ => 30
             };
+            if (days > maxDays) days = maxDays;
             return (utcNow.AddDays(-days), utcNow, label);
         }
     }

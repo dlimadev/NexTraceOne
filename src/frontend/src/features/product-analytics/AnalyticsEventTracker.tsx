@@ -25,7 +25,7 @@ function resolveModuleFromPath(pathname: string): string | null {
   if (pathname.startsWith('/operations')) return 'Incidents';
   if (pathname.startsWith('/ai')) return 'AiAssistant';
   if (pathname.startsWith('/governance')) return 'Governance';
-  if (pathname.startsWith('/analytics')) return 'Governance';
+  if (pathname.startsWith('/analytics')) return 'ProductAnalytics';
   if (pathname.startsWith('/platform')) return 'Admin';
   if (pathname.startsWith('/admin')) return 'Admin';
   return null;

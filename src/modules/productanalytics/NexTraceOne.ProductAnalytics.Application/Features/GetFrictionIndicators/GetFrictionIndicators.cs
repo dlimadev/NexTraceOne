@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetFrictionIndicators;
@@ -22,7 +26,7 @@ public static class GetFrictionIndicators
         string? Range) : IQuery<Response>;
 
     /// <summary>Handler que calcula e retorna indicadores de fricção baseados em dados reais de analytics.</summary>
-    public sealed class Handler(IAnalyticsEventRepository analyticsRepo, IDateTimeProvider clock) : IQueryHandler<Query, Response>
+    public sealed class Handler(IAnalyticsEventRepository analyticsRepo, IDateTimeProvider clock, IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         private static readonly (AnalyticsEventType EventType, FrictionSignalType SignalType, string Name)[] FrictionEvents =
         [
@@ -31,20 +35,26 @@ public static class GetFrictionIndicators
             (AnalyticsEventType.JourneyAbandoned, FrictionSignalType.AbortedJourney, "Journey Abandoned")
         ];
 
-        private static TrendDirection ClassifyTrend(long current, long previous)
+        private static TrendDirection ClassifyTrend(long current, long previous, decimal threshold = AnalyticsConstants.TrendThreshold)
         {
             if (previous == 0) return TrendDirection.Stable;
-            return current < (long)(previous * 0.95m)
+            return current < (long)(previous * (1m - threshold))
                 ? TrendDirection.Improving
-                : current > (long)(previous * 1.05m)
+                : current > (long)(previous * (1m + threshold))
                     ? TrendDirection.Declining
                     : TrendDirection.Stable;
         }
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var range = request.Range ?? "last_30d";
-            var (from, to) = ParseRange(range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var trendCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.TrendThresholdPercent, ConfigurationScope.System, null, cancellationToken);
+            var trendThreshold = decimal.TryParse(trendCfg?.EffectiveValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var tt) ? tt : AnalyticsConstants.TrendThreshold;
+
+            var range = request.Range ?? AnalyticsConstants.DefaultRange;
+            var (from, to) = ParseRange(range, maxRangeDays);
             var previousFrom = from.AddDays(-(to - from).TotalDays);
 
             var totalEvents = await analyticsRepo.CountAsync(
@@ -77,7 +87,7 @@ public static class GetFrictionIndicators
                 var previousCount = await analyticsRepo.CountByEventTypeAsync(
                     eventType, request.Persona, previousFrom, from, cancellationToken);
 
-                var trend = ClassifyTrend(count, previousCount);
+                var trend = ClassifyTrend(count, previousCount, trendThreshold);
 
                 var impactPercent = totalEvents > 0
                     ? Math.Round((decimal)count / totalEvents * 100, 1)
@@ -132,7 +142,7 @@ public static class GetFrictionIndicators
                 DataSource: "analytics"));
         }
 
-        private (DateTimeOffset From, DateTimeOffset To) ParseRange(string range)
+        private (DateTimeOffset From, DateTimeOffset To) ParseRange(string range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var now = clock.UtcNow;
             var days = range switch
@@ -142,6 +152,7 @@ public static class GetFrictionIndicators
                 "last_90d" => 90,
                 _ => 30
             };
+            if (days > maxDays) days = maxDays;
             return (now.AddDays(-days), now);
         }
     }

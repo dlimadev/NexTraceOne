@@ -1,4 +1,7 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Features.GetValueMilestones;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
@@ -12,15 +15,19 @@ public sealed class GetValueMilestonesTests
 {
     private readonly IAnalyticsEventRepository _repository = Substitute.For<IAnalyticsEventRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
 
     private static readonly DateTimeOffset FixedNow = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
 
     public GetValueMilestonesTests()
     {
         _clock.UtcNow.Returns(FixedNow);
+        _configService
+            .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
     }
 
-    private GetValueMilestones.Handler CreateHandler() => new(_repository, _clock);
+    private GetValueMilestones.Handler CreateHandler() => new(_repository, _clock, _configService);
 
     private void SetupZeroUsers()
     {

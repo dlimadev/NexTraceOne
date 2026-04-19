@@ -86,5 +86,14 @@ internal sealed class AnalyticsEventConfiguration : IEntityTypeConfiguration<Ana
         // ── Índice composto para consultas analíticas por tenant ──────────
         builder.HasIndex(x => new { x.TenantId, x.OccurredAt });
         builder.HasIndex(x => new { x.TenantId, x.Module, x.OccurredAt });
+
+        builder.HasIndex(x => new { x.TenantId, x.UserId, x.OccurredAt })
+            .HasDatabaseName("IX_pan_analytics_events_TenantId_UserId_OccurredAt");
+
+        builder.HasIndex(x => new { x.SessionId, x.OccurredAt })
+            .HasDatabaseName("IX_pan_analytics_events_SessionId_OccurredAt");
+
+        builder.HasIndex(x => new { x.Module, x.EventType })
+            .HasDatabaseName("IX_pan_analytics_events_Module_EventType");
     }
 }

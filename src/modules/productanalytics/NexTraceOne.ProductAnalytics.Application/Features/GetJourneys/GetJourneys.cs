@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
@@ -24,7 +28,8 @@ public static class GetJourneys
     /// <summary>Handler que calcula e retorna métricas de jornadas a partir de dados reais.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         /// <summary>
         /// Definições de jornadas do produto.
@@ -65,7 +70,10 @@ public static class GetJourneys
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var allEventTypes = JourneyDefinitions
                 .SelectMany(j => j.Steps.Select(s => s.EventType))
@@ -77,8 +85,20 @@ public static class GetJourneys
 
             if (sessionEventTypes.Count == 0)
             {
+                var skeletonJourneys = JourneyDefinitions
+                    .Where(def => string.IsNullOrWhiteSpace(request.JourneyId) ||
+                                  def.JourneyId.Equals(request.JourneyId, StringComparison.OrdinalIgnoreCase))
+                    .Select(def =>
+                    {
+                        var steps = def.Steps.Select((s, idx) =>
+                            new JourneyStepDto(s.StepId, s.StepName, 0m, idx)).ToArray();
+                        return new JourneyDto(def.JourneyId, def.JourneyName, steps,
+                            0m, 0m, JourneyStatus.Started, string.Empty);
+                    })
+                    .ToArray();
+
                 return Result<Response>.Success(new Response(
-                    Journeys: Array.Empty<JourneyDto>(),
+                    Journeys: skeletonJourneys,
                     AverageCompletionRate: 0m,
                     MostCompletedJourney: string.Empty,
                     HighestDropOffJourney: string.Empty,
@@ -183,7 +203,7 @@ public static class GetJourneys
                 PeriodLabel: periodLabel));
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -193,6 +213,7 @@ public static class GetJourneys
                 "last_90d" => 90,
                 _ => 30
             };
+            if (days > maxDays) days = maxDays;
             return (utcNow.AddDays(-days), utcNow, label);
         }
     }
