@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
@@ -35,7 +36,8 @@ public static class GetRiskHeatmap
     public sealed class Handler(
         IGovernancePackRepository packRepository,
         IGovernanceWaiverRepository waiverRepository,
-        IGovernanceRolloutRecordRepository rolloutRepository) : IQueryHandler<Query, Response>
+        IGovernanceRolloutRecordRepository rolloutRepository,
+        IDateTimeProvider clock) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -59,7 +61,7 @@ public static class GetRiskHeatmap
             var response = new Response(
                 Dimension: dimension,
                 Cells: cells,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: clock.UtcNow);
 
             return Result<Response>.Success(response);
         }

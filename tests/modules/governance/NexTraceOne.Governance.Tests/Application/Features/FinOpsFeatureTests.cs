@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Governance.Application.Features.GetDomainFinOps;
@@ -75,6 +76,13 @@ public sealed class FinOpsFeatureTests
         mock.ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((NexTraceOne.Configuration.Contracts.DTOs.EffectiveConfigurationDto?)null);
         return mock;
+    }
+
+    private static IDateTimeProvider CreateClockMock()
+    {
+        var clock = Substitute.For<IDateTimeProvider>();
+        clock.UtcNow.Returns(new DateTimeOffset(2026, 4, 19, 12, 0, 0, TimeSpan.Zero));
+        return clock;
     }
 
     // ── GetFinOpsSummary ──
@@ -311,7 +319,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetEfficiencyIndicators_ShouldReturnIndicatorsFromRealData()
     {
         // Arrange
-        var handler = new GetEfficiencyIndicators.Handler(CreateMock(), CreateConfigMock());
+        var handler = new GetEfficiencyIndicators.Handler(CreateMock(), CreateConfigMock(), CreateClockMock());
         var query = new GetEfficiencyIndicators.Query();
 
         // Act
@@ -333,7 +341,7 @@ public sealed class FinOpsFeatureTests
         mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<CostRecordSummary>());
 
-        var handler = new GetEfficiencyIndicators.Handler(mock, CreateConfigMock());
+        var handler = new GetEfficiencyIndicators.Handler(mock, CreateConfigMock(), CreateClockMock());
         var query = new GetEfficiencyIndicators.Query();
 
         // Act
@@ -350,7 +358,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetEfficiencyIndicators_ServicesShouldHaveMetrics()
     {
         // Arrange
-        var handler = new GetEfficiencyIndicators.Handler(CreateMock(), CreateConfigMock());
+        var handler = new GetEfficiencyIndicators.Handler(CreateMock(), CreateConfigMock(), CreateClockMock());
 
         // Act
         var result = await handler.Handle(new GetEfficiencyIndicators.Query(), CancellationToken.None);

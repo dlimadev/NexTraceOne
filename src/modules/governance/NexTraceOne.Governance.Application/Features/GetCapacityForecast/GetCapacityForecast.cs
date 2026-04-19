@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
@@ -22,6 +23,7 @@ public static class GetCapacityForecast
     /// </summary>
     public sealed class Handler(
         IRuntimeIntelligenceModule runtimeModule,
+        IDateTimeProvider clock,
         ILogger<Handler> logger) : IQueryHandler<Query, CapacityForecastResponse>
     {
         public async Task<Result<CapacityForecastResponse>> Handle(Query request, CancellationToken cancellationToken)
@@ -36,6 +38,9 @@ public static class GetCapacityForecast
                 logger.LogWarning(ex, "Failed to read platform runtime metrics for capacity forecast — falling back to estimates.");
             }
 
+            var utcNow = clock.UtcNow;
+            var forecastDate = utcNow.AddDays(30);
+
             List<CapacityForecastDto> forecasts;
             string? simulatedNote;
 
@@ -43,13 +48,13 @@ public static class GetCapacityForecast
             {
                 forecasts =
                 [
-                    BuildForecast("CPU", metrics.CurrentCpuPct, metrics.ForecastedCpuPct, metrics.CpuTrend),
-                    BuildForecast("Memory", metrics.CurrentMemoryPct, metrics.ForecastedMemoryPct, metrics.MemoryTrend),
+                    BuildForecast("CPU", metrics.CurrentCpuPct, metrics.ForecastedCpuPct, metrics.CpuTrend, forecastDate),
+                    BuildForecast("Memory", metrics.CurrentMemoryPct, metrics.ForecastedMemoryPct, metrics.MemoryTrend, forecastDate),
                     // Disk and DB connections have no telemetry source yet — keep estimated
                     new("Disk", CurrentUsagePct: 34, ForecastedUsagePct: 41,
-                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                        ForecastedAt: forecastDate, Trend: "stable", Risk: "Low"),
                     new("DatabaseConnections", CurrentUsagePct: 22, ForecastedUsagePct: 30,
-                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                        ForecastedAt: forecastDate, Trend: "stable", Risk: "Low"),
                 ];
                 simulatedNote = null;
             }
@@ -58,13 +63,13 @@ public static class GetCapacityForecast
                 forecasts =
                 [
                     new("CPU", CurrentUsagePct: 42, ForecastedUsagePct: 58,
-                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "increasing", Risk: "Low"),
+                        ForecastedAt: forecastDate, Trend: "increasing", Risk: "Low"),
                     new("Memory", CurrentUsagePct: 61, ForecastedUsagePct: 75,
-                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "increasing", Risk: "Medium"),
+                        ForecastedAt: forecastDate, Trend: "increasing", Risk: "Medium"),
                     new("Disk", CurrentUsagePct: 34, ForecastedUsagePct: 41,
-                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                        ForecastedAt: forecastDate, Trend: "stable", Risk: "Low"),
                     new("DatabaseConnections", CurrentUsagePct: 22, ForecastedUsagePct: 30,
-                        ForecastedAt: DateTimeOffset.UtcNow.AddDays(30), Trend: "stable", Risk: "Low"),
+                        ForecastedAt: forecastDate, Trend: "stable", Risk: "Low"),
                 ];
                 simulatedNote = "Capacity forecasts are estimated. No runtime snapshots found in the observability pipeline yet.";
             }
@@ -72,8 +77,8 @@ public static class GetCapacityForecast
             var response = new CapacityForecastResponse(
                 Forecasts: forecasts,
                 AnalysisWeeks: 4,
-                NextReviewDate: DateTimeOffset.UtcNow.AddDays(30),
-                GeneratedAt: DateTimeOffset.UtcNow,
+                NextReviewDate: forecastDate,
+                GeneratedAt: utcNow,
                 SimulatedNote: simulatedNote);
 
             return Result<CapacityForecastResponse>.Success(response);
@@ -83,7 +88,8 @@ public static class GetCapacityForecast
             string resource,
             double current,
             double forecasted,
-            string trend)
+            string trend,
+            DateTimeOffset forecastDate)
         {
             var risk = forecasted switch
             {
@@ -97,7 +103,7 @@ public static class GetCapacityForecast
                 Resource: resource,
                 CurrentUsagePct: Math.Round(current, 1),
                 ForecastedUsagePct: Math.Round(forecasted, 1),
-                ForecastedAt: DateTimeOffset.UtcNow.AddDays(30),
+                ForecastedAt: forecastDate,
                 Trend: trend,
                 Risk: risk);
         }

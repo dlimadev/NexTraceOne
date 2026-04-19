@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -18,7 +19,7 @@ public static class GetObservabilityMode
     public sealed record UpdateObservabilityMode(string Mode) : ICommand<ObservabilityModeConfigResponse>;
 
     /// <summary>Handler de leitura do modo de observabilidade.</summary>
-    public sealed class Handler(IConfiguration configuration) : IQueryHandler<Query, ObservabilityModeConfigResponse>
+    public sealed class Handler(IConfiguration configuration, IDateTimeProvider clock) : IQueryHandler<Query, ObservabilityModeConfigResponse>
     {
         public Task<Result<ObservabilityModeConfigResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -43,14 +44,14 @@ public static class GetObservabilityMode
                 OtelCollectorConnected: otelCollector,
                 AdditionalRamUsageGb: mode == "Full" ? 4.0 : mode == "Lite" ? 1.5 : 0.5,
                 TradeOffs: tradeOffs,
-                UpdatedAt: DateTimeOffset.UtcNow);
+                UpdatedAt: clock.UtcNow);
 
             return Task.FromResult(Result<ObservabilityModeConfigResponse>.Success(response));
         }
     }
 
     /// <summary>Handler de atualização do modo de observabilidade.</summary>
-    public sealed class UpdateHandler : ICommandHandler<UpdateObservabilityMode, ObservabilityModeConfigResponse>
+    public sealed class UpdateHandler(IDateTimeProvider clock) : ICommandHandler<UpdateObservabilityMode, ObservabilityModeConfigResponse>
     {
         public Task<Result<ObservabilityModeConfigResponse>> Handle(UpdateObservabilityMode request, CancellationToken cancellationToken)
         {
@@ -69,7 +70,7 @@ public static class GetObservabilityMode
                 OtelCollectorConnected: false,
                 AdditionalRamUsageGb: request.Mode == "Full" ? 4.0 : request.Mode == "Lite" ? 1.5 : 0.5,
                 TradeOffs: tradeOffs,
-                UpdatedAt: DateTimeOffset.UtcNow);
+                UpdatedAt: clock.UtcNow);
 
             return Task.FromResult(Result<ObservabilityModeConfigResponse>.Success(response));
         }
