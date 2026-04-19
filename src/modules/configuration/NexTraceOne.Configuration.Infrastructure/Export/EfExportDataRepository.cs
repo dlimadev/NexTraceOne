@@ -11,6 +11,8 @@ namespace NexTraceOne.Configuration.Infrastructure.Export;
 /// </summary>
 internal sealed class EfExportDataRepository(ConfigurationDbContext context) : IExportDataRepository
 {
+    /// <summary>Número máximo de linhas retornadas por exportação síncrona.</summary>
+    private const int MaxExportRows = 5000;
     public async Task<IReadOnlyList<IReadOnlyDictionary<string, object?>>> GetExportRowsAsync(
         string entity,
         string[]? columns,
@@ -32,7 +34,7 @@ internal sealed class EfExportDataRepository(ConfigurationDbContext context) : I
         var rows = await context.AuditEntries
             .AsNoTracking()
             .OrderByDescending(e => e.ChangedAt)
-            .Take(5000)
+            .Take(MaxExportRows)
             .Select(e => new
             {
                 id = (object?)e.Id.Value,
@@ -66,7 +68,7 @@ internal sealed class EfExportDataRepository(ConfigurationDbContext context) : I
         var rows = await context.ContractTemplates
             .AsNoTracking()
             .OrderByDescending(t => t.CreatedAt)
-            .Take(5000)
+            .Take(MaxExportRows)
             .Select(t => new
             {
                 id = (object?)t.Id.Value,
@@ -96,7 +98,7 @@ internal sealed class EfExportDataRepository(ConfigurationDbContext context) : I
         var rows = await context.ScheduledReports
             .AsNoTracking()
             .OrderByDescending(r => r.CreatedAt)
-            .Take(5000)
+            .Take(MaxExportRows)
             .Select(r => new
             {
                 id = (object?)r.Id.Value,

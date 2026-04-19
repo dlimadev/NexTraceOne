@@ -10,6 +10,9 @@ public interface IReleaseRepository
     /// <summary>Busca uma Release pelo seu identificador.</summary>
     Task<Release?> GetByIdAsync(ReleaseId id, CancellationToken cancellationToken = default);
 
+    /// <summary>Busca múltiplas Releases por lista de identificadores (batch).</summary>
+    Task<IReadOnlyList<Release>> ListByIdsAsync(IEnumerable<ReleaseId> ids, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Busca uma release pela chave natural do sistema de origem externo.
     /// Permite que consumidores externos (Jenkins, GitHub, Azure DevOps) consultem

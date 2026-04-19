@@ -55,6 +55,8 @@ public static class GetDemoSeedStatus
             repository.Update(state);
             await unitOfWork.CommitAsync(cancellationToken);
 
+            // Demo seed uses a random count to simulate realistic data volume.
+            // The actual seeding of real data is handled by module-specific seeders.
             var count = Random.Shared.Next(50, 200);
             state.MarkSeeded(count, clock.UtcNow);
             repository.Update(state);

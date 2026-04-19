@@ -66,9 +66,15 @@ public static class ListPromotionRequests
                 .ToList();
 
             var items = new List<PromotionRequestItem>(paged.Count);
+
+            // Batch fetch all releases for the page to avoid N+1 queries
+            var releaseIds = paged.Select(r => ReleaseId.From(r.ReleaseId));
+            var releases = await releaseRepository.ListByIdsAsync(releaseIds, cancellationToken);
+            var releaseMap = releases.ToDictionary(r => r.Id.Value);
+
             foreach (var r in paged)
             {
-                var release = await releaseRepository.GetByIdAsync(ReleaseId.From(r.ReleaseId), cancellationToken);
+                releaseMap.TryGetValue(r.ReleaseId, out var release);
                 items.Add(new PromotionRequestItem(
                     r.Id.Value,
                     r.ReleaseId,

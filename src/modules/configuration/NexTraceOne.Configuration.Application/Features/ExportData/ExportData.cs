@@ -1,5 +1,6 @@
 using FluentValidation;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -38,7 +39,7 @@ public static class ExportData
     }
 
     /// <summary>Handler que gera o ficheiro de exportação no formato solicitado.</summary>
-    public sealed class Handler(IExportDataRepository repository) : ICommandHandler<Command, ExportResult>
+    public sealed class Handler(IExportDataRepository repository, IDateTimeProvider clock) : ICommandHandler<Command, ExportResult>
     {
         public async Task<Result<ExportResult>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -46,7 +47,7 @@ public static class ExportData
 
             byte[] content;
             string contentType;
-            string fileName = $"{request.Entity}_{DateTimeOffset.UtcNow:yyyyMMdd_HHmmss}";
+            string fileName = $"{request.Entity}_{clock.UtcNow:yyyyMMdd_HHmmss}";
 
             if (request.Format.Equals("json", StringComparison.OrdinalIgnoreCase))
             {
