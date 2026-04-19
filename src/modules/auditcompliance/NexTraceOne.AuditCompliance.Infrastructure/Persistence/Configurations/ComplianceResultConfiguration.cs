@@ -41,5 +41,13 @@ internal sealed class ComplianceResultConfiguration : IEntityTypeConfiguration<C
         builder.HasIndex(x => x.CampaignId);
         builder.HasIndex(x => x.Outcome);
         builder.HasIndex(x => x.EvaluatedAt);
+
+        // FK: ComplianceResult.PolicyId → CompliancePolicy.Id
+        // Garante integridade referencial — sem resultados órfãos.
+        builder.HasOne<NexTraceOne.AuditCompliance.Domain.Entities.CompliancePolicy>()
+            .WithMany()
+            .HasForeignKey(x => x.PolicyId)
+            .HasConstraintName("FK_aud_compliance_results_aud_compliance_policies_PolicyId")
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

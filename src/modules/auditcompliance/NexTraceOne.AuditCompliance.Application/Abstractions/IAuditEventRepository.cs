@@ -38,6 +38,31 @@ public interface IAuditEventRepository
         CancellationToken cancellationToken);
 
     /// <summary>
+    /// Conta o total de eventos correspondentes aos filtros (sem paginação).
+    /// Usado para calcular TotalCount e TotalPages na resposta paginada.
+    /// </summary>
+    Task<int> CountAsync(
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Conta o total de eventos com filtros de recurso (sem paginação).
+    /// </summary>
+    Task<int> CountWithResourceAsync(
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
+        string? resourceType,
+        string? resourceId,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        CancellationToken cancellationToken);
+
+    /// <summary>
     /// Remove eventos auditáveis anteriores ao cutoff (para aplicar política de retenção).
     /// P7.4 — operação de retenção real sobre aud_audit_events.
     /// Retorna o número de eventos eliminados.

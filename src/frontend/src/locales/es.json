@@ -848,7 +848,14 @@
     "timestamp": "Fecha/Hora",
     "title": "Registro de Auditoría",
     "toDate": "Hasta",
-    "verifyIntegrity": "Verificar Integridad"
+    "verifyIntegrity": "Verificar Integridad",
+    "integrityValid": "Cadena de hash válida. Todos los {{count}} eventos verificados.",
+    "integrityViolation": "Violación de integridad detectada. {{count}} problema(s) encontrado(s).",
+    "integrityTruncated": "(truncada en la secuencia {{seq}})",
+    "resourceType": "Tipo de Recurso",
+    "resourceTypePlaceholder": "Filtrar por tipo de recurso (ej: Release)",
+    "resourceId": "ID del Recurso",
+    "resourceIdPlaceholder": "Filtrar por ID del recurso"
   },
   "auth": {
     "capChangeIntelligence": "Inteligencia de cambios y análisis de impacto",

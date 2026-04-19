@@ -2,6 +2,7 @@ using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.AuditCompliance.Application.Features.GenerateAuditReadyReport;
 using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.AuditCompliance.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AuditCompliance.Tests.Application.Features;
 
@@ -16,11 +17,18 @@ public sealed class GenerateAuditReadyReportTests
 {
     private readonly IAuditEventRepository _auditEventRepository = Substitute.For<IAuditEventRepository>();
     private readonly IComplianceResultRepository _complianceResultRepository = Substitute.For<IComplianceResultRepository>();
+    private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
+    private static readonly DateTimeOffset FixedNow = new(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
     private readonly Guid _tenantId = Guid.NewGuid();
 
+    public GenerateAuditReadyReportTests()
+    {
+        _clock.UtcNow.Returns(FixedNow);
+    }
+
     private GenerateAuditReadyReport.Handler CreateHandler() =>
-        new(_auditEventRepository, _complianceResultRepository);
+        new(_auditEventRepository, _complianceResultRepository, _clock);
 
     // ── Validation ─────────────────────────────────────────────────────────
 
@@ -243,5 +251,26 @@ public sealed class GenerateAuditReadyReportTests
             AuditEvent.Record("ChangeGovernance", "ChangeApproved", "chg-1", "Change", "tech-lead@org.com",
                 baseTime.AddDays(4), tenantId),
         };
+    }
+
+    [Fact]
+    public async Task GenerateAuditReadyReport_ShouldUseIDateTimeProviderForGeneratedAt()
+    {
+        var from = FixedNow.AddDays(-7);
+        var to = FixedNow;
+
+        _auditEventRepository.SearchAsync(Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Any<DateTimeOffset?>(), Arg.Any<DateTimeOffset?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(BuildSampleEvents(from));
+        _complianceResultRepository.ListAsync(Arg.Any<CompliancePolicyId?>(), Arg.Any<AuditCampaignId?>(), Arg.Any<ComplianceOutcome?>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ComplianceResult>());
+
+        var handler = CreateHandler();
+        var result = await handler.Handle(
+            new GenerateAuditReadyReport.Query(_tenantId, from, to, "JSON"), CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.GeneratedAt.Should().Be(FixedNow,
+            "GeneratedAt should come from IDateTimeProvider, not DateTimeOffset.UtcNow");
     }
 }

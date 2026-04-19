@@ -238,7 +238,7 @@ public sealed class ComplianceAsCodeTests
             .Returns(new List<ComplianceResult>().AsReadOnly());
 
         var handler = new ExportComplianceEvidences.Handler(
-            _policyRepository, _resultRepository, _auditEventRepository);
+            _policyRepository, _resultRepository, _auditEventRepository, _dateTimeProvider);
         var query = new ExportComplianceEvidences.Query(_tenantId, null, null, null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -264,7 +264,7 @@ public sealed class ComplianceAsCodeTests
             .Returns(new List<ComplianceResult> { soc2Result }.AsReadOnly());
 
         var handler = new ExportComplianceEvidences.Handler(
-            _policyRepository, _resultRepository, _auditEventRepository);
+            _policyRepository, _resultRepository, _auditEventRepository, _dateTimeProvider);
         var query = new ExportComplianceEvidences.Query(_tenantId, "SOC2", null, null, null);
 
         var result = await handler.Handle(query, CancellationToken.None);

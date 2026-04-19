@@ -15,6 +15,8 @@ export function AuditPage() {
   const [eventTypeFilter, setEventTypeFilter] = useState('');
   const [sourceModuleFilter, setSourceModuleFilter] = useState('');
   const [correlationFilter, setCorrelationFilter] = useState('');
+  const [resourceTypeFilter, setResourceTypeFilter] = useState('');
+  const [resourceIdFilter, setResourceIdFilter] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [isExporting, setIsExporting] = useState(false);
@@ -24,7 +26,7 @@ export function AuditPage() {
   const toIso = toDate ? new Date(toDate).toISOString() : undefined;
 
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
-    queryKey: ['audit', 'events', page, eventTypeFilter, sourceModuleFilter, correlationFilter, fromDate, toDate],
+    queryKey: ['audit', 'events', page, eventTypeFilter, sourceModuleFilter, correlationFilter, resourceTypeFilter, resourceIdFilter, fromDate, toDate],
     queryFn: () =>
       auditApi.listEvents({
         page,
@@ -32,6 +34,8 @@ export function AuditPage() {
         eventType: eventTypeFilter || undefined,
         sourceModule: sourceModuleFilter || undefined,
         correlationId: correlationFilter || undefined,
+        resourceType: resourceTypeFilter || undefined,
+        resourceId: resourceIdFilter || undefined,
         from: fromIso,
         to: toIso,
       }),
@@ -43,6 +47,21 @@ export function AuditPage() {
     queryFn: () => auditApi.verifyIntegrity(),
     enabled: false,
   });
+
+  // Build integrity message from structured data using i18n keys
+  const integrityMessage = integrity
+    ? integrity.valid
+      ? t('audit.integrityValid', {
+          count: integrity.totalLinks,
+          defaultValue: `Hash chain is valid. All ${integrity.totalLinks} events verified.`,
+        }) + (integrity.isTruncated
+          ? ` ${t('audit.integrityTruncated', { seq: integrity.truncatedAtSequence ?? t('common.unknown'), defaultValue: `(truncated at sequence ${integrity.truncatedAtSequence ?? 'unknown'})` })}`
+          : '')
+      : t('audit.integrityViolation', {
+          count: integrity.violations.length,
+          defaultValue: `Integrity violation detected. ${integrity.violations.length} issue(s) found.`,
+        })
+    : null;
 
   const handleExport = async () => {
     const now = new Date();
@@ -109,7 +128,7 @@ export function AuditPage() {
             <XCircle size={16} className="text-critical shrink-0" />
           )}
           <p className={`text-sm ${integrity.valid ? 'text-success' : 'text-critical'}`}>
-            {integrity.message}
+            {integrityMessage}
           </p>
         </div>
       )}
@@ -152,6 +171,28 @@ export function AuditPage() {
                 placeholder={t('audit.correlationIdPlaceholder')}
                 aria-label={t('audit.correlationIdPlaceholder')}
                 className="min-w-[180px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
+              />
+              <input
+                type="text"
+                value={resourceTypeFilter}
+                onChange={(e) => {
+                  setResourceTypeFilter(e.target.value);
+                  setPage(1);
+                }}
+                placeholder={t('audit.resourceTypePlaceholder')}
+                aria-label={t('audit.resourceTypePlaceholder')}
+                className="min-w-[150px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
+              />
+              <input
+                type="text"
+                value={resourceIdFilter}
+                onChange={(e) => {
+                  setResourceIdFilter(e.target.value);
+                  setPage(1);
+                }}
+                placeholder={t('audit.resourceIdPlaceholder')}
+                aria-label={t('audit.resourceIdPlaceholder')}
+                className="min-w-[150px] flex-1 text-sm bg-transparent text-heading placeholder:text-muted focus:outline-none"
               />
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted">{t('audit.fromDate')}</span>
