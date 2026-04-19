@@ -167,6 +167,52 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_pan_analytics_events_module", "\"Module\" IN ('Dashboard','ServiceCatalog','SourceOfTruth','ContractStudio','ChangeIntelligence','Incidents','Reliability','Runbooks','AiAssistant','Governance','ExecutiveViews','FinOps','IntegrationHub','DeveloperPortal','Admin','Automation','Search')");
                         });
                 });
+
+            modelBuilder.Entity("NexTraceOne.ProductAnalytics.Domain.Entities.JourneyDefinition", b =>
+                {
+                    b.Property<NexTraceOne.ProductAnalytics.Domain.Entities.JourneyDefinitionId>("Id")
+                        .HasConversion<Guid>()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("StepsJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamptz");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "IsActive")
+                        .HasDatabaseName("IX_pan_journey_definitions_TenantId_IsActive");
+
+                    b.HasIndex("TenantId", "Key")
+                        .IsUnique()
+                        .HasDatabaseName("UX_pan_journey_definitions_TenantId_Key");
+
+                    b.ToTable("pan_journey_definitions");
+                });
 #pragma warning restore 612, 618
         }
     }

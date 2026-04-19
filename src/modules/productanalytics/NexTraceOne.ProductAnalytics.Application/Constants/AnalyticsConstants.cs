@@ -71,4 +71,10 @@ public static class AnalyticsConstants
 
     /// <summary>Número máximo de dias permitidos numa janela de consulta.</summary>
     public const int MaxRangeDays = 180;
+
+    /// <summary>Número de períodos por defeito numa análise de cohorts.</summary>
+    public const int DefaultCohortPeriods = 8;
+
+    /// <summary>Número máximo de períodos numa análise de cohorts.</summary>
+    public const int MaxCohortPeriods = 24;
 }

@@ -22,6 +22,9 @@ public sealed class ProductAnalyticsDbContext(
     /// <summary>Eventos de product analytics (extraído de GovernanceDbContext em P2.3).</summary>
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
 
+    /// <summary>Definições de jornadas configuráveis (globais e por tenant).</summary>
+    public DbSet<JourneyDefinition> JourneyDefinitions => Set<JourneyDefinition>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ProductAnalyticsDbContext).Assembly;
 

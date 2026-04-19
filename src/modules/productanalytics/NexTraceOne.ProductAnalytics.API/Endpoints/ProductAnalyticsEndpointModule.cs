@@ -15,6 +15,11 @@ using GetFrictionIndicatorsFeature = NexTraceOne.ProductAnalytics.Application.Fe
 using GetAdoptionFunnelFeature = NexTraceOne.ProductAnalytics.Application.Features.GetAdoptionFunnel.GetAdoptionFunnel;
 using GetFeatureHeatmapFeature = NexTraceOne.ProductAnalytics.Application.Features.GetFeatureHeatmap.GetFeatureHeatmap;
 using ExportAnalyticsDataFeature = NexTraceOne.ProductAnalytics.Application.Features.ExportAnalyticsData.ExportAnalyticsData;
+using GetCohortAnalysisFeature = NexTraceOne.ProductAnalytics.Application.Features.GetCohortAnalysis.GetCohortAnalysis;
+using ListJourneyDefinitionsFeature = NexTraceOne.ProductAnalytics.Application.Features.ListJourneyDefinitions.ListJourneyDefinitions;
+using CreateJourneyDefinitionFeature = NexTraceOne.ProductAnalytics.Application.Features.CreateJourneyDefinition.CreateJourneyDefinition;
+using UpdateJourneyDefinitionFeature = NexTraceOne.ProductAnalytics.Application.Features.UpdateJourneyDefinition.UpdateJourneyDefinition;
+using DeleteJourneyDefinitionFeature = NexTraceOne.ProductAnalytics.Application.Features.DeleteJourneyDefinition.DeleteJourneyDefinition;
 
 namespace NexTraceOne.ProductAnalytics.API.Endpoints;
 
@@ -285,175 +290,87 @@ public sealed class ProductAnalyticsEndpointModule
         .RequirePermission("analytics:read")
         .WithSummary("Export analytics summary")
         .WithDescription("Exports a consolidated analytics summary (total events, unique users, value/friction scores, top modules) in CSV or JSON format.");
-    }
-}
-
-
-namespace NexTraceOne.ProductAnalytics.API.Endpoints;
-
-/// <summary>
-/// Endpoints de Product Analytics — disponibiliza métricas de adoção, valor, fricção, jornadas e milestones.
-/// Analytics orientados a decisão de produto, não a vanity metrics.
-/// Privacy-aware: sem coleta excessiva de PII.
-/// </summary>
-public sealed class ProductAnalyticsEndpointModule
-{
-    /// <summary>Registra endpoints de product analytics no roteador do ASP.NET Core.</summary>
-    public static void MapEndpoints(IEndpointRouteBuilder app)
-    {
-        var group = app.MapGroup("/api/v1/product-analytics");
 
         // ────────────────────────────────────────
-        // Evento de analytics
+        // Análise de cohorts (FEAT-05)
         // ────────────────────────────────────────
 
-        group.MapPost("/events", async (
-            RecordAnalyticsEventFeature.Command command,
+        group.MapGet("/cohorts", async (
+            string? granularity,
+            int? periods,
+            string? metric,
+            string? persona,
+            string? range,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetCohortAnalysisFeature.Query(granularity, periods, metric, persona, range);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("analytics:read")
+        .WithSummary("Get cohort analysis")
+        .WithDescription("Groups users by date of first event and computes retention/activation rates per cohort. Supports granularity=week|month, periods=1-24, metric=retention|activation.");
+
+        // ────────────────────────────────────────
+        // Configuração de jornadas (FEAT-03)
+        // ────────────────────────────────────────
+
+        var configGroup = group.MapGroup("/config/journeys")
+            .WithTags("ProductAnalytics");
+
+        configGroup.MapGet("/", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListJourneyDefinitionsFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("analytics:read")
+        .WithSummary("List journey definitions")
+        .WithDescription("Returns active journey definitions for the current tenant, merged with global platform defaults.");
+
+        configGroup.MapPost("/", async (
+            CreateJourneyDefinitionFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:write").RequireRateLimiting("data-intensive");
+        })
+        .RequirePermission("analytics:configure")
+        .WithSummary("Create journey definition")
+        .WithDescription("Creates a new journey/funnel definition. Key must be unique per scope (tenant or global). Steps JSON: [{stepId, stepName, eventType}].");
 
-        // ────────────────────────────────────────
-        // Resumo consolidado
-        // ────────────────────────────────────────
-
-        group.MapGet("/summary", async (
-            string? persona,
-            string? module,
-            string? teamId,
-            string? domainId,
-            string? range,
+        configGroup.MapPut("/{id:guid}", async (
+            Guid id,
+            UpdateJourneyDefinitionFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetAnalyticsSummaryFeature.Query(persona, module, teamId, domainId, range);
-            var result = await sender.Send(query, cancellationToken);
+            var effectiveCommand = command with { Id = id };
+            var result = await sender.Send(effectiveCommand, cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
+        })
+        .RequirePermission("analytics:configure")
+        .WithSummary("Update journey definition")
+        .WithDescription("Updates the name, steps and active state of a journey definition. Key is immutable after creation.");
 
-        // ────────────────────────────────────────
-        // Adoção por módulo
-        // ────────────────────────────────────────
-
-        group.MapGet("/adoption/modules", async (
-            string? persona,
-            string? teamId,
-            string? range,
+        configGroup.MapDelete("/{id:guid}", async (
+            Guid id,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var query = new GetModuleAdoptionFeature.Query(persona, teamId, range);
-            var result = await sender.Send(query, cancellationToken);
+            var result = await sender.Send(new DeleteJourneyDefinitionFeature.Command(id), cancellationToken);
             return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
-
-        // ────────────────────────────────────────
-        // Uso por persona
-        // ────────────────────────────────────────
-
-        group.MapGet("/adoption/personas", async (
-            string? persona,
-            string? teamId,
-            string? range,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var query = new GetPersonaUsageFeature.Query(persona, teamId, range);
-            var result = await sender.Send(query, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
-
-        // ────────────────────────────────────────
-        // Jornadas e funis
-        // ────────────────────────────────────────
-
-        group.MapGet("/journeys", async (
-            string? journeyId,
-            string? persona,
-            string? range,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var query = new GetJourneysFeature.Query(journeyId, persona, range);
-            var result = await sender.Send(query, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
-
-        // ────────────────────────────────────────
-        // Marcos de valor
-        // ────────────────────────────────────────
-
-        group.MapGet("/value-milestones", async (
-            string? persona,
-            string? teamId,
-            string? range,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var query = new GetValueMilestonesFeature.Query(persona, teamId, range);
-            var result = await sender.Send(query, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
-
-        // ────────────────────────────────────────
-        // Indicadores de fricção
-        // ────────────────────────────────────────
-
-        group.MapGet("/friction", async (
-            string? persona,
-            string? module,
-            string? range,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var query = new GetFrictionIndicatorsFeature.Query(persona, module, range);
-            var result = await sender.Send(query, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
-
-        // ────────────────────────────────────────
-        // Funil de adoção por módulo
-        // ────────────────────────────────────────
-
-        group.MapGet("/adoption/funnel", async (
-            string? module,
-            string? persona,
-            string? teamId,
-            string? range,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var query = new GetAdoptionFunnelFeature.Query(module, persona, teamId, range);
-            var result = await sender.Send(query, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
-
-        // ────────────────────────────────────────
-        // Mapa de calor de adoção de funcionalidades
-        // ────────────────────────────────────────
-
-        group.MapGet("/heatmap", async (
-            string? persona,
-            string? teamId,
-            string? range,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var query = new GetFeatureHeatmapFeature.Query(persona, teamId, range);
-            var result = await sender.Send(query, cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("analytics:read");
+        })
+        .RequirePermission("analytics:configure")
+        .WithSummary("Delete journey definition")
+        .WithDescription("Permanently removes a tenant-owned journey definition. Global platform definitions cannot be deleted.");
     }
 }
