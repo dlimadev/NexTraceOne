@@ -108,6 +108,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Bundles de suporte gerados pela plataforma.</summary>
     public DbSet<SupportBundle> SupportBundles => Set<SupportBundle>();
 
+    /// <summary>Jobs de recovery de dados iniciados via plataforma.</summary>
+    public DbSet<RecoveryJob> RecoveryJobs => Set<RecoveryJob>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

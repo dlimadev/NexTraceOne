@@ -68,6 +68,10 @@ public static class DependencyInjection
         // Canary Provider — NullCanaryProvider por default; substituir por implementação real quando sistema canary estiver disponível
         services.AddSingleton<ICanaryProvider, NullCanaryProvider>();
 
+        // Backup Provider — NullBackupProvider por default; substituir por implementação real (pg_dump, pgBackRest, Barman)
+        // quando sistema de backup estiver configurado no ambiente.
+        services.AddSingleton<IBackupProvider, NullBackupProvider>();
+
         return services;
     }
 }

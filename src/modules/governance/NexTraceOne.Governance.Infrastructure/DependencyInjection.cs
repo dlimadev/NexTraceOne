@@ -107,6 +107,7 @@ public static class DependencyInjection
 
         // Support Bundles — geração real de bundles de diagnóstico
         services.AddScoped<ISupportBundleRepository, SupportBundleRepository>();
+        services.AddScoped<IRecoveryJobRepository, RecoveryJobRepository>();
 
         // HTTP Audit Reader — consulta IObservabilityProvider para auditoria de chamadas HTTP externas
         services.AddScoped<IHttpAuditReader, ObservabilityHttpAuditReader>();

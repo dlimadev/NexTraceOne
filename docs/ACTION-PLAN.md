@@ -25,7 +25,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-001 — PromotionPage: `serviceName` usa `releaseId` como fallback incorreto
+### ACT-001 — PromotionPage: `serviceName` usa `releaseId` como fallback incorreto ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/frontend/src/features/change-governance/pages/PromotionPage.tsx`  
 **Linhas:** 147–148, 174–175  
@@ -53,7 +53,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-002 — PromotionPage: custos com placeholder zero no gate FinOps
+### ACT-002 — PromotionPage: custos com placeholder zero no gate FinOps ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/frontend/src/features/change-governance/pages/PromotionPage.tsx`  
 **Linhas:** 150–151  
@@ -73,7 +73,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-003 — Export endpoint retorna 501 Not Implemented
+### ACT-003 — Export endpoint retorna 501 Not Implemented ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/configuration/NexTraceOne.Configuration.API/Endpoints/ExportEndpointModule.cs`  
 **Impacto:** Qualquer fluxo de exportação (relatórios, auditoria, contratos) retorna 501. A feature está visível no produto mas completamente não funcional.
@@ -103,7 +103,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-004 — SAML SSO: UpdateSamlSsoConfig não persiste alterações
+### ACT-004 — SAML SSO: UpdateSamlSsoConfig não persiste alterações ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetSamlSsoConfig/GetSamlSsoConfig.cs`  
 **Impacto:** Quando o Platform Admin configura SAML SSO via UI (`SamlSsoPage`), as alterações são perdidas ao reiniciar a aplicação porque `UpdateSamlSsoConfig` apenas faz echo do request sem persistir em base de dados.
@@ -132,7 +132,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-005 — GetRightsizingReport: ligar ao ICostIntelligenceModule
+### ACT-005 — GetRightsizingReport: ligar ao ICostIntelligenceModule ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetRightsizingReport/GetRightsizingReport.cs`  
 **Estado atual:** Retorna lista vazia com `SimulatedNote`.  
@@ -150,7 +150,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-006 — GetCapacityForecast: ligar ao ITelemetryQueryService
+### ACT-006 — GetCapacityForecast: ligar ao ITelemetryQueryService ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetCapacityForecast/GetCapacityForecast.cs`  
 **Estado atual:** Valores fixos hardcoded (CPU 42%, Memory 61%, etc.).  
@@ -169,7 +169,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-007 — GetNonProdSchedules: persistir agendas em base de dados
+### ACT-007 — GetNonProdSchedules: persistir agendas em base de dados ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetNonProdSchedules/GetNonProdSchedules.cs`  
 **Estado atual:** Retorna lista hardcoded em memória com ambientes "staging" e "qa" fixos.
@@ -188,7 +188,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-008 — GetDemoSeedStatus: substituir static field por persistência real
+### ACT-008 — GetDemoSeedStatus: substituir static field por persistência real ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetDemoSeedStatus/GetDemoSeedStatus.cs`  
 **Estado atual:** `_state`, `_seededAt`, `_entitiesCount` são campos estáticos em memória — perdem estado ao reiniciar.  
@@ -205,7 +205,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-009 — SearchCatalog: documentar como READY (já implementado)
+### ACT-009 — SearchCatalog: documentar como READY (já implementado) ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/catalog/NexTraceOne.Catalog.Application/Portal/Features/SearchCatalog/SearchCatalog.cs`  
 **Estado atual:** Marcado como "stub intencional" na documentação — mas a análise do código revela que o handler **já está implementado** com PostgreSQL FTS/LIKE, combinando contratos e serviços com facetas.
@@ -247,7 +247,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-011 — GetCanaryRollouts: integração com sistema de canary externo
+### ACT-011 — GetCanaryRollouts: integração com sistema de canary externo ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetCanaryRollouts/GetCanaryRollouts.cs`  
 **Dependência:** Existência de sistema de canary deployment (Argo Rollouts, Flagger, LaunchDarkly, ou similar).
@@ -265,7 +265,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-012 — GetGreenOpsReport: calcular emissões com dados de telemetria reais
+### ACT-012 — GetGreenOpsReport: calcular emissões com dados de telemetria reais ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetGreenOpsReport/GetGreenOpsReport.cs`  
 **Dependência:** Dados de CPU/memória disponíveis via `IRuntimeIntelligenceModule` ou `ITelemetryQueryService`.
@@ -310,7 +310,7 @@ Este plano define a ordem de resolução recomendada, o esforço estimado por it
 
 ---
 
-### ACT-014 — GetRestorePoints: integração com sistema de backup
+### ACT-014 — GetRestorePoints: integração com sistema de backup ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetRestorePoints/GetRestorePoints.cs`  
 **Dependência:** Sistema de backup (pg_dump agendado, pgBackRest, Barman, ou similar).
@@ -454,7 +454,7 @@ dotnet ef database update --project <InfraProject> --startup-project src/platfor
 
 ---
 
-### ACT-021 — Adicionar testes unitários ao SearchCatalog.Handler
+### ACT-021 — Adicionar testes unitários ao SearchCatalog.Handler ✅ RESOLVIDO (Abril 2026)
 
 **Ficheiros:** `tests/modules/catalog/NexTraceOne.Catalog.Tests/`  
 **Estado atual:** `SearchCatalog.Handler` implementado mas sem testes dedicados.
@@ -541,27 +541,27 @@ Adicionar ao `CoreApiHostIntegrationTests.cs`:
 
 | ID | Título | Prioridade | Esforço | Dependências | Impacto |
 |---|---|---|---|---|---|
-| ACT-001 | PromotionPage: serviceName incorreto | 🔴 P1 | Médio | — | Bug visível em FinOps gate |
-| ACT-002 | PromotionPage: custos placeholder zero | 🔴 P1 | Alto | ACT-001 | Gate de budget inativo |
-| ACT-003 | Export endpoint 501 | 🔴 P1 | Alto | — | Feature completamente inativa |
-| ACT-004 | SAML write-through não persiste | 🔴 P1 | Médio-Alto | — | Configuração SSO perdida após restart |
-| ACT-005 | Rightsizing ligar a ICostIntelligenceModule | 🟡 P2 | Médio | — | Dados reais de rightsizing |
-| ACT-006 | Capacity Forecast ligar a IRuntimeIntelligenceModule | 🟡 P2 | Médio | — | Forecast baseado em dados reais |
-| ACT-007 | NonProdSchedules persistir em BD | 🟡 P2 | Médio | — | Agendas não perdidas após restart |
-| ACT-008 | DemoSeedStatus substituir campo estático | 🟡 P2 | Médio | — | Estado persistente em multi-instância |
-| ACT-009 | SearchCatalog documentar como READY | 🟢 P2 | Baixo | — | Correcção de documentação |
+| ACT-001 | PromotionPage: serviceName incorreto | ✅ DONE | Médio | — | Bug visível em FinOps gate |
+| ACT-002 | PromotionPage: custos placeholder zero | ✅ DONE | Alto | ACT-001 | Gate de budget inativo |
+| ACT-003 | Export endpoint 501 | ✅ DONE | Alto | — | Feature completamente inativa |
+| ACT-004 | SAML write-through não persiste | ✅ DONE | Médio-Alto | — | Configuração SSO perdida após restart |
+| ACT-005 | Rightsizing ligar a ICostIntelligenceModule | ✅ DONE | Médio | — | Dados reais de rightsizing |
+| ACT-006 | Capacity Forecast ligar a IRuntimeIntelligenceModule | ✅ DONE | Médio | — | Forecast baseado em dados reais |
+| ACT-007 | NonProdSchedules persistir em BD | ✅ DONE | Médio | — | Agendas não perdidas após restart |
+| ACT-008 | DemoSeedStatus substituir campo estático | ✅ DONE | Médio | — | Estado persistente em multi-instância |
+| ACT-009 | SearchCatalog documentar como READY | ✅ DONE | Baixo | — | Correcção de documentação |
 | ACT-010 | ExternalHttpAudit ligar Elasticsearch | ✅ DONE | Alto | ES ativo | Auditoria HTTP real |
-| ACT-011 | CanaryRollouts integração canary externo | 🟡 P2 | Médio | Sistema canary | Dashboard canary real |
-| ACT-012 | GreenOps calcular de telemetria real | 🟡 P2 | Alto | Telemetria histórica | ESG reporting real |
+| ACT-011 | CanaryRollouts integração canary externo | ✅ DONE | Médio | Sistema canary | Dashboard canary real |
+| ACT-012 | GreenOps calcular de telemetria real | ✅ DONE | Alto | Telemetria histórica | ESG reporting real |
 | ACT-013 | SupportBundles geração real | ✅ DONE | Alto | Storage decision | Support bundles funcionais |
-| ACT-014 | RestorePoints integração backup | 🟠 P3 | Médio | Backup system | Recovery operacional |
+| ACT-014 | RestorePoints integração backup | ✅ DONE | Médio | Backup system | Recovery operacional |
 | ACT-015 | SAML 2.0 Protocol Handlers | 🟠 P3 | Muito Alto | ACT-004 | SSO enterprise completo |
 | ACT-016 | Kafka Producer/Consumer real | 🟠 P3 | Alto | Kafka cluster | Event streaming real |
 | ACT-017 | FinOps cloud billing real | 🟠 P3 | Muito Alto | Cloud credentials | FinOps com dados cloud reais |
 | ACT-018 | Regenerar EF Core Designer files | 🟢 P4 | Baixo | PostgreSQL local | Developer tooling |
 | ACT-019 | GraphQL Contract Type | 🟢 P4 | Alto | — | Suporte a GraphQL contracts |
 | ACT-020 | Protobuf Contract Type | 🟢 P4 | Alto | — | Suporte a gRPC contracts |
-| ACT-021 | Testes SearchCatalog | 🟢 P4 | Baixo | — | Cobertura de testes |
+| ACT-021 | Testes SearchCatalog | ✅ DONE | Baixo | — | Cobertura de testes |
 | ACT-022 | Testes E2E SAML | 🟢 P4 | Médio | ACT-015 | Validação SSO |
 | ACT-023 | Testes integração Export | 🟢 P4 | Baixo | ACT-003 | Validação export |
 | ACT-024 | OpenAPI export como artefacto | 🟢 P4 | Baixo | — | Documentação pública |
