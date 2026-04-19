@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -21,7 +22,7 @@ public static class GetGracefulShutdownConfig
         bool AuditShutdownEvents) : ICommand<GracefulShutdownConfigResponse>;
 
     /// <summary>Handler de leitura da configuração de graceful shutdown.</summary>
-    public sealed class Handler(IConfiguration configuration) : IQueryHandler<Query, GracefulShutdownConfigResponse>
+    public sealed class Handler(IConfiguration configuration, IDateTimeProvider clock) : IQueryHandler<Query, GracefulShutdownConfigResponse>
     {
         public Task<Result<GracefulShutdownConfigResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -35,14 +36,14 @@ public static class GetGracefulShutdownConfig
                 OutboxDrainTimeoutSeconds: outboxDrain,
                 HealthCheckReturns503OnShutdown: health503,
                 AuditShutdownEvents: auditEvents,
-                UpdatedAt: DateTimeOffset.UtcNow);
+                UpdatedAt: clock.UtcNow);
 
             return Task.FromResult(Result<GracefulShutdownConfigResponse>.Success(response));
         }
     }
 
     /// <summary>Handler de atualização da configuração de graceful shutdown.</summary>
-    public sealed class UpdateHandler : ICommandHandler<UpdateGracefulShutdownConfig, GracefulShutdownConfigResponse>
+    public sealed class UpdateHandler(IDateTimeProvider clock) : ICommandHandler<UpdateGracefulShutdownConfig, GracefulShutdownConfigResponse>
     {
         public Task<Result<GracefulShutdownConfigResponse>> Handle(UpdateGracefulShutdownConfig request, CancellationToken cancellationToken)
         {
@@ -51,7 +52,7 @@ public static class GetGracefulShutdownConfig
                 OutboxDrainTimeoutSeconds: request.OutboxDrainTimeoutSeconds,
                 HealthCheckReturns503OnShutdown: request.HealthCheckReturns503OnShutdown,
                 AuditShutdownEvents: request.AuditShutdownEvents,
-                UpdatedAt: DateTimeOffset.UtcNow);
+                UpdatedAt: clock.UtcNow);
 
             return Task.FromResult(Result<GracefulShutdownConfigResponse>.Success(response));
         }

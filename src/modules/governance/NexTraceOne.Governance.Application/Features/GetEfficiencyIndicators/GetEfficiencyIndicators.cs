@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
@@ -36,7 +37,7 @@ public static class GetEfficiencyIndicators
         }
     }
 
-    public sealed class Handler(ICostIntelligenceModule costModule, IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
+    public sealed class Handler(ICostIntelligenceModule costModule, IConfigurationResolutionService configService, IDateTimeProvider clock) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -53,7 +54,7 @@ public static class GetEfficiencyIndicators
                     OverallEfficiencyScore: 0m,
                     ServiceCount: 0,
                     Services: Array.Empty<ServiceEfficiencyDto>(),
-                    GeneratedAt: DateTimeOffset.UtcNow,
+                    GeneratedAt: clock.UtcNow,
                     IsSimulated: false,
                     DataSource: "cost-intelligence"));
             }
@@ -112,7 +113,7 @@ public static class GetEfficiencyIndicators
                 OverallEfficiencyScore: Math.Round(overallScore, 1),
                 ServiceCount: result.Count,
                 Services: result,
-                GeneratedAt: DateTimeOffset.UtcNow,
+                GeneratedAt: clock.UtcNow,
                 IsSimulated: false,
                 DataSource: "cost-intelligence"));
         }

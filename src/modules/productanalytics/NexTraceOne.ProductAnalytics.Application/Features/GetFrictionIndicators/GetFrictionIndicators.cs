@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
@@ -21,7 +22,7 @@ public static class GetFrictionIndicators
         string? Range) : IQuery<Response>;
 
     /// <summary>Handler que calcula e retorna indicadores de fricção baseados em dados reais de analytics.</summary>
-    public sealed class Handler(IAnalyticsEventRepository analyticsRepo) : IQueryHandler<Query, Response>
+    public sealed class Handler(IAnalyticsEventRepository analyticsRepo, IDateTimeProvider clock) : IQueryHandler<Query, Response>
     {
         private static readonly (AnalyticsEventType EventType, FrictionSignalType SignalType, string Name)[] FrictionEvents =
         [
@@ -131,9 +132,9 @@ public static class GetFrictionIndicators
                 DataSource: "analytics"));
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To) ParseRange(string range)
+        private (DateTimeOffset From, DateTimeOffset To) ParseRange(string range)
         {
-            var now = DateTimeOffset.UtcNow;
+            var now = clock.UtcNow;
             var days = range switch
             {
                 "last_1d" => 1,

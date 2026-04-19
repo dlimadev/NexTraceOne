@@ -31,6 +31,10 @@ using EvaluateContinuousComplianceFeature = NexTraceOne.AuditCompliance.Applicat
 using GetComplianceDashboardFeature = NexTraceOne.AuditCompliance.Application.Features.GetComplianceDashboard.GetComplianceDashboard;
 using ExportComplianceEvidencesFeature = NexTraceOne.AuditCompliance.Application.Features.ExportComplianceEvidences.ExportComplianceEvidences;
 using GenerateAuditReadyReportFeature = NexTraceOne.AuditCompliance.Application.Features.GenerateAuditReadyReport.GenerateAuditReadyReport;
+using UpdateCompliancePolicyFeature = NexTraceOne.AuditCompliance.Application.Features.UpdateCompliancePolicy.UpdateCompliancePolicy;
+using ActivateCompliancePolicyFeature = NexTraceOne.AuditCompliance.Application.Features.ActivateCompliancePolicy.ActivateCompliancePolicy;
+using DeactivateCompliancePolicyFeature = NexTraceOne.AuditCompliance.Application.Features.DeactivateCompliancePolicy.DeactivateCompliancePolicy;
+using TransitionAuditCampaignFeature = NexTraceOne.AuditCompliance.Application.Features.TransitionAuditCampaign.TransitionAuditCampaign;
 
 namespace NexTraceOne.AuditCompliance.API.Endpoints.Endpoints;
 
@@ -203,6 +207,48 @@ public sealed class AuditEndpointModule
         })
         .RequirePermission("audit:compliance:read");
 
+        policiesGroup.MapPut("/{policyId:guid}", async (
+            Guid policyId,
+            UpdateCompliancePolicyFeature.Command body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            // Ensure route and body PolicyId are consistent
+            var command = body with { PolicyId = policyId };
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write")
+        .WithName("UpdateCompliancePolicy")
+        .WithSummary("Update an existing compliance policy's display name, description, category, severity and criteria");
+
+        policiesGroup.MapPatch("/{policyId:guid}/activate", async (
+            Guid policyId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ActivateCompliancePolicyFeature.Command(policyId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write")
+        .WithName("ActivateCompliancePolicy")
+        .WithSummary("Activate a deactivated compliance policy so it is included in continuous evaluation");
+
+        policiesGroup.MapPatch("/{policyId:guid}/deactivate", async (
+            Guid policyId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DeactivateCompliancePolicyFeature.Command(policyId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write")
+        .WithName("DeactivateCompliancePolicy")
+        .WithSummary("Deactivate a compliance policy so it is excluded from continuous evaluation");
+
         // --- Audit Campaigns ---
         var campaignsGroup = app.MapGroup("/api/v1/audit/campaigns");
 
@@ -238,6 +284,51 @@ public sealed class AuditEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("audit:compliance:read");
+
+        campaignsGroup.MapPatch("/{campaignId:guid}/start", async (
+            Guid campaignId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new TransitionAuditCampaignFeature.Command(campaignId, TransitionAuditCampaignFeature.CampaignAction.Start),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write")
+        .WithName("StartAuditCampaign")
+        .WithSummary("Start a planned audit campaign (Planned → InProgress)");
+
+        campaignsGroup.MapPatch("/{campaignId:guid}/complete", async (
+            Guid campaignId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new TransitionAuditCampaignFeature.Command(campaignId, TransitionAuditCampaignFeature.CampaignAction.Complete),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write")
+        .WithName("CompleteAuditCampaign")
+        .WithSummary("Complete an in-progress audit campaign (InProgress → Completed)");
+
+        campaignsGroup.MapPatch("/{campaignId:guid}/cancel", async (
+            Guid campaignId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new TransitionAuditCampaignFeature.Command(campaignId, TransitionAuditCampaignFeature.CampaignAction.Cancel),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("audit:compliance:write")
+        .WithName("CancelAuditCampaign")
+        .WithSummary("Cancel an audit campaign (Planned or InProgress → Cancelled)");
 
         // --- Compliance Results ---
         var resultsGroup = app.MapGroup("/api/v1/audit/compliance/results");

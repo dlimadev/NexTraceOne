@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
+using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -46,18 +47,36 @@ public static class SearchAuditLog
         {
             Guard.Against.Null(request);
 
+            IReadOnlyList<AuditEvent> events;
+            int totalCount;
+
             // Use the enriched search when ResourceType/ResourceId is provided
-            var events = (request.ResourceType is not null || request.ResourceId is not null)
-                ? await auditEventRepository.SearchWithResourceAsync(
+            if (request.ResourceType is not null || request.ResourceId is not null)
+            {
+                events = await auditEventRepository.SearchWithResourceAsync(
                     request.SourceModule, request.ActionType,
                     request.CorrelationId,
                     request.ResourceType, request.ResourceId,
                     request.From, request.To,
-                    request.Page, request.PageSize, cancellationToken)
-                : await auditEventRepository.SearchAsync(
+                    request.Page, request.PageSize, cancellationToken);
+
+                totalCount = await auditEventRepository.CountWithResourceAsync(
+                    request.SourceModule, request.ActionType,
+                    request.CorrelationId,
+                    request.ResourceType, request.ResourceId,
+                    request.From, request.To, cancellationToken);
+            }
+            else
+            {
+                events = await auditEventRepository.SearchAsync(
                     request.SourceModule, request.ActionType, request.CorrelationId,
                     request.From, request.To,
                     request.Page, request.PageSize, cancellationToken);
+
+                totalCount = await auditEventRepository.CountAsync(
+                    request.SourceModule, request.ActionType, request.CorrelationId,
+                    request.From, request.To, cancellationToken);
+            }
 
             var items = events
                 .Select(e => new AuditLogEntry(
@@ -71,12 +90,21 @@ public static class SearchAuditLog
                     e.ChainLink?.SequenceNumber))
                 .ToArray();
 
-            return new Response(items);
+            var totalPages = request.PageSize > 0
+                ? (int)Math.Ceiling((double)totalCount / request.PageSize)
+                : 0;
+
+            return new Response(items, totalCount, request.Page, request.PageSize, totalPages);
         }
     }
 
     /// <summary>Resposta da pesquisa de auditoria.</summary>
-    public sealed record Response(IReadOnlyList<AuditLogEntry> Items);
+    public sealed record Response(
+        IReadOnlyList<AuditLogEntry> Items,
+        int TotalCount,
+        int Page,
+        int PageSize,
+        int TotalPages);
 
     /// <summary>Entrada do log de auditoria.</summary>
     public sealed record AuditLogEntry(

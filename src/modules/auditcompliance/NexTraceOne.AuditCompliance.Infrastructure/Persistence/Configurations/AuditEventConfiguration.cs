@@ -37,5 +37,11 @@ internal sealed class AuditEventConfiguration : IEntityTypeConfiguration<AuditEv
         builder.HasIndex(x => x.ActionType);
         builder.HasIndex(x => x.PerformedBy);
         builder.HasIndex(x => x.CorrelationId);
+
+        // Composite indexes for common multi-column query patterns
+        builder.HasIndex(x => new { x.TenantId, x.OccurredAt })
+            .HasDatabaseName("IX_aud_audit_events_TenantId_OccurredAt");
+        builder.HasIndex(x => new { x.ResourceType, x.ResourceId })
+            .HasDatabaseName("IX_aud_audit_events_ResourceType_ResourceId");
     }
 }

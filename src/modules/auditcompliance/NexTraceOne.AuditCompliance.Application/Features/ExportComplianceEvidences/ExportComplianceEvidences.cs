@@ -3,6 +3,7 @@ using FluentValidation;
 using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.AuditCompliance.Application.Features.GetComplianceFrameworkSummary;
 using NexTraceOne.AuditCompliance.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -52,7 +53,8 @@ public static class ExportComplianceEvidences
     public sealed class Handler(
         ICompliancePolicyRepository policyRepository,
         IComplianceResultRepository resultRepository,
-        IAuditEventRepository auditEventRepository) : IQueryHandler<Query, Response>
+        IAuditEventRepository auditEventRepository,
+        IDateTimeProvider dateTimeProvider) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -118,13 +120,14 @@ public static class ExportComplianceEvidences
             var compliantCount = evidences.Count(e => e.Outcome == ComplianceOutcome.Compliant);
             var nonCompliantCount = evidences.Count(e => e.Outcome == ComplianceOutcome.NonCompliant);
 
-            var exportRef = $"AUDIT-{request.TenantId.ToString("N")[..8].ToUpperInvariant()}-{DateTimeOffset.UtcNow:yyyyMMddHHmm}";
+            var exportRef = $"AUDIT-{request.TenantId.ToString("N")[..8].ToUpperInvariant()}-{dateTimeProvider.UtcNow:yyyyMMddHHmm}";
+            var generatedAt = dateTimeProvider.UtcNow;
 
             return new Response(
                 ExportRef: exportRef,
                 TenantId: request.TenantId,
                 Framework: request.Framework,
-                GeneratedAt: DateTimeOffset.UtcNow,
+                GeneratedAt: generatedAt,
                 TotalEvidences: evidences.Count,
                 Compliant: compliantCount,
                 NonCompliant: nonCompliantCount,

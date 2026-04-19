@@ -271,7 +271,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(0L);
 
-        var handler = new GetFrictionIndicators.Handler(_repo);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
 
         // Act
         var result = await handler.Handle(
@@ -305,7 +305,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 100, 20) });
 
-        var handler = new GetFrictionIndicators.Handler(_repo);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
 
         // Act — filter by ChangeIntelligence which none of the indicators point to
         var result = await handler.Handle(
@@ -326,22 +326,21 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(1000L);
 
-        // Return 10 for current period, 100 for previous period
+        // Previous period: from < Now-30d; current period: from >= Now-30d
         _repo.CountByEventTypeAsync(
             Arg.Any<AnalyticsEventType>(), Arg.Any<string?>(),
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 var from = callInfo.ArgAt<DateTimeOffset>(2);
-                // Previous period will have an earlier 'from' date
-                return from < DateTimeOffset.UtcNow.AddDays(-31) ? 100L : 10L;
+                return from < Now.AddDays(-31) ? 100L : 10L;
             });
         _repo.GetTopModulesAsync(
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.Dashboard, 50, 10) });
 
-        var handler = new GetFrictionIndicators.Handler(_repo);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
 
         // Act
         var result = await handler.Handle(
@@ -362,21 +361,21 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(1000L);
 
-        // Return 100 for current period, 10 for previous period
+        // Previous period: from < Now-30d; current period: from >= Now-30d
         _repo.CountByEventTypeAsync(
             Arg.Any<AnalyticsEventType>(), Arg.Any<string?>(),
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(callInfo =>
             {
                 var from = callInfo.ArgAt<DateTimeOffset>(2);
-                return from < DateTimeOffset.UtcNow.AddDays(-31) ? 10L : 100L;
+                return from < Now.AddDays(-31) ? 10L : 100L;
             });
         _repo.GetTopModulesAsync(
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<string?>(),
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.Dashboard, 50, 10) });
 
-        var handler = new GetFrictionIndicators.Handler(_repo);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
 
         // Act
         var result = await handler.Handle(

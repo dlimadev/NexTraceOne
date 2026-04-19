@@ -7,6 +7,7 @@ using FluentValidation;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.AuditCompliance.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 
@@ -70,7 +71,8 @@ public static class GenerateAuditReadyReport
     /// </summary>
     public sealed class Handler(
         IAuditEventRepository auditEventRepository,
-        IComplianceResultRepository complianceResultRepository) : IQueryHandler<Query, Response>
+        IComplianceResultRepository complianceResultRepository,
+        IDateTimeProvider dateTimeProvider) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -144,6 +146,8 @@ public static class GenerateAuditReadyReport
             var reportTitle = request.Title
                 ?? $"Audit Report — {request.From:yyyy-MM-dd} to {request.To:yyyy-MM-dd}";
 
+            var generatedAt = dateTimeProvider.UtcNow;
+
             return Result<Response>.Success(new Response(
                 ReportId: Guid.NewGuid(),
                 Title: reportTitle,
@@ -151,7 +155,7 @@ public static class GenerateAuditReadyReport
                 From: request.From,
                 To: request.To,
                 Format: request.Format.ToUpperInvariant(),
-                GeneratedAt: DateTimeOffset.UtcNow,
+                GeneratedAt: generatedAt,
                 GeneratedBy: "NexTraceOne.AuditCompliance",
                 ReportVersion: ReportVersion,
                 DigitalSignature: signature,

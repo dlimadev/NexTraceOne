@@ -550,7 +550,7 @@ public sealed class UncoveredGovernanceFeaturesTests
     [Fact]
     public async Task GetRiskHeatmap_NoPacks_ShouldReturnEmptyCells()
     {
-        var handler = new GetRiskHeatmap.Handler(_packRepo, _waiverRepo, _rolloutRepo);
+        var handler = new GetRiskHeatmap.Handler(_packRepo, _waiverRepo, _rolloutRepo, _clock);
         var result = await handler.Handle(new GetRiskHeatmap.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -565,7 +565,7 @@ public sealed class UncoveredGovernanceFeaturesTests
         _packRepo.ListAsync(Arg.Any<GovernanceRuleCategory?>(), Arg.Any<GovernancePackStatus?>(), Arg.Any<CancellationToken>())
             .Returns(new[] { pack });
 
-        var handler = new GetRiskHeatmap.Handler(_packRepo, _waiverRepo, _rolloutRepo);
+        var handler = new GetRiskHeatmap.Handler(_packRepo, _waiverRepo, _rolloutRepo, _clock);
         var result = await handler.Handle(new GetRiskHeatmap.Query("category"), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();

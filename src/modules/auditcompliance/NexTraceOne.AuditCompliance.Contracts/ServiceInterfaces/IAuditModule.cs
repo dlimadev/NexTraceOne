@@ -8,7 +8,7 @@ namespace NexTraceOne.AuditCompliance.Contracts.ServiceInterfaces;
 public interface IAuditModule
 {
     /// <summary>Registra um evento de auditoria na trilha.</summary>
-    Task RecordEventAsync(string sourceModule, string actionType, string resourceId, string resourceType, string performedBy, Guid tenantId, string? payload, CancellationToken cancellationToken);
+    Task RecordEventAsync(string sourceModule, string actionType, string resourceId, string resourceType, string performedBy, Guid tenantId, string? payload, CancellationToken cancellationToken, string? correlationId = null);
 
     /// <summary>Verifica a integridade da cadeia de hash.</summary>
     Task<bool> VerifyChainIntegrityAsync(CancellationToken cancellationToken);

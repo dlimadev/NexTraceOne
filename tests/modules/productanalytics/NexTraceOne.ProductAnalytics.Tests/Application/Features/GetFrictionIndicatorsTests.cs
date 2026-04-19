@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Features.GetFrictionIndicators;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
@@ -9,9 +10,17 @@ namespace NexTraceOne.ProductAnalytics.Tests.Application.Features;
 /// </summary>
 public sealed class GetFrictionIndicatorsTests
 {
-    private readonly IAnalyticsEventRepository _repository = Substitute.For<IAnalyticsEventRepository>();
+    private static readonly DateTimeOffset FixedNow = new(2026, 4, 19, 12, 0, 0, TimeSpan.Zero);
 
-    private GetFrictionIndicators.Handler CreateHandler() => new(_repository);
+    private readonly IAnalyticsEventRepository _repository = Substitute.For<IAnalyticsEventRepository>();
+    private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+
+    public GetFrictionIndicatorsTests()
+    {
+        _clock.UtcNow.Returns(FixedNow);
+    }
+
+    private GetFrictionIndicators.Handler CreateHandler() => new(_repository, _clock);
 
     private void SetupZeroTotalEvents()
     {
@@ -123,6 +132,52 @@ public sealed class GetFrictionIndicatorsTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.PeriodLabel.Should().Be("last_7d");
+    }
+
+    [Fact]
+    public async Task GetFrictionIndicators_ParseRange_UsesClockUtcNow()
+    {
+        // Arrange — clock fixed at 2026-04-19. The handler should query from FixedNow-30d to FixedNow.
+        var expectedFrom = FixedNow.AddDays(-30);
+        SetupZeroTotalEvents();
+
+        var handler = CreateHandler();
+        var query = new GetFrictionIndicators.Query(null, null, null); // default last_30d
+
+        // Act
+        await handler.Handle(query, CancellationToken.None);
+
+        // Assert — CountAsync must have been called with the window derived from clock.UtcNow
+        await _repository.Received(1).CountAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Is<DateTimeOffset>(d => d == expectedFrom),
+            Arg.Is<DateTimeOffset>(d => d == FixedNow),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData("last_1d", 1)]
+    [InlineData("last_7d", 7)]
+    [InlineData("last_30d", 30)]
+    [InlineData("last_90d", 90)]
+    public async Task GetFrictionIndicators_ParseRange_CorrectWindowForEachRange(string range, int days)
+    {
+        // Arrange
+        var expectedFrom = FixedNow.AddDays(-days);
+        SetupZeroTotalEvents();
+
+        var handler = CreateHandler();
+        var query = new GetFrictionIndicators.Query(null, null, range);
+
+        // Act
+        await handler.Handle(query, CancellationToken.None);
+
+        // Assert — CountAsync is called with the correct window
+        await _repository.Received(1).CountAsync(
+            Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
+            Arg.Is<DateTimeOffset>(d => d == expectedFrom),
+            Arg.Is<DateTimeOffset>(d => d == FixedNow),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]

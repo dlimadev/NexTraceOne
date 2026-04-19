@@ -1,4 +1,5 @@
 using MediatR;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Configuration.Application.Abstractions;
@@ -25,7 +26,7 @@ public static class GetAiGovernanceDashboard
         int MaxTokenBudgetPerUser) : ICommand<AiGovernanceDashboard>;
 
     /// <summary>Handler de leitura do dashboard de governança de IA.</summary>
-    public sealed class Handler(IConfigurationResolutionService configService) : IQueryHandler<Query, AiGovernanceDashboard>
+    public sealed class Handler(IConfigurationResolutionService configService, IDateTimeProvider clock) : IQueryHandler<Query, AiGovernanceDashboard>
     {
         public async Task<Result<AiGovernanceDashboard>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -60,14 +61,14 @@ public static class GetAiGovernanceDashboard
                 Config: config,
                 ModelStats: modelStats,
                 FeedbackCounts: feedbackCounts,
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: clock.UtcNow);
 
             return Result<AiGovernanceDashboard>.Success(dashboard);
         }
     }
 
     /// <summary>Handler de atualização de configuração de governança de IA.</summary>
-    public sealed class UpdateHandler : ICommandHandler<UpdateAiGovernanceConfig, AiGovernanceDashboard>
+    public sealed class UpdateHandler(IDateTimeProvider clock) : ICommandHandler<UpdateAiGovernanceConfig, AiGovernanceDashboard>
     {
         public Task<Result<AiGovernanceDashboard>> Handle(UpdateAiGovernanceConfig request, CancellationToken cancellationToken)
         {
@@ -83,7 +84,7 @@ public static class GetAiGovernanceDashboard
                 Config: config,
                 ModelStats: [],
                 FeedbackCounts: new AiFeedbackCounts(0, 0, 0),
-                GeneratedAt: DateTimeOffset.UtcNow);
+                GeneratedAt: clock.UtcNow);
 
             return Task.FromResult(Result<AiGovernanceDashboard>.Success(dashboard));
         }

@@ -848,7 +848,14 @@
     "timestamp": "Data/Hora",
     "title": "Log de Auditoria",
     "toDate": "Até",
-    "verifyIntegrity": "Verificar Integridade"
+    "verifyIntegrity": "Verificar Integridade",
+    "integrityValid": "Cadeia de hash válida. Todos os {{count}} eventos verificados.",
+    "integrityViolation": "Violação de integridade detectada. {{count}} problema(s) encontrado(s).",
+    "integrityTruncated": "(truncada na sequência {{seq}})",
+    "resourceType": "Tipo de Recurso",
+    "resourceTypePlaceholder": "Filtrar por tipo de recurso (ex: Release)",
+    "resourceId": "ID do Recurso",
+    "resourceIdPlaceholder": "Filtrar por ID do recurso"
   },
   "auth": {
     "capChangeIntelligence": "Inteligência de mudanças e análise de impacto",

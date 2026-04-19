@@ -15,6 +15,10 @@ type AuditSearchResponse = {
     previousHash?: string | null;
     sequenceNumber?: number | null;
   }>;
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 };
 
 type VerifyChainResponse = {
@@ -28,7 +32,7 @@ type VerifyChainResponse = {
   truncatedAtSequence?: number | null;
 };
 
-function toPagedAuditEvents(response: AuditSearchResponse, page: number, pageSize: number): PagedList<AuditEvent> {
+function toPagedAuditEvents(response: AuditSearchResponse): PagedList<AuditEvent> {
   const items: AuditEvent[] = response.items.map((item) => ({
     eventId: item.eventId,
     id: item.eventId,
@@ -47,10 +51,10 @@ function toPagedAuditEvents(response: AuditSearchResponse, page: number, pageSiz
 
   return {
     items,
-    totalCount: items.length,
-    page,
-    pageSize,
-    totalPages: items.length > 0 ? 1 : 0,
+    totalCount: response.totalCount,
+    page: response.page,
+    pageSize: response.pageSize,
+    totalPages: response.totalPages,
   };
 }
 
@@ -84,23 +88,19 @@ export const auditApi = {
           resourceId: params?.resourceId,
         },
       })
-      .then((r) => toPagedAuditEvents(r.data, page, pageSize));
+      .then((r) => toPagedAuditEvents(r.data));
   },
 
   verifyIntegrity: () =>
     client
       .get<VerifyChainResponse>('/audit/verify-chain')
-      .then((r) => {
-        const truncatedInfo = r.data.isTruncated
-          ? ` (truncated at sequence ${r.data.truncatedAtSequence ?? 'unknown'})`
-          : '';
-        return {
-          valid: r.data.isIntact,
-          message: r.data.isIntact
-            ? `Hash chain is valid. All ${r.data.totalLinks} events verified.${truncatedInfo}`
-            : `Integrity violation detected. ${r.data.violations.length} issue(s) found.`,
-        };
-      }),
+      .then((r) => ({
+        valid: r.data.isIntact,
+        totalLinks: r.data.totalLinks,
+        violations: r.data.violations,
+        isTruncated: r.data.isTruncated ?? false,
+        truncatedAtSequence: r.data.truncatedAtSequence ?? null,
+      })),
 
   exportReport: (from: string, to: string) =>
     client

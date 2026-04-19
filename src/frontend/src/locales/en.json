@@ -902,7 +902,14 @@
     "timestamp": "Timestamp",
     "title": "Audit Log",
     "toDate": "To",
-    "verifyIntegrity": "Verify Integrity"
+    "verifyIntegrity": "Verify Integrity",
+    "integrityValid": "Hash chain is valid. All {{count}} events verified.",
+    "integrityViolation": "Integrity violation detected. {{count}} issue(s) found.",
+    "integrityTruncated": "(truncated at sequence {{seq}})",
+    "resourceType": "Resource Type",
+    "resourceTypePlaceholder": "Filter by resource type (e.g. Release)",
+    "resourceId": "Resource ID",
+    "resourceIdPlaceholder": "Filter by resource ID"
   },
   "auth": {
     "capChangeIntelligence": "Change intelligence & impact analysis",

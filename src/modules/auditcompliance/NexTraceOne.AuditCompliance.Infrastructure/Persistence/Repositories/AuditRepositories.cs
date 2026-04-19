@@ -92,6 +92,70 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<int> CountAsync(
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        CancellationToken cancellationToken)
+    {
+        var query = context.AuditEvents.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(sourceModule))
+            query = query.Where(e => e.SourceModule == sourceModule);
+
+        if (!string.IsNullOrWhiteSpace(actionType))
+            query = query.Where(e => e.ActionType == actionType);
+
+        if (!string.IsNullOrWhiteSpace(correlationId))
+            query = query.Where(e => e.CorrelationId == correlationId);
+
+        if (from.HasValue)
+            query = query.Where(e => e.OccurredAt >= from.Value);
+
+        if (to.HasValue)
+            query = query.Where(e => e.OccurredAt <= to.Value);
+
+        return await query.CountAsync(cancellationToken);
+    }
+
+    public async Task<int> CountWithResourceAsync(
+        string? sourceModule,
+        string? actionType,
+        string? correlationId,
+        string? resourceType,
+        string? resourceId,
+        DateTimeOffset? from,
+        DateTimeOffset? to,
+        CancellationToken cancellationToken)
+    {
+        var query = context.AuditEvents.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(sourceModule))
+            query = query.Where(e => e.SourceModule == sourceModule);
+
+        if (!string.IsNullOrWhiteSpace(actionType))
+            query = query.Where(e => e.ActionType == actionType);
+
+        if (!string.IsNullOrWhiteSpace(correlationId))
+            query = query.Where(e => e.CorrelationId == correlationId);
+
+        if (!string.IsNullOrWhiteSpace(resourceType))
+            query = query.Where(e => e.ResourceType == resourceType);
+
+        if (!string.IsNullOrWhiteSpace(resourceId))
+            query = query.Where(e => e.ResourceId == resourceId);
+
+        if (from.HasValue)
+            query = query.Where(e => e.OccurredAt >= from.Value);
+
+        if (to.HasValue)
+            query = query.Where(e => e.OccurredAt <= to.Value);
+
+        return await query.CountAsync(cancellationToken);
+    }
+
     public async Task<int> DeleteExpiredAsync(DateTimeOffset cutoff, CancellationToken cancellationToken)
     {
         // ExecuteDeleteAsync (EF Core 7+) performs a single SQL DELETE without loading entities into memory.
