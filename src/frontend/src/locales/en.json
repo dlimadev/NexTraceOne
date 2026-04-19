@@ -1833,6 +1833,21 @@
     "services": "Services",
     "title": "Command Palette"
   },
+  "ai": {
+    "feedback": {
+      "submitted": "Feedback submitted — thank you!",
+      "prompt": "Was this response helpful?",
+      "ratingLabel": "Rate this response",
+      "star": "{{count}} star",
+      "commentPlaceholder": "Optional: add a comment...",
+      "submit": "Submit Feedback",
+      "outcome": {
+        "resolved": "✓ Resolved",
+        "partial": "~ Partial",
+        "incorrect": "✗ Incorrect"
+      }
+    }
+  },
   "common": {
     "actions": "Actions",
     "allStatuses": "All statuses",
