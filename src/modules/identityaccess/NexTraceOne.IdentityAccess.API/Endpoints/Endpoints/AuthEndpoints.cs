@@ -20,6 +20,8 @@ using ForgotPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.Fo
 using ResetPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ResetPassword.ResetPassword;
 using ActivateAccountFeature = NexTraceOne.IdentityAccess.Application.Features.ActivateAccount.ActivateAccount;
 using ResendMfaCodeFeature = NexTraceOne.IdentityAccess.Application.Features.ResendMfaCode.ResendMfaCode;
+using StartSamlLoginFeature = NexTraceOne.IdentityAccess.Application.Features.StartSamlLogin.StartSamlLogin;
+using SamlAcsCallbackFeature = NexTraceOne.IdentityAccess.Application.Features.SamlAcsCallback.SamlAcsCallback;
 
 namespace NexTraceOne.IdentityAccess.API.Endpoints.Endpoints;
 
@@ -204,6 +206,44 @@ internal static class AuthEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // ── SAML 2.0 SSO ────────────────────────────────────────────────────────
+        // GET /auth/saml/sso — inicia o fluxo SAML e redireciona para o IdP
+        authGroup.MapGet("/saml/sso", async (
+            string? returnUrl,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new StartSamlLoginFeature.Query(returnUrl), cancellationToken);
+            if (result.IsFailure)
+            {
+                return result.ToHttpResult(localizer);
+            }
+
+            return Results.Redirect(result.Value.RedirectUrl);
+        }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // POST /auth/saml/acs — recebe o callback do IdP (Assertion Consumer Service)
+        authGroup.MapPost("/saml/acs", async (
+            HttpContext httpContext,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var samlResponse = httpContext.Request.Form["SAMLResponse"].ToString();
+            var relayState = httpContext.Request.Form["RelayState"].ToString();
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString();
+            var userAgent = httpContext.Request.Headers.UserAgent.ToString();
+
+            var result = await sender.Send(
+                new SamlAcsCallbackFeature.Command(samlResponse, relayState, ip, userAgent),
+                cancellationToken);
+
             return result.ToHttpResult(localizer);
         }).AllowAnonymous()
           .RequireRateLimiting("auth");

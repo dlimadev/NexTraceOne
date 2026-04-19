@@ -92,6 +92,10 @@ public static class DependencyInjection
         services.AddHttpClient("oidc");
         services.AddScoped<IOidcProvider, OidcProviderService>();
 
+        // SAML 2.0 SSO — protocolo e provider de configuração
+        services.AddScoped<ISamlService, SamlService>();
+        services.AddScoped<ISamlConfigProvider, ConfigurationSamlConfigProvider>();
+
         // Ponte de auditoria: propaga SecurityEvents do Identity para o módulo Audit central.
         // ISecurityAuditBridge é injetado opcionalmente nos handlers que geram eventos críticos.
         services.AddScoped<ISecurityAuditBridge, SecurityAuditBridge>();

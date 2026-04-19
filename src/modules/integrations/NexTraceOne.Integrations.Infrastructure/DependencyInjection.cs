@@ -13,6 +13,7 @@ using NexTraceOne.Integrations.Application.Abstractions;
 using NexTraceOne.Integrations.Application.LegacyTelemetry.Abstractions;
 using NexTraceOne.Integrations.Contracts;
 using NexTraceOne.Integrations.Domain.Events;
+using NexTraceOne.Integrations.Infrastructure.CloudBilling;
 using NexTraceOne.Integrations.Infrastructure.EventHandlers;
 using NexTraceOne.Integrations.Infrastructure.Integrations;
 using NexTraceOne.Integrations.Infrastructure.Kafka;
@@ -73,9 +74,24 @@ public static class DependencyInjection
         // quando sistema de backup estiver configurado no ambiente.
         services.AddSingleton<IBackupProvider, NullBackupProvider>();
 
-        // Kafka Event Producer — NullKafkaEventProducer por default; substituir por ConfluentKafkaEventProducer
-        // quando Kafka:Enabled = true e Kafka:BootstrapServers estiverem configurados.
-        services.AddSingleton<IKafkaEventProducer, NullKafkaEventProducer>();
+        // Kafka Event Producer — activa ConfluentKafkaEventProducer quando Kafka:Enabled = true e BootstrapServers configurados.
+        // Caso contrário, usa NullKafkaEventProducer que descarta silenciosamente todos os eventos.
+        var kafkaEnabled = configuration.GetValue<bool>("Kafka:Enabled");
+        var kafkaBootstrap = configuration["Kafka:BootstrapServers"];
+        if (kafkaEnabled && !string.IsNullOrWhiteSpace(kafkaBootstrap))
+        {
+            services.AddSingleton<IKafkaEventProducer, ConfluentKafkaEventProducer>();
+            services.AddHostedService<KafkaConsumerWorker>();
+        }
+        else
+        {
+            services.AddSingleton<IKafkaEventProducer, NullKafkaEventProducer>();
+        }
+
+        // Cloud Billing Provider — NullCloudBillingProvider por default.
+        // Substituir por AwsCloudBillingProvider, AzureCloudBillingProvider, etc.
+        // quando FinOps:Billing:Provider estiver configurado.
+        services.AddSingleton<ICloudBillingProvider, NullCloudBillingProvider>();
 
         return services;
     }
