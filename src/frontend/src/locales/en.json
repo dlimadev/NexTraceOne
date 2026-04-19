@@ -12850,6 +12850,8 @@
       "noParams": "no params",
       "required": "required",
       "parameters": "Parameters"
+    }
+  },
   "finops": {
     "config": {
       "title": "FinOps Configuration",

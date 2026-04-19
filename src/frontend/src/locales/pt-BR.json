@@ -12809,6 +12809,8 @@
       "noParams": "sem parâmetros",
       "required": "obrigatório",
       "parameters": "Parâmetros"
+    }
+  },
   "finops": {
     "config": {
       "title": "FinOps Configuration",
