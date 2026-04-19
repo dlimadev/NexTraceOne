@@ -89,3 +89,13 @@ cd src/frontend && npm test
 | `NEXTRACE_AUTO_MIGRATE` | Set `true` for staging auto-migrate (blocked in production) |
 | `NEXTRACE_SKIP_INTEGRITY` | Set `true` to skip assembly integrity check |
 | `NEXTRACE_IGNORE_PENDING_MODEL_CHANGES` | Set `true` to suppress EF model change warnings |
+
+## Elasticsearch
+
+Start Elasticsearch with Docker Compose:
+
+```bash
+docker compose up -d elasticsearch
+```
+
+> ⚠️ **Security:** The default `docker-compose.yml` disables Elasticsearch security for local development. For staging and production, always use `docker-compose.production.yml` or a custom override with `xpack.security.enabled=true`.

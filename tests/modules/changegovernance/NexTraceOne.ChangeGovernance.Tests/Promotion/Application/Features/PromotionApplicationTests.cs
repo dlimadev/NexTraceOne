@@ -5,10 +5,15 @@ using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
+using IReleaseRepository = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions.IReleaseRepository;
+using Release = NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.Release;
+using ReleaseId = NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ReleaseId;
+
 using CreatePromotionRequestFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.CreatePromotionRequest.CreatePromotionRequest;
 using EvaluatePromotionGatesFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.EvaluatePromotionGates.EvaluatePromotionGates;
 using ApprovePromotionFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ApprovePromotion.ApprovePromotion;
 using GetPromotionStatusFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.GetPromotionStatus.GetPromotionStatus;
+using ListPromotionRequestsFeature = NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests.ListPromotionRequests;
 
 namespace NexTraceOne.ChangeGovernance.Tests.Promotion.Application.Features;
 
@@ -312,6 +317,45 @@ public sealed class PromotionApplicationTests
         var svc = Substitute.For<IEnvironmentBehaviorService>();
         svc.IsEnabledAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).Returns(true);
         return svc;
+    }
+
+    // ── ListPromotionRequests ─────────────────────────────────────────────
+
+    [Fact]
+    public async Task ListPromotionRequests_Handle_ShouldIncludeServiceNameFromRelease()
+    {
+        var releaseId = Guid.NewGuid();
+        var srcEnv = CreateActiveEnvironment("Staging");
+        var tgtEnv = CreateActiveEnvironment("Production");
+        var promotionRequest = PromotionRequest.Create(releaseId, srcEnv.Id, tgtEnv.Id, "dev@company.com", FixedNow);
+
+        var requestRepo = Substitute.For<IPromotionRequestRepository>();
+        var releaseRepo = Substitute.For<IReleaseRepository>();
+
+        requestRepo.ListByStatusAsync(Arg.Any<PromotionStatus>(), Arg.Any<CancellationToken>())
+            .Returns(new List<PromotionRequest> { promotionRequest });
+
+        releaseRepo.GetByIdAsync(
+            Arg.Is<ReleaseId>(id => id.Value == releaseId),
+            Arg.Any<CancellationToken>())
+            .Returns(Release.Create(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                "my-service",
+                "1.0.0",
+                "staging",
+                "jenkins/pipeline",
+                "abc123def456",
+                FixedNow));
+
+        var sut = new ListPromotionRequestsFeature.Handler(requestRepo, releaseRepo);
+        var query = new ListPromotionRequestsFeature.Query(null, 1, 20);
+
+        var result = await sut.Handle(query, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Items.Should().HaveCount(1);
+        result.Value.Items[0].ServiceName.Should().Be("my-service");
     }
 
 }

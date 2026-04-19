@@ -4,7 +4,9 @@ using FluentValidation;
 
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Promotion.Abstractions;
+using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Enums;
 
 namespace NexTraceOne.ChangeGovernance.Application.Promotion.Features.ListPromotionRequests;
@@ -19,6 +21,7 @@ public static class ListPromotionRequests
     public sealed record PromotionRequestItem(
         Guid Id,
         Guid ReleaseId,
+        string? ServiceName,
         string Status,
         string RequestedBy,
         DateTimeOffset RequestedAt,
@@ -37,9 +40,11 @@ public static class ListPromotionRequests
         }
     }
 
-    /// <summary>Handler que lista as solicitações de promoção com paginação e filtro por status.</summary>
+    /// <summary>Handler que lista as solicitações de promoção com paginação e filtro por status.
+    /// Enriquece cada item com o nome do serviço a partir da Release associada.</summary>
     public sealed class Handler(
-        IPromotionRequestRepository requestRepository) : IQueryHandler<Query, Response>
+        IPromotionRequestRepository requestRepository,
+        IReleaseRepository releaseRepository) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -58,16 +63,23 @@ public static class ListPromotionRequests
             var paged = all
                 .Skip((request.Page - 1) * request.PageSize)
                 .Take(request.PageSize)
-                .Select(r => new PromotionRequestItem(
+                .ToList();
+
+            var items = new List<PromotionRequestItem>(paged.Count);
+            foreach (var r in paged)
+            {
+                var release = await releaseRepository.GetByIdAsync(ReleaseId.From(r.ReleaseId), cancellationToken);
+                items.Add(new PromotionRequestItem(
                     r.Id.Value,
                     r.ReleaseId,
+                    release?.ServiceName,
                     r.Status.ToString(),
                     r.RequestedBy,
                     r.RequestedAt,
-                    r.CompletedAt))
-                .ToList();
+                    r.CompletedAt));
+            }
 
-            return new Response(paged, totalCount, request.Page, request.PageSize);
+            return new Response(items, totalCount, request.Page, request.PageSize);
         }
     }
 
