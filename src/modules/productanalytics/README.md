@@ -27,7 +27,7 @@ Estes indicadores alimentam decisões de produto e são expostos no módulo Gove
 | **Assemblies** | `NexTraceOne.ProductAnalytics.Domain`, `.Application`, `.Infrastructure`, `.API`, `.Contracts` |
 | **DbContext** | `ProductAnalyticsDbContext` — banco `ProductAnalyticsDatabase` |
 | **Outbox table** | — (módulo principalmente de leitura e ingestão de eventos) |
-| **Base URL de API** | `/api/v1/analytics` |
+| **Base URL de API** | `/api/v1/product-analytics` |
 
 ---
 
@@ -124,7 +124,7 @@ Os eventos são categorizados por impacto no valor do produto:
 
 ## Como os Eventos são Registados
 
-O frontend envia eventos via `POST /api/v1/analytics/events` com o seguinte payload:
+O frontend envia eventos via `POST /api/v1/product-analytics/events` com o seguinte payload:
 
 ```typescript
 // src/frontend/src/features/product-analytics/api/analytics.ts
@@ -134,7 +134,7 @@ export const analyticsApi = {
     eventType: string;
     module: string;
     metadata?: Record<string, unknown>;
-  }) => apiClient.post('/analytics/events', event),
+  }) => apiClient.post('/api/v1/product-analytics/events', event),
 };
 ```
 
@@ -191,15 +191,15 @@ public static class RecordAnalyticsEvent
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| `POST` | `/analytics/events` | Regista evento de analytics |
-| `GET` | `/analytics/summary` | Resumo consolidado com filtros |
-| `GET` | `/analytics/modules/adoption` | Adopção por módulo |
-| `GET` | `/analytics/personas/usage` | Uso por persona |
-| `GET` | `/analytics/features/heatmap` | Heatmap de features |
-| `GET` | `/analytics/friction` | Indicadores de fricção |
-| `GET` | `/analytics/milestones` | Value milestones |
-| `GET` | `/analytics/journeys` | Análise de jornadas |
-| `GET` | `/analytics/funnel` | Funil de adopção |
+| `POST` | `/api/v1/product-analytics/events` | Regista evento de analytics |
+| `GET` | `/api/v1/product-analytics/summary` | Resumo consolidado com filtros |
+| `GET` | `/api/v1/product-analytics/adoption/modules` | Adopção por módulo |
+| `GET` | `/api/v1/product-analytics/adoption/personas` | Uso por persona |
+| `GET` | `/api/v1/product-analytics/heatmap` | Heatmap de features |
+| `GET` | `/api/v1/product-analytics/friction` | Indicadores de fricção |
+| `GET` | `/api/v1/product-analytics/value-milestones` | Value milestones |
+| `GET` | `/api/v1/product-analytics/journeys` | Análise de jornadas |
+| `GET` | `/api/v1/product-analytics/adoption/funnel` | Funil de adopção |
 
 ### Filtros disponíveis na maioria dos endpoints
 
@@ -268,4 +268,4 @@ builder.Services.AddProductAnalyticsInfrastructure(builder.Configuration);
 
 ---
 
-*Última atualização: Março 2026.*
+*Última atualização: Abril 2026.*
