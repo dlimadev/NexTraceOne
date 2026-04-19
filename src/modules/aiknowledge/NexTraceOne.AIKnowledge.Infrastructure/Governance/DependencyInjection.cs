@@ -95,6 +95,16 @@ public static class DependencyInjection
         services.AddScoped<IAiAgentPerformanceMetricRepository, AiAgentPerformanceMetricRepository>();
         services.AddHostedService<TrajectoryExporterJob>();
 
+        // ── Phase 11: Enterprise Capabilities ─────────────────────────────
+        services.AddScoped<ISkillLoader, SkillLoader>();
+        services.AddScoped<ISkillRegistry, SkillRegistry>();
+        services.AddScoped<ISkillContextInjector, SkillContextInjector>();
+        services.AddScoped<IAiWarRoomRepository, WarRoomRepository>();
+        services.AddScoped<IAiChangeConfidenceRepository, ChangeConfidenceRepository>();
+        services.AddScoped<IGuardianAlertRepository, GuardianAlertRepository>();
+        services.AddScoped<IOrganizationalMemoryRepository, OrganizationalMemoryRepository>();
+        services.AddHostedService<ProactiveArchitectureGuardianJob>();
+
         // ── Integration Event Handlers (E-M02) ───────────────────────────
         services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();
         services.AddScoped<

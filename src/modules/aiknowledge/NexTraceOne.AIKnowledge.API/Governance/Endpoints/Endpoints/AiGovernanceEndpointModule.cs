@@ -74,6 +74,20 @@ using SeedDefaultSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.
 using SubmitAgentExecutionFeedbackFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitAgentExecutionFeedback.SubmitAgentExecutionFeedback;
 using GetAgentPerformanceDashboardFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentPerformanceDashboard.GetAgentPerformanceDashboard;
 
+using LoadSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.LoadSkill.LoadSkill;
+using CreateWarRoomFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateWarRoom.CreateWarRoom;
+using GetWarRoomFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetWarRoom.GetWarRoom;
+using ListWarRoomsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListWarRooms.ListWarRooms;
+using ResolveWarRoomFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ResolveWarRoom.ResolveWarRoom;
+using CalculateChangeConfidenceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CalculateChangeConfidence.CalculateChangeConfidence;
+using ProcessNaturalLanguageQueryFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ProcessNaturalLanguageQuery.ProcessNaturalLanguageQuery;
+using AcknowledgeGuardianAlertFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.AcknowledgeGuardianAlert.AcknowledgeGuardianAlert;
+using DismissGuardianAlertFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.DismissGuardianAlert.DismissGuardianAlert;
+using ListGuardianAlertsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListGuardianAlerts.ListGuardianAlerts;
+using RecordMemoryNodeFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RecordMemoryNode.RecordMemoryNode;
+using QueryOrganizationalMemoryFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.QueryOrganizationalMemory.QueryOrganizationalMemory;
+using GetMemoryNodeDetailsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetMemoryNodeDetails.GetMemoryNodeDetails;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -113,6 +127,11 @@ public sealed class AiGovernanceEndpointModule
         MapSeedEndpoints(app);
         MapSkillsEndpoints(app);
         MapAgentLightningEndpoints(app);
+        MapWarRoomEndpoints(app);
+        MapChangeConfidenceEndpoints(app);
+        MapNaturalLanguageQueryEndpoints(app);
+        MapGuardianAlertEndpoints(app);
+        MapOrganizationalMemoryEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1067,6 +1086,17 @@ public sealed class AiGovernanceEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:skills:execute");
+
+        group.MapGet("/{skillName}/load", async (
+            string skillName,
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new LoadSkillFeature.Query(skillName, tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:read");
     }
 
     // ── Agent Lightning ─────────────────────────────────────────────────
@@ -1096,6 +1126,167 @@ public sealed class AiGovernanceEndpointModule
         {
             var result = await sender.Send(
                 new GetAgentPerformanceDashboardFeature.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
+
+    // ── War Rooms (Phase 11) ─────────────────────────────────────────────
+
+    private static void MapWarRoomEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/war-rooms");
+
+        group.MapGet("/", async (
+            Guid tenantId,
+            string? status,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListWarRoomsFeature.Query(tenantId, status), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{warRoomId:guid}", async (
+            Guid warRoomId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetWarRoomFeature.Query(warRoomId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/", async (
+            CreateWarRoomFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/{warRoomId:guid}/resolve", async (
+            Guid warRoomId,
+            ResolveWarRoomRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ResolveWarRoomFeature.Command(warRoomId, body.PostMortemDraft), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Change Confidence (Phase 11) ─────────────────────────────────────
+
+    private static void MapChangeConfidenceEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/change-confidence");
+
+        group.MapPost("/calculate", async (
+            CalculateChangeConfidenceFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Natural Language Query (Phase 11) ────────────────────────────────
+
+    private static void MapNaturalLanguageQueryEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/nlq/process", async (
+            ProcessNaturalLanguageQueryFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+    }
+
+    // ── Guardian Alerts (Phase 11) ───────────────────────────────────────
+
+    private static void MapGuardianAlertEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/guardian-alerts");
+
+        group.MapGet("/", async (
+            Guid tenantId,
+            string? serviceName,
+            string? status,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ListGuardianAlertsFeature.Query(tenantId, serviceName, status), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapPost("/{alertId:guid}/acknowledge", async (
+            Guid alertId,
+            AcknowledgeAlertRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new AcknowledgeGuardianAlertFeature.Command(alertId, body.AcknowledgedBy), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapPost("/{alertId:guid}/dismiss", async (
+            Guid alertId,
+            DismissAlertRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DismissGuardianAlertFeature.Command(alertId, body.Reason), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+    }
+
+    // ── Organizational Memory (Phase 11) ─────────────────────────────────
+
+    private static void MapOrganizationalMemoryEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/memory");
+
+        group.MapPost("/", async (
+            RecordMemoryNodeFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:write");
+
+        group.MapGet("/search", async (
+            string subject,
+            Guid tenantId,
+            int? limit,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new QueryOrganizationalMemoryFeature.Query(subject, tenantId, limit ?? 10), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:governance:read");
+
+        group.MapGet("/{nodeId:guid}", async (
+            Guid nodeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetMemoryNodeDetailsFeature.Query(nodeId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:read");
     }
@@ -1208,3 +1399,12 @@ public sealed record SubmitFeedbackRequest(
     int? TimeToResolveMinutes,
     string SubmittedBy,
     Guid TenantId);
+
+/// <summary>Corpo de pedido para resolução de uma War Room.</summary>
+public sealed record ResolveWarRoomRequest(string PostMortemDraft);
+
+/// <summary>Corpo de pedido para reconhecimento de um alerta do Guardian.</summary>
+public sealed record AcknowledgeAlertRequest(string AcknowledgedBy);
+
+/// <summary>Corpo de pedido para descarte de um alerta do Guardian.</summary>
+public sealed record DismissAlertRequest(string Reason);

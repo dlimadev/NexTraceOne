@@ -68,6 +68,12 @@ public sealed class AiGovernanceDbContext(
     public DbSet<AiAgentTrajectoryFeedback> AgentTrajectoryFeedbacks => Set<AiAgentTrajectoryFeedback>();
     public DbSet<AiAgentPerformanceMetric> AgentPerformanceMetrics => Set<AiAgentPerformanceMetric>();
 
+    // ── Phase 11: Enterprise Capabilities ────────────────────────────────────
+    public DbSet<WarRoomSession> WarRooms => Set<WarRoomSession>();
+    public DbSet<ChangeConfidenceScore> ChangeConfidenceScores => Set<ChangeConfidenceScore>();
+    public DbSet<GuardianAlert> GuardianAlerts => Set<GuardianAlert>();
+    public DbSet<OrganizationalMemoryNode> MemoryNodes => Set<OrganizationalMemoryNode>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

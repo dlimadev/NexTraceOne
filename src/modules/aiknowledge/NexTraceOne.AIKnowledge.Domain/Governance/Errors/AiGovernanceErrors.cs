@@ -340,4 +340,24 @@ public static class AiGovernanceErrors
         => Error.Business(
             "AiGovernance.Trajectory.FeedbackAlreadyExists",
             $"Feedback for execution '{executionId}' already exists.");
+
+    // ── Enterprise Capabilities (Phase 11) ─────────────────────────────
+
+    /// <summary>War Room não encontrada pelo identificador informado.</summary>
+    public static Error WarRoomNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.WarRoom.NotFound",
+            $"War room '{id}' not found.");
+
+    /// <summary>Alerta do Guardian não encontrado pelo identificador informado.</summary>
+    public static Error GuardianAlertNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.Guardian.AlertNotFound",
+            $"Guardian alert '{id}' not found.");
+
+    /// <summary>Nó de memória organizacional não encontrado pelo identificador informado.</summary>
+    public static Error MemoryNodeNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.Memory.NodeNotFound",
+            $"Memory node '{id}' not found.");
 }
