@@ -225,4 +225,56 @@ internal sealed class CostIntelligenceModuleService(
                 r.Priority))
             .ToListAsync(cancellationToken);
     }
+
+    /// <inheritdoc />
+    public async Task<CostContextPerDay?> GetCostContextPerDayAsync(
+        string serviceName,
+        string environment,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug(
+            "Computing cost context per day for service '{ServiceName}' in environment '{Environment}'",
+            serviceName,
+            environment);
+
+        var now = DateTimeOffset.UtcNow;
+        var currentPeriod = now.ToString("yyyy-MM");
+        var previousPeriod = now.AddMonths(-1).ToString("yyyy-MM");
+
+        var records = await context.CostRecords
+            .AsNoTracking()
+            .Where(r => r.ServiceName == serviceName
+                        && (r.Environment == null || r.Environment == environment)
+                        && (r.Period == currentPeriod || r.Period == previousPeriod))
+            .ToListAsync(cancellationToken);
+
+        if (records.Count == 0)
+            return null;
+
+        var currentRecords = records.Where(r => r.Period == currentPeriod).ToList();
+        var previousRecords = records.Where(r => r.Period == previousPeriod).ToList();
+
+        var currentMonthlyCost = currentRecords.Sum(r => r.TotalCost);
+        var previousMonthlyCost = previousRecords.Sum(r => r.TotalCost);
+        var currency = records.First().Currency;
+
+        // Normalize to daily cost — current month uses elapsed days, previous full month
+        var daysElapsedThisMonth = Math.Max(1, now.Day);
+        var daysInPreviousMonth = DateTime.DaysInMonth(now.AddMonths(-1).Year, now.AddMonths(-1).Month);
+
+        var actualCostPerDay = daysElapsedThisMonth > 0
+            ? Math.Round(currentMonthlyCost / daysElapsedThisMonth, 4)
+            : 0m;
+
+        var baselineCostPerDay = previousRecords.Count > 0
+            ? Math.Round(previousMonthlyCost / daysInPreviousMonth, 4)
+            : actualCostPerDay; // If no baseline, use current as baseline (no comparison)
+
+        return new CostContextPerDay(
+            ActualCostPerDay: actualCostPerDay,
+            BaselineCostPerDay: baselineCostPerDay,
+            Currency: currency,
+            ServiceName: serviceName,
+            Environment: environment);
+    }
 }

@@ -1,28 +1,52 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Integrations.Domain;
 
 namespace NexTraceOne.Governance.Application.Features.GetCanaryRollouts;
 
 /// <summary>
 /// Feature: GetCanaryRollouts — dashboard de rollouts canary ativos e histórico.
-/// Sem integração com sistema canary real. Retorna lista vazia com SimulatedNote.
+/// Delega para ICanaryProvider. Quando nenhum sistema canary está configurado,
+/// ICanaryProvider.IsConfigured é false e a lista retornada é vazia com SimulatedNote.
 /// </summary>
 public static class GetCanaryRollouts
 {
     /// <summary>Query com filtros opcionais de ambiente e estado.</summary>
     public sealed record Query(string? Environment, string? Status) : IQuery<CanaryDashboardResponse>;
 
-    /// <summary>Handler que retorna rollouts canary (integração real pendente).</summary>
-    public sealed class Handler : IQueryHandler<Query, CanaryDashboardResponse>
+    /// <summary>Handler que retorna rollouts canary via ICanaryProvider.</summary>
+    public sealed class Handler(ICanaryProvider canaryProvider) : IQueryHandler<Query, CanaryDashboardResponse>
     {
-        public Task<Result<CanaryDashboardResponse>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<CanaryDashboardResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var response = new CanaryDashboardResponse(
-                Rollouts: [],
-                CheckedAt: DateTimeOffset.UtcNow,
-                SimulatedNote: "No canary rollout system integrated. This endpoint will return real data once a canary provider is configured.");
+            var rollouts = await canaryProvider.GetActiveRolloutsAsync(request.Environment, cancellationToken);
 
-            return Task.FromResult(Result<CanaryDashboardResponse>.Success(response));
+            // Apply status filter client-side (data set is small)
+            IEnumerable<CanaryRolloutInfo> filtered = rollouts;
+            if (!string.IsNullOrWhiteSpace(request.Status))
+                filtered = filtered.Where(r => string.Equals(r.Status, request.Status, StringComparison.OrdinalIgnoreCase));
+
+            var items = filtered.Select(r => new CanaryRolloutDto(
+                Id: r.Id,
+                ServiceName: r.ServiceName,
+                Environment: r.Environment,
+                CanaryVersion: r.CanaryVersion,
+                StableVersion: r.StableVersion,
+                CanaryTrafficPct: r.CanaryTrafficPct,
+                Status: r.Status,
+                StartedAt: r.StartedAt,
+                CompletedAt: r.CompletedAt)).ToList();
+
+            var simulatedNote = canaryProvider.IsConfigured
+                ? null
+                : "No canary rollout system integrated. Configure ICanaryProvider to see real data.";
+
+            var response = new CanaryDashboardResponse(
+                Rollouts: items,
+                CheckedAt: DateTimeOffset.UtcNow,
+                SimulatedNote: simulatedNote);
+
+            return Result<CanaryDashboardResponse>.Success(response);
         }
     }
 
@@ -30,7 +54,7 @@ public static class GetCanaryRollouts
     public sealed record CanaryDashboardResponse(
         IReadOnlyList<CanaryRolloutDto> Rollouts,
         DateTimeOffset CheckedAt,
-        string SimulatedNote);
+        string? SimulatedNote);
 
     /// <summary>Detalhes de um rollout canary.</summary>
     public sealed record CanaryRolloutDto(

@@ -18,6 +18,7 @@ using EvaluateReleaseBudgetGateFeature = NexTraceOne.Governance.Application.Feat
 using CreateFinOpsBudgetApprovalFeature = NexTraceOne.Governance.Application.Features.CreateFinOpsBudgetApproval.CreateFinOpsBudgetApproval;
 using ResolveFinOpsBudgetApprovalFeature = NexTraceOne.Governance.Application.Features.ResolveFinOpsBudgetApproval.ResolveFinOpsBudgetApproval;
 using ListFinOpsBudgetApprovalsFeature = NexTraceOne.Governance.Application.Features.ListFinOpsBudgetApprovals.ListFinOpsBudgetApprovals;
+using GetCostContextPerDayFeature = NexTraceOne.Governance.Application.Features.GetCostContextPerDay.GetCostContextPerDay;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -180,6 +181,19 @@ public sealed class GovernanceFinOpsEndpointModule
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:finops:write");
+
+        // ── Contexto de custo por dia para gate de budget ──
+        group.MapGet("/service/{serviceName}/cost-context", async (
+            string serviceName,
+            string environment,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetCostContextPerDayFeature.Query(serviceName, environment);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:finops:read");
     }
 
     private sealed record ResolveApprovalRequest(bool Approved, string ResolvedBy, string? Comment);

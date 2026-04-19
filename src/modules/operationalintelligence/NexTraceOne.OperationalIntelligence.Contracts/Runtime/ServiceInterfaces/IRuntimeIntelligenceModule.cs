@@ -28,6 +28,13 @@ public interface IRuntimeIntelligenceModule
     /// Retorna null se nenhum snapshot de runtime foi capturado.
     /// </summary>
     Task<ServiceRuntimeMetrics?> GetServiceMetricsAsync(string serviceName, string environment, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém métricas médias da plataforma (CPU, Memória) agregadas de todos os serviços.
+    /// Usa os snapshots das últimas 4 semanas para calcular tendência linear de crescimento.
+    /// Retorna null se nenhum snapshot foi capturado.
+    /// </summary>
+    Task<PlatformAverageMetrics?> GetPlatformAverageMetricsAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -40,4 +47,20 @@ public interface IRuntimeIntelligenceModule
 public sealed record ServiceRuntimeMetrics(
     long AverageLatencyMs,
     decimal ErrorRate,
+    int SampleCount);
+
+/// <summary>
+/// Métricas médias da plataforma, calculadas a partir de todos os RuntimeSnapshots dos últimos 28 dias.
+/// CurrentCpuPct / CurrentMemoryPct: média atual (últimas 24h).
+/// ForecastedCpuPct / ForecastedMemoryPct: extrapolação linear a 30 dias.
+/// CpuTrend / MemoryTrend: "increasing", "decreasing" ou "stable".
+/// SampleCount: número de snapshots usados no cálculo.
+/// </summary>
+public sealed record PlatformAverageMetrics(
+    double CurrentCpuPct,
+    double CurrentMemoryPct,
+    double ForecastedCpuPct,
+    double ForecastedMemoryPct,
+    string CpuTrend,
+    string MemoryTrend,
     int SampleCount);

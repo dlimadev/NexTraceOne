@@ -21,6 +21,8 @@ internal sealed class RuntimeIntelligenceModule(
     private const decimal BaselineMinWeight = 0.85m;
     private const decimal BaselineVariableWeight = 0.15m;
     private const int MetricsMaxSamples = 50;
+    private const int ForecastDays = 30;
+    private const int TrendWindowDays = 28;
 
     /// <inheritdoc />
     public async Task<string?> GetCurrentHealthStatusAsync(
@@ -138,5 +140,85 @@ internal sealed class RuntimeIntelligenceModule(
         var avgErrorRate = Math.Round(snapshots.Average(s => s.ErrorRate), 4);
 
         return new ServiceRuntimeMetrics(avgLatency, avgErrorRate, snapshots.Count);
+    }
+
+    /// <inheritdoc />
+    public async Task<PlatformAverageMetrics?> GetPlatformAverageMetricsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug("Computing platform-wide average metrics for capacity forecast.");
+
+        var cutoffHistory = DateTimeOffset.UtcNow.AddDays(-TrendWindowDays);
+        var cutoffCurrent = DateTimeOffset.UtcNow.AddHours(-24);
+
+        // Fetch all snapshots in the 28-day window ordered chronologically
+        var allSnapshots = await context.RuntimeSnapshots
+            .AsNoTracking()
+            .Where(s => s.CapturedAt >= cutoffHistory)
+            .OrderBy(s => s.CapturedAt)
+            .Select(s => new { s.CpuUsagePercent, s.MemoryUsageMb, s.CapturedAt })
+            .ToListAsync(cancellationToken);
+
+        if (allSnapshots.Count == 0)
+            return null;
+
+        // Current averages (last 24h)
+        var recent = allSnapshots.Where(s => s.CapturedAt >= cutoffCurrent).ToList();
+        var currentCpu = recent.Count > 0
+            ? (double)recent.Average(s => s.CpuUsagePercent)
+            : (double)allSnapshots.TakeLast(Math.Min(50, allSnapshots.Count)).Average(s => s.CpuUsagePercent);
+
+        // Estimate memory as % of a reasonable host ceiling (e.g. 16 GB = 16384 MB)
+        const double MemoryCeilingMb = 16384.0;
+        var currentMemMb = recent.Count > 0
+            ? (double)recent.Average(s => s.MemoryUsageMb)
+            : (double)allSnapshots.TakeLast(Math.Min(50, allSnapshots.Count)).Average(s => s.MemoryUsageMb);
+        var currentMemPct = Math.Min(currentMemMb / MemoryCeilingMb * 100.0, 100.0);
+
+        // Linear regression: x = days since start, y = metric value
+        var startTime = allSnapshots[0].CapturedAt;
+        var cpuSlope = ComputeLinearSlope(
+            allSnapshots.Select(s => ((s.CapturedAt - startTime).TotalDays, (double)s.CpuUsagePercent)).ToList());
+        var memSlope = ComputeLinearSlope(
+            allSnapshots.Select(s => ((s.CapturedAt - startTime).TotalDays, (double)s.MemoryUsageMb / MemoryCeilingMb * 100.0)).ToList());
+
+        var forecastedCpu = Math.Clamp(currentCpu + cpuSlope * ForecastDays, 0, 100);
+        var forecastedMem = Math.Clamp(currentMemPct + memSlope * ForecastDays, 0, 100);
+
+        return new PlatformAverageMetrics(
+            CurrentCpuPct: Math.Round(currentCpu, 1),
+            CurrentMemoryPct: Math.Round(currentMemPct, 1),
+            ForecastedCpuPct: Math.Round(forecastedCpu, 1),
+            ForecastedMemoryPct: Math.Round(forecastedMem, 1),
+            CpuTrend: ClassifyTrend(cpuSlope),
+            MemoryTrend: ClassifyTrend(memSlope),
+            SampleCount: allSnapshots.Count);
+    }
+
+    /// <summary>Computes the slope (units per day) of a simple linear regression over (x, y) pairs.</summary>
+    private static double ComputeLinearSlope(IReadOnlyList<(double X, double Y)> points)
+    {
+        if (points.Count < 2)
+            return 0;
+
+        var n = points.Count;
+        var sumX = points.Sum(p => p.X);
+        var sumY = points.Sum(p => p.Y);
+        var sumXY = points.Sum(p => p.X * p.Y);
+        var sumX2 = points.Sum(p => p.X * p.X);
+        var denominator = n * sumX2 - sumX * sumX;
+
+        return Math.Abs(denominator) < double.Epsilon ? 0 : (n * sumXY - sumX * sumY) / denominator;
+    }
+
+    /// <summary>Classifies a slope as "increasing", "decreasing" or "stable".</summary>
+    private static string ClassifyTrend(double slopePerDay)
+    {
+        return slopePerDay switch
+        {
+            > 0.1 => "increasing",
+            < -0.1 => "decreasing",
+            _ => "stable"
+        };
     }
 }

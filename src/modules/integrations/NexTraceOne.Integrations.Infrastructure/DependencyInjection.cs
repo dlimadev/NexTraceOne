@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Integrations.Domain;
 using NexTraceOne.BuildingBlocks.Application.Integrations;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
@@ -63,6 +64,9 @@ public static class DependencyInjection
         // Domain Event Handlers — converte domain events em integration events para consumidores downstream
         services.AddScoped<IIntegrationEventHandler<IngestionPayloadProcessedDomainEvent>,
             IngestionPayloadProcessedDomainEventHandler>();
+
+        // Canary Provider — NullCanaryProvider por default; substituir por implementação real quando sistema canary estiver disponível
+        services.AddSingleton<ICanaryProvider, NullCanaryProvider>();
 
         return services;
     }
