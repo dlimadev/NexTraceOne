@@ -24,8 +24,7 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 | [PRODUCT-VISION.md](./PRODUCT-VISION.md) | Official product vision and positioning |
 | [NEXTRACEONE-PRESENTATION.md](./NEXTRACEONE-PRESENTATION.md) | Formal commercial and institutional presentation document |
 | [PLATFORM-CAPABILITIES.md](./PLATFORM-CAPABILITIES.md) | Platform capability overview |
-| [MODULES-AND-PAGES.md](./MODULES-AND-PAGES.md) | Module and page inventory |
-| [DOMAIN-BOUNDARIES.md](./DOMAIN-BOUNDARIES.md) | DDD domain boundaries |
+| [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md) | Full documentation index |
 
 ---
 
@@ -110,11 +109,4 @@ For the full index see [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md).
 |---|---|
 | [user-guide/](./user-guide/) | User guide (getting started, catalog, governance, operations, AI hub) |
 
----
 
-## Legacy / Mainframe
-
-| Document | Description |
-|---|---|
-| [LEGACY-MAINFRAME-WAVES.md](./LEGACY-MAINFRAME-WAVES.md) | Master document — 13 legacy/mainframe waves |
-| [legacy/](./legacy/) | Individual wave docs (WAVE-00 to WAVE-12) |

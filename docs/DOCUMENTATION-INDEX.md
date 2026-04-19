@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-10 — Wave G completa: Ideias 4, 5, 9, 11, 21, 22, 23 (Wave G — Visualization & Marketplace) concluídas. Total: **29 ideias implementadas** (Waves A–G todas ✅). RLS actualizado para 100 tabelas.
+> **Última actualização:** 2026-04-19
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -11,14 +11,10 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
-| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | **Roadmap de funcionalidades futuras** — 6.1 Unit Tests ✅, 6.2 E2E Tests ✅ |
-| [`BRAINSTORMING-INNOVATIVE-IDEAS.md`](BRAINSTORMING-INNOVATIVE-IDEAS.md) | **29 ideias inovadoras** — todas ✅ implementadas (Waves A–G completas) |
-| [`DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md`](DEVELOPMENT-PLAN-INNOVATIVE-IDEAS.md) | **Plano de desenvolvimento** — 29 ideias em 7 Waves (A–G todas ✅) |
-| [`PLATFORM-CUSTOMIZATION-EVOLUTION.md`](PLATFORM-CUSTOMIZATION-EVOLUTION.md) | **Plano de evolução de customização da plataforma** — Fases 1-8 ✅ COMPLETO |
+| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | Roadmap de funcionalidades futuras |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`NEXTRACEONE-PRESENTATION.md`](NEXTRACEONE-PRESENTATION.md) | **Documento formal de apresentação** — O que é, que problemas resolve, diferenciação, proposta de valor e ROI |
-| [`MODULES-AND-PAGES.md`](MODULES-AND-PAGES.md) | Módulos e páginas do produto |
 | [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
 
 ---
@@ -28,7 +24,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`ARCHITECTURE-OVERVIEW.md`](ARCHITECTURE-OVERVIEW.md) | Visão geral da arquitectura |
-| [`DOMAIN-BOUNDARIES.md`](DOMAIN-BOUNDARIES.md) | Fronteiras de domínio |
 | [`DATA-ARCHITECTURE.md`](DATA-ARCHITECTURE.md) | Arquitectura de dados |
 | [`SECURITY-ARCHITECTURE.md`](SECURITY-ARCHITECTURE.md) | Arquitectura de segurança |
 | [`FRONTEND-ARCHITECTURE.md`](FRONTEND-ARCHITECTURE.md) | Arquitectura frontend |
@@ -128,7 +123,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`deployment/DOCKER-AND-COMPOSE.md`](deployment/DOCKER-AND-COMPOSE.md) | Docker e Docker Compose |
 | [`deployment/ENVIRONMENT-CONFIGURATION.md`](deployment/ENVIRONMENT-CONFIGURATION.md) | Configuração de ambientes |
 | [`deployment/MIGRATION-STRATEGY.md`](deployment/MIGRATION-STRATEGY.md) | Estratégia de migrações |
-| [`deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md`](deployment/PHASE-7-DELIVERY-AND-DEPLOYMENT.md) | Delivery e deployment |
 
 ---
 
@@ -160,8 +154,6 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`observability/DRIFT-DETECTION-PIPELINE.md`](observability/DRIFT-DETECTION-PIPELINE.md) | Pipeline de detecção de drift |
 | [`observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md`](observability/ENVIRONMENT-COMPARISON-ARCHITECTURE.md) | Comparação de ambientes |
 | [`observability/INGESTION-API-ROLE-AND-FLOW.md`](observability/INGESTION-API-ROLE-AND-FLOW.md) | API de ingestão |
-| [`observability/PHASE-6-OBSERVABILITY-COMPLETION.md`](observability/PHASE-6-OBSERVABILITY-COMPLETION.md) | Conclusão de observabilidade |
-| [`observability/pipeline-validation-report.md`](observability/pipeline-validation-report.md) | Relatório de validação do pipeline |
 | [`observability/troubleshooting.md`](observability/troubleshooting.md) | Troubleshooting |
 | [`observability/configuration/`](observability/configuration/) | Configuração de observabilidade |
 | [`observability/collection/`](observability/collection/) | Colecção (IIS/CLR, Kafka, K8s) |
@@ -192,13 +184,12 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 
 ---
 
-## 14. Legacy / Mainframe — `docs/legacy/`
+## 14. Roadmap e Inovação — `docs/analysis/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`LEGACY-MAINFRAME-WAVES.md`](LEGACY-MAINFRAME-WAVES.md) | **Documento mestre** — visão geral das 13 ondas |
-| [`legacy/WAVE-00-STRATEGY.md`](legacy/WAVE-00-STRATEGY.md) – [`legacy/WAVE-12-SECURITY-READINESS.md`](legacy/WAVE-12-SECURITY-READINESS.md) | Ondas 0–12 |
+| [`analysis/INOVACAO-ROADMAP.md`](analysis/INOVACAO-ROADMAP.md) | Roadmap de inovação e propostas de novas funcionalidades |
 
 ---
 
-*Última consolidação: 2026-04-10*
+*Última consolidação: 2026-04-19*

@@ -606,7 +606,7 @@ Traces fluem via OTLP para o provider configurado (`ClickHouse` por padrão, `El
 
 | Tópico | Documento |
 |---|---|
-| Boundaries detalhados por módulo | `docs/DOMAIN-BOUNDARIES.md` |
+| Boundaries por módulo | `docs/ARCHITECTURE-OVERVIEW.md` |
 | Guia de implementação de módulos | `docs/BACKEND-MODULE-GUIDELINES.md` |
 | Estratégia de testes | `docs/TESTING-STRATEGY.md` |
 | Arquitetura de dados | `docs/DATA-ARCHITECTURE.md` |

@@ -104,7 +104,6 @@ Para configuração detalhada do ambiente, variáveis e providers, consultar:
 | [DRIFT-DETECTION-PIPELINE.md](./DRIFT-DETECTION-PIPELINE.md) | Pipeline de deteção de drift entre ambientes |
 | [ENVIRONMENT-COMPARISON-ARCHITECTURE.md](./ENVIRONMENT-COMPARISON-ARCHITECTURE.md) | Arquitetura de comparação entre ambientes (staging vs produção) |
 | [INGESTION-API-ROLE-AND-FLOW.md](./INGESTION-API-ROLE-AND-FLOW.md) | Papel e fluxo da API de ingestão de dados de observabilidade |
-| [PHASE-6-OBSERVABILITY-COMPLETION.md](./PHASE-6-OBSERVABILITY-COMPLETION.md) | Relatório de conclusão da fase 6 (observabilidade) |
 
 ### Documentação relacionada noutras pastas
 
