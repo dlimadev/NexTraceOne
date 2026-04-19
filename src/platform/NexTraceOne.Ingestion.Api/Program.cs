@@ -1,9 +1,6 @@
-using MediatR;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NexTraceOne.BuildingBlocks.Application;
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
@@ -12,12 +9,18 @@ using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints;
 using NexTraceOne.Governance.Infrastructure;
 using NexTraceOne.Governance.Infrastructure.Persistence;
-using NexTraceOne.Integrations.Application.Abstractions;
-using NexTraceOne.Integrations.Domain.Entities;
+using NexTraceOne.Ingestion.Api;
+using NexTraceOne.Ingestion.Api.Endpoints;
+using NexTraceOne.Ingestion.Api.Security;
+using NexTraceOne.Integrations.Application;
+using NexTraceOne.Integrations.Infrastructure;
+using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
+using NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints;
+using NexTraceOne.OperationalIntelligence.Application.Incidents;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Incidents;
+using Scalar.AspNetCore;
 using Serilog;
 using System.Diagnostics;
-using NotifyDeploymentFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.NotifyDeployment.NotifyDeployment;
-using ProcessIngestionPayloadFeature = NexTraceOne.Integrations.Application.Features.ProcessIngestionPayload.ProcessIngestionPayload;
 
 /// <summary>
 /// Ponto de entrada do NexTraceOne Ingestion API.
@@ -26,8 +29,12 @@ using ProcessIngestionPayloadFeature = NexTraceOne.Integrations.Application.Feat
 /// - Eventos de deployment (GitHub, GitLab, Jenkins, Azure DevOps)
 /// - Eventos de promoção entre ambientes
 /// - Atualizações de consumidores e dependências
-/// - Sinais de runtime e marcadores operacionais
+/// - Sinais de runtime e snapshots estruturados de saúde
 /// - Sincronização de contratos de fontes externas
+/// - Ingestão de commits de repositórios VCS
+/// - Ingestão de releases, feature flags, canary rollouts e observações pós-release
+/// - Ingestão de snapshots de custo de infraestrutura (FinOps)
+/// - Criação e consulta de incidentes operacionais
 ///
 /// Separado do ApiHost principal para:
 /// 1. Isolamento de carga — integrações externas não afetam o portal interno
@@ -44,6 +51,48 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddBuildingBlocksApplication(builder.Configuration);
 builder.Services.AddNexTraceHealthChecks();
+
+// OpenAPI — documentação do serviço de ingestão para consumidores externos
+builder.Services.AddOpenApi("ingestion", options =>
+{
+    options.AddDocumentTransformer((document, context, _) =>
+    {
+        document.Info.Title = "NexTraceOne Ingestion API";
+        document.Info.Version = "v1";
+        document.Info.Description = """
+            Entry point oficial para integrações externas com o NexTraceOne.
+
+            Permite que pipelines CI/CD, agentes de runtime e sistemas externos
+            notifiquem o NexTraceOne sobre eventos relevantes e consultem dados operacionais:
+
+            ## Escrita (integrations:write)
+
+            - **Deployments**: eventos de deploy originados em GitHub, GitLab, Jenkins, Azure DevOps
+            - **Promotions**: promoções de release entre ambientes (ex: staging → production)
+            - **Runtime Signals**: sinais genéricos de serviços em execução
+            - **Runtime Snapshots**: snapshots estruturados de saúde (latência, CPU, memória, error rate)
+            - **Consumers**: atualizações de dependências e consumidores de contratos
+            - **Contracts**: sincronização de contratos de APIs e eventos de fontes externas
+            - **Commits**: ingestão de commits de repositórios VCS (GitHub, GitLab, Azure DevOps)
+            - **Releases**: ingestão de releases externas, feature flags, canary rollouts, observações e rollbacks
+            - **FinOps**: snapshots de custo de infraestrutura (AWS, Azure, GCP)
+            - **Incidents**: criação de incidentes a partir de sistemas externos de alerta
+
+            ## Leitura (integrations:read)
+
+            - **Releases**: listar e consultar releases, advisories, blast radius e post-release reviews
+            - **Services**: saúde de runtime por serviço e ambiente
+            - **Incidents**: listar e consultar detalhe de incidentes
+
+            ## Autenticação
+
+            Todas as rotas requerem autenticação via **API Key** no header `X-Api-Key`.
+            - Operações de escrita requerem a permissão `integrations:write`.
+            - Operações de leitura requerem a permissão `integrations:read`.
+            """;
+        return System.Threading.Tasks.Task.CompletedTask;
+    });
+});
 builder.Services.AddHealthChecks()
     .AddCheck<DbContextConnectivityHealthCheck<GovernanceDbContext>>(
         "governance-db",
@@ -52,6 +101,7 @@ builder.Services.AddHealthChecks()
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 builder.Services.AddAuthorization(options =>
 {
+    // Política de escrita — usada por endpoints de ingestão (POST)
     options.AddPolicy(IngestionApiSecurity.PolicyName, policy =>
     {
         policy.AuthenticationSchemes.Add(ApiKeyAuthenticationOptions.SchemeName);
@@ -59,17 +109,36 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("auth_method", "api_key");
         policy.RequireClaim("permissions", IngestionApiSecurity.RequiredPermission);
     });
+
+    // Política de leitura — usada por endpoints de consulta (GET)
+    options.AddPolicy(IngestionApiSecurity.ReadPolicyName, policy =>
+    {
+        policy.AuthenticationSchemes.Add(ApiKeyAuthenticationOptions.SchemeName);
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("auth_method", "api_key");
+        policy.RequireClaim("permissions", IngestionApiSecurity.RequiredReadPermission);
+    });
 });
 
 // Add Governance Infrastructure for persistence
 builder.Services.AddGovernanceInfrastructure(builder.Configuration);
 
-// Add ChangeGovernance module so deploy events are automatically correlated to Releases
+// Add Integrations module — repositórios de conectores, execuções e fontes de ingestão
+builder.Services.AddIntegrationsApplication(builder.Configuration);
+builder.Services.AddIntegrationsInfrastructure(builder.Configuration);
+
+// Add ChangeGovernance module — correlação de deploys, Change Intelligence e advisories
 builder.Services.AddChangeIntelligenceModule(builder.Configuration);
+
+// Add OperationalIntelligence modules — runtime snapshots, custo e incidentes
+builder.Services.AddRuntimeIntelligenceModule(builder.Configuration);
+builder.Services.AddCostIntelligenceModule(builder.Configuration);
+builder.Services.AddIncidentsApplication(builder.Configuration);
+builder.Services.AddIncidentsInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-ValidateIngestionSecurityConfiguration(app);
+app.ValidateIngestionSecurityConfiguration();
 
 app.UseHttpsRedirection();
 app.Use(async (context, next) =>
@@ -122,13 +191,22 @@ app.UseStatusCodePages(async statusCodeContext =>
 });
 app.Use(async (context, next) =>
 {
-    var correlationId = ResolveCorrelationId(context);
+    var correlationId = IngestionCorrelationHelper.ResolveCorrelationId(context);
     context.Response.Headers[IngestionApiSecurity.CorrelationHeaderName] = correlationId;
     await next();
 });
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseAuthorization();
+
+// OpenAPI + Scalar — disponível em todos os ambientes (Ingestion API é consumida por sistemas externos)
+app.MapOpenApi("/openapi/{documentName}.json");
+app.MapScalarApiReference(options =>
+{
+    options.Title = "NexTraceOne Ingestion API";
+    options.Theme = ScalarTheme.BluePlanet;
+    options.DefaultOpenAllTags = true;
+});
 
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
@@ -147,534 +225,6 @@ app.MapHealthChecks("/live", new HealthCheckOptions
     ResponseWriter = HealthCheckResponseWriter.WriteResponse
 }).AllowAnonymous();
 
-// ============================================================
-// Deployment Events — recebe notificações de CI/CD
-// ============================================================
-var deployments = app.MapGroup("/api/v1/deployments")
-    .WithTags("Deployments")
-    .RequireAuthorization(IngestionApiSecurity.PolicyName);
-
-deployments.MapPost("/events", async (
-    HttpContext httpContext,
-    DeploymentEventRequest request,
-    IIntegrationConnectorRepository connectorRepo,
-    IIngestionExecutionRepository executionRepo,
-    IIngestionSourceRepository sourceRepo,
-    ISender sender,
-    IUnitOfWork unitOfWork,
-    IDateTimeProvider clock,
-    ILogger<Program> logger,
-    CancellationToken ct) =>
-{
-    var correlationId = ResolveCorrelationId(httpContext, request.CorrelationId);
-
-    // Find or create connector
-    var connector = await connectorRepo.GetByNameAsync(request.Provider, ct);
-    if (connector is null)
-    {
-        connector = IntegrationConnector.Create(
-            name: request.Provider.ToLowerInvariant().Replace(" ", "-"),
-            connectorType: "CI/CD",
-            description: $"Auto-registered {request.Provider} connector",
-            provider: request.Provider,
-            endpoint: null,
-            environment: null,
-            authenticationMode: null,
-            pollingMode: null,
-            allowedTeams: null,
-            utcNow: clock.UtcNow);
-        await connectorRepo.AddAsync(connector, ct);
-    }
-
-    // Find or create source
-    var source = await sourceRepo.GetByConnectorAndNameAsync(connector.Id, request.Source ?? "default", ct);
-    if (source is null)
-    {
-        source = IngestionSource.Create(
-            connectorId: connector.Id,
-            name: request.Source ?? "default",
-            sourceType: "Webhook",
-            dataDomain: null,
-            description: $"Deployment events from {request.Provider}",
-            endpoint: null,
-            expectedIntervalMinutes: 30,
-            utcNow: clock.UtcNow);
-        await sourceRepo.AddAsync(source, ct);
-    }
-
-    // Create execution
-    var execution = IngestionExecution.Start(
-        connectorId: connector.Id,
-        sourceId: source.Id,
-        correlationId: correlationId,
-        utcNow: clock.UtcNow);
-
-    // Mark completion
-    execution.CompleteSuccess(itemsProcessed: 1, itemsSucceeded: 1, utcNow: clock.UtcNow);
-
-    // Update source freshness
-    source.RecordDataReceived(itemCount: 1, utcNow: clock.UtcNow);
-
-    // Update connector stats
-    connector.RecordSuccess(clock.UtcNow);
-
-    await executionRepo.AddAsync(execution, ct);
-    await sourceRepo.UpdateAsync(source, ct);
-    await connectorRepo.UpdateAsync(connector, ct);
-    await unitOfWork.CommitAsync(ct);
-
-    // ── Correlação automática deploy event → Release (P5.1) ──────────────
-    // Se o evento contém dados suficientes, dispatch para ChangeGovernance.
-    // Falhas não bloqueiam a resposta ao pipeline — são registadas e descartadas.
-    Guid? releaseId = null;
-    bool? isNewRelease = null;
-
-    if (!string.IsNullOrWhiteSpace(request.ServiceName)
-        && !string.IsNullOrWhiteSpace(request.Version)
-        && !string.IsNullOrWhiteSpace(request.Environment)
-        && !string.IsNullOrWhiteSpace(request.CommitSha))
-    {
-        try
-        {
-            var pipelineSource = string.IsNullOrWhiteSpace(request.Source)
-                ? request.Provider
-                : $"{request.Provider}/{request.Source}";
-
-            var notifyCommand = new NotifyDeploymentFeature.Command(
-                ApiAssetId: null,
-                ServiceName: request.ServiceName,
-                Version: request.Version,
-                Environment: request.Environment,
-                PipelineSource: pipelineSource,
-                CommitSha: request.CommitSha,
-                ExternalDeploymentId: correlationId);
-
-            var notifyResult = await sender.Send(notifyCommand, ct);
-
-            if (notifyResult.IsSuccess)
-            {
-                releaseId = notifyResult.Value.ReleaseId;
-                isNewRelease = notifyResult.Value.IsNewRelease;
-            }
-            else
-            {
-                logger.LogWarning(
-                    "Deploy event → Release correlation returned failure for {ServiceName}@{Version} in {Environment}: {Error}",
-                    request.ServiceName, request.Version, request.Environment, notifyResult.Error?.Message);
-            }
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex,
-                "Unexpected error correlating deploy event to Release for {ServiceName}@{Version} in {Environment}",
-                request.ServiceName, request.Version, request.Environment);
-        }
-    }
-
-    // ── Semantic payload processing ───────────────────────────────────────────
-    // Only triggered when release was NOT already correlated via NotifyDeployment.
-    // "release_correlated" supersedes "processed" — no need to parse again when
-    // the full correlation pipeline already ran successfully.
-    string processingStatus;
-    if (releaseId.HasValue)
-    {
-        processingStatus = "release_correlated";
-    }
-    else
-    {
-        try
-        {
-            var rawPayload = System.Text.Json.JsonSerializer.Serialize(request);
-            var processCmd = new ProcessIngestionPayloadFeature.Command(execution.Id.Value, rawPayload);
-            var processResult = await sender.Send(processCmd, ct);
-            processingStatus = processResult.IsSuccess ? processResult.Value.Status : "metadata_recorded";
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex,
-                "Failed to dispatch ProcessIngestionPayload for execution {ExecutionId} — falling back to metadata_recorded",
-                execution.Id.Value);
-            processingStatus = "metadata_recorded";
-        }
-    }
-
-    return Results.Accepted(null, new
-    {
-        message = "Deployment event received",
-        status = "accepted",
-        processingStatus,
-        correlationId,
-        executionId = execution.Id.Value,
-        releaseId,
-        isNewRelease
-    });
-})
-.WithDescription("Receives deployment event notifications from CI/CD platforms");
-
-// ============================================================
-// Promotion Events — recebe eventos de promoção entre ambientes
-// ============================================================
-var promotions = app.MapGroup("/api/v1/promotions")
-    .WithTags("Promotions")
-    .RequireAuthorization(IngestionApiSecurity.PolicyName);
-
-promotions.MapPost("/events", async (
-    HttpContext httpContext,
-    PromotionEventRequest request,
-    IIntegrationConnectorRepository connectorRepo,
-    IIngestionExecutionRepository executionRepo,
-    IUnitOfWork unitOfWork,
-    IDateTimeProvider clock,
-    ISender sender,
-    ILogger<Program> logger,
-    CancellationToken ct) =>
-{
-    var correlationId = ResolveCorrelationId(httpContext, request.CorrelationId);
-
-    var connector = await connectorRepo.GetByNameAsync("promotions", ct);
-    if (connector is null)
-    {
-        connector = IntegrationConnector.Create(
-            name: "promotions",
-            connectorType: "Promotions",
-            description: "Environment promotion events",
-            provider: "Internal",
-            endpoint: null,
-            environment: null,
-            authenticationMode: null,
-            pollingMode: null,
-            allowedTeams: null,
-            utcNow: clock.UtcNow);
-        await connectorRepo.AddAsync(connector, ct);
-    }
-
-    var execution = IngestionExecution.Start(
-        connectorId: connector.Id,
-        sourceId: null,
-        correlationId: correlationId,
-        utcNow: clock.UtcNow);
-
-    execution.CompleteSuccess(itemsProcessed: 1, itemsSucceeded: 1, utcNow: clock.UtcNow);
-    connector.RecordSuccess(clock.UtcNow);
-
-    await executionRepo.AddAsync(execution, ct);
-    await connectorRepo.UpdateAsync(connector, ct);
-    await unitOfWork.CommitAsync(ct);
-
-    // ── Semantic payload processing ───────────────────────────────────────────
-    string processingStatus;
-    try
-    {
-        var rawPayload = System.Text.Json.JsonSerializer.Serialize(request);
-        var processCmd = new ProcessIngestionPayloadFeature.Command(execution.Id.Value, rawPayload);
-        var processResult = await sender.Send(processCmd, ct);
-        processingStatus = processResult.IsSuccess ? processResult.Value.Status : "metadata_recorded";
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex,
-            "Failed to dispatch ProcessIngestionPayload for promotion execution {ExecutionId}",
-            execution.Id.Value);
-        processingStatus = "metadata_recorded";
-    }
-
-    return Results.Accepted(null, new
-    {
-        message = "Promotion event received",
-        status = "accepted",
-        processingStatus,
-        correlationId,
-        executionId = execution.Id.Value
-    });
-})
-.WithDescription("Receives promotion event notifications");
-
-// ============================================================
-// Runtime Signals — recebe sinais operacionais
-// ============================================================
-var runtime = app.MapGroup("/api/v1/runtime")
-    .WithTags("Runtime")
-    .RequireAuthorization(IngestionApiSecurity.PolicyName);
-
-runtime.MapPost("/signals", async (
-    HttpContext httpContext,
-    RuntimeSignalRequest request,
-    IIntegrationConnectorRepository connectorRepo,
-    IIngestionExecutionRepository executionRepo,
-    IUnitOfWork unitOfWork,
-    IDateTimeProvider clock,
-    CancellationToken ct) =>
-{
-    var connector = await connectorRepo.GetByNameAsync("runtime-signals", ct);
-    if (connector is null)
-    {
-        connector = IntegrationConnector.Create(
-            name: "runtime-signals",
-            connectorType: "Runtime",
-            description: "Runtime signals and markers",
-            provider: "Internal",
-            endpoint: null,
-            environment: null,
-            authenticationMode: null,
-            pollingMode: null,
-            allowedTeams: null,
-            utcNow: clock.UtcNow);
-        await connectorRepo.AddAsync(connector, ct);
-    }
-
-    var correlationId = ResolveCorrelationId(httpContext);
-    var execution = IngestionExecution.Start(
-        connectorId: connector.Id,
-        sourceId: null,
-        correlationId: correlationId,
-        utcNow: clock.UtcNow);
-
-    execution.CompleteSuccess(itemsProcessed: 1, itemsSucceeded: 1, utcNow: clock.UtcNow);
-    connector.RecordSuccess(clock.UtcNow);
-
-    await executionRepo.AddAsync(execution, ct);
-    await connectorRepo.UpdateAsync(connector, ct);
-    await unitOfWork.CommitAsync(ct);
-
-    return Results.Accepted(null, new
-    {
-        message = "Runtime signal received",
-        status = "accepted",
-        processingStatus = "metadata_recorded",
-        note = "Signal metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
-        correlationId,
-        executionId = execution.Id.Value
-    });
-})
-.WithDescription("Receives runtime signals and markers from monitored services");
-
-
-// ============================================================
-// Consumer Updates — recebe atualizações de dependências
-// ============================================================
-var consumers = app.MapGroup("/api/v1/consumers")
-    .WithTags("Consumers")
-    .RequireAuthorization(IngestionApiSecurity.PolicyName);
-
-consumers.MapPost("/sync", async (
-    HttpContext httpContext,
-    ConsumerSyncRequest request,
-    IIntegrationConnectorRepository connectorRepo,
-    IIngestionExecutionRepository executionRepo,
-    IUnitOfWork unitOfWork,
-    IDateTimeProvider clock,
-    CancellationToken ct) =>
-{
-    var connector = await connectorRepo.GetByNameAsync("consumer-sync", ct);
-    if (connector is null)
-    {
-        connector = IntegrationConnector.Create(
-            name: "consumer-sync",
-            connectorType: "Dependencies",
-            description: "Consumer and dependency updates",
-            provider: "Internal",
-            endpoint: null,
-            environment: null,
-            authenticationMode: null,
-            pollingMode: null,
-            allowedTeams: null,
-            utcNow: clock.UtcNow);
-        await connectorRepo.AddAsync(connector, ct);
-    }
-
-    var correlationId = ResolveCorrelationId(httpContext);
-    var execution = IngestionExecution.Start(
-        connectorId: connector.Id,
-        sourceId: null,
-        correlationId: correlationId,
-        utcNow: clock.UtcNow);
-
-    execution.CompleteSuccess(
-        itemsProcessed: request.Consumers?.Count ?? 1,
-        itemsSucceeded: request.Consumers?.Count ?? 1,
-        utcNow: clock.UtcNow);
-    connector.RecordSuccess(clock.UtcNow);
-
-    await executionRepo.AddAsync(execution, ct);
-    await connectorRepo.UpdateAsync(connector, ct);
-    await unitOfWork.CommitAsync(ct);
-
-    return Results.Accepted(null, new
-    {
-        message = "Consumer update received",
-        status = "accepted",
-        processingStatus = "metadata_recorded",
-        note = "Update metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
-        correlationId,
-        executionId = execution.Id.Value
-    });
-})
-.WithDescription("Receives consumer/dependency update notifications");
-
-// ============================================================
-// Contract Sync — recebe contratos de fontes externas
-// ============================================================
-var contracts = app.MapGroup("/api/v1/contracts")
-    .WithTags("Contracts")
-    .RequireAuthorization(IngestionApiSecurity.PolicyName);
-
-contracts.MapPost("/sync", async (
-    HttpContext httpContext,
-    ContractSyncRequest request,
-    IIntegrationConnectorRepository connectorRepo,
-    IIngestionExecutionRepository executionRepo,
-    IUnitOfWork unitOfWork,
-    IDateTimeProvider clock,
-    CancellationToken ct) =>
-{
-    var connector = await connectorRepo.GetByNameAsync("contract-sync", ct);
-    if (connector is null)
-    {
-        connector = IntegrationConnector.Create(
-            name: "contract-sync",
-            connectorType: "ContractImport",
-            description: "External contract synchronization",
-            provider: request.Provider ?? "External",
-            endpoint: null,
-            environment: null,
-            authenticationMode: null,
-            pollingMode: null,
-            allowedTeams: null,
-            utcNow: clock.UtcNow);
-        await connectorRepo.AddAsync(connector, ct);
-    }
-
-    var correlationId = ResolveCorrelationId(httpContext);
-    var execution = IngestionExecution.Start(
-        connectorId: connector.Id,
-        sourceId: null,
-        correlationId: correlationId,
-        utcNow: clock.UtcNow);
-
-    execution.CompleteSuccess(
-        itemsProcessed: request.Contracts?.Count ?? 1,
-        itemsSucceeded: request.Contracts?.Count ?? 1,
-        utcNow: clock.UtcNow);
-    connector.RecordSuccess(clock.UtcNow);
-
-    await executionRepo.AddAsync(execution, ct);
-    await connectorRepo.UpdateAsync(connector, ct);
-    await unitOfWork.CommitAsync(ct);
-
-    return Results.Accepted(null, new
-    {
-        message = "Contract sync received",
-        status = "accepted",
-        processingStatus = "metadata_recorded",
-        note = "Sync metadata and execution tracked. Payload processing into domain entities is planned for a future release.",
-        correlationId,
-        executionId = execution.Id.Value
-    });
-})
-.WithDescription("Receives contract synchronization from external sources");
+IngestionEndpointModule.MapEndpoints(app);
 
 app.Run();
-
-static string ResolveCorrelationId(HttpContext httpContext, string? requestCorrelationId = null)
-{
-    var correlationId = !string.IsNullOrWhiteSpace(requestCorrelationId)
-        ? requestCorrelationId
-        : httpContext.Request.Headers[IngestionApiSecurity.CorrelationHeaderName].FirstOrDefault();
-
-    correlationId = string.IsNullOrWhiteSpace(correlationId)
-        ? Activity.Current?.Id ?? httpContext.TraceIdentifier
-        : correlationId;
-
-    httpContext.Response.Headers[IngestionApiSecurity.CorrelationHeaderName] = correlationId;
-    return correlationId;
-}
-
-static void ValidateIngestionSecurityConfiguration(WebApplication app)
-{
-    var configuredKeys = app.Configuration
-        .GetSection("Security:ApiKeys")
-        .Get<List<ApiKeyConfiguration>>() ?? [];
-
-    var validKeys = configuredKeys
-        .Where(IsValidIngestionApiKey)
-        .ToList();
-
-    if (validKeys.Count == 0)
-    {
-        const string message = "Ingestion.Api requires at least one API key with a valid tenant and 'integrations:write' permission configured under 'Security:ApiKeys'.";
-
-        if (app.Environment.IsDevelopment())
-        {
-            app.Logger.LogWarning("{Message} Requests will be rejected until a valid API key is configured via appsettings, secrets or environment variables.", message);
-            return;
-        }
-
-        throw new InvalidOperationException(message);
-    }
-
-    app.Logger.LogInformation(
-        "Ingestion.Api security initialized with {ApiKeyCount} API key client(s): {ClientIds}",
-        validKeys.Count,
-        string.Join(", ", validKeys.Select(key => key.ClientId)));
-}
-
-static bool IsValidIngestionApiKey(ApiKeyConfiguration apiKey)
-    => !string.IsNullOrWhiteSpace(apiKey.Key)
-        && !string.IsNullOrWhiteSpace(apiKey.ClientId)
-        && !string.IsNullOrWhiteSpace(apiKey.ClientName)
-        && Guid.TryParse(apiKey.TenantId, out _)
-        && apiKey.Permissions.Any(permission => string.Equals(permission, IngestionApiSecurity.RequiredPermission, StringComparison.OrdinalIgnoreCase));
-
-internal static class IngestionApiSecurity
-{
-    internal const string PolicyName = "IngestionApiKeyWrite";
-    internal const string RequiredPermission = "integrations:write";
-    internal const string CorrelationHeaderName = "X-Correlation-Id";
-}
-
-// ============================================================
-// Request DTOs
-// ============================================================
-
-/// <summary>Request for deployment events from CI/CD platforms.</summary>
-public sealed record DeploymentEventRequest(
-    string Provider,
-    string? Source,
-    string? CorrelationId,
-    string? ServiceName,
-    string? Environment,
-    string? Version,
-    string? CommitSha);
-
-/// <summary>Request for promotion events between environments.</summary>
-public sealed record PromotionEventRequest(
-    string? CorrelationId,
-    string? ServiceName,
-    string? FromEnvironment,
-    string? ToEnvironment,
-    string? Version);
-
-/// <summary>Request for runtime signals from monitored services.</summary>
-public sealed record RuntimeSignalRequest(
-    string? ServiceName,
-    string? SignalType,
-    string? Message,
-    Dictionary<string, string>? Tags);
-
-/// <summary>Request for consumer/dependency sync.</summary>
-public sealed record ConsumerSyncRequest(
-    string? ServiceName,
-    List<string>? Consumers,
-    List<string>? Dependencies);
-
-/// <summary>Request for contract synchronization.</summary>
-public sealed record ContractSyncRequest(
-    string? Provider,
-    List<ContractItem>? Contracts);
-
-/// <summary>Contract item for sync.</summary>
-public sealed record ContractItem(
-    string Name,
-    string Type,
-    string? Version,
-    string? Content);

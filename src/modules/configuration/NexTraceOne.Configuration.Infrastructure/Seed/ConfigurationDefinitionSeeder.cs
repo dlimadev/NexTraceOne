@@ -739,7 +739,8 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "80.0",
             validationRules: """{"min": 0, "max": 100}""",
             uiEditorType: "text",
-            sortOrder: 700),
+            sortOrder: 700,
+            isDeprecated: true),
 
         // ── BLOCK B — Instance Configuration ──────────────────────────────
 
@@ -3409,7 +3410,53 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "toggle",
             sortOrder: 5370),
 
-        // ── Block E — Anomaly, Waste & Financial Recommendations ───────
+        // ── Block E2 — Release Budget Gate ─────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.enabled",
+            displayName: "config.finops.release.budget_gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.finops.release.budget_gate.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 5380),
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.block_on_exceed",
+            displayName: "config.finops.release.budget_gate.block_on_exceed.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.finops.release.budget_gate.block_on_exceed.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5382),
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.require_approval",
+            displayName: "config.finops.release.budget_gate.require_approval.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant, ConfigurationScope.Environment],
+            description: "config.finops.release.budget_gate.require_approval.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5384),
+
+        ConfigurationDefinition.Create(
+            key: "finops.release.budget_gate.approvers",
+            displayName: "config.finops.release.budget_gate.approvers.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.release.budget_gate.approvers.description",
+            defaultValue: "[]",
+            uiEditorType: "json-editor",
+            sortOrder: 5386),
+
+        // ── Block F — Anomaly, Waste & Financial Recommendations ───────
 
         ConfigurationDefinition.Create(
             key: "finops.anomaly.detection_enabled",
@@ -3463,7 +3510,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             valueType: ConfigurationValueType.Json,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.finops.waste.thresholds.description",
-            defaultValue: """{"idleResourcePercent":90,"underutilizationPercent":20,"unusedDaysThreshold":14}""",
+            defaultValue: """{"idleResourcePercent":90,"underutilizationPercent":20,"unusedDaysThreshold":14,"percentileThreshold":75,"overProvisionedCostRatio":3.0,"idleCostlyRatio":2.0,"mediumSeverityFraction":0.5}""",
             uiEditorType: "json-editor",
             sortOrder: 5440),
 
@@ -3485,7 +3532,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             valueType: ConfigurationValueType.Json,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.finops.recommendation.policy.description",
-            defaultValue: """{"autoRecommend":true,"minSavingsThreshold":50,"showInDashboard":true,"notifyOnHighSavings":true,"highSavingsThreshold":500}""",
+            defaultValue: """{"autoRecommend":true,"minSavingsThreshold":50,"savingsRatePct":35,"showInDashboard":true,"notifyOnHighSavings":true,"highSavingsThreshold":500}""",
             uiEditorType: "json-editor",
             sortOrder: 5460),
 
@@ -3510,6 +3557,42 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: """{"critical":{"warningDeviation":10,"autoEscalate":true},"standard":{"warningDeviation":20,"autoEscalate":false}}""",
             uiEditorType: "json-editor",
             sortOrder: 5480),
+
+        // ── FinOps Efficiency Bands & Thresholds ──────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "finops.efficiency.trend_threshold_pct",
+            displayName: "config.finops.efficiency.trend_threshold_pct.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.efficiency.trend_threshold_pct.description",
+            defaultValue: "5.0",
+            validationRules: """{"min": 0.1, "max": 100}""",
+            uiEditorType: "text",
+            sortOrder: 5490),
+
+        ConfigurationDefinition.Create(
+            key: "finops.efficiency.cost_bands",
+            displayName: "config.finops.efficiency.cost_bands.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.efficiency.cost_bands.description",
+            defaultValue: """{"Wasteful":15000,"Inefficient":10000,"Acceptable":5000}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5495),
+
+        ConfigurationDefinition.Create(
+            key: "finops.efficiency.burn_rate_thresholds",
+            displayName: "config.finops.efficiency.burn_rate_thresholds.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.efficiency.burn_rate_thresholds.description",
+            defaultValue: """{"elevated":1.5,"critical":2.0}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5500),
 
         // ── Block F — Benchmarking Weights, Thresholds & Formulas ──────
 

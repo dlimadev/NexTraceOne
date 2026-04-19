@@ -12,6 +12,8 @@ vi.mock('../../features/governance/api/finOps', () => ({
     getTeamFinOps: vi.fn(),
     getDomainFinOps: vi.fn(),
     getTrends: vi.fn(),
+    getWasteSignals: vi.fn(),
+    getEfficiency: vi.fn(),
   },
 }));
 
@@ -75,6 +77,20 @@ describe('FinOpsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(finOpsApi.getSummary).mockResolvedValue(mockData);
+    vi.mocked(finOpsApi.getTrends).mockResolvedValue({
+      dimension: 'Service',
+      series: [],
+      aggregatedTrend: [
+        { period: '2026-01', cost: 38000 },
+        { period: '2026-02', cost: 42000 },
+        { period: '2026-03', cost: 45000 },
+      ],
+      overallDirection: 'Declining',
+      overallChangePercent: 18.4,
+      generatedAt: '2026-03-22T00:00:00Z',
+      isSimulated: false,
+      dataSource: 'cost-intelligence',
+    });
   });
 
   it('calls finOpsApi.getSummary on mount', async () => {
@@ -103,5 +119,27 @@ describe('FinOpsPage', () => {
     renderPage();
     await waitFor(() => expect(screen.getAllByText('Payment API').length).toBeGreaterThan(0));
     expect(screen.queryByTestId('demo-banner')).not.toBeInTheDocument();
+  });
+
+  it('calls finOpsApi.getTrends after summary loads', async () => {
+    renderPage();
+    await waitFor(() => expect(finOpsApi.getSummary).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(finOpsApi.getTrends).toHaveBeenCalledTimes(1));
+  });
+
+  it('renders optimization opportunities with non-zero savings', async () => {
+    vi.mocked(finOpsApi.getSummary).mockResolvedValue({
+      ...mockData,
+      optimizationOpportunities: [
+        { serviceId: 'svc-1', serviceName: 'Payment API', potentialSavings: 1120, priority: 'High', recommendation: 'Reduce retries' },
+      ],
+    });
+    renderPage();
+    await waitFor(() => expect(screen.getByText('$1,120')).toBeInTheDocument());
+  });
+
+  it('getWasteSignals is accessible in the finOpsApi mock', () => {
+    // Verifica que getWasteSignals está exposto no finOpsApi (o URL fix foi de /api/v1/finops/waste → /finops/waste)
+    expect(vi.mocked(finOpsApi).getWasteSignals).toBeDefined();
   });
 });

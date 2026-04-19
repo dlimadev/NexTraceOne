@@ -1,5 +1,8 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using FluentValidation;
@@ -32,14 +35,25 @@ public static class GetFinOpsTrends
     public sealed class Handler : IQueryHandler<Query, Response>
     {
         private readonly ICostIntelligenceModule _costModule;
+        private readonly IConfigurationResolutionService _configService;
 
-        public Handler(ICostIntelligenceModule costModule)
+        public Handler(ICostIntelligenceModule costModule, IConfigurationResolutionService configService)
         {
             _costModule = costModule;
+            _configService = configService;
         }
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // ── Ler janela de comparação e threshold de tendência ──
+            var windowCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsAnomalyComparisonWindowDays, ConfigurationScope.Tenant, null, cancellationToken);
+            var comparisonWindowDays = int.TryParse(windowCfg?.EffectiveValue, out var wd) ? Math.Max(wd, 1) : 30;
+
+            var trendThresholdCfg = await _configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsEfficiencyTrendThresholdPct, ConfigurationScope.Tenant, null, cancellationToken);
+            var trendThresholdPct = decimal.TryParse(trendThresholdCfg?.EffectiveValue, out var tt) ? Math.Max(tt, 0.1m) : 5m;
+
             var records = await _costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             var grouped = request.Dimension switch
@@ -65,12 +79,9 @@ public static class GetFinOpsTrends
                         ? (points[^1].Cost - points[0].Cost) / points[0].Cost * 100m
                         : 0m;
 
-                    var direction = changePercent switch
-                    {
-                        > 5m => TrendDirection.Declining,
-                        < -5m => TrendDirection.Improving,
-                        _ => TrendDirection.Stable
-                    };
+                    var direction = changePercent > trendThresholdPct ? TrendDirection.Declining
+                        : changePercent < -trendThresholdPct ? TrendDirection.Improving
+                        : TrendDirection.Stable;
 
                     return new TrendSeriesDto(g.Key.Id, g.Key.Name, points, direction, Math.Round(changePercent, 1));
                 })
@@ -86,12 +97,9 @@ public static class GetFinOpsTrends
                 ? (aggregated[^1].Cost - aggregated[0].Cost) / aggregated[0].Cost * 100m
                 : 0m;
 
-            var overallDirection = overallChange switch
-            {
-                > 5m => TrendDirection.Declining,
-                < -5m => TrendDirection.Improving,
-                _ => TrendDirection.Stable
-            };
+            var overallDirection = overallChange > trendThresholdPct ? TrendDirection.Declining
+                : overallChange < -trendThresholdPct ? TrendDirection.Improving
+                : TrendDirection.Stable;
 
             var response = new Response(
                 Dimension: request.Dimension,
@@ -99,6 +107,7 @@ public static class GetFinOpsTrends
                 AggregatedTrend: aggregated,
                 OverallDirection: overallDirection,
                 OverallChangePercent: Math.Round(overallChange, 1),
+                ComparisonWindowDays: comparisonWindowDays,
                 GeneratedAt: DateTimeOffset.UtcNow,
                 IsSimulated: false,
                 DataSource: "cost-intelligence");
@@ -114,6 +123,7 @@ public static class GetFinOpsTrends
         IReadOnlyList<TrendDataPointDto> AggregatedTrend,
         TrendDirection OverallDirection,
         decimal OverallChangePercent,
+        int ComparisonWindowDays,
         DateTimeOffset GeneratedAt,
         bool IsSimulated = false,
         string? DataSource = null);

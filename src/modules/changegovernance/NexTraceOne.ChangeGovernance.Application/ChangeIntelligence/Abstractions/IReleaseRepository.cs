@@ -10,6 +10,13 @@ public interface IReleaseRepository
     /// <summary>Busca uma Release pelo seu identificador.</summary>
     Task<Release?> GetByIdAsync(ReleaseId id, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Busca uma release pela chave natural do sistema de origem externo.
+    /// Permite que consumidores externos (Jenkins, GitHub, Azure DevOps) consultem
+    /// uma release pelo seu próprio ID sem precisar conhecer o GUID interno do NexTraceOne.
+    /// </summary>
+    Task<Release?> GetByExternalKeyAsync(string externalReleaseId, string externalSystem, CancellationToken cancellationToken = default);
+
     /// <summary>Busca releases de um ativo de API por versão.</summary>
     Task<Release?> GetByApiAssetAndVersionAsync(Guid apiAssetId, string version, string environment, CancellationToken cancellationToken = default);
 

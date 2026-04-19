@@ -742,6 +742,14 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.Property<bool?>("ExternalValidationPassed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("ExternalReleaseId")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ExternalSystem")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<bool>("HasBreakingChanges")
                         .HasColumnType("boolean");
 
@@ -802,6 +810,10 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.HasIndex("TenantId", "EnvironmentId")
                         .HasDatabaseName("ix_chg_releases_tenant_environment");
+
+                    b.HasIndex("ExternalReleaseId", "ExternalSystem")
+                        .HasDatabaseName("ix_chg_releases_external_key")
+                        .HasFilter("\"ExternalReleaseId\" IS NOT NULL AND \"ExternalSystem\" IS NOT NULL");
 
                     b.ToTable("chg_releases", null, t =>
                         {

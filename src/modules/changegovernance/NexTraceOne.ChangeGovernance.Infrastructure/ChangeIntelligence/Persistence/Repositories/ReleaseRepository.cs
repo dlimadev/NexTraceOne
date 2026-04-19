@@ -19,6 +19,12 @@ internal sealed class ReleaseRepository(ChangeIntelligenceDbContext context)
         => await context.Releases
             .SingleOrDefaultAsync(r => r.Id == id, ct);
 
+    /// <inheritdoc />
+    public async Task<Release?> GetByExternalKeyAsync(string externalReleaseId, string externalSystem, CancellationToken cancellationToken = default)
+        => await context.Releases
+            .SingleOrDefaultAsync(r => r.ExternalReleaseId == externalReleaseId
+                && r.ExternalSystem == externalSystem, cancellationToken);
+
     /// <summary>Busca releases de um ativo de API por versão e ambiente.</summary>
     public async Task<Release?> GetByApiAssetAndVersionAsync(Guid apiAssetId, string version, string environment, CancellationToken cancellationToken = default)
         => await context.Releases

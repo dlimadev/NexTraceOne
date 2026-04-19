@@ -87,6 +87,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Relatórios de compliance de licenças de dependências.</summary>
     public DbSet<LicenseComplianceReport> LicenseComplianceReports => Set<LicenseComplianceReport>();
 
+    /// <summary>Pedidos de aprovação de override de orçamento FinOps.</summary>
+    public DbSet<FinOpsBudgetApproval> FinOpsBudgetApprovals => Set<FinOpsBudgetApproval>();
+
     /// <summary>Métricas OpenTelemetry ingeridas pelo OTEL Collector pipeline.</summary>
     public DbSet<OtelMetricRecord> OtelMetrics => Set<OtelMetricRecord>();
 

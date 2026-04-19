@@ -1,3 +1,5 @@
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.Governance.Application.Features.GetDomainFinOps;
 using NexTraceOne.Governance.Application.Features.GetEfficiencyIndicators;
 using NexTraceOne.Governance.Application.Features.GetFinOpsSummary;
@@ -67,13 +69,21 @@ public sealed class FinOpsFeatureTests
         return mock;
     }
 
+    private static IConfigurationResolutionService CreateConfigMock()
+    {
+        var mock = Substitute.For<IConfigurationResolutionService>();
+        mock.ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((NexTraceOne.Configuration.Contracts.DTOs.EffectiveConfigurationDto?)null);
+        return mock;
+    }
+
     // ── GetFinOpsSummary ──
 
     [Fact]
     public async Task GetFinOpsSummary_ShouldReturnServiceCosts()
     {
         // Arrange
-        var handler = new GetFinOpsSummary.Handler(CreateMock());
+        var handler = new GetFinOpsSummary.Handler(CreateMock(), CreateConfigMock());
         var query = new GetFinOpsSummary.Query();
 
         // Act
@@ -91,7 +101,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetFinOpsSummary_ShouldReturnTopCostDrivers()
     {
         // Arrange
-        var handler = new GetFinOpsSummary.Handler(CreateMock());
+        var handler = new GetFinOpsSummary.Handler(CreateMock(), CreateConfigMock());
 
         // Act
         var result = await handler.Handle(new GetFinOpsSummary.Query(), CancellationToken.None);
@@ -107,7 +117,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetFinOpsTrends_ShouldReturnTrendSeries()
     {
         // Arrange
-        var handler = new GetFinOpsTrends.Handler(CreateMock());
+        var handler = new GetFinOpsTrends.Handler(CreateMock(), CreateConfigMock());
         var query = new GetFinOpsTrends.Query();
 
         // Act
@@ -126,7 +136,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetDomainFinOps_ShouldReturnDomainProfile()
     {
         // Arrange
-        var handler = new GetDomainFinOps.Handler(CreateMock());
+        var handler = new GetDomainFinOps.Handler(CreateMock(), CreateConfigMock());
         var query = new GetDomainFinOps.Query("Commerce");
 
         // Act
@@ -146,7 +156,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetServiceFinOps_ShouldReturnServiceProfile()
     {
         // Arrange
-        var handler = new GetServiceFinOps.Handler(CreateMock(), CreateReliabilityMock());
+        var handler = new GetServiceFinOps.Handler(CreateMock(), CreateReliabilityMock(), CreateConfigMock());
         var query = new GetServiceFinOps.Query("svc-payment-api");
 
         // Act
@@ -170,7 +180,7 @@ public sealed class FinOpsFeatureTests
         mock.GetServiceCostAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((CostRecordSummary?)null);
 
-        var handler = new GetServiceFinOps.Handler(mock, CreateReliabilityMock());
+        var handler = new GetServiceFinOps.Handler(mock, CreateReliabilityMock(), CreateConfigMock());
         var query = new GetServiceFinOps.Query("svc-nonexistent");
         var result = await handler.Handle(query, CancellationToken.None);
 
@@ -184,7 +194,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetTeamFinOps_ShouldReturnTeamProfile()
     {
         // Arrange
-        var handler = new GetTeamFinOps.Handler(CreateMock());
+        var handler = new GetTeamFinOps.Handler(CreateMock(), CreateConfigMock());
         var query = new GetTeamFinOps.Query("Team Commerce");
 
         // Act
@@ -208,7 +218,7 @@ public sealed class FinOpsFeatureTests
         mock.GetCostsByTeamAsync(Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<CostRecordSummary>());
 
-        var handler = new GetTeamFinOps.Handler(mock);
+        var handler = new GetTeamFinOps.Handler(mock, CreateConfigMock());
         var query = new GetTeamFinOps.Query("nonexistent-team");
 
         // Act
@@ -226,7 +236,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetWasteSignals_ShouldReturnSignalsForHighCostServices()
     {
         // Arrange
-        var handler = new GetWasteSignals.Handler(CreateMock());
+        var handler = new GetWasteSignals.Handler(CreateMock(), CreateConfigMock());
         var query = new GetWasteSignals.Query();
 
         // Act
@@ -244,7 +254,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetDomainFinOps_ShouldExposeTrendAndWasteFromRealRecords()
     {
         // Arrange
-        var handler = new GetDomainFinOps.Handler(CreateMock());
+        var handler = new GetDomainFinOps.Handler(CreateMock(), CreateConfigMock());
 
         // Act
         var result = await handler.Handle(new GetDomainFinOps.Query("Payments"), CancellationToken.None);
@@ -264,7 +274,7 @@ public sealed class FinOpsFeatureTests
         mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<CostRecordSummary>());
 
-        var handler = new GetWasteSignals.Handler(mock);
+        var handler = new GetWasteSignals.Handler(mock, CreateConfigMock());
         var query = new GetWasteSignals.Query();
 
         // Act
@@ -281,7 +291,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetWasteSignals_SignalsShouldHaveRequiredFields()
     {
         // Arrange
-        var handler = new GetWasteSignals.Handler(CreateMock());
+        var handler = new GetWasteSignals.Handler(CreateMock(), CreateConfigMock());
 
         // Act
         var result = await handler.Handle(new GetWasteSignals.Query(), CancellationToken.None);
@@ -301,7 +311,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetEfficiencyIndicators_ShouldReturnIndicatorsFromRealData()
     {
         // Arrange
-        var handler = new GetEfficiencyIndicators.Handler(CreateMock());
+        var handler = new GetEfficiencyIndicators.Handler(CreateMock(), CreateConfigMock());
         var query = new GetEfficiencyIndicators.Query();
 
         // Act
@@ -323,7 +333,7 @@ public sealed class FinOpsFeatureTests
         mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Array.Empty<CostRecordSummary>());
 
-        var handler = new GetEfficiencyIndicators.Handler(mock);
+        var handler = new GetEfficiencyIndicators.Handler(mock, CreateConfigMock());
         var query = new GetEfficiencyIndicators.Query();
 
         // Act
@@ -340,7 +350,7 @@ public sealed class FinOpsFeatureTests
     public async Task GetEfficiencyIndicators_ServicesShouldHaveMetrics()
     {
         // Arrange
-        var handler = new GetEfficiencyIndicators.Handler(CreateMock());
+        var handler = new GetEfficiencyIndicators.Handler(CreateMock(), CreateConfigMock());
 
         // Act
         var result = await handler.Handle(new GetEfficiencyIndicators.Query(), CancellationToken.None);
@@ -351,5 +361,75 @@ public sealed class FinOpsFeatureTests
             s.ServiceId.Should().NotBeNullOrWhiteSpace();
             s.Metrics.Should().NotBeEmpty();
         });
+    }
+
+    // ── GetFinOpsSummary — PotentialSavings ──
+
+    [Fact]
+    public async Task GetFinOpsSummary_OptimizationOpportunities_ShouldHaveNonZeroPotentialSavings()
+    {
+        // Arrange: svc-order-processor (18700 EUR) e svc-payment-api (12500 EUR) são Wasteful/Inefficient
+        var handler = new GetFinOpsSummary.Handler(CreateMock(), CreateConfigMock());
+
+        // Act
+        var result = await handler.Handle(new GetFinOpsSummary.Query(), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.OptimizationOpportunities.Should().NotBeEmpty();
+        result.Value.OptimizationOpportunities.Should().AllSatisfy(opt =>
+            opt.PotentialSavings.Should().BeGreaterThan(0,
+                "potentialSavings deve ser derivado do desperdício calculado (waste * 0.35), nunca hardcoded a 0"));
+    }
+
+    [Fact]
+    public async Task GetFinOpsSummary_OptimizationOpportunities_ShouldPrioritizeWastefulAsHigh()
+    {
+        // Arrange
+        var handler = new GetFinOpsSummary.Handler(CreateMock(), CreateConfigMock());
+
+        // Act
+        var result = await handler.Handle(new GetFinOpsSummary.Query(), CancellationToken.None);
+
+        // Assert: svc-order-processor (18700) é Wasteful → High priority
+        var wastefulOpt = result.Value.OptimizationOpportunities
+            .FirstOrDefault(opt => opt.ServiceId == "svc-order-processor");
+
+        wastefulOpt.Should().NotBeNull();
+        wastefulOpt!.Priority.Should().Be("High");
+    }
+
+    [Fact]
+    public async Task GetFinOpsSummary_OptimizationOpportunities_ShouldNotIncludeEfficientServices()
+    {
+        // Arrange
+        var handler = new GetFinOpsSummary.Handler(CreateMock(), CreateConfigMock());
+
+        // Act
+        var result = await handler.Handle(new GetFinOpsSummary.Query(), CancellationToken.None);
+
+        // Assert: svc-user-service (4200 EUR) é Efficient — não deve aparecer em OptimizationOpportunities
+        var efficientOpt = result.Value.OptimizationOpportunities
+            .FirstOrDefault(opt => opt.ServiceId == "svc-user-service");
+
+        efficientOpt.Should().BeNull("serviços Efficient não geram oportunidades de otimização");
+    }
+
+    [Fact]
+    public async Task GetFinOpsSummary_EmptyRecords_ShouldReturnEmptyOptimizationOpportunities()
+    {
+        // Arrange
+        var mock = Substitute.For<ICostIntelligenceModule>();
+        mock.GetCostRecordsAsync(Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<CostRecordSummary>());
+
+        var handler = new GetFinOpsSummary.Handler(mock, CreateConfigMock());
+
+        // Act
+        var result = await handler.Handle(new GetFinOpsSummary.Query(), CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.OptimizationOpportunities.Should().BeEmpty();
     }
 }

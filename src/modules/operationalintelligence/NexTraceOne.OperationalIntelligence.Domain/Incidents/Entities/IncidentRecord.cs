@@ -265,6 +265,20 @@ public sealed class IncidentRecord : AuditableEntity<IncidentRecordId>
     }
 
     /// <summary>
+    /// Marca o incidente como resolvido actualizando o status e a data de última actualização.
+    /// Operação idempotente — chamar quando o incidente já está resolvido não altera o estado.
+    /// </summary>
+    /// <param name="resolvedAt">Data/hora UTC em que o serviço foi confirmado como restaurado.</param>
+    public void MarkResolved(DateTimeOffset resolvedAt)
+    {
+        if (Status == IncidentStatus.Resolved || Status == IncidentStatus.Closed)
+            return;
+
+        Status = IncidentStatus.Resolved;
+        LastUpdatedAt = resolvedAt;
+    }
+
+    /// <summary>
     /// Define o contexto de tenant e ambiente do incidente.
     /// Operação idempotente — apenas atribui se o valor atual for null (??= semantics).
     /// Garante que o primeiro contexto definido não seja sobrescrito.

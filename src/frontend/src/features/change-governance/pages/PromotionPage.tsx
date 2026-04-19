@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowUpCircle, CheckCircle, XCircle, Plus, ChevronDown, ChevronUp, ShieldAlert } from 'lucide-react';
+import { ArrowUpCircle, CheckCircle, XCircle, Plus, ChevronDown, ChevronUp, ShieldAlert, AlertTriangle, Ban, ClipboardList } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody } from '../../../components/Card';
 import { Button } from '../../../components/Button';
@@ -12,6 +12,7 @@ import type { PromotionRequest } from '../../../types';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
+import { finOpsApi, type EvaluateReleaseBudgetGateResponse } from '../../governance/api/finOps';
 
 type PromotionStatus = PromotionRequest['status'];
 
@@ -119,6 +120,76 @@ export function PromotionPage() {
   const [expandedGates, setExpandedGates] = useState<Set<string>>(new Set());
   const [overrideTarget, setOverrideTarget] = useState<{ evaluationId: string; requestId: string } | null>(null);
   const [overrideJustification, setOverrideJustification] = useState('');
+
+  // ── Budget Gate state ───────────────────────────────────────────────────────
+  type BudgetGateDialogState =
+    | { kind: 'warn'; requestId: string; evaluation: EvaluateReleaseBudgetGateResponse }
+    | { kind: 'block'; evaluation: EvaluateReleaseBudgetGateResponse }
+    | { kind: 'approval_sent'; approvalId: string; evaluation: EvaluateReleaseBudgetGateResponse }
+    | null;
+  const [budgetGateDialog, setBudgetGateDialog] = useState<BudgetGateDialogState>(null);
+
+  const evaluateBudgetGateMutation = useMutation({
+    mutationFn: finOpsApi.evaluateReleaseBudgetGate,
+  });
+
+  const createBudgetApprovalMutation = useMutation({
+    mutationFn: finOpsApi.createBudgetApproval,
+  });
+
+  /** Called when user clicks "Promote". Evaluates the FinOps budget gate first. */
+  const handlePromote = async (req: PromotionRequest) => {
+    // Use a best-effort evaluation: if no cost data is available (baseline = 0, actual = 0)
+    // the backend will return Allow (no meaningful data to gate on).
+    let gateResult: EvaluateReleaseBudgetGateResponse | null = null;
+    try {
+      gateResult = await evaluateBudgetGateMutation.mutateAsync({
+        releaseId: req.releaseId,
+        serviceName: req.releaseId, // TODO: replace with actual service name once PromotionRequest carries service metadata
+        environment: req.targetEnvironment,
+        actualCostPerDay: 0,    // placeholder; real data comes from telemetry/FinOps context
+        baselineCostPerDay: 0,
+        measurementDays: 7,
+      });
+    } catch {
+      // Gate evaluation failed → allow promotion (fail-open for resilience)
+      promoteMutation.mutate(req.id);
+      return;
+    }
+
+    switch (gateResult.action) {
+      case 'Allow':
+        promoteMutation.mutate(req.id);
+        break;
+      case 'Warn':
+        setBudgetGateDialog({ kind: 'warn', requestId: req.id, evaluation: gateResult });
+        break;
+      case 'Block':
+        setBudgetGateDialog({ kind: 'block', evaluation: gateResult });
+        break;
+      case 'RequireApproval': {
+        // Auto-create a budget approval request
+        try {
+          const approval = await createBudgetApprovalMutation.mutateAsync({
+            releaseId: req.releaseId,
+            serviceName: req.releaseId, // TODO: replace with actual service name once PromotionRequest carries service metadata
+            environment: req.targetEnvironment,
+            actualCost: gateResult.actualTotalCost,
+            baselineCost: gateResult.baselineTotalCost,
+            costDeltaPct: gateResult.costDeltaPct,
+            currency: gateResult.currency,
+            requestedBy: 'current-user',
+            justification: t('promotion.budgetGate.autoJustification'),
+          }) as { approvalId: string };
+          setBudgetGateDialog({ kind: 'approval_sent', approvalId: approval.approvalId, evaluation: gateResult });
+        } catch {
+          // Fall back to block dialog if approval creation fails
+          setBudgetGateDialog({ kind: 'block', evaluation: gateResult });
+        }
+        break;
+      }
+    }
+  };
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['promotion', 'requests'],
@@ -350,8 +421,8 @@ export function PromotionPage() {
                       <Badge variant={statusVariant(req.status)}>{req.status}</Badge>
                       {req.status === 'Approved' && (
                         <Button
-                          onClick={() => promoteMutation.mutate(req.id)}
-                          loading={promoteMutation.isPending}
+                          onClick={() => handlePromote(req)}
+                          loading={promoteMutation.isPending || evaluateBudgetGateMutation.isPending}
                         >
                           {t('promotion.promote')}
                         </Button>
@@ -504,6 +575,117 @@ export function PromotionPage() {
               >
                 {t('promotion.confirmOverride')}
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Budget Gate — Warn Dialog (proceed with warning) */}
+      {budgetGateDialog?.kind === 'warn' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="budget-gate-warn-dialog">
+          <div className="bg-canvas rounded-lg border border-warning shadow-xl p-6 w-full max-w-lg">
+            <div className="flex items-center gap-3 mb-3">
+              <AlertTriangle size={20} className="text-warning shrink-0" />
+              <h2 className="text-base font-semibold text-heading">{t('promotion.budgetGate.warnTitle')}</h2>
+            </div>
+            <p className="text-sm text-body mb-2">{budgetGateDialog.evaluation.reason}</p>
+            <div className="bg-elevated rounded-md px-4 py-3 mb-4 text-xs text-muted space-y-1">
+              <div className="flex justify-between">
+                <span>{t('promotion.budgetGate.costDelta')}</span>
+                <span className="text-warning font-medium">+{budgetGateDialog.evaluation.costDeltaPct.toFixed(1)}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>{t('promotion.budgetGate.environment')}</span>
+                <span className="text-heading">{budgetGateDialog.evaluation.environment}</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted mb-4">{t('promotion.budgetGate.warnConfirmMessage')}</p>
+            <div className="flex justify-end gap-3">
+              <Button variant="secondary" onClick={() => setBudgetGateDialog(null)}>
+                {t('common.cancel')}
+              </Button>
+              <Button
+                variant="warning"
+                onClick={() => {
+                  promoteMutation.mutate(budgetGateDialog.requestId);
+                  setBudgetGateDialog(null);
+                }}
+                loading={promoteMutation.isPending}
+              >
+                {t('promotion.budgetGate.confirmPromoteAnyway')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Budget Gate — Block Dialog (hard block, no approval path) */}
+      {budgetGateDialog?.kind === 'block' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="budget-gate-block-dialog">
+          <div className="bg-canvas rounded-lg border border-critical shadow-xl p-6 w-full max-w-lg">
+            <div className="flex items-center gap-3 mb-3">
+              <Ban size={20} className="text-critical shrink-0" />
+              <h2 className="text-base font-semibold text-heading">{t('promotion.budgetGate.blockTitle')}</h2>
+            </div>
+            <p className="text-sm text-body mb-2">{budgetGateDialog.evaluation.reason}</p>
+            <div className="bg-elevated rounded-md px-4 py-3 mb-4 text-xs text-muted space-y-1">
+              <div className="flex justify-between">
+                <span>{t('promotion.budgetGate.costDelta')}</span>
+                <span className="text-critical font-medium">+{budgetGateDialog.evaluation.costDeltaPct.toFixed(1)}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>{t('promotion.budgetGate.environment')}</span>
+                <span className="text-heading">{budgetGateDialog.evaluation.environment}</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted mb-4">{t('promotion.budgetGate.blockMessage')}</p>
+            <div className="flex justify-end gap-3">
+              <Button variant="secondary" onClick={() => setBudgetGateDialog(null)}>
+                {t('common.close')}
+              </Button>
+              <a href="/governance/finops/configuration">
+                <Button variant="default">
+                  {t('promotion.budgetGate.goToFinOpsConfig')}
+                </Button>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Budget Gate — RequireApproval Dialog (approval request sent) */}
+      {budgetGateDialog?.kind === 'approval_sent' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="budget-gate-approval-dialog">
+          <div className="bg-canvas rounded-lg border border-accent shadow-xl p-6 w-full max-w-lg">
+            <div className="flex items-center gap-3 mb-3">
+              <ClipboardList size={20} className="text-accent shrink-0" />
+              <h2 className="text-base font-semibold text-heading">{t('promotion.budgetGate.approvalSentTitle')}</h2>
+            </div>
+            <p className="text-sm text-body mb-2">{budgetGateDialog.evaluation.reason}</p>
+            <div className="bg-elevated rounded-md px-4 py-3 mb-4 text-xs text-muted space-y-1">
+              <div className="flex justify-between">
+                <span>{t('promotion.budgetGate.costDelta')}</span>
+                <span className="text-warning font-medium">+{budgetGateDialog.evaluation.costDeltaPct.toFixed(1)}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>{t('promotion.budgetGate.environment')}</span>
+                <span className="text-heading">{budgetGateDialog.evaluation.environment}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>{t('promotion.budgetGate.approvalId')}</span>
+                <span className="font-mono text-heading">{budgetGateDialog.approvalId.slice(0, 8)}…</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted mb-4">{t('promotion.budgetGate.approvalSentMessage')}</p>
+            <div className="flex justify-end gap-3">
+              <Button variant="secondary" onClick={() => setBudgetGateDialog(null)}>
+                {t('common.close')}
+              </Button>
+              <a href="/governance/finops/approvals">
+                <Button variant="default">
+                  {t('promotion.budgetGate.goToApprovals')}
+                </Button>
+              </a>
             </div>
           </div>
         </div>

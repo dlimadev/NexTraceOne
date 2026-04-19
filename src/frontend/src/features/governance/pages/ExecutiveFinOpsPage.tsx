@@ -14,15 +14,14 @@ import { queryKeys } from '../../../shared/api/queryKeys';
 import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
-
-function formatCurrency(value: number, locale = 'en-US'): string {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-}
+import { formatCurrency } from '../utils/finOpsFormatters';
+import { useFinOpsCurrency } from '../hooks/useFinOpsConfig';
 
 export function ExecutiveFinOpsPage() {
   const { t, i18n } = useTranslation();
   const { activeEnvironmentId } = useEnvironment();
-  const fmt = (v: number) => formatCurrency(v, i18n.language);
+  const currency = useFinOpsCurrency();
+  const fmt = (v: number) => formatCurrency(v, i18n.language, currency);
 
   const { data: d, isLoading, isError, refetch } = useQuery({
     queryKey: queryKeys.governance.finops.summary(undefined, activeEnvironmentId),

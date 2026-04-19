@@ -2272,18 +2272,60 @@ export interface DomainFinOpsResponse {
   generatedAt: string;
 }
 
-export interface FinOpsTrendPointDto {
+/** Ponto de dados de tendência de custo (série agregada). */
+export interface FinOpsTrendDataPointDto {
   period: string;
-  totalCost: number;
-  waste: number;
-  efficiency: CostEfficiencyType;
+  cost: number;
 }
 
+/** Série temporal de custo por entidade (serviço, equipa ou domínio). */
+export interface FinOpsTrendSeriesDto {
+  entityId: string;
+  entityName: string;
+  dataPoints: FinOpsTrendDataPointDto[];
+  direction: GovernanceTrendDirection;
+  changePercent: number;
+}
+
+/** Resposta de tendências FinOps — alinhada com GetFinOpsTrends.Response do backend. */
 export interface FinOpsTrendsResponse {
   dimension: string;
-  filterId: string | null;
-  points: FinOpsTrendPointDto[];
+  series: FinOpsTrendSeriesDto[];
+  aggregatedTrend: FinOpsTrendDataPointDto[];
+  overallDirection: GovernanceTrendDirection;
+  overallChangePercent: number;
   generatedAt: string;
+  isSimulated: boolean;
+  dataSource: string | null;
+}
+
+/** Métrica individual de eficiência de serviço. */
+export interface EfficiencyMetricDto {
+  name: string;
+  category: string;
+  currentValue: number;
+  targetValue: number;
+  unit: string;
+  assessment: string;
+}
+
+/** Eficiência de um serviço individual. */
+export interface ServiceEfficiencyDto {
+  serviceId: string;
+  serviceName: string;
+  team: string;
+  efficiency: CostEfficiencyType;
+  metrics: EfficiencyMetricDto[];
+}
+
+/** Resposta de indicadores de eficiência — alinhada com GetEfficiencyIndicators.Response. */
+export interface EfficiencyIndicatorsResponse {
+  overallEfficiencyScore: number;
+  serviceCount: number;
+  services: ServiceEfficiencyDto[];
+  generatedAt: string;
+  isSimulated: boolean;
+  dataSource: string | null;
 }
 
 // ── Integration Hub ─────────────────────────────────────────────

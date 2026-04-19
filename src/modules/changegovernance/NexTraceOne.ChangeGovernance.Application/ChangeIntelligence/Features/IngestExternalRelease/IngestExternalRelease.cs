@@ -90,9 +90,11 @@ public static class IngestExternalRelease
             if (!ingestEnabled)
                 return ChangeIntelligenceErrors.IngestDisabledForEnvironment(request.TargetEnvironment);
 
-            // Idempotência: verifica se já existe release com mesmo externalId
-            var existing = await releaseRepository.GetByServiceNameVersionEnvironmentAsync(
-                request.ServiceName, request.Version, request.TargetEnvironment, cancellationToken);
+            // Idempotência: verifica se já existe release com a mesma chave natural externa.
+            // Usa ExternalReleaseId + ExternalSystem como chave canónica — é o identificador
+            // que o sistema de origem possui, sem necessitar do GUID interno do NexTraceOne.
+            var existing = await releaseRepository.GetByExternalKeyAsync(
+                request.ExternalReleaseId, request.ExternalSystem, cancellationToken);
 
             if (existing is not null)
                 return new Response(existing.Id.Value, request.ExternalReleaseId, false, existing.Status.ToString());
@@ -108,7 +110,9 @@ public static class IngestExternalRelease
                 environment: request.TargetEnvironment,
                 pipelineSource: $"External:{request.ExternalSystem}",
                 commitSha: request.CommitShas?.FirstOrDefault() ?? "external",
-                createdAt: now);
+                createdAt: now,
+                externalReleaseId: request.ExternalReleaseId,
+                externalSystem: request.ExternalSystem);
 
             releaseRepository.Add(release);
             await unitOfWork.CommitAsync(cancellationToken);

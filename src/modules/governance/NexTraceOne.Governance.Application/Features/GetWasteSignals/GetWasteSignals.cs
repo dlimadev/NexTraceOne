@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
+using NexTraceOne.Governance.Application.ConfigurationKeys;
 using NexTraceOne.Governance.Domain.Enums;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
+using System.Text.Json;
 using FluentValidation;
 
 namespace NexTraceOne.Governance.Application.Features.GetWasteSignals;
@@ -35,10 +39,38 @@ public static class GetWasteSignals
         }
     }
 
-    public sealed class Handler(ICostIntelligenceModule costModule) : IQueryHandler<Query, Response>
+    public sealed class Handler(ICostIntelligenceModule costModule, IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
+            // ── Ler configuração de detecção de desperdício ──
+            var detectionEnabledCfg = await configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsWasteDetectionEnabled, ConfigurationScope.Tenant, null, cancellationToken);
+            var detectionEnabled = detectionEnabledCfg?.EffectiveValue != "false";
+
+            if (!detectionEnabled)
+            {
+                return Result<Response>.Success(new Response(
+                    TotalWaste: 0m,
+                    SignalCount: 0,
+                    Signals: Array.Empty<WasteSignalDetailDto>(),
+                    ByType: Array.Empty<WasteByTypeDto>(),
+                    GeneratedAt: DateTimeOffset.UtcNow,
+                    IsSimulated: false,
+                    DataSource: "cost-intelligence"));
+            }
+
+            // ── Ler thresholds de desperdício ──
+            var thresholdsCfg = await configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsWasteThresholds, ConfigurationScope.Tenant, null, cancellationToken);
+            var (percentileThreshold, overProvisionedRatio, idleCostlyRatio, mediumSeverityFraction)
+                = ParseWasteThresholds(thresholdsCfg?.EffectiveValue);
+
+            // ── Ler categorias activas ──
+            var categoriesCfg = await configService.ResolveEffectiveValueAsync(
+                GovernanceConfigKeys.FinOpsWasteCategories, ConfigurationScope.Tenant, null, cancellationToken);
+            var allowedCategories = ParseStringSet(categoriesCfg?.EffectiveValue);
+
             var records = await costModule.GetCostRecordsAsync(cancellationToken: cancellationToken) ?? [];
 
             if (records.Count == 0)
@@ -55,7 +87,7 @@ public static class GetWasteSignals
 
             var avgCost = records.Average(r => r.TotalCost);
             var sortedCosts = records.Select(r => r.TotalCost).OrderBy(c => c).ToList();
-            var p75Index = (int)Math.Floor((sortedCosts.Count - 1) * 0.75m);
+            var p75Index = (int)Math.Floor((sortedCosts.Count - 1) * (percentileThreshold / 100m));
             var p75Threshold = sortedCosts.Count > 0 ? sortedCosts[Math.Min(p75Index, sortedCosts.Count - 1)] : 0m;
 
             var signals = new List<WasteSignalDetailDto>();
@@ -68,8 +100,13 @@ public static class GetWasteSignals
                 var waste = r.TotalCost - avgCost;
                 if (waste <= 0) continue;
 
-                var (type, pattern, description) = ClassifyWaste(r.TotalCost, avgCost, p75Threshold);
-                var severity = waste > avgCost ? "High" : waste > avgCost * 0.5m ? "Medium" : "Low";
+                var (type, pattern, description) = ClassifyWaste(r.TotalCost, avgCost, p75Threshold, overProvisionedRatio, idleCostlyRatio);
+
+                // Filtrar por categorias activas quando configurado
+                if (allowedCategories.Count > 0 && !allowedCategories.Contains(type.ToString()))
+                    continue;
+
+                var severity = waste > avgCost ? "High" : waste > avgCost * mediumSeverityFraction ? "Medium" : "Low";
 
                 signalIndex++;
                 signals.Add(new WasteSignalDetailDto(
@@ -110,18 +147,53 @@ public static class GetWasteSignals
                 DataSource: "cost-intelligence"));
         }
 
+        private static (decimal percentileThreshold, decimal overProvisionedRatio, decimal idleCostlyRatio, decimal mediumSeverityFraction)
+            ParseWasteThresholds(string? json)
+        {
+            const decimal defaultPercentile = 75m;
+            const decimal defaultOverProvisioned = 3.0m;
+            const decimal defaultIdleCostly = 2.0m;
+            const decimal defaultMediumFraction = 0.5m;
+            if (string.IsNullOrWhiteSpace(json)) return (defaultPercentile, defaultOverProvisioned, defaultIdleCostly, defaultMediumFraction);
+            try
+            {
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                var percentile = root.TryGetProperty("percentileThreshold", out var p) && p.TryGetDecimal(out var pv) ? pv : defaultPercentile;
+                var overProvisioned = root.TryGetProperty("overProvisionedCostRatio", out var o) && o.TryGetDecimal(out var ov) ? ov : defaultOverProvisioned;
+                var idleCostly = root.TryGetProperty("idleCostlyRatio", out var i) && i.TryGetDecimal(out var iv) ? iv : defaultIdleCostly;
+                var mediumFraction = root.TryGetProperty("mediumSeverityFraction", out var m) && m.TryGetDecimal(out var mv) ? mv : defaultMediumFraction;
+                return (Math.Clamp(percentile, 1m, 99m), Math.Max(overProvisioned, 1.1m), Math.Max(idleCostly, 1.1m), Math.Clamp(mediumFraction, 0.01m, 0.99m));
+            }
+            catch
+            {
+                return (defaultPercentile, defaultOverProvisioned, defaultIdleCostly, defaultMediumFraction);
+            }
+        }
+
+        private static HashSet<string> ParseStringSet(string? json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return [];
+            try
+            {
+                var list = JsonSerializer.Deserialize<List<string>>(json);
+                return list is { Count: > 0 } ? new HashSet<string>(list, StringComparer.OrdinalIgnoreCase) : [];
+            }
+            catch { return []; }
+        }
+
         private static (WasteSignalType Type, string Pattern, string Description) ClassifyWaste(
-            decimal cost, decimal avgCost, decimal p75)
+            decimal cost, decimal avgCost, decimal p75, decimal overProvisionedRatio, decimal idleCostlyRatio)
         {
             var ratio = avgCost > 0 ? cost / avgCost : 1m;
             return ratio switch
             {
-                > 3.0m => (WasteSignalType.OverProvisioned, "over-provisioned",
+                _ when ratio > overProvisionedRatio => (WasteSignalType.OverProvisioned, "over-provisioned",
                     $"Cost {cost:N2} is {ratio:N1}x above average — likely over-provisioned"),
-                > 2.0m => (WasteSignalType.IdleCostlyResource, "idle-costly-resource",
+                _ when ratio > idleCostlyRatio => (WasteSignalType.IdleCostlyResource, "idle-costly-resource",
                     $"Cost {cost:N2} is significantly above average — possible idle/underutilized resource"),
                 _ => (WasteSignalType.DegradedCostAmplification, "cost-amplification",
-                    $"Cost {cost:N2} exceeds p75 threshold {p75:N2} — cost amplification detected")
+                    $"Cost {cost:N2} exceeds p{(int)(p75)}% threshold — cost amplification detected")
             };
         }
     }
