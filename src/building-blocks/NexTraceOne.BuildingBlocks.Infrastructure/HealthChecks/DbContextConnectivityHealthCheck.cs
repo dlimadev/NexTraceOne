@@ -18,10 +18,10 @@ public sealed class DbContextConnectivityHealthCheck<TContext>(TContext dbContex
         try
         {
             var canConnect = await dbContext.Database.CanConnectAsync(cancellationToken);
-            var data = new Dictionary<string, object?>
+            var data = new Dictionary<string, object>
             {
                 ["dbContext"] = typeof(TContext).Name,
-                ["provider"] = dbContext.Database.ProviderName
+                ["provider"] = dbContext.Database.ProviderName ?? "unknown"
             };
 
             return canConnect
@@ -30,10 +30,10 @@ public sealed class DbContextConnectivityHealthCheck<TContext>(TContext dbContex
         }
         catch (Exception ex)
         {
-            var data = new Dictionary<string, object?>
+            var data = new Dictionary<string, object>
             {
                 ["dbContext"] = typeof(TContext).Name,
-                ["provider"] = dbContext.Database.ProviderName
+                ["provider"] = dbContext.Database.ProviderName ?? "unknown"
             };
 
             return new HealthCheckResult(

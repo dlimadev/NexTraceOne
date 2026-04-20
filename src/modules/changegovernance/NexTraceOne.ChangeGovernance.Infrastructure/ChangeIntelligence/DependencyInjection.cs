@@ -16,7 +16,6 @@ using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using NexTraceOne.Integrations.Contracts;
 

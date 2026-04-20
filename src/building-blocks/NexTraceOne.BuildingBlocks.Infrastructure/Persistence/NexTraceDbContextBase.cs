@@ -75,17 +75,17 @@ public abstract class NexTraceDbContextBase(
         base.OnModelCreating(modelBuilder);
     }
 
-    public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         WriteDomainEventsToOutbox();
 
         try
         {
-            return await base.SaveChangesAsync(ct);
+            return await base.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            var entityType = ex.Entries.FirstOrDefault()?.Entity.GetType().Name ?? "Unknown";
+            var entityType = ex.Entries.Count > 0 ? ex.Entries[0].Entity.GetType().Name : "Unknown";
             throw new NexTraceOne.BuildingBlocks.Application.Abstractions.ConcurrencyException(entityType, ex);
         }
     }
@@ -100,7 +100,7 @@ public abstract class NexTraceDbContextBase(
         foreach (var entity in aggregateEntries)
         {
             var domainEvents = GetDomainEvents(entity!);
-            if (domainEvents.Count == 0)
+            if (domainEvents.Length == 0)
             {
                 continue;
             }
@@ -114,7 +114,7 @@ public abstract class NexTraceDbContextBase(
         }
     }
 
-    private static IReadOnlyList<object> GetDomainEvents(object entity)
+    private static object[] GetDomainEvents(object entity)
         => (entity.GetType().GetProperty("DomainEvents")?.GetValue(entity) as System.Collections.IEnumerable)
             ?.Cast<object>()
             .ToArray()

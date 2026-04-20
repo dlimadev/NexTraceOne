@@ -15,8 +15,7 @@ namespace NexTraceOne.Notifications.Infrastructure.Engine;
 /// dentro de uma janela temporal configurável.
 /// Evita spam óbvio e duplicação por reprocessamento de eventos.
 /// A janela e o estado do feature são lidos de <c>notifications.dedup.*</c> via
-/// <see cref="IConfigurationResolutionService"/>; caso a chave não exista usa-se
-/// o valor do parâmetro <paramref name="windowMinutes"/> como fallback.
+/// <see cref="IConfigurationResolutionService"/>.
 /// </summary>
 internal sealed class NotificationDeduplicationService(
     NotificationsDbContext context,

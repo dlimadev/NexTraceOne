@@ -49,7 +49,7 @@ public sealed class ContractNegotiation : AuditableEntity<ContractNegotiationId>
     public string? ProposedContractSpec { get; private set; }
 
     /// <summary>Momento de criação da negociação.</summary>
-    public DateTimeOffset CreatedAt { get; private set; }
+    public new DateTimeOffset CreatedAt { get; private set; }
 
     /// <summary>Momento da última atividade na negociação.</summary>
     public DateTimeOffset LastActivityAt { get; private set; }

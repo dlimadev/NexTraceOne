@@ -98,7 +98,7 @@ public static class GetEnvironmentPromotionPath
             if (lastApproved is not null)
                 return lastApproved.TargetEnvironment;
 
-            var firstPending = steps.FirstOrDefault();
+            var firstPending = steps.Count > 0 ? steps[0] : null;
             return firstPending?.SourceEnvironment;
         }
     }

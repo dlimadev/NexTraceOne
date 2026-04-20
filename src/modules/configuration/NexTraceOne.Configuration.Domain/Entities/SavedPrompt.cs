@@ -84,7 +84,7 @@ public sealed class SavedPrompt : Entity<SavedPromptId>
     }
 
     private static string NormalizeContextType(string? contextType) =>
-        ValidContextTypes.Contains(contextType?.Trim().ToLower(), StringComparer.OrdinalIgnoreCase)
-            ? contextType!.Trim().ToLower()
+        ValidContextTypes.Contains(contextType?.Trim().ToLowerInvariant(), StringComparer.OrdinalIgnoreCase)
+            ? contextType!.Trim().ToLowerInvariant()
             : "general";
 }

@@ -83,9 +83,9 @@ public static class DiffCanonicalEntityVersions
 
             foreach (var field in toFields)
             {
-                if (!fromFields.ContainsKey(field.Key))
+                if (!fromFields.TryGetValue(field.Key, out var fromValue))
                     added.Add(field.Key);
-                else if (fromFields[field.Key] != field.Value)
+                else if (fromValue != field.Value)
                     modified.Add(field.Key);
             }
 

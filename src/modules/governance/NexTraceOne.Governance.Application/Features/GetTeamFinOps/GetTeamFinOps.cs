@@ -103,7 +103,7 @@ public static class GetTeamFinOps
             var response = new Response(
                 TeamId: request.TeamId,
                 TeamName: request.TeamId,
-                Domain: records.FirstOrDefault()?.Domain ?? string.Empty,
+                Domain: records.Count > 0 ? records[0].Domain ?? string.Empty : string.Empty,
                 TotalMonthlyCost: totalCost,
                 PreviousMonthCost: previousMonthCost,
                 CostTrend: GetTrendDirection(previousMonthCost, totalCost, trendThresholdPct),

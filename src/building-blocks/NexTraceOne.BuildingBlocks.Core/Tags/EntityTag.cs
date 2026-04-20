@@ -46,9 +46,9 @@ public sealed class EntityTag : AuditableEntity<EntityTagId>
         {
             Id = new EntityTagId(Guid.NewGuid()),
             TenantId = tenantId,
-            EntityType = entityType.Trim().ToLower(),
+            EntityType = entityType.Trim().ToLowerInvariant(),
             EntityId = entityId,
-            Key = key.Trim().ToLower(),
+            Key = key.Trim().ToLowerInvariant(),
             Value = value?.Trim() ?? string.Empty,
         };
 

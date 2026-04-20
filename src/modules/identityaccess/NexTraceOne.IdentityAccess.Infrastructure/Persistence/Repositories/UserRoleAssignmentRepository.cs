@@ -86,7 +86,7 @@ internal sealed class UserRoleAssignmentRepository(IdentityDbContext context)
                 cancellationToken);
 
     /// <inheritdoc />
-    public async Task<UserRoleAssignment?> GetByIdAsync(
+    public override async Task<UserRoleAssignment?> GetByIdAsync(
         UserRoleAssignmentId id,
         CancellationToken cancellationToken)
         => await context.UserRoleAssignments

@@ -54,7 +54,7 @@ public sealed class UserWatch : Entity<UserWatchId>
         Guard.Against.NullOrWhiteSpace(entityType, nameof(entityType));
         Guard.Against.NullOrWhiteSpace(entityId, nameof(entityId));
 
-        if (!ValidEntityTypes.Contains(entityType.Trim().ToLower(), StringComparer.OrdinalIgnoreCase))
+        if (!ValidEntityTypes.Contains(entityType.Trim().ToLowerInvariant(), StringComparer.OrdinalIgnoreCase))
             throw new ArgumentException($"EntityType must be one of: {string.Join(", ", ValidEntityTypes)}", nameof(entityType));
 
         return new UserWatch
@@ -62,7 +62,7 @@ public sealed class UserWatch : Entity<UserWatchId>
             Id = new UserWatchId(Guid.NewGuid()),
             UserId = userId.Trim(),
             TenantId = tenantId.Trim(),
-            EntityType = entityType.Trim().ToLower(),
+            EntityType = entityType.Trim().ToLowerInvariant(),
             EntityId = entityId.Trim(),
             NotifyLevel = NormalizeNotifyLevel(notifyLevel),
             CreatedAt = createdAt,
@@ -77,9 +77,9 @@ public sealed class UserWatch : Entity<UserWatchId>
     }
 
     private static string NormalizeNotifyLevel(string? level) =>
-        level?.Trim().ToLower() switch
+        level?.Trim().ToLowerInvariant() switch
         {
-            "all" or "critical" or "none" => level.Trim().ToLower(),
+            "all" or "critical" or "none" => level.Trim().ToLowerInvariant(),
             _ => "all"
         };
 }

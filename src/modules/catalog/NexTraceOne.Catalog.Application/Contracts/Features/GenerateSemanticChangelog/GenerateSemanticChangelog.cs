@@ -89,7 +89,7 @@ public static class GenerateSemanticChangelog
 
             return new Response(
                 request.ApiAssetId,
-                versions.First().ApiAssetId.ToString(),
+                versions[0].ApiAssetId.ToString(),
                 entries.AsReadOnly());
         }
 

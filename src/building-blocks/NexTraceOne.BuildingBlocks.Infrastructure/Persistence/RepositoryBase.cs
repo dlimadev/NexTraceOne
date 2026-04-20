@@ -13,8 +13,8 @@ public abstract class RepositoryBase<TEntity, TId>(DbContext context)
     where TEntity : Entity<TId>
     where TId     : ITypedId
 {
-    protected readonly DbContext Context = context;
-    protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
+    protected DbContext Context { get; } = context;
+    protected DbSet<TEntity> DbSet { get; } = context.Set<TEntity>();
 
     public virtual async Task<TEntity?> GetByIdAsync(TId id, CancellationToken ct = default)
         => await DbSet.FindAsync(new object[] { id }, ct);

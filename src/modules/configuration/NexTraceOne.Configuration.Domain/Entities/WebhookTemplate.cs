@@ -88,7 +88,7 @@ public sealed class WebhookTemplate : Entity<WebhookTemplateId>
     }
 
     private static string NormalizeEventType(string? eventType) =>
-        ValidEventTypes.Contains(eventType?.Trim().ToLower(), StringComparer.OrdinalIgnoreCase)
-            ? eventType!.Trim().ToLower()
+        ValidEventTypes.Contains(eventType?.Trim().ToLowerInvariant(), StringComparer.OrdinalIgnoreCase)
+            ? eventType!.Trim().ToLowerInvariant()
             : ValidEventTypes[0];
 }

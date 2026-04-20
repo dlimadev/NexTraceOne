@@ -33,7 +33,7 @@ public static class HealthCheckResponseWriter
                 DurationMs: entry.Value.Duration.TotalMilliseconds,
                 Tags: entry.Value.Tags.Any() ? entry.Value.Tags.ToArray() : null,
                 Data: entry.Value.Data.Count > 0
-                    ? entry.Value.Data.ToDictionary(pair => pair.Key, pair => pair.Value)
+                    ? entry.Value.Data.ToDictionary(pair => pair.Key, pair => (object?)pair.Value)
                     : null,
                 HasException: entry.Value.Exception is not null)).ToArray());
 

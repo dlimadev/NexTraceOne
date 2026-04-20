@@ -25,7 +25,7 @@ internal sealed class AnomalyNarrativeRepository(RuntimeIntelligenceDbContext co
             .SingleOrDefaultAsync(n => n.DriftFindingId == driftFindingId, cancellationToken);
 
     /// <summary>Persiste alterações à narrativa existente.</summary>
-    public void Update(AnomalyNarrative narrative)
+    public new void Update(AnomalyNarrative narrative)
     {
         context.AnomalyNarratives.Update(narrative);
     }

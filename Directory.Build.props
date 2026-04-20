@@ -3,13 +3,36 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1591</NoWarn>
-    <!-- Suppress MSB3277 assembly version conflicts caused by Npgsql.EntityFrameworkCore.PostgreSQL 10.0.1
-         transitively pulling Microsoft.EntityFrameworkCore.Relational 10.0.4 while we use EF Core 10.0.5.
-         .NET runtime handles binding to the higher version correctly at runtime. -->
-    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+    <!-- Suppressed warnings — see docs/HONEST-GAPS.md QLT-03 for full rationale:
+         1591: Missing XML comment — enforced selectively, not globally.
+         CA1848/CA1873: Use [LoggerMessage] / avoid eager string eval in logging — bulk migration deferred.
+         CS8907: Record primary constructor param shadowing inherited init property — C# 13 limitation.
+         CA1716: Reserved keyword as param/type name — domain types intentionally named.
+         CA1720: Identifier contains type name — domain enum members (String, Integer, Decimal) intentional.
+         CA1859: Change type for performance — API stability takes precedence.
+         CA1000: Static factory on generic type — Result<T>.Success() is idiomatic.
+         CA1304/CA1305/CA1310/CA1311: Specify culture/StringComparison/IFormatProvider — fixed where critical; bulk remainder deferred.
+         CA1711: Don't end in 'EventHandler' — IIntegrationEventHandler naming intentional.
+         CA1805: Don't initialize to default — explicit defaults aid readability.
+         CA2016: Forward CancellationToken — bulk audit deferred; no functional impact.
+         CA1822: Mark as static — virtual-dispatch pattern; not always applicable.
+         CA1861: Prefer static readonly — constant array args acceptable in non-hot paths.
+         CA1862: Use string.Equals with StringComparison — ToLower/Contains patterns acceptable.
+         CS9113: Primary constructor parameter unread — used as DI injection point for future use (stubs).
+         CS1570/CS1574/CS1587: XML comment issues — doc comment formatting; no runtime impact.
+         CA1860: Prefer Count > 0 over Any() — both are readable; deferred.
+         CA1865: Use EndsWith(char) instead of EndsWith(string) — deferred.
+         CA1725: Rename CancellationToken parameter to 'cancellationToken' — codebase convention is 'ct'; bulk rename deferred.
+         CA1869: Cache JsonSerializerOptions — valid concern; static field refactoring deferred for local serialization.
+         CS1573: Missing param tag in XML doc for CancellationToken — doc completeness deferred.
+         CA1825: Use Array.Empty — minor allocation; fixed in critical paths, deferred elsewhere.
+         IDE0161: Convert to file-scoped namespace — EF Core migration files are auto-generated.
+         CA1707: Remove underscores from type name — migration class names are EF Core conventions.
+         CA5350: HMACSHA1 is weak — TOTP (RFC 6238) mandates HMAC-SHA1 by specification.
+         MSB3277: Assembly version conflict (Npgsql.EF 10.0.1 pulling EF Relational 10.0.4; runtime resolves). -->
+    <NoWarn>1591;CA1848;CA1873;CS8907;CA1716;CA1720;CA1859;CA1000;CA1304;CA1305;CA1310;CA1311;CA1711;CA1805;CA2016;CA1822;CA1861;CA1862;CS9113;CS1570;CS1574;CS1587;IDE0161;CA1707;CA5350;CA1725;CA1869;CS1573;CA1825;CA1860;CA1865;MSB3277</NoWarn>
     <LangVersion>latest</LangVersion>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

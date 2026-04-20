@@ -41,7 +41,7 @@ public static class GetUserPreferences
 
             var preferences = entries
                 .Where(e => e.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                .Select(e => new PreferenceItem(e.Key, e.Value, e.UpdatedAt))
+                .Select(e => new PreferenceItem(e.Key, e.Value ?? string.Empty, e.UpdatedAt))
                 .OrderBy(e => e.Key)
                 .ToList();
 

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace NexTraceOne.BuildingBlocks.Core.Results;
 
 /// <summary>
@@ -12,7 +14,7 @@ public sealed record Error(string Code, string Message, ErrorType Type)
     /// <summary>Mensagem final formatada com os argumentos informados.</summary>
     public string FormattedMessage => MessageArgs.Length == 0
         ? Message
-        : string.Format(Message, MessageArgs);
+        : string.Format(CultureInfo.InvariantCulture, Message, MessageArgs);
 
     /// <summary>Cria um erro NotFound com suporte a argumentos de formatação.</summary>
     public static Error NotFound(string code, string msg, params object[] args)
