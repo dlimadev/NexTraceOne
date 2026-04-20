@@ -27,6 +27,7 @@ using RecordCanaryRolloutFeature = NexTraceOne.ChangeGovernance.Application.Chan
 using GetCanaryRolloutStatusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetCanaryRolloutStatus.GetCanaryRolloutStatus;
 using GetChangeConfidenceBreakdownFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeConfidenceBreakdown.GetChangeConfidenceBreakdown;
 using ComputeChangeConfidenceBreakdownFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeConfidenceBreakdown.ComputeChangeConfidenceBreakdown;
+using GetPromotionReadinessDeltaFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPromotionReadinessDelta.GetPromotionReadinessDelta;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -333,6 +334,29 @@ internal static class ChangeConfidenceEndpoints
         }).RequirePermission("change-intelligence:write")
           .WithTags("Change Intelligence")
           .WithSummary("Computa e persiste o breakdown do Change Confidence Score 2.0");
+
+        // ── Promotion Readiness Delta ─────────────────────────────────────
+        // Devolve deltas relativos entre dois ambientes para um serviço,
+        // prontos para alimentar a UX de ReleaseTrain e um gate de promoção
+        // consciente do risco. Sem bridge real configurada, devolve snapshot
+        // simulado marcado via Response.SimulatedNote.
+
+        group.MapGet("/promotion-readiness-delta", async (
+            string service,
+            string from,
+            string to,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int? days = null) =>
+        {
+            var result = await sender.Send(
+                new GetPromotionReadinessDeltaFeature.Query(service, from, to, days),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read")
+          .WithTags("Change Intelligence")
+          .WithSummary("Deltas runtime entre ambientes para decisão de promoção");
     }
 
     private sealed record ChangeFilterOptionsResponse(
