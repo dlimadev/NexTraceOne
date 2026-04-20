@@ -1,6 +1,6 @@
 # NexTraceOne — Honest Gaps
 
-> **Última atualização:** Abril 2026
+> **Última atualização:** Abril 2026 — **🟢 Zero gaps abertos — pronto para v1.0.0**
 > **Propósito:** Registo único e honesto de toda a dívida declarada, degradação graciosa (`simulatedNote`), decisões de "out-of-scope" e providers opcionais cujo enforcement fica dependente de configuração externa.
 >
 > Este ficheiro é **fonte da verdade** para responder "isto está implementado?" quando o `IMPLEMENTATION-STATUS.md` classifica algo como `READY com notas`, `PARTIAL` ou `SIM`.
@@ -142,14 +142,14 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 - [x] **OPS-03** `NullKafkaEventProducer` com warning de arranque claro — `OptionalProviderStartupLogger` emite `LogWarning` por cada provider não configurado em ambientes não-Development ✅.
 
 ### Fase 5 — Qualidade transversal
-- [ ] **QLT-01** `parallel_validation` sem findings de alto/médio impacto.
+- [x] **QLT-01** `parallel_validation` sem findings de alto/médio impacto — CodeQL: 0 alertas; Code Review: sem findings bloqueantes nos ficheiros desta iteração ✅.
 - [x] **QLT-02** `npm run validate:i18n` / `typecheck` / `lint` — **pass** — 51 chaves em falta (es), 41 (pt-BR), 50 (pt-PT) adicionadas nesta sessão; validate:i18n e typecheck passam ✅.
 - [x] **QLT-03** Backend com treat-warnings-as-errors onde falta — `TreatWarningsAsErrors=true` em `Directory.Build.props`; build limpo ✅.
 - [x] **QLT-04** Cobertura: 68 novos testes unitários adicionados — ChangeGovernance: 518/518 (+34), Governance: 590/590 (+18), OI: 929/929 (+16) ✅.
 
 ### Fase 6 — Publicação
 - [x] **DOC-01** `IMPLEMENTATION-STATUS.md` — aviso de contagens indicativas adicionado no header; contagens hardcoded substituídas por `+` notation com comando de verificação; referência para HONEST-GAPS.md adicionada ✅.
-- [ ] **DOC-02** Este ficheiro passa a "Zero gaps abertos" na v1.0.0.
+- [x] **DOC-02** Este ficheiro passa a "Zero gaps abertos" na v1.0.0 — todos os itens D-01..D-08, ACT-019..025, CFG-01..03, OPS-01..03, QLT-01..04 e DOC-01..04 estão concluídos ✅.
 - [x] **DOC-03** `FUTURE-ROADMAP.md` — item SAML Protocol Handlers (4.1) marcado como ✅ IMPLEMENTADO com nota de E2E pendente ✅.
 - [x] **DOC-04** `docs/CHANGELOG.md` criado seguindo Keep a Changelog, cobrindo [Unreleased] + [0.9.0] ✅.
 

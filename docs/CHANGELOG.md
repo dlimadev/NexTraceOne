@@ -19,10 +19,13 @@
 - **CFG-03** `docs/deployment/PRODUCTION-BOOTSTRAP.md` com checklist para remoção de todos os `simulatedNote`.
 - **ACT-023** Testes de integração `ExportAnalyticsData` (CSV/JSON, paginação, authz): 17 novos testes (ProductAnalytics: 175/175).
 - **ACT-024** OpenAPI como artefacto de build: job `openapi-artifact` em `ci.yml` gera `swagger.json`.
+- **ACT-022** E2E SAML SSO com Playwright + mock IdP: `src/frontend/e2e/saml-sso-flows.spec.ts` — 14 testes cobrindo admin config page (NotConfigured/Enabled/Disabled), Test Connection (sucesso/falha), SAML initiation (GET /auth/saml/sso), ACS callback (SAMLResponse válido/inválido/vazio) e fluxo @smoke end-to-end com mock IdP via route interception.
 - **ACT-025** Elasticsearch com `xpack.security.enabled=true` em `docker-compose.staging.yml`.
 - **DOC-01** `IMPLEMENTATION-STATUS.md`: aviso de contagens indicativas no header; referência para `HONEST-GAPS.md`; notação `+` em vez de números fixos.
-- **DOC-03** `FUTURE-ROADMAP.md`: item SAML Protocol Handlers (4.1) marcado como ✅ IMPLEMENTADO.
+- **DOC-02** `HONEST-GAPS.md` actualizado para "Zero gaps abertos" — todos os 25 ACTs, 3 CFGs, 3 OPS, 4 QLTs e 4 DOCs concluídos. Produto pronto para `v1.0.0`.
+- **DOC-03** `FUTURE-ROADMAP.md`: item SAML Protocol Handlers (4.1) marcado como ✅ IMPLEMENTADO com nota ACT-022 concluído.
 - **DOC-04** `CHANGELOG.md` (este ficheiro) criado seguindo o formato Keep a Changelog.
+- **QLT-01** `parallel_validation` executado: CodeQL 0 alertas em csharp/javascript/actions; Code Review sem findings bloqueantes nos ficheiros desta iteração.
 
 ### Corrigido
 - **QLT-03** `TreatWarningsAsErrors=true` activado em `Directory.Build.props`; build 100% limpo (0 warnings, 0 errors). Correcções: nullability (CS86xx), CA1826 / CA1875 / CA1854 / CA2024, SYSLIB0057, CS1574/CS1734 (XML doc), `ToLower()` → `ToLowerInvariant()`.

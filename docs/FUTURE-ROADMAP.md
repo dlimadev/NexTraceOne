@@ -76,7 +76,8 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ### 4.1 SAML Protocol Handlers ✅ IMPLEMENTADO (Abril 2026)
 - **Estado:** ✅ `ISamlProvider` + `NullSamlProvider` + `ConfigurationSamlProvider` implementados; SAML aparece em `/admin/system-health` como 5º provider opcional. Fluxo `StartSamlLogin` / `CompleteSamlLogin` funcional em modo controlado.
-- **Pendente futuro:** E2E SAML SSO com Playwright + mock IdP real (ADFS/Okta/PingFederate). Necessita sessão dedicada com docker-compose IdP stack.
+- **E2E:** ✅ `src/frontend/e2e/saml-sso-flows.spec.ts` — 14 testes Playwright cobrindo admin config page, SAML initiation, ACS callback e end-to-end flow com mock IdP via route interception (ACT-022 concluído Abril 2026).
+- **Futuro:** Testes com IdP real (ADFS/Okta/PingFederate) em docker-compose stack — apenas para certificação enterprise, não bloqueante para v1.0.0.
 - **Dependência:** Integração com identity provider específico para testes E2E
 - **Referência:** GAP-AI-08, DEG-11 (HONEST-GAPS.md Nível A′ → promovido a A)
 
