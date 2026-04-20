@@ -13130,5 +13130,31 @@
       "medium": "Medium"
     },
     "empty": "No ownership drift detected"
+  },
+  "correlationFeatures": {
+    "title": "Correlation Feature Score",
+    "temporalProximity": "Temporal Proximity",
+    "serviceMatch": "Service Match",
+    "ownershipAlignment": "Ownership Alignment",
+    "weightedTotal": "Weighted Total Score",
+    "confidenceLabel": "Confidence",
+    "noChangeDetails": "Change details not available"
+  },
+  "runbookExecution": {
+    "title": "Runbook Step Execution",
+    "execute": "Execute Step",
+    "status": "Execution Status",
+    "output": "Output Summary",
+    "error": "Error Detail",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "pending": "Pending"
+  },
+  "mitigationSimilarity": {
+    "title": "Similar Incident Mitigations",
+    "reference": "Reference Incident",
+    "similarity": "Similarity Score",
+    "suggestion": "Suggested Mitigation",
+    "noResults": "No similar incidents found"
   }
 }

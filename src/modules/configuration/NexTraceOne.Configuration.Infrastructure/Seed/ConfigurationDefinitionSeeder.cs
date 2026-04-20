@@ -7002,5 +7002,73 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "0.6",
             uiEditorType: "number",
             sortOrder: 5150),
+
+        // ── Operational Intelligence — Correlation Feature Scoring (Wave A.5) ───────────
+
+        ConfigurationDefinition.Create(
+            key: "oi.correlation.feature.temporalWeight",
+            displayName: "config.oi.correlation.feature.temporalWeight.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.correlation.feature.temporalWeight.description",
+            defaultValue: "0.4",
+            uiEditorType: "number",
+            sortOrder: 5200),
+
+        ConfigurationDefinition.Create(
+            key: "oi.correlation.feature.serviceWeight",
+            displayName: "config.oi.correlation.feature.serviceWeight.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.correlation.feature.serviceWeight.description",
+            defaultValue: "0.4",
+            uiEditorType: "number",
+            sortOrder: 5210),
+
+        ConfigurationDefinition.Create(
+            key: "oi.correlation.feature.ownershipWeight",
+            displayName: "config.oi.correlation.feature.ownershipWeight.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.correlation.feature.ownershipWeight.description",
+            defaultValue: "0.2",
+            uiEditorType: "number",
+            sortOrder: 5220),
+
+        ConfigurationDefinition.Create(
+            key: "oi.runbook.maxConcurrentExecutions",
+            displayName: "config.oi.runbook.maxConcurrentExecutions.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.runbook.maxConcurrentExecutions.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 5230),
+
+        ConfigurationDefinition.Create(
+            key: "oi.similarity.lookbackDays",
+            displayName: "config.oi.similarity.lookbackDays.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.similarity.lookbackDays.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 5240),
+
+        ConfigurationDefinition.Create(
+            key: "oi.similarity.minScore",
+            displayName: "config.oi.similarity.minScore.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.similarity.minScore.description",
+            defaultValue: "1",
+            uiEditorType: "number",
+            sortOrder: 5250),
     ];
 }

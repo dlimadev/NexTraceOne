@@ -13140,5 +13140,31 @@
       "medium": "Medio"
     },
     "empty": "Sin drift de ownership detectado"
+  },
+  "correlationFeatures": {
+    "title": "Puntuación de Características de Correlación",
+    "temporalProximity": "Proximidad Temporal",
+    "serviceMatch": "Coincidencia de Servicio",
+    "ownershipAlignment": "Alineación de Ownership",
+    "weightedTotal": "Puntuación Total Ponderada",
+    "confidenceLabel": "Confianza",
+    "noChangeDetails": "Detalles del cambio no disponibles"
+  },
+  "runbookExecution": {
+    "title": "Ejecución de Paso de Runbook",
+    "execute": "Ejecutar Paso",
+    "status": "Estado de Ejecución",
+    "output": "Resumen de Salida",
+    "error": "Detalle de Error",
+    "succeeded": "Exitoso",
+    "failed": "Fallido",
+    "pending": "Pendiente"
+  },
+  "mitigationSimilarity": {
+    "title": "Mitigaciones de Incidentes Similares",
+    "reference": "Incidente de Referencia",
+    "similarity": "Puntuación de Similaridad",
+    "suggestion": "Mitigación Sugerida",
+    "noResults": "No se encontraron incidentes similares"
   }
 }
