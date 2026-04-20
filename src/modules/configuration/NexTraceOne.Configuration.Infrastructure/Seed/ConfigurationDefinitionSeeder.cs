@@ -7070,5 +7070,51 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "1",
             uiEditorType: "number",
             sortOrder: 5250),
+
+        // ── Block: Ecosystem Integrations — Backstage Bridge & External Change ─
+
+        ConfigurationDefinition.Create(
+            key: "integrations.backstage.instanceUrl",
+            displayName: "config.integrations.backstage.instanceUrl.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.backstage.instanceUrl.description",
+            defaultValue: "",
+            uiEditorType: "text",
+            sortOrder: 5450),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.backstage.exportEnabled",
+            displayName: "config.integrations.backstage.exportEnabled.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.backstage.exportEnabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5460),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.externalChange.autoLinkEnabled",
+            displayName: "config.integrations.externalChange.autoLinkEnabled.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.externalChange.autoLinkEnabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 5470),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.externalChange.allowedSystems",
+            displayName: "config.integrations.externalChange.allowedSystems.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.externalChange.allowedSystems.description",
+            defaultValue: """["ServiceNow","Jira","AzureDevOps","Generic"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5480),
     ];
 }

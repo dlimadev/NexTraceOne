@@ -13156,5 +13156,32 @@
     "similarity": "Similarity Score",
     "suggestion": "Suggested Mitigation",
     "noResults": "No similar incidents found"
+  },
+  "backstageBridge": {
+    "title": "Backstage Export",
+    "export": "Export to Backstage",
+    "totalExported": "Total Exported",
+    "namespace": "Namespace",
+    "lifecycle": "Lifecycle",
+    "exportSuccess": "Export completed successfully",
+    "noServices": "No services to export"
+  },
+  "externalChangeRequest": {
+    "title": "External Change Requests",
+    "import": "Import Change Request",
+    "externalSystem": "External System",
+    "externalId": "External ID",
+    "changeType": "Change Type",
+    "requestedBy": "Requested By",
+    "scheduledStart": "Scheduled Start",
+    "scheduledEnd": "Scheduled End",
+    "status": {
+      "pending": "Pending",
+      "ingested": "Ingested",
+      "linked": "Linked",
+      "rejected": "Rejected"
+    },
+    "importSuccess": "Change request imported",
+    "alreadyExists": "Change request already ingested"
   }
 }

@@ -1,0 +1,164 @@
+# ============================================================================
+# NexTraceOne — OpenTelemetry Collector Recipe (Production-Ready)
+# ============================================================================
+# Purpose: Receive OTLP traces and metrics from any OTel-instrumented service
+#          and forward them to the NexTraceOne Ingestion API.
+#
+# Prerequisites:
+#   - OpenTelemetry Collector Contrib >= 0.100.0
+#   - NexTraceOne Ingestion API running and accessible from the collector
+#   - Set environment variables: NEXTRACEONE_API_KEY, NEXTRACEONE_TENANT,
+#     NEXTRACEONE_ENVIRONMENT, NEXTRACEONE_INGESTION_URL
+# ============================================================================
+
+extensions:
+  # ── Memory Limiter ──────────────────────────────────────────────────────────
+  # Prevents OOM conditions under high load by limiting heap usage.
+  memory_ballast:
+    size_mib: 256
+
+  health_check:
+    endpoint: "0.0.0.0:13133"
+
+  zpages:
+    endpoint: "0.0.0.0:55679"
+
+# ============================================================================
+# RECEIVERS — accept OTLP traces and metrics
+# ============================================================================
+receivers:
+  # ── OTLP Receiver (gRPC + HTTP) ────────────────────────────────────────────
+  # Accept telemetry from any OTel SDK or agent using the OTLP protocol.
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+# ============================================================================
+# PROCESSORS — enrich, batch and protect telemetry before export
+# ============================================================================
+processors:
+  # ── Memory Limiter ──────────────────────────────────────────────────────────
+  # Must be the first processor in the pipeline for stability.
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  # ── Batch Processor ─────────────────────────────────────────────────────────
+  # Reduces export overhead by batching signals before sending.
+  batch:
+    timeout: 10s
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+
+  # ── Resource Attributes ─────────────────────────────────────────────────────
+  # Inject NexTraceOne-specific resource attributes into every signal.
+  # These drive service correlation, tenant isolation, and environment context.
+  resource:
+    attributes:
+      # Tenant identifier — required for multi-tenant NexTraceOne deployments
+      - key: nextraceone.tenant
+        value: "${env:NEXTRACEONE_TENANT}"
+        action: upsert
+      # Logical environment (e.g., production, staging, development)
+      - key: nextraceone.environment
+        value: "${env:NEXTRACEONE_ENVIRONMENT}"
+        action: upsert
+      # OTel semantic convention for deployment environment
+      - key: deployment.environment
+        value: "${env:NEXTRACEONE_ENVIRONMENT}"
+        action: upsert
+
+# ============================================================================
+# EXPORTERS — send enriched telemetry to NexTraceOne
+# ============================================================================
+exporters:
+  # ── NexTraceOne Traces Exporter ────────────────────────────────────────────
+  # Sends traces to the NexTraceOne Ingestion API via OTLP/HTTP.
+  # NexTraceOne correlates these traces with releases, services, and incidents.
+  otlphttp/nextraceone_traces:
+    endpoint: "${env:NEXTRACEONE_INGESTION_URL}"
+    headers:
+      # API key for authentication — store securely, never commit to source control
+      Authorization: "Bearer ${env:NEXTRACEONE_API_KEY}"
+      X-NexTraceOne-Tenant: "${env:NEXTRACEONE_TENANT}"
+    tls:
+      insecure: false
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 120s
+    sending_queue:
+      enabled: true
+      num_consumers: 4
+      queue_size: 1000
+
+  # ── NexTraceOne Metrics Exporter ───────────────────────────────────────────
+  # Sends metrics to NexTraceOne for service reliability and FinOps correlation.
+  otlphttp/nextraceone_metrics:
+    endpoint: "${env:NEXTRACEONE_INGESTION_URL}"
+    headers:
+      Authorization: "Bearer ${env:NEXTRACEONE_API_KEY}"
+      X-NexTraceOne-Tenant: "${env:NEXTRACEONE_TENANT}"
+    tls:
+      insecure: false
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 120s
+    sending_queue:
+      enabled: true
+      num_consumers: 2
+      queue_size: 500
+
+  # ── Debug Exporter (optional, disable in production) ───────────────────────
+  # Logs telemetry to stdout for local troubleshooting. Remove in production.
+  debug:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+# ============================================================================
+# SERVICE — wire receivers, processors, and exporters into pipelines
+# ============================================================================
+service:
+  extensions:
+    - memory_ballast
+    - health_check
+    - zpages
+
+  pipelines:
+    # ── Traces Pipeline ────────────────────────────────────────────────────────
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter    # always first
+        - resource          # enrich before batching
+        - batch             # batch before export
+      exporters:
+        - otlphttp/nextraceone_traces
+        # - debug           # uncomment for local troubleshooting
+
+    # ── Metrics Pipeline ───────────────────────────────────────────────────────
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - resource
+        - batch
+      exporters:
+        - otlphttp/nextraceone_metrics
+        # - debug           # uncomment for local troubleshooting
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      address: "0.0.0.0:8888"

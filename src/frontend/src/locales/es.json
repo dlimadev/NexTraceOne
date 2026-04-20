@@ -13166,5 +13166,32 @@
     "similarity": "Puntuación de Similaridad",
     "suggestion": "Mitigación Sugerida",
     "noResults": "No se encontraron incidentes similares"
+  },
+  "backstageBridge": {
+    "title": "Exportación Backstage",
+    "export": "Exportar a Backstage",
+    "totalExported": "Total Exportado",
+    "namespace": "Espacio de Nombres",
+    "lifecycle": "Ciclo de Vida",
+    "exportSuccess": "Exportación completada correctamente",
+    "noServices": "No hay servicios para exportar"
+  },
+  "externalChangeRequest": {
+    "title": "Solicitudes de Cambio Externas",
+    "import": "Importar Solicitud de Cambio",
+    "externalSystem": "Sistema Externo",
+    "externalId": "ID Externo",
+    "changeType": "Tipo de Cambio",
+    "requestedBy": "Solicitado Por",
+    "scheduledStart": "Inicio Programado",
+    "scheduledEnd": "Fin Programado",
+    "status": {
+      "pending": "Pendiente",
+      "ingested": "Ingerido",
+      "linked": "Vinculado",
+      "rejected": "Rechazado"
+    },
+    "importSuccess": "Solicitud de cambio importada",
+    "alreadyExists": "Solicitud de cambio ya ingerida"
   }
 }

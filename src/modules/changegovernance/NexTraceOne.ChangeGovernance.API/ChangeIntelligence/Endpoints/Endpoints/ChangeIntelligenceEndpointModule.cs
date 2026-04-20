@@ -44,5 +44,8 @@ public sealed class ChangeIntelligenceEndpointModule
 
         // Commit pool precisa de acesso ao group e ao app raiz (para /api/v1/integrations/commits)
         CommitPoolEndpoints.Map(group, app);
+
+        // Bridge de pedidos de mudança externos (ServiceNow, Jira, AzureDevOps, Generic)
+        ExternalChangeBridgeEndpoints.Map(app);
     }
 }

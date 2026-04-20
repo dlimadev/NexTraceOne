@@ -322,9 +322,9 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 #### B.3 Ingestão real e ecosistema
 
 - **Kafka/RabbitMQ/Service Bus consumers reais** — mantém o que está em §3.2/3.3.
-- **OpenTelemetry Collector recipe oficial** — YAML exporter pronto para qualquer stack OTel alimentar NexTraceOne em minutos.
-- **Backstage bridge bidirectional** — export além do `ImportFromBackstage` existente, posicionando NexTraceOne como camada de governance superior.
-- **ServiceNow / Jira Change bridge** — importar CRs externos como `Change` entities governadas.
+- **OpenTelemetry Collector recipe oficial** ✅ — YAML exporter pronto para qualquer stack OTel alimentar NexTraceOne em minutos (`docs/otel-collector-recipe.yaml` + `docs/OTEL-INTEGRATION-GUIDE.md`).
+- **Backstage bridge bidirectional** ✅ — `ExportToBackstage` query no módulo Catalog (endpoint `GET /api/v1/catalog/services/export/backstage`), mapeando ServiceAssets para entidades Backstage Component com anotações NexTraceOne, namespace, lifecycle e owner configuráveis. Complementa o `ImportFromBackstage` existente. Config keys `integrations.backstage.instanceUrl` e `integrations.backstage.exportEnabled` (sort 5450–5460).
+- **ServiceNow / Jira Change bridge** ✅ — `ExternalChangeRequest` domain entity com `ExternalChangeRequestStatus` enum, `IExternalChangeRequestRepository`, `ImportExternalChangeRequest` command (idempotente por chave natural ExternalSystem+ExternalId), `EfExternalChangeRequestRepository`, migration `20260420190000_CG_AddExternalChangeRequest` (tabela `cg_external_change_requests`). Endpoints `POST/GET /api/v1/changes/external-change-requests`. Config keys `integrations.externalChange.autoLinkEnabled` e `integrations.externalChange.allowedSystems` (sort 5470–5480). 22 testes unitários.
 
 #### B.4 Knowledge Hub — de documentos para grafo vivo ✅
 

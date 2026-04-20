@@ -61,6 +61,7 @@ public static class DependencyInjection
         services.AddScoped<IReleaseNotesRepository, ReleaseNotesRepository>();
         services.AddScoped<IPromotionGateRepository, PromotionGateRepository>();
         services.AddScoped<IPromotionGateEvaluationRepository, PromotionGateEvaluationRepository>();
+        services.AddScoped<IExternalChangeRequestRepository, EfExternalChangeRequestRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();

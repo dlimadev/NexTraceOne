@@ -61,6 +61,7 @@ using GetServiceTierPolicyFeature = NexTraceOne.Catalog.Application.Graph.Featur
 using DetectOwnershipDriftFeature = NexTraceOne.Catalog.Application.Graph.Features.DetectOwnershipDrift.DetectOwnershipDrift;
 using GetOwnershipDriftReportFeature = NexTraceOne.Catalog.Application.Graph.Features.GetOwnershipDriftReport.GetOwnershipDriftReport;
 using ReviewServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.ReviewServiceOwnership.ReviewServiceOwnership;
+using ExportToBackstageFeature = NexTraceOne.Catalog.Application.Graph.Features.ExportToBackstage.ExportToBackstage;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
@@ -737,6 +738,21 @@ public sealed class ServiceCatalogEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetOwnershipDriftReportFeature.Query(teamName, domain, tier);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Backstage Bridge Export ──────────────────────────────────────
+
+        group.MapGet("/services/export/backstage", async (
+            string? @namespace,
+            string? lifecycle,
+            string? teamName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ExportToBackstageFeature.Query(@namespace, lifecycle, teamName);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");

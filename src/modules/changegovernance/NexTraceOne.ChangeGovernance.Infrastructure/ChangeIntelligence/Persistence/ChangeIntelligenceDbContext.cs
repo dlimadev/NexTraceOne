@@ -82,6 +82,9 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Políticas de aprovação de releases configuráveis por ambiente e serviço.</summary>
     public DbSet<ReleaseApprovalPolicy> ApprovalPolicies => Set<ReleaseApprovalPolicy>();
 
+    /// <summary>Pedidos de mudança externos importados de ServiceNow, Jira, AzureDevOps e sistemas genéricos.</summary>
+    public DbSet<ExternalChangeRequest> ExternalChangeRequests => Set<ExternalChangeRequest>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;
