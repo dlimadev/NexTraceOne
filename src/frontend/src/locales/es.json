@@ -684,7 +684,39 @@
     "viewJourneys": "Jornadas y Embudos",
     "viewModuleAdoption": "Adopción por Módulo",
     "viewPersonaUsage": "Uso por Persona",
-    "viewValueTracking": "Seguimiento de Valor"
+    "viewValueTracking": "Seguimiento de Valor",
+    "cohort": {
+      "title": "Análisis de Cohortes",
+      "subtitle": "Curvas de retención y activación agrupadas por cohorte de primer evento",
+      "granularity": "Granularidad",
+      "week": "Semana",
+      "month": "Mes",
+      "periods": "Períodos",
+      "metric": "Métrica",
+      "retention": "Retención",
+      "activation": "Activación",
+      "cohortLabel": "Cohorte",
+      "users": "Usuarios",
+      "period": "Período",
+      "empty": "No hay datos de cohorte disponibles para el período y la métrica seleccionados."
+    },
+    "journeyConfig": {
+      "title": "Definiciones de Jornadas",
+      "subtitle": "Gestione definiciones configurables de jornadas y embudos para este tenant",
+      "addJourney": "Nueva Jornada",
+      "editJourney": "Editar Jornada",
+      "deleteJourney": "Eliminar Jornada",
+      "journeyId": "ID de Jornada",
+      "journeyName": "Nombre de Jornada",
+      "steps": "Etapas (JSON)",
+      "isActive": "Activa",
+      "global": "Global",
+      "tenant": "Tenant",
+      "deleteConfirm": "¿Está seguro de que desea eliminar esta definición de jornada?",
+      "saveSuccess": "Definición de jornada guardada correctamente.",
+      "deleteSuccess": "Definición de jornada eliminada.",
+      "empty": "No se encontraron definiciones de jornada. Crea una para sobrescribir las jornadas predeterminadas."
+    }
   },
   "apiPolicyAsCode": {
     "auditOnly": "Solo Auditoría",

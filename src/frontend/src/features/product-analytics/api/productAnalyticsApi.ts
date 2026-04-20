@@ -10,6 +10,61 @@ import type {
   FeatureHeatmapResponse,
 } from '../../../types';
 
+// ─── Cohort Analysis types ────────────────────────────────────────────────────
+
+export interface CohortPeriodEntry {
+  period: number;
+  count: number;
+  rate: number;
+}
+
+export interface CohortRow {
+  cohortLabel: string;
+  cohortStart: string;
+  totalUsers: number;
+  periods: CohortPeriodEntry[];
+}
+
+export interface CohortAnalysisResponse {
+  granularity: string;
+  metric: string;
+  cohorts: CohortRow[];
+  maxPeriods: number;
+}
+
+// ─── Journey Definition types ─────────────────────────────────────────────────
+
+export interface JourneyStepDefinition {
+  stepId: string;
+  stepName: string;
+  eventType: string;
+  order: number;
+}
+
+export interface JourneyDefinitionDto {
+  id: string;
+  tenantId: string | null;
+  name: string;
+  key: string;
+  steps: JourneyStepDefinition[];
+  isActive: boolean;
+  isGlobal: boolean;
+  createdAt: string;
+}
+
+export interface CreateJourneyDefinitionRequest {
+  name: string;
+  key: string;
+  steps: JourneyStepDefinition[];
+  isActive: boolean;
+}
+
+export interface UpdateJourneyDefinitionRequest {
+  name: string;
+  steps: JourneyStepDefinition[];
+  isActive: boolean;
+}
+
 export const productAnalyticsApi = {
   getSummary: (params?: {
     persona?: string;
@@ -40,6 +95,30 @@ export const productAnalyticsApi = {
 
   getFeatureHeatmap: (params?: { persona?: string; teamId?: string; range?: string }) =>
     client.get<FeatureHeatmapResponse>('/product-analytics/heatmap', { params }).then((r) => r.data),
+
+  // ─── FEAT-05: Cohort Analysis ───────────────────────────────────────────────
+
+  getCohortAnalysis: (params?: {
+    granularity?: 'week' | 'month';
+    periods?: number;
+    metric?: 'retention' | 'activation';
+    range?: string;
+  }) =>
+    client.get<CohortAnalysisResponse>('/product-analytics/cohorts', { params }).then((r) => r.data),
+
+  // ─── FEAT-03: Journey Definition CRUD ──────────────────────────────────────
+
+  listJourneyDefinitions: () =>
+    client.get<JourneyDefinitionDto[]>('/product-analytics/config/journeys').then((r) => r.data),
+
+  createJourneyDefinition: (data: CreateJourneyDefinitionRequest) =>
+    client.post<JourneyDefinitionDto>('/product-analytics/config/journeys', data).then((r) => r.data),
+
+  updateJourneyDefinition: (id: string, data: UpdateJourneyDefinitionRequest) =>
+    client.put<JourneyDefinitionDto>(`/product-analytics/config/journeys/${id}`, data).then((r) => r.data),
+
+  deleteJourneyDefinition: (id: string) =>
+    client.delete(`/product-analytics/config/journeys/${id}`).then((r) => r.data),
 
   recordEvent: (data: {
     eventType: string;

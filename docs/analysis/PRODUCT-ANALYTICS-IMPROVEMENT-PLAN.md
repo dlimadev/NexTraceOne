@@ -24,12 +24,15 @@
 | FEAT-01 Paginação (GetPersonaUsage, GetModuleAdoption, GetAdoptionFunnel) | 4 | ✅ Implementado |
 | FEAT-04 Export CSV/JSON (/export/events, /export/summary) | 4 | ✅ Implementado |
 | FEAT-06 OpenAPI .WithTags + .WithSummary em todos endpoints | 4 | ✅ Implementado |
-| **119/119 testes passam** | — | ✅ |
+| TEST-05 EdgeCaseValidationTests (16 testes) | 3 | ✅ Implementado |
+| FEAT-05 Frontend CohortAnalysisPage.tsx + rota /analytics/cohorts | 4 | ✅ Implementado |
+| FEAT-03 Frontend JourneyConfigPage.tsx + rota /analytics/config/journeys | 4 | ✅ Implementado |
+| **158/158 testes passam** | — | ✅ |
 | BUG-01 Cálculo período anterior | 1 | ℹ️ Lógica atual é correta |
 | TEST-01 Testes de integração | 3 | ⏳ Requer PostgreSQL/Docker |
 | FEAT-02 Cache Redis | 4 | ⏳ Fora do MVP1 (sem Redis) |
-| FEAT-03 Journey/Funnel configurável via DB | 4 | ⏳ Pendente |
-| FEAT-05 Análise de cohorts | 4 | ⏳ Pendente |
+| FEAT-03 Journey/Funnel configurável via DB | 4 | ✅ Implementado |
+| FEAT-05 Análise de cohorts | 4 | ✅ Implementado |
 
 ---
 

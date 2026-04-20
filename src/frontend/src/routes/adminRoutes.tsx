@@ -57,6 +57,8 @@ const ValueTrackingPage = lazy(() => import('../features/product-analytics/pages
 const AdoptionFunnelPage = lazy(() => import('../features/product-analytics/pages/AdoptionFunnelPage').then(m => ({ default: m.AdoptionFunnelPage })));
 const FeatureHeatmapPage = lazy(() => import('../features/product-analytics/pages/FeatureHeatmapPage').then(m => ({ default: m.FeatureHeatmapPage })));
 const TimeToValuePage = lazy(() => import('../features/product-analytics/pages/TimeToValuePage').then(m => ({ default: m.TimeToValuePage })));
+const CohortAnalysisPage = lazy(() => import('../features/product-analytics/pages/CohortAnalysisPage').then(m => ({ default: m.CohortAnalysisPage })));
+const JourneyConfigPage = lazy(() => import('../features/product-analytics/pages/JourneyConfigPage').then(m => ({ default: m.JourneyConfigPage })));
 
 // Platform Admin (on-prem)
 const PreflightPage = lazy(() => import('../features/platform-admin/pages/PreflightPage').then(m => ({ default: m.PreflightPage })));
@@ -386,6 +388,22 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="analytics:read" redirectTo="/unauthorized">
             <TimeToValuePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics/cohorts"
+        element={
+          <ProtectedRoute permission="analytics:read" redirectTo="/unauthorized">
+            <CohortAnalysisPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics/config/journeys"
+        element={
+          <ProtectedRoute permission="analytics:configure" redirectTo="/unauthorized">
+            <JourneyConfigPage />
           </ProtectedRoute>
         }
       />

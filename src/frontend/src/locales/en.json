@@ -738,7 +738,39 @@
     "viewJourneys": "Journeys & Funnels",
     "viewModuleAdoption": "Module Adoption",
     "viewPersonaUsage": "Persona Usage",
-    "viewValueTracking": "Value Tracking"
+    "viewValueTracking": "Value Tracking",
+    "cohort": {
+      "title": "Cohort Analysis",
+      "subtitle": "User retention and activation curves grouped by first-event cohort",
+      "granularity": "Granularity",
+      "week": "Week",
+      "month": "Month",
+      "periods": "Periods",
+      "metric": "Metric",
+      "retention": "Retention",
+      "activation": "Activation",
+      "cohortLabel": "Cohort",
+      "users": "Users",
+      "period": "Period",
+      "empty": "No cohort data available for the selected range and metric."
+    },
+    "journeyConfig": {
+      "title": "Journey Definitions",
+      "subtitle": "Manage configurable journey and funnel definitions for this tenant",
+      "addJourney": "New Journey",
+      "editJourney": "Edit Journey",
+      "deleteJourney": "Delete Journey",
+      "journeyId": "Journey ID",
+      "journeyName": "Journey Name",
+      "steps": "Steps (JSON)",
+      "isActive": "Active",
+      "global": "Global",
+      "tenant": "Tenant",
+      "deleteConfirm": "Are you sure you want to delete this journey definition?",
+      "saveSuccess": "Journey definition saved successfully.",
+      "deleteSuccess": "Journey definition deleted.",
+      "empty": "No journey definitions found. Create one to override the default journeys."
+    }
   },
   "apiPolicyAsCode": {
     "auditOnly": "Audit Only",
