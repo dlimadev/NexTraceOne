@@ -7,5 +7,7 @@ export { ValueTrackingPage } from './pages/ValueTrackingPage';
 export { AdoptionFunnelPage } from './pages/AdoptionFunnelPage';
 export { FeatureHeatmapPage } from './pages/FeatureHeatmapPage';
 export { TimeToValuePage } from './pages/TimeToValuePage';
+export { CohortAnalysisPage } from './pages/CohortAnalysisPage';
+export { JourneyConfigPage } from './pages/JourneyConfigPage';
 export { AnalyticsEventTracker } from './AnalyticsEventTracker';
 export { productAnalyticsApi } from './api/productAnalyticsApi';

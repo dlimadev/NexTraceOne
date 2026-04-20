@@ -35,6 +35,7 @@ public static class DependencyInjection
 
         // Repositories — P2.3
         services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
+        services.AddScoped<IJourneyDefinitionRepository, JourneyDefinitionRepository>();
 
         // Cross-module contract — consumed by Governance for adoption metrics
         services.AddScoped<IProductAnalyticsModule, ProductAnalyticsModuleService>();

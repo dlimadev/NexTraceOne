@@ -1,5 +1,8 @@
 using System.Linq;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Contracts.DTOs;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Features.GetAdoptionFunnel;
 using NexTraceOne.ProductAnalytics.Application.Features.GetFeatureHeatmap;
@@ -18,11 +21,15 @@ public sealed class AdvancedAnalyticsFeatureTests
 {
     private readonly IAnalyticsEventRepository _repo = Substitute.For<IAnalyticsEventRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
     private static readonly DateTimeOffset Now = new(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
 
     public AdvancedAnalyticsFeatureTests()
     {
         _clock.UtcNow.Returns(Now);
+        _configService
+            .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+            .Returns((EffectiveConfigurationDto?)null);
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -51,7 +58,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(sessionEvents);
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
         var query = new GetAdoptionFunnel.Query(null, null, null, null);
 
         // Act
@@ -81,7 +88,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<SessionEventTypeRow>());
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetAdoptionFunnel.Query(null, null, null, null), CancellationToken.None);
@@ -106,7 +113,7 @@ public sealed class AdvancedAnalyticsFeatureTests
                 new("s1", AnalyticsEventType.AssistantPromptSubmitted, Now.AddMinutes(-30)),
             });
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
         var query = new GetAdoptionFunnel.Query(Module: "AiAssistant", Persona: null, TeamId: null, Range: null);
 
         // Act
@@ -128,7 +135,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<SessionEventTypeRow>());
 
-        var handler = new GetAdoptionFunnel.Handler(_repo, _clock);
+        var handler = new GetAdoptionFunnel.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(
@@ -160,7 +167,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(0);
 
-        var handler = new GetFeatureHeatmap.Handler(_repo, _clock);
+        var handler = new GetFeatureHeatmap.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetFeatureHeatmap.Query(null, null, null), CancellationToken.None);
@@ -199,7 +206,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(50);
 
-        var handler = new GetFeatureHeatmap.Handler(_repo, _clock);
+        var handler = new GetFeatureHeatmap.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetFeatureHeatmap.Query(null, null, null), CancellationToken.None);
@@ -241,7 +248,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(5);
 
-        var handler = new GetFeatureHeatmap.Handler(_repo, _clock);
+        var handler = new GetFeatureHeatmap.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(
@@ -271,7 +278,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(0L);
 
-        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(
@@ -305,7 +312,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.ServiceCatalog, 100, 20) });
 
-        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock, _configService);
 
         // Act — filter by ChangeIntelligence which none of the indicators point to
         var result = await handler.Handle(
@@ -340,7 +347,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.Dashboard, 50, 10) });
 
-        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(
@@ -375,7 +382,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleUsageRow> { new(ProductModule.Dashboard, 50, 10) });
 
-        var handler = new GetFrictionIndicators.Handler(_repo, _clock);
+        var handler = new GetFrictionIndicators.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(
@@ -408,7 +415,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleFeatureCountRow>());
 
-        var handler = new GetModuleAdoption.Handler(_repo, _clock);
+        var handler = new GetModuleAdoption.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetModuleAdoption.Query(null, null, null), CancellationToken.None);
@@ -445,7 +452,7 @@ public sealed class AdvancedAnalyticsFeatureTests
                 new(ProductModule.ContractStudio, "editor", 60),
             });
 
-        var handler = new GetModuleAdoption.Handler(_repo, _clock);
+        var handler = new GetModuleAdoption.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(new GetModuleAdoption.Query(null, null, null), CancellationToken.None);
@@ -489,7 +496,7 @@ public sealed class AdvancedAnalyticsFeatureTests
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(new List<ModuleFeatureCountRow>());
 
-        var handler = new GetModuleAdoption.Handler(_repo, _clock);
+        var handler = new GetModuleAdoption.Handler(_repo, _clock, _configService);
 
         // Act
         var result = await handler.Handle(

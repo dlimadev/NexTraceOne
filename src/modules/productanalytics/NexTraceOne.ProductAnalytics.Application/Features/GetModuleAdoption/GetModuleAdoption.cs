@@ -1,7 +1,11 @@
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
@@ -13,20 +17,26 @@ namespace NexTraceOne.ProductAnalytics.Application.Features.GetModuleAdoption;
 /// </summary>
 public static class GetModuleAdoption
 {
-    /// <summary>Query para métricas de adoção de módulos.</summary>
+    /// <summary>Query para métricas de adoção de módulos com paginação.</summary>
     public sealed record Query(
         string? Persona,
         string? TeamId,
-        string? Range) : IQuery<Response>;
+        string? Range,
+        int Page = 1,
+        int PageSize = 20) : IQuery<Response>;
 
     /// <summary>Handler que calcula e retorna adoção por módulo.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
+
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var rows = await repository.GetModuleAdoptionAsync(
                 persona: request.Persona,
@@ -58,7 +68,7 @@ public static class GetModuleAdoption
 
             var maxActionsPerUser = actionsPerUserByModule.Count == 0 ? 0m : actionsPerUserByModule.Values.Max();
 
-            var modules = rows
+            var allModules = rows
                 .Select(r =>
                 {
                     var adoptionPercent = totalUniqueUsers == 0 ? 0 : (int)Math.Round((r.UniqueUsers / (decimal)totalUniqueUsers) * 100m);
@@ -85,10 +95,16 @@ public static class GetModuleAdoption
                 .OrderByDescending(m => m.TotalActions)
                 .ToArray();
 
-            var overallAdoptionScore = modules.Length == 0 ? 0m : Math.Round(modules.Average(m => (decimal)m.AdoptionPercent), 1);
+            var totalCount = allModules.Length;
+            var page = Math.Max(1, request.Page);
+            var pageSize = Math.Clamp(request.PageSize, 1, 100);
+            var totalPages = pageSize > 0 ? (int)Math.Ceiling(totalCount / (double)pageSize) : 0;
+            var modules = allModules.Skip((page - 1) * pageSize).Take(pageSize).ToArray();
 
-            var mostAdopted = modules.OrderByDescending(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
-            var leastAdopted = modules.OrderBy(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
+            var overallAdoptionScore = allModules.Length == 0 ? 0m : Math.Round(allModules.Average(m => (decimal)m.AdoptionPercent), 1);
+
+            var mostAdopted = allModules.OrderByDescending(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
+            var leastAdopted = allModules.OrderBy(m => m.AdoptionPercent).FirstOrDefault()?.Module ?? ProductModule.Dashboard;
 
             var response = new Response(
                 Modules: modules,
@@ -96,12 +112,16 @@ public static class GetModuleAdoption
                 MostAdopted: mostAdopted,
                 LeastAdopted: leastAdopted,
                 BiggestGrowth: mostAdopted,
-                PeriodLabel: periodLabel);
+                PeriodLabel: periodLabel,
+                Page: page,
+                PageSize: pageSize,
+                TotalCount: totalCount,
+                TotalPages: Math.Max(1, totalPages));
 
             return response;
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -111,7 +131,7 @@ public static class GetModuleAdoption
                 "last_90d" => 90,
                 _ => 30
             };
-
+            if (days > maxDays) days = maxDays;
             return (utcNow.AddDays(-days), utcNow, label);
         }
 
@@ -129,14 +149,18 @@ public static class GetModuleAdoption
             };
     }
 
-    /// <summary>Resposta com adoção por módulo.</summary>
+    /// <summary>Resposta com adoção por módulo e metadados de paginação.</summary>
     public sealed record Response(
         IReadOnlyList<ModuleAdoptionDto> Modules,
         decimal OverallAdoptionScore,
         ProductModule MostAdopted,
         ProductModule LeastAdopted,
         ProductModule BiggestGrowth,
-        string PeriodLabel);
+        string PeriodLabel,
+        int Page,
+        int PageSize,
+        int TotalCount,
+        int TotalPages);
 
     /// <summary>Métricas de adoção de um módulo individual.</summary>
     public sealed record ModuleAdoptionDto(

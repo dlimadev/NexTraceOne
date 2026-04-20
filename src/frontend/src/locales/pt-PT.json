@@ -684,7 +684,39 @@
     "viewJourneys": "Jornadas e Funis",
     "viewModuleAdoption": "Adoção por Módulo",
     "viewPersonaUsage": "Uso por Persona",
-    "viewValueTracking": "Acompanhamento de Valor"
+    "viewValueTracking": "Acompanhamento de Valor",
+    "cohort": {
+      "title": "Análise de Cohorts",
+      "subtitle": "Curvas de retenção e ativação agrupadas por cohort de primeiro evento",
+      "granularity": "Granularidade",
+      "week": "Semana",
+      "month": "Mês",
+      "periods": "Períodos",
+      "metric": "Métrica",
+      "retention": "Retenção",
+      "activation": "Ativação",
+      "cohortLabel": "Cohort",
+      "users": "Utilizadores",
+      "period": "Período",
+      "empty": "Sem dados de cohort disponíveis para o período e métrica selecionados."
+    },
+    "journeyConfig": {
+      "title": "Definições de Jornadas",
+      "subtitle": "Gira definições configuráveis de jornadas e funis para este tenant",
+      "addJourney": "Nova Jornada",
+      "editJourney": "Editar Jornada",
+      "deleteJourney": "Eliminar Jornada",
+      "journeyId": "ID da Jornada",
+      "journeyName": "Nome da Jornada",
+      "steps": "Etapas (JSON)",
+      "isActive": "Ativa",
+      "global": "Global",
+      "tenant": "Tenant",
+      "deleteConfirm": "Tem a certeza que pretende eliminar esta definição de jornada?",
+      "saveSuccess": "Definição de jornada guardada com sucesso.",
+      "deleteSuccess": "Definição de jornada eliminada.",
+      "empty": "Sem definições de jornada. Crie uma para sobrepor as jornadas predefinidas."
+    }
   },
   "apiPolicyAsCode": {
     "auditOnly": "Apenas Auditoria",

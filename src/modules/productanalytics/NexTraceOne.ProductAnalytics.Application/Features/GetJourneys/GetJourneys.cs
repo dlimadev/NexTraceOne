@@ -1,8 +1,13 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Configuration.Application.Abstractions;
+using NexTraceOne.Configuration.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
+using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
+using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
+using System.Text.Json;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
 
@@ -12,6 +17,8 @@ namespace NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
 /// Qual é o tempo médio por jornada? Onde estão os pontos de drop-off?
 /// Consome dados reais do IAnalyticsEventRepository — computação de funil
 /// baseada em presença de tipos de evento por sessão.
+/// As definições de jornada são carregadas do banco (IJourneyDefinitionRepository)
+/// com fallback para as definições estáticas da plataforma.
 /// </summary>
 public static class GetJourneys
 {
@@ -24,14 +31,16 @@ public static class GetJourneys
     /// <summary>Handler que calcula e retorna métricas de jornadas a partir de dados reais.</summary>
     public sealed class Handler(
         IAnalyticsEventRepository repository,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        IConfigurationResolutionService configService,
+        IJourneyDefinitionRepository? journeyDefinitionRepository = null,
+        ICurrentTenant? tenant = null) : IQueryHandler<Query, Response>
     {
         /// <summary>
-        /// Definições de jornadas do produto.
-        /// Cada jornada é uma sequência de event types que representa um fluxo de valor.
-        /// Extraível para configuração no banco em fase futura.
+        /// Definições estáticas de fallback — usadas quando não existem definições no banco.
+        /// Mantidas para retrocompatibilidade e para novos tenants sem configuração.
         /// </summary>
-        private static readonly JourneyDefinition[] JourneyDefinitions =
+        private static readonly JourneyDefinition[] StaticJourneyDefinitions =
         [
             new("search_to_entity", "Search to Entity View",
             [
@@ -65,9 +74,26 @@ public static class GetJourneys
 
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range);
+            var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
+            var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
 
-            var allEventTypes = JourneyDefinitions
+            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
+
+            // Load journey definitions from DB if available, otherwise use static fallback
+            JourneyDefinition[] journeyDefinitions;
+            if (journeyDefinitionRepository is not null && tenant is not null)
+            {
+                var dbDefs = await journeyDefinitionRepository.ListActiveAsync(tenant.Id, cancellationToken);
+                journeyDefinitions = dbDefs.Count > 0
+                    ? dbDefs.Select(ParseDbDefinition).Where(d => d is not null).Cast<JourneyDefinition>().ToArray()
+                    : StaticJourneyDefinitions;
+            }
+            else
+            {
+                journeyDefinitions = StaticJourneyDefinitions;
+            }
+
+            var allEventTypes = journeyDefinitions
                 .SelectMany(j => j.Steps.Select(s => s.EventType))
                 .Distinct()
                 .ToArray();
@@ -77,8 +103,20 @@ public static class GetJourneys
 
             if (sessionEventTypes.Count == 0)
             {
+                var skeletonJourneys = journeyDefinitions
+                    .Where(def => string.IsNullOrWhiteSpace(request.JourneyId) ||
+                                  def.JourneyId.Equals(request.JourneyId, StringComparison.OrdinalIgnoreCase))
+                    .Select(def =>
+                    {
+                        var steps = def.Steps.Select((s, idx) =>
+                            new JourneyStepDto(s.StepId, s.StepName, 0m, idx)).ToArray();
+                        return new JourneyDto(def.JourneyId, def.JourneyName, steps,
+                            0m, 0m, JourneyStatus.Started, string.Empty);
+                    })
+                    .ToArray();
+
                 return Result<Response>.Success(new Response(
-                    Journeys: Array.Empty<JourneyDto>(),
+                    Journeys: skeletonJourneys,
                     AverageCompletionRate: 0m,
                     MostCompletedJourney: string.Empty,
                     HighestDropOffJourney: string.Empty,
@@ -93,7 +131,7 @@ public static class GetJourneys
 
             var journeys = new List<JourneyDto>();
 
-            foreach (var def in JourneyDefinitions)
+            foreach (var def in journeyDefinitions)
             {
                 if (!string.IsNullOrWhiteSpace(request.JourneyId) &&
                     !def.JourneyId.Equals(request.JourneyId, StringComparison.OrdinalIgnoreCase))
@@ -183,7 +221,39 @@ public static class GetJourneys
                 PeriodLabel: periodLabel));
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range)
+        /// <summary>
+        /// Parseia uma definição do banco para o formato interno.
+        /// Returns null se o JSON dos steps não for válido — evita crashes em definições corrompidas.
+        /// </summary>
+        private static JourneyDefinition? ParseDbDefinition(NexTraceOne.ProductAnalytics.Domain.Entities.JourneyDefinition dbDef)
+        {
+            try
+            {
+                var steps = JsonSerializer.Deserialize<JourneyStepJson[]>(dbDef.StepsJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (steps is null || steps.Length == 0) return null;
+
+                var stepDefs = steps
+                    .Where(s => !string.IsNullOrWhiteSpace(s.StepId)
+                             && !string.IsNullOrWhiteSpace(s.StepName)
+                             && Enum.TryParse<AnalyticsEventType>(s.EventType, out _))
+                    .Select(s => new JourneyStepDefinition(
+                        s.StepId!,
+                        s.StepName!,
+                        Enum.Parse<AnalyticsEventType>(s.EventType!)))
+                    .ToArray();
+
+                return stepDefs.Length > 0
+                    ? new JourneyDefinition(dbDef.Key, dbDef.Name, stepDefs)
+                    : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
         {
             var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
             var days = label switch
@@ -193,12 +263,21 @@ public static class GetJourneys
                 "last_90d" => 90,
                 _ => 30
             };
+            if (days > maxDays) days = maxDays;
             return (utcNow.AddDays(-days), utcNow, label);
         }
     }
 
     private sealed record JourneyDefinition(string JourneyId, string JourneyName, JourneyStepDefinition[] Steps);
     private sealed record JourneyStepDefinition(string StepId, string StepName, AnalyticsEventType EventType);
+
+    /// <summary>DTO intermediário para desserialização do JSON de steps.</summary>
+    private sealed class JourneyStepJson
+    {
+        public string? StepId { get; set; }
+        public string? StepName { get; set; }
+        public string? EventType { get; set; }
+    }
 
     /// <summary>Resposta com jornadas e funis do produto.</summary>
     public sealed record Response(
