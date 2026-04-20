@@ -15,20 +15,43 @@ Este plano consolida:
 - Base já existente de Custom Dashboards (aggregate `CustomDashboard`, 19 widgets, páginas `CustomDashboardsPage` / `DashboardBuilderPage` / `DashboardViewPage`, persistência JSONB no PostgreSQL, clone, partilha on/off, sistema de templates, export/import JSON).
 - Pesquisa de mercado (Dynatrace Dashboards/Notebooks & Davis CoPilot, Grafana 11 + Scenes, Datadog Dashboards, Observe OPAL Worksheets, Honeycomb Boards, New Relic Workloads, Looker/Mode, Superset, Metabase) sobre o que hoje é considerado estado-da-arte em dashboards enterprise: **query-driven widgets, live streaming, tokens/variables, notebooks, versionamento, partilha granular, deep-link contextual, AI-assisted creation, embedding, público/privado/equipa, delegação, colaboração em tempo real, marketplace, plugins, mobile on-call, dashboard-as-code**.
 
-> **Referências validadas nesta sessão (2026-04-20):** durante a re-tentativa, a rede do sandbox bloqueou docs/homepages oficiais (`docs.dynatrace.com`, `grafana.com/docs`, `docs.datadoghq.com`, `honeycomb.io`, `react.dev`, `tanstack.com`, `backstage.io`), mas foi possível aceder ao GitHub. As seguintes referências foram consultadas diretamente nos respetivos repositórios e confirmam as tendências listadas:
+> **Referências validadas nesta sessão (2026-04-20):** durante a re-tentativa, a rede do sandbox bloqueou docs/homepages oficiais (`docs.dynatrace.com`, `grafana.com/docs`, `docs.datadoghq.com`, `honeycomb.io`, `react.dev`, `tanstack.com`, `backstage.io`), mas foi possível aceder ao GitHub. As seguintes referências foram consultadas diretamente nos respetivos repositórios. **Todas as referências abaixo marcadas como "candidata a dependência" têm licença compatível com software comercial self-hosted/distribuído (MIT, Apache-2.0, BSD-2/3, ISC, MPL-2.0). Referências marcadas "UX-only" não entram como dependência por serem copyleft forte (AGPL/GPL) ou source-available com restrição comercial:**
 >
-> | Referência | Repositório | O que confirma |
-> |---|---|---|
-> | Grafana Scenes | `github.com/grafana/scenes` (Apache-2.0) | Framework moderno para apps Grafana altamente interativas — reforça V3.2 (query-driven) e V3.3 (live/cross-filter). |
-> | Backstage | `github.com/backstage/backstage` (CNCF Incubation) | Software Catalog + Templates + TechDocs + plugin ecosystem — confirma V3.8 (Plugin SDK + Template Gallery). |
-> | Apache Superset | `github.com/apache/superset` | Enterprise-ready BI com no-code charts + SQL editor + semantic layer — referência para V3.2 (NQL seguro) e V3.4 (notebook mode). |
-> | TanStack Router | `github.com/TanStack/router` | Já usado no frontend; end-to-end type safety, schema-driven search params, built-in caching — base para V3.5 (uplift). |
-> | Yjs (CRDT) | `github.com/yjs/yjs` (MIT) | CRDT framework usado por Evernote, Gitbook, AFFiNE, Huly, Sana; suporta shared cursors, offline, version snapshots, undo/redo — tecnologia candidata para V3.7 (collaboration). |
-> | Module Federation | `github.com/module-federation/module-federation-examples` | Adotado por Netflix, Microsoft, Amazon, Shopify, Auth0 — valida V3.8 (plugins governados). |
-> | OpenTelemetry spec | `github.com/open-telemetry/opentelemetry-specification` | Fonte da verdade para ingestão de telemetria que alimenta `QueryWidget` — validada para V3.2. |
-> | AsyncAPI spec 3.1.0 | `github.com/asyncapi/spec` | Já suportamos 3.x no Catalog (Wave B.1); mantém-se como referência para annotations e event contracts nos widgets. |
+> | Referência | Repositório | Licença | Uso permitido no NexTraceOne | O que confirma |
+> |---|---|---|---|---|
+> | **Grafana core** | `github.com/grafana/grafana` | **AGPL-3.0-only** ❌ | **UX-only — NUNCA como dependência, fork ou código embutido** | Inspiração visual para annotations, variables, history. |
+> | Grafana Scenes | `github.com/grafana/scenes` | **Apache-2.0** ✅ | Candidata a dependência | Framework moderno para apps altamente interativas — V3.2/V3.3. |
+> | Backstage | `github.com/backstage/backstage` | **Apache-2.0** ✅ (CNCF Incubation) | Candidata a dependência / inspiração arquitetural | Software Catalog + Templates + TechDocs + plugins — V3.8. |
+> | Apache Superset | `github.com/apache/superset` | **Apache-2.0** ✅ | UX-only (é produto standalone, não lib) | no-code charts + SQL editor + semantic layer — V3.2/V3.4. |
+> | TanStack Router | `github.com/TanStack/router` | **MIT** ✅ | Já em uso | type-safety, schema-driven search params — base V3.5. |
+> | **Yjs (CRDT)** | `github.com/yjs/yjs` | **MIT** ✅ | Candidata a dependência | Usado por Evernote, Gitbook, AFFiNE — V3.7. |
+> | Module Federation | `github.com/module-federation/module-federation-examples` | **MIT** ✅ (Webpack/Rspack) | Candidata a técnica de build | Plugin loading V3.8. |
+> | OpenTelemetry spec | `github.com/open-telemetry/opentelemetry-specification` | **Apache-2.0** ✅ | Spec, não é dependência | Telemetria para V3.2. |
+> | AsyncAPI spec 3.1.0 | `github.com/asyncapi/spec` | **Apache-2.0** ✅ | Spec, já suportada | Annotations e event contracts. |
 >
-> Pontos de ação de transparência: quando os domínios de docs oficiais ficarem acessíveis (fora do sandbox), validar em particular: Dynatrace Notebooks/Davis CoPilot UX patterns, Grafana 11 Scenes data flow, Datadog live-stream throttling, Honeycomb Boards sharing model, PagerDuty mobile on-call flows, React 19 `use` hook + View Transitions guidelines.
+> **⚠️ Alerta sobre Grafana:** `grafana/grafana` é **AGPL-3.0**, o que é incompatível com a distribuição comercial self-hosted do NexTraceOne. Fica explicitamente proibido: (a) importar, linkar ou empacotar Grafana core; (b) derivar/fork; (c) copiar trechos não-triviais de código-fonte AGPL. Apenas a biblioteca **Grafana Scenes** (Apache-2.0) seria tecnicamente elegível se algum dia fizesse sentido. Grafana permanece nesta pesquisa **apenas como referência de UX/UX patterns**, que não são protegíveis por licença de código.
+>
+> Pontos de ação de transparência: quando os domínios de docs oficiais ficarem acessíveis (fora do sandbox), validar Dynatrace Notebooks/Davis CoPilot UX patterns, Grafana 11 Scenes data flow, Datadog live-stream throttling, Honeycomb Boards sharing model, PagerDuty mobile on-call flows, React 19 `use` hook + View Transitions guidelines.
+
+### 1.0 Política obrigatória de licenciamento de dependências (hard constraint)
+
+O NexTraceOne é um produto **comercial self-hosted/on-premises** e portanto **nenhuma dependência transitiva ou direta** pode ter licença que restrinja uso comercial, exija abertura do código do NexTraceOne, ou condicione a distribuição.
+
+**Licenças aceites** (compatíveis com software comercial distribuído): MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Unlicense/CC0, MPL-2.0 (weak copyleft por ficheiro, aceitável com cuidado).
+
+**Licenças proibidas** como dependência, fork, link, código embutido, "vendor" ou "copy-paste": **GPL (qualquer versão), LGPL, AGPL-3.0** (p.ex. Grafana core), **SSPL** (p.ex. MongoDB, Elasticsearch 7.11+, OpenSearch não se aplica mas atenção), **Elastic License v2 (ELv2)** (p.ex. Kibana, Logstash pós-2021), **Business Source License (BUSL/BSL)** (p.ex. Sentry, Redis 7.4+, HashiCorp Terraform/Vault/Consul pós-2023, CockroachDB), **Commons Clause**, **Confluent Community License**, **Redis Source Available License (RSALv2/SSPLv1)**, qualquer licença "source-available" com cláusula anti-comercial, "non-commercial", "research-only", CC BY-NC/ND, ou que imponha fees de royalty.
+
+**Regra operacional:**
+
+1. Antes de adicionar qualquer dependência nova (NuGet, npm, Go, Maven, etc.), **validar a licença** via `gh-advisory-database` e inspeção direta do repositório.
+2. Se a licença não estiver na lista de aceites, **a dependência é rejeitada** — procurar alternativa permissiva ou implementar internamente.
+3. **Dependências indiretas** (transitivas) contam. Se uma lib MIT puxar uma AGPL, a combinação é proibida.
+4. Atenção a **re-licenciamentos retroativos**: libs que eram permissivas mas mudaram para BUSL/ELv2/SSPL (Redis, Elasticsearch, HashiCorp, Sentry, MongoDB). Fixar versão na última release compatível e planear substituição.
+5. **MediatR v12+** e **AutoMapper v13+** passaram a ter licenciamento comercial — qualquer upgrade nestas libs exige reavaliação. Se ainda estivermos em versão pré-comercial, **NÃO atualizar** sem decisão explícita.
+6. Documentar **NOTICE** / atribuições Apache-2.0 no release self-hosted.
+7. Para código de UX/componente inspirado em referências AGPL/GPL/BUSL, **não copiar código-fonte**; apenas reimplementar de forma independente (clean-room) os *padrões de UX*, que não são protegíveis por direito autoral.
+
+Esta política aplica-se a **todas as waves V3.1–V3.9** e substitui qualquer sugestão anterior de biblioteca que não cumpra os critérios acima. Toda nova referência adicionada a este documento **deve** explicitar a licença.
 - Alinhamento obrigatório com a visão oficial do produto: **dashboards não são dashboards genéricos de observabilidade** — são **superfícies de decisão contextualizadas** em serviços, contratos, mudanças, ownership, ambiente, persona e governança. (Copilot Instructions §10, §18, §20, §27)
 
 **Princípio-mestre da v3 para estas duas vertentes:** elevar o frontend de "app de módulos" para **Operational Intelligence Surface** persona-aware, e elevar Custom Dashboards de "grid de widgets" para **Governed Intelligence Boards** — persistidos, versionados, partilháveis, auditáveis e integrados com o Source of Truth.
