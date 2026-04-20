@@ -17,6 +17,7 @@ using GetNetworkPolicyFeature = NexTraceOne.Governance.Application.Features.GetN
 using GetTenantSchemasFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.GetTenantSchemas;
 using ProvisionTenantSchemaFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.ProvisionTenantSchema;
 using GetCanaryRolloutsFeature = NexTraceOne.Governance.Application.Features.GetCanaryRollouts.GetCanaryRollouts;
+using GetOptionalProvidersFeature = NexTraceOne.Governance.Application.Features.GetOptionalProviders.GetOptionalProviders;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -159,6 +160,18 @@ public sealed class PlatformStatusEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetCanaryRolloutsFeature.Query(environment, status);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        // CFG-01 — SystemHealthPage data source. Lists optional providers and whether each
+        // is configured (reason behind any `simulatedNote` seen elsewhere in the UI).
+        platform.MapGet("/optional-providers", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetOptionalProvidersFeature.Query();
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");

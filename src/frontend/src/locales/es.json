@@ -11344,6 +11344,48 @@
       "Paused": "Pausado"
     }
   },
+  "systemHealth": {
+    "title": "Salud del Sistema",
+    "subtitle": "Estado de cada provider opcional. Cuando un provider no está configurado, los paneles relacionados muestran un simulatedNote — configure el provider para ver datos reales.",
+    "actions": {
+      "refresh": "Actualizar",
+      "setupDocs": "Documentación de configuración"
+    },
+    "summary": {
+      "configured": "Configurados",
+      "notConfigured": "No configurados",
+      "total": "Total"
+    },
+    "states": {
+      "loading": "Cargando estado de los providers…",
+      "error": "Error al cargar el estado de los providers.",
+      "empty": "Ningún provider opcional registrado."
+    },
+    "status": {
+      "Configured": "Configurado",
+      "NotConfigured": "No configurado",
+      "Unknown": "Desconocido"
+    },
+    "categories": {
+      "operations": "Operaciones",
+      "integrations": "Integraciones",
+      "finops": "FinOps"
+    },
+    "providers": {
+      "canary": {
+        "name": "Canary rollouts"
+      },
+      "backup": {
+        "name": "Backup de base de datos"
+      },
+      "kafka": {
+        "name": "Productor de eventos Kafka"
+      },
+      "cloudBilling": {
+        "name": "Cloud billing"
+      }
+    }
+  },
   "multiTenantSchema": {
     "title": "Gestor de Schema Multi-Tenant",
     "subtitle": "Gestiona el aislamiento de schemas PostgreSQL por tenant para separación física de datos.",

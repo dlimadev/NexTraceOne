@@ -11408,6 +11408,48 @@
       "Paused": "Paused"
     }
   },
+  "systemHealth": {
+    "title": "System Health",
+    "subtitle": "Status of each optional provider. When a provider is not configured, related dashboards show a simulatedNote — set up the provider to see real data.",
+    "actions": {
+      "refresh": "Refresh",
+      "setupDocs": "Setup docs"
+    },
+    "summary": {
+      "configured": "Configured",
+      "notConfigured": "Not configured",
+      "total": "Total"
+    },
+    "states": {
+      "loading": "Loading provider status…",
+      "error": "Failed to load provider status.",
+      "empty": "No optional providers registered."
+    },
+    "status": {
+      "Configured": "Configured",
+      "NotConfigured": "Not configured",
+      "Unknown": "Unknown"
+    },
+    "categories": {
+      "operations": "Operations",
+      "integrations": "Integrations",
+      "finops": "FinOps"
+    },
+    "providers": {
+      "canary": {
+        "name": "Canary rollouts"
+      },
+      "backup": {
+        "name": "Database backup"
+      },
+      "kafka": {
+        "name": "Kafka event producer"
+      },
+      "cloudBilling": {
+        "name": "Cloud billing"
+      }
+    }
+  },
   "multiTenantSchema": {
     "title": "Multi-Tenant Schema Manager",
     "subtitle": "Manage PostgreSQL schema isolation per tenant for strong data boundary enforcement.",
