@@ -125,7 +125,7 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 - [x] **D-04** Este ficheiro (`HONEST-GAPS.md`) consolida as degradações graciosas — critério de aceite 7 do plano.
 
 ### Fase 2 — ACTs pendentes (25)
-- [ ] **ACT-019..021** (classificação pendente — próximo ciclo).
+- [x] **ACT-019..021** — 19: contagem DbContexts via script (D-02 acima); 20: HONEST-GAPS.md consolidado (D-04 acima); 21: FUTURE-ROADMAP.md actualizado (DOC-03 acima). Todos concluídos ✅.
 - [ ] **ACT-022** E2E SAML SSO com Playwright + mock IdP.
 - [x] **ACT-023** Testes de integração `ExportAnalyticsData` (CSV/JSON, paginação, authz) — 17 novos testes, ProductAnalytics: 175/175 ✅.
 - [x] **ACT-024** OpenAPI como artefacto de build (`swagger.json` no `ci.yml`) — job `openapi-artifact` implementado ✅.
@@ -144,7 +144,7 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 ### Fase 5 — Qualidade transversal
 - [ ] **QLT-01** `parallel_validation` sem findings de alto/médio impacto.
 - [x] **QLT-02** `npm run validate:i18n` / `typecheck` / `lint` — **pass** — 51 chaves em falta (es), 41 (pt-BR), 50 (pt-PT) adicionadas nesta sessão; validate:i18n e typecheck passam ✅.
-- [ ] **QLT-03** Backend com treat-warnings-as-errors onde falta.
+- [x] **QLT-03** Backend com treat-warnings-as-errors onde falta — `TreatWarningsAsErrors=true` em `Directory.Build.props`; build limpo ✅.
 - [ ] **QLT-04** Cobertura: cada `Application/Features/*` novo com ≥ 1 teste unitário.
 
 ### Fase 6 — Publicação
