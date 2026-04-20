@@ -33,7 +33,7 @@ public static class GetOptionalProviders
             var providers = new List<OptionalProviderDto>
             {
                 BuildDto(
-                    name: "canary",
+                    name: OptionalProviderNames.Canary,
                     category: "operations",
                     isConfigured: canaryProvider.IsConfigured,
                     configKeyPrefix: "Canary",
@@ -41,7 +41,7 @@ public static class GetOptionalProviders
                     description: "Canary rollouts dashboard (Argo Rollouts, Flagger, LaunchDarkly, …)."),
 
                 BuildDto(
-                    name: "backup",
+                    name: OptionalProviderNames.Backup,
                     category: "operations",
                     isConfigured: backupProvider.IsConfigured,
                     configKeyPrefix: "Backup",
@@ -49,7 +49,7 @@ public static class GetOptionalProviders
                     description: "Database backup posture (pg_dump, pgBackRest, Barman, Velero, …)."),
 
                 BuildDto(
-                    name: "kafka",
+                    name: OptionalProviderNames.Kafka,
                     category: "integrations",
                     isConfigured: kafkaProducer.IsConfigured,
                     configKeyPrefix: "Kafka",
@@ -57,7 +57,7 @@ public static class GetOptionalProviders
                     description: "Kafka event producer. When not configured, events are discarded silently by NullKafkaEventProducer."),
 
                 BuildDto(
-                    name: "cloudBilling",
+                    name: OptionalProviderNames.CloudBilling,
                     category: "finops",
                     isConfigured: cloudBillingProvider.IsConfigured,
                     configKeyPrefix: "FinOps:Billing",

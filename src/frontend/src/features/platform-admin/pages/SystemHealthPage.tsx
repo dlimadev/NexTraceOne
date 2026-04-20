@@ -15,6 +15,20 @@ import {
 } from '../api/platformAdmin';
 
 /**
+ * Base URL used to resolve the "Setup docs" link for each optional provider.
+ *
+ * Defaults to the public upstream repository, but can be overridden at build time
+ * via `VITE_DOCS_BASE_URL` to support forks, internal mirrors, or offline bundles.
+ * Examples:
+ *   - `https://github.com/your-org/NexTraceOne/blob/main`
+ *   - `https://internal-docs.company.com/nextraceone`
+ *   - `/docs` (bundled static docs served by the ApiHost)
+ */
+const DOCS_BASE_URL: string =
+  (import.meta as unknown as { env?: { VITE_DOCS_BASE_URL?: string } }).env
+    ?.VITE_DOCS_BASE_URL ?? 'https://github.com/dlimadev/NexTraceOne/blob/main';
+
+/**
  * SystemHealthPage — CFG-01
  *
  * Lista cada provider opcional da plataforma e o seu estado (configured /
@@ -137,7 +151,7 @@ export function SystemHealthPage() {
                     <p className="mt-1 text-sm text-slate-600">{provider.description}</p>
                   </div>
                   <a
-                    href={`https://github.com/dlimadev/NexTraceOne/blob/main/${provider.docsPath}`}
+                    href={`${DOCS_BASE_URL}/${provider.docsPath}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:underline"

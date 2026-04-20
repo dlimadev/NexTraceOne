@@ -261,6 +261,25 @@ var app = builder.Build();
 // ── Validação de configuração crítica ──
 app.ValidateStartupConfiguration();
 
+// ── OPS-03: Optional providers diagnostic log ──
+// Makes explicit which Null* fallbacks are active so operators understand why
+// canary/backup/kafka/billing dashboards may show simulatedNote.
+{
+    using var scope = app.Services.CreateScope();
+    var sp = scope.ServiceProvider;
+    var providerStatuses = new Dictionary<string, bool>
+    {
+        [NexTraceOne.Integrations.Domain.OptionalProviderNames.Canary] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.ICanaryProvider>().IsConfigured,
+        [NexTraceOne.Integrations.Domain.OptionalProviderNames.Backup] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.IBackupProvider>().IsConfigured,
+        [NexTraceOne.Integrations.Domain.OptionalProviderNames.Kafka] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.IKafkaEventProducer>().IsConfigured,
+        [NexTraceOne.Integrations.Domain.OptionalProviderNames.CloudBilling] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.ICloudBillingProvider>().IsConfigured,
+    };
+    OptionalProviderStartupLogger.LogProviderStatuses(
+        app.Logger,
+        app.Environment.EnvironmentName,
+        providerStatuses);
+}
+
 // ── Lifecycle logging — registo de arranque e encerramento gracioso ──
 var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
 lifetime.ApplicationStarted.Register(() => app.Logger.LogInformation("NexTraceOne API host started successfully. Environment: {Environment}", app.Environment.EnvironmentName));
