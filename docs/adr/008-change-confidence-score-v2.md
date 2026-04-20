@@ -66,7 +66,7 @@ Se uma fonte não estiver configurada (ex.: `ICanaryProvider` é `NullCanaryProv
 ### Persistência
 
 - Novo agregado `ChangeConfidenceBreakdown` em `ChangeGovernance.Domain.ChangeIntelligence`.
-- Tabela `cg_change_confidence_breakdowns` + `cg_change_confidence_sub_scores` (1:N).
+- Tabela `chg_confidence_breakdowns` + `chg_confidence_sub_scores` (1:N).
 - Migração EF Core em `ChangeIntelligenceDbContext`.
 - Retenção mínima: `Value` e `Citations` mantidos imutáveis por release; re-cálculo cria nova versão (não mutação).
 

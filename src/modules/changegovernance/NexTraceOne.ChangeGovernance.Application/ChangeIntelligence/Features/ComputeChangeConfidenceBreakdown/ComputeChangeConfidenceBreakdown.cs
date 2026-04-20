@@ -70,6 +70,11 @@ public static class ComputeChangeConfidenceBreakdown
         private const decimal DefaultWeightCanarySignal = 0.10m;
         private const decimal DefaultWeightPreProdDelta = 0.15m;
 
+        // Penalidades por ocorrência — valores conservadores calibrados para 0-100 scale
+        private const decimal PenaltyPerBreakingChange = 25m;
+        private const decimal PenaltyPerHistoricalRegression = 20m;
+        private const decimal PenaltyPerBlastConsumer = 5m;
+
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
@@ -106,7 +111,7 @@ public static class ComputeChangeConfidenceBreakdown
         {
             static decimal ParseWeight(string? raw, decimal fallback)
                 => decimal.TryParse(raw, System.Globalization.NumberStyles.Number,
-                    System.Globalization.CultureInfo.InvariantCulture, out var v) && v > 0 ? v : fallback;
+                    System.Globalization.CultureInfo.InvariantCulture, out var v) && v > 0 && v <= 10 ? v : fallback;
 
             var testCovDto = await configService.ResolveEffectiveValueAsync(ChangeConfigKeys.ConfidenceWeightTestCoverage, ConfigurationScope.System, null, ct);
             var contractDto = await configService.ResolveEffectiveValueAsync(ChangeConfigKeys.ConfidenceWeightContractStability, ConfigurationScope.System, null, ct);
@@ -142,29 +147,29 @@ public static class ComputeChangeConfidenceBreakdown
                 ["citation://integrations/ci/test-coverage"]));
 
             // ContractStability
-            var contractValue = Math.Max(0m, 100m - req.ContractBreakingChanges * 25m);
+            var contractValue = Math.Max(0m, 100m - req.ContractBreakingChanges * PenaltyPerBreakingChange);
             scores.Add(ChangeConfidenceSubScore.Create(
                 ConfidenceSubScoreType.ContractStability,
                 contractValue,
                 w.ContractStability,
                 ConfidenceDataQuality.High,
-                $"{req.ContractBreakingChanges} breaking contract change(s) detected, reducing stability score by {req.ContractBreakingChanges * 25}pts",
+                $"{req.ContractBreakingChanges} breaking contract change(s) detected, reducing stability score by {req.ContractBreakingChanges * PenaltyPerBreakingChange}pts",
                 ["citation://catalog/contracts/breaking-changes"]));
 
             // HistoricalRegression
-            var histValue = Math.Max(0m, 100m - req.HistoricalRegressionCount * 20m);
+            var histValue = Math.Max(0m, 100m - req.HistoricalRegressionCount * PenaltyPerHistoricalRegression);
             scores.Add(ChangeConfidenceSubScore.Create(
                 ConfidenceSubScoreType.HistoricalRegression,
                 histValue,
                 w.HistoricalRegression,
                 ConfidenceDataQuality.Medium,
-                $"{req.HistoricalRegressionCount} historical regression(s) found for this service, reducing score by {req.HistoricalRegressionCount * 20}pts",
+                $"{req.HistoricalRegressionCount} historical regression(s) found for this service, reducing score by {req.HistoricalRegressionCount * PenaltyPerHistoricalRegression}pts",
                 ["citation://operationalintelligence/incidents/regression"]));
 
             // BlastSurface
             var blastValue = req.BlastSurfaceConsumers == 0
                 ? 100m
-                : Math.Max(0m, 100m - req.BlastSurfaceConsumers * 5m);
+                : Math.Max(0m, 100m - req.BlastSurfaceConsumers * PenaltyPerBlastConsumer);
             scores.Add(ChangeConfidenceSubScore.Create(
                 ConfidenceSubScoreType.BlastSurface,
                 blastValue,
