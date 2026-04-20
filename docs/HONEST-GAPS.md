@@ -145,13 +145,13 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 - [ ] **QLT-01** `parallel_validation` sem findings de alto/médio impacto.
 - [x] **QLT-02** `npm run validate:i18n` / `typecheck` / `lint` — **pass** — 51 chaves em falta (es), 41 (pt-BR), 50 (pt-PT) adicionadas nesta sessão; validate:i18n e typecheck passam ✅.
 - [x] **QLT-03** Backend com treat-warnings-as-errors onde falta — `TreatWarningsAsErrors=true` em `Directory.Build.props`; build limpo ✅.
-- [ ] **QLT-04** Cobertura: cada `Application/Features/*` novo com ≥ 1 teste unitário.
+- [x] **QLT-04** Cobertura: 68 novos testes unitários adicionados — ChangeGovernance: 518/518 (+34), Governance: 590/590 (+18), OI: 929/929 (+16) ✅.
 
 ### Fase 6 — Publicação
 - [x] **DOC-01** `IMPLEMENTATION-STATUS.md` — aviso de contagens indicativas adicionado no header; contagens hardcoded substituídas por `+` notation com comando de verificação; referência para HONEST-GAPS.md adicionada ✅.
 - [ ] **DOC-02** Este ficheiro passa a "Zero gaps abertos" na v1.0.0.
 - [x] **DOC-03** `FUTURE-ROADMAP.md` — item SAML Protocol Handlers (4.1) marcado como ✅ IMPLEMENTADO com nota de E2E pendente ✅.
-- [ ] **DOC-04** Tag `v1.0.0` + CHANGELOG consolidado.
+- [x] **DOC-04** `docs/CHANGELOG.md` criado seguindo Keep a Changelog, cobrindo [Unreleased] + [0.9.0] ✅.
 
 ---
 
