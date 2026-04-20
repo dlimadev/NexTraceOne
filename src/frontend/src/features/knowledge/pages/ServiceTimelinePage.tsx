@@ -36,15 +36,22 @@ const SEVERITY_VARIANT: Record<NoteSeverity, 'info' | 'warning' | 'danger'> = {
 
 const PAGE_SIZE = 25;
 
+const SEVERITY_BORDER: Record<NoteSeverity, string> = {
+  Info: 'border-info',
+  Warning: 'border-warning',
+  Critical: 'border-critical',
+};
+
 function TimelineEntryCard({ entry }: { entry: ServiceTimelineEntryDto }) {
   const { t } = useTranslation();
+  const severity = entry.severity as NoteSeverity;
 
   return (
-    <Card className={`border-l-4 ${entry.severity === 'Critical' ? 'border-critical' : entry.severity === 'Warning' ? 'border-warning' : 'border-info'}`}>
+    <Card className={`border-l-4 ${SEVERITY_BORDER[severity] ?? 'border-border'}`}>
       <CardBody>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            {SEVERITY_ICON[entry.severity as NoteSeverity]}
+            {SEVERITY_ICON[severity]}
             <span className="font-medium text-sm truncate">{entry.title}</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -54,7 +61,7 @@ function TimelineEntryCard({ entry }: { entry: ServiceTimelineEntryDto }) {
                 {t('knowledge.serviceTimeline.resolved')}
               </Badge>
             )}
-            <Badge variant={SEVERITY_VARIANT[entry.severity as NoteSeverity]}>
+            <Badge variant={SEVERITY_VARIANT[severity]}>
               {entry.severity}
             </Badge>
           </div>
