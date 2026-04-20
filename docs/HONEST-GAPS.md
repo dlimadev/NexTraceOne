@@ -126,7 +126,7 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 
 ### Fase 2 — ACTs pendentes (25)
 - [x] **ACT-019..021** — 19: contagem DbContexts via script (D-02 acima); 20: HONEST-GAPS.md consolidado (D-04 acima); 21: FUTURE-ROADMAP.md actualizado (DOC-03 acima). Todos concluídos ✅.
-- [ ] **ACT-022** E2E SAML SSO com Playwright + mock IdP.
+- [x] **ACT-022** E2E SAML SSO com Playwright + mock IdP — `src/frontend/e2e/saml-sso-flows.spec.ts` (admin config page + login initiation + ACS callback, mock IdP via Playwright route interception) ✅.
 - [x] **ACT-023** Testes de integração `ExportAnalyticsData` (CSV/JSON, paginação, authz) — 17 novos testes, ProductAnalytics: 175/175 ✅.
 - [x] **ACT-024** OpenAPI como artefacto de build (`swagger.json` no `ci.yml`) — job `openapi-artifact` implementado ✅.
 - [x] **ACT-025** Elasticsearch com `xpack.security.enabled=true` em `docker-compose.staging.yml` ✅.
