@@ -290,4 +290,109 @@ public sealed class ContractPipelineTests
         var result = validator.Validate(new GenerateServerFromContract.Command(Guid.Empty, "dotnet", "Svc"));
         result.IsValid.Should().BeFalse();
     }
+
+    // ── OPS-02: GenerateServerFromContract template quality ───────────────
+
+    [Theory]
+    [InlineData("dotnet")]
+    [InlineData("java")]
+    [InlineData("nodejs")]
+    [InlineData("go")]
+    [InlineData("python")]
+    public async Task GenerateServerFromContract_NoLanguage_HasNoTodoComments(string language)
+    {
+        var handler = new GenerateServerFromContract.Handler();
+        var command = new GenerateServerFromContract.Command(ContractVersionId, language, "OrderService");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        foreach (var file in result.Value.Files)
+        {
+            file.Content.Should().NotContain("// TODO:", $"file {file.FileName} should not contain TODO comments");
+            file.Content.Should().NotContain("# TODO:", $"file {file.FileName} should not contain TODO comments");
+        }
+    }
+
+    [Fact]
+    public async Task GenerateServerFromContract_DotNet_GeneratesProjectFileAndInterface()
+    {
+        var handler = new GenerateServerFromContract.Handler();
+        var command = new GenerateServerFromContract.Command(ContractVersionId, "dotnet", "OrderService");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.Value.Files.Should().Contain(f => f.FileName.EndsWith(".csproj"), "should include .csproj project file");
+        result.Value.Files.Should().Contain(f => f.FileName.Contains("Service") && f.FileName.EndsWith(".cs"), "should include service interface");
+        result.Value.Files.Count.Should().BeGreaterThanOrEqualTo(3);
+    }
+
+    [Fact]
+    public async Task GenerateServerFromContract_Java_GeneratesPomAndServiceInterface()
+    {
+        var handler = new GenerateServerFromContract.Handler();
+        var command = new GenerateServerFromContract.Command(ContractVersionId, "java", "OrderService");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.Value.Files.Should().Contain(f => f.FileName == "pom.xml", "should include Maven POM");
+        result.Value.Files.Should().Contain(f => f.FileName.Contains("Service.java"), "should include Spring service interface");
+        result.Value.Files.Count.Should().BeGreaterThanOrEqualTo(3);
+    }
+
+    [Fact]
+    public async Task GenerateServerFromContract_NodeJs_GeneratesPackageJsonAndApp()
+    {
+        var handler = new GenerateServerFromContract.Handler();
+        var command = new GenerateServerFromContract.Command(ContractVersionId, "nodejs", "OrderService");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.Value.Files.Should().Contain(f => f.FileName == "package.json", "should include package.json");
+        result.Value.Files.Should().Contain(f => f.FileName.Contains("app.js"), "should include app entrypoint");
+        result.Value.Files.Count.Should().BeGreaterThanOrEqualTo(3);
+    }
+
+    [Fact]
+    public async Task GenerateServerFromContract_Go_GeneratesGoModAndMain()
+    {
+        var handler = new GenerateServerFromContract.Handler();
+        var command = new GenerateServerFromContract.Command(ContractVersionId, "go", "OrderService");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.Value.Files.Should().Contain(f => f.FileName == "go.mod", "should include go.mod module file");
+        result.Value.Files.Should().Contain(f => f.FileName.Contains("main.go"), "should include main.go entrypoint");
+        result.Value.Files.Count.Should().BeGreaterThanOrEqualTo(3);
+    }
+
+    [Fact]
+    public async Task GenerateServerFromContract_Python_GeneratesPyprojectAndApp()
+    {
+        var handler = new GenerateServerFromContract.Handler();
+        var command = new GenerateServerFromContract.Command(ContractVersionId, "python", "OrderService");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.Value.Files.Should().Contain(f => f.FileName == "pyproject.toml", "should include pyproject.toml");
+        result.Value.Files.Should().Contain(f => f.FileName.Contains("main.py"), "should include FastAPI entrypoint");
+        result.Value.Files.Count.Should().BeGreaterThanOrEqualTo(3);
+    }
+
+    [Fact]
+    public async Task GenerateServerFromContract_AllLanguages_IncludeServiceName()
+    {
+        var handler = new GenerateServerFromContract.Handler();
+        var serviceName = "PaymentGateway";
+
+        foreach (var lang in new[] { "dotnet", "java", "nodejs", "go", "python" })
+        {
+            var command = new GenerateServerFromContract.Command(ContractVersionId, lang, serviceName);
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            result.IsSuccess.Should().BeTrue();
+            var allContent = string.Join("\n", result.Value.Files.Select(f => f.Content));
+            allContent.Should().Contain(serviceName, $"language {lang} should reference service name");
+        }
+    }
 }

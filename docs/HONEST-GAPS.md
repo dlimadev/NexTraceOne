@@ -137,8 +137,8 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 - [x] **CFG-03** `docs/deployment/PRODUCTION-BOOTSTRAP.md` com checklist de "para remover todos os `simulatedNote` configure estes providers".
 
 ### Fase 4 — Gaps operacionais
-- [ ] **OPS-01** Knowledge Hub: Changelog vivo + Operational Notes timeline por serviço.
-- [ ] **OPS-02** `GenerateServerFromContract`: templates Java/Spring, Python/FastAPI, Node/Express sem TODOs quando possível.
+- [x] **OPS-01** Knowledge Hub: `GetServiceOperationalTimeline` feature + endpoint `GET /knowledge/services/{serviceId}/operational-timeline` + `ServiceTimelinePage` frontend + rota `/knowledge/services/:serviceId/timeline` + i18n 4 línguas + 11 testes.
+- [x] **OPS-02** `GenerateServerFromContract`: templates .NET/Java/Spring/Python/FastAPI/Node/Express/Go sem TODOs — cada linguagem inclui agora 3+ ficheiros (controller, interface de serviço, ficheiro de projeto: .csproj, pom.xml, package.json, pyproject.toml, go.mod).
 - [ ] **OPS-03** Validar NullKafkaEventProducer com warning de arranque claro.
 
 ### Fase 5 — Qualidade transversal

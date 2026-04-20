@@ -6861,6 +6861,17 @@
       "title": "Knowledge Graph",
       "totalEdges": "Total Edges",
       "totalNodes": "Total Nodes"
+    },
+    "serviceTimeline": {
+      "title": "Service Operational Timeline",
+      "subtitle": "Chronological view of operational notes attached to this service",
+      "filterBySeverity": "Filter by severity",
+      "filterByStatus": "Filter by status",
+      "open": "Open",
+      "resolved": "Resolved",
+      "empty": "No operational notes found for this service.",
+      "origin": "Origin",
+      "type": "Type"
     }
   },
   "knowledgeHub": {

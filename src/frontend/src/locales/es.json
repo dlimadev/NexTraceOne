@@ -6810,6 +6810,17 @@
       "title": "Grafo de Conocimiento",
       "totalEdges": "Total de Aristas",
       "totalNodes": "Total de Nodos"
+    },
+    "serviceTimeline": {
+      "title": "Línea de Tiempo Operacional del Servicio",
+      "subtitle": "Vista cronológica de las notas operacionales asociadas a este servicio",
+      "filterBySeverity": "Filtrar por severidad",
+      "filterByStatus": "Filtrar por estado",
+      "open": "Abiertas",
+      "resolved": "Resueltas",
+      "empty": "No se encontraron notas operacionales para este servicio.",
+      "origin": "Origen",
+      "type": "Tipo"
     }
   },
   "knowledgeHub": {

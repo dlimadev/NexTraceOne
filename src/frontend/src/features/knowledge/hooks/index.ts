@@ -128,3 +128,21 @@ export function useCreateKnowledgeRelation() {
     },
   });
 }
+
+export function useServiceOperationalTimeline(params: {
+  serviceId: string | undefined;
+  severity?: import('../../../types').NoteSeverity;
+  isResolved?: boolean;
+  page?: number;
+  pageSize?: number;
+}) {
+  return useQuery({
+    queryKey: [...knowledgeQueryKeys.all, 'service-timeline', params],
+    queryFn: () =>
+      knowledgeApi
+        .getServiceOperationalTimeline({ ...params, serviceId: params.serviceId! })
+        .then((r) => r.data),
+    enabled: !!params.serviceId,
+    staleTime: 30_000,
+  });
+}

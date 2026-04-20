@@ -14,6 +14,7 @@ import type {
   DocumentStatus,
   NoteSeverity,
   KnowledgeRelationType,
+  ServiceOperationalTimelineResponse,
 } from '../../../types';
 
 export const knowledgeApi = {
@@ -59,4 +60,18 @@ export const knowledgeApi = {
     client.get<{ items: KnowledgeRelationDto[] }>(
       `/knowledge/relations/by-source/${sourceEntityId}`
     ),
+
+  getServiceOperationalTimeline: (params: {
+    serviceId: string;
+    severity?: NoteSeverity;
+    isResolved?: boolean;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const { serviceId, ...rest } = params;
+    return client.get<ServiceOperationalTimelineResponse>(
+      `/knowledge/services/${serviceId}/operational-timeline`,
+      { params: rest }
+    );
+  },
 };
