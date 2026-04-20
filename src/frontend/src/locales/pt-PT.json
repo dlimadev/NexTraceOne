@@ -13012,5 +13012,30 @@
         "incorrect": "✗ Incorreto"
       }
     }
+  },
+  "changeConfidence": {
+    "breakdown": {
+      "title": "Breakdown de Confiança da Mudança",
+      "aggregatedScore": "Score Agregado",
+      "subScores": "Sub-scores",
+      "computed": "Calculado em",
+      "version": "Versão do score",
+      "confidence": {
+        "low": "Confiança baixa",
+        "medium": "Confiança média",
+        "high": "Confiança alta"
+      },
+      "subScoreType": {
+        "testCoverage": "Cobertura de Testes",
+        "contractStability": "Estabilidade de Contrato",
+        "historicalRegression": "Regressão Histórica",
+        "blastSurface": "Superfície de Impacto",
+        "dependencyHealth": "Saúde das Dependências",
+        "canarySignal": "Sinal Canary",
+        "preProdDelta": "Delta Pré-Prod"
+      },
+      "simulated": "Simulado — dados reais não disponíveis",
+      "citations": "Citações"
+    }
   }
 }

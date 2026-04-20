@@ -55,6 +55,9 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Registos de canary rollout de releases persistidos no módulo ChangeIntelligence.</summary>
     public DbSet<CanaryRollout> CanaryRollouts => Set<CanaryRollout>();
 
+    /// <summary>Breakdowns detalhados do Change Confidence Score 2.0 persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ChangeConfidenceBreakdown> ConfidenceBreakdowns => Set<ChangeConfidenceBreakdown>();
+
     /// <summary>Eventos de confiança de mudanças (append-only) persistidos no módulo ChangeIntelligence.</summary>
     public DbSet<ChangeConfidenceEvent> ChangeConfidenceEvents => Set<ChangeConfidenceEvent>();
 

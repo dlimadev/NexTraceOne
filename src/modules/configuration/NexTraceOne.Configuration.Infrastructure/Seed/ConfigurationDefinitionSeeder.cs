@@ -6778,5 +6778,106 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             isInheritable: true,
             uiEditorType: "toggle",
             sortOrder: 9900),
+
+        // ── Block H — Change Confidence Score 2.0 — Pesos e Thresholds ─────
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.testCoverage",
+            displayName: "config.change.confidence.weights.testCoverage.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.testCoverage.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4700),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.contractStability",
+            displayName: "config.change.confidence.weights.contractStability.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.contractStability.description",
+            defaultValue: "0.20",
+            uiEditorType: "number",
+            sortOrder: 4710),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.historicalRegression",
+            displayName: "config.change.confidence.weights.historicalRegression.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.historicalRegression.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4720),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.blastSurface",
+            displayName: "config.change.confidence.weights.blastSurface.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.blastSurface.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4730),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.dependencyHealth",
+            displayName: "config.change.confidence.weights.dependencyHealth.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.dependencyHealth.description",
+            defaultValue: "0.10",
+            uiEditorType: "number",
+            sortOrder: 4740),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.canarySignal",
+            displayName: "config.change.confidence.weights.canarySignal.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.canarySignal.description",
+            defaultValue: "0.10",
+            uiEditorType: "number",
+            sortOrder: 4750),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.preProdDelta",
+            displayName: "config.change.confidence.weights.preProdDelta.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.preProdDelta.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4760),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.minConfidenceForPromotion",
+            displayName: "config.change.confidence.minConfidenceForPromotion.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.minConfidenceForPromotion.description",
+            defaultValue: "70",
+            uiEditorType: "number",
+            sortOrder: 4770),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.historicalWindow.days",
+            displayName: "config.change.confidence.historicalWindow.days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Number,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.historicalWindow.days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 4780),
     ];
 }

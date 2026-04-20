@@ -12998,5 +12998,30 @@
         "chargebackEnabled": "Chargeback"
       }
     }
+  },
+  "changeConfidence": {
+    "breakdown": {
+      "title": "Change Confidence Breakdown",
+      "aggregatedScore": "Aggregated Score",
+      "subScores": "Sub-scores",
+      "computed": "Computed at",
+      "version": "Score version",
+      "confidence": {
+        "low": "Low confidence",
+        "medium": "Medium confidence",
+        "high": "High confidence"
+      },
+      "subScoreType": {
+        "testCoverage": "Test Coverage",
+        "contractStability": "Contract Stability",
+        "historicalRegression": "Historical Regression",
+        "blastSurface": "Blast Surface",
+        "dependencyHealth": "Dependency Health",
+        "canarySignal": "Canary Signal",
+        "preProdDelta": "Pre-Prod Delta"
+      },
+      "simulated": "Simulated — real data not available",
+      "citations": "Citations"
+    }
   }
 }
