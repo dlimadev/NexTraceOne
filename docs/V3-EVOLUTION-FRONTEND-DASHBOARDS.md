@@ -14,7 +14,21 @@ Este plano consolida:
 - Estado atual do frontend v2 do NexTraceOne (React 19 + TS + Vite 7 + TanStack Query/Router + Tailwind 4 + Radix UI + ECharts + Monaco, i18n 4 locales).
 - Base já existente de Custom Dashboards (aggregate `CustomDashboard`, 19 widgets, páginas `CustomDashboardsPage` / `DashboardBuilderPage` / `DashboardViewPage`, persistência JSONB no PostgreSQL, clone, partilha on/off, sistema de templates, export/import JSON).
 - Pesquisa de mercado (Dynatrace Dashboards/Notebooks & Davis CoPilot, Grafana 11 + Scenes, Datadog Dashboards, Observe OPAL Worksheets, Honeycomb Boards, New Relic Workloads, Looker/Mode, Superset, Metabase) sobre o que hoje é considerado estado-da-arte em dashboards enterprise: **query-driven widgets, live streaming, tokens/variables, notebooks, versionamento, partilha granular, deep-link contextual, AI-assisted creation, embedding, público/privado/equipa, delegação, colaboração em tempo real, marketplace, plugins, mobile on-call, dashboard-as-code**.
-  > **Nota de transparência:** Esta sessão foi executada em sandbox sem acesso à internet (web fetches retornaram erro de rede). Os itens desta pesquisa foram compilados a partir do meu conhecimento consolidado sobre as referências indicadas, não de páginas acedidas durante esta execução. Sugere-se validar/atualizar pontualmente antes do kickoff da v3 com links reais das docs oficiais (`docs.dynatrace.com`, `grafana.com/docs`, `docs.datadoghq.com`, `honeycomb.io/docs`).
+
+> **Referências validadas nesta sessão (2026-04-20):** durante a re-tentativa, a rede do sandbox bloqueou docs/homepages oficiais (`docs.dynatrace.com`, `grafana.com/docs`, `docs.datadoghq.com`, `honeycomb.io`, `react.dev`, `tanstack.com`, `backstage.io`), mas foi possível aceder ao GitHub. As seguintes referências foram consultadas diretamente nos respetivos repositórios e confirmam as tendências listadas:
+>
+> | Referência | Repositório | O que confirma |
+> |---|---|---|
+> | Grafana Scenes | `github.com/grafana/scenes` (Apache-2.0) | Framework moderno para apps Grafana altamente interativas — reforça V3.2 (query-driven) e V3.3 (live/cross-filter). |
+> | Backstage | `github.com/backstage/backstage` (CNCF Incubation) | Software Catalog + Templates + TechDocs + plugin ecosystem — confirma V3.8 (Plugin SDK + Template Gallery). |
+> | Apache Superset | `github.com/apache/superset` | Enterprise-ready BI com no-code charts + SQL editor + semantic layer — referência para V3.2 (NQL seguro) e V3.4 (notebook mode). |
+> | TanStack Router | `github.com/TanStack/router` | Já usado no frontend; end-to-end type safety, schema-driven search params, built-in caching — base para V3.5 (uplift). |
+> | Yjs (CRDT) | `github.com/yjs/yjs` (MIT) | CRDT framework usado por Evernote, Gitbook, AFFiNE, Huly, Sana; suporta shared cursors, offline, version snapshots, undo/redo — tecnologia candidata para V3.7 (collaboration). |
+> | Module Federation | `github.com/module-federation/module-federation-examples` | Adotado por Netflix, Microsoft, Amazon, Shopify, Auth0 — valida V3.8 (plugins governados). |
+> | OpenTelemetry spec | `github.com/open-telemetry/opentelemetry-specification` | Fonte da verdade para ingestão de telemetria que alimenta `QueryWidget` — validada para V3.2. |
+> | AsyncAPI spec 3.1.0 | `github.com/asyncapi/spec` | Já suportamos 3.x no Catalog (Wave B.1); mantém-se como referência para annotations e event contracts nos widgets. |
+>
+> Pontos de ação de transparência: quando os domínios de docs oficiais ficarem acessíveis (fora do sandbox), validar em particular: Dynatrace Notebooks/Davis CoPilot UX patterns, Grafana 11 Scenes data flow, Datadog live-stream throttling, Honeycomb Boards sharing model, PagerDuty mobile on-call flows, React 19 `use` hook + View Transitions guidelines.
 - Alinhamento obrigatório com a visão oficial do produto: **dashboards não são dashboards genéricos de observabilidade** — são **superfícies de decisão contextualizadas** em serviços, contratos, mudanças, ownership, ambiente, persona e governança. (Copilot Instructions §10, §18, §20, §27)
 
 **Princípio-mestre da v3 para estas duas vertentes:** elevar o frontend de "app de módulos" para **Operational Intelligence Surface** persona-aware, e elevar Custom Dashboards de "grid de widgets" para **Governed Intelligence Boards** — persistidos, versionados, partilháveis, auditáveis e integrados com o Source of Truth.
@@ -294,7 +308,7 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 
 #### Backend
 1. **Presence & Collaboration Service**
-   - Canal WebSocket/SSE por `dashboardId` / `notebookId` com presença (quem está a ver), cursores partilhados e edição concorrente baseada em CRDTs (operações comutativas) ou OT simples para texto/layout.
+   - Canal WebSocket/SSE por `dashboardId` / `notebookId` com presença (quem está a ver), cursores partilhados e edição concorrente baseada em **CRDTs — candidato de referência: [Yjs](https://github.com/yjs/yjs) (MIT)**, adotado por Evernote, Gitbook, AFFiNE, Huly, Sana, com suporte nativo a shared cursors, offline, undo/redo e version snapshots.
    - Tenant-aware, environment-aware, respeitando `SharingPolicy` (só participa quem tem permissão de leitura/edição).
    - Histórico de sessão colaborativa auditável (quem participou, quando, que alterações propôs).
 2. **Comentários ancorados**
@@ -323,7 +337,7 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 2. **Plugin SDK público**
    - Contrato estável `IWidgetKind` (evoluído da Wave V3.2) documentado como SDK, com empacotamento, assinatura de artefactos, verificação de integridade e sandbox de execução.
    - Registry multi-nível: System / Tenant / Private.
-   - Compatível com **Micro-frontends / Module Federation** para carregamento isolado e versionado.
+   - Compatível com **[Module Federation](https://github.com/module-federation/module-federation-examples)** (Webpack 5 / Rspack / Vite) para carregamento isolado e versionado — padrão já adotado por Netflix, Microsoft, Amazon, Shopify, Auth0.
 3. **Governance de plugins**
    - Políticas por tenant: plugins permitidos, bloqueados, fonte (interno/terceiros), revisão obrigatória.
    - Trilha de auditoria de instalação, ativação, desativação.
