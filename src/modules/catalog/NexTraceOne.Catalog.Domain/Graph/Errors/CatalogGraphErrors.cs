@@ -152,4 +152,10 @@ public static class CatalogGraphErrors
     /// <summary>Vínculo de contrato não encontrado pelo identificador.</summary>
     public static Error ContractBindingNotFound(Guid bindingId)
         => Error.NotFound("CatalogGraph.ContractBinding.NotFound", "Contract binding '{0}' was not found.", bindingId);
+
+    // ── Service Tier ──────────────────────────────────────────────────────
+
+    /// <summary>Tier de serviço inválido.</summary>
+    public static Error InvalidServiceTier(string tier)
+        => Error.Validation("CatalogGraph.ServiceAsset.InvalidTier", "Service tier '{0}' is not valid. Use: Critical, Standard or Experimental.", tier);
 }

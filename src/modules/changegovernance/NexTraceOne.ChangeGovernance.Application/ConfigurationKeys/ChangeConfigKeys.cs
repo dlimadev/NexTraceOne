@@ -101,4 +101,33 @@ public static class ChangeConfigKeys
     /// Pode ser sobreposta por environment override.
     /// </summary>
     public const string ReleaseFreezeWindowDefaultDurationHours = "change.release.freeze_window.default_duration_hours";
+
+    // ── Change Confidence Score 2.0 — pesos dos sub-scores ───────────────────
+
+    /// <summary>Peso do sub-score TestCoverage na média ponderada do Change Confidence Score 2.0.</summary>
+    public const string ConfidenceWeightTestCoverage = "change.confidence.weights.testCoverage";
+
+    /// <summary>Peso do sub-score ContractStability na média ponderada do Change Confidence Score 2.0.</summary>
+    public const string ConfidenceWeightContractStability = "change.confidence.weights.contractStability";
+
+    /// <summary>Peso do sub-score HistoricalRegression na média ponderada do Change Confidence Score 2.0.</summary>
+    public const string ConfidenceWeightHistoricalRegression = "change.confidence.weights.historicalRegression";
+
+    /// <summary>Peso do sub-score BlastSurface na média ponderada do Change Confidence Score 2.0.</summary>
+    public const string ConfidenceWeightBlastSurface = "change.confidence.weights.blastSurface";
+
+    /// <summary>Peso do sub-score DependencyHealth na média ponderada do Change Confidence Score 2.0.</summary>
+    public const string ConfidenceWeightDependencyHealth = "change.confidence.weights.dependencyHealth";
+
+    /// <summary>Peso do sub-score CanarySignal na média ponderada do Change Confidence Score 2.0.</summary>
+    public const string ConfidenceWeightCanarySignal = "change.confidence.weights.canarySignal";
+
+    /// <summary>Peso do sub-score PreProdDelta na média ponderada do Change Confidence Score 2.0.</summary>
+    public const string ConfidenceWeightPreProdDelta = "change.confidence.weights.preProdDelta";
+
+    /// <summary>Score mínimo de confiança (0–100) exigido para liberar promoção entre ambientes no Score 2.0.</summary>
+    public const string ConfidenceMinScoreForPromotion = "change.confidence.minConfidenceForPromotion";
+
+    /// <summary>Janela histórica em dias para análise de regressões passadas no Score 2.0.</summary>
+    public const string ConfidenceHistoricalWindowDays = "change.confidence.historicalWindow.days";
 }

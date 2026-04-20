@@ -49,6 +49,14 @@ internal static class AsyncApiCanonicalModelBuilder
 
     private static List<ContractOperation> ExtractAsyncApiOperations(JsonElement root)
     {
+        return AsyncApiSpecParser.IsAsyncApi3x(root)
+            ? ExtractAsyncApiOperations3x(root)
+            : ExtractAsyncApiOperations2x(root);
+    }
+
+    /// <summary>AsyncAPI 2.x: publish/subscribe inline nos channels.</summary>
+    private static List<ContractOperation> ExtractAsyncApiOperations2x(JsonElement root)
+    {
         var ops = new List<ContractOperation>();
         if (!root.TryGetProperty("channels", out var channels)) return ops;
 
@@ -74,14 +82,75 @@ internal static class AsyncApiCanonicalModelBuilder
         return ops;
     }
 
+    /// <summary>
+    /// AsyncAPI 3.x: operações no objecto top-level "operations" com "action": "send"/"receive"
+    /// e referência ao canal via "channel.$ref".
+    /// Mapeia "send" → "PUBLISH", "receive" → "SUBSCRIBE" para manter compatibilidade interna.
+    /// </summary>
+    private static List<ContractOperation> ExtractAsyncApiOperations3x(JsonElement root)
+    {
+        var ops = new List<ContractOperation>();
+        if (!root.TryGetProperty("operations", out var operations)) return ops;
+
+        foreach (var op in operations.EnumerateObject())
+        {
+            if (op.Value.ValueKind != JsonValueKind.Object) continue;
+
+            if (!op.Value.TryGetProperty("action", out var actionEl)) continue;
+            var action = actionEl.GetString()?.ToUpperInvariant();
+            var opType = action switch
+            {
+                "SEND" => "PUBLISH",
+                "RECEIVE" => "SUBSCRIBE",
+                _ => null
+            };
+            if (opType is null) continue;
+
+            // Resolver canal via $ref
+            var channelName = string.Empty;
+            if (op.Value.TryGetProperty("channel", out var chanRef)
+                && chanRef.TryGetProperty("$ref", out var refEl)
+                && refEl.GetString() is { Length: > 0 } refStr)
+            {
+                var parts = refStr.Split('/');
+                if (parts.Length >= 3 && parts[1].Equals("channels", StringComparison.OrdinalIgnoreCase))
+                    channelName = parts[2];
+            }
+
+            var opId = op.Name;
+            var desc = op.Value.TryGetProperty("description", out var d) ? d.GetString() :
+                       op.Value.TryGetProperty("summary", out var s) ? s.GetString() : null;
+            var tags = CanonicalModelHelpers.ExtractArrayStrings(op.Value, "tags");
+
+            ops.Add(new ContractOperation(opId, opId, desc, opType, channelName, [], [], false, tags));
+        }
+        return ops;
+    }
+
     private static List<string> ExtractAsyncApiServers(JsonElement root)
     {
         var servers = new List<string>();
-        if (root.TryGetProperty("servers", out var svrs) && svrs.ValueKind == JsonValueKind.Object)
+        if (!root.TryGetProperty("servers", out var svrs) || svrs.ValueKind != JsonValueKind.Object)
+            return servers;
+
+        var is3x = AsyncApiSpecParser.IsAsyncApi3x(root);
+
+        foreach (var s in svrs.EnumerateObject())
         {
-            foreach (var s in svrs.EnumerateObject())
+            if (s.Value.ValueKind != JsonValueKind.Object) continue;
+
+            if (is3x)
             {
-                if (s.Value.ValueKind == JsonValueKind.Object && s.Value.TryGetProperty("url", out var url))
+                // AsyncAPI 3.x: "host" + "protocol"
+                var host = s.Value.TryGetProperty("host", out var hostEl) ? hostEl.GetString() ?? "" : "";
+                var protocol = s.Value.TryGetProperty("protocol", out var protEl) ? protEl.GetString() ?? "" : "";
+                if (!string.IsNullOrEmpty(host))
+                    servers.Add(string.IsNullOrEmpty(protocol) ? host : $"{protocol}://{host}");
+            }
+            else
+            {
+                // AsyncAPI 2.x: "url"
+                if (s.Value.TryGetProperty("url", out var url))
                     servers.Add(url.GetString() ?? "");
             }
         }

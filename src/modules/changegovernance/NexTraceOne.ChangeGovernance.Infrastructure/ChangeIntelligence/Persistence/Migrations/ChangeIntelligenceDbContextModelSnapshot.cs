@@ -1080,6 +1080,117 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
 
                     b.ToTable("chg_rollback_assessments", (string)null);
                 });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeConfidenceBreakdown", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("AggregatedScore")
+                        .HasPrecision(7, 2)
+                        .HasColumnType("numeric(7,2)");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("ScoreVersion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId");
+
+                    b.ToTable("chg_confidence_breakdowns", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeConfidenceBreakdown", b =>
+                {
+                    b.OwnsMany("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ChangeConfidenceSubScore", "SubScores", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("BreakdownId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Citations")
+                                .IsRequired()
+                                .HasColumnType("jsonb");
+
+                            b1.Property<string>("Confidence")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)");
+
+                            b1.Property<string>("Reason")
+                                .IsRequired()
+                                .HasMaxLength(2000)
+                                .HasColumnType("character varying(2000)");
+
+                            b1.Property<string>("SimulatedNote")
+                                .HasMaxLength(500)
+                                .HasColumnType("character varying(500)");
+
+                            b1.Property<string>("SubScoreType")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.Property<decimal>("Value")
+                                .HasPrecision(7, 2)
+                                .HasColumnType("numeric(7,2)");
+
+                            b1.Property<decimal>("Weight")
+                                .HasPrecision(7, 4)
+                                .HasColumnType("numeric(7,4)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("BreakdownId");
+
+                            b1.ToTable("chg_confidence_sub_scores", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("BreakdownId");
+                        });
+
+                    b.Navigation("SubScores");
+                });
 #pragma warning restore 612, 618
         }
     }

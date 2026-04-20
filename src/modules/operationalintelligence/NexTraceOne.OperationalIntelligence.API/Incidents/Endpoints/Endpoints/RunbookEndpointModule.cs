@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.CreateRunbook;
+using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ExecuteRunbookStep;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.GetRunbookDetail;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.ListRunbooks;
 using NexTraceOne.OperationalIntelligence.Application.Incidents.Features.SuggestRunbooksForIncident;
@@ -110,5 +111,22 @@ public sealed class RunbookEndpointModule
         .RequirePermission("operations:runbooks:write")
         .WithName("UpdateRunbook")
         .WithSummary("Update an existing operational runbook");
+
+        // ── POST /api/v1/runbooks/{runbookId}/steps/{stepKey}/execute — Executar passo de runbook ──
+        group.MapPost("/{runbookId}/steps/{stepKey}/execute", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            string runbookId,
+            string stepKey,
+            ExecuteRunbookStep.Command command,
+            CancellationToken cancellationToken = default) =>
+        {
+            var cmd = new ExecuteRunbookStep.Command(Guid.Parse(runbookId), stepKey, command.ExecutorUserId);
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/runbooks/{runbookId}/steps/{stepKey}/executions/{r.ExecutionId}", localizer);
+        })
+        .RequirePermission("operations:runbooks:write")
+        .WithName("ExecuteRunbookStep")
+        .WithSummary("Execute a runbook step and record the execution result");
     }
 }

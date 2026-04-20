@@ -1,6 +1,6 @@
 # NexTraceOne — Honest Gaps
 
-> **Última atualização:** Abril 2026 — **🟢 Zero gaps abertos — pronto para v1.0.0**
+> **Última atualização:** Abril 2026 — **🟢 Zero gaps abertos — pronto para v1.0.0** | Evolução pós-v1.0.0 em progresso (Wave A.1 ✅, Wave A.2 ✅, Wave A.3 ✅, Wave A.4 ✅)
 > **Propósito:** Registo único e honesto de toda a dívida declarada, degradação graciosa (`simulatedNote`), decisões de "out-of-scope" e providers opcionais cujo enforcement fica dependente de configuração externa.
 >
 > Este ficheiro é **fonte da verdade** para responder "isto está implementado?" quando o `IMPLEMENTATION-STATUS.md` classifica algo como `READY com notas`, `PARTIAL` ou `SIM`.

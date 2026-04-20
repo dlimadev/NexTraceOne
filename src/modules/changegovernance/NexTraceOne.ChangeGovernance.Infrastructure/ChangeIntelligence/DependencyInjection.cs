@@ -56,11 +56,17 @@ public static class DependencyInjection
         services.AddScoped<IRollbackAssessmentRepository, RollbackAssessmentRepository>();
         services.AddScoped<IFeatureFlagStateRepository, FeatureFlagStateRepository>();
         services.AddScoped<ICanaryRolloutRepository, CanaryRolloutRepository>();
+        services.AddScoped<IChangeConfidenceBreakdownRepository, ChangeConfidenceBreakdownRepository>();
         services.AddScoped<IChangeConfidenceEventRepository, ChangeConfidenceEventRepository>();
         services.AddScoped<IReleaseNotesRepository, ReleaseNotesRepository>();
         services.AddScoped<IPromotionGateRepository, PromotionGateRepository>();
         services.AddScoped<IPromotionGateEvaluationRepository, PromotionGateEvaluationRepository>();
+        services.AddScoped<IExternalChangeRequestRepository, EfExternalChangeRequestRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
+
+        // Default honest-null reader para Promotion Readiness Delta.
+        // Uma bridge real p/ OperationalIntelligence substitui este default na composition root.
+        services.AddScoped<IRuntimeComparisonReader, Services.NullRuntimeComparisonReader>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();
 

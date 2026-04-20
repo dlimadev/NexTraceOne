@@ -12998,5 +12998,190 @@
         "chargebackEnabled": "Chargeback"
       }
     }
+  },
+  "changeConfidence": {
+    "breakdown": {
+      "title": "Change Confidence Breakdown",
+      "aggregatedScore": "Aggregated Score",
+      "subScores": "Sub-scores",
+      "computed": "Computed at",
+      "version": "Score version",
+      "confidence": {
+        "low": "Low confidence",
+        "medium": "Medium confidence",
+        "high": "High confidence"
+      },
+      "subScoreType": {
+        "testCoverage": "Test Coverage",
+        "contractStability": "Contract Stability",
+        "historicalRegression": "Historical Regression",
+        "blastSurface": "Blast Surface",
+        "dependencyHealth": "Dependency Health",
+        "canarySignal": "Canary Signal",
+        "preProdDelta": "Pre-Prod Delta"
+      },
+      "simulated": "Simulated — real data not available",
+      "citations": "Citations"
+    }
+  },
+  "aiEvaluation": {
+    "title": "AI Evaluation Harness",
+    "subtitle": "Define, run, and compare AI model evaluations per use case",
+    "suites": {
+      "title": "Evaluation Suites",
+      "create": "Create Suite",
+      "name": "Suite Name",
+      "displayName": "Display Name",
+      "description": "Description",
+      "useCase": "Use Case",
+      "version": "Version",
+      "targetModel": "Target Model (optional)",
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "archived": "Archived"
+      }
+    },
+    "runs": {
+      "title": "Evaluation Runs",
+      "create": "Run Evaluation",
+      "promptVersion": "Prompt Version",
+      "status": {
+        "pending": "Pending",
+        "running": "Running",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
+      "passed": "Passed",
+      "failed": "Failed",
+      "latency": "Avg Latency (ms)",
+      "tokenCost": "Token Cost"
+    },
+    "datasets": {
+      "title": "Evaluation Datasets",
+      "create": "Create Dataset",
+      "sourceType": {
+        "curated": "Curated",
+        "generated": "Generated (from trajectories)",
+        "synthetic": "Synthetic (AI-generated)"
+      }
+    },
+    "empty": "No evaluation suites found"
+  },
+  "serviceTier": {
+    "title": "Service Tier",
+    "label": "Operational Tier",
+    "set": "Set Tier",
+    "setSuccess": "Tier updated to {{tier}}",
+    "policy": "Tier Policy",
+    "policyTitle": "Tier Requirements",
+    "tier": {
+      "Critical": "Critical",
+      "Standard": "Standard",
+      "Experimental": "Experimental"
+    },
+    "policy": {
+      "minSlo": "Min SLO (%)",
+      "minMaturity": "Min Maturity Score",
+      "onCallRequired": "On-Call Required",
+      "runbookRequired": "Runbook Required",
+      "monitoringRequired": "Monitoring Required"
+    },
+    "conformance": {
+      "title": "Conformance",
+      "sloConformant": "SLO Conformant",
+      "hasOnCall": "Has On-Call",
+      "hasContactChannel": "Has Contact Channel"
+    },
+    "empty": "No tier policy found"
+  },
+  "ownershipDrift": {
+    "title": "Ownership Drift",
+    "subtitle": "Services with stale or incomplete ownership data",
+    "report": "Drift Report",
+    "detect": "Check Drift",
+    "review": "Mark as Reviewed",
+    "reviewSuccess": "Ownership marked as reviewed",
+    "hasDrift": "Has Drift",
+    "noDrift": "No Drift Detected",
+    "driftScore": "Drift Score",
+    "daysSinceReview": "Days Since Review",
+    "thresholdDays": "Threshold (days)",
+    "signals": {
+      "OwnershipNeverReviewed": "Ownership has never been reviewed",
+      "OwnershipReviewStale": "Ownership review is stale",
+      "NoTechnicalOwner": "No technical owner assigned",
+      "NoTeam": "No team assigned",
+      "NoOnCallRotation": "No on-call rotation configured",
+      "NoContactChannel": "No contact channel set",
+      "NoBusinessOwner": "No business owner assigned"
+    },
+    "severity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "info": "Info"
+    },
+    "summary": {
+      "total": "Total Evaluated",
+      "withDrift": "With Drift",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium"
+    },
+    "empty": "No ownership drift detected"
+  },
+  "correlationFeatures": {
+    "title": "Correlation Feature Score",
+    "temporalProximity": "Temporal Proximity",
+    "serviceMatch": "Service Match",
+    "ownershipAlignment": "Ownership Alignment",
+    "weightedTotal": "Weighted Total Score",
+    "confidenceLabel": "Confidence",
+    "noChangeDetails": "Change details not available"
+  },
+  "runbookExecution": {
+    "title": "Runbook Step Execution",
+    "execute": "Execute Step",
+    "status": "Execution Status",
+    "output": "Output Summary",
+    "error": "Error Detail",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "pending": "Pending"
+  },
+  "mitigationSimilarity": {
+    "title": "Similar Incident Mitigations",
+    "reference": "Reference Incident",
+    "similarity": "Similarity Score",
+    "suggestion": "Suggested Mitigation",
+    "noResults": "No similar incidents found"
+  },
+  "backstageBridge": {
+    "title": "Backstage Export",
+    "export": "Export to Backstage",
+    "totalExported": "Total Exported",
+    "namespace": "Namespace",
+    "lifecycle": "Lifecycle",
+    "exportSuccess": "Export completed successfully",
+    "noServices": "No services to export"
+  },
+  "externalChangeRequest": {
+    "title": "External Change Requests",
+    "import": "Import Change Request",
+    "externalSystem": "External System",
+    "externalId": "External ID",
+    "changeType": "Change Type",
+    "requestedBy": "Requested By",
+    "scheduledStart": "Scheduled Start",
+    "scheduledEnd": "Scheduled End",
+    "status": {
+      "pending": "Pending",
+      "ingested": "Ingested",
+      "linked": "Linked",
+      "rejected": "Rejected"
+    },
+    "importSuccess": "Change request imported",
+    "alreadyExists": "Change request already ingested"
   }
 }

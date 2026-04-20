@@ -13012,5 +13012,183 @@
         "incorrect": "✗ Incorreto"
       }
     }
+  },
+  "changeConfidence": {
+    "breakdown": {
+      "title": "Breakdown de Confiança da Mudança",
+      "aggregatedScore": "Score Agregado",
+      "subScores": "Sub-scores",
+      "computed": "Calculado em",
+      "version": "Versão do score",
+      "confidence": {
+        "low": "Confiança baixa",
+        "medium": "Confiança média",
+        "high": "Confiança alta"
+      },
+      "subScoreType": {
+        "testCoverage": "Cobertura de Testes",
+        "contractStability": "Estabilidade de Contrato",
+        "historicalRegression": "Regressão Histórica",
+        "blastSurface": "Superfície de Impacto",
+        "dependencyHealth": "Saúde das Dependências",
+        "canarySignal": "Sinal Canary",
+        "preProdDelta": "Delta Pré-Prod"
+      },
+      "simulated": "Simulado — dados reais não disponíveis",
+      "citations": "Citações"
+    }
+  },
+  "aiEvaluation": {
+    "title": "AI Evaluation Harness",
+    "subtitle": "Defina, execute e compare avaliações de modelos de IA por caso de uso",
+    "suites": {
+      "title": "Suites de Avaliação",
+      "create": "Criar Suite",
+      "name": "Nome da Suite",
+      "displayName": "Nome de Apresentação",
+      "description": "Descrição",
+      "useCase": "Caso de Uso",
+      "version": "Versão",
+      "targetModel": "Modelo Alvo (opcional)",
+      "status": {
+        "draft": "Rascunho",
+        "active": "Activa",
+        "archived": "Arquivada"
+      }
+    },
+    "runs": {
+      "title": "Execuções de Avaliação",
+      "create": "Executar Avaliação",
+      "promptVersion": "Versão do Prompt",
+      "status": {
+        "pending": "Pendente",
+        "running": "Em Execução",
+        "completed": "Concluída",
+        "failed": "Falhou"
+      },
+      "passed": "Aprovados",
+      "failed": "Reprovados",
+      "latency": "Latência Média (ms)",
+      "tokenCost": "Custo de Tokens"
+    },
+    "datasets": {
+      "title": "Datasets de Avaliação",
+      "create": "Criar Dataset",
+      "sourceType": {
+        "curated": "Curado",
+        "generated": "Gerado (de trajectórias)",
+        "synthetic": "Sintético (gerado por IA)"
+      }
+    },
+    "empty": "Nenhuma suite de avaliação encontrada"
+  },
+  "serviceTier": {
+    "title": "Tier de Serviço",
+    "label": "Tier Operacional",
+    "set": "Definir Tier",
+    "setSuccess": "Tier actualizado para {{tier}}",
+    "policy": "Política de Tier",
+    "policyTitle": "Requisitos do Tier",
+    "tier": {
+      "Critical": "Crítico",
+      "Standard": "Standard",
+      "Experimental": "Experimental"
+    },
+    "conformance": {
+      "title": "Conformidade",
+      "sloConformant": "SLO Conforme",
+      "hasOnCall": "Possui On-Call",
+      "hasContactChannel": "Possui Canal de Contacto"
+    },
+    "empty": "Nenhuma política de tier encontrada"
+  },
+  "ownershipDrift": {
+    "title": "Drift de Ownership",
+    "subtitle": "Serviços com dados de ownership desactualizados ou incompletos",
+    "report": "Relatório de Drift",
+    "detect": "Verificar Drift",
+    "review": "Marcar como Revisto",
+    "reviewSuccess": "Ownership marcado como revisto",
+    "hasDrift": "Possui Drift",
+    "noDrift": "Sem Drift Detectado",
+    "driftScore": "Score de Drift",
+    "daysSinceReview": "Dias desde a Revisão",
+    "thresholdDays": "Limiar (dias)",
+    "signals": {
+      "OwnershipNeverReviewed": "O ownership nunca foi revisto",
+      "OwnershipReviewStale": "A revisão de ownership está desactualizada",
+      "NoTechnicalOwner": "Sem responsável técnico atribuído",
+      "NoTeam": "Sem equipa atribuída",
+      "NoOnCallRotation": "Sem rotação on-call configurada",
+      "NoContactChannel": "Sem canal de contacto definido",
+      "NoBusinessOwner": "Sem responsável de negócio atribuído"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio",
+      "info": "Info"
+    },
+    "summary": {
+      "total": "Total Avaliados",
+      "withDrift": "Com Drift",
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio"
+    },
+    "empty": "Nenhum drift de ownership detectado"
+  },
+  "correlationFeatures": {
+    "title": "Score de Características de Correlação",
+    "temporalProximity": "Proximidade Temporal",
+    "serviceMatch": "Correspondência de Serviço",
+    "ownershipAlignment": "Alinhamento de Ownership",
+    "weightedTotal": "Score Total Ponderado",
+    "confidenceLabel": "Confiança",
+    "noChangeDetails": "Detalhes da alteração não disponíveis"
+  },
+  "runbookExecution": {
+    "title": "Execução de Passo de Runbook",
+    "execute": "Executar Passo",
+    "status": "Estado de Execução",
+    "output": "Resumo de Saída",
+    "error": "Detalhe do Erro",
+    "succeeded": "Concluído com Sucesso",
+    "failed": "Falhado",
+    "pending": "Pendente"
+  },
+  "mitigationSimilarity": {
+    "title": "Mitigações de Incidentes Similares",
+    "reference": "Incidente de Referência",
+    "similarity": "Score de Similaridade",
+    "suggestion": "Mitigação Sugerida",
+    "noResults": "Nenhum incidente similar encontrado"
+  },
+  "backstageBridge": {
+    "title": "Exportação Backstage",
+    "export": "Exportar para o Backstage",
+    "totalExported": "Total Exportado",
+    "namespace": "Namespace",
+    "lifecycle": "Ciclo de Vida",
+    "exportSuccess": "Exportação concluída com sucesso",
+    "noServices": "Nenhum serviço para exportar"
+  },
+  "externalChangeRequest": {
+    "title": "Pedidos de Alteração Externos",
+    "import": "Importar Pedido de Alteração",
+    "externalSystem": "Sistema Externo",
+    "externalId": "ID Externo",
+    "changeType": "Tipo de Alteração",
+    "requestedBy": "Solicitado Por",
+    "scheduledStart": "Início Agendado",
+    "scheduledEnd": "Fim Agendado",
+    "status": {
+      "pending": "Pendente",
+      "ingested": "Ingerido",
+      "linked": "Vinculado",
+      "rejected": "Rejeitado"
+    },
+    "importSuccess": "Pedido de alteração importado",
+    "alreadyExists": "Pedido de alteração já ingerido"
   }
 }

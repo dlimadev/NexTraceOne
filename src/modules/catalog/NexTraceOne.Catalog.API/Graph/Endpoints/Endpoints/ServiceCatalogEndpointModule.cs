@@ -56,6 +56,12 @@ using DeprecateServiceInterfaceFeature = NexTraceOne.Catalog.Application.Graph.F
 using BindContractToInterfaceFeature = NexTraceOne.Catalog.Application.Graph.Features.BindContractToInterface.BindContractToInterface;
 using ListContractBindingsByInterfaceFeature = NexTraceOne.Catalog.Application.Graph.Features.ListContractBindingsByInterface.ListContractBindingsByInterface;
 using DeactivateContractBindingFeature = NexTraceOne.Catalog.Application.Graph.Features.DeactivateContractBinding.DeactivateContractBinding;
+using SetServiceTierFeature = NexTraceOne.Catalog.Application.Graph.Features.SetServiceTier.SetServiceTier;
+using GetServiceTierPolicyFeature = NexTraceOne.Catalog.Application.Graph.Features.GetServiceTierPolicy.GetServiceTierPolicy;
+using DetectOwnershipDriftFeature = NexTraceOne.Catalog.Application.Graph.Features.DetectOwnershipDrift.DetectOwnershipDrift;
+using GetOwnershipDriftReportFeature = NexTraceOne.Catalog.Application.Graph.Features.GetOwnershipDriftReport.GetOwnershipDriftReport;
+using ReviewServiceOwnershipFeature = NexTraceOne.Catalog.Application.Graph.Features.ReviewServiceOwnership.ReviewServiceOwnership;
+using ExportToBackstageFeature = NexTraceOne.Catalog.Application.Graph.Features.ExportToBackstage.ExportToBackstage;
 
 namespace NexTraceOne.Catalog.API.Graph.Endpoints.Endpoints;
 
@@ -678,5 +684,77 @@ public sealed class ServiceCatalogEndpointModule
             var result = await sender.Send(new DeactivateContractBindingFeature.Command(bindingId, deactivatedBy), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:contract-bindings:write");
+
+        // ── Service Tier & Ownership Drift (Wave A.3) ─────────────────────
+
+        group.MapPut("/services/{serviceId:guid}/tier", async (
+            Guid serviceId,
+            SetServiceTierFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { ServiceId = serviceId };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapGet("/services/{serviceId:guid}/tier-policy", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetServiceTierPolicyFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapGet("/services/{serviceId:guid}/ownership-drift", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new DetectOwnershipDriftFeature.Query(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        group.MapPost("/services/{serviceId:guid}/ownership-review", async (
+            Guid serviceId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new ReviewServiceOwnershipFeature.Command(serviceId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:write");
+
+        group.MapGet("/ownership/drift-report", async (
+            string? teamName,
+            string? domain,
+            string? tier,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetOwnershipDriftReportFeature.Query(teamName, domain, tier);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
+
+        // ── Backstage Bridge Export ──────────────────────────────────────
+
+        group.MapGet("/services/export/backstage", async (
+            string? @namespace,
+            string? lifecycle,
+            string? teamName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ExportToBackstageFeature.Query(@namespace, lifecycle, teamName);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("catalog:assets:read");
     }
 }

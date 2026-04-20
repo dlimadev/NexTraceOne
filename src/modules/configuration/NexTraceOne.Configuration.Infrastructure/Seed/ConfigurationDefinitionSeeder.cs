@@ -6778,5 +6778,343 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             isInheritable: true,
             uiEditorType: "toggle",
             sortOrder: 9900),
+
+        // ── Block H — Change Confidence Score 2.0 — Pesos e Thresholds ─────
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.testCoverage",
+            displayName: "config.change.confidence.weights.testCoverage.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.testCoverage.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4700),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.contractStability",
+            displayName: "config.change.confidence.weights.contractStability.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.contractStability.description",
+            defaultValue: "0.20",
+            uiEditorType: "number",
+            sortOrder: 4710),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.historicalRegression",
+            displayName: "config.change.confidence.weights.historicalRegression.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.historicalRegression.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4720),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.blastSurface",
+            displayName: "config.change.confidence.weights.blastSurface.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.blastSurface.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4730),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.dependencyHealth",
+            displayName: "config.change.confidence.weights.dependencyHealth.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.dependencyHealth.description",
+            defaultValue: "0.10",
+            uiEditorType: "number",
+            sortOrder: 4740),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.canarySignal",
+            displayName: "config.change.confidence.weights.canarySignal.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.canarySignal.description",
+            defaultValue: "0.10",
+            uiEditorType: "number",
+            sortOrder: 4750),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.weights.preProdDelta",
+            displayName: "config.change.confidence.weights.preProdDelta.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.weights.preProdDelta.description",
+            defaultValue: "0.15",
+            uiEditorType: "number",
+            sortOrder: 4760),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.minConfidenceForPromotion",
+            displayName: "config.change.confidence.minConfidenceForPromotion.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.minConfidenceForPromotion.description",
+            defaultValue: "70",
+            uiEditorType: "number",
+            sortOrder: 4770),
+
+        ConfigurationDefinition.Create(
+            key: "change.confidence.historicalWindow.days",
+            displayName: "config.change.confidence.historicalWindow.days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.confidence.historicalWindow.days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 4780),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.defaults.latencyBudgetMs",
+            displayName: "config.ai.evaluation.defaults.latencyBudgetMs.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.defaults.latencyBudgetMs.description",
+            defaultValue: "5000",
+            uiEditorType: "number",
+            sortOrder: 4900),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.defaults.llmJudge.model",
+            displayName: "config.ai.evaluation.defaults.llmJudge.model.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.defaults.llmJudge.model.description",
+            defaultValue: "gpt-4o-mini",
+            uiEditorType: "text",
+            sortOrder: 4910),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.runs.retentionDays",
+            displayName: "config.ai.evaluation.runs.retentionDays.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.runs.retentionDays.description",
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 4920),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.runs.maxConcurrency",
+            displayName: "config.ai.evaluation.runs.maxConcurrency.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.runs.maxConcurrency.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 4930),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.humanReview.slaHours",
+            displayName: "config.ai.evaluation.humanReview.slaHours.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.humanReview.slaHours.description",
+            defaultValue: "48",
+            uiEditorType: "number",
+            sortOrder: 4940),
+
+        // ── Service Catalog — Tier & Ownership Drift (Wave A.3) ───────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.ownershipDrift.threshold.days",
+            displayName: "config.catalog.ownershipDrift.thresholdDays.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.ownershipDrift.thresholdDays.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 5100),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.critical.sloMinPercent",
+            displayName: "config.catalog.tier.critical.sloMinPercent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.critical.sloMinPercent.description",
+            defaultValue: "99.9",
+            uiEditorType: "number",
+            sortOrder: 5110),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.standard.sloMinPercent",
+            displayName: "config.catalog.tier.standard.sloMinPercent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.standard.sloMinPercent.description",
+            defaultValue: "99.5",
+            uiEditorType: "number",
+            sortOrder: 5120),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.experimental.sloMinPercent",
+            displayName: "config.catalog.tier.experimental.sloMinPercent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.experimental.sloMinPercent.description",
+            defaultValue: "99.0",
+            uiEditorType: "number",
+            sortOrder: 5130),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.critical.maturityMinScore",
+            displayName: "config.catalog.tier.critical.maturityMinScore.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.critical.maturityMinScore.description",
+            defaultValue: "0.8",
+            uiEditorType: "number",
+            sortOrder: 5140),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.standard.maturityMinScore",
+            displayName: "config.catalog.tier.standard.maturityMinScore.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.standard.maturityMinScore.description",
+            defaultValue: "0.6",
+            uiEditorType: "number",
+            sortOrder: 5150),
+
+        // ── Operational Intelligence — Correlation Feature Scoring (Wave A.5) ───────────
+
+        ConfigurationDefinition.Create(
+            key: "oi.correlation.feature.temporalWeight",
+            displayName: "config.oi.correlation.feature.temporalWeight.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.correlation.feature.temporalWeight.description",
+            defaultValue: "0.4",
+            uiEditorType: "number",
+            sortOrder: 5200),
+
+        ConfigurationDefinition.Create(
+            key: "oi.correlation.feature.serviceWeight",
+            displayName: "config.oi.correlation.feature.serviceWeight.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.correlation.feature.serviceWeight.description",
+            defaultValue: "0.4",
+            uiEditorType: "number",
+            sortOrder: 5210),
+
+        ConfigurationDefinition.Create(
+            key: "oi.correlation.feature.ownershipWeight",
+            displayName: "config.oi.correlation.feature.ownershipWeight.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.correlation.feature.ownershipWeight.description",
+            defaultValue: "0.2",
+            uiEditorType: "number",
+            sortOrder: 5220),
+
+        ConfigurationDefinition.Create(
+            key: "oi.runbook.maxConcurrentExecutions",
+            displayName: "config.oi.runbook.maxConcurrentExecutions.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.runbook.maxConcurrentExecutions.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 5230),
+
+        ConfigurationDefinition.Create(
+            key: "oi.similarity.lookbackDays",
+            displayName: "config.oi.similarity.lookbackDays.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.similarity.lookbackDays.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 5240),
+
+        ConfigurationDefinition.Create(
+            key: "oi.similarity.minScore",
+            displayName: "config.oi.similarity.minScore.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.oi.similarity.minScore.description",
+            defaultValue: "1",
+            uiEditorType: "number",
+            sortOrder: 5250),
+
+        // ── Block: Ecosystem Integrations — Backstage Bridge & External Change ─
+
+        ConfigurationDefinition.Create(
+            key: "integrations.backstage.instanceUrl",
+            displayName: "config.integrations.backstage.instanceUrl.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.backstage.instanceUrl.description",
+            defaultValue: "",
+            uiEditorType: "text",
+            sortOrder: 5450),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.backstage.exportEnabled",
+            displayName: "config.integrations.backstage.exportEnabled.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.backstage.exportEnabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5460),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.externalChange.autoLinkEnabled",
+            displayName: "config.integrations.externalChange.autoLinkEnabled.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.externalChange.autoLinkEnabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 5470),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.externalChange.allowedSystems",
+            displayName: "config.integrations.externalChange.allowedSystems.label",
+            category: ConfigurationCategory.Integration,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.integrations.externalChange.allowedSystems.description",
+            defaultValue: """["ServiceNow","Jira","AzureDevOps","Generic"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5480),
     ];
 }

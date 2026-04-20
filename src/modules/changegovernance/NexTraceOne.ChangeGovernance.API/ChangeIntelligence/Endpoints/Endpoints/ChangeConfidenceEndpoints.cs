@@ -25,6 +25,9 @@ using RecordFeatureFlagStateFeature = NexTraceOne.ChangeGovernance.Application.C
 using GetFeatureFlagAwarenessFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetFeatureFlagAwareness.GetFeatureFlagAwareness;
 using RecordCanaryRolloutFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RecordCanaryRollout.RecordCanaryRollout;
 using GetCanaryRolloutStatusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetCanaryRolloutStatus.GetCanaryRolloutStatus;
+using GetChangeConfidenceBreakdownFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeConfidenceBreakdown.GetChangeConfidenceBreakdown;
+using ComputeChangeConfidenceBreakdownFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeConfidenceBreakdown.ComputeChangeConfidenceBreakdown;
+using GetPromotionReadinessDeltaFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPromotionReadinessDelta.GetPromotionReadinessDelta;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -301,6 +304,59 @@ internal static class ChangeConfidenceEndpoints
                 cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("change-intelligence:read");
+
+        // ── Change Confidence Score 2.0 — Breakdown detalhado ──────────────
+
+        group.MapGet("/{changeId:guid}/confidence/breakdown", async (
+            Guid changeId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetChangeConfidenceBreakdownFeature.Query(changeId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read")
+          .WithTags("Change Intelligence")
+          .WithSummary("Retorna o breakdown detalhado do Change Confidence Score 2.0");
+
+        group.MapPost("/{changeId:guid}/confidence/breakdown", async (
+            Guid changeId,
+            ComputeChangeConfidenceBreakdownFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var effectiveCommand = command with { ReleaseId = changeId };
+            var result = await sender.Send(effectiveCommand, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/changes/{r.ReleaseId}/confidence/breakdown", localizer);
+        }).RequirePermission("change-intelligence:write")
+          .WithTags("Change Intelligence")
+          .WithSummary("Computa e persiste o breakdown do Change Confidence Score 2.0");
+
+        // ── Promotion Readiness Delta ─────────────────────────────────────
+        // Devolve deltas relativos entre dois ambientes para um serviço,
+        // prontos para alimentar a UX de ReleaseTrain e um gate de promoção
+        // consciente do risco. Sem bridge real configurada, devolve snapshot
+        // simulado marcado via Response.SimulatedNote.
+
+        group.MapGet("/promotion-readiness-delta", async (
+            string service,
+            string from,
+            string to,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int? days = null) =>
+        {
+            var result = await sender.Send(
+                new GetPromotionReadinessDeltaFeature.Query(service, from, to, days),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read")
+          .WithTags("Change Intelligence")
+          .WithSummary("Deltas runtime entre ambientes para decisão de promoção");
     }
 
     private sealed record ChangeFilterOptionsResponse(

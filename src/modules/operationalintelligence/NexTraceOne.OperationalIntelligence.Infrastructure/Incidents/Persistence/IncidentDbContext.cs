@@ -42,6 +42,9 @@ public sealed class IncidentDbContext(
     /// <summary>Narrativas de incidentes geradas por IA.</summary>
     public DbSet<IncidentNarrative> IncidentNarratives => Set<IncidentNarrative>();
 
+    /// <summary>Execuções de passos de runbooks operacionais.</summary>
+    public DbSet<RunbookStepExecution> RunbookStepExecutions => Set<RunbookStepExecution>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IncidentDbContext).Assembly;

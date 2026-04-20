@@ -55,6 +55,9 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Registos de canary rollout de releases persistidos no módulo ChangeIntelligence.</summary>
     public DbSet<CanaryRollout> CanaryRollouts => Set<CanaryRollout>();
 
+    /// <summary>Breakdowns detalhados do Change Confidence Score 2.0 persistidos no módulo ChangeIntelligence.</summary>
+    public DbSet<ChangeConfidenceBreakdown> ConfidenceBreakdowns => Set<ChangeConfidenceBreakdown>();
+
     /// <summary>Eventos de confiança de mudanças (append-only) persistidos no módulo ChangeIntelligence.</summary>
     public DbSet<ChangeConfidenceEvent> ChangeConfidenceEvents => Set<ChangeConfidenceEvent>();
 
@@ -78,6 +81,9 @@ public sealed class ChangeIntelligenceDbContext(
 
     /// <summary>Políticas de aprovação de releases configuráveis por ambiente e serviço.</summary>
     public DbSet<ReleaseApprovalPolicy> ApprovalPolicies => Set<ReleaseApprovalPolicy>();
+
+    /// <summary>Pedidos de mudança externos importados de ServiceNow, Jira, AzureDevOps e sistemas genéricos.</summary>
+    public DbSet<ExternalChangeRequest> ExternalChangeRequests => Set<ExternalChangeRequest>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
