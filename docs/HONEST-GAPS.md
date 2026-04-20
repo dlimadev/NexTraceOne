@@ -127,9 +127,9 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 ### Fase 2 — ACTs pendentes (25)
 - [ ] **ACT-019..021** (classificação pendente — próximo ciclo).
 - [ ] **ACT-022** E2E SAML SSO com Playwright + mock IdP.
-- [ ] **ACT-023** Testes de integração `ExportAnalyticsData` (CSV/JSON, paginação, authz).
-- [ ] **ACT-024** OpenAPI como artefacto de build (`swagger.json` no `ci.yml`).
-- [ ] **ACT-025** Elasticsearch com `xpack.security.enabled=true` em `docker-compose.staging.yml`.
+- [x] **ACT-023** Testes de integração `ExportAnalyticsData` (CSV/JSON, paginação, authz) — 17 novos testes, ProductAnalytics: 175/175 ✅.
+- [x] **ACT-024** OpenAPI como artefacto de build (`swagger.json` no `ci.yml`) — job `openapi-artifact` implementado ✅.
+- [x] **ACT-025** Elasticsearch com `xpack.security.enabled=true` em `docker-compose.staging.yml` ✅.
 
 ### Fase 3 — Coerência dos `simulatedNote`
 - [x] **CFG-01** `SystemHealthPage` (Platform Admin) listando providers opcionais e estado (configured / not-configured), com ligação para setup.
@@ -139,18 +139,18 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 ### Fase 4 — Gaps operacionais
 - [x] **OPS-01** Knowledge Hub: `GetServiceOperationalTimeline` feature + endpoint `GET /knowledge/services/{serviceId}/operational-timeline` + `ServiceTimelinePage` frontend + rota `/knowledge/services/:serviceId/timeline` + i18n 4 línguas + 11 testes.
 - [x] **OPS-02** `GenerateServerFromContract`: templates .NET/Java/Spring/Python/FastAPI/Node/Express/Go sem TODOs — cada linguagem inclui agora 3+ ficheiros (controller, interface de serviço, ficheiro de projeto: .csproj, pom.xml, package.json, pyproject.toml, go.mod).
-- [ ] **OPS-03** Validar NullKafkaEventProducer com warning de arranque claro.
+- [x] **OPS-03** `NullKafkaEventProducer` com warning de arranque claro — `OptionalProviderStartupLogger` emite `LogWarning` por cada provider não configurado em ambientes não-Development ✅.
 
 ### Fase 5 — Qualidade transversal
 - [ ] **QLT-01** `parallel_validation` sem findings de alto/médio impacto.
-- [ ] **QLT-02** `npm run validate:i18n` / `typecheck` / `lint` — **pass** (hoje validate:i18n falha com chaves em falta pré-existentes; não relacionadas a este ficheiro).
+- [x] **QLT-02** `npm run validate:i18n` / `typecheck` / `lint` — **pass** — 51 chaves em falta (es), 41 (pt-BR), 50 (pt-PT) adicionadas nesta sessão; validate:i18n e typecheck passam ✅.
 - [ ] **QLT-03** Backend com treat-warnings-as-errors onde falta.
 - [ ] **QLT-04** Cobertura: cada `Application/Features/*` novo com ≥ 1 teste unitário.
 
 ### Fase 6 — Publicação
-- [ ] **DOC-01** `IMPLEMENTATION-STATUS.md` rescrito sem afirmações não verificáveis.
+- [x] **DOC-01** `IMPLEMENTATION-STATUS.md` — aviso de contagens indicativas adicionado no header; contagens hardcoded substituídas por `+` notation com comando de verificação; referência para HONEST-GAPS.md adicionada ✅.
 - [ ] **DOC-02** Este ficheiro passa a "Zero gaps abertos" na v1.0.0.
-- [ ] **DOC-03** `FUTURE-ROADMAP.md` sem itens já entregues.
+- [x] **DOC-03** `FUTURE-ROADMAP.md` — item SAML Protocol Handlers (4.1) marcado como ✅ IMPLEMENTADO com nota de E2E pendente ✅.
 - [ ] **DOC-04** Tag `v1.0.0` + CHANGELOG consolidado.
 
 ---

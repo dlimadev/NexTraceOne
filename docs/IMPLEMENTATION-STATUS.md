@@ -1,14 +1,16 @@
 # NexTraceOne — Implementation Status
 
-> **Última atualização:** Abril 2026
-> **Roadmap futuro:** [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)
+> **Última atualização:** Abril 2026  
+> **Roadmap futuro:** [FUTURE-ROADMAP.md](./FUTURE-ROADMAP.md)  
+> **Gaps e degradação graciosa:** [HONEST-GAPS.md](./HONEST-GAPS.md) (fonte da verdade para "isso está mesmo implementado?")  
+> **Aviso sobre contagens:** Contagens de testes e migrations são indicativas. Correr `dotnet test tests/` e `./tools/count-dbcontexts.sh` para valores autoritativos em tempo real.
 
 Este documento regista o estado de implementação de cada módulo do NexTraceOne.
 
 **Legenda de status:**
 - **READY** — Produção-ready, persistência EF Core real, features reais
 - **PARTIAL** — Mix de features reais e mock/incompletas
-- **SIM** — Dados simulados/mock, não apto para produção
+- **SIM** — Dados simulados/mock, não apto para produção (ver HONEST-GAPS.md para contexto)
 - **INCOMPLETE** — Estrutura existe, migrations ou features em falta
 - **PLAN** — Planeado mas não implementado
 
@@ -44,7 +46,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Webhook Templates | READY | `WebhookTemplate` — EF Core com RLS |
 
 **DbContexts:** `ConfigurationDbContext` (3 migrações: Initial, UserSavedViews/Bookmarks, Phase3To8Tables)
-**Testes:** 451 unit tests (0 falhas)
+**Testes:** 451+ unit tests (0 falhas) — correr `dotnet test tests/modules/configuration/` para contagem exacta
 **Evidência:** `src/modules/configuration/`
 
 ---
@@ -85,7 +87,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 **DbContexts:** `ContractsDbContext`, `CatalogGraphDbContext`, `DeveloperPortalDbContext` (3 DbContexts, 4 migrações)
 **Status geral:** 90 features, 100% real; 10/10 contract types com visual builders; Phase 4 Innovation completa (6/6 PA items)
-**Testes:** 1179+ testes unitários (0 falhas)
+**Testes:** 1179+ testes unitários (0 falhas) — correr `dotnet test tests/modules/catalog/` para contagem exacta
 **Evidência:** `src/modules/catalog/`
 
 ---
@@ -108,7 +110,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 **DbContexts:** `ChangeIntelligenceDbContext`, `WorkflowDbContext`, `PromotionDbContext`, `RulesetGovernanceDbContext` (4 DbContexts, 4 migrações)
 **Status geral:** READY — módulo completo com navegação estruturada (21 páginas frontend, 4 sub-grupos de nav)
-**Testes:** 307 testes unitários backend (0 falhas) + 1771 testes frontend (261 ficheiros, 0 falhas)
+**Testes:** 307+ testes unitários backend (0 falhas) + 1771+ testes frontend (261 ficheiros, 0 falhas) — correr `dotnet test tests/modules/changegovernance/` para backend exacto
 **Evidência:** `src/modules/changegovernance/`
 
 ---
@@ -142,7 +144,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 **DbContexts:** `IncidentDbContext` (migração), `AutomationDbContext` (migração), `ReliabilityDbContext` (migração), `RuntimeIntelligenceDbContext` (migração), `CostIntelligenceDbContext` (migração)
 **Gap remanescente:** Heurísticas de correlação incident↔change são básicas (timestamp+service matching).
-**Testes:** 639 testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering.
+**Testes:** 639+ testes unitários (0 falhas). Inclui testes de OnCallIntelligence, PIR workflow, ChaosEngineering — correr `dotnet test tests/modules/operationalintelligence/` para contagem exacta
 **Evidência:** `src/modules/operationalintelligence/`
 
 ---
@@ -164,7 +166,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | AiAssistantPage (frontend) | REAL | Usa API real: `aiGovernanceApi.listConversations`, `sendMessage`, `getMessages` (7 chamadas API reais) |
 
 **DbContexts:** `AiGovernanceDbContext`, `AiOrchestrationDbContext`, `ExternalAiDbContext` — todos com migrações confirmadas.
-**Testes:** 819+ testes unitários (0 falhas)
+**Testes:** 819+ testes unitários (0 falhas) — correr `dotnet test tests/modules/aiknowledge/` para contagem exacta
 **Evidência:** `src/modules/aiknowledge/`
 
 ---
@@ -185,7 +187,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Executive Views | READY | `GetExecutiveOverview` usa `IIncidentModule` para métricas reais; `CrossModuleDataAvailable: true` |
 
 **Frontend:** 25/26 páginas conectadas a APIs reais (50+ endpoints). GovernanceConfigurationPage usa sistema de configuração. GovernanceGatesPage com 7 gates. DoraMetricsPage, ServiceScorecardPage, TechnicalDebtPage, CustomDashboardsPage implementados.
-**Testes:** 233+ testes unitários (0 falhas). Inclui DORA Metrics, Service Scorecard, Technical Debt, Custom Dashboards, FinOps Budget Gate, Compliance Remediation Gate.
+**Testes:** 233+ testes unitários (0 falhas). Inclui DORA Metrics, Service Scorecard, Technical Debt, Custom Dashboards, FinOps Budget Gate, Compliance Remediation Gate — correr `dotnet test tests/modules/governance/` para contagem exacta
 **Evidência:** `src/modules/governance/`
 
 ---

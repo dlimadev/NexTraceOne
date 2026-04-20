@@ -537,7 +537,61 @@
     "relevanceScore": "Relevância",
     "routingRationaleLabel": "Justificativa de roteamento",
     "contextTruncated": "Contexto foi truncado para caber na janela do modelo",
-    "explainPrompt": "Explica o teu raciocínio para a resposta anterior, indicando quais fontes usaste e porquê."
+    "explainPrompt": "Explica o teu raciocínio para a resposta anterior, indicando quais fontes usaste e porquê.",
+    "ideQuerySessions": "Sessões de consulta",
+    "ideQuerySessionsSubtitle": "Consultas de IA recentes enviadas por extensões de IDE",
+    "ideQuerySessionsNoData": "Nenhuma sessão de consulta encontrada.",
+    "ideQueryStatusProcessing": "Processando",
+    "ideQueryStatusResponded": "Respondido",
+    "ideQueryStatusBlocked": "Bloqueado",
+    "ideQueryStatusFailed": "Falhou",
+    "ideQueryUser": "Usuário",
+    "ideQueryClient": "Cliente",
+    "ideQueryType": "Tipo",
+    "ideQueryModel": "Modelo",
+    "ideQueryTokens": "Tokens",
+    "ideQueryResponseTime": "Tempo de resposta",
+    "ideQueryTime": "Hora",
+    "streaming": {
+      "generating": "Gerando resposta...",
+      "cancel": "Cancelar"
+    },
+    "onboarding": {
+      "back": "Voltar",
+      "next": "Próximo",
+      "finish": "Começar a conversar",
+      "personas": {
+        "Engineer": "Engenheiro",
+        "TechLead": "Tech Lead",
+        "Architect": "Arquiteto",
+        "Product": "Produto",
+        "Executive": "Executivo"
+      },
+      "step1": {
+        "title": "Bem-vindo ao Assistente de IA",
+        "description": "Seu assistente de IA governado e consciente do contexto para serviços, contratos e operações. Configure-se em segundos.",
+        "personaPrompt": "Selecione seu perfil"
+      },
+      "step2": {
+        "title": "Conheça o seu Assistente de IA",
+        "description": "Pergunte qualquer coisa sobre seus serviços, contratos, incidentes e mudanças. O assistente usa a Fonte da Verdade da sua organização para fornecer respostas precisas.",
+        "sampleLabel": "Tente perguntar:",
+        "samplePrompt": "\"O que mudou no payment-service nas últimas 24 horas?\""
+      },
+      "step3": {
+        "title": "Descubra os Agentes de IA",
+        "description": "Agentes de IA especializados ajudam você a gerar contratos, analisar incidentes e criar cenários de teste — tudo governado e auditado.",
+        "agents": {
+          "contractAgent": "Agente de Design de Contratos — gerar contratos REST e SOAP",
+          "incidentAgent": "Agente de Análise de Incidentes — correlacionar incidentes com mudanças",
+          "testAgent": "Agente de Geração de Testes — criar cobertura de cenários a partir de contratos"
+        }
+      },
+      "step4": {
+        "title": "Você está pronto!",
+        "description": "Seu Assistente de IA está configurado e pronto para ajudar. Inicie uma conversa para explorar seu contexto operacional."
+      }
+    }
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Alterações Recentes",
@@ -1830,10 +1884,10 @@
     "feedback": {
       "submitted": "Feedback enviado — obrigado!",
       "prompt": "Esta resposta foi útil?",
-      "ratingLabel": "Avaliar esta resposta",
+      "ratingLabel": "Avalie esta resposta",
       "star": "{{count}} estrela",
-      "commentPlaceholder": "Opcional: adicionar comentário...",
-      "submit": "Enviar Feedback",
+      "commentPlaceholder": "Opcional: adicione um comentário...",
+      "submit": "Enviar feedback",
       "outcome": {
         "resolved": "✓ Resolvido",
         "partial": "~ Parcial",
@@ -11289,7 +11343,11 @@
     "statExpiring": "Expirando",
     "statExpired": "Expirados / Revogados",
     "sectionPolicy": "Política mTLS",
-    "policyMode": "Modo de Política",
+    "policyMode": {
+      "Required": "Obrigatório (Todos os serviços)",
+      "PerService": "Por serviço",
+      "Disabled": "Desativado"
+    },
     "sectionRootCa": "Certificado Root CA",
     "rootCaPresent": "Certificado Root CA instalado",
     "rootCaAbsent": "Nenhum certificado Root CA configurado",
