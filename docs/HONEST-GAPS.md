@@ -72,6 +72,47 @@ Todos os itens abaixo retornam `simulatedNote` na UI enquanto o provider externo
 
 ---
 
+## 🟡 Auditoria do padrão `IsConfigured + Null*Provider` — CFG-02
+
+> **Auditado em:** Abril 2026. Estado real do padrão de configuração em cada entrada DEG-01..15.
+> Dois níveis de maturidade são esperados:
+>
+> - **Nível A — Pattern completo:** interface `IXxxProvider` com `IsConfigured`, implementação `NullXxxProvider` registada por defeito, implementação real registada condicionalmente, handlers leem `IsConfigured` e emitem `simulatedNote` quando falso.
+> - **Nível B — Simulated in handler:** handler decide internamente se o provider externo está ligado (ex.: consulta repositório, chama cliente HTTP e falha graciosamente), sem interface dedicada. Aceitável para features onde "configurar" significa "existir dados no banco" em vez de "apontar para sistema externo".
+
+| ID | Nível | Interface | `Null*` impl | Registado em `/admin/system-health` | Notas |
+|---|---|---|---|---|---|
+| **DEG-01** Canary | **A** | `ICanaryProvider` | `NullCanaryProvider` | ✅ sim | `OptionalProviderNames.Canary`. Pattern completo. |
+| **DEG-02** Backup | **A** | `IBackupProvider` | `NullBackupProvider` | ✅ sim | `OptionalProviderNames.Backup`. Pattern completo. |
+| **DEG-03** Runtime | B | — | — | ❌ não | `GetRuntimeModuleMatrix` simula em handler. Promover para A exige `IRuntimeProvider` + agente CLR real. Fora de escopo imediato. |
+| **DEG-04** Chaos | B | — | — | ❌ não | `SubmitChaosExperiment` aceita requests e retorna estado simulado. Para promover: `IChaosProvider` ligado a Litmus/Chaos Mesh. |
+| **DEG-05** mTLS | B | — | — | ❌ não | `GetMtlsManager` retorna `simulatedNote` de texto fixo. Para promover: `ICertificateProvider` ligado a cert-manager / Vault PKI. |
+| **DEG-06** Schema planner | B | — | — | ❌ não | Planner multi-tenant simulado. Promover exige executor IaC (Terraform/Pulumi) real. |
+| **DEG-07** Capacity forecast | B | — | — | ❌ não | `GetCapacityForecast` deriva `simulatedNote` da ausência de snapshots de runtime em `aik_*` (legítimo como Nível B). |
+| **DEG-08** Feature flags externo | B | — | — | ❌ não | Por design: BD local é a fonte primária. Read-through a LaunchDarkly/Unleash é feature futura opcional. |
+| **DEG-09** Kafka | **A** | `IKafkaEventProducer` | `NullKafkaEventProducer` | ✅ sim | `OptionalProviderNames.Kafka`. Real impl: `ConfluentKafkaEventProducer`. |
+| **DEG-10** Cloud billing | **A** | `ICloudBillingProvider` | `NullCloudBillingProvider` | ✅ sim | `OptionalProviderNames.CloudBilling`. |
+| **DEG-11** SAML SSO | **A′** | `ISamlService` / `ISamlConfigProvider` | metadata vazia = "não configurado" | ❌ ainda não | Pattern completo mas com *shape* próprio de IdP (metadata XML). Não aparece em `/admin/system-health` porque não expõe `IsConfigured` — a verificação é feita no fluxo (`StartSamlLogin` retorna `SamlNotConfigured`). **Ação recomendada:** expor derivado via `ISamlConfigProvider.HasAnyActiveProvider` para incluir no dashboard. |
+| **DEG-12** External AI | B | — | — | ❌ não | `ModelRegistry` + `AiAccessPolicy` decidem runtime-side (interno vs externo). Não cabe num único `IExternalAiProvider` — cada vendor tem driver próprio. |
+| **DEG-13** Elasticsearch | B | — | — | ❌ não | `telemetry.elastic.*` via `IElasticQueryClient`. PostgreSQL Product Store é fallback parcial documentado. |
+| **DEG-14** ClickHouse | B | — | — | ❌ não | `telemetry.clickhouse.*` análogo a DEG-13. |
+| **DEG-15** OTel Collector | B | — | — | ❌ não | `OTEL_EXPORTER_OTLP_ENDPOINT` é infrastructure concern; exporters in-memory/console quando ausente. |
+
+### Conclusões da auditoria
+
+1. **Nível A confirmado em 4/15** (DEG-01, DEG-02, DEG-09, DEG-10). São exatamente os 4 providers expostos em `/admin/system-health` via `OptionalProviderNames`.
+2. **Nível A′ em 1/15** (DEG-11 SAML). Tem a maquinaria de configuração mas não se integra ao dashboard — **próximo passo concreto**: adicionar `bool IsConfigured { get; }` em `ISamlConfigProvider` e expor como quinto provider em `OptionalProviderNames.Saml` + `GetOptionalProviders`.
+3. **Nível B em 10/15**. São legítimos como degradação graciosa interna ao handler enquanto não há cliente real atrás deles. Promover para A só compensa quando alguém implementa o cliente externo correspondente.
+4. **Nenhum DEG promovido a A deixa de aparecer em `/admin/system-health`** — a convenção é: se tem pattern completo, entra no dashboard (e no startup log via `OptionalProviderStartupLogger`).
+
+### Config keys centralizados
+
+Os 4 providers Nível A **não usam** `ConfigurationDefinitionSeeder + IConfigurationResolutionService` — consomem diretamente `appsettings`/env vars (`Kafka:BootstrapServers`, `FinOps:Billing:Provider`, …). Isto é coerente com a convenção interna: endpoints/credenciais de sistemas externos = infrastructure secrets → `appsettings`/env vars; parâmetros funcionais/operacionais (janelas, thresholds, budgets) → `IConfigurationResolutionService`.
+
+Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
+
+---
+
 ## 🔴 Dívida aberta — backlog priorizado para fechar
 
 > Estes são os itens que, quando fechados, permitem publicar `v1.0.0` com "zero gaps abertos".
@@ -91,9 +132,9 @@ Todos os itens abaixo retornam `simulatedNote` na UI enquanto o provider externo
 - [ ] **ACT-025** Elasticsearch com `xpack.security.enabled=true` em `docker-compose.staging.yml`.
 
 ### Fase 3 — Coerência dos `simulatedNote`
-- [ ] **CFG-01** `SystemHealthPage` (Platform Admin) listando providers opcionais e estado (configured / not-configured), com ligação para setup.
-- [ ] **CFG-02** Padrão `IFeature.IsConfigured` + `NullXxxProvider` + `XxxConfigKeys` auditado em todos os DEG-01..DEG-15.
-- [ ] **CFG-03** `docs/deployment/PRODUCTION-BOOTSTRAP.md` com checklist de "para remover todos os `simulatedNote` configure estes providers".
+- [x] **CFG-01** `SystemHealthPage` (Platform Admin) listando providers opcionais e estado (configured / not-configured), com ligação para setup.
+- [x] **CFG-02** Padrão `IFeature.IsConfigured` + `NullXxxProvider` + `XxxConfigKeys` auditado em todos os DEG-01..DEG-15 — ver secção *Auditoria do padrão `IsConfigured + Null*Provider`* acima. Próximo passo concreto identificado: promover DEG-11 (SAML) a Nível A expondo `ISamlConfigProvider.IsConfigured` no dashboard.
+- [x] **CFG-03** `docs/deployment/PRODUCTION-BOOTSTRAP.md` com checklist de "para remover todos os `simulatedNote` configure estes providers".
 
 ### Fase 4 — Gaps operacionais
 - [ ] **OPS-01** Knowledge Hub: Changelog vivo + Operational Notes timeline por serviço.

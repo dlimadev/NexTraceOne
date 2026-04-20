@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace NexTraceOne.ApiHost;
@@ -39,7 +40,7 @@ public static class OptionalProviderStartupLogger
         ArgumentNullException.ThrowIfNull(environmentName);
         ArgumentNullException.ThrowIfNull(providerStatuses);
 
-        var isDevelopment = string.Equals(environmentName, "Development", StringComparison.OrdinalIgnoreCase);
+        var isDevelopment = string.Equals(environmentName, Environments.Development, StringComparison.OrdinalIgnoreCase);
         var configured = providerStatuses.Where(p => p.Value).Select(p => p.Key).ToList();
         var notConfigured = providerStatuses.Where(p => !p.Value).Select(p => p.Key).ToList();
 

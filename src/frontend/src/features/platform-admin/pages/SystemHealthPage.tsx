@@ -25,8 +25,7 @@ import {
  *   - `/docs` (bundled static docs served by the ApiHost)
  */
 const DOCS_BASE_URL: string =
-  (import.meta as unknown as { env?: { VITE_DOCS_BASE_URL?: string } }).env
-    ?.VITE_DOCS_BASE_URL ?? 'https://github.com/dlimadev/NexTraceOne/blob/main';
+  import.meta.env.VITE_DOCS_BASE_URL ?? 'https://github.com/dlimadev/NexTraceOne/blob/main';
 
 /**
  * SystemHealthPage — CFG-01
