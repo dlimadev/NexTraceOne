@@ -270,8 +270,10 @@ jobs:
     env:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: "http://127.0.0.1:8099"
-      # ApiHost skips integrity check + pending-migrations guardrail to boot
-      # quickly against the ephemeral postgres service.
+      # CI-ONLY: these flags bypass integrity checks and the pending-migrations
+      # guardrail so the ApiHost can boot quickly against the ephemeral postgres
+      # service. They MUST NEVER be set in production deployments — production
+      # ApiHost relies on them to detect schema drift and tampered binaries.
       NEXTRACE_SKIP_INTEGRITY: "true"
       NEXTRACE_IGNORE_PENDING_MODEL_CHANGES: "true"
       NEXTRACE_AUTO_MIGRATE: "true"
