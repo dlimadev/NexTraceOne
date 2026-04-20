@@ -286,11 +286,15 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 - **Model Cost Attribution** — cruzar `ExternalAi` com `CostIntelligence` por serviço/equipa/tenant/caso de uso.
 - **PII/Secret-aware redaction** — estender `DefaultGuardrailCatalog` para classificar e **mascarar** (não só detectar) antes do envio a modelos externos.
 
-#### A.5 Operational Intelligence — correlação real
+#### A.5 Operational Intelligence — correlação real ✅
 
-- **ML-based Incident↔Change Correlation** — concretizar §8.4 com feature engineering sobre timestamps/services/contracts/ownership; modelo treinado localmente por tenant via stack AI interna.
-- **Runbook Execution real** — `RunbookStep.Executable` com conectores a `Integrations`/`Automation`; sugestão-confirmação-execução-auditoria com IA governada no loop.
-- **Mitigation Recommendation por similarity search** — indexar incidentes resolvidos em PostgreSQL FTS e sugerir mitigações com citação do incidente de referência.
+- **ML-based Incident↔Change Correlation** ✅ — `ScoreCorrelationFeatureSet` query com feature engineering sobre timestamps/services/ownership; sub-scores TemporalProximity + ServiceMatch + OwnershipAlignment + WeightedTotal com labels High/Medium/Low. `ICorrelationFeatureReader` abstraction + `NullCorrelationFeatureReader`. 3 config keys ponderáveis (sort 5200-5220).
+- **Runbook Execution real** ✅ — `RunbookStepExecution` domain entity (Id fortemente tipado, `RunbookStepExecutionStatus` enum, `MarkSucceeded/MarkFailed`), `IRunbookExecutionRepository`, `EfRunbookExecutionRepository`, migration `20260420160000_OI_AddRunbookStepExecution` (table `ops_inc_runbook_step_executions`), `ExecuteRunbookStep` command feature, endpoint `POST /incidents/runbooks/{id}/steps/{key}/execute`.
+- **Mitigation Recommendation por similarity search** ✅ — `GetMitigationRecommendationsBySimilarity` query reutiliza scoring de `FindSimilarIncidents` sobre incidentes resolvidos e retorna sugestões com citação do incidente de referência.
+- **3 novos endpoints** ✅ — `GET /incidents/{id}/changes/{changeId}/feature-score`, `GET /incidents/{id}/mitigation/similar-recommendations`, `POST /incidents/runbooks/{id}/steps/{key}/execute`.
+- **6 config keys** ✅ (sort 5200-5250): temporalWeight, serviceWeight, ownershipWeight, maxConcurrentExecutions, lookbackDays, minScore.
+- **i18n** ✅ — `correlationFeatures.*` + `runbookExecution.*` + `mitigationSimilarity.*` em 4 locales.
+- **24 testes unitários** ✅ — `OperationalIntelligenceA5Tests.cs`. OI: 956/956.
 
 #### A.6 FinOps contextual — fechar o loop
 
