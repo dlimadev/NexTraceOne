@@ -6879,5 +6879,60 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "90",
             uiEditorType: "number",
             sortOrder: 4780),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.defaults.latencyBudgetMs",
+            displayName: "config.ai.evaluation.defaults.latencyBudgetMs.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.defaults.latencyBudgetMs.description",
+            defaultValue: "5000",
+            uiEditorType: "number",
+            sortOrder: 4900),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.defaults.llmJudge.model",
+            displayName: "config.ai.evaluation.defaults.llmJudge.model.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.defaults.llmJudge.model.description",
+            defaultValue: "gpt-4o-mini",
+            uiEditorType: "text",
+            sortOrder: 4910),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.runs.retentionDays",
+            displayName: "config.ai.evaluation.runs.retentionDays.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.runs.retentionDays.description",
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 4920),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.runs.maxConcurrency",
+            displayName: "config.ai.evaluation.runs.maxConcurrency.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.runs.maxConcurrency.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 4930),
+
+        ConfigurationDefinition.Create(
+            key: "ai.evaluation.humanReview.slaHours",
+            displayName: "config.ai.evaluation.humanReview.slaHours.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.evaluation.humanReview.slaHours.description",
+            defaultValue: "48",
+            uiEditorType: "number",
+            sortOrder: 4940),
     ];
 }

@@ -367,4 +367,16 @@ public static class AiGovernanceErrors
             "AiGovernance.SelfHealingAction.NotFound",
             "Self-healing action '{0}' was not found.",
             id);
+
+    /// <summary>Suite de avaliação não encontrada pelo identificador informado.</summary>
+    public static Error EvaluationSuiteNotFound(string id)
+        => Error.NotFound("AiGovernance.EvaluationSuiteNotFound", $"Evaluation suite '{id}' not found.");
+
+    /// <summary>Execução de avaliação não encontrada pelo identificador informado.</summary>
+    public static Error EvaluationRunNotFound(string id)
+        => Error.NotFound("AiGovernance.EvaluationRunNotFound", $"Evaluation run '{id}' not found.");
+
+    /// <summary>Dataset de avaliação não encontrado pelo identificador informado.</summary>
+    public static Error EvaluationDatasetNotFound(string id)
+        => Error.NotFound("AiGovernance.EvaluationDatasetNotFound", $"Evaluation dataset '{id}' not found.");
 }

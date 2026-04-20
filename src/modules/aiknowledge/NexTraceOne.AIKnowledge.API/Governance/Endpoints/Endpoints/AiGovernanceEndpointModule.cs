@@ -94,6 +94,13 @@ using ProposeSelfHealingActionFeature = NexTraceOne.AIKnowledge.Application.Gove
 using ApproveSelfHealingActionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ApproveSelfHealingAction.ApproveSelfHealingAction;
 using ListSelfHealingActionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListSelfHealingActions.ListSelfHealingActions;
 
+using CreateEvaluationSuiteFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateEvaluationSuite.CreateEvaluationSuite;
+using GetEvaluationSuiteFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluationSuite.GetEvaluationSuite;
+using ListEvaluationSuitesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListEvaluationSuites.ListEvaluationSuites;
+using CreateEvaluationRunFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateEvaluationRun.CreateEvaluationRun;
+using GetEvaluationRunFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluationRun.GetEvaluationRun;
+using CreateEvaluationDatasetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateEvaluationDataset.CreateEvaluationDataset;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -1367,6 +1374,83 @@ public sealed class AiGovernanceEndpointModule
             .RequireAuthorization("ai:governance:write")
             .WithTags("AI Self-Healing")
             .WithSummary("Approve a pending self-healing action");
+
+        // ── ADR-009: AI Evaluation Harness ────────────────────────────────────
+
+        var evalSuitesGroup = app.MapGroup("/api/v1/aiorchestration/evaluation/suites");
+
+        evalSuitesGroup.MapPost("/",
+            async (CreateEvaluationSuiteRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var command = new CreateEvaluationSuiteFeature.Command(
+                    req.Name, req.DisplayName, req.Description ?? string.Empty,
+                    req.UseCase, req.Version, req.TenantId, req.TargetModelId);
+                var result = await mediator.Send(command, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:evaluation:author")
+            .WithTags("AI Evaluation Harness")
+            .WithSummary("Create evaluation suite");
+
+        evalSuitesGroup.MapGet("/",
+            async (Guid tenantId, string? useCase, int page, int pageSize, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new ListEvaluationSuitesFeature.Query(tenantId, useCase, page < 1 ? 1 : page, pageSize < 1 ? 20 : pageSize);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:evaluation:read")
+            .WithTags("AI Evaluation Harness")
+            .WithSummary("List evaluation suites");
+
+        evalSuitesGroup.MapGet("/{suiteId:guid}",
+            async (Guid suiteId, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new GetEvaluationSuiteFeature.Query(suiteId);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:evaluation:read")
+            .WithTags("AI Evaluation Harness")
+            .WithSummary("Get evaluation suite");
+
+        var evalRunsGroup = app.MapGroup("/api/v1/aiorchestration/evaluation/runs");
+
+        evalRunsGroup.MapPost("/",
+            async (CreateEvaluationRunRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var command = new CreateEvaluationRunFeature.Command(req.SuiteId, req.ModelId, req.PromptVersion, req.TenantId);
+                var result = await mediator.Send(command, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:evaluation:author")
+            .WithTags("AI Evaluation Harness")
+            .WithSummary("Create evaluation run");
+
+        evalRunsGroup.MapGet("/{runId:guid}",
+            async (Guid runId, IMediator mediator, CancellationToken ct) =>
+            {
+                var query = new GetEvaluationRunFeature.Query(runId);
+                var result = await mediator.Send(query, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:evaluation:read")
+            .WithTags("AI Evaluation Harness")
+            .WithSummary("Get evaluation run");
+
+        var evalDatasetsGroup = app.MapGroup("/api/v1/aiorchestration/evaluation/datasets");
+
+        evalDatasetsGroup.MapPost("/",
+            async (CreateEvaluationDatasetRequest req, IMediator mediator, CancellationToken ct) =>
+            {
+                var command = new CreateEvaluationDatasetFeature.Command(
+                    req.Name, req.Description ?? string.Empty, req.UseCase, req.SourceType, req.TenantId);
+                var result = await mediator.Send(command, ct);
+                return result.ToHttpResult();
+            })
+            .RequireAuthorization("ai:evaluation:author")
+            .WithTags("AI Evaluation Harness")
+            .WithSummary("Create evaluation dataset");
     }
 }
 
@@ -1521,3 +1605,28 @@ public sealed record ProposeSelfHealingActionRequest(
 
 /// <summary>Corpo de pedido para aprovação de acção de auto-remediação.</summary>
 public sealed record ApproveSelfHealingActionRequest(string ApprovedBy);
+
+/// <summary>Corpo de pedido para criação de suite de avaliação.</summary>
+public sealed record CreateEvaluationSuiteRequest(
+    string Name,
+    string DisplayName,
+    string? Description,
+    string UseCase,
+    string Version,
+    Guid TenantId,
+    Guid? TargetModelId);
+
+/// <summary>Corpo de pedido para criação de execução de avaliação.</summary>
+public sealed record CreateEvaluationRunRequest(
+    Guid SuiteId,
+    Guid ModelId,
+    string PromptVersion,
+    Guid TenantId);
+
+/// <summary>Corpo de pedido para criação de dataset de avaliação.</summary>
+public sealed record CreateEvaluationDatasetRequest(
+    string Name,
+    string? Description,
+    string UseCase,
+    string SourceType,
+    Guid TenantId);

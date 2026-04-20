@@ -13040,5 +13040,49 @@
       "simulated": "Simulado — datos reales no disponibles",
       "citations": "Citaciones"
     }
+  },
+  "aiEvaluation": {
+    "title": "AI Evaluation Harness",
+    "subtitle": "Define, ejecuta y compara evaluaciones de modelos de IA por caso de uso",
+    "suites": {
+      "title": "Suites de Evaluación",
+      "create": "Crear Suite",
+      "name": "Nombre de la Suite",
+      "displayName": "Nombre de Presentación",
+      "description": "Descripción",
+      "useCase": "Caso de Uso",
+      "version": "Versión",
+      "targetModel": "Modelo Objetivo (opcional)",
+      "status": {
+        "draft": "Borrador",
+        "active": "Activo",
+        "archived": "Archivado"
+      }
+    },
+    "runs": {
+      "title": "Ejecuciones de Evaluación",
+      "create": "Ejecutar Evaluación",
+      "promptVersion": "Versión del Prompt",
+      "status": {
+        "pending": "Pendiente",
+        "running": "En Ejecución",
+        "completed": "Completado",
+        "failed": "Fallido"
+      },
+      "passed": "Aprobados",
+      "failed": "Fallidos",
+      "latency": "Latencia Media (ms)",
+      "tokenCost": "Coste de Tokens"
+    },
+    "datasets": {
+      "title": "Datasets de Evaluación",
+      "create": "Crear Dataset",
+      "sourceType": {
+        "curated": "Curado",
+        "generated": "Generado (desde trayectorias)",
+        "synthetic": "Sintético (generado por IA)"
+      }
+    },
+    "empty": "No se encontraron suites de evaluación"
   }
 }

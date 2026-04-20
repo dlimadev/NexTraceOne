@@ -106,6 +106,12 @@ public static class DependencyInjection
         services.AddHostedService<ProactiveArchitectureGuardianJob>();
         services.AddScoped<ISelfHealingActionRepository, SelfHealingActionRepository>();
 
+        // ── ADR-009: AI Evaluation Harness ────────────────────────────────────
+        services.AddScoped<IEvaluationSuiteRepository, EvaluationSuiteRepository>();
+        services.AddScoped<IEvaluationCaseRepository, EvaluationCaseRepository>();
+        services.AddScoped<IEvaluationRunRepository, EvaluationRunRepository>();
+        services.AddScoped<IEvaluationDatasetRepository, EvaluationDatasetRepository>();
+
         // ── Integration Event Handlers (E-M02) ───────────────────────────
         services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();
         services.AddScoped<

@@ -2650,6 +2650,88 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
 
                     b.ToTable("aik_gov_outbox_messages", (string)null);
                 });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.EvaluationSuite", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<string>("Name").IsRequired().HasMaxLength(300).HasColumnType("character varying(300)");
+                    b.Property<string>("DisplayName").IsRequired().HasMaxLength(300).HasColumnType("character varying(300)");
+                    b.Property<string>("Description").HasColumnType("text");
+                    b.Property<string>("UseCase").IsRequired().HasMaxLength(200).HasColumnType("character varying(200)");
+                    b.Property<Guid?>("TargetModelId").HasColumnType("uuid");
+                    b.Property<string>("Status").IsRequired().HasMaxLength(50).HasColumnType("character varying(50)");
+                    b.Property<string>("Version").IsRequired().HasMaxLength(50).HasColumnType("character varying(50)");
+                    b.Property<Guid>("TenantId").HasColumnType("uuid");
+                    b.Property<DateTimeOffset?>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("CreatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("UpdatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.HasKey("Id");
+                    b.HasIndex("TenantId").HasDatabaseName("idx_aik_eval_suites_tenant");
+                    b.ToTable("aik_evaluation_suites", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.EvaluationCase", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<Guid>("SuiteId").HasColumnType("uuid");
+                    b.Property<string>("Name").IsRequired().HasMaxLength(300).HasColumnType("character varying(300)");
+                    b.Property<string>("InputPrompt").IsRequired().HasColumnType("text");
+                    b.Property<string>("GroundingContext").HasColumnType("text");
+                    b.Property<string>("ExpectedOutputPattern").HasColumnType("text");
+                    b.Property<string>("EvaluationCriteria").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<bool>("IsActive").HasColumnType("boolean");
+                    b.Property<DateTimeOffset?>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("CreatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("UpdatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.HasKey("Id");
+                    b.HasIndex("SuiteId").HasDatabaseName("idx_aik_eval_cases_suite");
+                    b.ToTable("aik_evaluation_cases", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.EvaluationRun", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<Guid>("SuiteId").HasColumnType("uuid");
+                    b.Property<Guid>("ModelId").HasColumnType("uuid");
+                    b.Property<string>("PromptVersion").IsRequired().HasMaxLength(100).HasColumnType("character varying(100)");
+                    b.Property<string>("Status").IsRequired().HasMaxLength(50).HasColumnType("character varying(50)");
+                    b.Property<DateTimeOffset?>("StartedAt").HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset?>("CompletedAt").HasColumnType("timestamp with time zone");
+                    b.Property<int>("TotalCases").HasColumnType("integer");
+                    b.Property<int>("PassedCases").HasColumnType("integer");
+                    b.Property<int>("FailedCases").HasColumnType("integer");
+                    b.Property<double>("AverageLatencyMs").HasColumnType("double precision");
+                    b.Property<decimal>("TotalTokenCost").HasColumnType("numeric(14,6)");
+                    b.Property<Guid>("TenantId").HasColumnType("uuid");
+                    b.Property<DateTimeOffset?>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("CreatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("UpdatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.HasKey("Id");
+                    b.HasIndex("SuiteId").HasDatabaseName("idx_aik_eval_runs_suite");
+                    b.HasIndex("TenantId").HasDatabaseName("idx_aik_eval_runs_tenant");
+                    b.ToTable("aik_evaluation_runs", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.EvaluationDataset", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<string>("Name").IsRequired().HasMaxLength(300).HasColumnType("character varying(300)");
+                    b.Property<string>("Description").HasColumnType("text");
+                    b.Property<string>("UseCase").IsRequired().HasMaxLength(200).HasColumnType("character varying(200)");
+                    b.Property<string>("SourceType").IsRequired().HasMaxLength(50).HasColumnType("character varying(50)");
+                    b.Property<int>("CaseCount").HasColumnType("integer");
+                    b.Property<Guid>("TenantId").HasColumnType("uuid");
+                    b.Property<DateTimeOffset?>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("CreatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("UpdatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.HasKey("Id");
+                    b.HasIndex("TenantId").HasDatabaseName("idx_aik_eval_datasets_tenant");
+                    b.ToTable("aik_evaluation_datasets", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }

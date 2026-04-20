@@ -75,6 +75,12 @@ public sealed class AiGovernanceDbContext(
     public DbSet<OrganizationalMemoryNode> MemoryNodes => Set<OrganizationalMemoryNode>();
     public DbSet<SelfHealingAction> SelfHealingActions => Set<SelfHealingAction>();
 
+    // ── ADR-009: AI Evaluation Harness ───────────────────────────────────────
+    public DbSet<EvaluationSuite> EvaluationSuites => Set<EvaluationSuite>();
+    public DbSet<EvaluationCase> EvaluationCases => Set<EvaluationCase>();
+    public DbSet<EvaluationRun> EvaluationRuns => Set<EvaluationRun>();
+    public DbSet<EvaluationDataset> EvaluationDatasets => Set<EvaluationDataset>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 
