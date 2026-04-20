@@ -40,7 +40,7 @@ interface JourneyFormState {
   isActive: boolean;
 }
 
-function emptyForm(): JourneyFormState {
+function getInitialFormState(): JourneyFormState {
   return { name: '', key: '', stepsJson: DEFAULT_STEPS_JSON, isActive: true };
 }
 
@@ -112,7 +112,7 @@ function JourneyFormModal({
                   className="w-full bg-bg border border-edge rounded-md px-3 py-2 text-xs text-heading focus:outline-none focus:border-accent/70"
                   placeholder="e.g. my_custom_journey"
                 />
-                <p className="text-xs text-muted mt-1">Lowercase letters, numbers and underscores only.</p>
+                <p className="text-xs text-muted mt-1">Lowercase letters, numbers and underscores only. At least 1 character required.</p>
               </div>
             )}
 
@@ -366,7 +366,7 @@ export function JourneyConfigPage() {
                   stepsJson: JSON.stringify(modal.item.steps, null, 2),
                   isActive: modal.item.isActive,
                 }
-              : emptyForm()
+              : getInitialFormState()
           }
           onSave={handleSave}
           onCancel={() => setModal(null)}
