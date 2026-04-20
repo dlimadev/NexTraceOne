@@ -296,11 +296,12 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 - **i18n** ✅ — `correlationFeatures.*` + `runbookExecution.*` + `mitigationSimilarity.*` em 4 locales.
 - **24 testes unitários** ✅ — `OperationalIntelligenceA5Tests.cs`. OI: 956/956.
 
-#### A.6 FinOps contextual — fechar o loop
+#### A.6 FinOps contextual — fechar o loop ✅
 
-- **FOCUS spec adoption** — adotar a FinOps Open Cost & Usage Specification como formato canónico interno (já existe `ICloudBillingProvider`).
-- **Waste signals por serviço** — idle connections, over-provisioning (via `RuntimeIntelligence`), low-traffic endpoints (via `ContractConsumerInventory`), ações concretas recomendadas por serviço.
-- **Cost-aware Change Gate** — bloquear/alertar promoções cujo impacto estimado de custo excede budget do serviço.
+- **FOCUS spec adoption** ✅ — `GetFocusExport` query exporta `CostRecord` no formato canónico FinOps FOCUS (BilledCost, BillingCurrency, ChargePeriodStart/End, ServiceName, ServiceCategory, Provider, ResourceId, Tags). Endpoint: `GET /api/v1/cost/focus-export` com paginação. Config key `finops.focus.pageSize` (sort 5340).
+- **Waste signals por serviço** ✅ — `WasteSignal` domain entity + `WasteSignalType` enum (`IdleResource/OverProvisioned/LowTrafficEndpoint/UnusedReservation`). `DetectWasteSignals` command: heurística de mediana (idle < threshold%, overprovision ≥ multiplier×median) sobre `CostRecord`. `GetWasteReport` query: agrega sinais por tipo com total estimado. EF config + `WasteSignalRepository` + migration `20260420170000_OI_AddWasteSignals` (table `ops_cost_waste_signals`). 4 endpoints. 6 config keys (sort 5300-5350). i18n `finOps.*` + `wasteSignal.*` + `costGate.*` em 4 locales.
+- **Cost-aware Change Gate** ✅ — `EvaluateCostAwareChangeGate` query consulta `ServiceCostProfile` (budget + currentCost + alertThreshold) e retorna `GateResult` (NotConfigured/Passed/Warning/Blocked) com `ShouldBlock` controlado por `finops.changeGate.blockOnBudgetExceed`. Endpoint: `GET /api/v1/cost/change-gate`.
+- **21 testes unitários** ✅ — `FinOpsA6Tests.cs`. OI: 977/977.
 
 ---
 
