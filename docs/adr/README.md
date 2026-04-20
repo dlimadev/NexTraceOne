@@ -14,3 +14,7 @@ Each ADR follows the format: number, title, status, context, decision, and conse
 | [003](003-elasticsearch-observability.md) | Elasticsearch as Observability Provider | Accepted |
 | [004](004-local-ai-first.md) | Local/Internal AI as Default Provider | Accepted |
 | [005](005-react-frontend-stack.md) | React 19 Frontend Stack | Accepted |
+| [006](006-graphql-protobuf-roadmap.md) | GraphQL and Protobuf/gRPC — Out of Scope for MVP1 | Accepted |
+| [007](007-data-contracts.md) | Data Contracts as First-Class Citizens | Proposed |
+| [008](008-change-confidence-score-v2.md) | Change Confidence Score 2.0 — Explainable Decomposition | Proposed |
+| [009](009-ai-evaluation-harness.md) | Internal AI Evaluation Harness | Proposed |
