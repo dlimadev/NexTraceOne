@@ -18,7 +18,7 @@ NexTraceOne serves as the **source of truth** for services, contracts, changes, 
 ## Architecture
 
 - **Modular Monolith** — 12 bounded context modules with clean separation (Domain → Application → Infrastructure → API → Contracts).
-- **28 DbContexts** — Each sub-domain has its own EF Core context sharing a single PostgreSQL database with table-prefix isolation. Run `./tools/count-dbcontexts.sh --count` to confirm.
+- **DbContexts** — Each sub-domain has its own EF Core context sharing a single PostgreSQL database with table-prefix isolation. Run `./tools/count-dbcontexts.sh --count` for the current count (source of truth).
 - **Cross-module communication** — 20 contract interfaces + outbox pattern (19 processors) for reliable async messaging.
 - **Row-Level Security** — PostgreSQL RLS policies for tenant isolation as defence-in-depth.
 
