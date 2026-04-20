@@ -326,11 +326,12 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 - **Backstage bridge bidirectional** — export além do `ImportFromBackstage` existente, posicionando NexTraceOne como camada de governance superior.
 - **ServiceNow / Jira Change bridge** — importar CRs externos como `Change` entities governadas.
 
-#### B.4 Knowledge Hub — de documentos para grafo vivo
+#### B.4 Knowledge Hub — de documentos para grafo vivo ✅
 
-- **Runbook generation from incidents resolvidos** — feedback loop auditado para runbook proposto.
-- **Knowledge Freshness Score** por documento (última revisão, ligações ativas, incidentes recentes contraditórios).
-- **Semantic search cross-module** sobre Knowledge + Contracts + Incidents + Changes — palette de comando do capítulo 7.6.
+- **Knowledge Freshness Score** ✅ — `ComputeFreshnessScore()` em `KnowledgeDocument` (0–100 clamped): penalização por nunca revisto, antiguidade > 90/180/365 dias, sem links activos, incidentes recentes; bónus para docs bem conectados. Novas propriedades: `LastReviewedAt`, `ReviewedBy`, `ActiveLinkCount`, `RecentIncidentCount`. Métodos: `MarkReviewed()`, `UpdateLinkCount()`, `UpdateRecentIncidentCount()`. `ScoreDocumentFreshness` query (label: Stale/Aging/Fresh/Excellent). `GetFreshnessReport` query (AverageScore, StaleCount, FreshCount).
+- **Runbook generation from incidents resolvidos** ✅ — `ProposedRunbook` domain entity (`ProposedRunbookStatus`: Draft/UnderReview/Approved/Rejected) + `IProposedRunbookRepository`. `ProposeRunbookFromIncident` command: bounded-context-safe (aceita dados do incidente inline), gera steps de MitigationActions, auto-approve via config `knowledge.runbook.autoApprove`. Migration `20260420180000_KNW_AddFreshnessAndProposedRunbook` (tabela `knw_proposed_runbooks` + colunas freshness em `knw_knowledge_documents`).
+- **Semantic search cross-module** ✅ — `SearchAcrossModules` query: pesquisa sobre KnowledgeDocuments + OperationalNotes + ProposedRunbooks com relevance scoring (1.0 title exact → 0.9 title contains → 0.7 content → 0.5 tags). Endpoint `GET /api/v1/knowledge/search`.
+- **4 novos endpoints**, 5 config keys (sort 5400–5440), i18n `knowledgeFreshness.*` + `proposedRunbook.*` + `knowledgeSearch.*` em 4 locales, **20 testes unitários**. Knowledge: 123/123.
 
 ---
 
