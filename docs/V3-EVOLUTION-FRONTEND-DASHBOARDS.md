@@ -13,7 +13,8 @@ Este plano consolida:
 
 - Estado atual do frontend v2 do NexTraceOne (React 19 + TS + Vite 7 + TanStack Query/Router + Tailwind 4 + Radix UI + ECharts + Monaco, i18n 4 locales).
 - Base já existente de Custom Dashboards (aggregate `CustomDashboard`, 19 widgets, páginas `CustomDashboardsPage` / `DashboardBuilderPage` / `DashboardViewPage`, persistência JSONB no PostgreSQL, clone, partilha on/off, sistema de templates, export/import JSON).
-- Pesquisa de mercado (Dynatrace Dashboards/Notebooks & Davis, Grafana 11, Datadog, Observe, Honeycomb Boards, New Relic Workloads) sobre o que hoje é considerado estado-da-arte em dashboards enterprise: **query-driven widgets, live streaming, tokens/variables, notebooks, versionamento, partilha granular, deep-link contextual, AI-assisted creation, embedding, público/privado/equipa, delegação**.
+- Pesquisa de mercado (Dynatrace Dashboards/Notebooks & Davis CoPilot, Grafana 11 + Scenes, Datadog Dashboards, Observe OPAL Worksheets, Honeycomb Boards, New Relic Workloads, Looker/Mode, Superset, Metabase) sobre o que hoje é considerado estado-da-arte em dashboards enterprise: **query-driven widgets, live streaming, tokens/variables, notebooks, versionamento, partilha granular, deep-link contextual, AI-assisted creation, embedding, público/privado/equipa, delegação, colaboração em tempo real, marketplace, plugins, mobile on-call, dashboard-as-code**.
+  > **Nota de transparência:** Esta sessão foi executada em sandbox sem acesso à internet (web fetches retornaram erro de rede). Os itens desta pesquisa foram compilados a partir do meu conhecimento consolidado sobre as referências indicadas, não de páginas acedidas durante esta execução. Sugere-se validar/atualizar pontualmente antes do kickoff da v3 com links reais das docs oficiais (`docs.dynatrace.com`, `grafana.com/docs`, `docs.datadoghq.com`, `honeycomb.io/docs`).
 - Alinhamento obrigatório com a visão oficial do produto: **dashboards não são dashboards genéricos de observabilidade** — são **superfícies de decisão contextualizadas** em serviços, contratos, mudanças, ownership, ambiente, persona e governança. (Copilot Instructions §10, §18, §20, §27)
 
 **Princípio-mestre da v3 para estas duas vertentes:** elevar o frontend de "app de módulos" para **Operational Intelligence Surface** persona-aware, e elevar Custom Dashboards de "grid de widgets" para **Governed Intelligence Boards** — persistidos, versionados, partilháveis, auditáveis e integrados com o Source of Truth.
@@ -36,29 +37,35 @@ Este plano consolida:
 | **Versionamento e histórico** (como um doc Google) | Grafana Dashboard History, Dynatrace | Alta — auditoria + rollback |
 | **Partilha granular** (público link, team, role, read/edit, embed) | Datadog public shares, Grafana | Alta — já temos `IsShared`; evoluir |
 | **AI-assisted dashboard creation** ("crie-me um dashboard para Payment Service") | Dynatrace Davis CoPilot, Grafana ML | Altíssima — alinha com pilar AI-assisted |
-| **Dashboard as Code** (YAML/JSON exportável, GitOps) | Grafana, Terraform providers | Média — já temos export JSON; evoluir para DaC |
+| **Dashboard as Code** (YAML/JSON exportável, GitOps) | Grafana, Terraform providers | Alta — já temos export JSON; evoluir para DaC |
 | **Alerting from widget** (criar alerta a partir duma query num widget) | Grafana alerts, Datadog monitors | Alta |
-| **Responsive layouts e mobile companion** | Datadog mobile | Média |
-| **Whitelabel / embed iframe assinado** | Grafana, Datadog | Média — para parceiros e intranet corporativa |
+| **Responsive layouts + mobile on-call companion** | Datadog mobile, PagerDuty | Alta — crítico para Engineer on-call |
+| **Whitelabel / embed iframe assinado** | Grafana, Datadog | Alta — parceiros e intranet corporativa |
 | **Scheduled reports / snapshots** (PDF, PNG, email) | Dynatrace Reports, Grafana Reporting | Alta — Exec/Auditor personas |
-| **Dark/Light density modes + high-contrast** | Observe, Dynatrace | Média — parte da experiência enterprise |
+| **Dark/Light/High-contrast + density modes** | Observe, Dynatrace | Alta — parte da experiência enterprise |
+| **Colaboração em tempo real** (cursors, presença, comments ancorados) | Figma, Notion, Observe | Alta em War Room e Notebooks |
+| **Marketplace / template gallery** (interno e comunitário) | Grafana.com dashboards, Power BI templates | Alta — acelera adoção e valor percebido |
+| **Plugin SDK para widgets de 3ºs** | Grafana plugins, Superset | Alta — extensibilidade enterprise e por parceiros |
+| **Alerting/Action from dashboard** (criar alerta/runbook a partir do widget) | Grafana, Datadog, New Relic | Alta — fecha o ciclo observação→ação |
+| **NQL avançado** (joins governados, subqueries, UDFs registadas) | Observe OPAL, Dynatrace DQL | Média-alta — sob governança estrita |
 
 ### 1.2 Tendências em Frontend enterprise
 
 | Tendência | Relevância para NexTraceOne |
 |---|---|
 | **Command Palette global** (Cmd+K) com ações, navegação, search semântico | Alta — alinha com pilar Source of Truth |
-| **Micro-frontends / Module Federation** para plugins de terceiros | Baixa no v3 — adiar, avaliar em v4 |
+| **Micro-frontends / Module Federation** para plugins e extensões | Alta — habilita extensões por parceiros, equipas internas e ISVs |
 | **Streaming SSR com React 19** (use hook, Suspense data) | Média — ganhos de performance em páginas pesadas |
 | **View Transitions API + route transitions** | Alta — sensação premium enterprise |
-| **Server-driven UI** para páginas raramente acedidas | Baixa — não adotar |
-| **Real-time collaboration** (cursors partilhados em dashboards/notebooks) | Média — diferenciador para War Room |
+| **Real-time collaboration** (cursors partilhados, presença, comentários ancorados) | Alta — diferenciador para War Room, Notebooks e Dashboards colaborativos |
 | **Accessibility WCAG 2.2 AA completo** | Alta — enterprise compliance |
 | **Design tokens unificados** (JSON → Tailwind + CSS vars) | Alta — consolidar o design system |
 | **Storybook / UI contract testing** para componentes reutilizáveis | Alta — qualidade e ADR-driven UI |
 | **IDE-like dev experience** (split panes, tabs, session restore) | Alta — War Room, Contract Studio |
 | **Offline-first / optimistic mutations** em fluxos críticos | Média — ativar onde faz sentido |
 | **Performance budgets automatizados** (bundle-size, LCP, INP) | Alta — requisito enterprise |
+| **Mobile companion on-call** (PWA ou nativo) | Alta — on-call, approvals e incident awareness móveis |
+| **Internacionalização avançada** (RTL + plural rules completos) | Média — abre mercado EMEA |
 
 ---
 
@@ -282,7 +289,85 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 
 ---
 
-## 4. Arquitetura alvo (resumo das decisões)
+### WAVE V3.7 — Real-time Collaboration & War Room
+**Objetivo:** transformar dashboards e notebooks em **superfícies colaborativas** onde equipas investigam juntas em tempo real.
+
+#### Backend
+1. **Presence & Collaboration Service**
+   - Canal WebSocket/SSE por `dashboardId` / `notebookId` com presença (quem está a ver), cursores partilhados e edição concorrente baseada em CRDTs (operações comutativas) ou OT simples para texto/layout.
+   - Tenant-aware, environment-aware, respeitando `SharingPolicy` (só participa quem tem permissão de leitura/edição).
+   - Histórico de sessão colaborativa auditável (quem participou, quando, que alterações propôs).
+2. **Comentários ancorados**
+   - Entidade `DashboardComment` / `NotebookCellComment` com referência a widget/célula, resolução (open/resolved), @menções a utilizadores e equipas.
+   - Notificações via SMTP e webhooks (respeitando `IntegrationsArchitecture`).
+
+#### Frontend
+3. **Indicadores de presença** (avatares, cursores por cor) em dashboards e notebooks.
+4. **Threads de comentários** ancorados por widget/célula, com resolução e mentions.
+5. **Modo "War Room"** (uni-link para stakeholders entrarem rapidamente num incidente com contexto pré-carregado).
+
+#### Critérios de aceite
+- Colaboração estável para ≥10 utilizadores simultâneos por dashboard/notebook.
+- Sem corrupção de estado em cenários de conflito; log de auditoria coerente.
+- Permissões respeitadas em tempo real (revogação propaga em ≤5s).
+
+---
+
+### WAVE V3.8 — Marketplace, Plugin SDK & Widgets de Terceiros
+**Objetivo:** abrir o produto a extensões governadas — templates, widgets e plugins — sem perder coerência nem segurança.
+
+#### Backend
+1. **Template Gallery interno**
+   - Dashboards e notebooks publicados como **templates reutilizáveis** (per-tenant e globais para a plataforma), com versão, autor, tags, persona alvo e dependências (variáveis requeridas, permissões).
+   - Instalar = clonar com resolução automática de variáveis contra Catalog/Environments.
+2. **Plugin SDK público**
+   - Contrato estável `IWidgetKind` (evoluído da Wave V3.2) documentado como SDK, com empacotamento, assinatura de artefactos, verificação de integridade e sandbox de execução.
+   - Registry multi-nível: System / Tenant / Private.
+   - Compatível com **Micro-frontends / Module Federation** para carregamento isolado e versionado.
+3. **Governance de plugins**
+   - Políticas por tenant: plugins permitidos, bloqueados, fonte (interno/terceiros), revisão obrigatória.
+   - Trilha de auditoria de instalação, ativação, desativação.
+   - Integração com `AI Governance` se o plugin invocar IA.
+
+#### Frontend
+4. **Marketplace/Template Gallery UI** (busca por persona, módulo, popularidade, rating interno).
+5. **Plugin Host** isolado com Module Federation; carregamento lazy e fallback gracioso se indisponível.
+6. **Publicação curada** de templates a partir de dashboards existentes (botão "Publish as template").
+
+#### Critérios de aceite
+- Plugin terceiro carregado via Module Federation executa sem romper CSP nem violar policies.
+- Galeria de templates com ≥20 templates iniciais por persona.
+- Revogação remota de plugin funciona em runtime.
+
+---
+
+### WAVE V3.9 — Advanced NQL, Alerting from Widget & Mobile On-Call Companion
+**Objetivo:** fechar o ciclo observação → ação e levar o valor do produto ao on-call em mobilidade.
+
+#### Backend
+1. **NQL avançado governado**
+   - Extensões: joins entre seletores de módulos governados (Catalog × Changes × Incidents × FinOps), subqueries, UDFs registadas (whitelisted) pela plataforma.
+   - Optimizador com plano auditável; rejeição de queries fora do envelope de custo/timeout.
+2. **Alerting & Actions from widget**
+   - A partir de qualquer `QueryWidget`, criar **monitor** (condição + janela + severidade + rota) ou **ação** (acionar runbook, abrir incidente, anotar change).
+   - Integrado com `Operations` (Incidents) e `Knowledge` (Runbooks).
+3. **Mobile API**
+   - Endpoints otimizados para mobile on-call (home do engineer, incidentes ativos, approvals pendentes, dashboards-chave em modo read-only compacto).
+   - Autenticação via OIDC + push tokens.
+
+#### Frontend
+4. **Mobile companion** como **PWA responsiva** no mesmo frontend (primeiro entregável) com possibilidade de app nativa fina no futuro partilhando a API de mobile.
+   - Capacidades v3.9: ver alertas/incidentes, acknowledge/ack, ver dashboards partilhados em layout compacto, abrir runbooks, aprovar mudanças de baixo risco (quando permitido por política).
+5. **Widget → Alert/Action** (UX inline no widget) com preview de condição e teste de acionamento.
+
+#### Critérios de aceite
+- PWA on-call instalável e funcional offline para leitura de dashboards cacheados.
+- Monitores criados a partir de widgets disparam e aparecem em `Operations`.
+- NQL avançado executa sob governance total; queries maliciosas/excessivas rejeitadas.
+
+---
+
+
 
 ### 4.1 Backend
 - **Módulo**: Custom Dashboards permanecem no `Governance` (aggregate root `CustomDashboard`); Notebooks podem ser novo submódulo `Governance.Notebooks` mantendo fronteira clara.
@@ -316,11 +401,16 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 4. **V3.4 AI + Notebooks** → diferencial competitivo alto; exige fundação das waves anteriores.
 5. **V3.5 Frontend Uplift** → paralelizável em parte com as waves anteriores; pode começar cedo em trilho dedicado.
 6. **V3.6 Governance/Reports/Embed** → fecha o ciclo enterprise e destrava vendas para Exec/Auditor.
+7. **V3.7 Real-time Collaboration** → requer fundação de partilha granular (V3.1) e auditoria.
+8. **V3.8 Marketplace & Plugin SDK** → requer Widget SDK interno estável (V3.2) e governance (V3.6).
+9. **V3.9 Advanced NQL + Alerting + Mobile On-Call** → consolida o ciclo observação → ação → mobilidade.
 
 **Trilhos paralelos** viáveis:
-- Trilho A: V3.1 → V3.2 → V3.3 → V3.4 (dashboards+notebooks)
-- Trilho B: V3.5 (frontend platform uplift) — pode correr em paralelo desde o início
-- Trilho C: V3.6 — inicia após V3.2 estar estável
+- Trilho A (Dashboards core): V3.1 → V3.2 → V3.3 → V3.4
+- Trilho B (Frontend platform): V3.5 — pode correr em paralelo desde o início
+- Trilho C (Governance/Enterprise): V3.6 — inicia após V3.2 estar estável
+- Trilho D (Extensibilidade & colaboração): V3.7 → V3.8 — inicia após V3.1/V3.2/V3.6 estáveis
+- Trilho E (Ciclo de ação + mobilidade): V3.9 — inicia após V3.2/V3.3 estáveis
 
 ---
 
@@ -331,6 +421,9 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 | Adoção | % de utilizadores ativos com ≥1 dashboard próprio | ≥60% |
 | Time-to-first-dashboard | Mediana desde "criar" até "publicar" | <3 minutos (com AI Composer) |
 | Reutilização | % de dashboards partilhados (scope ≥ Team) | ≥40% |
+| Reutilização cross-team | % de instalações via Template Gallery | ≥25% |
+| Colaboração | % de incidentes P1/P2 com War Room colaborativo | ≥70% |
+| Mobilidade | MTTA (mean time to acknowledge) via PWA on-call | -30% vs baseline |
 | Qualidade | Bugs de regressão em widgets por release | <3 |
 | Performance | LCP p75 das páginas dashboard | <2.0s |
 | Governança | % de dashboards com owner e variáveis obrigatórias | ≥95% |
@@ -344,25 +437,29 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 
 | Risco | Mitigação |
 |---|---|
-| NQL pode virar linguagem inchada | Começar subset minúsculo e seguro; avaliar cada extensão; nunca expor SQL cru |
+| NQL pode virar linguagem inchada | Começar subset minúsculo e seguro (V3.2); extensões (V3.9) passam por ADR; nunca expor SQL cru |
 | Live streaming em multi-tenant pode causar pressão em DB | SSE com coalescing por widget; rate limit; cache de 2ª camada |
 | AI Composer pode produzir dashboards ruidosos | Obrigar aprovação humana; rotular "AI-generated"; audit trail total |
 | Public links são superfície de risco | Tenant policies bloqueiam por default; expiração máxima configurável; auditoria; redação obrigatória |
 | Notebook mode pode confundir com dashboards | UX clara: dashboards = monitorização contínua; notebooks = investigação narrativa |
 | Design tokens v2 pode quebrar páginas legadas | Migração incremental com dupla-fonte temporária; testes visuais no CI |
-| Scope creep em "Frontend Uplift" | Budget fixo de waves; backlog explícito para v4 |
+| Plugins de 3ºs podem comprometer segurança/UX | Assinatura de artefactos; sandbox + CSP; policies por tenant; revogação remota; audit trail |
+| Colaboração em tempo real com conflitos de edição | CRDT para layout e texto; locking otimista para widgets pesados; histórico versionado (V3.1) |
+| PWA on-call pode expor dados sensíveis em dispositivo perdido | Tokens curtos; wipe remoto por admin; modo kiosk/read-only por default; redação conforme policy |
+| Scope creep em "Frontend Uplift" | Budget fixo de waves; backlog explícito rolado para a próxima major |
 
 ---
 
-## 8. Fora de escopo da v3 (ficam para v4+)
+## 8. Fora de escopo da v3
 
-- Micro-frontends / Module Federation para plugins de terceiros.
-- Marketplace público de dashboards/widgets.
-- Edição colaborativa em tempo real com cursors partilhados em dashboards (avaliar só para notebooks).
-- SDK externo de widgets para parceiros.
-- Mobile-native companion app.
-- Server-driven UI.
-- NQL avançado com joins livres e funções definidas pelo utilizador.
+Ficam conscientemente de fora **apenas** os itens que não representam evolução real para o produto ou que contradizem a visão oficial:
+
+- **Server-driven UI** — contradiz a arquitetura feature-based, persona-aware e a autonomia do frontend já estabelecida. Não adotar.
+- **Clone literal de produtos concorrentes** (Dynatrace/Grafana/Datadog clones visuais ou funcionais) — o NexTraceOne mantém identidade própria (ver Copilot Instructions §2, §27).
+- **Marketplace público aberto à internet (monetização/third-party público não revisto)** — a v3 entrega galeria/marketplace **interno e governado** (V3.8). Marketplace público não governado fica explicitamente fora por risco de segurança e curadoria até um programa formal de ISVs existir.
+- **Gamer/sci-fi/cyberpunk visual styling** — conforme Copilot Instructions §18.2.
+
+> **Nota:** todas as capacidades que anteriormente podiam parecer "adiáveis" — micro-frontends, marketplace/template gallery, plugin SDK externo, colaboração em tempo real, mobile companion (PWA), NQL avançado, alerting from widget — foram **absorvidas pelas waves V3.7, V3.8 e V3.9** por representarem evolução real e estratégica alinhada à visão do produto.
 
 ---
 
