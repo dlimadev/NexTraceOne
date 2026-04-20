@@ -5,7 +5,6 @@ export const finalProductionIncludedRoutePrefixes = [
   '/reset-password',
   '/activate',
   '/mfa',
-  '/invitation',
   '/select-tenant',
   '/search',
   '/source-of-truth',

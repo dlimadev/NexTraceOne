@@ -45,9 +45,9 @@ public sealed class ScheduledReport : AuditableEntity<ScheduledReportId>
         Guard.Against.NullOrWhiteSpace(reportType);
 
         var normalizedSchedule = ValidSchedules.Contains(schedule, StringComparer.OrdinalIgnoreCase)
-            ? schedule.ToLower() : "weekly";
+            ? schedule.ToLowerInvariant() : "weekly";
         var normalizedFormat = ValidFormats.Contains(format, StringComparer.OrdinalIgnoreCase)
-            ? format.ToLower() : "pdf";
+            ? format.ToLowerInvariant() : "pdf";
 
         var report = new ScheduledReport
         {

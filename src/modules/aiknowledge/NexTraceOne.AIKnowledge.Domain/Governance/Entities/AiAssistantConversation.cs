@@ -43,7 +43,7 @@ public sealed class AiAssistantConversation : AuditableEntity<AiAssistantConvers
     public string? LastModelUsed { get; private set; }
 
     /// <summary>Identificador do utilizador que criou a conversa.</summary>
-    public string CreatedBy { get; private set; } = string.Empty;
+    public new string CreatedBy { get; private set; } = string.Empty;
 
     /// <summary>Número de mensagens na conversa.</summary>
     public int MessageCount { get; private set; }

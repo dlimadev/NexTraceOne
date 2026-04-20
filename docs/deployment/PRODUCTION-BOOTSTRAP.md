@@ -220,6 +220,64 @@ Via interface web (**Configuration → Parameters**), ajustar:
 
 ---
 
+## Passo 7 — Providers opcionais (remover `simulatedNote` dos dashboards)
+
+Alguns dashboards do NexTraceOne dependem de integrações externas. Quando essas integrações
+não estão configuradas, a plataforma continua a funcionar mas usa fallbacks `Null*` que
+descartam silenciosamente as operações correspondentes e marcam a resposta com um campo
+`simulatedNote`. A página **Platform Admin → System Health** (`/admin/system-health`) e o
+endpoint `GET /api/v1/platform/optional-providers` mostram o estado de cada provider em
+tempo real, e os logs de arranque do ApiHost (`OptionalProviderStartupLogger`) emitem um
+*warning* por cada provider em modo degradado fora de Development.
+
+Checklist mínimo para uma instalação de produção sem `simulatedNote`:
+
+| Provider | Config keys obrigatórias | Dashboard afetado | Secção de referência |
+|---|---|---|---|
+| **Canary rollouts** (`ICanaryProvider`) | `Canary:Provider` (ex: `Argo`, `Flagger`, `LaunchDarkly`) + credenciais específicas | `/admin/canary-dashboard` | Configuration → Parameters (Canary) |
+| **Backup** (`IBackupProvider`) | `Backup:Provider` + credenciais da solução de backup (pgBackRest, Barman, Velero, …) | `/admin/backup-coordinator` | Configuration → Parameters (Backup) |
+| **Kafka event producer** (`IKafkaEventProducer`) | `Kafka:BootstrapServers`, `Kafka:ClientId`, SASL/SSL conforme cluster | Eventos de integração outbound | `docs/deployment/ENVIRONMENT-CONFIGURATION.md` |
+| **Cloud billing** (`ICloudBillingProvider`) | `FinOps:Billing:Provider` (`aws`, `azure`, `gcp`) + credenciais e dataset/bucket | FinOps dashboards | Configuration → Parameters (FinOps) |
+
+Passos recomendados:
+
+1. Partir de `/admin/system-health` para ver os providers que ainda estão como `NotConfigured`.
+2. Para cada entrada, seguir o link **Setup docs** na página (aponta para a secção deste guia).
+3. Preencher as configuration keys via **Configuration → Parameters** (nunca via `appsettings.*.json` — ver convenção em `IConfigurationResolutionService + ConfigurationDefinitionSeeder`).
+4. Reiniciar o ApiHost e confirmar nos logs de arranque: `Optional providers configured: canary, backup, kafka, cloudBilling`.
+5. Confirmar em `/admin/system-health` que todos os providers aparecem como `Configured`.
+
+### Canary provider
+
+Configure a integração com o controlador de canary rollouts (Argo Rollouts, Flagger,
+LaunchDarkly, …) via **Configuration → Parameters**. Até estar configurado,
+`/admin/canary-dashboard` devolve `simulatedNote` e lista vazia.
+
+### Backup provider
+
+Configure a integração com a solução de backup (pgBackRest, Barman, Velero, AWS Backup, …).
+Até estar configurado, o monitor de backup devolve `simulatedNote`.
+
+### Kafka
+
+Sem `Kafka:BootstrapServers` configurado, `IKafkaEventProducer` resolve para
+`NullKafkaEventProducer` e **todos os eventos outbound são descartados silenciosamente**.
+Use um cluster Kafka gerido (MSK, Confluent Cloud, Event Hubs com Kafka API) ou self-hosted
+com SASL/SSL.
+
+### Cloud billing
+
+Configure a ingestão de billing para FinOps contextual: AWS Cost and Usage Report (CUR),
+Azure Cost Management ou GCP BigQuery Billing Export. Até estar configurado, os relatórios
+FinOps mostram apenas dados sintéticos.
+
+> **Nota.** O NexTraceOne foi desenhado para arrancar com estes providers em falta — isso
+> **não** é um erro nem bloqueia o host. É, no entanto, inaceitável em produção para o
+> domínio em questão (ex.: sem `IKafkaEventProducer` configurado, todos os eventos outbound
+> são silenciosamente descartados). Use esta checklist como critério de prontidão operacional.
+
+---
+
 ## Troubleshooting
 
 | Problema | Solução |
@@ -229,6 +287,8 @@ Via interface web (**Configuration → Parameters**), ajustar:
 | Seeds não executam | `ConfigurationDefinitionSeeder` é automático; verificar logs para erros |
 | AI não responde | Verificar `OllamaRuntime__Endpoint` ou `OpenAI__ApiKey` |
 | OpenTelemetry sem dados | Verificar `OpenTelemetry__Endpoint` — default `localhost:4317` não funciona em produção |
+| Dashboards mostram `simulatedNote` | Seguir o **Passo 7** acima; verificar `/admin/system-health` |
+| Eventos não chegam ao Kafka | `IKafkaEventProducer.IsConfigured = false` → `NullKafkaEventProducer` descarta silenciosamente; configurar `Kafka:BootstrapServers` |
 
 ---
 

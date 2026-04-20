@@ -1,6 +1,5 @@
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
-using NexTraceOne.IdentityAccess.Application.Features.AcceptInvitation;
 using NexTraceOne.IdentityAccess.Application.Features.ForgotPassword;
 using NexTraceOne.IdentityAccess.Application.Features.ListBreakGlassRequests;
 using NexTraceOne.IdentityAccess.Application.Features.ResetPassword;
@@ -13,7 +12,7 @@ namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
 /// <summary>
 /// Testes unitários para fluxos de autenticação e acesso emergencial:
-/// ForgotPassword, AcceptInvitation, ResetPassword, ListBreakGlassRequests, RevokeBreakGlass.
+/// ForgotPassword, ResetPassword, ListBreakGlassRequests, RevokeBreakGlass.
 /// </summary>
 public sealed class IdentityAccessFlowFeaturesTests
 {
@@ -53,20 +52,6 @@ public sealed class IdentityAccessFlowFeaturesTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Accepted.Should().BeTrue("anti-enumeration: always accept");
-    }
-
-    // ── AcceptInvitation ────────────────────────────────────────────────────
-
-    [Fact]
-    public async Task AcceptInvitation_InfrastructureNotReady_ReturnsNotFoundError()
-    {
-        var handler = new AcceptInvitation.Handler();
-        var result = await handler.Handle(
-            new AcceptInvitation.Command("valid-token-123", "SecurePass123!"),
-            CancellationToken.None);
-
-        result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Contain("invitation");
     }
 
     // ── ResetPassword ───────────────────────────────────────────────────────

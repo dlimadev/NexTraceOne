@@ -29,7 +29,7 @@ public sealed class NegotiationComment : AuditableEntity<NegotiationCommentId>
     public string? LineReference { get; private set; }
 
     /// <summary>Momento de criação do comentário.</summary>
-    public DateTimeOffset CreatedAt { get; private set; }
+    public new DateTimeOffset CreatedAt { get; private set; }
 
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }

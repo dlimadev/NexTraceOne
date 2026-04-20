@@ -6824,25 +6824,6 @@
     "verified": "Verified",
     "warnings": "Warnings"
   },
-  "invitation": {
-    "accept": "Accept invitation",
-    "accepting": "Accepting...",
-    "alreadyAccepted": "This invitation has already been accepted.",
-    "confirmPasswordLabel": "Confirm password",
-    "confirmPasswordPlaceholder": "Re-enter your password",
-    "emailLabel": "Email",
-    "errorGeneric": "Unable to accept invitation. Please try again.",
-    "goToLogin": "Go to sign in",
-    "invalidToken": "This invitation link is invalid or has expired.",
-    "invalidTokenMessage": "Please contact your administrator for a new invitation.",
-    "passwordLabel": "Password",
-    "passwordPlaceholder": "Choose a password",
-    "roleLabel": "Role",
-    "subtitle": "You have been invited to join {{organization}} on NexTraceOne.",
-    "successMessage": "Your account is ready. You can now sign in to {{organization}}.",
-    "successTitle": "Welcome aboard",
-    "title": "You've been invited"
-  },
   "knowledge": {
     "autoDoc": {
       "docs": "{{count}} docs",
@@ -6880,6 +6861,17 @@
       "title": "Knowledge Graph",
       "totalEdges": "Total Edges",
       "totalNodes": "Total Nodes"
+    },
+    "serviceTimeline": {
+      "title": "Service Operational Timeline",
+      "subtitle": "Chronological view of operational notes attached to this service",
+      "filterBySeverity": "Filter by severity",
+      "filterByStatus": "Filter by status",
+      "open": "Open",
+      "resolved": "Resolved",
+      "empty": "No operational notes found for this service.",
+      "origin": "Origin",
+      "type": "Type"
     }
   },
   "knowledgeHub": {
@@ -11425,6 +11417,52 @@
       "Promoted": "Promoted",
       "RolledBack": "Rolled Back",
       "Paused": "Paused"
+    }
+  },
+  "systemHealth": {
+    "title": "System Health",
+    "subtitle": "Status of each optional provider. When a provider is not configured, related dashboards show a simulatedNote — set up the provider to see real data.",
+    "actions": {
+      "refresh": "Refresh",
+      "setupDocs": "Setup docs"
+    },
+    "summary": {
+      "configured": "Configured",
+      "notConfigured": "Not configured",
+      "total": "Total"
+    },
+    "states": {
+      "loading": "Loading provider status…",
+      "error": "Failed to load provider status.",
+      "empty": "No optional providers registered."
+    },
+    "status": {
+      "Configured": "Configured",
+      "NotConfigured": "Not configured",
+      "Unknown": "Unknown"
+    },
+    "categories": {
+      "operations": "Operations",
+      "integrations": "Integrations",
+      "finops": "FinOps",
+      "identity": "Identity"
+    },
+    "providers": {
+      "canary": {
+        "name": "Canary rollouts"
+      },
+      "backup": {
+        "name": "Database backup"
+      },
+      "kafka": {
+        "name": "Kafka event producer"
+      },
+      "cloudBilling": {
+        "name": "Cloud billing"
+      },
+      "saml": {
+        "name": "SAML 2.0 SSO"
+      }
     }
   },
   "multiTenantSchema": {

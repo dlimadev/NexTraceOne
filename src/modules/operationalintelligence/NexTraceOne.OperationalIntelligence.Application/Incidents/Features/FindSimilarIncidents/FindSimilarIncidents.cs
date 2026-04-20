@@ -57,7 +57,7 @@ public static class FindSimilarIncidents
                 return Task.FromResult<Result<Response>>(IncidentErrors.IncidentNotFound(request.IncidentId));
 
             var cutoff = detail.Identity.CreatedAt.AddDays(-request.LookbackDays);
-            var targetServiceId = detail.LinkedServices.FirstOrDefault()?.ServiceId ?? string.Empty;
+            var targetServiceId = detail.LinkedServices.Count > 0 ? detail.LinkedServices[0].ServiceId : string.Empty;
             var targetEnvironment = detail.ImpactedEnvironment;
             var targetIncidentType = detail.Identity.IncidentType;
 

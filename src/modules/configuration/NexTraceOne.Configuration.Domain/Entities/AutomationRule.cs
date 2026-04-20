@@ -49,7 +49,7 @@ public sealed class AutomationRule : AuditableEntity<AutomationRuleId>
             Id = new AutomationRuleId(Guid.NewGuid()),
             TenantId = tenantId,
             Name = name,
-            Trigger = trigger.Trim().ToLower(),
+            Trigger = trigger.Trim().ToLowerInvariant(),
             ConditionsJson = string.IsNullOrWhiteSpace(conditionsJson) ? "[]" : conditionsJson,
             ActionsJson = string.IsNullOrWhiteSpace(actionsJson) ? "[]" : actionsJson,
             IsEnabled = true,

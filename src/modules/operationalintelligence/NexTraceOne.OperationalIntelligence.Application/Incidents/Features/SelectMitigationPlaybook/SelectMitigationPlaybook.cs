@@ -65,7 +65,7 @@ public static class SelectMitigationPlaybook
             var correlation = store.GetIncidentCorrelation(request.IncidentId);
             var severity = detail.Identity.Severity;
             var incidentType = detail.Identity.IncidentType;
-            var serviceId = detail.LinkedServices.FirstOrDefault()?.ServiceId;
+            var serviceId = detail.LinkedServices.Count > 0 ? detail.LinkedServices[0].ServiceId : null;
             var incidentTitle = detail.Identity.Title;
 
             // Buscar runbooks por serviço e tipo de incidente

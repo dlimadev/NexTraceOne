@@ -53,13 +53,13 @@ internal sealed class EnvironmentDriftReportRepository(RuntimeIntelligenceDbCont
             .FirstOrDefaultAsync(ct);
 
     /// <summary>Adiciona um novo relatório.</summary>
-    public void Add(EnvironmentDriftReport report)
+    public new void Add(EnvironmentDriftReport report)
     {
         context.EnvironmentDriftReports.Add(report);
     }
 
     /// <summary>Atualiza um relatório existente.</summary>
-    public void Update(EnvironmentDriftReport report)
+    public new void Update(EnvironmentDriftReport report)
     {
         context.EnvironmentDriftReports.Update(report);
     }

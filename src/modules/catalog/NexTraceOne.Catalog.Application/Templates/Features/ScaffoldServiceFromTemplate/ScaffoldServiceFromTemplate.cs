@@ -169,7 +169,7 @@ public static class ScaffoldServiceFromTemplate
 
                 return entries
                     .Select(e => new ScaffoldedFile(
-                        ApplyVariables(e.Path, variables),
+                        ApplyVariables(e.Path, variables) ?? e.Path ?? string.Empty,
                         ApplyVariables(e.Content, variables)))
                     .ToArray();
             }

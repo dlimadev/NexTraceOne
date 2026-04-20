@@ -95,6 +95,7 @@ const MtlsManagerPage = lazy(() => import('../features/platform-admin/pages/Mtls
 const FeatureFlagsRuntimePage = lazy(() => import('../features/platform-admin/pages/FeatureFlagsRuntimePage').then(m => ({ default: m.FeatureFlagsRuntimePage })));
 const CanaryDashboardPage = lazy(() => import('../features/platform-admin/pages/CanaryDashboardPage').then(m => ({ default: m.CanaryDashboardPage })));
 const MultiTenantSchemaPage = lazy(() => import('../features/platform-admin/pages/MultiTenantSchemaPage').then(m => ({ default: m.MultiTenantSchemaPage })));
+const SystemHealthPage = lazy(() => import('../features/platform-admin/pages/SystemHealthPage').then(m => ({ default: m.SystemHealthPage })));
 
 export function AdminRoutes() {
   return (
@@ -733,6 +734,15 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:write" redirectTo="/unauthorized">
             <MultiTenantSchemaPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* ── System Health — CFG-01 (optional providers status) ── */}
+      <Route
+        path="/admin/system-health"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <SystemHealthPage />
           </ProtectedRoute>
         }
       />

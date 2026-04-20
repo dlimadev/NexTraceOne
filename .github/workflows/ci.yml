@@ -245,6 +245,115 @@ jobs:
           name: e2e-backend-test-results
           path: ./test-results/*.trx
 
+  # ── openapi-artifact ──────────────────────────────────────────────────────────
+  # ACT-024 — serialize and publish the OpenAPI document (swagger.json) as a
+  # build artifact. Starts the ApiHost in Development (so /openapi is mapped),
+  # waits for readiness, curls the document and uploads it.
+  openapi-artifact:
+    name: OpenAPI Artifact
+    runs-on: ubuntu-latest
+    needs: build-backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: nextraceone
+          POSTGRES_PASSWORD: nextraceone
+          POSTGRES_DB: nextraceone
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://127.0.0.1:8099"
+      # CI-ONLY: these flags bypass integrity checks and the pending-migrations
+      # guardrail so the ApiHost can boot quickly against the ephemeral postgres
+      # service. They MUST NEVER be set in production deployments — production
+      # ApiHost relies on them to detect schema drift and tampered binaries.
+      NEXTRACE_SKIP_INTEGRITY: "true"
+      NEXTRACE_IGNORE_PENDING_MODEL_CHANGES: "true"
+      NEXTRACE_AUTO_MIGRATE: "true"
+      ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=nextraceone;Username=nextraceone;Password=nextraceone"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props', '**/Directory.Build.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore NexTraceOne.sln
+
+      - name: Start ApiHost in background
+        run: |
+          nohup dotnet run --configuration Release --no-restore \
+            --project src/platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj \
+            > apihost.log 2>&1 &
+          echo $! > apihost.pid
+          echo "Started ApiHost with PID $(cat apihost.pid)"
+
+      - name: Wait for /health
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8099/health > /dev/null 2>&1; then
+              echo "✅ ApiHost is healthy after ${i} attempts"
+              break
+            fi
+            if [ "$i" = "60" ]; then
+              echo "❌ ApiHost did not become healthy in time"
+              tail -n 200 apihost.log || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+      - name: Fetch swagger.json
+        run: |
+          mkdir -p ./openapi-artifact
+          curl -fsS http://127.0.0.1:8099/openapi/v1.json \
+            -o ./openapi-artifact/swagger.json
+          # Validate it is non-empty JSON
+          test -s ./openapi-artifact/swagger.json
+          head -c 200 ./openapi-artifact/swagger.json
+          echo ""
+          echo "## OpenAPI document" >> $GITHUB_STEP_SUMMARY
+          echo "Bytes: $(wc -c < ./openapi-artifact/swagger.json)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Stop ApiHost
+        if: always()
+        run: |
+          if [ -f apihost.pid ]; then
+            kill "$(cat apihost.pid)" 2>/dev/null || true
+          fi
+
+      - name: Upload ApiHost log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apihost-log
+          path: apihost.log
+          retention-days: 7
+
+      - name: Upload OpenAPI artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-swagger-json
+          path: ./openapi-artifact/swagger.json
+          retention-days: 30
+
   # ── build-frontend ───────────────────────────────────────────────────────────
   build-frontend:
     name: Build Frontend
@@ -444,6 +553,7 @@ jobs:
       - test-backend-unit
       - test-backend-integration
       - test-backend-e2e
+      - openapi-artifact
       - build-frontend
       - test-frontend
       - e2e-smoke
@@ -456,6 +566,7 @@ jobs:
           echo "test-backend-unit: ${{ needs.test-backend-unit.result }}"
           echo "test-backend-integration: ${{ needs.test-backend-integration.result }}"
           echo "test-backend-e2e: ${{ needs.test-backend-e2e.result }}"
+          echo "openapi-artifact: ${{ needs.openapi-artifact.result }}"
           echo "build-frontend: ${{ needs.build-frontend.result }}"
           echo "test-frontend: ${{ needs.test-frontend.result }}"
           echo "e2e-smoke: ${{ needs.e2e-smoke.result }}"
@@ -467,6 +578,7 @@ jobs:
                 "${{ needs.test-backend-unit.result }}" == "failure" || \
                 "${{ needs.test-backend-integration.result }}" == "failure" || \
                 "${{ needs.test-backend-e2e.result }}" == "failure" || \
+                "${{ needs.openapi-artifact.result }}" == "failure" || \
                 "${{ needs.build-frontend.result }}" == "failure" || \
                 "${{ needs.test-frontend.result }}" == "failure" || \
                 "${{ needs.security-audit.result }}" == "failure" || \

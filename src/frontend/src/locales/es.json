@@ -537,7 +537,61 @@
     "relevanceScore": "Relevancia",
     "routingRationaleLabel": "Justificación de enrutamiento",
     "contextTruncated": "El contexto fue truncado para caber en la ventana del modelo",
-    "explainPrompt": "Explica tu razonamiento para la respuesta anterior, indicando qué fuentes usaste y por qué."
+    "explainPrompt": "Explica tu razonamiento para la respuesta anterior, indicando qué fuentes usaste y por qué.",
+    "ideQuerySessions": "Sesiones de consulta",
+    "ideQuerySessionsSubtitle": "Consultas de IA recientes enviadas desde extensiones de IDE",
+    "ideQuerySessionsNoData": "No se encontraron sesiones de consulta.",
+    "ideQueryStatusProcessing": "Procesando",
+    "ideQueryStatusResponded": "Respondido",
+    "ideQueryStatusBlocked": "Bloqueado",
+    "ideQueryStatusFailed": "Fallido",
+    "ideQueryUser": "Usuario",
+    "ideQueryClient": "Cliente",
+    "ideQueryType": "Tipo",
+    "ideQueryModel": "Modelo",
+    "ideQueryTokens": "Tokens",
+    "ideQueryResponseTime": "Tiempo de respuesta",
+    "ideQueryTime": "Hora",
+    "streaming": {
+      "generating": "Generando respuesta...",
+      "cancel": "Cancelar"
+    },
+    "onboarding": {
+      "back": "Atrás",
+      "next": "Siguiente",
+      "finish": "Empezar a chatear",
+      "personas": {
+        "Engineer": "Ingeniero",
+        "TechLead": "Tech Lead",
+        "Architect": "Arquitecto",
+        "Product": "Producto",
+        "Executive": "Ejecutivo"
+      },
+      "step1": {
+        "title": "Bienvenido al Asistente de IA",
+        "description": "Tu asistente de IA gobernado y con conciencia de contexto para servicios, contratos y operaciones. Configúrate en segundos.",
+        "personaPrompt": "Selecciona tu perfil"
+      },
+      "step2": {
+        "title": "Conoce tu Asistente de IA",
+        "description": "Pregunta cualquier cosa sobre tus servicios, contratos, incidentes y cambios. El asistente usa la Fuente de Verdad de tu organización para proporcionar respuestas precisas.",
+        "sampleLabel": "Intenta preguntar:",
+        "samplePrompt": "\"¿Qué cambió en el payment-service en las últimas 24 horas?\""
+      },
+      "step3": {
+        "title": "Descubre los Agentes de IA",
+        "description": "Agentes de IA especializados te ayudan a generar contratos, analizar incidentes y crear escenarios de prueba — todo gobernado y auditado.",
+        "agents": {
+          "contractAgent": "Agente de Diseño de Contratos — generar contratos REST y SOAP",
+          "incidentAgent": "Agente de Análisis de Incidentes — correlacionar incidentes con cambios",
+          "testAgent": "Agente de Generación de Pruebas — crear cobertura de escenarios a partir de contratos"
+        }
+      },
+      "step4": {
+        "title": "¡Estás listo!",
+        "description": "Tu Asistente de IA está configurado y listo para ayudar. Inicia una conversación para explorar tu contexto operacional."
+      }
+    }
   },
   "aiIntegrationsConfig": {
     "auditHistory": "Cambios Recientes",
@@ -6773,25 +6827,6 @@
     "verified": "Verificado",
     "warnings": "Advertencias"
   },
-  "invitation": {
-    "accept": "Aceptar invitación",
-    "accepting": "Accepting...",
-    "alreadyAccepted": "Esta invitación ya ha sido aceptada.",
-    "confirmPasswordLabel": "Confirmar contraseña",
-    "confirmPasswordPlaceholder": "Vuelva a ingresar su contraseña",
-    "emailLabel": "Correo electrónico",
-    "errorGeneric": "No se pudo aceptar la invitación. Por favor, inténtelo de nuevo.",
-    "goToLogin": "Ir al inicio de sesión",
-    "invalidToken": "Este enlace de invitación es inválido o ha expirado.",
-    "invalidTokenMessage": "Contacte a su administrador para una nueva invitación.",
-    "passwordLabel": "Contraseña",
-    "passwordPlaceholder": "Elija una contraseña",
-    "roleLabel": "Rol",
-    "subtitle": "Ha sido invitado a unirse a {{organization}} en NexTraceOne.",
-    "successMessage": "Su cuenta está lista. Ahora puede iniciar sesión en {{organization}}.",
-    "successTitle": "Bienvenido a bordo",
-    "title": "Ha sido invitado"
-  },
   "knowledge": {
     "autoDoc": {
       "docs": "{{count}} docs",
@@ -6829,6 +6864,17 @@
       "title": "Grafo de Conocimiento",
       "totalEdges": "Total de Aristas",
       "totalNodes": "Total de Nodos"
+    },
+    "serviceTimeline": {
+      "title": "Línea de Tiempo Operacional del Servicio",
+      "subtitle": "Vista cronológica de las notas operacionales asociadas a este servicio",
+      "filterBySeverity": "Filtrar por severidad",
+      "filterByStatus": "Filtrar por estado",
+      "open": "Abiertas",
+      "resolved": "Resueltas",
+      "empty": "No se encontraron notas operacionales para este servicio.",
+      "origin": "Origen",
+      "type": "Tipo"
     }
   },
   "knowledgeHub": {
@@ -11282,7 +11328,11 @@
     "statExpiring": "Por Vencer",
     "statExpired": "Vencidos / Revocados",
     "sectionPolicy": "Política mTLS",
-    "policyMode": "Modo de Política",
+    "policyMode": {
+      "Required": "Obligatorio (Todos los servicios)",
+      "PerService": "Por servicio",
+      "Disabled": "Desactivado"
+    },
     "sectionRootCa": "Certificado Root CA",
     "rootCaPresent": "Certificado Root CA instalado",
     "rootCaAbsent": "Ningún certificado Root CA configurado",
@@ -11361,6 +11411,52 @@
       "Promoted": "Promovido",
       "RolledBack": "Revertido",
       "Paused": "Pausado"
+    }
+  },
+  "systemHealth": {
+    "title": "Salud del Sistema",
+    "subtitle": "Estado de cada provider opcional. Cuando un provider no está configurado, los paneles relacionados muestran un simulatedNote — configure el provider para ver datos reales.",
+    "actions": {
+      "refresh": "Actualizar",
+      "setupDocs": "Documentación de configuración"
+    },
+    "summary": {
+      "configured": "Configurados",
+      "notConfigured": "No configurados",
+      "total": "Total"
+    },
+    "states": {
+      "loading": "Cargando estado de los providers…",
+      "error": "Error al cargar el estado de los providers.",
+      "empty": "Ningún provider opcional registrado."
+    },
+    "status": {
+      "Configured": "Configurado",
+      "NotConfigured": "No configurado",
+      "Unknown": "Desconocido"
+    },
+    "categories": {
+      "operations": "Operaciones",
+      "integrations": "Integraciones",
+      "finops": "FinOps",
+      "identity": "Identidad"
+    },
+    "providers": {
+      "canary": {
+        "name": "Canary rollouts"
+      },
+      "backup": {
+        "name": "Backup de base de datos"
+      },
+      "kafka": {
+        "name": "Productor de eventos Kafka"
+      },
+      "cloudBilling": {
+        "name": "Cloud billing"
+      },
+      "saml": {
+        "name": "SAML 2.0 SSO"
+      }
     }
   },
   "multiTenantSchema": {
@@ -11880,7 +11976,8 @@
     "emptyDescription": "No hay gates de promoción configurados para esta ruta de entorno y filtro",
     "blocking": "Bloqueante",
     "inactive": "Inactivo",
-    "created": "Creado"
+    "created": "Creado",
+    "nonBlocking": "No bloqueante"
   },
   "releaseParameterAudit": {
     "title": "Auditoría de Parámetros de Release",
@@ -12901,6 +12998,21 @@
         "description": "Showback visibility and chargeback allocation settings.",
         "showbackEnabled": "Showback",
         "chargebackEnabled": "Chargeback"
+      }
+    }
+  },
+  "ai": {
+    "feedback": {
+      "submitted": "Comentario enviado — ¡gracias!",
+      "prompt": "¿Fue útil esta respuesta?",
+      "ratingLabel": "Califica esta respuesta",
+      "star": "{{count}} estrella",
+      "commentPlaceholder": "Opcional: añade un comentario...",
+      "submit": "Enviar comentario",
+      "outcome": {
+        "resolved": "✓ Resuelto",
+        "partial": "~ Parcial",
+        "incorrect": "✗ Incorrecto"
       }
     }
   }

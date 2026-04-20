@@ -335,7 +335,7 @@ O NexTraceOne foi construído com o princípio **Security by Design**:
 
 - **Modular Monolith** — 12 bounded contexts com separação clara, sem microserviços prematuros
 - **DDD + Clean Architecture + CQRS** — domínio isolado, sem dependência de infraestrutura
-- **27 DbContexts** — cada subdomínio com o seu próprio contexto EF Core
+- **DbContexts** — cada subdomínio com o seu próprio contexto EF Core (use `./tools/count-dbcontexts.sh --count` para valor atualizado)
 - **15 interfaces cross-module** — comunicação entre módulos via contratos claros
 - **Outbox Pattern** — 25 processadores para mensageria assíncrona confiável
 

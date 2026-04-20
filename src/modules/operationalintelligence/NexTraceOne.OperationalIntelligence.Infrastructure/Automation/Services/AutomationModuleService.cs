@@ -64,7 +64,7 @@ internal sealed class AutomationModuleService(AutomationDbContext context) : IAu
         return workflows
             .Select(w => new AutomationWorkflowSummary(
                 WorkflowId: w.Id.Value.ToString(),
-                ServiceName: w.ServiceId,
+                ServiceName: w.ServiceId ?? string.Empty,
                 WorkflowStatus: w.Status.ToString(),
                 ActionType: w.ActionId,
                 CreatedAt: w.CreatedAt))

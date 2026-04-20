@@ -17,6 +17,7 @@ using UpdateKnowledgeDocumentFeature = NexTraceOne.Knowledge.Application.Feature
 using UpdateOperationalNoteFeature = NexTraceOne.Knowledge.Application.Features.UpdateOperationalNote.UpdateOperationalNote;
 using GetKnowledgeGraphOverviewFeature = NexTraceOne.Knowledge.Application.Features.GetKnowledgeGraphOverview.GetKnowledgeGraphOverview;
 using GenerateAutoDocumentationFeature = NexTraceOne.Knowledge.Application.Features.GenerateAutoDocumentation.GenerateAutoDocumentation;
+using GetServiceOperationalTimelineFeature = NexTraceOne.Knowledge.Application.Features.GetServiceOperationalTimeline.GetServiceOperationalTimeline;
 
 using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.Knowledge.Domain.Enums;
@@ -283,5 +284,33 @@ public sealed class KnowledgeEndpointModule
         })
         .WithTags("Knowledge")
         .WithSummary("Generate auto documentation for a service from Knowledge Hub data");
+
+        // ── GET /api/v1/knowledge/services/{serviceId}/operational-timeline ──
+        knowledge.MapGet("/services/{serviceId:guid}/operational-timeline", async (
+            Guid serviceId,
+            string? severity,
+            bool? isResolved,
+            int? page,
+            int? pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            NoteSeverity? parsedSeverity = null;
+            if (!string.IsNullOrWhiteSpace(severity) && Enum.TryParse<NoteSeverity>(severity, true, out var sev))
+                parsedSeverity = sev;
+
+            var result = await sender.Send(
+                new GetServiceOperationalTimelineFeature.Query(
+                    ServiceId: serviceId,
+                    Severity: parsedSeverity,
+                    IsResolved: isResolved,
+                    Page: page ?? 1,
+                    PageSize: pageSize ?? 25),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .WithTags("Knowledge")
+        .WithSummary("Get operational notes timeline for a specific service");
     }
 }

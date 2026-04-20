@@ -417,7 +417,7 @@ public static class CopybookParser
 
             // Apply OCCURS at group level
             var effectiveLength = fields[i].OccursCount.HasValue
-                ? groupLength * fields[i].OccursCount.Value
+                ? groupLength * fields[i].OccursCount!.Value
                 : groupLength;
 
             fields[i] = fields[i] with { Length = effectiveLength };

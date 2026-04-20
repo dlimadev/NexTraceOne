@@ -290,6 +290,26 @@ export interface BackupCoordinatorResponse {
 
 // ─── API client ───────────────────────────────────────────────────────────────
 
+// ─── Optional Providers (CFG-01 / SystemHealthPage) ───────────────────────────
+
+export type OptionalProviderStatus = 'Configured' | 'NotConfigured' | 'Unknown';
+
+export interface OptionalProviderDto {
+  name: string;
+  category: string;
+  status: OptionalProviderStatus;
+  configKeyPrefix: string;
+  docsPath: string;
+  description: string;
+}
+
+export interface OptionalProvidersResponse {
+  providers: OptionalProviderDto[];
+  configuredCount: number;
+  totalCount: number;
+  checkedAt: string;
+}
+
 export const platformAdminApi = {
   /**
    * GET /preflight — acessível sem autenticação.
@@ -956,6 +976,18 @@ export const platformAdminApi = {
    */
   getCanaryDashboard: (): Promise<CanaryDashboardResponse> =>
     client.get<CanaryDashboardResponse>('/api/v1/platform/canary/rollouts').then((r) => r.data),
+
+  // ── CFG-01: SystemHealthPage (optional providers) ─────────────────────────
+
+  /**
+   * GET /api/v1/platform/optional-providers — requer platform:admin:read.
+   * Lista cada provider opcional e indica se está configurado. Permite
+   * compreender imediatamente o porquê de ver `simulatedNote` noutras páginas.
+   */
+  getOptionalProviders: (): Promise<OptionalProvidersResponse> =>
+    client
+      .get<OptionalProvidersResponse>('/api/v1/platform/optional-providers')
+      .then((r) => r.data),
 
   // ── W8-05: Multi-Tenant Schema Management ─────────────────────────────────
 

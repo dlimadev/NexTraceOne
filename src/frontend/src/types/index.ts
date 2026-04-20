@@ -2919,7 +2919,31 @@ export interface KnowledgeRelationDto {
   createdAt: string;
 }
 
-export interface KnowledgeDocumentRelationItem {
+export interface ServiceTimelineEntryDto {
+  noteId: string;
+  title: string;
+  content: string;
+  severity: NoteSeverity;
+  noteType: OperationalNoteType;
+  origin: string;
+  authorId: string;
+  tags: string[];
+  isResolved: boolean;
+  occurredAt: string;
+  updatedAt: string | null;
+  resolvedAt: string | null;
+}
+
+export interface ServiceOperationalTimelineResponse {
+  serviceId: string;
+  items: ServiceTimelineEntryDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+
   relationId: string;
   documentId: string;
   title: string;

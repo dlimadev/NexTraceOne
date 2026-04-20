@@ -30,7 +30,6 @@ public sealed class FullSmokeNavigationTests : SeleniumTestBase
         new object[] { "/reset-password" },
         new object[] { "/activate" },
         new object[] { "/mfa" },
-        new object[] { "/invitation" },
         new object[] { "/select-tenant" },
 
         // ── Dashboard ──
@@ -157,7 +156,7 @@ public sealed class FullSmokeNavigationTests : SeleniumTestBase
     {
         // Public auth routes don't need session
         var isPublicRoute = route is "/login" or "/forgot-password" or "/reset-password"
-            or "/activate" or "/mfa" or "/invitation" or "/select-tenant";
+            or "/activate" or "/mfa" or "/select-tenant";
 
         if (!isPublicRoute)
         {

@@ -109,7 +109,7 @@ internal sealed class SamlService(ILogger<SamlService> logger) : ISamlService
             .Trim();
 
         var certBytes = Convert.FromBase64String(pemContent);
-        using var cert = new X509Certificate2(certBytes);
+        using var cert = X509CertificateLoader.LoadCertificate(certBytes);
 
         var signedXml = new SignedXml(doc);
         var signatureNode = doc.GetElementsByTagName("Signature", SignedXml.XmlDsigNamespaceUrl);

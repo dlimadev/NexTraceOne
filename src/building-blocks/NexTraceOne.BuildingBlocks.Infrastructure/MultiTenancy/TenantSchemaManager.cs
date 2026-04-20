@@ -99,9 +99,12 @@ public sealed class TenantSchemaManager(
             schemaName, tenantSlug);
 
         // Definir search_path para que as migrations sejam aplicadas no schema do tenant
+        // EF1002: schemaName is sanitized via NpgsqlUtils.QuoteIdentifier which escapes double-quotes.
+#pragma warning disable EF1002
         await context.Database.ExecuteSqlRawAsync(
             $"SET search_path TO {NpgsqlUtils.QuoteIdentifier(schemaName)}, public",
             cancellationToken);
+#pragma warning restore EF1002
 
         await context.Database.MigrateAsync(cancellationToken);
 
@@ -219,7 +222,7 @@ public sealed class TenantSchemaManager(
         await using var cmd = new NpgsqlCommand(sql, connection);
         cmd.Parameters.AddWithValue("@schemaName", schemaName);
         var result = await cmd.ExecuteScalarAsync(cancellationToken);
-        return Convert.ToInt64(result) > 0;
+        return Convert.ToInt64(result, System.Globalization.CultureInfo.InvariantCulture) > 0;
     }
 }
 

@@ -4,7 +4,6 @@ export { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 export { ResetPasswordPage } from './pages/ResetPasswordPage';
 export { ActivationPage } from './pages/ActivationPage';
 export { MfaPage } from './pages/MfaPage';
-export { InvitationPage } from './pages/InvitationPage';
 export { TenantSelectionPage } from './pages/TenantSelectionPage';
 export { UsersPage } from './pages/UsersPage';
 export { TenantsPage } from './pages/TenantsPage';

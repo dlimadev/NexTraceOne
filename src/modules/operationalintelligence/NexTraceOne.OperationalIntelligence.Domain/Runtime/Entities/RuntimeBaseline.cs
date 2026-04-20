@@ -121,7 +121,7 @@ public sealed class RuntimeBaseline : AuditableEntity<RuntimeBaselineId>
 
     /// <summary>
     /// Verifica se o score de confiança da baseline é suficiente para detecção de drift.
-    /// Baselines com poucos dados (< 0.5 de confiança) podem gerar falsos positivos.
+    /// Baselines com poucos dados (menos de 0.5 de confiança) podem gerar falsos positivos.
     /// </summary>
     public bool IsConfident => ConfidenceScore >= 0.5m;
 

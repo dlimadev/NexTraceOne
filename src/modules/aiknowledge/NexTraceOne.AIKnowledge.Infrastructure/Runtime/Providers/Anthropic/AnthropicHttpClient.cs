@@ -88,9 +88,9 @@ public sealed class AnthropicHttpClient
         using var reader = new StreamReader(stream);
 
         string? eventType = null;
-        while (!reader.EndOfStream)
+        string? line;
+        while ((line = await reader.ReadLineAsync(cancellationToken)) is not null)
         {
-            var line = await reader.ReadLineAsync(cancellationToken);
             if (string.IsNullOrWhiteSpace(line))
             {
                 eventType = null;

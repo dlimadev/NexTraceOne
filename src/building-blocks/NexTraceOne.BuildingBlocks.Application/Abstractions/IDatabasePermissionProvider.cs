@@ -8,7 +8,7 @@ namespace NexTraceOne.BuildingBlocks.Application.Abstractions;
 ///
 /// Modelo enterprise (bancos/seguradoras): permissões são armazenadas em base de dados
 /// para permitir customização granular por tenant, sem necessidade de redeploy.
-/// O <see cref="RolePermissionCatalog"/> estático permanece como fallback para cenários
+/// O <c>RolePermissionCatalog</c> estático permanece como fallback para cenários
 /// onde a tabela ainda não foi populada.
 /// </summary>
 public interface IDatabasePermissionProvider

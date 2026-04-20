@@ -109,7 +109,7 @@ public static class IngestExternalRelease
                 version: request.Version,
                 environment: request.TargetEnvironment,
                 pipelineSource: $"External:{request.ExternalSystem}",
-                commitSha: request.CommitShas?.FirstOrDefault() ?? "external",
+                commitSha: request.CommitShas is { Count: > 0 } shas ? shas[0] : "external",
                 createdAt: now,
                 externalReleaseId: request.ExternalReleaseId,
                 externalSystem: request.ExternalSystem);

@@ -17,6 +17,9 @@ const KnowledgeGraphPage = lazy(() =>
 const AutoDocumentationPage = lazy(() =>
   import('../features/knowledge/pages/AutoDocumentationPage').then(m => ({ default: m.AutoDocumentationPage }))
 );
+const ServiceTimelinePage = lazy(() =>
+  import('../features/knowledge/pages/ServiceTimelinePage').then(m => ({ default: m.ServiceTimelinePage }))
+);
 
 export function KnowledgeRoutes() {
   return (
@@ -66,6 +69,14 @@ export function KnowledgeRoutes() {
         element={
           <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
             <AutoDocumentationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/knowledge/services/:serviceId/timeline"
+        element={
+          <ProtectedRoute permission="catalog:assets:read" redirectTo="/unauthorized">
+            <ServiceTimelinePage />
           </ProtectedRoute>
         }
       />

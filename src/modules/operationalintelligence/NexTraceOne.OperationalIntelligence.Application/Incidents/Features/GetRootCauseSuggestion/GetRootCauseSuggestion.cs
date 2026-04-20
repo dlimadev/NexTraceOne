@@ -70,7 +70,8 @@ public static class GetRootCauseSuggestion
                     SupportingEvidence: Array.Empty<string>())));
             }
 
-            var primaryChange = correlation.RelatedChanges
+            var changes = correlation.RelatedChanges ?? [];
+            var primaryChange = changes
                 .OrderByDescending(c => c.DeployedAt)
                 .First();
 
@@ -80,7 +81,7 @@ public static class GetRootCauseSuggestion
             var steps = DeriveInvestigationSteps(category, primaryChange.Description);
             var evidence_signals = DeriveEvidenceSignals(
                 evidence?.DegradationSummary, evidence?.OperationalSignalsSummary,
-                correlation.RelatedChanges.Count, correlation.Confidence.ToString());
+                correlation.RelatedChanges?.Count ?? 0, correlation.Confidence.ToString());
 
             var confidenceLevel = correlation.Confidence switch
             {

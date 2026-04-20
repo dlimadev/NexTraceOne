@@ -69,7 +69,7 @@ internal sealed class EmailNotificationDispatcher(
             return false;
         }
 
-        var emailTemplate = templateResolver.ResolveEmailTemplate(notification, baseUrl);
+        var emailTemplate = templateResolver.ResolveEmailTemplate(notification, baseUrl ?? string.Empty);
 
         using var message = new MailMessage
         {
@@ -156,10 +156,10 @@ internal sealed class EmailNotificationDispatcher(
         // Fallback: appsettings via IOptions
         var emailSettings = channelOptions.Value.Email;
         return (
-            emailSettings.SmtpHost,
+            emailSettings.SmtpHost ?? string.Empty,
             emailSettings.SmtpPort,
             emailSettings.UseSsl,
-            emailSettings.FromAddress,
+            emailSettings.FromAddress ?? string.Empty,
             emailSettings.FromName,
             emailSettings.Username,
             emailSettings.Password,

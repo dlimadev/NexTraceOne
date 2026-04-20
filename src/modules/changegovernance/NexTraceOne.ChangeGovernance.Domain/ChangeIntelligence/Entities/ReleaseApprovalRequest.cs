@@ -10,7 +10,7 @@ namespace NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
 /// Entidade que representa um pedido de aprovação de release — interno ou externo.
 ///
 /// Para aprovações externas, o NexTraceOne envia um webhook outbound com um
-/// <see cref="CallbackToken"/> (UUID v4 armazenado em hash) e aguarda que o sistema
+/// CallbackToken (UUID v4 armazenado em hash) e aguarda que o sistema
 /// externo chame o endpoint de callback com a decisão (Approved/Rejected).
 ///
 /// O token autentica a resposta do sistema externo sem necessitar de credenciais adicionais.

@@ -69,7 +69,7 @@ public static class GenerateIncidentNarrative
 
             var symptomsSection = detail?.Identity.Summary ?? "No symptoms description available.";
             var timelineSection = $"Incident reported at {detail?.Identity.CreatedAt:u}.";
-            var affectedServicesSection = $"Service: {detail?.LinkedServices.FirstOrDefault()?.DisplayName ?? "N/A"} " +
+            var affectedServicesSection = $"Service: {(detail?.LinkedServices is { Count: > 0 } ls ? ls[0].DisplayName : "N/A")} " +
                 $"(Team: {detail?.OwnerTeam ?? "N/A"})";
             var probableCauseSection = $"Under investigation. Severity: {detail?.Identity.Severity}.";
             var mitigationSection = $"Status: {detail?.Identity.Status}.";

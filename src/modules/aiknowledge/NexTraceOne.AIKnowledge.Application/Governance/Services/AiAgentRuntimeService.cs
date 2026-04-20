@@ -198,7 +198,6 @@ public sealed class AiAgentRuntimeService(
         var sw = Stopwatch.StartNew();
         ChatCompletionResult chatResult;
         var toolResults = new List<ToolExecutionResult>();
-        var contextWindowTruncated = false;
 
         // Determine context window limit from resolved model
         var contextWindowTokens = resolvedModel.ContextWindow ?? DefaultContextWindowTokens;
@@ -210,7 +209,6 @@ public sealed class AiAgentRuntimeService(
                 chatMessages, contextWindowTokens, ReservedCompletionTokens);
             if (wasTruncated)
             {
-                contextWindowTruncated = true;
                 chatMessages = trimmedMessages.ToList();
             }
 
@@ -259,8 +257,7 @@ public sealed class AiAgentRuntimeService(
                     var (trimmedNative, nativeTruncated) = ContextWindowManager.TrimToFit(
                         chatMessages, contextWindowTokens, ReservedCompletionTokens);
                     if (nativeTruncated)
-                        contextWindowTruncated = true;
-                    chatMessages = trimmedNative.ToList();
+                        chatMessages = trimmedNative.ToList();
 
                     iteration++;
                 }
@@ -284,21 +281,19 @@ public sealed class AiAgentRuntimeService(
                     var iteration = 0;
                     while (iteration < MaxToolIterations)
                     {
-                        var toolCall = DetectToolCall(chatResult.Content, allowedTools);
+                        var toolCall = DetectToolCall(chatResult.Content!, allowedTools);
                         if (toolCall is null)
                             break;
 
                         var toolResult = await toolExecutor.ExecuteAsync(toolCall, cancellationToken);
                         toolResults.Add(toolResult);
 
-                        chatMessages.Add(new ChatMessage("assistant", chatResult.Content));
+                        chatMessages.Add(new ChatMessage("assistant", chatResult.Content!));
                         chatMessages.Add(new ChatMessage("user",
                             $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
 
-                        var (trimmedLoop, loopTruncated) = ContextWindowManager.TrimToFit(
+                        var (trimmedLoop, _) = ContextWindowManager.TrimToFit(
                             chatMessages, contextWindowTokens, ReservedCompletionTokens);
-                        if (loopTruncated)
-                            contextWindowTruncated = true;
 
                         chatResult = await chatProvider.CompleteAsync(
                             new ChatCompletionRequest(

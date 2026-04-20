@@ -62,13 +62,4 @@ export const mfaSchema = z.object({
 });
 export type MfaFormData = z.infer<typeof mfaSchema>;
 
-export const invitationSchema = z
-  .object({
-    password: passwordRules,
-    confirmPassword: z.string().min(1, 'validation.required'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'resetPassword.passwordMismatch',
-    path: ['confirmPassword'],
-  });
-export type InvitationFormData = z.infer<typeof invitationSchema>;
+

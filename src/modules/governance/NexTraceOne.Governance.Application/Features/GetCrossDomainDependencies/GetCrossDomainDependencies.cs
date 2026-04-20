@@ -66,7 +66,7 @@ public static class GetCrossDomainDependencies
                     else if (Guid.TryParse(dependency.TargetTeamId, out var targetTeamGuid))
                     {
                         var targetLinks = await teamDomainLinkRepository.ListByTeamIdAsync(new TeamId(targetTeamGuid), cancellationToken);
-                        var targetLink = targetLinks.FirstOrDefault();
+                        var targetLink = targetLinks.Count > 0 ? targetLinks[0] : null;
                         if (targetLink is not null)
                         {
                             var targetDomain = await domainRepository.GetByIdAsync(targetLink.DomainId, cancellationToken);

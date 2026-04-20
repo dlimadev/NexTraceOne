@@ -4,7 +4,7 @@ namespace NexTraceOne.BuildingBlocks.Application.Abstractions;
 /// Abstração para resolução de autorização via políticas de acesso ao nível
 /// de módulo/página/ação, persistidas em base de dados.
 ///
-/// Permite que o <see cref="PermissionAuthorizationHandler"/> consulte a tabela
+/// Permite que o <c>PermissionAuthorizationHandler</c> consulte a tabela
 /// iam_module_access_policies como fonte adicional de autorização, complementando
 /// os mapeamentos papel→permissão planos da tabela iam_role_permissions.
 ///

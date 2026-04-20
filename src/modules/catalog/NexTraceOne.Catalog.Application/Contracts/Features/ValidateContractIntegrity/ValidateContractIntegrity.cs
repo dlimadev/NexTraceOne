@@ -137,14 +137,14 @@ public static class ValidateContractIntegrity
             if (string.IsNullOrWhiteSpace(content))
                 return new Response(false, 0, 0, null, "Empty Protobuf specification.");
 
-            var messageCount = System.Text.RegularExpressions.Regex.Matches(
-                content, @"^\s*message\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            var messageCount = System.Text.RegularExpressions.Regex.Count(
+                content, @"^\s*message\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline);
 
-            var serviceCount = System.Text.RegularExpressions.Regex.Matches(
-                content, @"^\s*service\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            var serviceCount = System.Text.RegularExpressions.Regex.Count(
+                content, @"^\s*service\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline);
 
-            var rpcCount = System.Text.RegularExpressions.Regex.Matches(
-                content, @"^\s*rpc\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            var rpcCount = System.Text.RegularExpressions.Regex.Count(
+                content, @"^\s*rpc\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline);
 
             string? syntaxVersion = null;
             var syntaxMatch = System.Text.RegularExpressions.Regex.Match(
@@ -168,17 +168,17 @@ public static class ValidateContractIntegrity
             if (string.IsNullOrWhiteSpace(content))
                 return new Response(false, 0, 0, null, "Empty GraphQL specification.");
 
-            var typeCount = System.Text.RegularExpressions.Regex.Matches(
-                content, @"^\s*type\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            var typeCount = System.Text.RegularExpressions.Regex.Count(
+                content, @"^\s*type\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline);
 
-            var inputCount = System.Text.RegularExpressions.Regex.Matches(
-                content, @"^\s*input\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            var inputCount = System.Text.RegularExpressions.Regex.Count(
+                content, @"^\s*input\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline);
 
-            var enumCount = System.Text.RegularExpressions.Regex.Matches(
-                content, @"^\s*enum\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            var enumCount = System.Text.RegularExpressions.Regex.Count(
+                content, @"^\s*enum\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline);
 
-            var interfaceCount = System.Text.RegularExpressions.Regex.Matches(
-                content, @"^\s*interface\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+            var interfaceCount = System.Text.RegularExpressions.Regex.Count(
+                content, @"^\s*interface\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline);
 
             var totalDefinitions = typeCount + inputCount + enumCount + interfaceCount;
 
@@ -190,8 +190,8 @@ public static class ValidateContractIntegrity
             foreach (System.Text.RegularExpressions.Match match in rootTypePattern.Matches(content))
             {
                 var body = match.Groups[1].Value;
-                rootFieldCount += System.Text.RegularExpressions.Regex.Matches(
-                    body, @"^\s*\w+\s*[\(:]", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+                rootFieldCount += System.Text.RegularExpressions.Regex.Count(
+                    body, @"^\s*\w+\s*[\(:]", System.Text.RegularExpressions.RegexOptions.Multiline);
             }
 
             if (totalDefinitions == 0)

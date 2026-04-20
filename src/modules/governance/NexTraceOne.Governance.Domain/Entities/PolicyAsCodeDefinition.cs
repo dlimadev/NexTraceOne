@@ -136,7 +136,7 @@ public sealed class PolicyAsCodeDefinition : AuditableEntity<PolicyAsCodeDefinit
     /// </summary>
     public void RecordSimulationResult(int affectedServices, int nonCompliantServices, DateTimeOffset simulatedAt)
     {
-        if (affectedServices < 0) throw new ArgumentOutOfRangeException(nameof(affectedServices));
+        ArgumentOutOfRangeException.ThrowIfNegative(affectedServices);
         if (nonCompliantServices < 0 || nonCompliantServices > affectedServices)
             throw new ArgumentOutOfRangeException(nameof(nonCompliantServices));
 

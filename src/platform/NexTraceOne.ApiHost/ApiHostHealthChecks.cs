@@ -62,7 +62,7 @@ internal static class ApiHostHealthChecks
                 .Select(result => result.ProviderId)
                 .ToArray();
 
-            var data = new Dictionary<string, object?>
+            var data = new Dictionary<string, object>
             {
                 ["totalProviders"] = totalProviders,
                 ["unhealthyProviders"] = unhealthyProviders

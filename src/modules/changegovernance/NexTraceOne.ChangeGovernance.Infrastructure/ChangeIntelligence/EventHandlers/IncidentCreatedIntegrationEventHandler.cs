@@ -27,7 +27,7 @@ internal sealed class IncidentCreatedIntegrationEventHandler(
             pageSize: 1,
             cancellationToken: ct);
 
-        var latestRelease = releases.FirstOrDefault();
+        var latestRelease = releases.Count > 0 ? releases[0] : null;
         if (latestRelease is null)
         {
             logger.LogDebug(

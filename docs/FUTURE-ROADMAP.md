@@ -74,11 +74,12 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ## 4. Autenticação Avançada
 
-### 4.1 SAML Protocol Handlers
-- **Estado:** Entidades de domínio para SAML existem; protocol handlers pendentes
-- **Escopo:** SAML 2.0 SSO integration para enterprise identity providers
-- **Dependência:** Integração com identity provider específico (ADFS, Okta, PingFederate)
-- **Referência:** GAP-AI-08
+### 4.1 SAML Protocol Handlers ✅ IMPLEMENTADO (Abril 2026)
+- **Estado:** ✅ `ISamlProvider` + `NullSamlProvider` + `ConfigurationSamlProvider` implementados; SAML aparece em `/admin/system-health` como 5º provider opcional. Fluxo `StartSamlLogin` / `CompleteSamlLogin` funcional em modo controlado.
+- **E2E:** ✅ `src/frontend/e2e/saml-sso-flows.spec.ts` — 14 testes Playwright cobrindo admin config page, SAML initiation, ACS callback e end-to-end flow com mock IdP via route interception (ACT-022 concluído Abril 2026).
+- **Futuro:** Testes com IdP real (ADFS/Okta/PingFederate) em docker-compose stack — apenas para certificação enterprise, não bloqueante para v1.0.0.
+- **Dependência:** Integração com identity provider específico para testes E2E
+- **Referência:** GAP-AI-08, DEG-11 (HONEST-GAPS.md Nível A′ → promovido a A)
 
 ---
 
@@ -247,5 +248,6 @@ Customizações que o utilizador pode realizar **sem alterar a identidade visual
 1. **Este documento substitui:** ROADMAP.md, EVOLUTION-ROADMAP-2026-2027.md, CONSOLIDATED-GAP-ANALYSIS-AND-ACTION-PLAN.md, SERVICE-CREATION-STUDIO-PLAN.md
 2. **Documentos de referência mantidos:** PRODUCT-VISION.md, ARCHITECTURE-OVERVIEW.md, docs/adr/, docs/legacy/, docs/security/, docs/deployment/, docs/runbooks/, docs/observability/, docs/user-guide/
 3. **Licensing module** foi removido da solução e não consta neste roadmap
-4. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura
-5. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
+4. **Convites in-app** foram removidos por decisão de produto — onboarding é SSO-first. Ver `docs/HONEST-GAPS.md` (OOS-02).
+5. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura. A lista consolidada de gaps abertos está em [HONEST-GAPS.md](./HONEST-GAPS.md).
+6. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
