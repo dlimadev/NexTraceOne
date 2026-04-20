@@ -150,7 +150,24 @@ public sealed class DefaultGuardrailCatalogTests
     [Fact]
     public void Catalog_Has_Expected_Count()
     {
-        DefaultGuardrailCatalog.GetAll().Count.Should().Be(8,
-            "catalog should contain exactly 8 official guardrails");
+        DefaultGuardrailCatalog.GetAll().Count.Should().Be(11,
+            "catalog should contain exactly 11 official guardrails (Wave A.4 added 3 PII/secret redaction guardrails)");
+    }
+
+    [Fact]
+    public void Contains_Pii_Redaction_Guardrails_With_Sanitize_Action()
+    {
+        var catalog = DefaultGuardrailCatalog.GetAll();
+
+        catalog.Should().Contain(g => g.Name == "pii-credit-card-redaction" && g.Action == GuardrailAction.Sanitize,
+            "Wave A.4 requires credit-card PAN masking, not only detection");
+        catalog.Should().Contain(g => g.Name == "pii-national-id-redaction" && g.Action == GuardrailAction.Sanitize,
+            "Wave A.4 requires national-ID masking, not only detection");
+        catalog.Should().Contain(g => g.Name == "secret-bearer-token-redaction" && g.Action == GuardrailAction.Sanitize,
+            "Wave A.4 requires bearer-token masking, not only detection");
+        catalog.Single(g => g.Name == "pii-email-detection").Action
+            .Should().Be(GuardrailAction.Sanitize, "email PII must be masked, not only warned");
+        catalog.Single(g => g.Name == "pii-phone-detection").Action
+            .Should().Be(GuardrailAction.Sanitize, "phone PII must be masked, not only warned");
     }
 }
