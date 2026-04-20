@@ -94,24 +94,65 @@ public static class AsyncApiMetadataExtractor
     {
         try
         {
-            // AsyncAPI 2.x: components.messages
-            if (!root.TryGetProperty("components", out var components)
-                || !components.TryGetProperty("messages", out var messages))
-                return "{}";
-
             var result = new Dictionary<string, List<string>>();
-            foreach (var msg in messages.EnumerateObject())
+
+            if (AsyncApiSpecParser.IsAsyncApi3x(root))
             {
-                var fields = new List<string>();
-                if (msg.Value.TryGetProperty("payload", out var payload)
-                    && payload.TryGetProperty("properties", out var properties))
+                // AsyncAPI 3.x: mensagens em channels.{name}.messages e em components.messages
+                if (root.TryGetProperty("channels", out var channels))
                 {
-                    foreach (var prop in properties.EnumerateObject())
-                        fields.Add(prop.Name);
+                    foreach (var channel in channels.EnumerateObject())
+                    {
+                        if (!channel.Value.TryGetProperty("messages", out var channelMsgs)) continue;
+                        foreach (var msg in channelMsgs.EnumerateObject())
+                        {
+                            // Inline message com payload
+                            if (msg.Value.TryGetProperty("payload", out var payload)
+                                && payload.TryGetProperty("properties", out var properties))
+                            {
+                                var fields = properties.EnumerateObject().Select(p => p.Name).ToList();
+                                result[msg.Name] = fields;
+                            }
+                        }
+                    }
                 }
-                result[msg.Name] = fields;
+
+                // Também capturar de components.messages (3.x mantém secção de componentes)
+                if (root.TryGetProperty("components", out var components3)
+                    && components3.TryGetProperty("messages", out var compMessages3))
+                {
+                    foreach (var msg in compMessages3.EnumerateObject())
+                    {
+                        if (!result.ContainsKey(msg.Name)
+                            && msg.Value.TryGetProperty("payload", out var payload)
+                            && payload.TryGetProperty("properties", out var properties))
+                        {
+                            result[msg.Name] = properties.EnumerateObject().Select(p => p.Name).ToList();
+                        }
+                    }
+                }
             }
-            return JsonSerializer.Serialize(result);
+            else
+            {
+                // AsyncAPI 2.x: components.messages
+                if (!root.TryGetProperty("components", out var components)
+                    || !components.TryGetProperty("messages", out var messages))
+                    return "{}";
+
+                foreach (var msg in messages.EnumerateObject())
+                {
+                    var fields = new List<string>();
+                    if (msg.Value.TryGetProperty("payload", out var payload)
+                        && payload.TryGetProperty("properties", out var properties))
+                    {
+                        foreach (var prop in properties.EnumerateObject())
+                            fields.Add(prop.Name);
+                    }
+                    result[msg.Name] = fields;
+                }
+            }
+
+            return result.Count == 0 ? "{}" : JsonSerializer.Serialize(result);
         }
         catch (Exception ex)
         {
@@ -131,9 +172,25 @@ public static class AsyncApiMetadataExtractor
             var result = new Dictionary<string, string>();
             foreach (var server in servers.EnumerateObject())
             {
-                var url = server.Value.TryGetProperty("url", out var urlEl)
-                    ? urlEl.GetString() ?? string.Empty
-                    : string.Empty;
+                string url;
+                if (AsyncApiSpecParser.IsAsyncApi3x(root))
+                {
+                    // AsyncAPI 3.x: "host" em vez de "url"; protocolo separado
+                    var host = server.Value.TryGetProperty("host", out var hostEl)
+                        ? hostEl.GetString() ?? string.Empty
+                        : string.Empty;
+                    var protocol = server.Value.TryGetProperty("protocol", out var protocolEl)
+                        ? protocolEl.GetString() ?? string.Empty
+                        : string.Empty;
+                    url = string.IsNullOrEmpty(protocol) ? host : $"{protocol}://{host}";
+                }
+                else
+                {
+                    // AsyncAPI 2.x: "url" directo
+                    url = server.Value.TryGetProperty("url", out var urlEl)
+                        ? urlEl.GetString() ?? string.Empty
+                        : string.Empty;
+                }
                 result[server.Name] = url;
             }
             return JsonSerializer.Serialize(result);
