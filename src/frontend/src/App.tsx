@@ -10,7 +10,7 @@ import { ToastProvider } from './components/Toast';
 import { AppShell } from './components/shell/AppShell';
 
 // Eager imports — critical for fast first paint
-import { LoginPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, ActivationPage, MfaPage, InvitationPage } from './features/identity-access';
+import { LoginPage, TenantSelectionPage, ForgotPasswordPage, ResetPasswordPage, ActivationPage, MfaPage } from './features/identity-access';
 
 // ── Route groups (lazy-loaded by module) ──────────────────────────────────────
 import { CatalogRoutes } from './routes/catalogRoutes';
@@ -110,7 +110,6 @@ export default function App() {
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/activate" element={<ActivationPage />} />
                   <Route path="/mfa" element={<MfaPage />} />
-                  <Route path="/invitation" element={<InvitationPage />} />
                   <Route path="/select-tenant" element={<TenantSelectionPage />} />
 
                   {/* ── Authenticated shell ── */}

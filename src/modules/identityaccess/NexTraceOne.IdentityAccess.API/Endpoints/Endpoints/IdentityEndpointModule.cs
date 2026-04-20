@@ -35,7 +35,6 @@ public sealed class IdentityEndpointModule
         EnvironmentEndpoints.Map(group);
         RuntimeContextEndpoints.Map(group);
         SecurityEventsEndpoints.Map(group);
-        InvitationEndpoints.Map(group);
 
         // Endpoints de sessão cookie — apenas quando feature flag ativa
         var cookieSessionOptions = app.ServiceProvider

@@ -23,7 +23,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | BuildingBlocks.Infrastructure | READY | `NexTraceDbContextBase`, `TenantRlsInterceptor`, `AuditInterceptor` |
 | BuildingBlocks.Security | READY | JWT, API Key, CORS, rate limiting (6 policies), AES-256-GCM, `AssemblyIntegrityChecker` |
 | BuildingBlocks.Observability | READY | OpenTelemetry configurado; Elastic + ClickHouse providers reais; ITelemetryQueryService implementado; Product Store (5 reader/writer pairs) + Metrics Store (2 reader/writer pairs) com EF Core PostgreSQL; TelemetryRetentionService + TelemetryAggregationService implementados |
-| Outbox Processing | READY | `ModuleOutboxProcessorJob` registado para todos os 25 DbContexts via `BackgroundWorkers/Program.cs` (54 registros). HealthChecks configurados por módulo |
+| Outbox Processing | READY | `ModuleOutboxProcessorJob` registado dinamicamente para todos os DbContexts via `BackgroundWorkers/Program.cs`. Contagem autoritativa: correr `./tools/count-dbcontexts.sh --count` (fonte da verdade contra drift documental). HealthChecks configurados por módulo. |
 
 **Evidência:** `src/building-blocks/`
 
@@ -61,6 +61,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 | Delegations | READY | Acesso delegado com expiração e revogação |
 | Environments / Tenants / Users | READY | CRUD completo, isolamento de tenant |
 | Security Events | READY | Trilha de auditoria para eventos de segurança |
+| Invitation / Account Activation / Password Reset | **OUT-OF-SCOPE** | Platform é **SSO-first** (OIDC + SAML). Provisionamento de utilizadores é feito via IdP corporativo (JIT/SCIM). Convites in-app foram removidos por decisão de produto; activation/reset existem como stubs controlados porque password local só é caminho de fallback quando SSO não está configurado — ver `docs/HONEST-GAPS.md`. |
 
 **DbContexts:** `IdentityDbContext` (1 migração confirmada)
 **Evidência:** `src/modules/identityaccess/`
@@ -276,7 +277,7 @@ Este documento regista o estado de implementação de cada módulo do NexTraceOn
 
 | Componente | Status | Notas |
 |---|---|---|
-| Outbox Pattern (todos os 22 DbContexts) | ATIVO | `ModuleOutboxProcessorJob` registado para cada DbContext |
+| Outbox Pattern (todos os DbContexts) | ATIVO | `ModuleOutboxProcessorJob` registado dinamicamente. Contagem via `./tools/count-dbcontexts.sh --count`. |
 | Domain Event Publishing | ATIVO | Eventos capturados pelo outbox durante SaveChanges e entregues pelo processador |
 
 ---

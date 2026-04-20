@@ -6770,25 +6770,6 @@
     "verified": "Verificado",
     "warnings": "Avisos"
   },
-  "invitation": {
-    "accept": "Aceitar convite",
-    "accepting": "A aceitar...",
-    "alreadyAccepted": "Este convite já foi aceite.",
-    "confirmPasswordLabel": "Confirmar palavra-passe",
-    "confirmPasswordPlaceholder": "Reintroduza a sua palavra-passe",
-    "emailLabel": "Email",
-    "errorGeneric": "Não foi possível aceitar o convite. Tente novamente.",
-    "goToLogin": "Ir para o início de sessão",
-    "invalidToken": "Este link de convite é inválido ou expirou.",
-    "invalidTokenMessage": "Contacte o administrador para um novo convite.",
-    "passwordLabel": "Palavra-passe",
-    "passwordPlaceholder": "Escolha uma palavra-passe",
-    "roleLabel": "Função",
-    "subtitle": "Foi convidado para aderir a {{organization}} no NexTraceOne.",
-    "successMessage": "A sua conta está pronta. Já pode iniciar sessão em {{organization}}.",
-    "successTitle": "Bem-vindo a bordo",
-    "title": "Foi convidado"
-  },
   "knowledge": {
     "autoDoc": {
       "docs": "{{count}} docs",

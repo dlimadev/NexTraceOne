@@ -188,17 +188,6 @@ export const identityApi = {
   resendMfaCode: (sessionId: string) =>
     client.post('/identity/auth/mfa/resend', { sessionId }),
 
-  // ── Invitation ────────────────────────────────────────────────
-  getInvitationDetails: (token: string) =>
-    client
-      .get<{ email: string; organizationName: string; roleName: string; expiresAt: string }>(
-        `/identity/invitations/${encodeURIComponent(token)}`,
-      )
-      .then((r) => r.data),
-
-  acceptInvitation: (token: string, password: string) =>
-    client.post('/identity/invitations/accept', { token, password }),
-
   // ── OIDC / SSO ────────────────────────────────────────────────
   startOidcLogin: (provider = 'default', returnTo?: string) =>
     client

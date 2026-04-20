@@ -6773,25 +6773,6 @@
     "verified": "Verificado",
     "warnings": "Advertencias"
   },
-  "invitation": {
-    "accept": "Aceptar invitación",
-    "accepting": "Accepting...",
-    "alreadyAccepted": "Esta invitación ya ha sido aceptada.",
-    "confirmPasswordLabel": "Confirmar contraseña",
-    "confirmPasswordPlaceholder": "Vuelva a ingresar su contraseña",
-    "emailLabel": "Correo electrónico",
-    "errorGeneric": "No se pudo aceptar la invitación. Por favor, inténtelo de nuevo.",
-    "goToLogin": "Ir al inicio de sesión",
-    "invalidToken": "Este enlace de invitación es inválido o ha expirado.",
-    "invalidTokenMessage": "Contacte a su administrador para una nueva invitación.",
-    "passwordLabel": "Contraseña",
-    "passwordPlaceholder": "Elija una contraseña",
-    "roleLabel": "Rol",
-    "subtitle": "Ha sido invitado a unirse a {{organization}} en NexTraceOne.",
-    "successMessage": "Su cuenta está lista. Ahora puede iniciar sesión en {{organization}}.",
-    "successTitle": "Bienvenido a bordo",
-    "title": "Ha sido invitado"
-  },
   "knowledge": {
     "autoDoc": {
       "docs": "{{count}} docs",

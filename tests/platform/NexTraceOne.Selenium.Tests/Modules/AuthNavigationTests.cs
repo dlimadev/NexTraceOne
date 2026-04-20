@@ -4,7 +4,7 @@ namespace NexTraceOne.Selenium.Tests.Modules;
 
 /// <summary>
 /// Testes de navegação para páginas públicas de autenticação.
-/// Validam que login, forgot-password, reset-password, activation, MFA e invitation
+/// Validam que login, forgot-password, reset-password, activation e MFA
 /// carregam sem erros JS e renderizam os elementos esperados.
 /// </summary>
 [Collection(SeleniumCollection.Name)]
@@ -49,12 +49,6 @@ public sealed class AuthNavigationTests : SeleniumTestBase
     public void MfaPage_Loads()
     {
         AssertPageLoadsSuccessfully("/mfa");
-    }
-
-    [Fact]
-    public void InvitationPage_Loads()
-    {
-        AssertPageLoadsSuccessfully("/invitation");
     }
 
     [Fact]

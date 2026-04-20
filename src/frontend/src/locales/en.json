@@ -6824,25 +6824,6 @@
     "verified": "Verified",
     "warnings": "Warnings"
   },
-  "invitation": {
-    "accept": "Accept invitation",
-    "accepting": "Accepting...",
-    "alreadyAccepted": "This invitation has already been accepted.",
-    "confirmPasswordLabel": "Confirm password",
-    "confirmPasswordPlaceholder": "Re-enter your password",
-    "emailLabel": "Email",
-    "errorGeneric": "Unable to accept invitation. Please try again.",
-    "goToLogin": "Go to sign in",
-    "invalidToken": "This invitation link is invalid or has expired.",
-    "invalidTokenMessage": "Please contact your administrator for a new invitation.",
-    "passwordLabel": "Password",
-    "passwordPlaceholder": "Choose a password",
-    "roleLabel": "Role",
-    "subtitle": "You have been invited to join {{organization}} on NexTraceOne.",
-    "successMessage": "Your account is ready. You can now sign in to {{organization}}.",
-    "successTitle": "Welcome aboard",
-    "title": "You've been invited"
-  },
   "knowledge": {
     "autoDoc": {
       "docs": "{{count}} docs",
