@@ -13067,5 +13067,68 @@
       }
     },
     "empty": "No evaluation suites found"
+  },
+  "serviceTier": {
+    "title": "Service Tier",
+    "label": "Operational Tier",
+    "set": "Set Tier",
+    "setSuccess": "Tier updated to {{tier}}",
+    "policy": "Tier Policy",
+    "policyTitle": "Tier Requirements",
+    "tier": {
+      "Critical": "Critical",
+      "Standard": "Standard",
+      "Experimental": "Experimental"
+    },
+    "policy": {
+      "minSlo": "Min SLO (%)",
+      "minMaturity": "Min Maturity Score",
+      "onCallRequired": "On-Call Required",
+      "runbookRequired": "Runbook Required",
+      "monitoringRequired": "Monitoring Required"
+    },
+    "conformance": {
+      "title": "Conformance",
+      "sloConformant": "SLO Conformant",
+      "hasOnCall": "Has On-Call",
+      "hasContactChannel": "Has Contact Channel"
+    },
+    "empty": "No tier policy found"
+  },
+  "ownershipDrift": {
+    "title": "Ownership Drift",
+    "subtitle": "Services with stale or incomplete ownership data",
+    "report": "Drift Report",
+    "detect": "Check Drift",
+    "review": "Mark as Reviewed",
+    "reviewSuccess": "Ownership marked as reviewed",
+    "hasDrift": "Has Drift",
+    "noDrift": "No Drift Detected",
+    "driftScore": "Drift Score",
+    "daysSinceReview": "Days Since Review",
+    "thresholdDays": "Threshold (days)",
+    "signals": {
+      "OwnershipNeverReviewed": "Ownership has never been reviewed",
+      "OwnershipReviewStale": "Ownership review is stale",
+      "NoTechnicalOwner": "No technical owner assigned",
+      "NoTeam": "No team assigned",
+      "NoOnCallRotation": "No on-call rotation configured",
+      "NoContactChannel": "No contact channel set",
+      "NoBusinessOwner": "No business owner assigned"
+    },
+    "severity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "info": "Info"
+    },
+    "summary": {
+      "total": "Total Evaluated",
+      "withDrift": "With Drift",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium"
+    },
+    "empty": "No ownership drift detected"
   }
 }

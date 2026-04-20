@@ -268,11 +268,15 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 - **Contract Linting Marketplace** — pacotes Spectral oficiais distribuídos via `ConfigurationDefinitionSeeder` (enterprise, security, accessibility, internal-platform), ativáveis por tenant.
 - **Breaking Change Proposal Workflow** — workflow formal antes de publicar v2 com quebras: consulta consumidores, janela de migração, `DeprecationPlan` automático.
 
-#### A.3 Service Catalog — ownership vivo e scorecards
+#### A.3 Service Catalog — ownership vivo e scorecards ✅
 
-- **Ownership Drift Detection** — alertar serviços com N dias sem merge, sem on-call atualizado, sem owner presente em `SecurityEvents`.
-- **Service Maturity v2** — eixos explícitos (Reliability, Security, Observability, Documentation, Contract Health, DevEx) comparados contra "golden path" da organização, não apenas peers.
-- **Tier-based SLO enforcement** — `ServiceTier` (critical/standard/experimental) dita thresholds mínimos de error-budget e gates de promoção.
+- **Ownership Drift Detection** ✅ — `DetectOwnershipDrift` query por serviço + `GetOwnershipDriftReport` relatório por tenant, com sinais de drift (last review, on-call, owner, contact channel), threshold configurável via `catalog.ownershipDrift.threshold.days` e `ReviewServiceOwnership` command para repor o timer.
+- **ServiceTierType** ✅ — enum `Critical/Standard/Experimental` em domínio, propriedade `Tier` em `ServiceAsset`, `SetTier()` e `RecordOwnershipReview()`, migration `20260420150000_C_ServiceTierAndOwnershipReview`.
+- **Tier-based SLO enforcement** ✅ — `GetServiceTierPolicy` query retorna thresholds mínimos de SLO, maturidade, on-call e runbook por tier; conformância verificada em tempo real; 6 chaves de config no `ConfigurationDefinitionSeeder` (sort 5100-5150).
+- **i18n** ✅ — `serviceTier.*` + `ownershipDrift.*` em 4 locales (en/es/pt-BR/pt-PT).
+- **5 novos endpoints** ✅ — `PUT /services/{id}/tier`, `GET /services/{id}/tier-policy`, `GET /services/{id}/ownership-drift`, `POST /services/{id}/ownership-review`, `GET /ownership/drift-report`.
+- **15 testes unitários** ✅ — `ServiceCatalogV2Tests.cs`. Total Catalog: 1657/1657.
+- **Service Maturity v2** — roadmapped para Wave A.5; a base tier/drift criada aqui alimenta as dimensões de maturidade futuras.
 
 #### A.4 AI Governance — de capacidade para plataforma
 

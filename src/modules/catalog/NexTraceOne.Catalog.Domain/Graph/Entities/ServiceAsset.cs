@@ -115,6 +115,16 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
     /// <summary>Referência à rotação de on-call do serviço.</summary>
     public string OnCallRotationId { get; private set; } = string.Empty;
 
+    /// <summary>Tier operacional do serviço — define requisitos mínimos de SLO, gates e maturidade.</summary>
+    public ServiceTierType Tier { get; private set; } = ServiceTierType.Standard;
+
+    /// <summary>
+    /// Data/hora UTC em que o ownership foi revisto pela última vez.
+    /// Utilizado para detecção de drift de ownership quando o valor supera
+    /// o threshold configurável <c>catalog.ownershipDrift.threshold.days</c>.
+    /// </summary>
+    public DateTimeOffset? LastOwnershipReviewAt { get; private set; }
+
     // ── Concorrência ──────────────────────────────────────────────────
 
     /// <summary>
@@ -206,6 +216,17 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
         TechnicalOwner = technicalOwner ?? string.Empty;
         BusinessOwner = businessOwner ?? string.Empty;
     }
+
+    /// <summary>Define o tier operacional do serviço.</summary>
+    public void SetTier(ServiceTierType tier) => Tier = tier;
+
+    /// <summary>
+    /// Regista o momento em que o ownership foi revisto.
+    /// Deve ser chamado quando um utilizador confirma/actualiza dados de ownership
+    /// (equipa, owner técnico, owner de negócio, on-call, canal de contacto).
+    /// </summary>
+    public void RecordOwnershipReview(DateTimeOffset reviewedAt) =>
+        LastOwnershipReviewAt = reviewedAt;
 
     /// <summary>Atualiza o estado do ciclo de vida do serviço.</summary>
     public void UpdateLifecycleStatus(LifecycleStatus status)

@@ -13081,5 +13081,61 @@
       }
     },
     "empty": "Nenhuma suite de avaliação encontrada"
+  },
+  "serviceTier": {
+    "title": "Tier de Serviço",
+    "label": "Tier Operacional",
+    "set": "Definir Tier",
+    "setSuccess": "Tier actualizado para {{tier}}",
+    "policy": "Política de Tier",
+    "policyTitle": "Requisitos do Tier",
+    "tier": {
+      "Critical": "Crítico",
+      "Standard": "Standard",
+      "Experimental": "Experimental"
+    },
+    "conformance": {
+      "title": "Conformidade",
+      "sloConformant": "SLO Conforme",
+      "hasOnCall": "Possui On-Call",
+      "hasContactChannel": "Possui Canal de Contacto"
+    },
+    "empty": "Nenhuma política de tier encontrada"
+  },
+  "ownershipDrift": {
+    "title": "Drift de Ownership",
+    "subtitle": "Serviços com dados de ownership desactualizados ou incompletos",
+    "report": "Relatório de Drift",
+    "detect": "Verificar Drift",
+    "review": "Marcar como Revisto",
+    "reviewSuccess": "Ownership marcado como revisto",
+    "hasDrift": "Possui Drift",
+    "noDrift": "Sem Drift Detectado",
+    "driftScore": "Score de Drift",
+    "daysSinceReview": "Dias desde a Revisão",
+    "thresholdDays": "Limiar (dias)",
+    "signals": {
+      "OwnershipNeverReviewed": "O ownership nunca foi revisto",
+      "OwnershipReviewStale": "A revisão de ownership está desactualizada",
+      "NoTechnicalOwner": "Sem responsável técnico atribuído",
+      "NoTeam": "Sem equipa atribuída",
+      "NoOnCallRotation": "Sem rotação on-call configurada",
+      "NoContactChannel": "Sem canal de contacto definido",
+      "NoBusinessOwner": "Sem responsável de negócio atribuído"
+    },
+    "severity": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio",
+      "info": "Info"
+    },
+    "summary": {
+      "total": "Total Avaliados",
+      "withDrift": "Com Drift",
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Médio"
+    },
+    "empty": "Nenhum drift de ownership detectado"
   }
 }

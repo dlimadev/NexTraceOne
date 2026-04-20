@@ -6934,5 +6934,73 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "48",
             uiEditorType: "number",
             sortOrder: 4940),
+
+        // ── Service Catalog — Tier & Ownership Drift (Wave A.3) ───────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.ownershipDrift.threshold.days",
+            displayName: "config.catalog.ownershipDrift.thresholdDays.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.ownershipDrift.thresholdDays.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 5100),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.critical.sloMinPercent",
+            displayName: "config.catalog.tier.critical.sloMinPercent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.critical.sloMinPercent.description",
+            defaultValue: "99.9",
+            uiEditorType: "number",
+            sortOrder: 5110),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.standard.sloMinPercent",
+            displayName: "config.catalog.tier.standard.sloMinPercent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.standard.sloMinPercent.description",
+            defaultValue: "99.5",
+            uiEditorType: "number",
+            sortOrder: 5120),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.experimental.sloMinPercent",
+            displayName: "config.catalog.tier.experimental.sloMinPercent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.experimental.sloMinPercent.description",
+            defaultValue: "99.0",
+            uiEditorType: "number",
+            sortOrder: 5130),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.critical.maturityMinScore",
+            displayName: "config.catalog.tier.critical.maturityMinScore.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.critical.maturityMinScore.description",
+            defaultValue: "0.8",
+            uiEditorType: "number",
+            sortOrder: 5140),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.tier.standard.maturityMinScore",
+            displayName: "config.catalog.tier.standard.maturityMinScore.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.catalog.tier.standard.maturityMinScore.description",
+            defaultValue: "0.6",
+            uiEditorType: "number",
+            sortOrder: 5150),
     ];
 }

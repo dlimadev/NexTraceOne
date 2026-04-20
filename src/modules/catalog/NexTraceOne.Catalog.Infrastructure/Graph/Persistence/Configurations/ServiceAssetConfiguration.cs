@@ -67,6 +67,14 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
         builder.Property(x => x.ContactChannel).HasMaxLength(500).HasDefaultValue(string.Empty);
         builder.Property(x => x.OnCallRotationId).HasMaxLength(200).HasDefaultValue(string.Empty);
 
+        builder.Property(x => x.Tier)
+            .HasConversion<string>()
+            .HasMaxLength(30)
+            .HasDefaultValue("Standard");
+
+        builder.Property(x => x.LastOwnershipReviewAt)
+            .IsRequired(false);
+
         // ── Índices ───────────────────────────────────────────────────
         builder.HasIndex(x => x.Name).IsUnique();
         builder.HasIndex(x => x.TeamName);
