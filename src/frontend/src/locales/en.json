@@ -11433,7 +11433,8 @@
     "categories": {
       "operations": "Operations",
       "integrations": "Integrations",
-      "finops": "FinOps"
+      "finops": "FinOps",
+      "identity": "Identity"
     },
     "providers": {
       "canary": {
@@ -11447,6 +11448,9 @@
       },
       "cloudBilling": {
         "name": "Cloud billing"
+      },
+      "saml": {
+        "name": "SAML 2.0 SSO"
       }
     }
   },

@@ -16,13 +16,14 @@ public sealed class OptionalProviderStartupLoggerTests
     private readonly ILogger _logger = Substitute.For<ILogger>();
 
     private static IReadOnlyDictionary<string, bool> Statuses(
-        bool canary = false, bool backup = false, bool kafka = false, bool cloudBilling = false)
+        bool canary = false, bool backup = false, bool kafka = false, bool cloudBilling = false, bool saml = false)
         => new Dictionary<string, bool>
         {
             ["canary"] = canary,
             ["backup"] = backup,
             ["kafka"] = kafka,
             ["cloudBilling"] = cloudBilling,
+            ["saml"] = saml,
         };
 
     private int CountAtLevel(LogLevel level)
@@ -35,8 +36,8 @@ public sealed class OptionalProviderStartupLoggerTests
     {
         OptionalProviderStartupLogger.LogProviderStatuses(_logger, "Production", Statuses());
 
-        // Four providers not configured → four warnings
-        CountAtLevel(LogLevel.Warning).Should().Be(4);
+        // Five providers not configured → five warnings
+        CountAtLevel(LogLevel.Warning).Should().Be(5);
     }
 
     [Fact]
@@ -55,7 +56,7 @@ public sealed class OptionalProviderStartupLoggerTests
         OptionalProviderStartupLogger.LogProviderStatuses(
             _logger,
             "Production",
-            Statuses(canary: true, backup: true, kafka: true, cloudBilling: true));
+            Statuses(canary: true, backup: true, kafka: true, cloudBilling: true, saml: true));
 
         CountAtLevel(LogLevel.Warning).Should().Be(0);
         CountAtLevel(LogLevel.Information).Should().BeGreaterThanOrEqualTo(1);
@@ -67,8 +68,9 @@ public sealed class OptionalProviderStartupLoggerTests
         OptionalProviderStartupLogger.LogProviderStatuses(
             _logger,
             "Staging",
-            Statuses(canary: true, backup: false, kafka: true, cloudBilling: false));
+            Statuses(canary: true, backup: false, kafka: true, cloudBilling: false, saml: true));
 
+        // backup + cloudBilling not configured → 2 warnings; canary + kafka + saml are configured
         CountAtLevel(LogLevel.Warning).Should().Be(2);
     }
 

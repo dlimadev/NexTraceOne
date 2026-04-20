@@ -20,6 +20,7 @@ using NexTraceOne.Integrations.Infrastructure.Kafka;
 using NexTraceOne.Integrations.Infrastructure.LegacyTelemetry;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Integrations.Infrastructure.Saml;
 
 namespace NexTraceOne.Integrations.Infrastructure;
 
@@ -92,6 +93,19 @@ public static class DependencyInjection
         // Substituir por AwsCloudBillingProvider, AzureCloudBillingProvider, etc.
         // quando FinOps:Billing:Provider estiver configurado.
         services.AddSingleton<ICloudBillingProvider, NullCloudBillingProvider>();
+
+        // SAML Provider — ConfigurationSamlProvider quando Saml:EntityId e Saml:SsoUrl
+        // estiverem configurados; NullSamlProvider por defeito (retorna IsConfigured = false).
+        var samlEntityId = configuration["Saml:EntityId"];
+        var samlSsoUrl = configuration["Saml:SsoUrl"];
+        if (!string.IsNullOrWhiteSpace(samlEntityId) && !string.IsNullOrWhiteSpace(samlSsoUrl))
+        {
+            services.AddSingleton<ISamlProvider, ConfigurationSamlProvider>();
+        }
+        else
+        {
+            services.AddSingleton<ISamlProvider, NullSamlProvider>();
+        }
 
         return services;
     }

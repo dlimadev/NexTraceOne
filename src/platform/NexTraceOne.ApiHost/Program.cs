@@ -273,6 +273,7 @@ app.ValidateStartupConfiguration();
         [NexTraceOne.Integrations.Domain.OptionalProviderNames.Backup] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.IBackupProvider>().IsConfigured,
         [NexTraceOne.Integrations.Domain.OptionalProviderNames.Kafka] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.IKafkaEventProducer>().IsConfigured,
         [NexTraceOne.Integrations.Domain.OptionalProviderNames.CloudBilling] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.ICloudBillingProvider>().IsConfigured,
+        [NexTraceOne.Integrations.Domain.OptionalProviderNames.Saml] = sp.GetRequiredService<NexTraceOne.Integrations.Domain.ISamlProvider>().IsConfigured,
     };
     OptionalProviderStartupLogger.LogProviderStatuses(
         app.Logger,

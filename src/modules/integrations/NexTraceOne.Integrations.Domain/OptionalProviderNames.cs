@@ -21,4 +21,7 @@ public static class OptionalProviderNames
 
     /// <summary>Cloud billing ingestion (AWS CUR, Azure Cost Management, GCP BigQuery Billing Export).</summary>
     public const string CloudBilling = "cloudBilling";
+
+    /// <summary>SAML 2.0 SSO IdP integration; returns <c>SamlNotConfigured</c> error while absent.</summary>
+    public const string Saml = "saml";
 }

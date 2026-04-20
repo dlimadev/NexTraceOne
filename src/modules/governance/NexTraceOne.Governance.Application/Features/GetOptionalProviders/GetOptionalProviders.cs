@@ -26,7 +26,8 @@ public static class GetOptionalProviders
         ICanaryProvider canaryProvider,
         IBackupProvider backupProvider,
         IKafkaEventProducer kafkaProducer,
-        ICloudBillingProvider cloudBillingProvider) : IQueryHandler<Query, Response>
+        ICloudBillingProvider cloudBillingProvider,
+        ISamlProvider samlProvider) : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -63,6 +64,14 @@ public static class GetOptionalProviders
                     configKeyPrefix: "FinOps:Billing",
                     docsPath: "docs/deployment/PRODUCTION-BOOTSTRAP.md#cloud-billing",
                     description: "Cloud billing ingestion (AWS CUR, Azure Cost Management, GCP BigQuery Billing Export)."),
+
+                BuildDto(
+                    name: OptionalProviderNames.Saml,
+                    category: "identity",
+                    isConfigured: samlProvider.IsConfigured,
+                    configKeyPrefix: "Saml",
+                    docsPath: "docs/deployment/PRODUCTION-BOOTSTRAP.md#saml-sso",
+                    description: "SAML 2.0 SSO IdP integration. When not configured, StartSamlLogin returns SamlNotConfigured."),
             };
 
             var configuredCount = providers.Count(p => p.Status == OptionalProviderStatus.Configured);

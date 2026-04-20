@@ -15,7 +15,8 @@ public sealed class GetOptionalProvidersTests
         bool canary = false,
         bool backup = false,
         bool kafka = false,
-        bool cloudBilling = false)
+        bool cloudBilling = false,
+        bool saml = false)
     {
         var canaryProvider = Substitute.For<ICanaryProvider>();
         canaryProvider.IsConfigured.Returns(canary);
@@ -29,8 +30,11 @@ public sealed class GetOptionalProvidersTests
         var cloudBillingProvider = Substitute.For<ICloudBillingProvider>();
         cloudBillingProvider.IsConfigured.Returns(cloudBilling);
 
+        var samlProvider = Substitute.For<ISamlProvider>();
+        samlProvider.IsConfigured.Returns(saml);
+
         return new GetOptionalProviders.Handler(
-            canaryProvider, backupProvider, kafkaProducer, cloudBillingProvider);
+            canaryProvider, backupProvider, kafkaProducer, cloudBillingProvider, samlProvider);
     }
 
     [Fact]
@@ -42,8 +46,8 @@ public sealed class GetOptionalProvidersTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.ConfiguredCount.Should().Be(0);
-        result.Value.TotalCount.Should().Be(4);
-        result.Value.Providers.Should().HaveCount(4);
+        result.Value.TotalCount.Should().Be(5);
+        result.Value.Providers.Should().HaveCount(5);
         result.Value.Providers.Should()
             .OnlyContain(p => p.Status == GetOptionalProviders.OptionalProviderStatus.NotConfigured);
     }
@@ -51,13 +55,13 @@ public sealed class GetOptionalProvidersTests
     [Fact]
     public async Task Handle_AllProvidersConfigured_ReturnsAllConfigured()
     {
-        var handler = CreateHandler(canary: true, backup: true, kafka: true, cloudBilling: true);
+        var handler = CreateHandler(canary: true, backup: true, kafka: true, cloudBilling: true, saml: true);
 
         var result = await handler.Handle(new GetOptionalProviders.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.ConfiguredCount.Should().Be(4);
-        result.Value.TotalCount.Should().Be(4);
+        result.Value.ConfiguredCount.Should().Be(5);
+        result.Value.TotalCount.Should().Be(5);
         result.Value.Providers.Should()
             .OnlyContain(p => p.Status == GetOptionalProviders.OptionalProviderStatus.Configured);
     }
@@ -71,7 +75,7 @@ public sealed class GetOptionalProvidersTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.ConfiguredCount.Should().Be(2);
-        result.Value.TotalCount.Should().Be(4);
+        result.Value.TotalCount.Should().Be(5);
 
         var canary = result.Value.Providers.Single(p => p.Name == "canary");
         canary.Status.Should().Be(GetOptionalProviders.OptionalProviderStatus.Configured);
@@ -112,6 +116,7 @@ public sealed class GetOptionalProvidersTests
         result.Value.Providers.Single(p => p.Name == "backup").Category.Should().Be("operations");
         result.Value.Providers.Single(p => p.Name == "kafka").Category.Should().Be("integrations");
         result.Value.Providers.Single(p => p.Name == "cloudBilling").Category.Should().Be("finops");
+        result.Value.Providers.Single(p => p.Name == "saml").Category.Should().Be("identity");
     }
 
     [Fact]
@@ -124,5 +129,34 @@ public sealed class GetOptionalProvidersTests
 
         var after = DateTimeOffset.UtcNow.AddSeconds(1);
         result.Value.CheckedAt.Should().BeOnOrAfter(before).And.BeOnOrBefore(after);
+    }
+
+    [Fact]
+    public async Task Handle_SamlConfigured_AppearsAsConfiguredInIdentityCategory()
+    {
+        var handler = CreateHandler(saml: true);
+
+        var result = await handler.Handle(new GetOptionalProviders.Query(), CancellationToken.None);
+
+        var saml = result.Value.Providers.Single(p => p.Name == OptionalProviderNames.Saml);
+        saml.Status.Should().Be(GetOptionalProviders.OptionalProviderStatus.Configured);
+        saml.Category.Should().Be("identity");
+        saml.ConfigKeyPrefix.Should().Be("Saml");
+        saml.DocsPath.Should().Contain("saml-sso");
+    }
+
+    [Fact]
+    public async Task Handle_SamlNotConfigured_CountedCorrectlyAndCategoryIsIdentity()
+    {
+        var handler = CreateHandler(canary: true, backup: true, kafka: true, cloudBilling: true, saml: false);
+
+        var result = await handler.Handle(new GetOptionalProviders.Query(), CancellationToken.None);
+
+        result.Value.ConfiguredCount.Should().Be(4);
+        result.Value.TotalCount.Should().Be(5);
+
+        var saml = result.Value.Providers.Single(p => p.Name == OptionalProviderNames.Saml);
+        saml.Status.Should().Be(GetOptionalProviders.OptionalProviderStatus.NotConfigured);
+        saml.Category.Should().Be("identity");
     }
 }
