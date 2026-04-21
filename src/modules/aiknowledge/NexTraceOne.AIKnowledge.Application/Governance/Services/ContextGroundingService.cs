@@ -2,6 +2,7 @@ using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
 
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantMessage;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -13,11 +14,14 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Services;
 /// Implementação do serviço de resolução de contexto de grounding.
 /// Extrai e encapsula a lógica de classificação de use case, resolução de fontes,
 /// construção de contexto estruturado e augmentação via retrieval services.
+/// Inclui busca em fontes de dados externas (web search, GitHub, etc.) via IDataSourceSyncService.
 /// </summary>
 public sealed class ContextGroundingService(
     IDocumentRetrievalService documentRetrievalService,
     IDatabaseRetrievalService databaseRetrievalService,
     ITelemetryRetrievalService telemetryRetrievalService,
+    IExternalDataSourceRepository externalDataSourceRepository,
+    IDataSourceSyncService dataSourceSyncService,
     ILogger<ContextGroundingService> logger) : IContextGroundingService
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
@@ -215,6 +219,36 @@ public sealed class ContextGroundingService(
             {
                 logger.LogDebug(ex, "Database retrieval augmentation failed — continuing without");
             }
+        }
+
+        // Augment with active external data sources that support runtime search (e.g. web search APIs).
+        // SearchAsync returns empty for indexing-only connectors (GitHub, GitLab, Directory) — safe to call on all.
+        try
+        {
+            var activeSources = await externalDataSourceRepository.ListAsync(
+                connectorType: ExternalDataSourceConnectorType.WebSearch, isActive: true, cancellationToken);
+
+            foreach (var source in activeSources.Take(2))
+            {
+                try
+                {
+                    var webResults = await dataSourceSyncService.SearchAsync(source, query, maxResults: 5, cancellationToken);
+                    if (webResults.Count > 0)
+                    {
+                        augmentation.Add($"RetrievedFromWeb [{source.Name}]:");
+                        foreach (var hit in webResults)
+                            augmentation.Add($"  - {hit.Title}: {(hit.Content.Length > 200 ? string.Concat(hit.Content.AsSpan(0, 197), "...") : hit.Content)} ({hit.SourceUrl})");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogDebug(ex, "External data source '{Name}' search failed — continuing without.", source.Name);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "External data source retrieval augmentation failed — continuing without.");
         }
 
         return augmentation.Count == 0

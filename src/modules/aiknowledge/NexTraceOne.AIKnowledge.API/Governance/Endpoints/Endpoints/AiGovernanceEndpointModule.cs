@@ -101,6 +101,13 @@ using CreateEvaluationRunFeature = NexTraceOne.AIKnowledge.Application.Governanc
 using GetEvaluationRunFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluationRun.GetEvaluationRun;
 using CreateEvaluationDatasetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateEvaluationDataset.CreateEvaluationDataset;
 
+using ListExternalDataSourcesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListExternalDataSources.ListExternalDataSources;
+using GetExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetExternalDataSource.GetExternalDataSource;
+using RegisterExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterExternalDataSource.RegisterExternalDataSource;
+using UpdateExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateExternalDataSource.UpdateExternalDataSource;
+using ToggleExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ToggleExternalDataSource.ToggleExternalDataSource;
+using SyncExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SyncExternalDataSource.SyncExternalDataSource;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -147,6 +154,7 @@ public sealed class AiGovernanceEndpointModule
         MapOrganizationalMemoryEndpoints(app);
         MapAnalyticsEndpoints(app);
         MapSelfHealingEndpoints(app);
+        MapExternalDataSourceEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1452,6 +1460,134 @@ public sealed class AiGovernanceEndpointModule
             .WithTags("AI Evaluation Harness")
             .WithSummary("Create evaluation dataset");
     }
+
+    // ── External Data Sources (Extensible RAG) ────────────────────────────
+
+    private static void MapExternalDataSourceEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/data-sources");
+
+        group.MapGet("/", async (
+            string? connectorType,
+            bool? isActive,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListExternalDataSourcesFeature.Query(connectorType, isActive),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Data Sources")
+        .WithSummary("List external data sources");
+
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetExternalDataSourceFeature.Query(id),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Data Sources")
+        .WithSummary("Get external data source details");
+
+        group.MapPost("/", async (
+            RegisterExternalDataSourceRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var connectorType = Enum.Parse<NexTraceOne.AIKnowledge.Domain.Governance.Enums.ExternalDataSourceConnectorType>(
+                req.ConnectorType, ignoreCase: true);
+
+            var result = await sender.Send(
+                new RegisterExternalDataSourceFeature.Command(
+                    req.Name,
+                    req.Description,
+                    connectorType,
+                    req.ConnectorConfigJson,
+                    req.Priority,
+                    req.SyncIntervalMinutes),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Data Sources")
+        .WithSummary("Register a new external data source");
+
+        group.MapPut("/{id:guid}", async (
+            Guid id,
+            UpdateExternalDataSourceRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new UpdateExternalDataSourceFeature.Command(
+                    id,
+                    req.Description,
+                    req.ConnectorConfigJson,
+                    req.Priority,
+                    req.SyncIntervalMinutes),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Data Sources")
+        .WithSummary("Update external data source configuration");
+
+        group.MapPost("/{id:guid}/activate", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ToggleExternalDataSourceFeature.Command(id, Activate: true),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Data Sources")
+        .WithSummary("Activate an external data source");
+
+        group.MapPost("/{id:guid}/deactivate", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ToggleExternalDataSourceFeature.Command(id, Activate: false),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Data Sources")
+        .WithSummary("Deactivate an external data source");
+
+        group.MapPost("/{id:guid}/sync", async (
+            Guid id,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new SyncExternalDataSourceFeature.Command(id),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Data Sources")
+        .WithSummary("Trigger manual sync of an external data source");
+    }
 }
 
 // ── Request DTOs para endpoints PATCH ───────────────────────────────────
@@ -1630,3 +1766,19 @@ public sealed record CreateEvaluationDatasetRequest(
     string UseCase,
     string SourceType,
     Guid TenantId);
+
+/// <summary>Corpo de pedido para registo de fonte de dados externa.</summary>
+public sealed record RegisterExternalDataSourceRequest(
+    string Name,
+    string? Description,
+    string ConnectorType,
+    string ConnectorConfigJson,
+    int Priority = 10,
+    int SyncIntervalMinutes = 0);
+
+/// <summary>Corpo de pedido para actualização de fonte de dados externa.</summary>
+public sealed record UpdateExternalDataSourceRequest(
+    string? Description,
+    string ConnectorConfigJson,
+    int Priority,
+    int SyncIntervalMinutes);

@@ -16,6 +16,12 @@ public interface IAiKnowledgeSourceRepository
         CancellationToken ct);
 
     /// <summary>
+    /// Persiste uma nova fonte de conhecimento (usada pelo pipeline de indexação de fontes externas).
+    /// Upsert por nome: actualiza se já existir, insere se não existir.
+    /// </summary>
+    Task StoreKnowledgeSourceAsync(AIKnowledgeSource source, CancellationToken ct);
+
+    /// <summary>
     /// Persiste o vector de embedding na coluna pgvector da base de dados.
     /// Chamado pelo EmbeddingIndexJob após indexação bem-sucedida. (E-A01)
     /// </summary>

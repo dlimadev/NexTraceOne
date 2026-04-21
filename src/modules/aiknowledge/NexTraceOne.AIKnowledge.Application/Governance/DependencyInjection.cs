@@ -39,6 +39,11 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.SendAssistantMessa
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateBudget;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateConversation;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateModel;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetExternalDataSource;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterExternalDataSource;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.SyncExternalDataSource;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.ToggleExternalDataSource;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateExternalDataSource;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePolicy;
 using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.BuildingBlocks.Application;
@@ -115,6 +120,13 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListPromptTemplates.Query>, ListPromptTemplates.Validator>();
         services.AddTransient<IValidator<ListSuggestedPrompts.Query>, ListSuggestedPrompts.Validator>();
         services.AddTransient<IValidator<ListToolDefinitions.Query>, ListToolDefinitions.Validator>();
+
+        // ── External Data Sources (Extensible RAG) ────────────────────────
+        services.AddTransient<IValidator<RegisterExternalDataSource.Command>, RegisterExternalDataSource.Validator>();
+        services.AddTransient<IValidator<UpdateExternalDataSource.Command>, UpdateExternalDataSource.Validator>();
+        services.AddTransient<IValidator<ToggleExternalDataSource.Command>, ToggleExternalDataSource.Validator>();
+        services.AddTransient<IValidator<SyncExternalDataSource.Command>, SyncExternalDataSource.Validator>();
+        services.AddTransient<IValidator<GetExternalDataSource.Query>, GetExternalDataSource.Validator>();
 
         return services;
     }

@@ -80,4 +80,25 @@ internal sealed class AiKnowledgeSourceRepository(AiGovernanceDbContext context)
             return [];
         }
     }
+
+    /// <inheritdoc/>
+    public async Task StoreKnowledgeSourceAsync(AIKnowledgeSource source, CancellationToken ct)
+    {
+        // Upsert by name: update if already exists, otherwise insert.
+        var existing = await context.KnowledgeSources
+            .FirstOrDefaultAsync(s => s.Name == source.Name, ct);
+
+        if (existing is not null)
+        {
+            existing.Update(source.Description, source.EndpointOrPath);
+            if (source.GetEmbedding() is { } emb)
+                existing.SetEmbedding(emb);
+        }
+        else
+        {
+            await context.KnowledgeSources.AddAsync(source, ct);
+        }
+
+        await context.SaveChangesAsync(ct);
+    }
 }

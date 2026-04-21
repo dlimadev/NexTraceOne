@@ -81,6 +81,9 @@ public sealed class AiGovernanceDbContext(
     public DbSet<EvaluationRun> EvaluationRuns => Set<EvaluationRun>();
     public DbSet<EvaluationDataset> EvaluationDatasets => Set<EvaluationDataset>();
 
+    // ── External Data Sources (Extensible RAG) ───────────────────────────────
+    public DbSet<ExternalDataSource> ExternalDataSources => Set<ExternalDataSource>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 
