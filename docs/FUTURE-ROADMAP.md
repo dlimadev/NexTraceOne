@@ -956,6 +956,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 32. ✅ **Wave N.1** — `GetSloServiceRankingReport` — ranking de serviços por taxa de conformidade SLO: bandas Excellent/Good/Struggling, médias de valor observado vs alvo, contagens de Met/Warning/Breached, tenant avg compliance rate. OI: 1081 testes (+13).
 33. ✅ **Wave N.2** — `GetRiskTrendReport` — distribuição de risco por nível (Negligible/Low/Medium/High/Critical), top serviços de alto risco com score por dimensão (vuln 40%/change_failure 25%/blast_radius 20%/policy 15%), % alto/crítico no tenant. CG: 783 testes (+11).
 34. ✅ **Wave N.3** — `GetEvidencePackCoverageReport` — cobertura de evidence packs por releases: coverage%, signed packs%, complete packs%, breakdown por ambiente, lista de releases sem cobertura (até N). CG: 783 testes (+12). **WAVE N COMPLETO**.
+35. ✅ **Wave O.1** — `GetContractVersioningReport` — relatório de versionamento de contratos: distribuição por estado de ciclo de vida (Draft/InReview/Approved/Locked/Deprecated/Sunset/Retired), distribuição por protocolo (OpenAPI/AsyncAPI/GraphQL/Protobuf/WSDL), rácios obsoleto e ativo, top contratos deprecados/sunset candidatos a remoção. Catalog: 1813 testes (+11).
+36. ✅ **Wave O.2** — `GetFinOpsTrendReport` — tendência de custo operacional: série temporal diária (DailySeries), distribuição por categoria (Compute/Storage/Network/…), top serviços mais dispendiosos, delta período-a-período (CurrentPeriodTotalUsd / PreviousPeriodTotalUsd / DeltaPercent). OI: 1098 testes (+17).
+37. ✅ **Wave O.3** — `GetPromotionGateComplianceReport` — conformidade de promotion gates: total de avaliações pass/fail/overridden, taxa global de aprovação, distribuição por tipo de gate (SecurityGate/QualityGate/ApprovalGate/…), top gates que mais falham com fail rate. CG: 796 testes (+13). **WAVE O COMPLETO**.
 
 ### Riscos e recomendações transversais
 

@@ -1636,163 +1636,29 @@
     "title": "Catalog, Contracts & Change Governance Configuration"
   },
   "changeConfidence": {
-    "changeType": {
-      "ConfigurationChange": "Configuration",
-      "ContractChange": "Contract",
-      "DependencyChange": "Dependency",
-      "Deployment": "Deployment",
-      "OperationalChange": "Operational",
-      "PolicyChange": "Policy",
-      "SchemaChange": "Schema"
-    },
-    "confidenceStatus": {
-      "CorrelatedWithIncident": "Incident-Correlated",
-      "Mitigated": "Mitigated",
-      "NeedsAttention": "Needs Attention",
-      "NotAssessed": "Not Assessed",
-      "SuspectedRegression": "Suspected Regression",
-      "Validated": "Validated"
-    },
-    "detail": {
-      "advisory": "Advisory",
-      "advisoryFactors": "Assessment Factors",
-      "advisorySubtitle": "Governance recommendation based on evidence and risk analysis",
-      "affectedServices": "Affected Services & Contracts",
-      "affectedServicesSubtitle": "Services and contracts impacted by this change",
-      "approve": "Approve",
-      "approveConditionally": "Approve Conditionally",
-      "backToCatalog": "Back to Change Confidence",
-      "baselineMetrics": "Baseline Metrics",
-      "blastRadius": "Blast Radius",
-      "changeScore": "Change Score",
-      "changeType": "Change Type",
-      "commitSha": "Commit SHA",
-      "confidenceStatus": "Confidence Status",
-      "decidedAt": "Decided At",
-      "decidedBy": "Decided By",
-      "decision": "Decision",
-      "decisionActions": "Decision Actions",
-      "decisionConditions": "Conditions",
-      "decisionConditionsPlaceholder": "Specify conditions for conditional approval...",
-      "decisionError": "Failed to record decision",
-      "decisionHistory": "Decision History",
-      "decisionHistorySubtitle": "Audit trail of all governance decisions",
-      "decisionRationale": "Rationale",
-      "decisionRationalePlaceholder": "Explain the reason for your decision...",
-      "decisionSubtitle": "Take a governance decision on this change",
-      "decisionSuccess": "Decision recorded successfully",
-      "description": "Description",
-      "directConsumers": "Direct Consumers",
-      "evidenceComplete": "Evidence collection is complete",
-      "evidenceNone": "No evidence available yet",
-      "evidencePartial": "Some evidence is still missing",
-      "evidenceReadiness": "Evidence Readiness",
-      "evidenceReadinessSubtitle": "Completeness of evidence for governance decision",
-      "factorName": {
-        "BlastRadiusScope": "Blast Radius Scope",
-        "ChangeScore": "Change Score",
-        "EvidenceCompleteness": "Evidence Completeness",
-        "FreezeWindowConflict": "Freeze Window",
-        "RollbackReadiness": "Rollback Readiness"
+    "breakdown": {
+      "title": "Change Confidence Breakdown",
+      "aggregatedScore": "Aggregated Score",
+      "subScores": "Sub-scores",
+      "computed": "Computed at",
+      "version": "Score version",
+      "confidence": {
+        "low": "Low confidence",
+        "medium": "Medium confidence",
+        "high": "High confidence"
       },
-      "factorStatus": {
-        "Fail": "Fail",
-        "Pass": "Pass",
-        "Unknown": "Unknown",
-        "Warning": "Warning"
+      "subScoreType": {
+        "testCoverage": "Test Coverage",
+        "contractStability": "Contract Stability",
+        "historicalRegression": "Historical Regression",
+        "blastSurface": "Blast Surface",
+        "dependencyHealth": "Dependency Health",
+        "canarySignal": "Canary Signal",
+        "preProdDelta": "Pre-Prod Delta"
       },
-      "noAdvisory": "Advisory not available yet",
-      "noAffectedServices": "No linked services or contracts",
-      "noBlastRadius": "Blast radius not yet calculated",
-      "noDecisions": "No decisions recorded yet",
-      "noDecisionsDescription": "Decisions will appear here after a governance action is taken.",
-      "noTimeline": "No timeline events recorded",
-      "noValidation": "No validation evidence available",
-      "overallConfidence": "Overall Confidence",
-      "overview": "Overview",
-      "pipelineSource": "Pipeline Source",
-      "quickLinks": "Quick Links",
-      "rationale": "Rationale",
-      "recommendation": "Recommendation",
-      "recommendationType": {
-        "Approve": "Approve",
-        "ApproveConditionally": "Approve Conditionally",
-        "NeedsMoreEvidence": "Needs More Evidence",
-        "Reject": "Reject"
-      },
-      "reject": "Reject",
-      "reviewStatus": "Review Status",
-      "riskAndConfidence": "Risk & Confidence",
-      "submitDecision": "Submit Decision",
-      "timeline": "Timeline",
-      "title": "Change Detail",
-      "totalAffected": "Total Affected Consumers",
-      "transitiveConsumers": "Transitive Consumers",
-      "validation": "Validation & Evidence",
-      "validationStatus": "Validation Status",
-      "viewContract": "View Contract",
-      "viewInReleases": "View in Releases",
-      "viewIncidents": "View Incidents",
-      "viewIncidentsDescription": "View incidents correlated with this change",
-      "viewService": "View Service",
-      "viewServiceSot": "View Service in Source of Truth",
-      "workItem": "Work Item",
-      "featureFlags": "Feature Flag Awareness",
-      "featureFlagsSubtitle": "Active feature flags at the time of this release and associated risk",
-      "featureFlagsUnavailable": "Feature flag data is not available for this change",
-      "noFeatureFlagData": "No feature flag state has been recorded for this release",
-      "activeFlagCount": "Active Flags",
-      "criticalFlagCount": "Critical Flags",
-      "newFlagCount": "New Flags",
-      "flagRiskLevel": "Risk Level",
-      "flagProvider": "Provider",
-      "historicalPattern": "Historical Pattern Insight",
-      "historicalPatternSubtitle": "Risk signal based on similar past changes for this service and environment",
-      "historicalPatternUnavailable": "Historical pattern data is not available for this change",
-      "noHistoricalData": "Not enough historical samples to calculate a pattern",
-      "historicalSamples": "Samples",
-      "successRate": "Success Rate",
-      "rollbackRate": "Rollback Rate",
-      "failureRate": "Failure Rate",
-      "patternRisk": "Pattern Risk",
-      "lookbackWindow": "Lookback",
-      "traceCorrelations": "Trace Correlations",
-      "traceCorrelationsSubtitle": "Distributed traces correlated with this release window",
-      "traceCorrelationsUnavailable": "Trace correlation data is not available for this change",
-      "noTraceCorrelations": "No trace correlations found for this release",
-      "traceCorrelationsFound": "trace correlations found"
-    },
-    "filters": {
-      "allEnvironments": "All Environments",
-      "allStatuses": "All Statuses",
-      "allTypes": "All Types",
-      "changeType": "Change Type",
-      "confidenceStatus": "Confidence",
-      "environment": "Environment",
-      "searchPlaceholder": "Search changes...",
-      "serviceName": "Service"
-    },
-    "subtitle": "Track, validate and analyze changes across your services",
-    "summary": {
-      "changesNeedingAttention": "Needs Attention",
-      "correlatedWithIncidents": "Incident-Correlated",
-      "suspectedRegressions": "Suspected Regressions",
-      "totalChanges": "Total Changes",
-      "validatedChanges": "Validated"
-    },
-    "table": {
-      "changeType": "Type",
-      "confidence": "Confidence",
-      "date": "Date",
-      "deploymentStatus": "Status",
-      "environment": "Environment",
-      "noChanges": "No changes found",
-      "noChangesDescription": "Adjust your filters or wait for new deployments.",
-      "score": "Score",
-      "service": "Service",
-      "version": "Version"
-    },
-    "title": "Change Confidence"
+      "simulated": "Simulated — real data not available",
+      "citations": "Citations"
+    }
   },
   "chaosEngineering": {
     "cancelled": "Cancelled",
@@ -8322,35 +8188,39 @@
     }
   },
   "releaseCalendar": {
-    "activeFreezeWindows": "Active Freeze Windows",
-    "activeFreezes": "Active Freezes",
-    "avgScore": "Avg Score",
-    "dailySummary": "Daily Summary",
-    "date": "Date",
-    "deactivate": "Deactivate",
-    "editFreezeWindow": "Edit Freeze Window",
-    "environment": "Environment",
-    "filters": "Filters",
-    "freezeWindowsList": "Freeze Windows",
-    "from": "From",
-    "highRiskReleases": "High Risk",
-    "noReleases": "No releases found in this period",
-    "releaseTimeline": "Release Timeline",
-    "releasesLabel": "releases",
-    "scopeDomain": "Domain",
-    "scopeEnvironment": "Environment",
-    "scopeGlobal": "Global",
-    "scopeService": "Service",
-    "scopeTenant": "Tenant",
-    "score": "Score",
-    "subtitle": "Unified view of releases, freeze windows and change risk across time.",
-    "tabs": {
-      "calendar": "Calendar",
-      "freezeWindows": "Freeze Windows"
-    },
     "title": "Release Calendar",
-    "to": "To",
-    "totalReleases": "Total Releases"
+    "window": "Release Window",
+    "registerWindow": "Register Window",
+    "closeWindow": "Close Window",
+    "cancelWindow": "Cancel Window",
+    "windowType": "Window Type",
+    "windowStatus": "Status",
+    "startsAt": "Starts At",
+    "endsAt": "Ends At",
+    "environmentFilter": "Environment Filter",
+    "recurrenceTag": "Recurrence Tag",
+    "blocksChanges": "Blocks Changes",
+    "isHotfixOnly": "Hotfix Only",
+    "isOpen": "Window Open",
+    "isClosed": "Window Closed",
+    "windowTypes": {
+      "Scheduled": "Scheduled Deployment",
+      "Freeze": "Freeze Window",
+      "HotfixAllowed": "Hotfix Allowed",
+      "Maintenance": "Maintenance"
+    },
+    "windowStatuses": {
+      "Active": "Active",
+      "Closed": "Closed",
+      "Cancelled": "Cancelled"
+    },
+    "changeBlocked": "Change is blocked by an active freeze or maintenance window.",
+    "changeAllowed": "Change is allowed in the current release window.",
+    "errors": {
+      "invalidWindow": "End date must be after start date.",
+      "alreadyClosed": "Window is not in Active status.",
+      "alreadyStarted": "Cannot cancel a window that has already started."
+    }
   },
   "releaseScope": {
     "excludedDescription": "This area remains in the codebase but is intentionally outside the final production release scope. It is not part of the supported production surface.",
@@ -11685,27 +11555,33 @@
     "unknown": "Unknown"
   },
   "riskTrend": {
-    "title": "Risk Score Trend",
-    "serviceLabel": "Service",
-    "servicePlaceholder": "e.g. payment-service",
-    "envLabel": "Environment",
-    "envPlaceholder": "e.g. Production",
-    "limitLabel": "Limit",
-    "totalReleases": "Total Releases",
-    "avgScore": "Avg Risk Score",
-    "maxScore": "Max Risk Score",
-    "minScore": "Min Risk Score",
-    "chartTitle": "Risk Score Trend (Oldest → Newest)",
-    "tableTitle": "Release Risk History",
-    "noData": "No data points found for this service",
-    "emptyTitle": "No Service Selected",
-    "emptyMessage": "Enter a service name to view its risk score trend",
-    "colVersion": "Version",
-    "colEnvironment": "Environment",
-    "colChangeLevel": "Change Level",
-    "colScore": "Risk Score",
-    "colTrend": "Trend",
-    "colDate": "Date"
+    "title": "Risk Trend Report",
+    "description": "Distribution of services by risk level and ranking of the highest-risk services.",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "highCriticalPercent": "High/Critical %",
+    "avgOverallRiskScore": "Avg Overall Risk Score",
+    "riskDistribution": "Risk Distribution",
+    "dimensionAverages": "Dimension Averages",
+    "topHighRiskServices": "Top High-Risk Services",
+    "riskLevel": "Risk Level",
+    "overallScore": "Overall Score",
+    "vulnerabilityScore": "Vulnerability",
+    "changeFailureScore": "Change Failure",
+    "blastRadiusScore": "Blast Radius",
+    "policyViolationScore": "Policy Violation",
+    "activeSignals": "Active Signals",
+    "levels": {
+      "Negligible": "Negligible",
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidMaxHighRiskServices": "Max high-risk services must be between 1 and 100.",
+      "invalidHighRiskThreshold": "High-risk threshold must be between 1 and 100."
+    }
   },
   "commitPool": {
     "title": "Release Commit Pool",
@@ -12585,52 +12461,26 @@
     }
   },
   "dependencyRisk": {
-    "title": "Dependency Risk Scoring",
-    "subtitle": "Risk score per service with failure history, SLO and blast radius analysis",
-    "loading": "Loading dependency risk scores…",
-    "loadError": "Failed to load dependency risk data. Please try again.",
-    "noRecords": "No services found.",
-    "timeRange": {
-      "1h": "Last 1 hour",
-      "6h": "Last 6 hours",
-      "24h": "Last 24 hours",
-      "7d": "Last 7 days"
+    "title": "Dependency Risk Report",
+    "subtitle": "Graph-based risk scoring for services: tier, API fan-in and ownership governance gaps.",
+    "riskLevels": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
     },
-    "table": {
-      "service": "Service",
-      "riskScore": "Risk Score",
-      "failureHistory": "Failure History",
-      "sloHealth": "SLO Health",
-      "blastRadius": "Blast Radius",
-      "deployFrequency": "Deploy Freq",
-      "dependents": "Dependents",
-      "trend": "Trend"
-    },
-    "riskLevel": {
-      "critical": "Critical",
-      "high": "High",
-      "medium": "Medium",
-      "low": "Low"
-    },
-    "impactMatrix": {
-      "title": "What breaks if X degrades?",
-      "service": "If {{service}} degrades…",
-      "downstream": "Downstream Impact",
-      "severity": "Severity",
-      "probability": "Probability"
-    },
-    "factors": {
-      "title": "Risk Factors",
-      "failureHistory": "Failure History (30d)",
-      "sloCompliance": "SLO Compliance",
-      "blastRadius": "Blast Radius",
-      "deployFrequency": "Deploy Frequency"
-    },
-    "stats": {
-      "totalServices": "Services",
-      "critical": "Critical Risk",
-      "high": "High Risk",
-      "avgScore": "Avg Risk Score"
+    "overallRisk": "Overall Graph Risk",
+    "highRiskCount": "High/Critical Risk Services",
+    "totalAnalyzed": "Services Analyzed",
+    "service": "Service",
+    "tier": "Tier",
+    "owner": "Owner Team",
+    "riskScore": "Risk Score",
+    "apiCount": "APIs Exposed",
+    "riskFactors": "Risk Factors",
+    "errors": {
+      "noServices": "No services found for the specified filter.",
+      "tenantRequired": "Tenant ID is required."
     }
   },
   "loadTesting": {
@@ -12999,31 +12849,6 @@
       }
     }
   },
-  "changeConfidence": {
-    "breakdown": {
-      "title": "Change Confidence Breakdown",
-      "aggregatedScore": "Aggregated Score",
-      "subScores": "Sub-scores",
-      "computed": "Computed at",
-      "version": "Score version",
-      "confidence": {
-        "low": "Low confidence",
-        "medium": "Medium confidence",
-        "high": "High confidence"
-      },
-      "subScoreType": {
-        "testCoverage": "Test Coverage",
-        "contractStability": "Contract Stability",
-        "historicalRegression": "Historical Regression",
-        "blastSurface": "Blast Surface",
-        "dependencyHealth": "Dependency Health",
-        "canarySignal": "Canary Signal",
-        "preProdDelta": "Pre-Prod Delta"
-      },
-      "simulated": "Simulated — real data not available",
-      "citations": "Citations"
-    }
-  },
   "aiEvaluation": {
     "title": "AI Evaluation Harness",
     "subtitle": "Define, run, and compare AI model evaluations per use case",
@@ -13073,19 +12898,18 @@
     "label": "Operational Tier",
     "set": "Set Tier",
     "setSuccess": "Tier updated to {{tier}}",
-    "policy": "Tier Policy",
-    "policyTitle": "Tier Requirements",
-    "tier": {
-      "Critical": "Critical",
-      "Standard": "Standard",
-      "Experimental": "Experimental"
-    },
     "policy": {
       "minSlo": "Min SLO (%)",
       "minMaturity": "Min Maturity Score",
       "onCallRequired": "On-Call Required",
       "runbookRequired": "Runbook Required",
       "monitoringRequired": "Monitoring Required"
+    },
+    "policyTitle": "Tier Requirements",
+    "tier": {
+      "Critical": "Critical",
+      "Standard": "Standard",
+      "Experimental": "Experimental"
     },
     "conformance": {
       "title": "Conformance",
@@ -13461,41 +13285,6 @@
       "disabled": "Policy is disabled"
     }
   },
-  "releaseCalendar": {
-    "title": "Release Calendar",
-    "window": "Release Window",
-    "registerWindow": "Register Window",
-    "closeWindow": "Close Window",
-    "cancelWindow": "Cancel Window",
-    "windowType": "Window Type",
-    "windowStatus": "Status",
-    "startsAt": "Starts At",
-    "endsAt": "Ends At",
-    "environmentFilter": "Environment Filter",
-    "recurrenceTag": "Recurrence Tag",
-    "blocksChanges": "Blocks Changes",
-    "isHotfixOnly": "Hotfix Only",
-    "isOpen": "Window Open",
-    "isClosed": "Window Closed",
-    "windowTypes": {
-      "Scheduled": "Scheduled Deployment",
-      "Freeze": "Freeze Window",
-      "HotfixAllowed": "Hotfix Allowed",
-      "Maintenance": "Maintenance"
-    },
-    "windowStatuses": {
-      "Active": "Active",
-      "Closed": "Closed",
-      "Cancelled": "Cancelled"
-    },
-    "changeBlocked": "Change is blocked by an active freeze or maintenance window.",
-    "changeAllowed": "Change is allowed in the current release window.",
-    "errors": {
-      "invalidWindow": "End date must be after start date.",
-      "alreadyClosed": "Window is not in Active status.",
-      "alreadyStarted": "Cannot cancel a window that has already started."
-    }
-  },
   "riskCenter": {
     "title": "Risk Center",
     "report": "Risk Report",
@@ -13738,29 +13527,6 @@
         "CategoryGrowth": "Category Growth"
       },
       "noInsights": "No cost anomalies detected for this period."
-    }
-  },
-  "dependencyRisk": {
-    "title": "Dependency Risk Report",
-    "subtitle": "Graph-based risk scoring for services: tier, API fan-in and ownership governance gaps.",
-    "riskLevels": {
-      "Low": "Low",
-      "Medium": "Medium",
-      "High": "High",
-      "Critical": "Critical"
-    },
-    "overallRisk": "Overall Graph Risk",
-    "highRiskCount": "High/Critical Risk Services",
-    "totalAnalyzed": "Services Analyzed",
-    "service": "Service",
-    "tier": "Tier",
-    "owner": "Owner Team",
-    "riskScore": "Risk Score",
-    "apiCount": "APIs Exposed",
-    "riskFactors": "Risk Factors",
-    "errors": {
-      "noServices": "No services found for the specified filter.",
-      "tenantRequired": "Tenant ID is required."
     }
   },
   "gdprCompliance": {
@@ -14125,35 +13891,6 @@
       "invalidThreshold": "Excellent threshold must be greater than Good threshold."
     }
   },
-  "riskTrend": {
-    "title": "Risk Trend Report",
-    "description": "Distribution of services by risk level and ranking of the highest-risk services.",
-    "totalServicesAnalyzed": "Services Analyzed",
-    "highCriticalPercent": "High/Critical %",
-    "avgOverallRiskScore": "Avg Overall Risk Score",
-    "riskDistribution": "Risk Distribution",
-    "dimensionAverages": "Dimension Averages",
-    "topHighRiskServices": "Top High-Risk Services",
-    "riskLevel": "Risk Level",
-    "overallScore": "Overall Score",
-    "vulnerabilityScore": "Vulnerability",
-    "changeFailureScore": "Change Failure",
-    "blastRadiusScore": "Blast Radius",
-    "policyViolationScore": "Policy Violation",
-    "activeSignals": "Active Signals",
-    "levels": {
-      "Negligible": "Negligible",
-      "Low": "Low",
-      "Medium": "Medium",
-      "High": "High",
-      "Critical": "Critical"
-    },
-    "errors": {
-      "invalidTenantId": "Tenant ID is required.",
-      "invalidMaxHighRiskServices": "Max high-risk services must be between 1 and 100.",
-      "invalidHighRiskThreshold": "High-risk threshold must be between 1 and 100."
-    }
-  },
   "evidencePackCoverage": {
     "title": "Evidence Pack Coverage Report",
     "description": "Coverage analysis of evidence packs against releases in the selected period.",
@@ -14174,6 +13911,83 @@
       "invalidLookbackDays": "Lookback days must be between 1 and 365.",
       "invalidMaxUncovered": "Max uncovered releases must be between 1 and 100.",
       "invalidCompletenessThreshold": "Completeness threshold must be between 0 and 100."
+    }
+  },
+  "contractVersioningReport": {
+    "title": "Contract Versioning Report",
+    "description": "Lifecycle and protocol distribution of all registered contracts",
+    "totalVersions": "Total Versions",
+    "distinctContracts": "Distinct Contracts",
+    "deprecatedCount": "Deprecated",
+    "sunsetCount": "Sunset",
+    "retiredCount": "Retired",
+    "deprecatedRatio": "Obsolete Ratio %",
+    "activeRatio": "Active Ratio %",
+    "byLifecycleState": "By Lifecycle State",
+    "byProtocol": "By Protocol",
+    "topDeprecatedContracts": "Top Deprecated Contracts",
+    "state": "State",
+    "count": "Count",
+    "percent": "Percent",
+    "protocol": "Protocol",
+    "apiAssetId": "API Asset ID",
+    "semVer": "Version",
+    "lifecycleState": "Lifecycle State",
+    "errors": {
+      "invalidTopDeprecatedCount": "Top deprecated count must be between 1 and 50.",
+      "invalidPageSize": "Page size must be between 10 and 500."
+    }
+  },
+  "finOpsTrendReport": {
+    "title": "FinOps Trend Report",
+    "description": "Operational cost trend by day, category and top services",
+    "tenantId": "Tenant",
+    "from": "From",
+    "to": "To",
+    "lookbackDays": "Lookback Days",
+    "currentPeriodTotal": "Current Period Total (USD)",
+    "previousPeriodTotal": "Previous Period Total (USD)",
+    "deltaPercent": "Period Change %",
+    "dailySeries": "Daily Cost Series",
+    "byCategory": "By Category",
+    "topServices": "Top Services",
+    "date": "Date",
+    "totalUsd": "Total (USD)",
+    "category": "Category",
+    "serviceName": "Service",
+    "teamId": "Team",
+    "costPercent": "Cost %",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 1 and 365.",
+      "invalidTopServicesCount": "Top services count must be between 1 and 50."
+    }
+  },
+  "promotionGateComplianceReport": {
+    "title": "Promotion Gate Compliance Report",
+    "description": "Promotion gate evaluation pass rate, override count and top failing gates",
+    "tenantId": "Tenant",
+    "from": "From",
+    "to": "To",
+    "lookbackDays": "Lookback Days",
+    "totalEvaluations": "Total Evaluations",
+    "totalPassed": "Passed",
+    "totalFailed": "Failed",
+    "totalOverridden": "Overridden",
+    "globalPassRate": "Global Pass Rate %",
+    "byGateType": "By Gate Type",
+    "topFailingGates": "Top Failing Gates",
+    "gateType": "Gate Type",
+    "passedCount": "Passed",
+    "failedCount": "Failed",
+    "overriddenCount": "Overridden",
+    "passRate": "Pass Rate %",
+    "gateId": "Gate ID",
+    "failRate": "Fail Rate %",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 1 and 365.",
+      "invalidTopFailingGatesCount": "Top failing gates count must be between 1 and 50."
     }
   }
 }

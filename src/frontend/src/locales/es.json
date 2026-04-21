@@ -1651,163 +1651,29 @@
     "title": "Configuración de Catálogo, Contratos & Change Governance"
   },
   "changeConfidence": {
-    "changeType": {
-      "ConfigurationChange": "Configuración",
-      "ContractChange": "Contrato",
-      "DependencyChange": "Dependencia",
-      "Deployment": "Despliegue",
-      "OperationalChange": "Operacional",
-      "PolicyChange": "Política",
-      "SchemaChange": "Schema"
-    },
-    "confidenceStatus": {
-      "CorrelatedWithIncident": "Correlacionado con Incidente",
-      "Mitigated": "Mitigado",
-      "NeedsAttention": "Necesita Atención",
-      "NotAssessed": "No Evaluado",
-      "SuspectedRegression": "Regresión Sospechosa",
-      "Validated": "Validado"
-    },
-    "detail": {
-      "advisory": "Recomendación",
-      "advisoryFactors": "Factores de Evaluación",
-      "advisorySubtitle": "Recomendación de gobernanza basada en evidencias y análisis de riesgos",
-      "affectedServices": "Servicios y Contratos Afectados",
-      "affectedServicesSubtitle": "Servicios y contratos impactados por este cambio",
-      "approve": "Aprobar",
-      "approveConditionally": "Aprobar Condicionalmente",
-      "backToCatalog": "Volver a Confianza en Cambios",
-      "baselineMetrics": "Métricas de Línea Base",
-      "blastRadius": "Radio de Impacto",
-      "changeScore": "Score de Cambio",
-      "changeType": "Tipo de Cambio",
-      "commitSha": "Commit SHA",
-      "confidenceStatus": "Estado de Confianza",
-      "decidedAt": "Decidido En",
-      "decidedBy": "Decidido Por",
-      "decision": "Decisión",
-      "decisionActions": "Acciones de Decisión",
-      "decisionConditions": "Condiciones",
-      "decisionConditionsPlaceholder": "Especifique condiciones para la aprobación condicional...",
-      "decisionError": "Error al registrar la decisión",
-      "decisionHistory": "Historial de Decisiones",
-      "decisionHistorySubtitle": "Pista de auditoría de todas las decisiones de gobernanza",
-      "decisionRationale": "Justificación",
-      "decisionRationalePlaceholder": "Explique la razón de su decisión...",
-      "decisionSubtitle": "Tome una decisión de gobernanza sobre este cambio",
-      "decisionSuccess": "Decisión registrada exitosamente",
-      "description": "Descripción",
-      "directConsumers": "Consumidores Directos",
-      "evidenceComplete": "La recolección de evidencias está completa",
-      "evidenceNone": "No hay evidencias disponibles aún",
-      "evidencePartial": "Algunas evidencias aún faltan",
-      "evidenceReadiness": "Preparación de Evidencias",
-      "evidenceReadinessSubtitle": "Completitud de evidencias para la decisión de gobernanza",
-      "factorName": {
-        "BlastRadiusScope": "Alcance del Blast Radius",
-        "ChangeScore": "Puntuación del Cambio",
-        "EvidenceCompleteness": "Completitud de Evidencias",
-        "FreezeWindowConflict": "Ventana de Congelación",
-        "RollbackReadiness": "Preparación de Rollback"
+    "breakdown": {
+      "title": "Desglose de Confianza en el Cambio",
+      "aggregatedScore": "Puntuación Agregada",
+      "subScores": "Sub-puntuaciones",
+      "computed": "Calculado a las",
+      "version": "Versión de puntuación",
+      "confidence": {
+        "low": "Confianza baja",
+        "medium": "Confianza media",
+        "high": "Confianza alta"
       },
-      "factorStatus": {
-        "Fail": "Reprobado",
-        "Pass": "Aprobado",
-        "Unknown": "Desconocido",
-        "Warning": "Advertencia"
+      "subScoreType": {
+        "testCoverage": "Cobertura de Pruebas",
+        "contractStability": "Estabilidad de Contrato",
+        "historicalRegression": "Regresión Histórica",
+        "blastSurface": "Superficie de Impacto",
+        "dependencyHealth": "Salud de Dependencias",
+        "canarySignal": "Señal Canary",
+        "preProdDelta": "Delta Pre-Producción"
       },
-      "noAdvisory": "Recomendación aún no disponible",
-      "noAffectedServices": "No hay servicios o contratos vinculados",
-      "noBlastRadius": "Radio de impacto aún no calculado",
-      "noDecisions": "No hay decisiones registradas",
-      "noDecisionsDescription": "Las decisiones aparecerán aquí después de una acción de gobernanza.",
-      "noTimeline": "Sin eventos de timeline registrados",
-      "noValidation": "Sin evidencia de validación disponible",
-      "overallConfidence": "Confianza General",
-      "overview": "Visión General",
-      "pipelineSource": "Pipeline de Origen",
-      "quickLinks": "Enlaces Rápidos",
-      "rationale": "Justificación",
-      "recommendation": "Recomendación",
-      "recommendationType": {
-        "Approve": "Aprobar",
-        "ApproveConditionally": "Aprobar Condicionalmente",
-        "NeedsMoreEvidence": "Necesita Más Evidencias",
-        "Reject": "Rechazar"
-      },
-      "reject": "Rechazar",
-      "reviewStatus": "Estado de Revisión",
-      "riskAndConfidence": "Riesgo y Confianza",
-      "submitDecision": "Enviar Decisión",
-      "timeline": "Timeline",
-      "title": "Detalle del Cambio",
-      "totalAffected": "Total de Consumidores Afectados",
-      "transitiveConsumers": "Consumidores Transitivos",
-      "validation": "Validación y Evidencias",
-      "validationStatus": "Estado de Validación",
-      "viewContract": "Ver Contrato",
-      "viewInReleases": "Ver en Releases",
-      "viewIncidents": "Ver Incidentes",
-      "viewIncidentsDescription": "Ver incidentes correlacionados con este cambio",
-      "viewService": "Ver Servicio",
-      "viewServiceSot": "Ver Servicio en Source of Truth",
-      "workItem": "Work Item",
-      "featureFlags": "Feature Flag Awareness",
-      "featureFlagsSubtitle": "Feature flags activas en el momento de esta release y riesgo asociado",
-      "featureFlagsUnavailable": "Datos de feature flags no disponibles para este cambio",
-      "noFeatureFlagData": "No se ha registrado estado de feature flag para esta release",
-      "activeFlagCount": "Flags Activas",
-      "criticalFlagCount": "Flags Críticas",
-      "newFlagCount": "Nuevas Flags",
-      "flagRiskLevel": "Nivel de Riesgo",
-      "flagProvider": "Proveedor",
-      "historicalPattern": "Insight de Patrón Histórico",
-      "historicalPatternSubtitle": "Señal de riesgo basada en cambios similares del pasado para este servicio y entorno",
-      "historicalPatternUnavailable": "Datos de patrón histórico no disponibles para este cambio",
-      "noHistoricalData": "Muestras históricas insuficientes para calcular un patrón",
-      "historicalSamples": "Muestras",
-      "successRate": "Tasa de Éxito",
-      "rollbackRate": "Tasa de Rollback",
-      "failureRate": "Tasa de Fallo",
-      "patternRisk": "Riesgo del Patrón",
-      "lookbackWindow": "Ventana de Análisis",
-      "traceCorrelations": "Correlaciones de Trace",
-      "traceCorrelationsSubtitle": "Traces distribuidos correlacionados con la ventana de esta release",
-      "traceCorrelationsUnavailable": "Datos de correlación de trace no disponibles para este cambio",
-      "noTraceCorrelations": "No se encontraron correlaciones de trace para esta release",
-      "traceCorrelationsFound": "correlaciones de trace encontradas"
-    },
-    "filters": {
-      "allEnvironments": "Todos los Entornos",
-      "allStatuses": "Todos los Estados",
-      "allTypes": "Todos los Tipos",
-      "changeType": "Tipo de Cambio",
-      "confidenceStatus": "Confianza",
-      "environment": "Entorno",
-      "searchPlaceholder": "Buscar cambios...",
-      "serviceName": "Servicio"
-    },
-    "subtitle": "Rastree, valide y analice cambios en sus servicios",
-    "summary": {
-      "changesNeedingAttention": "Necesitan Atención",
-      "correlatedWithIncidents": "Correlacionados con Incidentes",
-      "suspectedRegressions": "Regresiones Sospechosas",
-      "totalChanges": "Total de Cambios",
-      "validatedChanges": "Validados"
-    },
-    "table": {
-      "changeType": "Tipo",
-      "confidence": "Confianza",
-      "date": "Fecha",
-      "deploymentStatus": "Estado",
-      "environment": "Entorno",
-      "noChanges": "No se encontraron cambios",
-      "noChangesDescription": "Ajuste sus filtros o espere nuevos despliegues.",
-      "score": "Score",
-      "service": "Servicio",
-      "version": "Versión"
-    },
-    "title": "Confianza en Cambios"
+      "simulated": "Simulado — datos reales no disponibles",
+      "citations": "Citaciones"
+    }
   },
   "chaosEngineering": {
     "cancelled": "Cancelado",
@@ -8325,35 +8191,39 @@
     }
   },
   "releaseCalendar": {
-    "activeFreezeWindows": "Ventanas de Freeze Activas",
-    "activeFreezes": "Freezes Activos",
-    "avgScore": "Score Promedio",
-    "dailySummary": "Resumen Diario",
-    "date": "Fecha",
-    "deactivate": "Desactivar",
-    "editFreezeWindow": "Editar Ventana de Freeze",
-    "environment": "Entorno",
-    "filters": "Filtros",
-    "freezeWindowsList": "Ventanas de Freeze",
-    "from": "Desde",
-    "highRiskReleases": "Alto Riesgo",
-    "noReleases": "Ninguna release encontrada en este período",
-    "releaseTimeline": "Timeline de Releases",
-    "releasesLabel": "releases",
-    "scopeDomain": "Dominio",
-    "scopeEnvironment": "Entorno",
-    "scopeGlobal": "Global",
-    "scopeService": "Servicio",
-    "scopeTenant": "Tenant",
-    "score": "Score",
-    "subtitle": "Vista unificada de releases, ventanas de freeze y riesgo de cambios a lo largo del tiempo.",
-    "tabs": {
-      "calendar": "Calendario",
-      "freezeWindows": "Ventanas de Freeze"
-    },
     "title": "Calendario de Releases",
-    "to": "Hasta",
-    "totalReleases": "Total de Releases"
+    "window": "Ventana de Release",
+    "registerWindow": "Registrar Ventana",
+    "closeWindow": "Cerrar Ventana",
+    "cancelWindow": "Cancelar Ventana",
+    "windowType": "Tipo de Ventana",
+    "windowStatus": "Estado",
+    "startsAt": "Inicio",
+    "endsAt": "Fin",
+    "environmentFilter": "Filtro de Entorno",
+    "recurrenceTag": "Etiqueta de Recurrencia",
+    "blocksChanges": "Bloquea Cambios",
+    "isHotfixOnly": "Solo Hotfix",
+    "isOpen": "Ventana Abierta",
+    "isClosed": "Ventana Cerrada",
+    "windowTypes": {
+      "Scheduled": "Despliegue Planificado",
+      "Freeze": "Congelamiento",
+      "HotfixAllowed": "Hotfix Permitido",
+      "Maintenance": "Mantenimiento"
+    },
+    "windowStatuses": {
+      "Active": "Activo",
+      "Closed": "Cerrado",
+      "Cancelled": "Cancelado"
+    },
+    "changeBlocked": "El cambio está bloqueado por una ventana de congelamiento o mantenimiento activa.",
+    "changeAllowed": "El cambio está permitido en la ventana de release actual.",
+    "errors": {
+      "invalidWindow": "La fecha de fin debe ser posterior a la fecha de inicio.",
+      "alreadyClosed": "La ventana no está en estado Activo.",
+      "alreadyStarted": "No se puede cancelar una ventana que ya ha comenzado."
+    }
   },
   "releaseScope": {
     "excludedDescription": "Esta área sigue en el código, pero fue retirada deliberadamente del alcance del release productivo final. No forma parte de la superficie soportada en producción.",
@@ -11679,27 +11549,33 @@
     "unknown": "Desconocido"
   },
   "riskTrend": {
-    "title": "Tendencia de Risk Score",
-    "serviceLabel": "Servicio",
-    "servicePlaceholder": "ej: payment-service",
-    "envLabel": "Entorno",
-    "envPlaceholder": "ej: Production",
-    "limitLabel": "Límite",
-    "totalReleases": "Total de Releases",
-    "avgScore": "Score Promedio",
-    "maxScore": "Score Máximo",
-    "minScore": "Score Mínimo",
-    "chartTitle": "Tendencia de Risk Score (Más Antiguo → Más Reciente)",
-    "tableTitle": "Historial de Riesgo por Release",
-    "noData": "Sin datos para este servicio",
-    "emptyTitle": "Ningún Servicio Seleccionado",
-    "emptyMessage": "Ingrese el nombre de un servicio para ver la tendencia de risk score",
-    "colVersion": "Versión",
-    "colEnvironment": "Entorno",
-    "colChangeLevel": "Nivel de Cambio",
-    "colScore": "Score de Riesgo",
-    "colTrend": "Tendencia",
-    "colDate": "Fecha"
+    "title": "Informe de Tendencia de Riesgo",
+    "description": "Distribución de servicios por nivel de riesgo y ranking de los servicios de mayor riesgo.",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "highCriticalPercent": "% Alto/Crítico",
+    "avgOverallRiskScore": "Puntuación Media Global de Riesgo",
+    "riskDistribution": "Distribución de Riesgo",
+    "dimensionAverages": "Medias por Dimensión",
+    "topHighRiskServices": "Servicios de Mayor Riesgo",
+    "riskLevel": "Nivel de Riesgo",
+    "overallScore": "Puntuación Global",
+    "vulnerabilityScore": "Vulnerabilidad",
+    "changeFailureScore": "Fallo de Cambio",
+    "blastRadiusScore": "Radio de Impacto",
+    "policyViolationScore": "Violación de Política",
+    "activeSignals": "Señales Activas",
+    "levels": {
+      "Negligible": "Negligible",
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidMaxHighRiskServices": "El máximo de servicios de alto riesgo debe estar entre 1 y 100.",
+      "invalidHighRiskThreshold": "El umbral de alto riesgo debe estar entre 1 y 100."
+    }
   },
   "commitPool": {
     "title": "Pool de Commits de la Release",
@@ -12587,52 +12463,26 @@
     }
   },
   "dependencyRisk": {
-    "title": "Puntuación de Riesgo de Dependencias",
-    "subtitle": "Puntuación de riesgo por servicio con historial de fallos, SLO y análisis de blast radius",
-    "loading": "Cargando puntuaciones de riesgo de dependencias…",
-    "loadError": "Error al cargar datos de riesgo. Inténtelo de nuevo.",
-    "noRecords": "No se encontraron servicios.",
-    "timeRange": {
-      "1h": "Última 1 hora",
-      "6h": "Últimas 6 horas",
-      "24h": "Últimas 24 horas",
-      "7d": "Últimos 7 días"
+    "title": "Informe de Riesgo de Dependencias",
+    "subtitle": "Puntuación de riesgo basada en el grafo: tier, fan-in de APIs y brechas de gobernanza de ownership.",
+    "riskLevels": {
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
     },
-    "table": {
-      "service": "Servicio",
-      "riskScore": "Puntuación de Riesgo",
-      "failureHistory": "Historial de Fallos",
-      "sloHealth": "Salud del SLO",
-      "blastRadius": "Blast Radius",
-      "deployFrequency": "Frec. de Deploy",
-      "dependents": "Dependientes",
-      "trend": "Tendencia"
-    },
-    "riskLevel": {
-      "critical": "Crítico",
-      "high": "Alto",
-      "medium": "Medio",
-      "low": "Bajo"
-    },
-    "impactMatrix": {
-      "title": "¿Qué falla si X se degrada?",
-      "service": "Si {{service}} se degrada…",
-      "downstream": "Impacto Downstream",
-      "severity": "Severidad",
-      "probability": "Probabilidad"
-    },
-    "factors": {
-      "title": "Factores de Riesgo",
-      "failureHistory": "Historial de Fallos (30d)",
-      "sloCompliance": "Cumplimiento de SLO",
-      "blastRadius": "Blast Radius",
-      "deployFrequency": "Frecuencia de Deploy"
-    },
-    "stats": {
-      "totalServices": "Servicios",
-      "critical": "Riesgo Crítico",
-      "high": "Riesgo Alto",
-      "avgScore": "Puntuación Media de Riesgo"
+    "overallRisk": "Riesgo Global del Grafo",
+    "highRiskCount": "Servicios de Alto/Crítico Riesgo",
+    "totalAnalyzed": "Servicios Analizados",
+    "service": "Servicio",
+    "tier": "Tier",
+    "owner": "Equipo Owner",
+    "riskScore": "Puntuación de Riesgo",
+    "apiCount": "APIs Expuestas",
+    "riskFactors": "Factores de Riesgo",
+    "errors": {
+      "noServices": "No se encontraron servicios para el filtro especificado.",
+      "tenantRequired": "El ID de tenant es obligatorio."
     }
   },
   "loadTesting": {
@@ -13014,31 +12864,6 @@
         "partial": "~ Parcial",
         "incorrect": "✗ Incorrecto"
       }
-    }
-  },
-  "changeConfidence": {
-    "breakdown": {
-      "title": "Desglose de Confianza en el Cambio",
-      "aggregatedScore": "Puntuación Agregada",
-      "subScores": "Sub-puntuaciones",
-      "computed": "Calculado a las",
-      "version": "Versión de puntuación",
-      "confidence": {
-        "low": "Confianza baja",
-        "medium": "Confianza media",
-        "high": "Confianza alta"
-      },
-      "subScoreType": {
-        "testCoverage": "Cobertura de Pruebas",
-        "contractStability": "Estabilidad de Contrato",
-        "historicalRegression": "Regresión Histórica",
-        "blastSurface": "Superficie de Impacto",
-        "dependencyHealth": "Salud de Dependencias",
-        "canarySignal": "Señal Canary",
-        "preProdDelta": "Delta Pre-Producción"
-      },
-      "simulated": "Simulado — datos reales no disponibles",
-      "citations": "Citaciones"
     }
   },
   "aiEvaluation": {
@@ -13471,41 +13296,6 @@
       "disabled": "La política está deshabilitada"
     }
   },
-  "releaseCalendar": {
-    "title": "Calendario de Releases",
-    "window": "Ventana de Release",
-    "registerWindow": "Registrar Ventana",
-    "closeWindow": "Cerrar Ventana",
-    "cancelWindow": "Cancelar Ventana",
-    "windowType": "Tipo de Ventana",
-    "windowStatus": "Estado",
-    "startsAt": "Inicio",
-    "endsAt": "Fin",
-    "environmentFilter": "Filtro de Entorno",
-    "recurrenceTag": "Etiqueta de Recurrencia",
-    "blocksChanges": "Bloquea Cambios",
-    "isHotfixOnly": "Solo Hotfix",
-    "isOpen": "Ventana Abierta",
-    "isClosed": "Ventana Cerrada",
-    "windowTypes": {
-      "Scheduled": "Despliegue Planificado",
-      "Freeze": "Congelamiento",
-      "HotfixAllowed": "Hotfix Permitido",
-      "Maintenance": "Mantenimiento"
-    },
-    "windowStatuses": {
-      "Active": "Activo",
-      "Closed": "Cerrado",
-      "Cancelled": "Cancelado"
-    },
-    "changeBlocked": "El cambio está bloqueado por una ventana de congelamiento o mantenimiento activa.",
-    "changeAllowed": "El cambio está permitido en la ventana de release actual.",
-    "errors": {
-      "invalidWindow": "La fecha de fin debe ser posterior a la fecha de inicio.",
-      "alreadyClosed": "La ventana no está en estado Activo.",
-      "alreadyStarted": "No se puede cancelar una ventana que ya ha comenzado."
-    }
-  },
   "riskCenter": {
     "title": "Centro de Riesgo",
     "report": "Informe de Riesgo",
@@ -13748,29 +13538,6 @@
         "CategoryGrowth": "Crecimiento de Categoría"
       },
       "noInsights": "No se detectaron anomalías de costo para este período."
-    }
-  },
-  "dependencyRisk": {
-    "title": "Informe de Riesgo de Dependencias",
-    "subtitle": "Puntuación de riesgo basada en el grafo: tier, fan-in de APIs y brechas de gobernanza de ownership.",
-    "riskLevels": {
-      "Low": "Bajo",
-      "Medium": "Medio",
-      "High": "Alto",
-      "Critical": "Crítico"
-    },
-    "overallRisk": "Riesgo Global del Grafo",
-    "highRiskCount": "Servicios de Alto/Crítico Riesgo",
-    "totalAnalyzed": "Servicios Analizados",
-    "service": "Servicio",
-    "tier": "Tier",
-    "owner": "Equipo Owner",
-    "riskScore": "Puntuación de Riesgo",
-    "apiCount": "APIs Expuestas",
-    "riskFactors": "Factores de Riesgo",
-    "errors": {
-      "noServices": "No se encontraron servicios para el filtro especificado.",
-      "tenantRequired": "El ID de tenant es obligatorio."
     }
   },
   "gdprCompliance": {
@@ -14135,35 +13902,6 @@
       "invalidThreshold": "El umbral Excellent debe ser mayor que el umbral Good."
     }
   },
-  "riskTrend": {
-    "title": "Informe de Tendencia de Riesgo",
-    "description": "Distribución de servicios por nivel de riesgo y ranking de los servicios de mayor riesgo.",
-    "totalServicesAnalyzed": "Servicios Analizados",
-    "highCriticalPercent": "% Alto/Crítico",
-    "avgOverallRiskScore": "Puntuación Media Global de Riesgo",
-    "riskDistribution": "Distribución de Riesgo",
-    "dimensionAverages": "Medias por Dimensión",
-    "topHighRiskServices": "Servicios de Mayor Riesgo",
-    "riskLevel": "Nivel de Riesgo",
-    "overallScore": "Puntuación Global",
-    "vulnerabilityScore": "Vulnerabilidad",
-    "changeFailureScore": "Fallo de Cambio",
-    "blastRadiusScore": "Radio de Impacto",
-    "policyViolationScore": "Violación de Política",
-    "activeSignals": "Señales Activas",
-    "levels": {
-      "Negligible": "Negligible",
-      "Low": "Bajo",
-      "Medium": "Medio",
-      "High": "Alto",
-      "Critical": "Crítico"
-    },
-    "errors": {
-      "invalidTenantId": "El ID del tenant es obligatorio.",
-      "invalidMaxHighRiskServices": "El máximo de servicios de alto riesgo debe estar entre 1 y 100.",
-      "invalidHighRiskThreshold": "El umbral de alto riesgo debe estar entre 1 y 100."
-    }
-  },
   "evidencePackCoverage": {
     "title": "Cobertura de Evidence Packs",
     "description": "Análisis de cobertura de evidence packs respecto a las releases en el período seleccionado.",
@@ -14184,6 +13922,83 @@
       "invalidLookbackDays": "Los días de lookback deben estar entre 1 y 365.",
       "invalidMaxUncovered": "El máximo de releases sin cobertura debe estar entre 1 y 100.",
       "invalidCompletenessThreshold": "El umbral de completitud debe estar entre 0 y 100."
+    }
+  },
+  "contractVersioningReport": {
+    "title": "Informe de Versionado de Contratos",
+    "description": "Distribución de ciclo de vida y protocolo de todos los contratos registrados",
+    "totalVersions": "Total de Versiones",
+    "distinctContracts": "Contratos Distintos",
+    "deprecatedCount": "Deprecados",
+    "sunsetCount": "Sunset",
+    "retiredCount": "Retirados",
+    "deprecatedRatio": "Ratio Obsoleto %",
+    "activeRatio": "Ratio Activo %",
+    "byLifecycleState": "Por Estado de Ciclo de Vida",
+    "byProtocol": "Por Protocolo",
+    "topDeprecatedContracts": "Top Contratos Obsoletos",
+    "state": "Estado",
+    "count": "Cantidad",
+    "percent": "Porcentaje",
+    "protocol": "Protocolo",
+    "apiAssetId": "ID del Activo API",
+    "semVer": "Versión",
+    "lifecycleState": "Estado de Ciclo de Vida",
+    "errors": {
+      "invalidTopDeprecatedCount": "El número de contratos deprecados debe estar entre 1 y 50.",
+      "invalidPageSize": "El tamaño de página debe estar entre 10 y 500."
+    }
+  },
+  "finOpsTrendReport": {
+    "title": "Informe de Tendencia FinOps",
+    "description": "Tendencia de costo operacional por día, categoría y principales servicios",
+    "tenantId": "Tenant",
+    "from": "Desde",
+    "to": "Hasta",
+    "lookbackDays": "Días de Análisis",
+    "currentPeriodTotal": "Total Período Actual (USD)",
+    "previousPeriodTotal": "Total Período Anterior (USD)",
+    "deltaPercent": "Variación del Período %",
+    "dailySeries": "Serie Diaria de Costo",
+    "byCategory": "Por Categoría",
+    "topServices": "Principales Servicios",
+    "date": "Fecha",
+    "totalUsd": "Total (USD)",
+    "category": "Categoría",
+    "serviceName": "Servicio",
+    "teamId": "Equipo",
+    "costPercent": "% del Costo",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de análisis deben estar entre 1 y 365.",
+      "invalidTopServicesCount": "El número de servicios debe estar entre 1 y 50."
+    }
+  },
+  "promotionGateComplianceReport": {
+    "title": "Informe de Cumplimiento de Gates de Promoción",
+    "description": "Tasa de aprobación de gates de promoción, overrides y gates con más fallos",
+    "tenantId": "Tenant",
+    "from": "Desde",
+    "to": "Hasta",
+    "lookbackDays": "Días de Análisis",
+    "totalEvaluations": "Total de Evaluaciones",
+    "totalPassed": "Aprobado",
+    "totalFailed": "Fallido",
+    "totalOverridden": "Override",
+    "globalPassRate": "Tasa Global de Aprobación %",
+    "byGateType": "Por Tipo de Gate",
+    "topFailingGates": "Gates con Más Fallos",
+    "gateType": "Tipo de Gate",
+    "passedCount": "Aprobado",
+    "failedCount": "Fallido",
+    "overriddenCount": "Override",
+    "passRate": "Tasa de Aprobación %",
+    "gateId": "ID del Gate",
+    "failRate": "Tasa de Fallo %",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de análisis deben estar entre 1 y 365.",
+      "invalidTopFailingGatesCount": "El número de gates debe estar entre 1 y 50."
     }
   }
 }
