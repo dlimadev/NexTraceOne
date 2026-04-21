@@ -16,4 +16,7 @@ public interface IEvidencePackRepository
 
     /// <summary>Busca o EvidencePack associado a uma instância de workflow.</summary>
     Task<EvidencePack?> GetByWorkflowInstanceIdAsync(WorkflowInstanceId instanceId, CancellationToken cancellationToken = default);
+
+    /// <summary>Lista EvidencePacks associados a um conjunto de releases (batch lookup para relatórios de conformidade).</summary>
+    Task<IReadOnlyList<EvidencePack>> ListByReleaseIdsAsync(IEnumerable<Guid> releaseIds, CancellationToken cancellationToken = default);
 }

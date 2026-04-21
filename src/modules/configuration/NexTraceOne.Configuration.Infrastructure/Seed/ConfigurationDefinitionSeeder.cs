@@ -7447,5 +7447,42 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "90",
             uiEditorType: "number",
             sortOrder: 9970),
+
+        // ── Wave D.1.b — Digital Twin: Failure Simulation ────────────────
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.failure_sim.max_depth",
+            displayName: "config.digital_twin.failure_sim.max_depth.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.failure_sim.max_depth.description",
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 9980),
+
+        // ── NIS2 Compliance Report ────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "compliance.nis2.enabled",
+            displayName: "config.compliance.nis2.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.nis2.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9990),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.nis2.report.period_days",
+            displayName: "config.compliance.nis2.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.nis2.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10000),
     ];
 }

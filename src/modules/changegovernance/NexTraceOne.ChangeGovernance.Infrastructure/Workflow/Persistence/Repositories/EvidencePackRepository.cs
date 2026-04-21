@@ -21,4 +21,13 @@ internal sealed class EvidencePackRepository(WorkflowDbContext context)
     public async Task<EvidencePack?> GetByWorkflowInstanceIdAsync(WorkflowInstanceId instanceId, CancellationToken cancellationToken = default)
         => await context.EvidencePacks
             .SingleOrDefaultAsync(e => e.WorkflowInstanceId == instanceId, cancellationToken);
+
+    /// <summary>Lista EvidencePacks associados a um conjunto de releases (batch lookup para relatórios de conformidade).</summary>
+    public async Task<IReadOnlyList<EvidencePack>> ListByReleaseIdsAsync(IEnumerable<Guid> releaseIds, CancellationToken cancellationToken = default)
+    {
+        var ids = releaseIds.ToList();
+        return await context.EvidencePacks
+            .Where(e => ids.Contains(e.ReleaseId))
+            .ToListAsync(cancellationToken);
+    }
 }

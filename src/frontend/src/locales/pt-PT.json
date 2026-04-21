@@ -13320,7 +13320,16 @@
     "nodeCount": "Nós",
     "edgeCount": "Arestas",
     "capturedAt": "Capturado Em",
-    "noSnapshot": "Nenhum snapshot de topologia disponível"
+    "noSnapshot": "Nenhum snapshot de topologia disponível",
+    "failureSim": {
+      "title": "Simulação de Impacto de Falha",
+      "cascadeRisk": "Risco em Cascata",
+      "exposedApis": "APIs Expostas",
+      "directImpact": "Impacto Direto",
+      "transitiveImpact": "Impacto Transitivo",
+      "totalImpacted": "Total de Serviços Impactados",
+      "consumerTeam": "Equipa Consumidora"
+    }
   },
   "agentApi": {
     "title": "Tokens de API de Agente",
@@ -13343,5 +13352,21 @@
     "durationMs": "Duração (ms)",
     "executedAt": "Executado Em",
     "rawTokenHint": "Este token é apresentado apenas uma vez. Guarde-o em segurança."
+  },
+  "nis2Compliance": {
+    "title": "Relatório de Conformidade NIS2",
+    "overallStatus": "Estado Geral",
+    "controlId": "ID do Controlo",
+    "controlName": "Controlo",
+    "status": {
+      "NotAssessed": "Não Avaliado",
+      "Compliant": "Conforme",
+      "PartiallyCompliant": "Parcialmente Conforme",
+      "NonCompliant": "Não Conforme"
+    },
+    "periodDays": "Período de Avaliação (dias)",
+    "generatedAt": "Gerado Em",
+    "signedPacks": "Pacotes de Evidência Assinados",
+    "totalReleases": "Total de Releases"
   }
 }
