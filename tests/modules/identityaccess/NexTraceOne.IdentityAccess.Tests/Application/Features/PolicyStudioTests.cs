@@ -140,6 +140,25 @@ public sealed class PolicyStudioTests
         resultFail.Passed.Should().BeFalse();
     }
 
+    [Fact]
+    public void PolicyDefinition_Evaluate_Handles_Matches_Wildcard_Operator()
+    {
+        var policy = PolicyDefinition.Create(
+            "tenant-1", "Wildcard filter", null, PolicyDefinitionType.AccessControl,
+            """[{"Field":"service","Operator":"Matches","Value":"payment-*"}]""",
+            """{"action":"Block","message":"Service not in allowed pattern"}""",
+            "*", null, null, Now);
+
+        var resultPass = policy.Evaluate("""{"service":"payment-gateway"}""");
+        var resultAlsoPass = policy.Evaluate("""{"service":"payment-processor"}""");
+        var resultFail = policy.Evaluate("""{"service":"catalog-service"}""");
+
+        resultPass.Passed.Should().BeTrue();
+        resultAlsoPass.Passed.Should().BeTrue();
+        resultFail.Passed.Should().BeFalse();
+        resultFail.Action.Should().Be("Block");
+    }
+
     // ── Handler tests ─────────────────────────────────────────────────────
 
     [Fact]

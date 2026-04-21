@@ -165,11 +165,48 @@ public sealed class PolicyDefinition : AuditableEntity<PolicyDefinitionId>
             "NotEquals" => !string.Equals(contextValue, rule.Value, StringComparison.OrdinalIgnoreCase),
             "Contains" => contextValue.Contains(rule.Value, StringComparison.OrdinalIgnoreCase),
             "NotContains" => !contextValue.Contains(rule.Value, StringComparison.OrdinalIgnoreCase),
-            "Matches" => contextValue.Equals(rule.Value, StringComparison.OrdinalIgnoreCase),
-            "GreaterThan" => decimal.TryParse(contextValue, out var cv) && decimal.TryParse(rule.Value, out var rv) && cv > rv,
-            "LessThan" => decimal.TryParse(contextValue, out var cv2) && decimal.TryParse(rule.Value, out var rv2) && cv2 < rv2,
+            "Matches" => MatchesWildcard(contextValue, rule.Value),
+            "GreaterThan" => decimal.TryParse(contextValue, out var contextNumericValue) && decimal.TryParse(rule.Value, out var ruleNumericValue) && contextNumericValue > ruleNumericValue,
+            "LessThan" => decimal.TryParse(contextValue, out var contextNumericValueLt) && decimal.TryParse(rule.Value, out var ruleNumericValueLt) && contextNumericValueLt < ruleNumericValueLt,
             _ => true
         };
+    }
+
+    /// <summary>
+    /// Avalia correspondência com padrão glob simples: '*' corresponde a qualquer sequência de caracteres.
+    /// Exemplo: "service-*" corresponde a "service-auth" ou "service-catalog".
+    /// A comparação é case-insensitive.
+    /// </summary>
+    private static bool MatchesWildcard(string value, string pattern)
+    {
+        if (string.IsNullOrEmpty(pattern)) return string.IsNullOrEmpty(value);
+        if (pattern == "*") return true;
+
+        var valueLower = value.ToLowerInvariant();
+        var patternLower = pattern.ToLowerInvariant();
+
+        if (!patternLower.Contains('*'))
+            return string.Equals(valueLower, patternLower, StringComparison.Ordinal);
+
+        var parts = patternLower.Split('*');
+        var pos = 0;
+        for (var i = 0; i < parts.Length; i++)
+        {
+            var part = parts[i];
+            if (part.Length == 0) continue;
+            var idx = valueLower.IndexOf(part, pos, StringComparison.Ordinal);
+            if (idx < 0) return false;
+            if (i == 0 && idx != 0) return false;
+            pos = idx + part.Length;
+        }
+
+        if (!patternLower.EndsWith('*') && parts[^1].Length > 0)
+        {
+            var lastPart = parts[^1];
+            return valueLower.EndsWith(lastPart, StringComparison.Ordinal);
+        }
+
+        return true;
     }
 
     private sealed record PolicyRule(string Field, string Operator, string Value);
