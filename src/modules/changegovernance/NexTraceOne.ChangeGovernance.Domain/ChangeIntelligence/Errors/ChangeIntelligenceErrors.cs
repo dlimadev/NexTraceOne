@@ -67,4 +67,20 @@ public static class ChangeIntelligenceErrors
             "ChangeIntelligence.Ingest.DisabledForEnvironment",
             "Change event ingest is disabled for environment '{0}'. Update 'env.behavior.change.ingest.enabled' to re-enable.",
             environment);
+
+    /// <summary>Nenhum campo de evidência SLSA foi fornecido.</summary>
+    public static Error SlsaNoEvidence()
+        => Error.Validation("ChangeIntelligence.Release.Slsa.NoEvidence", "At least one SLSA evidence field must be provided.");
+
+    /// <summary>URI de proveniência SLSA excede o comprimento máximo permitido.</summary>
+    public static Error SlsaProvenanceUriTooLong()
+        => Error.Validation("ChangeIntelligence.Release.Slsa.ProvenanceUriTooLong", "Provenance URI must be at most 2000 characters.");
+
+    /// <summary>Digest do artefacto excede o comprimento máximo permitido.</summary>
+    public static Error SlsaArtifactDigestTooLong()
+        => Error.Validation("ChangeIntelligence.Release.Slsa.ArtifactDigestTooLong", "Artifact digest must be at most 200 characters.");
+
+    /// <summary>URI do SBOM excede o comprimento máximo permitido.</summary>
+    public static Error SlsaSbomUriTooLong()
+        => Error.Validation("ChangeIntelligence.Release.Slsa.SbomUriTooLong", "SBOM URI must be at most 2000 characters.");
 }

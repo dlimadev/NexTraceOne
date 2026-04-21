@@ -13371,5 +13371,18 @@
     "generatedAt": "Generado El",
     "signedPacks": "Paquetes de Evidencia Firmados",
     "totalReleases": "Total de Releases"
+  },
+  "slsa": {
+    "title": "Evidencia SLSA Nivel 3",
+    "provenanceUri": "URI de Procedencia",
+    "artifactDigest": "Digest del Artefacto",
+    "sbomUri": "URI del SBOM",
+    "hasAttestation": "Tiene Attestation de Artefacto",
+    "artifactGate": {
+      "title": "Gate de Artefacto Firmado",
+      "passed": "Attestation del artefacto verificada",
+      "failed": "No se encontró attestation del artefacto",
+      "skipped": "Gate deshabilitado"
+    }
   }
 }

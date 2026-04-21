@@ -701,6 +701,11 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.Property<string>("ApprovalStatus")
                         .HasColumnType("text");
 
+                    b.Property<string>("ArtifactDigest")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("artifact_digest");
+
                     b.Property<int>("ChangeLevel")
                         .HasColumnType("integer");
 
@@ -776,6 +781,16 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("SbomUri")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("sbom_uri");
+
+                    b.Property<string>("SlsaProvenanceUri")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("slsa_provenance_uri");
+
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -814,6 +829,10 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ExternalReleaseId", "ExternalSystem")
                         .HasDatabaseName("ix_chg_releases_external_key")
                         .HasFilter("\"ExternalReleaseId\" IS NOT NULL AND \"ExternalSystem\" IS NOT NULL");
+
+                    b.HasIndex("ArtifactDigest")
+                        .HasDatabaseName("ix_chg_releases_artifact_digest")
+                        .HasFilter("\"artifact_digest\" IS NOT NULL");
 
                     b.ToTable("chg_releases", null, t =>
                         {

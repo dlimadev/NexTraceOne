@@ -73,6 +73,17 @@ public sealed class Release : AggregateRoot<ReleaseId>
     /// <summary>Descrição ou sumário da mudança.</summary>
     public string? Description { get; private set; }
 
+    // ── SLSA Level 3 evidence ────────────────────────────────────────
+
+    /// <summary>URI canónica para o documento de proveniência SLSA (ex.: URL de attestation GitHub Actions SLSA 3).</summary>
+    public string? SlsaProvenanceUri { get; private set; }
+
+    /// <summary>Digest criptográfico do artefacto publicado (SHA-256 ou SHA-512), em formato "algo:hex".</summary>
+    public string? ArtifactDigest { get; private set; }
+
+    /// <summary>URI para o SBOM (Software Bill of Materials) em formato CycloneDX ou SPDX.</summary>
+    public string? SbomUri { get; private set; }
+
     // ── Fase 4: Contexto de Tenant/Ambiente ────────────────────────────────
 
     /// <summary>
@@ -287,6 +298,32 @@ public sealed class Release : AggregateRoot<ReleaseId>
     public void SetExternalValidationPassed(bool passed)
     {
         ExternalValidationPassed = passed;
+    }
+
+    /// <summary>
+    /// Anexa evidência SLSA Level 3 à release: URI de proveniência, digest do artefacto e URI do SBOM.
+    /// Pelo menos um dos campos deve ser fornecido para que o método tenha efeito.
+    /// </summary>
+    public Result<Unit> AttachSlsaProvenance(string? provenanceUri, string? artifactDigest, string? sbomUri)
+    {
+        if (string.IsNullOrWhiteSpace(provenanceUri) &&
+            string.IsNullOrWhiteSpace(artifactDigest) &&
+            string.IsNullOrWhiteSpace(sbomUri))
+            return ChangeIntelligenceErrors.SlsaNoEvidence();
+
+        if (provenanceUri is not null && provenanceUri.Length > 2000)
+            return ChangeIntelligenceErrors.SlsaProvenanceUriTooLong();
+
+        if (artifactDigest is not null && artifactDigest.Length > 200)
+            return ChangeIntelligenceErrors.SlsaArtifactDigestTooLong();
+
+        if (sbomUri is not null && sbomUri.Length > 2000)
+            return ChangeIntelligenceErrors.SlsaSbomUriTooLong();
+
+        SlsaProvenanceUri = provenanceUri;
+        ArtifactDigest = artifactDigest;
+        SbomUri = sbomUri;
+        return Unit.Value;
     }
 
     /// <summary>

@@ -7484,5 +7484,27 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "90",
             uiEditorType: "number",
             sortOrder: 10000),
+
+        ConfigurationDefinition.Create(
+            key: "slsa.provenance.required_for_production",
+            displayName: "config.slsa.provenance.required_for_production.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slsa.provenance.required_for_production.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 10010),
+
+        ConfigurationDefinition.Create(
+            key: "slsa.artifact_gate.enabled",
+            displayName: "config.slsa.artifact_gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slsa.artifact_gate.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 10020),
     ];
 }

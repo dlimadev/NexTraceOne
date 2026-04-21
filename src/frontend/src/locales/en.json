@@ -13361,5 +13361,18 @@
     "generatedAt": "Generated At",
     "signedPacks": "Signed Evidence Packs",
     "totalReleases": "Total Releases"
+  },
+  "slsa": {
+    "title": "SLSA Level 3 Evidence",
+    "provenanceUri": "Provenance URI",
+    "artifactDigest": "Artifact Digest",
+    "sbomUri": "SBOM URI",
+    "hasAttestation": "Has Artifact Attestation",
+    "artifactGate": {
+      "title": "Signed Artifact Gate",
+      "passed": "Artifact attestation verified",
+      "failed": "No artifact attestation found",
+      "skipped": "Gate disabled"
+    }
   }
 }
