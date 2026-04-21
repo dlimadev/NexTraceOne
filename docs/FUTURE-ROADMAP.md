@@ -3,10 +3,11 @@
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
 > **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → AI (45 features novas documentadas, aguardam implementação)  
+> **Waves planeadas:** U → AM (57 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
+> **Waves AJ–AM (backend avançado III):** 4 novas waves planeadas — Multi-Tenant Governance Intelligence, Developer Experience & Notification Management, Audit Intelligence & Traceability Analytics, Auto-Cataloging & Service Discovery Intelligence  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -2427,6 +2428,382 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AJ — Multi-Tenant Governance Intelligence
+
+**Objetivo:** Materializar a capacidade de governança multi-tenant do NexTraceOne — passando do foco single-tenant para visibilidade cruzada entre tenants (onde consentida), benchmarks de maturidade, e gestão centralizada de políticas de plataforma que se propagam a múltiplos tenants. Esta wave endereça o cenário enterprise de organismos com múltiplas unidades de negócio ou clientes SaaS com instâncias segregadas.
+
+#### AJ.1 — GetCrossTenantMaturityReport (ChangeGovernance)
+
+**Feature:** Comparação anónima e consentida de maturidade entre tenants. Responde "onde estamos nós vs. o benchmark do ecossistema?" por dimensão de maturidade — sem expor dados de tenants específicos.
+
+**Domínio:** Complementa `BenchmarkSnapshotRecord` (Wave D.2) com análise de maturidade composta, adicionando mais dimensões e ranking percentual anónimo.
+
+**Capacidades:**
+- Para cada tenant com `TenantBenchmarkConsent.ConsentGiven = true`, calcula e publica `MaturitySnapshot` em 7 dimensões:
+  - **ContractGoverned** — % de serviços com contratos registados e aprovados
+  - **ChangeConfidenceEnabled** — % de releases com `ConfidenceScore` registado
+  - **SloTracked** — % de serviços com `SloObservation` no último mês
+  - **RunbookCovered** — % de incidentes com runbook associado pós-evento
+  - **ProfilingActive** — % de serviços com `ProfilingSession` no último mês
+  - **ComplianceEvaluated** — % de serviços com pelo menos 1 compliance report no trimestre
+  - **AiAssistantUsed** — % de utilizadores activos que interagiram com AI assistant no mês
+- **TenantMaturityScore** (0–100) — média ponderada das 7 dimensões
+- **MaturityTier:** `Pioneer` ≥85 / `Advanced` ≥65 / `Developing` ≥40 / `Emerging` <40
+- **BenchmarkPercentile** — percentil do tenant no ecossistema (apenas para tenants com consentimento; exclui self)
+- **WeakestDimensions** — top 3 dimensões com maior gap vs. benchmark mediano
+- **ImprovementPotential** — ganho estimado em MaturityScore se WeakestDimensions chegassem à mediana
+- Dados de benchmark anónimos: apenas median, p25, p75 do ecossistema por dimensão (nunca dados de tenant individual)
+- Resultado disponível via `GET /api/v1/governance/maturity/cross-tenant-benchmark`
+
+**Orientado para Executive, Platform Admin e Architect** — suporte a decisões de investimento em maturidade de plataforma com contexto de benchmark de mercado.
+
+#### AJ.2 — GetTenantHealthScoreReport (ChangeGovernance)
+
+**Feature:** Scorecard de saúde global do tenant por dimensão operacional. Agrega sinais de múltiplos módulos num único health score que reflete a "robustez operacional" do tenant no período.
+
+**Domínio:** Orquestra leituras de múltiplos módulos para produzir visão holística de saúde: serviços, contratos, mudanças, operação, compliance e FinOps.
+
+**Capacidades:**
+- **TenantHealthScore** (0–100) calculado por 6 pilares ponderados:
+  - **Service Governance** (20%) — % de serviços com ownership + tier + contratos definidos
+  - **Change Confidence** (20%) — média de `ConfidenceScore` das últimas 30 releases
+  - **Operational Reliability** (20%) — SLO compliance rate + MTTR DORA tier
+  - **Contract Health** (15%) — % de contratos `Approved` sem breaking changes não comunicados
+  - **Compliance Coverage** (15%) — % de serviços avaliados em ≥ 2 standards de compliance
+  - **FinOps Efficiency** (10%) — ausência de serviços `WasteAlert` + `WasteTier` tenant
+- **HealthTier:** `Excellent` ≥85 / `Good` ≥65 / `Fair` ≥40 / `AtRisk` <40
+- **PillarBreakdown** — score por pilar e contribuição para score global
+- **TrendComparison** — score do período atual vs. período anterior (30 dias antes)
+- **TopIssues** — top 5 issues mais impactantes no score (com pilar e impacto estimado em pontos)
+- **ActionableItems** — ações concretas para subir de tier (geradas a partir dos TopIssues)
+- Refresh recomendado: diário via Quartz.NET job
+
+**Orientado para Executive, Platform Admin e CTO** — visão C-level da saúde da plataforma num único número com drill-down por pilar e ações claras de melhoria.
+
+#### AJ.3 — GetPlatformPolicyComplianceReport (ChangeGovernance / IdentityAccess)
+
+**Feature:** Avaliação de conformidade de serviços e teams com as políticas de plataforma definidas via `PolicyDefinition` (Wave D.3). Responde "quais as políticas da organização que não estão a ser cumpridas e por quem?"
+
+**Domínio:** Executa `PolicyEvaluationResult` histórico contra as `PolicyDefinition` activas, agrupando resultados por policy, por equipa e por serviço.
+
+**Capacidades:**
+- Para cada `PolicyDefinition` activa no tenant:
+  - **PolicyName** e **PolicyType** (Mandatory/Advisory/Informational)
+  - **EvaluationCount** — número de avaliações no período
+  - **PassRate** — % de avaliações `Passed`
+  - **ViolatingEntities** — lista de serviços/equipas que falharam (com frequência e última data)
+  - **WorstOffenders** — top 5 entidades com menor PassRate para esta política
+- **PolicyComplianceTier por política:** `Enforced` ≥95% / `Partial` ≥75% / `AtRisk` ≥50% / `Failing` <50%
+- **TenantPolicyComplianceScore** — média ponderada das políticas `Mandatory` (peso 2×) e `Advisory` (peso 1×)
+- **PolicyComplianceDistribution** — % de políticas por tier
+- **EscalationRequired** — políticas `Mandatory` com `PolicyComplianceTier = Failing` (requerem acção imediata)
+- Filtro por PolicyType, equipa e serviço
+- Integra com `AuditEvent` para garantir trilha de todas as avaliações
+
+**Orientado para Platform Admin, Auditor e Tech Lead** — fecha o ciclo do Policy Studio (Wave D.3): não apenas definir políticas, mas medir a conformidade real e identificar onde o processo falha.
+
+#### Configuração Wave AJ
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `governance.maturity.lookback_months` | 1 | 12400 | Período de análise (meses) para cálculo de dimensões de maturidade |
+| `governance.maturity.compliance_lookback_months` | 3 | 12410 | Período para verificar compliance evaluation (>= 1 standard) |
+| `governance.maturity.min_tenants_for_benchmark` | 5 | 12420 | Mínimo de tenants com consentimento para calcular benchmark de ecossistema |
+| `governance.health_score.lookback_releases` | 30 | 12430 | Número de releases recentes para média de ConfidenceScore |
+| `governance.health_score.refresh_cron` | `0 2 * * *` | 12440 | Cron do Quartz.NET para refresh de TenantHealthScore |
+| `governance.policy_compliance.lookback_days` | 30 | 12450 | Período de análise para avaliações de política |
+| `governance.policy_compliance.failing_threshold` | 50 | 12460 | PassRate máximo para PolicyComplianceTier Failing |
+| `governance.policy_compliance.max_policies` | 100 | 12470 | Máximo de políticas no relatório |
+
+#### i18n Wave AJ
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `crossTenantMaturity.*` — comparação anónima de maturidade e benchmarks de ecossistema
+- `tenantHealthScore.*` — scorecard de saúde global do tenant por pilar e ações de melhoria
+- `platformPolicyCompliance.*` — conformidade de entidades com políticas de plataforma definidas
+
+**Totais estimados Wave AJ:** CG: ~45 testes (AJ.1 ~14 + AJ.2 ~16 + AJ.3 ~15). Configuração: +8 config keys (sort 12400–12470). i18n: +3 secções (4 locales). 1 novo endpoint REST (`/governance/maturity/cross-tenant-benchmark`). 1 job Quartz.NET (TenantHealthScore refresh diário). **Wave AJ PLANEADA**.
+
+---
+
+### Wave AK — Developer Experience & Notification Management
+
+**Objetivo:** Introduzir as infraestruturas de backend que suportam as integrações IDE (VS/VS Code) e um sistema de notificação estruturado que permite enviar alertas, insights e updates operacionais através de canais configuráveis (email, webhook, Slack, Teams) com controlo granular de subscriptions por persona e equipa.
+
+#### AK.1 — IDE Context API & Developer Workspace (Catalog / AIKnowledge)
+
+**Feature:** Endpoints backend dedicados às integrações de IDE (Visual Studio e VS Code). Permite que as extensões IDE consultem contexto de serviço, contratos, mudanças recentes e insights de IA sem aceder a APIs genéricas não optimizadas para este consumo.
+
+**Domínio:** Expõe endpoints especializados no bounded context `DeveloperWorkspace` com payloads compactos, optimizados para latência baixa (respostas ≤200ms) e caching agressivo via ETag.
+
+**Capacidades:**
+- `GET /api/v1/ide/context/service/{name}` — snapshot de contexto do serviço por nome (owner, tier, contratos active, última release, stability tier, open drifts, SLO status)
+- `GET /api/v1/ide/context/contract/{name}` — snapshot de contrato por nome (versão, tipo, exemplos, status, consumers)
+- `GET /api/v1/ide/changes/recent?service={name}` — últimas N mudanças do serviço com confidence score e status
+- `GET /api/v1/ide/ai/quick-assist` — endpoint de IA governado para quick assist em contexto de IDE (respeita `AiAccessPolicy` do utilizador, registra `AiTokenUsageRecord`, usa modelo por política)
+- `GET /api/v1/ide/health` — health check rápido para validar conectividade da extensão
+- **IDESessionToken** — token de curta duração específico para sessões IDE (derivado do access token principal, TTL configurável, auditável separadamente)
+- **IDEUsageRecord** — entidade para tracking de uso da extensão por utilizador (eventos: ContractLookup/ServiceLookup/ChangeLookup/AiAssistUsed) — alimenta `GetDeveloperActivityReport` (Wave AC.2)
+- **IIDEUsageRepository** + migration `IDEUsageRecords`
+
+**Orientado para Engineer (via IDE)** — suporta as integrações IDE planeadas em copilot instructions §12 com endpoints especializados e governados, sem forçar o IDE a parsear APIs de uso genérico.
+
+#### AK.2 — Notification Channel & Subscription Engine (Foundation)
+
+**Feature:** Sistema de notificações estruturado: canais de entrega (email, webhook, Slack, Teams), subscriptions por utilizador/equipa e tipos de evento, e motor de despacho com retry e dead letter.
+
+**Domínio:** Novo bounded context `NotificationManagement` com:
+- `NotificationChannel` — canal de entrega (`ChannelType`: Email/Webhook/Slack/Teams, configuração encriptada via `SecureConfig`, activo/inactivo)
+- `NotificationSubscription` — regra "persona X subscreve evento Y no âmbito Z" (`SubscriberType`: User/Team, `EventType` enum, `ScopeType`: Tenant/Team/Service)
+- `NotificationOutbox` — outbox pattern para garantia de entrega (at-least-once)
+- `INotificationDispatcher` — interface abstraindo o canal real
+- Migration `NotificationChannels` + `NotificationSubscriptions` + `NotificationOutbox`
+- 3 features: `RegisterNotificationChannel` / `ManageNotificationSubscription` / `GetNotificationDeliveryReport`
+
+**GetNotificationDeliveryReport capacidades:**
+- **DeliverySuccessRate** por canal no período
+- **ChannelHealthTier:** `Healthy` ≥99% / `Degraded` ≥95% / `Failing` <95%
+- **EventTypeDistribution** — tipos de evento mais frequentes
+- **DeadLetterCount** — mensagens não entregues após max retries
+- **Top destinatários por volume** — utilizadores/equipas com mais notificações
+
+**EventTypes suportados na v1:** `ReleaseHighRisk` / `SloBreached` / `DriftDetected` / `IncidentDetected` / `PolicyViolation` / `ContractBreakingChange` / `ComplianceGapDetected` / `CapacityThresholdApproaching`
+
+**Orientado para Engineer, Tech Lead e Platform Admin** — habilita o loop de feedback proativo que transforma relatórios passivos em alertas activos, sem acoplamento a serviços externos específicos.
+
+#### AK.3 — GetNotificationEffectivenessReport (Foundation / OperationalIntelligence)
+
+**Feature:** Análise de eficácia das notificações — quantas notificações disparadas resultaram em ação dentro de uma janela de tempo? Identifica "alert fatigue" e canais com baixa eficácia.
+
+**Domínio:** Cruza `NotificationOutbox` (notificações enviadas) com `AuditEvent` (acções do utilizador após a notificação) para calcular `ActionRate` por tipo de evento e canal.
+
+**Capacidades:**
+- Para cada `EventType` e `ChannelType`:
+  - **NotificationCount** — total de notificações enviadas no período
+  - **ActionRatePct** — % de notificações seguidas de acção do destinatário nas `action_window_hours` seguintes
+  - **MedianTimeToActionMinutes** — mediana do tempo entre notificação e acção
+  - **SilenceRatePct** — % de notificações sem qualquer acção (silenciadas ou ignoradas)
+- **EffectivenessTier por EventType:** `HighImpact` ≥60% / `Moderate` ≥30% / `LowImpact` ≥10% / `Noise` <10%
+- **AlertFatigueCandidates** — EventTypes com `EffectivenessTier = Noise` e `NotificationCount > noise_volume_threshold` (candidatos a silence rule ou ajuste de threshold)
+- **TopEffectiveChannels** — canais com maior `ActionRatePct` para cada EventType
+- **TenantNotificationHealthScore** — % de EventTypes com `EffectivenessTier ≥ Moderate`
+- **RecommendedAdjustments** — sugestões baseadas em AlertFatigueCandidates (aumentar threshold, adicionar silence period, reduzir frequência)
+
+**Orientado para Platform Admin e Tech Lead** — permite governar o sistema de notificações com dados, evitando o anti-padrão de "enviar tudo e esperar que alguém leia".
+
+#### Configuração Wave AK
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `ide.session_token.ttl_minutes` | 60 | 12480 | TTL do IDESessionToken em minutos |
+| `ide.context.cache_ttl_seconds` | 30 | 12490 | TTL do cache ETag para endpoints de contexto IDE |
+| `ide.ai.max_tokens_per_request` | 2000 | 12500 | Limite de tokens por pedido de quick assist no IDE |
+| `notifications.outbox.retry_count` | 3 | 12510 | Número máximo de retentativas de despacho de notificação |
+| `notifications.outbox.retry_delay_seconds` | 60 | 12520 | Delay entre retentativas (segundos) |
+| `notifications.effectiveness.action_window_hours` | 4 | 12530 | Janela de tempo (horas) para correlacionar notificação com acção |
+| `notifications.effectiveness.noise_volume_threshold` | 20 | 12540 | Volume mínimo de notificações para classificar EventType como candidato a Noise |
+| `notifications.channels.max_per_tenant` | 20 | 12550 | Máximo de canais de notificação por tenant |
+
+#### i18n Wave AK
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `ideContextApi.*` — contexto de serviços e contratos para extensões IDE e quick assist
+- `notificationChannel.*` — canais de notificação, subscriptions e relatório de entrega
+- `notificationEffectiveness.*` — eficácia de notificações, alert fatigue e recomendações de ajuste
+
+**Totais estimados Wave AK:** Foundation/CG: ~16 testes (AK.2 ~10 + AK.3 ~6). Catalog/AI: ~20 testes (AK.1 ~20). Total: ~36 testes. Configuração: +8 config keys (sort 12480–12550). i18n: +3 secções (4 locales). Novas migrations: 3 (`IDEUsageRecords` + `NotificationChannels+Subscriptions+Outbox` — 2 migrations). **Wave AK PLANEADA**.
+
+---
+
+### Wave AL — Audit Intelligence & Traceability Analytics
+
+**Objetivo:** Elevar o módulo de auditoria de "registo passivo de eventos" para "inteligência de auditoria activa" — com análise de qualidade de eventos de auditoria, detecção de lacunas na trilha de auditoria, scoring de completude de traceabilidade e relatórios prontos para auditor externo. Esta wave fecha o ciclo de auditoria: não apenas registar, mas garantir que o registo é completo, confiável e analisável.
+
+#### AL.1 — GetAuditTrailCompletenessReport (IdentityAccess / ChangeGovernance)
+
+**Feature:** Avaliação de completude da trilha de auditoria por módulo e por tipo de operação crítica. Responde "temos auditoria completa de todas as acções sensíveis que devemos registar?"
+
+**Domínio:** Define um conjunto de `ExpectedAuditEventTypes` por módulo (baseados nas regras de compliance e políticas de segurança), cruza com `AuditEvent` observados no período, e identifica lacunas.
+
+**Capacidades:**
+- Para cada módulo (IdentityAccess / Catalog / ChangeGovernance / OperationalIntelligence):
+  - **ExpectedEventTypes** — lista de tipos de evento que devem ser auditados (definidos por configuração)
+  - **ObservedEventTypes** — tipos de evento efectivamente observados no período
+  - **MissingEventTypes** — EventTypes esperados sem registos no período (gap de cobertura)
+  - **CoverageRate** — `ObservedEventTypes ∩ ExpectedEventTypes / ExpectedEventTypes * 100`
+- **AuditCompletenessTier por módulo:** `Full` ≥98% / `Good` ≥85% / `Partial` ≥60% / `Insufficient` <60%
+- **TenantAuditCompletenessScore** — média ponderada por importância regulatória do módulo
+- **GapsByRegulation** — mapeamento de MissingEventTypes para standards afectados (GDPR/PCI-DSS/HIPAA/SOC2/ISO27001)
+- **Top eventos críticos ausentes** — missing events com maior impacto regulatório
+- **AuditVolumeTimeline** — série temporal de 30 dias de volume de eventos por módulo
+
+**Orientado para Auditor, Platform Admin e Compliance Officer** — permite auto-auditoria proativa antes de auditorias externas, identificando lacunas com antecipação suficiente para correcção.
+
+#### AL.2 — GetUserActionAuditReport (IdentityAccess)
+
+**Feature:** Relatório de auditoria de acções de utilizadores específicos ou grupos de utilizadores. Suporta investigação de incidentes de segurança, revisões de acesso periódicas e análise de comportamento em janelas de tempo.
+
+**Domínio:** Agrega `AuditEvent` filtrado por utilizador/grupo no período, com análise de padrões, anomalias simples e comparação com baseline de actividade normal.
+
+**Capacidades:**
+- Para um utilizador (ou grupo de utilizadores) e período:
+  - **TotalActions** — total de acções auditadas
+  - **ActionsByType** — distribuição por tipo de acção (Read/Write/Delete/Admin/AiAssist/Export)
+  - **ActionsByModule** — distribuição por módulo acedido
+  - **PeakActivityHour** — hora do dia com maior actividade (detecção de off-hours)
+  - **SensitiveOperationsCount** — operações em recursos sensíveis (configurações, políticas, dados de compliance)
+  - **FailedAttempts** — tentativas de acção que foram negadas por autorização
+- **ActivityPatternFlags:**
+  - `OffHoursActivity` — acções fora do horário normal de trabalho configurado
+  - `UnusualVolume` — volume de acções > `volume_anomaly_multiplier × baseline` no período
+  - `BulkExportDetected` — operações de export superiores a `bulk_export_threshold`
+  - `SensitiveResourceAccess` — acesso a recursos marcados como sensitive
+- **UserRiskTier:** `Low` (nenhum flag) / `Medium` (1 flag) / `High` (2 flags) / `Critical` (3+ flags)
+- Endpoint: `GET /api/v1/audit/users/{userId}/action-report?from=&to=`
+- Suporte a export em formato auditável (JSON assinado)
+
+**Orientado para Auditor e Platform Admin** — suporta revisões periódicas de acesso e investigação de incidentes de segurança internos com trilha completa e análise de padrões.
+
+#### AL.3 — GetChangeTraceabilityReport (ChangeGovernance)
+
+**Feature:** Rastreabilidade completa de uma mudança — do ticket/request original, passando pelo deploy, impacto em serviços e contratos, até à resolução de incidentes correlacionados. Constrói a "cadeia de custódia" de uma release.
+
+**Domínio:** Para um dado `ReleaseId`, agrega dados de múltiplos domínios para construir o grafo de traceabilidade completo da mudança.
+
+**Capacidades:**
+- Para um `ReleaseId`:
+  - **ReleaseIdentity** — serviço, versão, autor, ambiente, data de deploy
+  - **ChangeRequestLink** — referência ao ticket/change request externo (se integrado via `ExternalChangeRequest`)
+  - **ContractsAffected** — lista de contratos alterados por esta release (via diff de `ApiAsset`)
+  - **ConsumersNotified** — equipas consumidoras dos contratos afectados com data de notificação
+  - **BlastRadiusAtDeploy** — blast radius calculado no momento do deploy
+  - **EvidencePackSummary** — estado do evidence pack (signed/unsigned, completude, aprovações)
+  - **ApprovalChain** — lista de aprovações com aprovador, data e role
+  - **PromotionPath** — estados de promoção (dev → staging → prod) com datas e aprovadores
+  - **PostDeployIncidents** — incidentes correlacionados nas 72h após deploy (via `GetIncidentChangeCorrelationReport`)
+  - **RollbackHistory** — rollbacks desta release com motivo e responsável
+  - **ChangeScore** — score composto de traceabilidade (0–100): documentação + aprovações + evidências + notificações
+- **TraceabilityTier:** `Complete` ≥90 / `Good` ≥70 / `Partial` ≥50 / `Insufficient` <50
+- Endpoint: `GET /api/v1/changes/releases/{id}/traceability`
+- Resposta incluí `AuditSignature` para validação de integridade
+
+**Orientado para Auditor, Architect e Platform Admin** — produz o relatório de traceabilidade que um auditor externo pediria sobre uma mudança específica, directamente a partir dos dados do NexTraceOne sem necessidade de agregação manual.
+
+#### Configuração Wave AL
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `audit.completeness.expected_events_config` | `"default"` | 12560 | Nome do conjunto de EventTypes esperados por módulo (referencia ficheiro de configuração) |
+| `audit.completeness.lookback_days` | 30 | 12570 | Período de análise para avaliação de completude de auditoria |
+| `audit.completeness.full_threshold` | 98 | 12580 | CoverageRate mínimo para AuditCompletenessTier Full |
+| `audit.user_action.work_hours_start` | 8 | 12590 | Hora de início do horário de trabalho normal (para flag OffHoursActivity) |
+| `audit.user_action.work_hours_end` | 20 | 12600 | Hora de fim do horário de trabalho normal |
+| `audit.user_action.volume_anomaly_multiplier` | 3 | 12610 | Multiplicador do baseline para flag UnusualVolume |
+| `audit.user_action.bulk_export_threshold` | 100 | 12620 | Número de operações de export para flag BulkExportDetected |
+| `audit.traceability.post_deploy_incident_hours` | 72 | 12630 | Janela de horas pós-deploy para correlacionar incidentes |
+
+#### i18n Wave AL
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `auditTrailCompleteness.*` — completude de trilha de auditoria por módulo e mapeamento regulatório
+- `userActionAudit.*` — auditoria de acções de utilizadores, padrões e flags de risco
+- `changeTraceability.*` — cadeia de custódia de releases e score de traceabilidade
+
+**Totais estimados Wave AL:** IA: ~16 testes (AL.1 ~9 + AL.2 ~7). CG: ~14 testes (AL.3). Total: ~30 testes. Configuração: +8 config keys (sort 12560–12630). i18n: +3 secções (4 locales). 2 novos endpoints REST (`/audit/users/{id}/action-report` + `/changes/releases/{id}/traceability`). **Wave AL PLANEADA**.
+
+---
+
+### Wave AM — Auto-Cataloging & Service Discovery Intelligence
+
+**Objetivo:** Introduzir capacidades de auto-descoberta e catalogação assistida — reduzindo o esforço manual de manutenção do catálogo de serviços e contratos através da inferência de informação a partir de telemetria, deploys e análise de tráfego. Esta wave fecha o gap entre "serviços que existem" e "serviços registados no NexTraceOne", tornando o catálogo continuamente convergente com a realidade operacional.
+
+#### AM.1 — GetUncatalogedServicesReport (Catalog)
+
+**Feature:** Detecção de serviços activos em telemetria que ainda não estão registados no catálogo do NexTraceOne. Identifica "shadow services" — serviços que existem em produção mas são invisíveis para governança.
+
+**Domínio:** Cruza `RuntimeSnapshot` (fontes: service name de traces OpenTelemetry) com `ServiceAsset` para encontrar nomes de serviços com telemetria mas sem registo no catálogo.
+
+**Capacidades:**
+- Para cada fonte de telemetria, extrai `ServiceName` únicos observados no período
+- Cruzamento com `ServiceAsset`: identifica `UncatalogedServices` — nomes sem match no catálogo
+- Para cada `UncatalogedService`:
+  - **FirstSeen** e **LastSeen** — primeira e última observação em telemetria
+  - **DailyCallCount** (estimado) — volume de actividade observado
+  - **ObservedEnvironments** — ambientes onde o serviço aparece em telemetria
+  - **PossibleOwner** — equipa inferida por proximity de namespace ou padrão de nome (heurística leve)
+  - **SuggestedTier** — tier inferido por volume (Alto → Critical, Médio → Standard, Baixo → Internal)
+- **UncatalogedCount** — total de serviços sem registo
+- **ShadowServiceRisk** — % de serviços activos sem governança = `UncatalogedCount / (CatalogedCount + UncatalogedCount) * 100`
+- **CatalogCoverageRate** — 100 - ShadowServiceRisk
+- **QuickRegisterList** — lista de UncatalogedServices com campos pré-preenchidos para registo rápido (nome, tier sugerido, owner sugerido)
+
+**Orientado para Platform Admin e Architect** — transforma o NexTraceOne de catálogo manual para sistema com awareness da realidade operacional, identificando proativamente o que não está governado.
+
+#### AM.2 — GetContractDriftFromRealityReport (Catalog)
+
+**Feature:** Detecção de divergências entre os contratos REST/AsyncAPI registados e o comportamento real observado em runtime. Responde "o que o serviço realmente faz difere do que o contrato diz que faz?"
+
+**Domínio:** Cruza `ApiAsset` (contrato registado) com `RuntimeSnapshot` (endpoints chamados, eventos produzidos) e `ContractTestRecord` (Wave AE.1) para detectar endpoints não documentados e operações documentadas mas nunca observadas.
+
+**Capacidades:**
+- Para cada contrato com telemetria de runtime disponível:
+  - **DocumentedOperations** — operações/endpoints definidos no contrato
+  - **ObservedOperations** — endpoints/operações chamados em runtime no período
+  - **UndocumentedCalls** — operações observadas em runtime que não constam do contrato (ghost endpoints)
+  - **UnusedDocumentedOps** — operações documentadas sem chamadas no período (`StagnationDays` desde última chamada)
+  - **ParameterMismatches** — parâmetros obrigatórios observados em runtime que não constam do contrato (inferido via header/query patterns)
+- **RealityDriftTier:** `Aligned` (0 UndocumentedCalls + ≤10% UnusedOps) / `MinorDrift` / `SignificantDrift` / `Misaligned` (>30% UndocumentedCalls)
+- **TenantContractRealityScore** — % de contratos `Aligned` ou `MinorDrift`
+- **Top contratos com maior divergência** — ordenados por UndocumentedCalls + UnusedDocumentedOps
+- **AutoDocumentationHints** — para cada UndocumentedCall, sugestão de formato OpenAPI para adicionar ao contrato
+
+**Orientado para Architect, Tech Lead e Engineer** — garante que o catálogo de contratos reflecte a realidade, não o que foi documentado na criação do serviço (que frequentemente diverge ao longo do tempo).
+
+#### AM.3 — GetCatalogHealthMaintenanceReport (Catalog)
+
+**Feature:** Análise de qualidade de manutenção do catálogo — identifica entradas stale, campos obrigatórios em falta, descrições genéricas e relações de dependência desactualizadas. Suporte a campanhas de "catálogo hygiene".
+
+**Domínio:** Analisa qualidade dos dados em `ServiceAsset`, `ApiAsset`, `ServiceDependency`, `OwnershipRecord` e `Runbook` para produzir score de qualidade de manutenção por serviço e globalmente.
+
+**Capacidades:**
+- Para cada serviço no catálogo, calcula `CatalogQualityScore` (0–100) por dimensões:
+  - **DescriptionCompleteness** (20%) — descrição com ≥ `min_description_words` palavras (não genérica)
+  - **OwnershipFreshness** (25%) — `OwnershipRecord` actualizado nos últimos `ownership_stale_days` dias
+  - **ContractCoverage** (25%) — ≥ 1 contrato `Approved` registado para o serviço
+  - **DependencyMapFreshness** (15%) — `ServiceDependency` actualizado nos últimos `dependency_stale_days` dias
+  - **RunbookLinked** (15%) — runbook activo com ≥ 1 step de resolução para o serviço
+- **CatalogQualityTier:** `Excellent` ≥85 / `Good` ≥65 / `Fair` ≥40 / `Poor` <40
+- **TenantCatalogHealthScore** — média ponderada por tier de serviço (Critical peso 3×, Standard peso 2×, Internal peso 1×)
+- **CampaignList** — serviços `Poor` ou `Fair` ordenados por tier (críticos primeiro) com lista de issues específicos
+- **StaleEntryList** — serviços sem qualquer actividade de manutenção nos últimos `maintenance_stale_days` dias (candidatos a review ou arquivamento)
+- **GlobalDescriptionQualityFlags** — detecção de descrições genéricas (lista de termos proibidos configurável: "serviço de", "sistema de", "módulo de")
+
+**Orientado para Platform Admin e Architect** — permite planear e executar campanhas de melhoria de qualidade do catálogo com critérios claros e lista de acção prioritizada, mantendo o NexTraceOne como fonte de verdade de alta qualidade.
+
+#### Configuração Wave AM
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `catalog.discovery.lookback_days` | 30 | 12640 | Período de análise para detecção de serviços não catalogados |
+| `catalog.discovery.min_daily_calls` | 10 | 12650 | Volume mínimo diário para considerar serviço uncataloged como significativo |
+| `catalog.reality_drift.lookback_days` | 30 | 12660 | Período de análise para comparação contrato vs. runtime |
+| `catalog.reality_drift.unused_ops_stagnation_days` | 30 | 12670 | Dias sem chamadas para classificar operação como UnusedDocumentedOp |
+| `catalog.maintenance.min_description_words` | 10 | 12680 | Mínimo de palavras na descrição para DescriptionCompleteness completo |
+| `catalog.maintenance.ownership_stale_days` | 90 | 12690 | Dias sem actualização de ownership para flag OwnershipFreshness como stale |
+| `catalog.maintenance.dependency_stale_days` | 60 | 12700 | Dias sem actualização de dependências para flag DependencyMapFreshness como stale |
+| `catalog.maintenance.maintenance_stale_days` | 180 | 12710 | Dias sem actividade de manutenção para candidato a StaleEntry |
+
+#### i18n Wave AM
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `uncatalogedServices.*` — descoberta de serviços sem registo no catálogo e shadow service risk
+- `contractDriftFromReality.*` — divergência entre contratos registados e comportamento real em runtime
+- `catalogHealthMaintenance.*` — qualidade de manutenção do catálogo e campanhas de hygiene
+
+**Totais estimados Wave AM:** Catalog: ~46 testes (AM.1 ~14 + AM.2 ~16 + AM.3 ~16). Configuração: +8 config keys (sort 12640–12710). i18n: +3 secções (4 locales). **Wave AM PLANEADA**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -2536,6 +2913,19 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 94. 🔲 **Wave AI.2** — `GetCapacityTrendForecastReport` — projeção de capacidade por serviço: regressão linear sobre RuntimeSnapshot histórico, DaysToLatencyThreshold, DaysToErrorRateThreshold, ForecastAlertTier (Stable/WatchList/AtRisk/Imminent). OI. Config: `runtime.capacity_forecast.*` sort 12340–12360.
 95. 🔲 **Wave AI.3** — `GetIncidentProbabilityReport` — probabilidade preditiva de incidente: IncidentProbabilityScore (5 sinais: OpenDrift+SloBreachTrend+ChaosGap+RecentHighRiskRelease+OpenVulns), IncidentProbabilityTier (Unlikely/Possible/Probable/Imminent), TenantRiskHeatmap, refresh via Quartz.NET job. OI. Config: `runtime.incident_probability.*` sort 12370–12390. **Wave AI PLANEADA**.
 
+96. 🔲 **Wave AJ.1** — `GetCrossTenantMaturityReport` — maturidade anónima cross-tenant: 7 dimensões (ContractGoverned/ChangeConfidenceEnabled/SloTracked/RunbookCovered/ProfilingActive/ComplianceEvaluated/AiAssistantUsed), TenantMaturityScore, MaturityTier (Pioneer/Advanced/Developing/Emerging), BenchmarkPercentile anónimo, WeakestDimensions, ImprovementPotential. CG. Config: `governance.maturity.*` sort 12400–12420.
+97. 🔲 **Wave AJ.2** — `GetTenantHealthScoreReport` — scorecard de saúde global do tenant: TenantHealthScore (6 pilares: Service Governance 20%+Change Confidence 20%+Operational Reliability 20%+Contract Health 15%+Compliance 15%+FinOps 10%), HealthTier (Excellent/Good/Fair/AtRisk), TrendComparison, TopIssues, ActionableItems, refresh Quartz.NET diário. CG. Config: `governance.health_score.*` sort 12430–12440.
+98. 🔲 **Wave AJ.3** — `GetPlatformPolicyComplianceReport` — conformidade de entidades com `PolicyDefinition` (Wave D.3): PassRate por política, PolicyComplianceTier (Enforced/Partial/AtRisk/Failing), ViolatingEntities, EscalationRequired (Mandatory+Failing), TenantPolicyComplianceScore. CG/IA. Config: `governance.policy_compliance.*` sort 12450–12470. **Wave AJ PLANEADA**.
+99. 🔲 **Wave AK.1** — IDE Context API — `IDESessionToken` + `IDEUsageRecord` + endpoints especializados: `GET /api/v1/ide/context/service/{name}` + `GET /api/v1/ide/context/contract/{name}` + `GET /api/v1/ide/changes/recent` + `GET /api/v1/ide/ai/quick-assist` (governado, auditado). Migration `IDEUsageRecords`. Catalog/AI. Config: `ide.*` sort 12480–12500.
+100. 🔲 **Wave AK.2** — Notification Engine — `NotificationChannel` + `NotificationSubscription` + `NotificationOutbox` (outbox pattern) + `INotificationDispatcher` + 3 features (RegisterChannel/ManageSubscription/GetDeliveryReport). Migrations: 2 (Channels+Subscriptions+Outbox). Foundation. Config: `notifications.outbox.*` sort 12510–12520.
+101. 🔲 **Wave AK.3** — `GetNotificationEffectivenessReport` — eficácia de notificações: ActionRatePct, MedianTimeToActionMinutes, SilenceRatePct, EffectivenessTier (HighImpact/Moderate/LowImpact/Noise), AlertFatigueCandidates, RecommendedAdjustments, TenantNotificationHealthScore. Foundation/OI. Config: `notifications.effectiveness.*` sort 12530–12550. **Wave AK PLANEADA**.
+102. 🔲 **Wave AL.1** — `GetAuditTrailCompletenessReport` — completude da trilha de auditoria: ExpectedEventTypes vs. ObservedEventTypes por módulo, AuditCompletenessTier (Full/Good/Partial/Insufficient), TenantAuditCompletenessScore, GapsByRegulation (GDPR/PCI/HIPAA/SOC2/ISO), AuditVolumeTimeline 30d. IA/CG. Config: `audit.completeness.*` sort 12560–12580.
+103. 🔲 **Wave AL.2** — `GetUserActionAuditReport` — auditoria de acções de utilizador: TotalActions, ActionsByType/Module, ActivityPatternFlags (OffHoursActivity/UnusualVolume/BulkExportDetected/SensitiveResourceAccess), UserRiskTier (Low/Medium/High/Critical), export JSON assinado. Endpoint `/audit/users/{id}/action-report`. IA. Config: `audit.user_action.*` sort 12590–12620.
+104. 🔲 **Wave AL.3** — `GetChangeTraceabilityReport` — cadeia de custódia de release: ContractsAffected+ConsumersNotified+BlastRadius+EvidencePackSummary+ApprovalChain+PromotionPath+PostDeployIncidents+RollbackHistory, ChangeScore, TraceabilityTier (Complete/Good/Partial/Insufficient), AuditSignature. Endpoint `/changes/releases/{id}/traceability`. CG. Config: `audit.traceability.*` sort 12630. **Wave AL PLANEADA**.
+105. 🔲 **Wave AM.1** — `GetUncatalogedServicesReport` — detecção de shadow services: `UncatalogedServices` (telemetria sem registo), ShadowServiceRisk (%), CatalogCoverageRate, PossibleOwner (heurística), SuggestedTier, QuickRegisterList pré-preenchido. Catalog. Config: `catalog.discovery.*` sort 12640–12650.
+106. 🔲 **Wave AM.2** — `GetContractDriftFromRealityReport` — divergência contrato vs. runtime: UndocumentedCalls (ghost endpoints), UnusedDocumentedOps, ParameterMismatches, RealityDriftTier (Aligned/MinorDrift/SignificantDrift/Misaligned), TenantContractRealityScore, AutoDocumentationHints. Catalog. Config: `catalog.reality_drift.*` sort 12660–12670.
+107. 🔲 **Wave AM.3** — `GetCatalogHealthMaintenanceReport` — qualidade de manutenção do catálogo: CatalogQualityScore (5 dims: Description+Ownership+ContractCoverage+DependencyMap+Runbook), CatalogQualityTier (Excellent/Good/Fair/Poor), TenantCatalogHealthScore ponderado por tier, CampaignList, StaleEntryList. Catalog. Config: `catalog.maintenance.*` sort 12680–12710. **Wave AM PLANEADA**.
+
 ### Riscos e recomendações transversais
 
 - **Feature sprawl** — resistir à tentação de criar módulos novos; preferir aprofundar existentes (Wave A > Wave B).
@@ -2560,3 +2950,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 10. **Status das secções 1–12 revisto (Abril 2026):** §1.1 GraphQL e §1.2 Protobuf marcados como ✅ implementados (Waves G.3/H.1). §8.4 ML Correlation marcado como ✅ implementado (Wave A.5). §9.1 Compliance Packs marcado como ✅ parcialmente implementado (8 standards via Waves G–L). Tabela Priorização Recomendada actualizada para reflectir estado real.
 11. **Waves AB–AE (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 72–83 da lista de priorização. **Wave AB** (Knowledge Graph & Semantic Relations): AB.1 `GetKnowledgeRelationGraph` + AB.2 `GetContractLineageReport` + AB.3 `GetIncidentKnowledgeBaseReport`. +8 config keys (sort 11760–11830). **Wave AC** (Self-Service & Platform Adoption Intelligence): AC.1 `GetOnboardingHealthReport` + AC.2 `GetDeveloperActivityReport` + AC.3 `GetPlatformAdoptionReport`. +8 config keys (sort 11840–11910). **Wave AD** (Zero Trust & Security Posture Analytics): AD.1 `GetZeroTrustPostureReport` + AD.2 `GetSecretsExposureRiskReport` + AD.3 `GetAccessPatternAnomalyReport`. +8 config keys (sort 11920–11990). **Wave AE** (Contract Testing & API Backward Compatibility): AE.1 `ContractTestRecord`+`IngestContractTestResult`+`GetContractTestCoverageReport` + AE.2 `GetSchemaBreakingChangeImpactReport` + AE.3 `GetApiBackwardCompatibilityReport`. +8 config keys (sort 12000–12070). Total de config keys adicionadas: +32 (sort 11760–12070). Total de testes estimados: +186 (Catalog +~115, OI +~42, CG/IA +~29). Novas migrations: 1 (`ContractTestRecords` — Wave AE.1). i18n: +12 secções em 4 locales.
 12. **Waves AF–AI (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 84–95 da lista de priorização. **Wave AF** (Service Lifecycle Governance): AF.1 `GetServiceLifecycleTransitionReport` + AF.2 `GetServiceRetirementReadinessReport` + AF.3 `GetServiceMigrationProgressReport`. +8 config keys (sort 12080–12150). **Wave AG** (FinOps Advanced Attribution): AG.1 `GetEnvironmentCostComparisonReport` + AG.2 `GetCostPerReleaseReport` + AG.3 `GetFinOpsWasteAnalysisReport`. +8 config keys (sort 12160–12230). **Wave AH** (Event-Driven Architecture Governance): AH.1 `GetEventSchemaEvolutionReport` + AH.2 `GetEventProducerConsumerBalanceReport` + AH.3 `GetEventContractComplianceReport`. +8 config keys (sort 12240–12310). **Wave AI** (Predictive Intelligence & Forecasting): AI.1 `GetDeploymentRiskForecastReport` + AI.2 `GetCapacityTrendForecastReport` + AI.3 `GetIncidentProbabilityReport`. +8 config keys (sort 12320–12390). 1 novo endpoint REST (`/risk-forecast`). 1 job Quartz.NET (refresh de incident probability). Total: +32 config keys (sort 12080–12390). Testes estimados: +210 (Catalog +~84, OI +~113, CG +~13). i18n: +12 secções em 4 locales.
+13. **Waves AJ–AM (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 96–107 da lista de priorização. **Wave AJ** (Multi-Tenant Governance Intelligence): AJ.1 `GetCrossTenantMaturityReport` + AJ.2 `GetTenantHealthScoreReport` + AJ.3 `GetPlatformPolicyComplianceReport`. +8 config keys (sort 12400–12470). 1 novo endpoint REST (`/governance/maturity/cross-tenant-benchmark`). 1 job Quartz.NET (TenantHealthScore refresh diário). **Wave AK** (Developer Experience & Notification Management): AK.1 IDE Context API + `IDESessionToken` + `IDEUsageRecord` + AK.2 Notification Engine (`NotificationChannel`+`NotificationSubscription`+`NotificationOutbox`+3 features) + AK.3 `GetNotificationEffectivenessReport`. +8 config keys (sort 12480–12550). Migrations: 3 (`IDEUsageRecords` + 2 Notification). **Wave AL** (Audit Intelligence & Traceability Analytics): AL.1 `GetAuditTrailCompletenessReport` + AL.2 `GetUserActionAuditReport` + AL.3 `GetChangeTraceabilityReport`. +8 config keys (sort 12560–12630). 2 novos endpoints REST (`/audit/users/{id}/action-report` + `/changes/releases/{id}/traceability`). **Wave AM** (Auto-Cataloging & Service Discovery Intelligence): AM.1 `GetUncatalogedServicesReport` + AM.2 `GetContractDriftFromRealityReport` + AM.3 `GetCatalogHealthMaintenanceReport`. +8 config keys (sort 12640–12710). Total: +32 config keys (sort 12400–12710). Testes estimados: +157 (CG +~45, IA +~30, Catalog +~46, Foundation +~36). i18n: +12 secções em 4 locales.
