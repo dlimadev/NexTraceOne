@@ -13945,5 +13945,80 @@
         "invalidDays": "El período debe estar entre 7 y 90 días."
       }
     }
+  },
+  "ownershipHealth": {
+    "title": "Informe de Salud de Ownership de Servicios",
+    "subtitle": "Puntuación de salud de cobertura de ownership por servicio. Identifica brechas de gobernanza: propietarios ausentes, revisiones desactualizadas y documentación faltante.",
+    "catalogHealthScore": "Puntuación de Salud del Catálogo",
+    "healthBand": "Banda de Salud",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "issueBreakdown": "Distribución de Problemas",
+    "issues": {
+      "MissingTeam": "Equipo Faltante",
+      "MissingTechnicalOwner": "Technical Owner Faltante",
+      "MissingBusinessOwner": "Business Owner Faltante",
+      "StaleReview": "Revisión de Ownership Desactualizada",
+      "MissingDocumentation": "URL de Documentación Faltante"
+    },
+    "healthBands": {
+      "Healthy": "Saludable",
+      "Fair": "Aceptable",
+      "AtRisk": "En Riesgo",
+      "Critical": "Crítico"
+    },
+    "serviceHealthScore": "Puntuación de Salud",
+    "lastReviewedAt": "Última Revisión de Ownership",
+    "stalenessThreshold": "Umbral de Desactualización de Revisión (días)",
+    "errors": {
+      "noServices": "No se encontraron servicios para el filtro especificado.",
+      "invalidThreshold": "El umbral de desactualización debe estar entre 7 y 365 días."
+    }
+  },
+  "fedRampCompliance": {
+    "title": "Informe de Conformidad FedRAMP Moderate",
+    "subtitle": "Postura de autorización FedRAMP Moderate evaluada contra artefactos de gobernanza de cambios y packs de evidencia.",
+    "impactLevel": "Nivel de Impacto",
+    "controls": {
+      "ac2": "Gestión de Cuentas",
+      "au2": "Registro de Eventos",
+      "cm6": "Configuraciones del Sistema",
+      "ir4": "Manejo de Incidentes",
+      "si2": "Remediación de Defectos"
+    },
+    "overallStatus": "Estado General",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Packs de Evidencia Firmados",
+    "totalEvidencePacks": "Total de Packs de Evidencia",
+    "generatedAt": "Informe Generado En",
+    "periodDays": "Período de Evaluación (días)",
+    "errors": {
+      "notEnabled": "El informe de conformidad FedRAMP no está habilitado para este tenant.",
+      "invalidPeriod": "El período de evaluación debe estar entre 1 y 365 días."
+    }
+  },
+  "operationalReadiness": {
+    "title": "Informe de Preparación Operacional",
+    "subtitle": "Scorecard de preparación operacional pre-producción. Evalúa conformidad de SLO, resiliencia a chaos, cobertura de profiling, ausencia de drift y baseline de runtime entre entornos.",
+    "compositeScore": "Puntuación Compuesta",
+    "classification": {
+      "ReadyForProduction": "Listo para Producción",
+      "ConditionallyReady": "Condicionalmente Listo",
+      "NotReady": "No Listo"
+    },
+    "dimensions": {
+      "slo": "Conformidad de SLO",
+      "chaos": "Resiliencia a Chaos",
+      "profiling": "Cobertura de Profiling",
+      "drift": "Libre de Drift",
+      "baseline": "Cobertura de Baseline"
+    },
+    "blockers": "Bloqueadores",
+    "noBlockers": "No se detectaron bloqueadores.",
+    "sourceEnvironment": "Entorno de Origen",
+    "targetEnvironment": "Entorno Destino",
+    "errors": {
+      "serviceRequired": "El nombre del servicio es obligatorio.",
+      "invalidDays": "El período de lookback debe estar entre 1 y 90 días."
+    }
   }
 }

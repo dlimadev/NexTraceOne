@@ -13935,5 +13935,80 @@
         "invalidDays": "Period must be between 7 and 90 days."
       }
     }
+  },
+  "ownershipHealth": {
+    "title": "Service Ownership Health Report",
+    "subtitle": "Ownership coverage health score per service. Identifies governance gaps: missing owners, stale reviews, and missing documentation.",
+    "catalogHealthScore": "Catalog Health Score",
+    "healthBand": "Health Band",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "issueBreakdown": "Issue Breakdown",
+    "issues": {
+      "MissingTeam": "Missing Team",
+      "MissingTechnicalOwner": "Missing Technical Owner",
+      "MissingBusinessOwner": "Missing Business Owner",
+      "StaleReview": "Stale Ownership Review",
+      "MissingDocumentation": "Missing Documentation URL"
+    },
+    "healthBands": {
+      "Healthy": "Healthy",
+      "Fair": "Fair",
+      "AtRisk": "At Risk",
+      "Critical": "Critical"
+    },
+    "serviceHealthScore": "Health Score",
+    "lastReviewedAt": "Last Ownership Review",
+    "stalenessThreshold": "Review Staleness Threshold (days)",
+    "errors": {
+      "noServices": "No services found for the specified filter.",
+      "invalidThreshold": "Review staleness threshold must be between 7 and 365 days."
+    }
+  },
+  "fedRampCompliance": {
+    "title": "FedRAMP Moderate Compliance Report",
+    "subtitle": "FedRAMP Moderate authorization posture scored against change governance artifacts and evidence packs.",
+    "impactLevel": "Impact Level",
+    "controls": {
+      "ac2": "Account Management",
+      "au2": "Event Logging",
+      "cm6": "Configuration Settings",
+      "ir4": "Incident Handling",
+      "si2": "Flaw Remediation"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "FedRAMP compliance report is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "operationalReadiness": {
+    "title": "Operational Readiness Report",
+    "subtitle": "Pre-production operational readiness scorecard. Evaluates SLO compliance, chaos resilience, profiling coverage, drift-free status, and runtime baseline across environments.",
+    "compositeScore": "Composite Score",
+    "classification": {
+      "ReadyForProduction": "Ready for Production",
+      "ConditionallyReady": "Conditionally Ready",
+      "NotReady": "Not Ready"
+    },
+    "dimensions": {
+      "slo": "SLO Compliance",
+      "chaos": "Chaos Resilience",
+      "profiling": "Profiling Coverage",
+      "drift": "Drift Free",
+      "baseline": "Baseline Coverage"
+    },
+    "blockers": "Blockers",
+    "noBlockers": "No blockers detected.",
+    "sourceEnvironment": "Source Environment",
+    "targetEnvironment": "Target Environment",
+    "errors": {
+      "serviceRequired": "Service name is required.",
+      "invalidDays": "Lookback period must be between 1 and 90 days."
+    }
   }
 }

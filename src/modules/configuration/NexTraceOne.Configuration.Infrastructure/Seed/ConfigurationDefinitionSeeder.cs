@@ -8126,5 +8126,98 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "50",
             uiEditorType: "number",
             sortOrder: 10550),
+
+        // ── Wave L ─────────────────────────────────────────────────────────────────────
+
+        // L.1 — Service Ownership Health Report
+        ConfigurationDefinition.Create(
+            key: "ownership.health.report.staleness_threshold_days",
+            displayName: "config.ownership.health.staleness_threshold_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ownership.health.staleness_threshold_days.description",
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 10560),
+
+        ConfigurationDefinition.Create(
+            key: "ownership.health.report.max_services",
+            displayName: "config.ownership.health.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ownership.health.max_services.description",
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 10570),
+
+        // L.2 — FedRAMP Moderate Compliance Report
+        ConfigurationDefinition.Create(
+            key: "compliance.fedramp.enabled",
+            displayName: "config.compliance.fedramp.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.fedramp.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10580),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.fedramp.report_period_days",
+            displayName: "config.compliance.fedramp.report_period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.fedramp.report_period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10590),
+
+        // L.3 — Operational Readiness Report
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.lookback_days",
+            displayName: "config.operational.readiness.lookback_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.lookback_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10600),
+
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.ready_score_threshold",
+            displayName: "config.operational.readiness.ready_score_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.ready_score_threshold.description",
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10610),
+
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.conditional_score_threshold",
+            displayName: "config.operational.readiness.conditional_score_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.conditional_score_threshold.description",
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 10620),
+
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.slo_weight_percent",
+            displayName: "config.operational.readiness.slo_weight_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.slo_weight_percent.description",
+            defaultValue: "35",
+            uiEditorType: "number",
+            sortOrder: 10630),
     ];
 }

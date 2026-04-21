@@ -746,6 +746,92 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave L — Service Ownership Health + FedRAMP Moderate + Operational Readiness ✅ COMPLETO (Abril 2026)
+
+#### L.1 — GetServiceOwnershipHealthReport (Catalog)
+
+**Objetivo:** scorecard de saúde de ownership do catálogo de serviços, identificando gaps de governança que comprometem o Source of Truth do NexTraceOne.
+
+**Implementação:**
+- `GetServiceOwnershipHealthReport.Query` — filtros por tenant, tier, threshold de saúde, máximo de serviços e threshold de staleness de revisão de ownership
+- `OwnershipIssue` enum — `MissingTeam`, `MissingTechnicalOwner`, `MissingBusinessOwner`, `StaleReview`, `MissingDocumentation`
+- `OwnershipHealthBand` enum — `Healthy` (≥90), `Fair` (≥70), `AtRisk` (≥50), `Critical` (<50)
+- Score por serviço (0–100): -35 equipa ausente, -25 tech owner ausente, -15 biz owner ausente, -15 revisão stale, -10 doc URL ausente
+- Score global do catálogo (média dos serviços analisados)
+- `OwnershipIssueBreakdown` — contagem de cada tipo de problema por serviço
+- Ordenação por score ascendente (piores primeiro)
+- Filtro por `HealthScoreThreshold` para focar nos serviços mais problemáticos
+- Orientado para **Tech Lead, Architect e Platform Admin** personas
+
+#### L.2 — GetFedRampComplianceReport (ChangeGovernance)
+
+**Objetivo:** relatório de conformidade FedRAMP Moderate para clientes cloud federais dos EUA, adicionando à suite de compliance o standard NIST SP 800-53 Rev 5.
+
+**Controlos FedRAMP Moderate cobertos:**
+- **AC-2** (Access Control): Account Management — deploy workflow como proxy de controlo de acesso
+- **AU-2** (Audit & Accountability): Event Logging — evidence packs HMAC-SHA256 como artefatos de auditoria
+- **CM-6** (Configuration Management): Configuration Settings — releases com version tracking de configuração
+- **IR-4** (Incident Response): Incident Handling — correlação change-to-incident e rollback intelligence
+- **SI-2** (System & Information Integrity): Flaw Remediation — vulnerability promotion gates por release
+
+**Implementação:**
+- `FedRampControlResult` record — `ControlId`, `ControlFamily`, `ControlName`, `Status`, `Note`
+- `ImpactLevel: "Moderate"` identifica o baseline de autorização FedRAMP
+- Scoring contextual via releases e evidence packs assinados (HMAC-SHA256)
+- Overall status: `NotAssessed → PartiallyCompliant → Compliant`
+- Reutiliza `Nis2ControlStatus` enum da suite de compliance existente
+
+#### L.3 — GetOperationalReadinessReport (OperationalIntelligence)
+
+**Objetivo:** scorecard composto de prontidão operacional pré-produção, combinando 5 dimensões operacionais para produzir um score e classificação de readiness.
+
+**5 Dimensões com pesos:**
+| Dimensão | Peso | Fonte de dados |
+|---|---|---|
+| SLO Compliance | 35% | `SloObservation` (% Met) |
+| Chaos Resilience | 25% | `ChaosExperiment` (% Completed) |
+| Drift Free | 20% | `DriftFinding` (unacknowledged) |
+| Profiling Coverage | 10% | `ProfilingSession` (recente) |
+| Baseline Coverage | 10% | `RuntimeSnapshot` (recente) |
+
+**Classificações:**
+- `ReadyForProduction` — score ≥ 80 e zero bloqueadores
+- `ConditionallyReady` — score ≥ 60 mas com bloqueadores
+- `NotReady` — score < 60 ou bloqueadores críticos
+
+**Bloqueadores automáticos:**
+- SLO breaches no período de lookback
+- Chaos experiments que falharam
+- Drift findings não reconhecidos
+- Ausência de sessão de profiling recente
+- Ausência de baseline de runtime recente
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — suporta gates de promoção pré-produção.
+
+#### Configuração Wave L
+
+```
+ownership.health.report.staleness_threshold_days  sort 10560  default: 180
+ownership.health.report.max_services              sort 10570  default: 100
+compliance.fedramp.enabled                        sort 10580  default: true
+compliance.fedramp.report_period_days             sort 10590  default: 90
+operational.readiness.lookback_days               sort 10600  default: 30
+operational.readiness.ready_score_threshold       sort 10610  default: 80
+operational.readiness.conditional_score_threshold sort 10620  default: 60
+operational.readiness.slo_weight_percent          sort 10630  default: 35
+```
+
+#### i18n Wave L
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `ownershipHealth.*` — scorecard de ownership de serviços
+- `fedRampCompliance.*` — FedRAMP Moderate compliance
+- `operationalReadiness.*` — prontidão operacional pré-produção
+
+**Totais Wave L:** CG: 745 testes (+11). OI: 1047 testes (+14). Catalog: 1783 testes (+19). Configuração: +8 config keys (sort 10560–10630). i18n: +3 secções (4 locales). **WAVE L COMPLETO**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -775,6 +861,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 23. ✅ **Wave K.1** — `GetChaosExperimentReport` — analytics de chaos experiments: taxa de sucesso, distribuição por tipo/risco/estado, top 5 serviços, duração média. OI: 1033 testes (+13).
 24. ✅ **Wave K.2** — `GetCmmcComplianceReport` — CMMC 2.0 Level 2: 5 práticas (AC.1.001, IA.1.076, AU.2.041, IR.2.092, RM.2.141) com scoring contextual via releases e Evidence Packs assinados. CG: 734 testes (+11).
 25. ✅ **Wave K.3** — `GetChangeFrequencyHeatmap` + `GetDeploymentCadenceReport` — heatmap 7×24 de deployments + classificação DORA (HighPerformer/Medium/LowPerformer/Insufficient) por serviço. CG: 734 testes (+25 total). **WAVE K COMPLETO**.
+26. ✅ **Wave L.1** — `GetServiceOwnershipHealthReport` — scorecard de saúde de ownership por serviço: 5 tipos de problema, 4 bandas de saúde, score 0–100 com pesos por gravidade. Catalog: 1783 testes (+19).
+27. ✅ **Wave L.2** — `GetFedRampComplianceReport` — FedRAMP Moderate: 5 controlos NIST SP 800-53 (AC-2, AU-2, CM-6, IR-4, SI-2) com scoring contextual via releases e Evidence Packs. CG: 745 testes (+11).
+28. ✅ **Wave L.3** — `GetOperationalReadinessReport` — scorecard pré-produção: 5 dimensões ponderadas (SLO 35%, Chaos 25%, Drift 20%, Profiling 10%, Baseline 10%), 3 classificações (Ready/Conditional/NotReady) com bloqueadores automáticos. OI: 1047 testes (+14). **WAVE L COMPLETO**.
 
 ### Riscos e recomendações transversais
 
