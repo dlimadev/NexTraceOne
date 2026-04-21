@@ -13286,5 +13286,55 @@
     "escalated": "Campaigns Escalated",
     "campaignExpiring": "Campaign expiring soon",
     "pendingItems": "Pending items"
+  },
+  "digitalTwin": {
+    "title": "Digital Twin",
+    "whatIf": "What-If Analysis",
+    "topologySnapshot": "Topology Snapshot",
+    "simulateChange": "Simulate Contract Change",
+    "changeType": {
+      "Additive": "Additive",
+      "NonBreaking": "Non-Breaking",
+      "Breaking": "Breaking",
+      "Deprecation": "Deprecation"
+    },
+    "impactLevel": {
+      "None": "No Impact",
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "overallRisk": "Overall Risk",
+    "affectedConsumers": "Affected Consumers",
+    "totalConsumers": "Total Consumers",
+    "consumerName": "Consumer Service",
+    "recommendation": "Recommendation",
+    "nodeCount": "Nodes",
+    "edgeCount": "Edges",
+    "capturedAt": "Captured At",
+    "noSnapshot": "No topology snapshot available"
+  },
+  "agentApi": {
+    "title": "Agent API Tokens",
+    "create": "Create Token",
+    "revoke": "Revoke",
+    "scope": {
+      "Read": "Read",
+      "ReadWrite": "Read & Write",
+      "Admin": "Admin"
+    },
+    "prefix": "Token Prefix",
+    "expiresAt": "Expires At",
+    "lastUsed": "Last Used",
+    "active": "Active",
+    "revoked": "Revoked",
+    "revokeReason": "Revocation Reason",
+    "auditLog": "Agent Query Audit Log",
+    "queryType": "Query Type",
+    "responseCode": "Response Code",
+    "durationMs": "Duration (ms)",
+    "executedAt": "Executed At",
+    "rawTokenHint": "This token is shown only once. Store it securely."
   }
 }

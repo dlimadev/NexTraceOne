@@ -70,6 +70,10 @@ public static class DependencyInjection
         // Repositórios — v1.4 Multi-Role por Tenant
         services.AddScoped<IUserRoleAssignmentRepository, UserRoleAssignmentRepository>();
 
+        // Repositórios — v1.5 Agent-to-Agent Protocol (Wave D.4)
+        services.AddScoped<IPlatformApiTokenRepository, EfPlatformApiTokenRepository>();
+        services.AddScoped<IAgentQueryRepository, EfAgentQueryRepository>();
+
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();

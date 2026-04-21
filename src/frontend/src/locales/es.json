@@ -13296,5 +13296,55 @@
     "escalated": "Campañas Escaladas",
     "campaignExpiring": "Campaña próxima a vencer",
     "pendingItems": "Ítems pendientes"
+  },
+  "digitalTwin": {
+    "title": "Digital Twin",
+    "whatIf": "Análisis What-If",
+    "topologySnapshot": "Snapshot de Topología",
+    "simulateChange": "Simular Cambio de Contrato",
+    "changeType": {
+      "Additive": "Aditivo",
+      "NonBreaking": "No-Breaking",
+      "Breaking": "Breaking",
+      "Deprecation": "Deprecación"
+    },
+    "impactLevel": {
+      "None": "Sin Impacto",
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "overallRisk": "Riesgo General",
+    "affectedConsumers": "Consumidores Afectados",
+    "totalConsumers": "Total de Consumidores",
+    "consumerName": "Servicio Consumidor",
+    "recommendation": "Recomendación",
+    "nodeCount": "Nodos",
+    "edgeCount": "Aristas",
+    "capturedAt": "Capturado El",
+    "noSnapshot": "No hay snapshot de topología disponible"
+  },
+  "agentApi": {
+    "title": "Tokens de API de Agente",
+    "create": "Crear Token",
+    "revoke": "Revocar",
+    "scope": {
+      "Read": "Lectura",
+      "ReadWrite": "Lectura y Escritura",
+      "Admin": "Administrador"
+    },
+    "prefix": "Prefijo del Token",
+    "expiresAt": "Expira El",
+    "lastUsed": "Último Uso",
+    "active": "Activo",
+    "revoked": "Revocado",
+    "revokeReason": "Motivo de Revocación",
+    "auditLog": "Log de Auditoría de Queries de Agente",
+    "queryType": "Tipo de Query",
+    "responseCode": "Código de Respuesta",
+    "durationMs": "Duración (ms)",
+    "executedAt": "Ejecutado El",
+    "rawTokenHint": "Este token se muestra solo una vez. Guárdelo de forma segura."
   }
 }

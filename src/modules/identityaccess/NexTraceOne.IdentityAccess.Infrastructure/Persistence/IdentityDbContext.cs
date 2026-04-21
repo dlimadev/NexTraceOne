@@ -21,6 +21,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 /// - v1.2: Environment, EnvironmentAccess
 /// - v1.3: RolePermission, ModuleAccessPolicy
 /// - v1.4: UserRoleAssignment, Tenant hierarquia (ParentTenantId, TenantType)
+/// - v1.5: PlatformApiToken, AgentQueryRecord (Agent-to-Agent Protocol — Wave D.4)
 /// </summary>
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
@@ -101,6 +102,14 @@ public sealed class IdentityDbContext(
 
     /// <summary>Atribuições de papéis a usuários em tenants (suporte a N papéis por user/tenant).</summary>
     public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
+
+    // ── v1.5 — Agent-to-Agent Protocol (Wave D.4) ─────────────────────────
+
+    /// <summary>Tokens de acesso de plataforma para agentes autónomos.</summary>
+    public DbSet<PlatformApiToken> PlatformApiTokens => Set<PlatformApiToken>();
+
+    /// <summary>Registos de auditoria de queries de agentes.</summary>
+    public DbSet<AgentQueryRecord> AgentQueryRecords => Set<AgentQueryRecord>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;

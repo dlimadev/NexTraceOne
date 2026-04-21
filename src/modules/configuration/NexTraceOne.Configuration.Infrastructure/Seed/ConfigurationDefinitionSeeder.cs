@@ -7366,5 +7366,86 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "true",
             uiEditorType: "toggle",
             sortOrder: 5980),
+
+        // ── Wave D.1 — Digital Twin ────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.what_if.enabled",
+            displayName: "config.digital_twin.what_if.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.what_if.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9910),
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.what_if.max_consumers_analysis",
+            displayName: "config.digital_twin.what_if.max_consumers_analysis.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.what_if.max_consumers_analysis.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 9920),
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.topology_snapshot.enabled",
+            displayName: "config.digital_twin.topology_snapshot.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.topology_snapshot.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9930),
+
+        // ── Wave D.4 — Agent API ───────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.token.max_per_tenant",
+            displayName: "config.agent.api.token.max_per_tenant.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.token.max_per_tenant.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 9940),
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.token.default_expiry_days",
+            displayName: "config.agent.api.token.default_expiry_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.token.default_expiry_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 9950),
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.query_audit.enabled",
+            displayName: "config.agent.api.query_audit.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.query_audit.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9960),
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.query_audit.retention_days",
+            displayName: "config.agent.api.query_audit.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.query_audit.retention_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 9970),
     ];
 }
