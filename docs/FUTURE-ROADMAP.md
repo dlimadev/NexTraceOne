@@ -3,9 +3,10 @@
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
 > **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → AE (33 features novas documentadas, aguardam implementação)  
+> **Waves planeadas:** U → AI (45 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
+> **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -2043,6 +2044,389 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AF — Service Lifecycle Governance
+
+**Objetivo:** Materializar o NexTraceOne como controlador de ciclo de vida de serviços — acompanhando transições de estado, avaliando condições de retirada segura e rastreando o progresso de migração de consumidores para longe de serviços deprecados. Esta wave fecha o gap entre "catálogo de serviços" e "governança de fim de vida de serviços".
+
+#### AF.1 — GetServiceLifecycleTransitionReport (Catalog)
+
+**Feature:** Relatório de transições de estado no ciclo de vida dos serviços. Identifica serviços estagnados num estado, serviços a transitar mais rapidamente que o esperado, e serviços com transições bloqueadas.
+
+**Domínio:** Analisa histórico de mudanças de `ServiceLifecycleState` (Active/Deprecated/Sunset/Retired) por serviço via `ServiceAsset` + `ContractChangelog` como proxy de actividade.
+
+**Capacidades:**
+- Para cada serviço, calcula:
+  - `CurrentLifecycleState` — estado atual (Active/Deprecated/Sunset/Retired)
+  - `DaysInCurrentState` — dias no estado atual
+  - `LastTransitionDate` — data da última transição de estado
+  - `TransitionCount` — número de transições no período
+- **StagnationFlag** — serviços `Deprecated` há mais de `stagnation_days` sem progresso de migração de consumidores (identificado via `ConsumerExpectation`)
+- **AcceleratedRetirementFlag** — serviços passaram de `Active` para `Sunset` em menos de `min_deprecation_days` (possível violação de processo de governance)
+- **BlockedTransitionFlag** — serviços `Deprecated` com `ConsumerExpectation` de consumidores `Critical` ainda ativos (retirada bloqueada por dependência)
+- **LifecycleDistribution** — distribuição de serviços por estado de ciclo de vida no tenant
+- **Top serviços com `DaysInCurrentState` mais alto** (por estado) — identifica stagnation por estado
+- Filtro por equipa, tier de serviço e estado de ciclo de vida
+
+**Orientado para Architect, Platform Admin e Tech Lead** — suporta decisões de when e how retirar serviços de forma segura, sem quebrar consumidores.
+
+#### AF.2 — GetServiceRetirementReadinessReport (Catalog)
+
+**Feature:** Avaliação de prontidão para retirar um serviço específico. Responde "posso deprecar/retirar este serviço com segurança?" com score composto e lista de bloqueadores.
+
+**Domínio:** Para um dado `ServiceAssetId`, agrega sinais de múltiplas fontes para determinar se a retirada é segura.
+
+**Capacidades:**
+- **RetirementReadinessScore** (0–100) calculado por dimensões ponderadas:
+  - **ConsumerMigrated** (40%) — % de consumidores com `ConsumerExpectation` migrados para versão mais recente ou para alternativa
+  - **ContractsDeprecated** (25%) — % de contratos do serviço em estado `Deprecated` ou `Sunset` (não `Active`/`Approved`)
+  - **RunbookDocumented** (15%) — runbook de decommission existente e aprovado
+  - **DependantsNotified** (20%) — % de equipas consumidoras notificadas (via `OperationalNote` ou canal configurado)
+- **RetirementReadinessTier:**
+  - `Ready` — score ≥ 85 (pode ser retirado)
+  - `NearReady` — score ≥ 65 (gaps menores)
+  - `Blocked` — score ≥ 40 (bloqueadores significativos)
+  - `NotReady` — score < 40 (retirada prematura)
+- **BlockerList** — lista explícita de o que impede a retirada (consumidores ainda activos, contratos ainda Active, runbook ausente)
+- **MigrationProgress** — para cada consumidor ativo, estado de migração para alternativa
+- Endpoint específico por serviço: `GET /api/v1/catalog/services/{id}/retirement-readiness`
+
+**Orientado para Architect e Platform Admin** — transforma a decisão de retirada de serviço de ad-hoc para processo estruturado e auditável.
+
+#### AF.3 — GetServiceMigrationProgressReport (Catalog)
+
+**Feature:** Rastreamento de progresso de migração de consumidores de um serviço `Deprecated` ou `Sunset` para a alternativa designada. Responde "quantos consumidores ainda estão presos no serviço antigo?"
+
+**Domínio:** Cruza `ServiceDependency` + `ConsumerExpectation` + `ApiAsset` (alternativa designada via `ReplacedByServiceId` ou `SuccessorContractId`) para construir pipeline de migração.
+
+**Capacidades:**
+- Para cada serviço `Deprecated` ou `Sunset` com alternativa designada:
+  - **TotalConsumers** — número total de consumidores com dependência registada
+  - **MigratedConsumers** — consumidores sem `ConsumerExpectation` ativa no serviço antigo e com dependência no serviço novo
+  - **InProgressConsumers** — consumidores com dependências em ambos (em transição)
+  - **StuckConsumers** — consumidores sem qualquer sinal de migração no período
+- **MigrationCompletionRate** — `MigratedConsumers / TotalConsumers * 100`
+- **MigrationTier:** `Complete` ≥100% / `Advanced` ≥75% / `InProgress` ≥25% / `Lagging` <25%
+- **EstimatedCompletionDate** — projeção baseada na taxa de migração atual (linear)
+- **Top consumidores bloqueados** — consumidores `Stuck` com tier `Critical` ou `Standard`
+- **DailyMigrationTimeline** — série temporal de 30 dias de progresso
+
+**Orientado para Tech Lead, Architect e Platform Admin** — suporta o processo de sunset controlado de serviços com visibilidade de progresso de migração por equipa consumidora.
+
+#### Configuração Wave AF
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `catalog.lifecycle.stagnation_days` | 90 | 12080 | Dias no estado Deprecated sem progresso para flag StagnationFlag |
+| `catalog.lifecycle.min_deprecation_days` | 30 | 12090 | Dias mínimos de estado Deprecated antes de Sunset (AcceleratedRetirementFlag) |
+| `catalog.lifecycle.max_services` | 200 | 12100 | Máximo de serviços no relatório de transições de ciclo de vida |
+| `catalog.retirement_readiness.ready_threshold` | 85 | 12110 | Score mínimo para RetirementReadinessTier Ready |
+| `catalog.retirement_readiness.near_ready_threshold` | 65 | 12120 | Score mínimo para RetirementReadinessTier NearReady |
+| `catalog.migration_progress.lookback_days` | 90 | 12130 | Período de análise para progresso de migração |
+| `catalog.migration_progress.stuck_threshold_days` | 30 | 12140 | Dias sem sinal de migração para classificar como StuckConsumer |
+| `catalog.migration_progress.max_services` | 100 | 12150 | Máximo de serviços no relatório de progresso de migração |
+
+#### i18n Wave AF
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `serviceLifecycleTransition.*` — transições de estado no ciclo de vida de serviços
+- `serviceRetirementReadiness.*` — prontidão para retirada de serviços e lista de bloqueadores
+- `serviceMigrationProgress.*` — progresso de migração de consumidores de serviços deprecated
+
+**Totais estimados Wave AF:** Catalog: ~42 testes (AF.1 ~13 + AF.2 ~15 + AF.3 ~14). Configuração: +8 config keys (sort 12080–12150). i18n: +3 secções (4 locales). **Wave AF PLANEADA**.
+
+---
+
+### Wave AG — FinOps Advanced Attribution
+
+**Objetivo:** Aprofundar a capacidade FinOps contextual do NexTraceOne — passando de "custo por serviço" para atribuição granular por ambiente, por release e por padrão de desperdício operacional. Esta wave fecha o gap entre observabilidade de custo e decisão de rightsizing informada por contexto operacional real.
+
+#### AG.1 — GetEnvironmentCostComparisonReport (OperationalIntelligence)
+
+**Feature:** Comparação de custo operacional entre ambientes (dev/staging/prod) por serviço. Identifica serviços onde o custo em não-produção excede de forma desproporcional o custo em produção — sinal de desperdício em ambientes de teste.
+
+**Domínio:** Agrega `ServiceCostAllocationRecord` por serviço e ambiente no período, com ratio não-prod/prod.
+
+**Capacidades:**
+- Para cada serviço com custo registado em múltiplos ambientes, calcula:
+  - `ProdCostUsd` — custo total em ambiente `Production`
+  - `NonProdCostUsd` — custo total em ambientes não-produção (soma)
+  - `NonProdToProdRatio` — `NonProdCostUsd / ProdCostUsd`
+  - `NonProdWasteCostUsd` — custo excedente não-prod vs. prod (se ratio > `expected_ratio`)
+- **EnvironmentEfficiencyTier por serviço:**
+  - `Optimal` — ratio ≤ 0.5 (não-prod custa metade ou menos que prod — esperado)
+  - `Acceptable` — ratio ≤ 1.0
+  - `Overprovisioned` — ratio ≤ 2.0 (não-prod custa mais que prod)
+  - `WasteAlert` — ratio > 2.0 (non-prod custa 2× ou mais que prod)
+- **TotalNonProdWasteUsd** — waste estimado total do tenant em não-produção
+- **Top serviços com maior WasteCostUsd**
+- **DistributionByTier** — distribuição de serviços por EnvironmentEfficiencyTier
+- Filtro por equipa e período (30–90 dias)
+
+**Orientado para FinOps, Platform Admin e Tech Lead** — quantifica desperdício em ambientes de teste que frequentemente é invisível nos relatórios de custo cloud genéricos.
+
+#### AG.2 — GetCostPerReleaseReport (OperationalIntelligence)
+
+**Feature:** Custo operacional atribuído por release de serviço. Responde "qual é o custo de deploy de uma release?" e identifica releases com cost spike pós-deploy.
+
+**Domínio:** Junta `Release` (data de deploy, serviço, ambiente) com `ServiceCostAllocationRecord` para calcular custo médio diário nos N dias após cada release versus baseline pré-release.
+
+**Capacidades:**
+- Para cada release no período, calcula:
+  - `PreReleaseDailyAvgCostUsd` — custo médio diário nos `pre_release_days` antes do deploy
+  - `PostReleaseDailyAvgCostUsd` — custo médio diário nos `post_release_days` após o deploy
+  - `CostDeltaPct` — variação percentual post vs. pre
+  - `PostReleaseTotalCostUsd` — custo total no período de análise pós-deploy
+- **CostImpactTier por release:**
+  - `Neutral` — delta entre -10% e +10%
+  - `CostSaving` — delta < -10% (release reduziu custo — eficiência ou scale-down)
+  - `MinorIncrease` — delta 10–30%
+  - `MajorIncrease` — delta 30–100%
+  - `CostSpike` — delta > 100% (release causou spike de custo — regressão ou over-provisioning)
+- **Top releases com maior CostDeltaPct** (positivo e negativo)
+- **ReleaseCostSummary** — média de custo por release no tenant, % com CostSpike, % com CostSaving
+- Correlação com `DeploymentStatus` (Failed/RolledBack com CostSpike = flag especial `WastedDeploymentCost`)
+
+**Orientado para FinOps, Architect e Platform Admin** — conecta releases (Wave P.3) com custo real pós-deploy, habilitando optimização de deployment strategies.
+
+#### AG.3 — GetFinOpsWasteAnalysisReport (OperationalIntelligence)
+
+**Feature:** Análise consolidada de desperdício operacional por serviço, cruzando múltiplos sinais de waste: idle resources, over-provisioning, failed deployments, e custo de não-prod desproporcionado.
+
+**Domínio:** Agrega sinais de `ServiceCostAllocationRecord` + `WasteSignal` (existente) + `Release` (deployments failed/rolled back) + análise de `EnvironmentEfficiencyTier` (AG.1).
+
+**Capacidades:**
+- Para cada serviço, identifica categorias de waste:
+  - **IdleWaste** — custo de serviços `LowLoad` (Wave U.3) com custo acima da mediana
+  - **OverProvisioningWaste** — custo de não-prod desproporcional (ratio > `expected_ratio`)
+  - **FailedDeploymentWaste** — custo acumulado de releases `Failed` ou `RolledBack`
+  - **DriftWaste** — custo de serviços com `DriftFinding.Severity = High/Critical` (degradação não resolvida aumenta custo)
+- **WasteScore por serviço** (0–100) — soma ponderada de categorias de waste
+- **WasteTier:** `Clean` ≤10 / `Minor` ≤30 / `Significant` ≤60 / `Critical` >60
+- **TotalEstimatedWasteUsd** — estimativa total de desperdício no tenant no período
+- **WasteByCategory** — distribuição percentual por categoria
+- **Top serviços com maior WasteScore** e maior `EstimatedWasteUsd`
+- **WasteOpportunity** — total estimado de poupança se top 10 serviços forem otimizados
+
+**Orientado para FinOps, Platform Admin e Executive** — visão executiva do desperdício total da plataforma, com breakdown acionável por categoria e serviço.
+
+#### Configuração Wave AG
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `finops.environment_cost.expected_nonprod_ratio` | 0.5 | 12160 | Ratio non-prod/prod esperado para EnvironmentEfficiencyTier Optimal |
+| `finops.environment_cost.lookback_days` | 30 | 12170 | Período de análise para comparação de custo entre ambientes |
+| `finops.cost_per_release.pre_release_days` | 7 | 12180 | Dias antes do deploy para baseline de custo |
+| `finops.cost_per_release.post_release_days` | 7 | 12190 | Dias após o deploy para análise de custo pós-release |
+| `finops.cost_per_release.spike_threshold_pct` | 100 | 12200 | Threshold (%) de CostDeltaPct para classificação CostSpike |
+| `finops.waste_analysis.lookback_days` | 30 | 12210 | Período de análise para relatório de waste |
+| `finops.waste_analysis.max_services` | 100 | 12220 | Máximo de serviços no relatório de waste |
+| `finops.waste_analysis.significant_waste_threshold` | 30 | 12230 | Threshold de WasteScore para WasteTier Significant |
+
+#### i18n Wave AG
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `environmentCostComparison.*` — comparação de custo entre ambientes e detecção de waste em não-prod
+- `costPerRelease.*` — custo operacional por release e identificação de cost spikes pós-deploy
+- `finOpsWasteAnalysis.*` — análise consolidada de desperdício por categoria e serviço
+
+**Totais estimados Wave AG:** OI: ~43 testes (AG.1 ~13 + AG.2 ~15 + AG.3 ~15). Configuração: +8 config keys (sort 12160–12230). i18n: +3 secções (4 locales). **Wave AG PLANEADA**.
+
+---
+
+### Wave AH — Event-Driven Architecture Governance
+
+**Objetivo:** Introduzir governança de arquitecturas event-driven — rastreando evolução de schemas de eventos, detectando desequilíbrios entre produtores e consumidores de eventos, e validando conformidade dos produtores com os contratos AsyncAPI registados. Esta wave completa o ciclo de governance de contratos estendendo-o ao domínio de eventos.
+
+#### AH.1 — GetEventSchemaEvolutionReport (Catalog)
+
+**Feature:** Rastreamento da evolução de schemas de eventos (AsyncAPI/Kafka) ao longo do tempo. Identifica eventos com historiais de breaking changes frequentes e consumidores que ainda utilizam versões obsoletas de schemas.
+
+**Domínio:** Agrega `ContractChangelog` filtrado por contratos AsyncAPI + `ConsumerExpectation` por schema de evento + `DetectGraphQlBreakingChanges` como referência de padrão para deteção de breaking changes em AsyncAPI.
+
+**Capacidades:**
+- Para cada contrato AsyncAPI/evento no período, calcula:
+  - `TotalSchemaChanges` — total de changelogs registados
+  - `BreakingSchemaChanges` — changelogs com `IsBreaking = true`
+  - `BreakingChangeRate` — % de mudanças breaking
+  - `ActiveConsumersOnOldVersion` — consumidores com `ConsumerExpectation` em versão anterior à current
+  - `SchemaLagDays` — diferença em dias entre data de publicação da versão atual e data de última atualização do consumidor mais atrasado
+- **EventSchemaStabilityTier:** `Stable` (BreakingChangeRate < 5%) / `Evolving` (5–20%) / `Volatile` (20–50%) / `Unstable` (>50%)
+- **MigrationLag flag** — contratos com `ActiveConsumersOnOldVersion > 0` e `SchemaLagDays > lag_alert_days`
+- **Top eventos com maior BreakingChangeRate** e maior `SchemaLagDays`
+- **TenantEventSchemaHealthSummary** — distribuição de contratos AsyncAPI por tier de estabilidade
+
+**Orientado para Architect e Tech Lead** — suporta governança de event-driven architecture com visibilidade de maturidade de evolução de schemas, complementando a análise de contratos REST/GraphQL/Protobuf.
+
+#### AH.2 — GetEventProducerConsumerBalanceReport (Catalog)
+
+**Feature:** Análise de equilíbrio entre produtores e consumidores de eventos registados. Identifica eventos órfãos (produzidos sem consumidores), consumidores sem produtor registado (dependência cega) e eventos sobrecarregados (muitos consumidores num único produtor).
+
+**Domínio:** Cruza `ApiAsset` de tipo `AsyncApiEvent` com `ServiceDependency` + `ConsumerExpectation` para mapear o grafo de produção/consumo de eventos.
+
+**Capacidades:**
+- Para cada contrato de evento (AsyncAPI/Kafka) no tenant:
+  - **ProducerCount** — número de serviços que produzem este evento
+  - **ConsumerCount** — número de serviços que consomem este evento
+  - **IsOrphaned** — `ConsumerCount = 0` e contrato `Active` (evento produzido sem utilidade registada)
+  - **IsBlind** — `ProducerCount = 0` e `ConsumerCount > 0` (consumidores dependem de evento sem produtor registado)
+  - **FanOutRisk** — `ConsumerCount ≥ fan_out_threshold` (evento com muitos consumidores — blast radius elevado em breaking change)
+- **OrphanedEvents** — lista de contratos `Active` sem consumidores (candidatos a deprecação)
+- **BlindConsumers** — lista de consumidores sem produtor registado (gap de catalogação)
+- **HighFanOutEvents** — eventos com `FanOutRisk = true` ordenados por ConsumerCount
+- **BalanceSummary** — % de eventos orphaned, % com blind consumers, % com FanOutRisk, total de eventos no tenant
+
+**Orientado para Architect e Platform Admin** — identifica problemas estruturais na arquitectura de eventos que não são visíveis sem um catálogo de contratos centralizado.
+
+#### AH.3 — GetEventContractComplianceReport (Catalog)
+
+**Feature:** Conformidade dos produtores de eventos com os contratos AsyncAPI registados. Responde "os eventos produzidos em runtime estão em conformidade com o schema registado?"
+
+**Domínio:** Cruza `ApiAsset` (AsyncAPI contrato) com `RuntimeSnapshot` (eventos observados via telemetria) e `ContractTestRecord` (Wave AE.1 — testes de contrato de eventos) para calcular compliance.
+
+**Capacidades:**
+- Para cada contrato de evento com produtores e dados de runtime:
+  - **SchemaComplianceRate** — % de eventos observados que passaram validação de schema (via `ContractTestRecord` ou runtime sampling)
+  - **PayloadViolationCount** — número de payloads que violaram o schema registado no período
+  - **UnregisteredFields** — campos presentes nos payloads mas não no schema (extensão não documentada)
+  - **MissingRequiredFields** — campos obrigatórios ausentes em algum payload
+- **ComplianceTier por contrato:**
+  - `Compliant` — SchemaComplianceRate ≥ 99%
+  - `MinorViolations` — SchemaComplianceRate ≥ 95%
+  - `Degraded` — SchemaComplianceRate ≥ 80%
+  - `NonCompliant` — SchemaComplianceRate < 80%
+- **TenantEventComplianceScore** — média ponderada de SchemaComplianceRate por contrato
+- **Top contratos não-conformes** e **top produtores com maior PayloadViolationCount**
+- **ViolationTimeline** — série temporal de 30 dias de violações por tipo
+
+**Orientado para Architect, Engineer e Auditor** — fecha o loop entre o contrato AsyncAPI registado e a realidade em runtime, tornando o NexTraceOne a fonte de verdade para conformidade de eventos.
+
+#### Configuração Wave AH
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `catalog.event_schema.lag_alert_days` | 30 | 12240 | Dias de SchemaLag para flag MigrationLag em esquemas de eventos |
+| `catalog.event_schema.max_contracts` | 200 | 12250 | Máximo de contratos AsyncAPI no relatório de evolução |
+| `catalog.event_balance.fan_out_threshold` | 10 | 12260 | Número de consumidores para flag FanOutRisk |
+| `catalog.event_balance.max_contracts` | 200 | 12270 | Máximo de contratos no relatório de equilíbrio produtor-consumidor |
+| `catalog.event_compliance.lookback_days` | 30 | 12280 | Período de análise para conformidade de contratos de eventos |
+| `catalog.event_compliance.compliant_threshold` | 99 | 12290 | SchemaComplianceRate mínimo para ComplianceTier Compliant |
+| `catalog.event_compliance.degraded_threshold` | 80 | 12300 | SchemaComplianceRate mínimo para ComplianceTier Degraded |
+| `catalog.event_compliance.max_contracts` | 200 | 12310 | Máximo de contratos no relatório de conformidade de eventos |
+
+#### i18n Wave AH
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `eventSchemaEvolution.*` — evolução de schemas de eventos AsyncAPI e migração de consumidores
+- `eventProducerConsumerBalance.*` — equilíbrio produtor-consumidor e deteção de eventos órfãos
+- `eventContractCompliance.*` — conformidade de produtores de eventos com contratos AsyncAPI
+
+**Totais estimados Wave AH:** Catalog: ~42 testes (AH.1 ~13 + AH.2 ~14 + AH.3 ~15). Configuração: +8 config keys (sort 12240–12310). i18n: +3 secções (4 locales). **Wave AH PLANEADA**.
+
+---
+
+### Wave AI — Predictive Intelligence & Forecasting
+
+**Objetivo:** Introduzir capacidades de inteligência preditiva no NexTraceOne — passando de relatórios descritivos ("o que aconteceu?") para análises prescritivas ("o que vai acontecer?"). Esta wave usa o histórico operacional acumulado pelas waves anteriores para produzir forecasts de risco de deployment, projeções de capacidade e scoring de probabilidade de incidente — sempre governados, auditáveis e contextualizados por serviço.
+
+#### AI.1 — GetDeploymentRiskForecastReport (ChangeGovernance)
+
+**Feature:** Scoring preditivo de risco para deployments futuros ou em curso, baseado em padrões históricos do serviço, contexto de ambiente e sinais operacionais recentes. Responde "qual é o risco desta release específica antes de ela chegar a produção?"
+
+**Domínio:** Combina `Release` (histórico de deployments), `ServiceRiskProfile` (Wave F.2), `ChangeConfidenceBreakdown`, `RollbackPatternReport` (Wave W.1) e `EnvironmentStabilityReport` (Wave T.3) para um modelo de scoring heurístico sem ML externo.
+
+**Capacidades:**
+- Para cada release em estado `Pending` ou recente (`Running/Succeeded`), calcula `ForecastRiskScore` (0–100) por dimensões:
+  - **HistoricalRollbackRate do serviço** (25%) — se o serviço tem padrão `Serial` de rollback, score aumenta
+  - **CurrentEnvironmentInstability** (20%) — se o ambiente de destino está `Unstable` ou `Critical` (Wave T.3)
+  - **ServiceRiskProfileScore** (20%) — score atual do Risk Center (Wave F.2)
+  - **ChangeConfidenceInverse** (20%) — 100 - confidence score atual da release
+  - **RecentIncidentRate** (15%) — taxa de incidentes pós-deploy nos últimos 30 dias para este serviço
+- **RiskForecastTier:**
+  - `Low` — score < 25
+  - `Moderate` — score < 50
+  - `High` — score < 75
+  - `Critical` — score ≥ 75 (recomendação automática de aprovação adicional ou delay)
+- **ForecastExplanation** — lista das dimensões que mais contribuíram para o score (top 3 fatores)
+- **RecommendedActions** — sugestões baseadas nos fatores dominantes (ex: "resolver drift aberto antes do deploy", "aguardar janela de mudança agendada")
+- **Top releases pendentes de alto risco** no tenant
+- Endpoint: `GET /api/v1/changes/releases/{id}/risk-forecast`
+
+**Orientado para Engineer, Tech Lead e Platform Admin** — suporte proativo à decisão de promover ou adiar uma release, antes do incidente acontecer.
+
+#### AI.2 — GetCapacityTrendForecastReport (OperationalIntelligence)
+
+**Feature:** Projeção de tendências de capacidade (throughput, latência, custo) por serviço baseada em extrapolação linear do histórico de `RuntimeSnapshot`. Identifica serviços que vão aproximar-se de thresholds críticos nos próximos N dias.
+
+**Domínio:** Analisa séries temporais de `RuntimeSnapshot` (AvgLatencyMs, AvgThroughput, AvgErrorRate) por serviço e ambiente, aplicando regressão linear simples para projeção.
+
+**Capacidades:**
+- Para cada serviço com ≥ `min_data_points` snapshots no histórico, calcula:
+  - **ThroughputTrend** — slope da regressão linear de `AvgThroughput` (positivo = crescimento)
+  - **LatencyTrend** — slope da regressão de `AvgLatencyMs` (positivo = degradação)
+  - **ErrorRateTrend** — slope da regressão de `AvgErrorRate`
+  - **ProjectedThroughputIn30Days** e **ProjectedLatencyIn30Days** — extrapolação dos valores atuais
+  - **DaysToLatencyThreshold** — dias estimados até `AvgLatencyMs > latency_critical_threshold` (se tendência ascendente)
+  - **DaysToErrorRateThreshold** — dias estimados até `AvgErrorRate > error_rate_critical_threshold`
+- **ForecastAlertTier:**
+  - `Stable` — nenhum threshold vai ser atingido em 90 dias com tendência atual
+  - `WatchList` — threshold estimado em 31–90 dias
+  - `AtRisk` — threshold estimado em 8–30 dias
+  - `Imminent` — threshold estimado em ≤ 7 dias (ação imediata recomendada)
+- **Top serviços com menor `DaysToThreshold`** (mais urgentes)
+- **TenantCapacitySummary** — % de serviços por ForecastAlertTier
+- Filtro por ambiente e tier de serviço
+
+**Orientado para Architect, Platform Admin e Engineer** — transforma o histórico de observabilidade em decisão proativa de rightsizing e escalamento, antes de SLOs serem violados.
+
+#### AI.3 — GetIncidentProbabilityReport (OperationalIntelligence)
+
+**Feature:** Scoring de probabilidade de incidente por serviço nas próximas 48–72 horas, baseado na convergência de sinais de risco operacional: drifts abertos, chaos coverage gaps, SLO em degradação, e mudanças recentes de alto risco.
+
+**Domínio:** Agrega sinais de `DriftFinding`, `SloObservation`, `ChaosExperiment`, `Release` recentes e `VulnerabilityAdvisoryRecord` para calcular um score de probabilidade heurístico.
+
+**Capacidades:**
+- Para cada serviço ativo, calcula `IncidentProbabilityScore` (0–100) por contribuições:
+  - **OpenDriftSignals** (25%) — número de `DriftFinding` abertos com severidade High/Critical
+  - **SloBreachTrend** (25%) — % de SLO observations em estado `Breached` nas últimas 72h
+  - **ChaosGap** (20%) — se serviço Critical sem `FullCoverage` de chaos (Wave V.2)
+  - **RecentHighRiskRelease** (20%) — se existe release com `ForecastRiskScore > 75` nas últimas 24h (Wave AI.1)
+  - **OpenVulnerabilities** (10%) — número de `VulnerabilityAdvisoryRecord` severity Critical/High
+- **IncidentProbabilityTier:**
+  - `Unlikely` — score < 20
+  - `Possible` — score < 40
+  - `Probable` — score < 65
+  - `Imminent` — score ≥ 65 (alerta proativo recomendado)
+- **ProbabilityExplanation** — top 3 fatores contribuintes (para cada serviço)
+- **TenantRiskHeatmap** — distribuição de serviços por tier e top 10 serviços mais em risco
+- **AlertServicesList** — serviços `Imminent` com drill-down para cada sinal contribuinte
+- Refresh recomendado: periódico (via Quartz.NET job) com caching de `incident_probability_cache_ttl_minutes`
+
+**Orientado para Engineer, Tech Lead e Platform Admin** — funciona como "early warning system" unificado que combina todos os sinais de risco numa única visão proativa, eliminando a necessidade de monitorar cada relatório individualmente.
+
+#### Configuração Wave AI
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `changes.risk_forecast.critical_threshold` | 75 | 12320 | Score mínimo de ForecastRiskScore para tier Critical |
+| `changes.risk_forecast.high_threshold` | 50 | 12330 | Score mínimo para tier High |
+| `runtime.capacity_forecast.min_data_points` | 14 | 12340 | Mínimo de snapshots para habilitar projeção de capacidade |
+| `runtime.capacity_forecast.latency_critical_ms` | 2000 | 12350 | Threshold de latência (ms) para alerta de capacidade |
+| `runtime.capacity_forecast.error_rate_critical_pct` | 5 | 12360 | Threshold de error rate (%) para alerta de capacidade |
+| `runtime.incident_probability.imminent_threshold` | 65 | 12370 | Score mínimo para IncidentProbabilityTier Imminent |
+| `runtime.incident_probability.probable_threshold` | 40 | 12380 | Score mínimo para IncidentProbabilityTier Probable |
+| `runtime.incident_probability.cache_ttl_minutes` | 15 | 12390 | TTL do cache de scoring de probabilidade de incidente |
+
+#### i18n Wave AI
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `deploymentRiskForecast.*` — previsão de risco de deployment e recomendações proativas
+- `capacityTrendForecast.*` — projeção de capacidade e alertas de threshold por serviço
+- `incidentProbability.*` — scoring de probabilidade de incidente e early warning por serviço
+
+**Totais estimados Wave AI:** CG: ~13 testes (AI.1). OI: ~28 testes (AI.2 ~13 + AI.3 ~15). Configuração: +8 config keys (sort 12320–12390). i18n: +3 secções (4 locales). 1 novo endpoint backend: `GET /api/v1/changes/releases/{id}/risk-forecast`. Job Quartz.NET para refresh periódico de probabilidade de incidente. **Wave AI PLANEADA**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -2139,6 +2523,19 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 82. 🔲 **Wave AE.2** — `GetSchemaBreakingChangeImpactReport` — impacto transitivo de breaking changes: DirectConsumers + IndirectConsumers (até `max_hop_depth` saltos), ImpactScore ponderado por tier, BreakingChangeImpactTier (Contained/Moderate/Significant/Widespread), MitigationOptions, breakdown por ambiente. Catalog. Config: `contracts.breaking_change_impact.*` sort 12030–12040.
 83. 🔲 **Wave AE.3** — `GetApiBackwardCompatibilityReport` — compatibilidade retroativa longitudinal: BreakingChangeRate, ConsumerAdoptionLag, BackwardCompatibilityScore, CompatibilityTier (Stable/Evolving/Volatile/Unstable), StagnationFlag, TenantCompatibilityIndex. Catalog. Config: `contracts.backward_compat.*` sort 12050–12070. **Wave AE PLANEADA**.
 
+84. 🔲 **Wave AF.1** — `GetServiceLifecycleTransitionReport` — transições de estado no ciclo de vida dos serviços: DaysInCurrentState, StagnationFlag (Deprecated sem progresso), AcceleratedRetirementFlag (salto rápido para Sunset), BlockedTransitionFlag (consumidores Critical ativos). Catalog. Config: `catalog.lifecycle.*` sort 12080–12100.
+85. 🔲 **Wave AF.2** — `GetServiceRetirementReadinessReport` — prontidão para retirada de serviço: RetirementReadinessScore (ConsumerMigrated 40% + ContractsDeprecated 25% + RunbookDocumented 15% + DependantsNotified 20%), RetirementReadinessTier (Ready/NearReady/Blocked/NotReady), BlockerList, MigrationProgress. Endpoint `/retirement-readiness`. Catalog. Config: `catalog.retirement_readiness.*` sort 12110–12120.
+86. 🔲 **Wave AF.3** — `GetServiceMigrationProgressReport` — progresso de migração de consumidores de serviços deprecated: MigrationCompletionRate, MigrationTier (Complete/Advanced/InProgress/Lagging), EstimatedCompletionDate (linear projection), StuckConsumers, DailyMigrationTimeline 30d. Catalog. Config: `catalog.migration_progress.*` sort 12130–12150. **Wave AF PLANEADA**.
+87. 🔲 **Wave AG.1** — `GetEnvironmentCostComparisonReport` — comparação de custo non-prod vs. prod por serviço: NonProdToProdRatio, EnvironmentEfficiencyTier (Optimal/Acceptable/Overprovisioned/WasteAlert), NonProdWasteCostUsd, TotalNonProdWasteUsd do tenant. OI. Config: `finops.environment_cost.*` sort 12160–12170.
+88. 🔲 **Wave AG.2** — `GetCostPerReleaseReport` — custo operacional por release: PreRelease vs. PostRelease daily avg, CostDeltaPct, CostImpactTier (Neutral/CostSaving/MinorIncrease/MajorIncrease/CostSpike), WastedDeploymentCost flag (Failed+CostSpike). OI. Config: `finops.cost_per_release.*` sort 12180–12200.
+89. 🔲 **Wave AG.3** — `GetFinOpsWasteAnalysisReport` — análise consolidada de waste: 4 categorias (IdleWaste/OverProvisioningWaste/FailedDeploymentWaste/DriftWaste), WasteScore 0–100, WasteTier (Clean/Minor/Significant/Critical), TotalEstimatedWasteUsd, WasteOpportunity (top 10 savings). OI. Config: `finops.waste_analysis.*` sort 12210–12230. **Wave AG PLANEADA**.
+90. 🔲 **Wave AH.1** — `GetEventSchemaEvolutionReport` — evolução de schemas AsyncAPI/Kafka: BreakingSchemaChanges, EventSchemaStabilityTier (Stable/Evolving/Volatile/Unstable), MigrationLag flag (consumidores em versão antiga > `lag_alert_days`), top eventos mais instáveis. Catalog. Config: `catalog.event_schema.*` sort 12240–12250.
+91. 🔲 **Wave AH.2** — `GetEventProducerConsumerBalanceReport` — equilíbrio produtor-consumidor de eventos: OrphanedEvents (produzidos sem consumidores), BlindConsumers (consumidores sem produtor registado), HighFanOutEvents (`FanOutRisk`), BalanceSummary global. Catalog. Config: `catalog.event_balance.*` sort 12260–12270.
+92. 🔲 **Wave AH.3** — `GetEventContractComplianceReport` — conformidade de produtores com contratos AsyncAPI: SchemaComplianceRate, PayloadViolationCount, UnregisteredFields, MissingRequiredFields, ComplianceTier (Compliant/MinorViolations/Degraded/NonCompliant), ViolationTimeline 30d. Catalog. Config: `catalog.event_compliance.*` sort 12280–12310. **Wave AH PLANEADA**.
+93. 🔲 **Wave AI.1** — `GetDeploymentRiskForecastReport` — previsão preditiva de risco de deployment: ForecastRiskScore (5 dimensões: HistoricalRollbackRate+EnvironmentInstability+ServiceRiskProfile+ChangeConfidenceInverse+RecentIncidentRate), RiskForecastTier (Low/Moderate/High/Critical), ForecastExplanation, RecommendedActions. Endpoint `/risk-forecast` por release. CG. Config: `changes.risk_forecast.*` sort 12320–12330.
+94. 🔲 **Wave AI.2** — `GetCapacityTrendForecastReport` — projeção de capacidade por serviço: regressão linear sobre RuntimeSnapshot histórico, DaysToLatencyThreshold, DaysToErrorRateThreshold, ForecastAlertTier (Stable/WatchList/AtRisk/Imminent). OI. Config: `runtime.capacity_forecast.*` sort 12340–12360.
+95. 🔲 **Wave AI.3** — `GetIncidentProbabilityReport` — probabilidade preditiva de incidente: IncidentProbabilityScore (5 sinais: OpenDrift+SloBreachTrend+ChaosGap+RecentHighRiskRelease+OpenVulns), IncidentProbabilityTier (Unlikely/Possible/Probable/Imminent), TenantRiskHeatmap, refresh via Quartz.NET job. OI. Config: `runtime.incident_probability.*` sort 12370–12390. **Wave AI PLANEADA**.
+
 ### Riscos e recomendações transversais
 
 - **Feature sprawl** — resistir à tentação de criar módulos novos; preferir aprofundar existentes (Wave A > Wave B).
@@ -2162,3 +2559,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 9. **Waves X–Z (planeadas):** 3 novas waves detalhadas na secção 15, cobrindo itens 62–70. Wave X: Frontend Intelligence (dashboards, visual builders, adaptive navigation). Wave Y: AI Governance Deep Dive (agentic runtime, NLP routing, token budget attribution). Wave Z: Integration Ecosystem Completion (Kafka consumer, SDK, ClickHouse). Adicionam 24 config keys (sort 11520–11750), 3×3–4 secções i18n.
 10. **Status das secções 1–12 revisto (Abril 2026):** §1.1 GraphQL e §1.2 Protobuf marcados como ✅ implementados (Waves G.3/H.1). §8.4 ML Correlation marcado como ✅ implementado (Wave A.5). §9.1 Compliance Packs marcado como ✅ parcialmente implementado (8 standards via Waves G–L). Tabela Priorização Recomendada actualizada para reflectir estado real.
 11. **Waves AB–AE (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 72–83 da lista de priorização. **Wave AB** (Knowledge Graph & Semantic Relations): AB.1 `GetKnowledgeRelationGraph` + AB.2 `GetContractLineageReport` + AB.3 `GetIncidentKnowledgeBaseReport`. +8 config keys (sort 11760–11830). **Wave AC** (Self-Service & Platform Adoption Intelligence): AC.1 `GetOnboardingHealthReport` + AC.2 `GetDeveloperActivityReport` + AC.3 `GetPlatformAdoptionReport`. +8 config keys (sort 11840–11910). **Wave AD** (Zero Trust & Security Posture Analytics): AD.1 `GetZeroTrustPostureReport` + AD.2 `GetSecretsExposureRiskReport` + AD.3 `GetAccessPatternAnomalyReport`. +8 config keys (sort 11920–11990). **Wave AE** (Contract Testing & API Backward Compatibility): AE.1 `ContractTestRecord`+`IngestContractTestResult`+`GetContractTestCoverageReport` + AE.2 `GetSchemaBreakingChangeImpactReport` + AE.3 `GetApiBackwardCompatibilityReport`. +8 config keys (sort 12000–12070). Total de config keys adicionadas: +32 (sort 11760–12070). Total de testes estimados: +186 (Catalog +~115, OI +~42, CG/IA +~29). Novas migrations: 1 (`ContractTestRecords` — Wave AE.1). i18n: +12 secções em 4 locales.
+12. **Waves AF–AI (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 84–95 da lista de priorização. **Wave AF** (Service Lifecycle Governance): AF.1 `GetServiceLifecycleTransitionReport` + AF.2 `GetServiceRetirementReadinessReport` + AF.3 `GetServiceMigrationProgressReport`. +8 config keys (sort 12080–12150). **Wave AG** (FinOps Advanced Attribution): AG.1 `GetEnvironmentCostComparisonReport` + AG.2 `GetCostPerReleaseReport` + AG.3 `GetFinOpsWasteAnalysisReport`. +8 config keys (sort 12160–12230). **Wave AH** (Event-Driven Architecture Governance): AH.1 `GetEventSchemaEvolutionReport` + AH.2 `GetEventProducerConsumerBalanceReport` + AH.3 `GetEventContractComplianceReport`. +8 config keys (sort 12240–12310). **Wave AI** (Predictive Intelligence & Forecasting): AI.1 `GetDeploymentRiskForecastReport` + AI.2 `GetCapacityTrendForecastReport` + AI.3 `GetIncidentProbabilityReport`. +8 config keys (sort 12320–12390). 1 novo endpoint REST (`/risk-forecast`). 1 job Quartz.NET (refresh de incident probability). Total: +32 config keys (sort 12080–12390). Testes estimados: +210 (Catalog +~84, OI +~113, CG +~13). i18n: +12 secções em 4 locales.
