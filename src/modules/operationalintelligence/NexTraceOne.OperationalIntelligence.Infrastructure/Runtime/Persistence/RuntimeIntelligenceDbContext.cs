@@ -60,6 +60,9 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Registos de alocação de custo operacional por serviço (FinOps Contextual).</summary>
     public DbSet<ServiceCostAllocationRecord> ServiceCostAllocations => Set<ServiceCostAllocationRecord>();
 
+    /// <summary>Observações pontuais de SLO por serviço e métrica (SLO Tracking).</summary>
+    public DbSet<SloObservation> SloObservations => Set<SloObservation>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;

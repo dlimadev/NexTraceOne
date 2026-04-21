@@ -13772,5 +13772,84 @@
       "noServices": "Nenhum serviço encontrado para o filtro especificado.",
       "tenantRequired": "O ID de tenant é obrigatório."
     }
+  },
+  "gdprCompliance": {
+    "title": "Relatório de Conformidade GDPR",
+    "subtitle": "Estado de conformidade com o Regulamento Geral de Proteção de Dados com base na gestão de mudanças, trilha de auditoria, evidence packs e controles de governança de dados.",
+    "articles": {
+      "art5": "Princípios do Tratamento",
+      "art13": "Transparência",
+      "art17": "Direito ao Apagamento",
+      "art25": "Proteção de Dados por Design",
+      "art33": "Preparação para Notificação de Violação"
+    },
+    "overallStatus": "Status Global",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Evidence Packs Assinados",
+    "totalEvidencePacks": "Total de Evidence Packs",
+    "generatedAt": "Relatório Gerado Em",
+    "periodDays": "Período de Avaliação (dias)",
+    "errors": {
+      "notEnabled": "O relatório de conformidade GDPR não está ativo para este tenant.",
+      "invalidPeriod": "O período de avaliação deve ser entre 1 e 365 dias."
+    }
+  },
+  "sloTracking": {
+    "title": "Resumo de Conformidade de SLO",
+    "trendTitle": "Tendência de Violações de SLO",
+    "subtitle": "Rastreio de conformidade de Service Level Objectives: valores observados vs objetivos, taxa de violações e análise de tendências.",
+    "statuses": {
+      "Met": "Cumprido",
+      "Warning": "Alerta",
+      "Breached": "Violado"
+    },
+    "overallStatus": {
+      "AllMet": "Todos os SLOs Cumpridos",
+      "Partial": "Parcialmente Conforme",
+      "Violated": "SLO Violado",
+      "NoData": "Sem Dados"
+    },
+    "complianceRate": "Taxa de Conformidade (%)",
+    "totalObservations": "Total de Observações",
+    "totalViolations": "Total de Violações",
+    "trend": {
+      "Improving": "Melhorando",
+      "Stable": "Estável",
+      "Worsening": "Piorando",
+      "Insufficient": "Dados Insuficientes"
+    },
+    "peakViolationDate": "Data de Pico de Violações",
+    "ingest": {
+      "success": "Observação de SLO ingestada com sucesso.",
+      "invalidPeriod": "O fim do período deve ser posterior ao início.",
+      "invalidTarget": "O objetivo de SLO deve ser superior a zero."
+    },
+    "errors": {
+      "noObservations": "Nenhuma observação de SLO encontrada para o filtro especificado.",
+      "tenantRequired": "O ID de tenant é obrigatório."
+    }
+  },
+  "rollbackRecommendation": {
+    "title": "Recomendação de Rollback de Mudança",
+    "subtitle": "Score composto de urgência de rollback baseado em confiança na mudança, blast radius e integridade de evidence packs.",
+    "urgency": {
+      "None": "Não Indicado",
+      "Suggest": "Considerar Rollback",
+      "Recommend": "Rollback Recomendado",
+      "Critical": "Rollback Urgente"
+    },
+    "rollbackScore": "Score de Rollback",
+    "factors": {
+      "ChangeConfidence": "Confiança na Mudança",
+      "BlastRadius": "Blast Radius",
+      "EvidenceIntegrity": "Integridade de Evidence Pack"
+    },
+    "hasConfidenceData": "Dados de Confiança Disponíveis",
+    "hasBlastRadiusData": "Dados de Blast Radius Disponíveis",
+    "evidencePackCount": "Evidence Packs",
+    "errors": {
+      "releaseNotFound": "Release não encontrada.",
+      "invalidReleaseId": "É necessário um ID de release válido."
+    }
   }
 }

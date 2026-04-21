@@ -56,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IResilienceReportRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.ResilienceReportRepository>();
         services.AddScoped<IProfilingSessionRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.ProfilingSessionRepository>();
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.FinOps.Abstractions.IServiceCostAllocationRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.ServiceCostAllocationRepository>();
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.ISloObservationRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.SloObservationRepository>();
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);

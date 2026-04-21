@@ -13762,5 +13762,84 @@
       "noServices": "No services found for the specified filter.",
       "tenantRequired": "Tenant ID is required."
     }
+  },
+  "gdprCompliance": {
+    "title": "GDPR Compliance Report",
+    "subtitle": "General Data Protection Regulation compliance status based on change management, audit trail, evidence packs and data governance controls.",
+    "articles": {
+      "art5": "Principles of Processing",
+      "art13": "Transparency",
+      "art17": "Right to Erasure",
+      "art25": "Privacy by Design",
+      "art33": "Breach Notification Readiness"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "GDPR compliance reporting is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "sloTracking": {
+    "title": "SLO Compliance Summary",
+    "trendTitle": "SLO Violation Trend",
+    "subtitle": "Service Level Objective compliance tracking: observed values vs targets, violation rates and trend analysis.",
+    "statuses": {
+      "Met": "Met",
+      "Warning": "Warning",
+      "Breached": "Breached"
+    },
+    "overallStatus": {
+      "AllMet": "All SLOs Met",
+      "Partial": "Partially Compliant",
+      "Violated": "SLO Violated",
+      "NoData": "No Data"
+    },
+    "complianceRate": "Compliance Rate (%)",
+    "totalObservations": "Total Observations",
+    "totalViolations": "Total Violations",
+    "trend": {
+      "Improving": "Improving",
+      "Stable": "Stable",
+      "Worsening": "Worsening",
+      "Insufficient": "Insufficient Data"
+    },
+    "peakViolationDate": "Peak Violation Date",
+    "ingest": {
+      "success": "SLO observation ingested successfully.",
+      "invalidPeriod": "Period end must be after period start.",
+      "invalidTarget": "SLO target must be greater than zero."
+    },
+    "errors": {
+      "noObservations": "No SLO observations found for the specified filter.",
+      "tenantRequired": "Tenant ID is required."
+    }
+  },
+  "rollbackRecommendation": {
+    "title": "Change Rollback Recommendation",
+    "subtitle": "Composite rollback urgency scoring based on change confidence, blast radius and evidence pack integrity.",
+    "urgency": {
+      "None": "Not Indicated",
+      "Suggest": "Consider Rollback",
+      "Recommend": "Rollback Recommended",
+      "Critical": "Rollback Urgent"
+    },
+    "rollbackScore": "Rollback Score",
+    "factors": {
+      "ChangeConfidence": "Change Confidence",
+      "BlastRadius": "Blast Radius",
+      "EvidenceIntegrity": "Evidence Pack Integrity"
+    },
+    "hasConfidenceData": "Confidence Data Available",
+    "hasBlastRadiusData": "Blast Radius Data Available",
+    "evidencePackCount": "Evidence Packs",
+    "errors": {
+      "releaseNotFound": "Release not found.",
+      "invalidReleaseId": "A valid release ID is required."
+    }
   }
 }

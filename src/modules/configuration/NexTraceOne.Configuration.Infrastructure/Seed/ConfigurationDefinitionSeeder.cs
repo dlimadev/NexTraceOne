@@ -7944,5 +7944,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "50",
             uiEditorType: "number",
             sortOrder: 10390),
+
+        // ── Wave J.1 — GDPR Compliance Report ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.gdpr.enabled",
+            displayName: "config.compliance.gdpr.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.gdpr.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10400),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.gdpr.default_evaluation_days",
+            displayName: "config.compliance.gdpr.default_evaluation_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.gdpr.default_evaluation_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10410),
+
+        // ── Wave J.2 — SLO Tracking ──────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "slo.tracking.warning_threshold_percent",
+            displayName: "config.slo.tracking.warning_threshold_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slo.tracking.warning_threshold_percent.description",
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10420),
+
+        ConfigurationDefinition.Create(
+            key: "slo.tracking.violation_alert_enabled",
+            displayName: "config.slo.tracking.violation_alert_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slo.tracking.violation_alert_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10430),
+
+        ConfigurationDefinition.Create(
+            key: "slo.tracking.trend_analysis_days",
+            displayName: "config.slo.tracking.trend_analysis_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slo.tracking.trend_analysis_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10440),
+
+        // ── Wave J.3 — Change Rollback Recommendation ────────────────────────
+        ConfigurationDefinition.Create(
+            key: "change.rollback.recommendation_enabled",
+            displayName: "config.change.rollback.recommendation_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.rollback.recommendation_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10450),
+
+        ConfigurationDefinition.Create(
+            key: "change.rollback.critical_urgency_threshold",
+            displayName: "config.change.rollback.critical_urgency_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.rollback.critical_urgency_threshold.description",
+            defaultValue: "75",
+            uiEditorType: "number",
+            sortOrder: 10460),
+
+        ConfigurationDefinition.Create(
+            key: "change.rollback.high_blast_radius_threshold",
+            displayName: "config.change.rollback.high_blast_radius_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.rollback.high_blast_radius_threshold.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10470),
     ];
 }
