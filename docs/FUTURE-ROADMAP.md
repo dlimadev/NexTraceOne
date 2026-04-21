@@ -3,7 +3,7 @@
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
 > **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → AY (93 features novas documentadas, aguardam implementação)  
+> **Waves planeadas:** U → BC (105 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
@@ -11,6 +11,7 @@
 > **Waves AN–AQ (backend avançado IV):** 4 novas waves planeadas — SRE Intelligence & Error Budget Management, Supply Chain & Dependency Provenance, Collaborative Governance & Workflow Automation, Data Observability & Schema Quality  
 > **Waves AR–AU (backend avançado V):** 4 novas waves planeadas — Service Topology Intelligence & Dependency Mapping, Feature Flag & Experimentation Governance, AI Model Quality & Drift Governance, Platform Self-Optimization & Adaptive Intelligence  
 > **Waves AV–AY (backend avançado VI):** 4 novas waves planeadas — Contract Lifecycle Automation & Deprecation Intelligence, Release Intelligence & Deployment Analytics, Security Posture & Vulnerability Intelligence, Organizational Knowledge & Documentation Intelligence  
+> **Waves AZ–BC (backend avançado VII):** 4 novas waves planeadas — Service Mesh & Runtime Traffic Intelligence, Platform Engineering & Developer Portal Intelligence, Compliance Automation & Regulatory Reporting, Advanced Change Confidence & Promotion Intelligence  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -4054,6 +4055,432 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AZ — Service Mesh & Runtime Traffic Intelligence
+
+**Objetivo:** Introduzir inteligência sobre o tráfego real em runtime como capacidade analítica nativa do NexTraceOne — complementando o contract governance com observação do comportamento observado versus comportamento contratado. O NexTraceOne já tem contratos, dependências, topologia e drift de configuração. Esta wave acrescenta a camada de **tráfego real por endpoint**, detectando padrões anómalos, consumers não previstos nos contratos e discrepâncias entre o que foi acordado e o que está a acontecer em produção.
+
+#### AZ.1 — GetRuntimeTrafficContractDeviationReport (Catalog / OperationalIntelligence)
+
+**Feature:** Análise de desvios entre o tráfego real e o contrato declarado. Responde "o que está a acontecer no tráfego real que não está previsto no contrato — chamadas a endpoints não documentados, payloads fora do schema, consumers não registados?"
+
+**Domínio:** Agrega dados de telemetria de tráfego (via OTel trace summaries, ingestão de `TrafficObservationRecord`) com `ContractDefinition` para detectar desvios contractuais em runtime.
+
+**Capacidades:**
+- Por serviço com tráfego observável:
+  - **UndocumentedEndpointCalls** — chamadas a endpoints não declarados no contrato (`path + method` não encontrado em nenhuma operação do contrato activo)
+  - **UndeclaredConsumers** — serviços ou sistemas a chamar este serviço sem estarem registados como `ContractConsumer`
+  - **PayloadDeviationRate** — % de respostas com estrutura que diverge do schema do contrato (requer ingestão de schema validation events)
+  - **ObservedStatusCodes** vs **ContractedStatusCodes** — status codes retornados em runtime não documentados no contrato (ex: 500 não previsto, 204 não documentado)
+  - **TrafficContractDeviationTier:** `Aligned` (0 desvios significativos) / `MinorDrift` (undocumented endpoints < `minor_drift_threshold`) / `Significant` / `Critical` (UndeclaredConsumers com serviços críticos)
+- **TenantTrafficContractDeviationSummary:**
+  - **ServicesWithUndocumentedEndpoints** — contagem e top list
+  - **ServicesWithUndeclaredConsumers** — contagem e lista
+  - **TenantDeviationHealthScore** (0–100) — % de serviços com `TrafficContractDeviationTier = Aligned`
+  - **TopDeviatingServices** — top 10 por número total de desvios
+- **UndocumentedEndpointHotspots** — endpoints mais chamados que não existem no contrato (candidatos prioritários a documentar ou bloquear)
+- **ContractGapOpportunities** — contratos que precisam de actualização com base no tráfego real observado (pull from reality)
+- **HistoricalDeviationTrend** — desvios a aumentar ou diminuir nos últimos 30 dias (está a piorar ou a melhorar a aderência ao contrato?)
+
+**Orientado para Architect, Tech Lead e Auditor** — fecha o ciclo de "contract governance": não apenas dizer o que deve acontecer, mas verificar o que está realmente a acontecer e alertar quando diverge.
+
+#### AZ.2 — GetHighTrafficEndpointRiskReport (Catalog / OperationalIntelligence)
+
+**Feature:** Análise de risco de endpoints de alto tráfego. Responde "os nossos endpoints mais chamados são os mais bem documentados, mais resilientes e mais protegidos — ou são pontos de risco elevado que estão a receber muito tráfego sem cobertura de contrato, chaos ou SLO?"
+
+**Domínio:** Agrega dados de tráfego observado com `ContractDefinition`, `ChaosExperimentRecord`, `SloObservation` e `ServiceAsset` para classificar o risco de cada endpoint de alto tráfego.
+
+**Capacidades:**
+- Por endpoint com tráfego significativo (acima de `high_traffic_rps_threshold` req/s ou top `high_traffic_top_n`):
+  - **CallVolume** — chamadas no período (ex: 24h)
+  - **P50/P95/P99 Latency** — latências observadas
+  - **ErrorRate** — % de respostas 4xx/5xx
+  - **ContractCoverage:** `Documented` (existe no contrato activo) / `Undocumented` / `Deprecated` (no contrato deprecated)
+  - **ChaosTestedFlag** — bool (endpoint foi submetido a chaos testing no último `chaos_coverage_days`)
+  - **SloAssociated** — bool (este serviço tem SLO activo)
+  - **EndpointRiskScore** (0–100): `(1 - ContractCoverage) × 30 + (1 - ChaosTested) × 25 + ErrorRate × 25 + LatencyP99 > threshold × 20`
+  - **EndpointRiskTier:** `Safe` / `Monitored` / `AtRisk` / `Critical` (Undocumented + High ErrorRate + No SLO)
+- **TenantHighTrafficRiskSummary:**
+  - **CriticalUncoveredEndpoints** — endpoints Critical sem documentação nem SLO (máximo risco operacional)
+  - **TenantEndpointRiskScore** — média ponderada de EndpointRiskScore pelo volume de tráfego
+  - **TopRiskByVolume** — top 5 endpoints com mais tráfego e maior EndpointRiskScore (foco imediato)
+- **DocumentationOpportunity** — endpoints Undocumented com CallVolume > `documentation_priority_threshold` (candidatos prioritários a documentar)
+- **ChaosGapByTrafficVolume** — endpoints de alto tráfego sem cobertura de chaos (investimento prioritário em resiliência)
+- **SloGapForHighTraffic** — endpoints de serviços de alto tráfego sem SLO (risco de ausência de contrato de qualidade)
+
+**Orientado para SRE, Architect e Tech Lead** — une tráfego real com cobertura de contrato, chaos e SLO para identificar onde a combinação de "muito tráfego + pouca cobertura" cria risco operacional real.
+
+#### AZ.3 — GetTrafficAnomalyReport (OperationalIntelligence)
+
+**Feature:** Detecção de anomalias de tráfego em tempo analítico. Responde "existe algum padrão de tráfego anormal agora ou no último período — picos inexplicáveis, drops de tráfego, mudanças abruptas de latência ou error rate não correlacionados com deploys?"
+
+**Domínio:** Analisa séries temporais de tráfego (via `TrafficObservationRecord` ou ingestão de métricas agregadas) para detectar anomalias estatísticas por serviço, endpoint e período, correlacionando com `ReleaseRecord` e `IncidentRecord`.
+
+**Capacidades:**
+- Por serviço no período analisado:
+  - **TrafficAnomalies** — lista de anomalias detectadas:
+    - `SpikeAnomaly` — RPS > `traffic_spike_sigma` × desvio padrão histórico
+    - `DropAnomaly` — RPS < `traffic_drop_pct`% da média histórica
+    - `LatencySpike` — P95 acima de `latency_spike_multiplier` × baseline do serviço
+    - `ErrorRateSpike` — taxa de erro > `error_rate_spike_threshold`% do baseline
+  - **AnomalyCorrelation:** `CorrelatedWithDeploy` / `CorrelatedWithIncident` / `Unexplained` — correlação com evento registado
+  - **AnomalySeverity:** `Informational` / `Warning` / `Critical`
+  - **AnomalyDuration** — duração em minutos (para estimar impacto acumulado)
+- **TenantTrafficAnomalySummary:**
+  - **TotalAnomalies** / **CriticalAnomalies** / **UnexplainedAnomalies** no período
+  - **MostAnomalousServices** — top 5 serviços por contagem de anomalias
+  - **AnomalyResolutionRate** — % de anomalias que terminaram sem incidente registado (anomalia auto-resolvida)
+- **UnexplainedAnomalyList** — anomalias sem correlação com deploy ou incidente (maior valor de investigação)
+- **AnomalyTimeline** — linha temporal das anomalias detectadas overlaid com eventos de release/incidente (para análise visual)
+- **RecurringAnomalyPatterns** — anomalias que se repetem no mesmo serviço ao mesmo dia/hora da semana (padrão sistemático vs acidental)
+
+**Orientado para SRE, Tech Lead e Platform Admin** — introduz detecção analítica de anomalias de tráfego que não depende de alertas de monitoring externo, mas da análise de padrões históricos indexados no NexTraceOne.
+
+#### Configuração Wave AZ
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `traffic.contract.minor_drift_threshold` | 3 | 13680 | Número de endpoints não documentados para TrafficContractDeviationTier MinorDrift |
+| `traffic.contract.undeclared_consumer_critical` | 1 | 13690 | Número de consumers não declarados de serviços críticos para tier Critical |
+| `traffic.high_risk.rps_threshold` | 100 | 13700 | Req/s para classificar endpoint como high traffic |
+| `traffic.high_risk.top_n` | 20 | 13710 | Top N endpoints por volume a analisar no risco |
+| `traffic.high_risk.chaos_coverage_days` | 90 | 13720 | Dias de lookback para ChaosTestedFlag |
+| `traffic.anomaly.spike_sigma` | 3 | 13730 | Desvios padrão acima da média para SpikeAnomaly |
+| `traffic.anomaly.drop_pct` | 50 | 13740 | % de queda face à média para DropAnomaly |
+| `traffic.anomaly.error_rate_spike_threshold` | 5 | 13750 | % de error rate acima do baseline para ErrorRateSpike |
+
+#### i18n Wave AZ
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `trafficContractDeviation.*` — desvios de tráfego vs contrato, UndocumentedEndpoints, UndeclaredConsumers, TrafficContractDeviationTier, ContractGapOpportunities
+- `highTrafficEndpointRisk.*` — risco de endpoints de alto tráfego, EndpointRiskScore, EndpointRiskTier, CriticalUncoveredEndpoints, ChaosGapByTrafficVolume
+- `trafficAnomaly.*` — anomalias de tráfego, SpikeAnomaly/DropAnomaly, AnomalyCorrelation, UnexplainedAnomalyList, RecurringAnomalyPatterns
+
+**Totais estimados Wave AZ:** Catalog/OI: ~45 testes (AZ.1 ~15 + AZ.2 ~15 + AZ.3 ~15). Configuração: +8 config keys (sort 13680–13750). i18n: +3 secções (4 locales). 1 nova migration (`TrafficObservationRecords`). **Wave AZ PLANEADA**.
+
+---
+
+### Wave BA — Platform Engineering & Developer Portal Intelligence
+
+**Objetivo:** Introduzir inteligência sobre o uso e saúde da própria plataforma NexTraceOne enquanto Developer Portal — métricas de adopção, qualidade do onboarding, saúde das integrações activas e eficácia dos workflows de self-service. Esta wave fecha o ciclo de **plataforma que se observa a si própria** do ponto de vista da experiência do developer, complementando o `GetPlatformHealthIndexReport` da Wave AU.2 com análise centrada na persona Engineer/Tech Lead e nos fluxos de self-service.
+
+#### BA.1 — GetPortalAdoptionFunnelReport (Foundation)
+
+**Feature:** Análise do funil de adopção do NexTraceOne como Developer Portal. Responde "como estão os engenheiros a adoptar o NexTraceOne — onde é que o funil quebra, quais as funcionalidades menos usadas por quem devia estar a usá-las, e que teams têm adoption lag?"
+
+**Domínio:** Agrega eventos de sessão, feature usage e acções de utilizador (via `AuditEvent` e `PlatformUsageEvent`) por persona, equipa e módulo para calcular um funil de adopção por funcionalidade.
+
+**Capacidades:**
+- **AdoptionFunnelByFeature** — para cada feature principal do portal:
+  - **AwareUsers** — utilizadores que acederam ao módulo pelo menos uma vez no período
+  - **ActiveUsers** — utilizadores com ≥ `active_usage_sessions` sessões no módulo no período
+  - **PowerUsers** — utilizadores que usaram features avançadas do módulo (ex: criaram contrato, agendaram deprecação, configuraram gate)
+  - **FunnelDropRate** — % de utilizadores que acederam mas não passaram a Active
+- **TeamAdoptionMatrix** — por equipa:
+  - **OverallAdoptionScore** (0–100) — % de features com pelo menos um PowerUser na equipa
+  - **AdoptionTier:** `Leader` (Score ≥80%) / `Active` / `Lagging` / `Inactive`
+  - **LastActiveAt** — última sessão activa de qualquer membro da equipa
+  - **FeatureGaps** — features nunca usadas por esta equipa (oportunidades de enablement)
+- **TenantAdoptionFunnelSummary:**
+  - **ActiveUserRate** — % de utilizadores licenciados activos no período
+  - **TenantAdoptionScore** (0–100) — % de equipas com AdoptionTier ≥ Active
+  - **MostAdoptedFeatures** / **LeastAdoptedFeatures** — top e bottom por PowerUserRate
+  - **AdoptionTrend** (90d) — crescimento ou declínio da adopção geral
+- **InactiveUsers** — utilizadores com licença mas sem login nos últimos `inactive_user_days` (custo sem utilização)
+- **EnablementOpportunityList** — top 5 combinações (equipa × feature) com maior gap de adopção e maior potencial de valor
+
+**Orientado para Platform Admin e Product** — permite medir o ROI da plataforma e identificar onde o investimento em enablement e comunicação tem maior impacto.
+
+#### BA.2 — GetSelfServiceWorkflowHealthReport (Foundation / ChangeGovernance)
+
+**Feature:** Análise da saúde dos workflows de self-service do NexTraceOne. Responde "os developers conseguem completar os workflows de self-service sem fricção — registar serviços, criar contratos, pedir aprovações, fazer promoções — ou existe abandono, erros frequentes e dependências desnecessárias de admin?"
+
+**Domínio:** Agrega eventos de workflow (via `AuditEvent`, início e conclusão de fluxos como `CreateService`, `CreateContractDraft`, `RequestPromotion`, `ScheduleDeprecation`) para medir a taxa de conclusão, friction points e tempo de cada fluxo.
+
+**Capacidades:**
+- Por workflow de self-service:
+  - **WorkflowName** (ex: `CreateService`, `CreateContractDraft`, `RequestPromotion`, `ScheduleDeprecation`, `IngestSbom`, `RegisterDataContract`)
+  - **AttemptCount** — tentativas iniciadas no período
+  - **CompletionRate** — % de tentativas concluídas com sucesso sem intervenção admin
+  - **AbandonmentRate** — % de workflows iniciados e não concluídos em > `workflow_timeout_hours`
+  - **AvgCompletionTimeMinutes** — tempo médio para completar o workflow (proxy de fricção)
+  - **AdminInterventionRate** — % de workflows que precisaram de acção de Platform Admin para avançar
+  - **WorkflowHealthTier:** `Smooth` (CompletionRate ≥90% + AdminIntervention <5%) / `Functional` / `Friction-Heavy` / `Broken` (CompletionRate <50%)
+- **TenantSelfServiceHealthSummary:**
+  - **OverallSelfServiceScore** (0–100) — média ponderada de WorkflowHealthTier por volume de uso
+  - **FrictionWorkflows** — workflows com WorkflowHealthTier = Friction-Heavy ou Broken (candidatos a melhoria de UX)
+  - **AdminDependencyIndex** — % de workflows que precisam de admin (quanto maior, mais a plataforma falha no self-service)
+- **WorkflowAbandonmentHotspots** — etapas específicas onde o abandono é mais frequente (ex: "os utilizadores abandonam quando chegam à validação de schema")
+- **SlowestWorkflows** — top 5 por AvgCompletionTimeMinutes (maior fricção percebida)
+- **WorkflowTrendByFeatureRelease** — variação de CompletionRate após mudanças na UI da plataforma (medir impacto de melhorias de UX)
+
+**Orientado para Platform Admin e Product** — transforma o NexTraceOne num sistema que se auto-observa do ponto de vista da experiência de developer, identificando onde o self-service falha antes que os utilizadores abandonem a plataforma.
+
+#### BA.3 — GetIntegrationHealthReport (Foundation)
+
+**Feature:** Análise da saúde das integrações activas do NexTraceOne com sistemas externos. Responde "as nossas integrações com GitLab, Jenkins, Azure DevOps, provedores de identity e outros sistemas estão saudáveis — ou existem falhas, atrasos e sincronizações incompletas que estão a degradar a qualidade dos dados no NexTraceOne?"
+
+**Domínio:** Agrega dados de execução de integrações (via `IntegrationSyncRecord` ou `AuditEvent` de ingestão) para calcular saúde por integração: última sincronização, taxa de erro, dados mais antigos do que o esperado.
+
+**Capacidades:**
+- Por integração activa:
+  - **IntegrationName** e **IntegrationType** (ex: `GitLab`, `Jenkins`, `AzureDevOps`, `OIDC`, `Kafka`, `Webhook`)
+  - **LastSyncAt** — timestamp da última sincronização bem-sucedida
+  - **SyncAge** — horas desde a última sincronização (proxy de freshness dos dados)
+  - **SyncSuccessRate** — % de sincronizações bem-sucedidas nas últimas `sync_health_window_hours` horas
+  - **LastErrorMessage** — última mensagem de erro (quando aplicável)
+  - **DataFreshnessStatus:** `Fresh` (SyncAge ≤ `sync_freshness_hours`) / `Aging` / `Stale` / `Offline` (SyncSuccessRate = 0 recentemente)
+  - **IntegrationHealthTier:** `Healthy` (SyncSuccessRate ≥95% + Fresh) / `Degraded` / `Failing` / `Offline`
+- **TenantIntegrationHealthSummary:**
+  - **HealthyIntegrations** / **DegradedIntegrations** / **FailingIntegrations** / **OfflineIntegrations**
+  - **TenantIntegrationHealthScore** (0–100) — % de integrações com `IntegrationHealthTier = Healthy`
+  - **CriticalOfflineIntegrations** — integrações Offline cujos dados afectam funcionalidades críticas (ex: identity provider offline afecta auth)
+- **DataFreshnessImpact** — por integração Stale/Offline: que dados no NexTraceOne podem estar desactualizados e que features são afectadas
+- **IntegrationHealthHistory** — últimas 7 dias de `IntegrationHealthTier` por integração (para detectar padrões de instabilidade)
+- **TopErrorIntegrations** — integrações com maior volume de erros de sincronização (candidatas a investigação)
+
+**Orientado para Platform Admin e Architect** — garante que a qualidade dos dados no NexTraceOne não é silenciosamente degradada por integrações com falhas não detectadas, e que os utilizadores têm visibilidade sobre a freshness das fontes de dados da plataforma.
+
+#### Configuração Wave BA
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `portal.adoption.active_usage_sessions` | 3 | 13760 | Sessões mínimas por período para considerar utilizador Active |
+| `portal.adoption.inactive_user_days` | 30 | 13770 | Dias sem login para flag InactiveUser |
+| `portal.adoption.funnel_period_days` | 30 | 13780 | Período de análise do funil de adopção |
+| `portal.workflow.timeout_hours` | 48 | 13790 | Horas sem conclusão para marcar workflow como Abandonado |
+| `portal.workflow.smooth_completion_rate` | 90 | 13800 | % mínima de CompletionRate para WorkflowHealthTier Smooth |
+| `portal.workflow.smooth_admin_rate` | 5 | 13810 | % máxima de AdminInterventionRate para WorkflowHealthTier Smooth |
+| `integration.health.sync_freshness_hours` | 24 | 13820 | Horas máximas de SyncAge para DataFreshnessStatus Fresh |
+| `integration.health.sync_health_window_hours` | 72 | 13830 | Janela de horas para calcular SyncSuccessRate |
+
+#### i18n Wave BA
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `portalAdoptionFunnel.*` — funil de adopção do portal, TeamAdoptionMatrix, AdoptionTier, FeatureGaps e EnablementOpportunityList
+- `selfServiceWorkflowHealth.*` — saúde dos workflows de self-service, CompletionRate, AbandonmentHotspots, AdminDependencyIndex e FrictionWorkflows
+- `integrationHealth.*` — saúde das integrações, DataFreshnessStatus, IntegrationHealthTier, CriticalOfflineIntegrations e DataFreshnessImpact
+
+**Totais estimados Wave BA:** Foundation/CG: ~44 testes (BA.1 ~14 + BA.2 ~15 + BA.3 ~15). Configuração: +8 config keys (sort 13760–13830). i18n: +3 secções (4 locales). 1 nova migration (`IntegrationSyncRecords`). **Wave BA PLANEADA**.
+
+---
+
+### Wave BB — Compliance Automation & Regulatory Reporting
+
+**Objetivo:** Elevar a capacidade de compliance do NexTraceOne de "relatórios por standard" (já implementados para GDPR, HIPAA, PCI-DSS, FedRAMP, CMMC — Waves G–L) para **automatização de evidências e relatórios cross-standard** que respondem às necessidades de auditores externos sem intervenção manual. Esta wave fecha o gap entre "sabemos que somos compliant" e "conseguimos provar que somos compliant com evidências auditáveis e relatórios exportáveis".
+
+#### BB.1 — GetCrossStandardComplianceGapReport (ChangeGovernance)
+
+**Feature:** Análise de gaps de compliance entre múltiplos standards simultaneamente. Responde "qual é o nosso perfil de compliance cross-standard — onde os mesmos gaps se repetem em múltiplos standards, e qual a ordem de prioridade para fechar os gaps com maior impacto transversal?"
+
+**Domínio:** Agrega os resultados dos relatórios de compliance existentes (GDPR, HIPAA, PCI-DSS, FedRAMP, CMMC, SOC2) para identificar controlos em falta, sobreposições (um fix resolve múltiplos standards) e gap prioritization baseada em transversalidade.
+
+**Capacidades:**
+- Por controlo de compliance em falta num serviço:
+  - **ControlId** e **ControlDescription**
+  - **AffectedStandards** — lista de standards onde este gap aparece (ex: `GDPR.Art.25 + PCI-DSS.Req.6 + CMMC.AC.1.001`)
+  - **ImpactScore** — `AffectedStandards.Count × ServiceTierWeight` — controlo com maior impacto transversal
+  - **GapType:** `TechnicalControl` (ausência de mecanismo técnico) / `ProcessControl` (processo não documentado) / `EvidenceGap` (controlo existe mas sem evidência auditável)
+  - **RemediationComplexity:** `Low` / `Medium` / `High` — estimativa de esforço de remediação
+- **CrossStandardGapMatrix** — matriz N × M onde N = gaps e M = standards, mostrando quais gaps afectam quais standards (para decisão de priorização de investimento de compliance)
+- **TenantCompliancePriorityList** — gaps ordenados por ImpactScore × (1 / RemediationComplexity) — "o que fecha mais gaps com menos esforço"
+- **TenantCrossStandardSummary:**
+  - **TotalGapsIdentified** / **TransversalGaps** (afectam ≥2 standards) / **UniqueStandardGaps** (apenas 1 standard)
+  - **TopPriorityGap** — o único gap com maior ImpactScore (foco imediato)
+  - **EstimatedComplianceLift** — se os top 5 gaps fossem fechados, qual o ganho estimado de compliance score cross-tenant
+
+**Orientado para Platform Admin, Auditor e Executive** — resolve o problema mais comum em compliance enterprise: equipas a trabalhar em silos de standards, sem visão de quais gaps têm impacto transversal e onde o investimento de remediação rende mais.
+
+#### BB.2 — GetEvidenceCollectionStatusReport (ChangeGovernance / Foundation)
+
+**Feature:** Estado da recolha de evidências de compliance. Responde "para a próxima auditoria, qual é o estado das evidências — temos tudo o que precisamos, o que está em falta, e o que está desactualizado?"
+
+**Domínio:** Agrega `EvidencePack` (por release), `AuditEvent` (trail de acções), resultados de compliance reports e dados de configuração para calcular a prontidão de evidências por standard e por domínio de controlo.
+
+**Capacidades:**
+- Por standard de compliance e categoria de controlo:
+  - **EvidenceRequired** — número de evidências necessárias para o standard
+  - **EvidenceCollected** — evidências disponíveis no NexTraceOne para este standard
+  - **EvidenceFreshness** — % de evidências dentro de `evidence_freshness_days` (evidências antigas podem não ser aceites em auditoria)
+  - **EvidenceCompleteness** — `EvidenceCollected / EvidenceRequired × EvidenceFreshnessRate` — score composto
+  - **AuditReadinessTier:** `Ready` (Completeness ≥95%) / `AlmostReady` (≥80%) / `NeedsWork` / `NotReady` (<50%)
+- **EvidenceGapsByControl** — controlos sem evidência colectada (máxima urgência pré-auditoria)
+- **StaleEvidences** — evidências existentes mas com `CollectedAt` > `evidence_freshness_days` (precisam de re-colecção)
+- **TenantEvidenceReadinessSummary:**
+  - **OverallAuditReadinessScore** (0–100) — média ponderada de AuditReadinessTier por criticidade do standard
+  - **DaysToAudit** — se existir auditoria agendada (`audit_date` configurável), dias restantes
+  - **ReadyStandards** / **NotReadyStandards**
+  - **CriticalGaps** — evidências em falta para standards com `DaysToAudit ≤ evidence_critical_window_days`
+- **AutoCollectableEvidence** — evidências que o NexTraceOne pode gerar automaticamente a partir dos dados já existentes (ex: audit trail, evidence packs de releases, compliance report snapshots)
+- **ManualEvidenceRequired** — evidências que requerem acção humana para recolha (ex: screenshots, certificados, aprovações físicas)
+- **EvidenceExportPackage** — lista de evidências prontas para exportação em formato de auditoria (para uso directo com auditores externos)
+
+**Orientado para Platform Admin, Auditor e Executive** — transforma a preparação de auditoria de um processo manual e stressante para um estado continuamente monitorizado e exportável.
+
+#### BB.3 — GetRegulatoryChangeImpactReport (ChangeGovernance / Catalog)
+
+**Feature:** Análise de impacto de mudanças regulatórias nos serviços e contratos do tenant. Responde "se um novo requisito regulatório entrar em vigor (ex: nova versão do GDPR, novo requisito PCI-DSS), que serviços e contratos são afectados e qual o esforço estimado de conformidade?"
+
+**Domínio:** Agrega `ContractDefinition` (dados processados, localização de armazenamento, tipo de serviço), `ServiceAsset` (ServiceTier, dependências) e `ComplianceControl` (standards activos) para simular o impacto de mudanças regulatórias no perfil de compliance actual.
+
+**Capacidades:**
+- **RegulatoryChangeScenario** (input):
+  - `StandardId` — standard regulatório a analisar (ex: `GDPR`, `PCI-DSS`, `HIPAA`)
+  - `NewControlId` — novo controlo a adicionar ao standard
+  - `ControlDescription` — descrição do novo requisito
+  - `ControlScope` — âmbito do controlo (ex: `all_services_processing_pii`, `services_handling_card_data`)
+- **ImpactedServicesCount** — número de serviços em scope para o novo controlo
+- **ImpactedContractsCount** — contratos que precisariam de revisão/atualização
+- **EstimatedRemediationEffort:**
+  - `HighEffortServices` — serviços sem nenhum controlo similar implementado
+  - `LowEffortServices` — serviços com controlo similar já parcialmente implementado
+  - `EffortEstimateDays` — estimativa total em dias-homem baseada em complexidade e volume
+- **ServiceImpactList** — por serviço afectado:
+  - **CurrentComplianceGap** — distância ao novo requisito baseada em dados actuais
+  - **MitigationPath** — sugestão de remediação (ex: `add encryption at rest`, `add audit logging`, `update data retention policy`)
+- **TenantRegulatoryReadinessScore** (0–100) para o cenário analisado — % de serviços que já cumprem o novo requisito sem mudanças
+- **HistoricalRegulatoryImpactComparison** — comparação com impacto de mudanças regulatórias anteriores para benchmark de esforço
+
+**Orientado para Architect, Auditor e Executive** — antecipa o impacto de mudanças regulatórias antes que entrem em vigor, permitindo planeamento de roadmap de compliance com base em dados objectivos em vez de avaliações manuais.
+
+#### Configuração Wave BB
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `compliance.cross_standard.transversal_min_standards` | 2 | 13840 | Mínimo de standards para classificar gap como Transversal |
+| `compliance.evidence.freshness_days` | 90 | 13850 | Dias máximos para evidência ser considerada Fresh |
+| `compliance.evidence.completeness_ready_threshold` | 95 | 13860 | % mínima de EvidenceCompleteness para AuditReadinessTier Ready |
+| `compliance.evidence.critical_window_days` | 30 | 13870 | Dias antes da auditoria para flag CriticalGap |
+| `compliance.audit.date` | `""` | 13880 | Data da próxima auditoria agendada (ISO 8601, opcional) |
+| `compliance.regulatory.impact_scope_resolver` | `"auto"` | 13890 | Método para calcular scope de impacto de novo requisito: auto \| manual |
+| `compliance.evidence.auto_collect_enabled` | `true` | 13900 | Activa recolha automática de evidências a partir de dados do NexTraceOne |
+| `compliance.cross_standard.priority_weight_transversal` | 2.0 | 13910 | Multiplicador de ImpactScore para gaps transversais |
+
+#### i18n Wave BB
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `crossStandardComplianceGap.*` — gaps cross-standard, CrossStandardGapMatrix, TenantCompliancePriorityList, TransversalGaps e RemediationComplexity
+- `evidenceCollectionStatus.*` — estado de recolha de evidências, AuditReadinessTier, EvidenceFreshness, AutoCollectableEvidence e EvidenceExportPackage
+- `regulatoryChangeImpact.*` — impacto de mudanças regulatórias, RegulatoryChangeScenario, EstimatedRemediationEffort, TenantRegulatoryReadinessScore
+
+**Totais estimados Wave BB:** CG/Catalog/Foundation: ~43 testes (BB.1 ~14 + BB.2 ~14 + BB.3 ~15). Configuração: +8 config keys (sort 13840–13910). i18n: +3 secções (4 locales). 1 endpoint REST (`POST /compliance/regulatory-change-impact`). **Wave BB PLANEADA**.
+
+---
+
+### Wave BC — Advanced Change Confidence & Promotion Intelligence
+
+**Objetivo:** Aprofundar e fechar o ciclo de **Change Intelligence** — um dos pilares mais estratégicos do NexTraceOne — com features analíticas que elevam a confiança de promoção para produção ao nível de decisão data-driven. O NexTraceOne já tem blast radius, rollback recommendation, promotion gates, change window utilization e DORA metrics. Esta wave acrescenta **comparação de comportamento entre ambientes como critério de promoção**, **análise de coerência de evidências** e **motor de score de confiança de promoção multi-dimensional** que integra todos os sinais disponíveis.
+
+#### BC.1 — GetEnvironmentBehaviorComparisonReport (OperationalIntelligence / ChangeGovernance)
+
+**Feature:** Comparação de comportamento entre ambientes para suporte à decisão de promoção. Responde "o comportamento observado em Pre-Prod é suficientemente próximo do que esperamos em Produção para darmos confiança à promoção — ou existem divergências críticas que deviam bloquear o avanço?"
+
+**Domínio:** Agrega métricas de telemetria, drift observations, SLO observations e dados de chaos por par de ambientes (Source: Pre-Prod → Target: Production) para calcular a similaridade comportamental antes de uma promoção.
+
+**Capacidades:**
+- Por par de ambientes e serviço a promover:
+  - **PerformanceSimilarity:**
+    - **P95LatencyDelta** — diferença de P95 latency entre Pre-Prod e Prod baseline
+    - **ErrorRateDelta** — diferença de error rate
+    - **ThroughputScalingFactor** — ratio de tráfego Pre-Prod / Prod (para normalizar comparações)
+  - **StabilityComparison:**
+    - **NonProdDriftCount** — número de drift events em Pre-Prod no período (instabilidade de ambiente)
+    - **SloViolationRate** — % de SLO violations em Pre-Prod no período
+    - **ChaosExperimentResults** — se chaos foi executado em Pre-Prod para esta feature/release
+  - **ConfigurationAlignment:**
+    - **ConfigDriftBetweenEnvs** — divergências de configuração identificadas entre Pre-Prod e Prod (requer Wave AU.1)
+    - **CriticalConfigDivergences** — configurações críticas que diferem (ex: connection strings, feature flags, timeouts)
+  - **BehaviorSimilarityScore** (0–100): Performance (40%) + Stability (35%) + Configuration (25%)
+  - **PromotionReadinessTier:** `Ready` (Score ≥85%) / `ConditionallyReady` (70–84%, com ressalvas documentadas) / `NotReady` (<70%, bloqueio recomendado) / `InsufficientData` (sem observações suficientes em Pre-Prod)
+- **TenantEnvironmentBehaviorSummary:**
+  - **ServicesByPromotionReadiness** — distribuição por PromotionReadinessTier
+  - **CriticalServicesNotReady** — serviços críticos com PromotionReadinessTier NotReady (risco máximo)
+  - **AveragePreProdSoakTime** — tempo médio que os releases ficam em Pre-Prod antes de promoção (correlacionar com ReadinessTier)
+- **BehaviorDivergenceAlerts** — desvios específicos que justificam bloqueio (ex: "Error rate em Pre-Prod é 3× o baseline de Prod")
+- **HistoricalPromotionOutcome** — para releases anteriores com BehaviorSimilarityScore similar: qual foi a outcome em Produção (calibração do modelo)
+
+**Orientado para SRE, Tech Lead e Architect** — torna a decisão de promoção data-driven em vez de baseada em intuição ou listas de verificação manuais, usando comportamento observado em Pre-Prod como predictor da saúde em Prod.
+
+#### BC.2 — GetEvidencePackIntegrityReport (ChangeGovernance)
+
+**Feature:** Análise de integridade e completude dos Evidence Packs por release. Responde "os Evidence Packs das nossas releases estão completos, assinados e coerentes — ou existem releases em produção com evidências em falta, inconsistentes ou adulteradas?"
+
+**Domínio:** Aprofunda a análise de `EvidencePack` (já com cobertura básica em Wave N.3) para incluir verificação de integridade hash, coerência entre evidências declaradas e artefactos reais, e análise de padrões de assinatura.
+
+**Capacidades:**
+- Por `EvidencePack` (por release):
+  - **IntegrityStatus:** `Intact` (todos os hashes verificados) / `Modified` (hash não corresponde ao registo original) / `Missing` (evidência declarada mas não encontrada) / `Unverified` (sem hash registado)
+  - **CoherenceStatus:** `Coherent` (evidências declaradas correspondem ao escopo da release) / `Incomplete` (evidências em falta para o escopo) / `Inconsistent` (evidências de serviços não incluídos na release)
+  - **SignatureStatus:** `FullySigned` (todas as evidências com assinatura de approver) / `PartiallySigned` / `Unsigned`
+  - **EvidencePackScore** (0–100): Integrity (40%) + Coherence (35%) + Signature (25%)
+  - **EvidencePackIntegrityTier:** `Trustworthy` (Score ≥90%) / `Acceptable` / `Questionable` / `Invalid` (IntegrityStatus = Modified)
+- **TenantEvidencePackIntegritySummary:**
+  - **TrustworthyPacks** / **QuestionablePacks** / **InvalidPacks**
+  - **TenantEvidenceIntegrityScore** (0–100) — % de packs com EvidencePackIntegrityTier ≥ Acceptable
+  - **ProductionReleasesWithInvalidEvidence** — releases em produção com IntegrityStatus = Modified (risco legal e de auditoria)
+- **IntegrityAnomalies** — Evidence Packs onde o hash diverge do original (possível adulteração ou corrupção)
+- **SignatureGapsByApprover** — aprovadores com padrão de não assinar evidências quando deveriam
+- **EvidencePackAuditTrail** — timeline completa de acções sobre cada Evidence Pack (para uso em auditoria formal)
+
+**Orientado para Auditor, Platform Admin e Executive** — garante que o processo de evidências do NexTraceOne mantém integridade formal suficiente para auditoria externa e valida que os packs não foram adulterados após a criação.
+
+#### BC.3 — GetMultiDimensionalPromotionConfidenceReport (ChangeGovernance)
+
+**Feature:** Motor de score de confiança de promoção multi-dimensional. Responde "com base em TODOS os sinais disponíveis, qual é o nosso nível de confiança para promover esta release para produção — e quais os factores específicos que mais contribuem para o risco?"
+
+**Domínio:** Integra sinais de múltiplas features existentes e das Waves anteriores para construir o score de confiança de promoção mais completo possível: blast radius, rollback viability, environment behavior, evidence integrity, contract compliance, SLO health, chaos coverage e change pattern risk.
+
+**Capacidades:**
+- Por release a promover:
+  - **ConfidenceDimensions** — 8 dimensões com score individual (0–100):
+    1. **BlastRadiusDimension** — baseado em `GetBlastRadiusDistributionReport` (bucket Small/Medium/Large)
+    2. **RollbackViabilityDimension** — baseado em `GetChangeRollbackRecommendation` (urgency level)
+    3. **EnvironmentBehaviorDimension** — baseado em `GetEnvironmentBehaviorComparisonReport` (BehaviorSimilarityScore)
+    4. **EvidenceIntegrityDimension** — baseado em `GetEvidencePackIntegrityReport` (EvidencePackScore)
+    5. **ContractComplianceDimension** — contratos da release estão documentados e sem breaking changes não declaradas
+    6. **SloHealthDimension** — serviços da release têm SLO saudável em Pre-Prod
+    7. **ChaosResilienceDimension** — serviços da release têm cobertura de chaos adequada
+    8. **ChangePatternDimension** — baseado em `GetReleasePatternAnalysisReport` (risco de pattern desta release)
+  - **DimensionWeights** — configuráveis por tenant (ex: enterprise regulado pode ponderar EvidenceIntegrity mais)
+  - **CompositePromotionConfidenceScore** (0–100) — média ponderada das 8 dimensões
+  - **PromotionConfidenceTier:** `HighConfidence` (Score ≥85%) / `MediumConfidence` / `LowConfidence` / `BlockingIssues` (qualquer dimensão < `blocking_dimension_threshold`)
+  - **DimensionBreakdown** — quais dimensões contribuíram mais para o score e quais puxam para baixo
+  - **BlockingFactors** — dimensões com score < `blocking_dimension_threshold` (impedem promoção mesmo com score composto alto)
+  - **PromotionRecommendation:** `ProceedAutomatically` / `ProceedWithConditions` / `RequireManualApproval` / `Block`
+- **TenantPromotionConfidenceSummary:**
+  - **PromotionsByTier** — distribuição de releases por PromotionConfidenceTier no período
+  - **AverageConfidenceScore** por ServiceTier
+  - **DimensionRankingByImpact** — quais dimensões são mais limitantes na organização (onde investir)
+  - **ConfidenceTrend** (90d) — melhoria ou degradação do score médio de promoção
+- **HistoricalConfidenceVsOutcome** — correlação entre PromotionConfidenceScore histórico e outcome real (incidents pós-deploy) — para calibrar e validar o modelo
+
+**Orientado para Tech Lead, SRE e Architect** — é a feature de culminação do pilar Change Intelligence: um score único, transparente, configurável e baseado em dados reais que transforma a promoção para produção de uma decisão humana intuitiva numa decisão data-driven com evidência auditável.
+
+#### Configuração Wave BC
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `promotion.confidence.blast_radius_weight` | 15 | 13920 | Peso da dimensão BlastRadius no score composto (%) |
+| `promotion.confidence.rollback_weight` | 10 | 13930 | Peso da dimensão RollbackViability no score composto (%) |
+| `promotion.confidence.environment_behavior_weight` | 20 | 13940 | Peso da dimensão EnvironmentBehavior no score composto (%) |
+| `promotion.confidence.evidence_integrity_weight` | 15 | 13950 | Peso da dimensão EvidenceIntegrity no score composto (%) |
+| `promotion.confidence.contract_compliance_weight` | 10 | 13960 | Peso da dimensão ContractCompliance no score composto (%) |
+| `promotion.confidence.slo_health_weight` | 10 | 13970 | Peso da dimensão SloHealth no score composto (%) |
+| `promotion.confidence.chaos_resilience_weight` | 10 | 13980 | Peso da dimensão ChaosResilience no score composto (%) |
+| `promotion.confidence.change_pattern_weight` | 10 | 13990 | Peso da dimensão ChangePattern no score composto (%) |
+
+> **Nota:** os pesos somam 100%. O campo `blocking_dimension_threshold` (default: 40) é configurado separadamente como `promotion.confidence.blocking_dimension_threshold` (sort 13990 reservado; default 40).
+
+#### i18n Wave BC
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `environmentBehaviorComparison.*` — comparação de comportamento entre ambientes, BehaviorSimilarityScore, PromotionReadinessTier, ConfigurationAlignment e BehaviorDivergenceAlerts
+- `evidencePackIntegrity.*` — integridade de Evidence Packs, IntegrityStatus, CoherenceStatus, SignatureStatus, EvidencePackIntegrityTier e IntegrityAnomalies
+- `multiDimensionalPromotionConfidence.*` — score de confiança de promoção multi-dimensional, 8 ConfidenceDimensions, PromotionConfidenceTier, BlockingFactors e PromotionRecommendation
+
+**Totais estimados Wave BC:** CG/OI: ~48 testes (BC.1 ~16 + BC.2 ~15 + BC.3 ~17). Configuração: +8 config keys (sort 13920–13990) + 1 chave adicional (`blocking_dimension_threshold`). i18n: +3 secções (4 locales). 1 endpoint REST (`GET /changes/releases/{id}/promotion-confidence`). **Wave BC PLANEADA**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -4215,6 +4642,19 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 142. 🔲 **Wave AY.2** — `GetKnowledgeBaseUtilizationReport` — utilização do knowledge hub: SearchTermsWithNoResults (gaps de conteúdo), KnowledgeResolutionRate (% sessões com click em resultado), MostAccessedRunbooks (proxy de incidentes recorrentes), KnowledgeHubHealthTier (Thriving/Active/Underused/Gap-Heavy), DailyActiveKnowledgeUsers. Knowledge/Foundation. Config: `knowledge.hub.*` sort 13630–13640.
 143. 🔲 **Wave AY.3** — `GetTeamKnowledgeSharingReport` — partilha de conhecimento: KnowledgeSharingRatio (CrossTeam/Total), KnowledgeSiloRisk (ratio < threshold), BusFactor1Services (conhecimento de um único contribuidor), KnowledgeColdSpots, CollaborationTrend 90d, TenantKnowledgeSharingScore. Knowledge/Foundation. Config: `knowledge.sharing.*` sort 13650–13670. **Wave AY PLANEADA**.
 
+144. 🔲 **Wave AZ.1** — `GetRuntimeTrafficContractDeviationReport` — desvios de tráfego real vs contrato: UndocumentedEndpointCalls, UndeclaredConsumers, PayloadDeviationRate, ObservedVsContractedStatusCodes, TrafficContractDeviationTier (Aligned/MinorDrift/Significant/Critical), ContractGapOpportunities, HistoricalDeviationTrend. Catalog/OI. Config: `traffic.contract.*` sort 13680–13690.
+145. 🔲 **Wave AZ.2** — `GetHighTrafficEndpointRiskReport` — risco de endpoints de alto tráfego (top N ou >X rps): EndpointRiskScore (ContractCoverage 30%+ChaosTested 25%+ErrorRate 25%+LatencyP99 20%), EndpointRiskTier (Safe/Monitored/AtRisk/Critical), CriticalUncoveredEndpoints, DocumentationOpportunity, ChaosGapByTrafficVolume, SloGapForHighTraffic. Catalog/OI. Config: `traffic.high_risk.*` sort 13700–13720.
+146. 🔲 **Wave AZ.3** — `GetTrafficAnomalyReport` — anomalias de tráfego analíticas: SpikeAnomaly/DropAnomaly/LatencySpike/ErrorRateSpike, AnomalyCorrelation (Deploy/Incident/Unexplained), AnomalySeverity, UnexplainedAnomalyList, RecurringAnomalyPatterns (mesmo horário/serviço). OI. Config: `traffic.anomaly.*` sort 13730–13750. **Wave AZ PLANEADA**.
+147. 🔲 **Wave BA.1** — `GetPortalAdoptionFunnelReport` — funil de adopção do portal: AwareUsers/ActiveUsers/PowerUsers por feature, TeamAdoptionMatrix (AdoptionTier Leader/Active/Lagging/Inactive), InactiveUsers, EnablementOpportunityList (equipa×feature com maior gap), TenantAdoptionScore, AdoptionTrend 90d. Foundation. Config: `portal.adoption.*` sort 13760–13780.
+148. 🔲 **Wave BA.2** — `GetSelfServiceWorkflowHealthReport` — saúde de workflows self-service: CompletionRate, AbandonmentRate, AdminInterventionRate, WorkflowHealthTier (Smooth/Functional/Friction-Heavy/Broken), WorkflowAbandonmentHotspots (etapas de abandono), AdminDependencyIndex, WorkflowTrendByFeatureRelease. Foundation/CG. Config: `portal.workflow.*` sort 13790–13810.
+149. 🔲 **Wave BA.3** — `GetIntegrationHealthReport` — saúde das integrações activas (GitLab/Jenkins/AzDo/OIDC/Kafka/Webhook): DataFreshnessStatus (Fresh/Aging/Stale/Offline), SyncSuccessRate, IntegrationHealthTier (Healthy/Degraded/Failing/Offline), DataFreshnessImpact, CriticalOfflineIntegrations, IntegrationHealthHistory 7d. Foundation. Config: `integration.health.*` sort 13820–13830. **Wave BA PLANEADA**.
+150. 🔲 **Wave BB.1** — `GetCrossStandardComplianceGapReport` — gaps cross-standard: por gap identifica AffectedStandards (GDPR/HIPAA/PCI-DSS/FedRAMP/CMMC), ImpactScore (standards × ServiceTierWeight), GapType (Technical/Process/Evidence), CrossStandardGapMatrix N×M, TenantCompliancePriorityList (ImpactScore/RemediationComplexity), EstimatedComplianceLift. CG. Config: `compliance.cross_standard.*` sort 13840.
+151. 🔲 **Wave BB.2** — `GetEvidenceCollectionStatusReport` — estado de recolha de evidências pré-auditoria: EvidenceCompleteness por standard, AuditReadinessTier (Ready/AlmostReady/NeedsWork/NotReady), EvidenceGapsByControl, StaleEvidences (>90d), AutoCollectableEvidence, ManualEvidenceRequired, DaysToAudit (se `compliance.audit.date` configurado). CG/Foundation. Config: `compliance.evidence.*` sort 13850–13900.
+152. 🔲 **Wave BB.3** — `GetRegulatoryChangeImpactReport` — impacto de mudanças regulatórias: RegulatoryChangeScenario (StandardId+NewControlId+Scope), ImpactedServicesCount, EstimatedRemediationEffort (High/Low effort + days), ServiceImpactList com MitigationPath, TenantRegulatoryReadinessScore. Endpoint `POST /compliance/regulatory-change-impact`. CG/Catalog. Config: `compliance.regulatory.*` sort 13890–13910. **Wave BB PLANEADA**.
+153. 🔲 **Wave BC.1** — `GetEnvironmentBehaviorComparisonReport` — comparação Pre-Prod vs Prod: BehaviorSimilarityScore (Performance 40%+Stability 35%+Configuration 25%), PromotionReadinessTier (Ready/ConditionallyReady/NotReady/InsufficientData), ConfigDriftBetweenEnvs (requer Wave AU.1), BehaviorDivergenceAlerts, CriticalServicesNotReady, HistoricalPromotionOutcome. OI/CG. Config: dimensões no score (sem config key própria).
+154. 🔲 **Wave BC.2** — `GetEvidencePackIntegrityReport` — integridade de Evidence Packs: IntegrityStatus (Intact/Modified/Missing/Unverified), CoherenceStatus (Coherent/Incomplete/Inconsistent), SignatureStatus, EvidencePackScore (Integrity 40%+Coherence 35%+Signature 25%), EvidencePackIntegrityTier (Trustworthy/Acceptable/Questionable/Invalid), IntegrityAnomalies (hash divergente), ProductionReleasesWithInvalidEvidence. CG.
+155. 🔲 **Wave BC.3** — `GetMultiDimensionalPromotionConfidenceReport` — score de confiança de promoção 8-dimensional (BlastRadius+Rollback+EnvBehavior+EvidenceIntegrity+ContractCompliance+SloHealth+ChaosResilience+ChangePattern), PromotionConfidenceTier (HighConfidence/MediumConfidence/LowConfidence/BlockingIssues), BlockingFactors (dimensão < threshold), PromotionRecommendation (ProceedAutomatically/ProceedWithConditions/RequireManualApproval/Block), HistoricalConfidenceVsOutcome. Endpoint `GET /changes/releases/{id}/promotion-confidence`. CG/OI. Config: `promotion.confidence.*` sort 13920–13990. **Wave BC PLANEADA**.
+
 ### Riscos e recomendações transversais
 
 - **Feature sprawl** — resistir à tentação de criar módulos novos; preferir aprofundar existentes (Wave A > Wave B).
@@ -4243,3 +4683,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 14. **Waves AN–AQ (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 108–119 da lista de priorização. **Wave AN** (SRE Intelligence & Error Budget Management): AN.1 `GetErrorBudgetReport` (BurnRate, DaysToExhaustion, ErrorBudgetTier, FreezeRecommendations) + AN.2 `GetIncidentImpactScorecardReport` (4-dim score, TeamReliabilityTier, RepeatOffenderServices) + AN.3 `GetSreMaturityIndexReport` (6 práticas SRE, SreMaturityTier Elite/Advanced/Practicing/Foundational). +8 config keys (sort 12720–12790). 1 endpoint REST. **Wave AO** (Supply Chain & Dependency Provenance): AO.1 `SbomRecord`+`IngestSbomRecord`+`GetSbomCoverageReport` (SbomCoverageTier, LicenseRiskFlags) + AO.2 `GetDependencyProvenanceReport` (ProvenanceTier, SinglePointOfFailureComponents) + AO.3 `GetSupplyChainRiskReport` (ComponentRiskScore, SupplyChainRiskTier, PrioritizedPatchList). +8 config keys (sort 12800–12870). Migration `SbomRecords`. **Wave AP** (Collaborative Governance & Workflow Automation): AP.1 `GetApprovalWorkflowReport` (ApprovalTier, BottleneckApprovers, ApprovalHeatmap) + AP.2 `GetPeerReviewCoverageReport` (ReviewerConcentrationIndex, ReviewCompletionTier) + AP.3 `GetGovernanceEscalationReport` (BreakGlass, JIT, EscalationRiskTier). +8 config keys (sort 12880–12950). 1 endpoint REST. **Wave AQ** (Data Observability & Schema Quality): AQ.1 `DataContractRecord`+`RegisterDataContract`+`GetDataContractComplianceReport` (DataContractTier Governed/Partial/Unmanaged) + AQ.2 `GetSchemaQualityIndexReport` (5-dim SchemaQualityScore, QualityTrend mensal) + AQ.3 `GetSchemaEvolutionSafetyReport` (EvolutionSafetyTier Safe→Dangerous, ProtocolBreakingRateComparison). +8 config keys (sort 12960–13030). Migration `DataContractRecords`. 1 job Quartz.NET. Total: +32 config keys (sort 12720–13030). Testes estimados: +173 (OI +~39, Catalog +~91, CG +~43). i18n: +12 secções em 4 locales. 2 novas migrations. 3 novos endpoints REST.
 15. **Waves AR–AU (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 120–131 da lista de priorização. **Wave AR** (Service Topology Intelligence & Dependency Mapping): AR.1 `GetServiceTopologyHealthReport` (OrphanServices, CircularDependencies, HubServices, TopologyHealthTier) + AR.2 `GetCriticalPathReport` (CriticalPathChains, CascadeRiskScore, BottleneckServices; endpoint `/topology/critical-path`) + AR.3 `GetDependencyVersionAlignmentReport` (AlignmentTier Aligned→SecurityRisk, CrossTeamInconsistencies; requer Wave AO.1). +8 config keys (sort 13040–13110). **Wave AS** (Feature Flag & Experimentation Governance): AS.1 `FeatureFlagRecord`+`IngestFeatureFlagState`+`GetFeatureFlagInventoryReport` (FlagType Release/Experiment/Permission/Kill-switch; migration `FeatureFlagRecords`) + AS.2 `GetFeatureFlagRiskReport` (FlagRiskTier Safe→Urgent, ScheduledRemovalOverdue) + AS.3 `GetExperimentGovernanceReport` (ExperimentGovernanceTier Governed→Unmanaged, MetricImpact, ExperimentProdOnlyRisk). +8 config keys (sort 13120–13190). Migration `FeatureFlagRecords`. 2 endpoints REST. **Wave AT** (AI Model Quality & Drift Governance): AT.1 `ModelPredictionSample`+`IngestModelPredictionSample`+`GetModelDriftReport` (InputDriftScore PSI, ModelDriftTier Stable→Critical; migration `ModelPredictionSamples`) + AT.2 `GetAiModelQualityReport` (AccuracyRate, LowConfidencePredictionRate, InferenceLatencyP95, ModelQualityTier) + AT.3 `GetAiGovernanceComplianceReport` (ModelGovernanceTier Compliant→Untracked, AiGovernanceComplianceIndex; endpoint `/ai/governance/compliance-report`). +8 config keys (sort 13200–13270). Migration `ModelPredictionSamples`. 1 endpoint REST. **Wave AU** (Platform Self-Optimization & Adaptive Intelligence): AU.1 `GetConfigurationDriftReport` (DivergenceType Intentional/Unexplained/Stale, ConfigDriftTier, RolloutReadinessBlocks; endpoint `/platform/configuration-drift`) + AU.2 `GetPlatformHealthIndexReport` (7-dim index, PlatformHealthTier Optimized→Underutilized, ValueRealizationScore, TenantBenchmarkPosition) + AU.3 `GetAdaptiveRecommendationReport` (motor cross-wave, Top10 por ImpactScore/Effort, TenantActionPrioritySummary executivo; endpoint `/platform/recommendations`; job Quartz.NET diário). +8 config keys (sort 13280–13350). 3 endpoints REST. 1 job Quartz.NET. Total: +32 config keys (sort 13040–13350). Testes estimados: +182 (Catalog/Foundation +~92, AI/OI +~44, CG/Foundation +~46). i18n: +12 secções em 4 locales. 2 novas migrations. 6 novos endpoints REST. 1 job Quartz.NET adicional.
 16. **Waves AV–AY (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 132–143 da lista de priorização. **Wave AV** (Contract Lifecycle Automation & Deprecation Intelligence): AV.1 `GetContractDeprecationPipelineReport` (DeprecationPipelineTier OnTrack→Blocked, MigrationProgress, NotificationGaps, BlockingConsumers) + AV.2 `GetApiVersionStrategyReport` (SemverAdoptionRate, VersioningPattern Linear/Parallel/Fragmented, BreakingChangeTrend, TenantVersioningHealthTier Mature→Chaotic) + AV.3 `GetContractDeprecationForecast`+`ScheduleContractDeprecation` (DeprecationProbabilityScore 4-dim, PlannedDeprecationCalendar; endpoint `POST /contracts/{id}/deprecation-schedule`). +8 config keys (sort 13360–13430). 1 endpoint REST. **Wave AW** (Release Intelligence & Deployment Analytics): AW.1 `GetReleasePatternAnalysisReport` (BatchSizeVsFailureCorrelation, EndOfSprintCluster, ReleaseClusteringTier Safe→Critical, IncidentInHour1Rate, RepeatFailureServices) + AW.2 `GetChangeLeadTimeReport` (5-estágio StageBreakdown, BottleneckStage, LeadTimeTier DORA Elite→Low, ApprovalBottleneckIndex, LeadTimeTrend) + AW.3 `GetDeploymentFrequencyHealthReport` (DeployFrequencyTier Optimal/Underdeploying/Overdeploying/Stale, StaleDeployPotentialImpact via Wave AO). +8 config keys (sort 13440–13510). **Wave AX** (Security Posture & Vulnerability Intelligence): AX.1 `GetVulnerabilityExposureReport` (ExposureScore 4-dim, VulnerabilityExposureTier Minimal→Critical, ExposureTrend; requer Wave AO.1) + AX.2 `GetSecurityPatchComplianceReport` (SLAs 7/30/90/180d, PatchComplianceTier Compliant→AtRisk, SLABreaches, TenantPatchComplianceScore) + AX.3 `GetSecurityIncidentCorrelationReport` (CorrelationSignals, SecurityIncidentCorrelationRisk None→Strong, CVEsWithIncidentCorrelation, RiskReductionOpportunity). +8 config keys (sort 13520–13590). Dependência: `SbomRecord` (Wave AO.1). **Wave AY** (Organizational Knowledge & Documentation Intelligence): AY.1 `GetDocumentationHealthReport` (RunbookCoverage Covered/Stale/Missing, ApiDocCoverage, DocHealthScore 4-dim, TenantDocHealthTier Excellent→Critical) + AY.2 `GetKnowledgeBaseUtilizationReport` (SearchTermsWithNoResults gap detection, KnowledgeResolutionRate, KnowledgeHubHealthTier Thriving→Gap-Heavy) + AY.3 `GetTeamKnowledgeSharingReport` (KnowledgeSharingRatio, KnowledgeSiloRisk, BusFactor1Services, CollaborationTrend). +8 config keys (sort 13600–13670). Total: +32 config keys (sort 13360–13670). Testes estimados: +182 (Catalog/CG/Foundation +~92, OI/Knowledge +~46, CG/OI +~44). i18n: +12 secções em 4 locales. 1 novo endpoint REST. Dependências novas: Wave AO.1 (`SbomRecord`) para AX.
+17. **Waves AZ–BC (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 144–155 da lista de priorização. **Wave AZ** (Service Mesh & Runtime Traffic Intelligence): AZ.1 `GetRuntimeTrafficContractDeviationReport` (UndocumentedEndpoints, UndeclaredConsumers, TrafficContractDeviationTier Aligned→Critical, ContractGapOpportunities) + AZ.2 `GetHighTrafficEndpointRiskReport` (EndpointRiskScore 4-dim, EndpointRiskTier Safe→Critical, CriticalUncoveredEndpoints, ChaosGapByTrafficVolume) + AZ.3 `GetTrafficAnomalyReport` (SpikeAnomaly/DropAnomaly/LatencySpike/ErrorRateSpike, AnomalyCorrelation Deploy/Incident/Unexplained, RecurringAnomalyPatterns). +8 config keys (sort 13680–13750). 1 migration (`TrafficObservationRecords`). **Wave BA** (Platform Engineering & Developer Portal Intelligence): BA.1 `GetPortalAdoptionFunnelReport` (AwareUsers/ActiveUsers/PowerUsers, TeamAdoptionMatrix AdoptionTier Leader→Inactive, EnablementOpportunityList) + BA.2 `GetSelfServiceWorkflowHealthReport` (CompletionRate, AbandonmentHotspots, AdminDependencyIndex, WorkflowHealthTier Smooth→Broken) + BA.3 `GetIntegrationHealthReport` (DataFreshnessStatus Fresh→Offline, IntegrationHealthTier Healthy→Offline, DataFreshnessImpact, CriticalOfflineIntegrations). +8 config keys (sort 13760–13830). 1 migration (`IntegrationSyncRecords`). **Wave BB** (Compliance Automation & Regulatory Reporting): BB.1 `GetCrossStandardComplianceGapReport` (CrossStandardGapMatrix, TenantCompliancePriorityList, TransversalGaps ≥2 standards, EstimatedComplianceLift) + BB.2 `GetEvidenceCollectionStatusReport` (AuditReadinessTier Ready→NotReady, EvidenceCompleteness, AutoCollectableEvidence, DaysToAudit) + BB.3 `GetRegulatoryChangeImpactReport` (RegulatoryChangeScenario input, EstimatedRemediationEffort, TenantRegulatoryReadinessScore; endpoint `POST /compliance/regulatory-change-impact`). +8 config keys (sort 13840–13910). 1 endpoint REST. **Wave BC** (Advanced Change Confidence & Promotion Intelligence): BC.1 `GetEnvironmentBehaviorComparisonReport` (BehaviorSimilarityScore 3-dim, PromotionReadinessTier Ready→InsufficientData, BehaviorDivergenceAlerts; requer Wave AU.1 ConfigDrift) + BC.2 `GetEvidencePackIntegrityReport` (IntegrityStatus Intact→Unverified, CoherenceStatus, SignatureStatus, EvidencePackIntegrityTier Trustworthy→Invalid, IntegrityAnomalies) + BC.3 `GetMultiDimensionalPromotionConfidenceReport` (8-dimensional ConfidenceScore, PromotionConfidenceTier HighConfidence→BlockingIssues, BlockingFactors, PromotionRecommendation ProceedAutomatically→Block; endpoint `GET /changes/releases/{id}/promotion-confidence`). +8 config keys + 1 extra (sort 13920–13990). 1 endpoint REST. Total: +33 config keys (sort 13680–13990). Testes estimados: +180 (OI/Catalog +~60, Foundation/CG +~74, CG/OI +~46). i18n: +12 secções em 4 locales. 2 novas migrations. 3 novos endpoints REST. Dependências: Wave AU.1 para BC.1, Wave AO.1 (SbomRecord) indirecta.
