@@ -3,12 +3,13 @@
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
 > **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → AQ (69 features novas documentadas, aguardam implementação)  
+> **Waves planeadas:** U → AU (81 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
 > **Waves AJ–AM (backend avançado III):** 4 novas waves planeadas — Multi-Tenant Governance Intelligence, Developer Experience & Notification Management, Audit Intelligence & Traceability Analytics, Auto-Cataloging & Service Discovery Intelligence  
 > **Waves AN–AQ (backend avançado IV):** 4 novas waves planeadas — SRE Intelligence & Error Budget Management, Supply Chain & Dependency Provenance, Collaborative Governance & Workflow Automation, Data Observability & Schema Quality  
+> **Waves AR–AU (backend avançado V):** 4 novas waves planeadas — Service Topology Intelligence & Dependency Mapping, Feature Flag & Experimentation Governance, AI Model Quality & Drift Governance, Platform Self-Optimization & Adaptive Intelligence  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -3212,6 +3213,421 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AR — Service Topology Intelligence & Dependency Mapping
+
+**Objetivo:** Elevar a análise do grafo de dependências de um mapa estático para uma capacidade de inteligência activa. O NexTraceOne já regista dependências entre serviços; esta wave transforma esse grafo em fonte analítica que identifica topologias de risco, critical paths e desalinhamento de versões de dependências — convertendo o mapa de dependências em ferramenta de decisão arquitectural e operacional.
+
+#### AR.1 — GetServiceTopologyHealthReport (Catalog)
+
+**Feature:** Análise de saúde do grafo de dependências a nível de tenant. Responde "o nosso grafo de dependências está saudável — ou existem nós isolados, dependências circulares, hubs frágeis e topologia obsoleta?"
+
+**Domínio:** Analisa `ServiceDependency` e `ServiceAsset` para calcular métricas estruturais do grafo de dependências do tenant, identificando padrões de risco arquitectural.
+
+**Capacidades:**
+- **GraphMetrics gerais:**
+  - **TotalServices** — número total de serviços no tenant
+  - **TotalDependencies** — total de dependências registadas
+  - **AvgFanOut** — média de dependências saídas por serviço
+  - **AvgFanIn** — média de dependências entradas por serviço
+  - **GraphDensity** — `TotalDependencies / (TotalServices × (TotalServices - 1))` — quão interligado é o grafo
+  - **TopologyFreshnessScore** — % de dependências actualizadas em ≤ `topology_freshness_days`
+- **OrphanServices** — serviços sem dependências de entrada e sem dependências de saída (possíveis serviços esquecidos ou não documentados)
+- **HubServices** — serviços com FanIn ≥ `hub_fanin_threshold` (pontos de pressão arquitectural — falha propaga para muitos)
+- **CircularDependencies** — ciclos detectados no grafo (A→B→C→A) — sempre um risco de acoplamento indevido
+- **IsolatedClusters** — sub-grafos sem ligação ao núcleo da topologia (silos que possivelmente deveriam integrar)
+- **TopologyHealthTier:** `Healthy` (sem circulares, ≤2 hubs críticos, freshness ≥90%) / `Warning` / `Degraded` / `Critical`
+- **TenantTopologyHealthScore** (0–100) — score composto: CircularCount (−20 por ciclo) + HubConcentration (−15 por hub crítico) + TopologyFreshness (peso 40%) + GraphDensity normalizado (peso 30%)
+- **StaleTopologyServices** — serviços cujas dependências não são actualizadas há mais de `topology_freshness_days` (provavelmente desactualizadas)
+- **ArchitectureRecommendations** — sugestões geradas para os top 3 problemas detectados (ex: "resolver circular A→B→C→A", "reduzir fan-in do serviço X")
+
+**Orientado para Architect e Tech Lead** — suporta revisões arquitecturais com base em dados observados em vez de diagramas desactualizados.
+
+#### AR.2 — GetCriticalPathReport (Catalog)
+
+**Feature:** Análise de caminho crítico no grafo de dependências. Identifica as cadeias de dependência mais longas e os serviços que constituem bottlenecks estruturais do ponto de vista de propagação de falhas.
+
+**Domínio:** Aplica algoritmos de análise de grafo dirigido sobre `ServiceDependency` para identificar caminhos críticos, profundidade de dependências e risco de propagação em cascata.
+
+**Capacidades:**
+- **CriticalPathChains** — as N cadeias de dependência mais longas do tenant (por comprimento em hops):
+  - **Path** — lista ordenada de serviços na cadeia
+  - **Depth** — número de hops
+  - **CustomerFacingAtRoot** — bool (chain começa num serviço customer-facing — maior risco)
+  - **TotalServiceTierRisk** — soma dos ServiceTier weights ao longo da cadeia
+- **MaxDependencyDepth** — profundidade máxima observada no grafo do tenant
+- **BottleneckServices** — serviços presentes em ≥ `bottleneck_path_count` cadeias críticas distintas (presença em muitos caminhos = risco amplificado)
+- **CascadeRiskScore por serviço** (0–100) — estimativa do impacto em cascata se o serviço falhar: FanOut (40%) + PathPresence (40%) + CustomerFacingDownstream (20%)
+- **TopCascadeRiskServices** — top 10 por CascadeRiskScore (para priorização de esforço SRE/resiliência)
+- **DepthDistribution** — distribuição de serviços por nível de profundidade máxima (quantos estão a ≥3, ≥5, ≥8 hops do root)
+- **TenantCriticalPathIndex** — MaxDependencyDepth normalizado × presença de ciclos × TopCascadeRiskServices — score executivo de risco estrutural do grafo
+- Endpoint: `GET /api/v1/topology/critical-path`
+
+**Orientado para Architect, SRE e Tech Lead** — transforma o mapa de dependências em análise de risco de propagação de falhas, apoiando decisões de resiliência e de simplificação arquitectural.
+
+#### AR.3 — GetDependencyVersionAlignmentReport (Catalog)
+
+**Feature:** Análise de alinhamento de versões de dependências entre serviços. Responde "os nossos serviços estão a usar versões consistentes das mesmas dependências ou existe drift de versão que aumenta risco operacional?"
+
+**Domínio:** Agrega dados de `SbomRecord` (Wave AO) para identificar serviços que dependem de versões diferentes do mesmo componente, calculando risco de inconsistência e esforço de alinhamento.
+
+**Dependência:** Requer `SbomRecord` (Wave AO.1) para dados de componentes por serviço.
+
+**Capacidades:**
+- Por componente com múltiplas versões em uso no tenant:
+  - **ComponentName** e **VersionsInUse** — lista de versões distintas activas
+  - **ServicesByVersion** — mapeamento de versão → lista de serviços que a usam
+  - **VersionSpread** — número de versões distintas em uso (1 = alinhado, >1 = drift)
+  - **LatestAvailable** — versão mais recente identificável (se registry info disponível)
+  - **ServicesOnOldestVersion** — serviços usando a versão mais antiga (maior urgência)
+  - **HasSecurityImplications** — bool (alguma versão antiga tem CVE que a versão mais recente resolveu)
+- **AlignmentTier por componente:** `Aligned` (VersionSpread = 1) / `MinorDrift` (2–3 versões) / `MajorDrift` (>3 versões) / `SecurityRisk` (drift + CVE diferencial)
+- **TenantAlignmentScore** (0–100) — % de componentes com AlignmentTier = Aligned ou MinorDrift
+- **AlignmentUpgradeMap** — agrupamento de serviços por componente e versão alvo de upgrade (para planeamento de sprints de alinhamento)
+- **CrossTeamInconsistencies** — componentes em que equipas diferentes adoptaram versões incompatíveis (risco de comportamento divergente no mesmo pipeline)
+- **CriticalAlignmentGaps** — componentes com `AlignmentTier = SecurityRisk` + `ServiceCount ≥ 2` (prioridade máxima de alinhamento)
+
+**Orientado para Architect, Platform Admin e Engineer** — suporta decisões de padronização de dependências e reduz o risco de "funciona na minha versão" em releases complexas.
+
+#### Configuração Wave AR
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `topology.freshness_days` | 30 | 13040 | Dias máximos para dependência ser considerada fresca |
+| `topology.hub_fanin_threshold` | 5 | 13050 | FanIn mínimo para classificar serviço como Hub |
+| `topology.health.hub_penalty` | 15 | 13060 | Penalidade por hub crítico no TenantTopologyHealthScore |
+| `topology.health.circular_penalty` | 20 | 13070 | Penalidade por ciclo detectado no TenantTopologyHealthScore |
+| `topology.critical_path.top_n_chains` | 10 | 13080 | Número de cadeias críticas a apresentar no relatório |
+| `topology.critical_path.bottleneck_path_count` | 3 | 13090 | Mínimo de cadeias para classificar serviço como Bottleneck |
+| `topology.alignment.major_drift_threshold` | 3 | 13100 | Número de versões distintas para AlignmentTier MajorDrift |
+| `topology.alignment.critical_service_count` | 2 | 13110 | Mínimo de serviços para CriticalAlignmentGap |
+
+#### i18n Wave AR
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `serviceTopologyHealth.*` — saúde do grafo de dependências, hubs, circulares, clusters isolados e freshness
+- `criticalPath.*` — caminho crítico, bottlenecks, CascadeRiskScore e depth distribution
+- `dependencyVersionAlignment.*` — alinhamento de versões, version drift, AlignmentTier e upgrade map
+
+**Totais estimados Wave AR:** Catalog: ~45 testes (AR.1 ~14 + AR.2 ~15 + AR.3 ~16). Configuração: +8 config keys (sort 13040–13110). i18n: +3 secções (4 locales). 1 novo endpoint REST (`/topology/critical-path`). **Wave AR PLANEADA**.
+
+---
+
+### Wave AS — Feature Flag & Experimentation Governance
+
+**Objetivo:** Introduzir governança de feature flags e experimentação como capacidade de primeira classe no NexTraceOne. Feature flags são uma das ferramentas mais poderosas de deployment moderno — e uma das menos governadas. Esta wave torna o NexTraceOne responsável por inventariar, analisar o risco e auditar o ciclo de vida de feature flags e experimentos A/B, evitando o problema crónico de "feature flags que nunca são removidos" e de "experimentos que ninguém sabe se ainda estão activos".
+
+#### AS.1 — FeatureFlagRecord + IngestFeatureFlagState + GetFeatureFlagInventoryReport (Catalog / Foundation)
+
+**Feature:** Registo e inventário governado de feature flags por serviço. Suporta ingestão via CLI/CI e consulta do estado activo de todas as flags do tenant.
+
+**Domínio:** Nova entidade `FeatureFlagRecord` — regista o estado actual de uma feature flag: `ServiceId`, `FlagKey`, `FlagType` (Release/Experiment/Permission/Kill-switch), `IsEnabled`, `EnabledEnvironments` (JSON), `OwnerId`, `CreatedAt`, `LastToggledAt`, `ScheduledRemovalDate`.
+
+**Capacidades:**
+- **FeatureFlagRecord** + **IFeatureFlagRepository** + migration `FeatureFlagRecords`
+- 2 features: `IngestFeatureFlagState` (ingestão via POST, idempotente por `ServiceId+FlagKey`) + `GetFeatureFlagInventoryReport`
+- **GetFeatureFlagInventoryReport capacidades:**
+  - Por serviço:
+    - **TotalFlags** — número total de feature flags registadas
+    - **ActiveFlags** — flags com `IsEnabled = true` em pelo menos 1 ambiente
+    - **ByType** — distribuição por FlagType
+    - **StaleFlagsCount** — flags com `LastToggledAt` há mais de `stale_flag_days` (nunca toggled = possivelmente esquecida)
+    - **OwnerlessFlags** — flags sem `OwnerId` definido
+    - **FlagsInAllEnvironments** — flags activas em todos os ambientes incluindo produção (potencial risco de permanência)
+  - **TenantFeatureFlagSummary:**
+    - **TotalFlags** / **ActiveFlags** / **StaleFlags** / **OwnerlessFlags**
+    - **KillSwitchCount** — flags do tipo Kill-switch activas (visibilidade especial de safety)
+    - **TopServicesWithStaleFlags** — top 5 serviços com mais flags stale
+  - **FlagsByEnvironment** — distribuição de flags activas por ambiente (Dev/PreProd/Prod)
+  - Endpoint: `POST /api/v1/feature-flags/ingest` + `GET /api/v1/feature-flags/inventory`
+
+**Orientado para Engineer, Tech Lead e Platform Admin** — fecha uma lacuna real: as equipas têm flags distribuídas por múltiplos sistemas (LaunchDarkly, custom solutions, env variables) sem inventário centralizado. O NexTraceOne torna-se o inventário governado de feature flags.
+
+#### AS.2 — GetFeatureFlagRiskReport (Catalog / ChangeGovernance)
+
+**Feature:** Análise de risco do portfólio de feature flags. Identifica flags problemáticas por critérios objectivos — staleness, ausência de ownership, permanência em produção, correlação com incidentes.
+
+**Domínio:** Agrega `FeatureFlagRecord` com dados de `IncidentRecord` (correlação temporal) e `ServiceRiskProfile` para calcular risco por flag.
+
+**Capacidades:**
+- Por feature flag no tenant:
+  - **StalenessRisk:** `High` (não toggled em > `stale_flag_days`) / `Medium` (30–60d) / `Low` (<30d)
+  - **OwnershipRisk:** `None` (OwnerlessFlag) / `Low` (owner activo no serviço)
+  - **ProductionPresenceRisk:** `High` (activa em Prod + LastToggled > `prod_presence_days`) / `Medium` / `Low`
+  - **IncidentCorrelation:** bool — existem incidentes correlacionados com toggles desta flag nas últimas 24h?
+  - **FlagRiskScore** (0–100): Staleness (30%) + Ownership (25%) + ProductionPresence (30%) + IncidentCorrelation (15%)
+- **FlagRiskTier:** `Safe` ≤25 / `Monitor` ≤55 / `Review` ≤80 / `Urgent` >80
+- **TenantFlagRiskSummary:**
+  - **UrgentFlagCount** / **ReviewFlagCount** — contagens de prioridade
+  - **TenantFlagRiskIndex** — % de flags com FlagRiskTier ≤ Monitor (saúde do portfólio)
+- **ScheduledRemovalOverdue** — flags com `ScheduledRemovalDate` ultrapassada ainda activas (incumprimento de compromisso de remoção)
+- **ToggleWithIncidentCorrelation** — lista de flags cujo último toggle foi seguido de incidente em < `incident_window_hours` (análise forense)
+- **RecommendedRemovals** — flags com FlagRiskTier = Urgent + IncidentCorrelation false (candidatas a remoção imediata)
+
+**Orientado para Tech Lead e Platform Admin** — garante que o portfólio de feature flags não cresce indefinidamente sem governança, e que flags críticas são identificadas e tratadas proactivamente.
+
+#### AS.3 — GetExperimentGovernanceReport (Catalog / OperationalIntelligence)
+
+**Feature:** Governança de experimentação A/B e de feature experimentation. Responde "os nossos experimentos têm ownership, duração definida, critérios de sucesso e são correctamente encerrados?"
+
+**Domínio:** Analisa `FeatureFlagRecord` do tipo `Experiment` + correlação com `RuntimeSnapshot` e `SloObservation` para avaliar a qualidade da governança de experimentação no tenant.
+
+**Capacidades:**
+- Por experiment flag (FlagType = Experiment):
+  - **ExperimentDuration** — dias desde criação
+  - **HasSuccessCriteria** — bool (baseado em campos opcionais da ingestão: `successMetric`, `targetValue`)
+  - **ExperimentStatus:** `Active` / `Overdue` (> `experiment_max_days` sem conclusão) / `Stale` (sem toggles em > `stale_flag_days`) / `Concluded` (IsEnabled = false em todos os ambientes)
+  - **MetricImpact** — se `successMetric` registado: comparação de SLO/latência/error rate do serviço no período de experiência vs. período anterior (via `RuntimeSnapshot`)
+  - **EnvironmentCoverage** — ambientes em que o experimento está activo (Prod-only = risco mais elevado)
+- **ExperimentHealthSummary:**
+  - **ActiveExperiments** / **OverdueExperiments** / **ExperimentsWithoutSuccessCriteria**
+  - **MedianExperimentDurationDays** — duração mediana para tracking de progresso
+  - **ExperimentVelocity** — experimentos concluídos no último mês vs. criados (taxa de liquidação)
+- **ExperimentGovernanceTier:** `Governed` (≤20% Overdue + ≤10% WithoutCriteria) / `Improving` / `AtRisk` / `Unmanaged`
+- **LongRunningExperiments** — experimentos com ExperimentDuration > `experiment_max_days` (candidatos a decisão: promover ou abandonar)
+- **ExperimentProdOnlyRisk** — experimentos activos apenas em produção (sem validação em non-prod — risco alto)
+- **TenantExperimentGovernanceScore** — score ponderado baseado no ExperimentGovernanceTier + ExperimentVelocity + MetricImpact coverage
+
+**Orientado para Product, Tech Lead e Architect** — suporta uma cultura de experimentação disciplinada onde experimentos têm lifecycle claro, critérios mensuráveis e são encerrados quando concluídos.
+
+#### Configuração Wave AS
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `feature_flags.stale_flag_days` | 60 | 13120 | Dias sem toggle para StalenessRisk High |
+| `feature_flags.prod_presence_days` | 90 | 13130 | Dias em produção para ProductionPresenceRisk High |
+| `feature_flags.incident_window_hours` | 24 | 13140 | Janela de horas pós-toggle para correlacionar com incidente |
+| `feature_flags.risk.staleness_weight` | 30 | 13150 | Peso da Staleness no FlagRiskScore |
+| `feature_flags.experiment.max_days` | 30 | 13160 | Duração máxima de experimento antes de ExperimentStatus Overdue |
+| `feature_flags.experiment.governed_overdue_pct` | 20 | 13170 | % máximo de OverdueExperiments para ExperimentGovernanceTier Governed |
+| `feature_flags.experiment.governed_no_criteria_pct` | 10 | 13180 | % máximo de experimentos sem critérios para tier Governed |
+| `feature_flags.inventory.ingest_endpoint_enabled` | `true` | 13190 | Activa endpoint de ingestão de feature flags |
+
+#### i18n Wave AS
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `featureFlagInventory.*` — inventário de feature flags por serviço, tipos, flags stale e kill-switches
+- `featureFlagRisk.*` — risco de feature flags, FlagRiskTier, scheduled removals e correlações com incidentes
+- `experimentGovernance.*` — governança de experimentação, lifecycle, critérios de sucesso, LongRunningExperiments
+
+**Totais estimados Wave AS:** Catalog/Foundation: ~47 testes (AS.1 ~16 + AS.2 ~15 + AS.3 ~16). Configuração: +8 config keys (sort 13120–13190). i18n: +3 secções (4 locales). 1 nova migration (`FeatureFlagRecords`). 2 novos endpoints REST (`POST /feature-flags/ingest` + `GET /feature-flags/inventory`). **Wave AS PLANEADA**.
+
+---
+
+### Wave AT — AI Model Quality & Drift Governance
+
+**Objetivo:** Introduzir governança de qualidade e drift de modelos de IA como capacidade nativa do NexTraceOne — complementando o AI Governance já planeado (Wave Y) com capacidades de monitorização de qualidade de modelo em produção. Esta wave posiciona o NexTraceOne como plataforma que não apenas governa quem usa IA e com que política, mas também garante que os modelos em uso mantêm qualidade esperada e não derivam silenciosamente.
+
+#### AT.1 — ModelPredictionSample + IngestModelPredictionSample + GetModelDriftReport (AI / OperationalIntelligence)
+
+**Feature:** Detecção de drift de modelos de IA em produção. Regista amostras de predição e detecta quando a distribuição de inputs ou outputs se afasta significativamente do baseline de treino.
+
+**Domínio:** Nova entidade `ModelPredictionSample` — regista amostras de predições de modelos: `ModelId`, `ServiceId`, `PredictedAt`, `InputFeatureVector` (JSON: feature stats: mean/std/nullPct por feature), `PredictedClass` (para classificação), `ConfidenceScore`, `ActualClass` (opcional — para feedback loop).
+
+**Capacidades:**
+- **ModelPredictionSample** + **IModelPredictionRepository** + migration `ModelPredictionSamples`
+- `IngestModelPredictionSample` — ingestão em batch ou individual de amostras de predição
+- **GetModelDriftReport capacidades:**
+  - Por modelo, vs. baseline (primeiro período ou snapshot de referência):
+    - **InputDriftScore** (0–100) — distância estatística da distribuição de inputs actual vs. baseline (Population Stability Index simplificado)
+    - **OutputDriftScore** (0–100) — desvio na distribuição de classes preditas vs. baseline
+    - **ConfidenceDrift** — desvio na distribuição de ConfidenceScore (modelos mais incertos = drift de conceito potencial)
+    - **NullRateIncrease** — aumento de % de features nulas vs. baseline (sinal de degradação upstream)
+    - **DriftDetectionAlgorithm** — método usado (`psi_simplified` / `ks_test_simplified`)
+  - **ModelDriftTier:** `Stable` (InputDrift ≤20 + OutputDrift ≤15) / `Warning` / `Drifting` / `Critical`
+  - **DriftTimeline** — série temporal de InputDriftScore e OutputDriftScore (30d, daily)
+  - **TenantModelDriftSummary:**
+    - **StableModels** / **DriftingModels** / **CriticalModels**
+    - **TopDriftingModels** — top 5 por InputDriftScore
+  - **DriftAlerts** — modelos com ModelDriftTier = Critical + sem DriftAcknowledgement registado
+
+**Orientado para Architect, Engineer e Platform Admin** — garante que modelos de IA em produção são monitorizados não apenas por latência mas pela qualidade e consistência das suas predições ao longo do tempo.
+
+#### AT.2 — GetAiModelQualityReport (AI / OperationalIntelligence)
+
+**Feature:** Relatório de qualidade de modelos de IA em produção. Agrega métricas de performance de modelo (quando feedback disponível), latência de inferência, taxa de fallback e comparação com baseline para uma visão executiva da qualidade de IA do tenant.
+
+**Domínio:** Agrega `ModelPredictionSample` (com ActualClass quando disponível), dados de latência de inferência (via `RuntimeSnapshot` ou ingestão dedicada) e dados do `ModelRegistry` (Wave Y — planeada).
+
+**Capacidades:**
+- Por modelo com dados suficientes (≥ `min_samples_for_quality` amostras):
+  - **AccuracyRate** — quando ActualClass disponível: `CorrectPredictions / TotalSamples * 100`
+  - **FeedbackCoverageRate** — % de predições com ActualClass registado (para avaliar confiabilidade do AccuracyRate)
+  - **AvgConfidenceScore** — média de ConfidenceScore (modelos com baixa confiança média = risco)
+  - **LowConfidencePredictionRate** — % de predições com ConfidenceScore ≤ `low_confidence_threshold`
+  - **InferenceLatencyP50** / **InferenceLatencyP95** — latência de inferência em ms (p50 e p95)
+  - **FallbackRate** — % de chamadas que resultaram em fallback para resposta default (quando trackeado)
+  - **QualityTrend** — comparação dos últimos 7d vs. 7d anteriores para AccuracyRate e AvgConfidenceScore
+- **ModelQualityTier:** `Excellent` (Accuracy ≥95% + LowConf ≤5% + Latency P95 ≤ `latency_budget_ms`) / `Good` / `Degraded` / `Poor`
+- **TenantAiQualitySummary:**
+  - **ModelsWithFeedback** — modelos com AccuracyRate calculável
+  - **TenantAiQualityScore** — média ponderada de ModelQualityTier (Critical × 3, Standard × 2)
+  - **LowConfidenceModelCount** — modelos com AvgConfidenceScore ≤ `low_confidence_threshold` (risco de decisões baseadas em outputs incorrectos)
+- **QualityAnomalies** — modelos com QualityTrend negativo significativo (degradação activa — sem drift de dados, possível problema de modelo ou integração)
+
+**Orientado para Architect, Product e Platform Admin** — fornece visão executiva de "qual é a qualidade real da IA que está a ser usada em produção?" — não apenas se os modelos estão a correr, mas se estão a produzir resultados de qualidade.
+
+#### AT.3 — GetAiGovernanceComplianceReport (AI / ChangeGovernance)
+
+**Feature:** Relatório de compliance de governança de IA. Verifica se os modelos em uso no tenant cumprem os requisitos de governança definidos — aprovação formal, audit trail, budget de tokens, política de acesso e auditoria de uso.
+
+**Domínio:** Agrega dados do `ModelRegistry` (Wave Y), `AiUsageRecord`, `AuditEvent` e `AiAccessPolicy` para verificar conformidade de cada modelo activo com as políticas de governança definidas.
+
+**Capacidades:**
+- Por modelo activo no tenant:
+  - **HasFormalApproval** — bool (registo de aprovação no ModelRegistry com approver e data)
+  - **HasAuditTrail** — bool (AuditEvent registados para uso nas últimas 30d)
+  - **BudgetComplianceRate** — % de períodos em que o uso de tokens ficou dentro do budget configurado
+  - **PolicyAdherence** — % de chamadas ao modelo dentro das políticas de acesso (sem violações de role/environment/tenant)
+  - **LastReviewDate** — data da última revisão formal do modelo (staleness de governance)
+  - **ReviewOverdue** — bool (`LastReviewDate` há mais de `model_review_days`)
+- **ModelGovernanceTier:** `Compliant` (HasApproval + HasAuditTrail + BudgetCompliance ≥95% + !ReviewOverdue) / `Partial` / `NonCompliant` / `Untracked` (sem dados de governance)
+- **TenantAiGovernanceScore** (0–100) — % de modelos activos com `ModelGovernanceTier = Compliant` ou `Partial`
+- **ComplianceGaps:**
+  - **ModelsWithoutApproval** — lista de modelos sem aprovação formal (maior risco de compliance)
+  - **ModelsWithoutAuditTrail** — modelos sem evidências de uso auditado
+  - **BudgetOverruns** — modelos que excederam budget em ≥ `budget_overrun_threshold` períodos
+  - **PolicyViolatingCalls** — chamadas a modelos fora de política (por modelo e por tipo de violação)
+- **Endpoint:** `GET /api/v1/ai/governance/compliance-report`
+- **AiGovernanceComplianceIndex** — % de modelos em `Compliant`, para dashboard executivo de AI Governance
+
+**Orientado para Auditor, Platform Admin e Executive** — fecha o loop do AI Governance: não apenas definir políticas mas verificar que são cumpridas e que modelos em uso são rastreáveis, aprovados e dentro de orçamento.
+
+#### Configuração Wave AT
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `ai.model_drift.input_drift_warning_score` | 20 | 13200 | InputDriftScore para ModelDriftTier Warning |
+| `ai.model_drift.output_drift_warning_score` | 15 | 13210 | OutputDriftScore para ModelDriftTier Warning |
+| `ai.model_quality.min_samples_for_quality` | 100 | 13220 | Amostras mínimas para calcular ModelQualityTier |
+| `ai.model_quality.low_confidence_threshold` | 0.6 | 13230 | ConfidenceScore abaixo do qual predição é Low Confidence |
+| `ai.model_quality.latency_budget_ms` | 500 | 13240 | Budget de latência P95 para ModelQualityTier Excellent |
+| `ai.governance.model_review_days` | 90 | 13250 | Dias máximos sem revisão formal para ReviewOverdue |
+| `ai.governance.budget_overrun_threshold` | 2 | 13260 | Períodos com overrun para flag BudgetOverruns |
+| `ai.governance.audit_trail_lookback_days` | 30 | 13270 | Janela de lookback para verificar HasAuditTrail |
+
+#### i18n Wave AT
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `modelDrift.*` — drift de modelo, InputDriftScore, OutputDriftScore, DriftTier e timeline
+- `aiModelQuality.*` — qualidade de modelos IA, accuracy, confidence, latência e QualityTrend
+- `aiGovernanceCompliance.*` — compliance de governança de IA, approval, audit trail, budget e PolicyAdherence
+
+**Totais estimados Wave AT:** AI/OI/CG: ~44 testes (AT.1 ~14 + AT.2 ~15 + AT.3 ~15). Configuração: +8 config keys (sort 13200–13270). i18n: +3 secções (4 locales). 1 nova migration (`ModelPredictionSamples`). 1 novo endpoint REST (`/ai/governance/compliance-report`). **Wave AT PLANEADA**.
+
+---
+
+### Wave AU — Platform Self-Optimization & Adaptive Intelligence
+
+**Objetivo:** Introduzir capacidades de inteligência adaptativa sobre o próprio NexTraceOne como plataforma — monitorizar a saúde da configuração entre ambientes, calcular um índice de saúde global da plataforma como produto e gerar recomendações accionáveis priorizadas baseadas na análise agregada de todas as waves anteriores. Esta wave transforma o NexTraceOne num sistema que se autodiagnostica e apoia a organização a extrair o máximo valor da plataforma.
+
+#### AU.1 — GetConfigurationDriftReport (Foundation / ChangeGovernance)
+
+**Feature:** Análise de drift de configuração entre ambientes. Responde "as nossas configurações estão consistentes entre Dev, PreProd e Produção — ou existem divergências que podem causar comportamento inesperado?"
+
+**Domínio:** Compara os valores das `ConfigurationDefinition` activas por ambiente para detectar divergências que possam causar comportamento diferente entre ambientes — um dos maiores factores de "funciona em QA mas falha em produção".
+
+**Capacidades:**
+- Por ConfigKey com valores diferentes entre ambientes:
+  - **Key** — identificador da configuração
+  - **Module** — módulo dono da configuração
+  - **ValueByEnvironment** — mapa `{env → value}` mostrando o valor actual em cada ambiente
+  - **IsDivergent** — bool (valores diferentes entre ambientes que deveriam ser consistentes)
+  - **DivergenceType:** `Intentional` (divergência esperada por design — ex: thresholds de prod vs. dev) / `Unexplained` (sem razão documentada) / `Stale` (valor num ambiente não actualizado há mais de `config_stale_days`)
+- **ConfigDriftTier:** `Aligned` (sem divergências unexplained) / `MinorDrift` (1–3 unexplained) / `MajorDrift` (4–10) / `Critical` (>10)
+- **TenantConfigurationHealthScore** (0–100) — % de config keys sem divergência `Unexplained` ou `Stale`
+- **HighImpactDivergences** — divergências em keys de alto impacto (thresholds de risco, SLA, approval): prioritárias para resolução
+- **StaleConfigKeys** — keys não actualizadas em nenhum ambiente há mais de `config_stale_days` (potencialmente obsoletas)
+- **RolloutReadinessBlocks** — divergências que podem bloquear uma promoção saudável (ex: `approval.sla_hours` diferente em PreProd vs. Prod)
+- **ConfigAlignmentRecommendations** — sugestões para resolver as top 5 divergências `Unexplained`
+- Endpoint: `GET /api/v1/platform/configuration-drift`
+
+**Orientado para Platform Admin e Architect** — fecha um gap silencioso e perigoso: configuração divergente entre ambientes que causa comportamento não determinístico em promoções.
+
+#### AU.2 — GetPlatformHealthIndexReport (Foundation / múltiplos módulos)
+
+**Feature:** Índice composto de saúde do NexTraceOne como plataforma. Responde "em que medida esta organização está a usar o NexTraceOne com profundidade e consistência suficientes para extrair o seu valor real?"
+
+**Domínio:** Agrega dados de múltiplos módulos (Catalog, CG, OI, IA, Foundation) para calcular um índice de adopção e saúde da plataforma — distinto da saúde dos serviços geridos, este relatório mede a própria plataforma.
+
+**Capacidades:**
+- 7 dimensões de saúde da plataforma, cada uma com score 0–100:
+  - **ServiceCatalogCompleteness** (15%) — % de serviços com owner, tier, runbook e ≥1 contrato
+  - **ContractCoverage** (15%) — % de serviços com pelo menos 1 contrato activo e não stale
+  - **ChangeGovernanceAdoption** (15%) — % de releases com evidence pack + approval workflow activo
+  - **SloGovernanceAdoption** (15%) — % de serviços com SLO definido e `SloObservation` activa
+  - **ObservabilityContextualization** (10%) — % de serviços com `RuntimeSnapshot` activo + correlação com mudanças
+  - **AiGovernanceReadiness** (15%) — % de modelos activos com ModelGovernanceTier ≥ Partial
+  - **DataFreshness** (15%) — % de entidades principais (serviços, contratos, dependências, sbom) actualizadas em ≤ `freshness_days`
+- **PlatformHealthIndex** (0–100) — soma ponderada das 7 dimensões
+- **PlatformHealthTier:** `Optimized` ≥85 / `Operational` ≥65 / `Partial` ≥40 / `Underutilized` <40
+- **WeakestDimensions** — 3 dimensões com menor score (foco de melhoria prioritária)
+- **PlatformHealthTimeline** — evolução mensal do PlatformHealthIndex nos últimos 6 meses
+- **DimensionBreakdown** — para cada dimensão: score + items que contribuem negativamente
+- **TenantBenchmarkPosition** — comparação anonimizada com outros tenants de dimensão similar (se `TenantBenchmarkConsent` = true, via Wave D.2)
+- **ValueRealizationScore** — sub-índice específico de "quanto valor de produto está a ser realizado" (ContractCoverage × ChangeGovernance × SloGovernance)
+
+**Orientado para Platform Admin e Executive** — permite à liderança perceber se a organização está a usar o NexTraceOne com profundidade real ou apenas superficialmente, e priorizar esforços de adopção.
+
+#### AU.3 — GetAdaptiveRecommendationReport (Foundation / múltiplos módulos)
+
+**Feature:** Motor de recomendações adaptativas baseado na análise cross-wave de todos os dados do tenant. Gera e prioriza as top acções de maior impacto que a organização pode tomar para melhorar a sua posição em governança, confiabilidade, segurança, qualidade e adopção.
+
+**Domínio:** Agrega indicadores críticos de múltiplos relatórios já calculados (via leitura dos resultados recentes armazenados) para gerar um ranking de recomendações priorizadas por impacto esperado.
+
+**Capacidades:**
+- **RecommendationEngine** — lê sinais de outros relatórios e gera recomendações:
+  - Da `GetServiceTopologyHealthReport` → flags de circulares e hubs
+  - Da `GetErrorBudgetReport` → serviços com Burned/Exhausted budget
+  - Da `GetSbomCoverageReport` → serviços com SbomCoverageTier Missing + CVEs críticos
+  - Da `GetFeatureFlagRiskReport` → flags Urgent sem remoção agendada
+  - Da `GetModelDriftReport` → modelos Critical sem DriftAcknowledgement
+  - Da `GetPlatformHealthIndexReport` → dimensões WeakestDimensions
+  - Da `GetConfigurationDriftReport` → RolloutReadinessBlocks activos
+  - Da `GetSreMaturityIndexReport` → equipas FoundationalTeam com WeakestPractices
+  - Da `GetSupplyChainRiskReport` → componentes Critical não patchados
+  - Da `GetGovernanceEscalationReport` → EscalationRiskTier High/Critical não resolvido
+- Por recomendação gerada:
+  - **RecommendationId** — identificador único
+  - **Category:** `Reliability` / `Security` / `Governance` / `Quality` / `Adoption`
+  - **Title** e **Description** — texto da recomendação (i18n-keyed)
+  - **ImpactScore** (0–100) — impacto esperado se acção for tomada
+  - **EffortEstimate:** `Low` (< 1 sprint) / `Medium` (1–2 sprints) / `High` (> 2 sprints)
+  - **AffectedServices** / **AffectedTeams** — contexto de impacto
+  - **RecommendationSource** — nome do relatório de origem
+  - **EvidenceLinks** — referências aos relatórios específicos com dados de suporte
+- **Top10Recommendations** — ranking por `ImpactScore / EffortMultiplier` (prioridade de ROI máximo)
+- **CategoryDistribution** — distribuição de recomendações por categoria (visão executiva de onde está a maior dívida)
+- **RecommendationActionability** — % de recomendações com EffortEstimate Low ou Medium (o que pode ser resolvido neste sprint)
+- **TenantActionPrioritySummary** — para Executive: 3 bullet points de máxima prioridade gerados automaticamente com linguagem de negócio
+- **RefreshedAt** — timestamp de geração (recomendações são geradas on-demand ou via job diário)
+- Endpoint: `GET /api/v1/platform/recommendations` + job Quartz.NET (refresh diário)
+
+**Orientado para Platform Admin, Tech Lead e Executive** — fecha o ciclo de valor do NexTraceOne: não apenas "medir e reportar" mas "recomendar acções priorizadas" — transformando dados em decisões accionáveis sem requerer que o utilizador leia todos os relatórios individualmente.
+
+#### Configuração Wave AU
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `platform.config_drift.stale_days` | 90 | 13280 | Dias sem actualização para ConfigKey ser Stale |
+| `platform.config_drift.high_impact_modules` | `"governance,sre,sbom"` | 13290 | Módulos cujas config keys são HighImpact (CSV) |
+| `platform.health.freshness_days` | 30 | 13300 | Dias máximos para DataFreshness por entidade |
+| `platform.health.optimized_threshold` | 85 | 13310 | PlatformHealthIndex mínimo para tier Optimized |
+| `platform.health.operational_threshold` | 65 | 13320 | PlatformHealthIndex mínimo para tier Operational |
+| `platform.recommendations.top_n` | 10 | 13330 | Número de recomendações a apresentar no Top |
+| `platform.recommendations.refresh_cron` | `0 6 * * *` | 13340 | Cron para refresh diário de recomendações |
+| `platform.recommendations.low_effort_sprints` | 1 | 13350 | Sprints máximos para EffortEstimate Low |
+
+#### i18n Wave AU
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `configurationDrift.*` — drift de configuração entre ambientes, DivergenceType, RolloutReadinessBlocks e recomendações de alinhamento
+- `platformHealthIndex.*` — índice de saúde da plataforma NexTraceOne, 7 dimensões, PlatformHealthTier e ValueRealizationScore
+- `adaptiveRecommendations.*` — motor de recomendações adaptativas, ImpactScore, EffortEstimate, CategoryDistribution e TenantActionPrioritySummary
+
+**Totais estimados Wave AU:** Foundation/CG/OI: ~46 testes (AU.1 ~14 + AU.2 ~16 + AU.3 ~16). Configuração: +8 config keys (sort 13280–13350). i18n: +3 secções (4 locales). 2 novos endpoints REST (`/platform/configuration-drift` + `/platform/recommendations`). 1 job Quartz.NET (refresh diário de recomendações). **Wave AU PLANEADA**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -3347,6 +3763,19 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 118. 🔲 **Wave AQ.2** — `GetSchemaQualityIndexReport` — qualidade de schema por contrato: SchemaQualityScore (5 dims: Descriptions 25%+Examples 25%+ErrorCodes 20%+FieldConstraints 15%+Enums 15%), SchemaQualityTier (Excellent/Good/Fair/Poor), TenantSchemaHealthScore, WorstQualityContracts, QualityImprovementHints, QualityTrend mensal. Catalog. Config: `schema_quality.*` sort 12980–12990.
 119. 🔲 **Wave AQ.3** — `GetSchemaEvolutionSafetyReport` — segurança evolutiva de schemas: BreakingChangeRate, SafeEvolutionRate, ConsumerNotificationRate, EvolutionSafetyTier (Safe/Cautious/Risky/Dangerous), BreakingChangesWithIncidentCorrelation, ProtocolBreakingRateComparison, EvolutionPatternRecommendations, migration `DataContractRecords` (partilhada AQ.1). Catalog/CG. Config: `schema_evolution.*` sort 13000–13030. **Wave AQ PLANEADA**.
 
+120. 🔲 **Wave AR.1** — `GetServiceTopologyHealthReport` — saúde do grafo de dependências: OrphanServices, HubServices (FanIn ≥ threshold), CircularDependencies, IsolatedClusters, TopologyFreshnessScore, TopologyHealthTier (Healthy/Warning/Degraded/Critical), TenantTopologyHealthScore, ArchitectureRecommendations. Catalog. Config: `topology.freshness_days` + `topology.hub_fanin_threshold` + `topology.health.*` sort 13040–13070.
+121. 🔲 **Wave AR.2** — `GetCriticalPathReport` — análise de critical path: CriticalPathChains (top N por profundidade), MaxDependencyDepth, BottleneckServices, CascadeRiskScore (FanOut 40%+PathPresence 40%+CustomerFacingDownstream 20%), TopCascadeRiskServices top 10, DepthDistribution, TenantCriticalPathIndex. Endpoint `/topology/critical-path`. Catalog. Config: `topology.critical_path.*` sort 13080–13090.
+122. 🔲 **Wave AR.3** — `GetDependencyVersionAlignmentReport` — alinhamento de versões de dependências (requer Wave AO.1 `SbomRecord`): VersionSpread, AlignmentTier (Aligned/MinorDrift/MajorDrift/SecurityRisk), CrossTeamInconsistencies, CriticalAlignmentGaps, AlignmentUpgradeMap, TenantAlignmentScore. Catalog. Config: `topology.alignment.*` sort 13100–13110. **Wave AR PLANEADA**.
+123. 🔲 **Wave AS.1** — `FeatureFlagRecord`+`IngestFeatureFlagState`+`GetFeatureFlagInventoryReport` — inventário de feature flags: FlagType (Release/Experiment/Permission/Kill-switch), StaleFlagsCount, OwnerlessFlags, KillSwitchCount, FlagsInAllEnvironments, migration `FeatureFlagRecords`. Endpoints `POST /feature-flags/ingest` + `GET /feature-flags/inventory`. Catalog/Foundation. Config: `feature_flags.*` sort 13120–13190.
+124. 🔲 **Wave AS.2** — `GetFeatureFlagRiskReport` — risco de feature flags: FlagRiskScore (Staleness 30%+Ownership 25%+ProdPresence 30%+IncidentCorrelation 15%), FlagRiskTier (Safe/Monitor/Review/Urgent), ScheduledRemovalOverdue, ToggleWithIncidentCorrelation, RecommendedRemovals, TenantFlagRiskIndex. Catalog/CG. Config: (partilhada AS.1).
+125. 🔲 **Wave AS.3** — `GetExperimentGovernanceReport` — governança de experimentação A/B: ExperimentStatus (Active/Overdue/Stale/Concluded), MetricImpact (SLO/latência vs. período anterior), ExperimentGovernanceTier (Governed/Improving/AtRisk/Unmanaged), LongRunningExperiments, ExperimentProdOnlyRisk, TenantExperimentGovernanceScore. Catalog/OI. Config: (partilhada AS.1). **Wave AS PLANEADA**.
+126. 🔲 **Wave AT.1** — `ModelPredictionSample`+`IngestModelPredictionSample`+`GetModelDriftReport` — drift de modelo: InputDriftScore (PSI simplificado), OutputDriftScore, ConfidenceDrift, ModelDriftTier (Stable/Warning/Drifting/Critical), DriftTimeline 30d, DriftAlerts, migration `ModelPredictionSamples`. AI/OI. Config: `ai.model_drift.*` sort 13200–13210.
+127. 🔲 **Wave AT.2** — `GetAiModelQualityReport` — qualidade de modelos IA em produção: AccuracyRate (quando feedback disponível), LowConfidencePredictionRate, InferenceLatencyP50/P95, FallbackRate, QualityTrend, ModelQualityTier (Excellent/Good/Degraded/Poor), TenantAiQualityScore, QualityAnomalies. AI/OI. Config: `ai.model_quality.*` sort 13220–13240.
+128. 🔲 **Wave AT.3** — `GetAiGovernanceComplianceReport` — compliance de governança de IA: HasFormalApproval, HasAuditTrail, BudgetComplianceRate, PolicyAdherence, ModelGovernanceTier (Compliant/Partial/NonCompliant/Untracked), TenantAiGovernanceScore, ComplianceGaps (ModelsWithoutApproval/BudgetOverruns), AiGovernanceComplianceIndex. Endpoint `/ai/governance/compliance-report`. AI/CG. Config: `ai.governance.*` sort 13250–13270. **Wave AT PLANEADA**.
+129. 🔲 **Wave AU.1** — `GetConfigurationDriftReport` — drift de configuração entre ambientes: ValueByEnvironment por ConfigKey, DivergenceType (Intentional/Unexplained/Stale), ConfigDriftTier (Aligned/MinorDrift/MajorDrift/Critical), RolloutReadinessBlocks, TenantConfigurationHealthScore, ConfigAlignmentRecommendations. Endpoint `/platform/configuration-drift`. Foundation/CG. Config: `platform.config_drift.*` sort 13280–13290.
+130. 🔲 **Wave AU.2** — `GetPlatformHealthIndexReport` — índice de saúde da plataforma NexTraceOne: 7 dimensões (ServiceCatalogCompleteness 15%+ContractCoverage 15%+ChangeGovernanceAdoption 15%+SloGovernanceAdoption 15%+ObservabilityContextualization 10%+AiGovernanceReadiness 15%+DataFreshness 15%), PlatformHealthTier (Optimized/Operational/Partial/Underutilized), TenantBenchmarkPosition (via Wave D.2 consent), ValueRealizationScore. Foundation. Config: `platform.health.*` sort 13300–13320.
+131. 🔲 **Wave AU.3** — `GetAdaptiveRecommendationReport` — motor de recomendações adaptativas cross-wave: Top10Recommendations por ImpactScore/EffortMultiplier, Category (Reliability/Security/Governance/Quality/Adoption), EffortEstimate (Low/Medium/High), EvidenceLinks para relatórios de origem, TenantActionPrioritySummary (3 bullet points executivos), job Quartz.NET refresh diário. Endpoint `/platform/recommendations`. Foundation. Config: `platform.recommendations.*` sort 13330–13350. **Wave AU PLANEADA**.
+
 ### Riscos e recomendações transversais
 
 - **Feature sprawl** — resistir à tentação de criar módulos novos; preferir aprofundar existentes (Wave A > Wave B).
@@ -3373,3 +3802,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 12. **Waves AF–AI (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 84–95 da lista de priorização. **Wave AF** (Service Lifecycle Governance): AF.1 `GetServiceLifecycleTransitionReport` + AF.2 `GetServiceRetirementReadinessReport` + AF.3 `GetServiceMigrationProgressReport`. +8 config keys (sort 12080–12150). **Wave AG** (FinOps Advanced Attribution): AG.1 `GetEnvironmentCostComparisonReport` + AG.2 `GetCostPerReleaseReport` + AG.3 `GetFinOpsWasteAnalysisReport`. +8 config keys (sort 12160–12230). **Wave AH** (Event-Driven Architecture Governance): AH.1 `GetEventSchemaEvolutionReport` + AH.2 `GetEventProducerConsumerBalanceReport` + AH.3 `GetEventContractComplianceReport`. +8 config keys (sort 12240–12310). **Wave AI** (Predictive Intelligence & Forecasting): AI.1 `GetDeploymentRiskForecastReport` + AI.2 `GetCapacityTrendForecastReport` + AI.3 `GetIncidentProbabilityReport`. +8 config keys (sort 12320–12390). 1 novo endpoint REST (`/risk-forecast`). 1 job Quartz.NET (refresh de incident probability). Total: +32 config keys (sort 12080–12390). Testes estimados: +210 (Catalog +~84, OI +~113, CG +~13). i18n: +12 secções em 4 locales.
 13. **Waves AJ–AM (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 96–107 da lista de priorização. **Wave AJ** (Multi-Tenant Governance Intelligence): AJ.1 `GetCrossTenantMaturityReport` + AJ.2 `GetTenantHealthScoreReport` + AJ.3 `GetPlatformPolicyComplianceReport`. +8 config keys (sort 12400–12470). 1 novo endpoint REST (`/governance/maturity/cross-tenant-benchmark`). 1 job Quartz.NET (TenantHealthScore refresh diário). **Wave AK** (Developer Experience & Notification Management): AK.1 IDE Context API + `IDESessionToken` + `IDEUsageRecord` + AK.2 Notification Engine (`NotificationChannel`+`NotificationSubscription`+`NotificationOutbox`+3 features) + AK.3 `GetNotificationEffectivenessReport`. +8 config keys (sort 12480–12550). Migrations: 3 (`IDEUsageRecords` + 2 Notification). **Wave AL** (Audit Intelligence & Traceability Analytics): AL.1 `GetAuditTrailCompletenessReport` + AL.2 `GetUserActionAuditReport` + AL.3 `GetChangeTraceabilityReport`. +8 config keys (sort 12560–12630). 2 novos endpoints REST (`/audit/users/{id}/action-report` + `/changes/releases/{id}/traceability`). **Wave AM** (Auto-Cataloging & Service Discovery Intelligence): AM.1 `GetUncatalogedServicesReport` + AM.2 `GetContractDriftFromRealityReport` + AM.3 `GetCatalogHealthMaintenanceReport`. +8 config keys (sort 12640–12710). Total: +32 config keys (sort 12400–12710). Testes estimados: +157 (CG +~45, IA +~30, Catalog +~46, Foundation +~36). i18n: +12 secções em 4 locales.
 14. **Waves AN–AQ (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 108–119 da lista de priorização. **Wave AN** (SRE Intelligence & Error Budget Management): AN.1 `GetErrorBudgetReport` (BurnRate, DaysToExhaustion, ErrorBudgetTier, FreezeRecommendations) + AN.2 `GetIncidentImpactScorecardReport` (4-dim score, TeamReliabilityTier, RepeatOffenderServices) + AN.3 `GetSreMaturityIndexReport` (6 práticas SRE, SreMaturityTier Elite/Advanced/Practicing/Foundational). +8 config keys (sort 12720–12790). 1 endpoint REST. **Wave AO** (Supply Chain & Dependency Provenance): AO.1 `SbomRecord`+`IngestSbomRecord`+`GetSbomCoverageReport` (SbomCoverageTier, LicenseRiskFlags) + AO.2 `GetDependencyProvenanceReport` (ProvenanceTier, SinglePointOfFailureComponents) + AO.3 `GetSupplyChainRiskReport` (ComponentRiskScore, SupplyChainRiskTier, PrioritizedPatchList). +8 config keys (sort 12800–12870). Migration `SbomRecords`. **Wave AP** (Collaborative Governance & Workflow Automation): AP.1 `GetApprovalWorkflowReport` (ApprovalTier, BottleneckApprovers, ApprovalHeatmap) + AP.2 `GetPeerReviewCoverageReport` (ReviewerConcentrationIndex, ReviewCompletionTier) + AP.3 `GetGovernanceEscalationReport` (BreakGlass, JIT, EscalationRiskTier). +8 config keys (sort 12880–12950). 1 endpoint REST. **Wave AQ** (Data Observability & Schema Quality): AQ.1 `DataContractRecord`+`RegisterDataContract`+`GetDataContractComplianceReport` (DataContractTier Governed/Partial/Unmanaged) + AQ.2 `GetSchemaQualityIndexReport` (5-dim SchemaQualityScore, QualityTrend mensal) + AQ.3 `GetSchemaEvolutionSafetyReport` (EvolutionSafetyTier Safe→Dangerous, ProtocolBreakingRateComparison). +8 config keys (sort 12960–13030). Migration `DataContractRecords`. 1 job Quartz.NET. Total: +32 config keys (sort 12720–13030). Testes estimados: +173 (OI +~39, Catalog +~91, CG +~43). i18n: +12 secções em 4 locales. 2 novas migrations. 3 novos endpoints REST.
+15. **Waves AR–AU (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 120–131 da lista de priorização. **Wave AR** (Service Topology Intelligence & Dependency Mapping): AR.1 `GetServiceTopologyHealthReport` (OrphanServices, CircularDependencies, HubServices, TopologyHealthTier) + AR.2 `GetCriticalPathReport` (CriticalPathChains, CascadeRiskScore, BottleneckServices; endpoint `/topology/critical-path`) + AR.3 `GetDependencyVersionAlignmentReport` (AlignmentTier Aligned→SecurityRisk, CrossTeamInconsistencies; requer Wave AO.1). +8 config keys (sort 13040–13110). **Wave AS** (Feature Flag & Experimentation Governance): AS.1 `FeatureFlagRecord`+`IngestFeatureFlagState`+`GetFeatureFlagInventoryReport` (FlagType Release/Experiment/Permission/Kill-switch; migration `FeatureFlagRecords`) + AS.2 `GetFeatureFlagRiskReport` (FlagRiskTier Safe→Urgent, ScheduledRemovalOverdue) + AS.3 `GetExperimentGovernanceReport` (ExperimentGovernanceTier Governed→Unmanaged, MetricImpact, ExperimentProdOnlyRisk). +8 config keys (sort 13120–13190). Migration `FeatureFlagRecords`. 2 endpoints REST. **Wave AT** (AI Model Quality & Drift Governance): AT.1 `ModelPredictionSample`+`IngestModelPredictionSample`+`GetModelDriftReport` (InputDriftScore PSI, ModelDriftTier Stable→Critical; migration `ModelPredictionSamples`) + AT.2 `GetAiModelQualityReport` (AccuracyRate, LowConfidencePredictionRate, InferenceLatencyP95, ModelQualityTier) + AT.3 `GetAiGovernanceComplianceReport` (ModelGovernanceTier Compliant→Untracked, AiGovernanceComplianceIndex; endpoint `/ai/governance/compliance-report`). +8 config keys (sort 13200–13270). Migration `ModelPredictionSamples`. 1 endpoint REST. **Wave AU** (Platform Self-Optimization & Adaptive Intelligence): AU.1 `GetConfigurationDriftReport` (DivergenceType Intentional/Unexplained/Stale, ConfigDriftTier, RolloutReadinessBlocks; endpoint `/platform/configuration-drift`) + AU.2 `GetPlatformHealthIndexReport` (7-dim index, PlatformHealthTier Optimized→Underutilized, ValueRealizationScore, TenantBenchmarkPosition) + AU.3 `GetAdaptiveRecommendationReport` (motor cross-wave, Top10 por ImpactScore/Effort, TenantActionPrioritySummary executivo; endpoint `/platform/recommendations`; job Quartz.NET diário). +8 config keys (sort 13280–13350). 3 endpoints REST. 1 job Quartz.NET. Total: +32 config keys (sort 13040–13350). Testes estimados: +182 (Catalog/Foundation +~92, AI/OI +~44, CG/Foundation +~46). i18n: +12 secções em 4 locales. 2 novas migrations. 6 novos endpoints REST. 1 job Quartz.NET adicional.
