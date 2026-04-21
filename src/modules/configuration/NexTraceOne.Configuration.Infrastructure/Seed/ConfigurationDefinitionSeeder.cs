@@ -8301,5 +8301,87 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "200",
             uiEditorType: "number",
             sortOrder: 10710),
+
+        // ── Wave N ────────────────────────────────────────────────────────────
+
+        CreateDefinition(
+            key: "slo.service.ranking.lookback_days",
+            displayName: "config.slo.service.ranking.lookback_days.name",
+            description: "config.slo.service.ranking.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10720),
+
+        CreateDefinition(
+            key: "slo.service.ranking.max_services",
+            displayName: "config.slo.service.ranking.max_services.name",
+            description: "config.slo.service.ranking.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10730),
+
+        CreateDefinition(
+            key: "slo.service.ranking.excellent_threshold",
+            displayName: "config.slo.service.ranking.excellent_threshold.name",
+            description: "config.slo.service.ranking.excellent_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            defaultValue: "95.0",
+            uiEditorType: "number",
+            sortOrder: 10740),
+
+        CreateDefinition(
+            key: "risk.trend.max_high_risk_services",
+            displayName: "config.risk.trend.max_high_risk_services.name",
+            description: "config.risk.trend.max_high_risk_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10750),
+
+        CreateDefinition(
+            key: "risk.trend.high_risk_threshold",
+            displayName: "config.risk.trend.high_risk_threshold.name",
+            description: "config.risk.trend.high_risk_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 10760),
+
+        CreateDefinition(
+            key: "evidence.pack.coverage.lookback_days",
+            displayName: "config.evidence.pack.coverage.lookback_days.name",
+            description: "config.evidence.pack.coverage.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10770),
+
+        CreateDefinition(
+            key: "evidence.pack.coverage.max_uncovered",
+            displayName: "config.evidence.pack.coverage.max_uncovered.name",
+            description: "config.evidence.pack.coverage.max_uncovered.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10780),
+
+        CreateDefinition(
+            key: "evidence.pack.coverage.completeness_threshold",
+            displayName: "config.evidence.pack.coverage.completeness_threshold.name",
+            description: "config.evidence.pack.coverage.completeness_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10790),
     ];
 }

@@ -14094,5 +14094,86 @@
       "invalidMaxMetrics": "Max metrics must be between 1 and 50.",
       "invalidPageSize": "Page size must be between 10 and 500."
     }
+  },
+  "sloServiceRanking": {
+    "title": "SLO Service Ranking Report",
+    "description": "Ranks services by SLO compliance rate in the selected period.",
+    "totalServices": "Total Services",
+    "servicesExcellent": "Excellent",
+    "servicesGood": "Good",
+    "servicesStruggling": "Struggling",
+    "totalObservations": "Total Observations",
+    "totalBreaches": "Total Breaches",
+    "tenantAvgCompliance": "Tenant Avg Compliance",
+    "complianceRate": "Compliance Rate",
+    "metCount": "Met",
+    "warningCount": "Warnings",
+    "breachedCount": "Breaches",
+    "avgObserved": "Avg Observed",
+    "avgTarget": "Avg Target",
+    "healthTier": "Health",
+    "tiers": {
+      "Excellent": "Excellent",
+      "Good": "Good",
+      "Struggling": "Struggling",
+      "Unknown": "Unknown"
+    },
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 1 and 365.",
+      "invalidMaxServices": "Max services must be between 1 and 200.",
+      "invalidThreshold": "Excellent threshold must be greater than Good threshold."
+    }
+  },
+  "riskTrend": {
+    "title": "Risk Trend Report",
+    "description": "Distribution of services by risk level and ranking of the highest-risk services.",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "highCriticalPercent": "High/Critical %",
+    "avgOverallRiskScore": "Avg Overall Risk Score",
+    "riskDistribution": "Risk Distribution",
+    "dimensionAverages": "Dimension Averages",
+    "topHighRiskServices": "Top High-Risk Services",
+    "riskLevel": "Risk Level",
+    "overallScore": "Overall Score",
+    "vulnerabilityScore": "Vulnerability",
+    "changeFailureScore": "Change Failure",
+    "blastRadiusScore": "Blast Radius",
+    "policyViolationScore": "Policy Violation",
+    "activeSignals": "Active Signals",
+    "levels": {
+      "Negligible": "Negligible",
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidMaxHighRiskServices": "Max high-risk services must be between 1 and 100.",
+      "invalidHighRiskThreshold": "High-risk threshold must be between 1 and 100."
+    }
+  },
+  "evidencePackCoverage": {
+    "title": "Evidence Pack Coverage Report",
+    "description": "Coverage analysis of evidence packs against releases in the selected period.",
+    "totalReleases": "Total Releases",
+    "releasesWithPack": "With Pack",
+    "releasesWithoutPack": "Without Pack",
+    "coveragePercent": "Coverage %",
+    "signedPackPercent": "Signed Packs %",
+    "completePackPercent": "Complete Packs %",
+    "byEnvironment": "By Environment",
+    "uncoveredReleases": "Uncovered Releases",
+    "environment": "Environment",
+    "serviceName": "Service",
+    "version": "Version",
+    "createdAt": "Created At",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 1 and 365.",
+      "invalidMaxUncovered": "Max uncovered releases must be between 1 and 100.",
+      "invalidCompletenessThreshold": "Completeness threshold must be between 0 and 100."
+    }
   }
 }

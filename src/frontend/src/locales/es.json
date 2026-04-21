@@ -14104,5 +14104,86 @@
       "invalidMaxMetrics": "El máximo de métricas debe estar entre 1 y 50.",
       "invalidPageSize": "El tamaño de página debe estar entre 10 y 500."
     }
+  },
+  "sloServiceRanking": {
+    "title": "Ranking de Conformidad SLO por Servicio",
+    "description": "Clasifica los servicios por tasa de conformidad SLO en el período seleccionado.",
+    "totalServices": "Total de Servicios",
+    "servicesExcellent": "Excelentes",
+    "servicesGood": "Buenos",
+    "servicesStruggling": "Con Dificultades",
+    "totalObservations": "Total de Observaciones",
+    "totalBreaches": "Total de Infracciones",
+    "tenantAvgCompliance": "Conformidad Media del Tenant",
+    "complianceRate": "Tasa de Conformidad",
+    "metCount": "Cumplidos",
+    "warningCount": "Avisos",
+    "breachedCount": "Infracciones",
+    "avgObserved": "Observado Medio",
+    "avgTarget": "Objetivo Medio",
+    "healthTier": "Salud",
+    "tiers": {
+      "Excellent": "Excelente",
+      "Good": "Bueno",
+      "Struggling": "Con Dificultades",
+      "Unknown": "Desconocido"
+    },
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de lookback deben estar entre 1 y 365.",
+      "invalidMaxServices": "El máximo de servicios debe estar entre 1 y 200.",
+      "invalidThreshold": "El umbral Excellent debe ser mayor que el umbral Good."
+    }
+  },
+  "riskTrend": {
+    "title": "Informe de Tendencia de Riesgo",
+    "description": "Distribución de servicios por nivel de riesgo y ranking de los servicios de mayor riesgo.",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "highCriticalPercent": "% Alto/Crítico",
+    "avgOverallRiskScore": "Puntuación Media Global de Riesgo",
+    "riskDistribution": "Distribución de Riesgo",
+    "dimensionAverages": "Medias por Dimensión",
+    "topHighRiskServices": "Servicios de Mayor Riesgo",
+    "riskLevel": "Nivel de Riesgo",
+    "overallScore": "Puntuación Global",
+    "vulnerabilityScore": "Vulnerabilidad",
+    "changeFailureScore": "Fallo de Cambio",
+    "blastRadiusScore": "Radio de Impacto",
+    "policyViolationScore": "Violación de Política",
+    "activeSignals": "Señales Activas",
+    "levels": {
+      "Negligible": "Negligible",
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidMaxHighRiskServices": "El máximo de servicios de alto riesgo debe estar entre 1 y 100.",
+      "invalidHighRiskThreshold": "El umbral de alto riesgo debe estar entre 1 y 100."
+    }
+  },
+  "evidencePackCoverage": {
+    "title": "Cobertura de Evidence Packs",
+    "description": "Análisis de cobertura de evidence packs respecto a las releases en el período seleccionado.",
+    "totalReleases": "Total de Releases",
+    "releasesWithPack": "Con Pack",
+    "releasesWithoutPack": "Sin Pack",
+    "coveragePercent": "Cobertura %",
+    "signedPackPercent": "Packs Firmados %",
+    "completePackPercent": "Packs Completos %",
+    "byEnvironment": "Por Entorno",
+    "uncoveredReleases": "Releases Sin Cobertura",
+    "environment": "Entorno",
+    "serviceName": "Servicio",
+    "version": "Versión",
+    "createdAt": "Creado El",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de lookback deben estar entre 1 y 365.",
+      "invalidMaxUncovered": "El máximo de releases sin cobertura debe estar entre 1 y 100.",
+      "invalidCompletenessThreshold": "El umbral de completitud debe estar entre 0 y 100."
+    }
   }
 }

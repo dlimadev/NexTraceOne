@@ -953,6 +953,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 29. ✅ **Wave M.1** — `GetContractHealthDistributionReport` — distribuição de scores de saúde de contratos: 4 bandas (Healthy/Fair/AtRisk/Critical), médias por dimensão (6 dimensões), top contratos críticos. Catalog: 1802 testes (+19).
 30. ✅ **Wave M.2** — `GetTeamChangeVelocityReport` — velocidade de mudança por equipa: releases/semana, taxa de sucesso/falha/rollback, participação no tenant, `VelocityTier` (HighVolume/Moderate/LowFrequency/Inactive). CG: 760 testes (+15).
 31. ✅ **Wave M.3** — `GetOpenDriftImpactSummary` — sumário de drifts abertos: serviços mais afetados, métricas mais desviantes, distribuição de severidade (Low/Medium/High/Critical), desvio médio e máximo global. OI: 1068 testes (+21). **WAVE M COMPLETO**.
+32. ✅ **Wave N.1** — `GetSloServiceRankingReport` — ranking de serviços por taxa de conformidade SLO: bandas Excellent/Good/Struggling, médias de valor observado vs alvo, contagens de Met/Warning/Breached, tenant avg compliance rate. OI: 1081 testes (+13).
+33. ✅ **Wave N.2** — `GetRiskTrendReport` — distribuição de risco por nível (Negligible/Low/Medium/High/Critical), top serviços de alto risco com score por dimensão (vuln 40%/change_failure 25%/blast_radius 20%/policy 15%), % alto/crítico no tenant. CG: 783 testes (+11).
+34. ✅ **Wave N.3** — `GetEvidencePackCoverageReport` — cobertura de evidence packs por releases: coverage%, signed packs%, complete packs%, breakdown por ambiente, lista de releases sem cobertura (até N). CG: 783 testes (+12). **WAVE N COMPLETO**.
 
 ### Riscos e recomendações transversais
 
