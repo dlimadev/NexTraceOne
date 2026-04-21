@@ -8035,5 +8035,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "20",
             uiEditorType: "number",
             sortOrder: 10470),
+
+        // ── Wave K.1 — Chaos Engineering Analytics ─────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "chaos.analytics.report_lookback_days",
+            displayName: "config.chaos.analytics.report_lookback_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.chaos.analytics.report_lookback_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10480),
+
+        ConfigurationDefinition.Create(
+            key: "chaos.analytics.max_experiments_in_report",
+            displayName: "config.chaos.analytics.max_experiments_in_report.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.chaos.analytics.max_experiments_in_report.description",
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 10490),
+
+        // ── Wave K.2 — CMMC 2.0 Compliance ─────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.cmmc.enabled",
+            displayName: "config.compliance.cmmc.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.cmmc.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10500),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.cmmc.report_period_days",
+            displayName: "config.compliance.cmmc.report_period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.cmmc.report_period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10510),
+
+        // ── Wave K.3 — Change Frequency Analytics ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "change.frequency.heatmap.max_days",
+            displayName: "config.change.frequency.heatmap.max_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.heatmap.max_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10520),
+
+        ConfigurationDefinition.Create(
+            key: "change.frequency.cadence.high_performer_threshold",
+            displayName: "config.change.frequency.cadence.high_performer_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.cadence.high_performer_threshold.description",
+            defaultValue: "1.0",
+            uiEditorType: "number",
+            sortOrder: 10530),
+
+        ConfigurationDefinition.Create(
+            key: "change.frequency.cadence.low_performer_threshold",
+            displayName: "config.change.frequency.cadence.low_performer_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.cadence.low_performer_threshold.description",
+            defaultValue: "0.0357",
+            uiEditorType: "number",
+            sortOrder: 10540),
+
+        ConfigurationDefinition.Create(
+            key: "change.frequency.cadence.max_services",
+            displayName: "config.change.frequency.cadence.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.cadence.max_services.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10550),
     ];
 }

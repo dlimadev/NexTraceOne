@@ -13851,5 +13851,99 @@
       "releaseNotFound": "Release no encontrada.",
       "invalidReleaseId": "Se requiere un ID de release válido."
     }
+  },
+  "chaosExperimentReport": {
+    "title": "Informe de Chaos Engineering",
+    "subtitle": "Informe analítico de experimentos de chaos: tasa de éxito, distribución de experimentos y servicios más probados.",
+    "totalExperiments": "Total de Experimentos",
+    "successRate": "Tasa de Éxito (%)",
+    "averageDuration": "Duración Media (s)",
+    "byType": "Experimentos por Tipo",
+    "byRiskLevel": "Experimentos por Nivel de Riesgo",
+    "byStatus": "Distribución por Estado",
+    "topServices": "Top Servicios Probados",
+    "mostRecentAt": "Experimento Más Reciente",
+    "status": {
+      "Planned": "Planificado",
+      "Running": "En Ejecución",
+      "Completed": "Completado",
+      "Failed": "Fallido",
+      "Cancelled": "Cancelado"
+    },
+    "riskLevel": {
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto"
+    },
+    "errors": {
+      "noExperiments": "No se encontraron experimentos de chaos para el filtro especificado.",
+      "tenantRequired": "El ID de tenant es obligatorio."
+    }
+  },
+  "cmmcCompliance": {
+    "title": "Informe de Conformidad CMMC 2.0",
+    "subtitle": "Estado de conformidad CMMC Level 2 basado en gobernanza de cambios, pista de auditoría y packs de evidencia.",
+    "cmmcLevel": "Nivel CMMC",
+    "practices": {
+      "ac1001": "Limitar Acceso a Usuarios Autorizados",
+      "ia1076": "Identificar Usuarios del Sistema de Información",
+      "au2041": "Crear y Mantener Registros de Auditoría",
+      "ir2092": "Establecer Capacidad de Respuesta a Incidentes",
+      "rm2141": "Evaluar Periódicamente el Riesgo Organizacional"
+    },
+    "overallStatus": "Estado General",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Packs de Evidencia Firmados",
+    "totalEvidencePacks": "Total de Packs de Evidencia",
+    "generatedAt": "Informe Generado En",
+    "periodDays": "Período de Evaluación (días)",
+    "errors": {
+      "notEnabled": "El informe de conformidad CMMC no está habilitado para este tenant.",
+      "invalidPeriod": "El período de evaluación debe estar entre 1 y 365 días."
+    }
+  },
+  "changeFrequency": {
+    "heatmap": {
+      "title": "Heatmap de Frecuencia de Despliegue",
+      "subtitle": "Distribución de despliegues por día de la semana y hora del día (UTC). Identifica patrones y ventanas de riesgo.",
+      "totalDeploys": "Total de Despliegues",
+      "maxCellCount": "Pico de Celda",
+      "peakDay": "Día Pico de la Semana",
+      "peakHour": "Hora Pico (UTC)",
+      "byDayOfWeek": "Despliegues por Día de la Semana",
+      "days": {
+        "0": "Domingo",
+        "1": "Lunes",
+        "2": "Martes",
+        "3": "Miércoles",
+        "4": "Jueves",
+        "5": "Viernes",
+        "6": "Sábado"
+      },
+      "errors": {
+        "noData": "No se encontraron despliegues para el filtro especificado.",
+        "invalidDays": "El período debe estar entre 7 y 90 días."
+      }
+    },
+    "cadence": {
+      "title": "Informe de Cadencia de Despliegue",
+      "subtitle": "Clasificación de cadencia de despliegue por servicio alineada con DORA. Identifica high performers y servicios que necesitan mejora.",
+      "totalServices": "Total de Servicios",
+      "totalDeploys": "Total de Despliegues",
+      "overallCadence": "Cadencia Global",
+      "distribution": "Distribución de Cadencia",
+      "deploysPerDay": "Despliegues / Día",
+      "deploysPerWeek": "Despliegues / Semana",
+      "classification": {
+        "HighPerformer": "Alto Rendimiento",
+        "Medium": "Medio",
+        "LowPerformer": "Bajo Rendimiento",
+        "Insufficient": "Datos Insuficientes"
+      },
+      "errors": {
+        "noData": "No se encontraron datos de despliegue para el filtro especificado.",
+        "invalidDays": "El período debe estar entre 7 y 90 días."
+      }
+    }
   }
 }

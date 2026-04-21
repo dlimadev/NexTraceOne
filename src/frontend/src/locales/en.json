@@ -13841,5 +13841,99 @@
       "releaseNotFound": "Release not found.",
       "invalidReleaseId": "A valid release ID is required."
     }
+  },
+  "chaosExperimentReport": {
+    "title": "Chaos Engineering Report",
+    "subtitle": "Analytics report for chaos experiments: success rate, experiment distribution and top services tested.",
+    "totalExperiments": "Total Experiments",
+    "successRate": "Success Rate (%)",
+    "averageDuration": "Average Duration (s)",
+    "byType": "Experiments by Type",
+    "byRiskLevel": "Experiments by Risk Level",
+    "byStatus": "Status Distribution",
+    "topServices": "Top Tested Services",
+    "mostRecentAt": "Most Recent Experiment",
+    "status": {
+      "Planned": "Planned",
+      "Running": "Running",
+      "Completed": "Completed",
+      "Failed": "Failed",
+      "Cancelled": "Cancelled"
+    },
+    "riskLevel": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High"
+    },
+    "errors": {
+      "noExperiments": "No chaos experiments found for the specified filter.",
+      "tenantRequired": "Tenant ID is required."
+    }
+  },
+  "cmmcCompliance": {
+    "title": "CMMC 2.0 Compliance Report",
+    "subtitle": "Cybersecurity Maturity Model Certification Level 2 compliance status based on change governance, audit trail and evidence packs.",
+    "cmmcLevel": "CMMC Level",
+    "practices": {
+      "ac1001": "Limit Access to Authorized Users",
+      "ia1076": "Identify Information System Users",
+      "au2041": "Create and Retain Audit Logs",
+      "ir2092": "Establish Incident-Handling Capability",
+      "rm2141": "Periodically Assess Organizational Risk"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "CMMC compliance reporting is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "changeFrequency": {
+    "heatmap": {
+      "title": "Deployment Frequency Heatmap",
+      "subtitle": "Distribution of deployments by day of week and hour of day (UTC). Identifies deployment patterns and risk windows.",
+      "totalDeploys": "Total Deployments",
+      "maxCellCount": "Peak Cell Count",
+      "peakDay": "Peak Day of Week",
+      "peakHour": "Peak Hour (UTC)",
+      "byDayOfWeek": "Deployments by Day of Week",
+      "days": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      },
+      "errors": {
+        "noData": "No deployments found for the specified filter.",
+        "invalidDays": "Period must be between 7 and 90 days."
+      }
+    },
+    "cadence": {
+      "title": "Deployment Cadence Report",
+      "subtitle": "DORA-aligned deployment cadence classification per service. Identifies high performers and services needing improvement.",
+      "totalServices": "Total Services",
+      "totalDeploys": "Total Deployments",
+      "overallCadence": "Overall Cadence",
+      "distribution": "Cadence Distribution",
+      "deploysPerDay": "Deploys / Day",
+      "deploysPerWeek": "Deploys / Week",
+      "classification": {
+        "HighPerformer": "High Performer",
+        "Medium": "Medium",
+        "LowPerformer": "Low Performer",
+        "Insufficient": "Insufficient Data"
+      },
+      "errors": {
+        "noData": "No deployment data found for the specified filter.",
+        "invalidDays": "Period must be between 7 and 90 days."
+      }
+    }
   }
 }

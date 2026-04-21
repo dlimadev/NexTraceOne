@@ -658,6 +658,94 @@ Scorecard de maturidade v2 com 6 dimensões, pesos tier-aware e postura de vulne
 
 ---
 
+### Wave K — Chaos Analytics + CMMC 2.0 + Change Frequency Heatmap ✅ COMPLETO (Abril 2026)
+
+#### K.1 — Chaos Engineering Analytics (OperationalIntelligence)
+
+**Feature:** `GetChaosExperimentReport` — relatório analítico de todos os experimentos de chaos engineering do tenant num período configurável.
+
+**Domínio:** Operacional — aproveita o `ChaosExperiment` aggregate já existente (Wave B) e os repositórios `IChaosExperimentRepository` + `CreateChaosExperiment` + `ListChaosExperiments` já implementados.
+
+**Capacidades:**
+- Taxa de sucesso (Completed vs Completed+Failed)
+- Distribuição por tipo de experimento (`ByType`)
+- Distribuição por nível de risco (`ByRiskLevel`: Low/Medium/High)
+- Distribuição de estados (`ByStatus`: Planned/Running/Completed/Failed/Cancelled)
+- Top 5 serviços mais testados (`TopServices`)
+- Duração média dos experimentos
+- Timestamp do experimento mais recente
+- Filtro por período (1–90 dias), serviço e ambiente
+
+**Ficheiros:**
+- `src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetChaosExperimentReport/GetChaosExperimentReport.cs`
+- `tests/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Tests/Runtime/Application/ChaosExperimentReportTests.cs`
+- **~13 testes unitários** ✅ — `ChaosExperimentReportTests.cs`
+
+#### K.2 — CMMC 2.0 Compliance Report (ChangeGovernance)
+
+**Feature:** `GetCmmcComplianceReport` — relatório de conformidade CMMC 2.0 Level 2 para clientes em ambiente de Contratação Federal dos EUA (Controlled Unclassified Information).
+
+**Práticas cobertas:**
+- `AC.1.001` — Access Control: Limit Access to Authorized Users
+- `IA.1.076` — Identification & Authentication: Identify Information System Users
+- `AU.2.041` — Audit & Accountability: Create and Retain Audit Logs (scoring por evidence packs assinados)
+- `IR.2.092` — Incident Response: Establish Incident-Handling Capability
+- `RM.2.141` — Risk Management: Periodically Assess Organizational Risk
+
+**Ficheiros:**
+- `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/Compliance/Features/GetCmmcComplianceReport/GetCmmcComplianceReport.cs`
+- `tests/modules/changegovernance/NexTraceOne.ChangeGovernance.Tests/Compliance/GetCmmcComplianceReportTests.cs`
+- **~11 testes unitários** ✅ — `GetCmmcComplianceReportTests.cs`
+
+#### K.3 — Change Frequency Heatmap + Deployment Cadence Report (ChangeGovernance)
+
+**Features:**
+1. `GetChangeFrequencyHeatmap` — heatmap de deployments por (DayOfWeek × HourOfDay) em UTC. Revela padrões de cadência, picos de risco (e.g. sextas-feiras à tarde) e janelas preferenciais.
+2. `GetDeploymentCadenceReport` — classificação DORA de cadência de deployment por serviço: HighPerformer (≥1/dia), Medium (≥1/semana), LowPerformer (<1/semana), Insufficient (sem deploys no período).
+
+**Capacidades K.3a (Heatmap):**
+- Matriz 7×24 (DayOfWeek × HourOfDay)
+- Célula mais quente (`MaxCellCount`, `PeakDayOfWeek`, `PeakHourOfDay`)
+- Distribuição agregada por dia da semana (`ByDayOfWeek`)
+- Filtro por serviço, ambiente, período (7–90 dias)
+
+**Capacidades K.3b (Cadence):**
+- Classifica cada serviço em HighPerformer/Medium/LowPerformer/Insufficient
+- `DeploysPerDay` e `DeploysPerWeek` por serviço
+- Distribuição global de cadência (`Distribution`)
+- Ordered by `DeploysPerDay` desc
+- Filtro por equipa, ambiente, período (7–90 dias), max serviços (1–200)
+
+**Ficheiros:**
+- `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetChangeFrequencyHeatmap/GetChangeFrequencyHeatmap.cs`
+- `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetDeploymentCadenceReport/GetDeploymentCadenceReport.cs`
+- `tests/modules/changegovernance/NexTraceOne.ChangeGovernance.Tests/ChangeIntelligence/Application/Features/ChangeFrequencyTests.cs`
+- **~13 testes unitários** ✅ — `ChangeFrequencyTests.cs`
+
+#### Configuração Wave K
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `chaos.analytics.report_lookback_days` | 30 | 10480 | Período padrão para relatório de chaos analytics |
+| `chaos.analytics.max_experiments_in_report` | 500 | 10490 | Máximo de experimentos por relatório de analytics |
+| `compliance.cmmc.enabled` | true | 10500 | Ativa relatório CMMC 2.0 Level 2 |
+| `compliance.cmmc.report_period_days` | 90 | 10510 | Período padrão de avaliação CMMC |
+| `change.frequency.heatmap.max_days` | 90 | 10520 | Máximo de dias para heatmap de frequência |
+| `change.frequency.cadence.high_performer_threshold` | 1.0 | 10530 | Threshold de deploys/dia para HighPerformer |
+| `change.frequency.cadence.low_performer_threshold` | 0.0357 | 10540 | Threshold mínimo de deploys/dia para LowPerformer |
+| `change.frequency.cadence.max_services` | 50 | 10550 | Máximo de serviços no relatório de cadência |
+
+#### i18n Wave K
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `chaosExperimentReport.*` — relatório de chaos engineering
+- `cmmcCompliance.*` — CMMC 2.0 compliance
+- `changeFrequency.heatmap.*` + `changeFrequency.cadence.*` — heatmap e cadência
+
+**Totais Wave K:** CG: 734 testes (+25). OI: 1033 testes (+13). Configuração: +8 config keys (sort 10480–10550). i18n: +3 secções (4 locales). **WAVE K COMPLETO**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -684,6 +772,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 20. ✅ **Wave J.1** — `GetGdprComplianceReport` — GDPR: 5 controlos (Art. 5/13/17/25/33) com scoring contextual via releases, evidence packs assinados e análise de integridade. CG: 709 testes (+11).
 21. ✅ **Wave J.2** — `SloObservation` + `IngestSloObservation` + `GetSloComplianceSummary` + `GetSloViolationTrend` — SLO Tracking com classificação automática (Met/Warning/Breached), compliance summary e trend analysis (30 janelas diárias). OI: 1020 testes (+16).
 22. ✅ **Wave J.3** — `GetChangeRollbackRecommendation` — scoring composto de urgência de rollback (0–100) por confidence + blast radius + evidence integrity. 4 níveis: None/Suggest/Recommend/Critical. CG: 709 testes (+24 total). **WAVE J COMPLETO**.
+23. ✅ **Wave K.1** — `GetChaosExperimentReport` — analytics de chaos experiments: taxa de sucesso, distribuição por tipo/risco/estado, top 5 serviços, duração média. OI: 1033 testes (+13).
+24. ✅ **Wave K.2** — `GetCmmcComplianceReport` — CMMC 2.0 Level 2: 5 práticas (AC.1.001, IA.1.076, AU.2.041, IR.2.092, RM.2.141) com scoring contextual via releases e Evidence Packs assinados. CG: 734 testes (+11).
+25. ✅ **Wave K.3** — `GetChangeFrequencyHeatmap` + `GetDeploymentCadenceReport` — heatmap 7×24 de deployments + classificação DORA (HighPerformer/Medium/LowPerformer/Insufficient) por serviço. CG: 734 testes (+25 total). **WAVE K COMPLETO**.
 
 ### Riscos e recomendações transversais
 
