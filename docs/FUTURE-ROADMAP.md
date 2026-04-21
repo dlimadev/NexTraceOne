@@ -920,7 +920,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ### Wave S — Change Window Utilization + Contract Adoption + MTTR Trend
 
-**Objetivo:** Fechar o loop entre Release Calendar e conformidade de deployment, medir a velocidade de adoção de versões de contrato pelos consumidores, e introduzir análise de tendência de MTTR (Mean Time To Recovery) por serviço.
+**Objetivo:** Fechar o loop entre Release Calendar e conformidade de deployment, medir a velocidade de adoção de versões de contrato pelos consumidores, e introduzir análise de tendência de MTTR (Mean Time To Restore) por serviço.
 
 #### S.1 — GetChangeWindowUtilizationReport (ChangeGovernance)
 
@@ -965,7 +965,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 #### S.3 — GetMttrTrendReport (OperationalIntelligence)
 
-**Feature:** Tendência de MTTR (Mean Time To Recovery) por serviço e equipa. Mede a velocidade de recuperação de incidentes ao longo do tempo e compara com benchmarks DORA.
+**Feature:** Tendência de MTTR (Mean Time To Restore) por serviço e equipa. Mede a velocidade de restauro de incidentes ao longo do tempo e compara com benchmarks DORA.
 
 **Domínio:** Cruza `Incident` (`CreatedAt` → `ResolvedAt`) agrupado por `ServiceName`/`TeamId`.
 
@@ -1006,7 +1006,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `changeWindowUtilization.*` — conformidade de janelas de mudança
 - `contractAdoption.*` — adoção de versões de contratos por consumidores
-- `mttrTrend.*` — tendência de Mean Time To Recovery
+- `mttrTrend.*` — tendência de Mean Time To Restore
 
 **Totais estimados Wave S:** CG: ~867 testes (+15). Catalog: ~1873 testes (+12). OI: ~1179 testes (+18). Configuração: +8 config keys (sort 11120–11190). i18n: +3 secções (4 locales).
 
