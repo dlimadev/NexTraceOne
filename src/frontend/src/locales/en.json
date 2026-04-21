@@ -13603,5 +13603,89 @@
       "schemaTooBig": "Schema content exceeds the maximum allowed size.",
       "invalidSchema": "Schema content is invalid or could not be parsed."
     }
+  },
+  "protobufSchema": {
+    "title": "Protobuf / gRPC Schema Analysis",
+    "analyze": {
+      "title": "Analyze Protobuf Schema",
+      "success": "Protobuf schema analyzed and snapshot captured successfully."
+    },
+    "history": {
+      "title": "Schema History",
+      "empty": "No Protobuf schema snapshots found for this contract.",
+      "capturedAt": "Captured At",
+      "messageCount": "Messages",
+      "fieldCount": "Fields",
+      "serviceCount": "Services",
+      "rpcCount": "RPCs",
+      "syntax": "Syntax"
+    },
+    "diff": {
+      "title": "Breaking Change Detection",
+      "hasBreakingChanges": "Has Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Non-Breaking Changes",
+      "changeTypes": {
+        "MessageRemoved": "Message Removed",
+        "MessageAdded": "Message Added",
+        "FieldRemoved": "Field Removed",
+        "FieldAdded": "Field Added",
+        "ServiceRemoved": "Service Removed",
+        "ServiceAdded": "Service Added",
+        "RpcRemoved": "RPC Removed",
+        "RpcAdded": "RPC Added"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "Protobuf schema snapshot not found.",
+      "schemaTooBig": "Schema content exceeds the maximum allowed size (256 KB).",
+      "invalidSchema": "Schema content is invalid or could not be parsed."
+    }
+  },
+  "pciDssCompliance": {
+    "title": "PCI-DSS Compliance Report",
+    "subtitle": "PCI-DSS v4.0 compliance status based on change management, audit trail and evidence packs.",
+    "requirements": {
+      "req12": "Network Security Controls",
+      "req6": "Secure Systems and Software",
+      "req10": "Log and Monitor All Access",
+      "req11": "Security Testing",
+      "req12policy": "Organizational Policies and Programs"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "PCI-DSS compliance reporting is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "maturityV2": {
+    "title": "Service Maturity Score v2",
+    "subtitle": "Dimensional maturity scoring with tier-aware weights and vulnerability posture.",
+    "levels": {
+      "Nascente": "Nascent",
+      "Em Desenvolvimento": "Developing",
+      "Maduro": "Mature",
+      "Excelente": "Excellent"
+    },
+    "dimensions": {
+      "ownership": "Ownership",
+      "contracts": "Contracts",
+      "documentation": "Documentation",
+      "operational_readiness": "Operational Readiness",
+      "tier_compliance": "Tier Compliance",
+      "vulnerability_posture": "Vulnerability Posture"
+    },
+    "tier": "Service Tier",
+    "overallScore": "Overall Score",
+    "computedAt": "Computed At",
+    "errors": {
+      "serviceNotFound": "Service not found.",
+      "computationFailed": "Failed to compute maturity score."
+    }
   }
 }

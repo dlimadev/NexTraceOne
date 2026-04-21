@@ -7759,5 +7759,99 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "365",
             uiEditorType: "number",
             sortOrder: 10230),
+
+        // ── Wave H.1 — Protobuf Schema Analysis ──────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "protobuf.schema.max_size_kb",
+            displayName: "config.protobuf.schema.max_size_kb.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.protobuf.schema.max_size_kb.description",
+            defaultValue: "256",
+            uiEditorType: "number",
+            sortOrder: 10240),
+
+        ConfigurationDefinition.Create(
+            key: "protobuf.schema.breaking_change.strict_mode",
+            displayName: "config.protobuf.schema.breaking_change.strict_mode.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.protobuf.schema.breaking_change.strict_mode.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10250),
+
+        ConfigurationDefinition.Create(
+            key: "protobuf.schema.history.retention_days",
+            displayName: "config.protobuf.schema.history.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.protobuf.schema.history.retention_days.description",
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 10260),
+
+        // ── Wave H.2 — PCI-DSS Compliance Report ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "compliance.pci_dss.enabled",
+            displayName: "config.compliance.pci_dss.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.pci_dss.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 10270),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.pci_dss.report.period_days",
+            displayName: "config.compliance.pci_dss.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.pci_dss.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10280),
+
+        // ── Wave H.3 — Service Maturity Score v2 ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "maturity.v2.critical_tier.min_score",
+            displayName: "config.maturity.v2.critical_tier.min_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.maturity.v2.critical_tier.min_score.description",
+            defaultValue: "65",
+            uiEditorType: "number",
+            sortOrder: 10290),
+
+        ConfigurationDefinition.Create(
+            key: "maturity.v2.standard_tier.min_score",
+            displayName: "config.maturity.v2.standard_tier.min_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.maturity.v2.standard_tier.min_score.description",
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 10300),
+
+        ConfigurationDefinition.Create(
+            key: "maturity.v2.vulnerability.gate.block_on_critical",
+            displayName: "config.maturity.v2.vulnerability.gate.block_on_critical.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.maturity.v2.vulnerability.gate.block_on_critical.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10310),
     ];
 }

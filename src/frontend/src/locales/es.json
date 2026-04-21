@@ -13613,5 +13613,88 @@
       "schemaTooBig": "El contenido del schema supera el tamaño máximo permitido.",
       "invalidSchema": "El contenido del schema es inválido o no se puede analizar."
     }
+  },
+  "protobufSchema": {
+    "title": "Análisis de Schema Protobuf / gRPC",
+    "analyze": {
+      "title": "Analizar Schema Protobuf",
+      "success": "Schema Protobuf analizado y snapshot capturado con éxito."
+    },
+    "history": {
+      "title": "Historial de Schemas",
+      "empty": "No se encontraron snapshots de schema Protobuf para este contrato.",
+      "capturedAt": "Capturado En",
+      "messageCount": "Messages",
+      "fieldCount": "Campos",
+      "serviceCount": "Services",
+      "rpcCount": "RPCs",
+      "syntax": "Sintaxis"
+    },
+    "diff": {
+      "title": "Detección de Breaking Changes",
+      "hasBreakingChanges": "Tiene Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Cambios No-Breaking",
+      "changeTypes": {
+        "MessageRemoved": "Message Eliminada",
+        "MessageAdded": "Message Añadida",
+        "FieldRemoved": "Campo Eliminado",
+        "FieldAdded": "Campo Añadido",
+        "ServiceRemoved": "Service Eliminado",
+        "ServiceAdded": "Service Añadido",
+        "RpcRemoved": "RPC Eliminado",
+        "RpcAdded": "RPC Añadido"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "Snapshot de schema Protobuf no encontrado.",
+      "schemaTooBig": "El contenido del schema supera el tamaño máximo permitido (256 KB).",
+      "invalidSchema": "El contenido del schema es inválido o no se puede analizar."
+    }
+  },
+  "pciDssCompliance": {
+    "title": "Informe de Conformidad PCI-DSS",
+    "subtitle": "Estado de conformidad PCI-DSS v4.0 basado en gestión de cambios, trazabilidad de auditoría y paquetes de evidencia.",
+    "requirements": {
+      "req12": "Controles de Seguridad de Red",
+      "req6": "Sistemas y Software Seguros",
+      "req10": "Registrar y Monitorear Todo el Acceso",
+      "req11": "Pruebas de Seguridad",
+      "req12policy": "Políticas y Programas Organizacionales"
+    },
+    "overallStatus": "Estado General",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Paquetes de Evidencia Firmados",
+    "totalEvidencePacks": "Total de Paquetes de Evidencia",
+    "generatedAt": "Informe Generado En",
+    "periodDays": "Período de Evaluación (días)",
+    "errors": {
+      "notEnabled": "El reporte de conformidad PCI-DSS no está habilitado para este tenant.",
+      "invalidPeriod": "El período de evaluación debe estar entre 1 y 365 días."
+    }
+  },
+  "maturityV2": {
+    "title": "Puntuación de Madurez de Servicio v2",
+    "subtitle": "Puntuación dimensional de madurez con pesos según tier y postura de vulnerabilidad.",
+    "levels": {
+      "Nascente": "Naciente",
+      "Em Desenvolvimento": "En Desarrollo",
+      "Maduro": "Maduro",
+      "Excelente": "Excelente"
+    },
+    "dimensions": {
+      "ownership": "Ownership",
+      "contracts": "Contratos",
+      "documentation": "Documentación",
+      "operational_readiness": "Preparación Operacional",
+      "tier_compliance": "Conformidad con Tier",
+      "vulnerability_posture": "Postura de Vulnerabilidad"
+    },
+    "tier": "Tier del Servicio",
+    "overallScore": "Puntuación General",
+    "computedAt": "Calculado En",
+    "errors": {
+      "serviceNotFound": "Servicio no encontrado.",
+      "computationFailed": "Error al calcular la puntuación de madurez."
+    }
   }
-}
