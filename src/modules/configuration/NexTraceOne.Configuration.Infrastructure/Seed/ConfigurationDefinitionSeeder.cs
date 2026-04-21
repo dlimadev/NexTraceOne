@@ -9034,5 +9034,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "number",
             sortOrder: 11350),
+
+        // ── Wave V.1 — Service API Growth Report ───────────────────────────
+        ConfigurationDefinition.Create(
+            key: "catalog.service_api_growth.lookback_days",
+            displayName: "config.catalog.service_api_growth.lookback_days.name",
+            description: "config.catalog.service_api_growth.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11360),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service_api_growth.comparison_period_days",
+            displayName: "config.catalog.service_api_growth.comparison_period_days.name",
+            description: "config.catalog.service_api_growth.comparison_period_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11370),
+
+        // ── Wave V.2 — Chaos Coverage Gap Report ───────────────────────────
+        ConfigurationDefinition.Create(
+            key: "runtime.chaos_coverage_gap.lookback_days",
+            displayName: "config.runtime.chaos_coverage_gap.lookback_days.name",
+            description: "config.runtime.chaos_coverage_gap.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11380),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.chaos_coverage_gap.max_top_services",
+            displayName: "config.runtime.chaos_coverage_gap.max_top_services.name",
+            description: "config.runtime.chaos_coverage_gap.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11390),
+
+        // ── Wave V.3 — Release Frequency Deviation Report ─────────────────
+        ConfigurationDefinition.Create(
+            key: "changegovernance.release_frequency_deviation.recent_days",
+            displayName: "config.changegovernance.release_frequency_deviation.recent_days.name",
+            description: "config.changegovernance.release_frequency_deviation.recent_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11400),
+
+        ConfigurationDefinition.Create(
+            key: "changegovernance.release_frequency_deviation.historical_days",
+            displayName: "config.changegovernance.release_frequency_deviation.historical_days.name",
+            description: "config.changegovernance.release_frequency_deviation.historical_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11410),
+
+        ConfigurationDefinition.Create(
+            key: "changegovernance.release_frequency_deviation.max_top_services",
+            displayName: "config.changegovernance.release_frequency_deviation.max_top_services.name",
+            description: "config.changegovernance.release_frequency_deviation.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 11420),
+
+        ConfigurationDefinition.Create(
+            key: "changegovernance.release_frequency_deviation.accelerating_threshold_pct",
+            displayName: "config.changegovernance.release_frequency_deviation.accelerating_threshold_pct.name",
+            description: "config.changegovernance.release_frequency_deviation.accelerating_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 11430),
     ];
 }
