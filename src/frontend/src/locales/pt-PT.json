@@ -13536,5 +13536,79 @@
     "errors": {
       "profileNotFound": "Nenhum perfil de risco encontrado para este serviço."
     }
+  },
+  "soc2Compliance": {
+    "title": "Relatório de Conformidade SOC 2",
+    "overallStatus": "Estado Global",
+    "controlId": "ID do Controlo",
+    "controlName": "Controlo",
+    "periodDays": "Período de Avaliação (dias)",
+    "generatedAt": "Gerado Em",
+    "totalReleases": "Total de Releases",
+    "signedPacks": "Evidence Packs Assinados",
+    "controls": {
+      "CC6": "Controlos de Acesso Lógico e Físico",
+      "CC7": "Operações do Sistema",
+      "CC8": "Gestão de Mudanças",
+      "CC9": "Mitigação de Risco",
+      "A1": "Disponibilidade"
+    },
+    "errors": {
+      "notEnabled": "O relatório de conformidade SOC 2 não está habilitado para este tenant."
+    }
+  },
+  "iso27001Compliance": {
+    "title": "Relatório de Conformidade ISO/IEC 27001:2022",
+    "overallStatus": "Estado Global",
+    "controlId": "ID do Controlo",
+    "controlName": "Controlo",
+    "periodDays": "Período de Avaliação (dias)",
+    "generatedAt": "Gerado Em",
+    "totalReleases": "Total de Releases",
+    "signedPacks": "Evidence Packs Assinados",
+    "controls": {
+      "A.8.8": "Gestão de Vulnerabilidades Técnicas",
+      "A.8.32": "Gestão de Mudanças",
+      "A.5.26": "Resposta a Incidentes de Segurança",
+      "A.5.29": "Segurança de Informação em Perturbações",
+      "A.8.9": "Gestão de Configuração"
+    },
+    "errors": {
+      "notEnabled": "O relatório de conformidade ISO 27001 não está habilitado para este tenant."
+    }
+  },
+  "graphqlSchema": {
+    "title": "Análise de Schema GraphQL",
+    "analyze": {
+      "title": "Analisar Schema GraphQL",
+      "success": "Schema GraphQL analisado e snapshot capturado com sucesso."
+    },
+    "history": {
+      "title": "Histórico de Schemas",
+      "empty": "Nenhum snapshot de schema GraphQL encontrado para este contrato.",
+      "capturedAt": "Capturado Em",
+      "typeCount": "Tipos",
+      "fieldCount": "Campos",
+      "operationCount": "Operações"
+    },
+    "diff": {
+      "title": "Detecção de Breaking Changes",
+      "hasBreakingChanges": "Tem Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Mudanças Não-Breaking",
+      "changeTypes": {
+        "TypeRemoved": "Tipo Removido",
+        "TypeAdded": "Tipo Adicionado",
+        "FieldRemoved": "Campo Removido",
+        "FieldAdded": "Campo Adicionado",
+        "OperationRemoved": "Operação Removida",
+        "OperationAdded": "Operação Adicionada"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "Snapshot de schema GraphQL não encontrado.",
+      "schemaTooBig": "O conteúdo do schema excede o tamanho máximo permitido.",
+      "invalidSchema": "O conteúdo do schema é inválido ou não pode ser analisado."
+    }
   }
 }

@@ -13529,5 +13529,79 @@
     "errors": {
       "profileNotFound": "No risk profile found for this service."
     }
+  },
+  "soc2Compliance": {
+    "title": "SOC 2 Compliance Report",
+    "overallStatus": "Overall Status",
+    "controlId": "Control ID",
+    "controlName": "Control",
+    "periodDays": "Evaluation Period (days)",
+    "generatedAt": "Generated At",
+    "totalReleases": "Total Releases",
+    "signedPacks": "Signed Evidence Packs",
+    "controls": {
+      "CC6": "Logical and Physical Access Controls",
+      "CC7": "System Operations",
+      "CC8": "Change Management",
+      "CC9": "Risk Mitigation",
+      "A1": "Availability"
+    },
+    "errors": {
+      "notEnabled": "SOC 2 compliance report is not enabled for this tenant."
+    }
+  },
+  "iso27001Compliance": {
+    "title": "ISO/IEC 27001:2022 Compliance Report",
+    "overallStatus": "Overall Status",
+    "controlId": "Control ID",
+    "controlName": "Control",
+    "periodDays": "Evaluation Period (days)",
+    "generatedAt": "Generated At",
+    "totalReleases": "Total Releases",
+    "signedPacks": "Signed Evidence Packs",
+    "controls": {
+      "A.8.8": "Management of Technical Vulnerabilities",
+      "A.8.32": "Change Management",
+      "A.5.26": "Response to Information Security Incidents",
+      "A.5.29": "Information Security During Disruption",
+      "A.8.9": "Configuration Management"
+    },
+    "errors": {
+      "notEnabled": "ISO 27001 compliance report is not enabled for this tenant."
+    }
+  },
+  "graphqlSchema": {
+    "title": "GraphQL Schema Analysis",
+    "analyze": {
+      "title": "Analyze GraphQL Schema",
+      "success": "GraphQL schema analyzed and snapshot captured successfully."
+    },
+    "history": {
+      "title": "Schema History",
+      "empty": "No GraphQL schema snapshots found for this contract.",
+      "capturedAt": "Captured At",
+      "typeCount": "Types",
+      "fieldCount": "Fields",
+      "operationCount": "Operations"
+    },
+    "diff": {
+      "title": "Breaking Change Detection",
+      "hasBreakingChanges": "Has Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Non-Breaking Changes",
+      "changeTypes": {
+        "TypeRemoved": "Type Removed",
+        "TypeAdded": "Type Added",
+        "FieldRemoved": "Field Removed",
+        "FieldAdded": "Field Added",
+        "OperationRemoved": "Operation Removed",
+        "OperationAdded": "Operation Added"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "GraphQL schema snapshot not found.",
+      "schemaTooBig": "Schema content exceeds the maximum allowed size.",
+      "invalidSchema": "Schema content is invalid or could not be parsed."
+    }
   }
 }

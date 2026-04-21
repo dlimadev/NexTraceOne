@@ -7679,5 +7679,85 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "50",
             uiEditorType: "number",
             sortOrder: 10160),
+
+        // ── Wave G.1 — SOC 2 Compliance Report ──────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.soc2.enabled",
+            displayName: "config.compliance.soc2.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.soc2.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10170),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.soc2.report.period_days",
+            displayName: "config.compliance.soc2.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.soc2.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10180),
+
+        // ── Wave G.2 — ISO 27001 Compliance Report ───────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.iso27001.enabled",
+            displayName: "config.compliance.iso27001.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.iso27001.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10190),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.iso27001.report.period_days",
+            displayName: "config.compliance.iso27001.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.iso27001.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10200),
+
+        // ── Wave G.3 — GraphQL Schema Analysis ──────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "graphql.schema.max_size_kb",
+            displayName: "config.graphql.schema.max_size_kb.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.graphql.schema.max_size_kb.description",
+            defaultValue: "512",
+            uiEditorType: "number",
+            sortOrder: 10210),
+
+        ConfigurationDefinition.Create(
+            key: "graphql.schema.breaking_change.strict_mode",
+            displayName: "config.graphql.schema.breaking_change.strict_mode.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.graphql.schema.breaking_change.strict_mode.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10220),
+
+        ConfigurationDefinition.Create(
+            key: "graphql.schema.history.retention_days",
+            displayName: "config.graphql.schema.history.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.graphql.schema.history.retention_days.description",
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 10230),
     ];
 }
