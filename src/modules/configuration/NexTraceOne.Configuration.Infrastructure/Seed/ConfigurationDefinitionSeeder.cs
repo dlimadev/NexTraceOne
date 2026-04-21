@@ -8489,5 +8489,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "20.0",
             uiEditorType: "number",
             sortOrder: 10870),
+
+        // ── Wave P — Service API Exposure + Resilience Score Summary + Release Success Rate ──────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.api_exposure.max_top_services",
+            displayName: "config.catalog.api_exposure.max_top_services.name",
+            description: "config.catalog.api_exposure.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10880),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.api_exposure.high_exposure_threshold",
+            displayName: "config.catalog.api_exposure.high_exposure_threshold.name",
+            description: "config.catalog.api_exposure.high_exposure_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 10890),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.api_exposure.page_size",
+            displayName: "config.catalog.api_exposure.page_size.name",
+            description: "config.catalog.api_exposure.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 10900),
+
+        ConfigurationDefinition.Create(
+            key: "resilience.score.max_top_services",
+            displayName: "config.resilience.score.max_top_services.name",
+            description: "config.resilience.score.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10910),
+
+        ConfigurationDefinition.Create(
+            key: "resilience.score.max_experiment_types",
+            displayName: "config.resilience.score.max_experiment_types.name",
+            description: "config.resilience.score.max_experiment_types.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10920),
+
+        ConfigurationDefinition.Create(
+            key: "resilience.score.excellent_threshold",
+            displayName: "config.resilience.score.excellent_threshold.name",
+            description: "config.resilience.score.excellent_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 10930),
+
+        ConfigurationDefinition.Create(
+            key: "release.success_rate.lookback_days",
+            displayName: "config.release.success_rate.lookback_days.name",
+            description: "config.release.success_rate.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10940),
+
+        ConfigurationDefinition.Create(
+            key: "release.success_rate.max_services",
+            displayName: "config.release.success_rate.max_services.name",
+            description: "config.release.success_rate.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10950),
     ];
 }

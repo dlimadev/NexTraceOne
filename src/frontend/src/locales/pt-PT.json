@@ -13997,5 +13997,85 @@
       "invalidLookbackDays": "Os dias de análise devem ser entre 1 e 365.",
       "invalidTopFailingGatesCount": "O número de gates deve ser entre 1 e 50."
     }
+  },
+  "serviceApiExposureReport": {
+    "title": "Relatório de Exposição de APIs por Serviço",
+    "description": "Mapa de superfície de APIs por serviço: serviços órfãos, serviços de alta exposição, distribuição por visibilidade e tipo de exposição",
+    "totalServices": "Total de Serviços",
+    "totalApis": "Total de APIs",
+    "orphanedServiceCount": "Serviços Órfãos (sem APIs)",
+    "highExposureServiceCount": "Serviços de Alta Exposição",
+    "apiPerServiceAvg": "Média de APIs por Serviço",
+    "apisByVisibility": "APIs por Visibilidade",
+    "servicesByExposureType": "Serviços por Tipo de Exposição",
+    "topServicesByApiCount": "Principais Serviços por Contagem de APIs",
+    "serviceName": "Serviço",
+    "teamName": "Equipa",
+    "exposureType": "Tipo de Exposição",
+    "apiCount": "Nº de APIs",
+    "isHighExposure": "Alta Exposição",
+    "errors": {
+      "invalidMaxTopServices": "O máximo de serviços deve ser entre 1 e 100.",
+      "invalidHighExposureThreshold": "O limiar de alta exposição deve ser entre 1 e 100."
+    }
+  },
+  "resilienceScoreSummaryReport": {
+    "title": "Relatório de Sumário de Score de Resiliência",
+    "description": "Scores de resiliência agregados de relatórios pós-chaos: tiers por serviço, tempos de recuperação, precisão do blast radius",
+    "totalReports": "Total de Relatórios",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "overallAvgResilienceScore": "Score Médio de Resiliência",
+    "overallScoreTier": "Tier de Score Global",
+    "scoreDistribution": "Distribuição de Scores",
+    "avgRecoveryTimeSeconds": "Tempo Médio de Recuperação (s)",
+    "avgBlastRadiusDeviationPercent": "Desvio Médio de Blast Radius %",
+    "topResilientServices": "Serviços Mais Resilientes",
+    "topVulnerableServices": "Serviços Mais Vulneráveis",
+    "byExperimentType": "Por Tipo de Experimento",
+    "serviceName": "Serviço",
+    "reportCount": "Relatórios",
+    "avgResilienceScore": "Score Médio",
+    "scoreTier": "Tier",
+    "experimentType": "Tipo de Experimento",
+    "poor": "Fraco",
+    "fair": "Regular",
+    "good": "Bom",
+    "excellent": "Excelente",
+    "errors": {
+      "invalidMaxTopServices": "O máximo de serviços deve ser entre 1 e 100.",
+      "invalidMaxTopExperimentTypes": "O máximo de tipos de experimento deve ser entre 1 e 50."
+    }
+  },
+  "releaseSuccessRateReport": {
+    "title": "Relatório de Taxa de Sucesso de Releases",
+    "description": "Taxas de sucesso, falha e rollback de releases por serviço e ambiente no período configurado",
+    "tenantId": "Tenant",
+    "lookbackDays": "Dias de Análise",
+    "totalReleases": "Total de Releases",
+    "totalServicesWithReleases": "Serviços com Releases",
+    "globalSuccessRatePercent": "Taxa Global de Sucesso %",
+    "globalFailureRatePercent": "Taxa Global de Falha %",
+    "globalRollbackRatePercent": "Taxa Global de Rollback %",
+    "globalSuccessRateTier": "Tier de Sucesso Global",
+    "byStatus": "Por Estado",
+    "byEnvironment": "Por Ambiente",
+    "topServicesByFailureRate": "Serviços com Maior Taxa de Falha",
+    "serviceName": "Serviço",
+    "totalReleasesCol": "Releases",
+    "succeededCount": "Com Sucesso",
+    "failedCount": "Falhas",
+    "rolledBackCount": "Rollbacks",
+    "successRatePercent": "Taxa de Sucesso %",
+    "failureRatePercent": "Taxa de Falha %",
+    "rollbackRatePercent": "Taxa de Rollback %",
+    "elite": "Elite",
+    "high": "Alto",
+    "medium": "Médio",
+    "low": "Baixo",
+    "errors": {
+      "invalidTenantId": "O ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de análise devem ser entre 1 e 365.",
+      "invalidMaxServices": "O máximo de serviços deve ser entre 1 e 200."
+    }
   }
 }

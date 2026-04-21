@@ -13989,5 +13989,86 @@
       "invalidLookbackDays": "Lookback days must be between 1 and 365.",
       "invalidTopFailingGatesCount": "Top failing gates count must be between 1 and 50."
     }
+  },
+
+  "serviceApiExposureReport": {
+    "title": "Service API Exposure Report",
+    "description": "API surface map by service: orphaned services, high-exposure services, visibility and exposure type distribution",
+    "totalServices": "Total Services",
+    "totalApis": "Total APIs",
+    "orphanedServiceCount": "Orphaned Services (no APIs)",
+    "highExposureServiceCount": "High Exposure Services",
+    "apiPerServiceAvg": "Avg APIs per Service",
+    "apisByVisibility": "APIs by Visibility",
+    "servicesByExposureType": "Services by Exposure Type",
+    "topServicesByApiCount": "Top Services by API Count",
+    "serviceName": "Service",
+    "teamName": "Team",
+    "exposureType": "Exposure Type",
+    "apiCount": "API Count",
+    "isHighExposure": "High Exposure",
+    "errors": {
+      "invalidMaxTopServices": "Max top services must be between 1 and 100.",
+      "invalidHighExposureThreshold": "High exposure threshold must be between 1 and 100."
+    }
+  },
+  "resilienceScoreSummaryReport": {
+    "title": "Resilience Score Summary Report",
+    "description": "Aggregated resilience scores from chaos engineering resilience reports: service tiers, recovery times, blast radius accuracy",
+    "totalReports": "Total Reports",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "overallAvgResilienceScore": "Overall Avg Resilience Score",
+    "overallScoreTier": "Overall Score Tier",
+    "scoreDistribution": "Score Distribution",
+    "avgRecoveryTimeSeconds": "Avg Recovery Time (s)",
+    "avgBlastRadiusDeviationPercent": "Avg Blast Radius Deviation %",
+    "topResilientServices": "Top Resilient Services",
+    "topVulnerableServices": "Top Vulnerable Services",
+    "byExperimentType": "By Experiment Type",
+    "serviceName": "Service",
+    "reportCount": "Reports",
+    "avgResilienceScore": "Avg Score",
+    "scoreTier": "Tier",
+    "experimentType": "Experiment Type",
+    "poor": "Poor",
+    "fair": "Fair",
+    "good": "Good",
+    "excellent": "Excellent",
+    "errors": {
+      "invalidMaxTopServices": "Max top services must be between 1 and 100.",
+      "invalidMaxTopExperimentTypes": "Max experiment types must be between 1 and 50."
+    }
+  },
+  "releaseSuccessRateReport": {
+    "title": "Release Success Rate Report",
+    "description": "Release success, failure and rollback rates by service and environment for the configured period",
+    "tenantId": "Tenant",
+    "lookbackDays": "Lookback Days",
+    "totalReleases": "Total Releases",
+    "totalServicesWithReleases": "Services with Releases",
+    "globalSuccessRatePercent": "Global Success Rate %",
+    "globalFailureRatePercent": "Global Failure Rate %",
+    "globalRollbackRatePercent": "Global Rollback Rate %",
+    "globalSuccessRateTier": "Global Success Tier",
+    "byStatus": "By Status",
+    "byEnvironment": "By Environment",
+    "topServicesByFailureRate": "Top Services by Failure Rate",
+    "serviceName": "Service",
+    "totalReleasesCol": "Releases",
+    "succeededCount": "Succeeded",
+    "failedCount": "Failed",
+    "rolledBackCount": "Rolled Back",
+    "successRatePercent": "Success Rate %",
+    "failureRatePercent": "Failure Rate %",
+    "rollbackRatePercent": "Rollback Rate %",
+    "elite": "Elite",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 1 and 365.",
+      "invalidMaxServices": "Max services must be between 1 and 200."
+    }
   }
 }
