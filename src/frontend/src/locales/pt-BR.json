@@ -14348,5 +14348,86 @@
       "invalidLookbackDays": "Os dias de retrospectiva devem ser entre 1 e 90.",
       "invalidTopWorstCount": "A contagem de piores serviços deve ser entre 1 e 100."
     }
+  },
+  "postIncidentLearningReport": {
+    "title": "Relatório de Aprendizado Pós-Incidente",
+    "description": "Mede com que consistência incidentes geram runbooks aprovados que previnem recorrência: taxa de aprendizado por serviço, incidentes recorrentes sem documentação e distribuição por cobertura",
+    "lookbackDays": "Dias de Retrospectiva",
+    "totalIncidentsAnalyzed": "Total de Incidentes Analisados",
+    "totalIncidentsWithRunbook": "Incidentes com Runbook",
+    "tenantLearningRatePct": "Taxa de Aprendizado do Tenant (%)",
+    "totalRecurringWithoutRunbook": "Recorrentes Sem Runbook",
+    "coverageDistribution": "Distribuição de Cobertura de Aprendizado",
+    "fullCoverage": "Completa (≥80%)",
+    "partialCoverage": "Parcial (≥40%)",
+    "lowCoverage": "Baixa (<40%)",
+    "topLowCoverageServices": "Top Serviços com Baixa Cobertura",
+    "allServices": "Todos os Serviços",
+    "serviceName": "Serviço",
+    "totalIncidents": "Incidentes",
+    "incidentsWithRunbook": "Com Runbook",
+    "recurringIncidentsWithoutRunbook": "Recorrentes s/ Runbook",
+    "learningRatePct": "Taxa de Aprendizado (%)",
+    "coverage": "Cobertura",
+    "errors": {
+      "invalidTenantId": "ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de retrospectiva devem ser entre 7 e 180.",
+      "invalidTopServiceCount": "A contagem de serviços deve ser entre 1 e 100.",
+      "invalidPartialThreshold": "O threshold parcial deve ser menor que o threshold completo."
+    }
+  },
+  "apiSchemaCoverageReport": {
+    "title": "Relatório de Cobertura de Schema de API",
+    "description": "Completude da documentação de contratos aprovados e bloqueados: corpos de resposta, corpos de requisição, exemplos e códigos de status de erro com classificação por nota",
+    "totalContractsAnalyzed": "Total de Contratos Analisados",
+    "averageScoreGlobal": "Score Médio de Cobertura",
+    "gradeDistribution": "Distribuição por Nota de Cobertura",
+    "gradeA": "Nota A (≥90)",
+    "gradeB": "Nota B (≥70)",
+    "gradeC": "Nota C (≥50)",
+    "gradeD": "Nota D (<50)",
+    "topLowCoverageContracts": "Contratos que Precisam de Melhoria",
+    "allContracts": "Todos os Contratos",
+    "apiAssetId": "ID do Ativo",
+    "semVer": "Versão",
+    "protocol": "Protocolo",
+    "coverageScore": "Score",
+    "grade": "Nota",
+    "hasResponseBody": "Tem Corpo de Resposta",
+    "hasRequestBody": "Tem Corpo de Requisição",
+    "hasExamples": "Tem Exemplos",
+    "hasErrorStatusCodes": "Tem Códigos de Erro",
+    "errors": {
+      "invalidTopLowCoverageCount": "A contagem deve ser entre 1 e 100.",
+      "invalidPageSize": "O tamanho de página deve ser entre 10 e 1000."
+    }
+  },
+  "environmentStabilityReport": {
+    "title": "Relatório de Estabilidade por Ambiente",
+    "description": "Score de estabilidade por ambiente derivado de conformidade SLO, taxa livre de drift, taxa de sucesso de chaos e taxa livre de incidentes: classificação por tier e comparação não-prod vs prod",
+    "lookbackDays": "Dias de Retrospectiva",
+    "totalEnvironmentsAnalyzed": "Ambientes Analisados",
+    "nonProdMoreUnstableThanProd": "Não-Prod Mais Instável que Prod",
+    "tierDistribution": "Distribuição por Tier de Estabilidade",
+    "stableTier": "Estável (≥80)",
+    "unstableTier": "Instável (≥55)",
+    "criticalTier": "Crítico (<55)",
+    "environments": "Ambientes",
+    "environment": "Ambiente",
+    "isProduction": "Produção",
+    "stabilityScore": "Score de Estabilidade",
+    "tier": "Tier",
+    "sloComplianceRatePct": "Conformidade SLO (%)",
+    "driftFreeRatePct": "Taxa Livre de Drift (%)",
+    "chaosSuccessRatePct": "Sucesso em Chaos (%)",
+    "incidentFreeRatePct": "Taxa Livre de Incidentes (%)",
+    "totalSloObservations": "Observações SLO",
+    "unacknowledgedDriftCount": "Drifts Não Reconhecidos",
+    "totalChaosExperiments": "Experimentos de Chaos",
+    "errors": {
+      "invalidTenantId": "ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de retrospectiva devem ser entre 1 e 90.",
+      "invalidMaxDriftPenaltyPerService": "A penalidade máxima de drift deve ser entre 1 e 20."
+    }
   }
 }

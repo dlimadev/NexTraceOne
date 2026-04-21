@@ -8852,5 +8852,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "number",
             sortOrder: 11190),
+
+        // ── Wave T.1 — Post-Incident Learning Report ───────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.post_incident_learning.lookback_days",
+            displayName: "config.compliance.post_incident_learning.lookback_days.name",
+            description: "config.compliance.post_incident_learning.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11200),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.post_incident_learning.full_coverage_threshold_pct",
+            displayName: "config.compliance.post_incident_learning.full_coverage_threshold_pct.name",
+            description: "config.compliance.post_incident_learning.full_coverage_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 11210),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.post_incident_learning.partial_coverage_threshold_pct",
+            displayName: "config.compliance.post_incident_learning.partial_coverage_threshold_pct.name",
+            description: "config.compliance.post_incident_learning.partial_coverage_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 11220),
+
+        // ── Wave T.2 — API Schema Coverage Report ─────────────────────────
+        ConfigurationDefinition.Create(
+            key: "catalog.api_schema_coverage.top_low_coverage_count",
+            displayName: "config.catalog.api_schema_coverage.top_low_coverage_count.name",
+            description: "config.catalog.api_schema_coverage.top_low_coverage_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11230),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.api_schema_coverage.page_size",
+            displayName: "config.catalog.api_schema_coverage.page_size.name",
+            description: "config.catalog.api_schema_coverage.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 11240),
+
+        // ── Wave T.3 — Environment Stability Report ────────────────────────
+        ConfigurationDefinition.Create(
+            key: "runtime.environment_stability.lookback_days",
+            displayName: "config.runtime.environment_stability.lookback_days.name",
+            description: "config.runtime.environment_stability.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11250),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.environment_stability.stable_tier_threshold",
+            displayName: "config.runtime.environment_stability.stable_tier_threshold.name",
+            description: "config.runtime.environment_stability.stable_tier_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 11260),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.environment_stability.unstable_tier_threshold",
+            displayName: "config.runtime.environment_stability.unstable_tier_threshold.name",
+            description: "config.runtime.environment_stability.unstable_tier_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "55",
+            uiEditorType: "number",
+            sortOrder: 11270),
     ];
 }
