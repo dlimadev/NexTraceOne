@@ -3,11 +3,12 @@
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
 > **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → AM (57 features novas documentadas, aguardam implementação)  
+> **Waves planeadas:** U → AQ (69 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
 > **Waves AJ–AM (backend avançado III):** 4 novas waves planeadas — Multi-Tenant Governance Intelligence, Developer Experience & Notification Management, Audit Intelligence & Traceability Analytics, Auto-Cataloging & Service Discovery Intelligence  
+> **Waves AN–AQ (backend avançado IV):** 4 novas waves planeadas — SRE Intelligence & Error Budget Management, Supply Chain & Dependency Provenance, Collaborative Governance & Workflow Automation, Data Observability & Schema Quality  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -2804,6 +2805,413 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AN — SRE Intelligence & Error Budget Management
+
+**Objetivo:** Materializar a prática de SRE (Site Reliability Engineering) como capacidade analítica do NexTraceOne — passando do tracking passivo de SLOs (Wave J.2) para gestão activa de error budget, scorecards de impacto de incidentes e índice de maturidade SRE por equipa. Esta wave transforma o NexTraceOne numa plataforma que governa a confiabilidade com a mesma seriedade que governa contratos e mudanças.
+
+#### AN.1 — GetErrorBudgetReport (OperationalIntelligence)
+
+**Feature:** Tracking de consumo de error budget por serviço por janela de SLO. Responde "quanto do nosso orçamento de erro já consumimos e quando vai esgotar ao ritmo actual?"
+
+**Domínio:** Complementa `SloObservation` (Wave J.2) adicionando a dimensão de budget: para cada SLO activo, calcula o budget disponível no período e o consumo acumulado, com projecção de esgotamento.
+
+**Capacidades:**
+- Para cada serviço com SLO definido e `SloObservation` no período:
+  - **SloTarget** — target percentual (ex: 99.9%)
+  - **ActualCompliance** — compliance real observado no período
+  - **ErrorBudgetPct** — budget total disponível (ex: 0.1% para SLO 99.9%)
+  - **BudgetConsumedPct** — `(1 - ActualCompliance) / ErrorBudgetPct * 100`
+  - **BudgetRemainingPct** — `100 - BudgetConsumedPct`
+  - **BurnRate** — taxa de consumo de budget (actual rate / ideal rate)
+  - **DaysToExhaustion** — projecção linear de quando o budget será esgotado ao ritmo actual (∞ se BurnRate ≤ 1.0)
+  - **BudgetPeriodEndDate** — fim do período de SLO
+- **ErrorBudgetTier:** `Healthy` (≥70% remaining) / `Warning` (≥30% remaining) / `Exhausted` (0% remaining) / `Burned` (<0% — em deficit)
+- **TenantBudgetHealthSummary:**
+  - **HealthyServices** / **WarningServices** / **ExhaustedServices** / **BurnedServices** — contagens por tier
+  - **GlobalBurnRate** — média ponderada por SLO criticality
+  - **TopBurningServices** — top 5 serviços com maior BurnRate no período
+- **ErrorBudgetTimeline** — série temporal de 30 dias de BudgetConsumedPct por serviço (suporte a alertas antecipados)
+- **FreezeRecommendations** — serviços com `ErrorBudgetTier = Exhausted | Burned` que deveriam entrar em modo conservador (sem novas features, apenas fixes)
+- Endpoint: `GET /api/v1/sre/services/{name}/error-budget?period=30d`
+
+**Orientado para Tech Lead, SRE e Engineer** — suporta a prática SRE de error budget como ferramenta de decisão de deploy e de negociação com produto sobre velocidade vs. confiabilidade.
+
+#### AN.2 — GetIncidentImpactScorecardReport (OperationalIntelligence)
+
+**Feature:** Scorecard composto de impacto de incidentes por serviço e por equipa. Vai além do simples MTTR: combina duração, blast radius, impacto em SLO, customer-facing flag e frequência para produzir um score de impacto real.
+
+**Domínio:** Agrega dados de `IncidentRecord`, `SloObservation`, `RuntimeSnapshot` e `ServiceAsset` para calcular o impacto operacional composto de incidentes no período.
+
+**Capacidades:**
+- Para cada incidente no período:
+  - **DurationMinutes** — duração do incidente
+  - **BlastRadiusDependents** — número de serviços impactados (via topology)
+  - **SloImpactPct** — percentagem de budget consumido no SLO do serviço durante o incidente
+  - **CustomerFacing** — flag do serviço afectado
+  - **IncidentImpactScore** — 0–100 composto: Duration (30%) + BlastRadius (25%) + SloImpact (25%) + CustomerFacing (20%)
+- **ImpactTier por incidente:** `Minor` ≤25 / `Moderate` ≤55 / `Severe` ≤80 / `Critical` >80
+- **TeamIncidentScorecard** — por equipa, no período:
+  - **TotalIncidents** e **IncidentsPerWeek**
+  - **AverageImpactScore** e **MaxImpactScore**
+  - **SevereOrCriticalCount** — incidentes com ImpactTier Severe ou Critical
+  - **TeamReliabilityTier:** `Excellent` (avg ≤25 + Severe/Critical ≤1/mês) / `Good` / `AtRisk` / `Struggling`
+  - **TrendVsPreviousPeriod** — melhoria/pioria do AverageImpactScore vs. período anterior
+- **TenantIncidentHealthIndex** — % de equipas com TeamReliabilityTier ≥ Good
+- **TopImpactfulIncidents** — top 10 incidentes por IncidentImpactScore no período (com equipa, serviço e detalhes)
+- **RepeatOffenderServices** — serviços com ≥ `repeat_incident_threshold` incidentes no período (sinalizados para Root Cause Action)
+
+**Orientado para Tech Lead, Executive e Platform Admin** — suporta a discussão de prioridade de estabilização baseada em impacto real, não em contagem de incidentes.
+
+#### AN.3 — GetSreMaturityIndexReport (ChangeGovernance / OperationalIntelligence)
+
+**Feature:** Índice de maturidade SRE por equipa. Avalia em que medida cada equipa pratica os fundamentos de SRE de forma mensurável e governada no NexTraceOne.
+
+**Domínio:** Orquestra dados de múltiplos domínios para avaliar 6 práticas SRE por equipa com base em evidências observadas no NexTraceOne (não auto-declaradas).
+
+**Capacidades:**
+- Para cada equipa, 6 dimensões SRE com critérios claros e mensuráveis:
+  - **SloDefinitionCoverage** (20%) — % de serviços da equipa com SLO definido e `SloObservation` activa
+  - **ErrorBudgetTracking** (20%) — % de serviços com `ErrorBudgetTier` calculado e revisão mensal
+  - **ChaosEngineeringAdoption** (15%) — % de serviços com `ProfilingSession` ou `ChaosExperiment` no último trimestre
+  - **ToilReductionEvidence** (15%) — presença de `AutoApproval` ou deployment automation (pipeline-triggered releases sem aprovação manual) como proxy de redução de toil
+  - **PostIncidentReviewRate** (15%) — % de incidentes Severe/Critical com `PostIncidentLearning` registado (via `GetPostIncidentLearningReport`)
+  - **RunbookCompleteness** (15%) — % de incidentes da equipa com runbook activo associado ao serviço afectado
+- **SreMaturityScore** (0–100) — média ponderada das 6 dimensões
+- **SreMaturityTier:** `Elite` ≥85 / `Advanced` ≥65 / `Practicing` ≥40 / `Foundational` <40
+- **WeakestPractices** — 2 dimensões com menor score (com sugestão de melhoria)
+- **TenantSreMaturitIndex** — média ponderada por número de serviços da equipa
+- **MaturityEvolution** — comparação com período anterior (trimestre) por equipa
+- **EliteTeamCount** / **FoundationalTeamCount** — distribuição de tiers para visão executiva
+
+**Orientado para Tech Lead, Architect e Executive** — permite que a organização veja o estado real de maturidade SRE por equipa, com base em dados observados, e defina roteiros de melhoria concretos.
+
+#### Configuração Wave AN
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `sre.error_budget.default_period_days` | 30 | 12720 | Período padrão de cálculo de error budget (dias) |
+| `sre.error_budget.healthy_remaining_pct` | 70 | 12730 | % de budget restante para tier Healthy |
+| `sre.error_budget.warning_remaining_pct` | 30 | 12740 | % de budget restante para tier Warning |
+| `sre.incident_scorecard.repeat_incident_threshold` | 3 | 12750 | Número mínimo de incidentes para flagging RepeatOffender |
+| `sre.incident_scorecard.lookback_days` | 30 | 12760 | Período de análise para scorecard de incidentes |
+| `sre.maturity.chaos_lookback_months` | 3 | 12770 | Período de análise para ChaosEngineeringAdoption |
+| `sre.maturity.postincident_required_tiers` | `"Severe,Critical"` | 12780 | Tiers de incidente que requerem post-incident review |
+| `sre.maturity.evolution_lookback_months` | 3 | 12790 | Período de comparação para MaturityEvolution |
+
+#### i18n Wave AN
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `errorBudget.*` — tracking de error budget, burn rate, projecção de esgotamento e recomendações de freeze
+- `incidentImpactScorecard.*` — scorecard composto de impacto de incidentes por equipa e serviço
+- `sreMaturityIndex.*` — índice de maturidade SRE por equipa, dimensões e comparação evolutiva
+
+**Totais estimados Wave AN:** OI: ~39 testes (AN.1 ~13 + AN.2 ~15 + AN.3 ~11). Configuração: +8 config keys (sort 12720–12790). i18n: +3 secções (4 locales). 1 novo endpoint REST (`/sre/services/{name}/error-budget`). **Wave AN PLANEADA**.
+
+---
+
+### Wave AO — Supply Chain & Dependency Provenance
+
+**Objetivo:** Introduzir capacidades de governança da cadeia de fornecimento de software (supply chain security) — cobrindo SBOM (Software Bill of Materials), proveniência de dependências, licenciamento e risco consolidado de componentes com CVEs. Esta wave posiciona o NexTraceOne como plataforma de governança que abrange não apenas o comportamento dos serviços em runtime mas também a qualidade e segurança dos componentes que os constituem.
+
+#### AO.1 — GetSbomCoverageReport (Catalog)
+
+**Feature:** Análise de cobertura de SBOM por serviço. Responde "quantos dos nossos serviços têm um Bill of Materials registado e qual o estado de segurança dos seus componentes?"
+
+**Domínio:** Novo `SbomRecord` — entidade que regista a lista de componentes (dependências directas e transitivas) de um serviço numa versão específica. Alimenta análise de vulnerabilidades e cobertura.
+
+**Capacidades:**
+- **SbomRecord** — entidade nova: `ServiceId`, `Version`, `RecordedAt`, `Components` (JSON: lista de `{name, version, registry, license, cveCount, highestCveSeverity}`)
+- **IISbomRepository** + migration `SbomRecords`
+- 2 features: `IngestSbomRecord` (ingestão via CLI/CI) + `GetSbomCoverageReport`
+- **GetSbomCoverageReport capacidades:**
+  - Por serviço com SBOM:
+    - **ComponentCount** — total de componentes (directos + transitivos)
+    - **HighSeverityCveCount** / **CriticalCveCount** — vulnerabilidades por severidade
+    - **OutdatedComponentCount** — componentes com versão menor que a mais recente disponível (se registry info presente)
+    - **LicenseDistribution** — contagem de componentes por tipo de licença
+    - **SbomAge** — dias desde o último `SbomRecord` — freshness
+  - **SbomCoverageTier por serviço:** `Covered` (SBOM ≤30d) / `Stale` (SBOM 31–90d) / `Outdated` (SBOM >90d) / `Missing` (sem SBOM)
+  - **TenantSbomHealthSummary:**
+    - **CoveredPct** — % de serviços com SbomCoverageTier = Covered
+    - **TotalCriticalCves** — soma de CriticalCveCount no tenant
+    - **TopVulnerableServices** — top 5 por CriticalCveCount
+  - **LicenseRiskFlags** — serviços com componentes de licença `GPL` / `AGPL` (risco legal para software comercial)
+  - Endpoint: `POST /api/v1/sbom/ingest` + `GET /api/v1/sbom/coverage`
+
+**Orientado para Architect, Platform Admin e Auditor** — suporta compliance com requisitos como NIST SSDF e Executive Order 14028 (US) que exigem SBOM para software enterprise.
+
+#### AO.2 — GetDependencyProvenanceReport (Catalog)
+
+**Feature:** Análise de proveniência das dependências de serviços — origem, registry, licença e risco de supply chain por componente e por serviço.
+
+**Domínio:** Agrega dados dos `SbomRecord` ingeridos para produzir visão de proveniência a nível de tenant, identificando dependências de fontes desconhecidas, licenças incompatíveis e repositórios não approvados.
+
+**Capacidades:**
+- Por componente (agregado a nível de tenant):
+  - **ComponentName** e **VersionsInUse** — quantas versões diferentes do mesmo componente em uso
+  - **ServiceCount** — número de serviços que dependem do componente
+  - **RegistryOrigin** — registry declarado (nuget.org, npmjs.com, etc.)
+  - **IsApprovedRegistry** — bool (baseado na lista configurada de registries aprovados)
+  - **LicenseType** — licença declarada
+  - **LicenseRisk:** `Safe` / `Attention` (LGPL) / `HighRisk` (GPL/AGPL) / `Unknown`
+  - **TotalCveCount** e **HighestSeverity** — vulnerabilidades agregadas do componente
+- **ProvenanceTier por componente:** `Trusted` (approved registry + LicenseRisk Safe + 0 Critical CVEs) / `Review` / `HighRisk` / `Blocked`
+- **TenantProvenanceSummary:**
+  - **TrustedPct** / **HighRiskPct** / **BlockedPct**
+  - **UnapprovedRegistryComponents** — lista de componentes de registries não aprovados
+  - **HighRiskLicenseComponents** — lista de componentes GPL/AGPL em uso
+  - **CriticalVulnerabilityComponents** — componentes com CVE severity Critical
+- **MostUsedComponents** — top 20 componentes mais presentes no tenant (visão de dependência crítica)
+- **SinglePointOfFailureComponents** — componentes usados em ≥ `spof_service_threshold` serviços sem alternativa declarada
+
+**Orientado para Architect e Platform Admin** — garante que a organização tem visibilidade sobre o que corre dentro dos seus serviços, de onde vem e quais os riscos jurídicos e de segurança associados.
+
+#### AO.3 — GetSupplyChainRiskReport (Catalog / ChangeGovernance)
+
+**Feature:** Relatório consolidado de risco da cadeia de fornecimento — cruza vulnerabilidades de componentes (SBOM) com o grafo de dependências de serviços para calcular propagação de risco e exposição real.
+
+**Domínio:** Combina `SbomRecord` (componentes vulneráveis) com `ServiceDependency` (grafo de dependências) para calcular qual o impacto real de uma vulnerabilidade num componente compartilhado por múltiplos serviços.
+
+**Capacidades:**
+- Para cada componente com CVE crítico ou alto:
+  - **AffectedServices** — serviços que incluem o componente (directamente)
+  - **TransitivelyAffectedServices** — serviços que dependem dos AffectedServices (via grafo de dependências)
+  - **TotalExposedServices** — `AffectedServices ∪ TransitivelyAffectedServices`
+  - **ExposureBlastRadius** — % de serviços do tenant expostos
+  - **CustomerFacingExposed** — count de serviços customer-facing expostos
+- **ComponentRiskScore** (0–100) por componente: CveSeverity (50%) + TotalExposedServices (30%) + CustomerFacingExposed (20%)
+- **SupplyChainRiskHeatmap** — matrix componente × serviço com código de cor por severity (para visualização futura no frontend)
+- **TenantSupplyChainRiskScore** (0–100) — média ponderada dos ComponentRiskScore dos componentes presentes no tenant
+- **SupplyChainRiskTier:** `Secure` ≤20 / `Monitored` ≤50 / `Exposed` ≤75 / `Critical` >75
+- **PrioritizedPatchList** — lista ordenada de `{component, version_fix_available, ComponentRiskScore, AffectedServicesCount}` para guiar esforço de patching com foco no maior impacto
+- **UnpatchedWindowDays** — dias desde que o CVE foi publicado até hoje sem patch registado
+
+**Orientado para Architect, Security e Platform Admin** — transforma os dados de SBOM em priorização accionável de patching, evitando que equipas percam tempo em CVEs de baixo impacto real enquanto componentes com alto blast radius ficam sem patch.
+
+#### Configuração Wave AO
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `sbom.coverage.fresh_days` | 30 | 12800 | Dias máximos para SbomCoverageTier = Covered |
+| `sbom.coverage.stale_days` | 90 | 12810 | Dias máximos para SbomCoverageTier = Stale |
+| `sbom.provenance.approved_registries` | `"nuget.org,npmjs.com"` | 12820 | Lista de registries aprovados (CSV) |
+| `sbom.provenance.high_risk_licenses` | `"GPL,AGPL"` | 12830 | Licenças de alto risco (CSV) |
+| `sbom.risk.spof_service_threshold` | 5 | 12840 | Mínimo de serviços para flag SinglePointOfFailure |
+| `sbom.risk.critical_cve_weight` | 50 | 12850 | Peso da severidade CVE no ComponentRiskScore |
+| `sbom.risk.exposure_weight` | 30 | 12860 | Peso do TotalExposedServices no ComponentRiskScore |
+| `sbom.risk.customer_facing_weight` | 20 | 12870 | Peso do CustomerFacingExposed no ComponentRiskScore |
+
+#### i18n Wave AO
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `sbomCoverage.*` — cobertura de SBOM por serviço, CVEs e freshness de bill of materials
+- `dependencyProvenance.*` — proveniência de dependências, licenças, registries e risco jurídico/segurança
+- `supplyChainRisk.*` — risco consolidado da cadeia de fornecimento, heatmap e lista priorizada de patches
+
+**Totais estimados Wave AO:** Catalog: ~46 testes (AO.1 ~15 + AO.2 ~16 + AO.3 ~15). Configuração: +8 config keys (sort 12800–12870). i18n: +3 secções (4 locales). 1 nova migration (`SbomRecords`). 1 novo endpoint REST (`POST /api/v1/sbom/ingest` + `GET /api/v1/sbom/coverage`). **Wave AO PLANEADA**.
+
+---
+
+### Wave AP — Collaborative Governance & Workflow Automation
+
+**Objetivo:** Elevar as capacidades de governança colaborativa do NexTraceOne — analisando a eficiência dos workflows de aprovação, cobertura de peer review, e rastreabilidade de escalações de governança (Break Glass, JIT access). Esta wave fecha o círculo entre "definir processo" e "medir se o processo está a funcionar".
+
+#### AP.1 — GetApprovalWorkflowReport (ChangeGovernance)
+
+**Feature:** Análise de eficiência dos workflows de aprovação de mudanças. Responde "os nossos processos de aprovação são eficientes ou são um gargalo?"
+
+**Domínio:** Agrega dados de `ChangeApproval`, `ReleaseCalendarEntry` e `PromotionGate` para calcular métricas de eficiência do processo de aprovação no período.
+
+**Capacidades:**
+- Por ambiente e por tipo de aprovação:
+  - **TotalApprovals** — número de aprovações no período
+  - **AvgApprovalTimeHours** — tempo médio entre submissão e aprovação
+  - **SlaComplianceRate** — % de aprovações dentro do SLA configurado (`approval_sla_hours`)
+  - **AutoApprovalRate** — % de aprovações automáticas (sem intervenção humana)
+  - **RejectionRate** — % de aprovações que resultaram em rejeição
+  - **PendingCount** — aprovações abertas há mais de `approval_overdue_hours`
+- **ApprovalTier:** `Efficient` (AvgTime ≤ `approval_sla_hours`×0.5 + SLA ≥95%) / `Normal` / `Delayed` / `Blocked` (PendingCount > `pending_threshold`)
+- **BottleneckApprovers** — aprovadores com maior backlog (`PendingAssigned ≥ bottleneck_threshold`)
+- **ApprovalHeatmap** — distribuição de aprovações por dia da semana e hora (7×24)
+- **TenantApprovalHealthScore** — % de ambientes com ApprovalTier ≥ Normal
+- **RecommendedAutomations** — sugestões de fluxos candidatos a auto-aprovação (baseado em histórico de aprovações: sempre aprovado + baixo risco + mesmo approver)
+
+**Orientado para Tech Lead e Platform Admin** — permite identificar onde o processo de aprovação atrasa mudanças e propor melhorias baseadas em dados.
+
+#### AP.2 — GetPeerReviewCoverageReport (ChangeGovernance / Catalog)
+
+**Feature:** Análise de cobertura de peer review em contratos e mudanças. Responde "as nossas mudanças passam por revisão antes de chegar a produção?"
+
+**Domínio:** Agrega dados de `ChangeApproval` (para mudanças) e `ApiAsset` (para contratos, via review workflow) para calcular cobertura real de revisão por pares.
+
+**Capacidades:**
+- **ChangeReviewCoverage:**
+  - **TotalChanges** — mudanças no período
+  - **ChangesWithPeerReview** — mudanças com ≥1 review por utilizador diferente do autor
+  - **ReviewCoverageRate** — `ChangesWithPeerReview / TotalChanges * 100`
+  - **AvgReviewersPerChange** — média de revisores diferentes por mudança
+  - **ReviewerConcentrationIndex** — % de reviews feitas pelo top 3 revisores (Gini-like: alto = risco de dependência)
+- **ContractReviewCoverage:**
+  - **TotalContractChanges** — mudanças de contrato (breaking ou minor) no período
+  - **ContractChangesWithReview** — contratos com review aprovado antes de publicação
+  - **ContractReviewRate**
+- **ReviewCompletionTier:** `Full` ≥95% / `Good` ≥80% / `Partial` ≥60% / `AtRisk` <60%
+- **UnreviewedHighRiskChanges** — mudanças com BlastRadius `Large` ou `ConfidenceScore` ≤50 que não tiveram peer review
+- **ReviewThrottleRisk** — equipas onde ReviewerConcentrationIndex >70% (single reviewer dependency risk)
+- **ReviewBacklogAge** — mudanças com review pendente há mais de `review_overdue_hours`
+
+**Orientado para Tech Lead e Architect** — garante que o processo de peer review não é apenas declarado mas efectivamente praticado, identificando gaps críticos (mudanças de alto risco sem review).
+
+#### AP.3 — GetGovernanceEscalationReport (ChangeGovernance / IdentityAccess)
+
+**Feature:** Relatório de escalações de governança — Break Glass events, JIT access requests, delegações e privilégios elevados. Suporta revisões de acesso e auditoria de padrões de escalação anormais.
+
+**Domínio:** Agrega eventos de `AuditEvent` do tipo `BreakGlass`, `JitAccessGranted`, `DelegatedAccess` e `PrivilegeEscalation` para análise de padrões de escalação no período.
+
+**Capacidades:**
+- **BreakGlassEvents:**
+  - **TotalCount** no período
+  - **ByUser** — distribuição por utilizador iniciador
+  - **ByEnvironment** — distribuição por ambiente (produção vs. non-prod)
+  - **AverageResolutionHours** — tempo médio até ao user retornar ao nível normal
+  - **UnresolvedCount** — Break Glass events ainda activos (potencial risco)
+  - **BreakGlassTrend** — comparação com período anterior
+- **JitAccessSummary:**
+  - **TotalRequests** / **ApprovedRequests** / **RejectedRequests**
+  - **AutoApprovedRequests** — JIT aprovados automaticamente por política
+  - **AvgGrantDurationHours** — duração média das concessões JIT
+  - **ExpiredWithoutUseCount** — JIT concedidos que expiraram sem uso (auditoria de necessidade real)
+- **EscalationRiskTier:** `Low` (BreakGlass ≤ `bg_low_threshold`/mês, nenhum Unresolved) / `Medium` / `High` / `Critical` (Unresolved BreakGlass em produção)
+- **TopEscalatingUsers** — utilizadores com maior frequência de escalação (potencial abuso ou necessidade de permissões permanentes)
+- **EscalationPatternFlags:**
+  - `FrequentBreakGlass` — utilizador com BreakGlass > `bg_frequent_threshold` no período
+  - `LongRunningJit` — JIT activo há mais de `jit_max_duration_hours`
+  - `ProductionBreakGlassUnresolved` — Break Glass em produção sem resolução
+- Endpoint: `GET /api/v1/governance/escalations/report`
+
+**Orientado para Auditor, Platform Admin e Security** — fecha o ciclo do Break Glass Protocol (referenciado nas copilot instructions §16.4): não apenas suportar escalações de emergência, mas analisar padrões de uso e garantir que privilégios elevados são realmente necessários e resolvidos.
+
+#### Configuração Wave AP
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `governance.approval.sla_hours` | 8 | 12880 | SLA de aprovação em horas para ApprovalTier Efficient |
+| `governance.approval.overdue_hours` | 24 | 12890 | Horas para classificar aprovação como overdue |
+| `governance.approval.pending_threshold` | 5 | 12900 | Pending count para ApprovalTier Blocked |
+| `governance.review.review_overdue_hours` | 48 | 12910 | Horas para classificar review como overdue |
+| `governance.review.concentration_risk_pct` | 70 | 12920 | % de ReviewerConcentrationIndex para flag ReviewThrottleRisk |
+| `governance.escalation.bg_low_threshold` | 2 | 12930 | Máximo de BreakGlass/mês para EscalationRiskTier Low |
+| `governance.escalation.bg_frequent_threshold` | 3 | 12940 | BreakGlass/mês para flag FrequentBreakGlass |
+| `governance.escalation.jit_max_duration_hours` | 8 | 12950 | Duração máxima de JIT antes de flag LongRunningJit |
+
+#### i18n Wave AP
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `approvalWorkflow.*` — eficiência de workflows de aprovação, SLA, gargalos e recomendações de automação
+- `peerReviewCoverage.*` — cobertura de peer review em mudanças e contratos, concentration risk e backlog
+- `governanceEscalation.*` — escalações de governança, Break Glass, JIT access e flags de padrões anómalos
+
+**Totais estimados Wave AP:** CG: ~43 testes (AP.1 ~14 + AP.2 ~15 + AP.3 ~14). Configuração: +8 config keys (sort 12880–12950). i18n: +3 secções (4 locales). 1 novo endpoint REST (`/governance/escalations/report`). **Wave AP PLANEADA**.
+
+---
+
+### Wave AQ — Data Observability & Schema Quality
+
+**Objetivo:** Introduzir uma camada de observabilidade específica para dados e schemas — complementando a observabilidade de runtime (latência, erros, CPU) com análise de qualidade de schemas, conformidade de data contracts, e segurança evolutiva dos contratos ao longo do tempo. Esta wave consolida o NexTraceOne como plataforma de governança que abrange tanto o comportamento dos serviços como a qualidade das interfaces de dados que os interligam.
+
+#### AQ.1 — GetDataContractComplianceReport (Catalog)
+
+**Feature:** Análise de conformidade de data contracts — contratos que descrevem a estrutura e qualidade dos dados trocados entre serviços (mais ricos que simples OpenAPI: incluem SLA de freshness, qualidade de campo, ownership de dados).
+
+**Domínio:** `DataContractRecord` — nova entidade que regista um data contract: `ServiceId`, `DatasetName`, `ContractVersion`, `FreshnessRequirementHours`, `FieldDefinitions` (JSON: lista de `{fieldName, type, nullable, description, qualityRule}`), `OwnerTeamId`, `Status`.
+
+**Capacidades:**
+- **DataContractRecord** + **IDataContractRepository** + migration `DataContractRecords`
+- 2 features: `RegisterDataContract` + `GetDataContractComplianceReport`
+- **GetDataContractComplianceReport capacidades:**
+  - Por data contract:
+    - **FreshnessComplianceRate** — % de períodos em que a freshness SLA foi cumprida (baseado em ingestão de `DataQualityObservation` — futuro)
+    - **FieldDefinitionCompleteness** — % de campos com description + qualityRule definidos
+    - **ContractAge** — dias desde o último update do contrato
+  - **DataContractTier por contrato:** `Governed` (owner + SLA + fields complete + updated ≤90d) / `Partial` (2 de 3 critérios) / `Unmanaged` (sem owner ou sem SLA)
+  - **TenantDataContractSummary:**
+    - **DataContractCoverage** — % de serviços com ≥1 data contract registado
+    - **GovernedPct** / **PartialPct** / **UnmanagedPct**
+    - **StaleContracts** — contratos não actualizados em > `data_contract_stale_days`
+    - **FieldlessContracts** — contratos sem `FieldDefinitions` definidas (contratos "fantasma")
+  - **TeamDataGovernanceScore** — % de data contracts da equipa com tier `Governed`
+
+**Orientado para Architect, Data Engineer e Platform Admin** — suporta a adopção de data contracts como padrão de governança de dados, alinhando o NexTraceOne com práticas modernas de Data Mesh.
+
+#### AQ.2 — GetSchemaQualityIndexReport (Catalog)
+
+**Feature:** Índice de qualidade de schema por contrato e por tipo de protocolo. Analisa a qualidade intrínseca do schema — não se está a ser cumprido em runtime, mas se está bem definido como especificação.
+
+**Domínio:** Analisa `ApiAsset` (contratos REST/AsyncAPI/GraphQL/Protobuf) com base em 5 dimensões de qualidade de especificação que impactam a usabilidade do contrato por consumidores.
+
+**Capacidades:**
+- Para cada contrato com schema disponível:
+  - **DescriptionCoverage** (25%) — % de campos/operações com description não vazia e ≥ `min_desc_words` palavras
+  - **ExampleCoverage** (25%) — % de operações/events com ≥1 exemplo de payload
+  - **ErrorCodeCoverage** (20%) — % de operações REST com error codes documentados (4xx/5xx)
+  - **FieldConstraintCoverage** (15%) — % de campos com constraints definidas (required/pattern/format/enum/min/max)
+  - **EnumCoverage** (15%) — % de campos de tipo enum com ≥3 valores explicitamente definidos
+- **SchemaQualityScore** (0–100) — soma ponderada das 5 dimensões
+- **SchemaQualityTier:** `Excellent` ≥85 / `Good` ≥65 / `Fair` ≥40 / `Poor` <40
+- **QualityByProtocol** — média de SchemaQualityScore por protocolo (REST/AsyncAPI/GraphQL/Protobuf)
+- **TenantSchemaHealthScore** — média ponderada por tier de serviço (Critical ×3, Standard ×2, Internal ×1)
+- **WorstQualityContracts** — top 10 contratos com menor SchemaQualityScore (por tipo + problemas específicos)
+- **QualityImprovementHints** — para cada contrato Poor/Fair, lista das dimensões com maior gap e sugestões de melhoria (ex: "adicionar exemplos em 5 operações", "documentar error codes em 3 endpoints")
+- **QualityTrend** — comparação com análise anterior (snapshot mensal) para detectar degradação ou melhoria
+
+**Orientado para Architect, Engineer e Tech Lead** — fecha o ciclo do Contract Studio: não apenas criar contratos, mas garantir que os contratos criados têm qualidade suficiente para serem consumíveis de forma autónoma.
+
+#### AQ.3 — GetSchemaEvolutionSafetyReport (Catalog / ChangeGovernance)
+
+**Feature:** Análise de segurança evolutiva dos schemas ao longo do tempo. Responde "as nossas equipas evoluem os contratos de forma segura (backward-compatible) ou introduzem breaking changes frequentemente?"
+
+**Domínio:** Agrega dados de `ApiAsset` (diff de contratos), `BreakingChangeDetection` (resultados de Wave AE) e correlação com `IncidentRecord` para analisar padrões de evolução de schema por equipa e por protocolo.
+
+**Capacidades:**
+- Por equipa, no período:
+  - **TotalSchemaChanges** — total de mudanças de contrato registadas
+  - **BreakingChanges** — mudanças classificadas como breaking (detectadas via análise de diff)
+  - **BreakingChangeRate** — `BreakingChanges / TotalSchemaChanges * 100`
+  - **SafeEvolutionRate** — `100 - BreakingChangeRate`
+  - **BreakingChangesWithIncidentCorrelation** — breaking changes seguidas de incidente nas 48h seguintes
+  - **ConsumerNotificationRate** — % de breaking changes onde consumidores foram notificados antes do deploy
+- **EvolutionSafetyTier por equipa:** `Safe` (BreakingChangeRate ≤5% + ConsumerNotificationRate ≥90%) / `Cautious` / `Risky` / `Dangerous` (BreakingChangeRate >25% ou BreakingChangesWithIncidentCorrelation >0)
+- **ProtocolBreakingRateComparison** — taxa de breaking changes por protocolo (REST vs. AsyncAPI vs. GraphQL vs. Protobuf) — para identificar qual protocolo é evoluído com menos cuidado
+- **TenantEvolutionSafetyIndex** — % de equipas com EvolutionSafetyTier ≥ Cautious
+- **HighRiskSchemaChanges** — breaking changes recentes de equipas `Risky` ou `Dangerous` não correlacionadas com incidente ainda (janela de risco activa)
+- **EvolutionPatternRecommendations** — sugestões geradas para equipas com alto BreakingChangeRate (ex: "considerar versionamento de contrato", "adoptar contract testing pré-deploy")
+
+**Orientado para Architect, Tech Lead e Platform Admin** — permite identificar equipas que evoluem contratos de forma arriscada e fornece base factual para adopção de práticas de contract-first development e contract testing (Wave AE).
+
+#### Configuração Wave AQ
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `data_contract.stale_days` | 90 | 12960 | Dias sem update para flagging de StaleContract |
+| `data_contract.min_field_completeness_pct` | 80 | 12970 | % mínimo de campos com qualityRule para tier Governed |
+| `schema_quality.min_desc_words` | 5 | 12980 | Mínimo de palavras na description de campo para DescriptionCoverage |
+| `schema_quality.snapshot_cron` | `0 3 1 * *` | 12990 | Cron para snapshot mensal de qualidade de schema (QualityTrend) |
+| `schema_evolution.breaking_change_low_pct` | 5 | 13000 | Taxa máxima de breaking changes para EvolutionSafetyTier Safe |
+| `schema_evolution.breaking_change_dangerous_pct` | 25 | 13010 | Taxa mínima de breaking changes para EvolutionSafetyTier Dangerous |
+| `schema_evolution.incident_correlation_hours` | 48 | 13020 | Janela de horas pós-breaking-change para correlacionar com incidentes |
+| `schema_evolution.lookback_days` | 30 | 13030 | Período de análise para métricas de evolução de schema |
+
+#### i18n Wave AQ
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `dataContractCompliance.*` — conformidade de data contracts, freshness, field completeness e governance score por equipa
+- `schemaQualityIndex.*` — índice de qualidade de schema por contrato e protocolo, hints de melhoria e tendência
+- `schemaEvolutionSafety.*` — segurança evolutiva de schemas por equipa, breaking change rate e padrões de risco
+
+**Totais estimados Wave AQ:** Catalog: ~45 testes (AQ.1 ~14 + AQ.2 ~16 + AQ.3 ~15). Configuração: +8 config keys (sort 12960–13030). i18n: +3 secções (4 locales). 1 nova migration (`DataContractRecords`). 1 job Quartz.NET (snapshot mensal de qualidade de schema). **Wave AQ PLANEADA**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -2926,6 +3334,19 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 106. 🔲 **Wave AM.2** — `GetContractDriftFromRealityReport` — divergência contrato vs. runtime: UndocumentedCalls (ghost endpoints), UnusedDocumentedOps, ParameterMismatches, RealityDriftTier (Aligned/MinorDrift/SignificantDrift/Misaligned), TenantContractRealityScore, AutoDocumentationHints. Catalog. Config: `catalog.reality_drift.*` sort 12660–12670.
 107. 🔲 **Wave AM.3** — `GetCatalogHealthMaintenanceReport` — qualidade de manutenção do catálogo: CatalogQualityScore (5 dims: Description+Ownership+ContractCoverage+DependencyMap+Runbook), CatalogQualityTier (Excellent/Good/Fair/Poor), TenantCatalogHealthScore ponderado por tier, CampaignList, StaleEntryList. Catalog. Config: `catalog.maintenance.*` sort 12680–12710. **Wave AM PLANEADA**.
 
+108. 🔲 **Wave AN.1** — `GetErrorBudgetReport` — tracking de error budget por serviço: BudgetConsumedPct, BudgetRemainingPct, BurnRate, DaysToExhaustion (projecção linear), ErrorBudgetTier (Healthy/Warning/Exhausted/Burned), FreezeRecommendations, ErrorBudgetTimeline 30d. Endpoint `/sre/services/{name}/error-budget`. OI. Config: `sre.error_budget.*` sort 12720–12740.
+109. 🔲 **Wave AN.2** — `GetIncidentImpactScorecardReport` — scorecard composto de impacto de incidentes: IncidentImpactScore (4 dims: Duration 30%+BlastRadius 25%+SloImpact 25%+CustomerFacing 20%), ImpactTier (Minor/Moderate/Severe/Critical), TeamIncidentScorecard+TeamReliabilityTier, RepeatOffenderServices. OI. Config: `sre.incident_scorecard.*` sort 12750–12760.
+110. 🔲 **Wave AN.3** — `GetSreMaturityIndexReport` — índice de maturidade SRE por equipa: 6 dimensões (SloDefinition/ErrorBudget/Chaos/ToilReduction/PostIncidentReview/RunbookCompleteness), SreMaturityTier (Elite/Advanced/Practicing/Foundational), WeakestPractices, TenantSreMaturitIndex, MaturityEvolution. CG/OI. Config: `sre.maturity.*` sort 12770–12790. **Wave AN PLANEADA**.
+111. 🔲 **Wave AO.1** — `SbomRecord`+`IngestSbomRecord`+`GetSbomCoverageReport` — cobertura de SBOM: SbomCoverageTier (Covered/Stale/Outdated/Missing), CriticalCveCount, LicenseRiskFlags (GPL/AGPL), TopVulnerableServices, migration `SbomRecords`. Endpoint `POST /sbom/ingest` + `GET /sbom/coverage`. Catalog. Config: `sbom.coverage.*` sort 12800–12810.
+112. 🔲 **Wave AO.2** — `GetDependencyProvenanceReport` — proveniência de dependências: ProvenanceTier (Trusted/Review/HighRisk/Blocked), UnapprovedRegistryComponents, HighRiskLicenseComponents, SinglePointOfFailureComponents, MostUsedComponents top 20. Catalog. Config: `sbom.provenance.*` sort 12820–12830.
+113. 🔲 **Wave AO.3** — `GetSupplyChainRiskReport` — risco da cadeia de fornecimento: ComponentRiskScore (CveSeverity 50%+ExposedServices 30%+CustomerFacing 20%), SupplyChainRiskTier (Secure/Monitored/Exposed/Critical), SupplyChainRiskHeatmap (component×service), PrioritizedPatchList. Catalog/CG. Config: `sbom.risk.*` sort 12840–12870. **Wave AO PLANEADA**.
+114. 🔲 **Wave AP.1** — `GetApprovalWorkflowReport` — eficiência de workflows de aprovação: AvgApprovalTimeHours, SlaComplianceRate, AutoApprovalRate, ApprovalTier (Efficient/Normal/Delayed/Blocked), BottleneckApprovers, ApprovalHeatmap 7×24, RecommendedAutomations. CG. Config: `governance.approval.*` sort 12880–12900.
+115. 🔲 **Wave AP.2** — `GetPeerReviewCoverageReport` — cobertura de peer review: ChangeReviewCoverage+ContractReviewCoverage, ReviewCoverageRate, ReviewerConcentrationIndex (Gini-like), ReviewCompletionTier (Full/Good/Partial/AtRisk), UnreviewedHighRiskChanges, ReviewThrottleRisk. CG/Catalog. Config: `governance.review.*` sort 12910–12920.
+116. 🔲 **Wave AP.3** — `GetGovernanceEscalationReport` — escalações de governança: BreakGlassEvents (total/byUser/UnresolvedCount), JitAccessSummary (ExpiredWithoutUse), EscalationRiskTier (Low/Medium/High/Critical), EscalationPatternFlags (FrequentBreakGlass/LongRunningJit/ProductionUnresolved). CG/IA. Endpoint `/governance/escalations/report`. Config: `governance.escalation.*` sort 12930–12950. **Wave AP PLANEADA**.
+117. 🔲 **Wave AQ.1** — `DataContractRecord`+`RegisterDataContract`+`GetDataContractComplianceReport` — conformidade de data contracts: DataContractTier (Governed/Partial/Unmanaged), FreshnessComplianceRate, FieldDefinitionCompleteness, StaleContracts, TeamDataGovernanceScore, migration `DataContractRecords`. Catalog. Config: `data_contract.*` sort 12960–12970.
+118. 🔲 **Wave AQ.2** — `GetSchemaQualityIndexReport` — qualidade de schema por contrato: SchemaQualityScore (5 dims: Descriptions 25%+Examples 25%+ErrorCodes 20%+FieldConstraints 15%+Enums 15%), SchemaQualityTier (Excellent/Good/Fair/Poor), TenantSchemaHealthScore, WorstQualityContracts, QualityImprovementHints, QualityTrend mensal. Catalog. Config: `schema_quality.*` sort 12980–12990.
+119. 🔲 **Wave AQ.3** — `GetSchemaEvolutionSafetyReport` — segurança evolutiva de schemas: BreakingChangeRate, SafeEvolutionRate, ConsumerNotificationRate, EvolutionSafetyTier (Safe/Cautious/Risky/Dangerous), BreakingChangesWithIncidentCorrelation, ProtocolBreakingRateComparison, EvolutionPatternRecommendations, migration `DataContractRecords` (partilhada AQ.1). Catalog/CG. Config: `schema_evolution.*` sort 13000–13030. **Wave AQ PLANEADA**.
+
 ### Riscos e recomendações transversais
 
 - **Feature sprawl** — resistir à tentação de criar módulos novos; preferir aprofundar existentes (Wave A > Wave B).
@@ -2951,3 +3372,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 11. **Waves AB–AE (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 72–83 da lista de priorização. **Wave AB** (Knowledge Graph & Semantic Relations): AB.1 `GetKnowledgeRelationGraph` + AB.2 `GetContractLineageReport` + AB.3 `GetIncidentKnowledgeBaseReport`. +8 config keys (sort 11760–11830). **Wave AC** (Self-Service & Platform Adoption Intelligence): AC.1 `GetOnboardingHealthReport` + AC.2 `GetDeveloperActivityReport` + AC.3 `GetPlatformAdoptionReport`. +8 config keys (sort 11840–11910). **Wave AD** (Zero Trust & Security Posture Analytics): AD.1 `GetZeroTrustPostureReport` + AD.2 `GetSecretsExposureRiskReport` + AD.3 `GetAccessPatternAnomalyReport`. +8 config keys (sort 11920–11990). **Wave AE** (Contract Testing & API Backward Compatibility): AE.1 `ContractTestRecord`+`IngestContractTestResult`+`GetContractTestCoverageReport` + AE.2 `GetSchemaBreakingChangeImpactReport` + AE.3 `GetApiBackwardCompatibilityReport`. +8 config keys (sort 12000–12070). Total de config keys adicionadas: +32 (sort 11760–12070). Total de testes estimados: +186 (Catalog +~115, OI +~42, CG/IA +~29). Novas migrations: 1 (`ContractTestRecords` — Wave AE.1). i18n: +12 secções em 4 locales.
 12. **Waves AF–AI (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 84–95 da lista de priorização. **Wave AF** (Service Lifecycle Governance): AF.1 `GetServiceLifecycleTransitionReport` + AF.2 `GetServiceRetirementReadinessReport` + AF.3 `GetServiceMigrationProgressReport`. +8 config keys (sort 12080–12150). **Wave AG** (FinOps Advanced Attribution): AG.1 `GetEnvironmentCostComparisonReport` + AG.2 `GetCostPerReleaseReport` + AG.3 `GetFinOpsWasteAnalysisReport`. +8 config keys (sort 12160–12230). **Wave AH** (Event-Driven Architecture Governance): AH.1 `GetEventSchemaEvolutionReport` + AH.2 `GetEventProducerConsumerBalanceReport` + AH.3 `GetEventContractComplianceReport`. +8 config keys (sort 12240–12310). **Wave AI** (Predictive Intelligence & Forecasting): AI.1 `GetDeploymentRiskForecastReport` + AI.2 `GetCapacityTrendForecastReport` + AI.3 `GetIncidentProbabilityReport`. +8 config keys (sort 12320–12390). 1 novo endpoint REST (`/risk-forecast`). 1 job Quartz.NET (refresh de incident probability). Total: +32 config keys (sort 12080–12390). Testes estimados: +210 (Catalog +~84, OI +~113, CG +~13). i18n: +12 secções em 4 locales.
 13. **Waves AJ–AM (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 96–107 da lista de priorização. **Wave AJ** (Multi-Tenant Governance Intelligence): AJ.1 `GetCrossTenantMaturityReport` + AJ.2 `GetTenantHealthScoreReport` + AJ.3 `GetPlatformPolicyComplianceReport`. +8 config keys (sort 12400–12470). 1 novo endpoint REST (`/governance/maturity/cross-tenant-benchmark`). 1 job Quartz.NET (TenantHealthScore refresh diário). **Wave AK** (Developer Experience & Notification Management): AK.1 IDE Context API + `IDESessionToken` + `IDEUsageRecord` + AK.2 Notification Engine (`NotificationChannel`+`NotificationSubscription`+`NotificationOutbox`+3 features) + AK.3 `GetNotificationEffectivenessReport`. +8 config keys (sort 12480–12550). Migrations: 3 (`IDEUsageRecords` + 2 Notification). **Wave AL** (Audit Intelligence & Traceability Analytics): AL.1 `GetAuditTrailCompletenessReport` + AL.2 `GetUserActionAuditReport` + AL.3 `GetChangeTraceabilityReport`. +8 config keys (sort 12560–12630). 2 novos endpoints REST (`/audit/users/{id}/action-report` + `/changes/releases/{id}/traceability`). **Wave AM** (Auto-Cataloging & Service Discovery Intelligence): AM.1 `GetUncatalogedServicesReport` + AM.2 `GetContractDriftFromRealityReport` + AM.3 `GetCatalogHealthMaintenanceReport`. +8 config keys (sort 12640–12710). Total: +32 config keys (sort 12400–12710). Testes estimados: +157 (CG +~45, IA +~30, Catalog +~46, Foundation +~36). i18n: +12 secções em 4 locales.
+14. **Waves AN–AQ (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 108–119 da lista de priorização. **Wave AN** (SRE Intelligence & Error Budget Management): AN.1 `GetErrorBudgetReport` (BurnRate, DaysToExhaustion, ErrorBudgetTier, FreezeRecommendations) + AN.2 `GetIncidentImpactScorecardReport` (4-dim score, TeamReliabilityTier, RepeatOffenderServices) + AN.3 `GetSreMaturityIndexReport` (6 práticas SRE, SreMaturityTier Elite/Advanced/Practicing/Foundational). +8 config keys (sort 12720–12790). 1 endpoint REST. **Wave AO** (Supply Chain & Dependency Provenance): AO.1 `SbomRecord`+`IngestSbomRecord`+`GetSbomCoverageReport` (SbomCoverageTier, LicenseRiskFlags) + AO.2 `GetDependencyProvenanceReport` (ProvenanceTier, SinglePointOfFailureComponents) + AO.3 `GetSupplyChainRiskReport` (ComponentRiskScore, SupplyChainRiskTier, PrioritizedPatchList). +8 config keys (sort 12800–12870). Migration `SbomRecords`. **Wave AP** (Collaborative Governance & Workflow Automation): AP.1 `GetApprovalWorkflowReport` (ApprovalTier, BottleneckApprovers, ApprovalHeatmap) + AP.2 `GetPeerReviewCoverageReport` (ReviewerConcentrationIndex, ReviewCompletionTier) + AP.3 `GetGovernanceEscalationReport` (BreakGlass, JIT, EscalationRiskTier). +8 config keys (sort 12880–12950). 1 endpoint REST. **Wave AQ** (Data Observability & Schema Quality): AQ.1 `DataContractRecord`+`RegisterDataContract`+`GetDataContractComplianceReport` (DataContractTier Governed/Partial/Unmanaged) + AQ.2 `GetSchemaQualityIndexReport` (5-dim SchemaQualityScore, QualityTrend mensal) + AQ.3 `GetSchemaEvolutionSafetyReport` (EvolutionSafetyTier Safe→Dangerous, ProtocolBreakingRateComparison). +8 config keys (sort 12960–13030). Migration `DataContractRecords`. 1 job Quartz.NET. Total: +32 config keys (sort 12720–13030). Testes estimados: +173 (OI +~39, Catalog +~91, CG +~43). i18n: +12 secções em 4 locales. 2 novas migrations. 3 novos endpoints REST.
