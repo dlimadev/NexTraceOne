@@ -918,6 +918,483 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave S — Change Window Utilization + Contract Adoption + MTTR Trend
+
+**Objetivo:** Fechar o loop entre Release Calendar e conformidade de deployment, medir a velocidade de adoção de versões de contrato pelos consumidores, e introduzir análise de tendência de MTTR (Mean Time To Recovery) por serviço.
+
+#### S.1 — GetChangeWindowUtilizationReport (ChangeGovernance)
+
+**Feature:** Relatório de utilização de janelas de mudança registadas no Release Calendar. Responde à pergunta: "as equipas estão a respeitar as janelas de deployment definidas?"
+
+**Domínio:** Aproveita `ReleaseCalendarEntry` (Wave F) e os repositórios de `Release` já existentes.
+
+**Capacidades:**
+- Para cada janela do tipo `Scheduled` ou `HotfixAllowed` no período, calcula quantas releases ocorreram dentro (`InsideWindow`) e fora (`OutsideWindow`) da janela
+- **Taxa de compliance global:** `InsideWindow / TotalReleases * 100`
+- **Distribuição por tipo de janela:** Scheduled / HotfixAllowed / Maintenance
+- **Top equipas não-conformes:** equipas com maior taxa de deploys fora de janela
+- **Classificação de compliance:**
+  - `Excellent` — taxa ≥ `excellent_threshold` (default 90%)
+  - `Good` — taxa ≥ `good_threshold` (default 70%)
+  - `AtRisk` — taxa < `good_threshold`
+- Filtro por ambiente e período (7–90 dias)
+
+**Orientado para Platform Admin, Tech Lead e Architect** — alimenta o Release Calendar como fonte de verdade de compliance operacional.
+
+#### S.2 — GetContractAdoptionReport (Catalog)
+
+**Feature:** Progresso de adoção de versões de contrato pelos consumidores registados. Identifica contratos com migração lenta e consumidores presos em versões antigas.
+
+**Domínio:** Cruza `ApiAsset` + `ContractVersion` + `ConsumerExpectation` (consumidores registados por versão).
+
+**Capacidades:**
+- Para cada contrato com múltiplas versões e consumidores registados, calcula:
+  - `ConsumersOnLatestVersion` / `TotalConsumers` = **taxa de migração**
+  - Versão mais antiga ainda em uso (`OldestActiveVersion`) — identifica "stragglers"
+  - `DaysLatestVersionAge` — antiguidade da versão mais recente
+- **MigrationTier por contrato:**
+  - `Complete` — taxa ≥ 90% (todos os consumidores na versão mais recente)
+  - `InProgress` — taxa ≥ 50%
+  - `Lagging` — taxa < 50%
+  - `NoConsumers` — sem expectativas de consumo registadas
+- **Top contratos com migração mais lenta** (ordenados por taxa asc)
+- **Distribuição global de MigrationTier** no tenant
+- Filtro por protocolo (OpenAPI/AsyncAPI/GraphQL/Protobuf) e ambiente
+
+**Orientado para Architect e Tech Lead** — suporta decisões de deprecation e sunset de versões com visibilidade de impacto real.
+
+#### S.3 — GetMttrTrendReport (OperationalIntelligence)
+
+**Feature:** Tendência de MTTR (Mean Time To Recovery) por serviço e equipa. Mede a velocidade de recuperação de incidentes ao longo do tempo e compara com benchmarks DORA.
+
+**Domínio:** Cruza `Incident` (`CreatedAt` → `ResolvedAt`) agrupado por `ServiceName`/`TeamId`.
+
+**Capacidades:**
+- **MTTR médio por serviço** no período (em minutos)
+- **Classificação DORA de MTTR:**
+  - `Elite` — MTTR < 60 min
+  - `High` — MTTR < 240 min (4h)
+  - `Medium` — MTTR < 1440 min (24h)
+  - `Low` — MTTR ≥ 1440 min
+- **Distribuição global por DORA tier** no tenant
+- **Tendência em janelas diárias** (`TrendWindows`): 30 pontos com data + MTTR médio do dia
+- **Classificação de tendência:**
+  - `Worsening` — MTTR recente > 1.25× MTTR anterior
+  - `Improving` — MTTR recente < 0.75× MTTR anterior
+  - `Stable` — variação dentro da banda
+  - `Insufficient` — dados insuficientes (< 2 incidentes)
+- **Top serviços com pior MTTR** e **top serviços com maior pioria de MTTR** no período
+- Filtro por equipa, ambiente e período (7–90 dias)
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — alinha com DORA metrics e suporta objetivos de confiabilidade operacional.
+
+#### Configuração Wave S
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `changes.window_utilization.lookback_days` | 30 | 11120 | Período padrão para relatório de utilização de janelas |
+| `changes.window_utilization.excellent_threshold` | 90 | 11130 | Threshold (%) para classificação Excellent de compliance |
+| `changes.window_utilization.good_threshold` | 70 | 11140 | Threshold (%) para classificação Good de compliance |
+| `contracts.adoption.max_contracts` | 50 | 11150 | Máximo de contratos no relatório de adoção |
+| `contracts.adoption.migration_complete_threshold` | 90 | 11160 | Threshold (%) de consumidores na versão mais recente para MigrationTier Complete |
+| `contracts.adoption.migration_in_progress_threshold` | 50 | 11170 | Threshold (%) para MigrationTier InProgress |
+| `runtime.mttr.lookback_days` | 30 | 11180 | Período padrão para análise de MTTR |
+| `runtime.mttr.trend_window_count` | 30 | 11190 | Número de janelas diárias na tendência de MTTR |
+
+#### i18n Wave S
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `changeWindowUtilization.*` — conformidade de janelas de mudança
+- `contractAdoption.*` — adoção de versões de contratos por consumidores
+- `mttrTrend.*` — tendência de Mean Time To Recovery
+
+**Totais estimados Wave S:** CG: ~867 testes (+15). Catalog: ~1873 testes (+12). OI: ~1179 testes (+18). Configuração: +8 config keys (sort 11120–11190). i18n: +3 secções (4 locales).
+
+---
+
+### Wave T — Post-Incident Learning + API Schema Coverage + Environment Stability
+
+**Objetivo:** Medir o aprendizado organizacional pós-incidente, avaliar a completude de documentação dos schemas de API e monitorizar a estabilidade comparada de ambientes para suportar decisões de promoção entre ambientes.
+
+#### T.1 — GetPostIncidentLearningReport (ChangeGovernance)
+
+**Feature:** Relatório de aprendizado pós-incidente. Quantifica em que medida os incidentes geram conhecimento documentado (runbooks, notas) que previne recorrência.
+
+**Domínio:** Cruza `Incident` com `ProposedRunbook` (Knowledge module via abstração) e identifica incidentes repetidos no mesmo serviço.
+
+**Capacidades:**
+- Para cada incidente no período, verifica se foi criado um `ProposedRunbook` com status `Approved` pós-incidente
+- **Learning Rate:** `IncidentsWithRunbook / TotalIncidents * 100`
+- **Incidentes recorrentes:** mesmo serviço + mesmo `Category` com ≥ 2 ocorrências sem runbook aprovado = "recorrência sem aprendizado"
+- **Classificação de cobertura:**
+  - `Full` — taxa ≥ 80%
+  - `Partial` — taxa ≥ 40%
+  - `Low` — taxa < 40%
+- **Top serviços com menor learning rate** (piores primeiro)
+- **Total de incidentes recorrentes não documentados** (risco de reincidência)
+- Filtro por equipa, serviço e período (7–180 dias)
+
+**Orientado para Tech Lead, Architect e Platform Admin** — reforça o Knowledge Hub como ferramenta de melhoria contínua e não apenas repositório passivo.
+
+#### T.2 — GetApiSchemaCoverageReport (Catalog)
+
+**Feature:** Scorecard de completude de documentação de schemas de API. Revela contratos mal documentados que comprometem a qualidade do catálogo como Source of Truth.
+
+**Domínio:** Analisa `ApiAsset` + `ContractVersion` em estado `Approved` ou `Locked`.
+
+**Capacidades:**
+- Para cada contrato, score de completude de schema (0–100) por 4 dimensões:
+  - +25 **Response bodies documentados** (pelo menos 200 OK definido)
+  - +25 **Request body documentado** (onde aplicável — não GET/DELETE)
+  - +25 **Exemplos de payload presentes** (pelo menos 1 exemplo por contrato)
+  - +25 **Status codes complementares documentados** (além de 200: 4xx, 5xx, 201/204)
+- **CoverageGrade por contrato:**
+  - `A` — score ≥ 90
+  - `B` — score ≥ 70
+  - `C` — score ≥ 50
+  - `D` — score < 50
+- **Distribuição global por CoverageGrade** no tenant
+- **Score médio de cobertura de schema** do tenant
+- **Top contratos com menor cobertura** (prioridade para melhoria)
+- Filtro por protocolo, equipa e máximo de contratos (1–200)
+
+**Orientado para Architect e Tech Lead** — alimenta developer onboarding e garante que o catálogo tenha valor real para consumidores de contratos.
+
+#### T.3 — GetEnvironmentStabilityReport (OperationalIntelligence)
+
+**Feature:** Score de estabilidade comparado por ambiente (dev/staging/production). Responde à pergunta: "os ambientes não-produtivos são estáveis o suficiente para ser confiáveis como preditores de produção?"
+
+**Domínio:** Agrega sinais de `SloObservation` (breaches), `DriftFinding` (não reconhecidos), `ChaosExperiment` (falhas) e incidentes correlacionados a mudanças por ambiente.
+
+**Capacidades:**
+- **Score de estabilidade por ambiente (0–100)** com 4 dimensões ponderadas:
+  - SLO compliance (30%): `MetCount / TotalObservations`
+  - Drift-free ratio (30%): `1 - (OpenDriftFindings / MaxExpected)`
+  - Chaos success (20%): `CompletedExperiments / TotalExperiments`
+  - Post-change incident ratio (20%): `1 - (IncidentsPostChange / TotalReleases)`
+- **Classificação por ambiente:**
+  - `Stable` — score ≥ 80
+  - `Unstable` — score ≥ 50
+  - `Critical` — score < 50
+- **Sinal de alerta "Non-Prod mais instável que Prod"** — flag explícita quando staging/dev tem score inferior ao de production (inverte o valor preditivo)
+- **Top serviços desestabilizadores** por ambiente (maior contribuição negativa)
+- Comparação side-by-side entre todos os ambientes ativos do tenant
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — base para gates de promoção que consideram estabilidade de ambientes upstream.
+
+#### Configuração Wave T
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `compliance.learning.lookback_days` | 90 | 11200 | Período de análise para relatório de aprendizado pós-incidente |
+| `compliance.learning.full_coverage_threshold` | 80 | 11210 | Threshold (%) para classificação Full de cobertura |
+| `compliance.learning.partial_coverage_threshold` | 40 | 11220 | Threshold (%) para classificação Partial de cobertura |
+| `contracts.schema_coverage.max_contracts` | 100 | 11230 | Máximo de contratos no relatório de cobertura de schema |
+| `contracts.schema_coverage.grade_a_threshold` | 90 | 11240 | Threshold de score para CoverageGrade A |
+| `contracts.schema_coverage.grade_b_threshold` | 70 | 11250 | Threshold de score para CoverageGrade B |
+| `runtime.environment_stability.lookback_days` | 30 | 11260 | Período de análise para estabilidade de ambientes |
+| `runtime.environment_stability.stable_threshold` | 80 | 11270 | Threshold de score para classificação Stable |
+
+#### i18n Wave T
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `postIncidentLearning.*` — aprendizado pós-incidente e runbook coverage
+- `apiSchemaCoverage.*` — cobertura de documentação de schemas de API
+- `environmentStability.*` — estabilidade comparada de ambientes
+
+**Totais estimados Wave T:** CG: ~879 testes (+12). Catalog: ~1887 testes (+14). OI: ~1195 testes (+16). Configuração: +8 config keys (sort 11200–11270). i18n: +3 secções (4 locales).
+
+---
+
+### Wave U — Compliance Coverage Matrix + Dependency Freshness + Service Load Distribution
+
+**Objetivo:** Introduzir uma visão unificada de cobertura de compliance por serviço (matriz multi-standard), medir o envelhecimento das dependências entre serviços cruzado com vulnerabilidades, e mapear a distribuição de carga operacional para identificar outliers de custo por throughput.
+
+#### U.1 — GetComplianceCoverageMatrixReport (ChangeGovernance)
+
+**Feature:** Matriz de cobertura de standards de compliance por serviço ou equipa. Identifica "compliance blind spots" — serviços sem qualquer avaliação de conformidade.
+
+**Domínio:** Agrega resultados de todos os relatórios de compliance (SOC2, ISO 27001, PCI-DSS, HIPAA, GDPR, FedRAMP, NIS2, CMMC) por serviço/tenant.
+
+**Capacidades:**
+- Para cada serviço no tenant, lista quais standards foram avaliados e respetivo estado (`Compliant / PartiallyCompliant / NonCompliant / NotAssessed`)
+- **CoverageScore por serviço:** número de standards com estado diferente de `NotAssessed` / total de standards ativos × 100
+- **CoverageLevel por serviço:**
+  - `Full` — todos os standards ativos avaliados (score = 100%)
+  - `Partial` — ≥ 50% dos standards avaliados
+  - `Minimal` — < 50% avaliados
+  - `None` — nenhum standard avaliado (blind spot)
+- **Distribuição global de CoverageLevel** no tenant
+- **Top serviços com maior gap de compliance** (piores primeiros por CoverageScore)
+- **Score de compliance agregado por standard** (quantos serviços passaram em cada standard)
+- Filtro por equipa, tier de serviço e lista de standards ativos configurável
+
+**Orientado para Auditor, Platform Admin e Executive** — visão transversal que responde "quão cobertos estamos em compliance?" em vez de relatório por standard individual.
+
+#### U.2 — GetDependencyUpdateFreshnessReport (Catalog)
+
+**Feature:** Análise de "frescor" das dependências registadas entre serviços. Identifica serviços com dependências desatualizadas que aumentam o risco de exposição a vulnerabilidades conhecidas.
+
+**Domínio:** Cruza `ServiceDependency` (última mudança via `ContractChangelog` ou `Release`) com `VulnerabilityAdvisoryRecord` por serviço.
+
+**Capacidades:**
+- Para cada serviço, calcula `DaysSinceLastDependencyChange` (último `ContractChangelog` de um contrato consumido pelo serviço, ou último `Release` que tocou no serviço)
+- **FreshnessTier por serviço:**
+  - `Fresh` — últimos 30 dias
+  - `Aging` — 31–90 dias
+  - `Stale` — 91–180 dias
+  - `Critical` — mais de 180 dias sem atualização registada
+- **Correlação com vulnerabilidades:** serviços `Stale` ou `Critical` com `VulnerabilityAdvisoryRecord` aberto = flag `VulnerabilityGap`
+- **Top serviços mais desatualizados** com número de vulns abertas associadas
+- **Distribuição global por FreshnessTier** no tenant
+- Filtro por tier de serviço e threshold de criticidade de vulnerabilidade
+
+**Orientado para Architect, Tech Lead e Security** — alimenta decisões de upgrade de dependências priorizadas por risco real.
+
+#### U.3 — GetServiceLoadDistributionReport (OperationalIntelligence)
+
+**Feature:** Distribuição de carga operacional entre serviços do tenant, correlacionada com custo. Identifica outliers de custo por throughput (serviços caros com baixo uso — desperdício) e serviços sobrecarregados.
+
+**Domínio:** Cruza `RuntimeSnapshot` (latência, throughput, taxa de erro) com `ServiceCostAllocationRecord` (custo por serviço/ambiente).
+
+**Capacidades:**
+- Para cada serviço com snapshots de runtime no período, calcula:
+  - `AvgLatencyMs`, `AvgThroughput`, `AvgErrorRate` (médias dos snapshots)
+  - `TotalCostUsd` (do `ServiceCostAllocationRecord` no mesmo período e ambiente)
+  - `CostPerRequestUsd` = `TotalCostUsd / (AvgThroughput * PeriodDays * 86400)` — custo por request
+- **LoadBand por serviço** (baseado em throughput comparativo por quartil):
+  - `HighLoad` — throughput no quartil superior (top 25%)
+  - `MediumLoad` — quartis 2 e 3 (50%)
+  - `LowLoad` — quartil inferior (bottom 25%)
+- **WasteCandidate flag** — serviços `LowLoad` com custo > mediana dos pares (custo elevado, uso baixo)
+- **HighCostEfficiency flag** — serviços `HighLoad` com `CostPerRequest` abaixo da mediana (eficientes)
+- **Top 10 serviços com pior custo por request** (outliers de waste)
+- Filtro por ambiente e período (7–90 dias)
+
+**Orientado para Platform Admin, FinOps e Architect** — fecha o loop entre observabilidade operacional e custo real, habilitando decisões de rightsizing.
+
+#### Configuração Wave U
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `compliance.coverage.enabled_standards` | `SOC2,ISO27001,PCI-DSS,HIPAA,GDPR,FedRAMP,NIS2,CMMC` | 11280 | Standards ativos para a matriz de cobertura |
+| `compliance.coverage.full_threshold` | 100 | 11290 | Threshold (%) para CoverageLevel Full |
+| `compliance.coverage.partial_threshold` | 50 | 11300 | Threshold (%) para CoverageLevel Partial |
+| `catalog.dependency_freshness.fresh_threshold_days` | 30 | 11310 | Máximo de dias para FreshnessTier Fresh |
+| `catalog.dependency_freshness.aging_threshold_days` | 90 | 11320 | Máximo de dias para FreshnessTier Aging |
+| `catalog.dependency_freshness.stale_threshold_days` | 180 | 11330 | Máximo de dias para FreshnessTier Stale |
+| `runtime.load_distribution.max_services` | 50 | 11340 | Máximo de serviços no relatório de distribuição de carga |
+| `runtime.load_distribution.lookback_days` | 30 | 11350 | Período de análise para distribuição de carga |
+
+#### i18n Wave U
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `complianceCoverageMatrix.*` — matriz de cobertura de compliance por serviço
+- `dependencyFreshness.*` — frescor de dependências e gap de vulnerabilidades
+- `serviceLoadDistribution.*` — distribuição de carga operacional e custo por request
+
+**Totais estimados Wave U:** CG: ~892 testes (+13). Catalog: ~1898 testes (+11). OI: ~1210 testes (+15). Configuração: +8 config keys (sort 11280–11350). i18n: +3 secções (4 locales).
+
+---
+
+### Wave V — API Growth Rate + Chaos Coverage Gap + Release Frequency Deviation
+
+**Objetivo:** Detectar acumulação descontrolada de APIs em serviços (crescimento sem governance), identificar serviços críticos sem cobertura de chaos engineering, e revelar desvios bruscos de ritmo de deployment que podem indicar problemas organizacionais ou de confiança.
+
+#### V.1 — GetServiceApiGrowthReport (Catalog)
+
+**Feature:** Taxa de crescimento do número de APIs (contratos) por serviço ao longo do tempo. Identifica serviços a acumular APIs sem revisão de governance.
+
+**Domínio:** Compara `ApiAssetCount` por serviço entre dois períodos (atual vs. `comparison_period_days` atrás), cruzado com `GetContractHealthDistributionReport` para correlacionar crescimento com qualidade.
+
+**Capacidades:**
+- Para cada serviço, compara contagem de contratos em `Approved` ou `Locked` entre o período atual e o período de comparação
+- **GrowthRatePct:** `(CurrentCount - PreviousCount) / PreviousCount * 100`
+- **GrowthTier por serviço:**
+  - `Stable` — crescimento < 10%
+  - `Growing` — crescimento 10–50%
+  - `RapidGrowth` — crescimento 50–100%
+  - `Exploding` — crescimento > 100% (risco de governance sprawl)
+  - `Shrinking` — crescimento negativo (consolidação ou deprecation)
+- **GovernanceRisk flag** — serviços `RapidGrowth` ou `Exploding` com `ContractHealthScore` médio < 60 (crescimento com baixa qualidade)
+- **Top serviços com maior crescimento** e top serviços `GovernanceRisk`
+- **Distribuição global por GrowthTier** no tenant
+- Filtro por equipa e tier de serviço
+
+**Orientado para Architect e Platform Admin** — previne "API sprawl" e garante que o crescimento do catálogo acompanha a governance.
+
+#### V.2 — GetChaosCoverageGapReport (OperationalIntelligence)
+
+**Feature:** Análise de gaps de cobertura de chaos engineering por serviço. Identifica serviços críticos não testados quanto à sua resiliência.
+
+**Domínio:** Cruza `ServiceAsset` (tier, owner) com `ChaosExperiment` (por serviço, por ambiente) para identificar ausências de cobertura.
+
+**Capacidades:**
+- Para cada serviço no tenant, verifica presença de `ChaosExperiment` no período:
+  - Sem experimentos = `NoCoverage`
+  - Experimentos apenas em não-produção = `ProductionGap`
+  - Experimentos em produção mas todos `Failed` ou `Cancelled` = `FailedCoverage`
+  - Experimentos com pelo menos 1 `Completed` em produção = `FullCoverage`
+- **GapLevel enum:** `NoCoverage / ProductionGap / FailedCoverage / PartialCoverage / FullCoverage`
+- **CriticalGap flag** — serviços de tier `Critical` com `GapLevel != FullCoverage`
+- **Distribuição global por GapLevel** no tenant
+- **Top serviços críticos sem cobertura** (ordenados por tier e nome)
+- **CoverageRate geral** = serviços com `FullCoverage` / total de serviços ativos
+- Filtro por tier de serviço, ambiente e período (30–365 dias)
+
+**Orientado para Architect, Tech Lead e Platform Admin** — suporta a estratégia de chaos engineering como capacidade governada, não ad-hoc.
+
+#### V.3 — GetReleaseFrequencyDeviationReport (ChangeGovernance)
+
+**Feature:** Deteção de desvios bruscos de frequência de deployment por serviço. Identifica acelerações (possível rush sem qualidade) ou desacelerações (possível estagnação ou bloqueio).
+
+**Domínio:** Compara `DeploysPerDay` em dois períodos: recente (`recent_days`) vs. histórico (`historical_days`). Aprofunda a análise de cadência do `GetDeploymentCadenceReport` (Wave K) com perspetiva temporal.
+
+**Capacidades:**
+- Para cada serviço com releases no histórico, calcula:
+  - `DeploysPerDayRecent` = releases nos últimos `recent_days` / `recent_days`
+  - `DeploysPerDayHistorical` = releases nos `historical_days` anteriores / `historical_days`
+  - `DeviationPct` = `(recent - historical) / historical * 100`
+- **FrequencyDeviation enum:**
+  - `Accelerating` — desvio > +50% (rush de deployments — risco de qualidade)
+  - `Stable` — desvio entre -50% e +50%
+  - `Decelerating` — desvio < -50% (possível bloqueio ou loss of momentum)
+  - `Stalled` — zero releases recentes mas com histórico (potencial paralisia)
+  - `New` — sem histórico, apenas releases recentes (serviço novo)
+- **RiskFlag** — `Accelerating` com `ReleaseSuccessRate < 80%` ou `Stalled` com tier `Critical`
+- **Top serviços com maior desvio positivo e negativo**
+- **Distribuição global por FrequencyDeviation** no tenant
+- Filtro por equipa, ambiente e tier de serviço
+
+**Orientado para Tech Lead, Architect e Executive** — complementa a análise DORA de cadência com perspetiva de variação de ritmo, não só estado absoluto.
+
+#### Configuração Wave V
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `catalog.api_growth.comparison_period_days` | 90 | 11360 | Período de comparação para cálculo de crescimento de APIs |
+| `catalog.api_growth.stable_threshold_pct` | 10 | 11370 | Threshold (%) de crescimento para GrowthTier Stable |
+| `catalog.api_growth.rapid_threshold_pct` | 50 | 11380 | Threshold (%) de crescimento para GrowthTier RapidGrowth |
+| `chaos.coverage.lookback_days` | 90 | 11390 | Período de análise para gaps de cobertura de chaos |
+| `chaos.coverage.max_services` | 100 | 11400 | Máximo de serviços no relatório de gap de chaos |
+| `changes.frequency_deviation.historical_days` | 90 | 11410 | Período histórico para cálculo de frequência base |
+| `changes.frequency_deviation.recent_days` | 30 | 11420 | Período recente para cálculo de frequência de comparação |
+| `changes.frequency_deviation.max_services` | 50 | 11430 | Máximo de serviços no relatório de desvio de frequência |
+
+#### i18n Wave V
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `serviceApiGrowth.*` — taxa de crescimento de APIs por serviço
+- `chaosCoverageGap.*` — gaps de cobertura de chaos engineering
+- `releaseFrequencyDeviation.*` — desvio de frequência de deployments
+
+**Totais estimados Wave V:** CG: ~903 testes (+11). Catalog: ~1911 testes (+13). OI: ~1224 testes (+14). Configuração: +8 config keys (sort 11360–11430). i18n: +3 secções (4 locales).
+
+---
+
+### Wave W — Rollback Pattern Analysis + Service Coupling Index + Anomaly Detection Summary
+
+**Objetivo:** Analisar padrões sistemáticos de rollback para identificar anti-padrões de deployment, introduzir um índice de acoplamento entre serviços baseado em dependências registadas, e consolidar todas as anomalias detetadas pelo sistema numa visão unificada por serviço.
+
+#### W.1 — GetRollbackPatternReport (ChangeGovernance)
+
+**Feature:** Análise de padrões de rollback por serviço, equipa e ambiente. Distingue rollbacks isolados de padrões recorrentes ou seriais que indicam disfunções sistémicas.
+
+**Domínio:** Agrega `Release` com `DeploymentStatus = RolledBack` cruzado com `ChangeConfidenceBreakdown` e `EvidencePack` para correlacionar rollbacks com qualidade de preparação.
+
+**Capacidades:**
+- Para cada serviço com rollbacks no período, calcula:
+  - `TotalRollbacks` e `RollbackRate` = rollbacks / total releases
+  - `AvgConfidenceAtRollback` — confidence score médio das releases que foram revertidas
+  - `AvgEvidencePackCompleteness` — completude média dos evidence packs nas releases revertidas
+- **RollbackPattern por serviço:**
+  - `Isolated` — 1 rollback no período (one-off)
+  - `Recurring` — 2–3 rollbacks no período (padrão de atenção)
+  - `Serial` — ≥ 4 rollbacks no período (disfunção sistémica)
+  - `None` — zero rollbacks (clean record)
+- **SystemicRisk flag** — serviços `Serial` com `AvgConfidenceAtRollback < 50` (deploys de baixa confiança que resultam em rollback)
+- **Correlação com Evidence Packs** — serviços com rollbacks e `AvgEvidencePackCompleteness < 70%` = flag `EvidenceGap`
+- **Top serviços com maior RollbackRate** e top serviços `Serial`
+- **Distribuição por RollbackPattern** no tenant
+- Filtro por equipa, ambiente e período (7–180 dias)
+
+**Orientado para Tech Lead, Architect e Platform Admin** — fecha o loop entre rollback intelligence (Wave J.3) e análise de padrões de qualidade de deployment.
+
+#### W.2 — GetServiceCouplingIndexReport (Catalog)
+
+**Feature:** Índice de acoplamento estrutural entre serviços do tenant baseado em dependências registadas. Identifica "hub services" de alta criticidade e serviços isolados sem integração no ecossistema.
+
+**Domínio:** Analisa `ServiceDependency` (grafo dirigido de dependências) para calcular fan-in (quantos dependem de mim) e fan-out (de quantos eu dependo) por serviço.
+
+**Capacidades:**
+- Para cada serviço, calcula:
+  - `FanIn` — número de serviços que dependem deste serviço (upstream consumers)
+  - `FanOut` — número de serviços dos quais este serviço depende (downstream dependencies)
+  - `CouplingIndex` = normalizado 0–100: `min(100, (FanIn * 3 + FanOut * 2) / sqrt(max(1, TotalServices)) * 10)`
+- **CouplingTier por serviço:**
+  - `HubService` — CouplingIndex ≥ 70 (alto fan-in — alto blast radius potencial)
+  - `HighlyCoupled` — CouplingIndex ≥ 50 (alto fan-out — alta dependência de terceiros)
+  - `ModeratelyCoupled` — CouplingIndex ≥ 25
+  - `LooselyCoupled` — CouplingIndex ≥ 10
+  - `Isolated` — CouplingIndex < 10 e FanIn = 0 e FanOut = 0 (sem dependências registadas)
+- **ArchitecturalRisk flag** — serviços `HubService` com tier `Critical` e `FanIn ≥ 5`
+- **IsolationRisk flag** — serviços `Isolated` com tier `Critical` ou `Standard` (potencial governance gap)
+- **Top hub services** (maior fan-in) e top acoplados (maior fan-out)
+- **CouplingIndex médio do tenant** e **% de serviços Isolated**
+
+**Orientado para Architect e Platform Admin** — suporta análise de blast radius, decisões de decomposição de serviços e identificação de single points of failure estruturais.
+
+#### W.3 — GetAnomalyDetectionSummaryReport (OperationalIntelligence)
+
+**Feature:** Sumário consolidado de todas as anomalias detetadas pelo NexTraceOne num período, por serviço. Responde à pergunta: "quais serviços têm múltiplos sinais de problema simultâneos?"
+
+**Domínio:** Agrega anomalias de múltiplas fontes:
+- `WasteSignal` (FinOps — idle/overprovision)
+- `DriftFinding` (runtime — desvio de baseline)
+- `SloObservation` com status `Breached`
+- `ChaosExperiment` com status `Failed`
+- `VulnerabilityAdvisoryRecord` com severity `Critical` ou `High`
+- Incidentes correlacionados a mudanças recentes
+
+**Capacidades:**
+- Para cada serviço, lista todos os tipos de anomalia ativos no período com contagem
+- **AnomalyCount total** por serviço (soma de todos os tipos)
+- **AnomalyDensity tier:**
+  - `Clean` — 0 anomalias ativas
+  - `Moderate` — 1–2 tipos de anomalia
+  - `Dense` — 3–4 tipos de anomalia
+  - `Critical` — ≥ 5 tipos de anomalia simultâneos
+- **MultiAnomalyServices** — lista de serviços com ≥ 3 tipos simultâneos (requerem atenção imediata)
+- **Timeline de anomalias por dia** (30 pontos) — pico de anomalias por dia no tenant
+- **Distribuição por tipo de anomalia** no tenant
+- **Top serviços com maior AnomalyCount**
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — funciona como "early warning dashboard" unificado que cruza todos os sinais de alerta disponíveis, eliminando a necessidade de consultar cada relatório individualmente.
+
+#### Configuração Wave W
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `changes.rollback_pattern.lookback_days` | 90 | 11440 | Período de análise para padrões de rollback |
+| `changes.rollback_pattern.serial_threshold` | 4 | 11450 | Número mínimo de rollbacks para padrão Serial |
+| `changes.rollback_pattern.max_services` | 50 | 11460 | Máximo de serviços no relatório de padrões |
+| `catalog.coupling_index.max_services` | 100 | 11470 | Máximo de serviços no relatório de acoplamento |
+| `catalog.coupling_index.hub_threshold` | 70 | 11480 | Threshold de CouplingIndex para HubService |
+| `catalog.coupling_index.high_coupled_threshold` | 50 | 11490 | Threshold de CouplingIndex para HighlyCoupled |
+| `runtime.anomaly_summary.lookback_days` | 30 | 11500 | Período de análise para sumário de anomalias |
+| `runtime.anomaly_summary.max_services` | 100 | 11510 | Máximo de serviços no sumário de anomalias |
+
+#### i18n Wave W
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `rollbackPattern.*` — padrões de rollback por serviço
+- `serviceCouplingIndex.*` — índice de acoplamento entre serviços
+- `anomalyDetectionSummary.*` — sumário consolidado de anomalias
+
+**Totais estimados Wave W:** CG: ~916 testes (+13). Catalog: ~1924 testes (+13). OI: ~1240 testes (+16). Configuração: +8 config keys (sort 11440–11510). i18n: +3 secções (4 locales).
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -974,6 +1451,21 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 45. ✅ **Wave R.2** — `GetApiSchemaStabilityReport` — estabilidade de schemas de API por frequência de changelogs. Agrega entradas de `ContractChangelog` no período por `ApiAssetId` via `ListByTenantInPeriodAsync`. Classifica estabilidade em `SchemaStabilityTier` (Stable=0 / Volatile≥1 / Unstable≥3 / Critical≥6). Produz: total de contratos com alterações, avg e max de changelogs por contrato, distribuição por tier, top contratos mais instáveis e mais estáveis. Adicionado `ListByTenantInPeriodAsync` a `IContractChangelogRepository` e implementação correspondente no repositório de infraestrutura. Catalog: 1861 testes (+16). Config: `contracts.schema_stability.*` sort 11060–11080.
 
 46. ✅ **Wave R.3** — `GetTeamOperationalHealthReport` — scorecard composto de saúde operacional por equipa. Usa nova abstração `ITeamOperationalMetricsReader` para obter métricas pré-agregadas por equipa (ServiceCount, SloComplianceRatePct, UnacknowledgedDriftCount, ChaosSuccessRatePct, ServicesWithProfilingCount, PostDeployIncidentCount). Computa score ponderado: SLO 40% + Drift 30% + Chaos 20% + Profiling 10%. Classifica em `OperationalHealthTier` (Excellent ≥90 / Good ≥70 / Fair ≥50 / Poor <50). Produz: média do tenant, distribuição por tier, top equipas saudáveis e em risco, ranking completo. OI: 1161 testes (+23). Config: `runtime.team_health.*` sort 11090–11110. **WAVE R COMPLETO**.
+47. 🔲 **Wave S.1** — `GetChangeWindowUtilizationReport` — conformidade de janelas de mudança: taxa de deploys dentro vs. fora de janela (Scheduled/HotfixAllowed), top equipas não-conformes, classificação Excellent/Good/AtRisk. Aprofunda Release Calendar (Wave F) como mecanismo de governance de deployment. CG. Config: `changes.window_utilization.*` sort 11120–11140.
+48. 🔲 **Wave S.2** — `GetContractAdoptionReport` — progresso de migração de versões de contrato pelos consumidores: taxa de adoção da versão mais recente por contrato, `MigrationTier` (Complete/InProgress/Lagging/NoConsumers), versão mais antiga ainda em uso, top contratos com migração mais lenta. Catalog. Config: `contracts.adoption.*` sort 11150–11170.
+49. 🔲 **Wave S.3** — `GetMttrTrendReport` — tendência de MTTR por serviço: classificação DORA (Elite/High/Medium/Low), série temporal diária (30 pontos), tendência Worsening/Improving/Stable/Insufficient, top serviços com pior MTTR e maior pioria. OI. Config: `runtime.mttr.*` sort 11180–11190. **Wave S PLANEADA**.
+50. 🔲 **Wave T.1** — `GetPostIncidentLearningReport` — taxa de aprendizado pós-incidente: % de incidentes com runbook aprovado pós-evento, incidentes recorrentes sem documentação (`LearningCoverage`: Full/Partial/Low), top serviços com menor learning rate. CG. Config: `compliance.learning.*` sort 11200–11220.
+51. 🔲 **Wave T.2** — `GetApiSchemaCoverageReport` — completude de documentação de schemas de API: score por 4 dimensões (response body, request body, exemplos, status codes), `CoverageGrade` A/B/C/D por contrato, distribuição global, top contratos com menor cobertura. Catalog. Config: `contracts.schema_coverage.*` sort 11230–11250.
+52. 🔲 **Wave T.3** — `GetEnvironmentStabilityReport` — score de estabilidade comparado por ambiente (dev/staging/prod): 4 dimensões ponderadas (SLO/Drift/Chaos/incident correlation), `StabilityTier` Stable/Unstable/Critical, flag de alerta "non-prod mais instável que prod", top serviços desestabilizadores. OI. Config: `runtime.environment_stability.*` sort 11260–11270. **Wave T PLANEADA**.
+53. 🔲 **Wave U.1** — `GetComplianceCoverageMatrixReport` — matriz de cobertura de standards por serviço: quantos standards (SOC2/ISO27001/PCI-DSS/HIPAA/GDPR/FedRAMP/NIS2/CMMC) foram avaliados, `CoverageLevel` Full/Partial/Minimal/None, top serviços com maior gap de compliance, score de compliance por standard. CG. Config: `compliance.coverage.*` sort 11280–11300.
+54. 🔲 **Wave U.2** — `GetDependencyUpdateFreshnessReport` — análise de frescor de dependências entre serviços: `FreshnessTier` Fresh/Aging/Stale/Critical por serviço, flag `VulnerabilityGap` para serviços Stale/Critical com vulns abertas, top serviços mais desatualizados com contagem de vulns. Catalog. Config: `catalog.dependency_freshness.*` sort 11310–11330.
+55. 🔲 **Wave U.3** — `GetServiceLoadDistributionReport` — distribuição de carga operacional por serviço: `LoadBand` High/Medium/Low por quartil de throughput, correlação com custo (`CostPerRequestUsd`), flag `WasteCandidate` (baixo uso + alto custo), top 10 serviços com pior custo por request. OI. Config: `runtime.load_distribution.*` sort 11340–11350. **Wave U PLANEADA**.
+56. 🔲 **Wave V.1** — `GetServiceApiGrowthReport` — taxa de crescimento de APIs por serviço: `GrowthTier` Stable/Growing/RapidGrowth/Exploding/Shrinking, `GovernanceRisk` flag (crescimento acelerado + qualidade baixa), top serviços com maior crescimento. Catalog. Config: `catalog.api_growth.*` sort 11360–11380.
+57. 🔲 **Wave V.2** — `GetChaosCoverageGapReport` — gaps de cobertura de chaos engineering: `GapLevel` NoCoverage/ProductionGap/FailedCoverage/PartialCoverage/FullCoverage, flag `CriticalGap` para serviços Critical sem cobertura, `CoverageRate` global, top serviços críticos não cobertos. OI. Config: `chaos.coverage.*` sort 11390–11400.
+58. 🔲 **Wave V.3** — `GetReleaseFrequencyDeviationReport` — desvio de frequência de deployment: compara período recente vs. histórico, `FrequencyDeviation` Accelerating/Stable/Decelerating/Stalled/New, `RiskFlag` para aceleração com baixo success rate ou serviços críticos parados. CG. Config: `changes.frequency_deviation.*` sort 11410–11430. **Wave V PLANEADA**.
+59. 🔲 **Wave W.1** — `GetRollbackPatternReport` — padrões de rollback por serviço: `RollbackPattern` Isolated/Recurring/Serial/None, `SystemicRisk` flag (Serial + baixa confidence), `EvidenceGap` flag (rollbacks com evidence packs incompletos), correlação com ChangeConfidenceBreakdown. CG. Config: `changes.rollback_pattern.*` sort 11440–11460.
+60. 🔲 **Wave W.2** — `GetServiceCouplingIndexReport` — índice de acoplamento entre serviços: `CouplingIndex` 0–100 por fan-in/fan-out, `CouplingTier` HubService/HighlyCoupled/ModeratelyCoupled/LooselyCoupled/Isolated, `ArchitecturalRisk` e `IsolationRisk` flags, % de serviços Isolated, CouplingIndex médio do tenant. Catalog. Config: `catalog.coupling_index.*` sort 11470–11490.
+61. 🔲 **Wave W.3** — `GetAnomalyDetectionSummaryReport` — sumário consolidado de anomalias: agrega WasteSignal + DriftFinding + SLO breaches + Chaos failures + VulnerabilityAdvisory + incidentes pós-deploy por serviço, `AnomalyDensity` Clean/Moderate/Dense/Critical, lista de serviços multi-anomaly, timeline diária de 30 pontos. OI. Config: `runtime.anomaly_summary.*` sort 11500–11510. **Wave W PLANEADA**.
 
 ### Riscos e recomendações transversais
 
@@ -994,3 +1486,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 5. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura. A lista consolidada de gaps abertos está em [HONEST-GAPS.md](./HONEST-GAPS.md).
 6. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
 7. **Waves pós-v1.0.0:** Secção 15 consolida Waves A/B/C/D com ADRs associados (ADR-007/008/009).
+8. **Waves S–W (planeadas):** 5 novas waves detalhadas na secção 15, cobrindo itens 47–61 da lista de priorização. Adicionam 40 config keys (sort 11120–11510), 5×3 secções i18n e estimativa de +150 testes distribuídos por CG/Catalog/OI.
