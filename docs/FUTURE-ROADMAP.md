@@ -371,25 +371,33 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 
 ### Wave D — Frontier (apostas estratégicas)
 
-#### D.1 Digital Twin Operacional
+#### D.1 Digital Twin Operacional ✅ PARCIALMENTE IMPLEMENTADO (Abril 2026)
 
 Culminação natural do pilar Source of Truth — representação navegável e consultável da "forma atual" do sistema usando Catalog + Contracts + RuntimeIntelligence + ChangeGovernance + CostIntelligence:
 
-- **What-if de mudanças** ("se eu alterar este contrato, quem parte?").
-- **Simulação de failure** ("se este serviço cair, qual o impacto?").
-- **Navegação temporal** ("como estava isto antes da release X?").
+- **What-if de mudanças** ✅ — `SimulateContractChangeImpact` query em `Catalog.Application/Contracts/Features/SimulateContractChangeImpact`. Recebe `ApiAssetId` + `WhatIfChangeType` (Additive/NonBreaking/Breaking/Deprecation) e classifica cada `ConsumerExpectation` activa em `WhatIfImpactLevel` (None/Low/Medium/High/Critical) com razão e recomendação. `TotalConsumers`, `ImpactedConsumers`, `OverallRisk` no relatório. Enums `WhatIfChangeType` + `WhatIfImpactLevel` em `Catalog.Domain.Contracts.Enums`. 14 testes em `DigitalTwinD1Tests.cs`. Catalog: 1701/1701.
+- **Navegação temporal** ✅ — `GetLatestTopologySnapshot` query retorna o snapshot mais recente do grafo com `NodeCount`, `EdgeCount`, `CapturedAt`, `NodesJson`, `EdgesJson`. Usa `IGraphSnapshotRepository.GetLatestAsync()`.
+- **Simulação de failure** 🔲 — blast radius por failure simulation (ex.: "se este serviço cair, quais services downstream são afectados transitivamente?"). Backlog Wave D.1.b — usa `GetImpactPropagation` como base.
+- **Config**: 3 chaves `digital_twin.*` (sort 9910–9920) + i18n `digitalTwin.*` em 4 locales.
 
-#### D.2 Cross-tenant Benchmarks anonimizados (opt-in)
+#### D.2 Cross-tenant Benchmarks anonimizados (opt-in) 🔲
 
 Benchmarks agregados de DORA, maturity, cost-per-request — valor para Exec/CTO persona. Requer governança forte de privacidade (LGPD/GDPR) e consentimento explícito por tenant.
 
-#### D.3 No-code Policy Studio
+#### D.3 No-code Policy Studio 🔲
 
 Editor visual de políticas (compliance, promotion gates, access) para Platform Admin. OPA/Rego como backend, UI amigável reduzindo dependência de alterar configuração complexa.
 
-#### D.4 Agent-to-Agent protocol
+#### D.4 Agent-to-Agent protocol ✅ IMPLEMENTADO (Abril 2026)
 
 **Agent-facing API** governada (catálogo, contratos, change status, incident status) com autenticação e auditoria específicas de agente. Prepara o produto para ambientes corporativos com múltiplos agentes autónomos.
+
+- **`PlatformApiToken`** aggregate ✅ — entidade em `IdentityAccess.Domain` com `TokenHash` (SHA-256), `TokenPrefix` (8 chars), `PlatformApiTokenScope` (Read/ReadWrite/Admin), `ExpiresAt`, `RevokedAt`, `LastUsedAt`. O valor real do token é apresentado apenas uma vez na criação (não é persistido). 5 features: `CreatePlatformApiToken` (geração segura via `RandomNumberGenerator`), `RevokePlatformApiToken`, `ListPlatformApiTokens`, `RecordAgentQuery`, `GetAgentQueryAuditLog`.
+- **`AgentQueryRecord`** entity ✅ — registo de auditoria de cada query de agente com `TokenId`, `QueryType`, `QueryParametersJson`, `ResponseCode`, `DurationMs`, `ExecutedAt`, `ErrorMessage`. Rastreabilidade completa de acções de agentes.
+- **`IPlatformApiTokenRepository`** + **`IAgentQueryRepository`** + implementações EF ✅.
+- **Migration `20260421090000_IAM_AddPlatformApiTokensAndAgentAudit`** ✅ — tabelas `iam_platform_api_tokens` + `iam_agent_query_records` com índices por tenant, token hash (unique), tokenId, executedAt.
+- **4 config keys** `agent.api.*` (sort 9930–9960) + i18n `agentApi.*` em 4 locales.
+- **16 testes unitários** ✅ — `AgentApiD4Tests.cs`. IA: 530/530.
 
 ---
 
@@ -401,7 +409,8 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 2. ✅ **Wave B completo** — B.1 AsyncAPI 3.x parity + B.2 CLI (nex catalog describe, nex change status) + PlatformApiToken + B.3 Backstage bridge + ExternalChangeRequest + OTel recipe + B.4 Knowledge Freshness + ProposedRunbook. **COMPLETO**.
 3. ✅ **Wave C.1 (supply-chain) + C.2 (Evidence integrity + DORA + Access Review escalation)** — destrancam clientes enterprise regulados. **PARCIALMENTE COMPLETO** (C.3 eBPF e C.4 Helm pendentes — Wave D).
 4. 🔲 **Wave C.4 (K8s operator + air-gapped)** — destranca escala e mercado defesa/finance.
-5. 🔲 **Wave D** — apenas após C.3/C.4 maduros; Digital Twin (D.1) primeiro, por ser o mais defensável.
+5. ✅ **Wave D.1 (Digital Twin — What-if + Topology Snapshot) + D.4 (Agent-to-Agent Protocol)** — `SimulateContractChangeImpact` + `GetLatestTopologySnapshot` + `PlatformApiToken` + `AgentQueryRecord`. **COMPLETO**. Pendentes: D.1.b (failure simulation), D.2 (benchmarks), D.3 (policy studio).
+6. 🔲 **Wave D.2/D.3** — benchmarks cross-tenant (privacidade) e policy studio (OPA/Rego); apenas com equipa dedicada.
 
 ### Riscos e recomendações transversais
 
