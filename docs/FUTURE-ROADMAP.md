@@ -4,6 +4,7 @@
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
 > **Waves concluídas:** A → R (46 features analytics/governance implementadas e testadas)  
 > **Waves planeadas:** S → Z (24 features novas documentadas, aguardam implementação)  
+> **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -1625,6 +1626,52 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AA — V3 Frontend Evolution (Dashboards + Persona Suites + Source-of-Truth Surfaces)
+
+**Estado:** 📘 PLANEADA — documento detalhado em [`docs/V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md).
+
+**Objetivo:** elevar o frontend do NexTraceOne de "app de módulos" para **Operational Intelligence Surface persona-aware** e os Custom Dashboards para **Governed Intelligence Boards**, consolidando simultaneamente as superfícies que materializam o NexTraceOne como **Source of Truth** operacional. Wave AA é a contraparte frontend das waves backend A–Z — transforma os ~46 features analytics/governance já entregues (waves A–R) e os 24 planeados (S–Z) em **superfícies de decisão enterprise** coesas.
+
+**Escopo (12 waves incrementais):**
+
+- **V3.1 Dashboard Intelligence Foundation** — versionamento de dashboards (`DashboardRevision`), variables/tokens (`$service`, `$env`, `$team`, `$timeRange`), `SharingPolicy` granular (Private/Team/Tenant/PublicLink × Read/Edit), auditoria completa.
+- **V3.2 Query-driven Widgets & Widget SDK** — `QueryWidget` com NQL governada, `IWidgetKind` como contrato interno estável, Annotations API (changes/incidents/deploys).
+- **V3.3 Live, Cross-filter, Drill-down** — SSE live streaming, cross-filter contextual, drill-down para páginas-dono ("Open with…"), deep-linking estável.
+- **V3.4 AI-assisted Dashboard Creation & Notebook Mode** — AI Agent "Dashboard Composer" sob governança, Notebooks (cells Markdown/Query/Widget/Action/AI) para investigação e post-mortems.
+- **V3.5 Frontend Platform Uplift** — Design Tokens v2, Command Palette global, View Transitions, WCAG 2.2 AA, performance budgets em CI, Storybook, telemetry de UX.
+- **V3.6 Governance, Reports & Embedding** — Scheduled snapshots (PDF/PNG/email via SMTP), public signed links + iframe embed, Dashboard-as-Code (YAML canonicalizado), policies sobre dashboards, lifecycle Draft/Published/Deprecated/Archived.
+- **V3.7 Real-time Collaboration & War Room** — presença, cursores partilhados, edição concorrente via CRDT (Yjs MIT), comentários ancorados, modo War Room.
+- **V3.8 Marketplace, Plugin SDK & Widgets de Terceiros** — Template Gallery interno, Plugin SDK público via Module Federation, governance de plugins assinados.
+- **V3.9 Advanced NQL + Alerting from Widget + Mobile On-Call** — NQL avançado governado (joins/subqueries/UDFs whitelisted), criar monitor/ação a partir de widget, PWA on-call com offline cache.
+- **V3.10 Persona-first Experience Suites** — 7 homes dedicadas (Engineer Cockpit, Tech Lead Team Command Center, Architect Landscape View, Product Portfolio Home, Executive Brief Center, Platform Admin Cockpit, Auditor Console); `IPersonaHomeResolver` + `IUserOperationalScopeResolver` + Persona Quick Actions Registry; persona switcher governado.
+- **V3.11 Source-of-Truth Consolidation Surfaces** — 11 Centers que materializam as waves backend: Compliance Scorecard Center (G/H/I/J/K/L), Risk Center UX (F.2/N.2), FinOps Context Views (I.2/O.2), Change Confidence Hub, Release Calendar & Window Gate (F.1/S.1), Rollback Intelligence Cockpit (J.3), Blast Radius Explorer (Q.3), Evidence Pack Viewer (N.3 + SLSA), Operational Readiness Board (L.3), Drift Center (M.3/Q.1), SLO Service Center + Chaos Lab + Post-Incident Learning Board (J.2/N.1/S.3 + K.1/V.2 + T.1). `ISourceOfTruthNavigationGraph` para deep-links canônicos e integração com AI Assistant.
+- **V3.12 Contract Studio Visual + AI Agent Marketplace + IDE Console + Admin Consoles** — 7 sub-épicos: (12.1) Visual Designers para REST/OpenAPI + AsyncAPI 3.x + SOAP/WSDL + GraphQL + Protobuf + Unified Publication Center; (12.2) AI Agent Registry/Builder + AI Token & Budget Governance Console + External AI Integration Console; (12.3) IDE Extensions Admin para Visual Studio e VS Code + Developer Enrollment UX; (12.4) Break Glass + JIT Privileged Access + Delegated Access + Access Review Workflows; (12.5) Licensing & Entitlements Admin (online + offline/air-gapped); (12.6) Knowledge Hub ↔ Notebooks ↔ Runbooks Bridge; (12.7) Dashboards-as-Code GitOps Console.
+
+**Alinhamento com visão oficial do produto (Copilot Instructions v3):**
+
+- **§6 Personas** — V3.10 entrega segmentação real por persona (não só por cargo); considera papel funcional + escopo organizacional + responsabilidade operacional + permissões reais + ownership.
+- **§7 Módulos oficiais** — V3.11 e V3.12 cobrem Foundation (Identity/Org/Teams/Environments/Integrations/Licensing), Services (Catalog/Reliability/Lifecycle), Contracts (todos os tipos + Studio), Changes (Calendar/Gate/Rollback/Blast Radius/Evidence), Operations (Incidents/Runbooks/Drift/Chaos/SLO), Knowledge (Hub/Notebooks/Runbooks), AI (Registry/Agents/Policies/IDE), Governance (Reports/Risk/Compliance/FinOps/Policy).
+- **§§8/9/10** — Contratos e mudanças são first-class (V3.12.1 + V3.11.4/5/6/7); observabilidade é meio, não fim (V3.11 contextualiza tudo em serviço/contrato/mudança/ambiente).
+- **§11 IA governada** — V3.12.2 materializa model registry, quotas, budget, audit completo, policies por tenant/ambiente/persona.
+- **§12 IDE Extensions** — V3.12.3 entrega a experiência IDE como capacidade de primeira classe, não acessório.
+- **§13 FinOps contextual** — V3.11.3 entrega FinOps *contextual*, nunca genérico.
+- **§§16/17 Segurança/Licensing** — V3.12.4 (Break Glass/JIT/Delegated/Access Reviews) e V3.12.5 (License online + offline).
+- **§18 UI enterprise sóbria** — V3.5 reforça design tokens, WCAG, performance budgets.
+
+**Critérios de aceite agregados:**
+- Persona fit ≥70% (% de utilizadores que usam Persona Home como entrada principal).
+- Source of Truth adoption ≥80% (decisões de promoção/rollback tomadas via Change Confidence Hub).
+- Compliance time-to-report <10 minutos por standard.
+- Contract Studio adoption ≥50% dos contratos novos.
+- AI governance ≥85% das invocações via agentes registrados.
+- Break Glass safety 100% (gravação + audit + expiração).
+
+**Volumetria estimada Wave AA:** dashboards core ~100 testes (V3.1–V3.4); frontend uplift + Storybook ≥75 componentes (V3.5); governance/reports ≥50 testes (V3.6); collaboration CRDT ≥30 testes (V3.7); marketplace ≥40 testes (V3.8); NQL+Alerting+PWA ≥60 testes (V3.9); **Persona Suites ≥40 testes (V3.10); 11 Centers ≥60 testes (V3.11); Contract Studio + AI Agents + IDE + Admin ≥70 testes (V3.12)** — total indicativo ≥525 testes dedicados, além da cobertura já existente nos módulos backend.
+
+**Referências cruzadas:** ver documento detalhado [`docs/V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) secções 3 (plano por wave), 5 (ordem recomendada e trilhos paralelos A–G), 6 (indicadores de sucesso), 7 (riscos e mitigações) e 9 (referências no código).
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -1705,6 +1752,8 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 68. 🔲 **Wave Z.1** — Kafka / Message Queue Consumer Real — `EventConsumerWorker` (`BackgroundService`) + `IEventNormalizationStrategy` por source type + dead letter queue + monitoring endpoint. Worker. Config: `integrations.event_consumer.*` sort 11680–11700.
 69. 🔲 **Wave Z.2** — SDK NexTrace — CLI `nexone` + NuGet `NexTrace.Sdk` + npm `nexone-sdk` + GitHub Action `nexone/change-confidence-gate@v1`. Developer tooling. Config: `sdk.platform_api.*` sort 11710–11720.
 70. 🔲 **Wave Z.3** — ClickHouse Analytics Provider — `IClickHouseAnalyticsWriter/Reader` adapter + schema MergeTree/SummingMergeTree + health check + `analytics.Provider` config switch. Infrastructure. Config: `analytics.clickhouse.*` sort 11730–11750. **Wave Z PLANEADA**.
+
+71. 📘 **Wave AA — V3 Frontend Evolution** — 12 sub-waves (V3.1→V3.12) cobrindo: Dashboard Intelligence Foundation (variables, revisions, SharingPolicy granular), Query-driven Widgets + NQL, Live/Cross-filter/Drill-down, AI-assisted Dashboards + Notebooks, Frontend Platform Uplift (tokens v2, Command Palette, WCAG 2.2, Storybook, perf budgets), Governance/Reports/Embedding, Real-time Collaboration via CRDT (Yjs), Marketplace + Plugin SDK (Module Federation), Advanced NQL + Alerting from widget + PWA on-call, **Persona-first Experience Suites (7 homes: Engineer/Tech Lead/Architect/Product/Executive/Platform Admin/Auditor)**, **Source-of-Truth Consolidation Surfaces (11 Centers: Compliance/Risk/FinOps/Change Confidence/Release Calendar/Rollback/Blast Radius/Evidence Pack/Operational Readiness/Drift/SLO+Chaos+Learning)**, **Contract Studio Visual (REST/SOAP/AsyncAPI/GraphQL/Protobuf) + AI Agent Marketplace + IDE Extensions Console (VS + VS Code) + Break Glass/JIT + Licensing Admin + Knowledge Hub Bridge + DaC GitOps**. Plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md). Alinhada com Copilot Instructions §§6, 7, 11, 12, 13, 16, 17, 18. Estimativa agregada ≥525 testes dedicados, além da cobertura backend existente. **Wave AA PLANEADA**.
 
 ### Riscos e recomendações transversais
 
