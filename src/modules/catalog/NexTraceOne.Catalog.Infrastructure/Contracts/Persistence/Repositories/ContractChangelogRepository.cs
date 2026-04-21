@@ -32,4 +32,17 @@ internal sealed class ContractChangelogRepository(ContractsDbContext context)
 
     public async Task AddAsync(ContractChangelog changelog, CancellationToken cancellationToken)
         => await context.ContractChangelogs.AddAsync(changelog, cancellationToken);
+
+    public async Task<IReadOnlyList<ContractChangelog>> ListByTenantInPeriodAsync(
+        string tenantId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken)
+        => await context.ContractChangelogs
+            .Where(c => c.TenantId == tenantId
+                        && c.CreatedAt >= from
+                        && c.CreatedAt <= to)
+            .OrderByDescending(c => c.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 }

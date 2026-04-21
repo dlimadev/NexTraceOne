@@ -8035,5 +8035,731 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "20",
             uiEditorType: "number",
             sortOrder: 10470),
+
+        // ── Wave K.1 — Chaos Engineering Analytics ─────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "chaos.analytics.report_lookback_days",
+            displayName: "config.chaos.analytics.report_lookback_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.chaos.analytics.report_lookback_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10480),
+
+        ConfigurationDefinition.Create(
+            key: "chaos.analytics.max_experiments_in_report",
+            displayName: "config.chaos.analytics.max_experiments_in_report.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.chaos.analytics.max_experiments_in_report.description",
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 10490),
+
+        // ── Wave K.2 — CMMC 2.0 Compliance ─────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.cmmc.enabled",
+            displayName: "config.compliance.cmmc.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.cmmc.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10500),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.cmmc.report_period_days",
+            displayName: "config.compliance.cmmc.report_period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.cmmc.report_period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10510),
+
+        // ── Wave K.3 — Change Frequency Analytics ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "change.frequency.heatmap.max_days",
+            displayName: "config.change.frequency.heatmap.max_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.heatmap.max_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10520),
+
+        ConfigurationDefinition.Create(
+            key: "change.frequency.cadence.high_performer_threshold",
+            displayName: "config.change.frequency.cadence.high_performer_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.cadence.high_performer_threshold.description",
+            defaultValue: "1.0",
+            uiEditorType: "number",
+            sortOrder: 10530),
+
+        ConfigurationDefinition.Create(
+            key: "change.frequency.cadence.low_performer_threshold",
+            displayName: "config.change.frequency.cadence.low_performer_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.cadence.low_performer_threshold.description",
+            defaultValue: "0.0357",
+            uiEditorType: "number",
+            sortOrder: 10540),
+
+        ConfigurationDefinition.Create(
+            key: "change.frequency.cadence.max_services",
+            displayName: "config.change.frequency.cadence.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.frequency.cadence.max_services.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10550),
+
+        // ── Wave L ─────────────────────────────────────────────────────────────────────
+
+        // L.1 — Service Ownership Health Report
+        ConfigurationDefinition.Create(
+            key: "ownership.health.report.staleness_threshold_days",
+            displayName: "config.ownership.health.staleness_threshold_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ownership.health.staleness_threshold_days.description",
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 10560),
+
+        ConfigurationDefinition.Create(
+            key: "ownership.health.report.max_services",
+            displayName: "config.ownership.health.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ownership.health.max_services.description",
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 10570),
+
+        // L.2 — FedRAMP Moderate Compliance Report
+        ConfigurationDefinition.Create(
+            key: "compliance.fedramp.enabled",
+            displayName: "config.compliance.fedramp.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.fedramp.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10580),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.fedramp.report_period_days",
+            displayName: "config.compliance.fedramp.report_period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.fedramp.report_period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10590),
+
+        // L.3 — Operational Readiness Report
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.lookback_days",
+            displayName: "config.operational.readiness.lookback_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.lookback_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10600),
+
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.ready_score_threshold",
+            displayName: "config.operational.readiness.ready_score_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.ready_score_threshold.description",
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10610),
+
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.conditional_score_threshold",
+            displayName: "config.operational.readiness.conditional_score_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.conditional_score_threshold.description",
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 10620),
+
+        ConfigurationDefinition.Create(
+            key: "operational.readiness.slo_weight_percent",
+            displayName: "config.operational.readiness.slo_weight_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.operational.readiness.slo_weight_percent.description",
+            defaultValue: "35",
+            uiEditorType: "number",
+            sortOrder: 10630),
+
+        // ── Wave M — Contract Health Distribution + Team Change Velocity + Open Drift Impact ──
+
+        ConfigurationDefinition.Create(
+            key: "contracts.health.distribution.top_critical_count",
+            displayName: "config.contracts.health.distribution.top_critical_count.name",
+            description: "config.contracts.health.distribution.top_critical_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10640),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.health.distribution.healthy_threshold",
+            displayName: "config.contracts.health.distribution.healthy_threshold.name",
+            description: "config.contracts.health.distribution.healthy_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10650),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.health.distribution.fair_threshold",
+            displayName: "config.contracts.health.distribution.fair_threshold.name",
+            description: "config.contracts.health.distribution.fair_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 10660),
+
+        ConfigurationDefinition.Create(
+            key: "changes.velocity.lookback_days",
+            displayName: "config.changes.velocity.lookback_days.name",
+            description: "config.changes.velocity.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10670),
+
+        ConfigurationDefinition.Create(
+            key: "changes.velocity.top_teams_count",
+            displayName: "config.changes.velocity.top_teams_count.name",
+            description: "config.changes.velocity.top_teams_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10680),
+
+        ConfigurationDefinition.Create(
+            key: "drift.impact.summary.max_services",
+            displayName: "config.drift.impact.summary.max_services.name",
+            description: "config.drift.impact.summary.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10690),
+
+        ConfigurationDefinition.Create(
+            key: "drift.impact.summary.max_metrics",
+            displayName: "config.drift.impact.summary.max_metrics.name",
+            description: "config.drift.impact.summary.max_metrics.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10700),
+
+        ConfigurationDefinition.Create(
+            key: "drift.impact.summary.page_size",
+            displayName: "config.drift.impact.summary.page_size.name",
+            description: "config.drift.impact.summary.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 10710),
+
+        // ── Wave N ────────────────────────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "slo.service.ranking.lookback_days",
+            displayName: "config.slo.service.ranking.lookback_days.name",
+            description: "config.slo.service.ranking.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10720),
+
+        ConfigurationDefinition.Create(
+            key: "slo.service.ranking.max_services",
+            displayName: "config.slo.service.ranking.max_services.name",
+            description: "config.slo.service.ranking.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10730),
+
+        ConfigurationDefinition.Create(
+            key: "slo.service.ranking.excellent_threshold",
+            displayName: "config.slo.service.ranking.excellent_threshold.name",
+            description: "config.slo.service.ranking.excellent_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "95.0",
+            uiEditorType: "number",
+            sortOrder: 10740),
+
+        ConfigurationDefinition.Create(
+            key: "risk.trend.max_high_risk_services",
+            displayName: "config.risk.trend.max_high_risk_services.name",
+            description: "config.risk.trend.max_high_risk_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10750),
+
+        ConfigurationDefinition.Create(
+            key: "risk.trend.high_risk_threshold",
+            displayName: "config.risk.trend.high_risk_threshold.name",
+            description: "config.risk.trend.high_risk_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 10760),
+
+        ConfigurationDefinition.Create(
+            key: "evidence.pack.coverage.lookback_days",
+            displayName: "config.evidence.pack.coverage.lookback_days.name",
+            description: "config.evidence.pack.coverage.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10770),
+
+        ConfigurationDefinition.Create(
+            key: "evidence.pack.coverage.max_uncovered",
+            displayName: "config.evidence.pack.coverage.max_uncovered.name",
+            description: "config.evidence.pack.coverage.max_uncovered.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10780),
+
+        ConfigurationDefinition.Create(
+            key: "evidence.pack.coverage.completeness_threshold",
+            displayName: "config.evidence.pack.coverage.completeness_threshold.name",
+            description: "config.evidence.pack.coverage.completeness_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10790),
+
+        // ── Wave O — Contract Versioning + FinOps Trend + Promotion Gate Compliance ──
+
+        ConfigurationDefinition.Create(
+            key: "contracts.versioning.top_deprecated_count",
+            displayName: "config.contracts.versioning.top_deprecated_count.name",
+            description: "config.contracts.versioning.top_deprecated_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10800),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.versioning.page_size",
+            displayName: "config.contracts.versioning.page_size.name",
+            description: "config.contracts.versioning.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 10810),
+
+        ConfigurationDefinition.Create(
+            key: "finops.trend.lookback_days",
+            displayName: "config.finops.trend.lookback_days.name",
+            description: "config.finops.trend.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10820),
+
+        ConfigurationDefinition.Create(
+            key: "finops.trend.top_services_count",
+            displayName: "config.finops.trend.top_services_count.name",
+            description: "config.finops.trend.top_services_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10830),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.gate.compliance.lookback_days",
+            displayName: "config.promotion.gate.compliance.lookback_days.name",
+            description: "config.promotion.gate.compliance.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10840),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.gate.compliance.top_failing_count",
+            displayName: "config.promotion.gate.compliance.top_failing_count.name",
+            description: "config.promotion.gate.compliance.top_failing_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10850),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.gate.compliance.override_alert_threshold",
+            displayName: "config.promotion.gate.compliance.override_alert_threshold.name",
+            description: "config.promotion.gate.compliance.override_alert_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 10860),
+
+        ConfigurationDefinition.Create(
+            key: "finops.trend.cost_growth_alert_percent",
+            displayName: "config.finops.trend.cost_growth_alert_percent.name",
+            description: "config.finops.trend.cost_growth_alert_percent.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20.0",
+            uiEditorType: "number",
+            sortOrder: 10870),
+
+        // ── Wave P — Service API Exposure + Resilience Score Summary + Release Success Rate ──────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.api_exposure.max_top_services",
+            displayName: "config.catalog.api_exposure.max_top_services.name",
+            description: "config.catalog.api_exposure.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10880),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.api_exposure.high_exposure_threshold",
+            displayName: "config.catalog.api_exposure.high_exposure_threshold.name",
+            description: "config.catalog.api_exposure.high_exposure_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 10890),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.api_exposure.page_size",
+            displayName: "config.catalog.api_exposure.page_size.name",
+            description: "config.catalog.api_exposure.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 10900),
+
+        ConfigurationDefinition.Create(
+            key: "resilience.score.max_top_services",
+            displayName: "config.resilience.score.max_top_services.name",
+            description: "config.resilience.score.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10910),
+
+        ConfigurationDefinition.Create(
+            key: "resilience.score.max_experiment_types",
+            displayName: "config.resilience.score.max_experiment_types.name",
+            description: "config.resilience.score.max_experiment_types.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10920),
+
+        ConfigurationDefinition.Create(
+            key: "resilience.score.excellent_threshold",
+            displayName: "config.resilience.score.excellent_threshold.name",
+            description: "config.resilience.score.excellent_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 10930),
+
+        ConfigurationDefinition.Create(
+            key: "release.success_rate.lookback_days",
+            displayName: "config.release.success_rate.lookback_days.name",
+            description: "config.release.success_rate.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10940),
+
+        ConfigurationDefinition.Create(
+            key: "release.success_rate.max_services",
+            displayName: "config.release.success_rate.max_services.name",
+            description: "config.release.success_rate.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10950),
+
+        // Wave Q.1 — Runtime Baseline Comparison Report
+        ConfigurationDefinition.Create(
+            key: "runtime.baseline.comparison.lookback_hours",
+            displayName: "config.runtime.baseline.comparison.lookback_hours.name",
+            description: "config.runtime.baseline.comparison.lookback_hours.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "48",
+            uiEditorType: "number",
+            sortOrder: 10960),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.baseline.comparison.top_drifting_services",
+            displayName: "config.runtime.baseline.comparison.top_drifting_services.name",
+            description: "config.runtime.baseline.comparison.top_drifting_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10970),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.baseline.comparison.drift_minor_threshold_pct",
+            displayName: "config.runtime.baseline.comparison.drift_minor_threshold_pct.name",
+            description: "config.runtime.baseline.comparison.drift_minor_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 10980),
+
+        // Wave Q.2 — Contract Consumer Impact Report
+        ConfigurationDefinition.Create(
+            key: "contracts.consumer_impact.page_size",
+            displayName: "config.contracts.consumer_impact.page_size.name",
+            description: "config.contracts.consumer_impact.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 10990),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.consumer_impact.max_top_contracts",
+            displayName: "config.contracts.consumer_impact.max_top_contracts.name",
+            description: "config.contracts.consumer_impact.max_top_contracts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11000),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.consumer_impact.max_top_domains",
+            displayName: "config.contracts.consumer_impact.max_top_domains.name",
+            description: "config.contracts.consumer_impact.max_top_domains.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 11010),
+
+        // Wave Q.3 — Blast Radius Distribution Report
+        ConfigurationDefinition.Create(
+            key: "changes.blast_radius.distribution.lookback_days",
+            displayName: "config.changes.blast_radius.distribution.lookback_days.name",
+            description: "config.changes.blast_radius.distribution.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11020),
+
+        ConfigurationDefinition.Create(
+            key: "changes.blast_radius.distribution.top_releases",
+            displayName: "config.changes.blast_radius.distribution.top_releases.name",
+            description: "config.changes.blast_radius.distribution.top_releases.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11030),
+
+        // ── Wave R.1 — Incident-Change Correlation Report ─────────────────────
+        ConfigurationDefinition.Create(
+            key: "changes.incident_correlation.lookback_days",
+            displayName: "config.changes.incident_correlation.lookback_days.name",
+            description: "config.changes.incident_correlation.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11040),
+
+        ConfigurationDefinition.Create(
+            key: "changes.incident_correlation.top_services_count",
+            displayName: "config.changes.incident_correlation.top_services_count.name",
+            description: "config.changes.incident_correlation.top_services_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11050),
+
+        // ── Wave R.2 — API Schema Stability Report ────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "contracts.schema_stability.lookback_days",
+            displayName: "config.contracts.schema_stability.lookback_days.name",
+            description: "config.contracts.schema_stability.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11060),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.schema_stability.top_unstable_count",
+            displayName: "config.contracts.schema_stability.top_unstable_count.name",
+            description: "config.contracts.schema_stability.top_unstable_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11070),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.schema_stability.volatile_threshold",
+            displayName: "config.contracts.schema_stability.volatile_threshold.name",
+            description: "config.contracts.schema_stability.volatile_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "1",
+            uiEditorType: "number",
+            sortOrder: 11080),
+
+        // ── Wave R.3 — Team Operational Health Report ─────────────────────────
+        ConfigurationDefinition.Create(
+            key: "runtime.team_health.lookback_days",
+            displayName: "config.runtime.team_health.lookback_days.name",
+            description: "config.runtime.team_health.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11090),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.team_health.top_teams_count",
+            displayName: "config.runtime.team_health.top_teams_count.name",
+            description: "config.runtime.team_health.top_teams_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 11100),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.team_health.max_drift_penalty_per_service",
+            displayName: "config.runtime.team_health.max_drift_penalty_per_service.name",
+            description: "config.runtime.team_health.max_drift_penalty_per_service.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 11110),
     ];
 }

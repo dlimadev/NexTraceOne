@@ -658,6 +658,266 @@ Scorecard de maturidade v2 com 6 dimensões, pesos tier-aware e postura de vulne
 
 ---
 
+### Wave K — Chaos Analytics + CMMC 2.0 + Change Frequency Heatmap ✅ COMPLETO (Abril 2026)
+
+#### K.1 — Chaos Engineering Analytics (OperationalIntelligence)
+
+**Feature:** `GetChaosExperimentReport` — relatório analítico de todos os experimentos de chaos engineering do tenant num período configurável.
+
+**Domínio:** Operacional — aproveita o `ChaosExperiment` aggregate já existente (Wave B) e os repositórios `IChaosExperimentRepository` + `CreateChaosExperiment` + `ListChaosExperiments` já implementados.
+
+**Capacidades:**
+- Taxa de sucesso (Completed vs Completed+Failed)
+- Distribuição por tipo de experimento (`ByType`)
+- Distribuição por nível de risco (`ByRiskLevel`: Low/Medium/High)
+- Distribuição de estados (`ByStatus`: Planned/Running/Completed/Failed/Cancelled)
+- Top 5 serviços mais testados (`TopServices`)
+- Duração média dos experimentos
+- Timestamp do experimento mais recente
+- Filtro por período (1–90 dias), serviço e ambiente
+
+**Ficheiros:**
+- `src/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Application/Runtime/Features/GetChaosExperimentReport/GetChaosExperimentReport.cs`
+- `tests/modules/operationalintelligence/NexTraceOne.OperationalIntelligence.Tests/Runtime/Application/ChaosExperimentReportTests.cs`
+- **~13 testes unitários** ✅ — `ChaosExperimentReportTests.cs`
+
+#### K.2 — CMMC 2.0 Compliance Report (ChangeGovernance)
+
+**Feature:** `GetCmmcComplianceReport` — relatório de conformidade CMMC 2.0 Level 2 para clientes em ambiente de Contratação Federal dos EUA (Controlled Unclassified Information).
+
+**Práticas cobertas:**
+- `AC.1.001` — Access Control: Limit Access to Authorized Users
+- `IA.1.076` — Identification & Authentication: Identify Information System Users
+- `AU.2.041` — Audit & Accountability: Create and Retain Audit Logs (scoring por evidence packs assinados)
+- `IR.2.092` — Incident Response: Establish Incident-Handling Capability
+- `RM.2.141` — Risk Management: Periodically Assess Organizational Risk
+
+**Ficheiros:**
+- `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/Compliance/Features/GetCmmcComplianceReport/GetCmmcComplianceReport.cs`
+- `tests/modules/changegovernance/NexTraceOne.ChangeGovernance.Tests/Compliance/GetCmmcComplianceReportTests.cs`
+- **~11 testes unitários** ✅ — `GetCmmcComplianceReportTests.cs`
+
+#### K.3 — Change Frequency Heatmap + Deployment Cadence Report (ChangeGovernance)
+
+**Features:**
+1. `GetChangeFrequencyHeatmap` — heatmap de deployments por (DayOfWeek × HourOfDay) em UTC. Revela padrões de cadência, picos de risco (e.g. sextas-feiras à tarde) e janelas preferenciais.
+2. `GetDeploymentCadenceReport` — classificação DORA de cadência de deployment por serviço: HighPerformer (≥1/dia), Medium (≥1/semana), LowPerformer (<1/semana), Insufficient (sem deploys no período).
+
+**Capacidades K.3a (Heatmap):**
+- Matriz 7×24 (DayOfWeek × HourOfDay)
+- Célula mais quente (`MaxCellCount`, `PeakDayOfWeek`, `PeakHourOfDay`)
+- Distribuição agregada por dia da semana (`ByDayOfWeek`)
+- Filtro por serviço, ambiente, período (7–90 dias)
+
+**Capacidades K.3b (Cadence):**
+- Classifica cada serviço em HighPerformer/Medium/LowPerformer/Insufficient
+- `DeploysPerDay` e `DeploysPerWeek` por serviço
+- Distribuição global de cadência (`Distribution`)
+- Ordered by `DeploysPerDay` desc
+- Filtro por equipa, ambiente, período (7–90 dias), max serviços (1–200)
+
+**Ficheiros:**
+- `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetChangeFrequencyHeatmap/GetChangeFrequencyHeatmap.cs`
+- `src/modules/changegovernance/NexTraceOne.ChangeGovernance.Application/ChangeIntelligence/Features/GetDeploymentCadenceReport/GetDeploymentCadenceReport.cs`
+- `tests/modules/changegovernance/NexTraceOne.ChangeGovernance.Tests/ChangeIntelligence/Application/Features/ChangeFrequencyTests.cs`
+- **~13 testes unitários** ✅ — `ChangeFrequencyTests.cs`
+
+#### Configuração Wave K
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `chaos.analytics.report_lookback_days` | 30 | 10480 | Período padrão para relatório de chaos analytics |
+| `chaos.analytics.max_experiments_in_report` | 500 | 10490 | Máximo de experimentos por relatório de analytics |
+| `compliance.cmmc.enabled` | true | 10500 | Ativa relatório CMMC 2.0 Level 2 |
+| `compliance.cmmc.report_period_days` | 90 | 10510 | Período padrão de avaliação CMMC |
+| `change.frequency.heatmap.max_days` | 90 | 10520 | Máximo de dias para heatmap de frequência |
+| `change.frequency.cadence.high_performer_threshold` | 1.0 | 10530 | Threshold de deploys/dia para HighPerformer |
+| `change.frequency.cadence.low_performer_threshold` | 0.0357 | 10540 | Threshold mínimo de deploys/dia para LowPerformer |
+| `change.frequency.cadence.max_services` | 50 | 10550 | Máximo de serviços no relatório de cadência |
+
+#### i18n Wave K
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `chaosExperimentReport.*` — relatório de chaos engineering
+- `cmmcCompliance.*` — CMMC 2.0 compliance
+- `changeFrequency.heatmap.*` + `changeFrequency.cadence.*` — heatmap e cadência
+
+**Totais Wave K:** CG: 734 testes (+25). OI: 1033 testes (+13). Configuração: +8 config keys (sort 10480–10550). i18n: +3 secções (4 locales). **WAVE K COMPLETO**.
+
+---
+
+### Wave L — Service Ownership Health + FedRAMP Moderate + Operational Readiness ✅ COMPLETO (Abril 2026)
+
+#### L.1 — GetServiceOwnershipHealthReport (Catalog)
+
+**Objetivo:** scorecard de saúde de ownership do catálogo de serviços, identificando gaps de governança que comprometem o Source of Truth do NexTraceOne.
+
+**Implementação:**
+- `GetServiceOwnershipHealthReport.Query` — filtros por tenant, tier, threshold de saúde, máximo de serviços e threshold de staleness de revisão de ownership
+- `OwnershipIssue` enum — `MissingTeam`, `MissingTechnicalOwner`, `MissingBusinessOwner`, `StaleReview`, `MissingDocumentation`
+- `OwnershipHealthBand` enum — `Healthy` (≥90), `Fair` (≥70), `AtRisk` (≥50), `Critical` (<50)
+- Score por serviço (0–100): -35 equipa ausente, -25 tech owner ausente, -15 biz owner ausente, -15 revisão stale, -10 doc URL ausente
+- Score global do catálogo (média dos serviços analisados)
+- `OwnershipIssueBreakdown` — contagem de cada tipo de problema por serviço
+- Ordenação por score ascendente (piores primeiro)
+- Filtro por `HealthScoreThreshold` para focar nos serviços mais problemáticos
+- Orientado para **Tech Lead, Architect e Platform Admin** personas
+
+#### L.2 — GetFedRampComplianceReport (ChangeGovernance)
+
+**Objetivo:** relatório de conformidade FedRAMP Moderate para clientes cloud federais dos EUA, adicionando à suite de compliance o standard NIST SP 800-53 Rev 5.
+
+**Controlos FedRAMP Moderate cobertos:**
+- **AC-2** (Access Control): Account Management — deploy workflow como proxy de controlo de acesso
+- **AU-2** (Audit & Accountability): Event Logging — evidence packs HMAC-SHA256 como artefatos de auditoria
+- **CM-6** (Configuration Management): Configuration Settings — releases com version tracking de configuração
+- **IR-4** (Incident Response): Incident Handling — correlação change-to-incident e rollback intelligence
+- **SI-2** (System & Information Integrity): Flaw Remediation — vulnerability promotion gates por release
+
+**Implementação:**
+- `FedRampControlResult` record — `ControlId`, `ControlFamily`, `ControlName`, `Status`, `Note`
+- `ImpactLevel: "Moderate"` identifica o baseline de autorização FedRAMP
+- Scoring contextual via releases e evidence packs assinados (HMAC-SHA256)
+- Overall status: `NotAssessed → PartiallyCompliant → Compliant`
+- Reutiliza `Nis2ControlStatus` enum da suite de compliance existente
+
+#### L.3 — GetOperationalReadinessReport (OperationalIntelligence)
+
+**Objetivo:** scorecard composto de prontidão operacional pré-produção, combinando 5 dimensões operacionais para produzir um score e classificação de readiness.
+
+**5 Dimensões com pesos:**
+| Dimensão | Peso | Fonte de dados |
+|---|---|---|
+| SLO Compliance | 35% | `SloObservation` (% Met) |
+| Chaos Resilience | 25% | `ChaosExperiment` (% Completed) |
+| Drift Free | 20% | `DriftFinding` (unacknowledged) |
+| Profiling Coverage | 10% | `ProfilingSession` (recente) |
+| Baseline Coverage | 10% | `RuntimeSnapshot` (recente) |
+
+**Classificações:**
+- `ReadyForProduction` — score ≥ 80 e zero bloqueadores
+- `ConditionallyReady` — score ≥ 60 mas com bloqueadores
+- `NotReady` — score < 60 ou bloqueadores críticos
+
+**Bloqueadores automáticos:**
+- SLO breaches no período de lookback
+- Chaos experiments que falharam
+- Drift findings não reconhecidos
+- Ausência de sessão de profiling recente
+- Ausência de baseline de runtime recente
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — suporta gates de promoção pré-produção.
+
+#### Configuração Wave L
+
+```
+ownership.health.report.staleness_threshold_days  sort 10560  default: 180
+ownership.health.report.max_services              sort 10570  default: 100
+compliance.fedramp.enabled                        sort 10580  default: true
+compliance.fedramp.report_period_days             sort 10590  default: 90
+operational.readiness.lookback_days               sort 10600  default: 30
+operational.readiness.ready_score_threshold       sort 10610  default: 80
+operational.readiness.conditional_score_threshold sort 10620  default: 60
+operational.readiness.slo_weight_percent          sort 10630  default: 35
+```
+
+#### i18n Wave L
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `ownershipHealth.*` — scorecard de ownership de serviços
+- `fedRampCompliance.*` — FedRAMP Moderate compliance
+- `operationalReadiness.*` — prontidão operacional pré-produção
+
+**Totais Wave L:** CG: 745 testes (+11). OI: 1047 testes (+14). Catalog: 1783 testes (+19). Configuração: +8 config keys (sort 10560–10630). i18n: +3 secções (4 locales). **WAVE L COMPLETO**.
+
+---
+
+### Wave M — Contract Health Distribution + Team Change Velocity + Open Drift Impact
+
+#### M.1 — GetContractHealthDistributionReport (Catalog Contracts)
+
+**Feature:** Relatório de distribuição de scores de saúde de todos os contratos de API registados no tenant.
+
+**Produz:**
+- Contagem total e percentagem por banda de saúde: `Healthy / Fair / AtRisk / Critical`
+- Score médio por dimensão: breaking change frequency, consumer impact, review recency, example coverage, policy compliance, documentation, overall
+- Lista dos contratos mais críticos (score mais baixo), limitada por `TopCriticalCount`
+- Percentagem de contratos saudáveis e críticos no catálogo
+
+**Bandas de saúde (configuráveis):**
+- `Healthy` — score ≥ HealthyThreshold (default 80)
+- `Fair` — score ≥ FairThreshold (default 60)
+- `AtRisk` — score ≥ AtRiskThreshold (default 40)
+- `Critical` — score < AtRiskThreshold
+
+**Orientado para Architect, Tech Lead e Platform Admin** — serve como painel de qualidade dos contratos e fonte de verdade da saúde do catálogo.
+
+#### M.2 — GetTeamChangeVelocityReport (ChangeGovernance Change Intelligence)
+
+**Feature:** Relatório de velocidade de mudança por equipa para um período configurável.
+
+**Produz por equipa:**
+- Total de releases
+- Releases por semana (velocidade média)
+- Taxa de sucesso (`Succeeded / total`)
+- Taxa de falha (`Failed / total`)
+- Taxa de rollback (`RolledBack / total`)
+- Participação percentual no total do tenant
+- Classificação de nível de velocidade
+
+**Níveis de velocidade (`VelocityTier`):**
+- `HighVolume` — ≥ 4 releases/semana
+- `Moderate` — ≥ 1 release/semana
+- `LowFrequency` — ≥ 0.25 releases/semana
+- `Inactive` — < 0.25 releases/semana
+
+**Métricas tenant-level:** taxa de sucesso global, taxa de rollback global, equipas com rollbacks no período.
+
+**Orientado para Tech Lead, Architect e Executive** — compara cadência e confiabilidade entre equipas e identifica outliers.
+
+#### M.3 — GetOpenDriftImpactSummary (OperationalIntelligence Runtime)
+
+**Feature:** Sumário de impacto dos drift findings abertos (não reconhecidos, não resolvidos).
+
+**Produz:**
+- Total de drifts abertos
+- Desvio médio global e desvio máximo global
+- Distribuição de severidade: `Low / Medium / High / Critical` (por percentagem de desvio)
+- Top serviços mais afetados (por contagem de drifts, com desvio máx e médio e pior severidade)
+- Top métricas mais desviantes (por desvio médio, com serviços afetados)
+
+**Classificação de severidade por desvio:**
+- `Low` — desvio < 10%
+- `Medium` — desvio 10–30%
+- `High` — desvio 30–60%
+- `Critical` — desvio > 60%
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — suplementa o `GetOperationalReadinessReport` com detalhe sobre drifts abertos e identifica hotspots de instabilidade operacional.
+
+#### Configuração Wave M
+
+```
+contracts.health.distribution.top_critical_count  sort 10640  default: 10
+contracts.health.distribution.healthy_threshold   sort 10650  default: 80
+contracts.health.distribution.fair_threshold      sort 10660  default: 60
+changes.velocity.lookback_days                    sort 10670  default: 90
+changes.velocity.top_teams_count                  sort 10680  default: 20
+drift.impact.summary.max_services                 sort 10690  default: 10
+drift.impact.summary.max_metrics                  sort 10700  default: 10
+drift.impact.summary.page_size                    sort 10710  default: 200
+```
+
+#### i18n Wave M
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `contractHealthDistribution.*` — distribuição de saúde de contratos
+- `teamChangeVelocity.*` — velocidade de mudanças por equipa
+- `openDriftImpact.*` — sumário de impacto de drifts abertos
+
+**Totais Wave M:** CG: 760 testes (+15). OI: 1068 testes (+21). Catalog: 1802 testes (+19). Configuração: +8 config keys (sort 10640–10710). i18n: +3 secções (4 locales). **WAVE M COMPLETO**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -684,6 +944,36 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 20. ✅ **Wave J.1** — `GetGdprComplianceReport` — GDPR: 5 controlos (Art. 5/13/17/25/33) com scoring contextual via releases, evidence packs assinados e análise de integridade. CG: 709 testes (+11).
 21. ✅ **Wave J.2** — `SloObservation` + `IngestSloObservation` + `GetSloComplianceSummary` + `GetSloViolationTrend` — SLO Tracking com classificação automática (Met/Warning/Breached), compliance summary e trend analysis (30 janelas diárias). OI: 1020 testes (+16).
 22. ✅ **Wave J.3** — `GetChangeRollbackRecommendation` — scoring composto de urgência de rollback (0–100) por confidence + blast radius + evidence integrity. 4 níveis: None/Suggest/Recommend/Critical. CG: 709 testes (+24 total). **WAVE J COMPLETO**.
+23. ✅ **Wave K.1** — `GetChaosExperimentReport` — analytics de chaos experiments: taxa de sucesso, distribuição por tipo/risco/estado, top 5 serviços, duração média. OI: 1033 testes (+13).
+24. ✅ **Wave K.2** — `GetCmmcComplianceReport` — CMMC 2.0 Level 2: 5 práticas (AC.1.001, IA.1.076, AU.2.041, IR.2.092, RM.2.141) com scoring contextual via releases e Evidence Packs assinados. CG: 734 testes (+11).
+25. ✅ **Wave K.3** — `GetChangeFrequencyHeatmap` + `GetDeploymentCadenceReport` — heatmap 7×24 de deployments + classificação DORA (HighPerformer/Medium/LowPerformer/Insufficient) por serviço. CG: 734 testes (+25 total). **WAVE K COMPLETO**.
+26. ✅ **Wave L.1** — `GetServiceOwnershipHealthReport` — scorecard de saúde de ownership por serviço: 5 tipos de problema, 4 bandas de saúde, score 0–100 com pesos por gravidade. Catalog: 1783 testes (+19).
+27. ✅ **Wave L.2** — `GetFedRampComplianceReport` — FedRAMP Moderate: 5 controlos NIST SP 800-53 (AC-2, AU-2, CM-6, IR-4, SI-2) com scoring contextual via releases e Evidence Packs. CG: 745 testes (+11).
+28. ✅ **Wave L.3** — `GetOperationalReadinessReport` — scorecard pré-produção: 5 dimensões ponderadas (SLO 35%, Chaos 25%, Drift 20%, Profiling 10%, Baseline 10%), 3 classificações (Ready/Conditional/NotReady) com bloqueadores automáticos. OI: 1047 testes (+14). **WAVE L COMPLETO**.
+29. ✅ **Wave M.1** — `GetContractHealthDistributionReport` — distribuição de scores de saúde de contratos: 4 bandas (Healthy/Fair/AtRisk/Critical), médias por dimensão (6 dimensões), top contratos críticos. Catalog: 1802 testes (+19).
+30. ✅ **Wave M.2** — `GetTeamChangeVelocityReport` — velocidade de mudança por equipa: releases/semana, taxa de sucesso/falha/rollback, participação no tenant, `VelocityTier` (HighVolume/Moderate/LowFrequency/Inactive). CG: 760 testes (+15).
+31. ✅ **Wave M.3** — `GetOpenDriftImpactSummary` — sumário de drifts abertos: serviços mais afetados, métricas mais desviantes, distribuição de severidade (Low/Medium/High/Critical), desvio médio e máximo global. OI: 1068 testes (+21). **WAVE M COMPLETO**.
+32. ✅ **Wave N.1** — `GetSloServiceRankingReport` — ranking de serviços por taxa de conformidade SLO: bandas Excellent/Good/Struggling, médias de valor observado vs alvo, contagens de Met/Warning/Breached, tenant avg compliance rate. OI: 1081 testes (+13).
+33. ✅ **Wave N.2** — `GetRiskTrendReport` — distribuição de risco por nível (Negligible/Low/Medium/High/Critical), top serviços de alto risco com score por dimensão (vuln 40%/change_failure 25%/blast_radius 20%/policy 15%), % alto/crítico no tenant. CG: 783 testes (+11).
+34. ✅ **Wave N.3** — `GetEvidencePackCoverageReport` — cobertura de evidence packs por releases: coverage%, signed packs%, complete packs%, breakdown por ambiente, lista de releases sem cobertura (até N). CG: 783 testes (+12). **WAVE N COMPLETO**.
+35. ✅ **Wave O.1** — `GetContractVersioningReport` — relatório de versionamento de contratos: distribuição por estado de ciclo de vida (Draft/InReview/Approved/Locked/Deprecated/Sunset/Retired), distribuição por protocolo (OpenAPI/AsyncAPI/GraphQL/Protobuf/WSDL), rácios obsoleto e ativo, top contratos deprecados/sunset candidatos a remoção. Catalog: 1813 testes (+11).
+36. ✅ **Wave O.2** — `GetFinOpsTrendReport` — tendência de custo operacional: série temporal diária (DailySeries), distribuição por categoria (Compute/Storage/Network/…), top serviços mais dispendiosos, delta período-a-período (CurrentPeriodTotalUsd / PreviousPeriodTotalUsd / DeltaPercent). OI: 1098 testes (+17).
+37. ✅ **Wave O.3** — `GetPromotionGateComplianceReport` — conformidade de promotion gates: total de avaliações pass/fail/overridden, taxa global de aprovação, distribuição por tipo de gate (SecurityGate/QualityGate/ApprovalGate/…), top gates que mais falham com fail rate. CG: 796 testes (+13). **WAVE O COMPLETO**.
+38. ✅ **Wave P.1** — `GetServiceApiExposureReport` — mapa de exposição de APIs do tenant: total de serviços e APIs, serviços órfãos (sem APIs), serviços de alta exposição (API count ≥ threshold), distribuição por visibilidade (Public/Internal/Partner/Other), distribuição por ExposureType (Internal/External/Partner), top serviços por contagem de APIs, média de APIs por serviço. Catalog: 1831 testes (+18). Config: `catalog.api_exposure.*` sort 10880–10900.
+39. ✅ **Wave P.2** — `GetResilienceScoreSummaryReport` — sumário de scores de resiliência pós-chaos: score médio global, classificação de tier (Poor/Fair/Good/Excellent), distribuição de relatórios por tier, top serviços mais resilientes e mais vulneráveis por score médio, tempo médio de recuperação, desvio médio de blast radius, distribuição por tipo de experimento. OI: 1120 testes (+22). Config: `resilience.score.*` sort 10910–10930.
+40. ✅ **Wave P.3** — `GetReleaseSuccessRateReport` — taxa de sucesso de releases por serviço e ambiente: taxa global de sucesso/falha/rollback, distribuição por DeploymentStatus (Pending/Running/Succeeded/Failed/RolledBack), distribuição por ambiente, top serviços com maior taxa de falha, SuccessRateTier (Elite ≥99%/High ≥95%/Medium ≥80%/Low). CG: 816 testes (+20). Config: `release.success_rate.*` sort 10940–10950. **WAVE P COMPLETO**.
+
+41. ✅ **Wave Q.1** — `GetRuntimeBaselineComparisonReport` — comparação de snapshots de runtime recentes contra baselines estabelecidas por serviço e ambiente. Para cada par (serviço, ambiente) com snapshot recente, calcula desvio percentual de latência média, latência P99, taxa de erro e throughput. Classifica drift em DriftSeverity (None / Minor / Moderate / Severe) usando o desvio máximo entre métricas. Produz: totais (monitorados / com baseline / sem baseline / com drift / drift severo), distribuição por severidade, top serviços com maior desvio composto, desvios médios de latência e erro a nível de tenant. OI: 1138 testes (+18). Config: `runtime.baseline.comparison.*` sort 10960–10980.
+
+42. ✅ **Wave Q.2** — `GetContractConsumerImpactReport` — relatório de impacto nos consumidores de contratos em risco de remoção. Identifica contratos com LifecycleState Deprecated ou Sunset (opcionalmente Retired), e para cada um lista os consumidores activos com ConsumerExpectation registada. Produz: total de contratos em risco, total de expectativas de consumidores afetadas, serviços e domínios distintos, distribuição por estado de lifecycle, top contratos por número de consumidores, top domínios por exposição. Catalog: 1845 testes (+14). Config: `contracts.consumer_impact.*` sort 10990–11010.
+
+43. ✅ **Wave Q.3** — `GetBlastRadiusDistributionReport` — distribuição do blast radius das releases no período. Agrega relatórios de blast radius calculados para todas as releases num intervalo temporal. Produz: totais de releases com/sem blast radius, médias de consumidores diretos e totais, distribuição por bucket de impacto (Zero=0 / Small=1–5 / Medium=6–20 / Large>20), top releases por total de consumidores afetados, top serviços por blast radius médio e máximo. CG: 833 testes (+17). Config: `changes.blast_radius.distribution.*` sort 11020–11030. **WAVE Q COMPLETO**.
+
+44. ✅ **Wave R.1** — `GetIncidentChangeCorrelationReport` — correlação entre releases e incidentes pós-deploy por serviço. Analisa todas as releases no período e, para cada uma, verifica eventos `incident_correlated` na sua timeline. Agrega por serviço: total de releases, releases com incidente, taxa de incidente pós-deploy (%). Classifica risco em `IncidentCorrelationRisk` (Low <5% / Medium 5–15% / High 15–30% / Critical >30%). Produz: totais do tenant, distribuição por tier de risco, top serviços por taxa de incidente e por contagem absoluta. CG: 852 testes (+19). Config: `changes.incident_correlation.*` sort 11040–11050.
+
+45. ✅ **Wave R.2** — `GetApiSchemaStabilityReport` — estabilidade de schemas de API por frequência de changelogs. Agrega entradas de `ContractChangelog` no período por `ApiAssetId` via `ListByTenantInPeriodAsync`. Classifica estabilidade em `SchemaStabilityTier` (Stable=0 / Volatile≥1 / Unstable≥3 / Critical≥6). Produz: total de contratos com alterações, avg e max de changelogs por contrato, distribuição por tier, top contratos mais instáveis e mais estáveis. Adicionado `ListByTenantInPeriodAsync` a `IContractChangelogRepository` e implementação correspondente no repositório de infraestrutura. Catalog: 1861 testes (+16). Config: `contracts.schema_stability.*` sort 11060–11080.
+
+46. ✅ **Wave R.3** — `GetTeamOperationalHealthReport` — scorecard composto de saúde operacional por equipa. Usa nova abstração `ITeamOperationalMetricsReader` para obter métricas pré-agregadas por equipa (ServiceCount, SloComplianceRatePct, UnacknowledgedDriftCount, ChaosSuccessRatePct, ServicesWithProfilingCount, PostDeployIncidentCount). Computa score ponderado: SLO 40% + Drift 30% + Chaos 20% + Profiling 10%. Classifica em `OperationalHealthTier` (Excellent ≥90 / Good ≥70 / Fair ≥50 / Poor <50). Produz: média do tenant, distribuição por tier, top equipas saudáveis e em risco, ranking completo. OI: 1161 testes (+23). Config: `runtime.team_health.*` sort 11090–11110. **WAVE R COMPLETO**.
 
 ### Riscos e recomendações transversais
 
