@@ -359,12 +359,12 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 
 - 🔲 **ClickHouse provider real** — `ClickHouseAnalyticsWriter` já existe como adapter. Critérios objectivos ClickHouse vs. Elasticsearch: ClickHouse preferível para >100M events/day, queries de agregação OLAP pesadas, retenção longa e baixo custo storage; Elasticsearch preferível para full-text search, correlação de logs e queries ad-hoc em <10M eventos.
 - 🔲 **eBPF-based runtime signal** — alternativa ao CLR profiler para workloads Linux não-.NET (Wave D backlog).
-- 🔲 **Continuous Profiling** (pprof / dotnet-trace ingest) contextualizado por serviço — diferencial face a Dynatrace/Datadog em on-prem (Wave D backlog).
+- ✅ **Continuous Profiling** (pprof / dotnet-trace ingest) contextualizado por serviço — diferencial face a Dynatrace/Datadog em on-prem (Wave D backlog).
 
 #### C.4 Operação self-hosted e deploy
 
 - 🔲 **Helm chart oficial + K8s Operator** — HA reference architecture para >10 tenants e >1000 serviços.
-- 🔲 **Upgrade path automatizado** — tooling de rollout seguro + rollback para migrações EF Core.
+- ✅ **Upgrade path automatizado** — tooling de rollout seguro + rollback para migrações EF Core.
 - 🔲 **Air-gapped install mode** com AI model bundle interno — mercado enterprise defesa/finance.
 
 ---

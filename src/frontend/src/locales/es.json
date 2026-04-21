@@ -13384,5 +13384,37 @@
       "failed": "No se encontró attestation del artefacto",
       "skipped": "Gate deshabilitado"
     }
+  },
+  "profiling": {
+    "title": "Profiling Continuo",
+    "frameType": "Tipo de Frame",
+    "windowStart": "Inicio de Ventana",
+    "windowEnd": "Fin de Ventana",
+    "durationSeconds": "Duración (s)",
+    "totalCpuSamples": "Total de Muestras de CPU",
+    "peakMemoryMb": "Pico de Memoria (MB)",
+    "peakThreadCount": "Pico de Hilos",
+    "hasAnomalies": "Tiene Anomalías",
+    "topFrames": "Top Frames (Hotspots)",
+    "rawDataUri": "URI de Datos en Bruto",
+    "releaseVersion": "Versión de Release",
+    "ingest": {
+      "title": "Ingestar Sesión de Profiling",
+      "success": "Sesión de profiling ingestada correctamente"
+    },
+    "history": {
+      "title": "Historial de Profiling",
+      "empty": "No se encontraron sesiones de profiling para este servicio"
+    },
+    "analysis": {
+      "title": "Análisis de Profiling",
+      "notFound": "Sesión de profiling no encontrada"
+    }
+  },
+  "migrationHealth": {
+    "title": "Informe de Preparación para Actualización",
+    "totalModules": "Total de Módulos",
+    "upgradeSteps": "Pasos de Actualización",
+    "maintenanceWindow": "Ventana de Mantenimiento Recomendada"
   }
 }

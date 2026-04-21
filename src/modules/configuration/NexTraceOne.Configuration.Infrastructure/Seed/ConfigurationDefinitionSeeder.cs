@@ -7506,5 +7506,38 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "false",
             uiEditorType: "toggle",
             sortOrder: 10020),
+
+        ConfigurationDefinition.Create(
+            key: "profiling.enabled",
+            displayName: "config.profiling.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.profiling.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10030),
+
+        ConfigurationDefinition.Create(
+            key: "profiling.retention.days",
+            displayName: "config.profiling.retention.days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.profiling.retention.days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10040),
+
+        ConfigurationDefinition.Create(
+            key: "profiling.max_sessions_per_service",
+            displayName: "config.profiling.max_sessions_per_service.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.profiling.max_sessions_per_service.description",
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 10050),
     ];
 }

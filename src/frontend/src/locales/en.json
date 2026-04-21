@@ -13374,5 +13374,37 @@
       "failed": "No artifact attestation found",
       "skipped": "Gate disabled"
     }
+  },
+  "profiling": {
+    "title": "Continuous Profiling",
+    "frameType": "Frame Type",
+    "windowStart": "Window Start",
+    "windowEnd": "Window End",
+    "durationSeconds": "Duration (s)",
+    "totalCpuSamples": "Total CPU Samples",
+    "peakMemoryMb": "Peak Memory (MB)",
+    "peakThreadCount": "Peak Thread Count",
+    "hasAnomalies": "Has Anomalies",
+    "topFrames": "Top Frames (Hotspots)",
+    "rawDataUri": "Raw Data URI",
+    "releaseVersion": "Release Version",
+    "ingest": {
+      "title": "Ingest Profiling Session",
+      "success": "Profiling session ingested successfully"
+    },
+    "history": {
+      "title": "Profiling History",
+      "empty": "No profiling sessions found for this service"
+    },
+    "analysis": {
+      "title": "Profiling Analysis",
+      "notFound": "Profiling session not found"
+    }
+  },
+  "migrationHealth": {
+    "title": "Upgrade Readiness Report",
+    "totalModules": "Total Modules",
+    "upgradeSteps": "Upgrade Steps",
+    "maintenanceWindow": "Recommended Maintenance Window"
   }
 }

@@ -53,6 +53,9 @@ public sealed class RuntimeIntelligenceDbContext(
     /// <summary>Relatórios de resiliência gerados após experimentos de chaos.</summary>
     public DbSet<ResilienceReport> ResilienceReports => Set<ResilienceReport>();
 
+    /// <summary>Sessões de profiling contínuo ingestadas por serviço.</summary>
+    public DbSet<ProfilingSession> ProfilingSessions => Set<ProfilingSession>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(RuntimeIntelligenceDbContext).Assembly;
