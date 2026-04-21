@@ -8579,5 +8579,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "20",
             uiEditorType: "number",
             sortOrder: 10950),
+
+        // Wave Q.1 — Runtime Baseline Comparison Report
+        ConfigurationDefinition.Create(
+            key: "runtime.baseline.comparison.lookback_hours",
+            displayName: "config.runtime.baseline.comparison.lookback_hours.name",
+            description: "config.runtime.baseline.comparison.lookback_hours.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "48",
+            uiEditorType: "number",
+            sortOrder: 10960),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.baseline.comparison.top_drifting_services",
+            displayName: "config.runtime.baseline.comparison.top_drifting_services.name",
+            description: "config.runtime.baseline.comparison.top_drifting_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10970),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.baseline.comparison.drift_minor_threshold_pct",
+            displayName: "config.runtime.baseline.comparison.drift_minor_threshold_pct.name",
+            description: "config.runtime.baseline.comparison.drift_minor_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 10980),
+
+        // Wave Q.2 — Contract Consumer Impact Report
+        ConfigurationDefinition.Create(
+            key: "contracts.consumer_impact.page_size",
+            displayName: "config.contracts.consumer_impact.page_size.name",
+            description: "config.contracts.consumer_impact.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 10990),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.consumer_impact.max_top_contracts",
+            displayName: "config.contracts.consumer_impact.max_top_contracts.name",
+            description: "config.contracts.consumer_impact.max_top_contracts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11000),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.consumer_impact.max_top_domains",
+            displayName: "config.contracts.consumer_impact.max_top_domains.name",
+            description: "config.contracts.consumer_impact.max_top_domains.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 11010),
+
+        // Wave Q.3 — Blast Radius Distribution Report
+        ConfigurationDefinition.Create(
+            key: "changes.blast_radius.distribution.lookback_days",
+            displayName: "config.changes.blast_radius.distribution.lookback_days.name",
+            description: "config.changes.blast_radius.distribution.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11020),
+
+        ConfigurationDefinition.Create(
+            key: "changes.blast_radius.distribution.top_releases",
+            displayName: "config.changes.blast_radius.distribution.top_releases.name",
+            description: "config.changes.blast_radius.distribution.top_releases.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11030),
     ];
 }
