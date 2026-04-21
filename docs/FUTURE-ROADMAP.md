@@ -832,6 +832,92 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave M — Contract Health Distribution + Team Change Velocity + Open Drift Impact
+
+#### M.1 — GetContractHealthDistributionReport (Catalog Contracts)
+
+**Feature:** Relatório de distribuição de scores de saúde de todos os contratos de API registados no tenant.
+
+**Produz:**
+- Contagem total e percentagem por banda de saúde: `Healthy / Fair / AtRisk / Critical`
+- Score médio por dimensão: breaking change frequency, consumer impact, review recency, example coverage, policy compliance, documentation, overall
+- Lista dos contratos mais críticos (score mais baixo), limitada por `TopCriticalCount`
+- Percentagem de contratos saudáveis e críticos no catálogo
+
+**Bandas de saúde (configuráveis):**
+- `Healthy` — score ≥ HealthyThreshold (default 80)
+- `Fair` — score ≥ FairThreshold (default 60)
+- `AtRisk` — score ≥ AtRiskThreshold (default 40)
+- `Critical` — score < AtRiskThreshold
+
+**Orientado para Architect, Tech Lead e Platform Admin** — serve como painel de qualidade dos contratos e fonte de verdade da saúde do catálogo.
+
+#### M.2 — GetTeamChangeVelocityReport (ChangeGovernance Change Intelligence)
+
+**Feature:** Relatório de velocidade de mudança por equipa para um período configurável.
+
+**Produz por equipa:**
+- Total de releases
+- Releases por semana (velocidade média)
+- Taxa de sucesso (`Succeeded / total`)
+- Taxa de falha (`Failed / total`)
+- Taxa de rollback (`RolledBack / total`)
+- Participação percentual no total do tenant
+- Classificação de nível de velocidade
+
+**Níveis de velocidade (`VelocityTier`):**
+- `HighVolume` — ≥ 4 releases/semana
+- `Moderate` — ≥ 1 release/semana
+- `LowFrequency` — ≥ 0.25 releases/semana
+- `Inactive` — < 0.25 releases/semana
+
+**Métricas tenant-level:** taxa de sucesso global, taxa de rollback global, equipas com rollbacks no período.
+
+**Orientado para Tech Lead, Architect e Executive** — compara cadência e confiabilidade entre equipas e identifica outliers.
+
+#### M.3 — GetOpenDriftImpactSummary (OperationalIntelligence Runtime)
+
+**Feature:** Sumário de impacto dos drift findings abertos (não reconhecidos, não resolvidos).
+
+**Produz:**
+- Total de drifts abertos
+- Desvio médio global e desvio máximo global
+- Distribuição de severidade: `Low / Medium / High / Critical` (por percentagem de desvio)
+- Top serviços mais afetados (por contagem de drifts, com desvio máx e médio e pior severidade)
+- Top métricas mais desviantes (por desvio médio, com serviços afetados)
+
+**Classificação de severidade por desvio:**
+- `Low` — desvio < 10%
+- `Medium` — desvio 10–30%
+- `High` — desvio 30–60%
+- `Critical` — desvio > 60%
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — suplementa o `GetOperationalReadinessReport` com detalhe sobre drifts abertos e identifica hotspots de instabilidade operacional.
+
+#### Configuração Wave M
+
+```
+contracts.health.distribution.top_critical_count  sort 10640  default: 10
+contracts.health.distribution.healthy_threshold   sort 10650  default: 80
+contracts.health.distribution.fair_threshold      sort 10660  default: 60
+changes.velocity.lookback_days                    sort 10670  default: 90
+changes.velocity.top_teams_count                  sort 10680  default: 20
+drift.impact.summary.max_services                 sort 10690  default: 10
+drift.impact.summary.max_metrics                  sort 10700  default: 10
+drift.impact.summary.page_size                    sort 10710  default: 200
+```
+
+#### i18n Wave M
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `contractHealthDistribution.*` — distribuição de saúde de contratos
+- `teamChangeVelocity.*` — velocidade de mudanças por equipa
+- `openDriftImpact.*` — sumário de impacto de drifts abertos
+
+**Totais Wave M:** CG: 760 testes (+15). OI: 1068 testes (+21). Catalog: 1802 testes (+19). Configuração: +8 config keys (sort 10640–10710). i18n: +3 secções (4 locales). **WAVE M COMPLETO**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -864,6 +950,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 26. ✅ **Wave L.1** — `GetServiceOwnershipHealthReport` — scorecard de saúde de ownership por serviço: 5 tipos de problema, 4 bandas de saúde, score 0–100 com pesos por gravidade. Catalog: 1783 testes (+19).
 27. ✅ **Wave L.2** — `GetFedRampComplianceReport` — FedRAMP Moderate: 5 controlos NIST SP 800-53 (AC-2, AU-2, CM-6, IR-4, SI-2) com scoring contextual via releases e Evidence Packs. CG: 745 testes (+11).
 28. ✅ **Wave L.3** — `GetOperationalReadinessReport` — scorecard pré-produção: 5 dimensões ponderadas (SLO 35%, Chaos 25%, Drift 20%, Profiling 10%, Baseline 10%), 3 classificações (Ready/Conditional/NotReady) com bloqueadores automáticos. OI: 1047 testes (+14). **WAVE L COMPLETO**.
+29. ✅ **Wave M.1** — `GetContractHealthDistributionReport` — distribuição de scores de saúde de contratos: 4 bandas (Healthy/Fair/AtRisk/Critical), médias por dimensão (6 dimensões), top contratos críticos. Catalog: 1802 testes (+19).
+30. ✅ **Wave M.2** — `GetTeamChangeVelocityReport` — velocidade de mudança por equipa: releases/semana, taxa de sucesso/falha/rollback, participação no tenant, `VelocityTier` (HighVolume/Moderate/LowFrequency/Inactive). CG: 760 testes (+15).
+31. ✅ **Wave M.3** — `GetOpenDriftImpactSummary` — sumário de drifts abertos: serviços mais afetados, métricas mais desviantes, distribuição de severidade (Low/Medium/High/Critical), desvio médio e máximo global. OI: 1068 testes (+21). **WAVE M COMPLETO**.
 
 ### Riscos e recomendações transversais
 

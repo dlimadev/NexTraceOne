@@ -8219,5 +8219,87 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "35",
             uiEditorType: "number",
             sortOrder: 10630),
+
+        // ── Wave M — Contract Health Distribution + Team Change Velocity + Open Drift Impact ──
+
+        CreateDefinition(
+            key: "contracts.health.distribution.top_critical_count",
+            displayName: "config.contracts.health.distribution.top_critical_count.name",
+            description: "config.contracts.health.distribution.top_critical_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10640),
+
+        CreateDefinition(
+            key: "contracts.health.distribution.healthy_threshold",
+            displayName: "config.contracts.health.distribution.healthy_threshold.name",
+            description: "config.contracts.health.distribution.healthy_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10650),
+
+        CreateDefinition(
+            key: "contracts.health.distribution.fair_threshold",
+            displayName: "config.contracts.health.distribution.fair_threshold.name",
+            description: "config.contracts.health.distribution.fair_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 10660),
+
+        CreateDefinition(
+            key: "changes.velocity.lookback_days",
+            displayName: "config.changes.velocity.lookback_days.name",
+            description: "config.changes.velocity.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10670),
+
+        CreateDefinition(
+            key: "changes.velocity.top_teams_count",
+            displayName: "config.changes.velocity.top_teams_count.name",
+            description: "config.changes.velocity.top_teams_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10680),
+
+        CreateDefinition(
+            key: "drift.impact.summary.max_services",
+            displayName: "config.drift.impact.summary.max_services.name",
+            description: "config.drift.impact.summary.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10690),
+
+        CreateDefinition(
+            key: "drift.impact.summary.max_metrics",
+            displayName: "config.drift.impact.summary.max_metrics.name",
+            description: "config.drift.impact.summary.max_metrics.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10700),
+
+        CreateDefinition(
+            key: "drift.impact.summary.page_size",
+            displayName: "config.drift.impact.summary.page_size.name",
+            description: "config.drift.impact.summary.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 10710),
     ];
 }

@@ -14020,5 +14020,89 @@
       "serviceRequired": "El nombre del servicio es obligatorio.",
       "invalidDays": "El período de lookback debe estar entre 1 y 90 días."
     }
+  },
+  "contractHealthDistribution": {
+    "title": "Distribución de Salud de Contratos",
+    "description": "Distribución de puntuaciones de salud de contratos de API registrados.",
+    "totalContracts": "Total de Contratos",
+    "healthy": "Saludable",
+    "fair": "Aceptable",
+    "atRisk": "En Riesgo",
+    "critical": "Crítico",
+    "healthyPercent": "% Saludables",
+    "criticalPercent": "% Críticos",
+    "topCriticalContracts": "Contratos Más Críticos",
+    "dimensionAverages": "Promedios por Dimensión",
+    "dimensions": {
+      "breakingChangeFrequency": "Frecuencia de Cambios Disruptivos",
+      "consumerImpact": "Impacto en Consumidores",
+      "reviewRecency": "Recencia de Revisión",
+      "exampleCoverage": "Cobertura de Ejemplos",
+      "policyCompliance": "Cumplimiento de Políticas",
+      "documentation": "Documentación",
+      "overall": "General"
+    },
+    "bands": {
+      "Healthy": "Saludable",
+      "Fair": "Aceptable",
+      "AtRisk": "En Riesgo",
+      "Critical": "Crítico"
+    },
+    "errors": {
+      "invalidTopCritical": "El conteo de contratos críticos debe estar entre 1 y 50.",
+      "invalidThresholds": "HealthyThreshold > FairThreshold > AtRiskThreshold debe cumplirse."
+    }
+  },
+  "teamChangeVelocity": {
+    "title": "Velocidad de Cambios por Equipo",
+    "description": "Métricas de velocidad de releases por equipo en el período seleccionado.",
+    "totalReleases": "Total de Releases",
+    "teamsAnalyzed": "Equipos Analizados",
+    "teamsWithRollbacks": "Equipos con Rollbacks",
+    "tenantSuccessRate": "Tasa de Éxito del Tenant",
+    "tenantRollbackRate": "Tasa de Rollback del Tenant",
+    "releasesPerWeek": "Releases / Semana",
+    "successRate": "Tasa de Éxito",
+    "failureRate": "Tasa de Fallo",
+    "rollbackRate": "Tasa de Rollback",
+    "shareOfTenant": "Participación en el Tenant",
+    "velocityTier": "Nivel de Velocidad",
+    "tiers": {
+      "HighVolume": "Alto Volumen",
+      "Moderate": "Moderado",
+      "LowFrequency": "Baja Frecuencia",
+      "Inactive": "Inactivo"
+    },
+    "errors": {
+      "tenantRequired": "El ID del tenant es obligatorio.",
+      "invalidDays": "El período de lookback debe estar entre 1 y 365 días.",
+      "invalidTopTeams": "El número de equipos debe estar entre 1 y 100."
+    }
+  },
+  "openDriftImpact": {
+    "title": "Resumen de Impacto de Drifts Abiertos",
+    "description": "Resumen de drift findings no reconocidos agrupados por servicio y métrica.",
+    "totalOpenDrifts": "Total de Drifts Abiertos",
+    "globalAvgDeviation": "Desviación Media %",
+    "globalMaxDeviation": "Desviación Máxima %",
+    "severityDistribution": "Distribución de Severidad",
+    "topAffectedServices": "Servicios Más Afectados",
+    "topDeviantMetrics": "Métricas Más Desviadas",
+    "openDriftCount": "Drifts Abiertos",
+    "maxDeviation": "Desviación Máxima %",
+    "avgDeviation": "Desviación Media %",
+    "worstSeverity": "Peor Severidad",
+    "affectedServices": "Servicios Afectados",
+    "severities": {
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "errors": {
+      "invalidMaxServices": "El máximo de servicios debe estar entre 1 y 100.",
+      "invalidMaxMetrics": "El máximo de métricas debe estar entre 1 y 50.",
+      "invalidPageSize": "El tamaño de página debe estar entre 10 y 500."
+    }
   }
 }

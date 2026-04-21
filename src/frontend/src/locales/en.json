@@ -14010,5 +14010,89 @@
       "serviceRequired": "Service name is required.",
       "invalidDays": "Lookback period must be between 1 and 90 days."
     }
+  },
+  "contractHealthDistribution": {
+    "title": "Contract Health Distribution",
+    "description": "Distribution of API contract health scores across all registered contracts.",
+    "totalContracts": "Total Contracts",
+    "healthy": "Healthy",
+    "fair": "Fair",
+    "atRisk": "At Risk",
+    "critical": "Critical",
+    "healthyPercent": "Healthy %",
+    "criticalPercent": "Critical %",
+    "topCriticalContracts": "Top Critical Contracts",
+    "dimensionAverages": "Dimension Averages",
+    "dimensions": {
+      "breakingChangeFrequency": "Breaking Change Frequency",
+      "consumerImpact": "Consumer Impact",
+      "reviewRecency": "Review Recency",
+      "exampleCoverage": "Example Coverage",
+      "policyCompliance": "Policy Compliance",
+      "documentation": "Documentation",
+      "overall": "Overall"
+    },
+    "bands": {
+      "Healthy": "Healthy",
+      "Fair": "Fair",
+      "AtRisk": "At Risk",
+      "Critical": "Critical"
+    },
+    "errors": {
+      "invalidTopCritical": "Top critical count must be between 1 and 50.",
+      "invalidThresholds": "HealthyThreshold > FairThreshold > AtRiskThreshold must hold."
+    }
+  },
+  "teamChangeVelocity": {
+    "title": "Team Change Velocity",
+    "description": "Release velocity metrics per team for the selected period.",
+    "totalReleases": "Total Releases",
+    "teamsAnalyzed": "Teams Analyzed",
+    "teamsWithRollbacks": "Teams With Rollbacks",
+    "tenantSuccessRate": "Tenant Success Rate",
+    "tenantRollbackRate": "Tenant Rollback Rate",
+    "releasesPerWeek": "Releases / Week",
+    "successRate": "Success Rate",
+    "failureRate": "Failure Rate",
+    "rollbackRate": "Rollback Rate",
+    "shareOfTenant": "Share of Tenant",
+    "velocityTier": "Velocity Tier",
+    "tiers": {
+      "HighVolume": "High Volume",
+      "Moderate": "Moderate",
+      "LowFrequency": "Low Frequency",
+      "Inactive": "Inactive"
+    },
+    "errors": {
+      "tenantRequired": "Tenant ID is required.",
+      "invalidDays": "Lookback period must be between 1 and 365 days.",
+      "invalidTopTeams": "Top teams count must be between 1 and 100."
+    }
+  },
+  "openDriftImpact": {
+    "title": "Open Drift Impact Summary",
+    "description": "Summary of unacknowledged drift findings grouped by service and metric.",
+    "totalOpenDrifts": "Total Open Drifts",
+    "globalAvgDeviation": "Avg Deviation %",
+    "globalMaxDeviation": "Max Deviation %",
+    "severityDistribution": "Severity Distribution",
+    "topAffectedServices": "Top Affected Services",
+    "topDeviantMetrics": "Top Deviant Metrics",
+    "openDriftCount": "Open Drift Count",
+    "maxDeviation": "Max Deviation %",
+    "avgDeviation": "Avg Deviation %",
+    "worstSeverity": "Worst Severity",
+    "affectedServices": "Affected Services",
+    "severities": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "errors": {
+      "invalidMaxServices": "Max services must be between 1 and 100.",
+      "invalidMaxMetrics": "Max metrics must be between 1 and 50.",
+      "invalidPageSize": "Page size must be between 10 and 500."
+    }
   }
 }
