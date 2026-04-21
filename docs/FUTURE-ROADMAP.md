@@ -2,9 +2,10 @@
 
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
-> **Waves concluídas:** A → R (46 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** S → Z (24 features novas documentadas, aguardam implementação)  
+> **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
+> **Waves planeadas:** U → AE (33 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
+> **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -1672,6 +1673,376 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AB — Knowledge Graph & Semantic Relations
+
+**Objetivo:** Materializar o NexTraceOne como Knowledge Hub operacional através de um grafo semântico de relações entre entidades (serviços, contratos, runbooks, incidentes, mudanças, equipas), rastreabilidade de linhagem de contratos por versão, e agregação de aprendizado operacional a partir do histórico de incidentes e runbooks.
+
+#### AB.1 — GetKnowledgeRelationGraph (Catalog)
+
+**Feature:** Grafo de relações semânticas entre entidades do NexTraceOne — responde "o que está ligado a este serviço/contrato/incidente?" com um grafo navegável de adjacências ponderadas.
+
+**Domínio:** Cruza `ServiceAsset`, `ApiAsset`, `ServiceDependency`, `IncidentEvent`, `Release`, `Runbook` e `OperationalNote` para construir um grafo de adjacência ponderado.
+
+**Capacidades:**
+- **Nós do grafo** (`KnowledgeNode`) — entidades tipificadas: `Service`, `Contract`, `Runbook`, `Incident`, `Release`, `Team`, `OperationalNote`
+- **Arestas do grafo** (`KnowledgeEdge`) — relações nomeadas: `OwnedBy`, `DependsOn`, `PublishesContract`, `ConsumesContract`, `CorrelatedWith`, `MitigatedBy`, `DocumentedIn`, `DeployedAs`
+- **Subgrafo por âncora** — dado um serviço ou contrato âncora, retorna o grafo de profundidade configurável (1–3 saltos)
+- **RelationStrength** — peso de cada aresta baseado em frequência de correlação e recência (decaimento por `relation_strength_decay_days`)
+- **Filtro por tipo de nó e relação** — permite focar apenas em contratos, runbooks ou incidentes
+- **KnowledgeGraphSummary** — contagens de nós/arestas, tipos mais frequentes, densidade do grafo no tenant
+- Retorno em formato compatível com visualização de grafo (adjacency list + node metadata)
+
+**Orientado para Architect, Tech Lead e Engineer** — permite navegar o contexto operacional de qualquer entidade sem saltar entre módulos.
+
+#### AB.2 — GetContractLineageReport (Catalog)
+
+**Feature:** Linhagem de versões de um contrato — rastreabilidade completa de quem criou, aprovou, modificou e descontinuou cada versão, com métricas de longevidade e estabilidade.
+
+**Domínio:** Agrega `ContractChangelog`, `ContractVersion`, `ApprovalRecord` e eventos de `ReleaseTimeline` que referenciaram o contrato.
+
+**Capacidades:**
+- **LineageNode por versão** — versão, estado de ciclo de vida, autor da mudança, aprovador, data de promoção e data de deprecation
+- **BreakingChangeCount por transição de versão** — número de breaking changes entre versões consecutivas
+- **ConsumerImpactAtDeprecation** — número de consumidores ativos no momento em que a versão foi deprecada
+- **VersionRetentionDays** — tempo que cada versão permaneceu ativa antes de ser substituída
+- **StabilityScore de linhagem** — inversamente proporcional a `BreakingChangeCount / TotalTransitions`
+- **LineageSummary** — total de versões, versão mais longeva, versão mais curta, autor com mais contribuições
+- Filtro por protocolo, equipa e período de publicação
+
+**Orientado para Architect e Auditor** — suporta compliance de governança de API e análise de maturidade do processo de versionamento ao longo do tempo.
+
+#### AB.3 — GetIncidentKnowledgeBaseReport (OperationalIntelligence)
+
+**Feature:** Agregação de aprendizado operacional a partir do histórico de incidentes, runbooks e post-mortems. Responde "o que aprendemos com os incidentes passados?" de forma quantificável.
+
+**Domínio:** Cruza `IncidentEvent`, `Runbook`, `OperationalNote` e `ProposedRunbook` (Wave B.4) por serviço e tipo de incidente.
+
+**Capacidades:**
+- Para cada categoria de incidente (por `IncidentType` ou tag), agrega:
+  - Frequência histórica e tendência (aumentando/diminuindo)
+  - **ResolutionConfidence** — % de incidentes do tipo com runbook aprovado disponível
+  - **MeanTimeToRunbook** — tempo médio entre abertura do incidente e aplicação de runbook
+  - **RunbookEffectivenessScore** — % de incidentes em que o runbook foi aplicado e o incidente foi fechado sem reabertura
+- **KnowledgeGap flag** — tipos de incidente recorrentes sem runbook aprovado
+- **StaleRunbook flag** — runbooks não revistos em > `stale_runbook_days` com incidentes ativos associados
+- **Top 10 tipos de incidente com maior frequência e menor ResolutionConfidence**
+- **KnowledgeMaturityScore global** — média ponderada de ResolutionConfidence + RunbookEffectivenessScore por serviço
+
+**Orientado para Tech Lead, Platform Admin e Engineer** — fecha o loop entre incidentes operacionais e o Knowledge Hub, transformando histórico em aprendizado governado e mensurável.
+
+#### Configuração Wave AB
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `catalog.knowledge_graph.max_depth` | 2 | 11760 | Profundidade máxima do subgrafo de relações semânticas |
+| `catalog.knowledge_graph.max_nodes` | 200 | 11770 | Máximo de nós retornados no grafo de conhecimento |
+| `catalog.knowledge_graph.relation_strength_decay_days` | 90 | 11780 | Dias de decaimento de força de relação por inatividade |
+| `catalog.contract_lineage.max_versions` | 50 | 11790 | Máximo de versões na linhagem de um contrato |
+| `catalog.contract_lineage.lookback_days` | 365 | 11800 | Período de análise para linhagem de contratos |
+| `runtime.incident_knowledge.stale_runbook_days` | 180 | 11810 | Dias sem revisão para classificar runbook como Stale |
+| `runtime.incident_knowledge.lookback_days` | 365 | 11820 | Período de análise para base de conhecimento de incidentes |
+| `runtime.incident_knowledge.top_incidents` | 10 | 11830 | Número de tipos de incidente no top ranking |
+
+#### i18n Wave AB
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `knowledgeRelationGraph.*` — grafo de relações semânticas entre entidades do NexTraceOne
+- `contractLineage.*` — linhagem e rastreabilidade de versões de contratos
+- `incidentKnowledgeBase.*` — base de conhecimento e aprendizado operacional de incidentes
+
+**Totais estimados Wave AB:** Catalog: ~30 testes (AB.1 ~14 + AB.2 ~16). OI: ~14 testes (AB.3). Configuração: +8 config keys (sort 11760–11830). i18n: +3 secções (4 locales). **Wave AB PLANEADA**.
+
+---
+
+### Wave AC — Self-Service & Platform Adoption Intelligence
+
+**Objetivo:** Introduzir métricas de adoção e saúde de onboarding que respondam "as equipas estão a usar o NexTraceOne eficazmente?" — habilitando Platform Admins a medir o valor real da plataforma, identificar equipas que precisam de suporte para adotar capacidades críticas, e quantificar o ROI da adoção por equipa.
+
+#### AC.1 — GetOnboardingHealthReport (Catalog)
+
+**Feature:** Scorecard de completude de onboarding por equipa e serviço. Identifica serviços subregistados ou equipas com baixa adoção de capacidades core do NexTraceOne.
+
+**Domínio:** Cruza `ServiceAsset`, `ApiAsset`, `TeamOwnership`, `Runbook`, `SloObservation` e `ProfilingSession` para medir completude de onboarding por dimensão.
+
+**Capacidades:**
+- Para cada serviço no tenant, calcula `OnboardingScore` (0–100) por dimensões ponderadas:
+  - **Ownership** (20%) — serviço tem equipa proprietária + ownership não obsoleto
+  - **Contracts** (25%) — ≥1 contrato em estado `Approved` ou `Locked` registado
+  - **Runbook** (20%) — ≥1 runbook aprovado associado ao serviço
+  - **SLO** (20%) — ≥1 SLO observado nos últimos 30 dias
+  - **Profiling** (15%) — ≥1 sessão de profiling nos últimos 90 dias
+- **OnboardingTier por serviço:**
+  - `Complete` — score ≥ 90
+  - `Advanced` — score ≥ 70
+  - `Basic` — score ≥ 40
+  - `Minimal` — score < 40 (candidates para suporte prioritário)
+- **Top serviços com menor OnboardingScore**
+- **Distribuição por OnboardingTier** no tenant
+- **TeamOnboardingAvg** — score médio por equipa
+- **TenantOnboardingScore** — média global ponderada por tier de serviço (Critical > Standard > Experimental)
+
+**Orientado para Platform Admin e Executive** — responde "qual é a adoção real da plataforma?" sem assumir que registar o serviço equivale a usar as capacidades.
+
+#### AC.2 — GetDeveloperActivityReport (IdentityAccess)
+
+**Feature:** Relatório de atividade de desenvolvedores no NexTraceOne por equipa e período. Identifica equipas mais ativas, champions internos e gaps de participação para decisões de enablement.
+
+**Domínio:** Agrega eventos de auditoria (`AuditTrailEntry`) filtrados por ações de criação/edição de entidades de produto (contratos, runbooks, notas, releases).
+
+**Capacidades:**
+- Para cada utilizador/equipa, calcula no período:
+  - `ContractsCreated` e `ContractsUpdated`
+  - `RunbooksCreated` e `RunbooksUpdated`
+  - `ReleasesRegistered`
+  - `OperationalNotesCreated`
+  - `TotalActions` — soma ponderada de todas as ações rastreadas (contratos=3, runbooks=2, resto=1)
+- **ActivityTier por utilizador:**
+  - `HighlyActive` — TotalActions ≥ percentil 75 do tenant
+  - `Active` — TotalActions ≥ percentil 50
+  - `Occasional` — TotalActions ≥ 1
+  - `Inactive` — TotalActions = 0 (potencial gap de enablement)
+- **TeamActivityScore** — soma ponderada de ações por equipa
+- **Top 10 utilizadores mais ativos** e **top 10 equipas mais ativas**
+- **InactiveTeams** — equipas sem nenhuma ação no período (candidatas a outreach de adoção)
+- Filtro por equipa, tipo de ação e período (7–90 dias)
+
+**Orientado para Platform Admin e Tech Lead** — suporta decisões de enablement, formação e identificação de champions internos da plataforma.
+
+#### AC.3 — GetPlatformAdoptionReport (OperationalIntelligence)
+
+**Feature:** Relatório de adoção de capacidades da plataforma por equipa. Mede que percentagem das capacidades disponíveis cada equipa está a usar ativamente.
+
+**Domínio:** Agrega sinais de uso de features por equipa: SLO tracking, chaos experiments, profiling, compliance reports, AI assistant, change confidence, release calendar.
+
+**Capacidades:**
+- Para cada equipa, verifica adoção de 7 capacidades core:
+  - `SloTracking` — ≥1 SLO observado nos últimos 30 dias
+  - `ChaosEngineering` — ≥1 experimento nos últimos 90 dias
+  - `ContinuousProfiling` — ≥1 sessão de profiling nos últimos 90 dias
+  - `ComplianceReports` — ≥1 relatório de compliance gerado nos últimos 90 dias
+  - `ChangeConfidence` — ≥1 avaliação de confiança por release nos últimos 30 dias
+  - `ReleaseCalendar` — ≥1 janela de deploy registada nos últimos 90 dias
+  - `AiAssistant` — ≥1 consulta ao AI assistant nos últimos 30 dias
+- **AdoptionScore por equipa** — % de capacidades usadas (0–100%)
+- **AdoptionTier:** `Pioneer` ≥80% / `Adopter` ≥60% / `Explorer` ≥40% / `Laggard` <40%
+- **CapabilityAdoptionRate global** — % de equipas que usam cada capacidade (identifica capacidades subutilizadas)
+- **GrowthOpportunity** — capacidades com menos de 30% de adoção global (targets para enablement)
+- Filtro por equipa e período de análise
+
+**Orientado para Platform Admin e Executive** — responde "a plataforma está a entregar valor?" com dados reais de uso, não métricas de registo.
+
+#### Configuração Wave AC
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `catalog.onboarding_health.complete_threshold` | 90 | 11840 | Score mínimo para OnboardingTier Complete |
+| `catalog.onboarding_health.advanced_threshold` | 70 | 11850 | Score mínimo para OnboardingTier Advanced |
+| `catalog.onboarding_health.basic_threshold` | 40 | 11860 | Score mínimo para OnboardingTier Basic |
+| `audit.developer_activity.lookback_days` | 30 | 11870 | Período padrão para relatório de atividade de developer |
+| `audit.developer_activity.highly_active_percentile` | 75 | 11880 | Percentil de TotalActions para ActivityTier HighlyActive |
+| `platform.adoption.slo_lookback_days` | 30 | 11890 | Lookback para verificação de adoção de SLO Tracking |
+| `platform.adoption.feature_lookback_days` | 90 | 11900 | Lookback padrão para verificação de features de adoption |
+| `platform.adoption.pioneer_threshold` | 80 | 11910 | Threshold (%) para AdoptionTier Pioneer |
+
+#### i18n Wave AC
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `onboardingHealth.*` — saúde e completude de onboarding por serviço e equipa
+- `developerActivity.*` — atividade de desenvolvedores e equipas na plataforma
+- `platformAdoption.*` — adoção de capacidades da plataforma por equipa
+
+**Totais estimados Wave AC:** Catalog: ~13 testes (AC.1). IA/Audit: ~12 testes (AC.2). OI: ~14 testes (AC.3). Configuração: +8 config keys (sort 11840–11910). i18n: +3 secções (4 locales). **Wave AC PLANEADA**.
+
+---
+
+### Wave AD — Zero Trust & Security Posture Analytics
+
+**Objetivo:** Introduzir visibilidade de postura de segurança no contexto de serviços e contratos — respondendo "quão segura é a comunicação entre serviços?", "existem riscos de exposição de segredos nos artefactos governados?" e "há padrões anómalos de acesso à plataforma?" — reforçando o NexTraceOne como plataforma de confiança operacional, não apenas de catálogo.
+
+#### AD.1 — GetZeroTrustPostureReport (ChangeGovernance)
+
+**Feature:** Avaliação de postura Zero Trust por serviço: cobertura de autenticação mútua, rotação de tokens e uso de políticas de acesso explícitas. Identifica serviços expostos sem controlo de comunicação adequado.
+
+**Domínio:** Cruza metadados de segurança de `ServiceAsset` (campos `AuthenticationScheme`, `MtlsEnabled`, `TokenRotationPolicy`) com `PolicyDefinition` (Wave D.3) e security gates de `ReleaseTimeline`.
+
+**Capacidades:**
+- Para cada serviço, calcula `ZeroTrustScore` (0–100) por dimensões ponderadas:
+  - **Authentication** (30%) — esquema de autenticação definido e ativo (Bearer/mTLS/API Key)
+  - **Mutual TLS** (25%) — mTLS habilitado para comunicação inter-serviço
+  - **Token Rotation** (20%) — política de rotação de tokens definida e não expirada
+  - **Policy Coverage** (25%) — ≥1 `PolicyDefinition` de acesso aplicada ao serviço
+- **ZeroTrustTier por serviço:**
+  - `Enforced` — score ≥ 85 (postura robusta)
+  - `Controlled` — score ≥ 65 (postura adequada com gaps menores)
+  - `Partial` — score ≥ 40 (gaps significativos)
+  - `Exposed` — score < 40 (risco elevado — comunicação sem controlo adequado)
+- **CriticalExposure flag** — serviços de tier `Critical` com `ZeroTrustTier = Exposed`
+- **Distribuição por ZeroTrustTier** no tenant
+- **Top serviços com menor score** (prioritários para hardening)
+- **TenantZeroTrustScore** — média ponderada por tier de serviço
+
+**Orientado para Security, Platform Admin e Architect** — introduz visibilidade de segurança no contexto do catálogo de serviços, não como ferramenta isolada de security scanning.
+
+#### AD.2 — GetSecretsExposureRiskReport (Catalog)
+
+**Feature:** Deteção de risco de exposição de segredos em artefactos governados pelo NexTraceOne — contratos, notas operacionais e runbooks — usando pattern matching leve sem dependências externas.
+
+**Domínio:** Analisa conteúdo textual de `ApiAsset` (exemplos de payloads, descrições), `OperationalNote` e `Runbook` por padrões suspeitos de segredos.
+
+**Capacidades:**
+- **Pattern detection leve** — varredura por expressões regulares para padrões comuns:
+  - API keys (padrões `sk-`, `AKIA`, `ghp_`, etc.)
+  - Tokens JWT expostos em exemplos de payload
+  - Connection strings com credenciais embebidas (`password=`, `pwd=`, `secret=`)
+  - IPs privados em exemplos de payload de produção
+  - Emails pessoais em payloads de exemplo
+- **ExposureRisk por artefacto:** `None / Low / Medium / High / Critical`
+- **AffectedArtifacts list** — lista de contratos, runbooks e notas com ExposureRisk ≥ Medium
+- **ExposureCategory distribution** — distribuição por tipo de pattern detectado
+- **Top serviços com maior número de artefactos em risco**
+- **AuditTrail** — cada deteção registada com tipo de artefacto, campo, pattern e timestamp
+- Configurável: quais patterns ativar e thresholds de risco por tipo de pattern
+
+**Orientado para Security, Auditor e Platform Admin** — previne exposição acidental de segredos via conteúdo dos contratos e runbooks, um vetor frequentemente ignorado em ferramentas de API governance.
+
+#### AD.3 — GetAccessPatternAnomalyReport (IdentityAccess)
+
+**Feature:** Deteção de padrões anómalos de acesso ao NexTraceOne — acessos incomuns a contratos sensíveis, picos de consultas fora do padrão, ou primeiro acesso a recursos restritos por utilizadores não habituais.
+
+**Domínio:** Analisa `AuditTrailEntry` para identificar desvios em padrões de acesso por utilizador, equipa e recurso comparados com baseline histórica.
+
+**Capacidades:**
+- **BaselineAccess por utilizador** — padrão de acesso histórico (dias da semana, horas, tipos de recurso, volume médio)
+- **AnomalySignal** por tipo:
+  - `OffHours` — acesso fora de horário habitual (definido por percentil histórico do utilizador)
+  - `VolumetricSpike` — volume de queries > `volumetric_spike_multiplier`× a média do utilizador
+  - `FirstAccessSensitive` — primeiro acesso a contrato marcado como `Restricted` ou `Partner`
+  - `UnusualResource` — acesso a tipo de recurso nunca acedido pelo utilizador no histórico
+  - `BulkExport` — download/export de > `bulk_export_threshold` contratos em sessão curta
+- **RiskScore por evento anómalo** — combinação de tipo de anomalia + sensibilidade do recurso
+- **AnomalyDensityByUser** — utilizadores com > 3 sinais no período (risco de insider threat ou comprometimento de conta)
+- **Top recursos mais acedidos anomalamente** (contratos, runbooks, relatórios)
+- Filtro por severidade, tipo de anomalia e período
+
+**Orientado para Auditor, Security e Platform Admin** — complementa o audit trail passivo com deteção ativa de padrões suspeitos, aproximando o NexTraceOne de UEBA leve para o seu ecossistema.
+
+#### Configuração Wave AD
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `security.zero_trust.enforced_threshold` | 85 | 11920 | Score mínimo para classificação ZeroTrustTier Enforced |
+| `security.zero_trust.critical_exposure_threshold` | 40 | 11930 | Score máximo para classificação ZeroTrustTier Exposed |
+| `catalog.secrets_exposure.max_artifacts` | 500 | 11940 | Máximo de artefactos inspecionados por relatório |
+| `catalog.secrets_exposure.min_risk_level` | Medium | 11950 | Nível mínimo de risco para inclusão no relatório |
+| `audit.access_anomaly.lookback_days` | 30 | 11960 | Período de análise para padrões de acesso |
+| `audit.access_anomaly.volumetric_spike_multiplier` | 3 | 11970 | Multiplicador de volume para flag VolumetricSpike |
+| `audit.access_anomaly.bulk_export_threshold` | 20 | 11980 | Número de contratos para flag BulkExport |
+| `audit.access_anomaly.max_users` | 100 | 11990 | Máximo de utilizadores no relatório de anomalias de acesso |
+
+#### i18n Wave AD
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `zeroTrustPosture.*` — postura Zero Trust e cobertura de autenticação mútua por serviço
+- `secretsExposureRisk.*` — risco de exposição de segredos em artefactos governados
+- `accessPatternAnomaly.*` — anomalias de padrão de acesso e sinais de risco comportamental
+
+**Totais estimados Wave AD:** CG: ~13 testes (AD.1). Catalog: ~13 testes (AD.2). IA/Audit: ~14 testes (AD.3). Configuração: +8 config keys (sort 11920–11990). i18n: +3 secções (4 locales). Nota: AD.2 requer apenas regex scanning leve, sem dependências externas de SAST. **Wave AD PLANEADA**.
+
+---
+
+### Wave AE — Contract Testing & API Backward Compatibility
+
+**Objetivo:** Completar o ciclo de governance de contratos introduzindo visibilidade de cobertura de testes de contrato (consumer-driven contract testing), avaliação de impacto downstream de breaking changes, e scorecard de compatibilidade retroativa — transformando o NexTraceOne na fonte única de confiança para evolução segura de APIs.
+
+#### AE.1 — GetContractTestCoverageReport + IngestContractTestResult (Catalog)
+
+**Feature:** Cobertura de testes de contrato por serviço e API. Identifica serviços sem testes de contrato registados, onde uma mudança pode quebrar consumidores silenciosamente.
+
+**Domínio:** Novo aggregate `ContractTestRecord` — registo de resultados de testes de contrato ingeridos via webhook ou API (de Pact Broker, pipeline CI ou ferramenta de contract testing).
+
+**Capacidades:**
+- **`ContractTestRecord`** entity — `ApiAssetId`, `ConsumerServiceName`, `ProducerServiceName`, `TestSuite`, `TestStatus` (`Passed/Failed/Pending`), `FailureReason`, `TestedAt`, `PactBrokerUrl` (opcional), `CiPipelineRef`
+- **`IngestContractTestResult`** command — endpoint de ingestão de resultados via pipeline CI/CD
+- **`GetContractTestCoverageReport`** query — cobertura por serviço:
+  - `TestedApiCount` / `TotalApiCount` → `CoverageRate`
+  - `TestPassRate` — % de testes passing no período
+  - `FailedContracts` — lista de contratos com testes failing
+  - **CoverageTier:** `Full` ≥90% / `Good` ≥70% / `Partial` ≥40% / `None` <40%
+  - **Top serviços com menor cobertura** e **top contratos com testes failing**
+  - **UncoveredConsumerPairs** — pares produtor-consumidor sem teste registado
+- Migration para tabela `contract_test_records`
+
+**Orientado para Engineer, Tech Lead e Architect** — fecha o gap entre "contrato documentado" e "contrato testado", tornando o NexTraceOne o ponto central de confiança para evolução de APIs.
+
+#### AE.2 — GetSchemaBreakingChangeImpactReport (Catalog)
+
+**Feature:** Avaliação de impacto downstream quando é detetada uma breaking change num schema de contrato. Responde "se eu fizer esta breaking change, quem é afetado e qual o risco real?"
+
+**Domínio:** Cruza `ContractChangelog` (breaking changes registadas) com `ConsumerExpectation` (Wave Q.2) e `ServiceDependency` para propagar o impacto transitivo.
+
+**Capacidades:**
+- Dado um `ApiAssetId` + `ChangelogEntryId` com `IsBreaking = true`, calcula:
+  - **DirectConsumers** — serviços com `ConsumerExpectation` registada para esta API
+  - **IndirectConsumers** — serviços que dependem dos `DirectConsumers` até `max_hop_depth` saltos
+  - **ImpactScore** — ponderado por tier dos consumidores afetados (Critical=3, Standard=2, Experimental=1)
+  - **TotalAffectedServices** — soma de diretos + indiretos únicos
+  - **MitigationOptions** — sugestões geradas: deprecar antes de remover, manter compat via versioning, notificar consumidores
+- **BreakingChangeImpactTier:**
+  - `Contained` — apenas consumidores `Experimental` afetados
+  - `Moderate` — ≥1 consumidor `Standard` afetado
+  - `Significant` — ≥1 consumidor `Critical` afetado
+  - `Widespread` — ≥5 serviços afetados (diretos + indiretos)
+- **ByEnvironment breakdown** — impacto diferenciado por ambiente (production vs. non-prod consumers)
+
+**Orientado para Architect, Tech Lead e Engineer** — transforma a deteção de breaking changes (Waves G.3/H.1) em decisão informada com quantificação de impacto real por tier e ambiente.
+
+#### AE.3 — GetApiBackwardCompatibilityReport (Catalog)
+
+**Feature:** Scorecard de compatibilidade retroativa por contrato ao longo do tempo. Mede quão "safe to evolve" é cada contrato para os seus consumidores, com perspetiva longitudinal.
+
+**Domínio:** Analisa o histórico de `ContractChangelog` por contrato: rácio de breaking vs. non-breaking changes, cadência de versões major e adoção pelos consumidores.
+
+**Capacidades:**
+- Para cada contrato com histórico de changelogs, calcula:
+  - `BreakingChangeRate` — % de changelogs com `IsBreaking = true` no período
+  - `MajorVersionCount` — número de versões major no período
+  - `ConsumerAdoptionLag` — dias médios para consumidores migrarem para a versão mais recente (via `ConsumerExpectation`)
+  - `BackwardCompatibilityScore` = `(1 - BreakingChangeRate) * 100` ajustado por `ConsumerAdoptionLag`
+- **CompatibilityTier por contrato:**
+  - `Stable` — score ≥ 85, BreakingChangeRate < 10%
+  - `Evolving` — score ≥ 65, breaking changes controladas com adoção rápida
+  - `Volatile` — score ≥ 40, breaking changes frequentes ou adoção lenta
+  - `Unstable` — score < 40 (breaking changes frequentes + consumidores sem migrar)
+- **StagnationFlag** — contratos `Stable` com zero changelogs em > `stagnation_days` (possível abandono)
+- **Top contratos mais estáveis** e **top contratos mais voláteis**
+- **TenantCompatibilityIndex** — média ponderada de BackwardCompatibilityScore no tenant
+
+**Orientado para Architect, Tech Lead e Platform Admin** — perspetiva longitudinal da qualidade de evolução do catálogo de contratos, complementando o snapshot de saúde atual (Waves M.1/O.1/R.2).
+
+#### Configuração Wave AE
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `contracts.test_coverage.full_threshold` | 90 | 12000 | Threshold (%) para CoverageTier Full de testes de contrato |
+| `contracts.test_coverage.good_threshold` | 70 | 12010 | Threshold (%) para CoverageTier Good de testes de contrato |
+| `contracts.test_coverage.max_services` | 100 | 12020 | Máximo de serviços no relatório de cobertura de testes |
+| `contracts.breaking_change_impact.max_hop_depth` | 2 | 12030 | Profundidade máxima de propagação de impacto transitivo |
+| `contracts.breaking_change_impact.max_consumers` | 200 | 12040 | Máximo de consumidores analisados por breaking change |
+| `contracts.backward_compat.stable_threshold` | 85 | 12050 | Score mínimo para CompatibilityTier Stable |
+| `contracts.backward_compat.stagnation_days` | 180 | 12060 | Dias sem changelog para flag StagnationFlag |
+| `contracts.backward_compat.max_contracts` | 200 | 12070 | Máximo de contratos no relatório de compatibilidade retroativa |
+
+#### i18n Wave AE
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `contractTestCoverage.*` — cobertura de testes de contrato por serviço e pares produtor-consumidor
+- `schemaBreakingChangeImpact.*` — impacto de breaking changes em consumidores diretos e indiretos
+- `apiBackwardCompatibility.*` — scorecard de compatibilidade retroativa e evolução de contratos
+
+**Totais estimados Wave AE:** Catalog: ~42 testes (AE.1 ~16 + AE.2 ~12 + AE.3 ~14). Configuração: +8 config keys (sort 12000–12070). i18n: +3 secções (4 locales). Novas migrations: 1 (`ContractTestRecords`). **Wave AE PLANEADA**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -1755,6 +2126,19 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 
 71. 📘 **Wave AA — V3 Frontend Evolution** — 12 sub-waves (V3.1→V3.12) cobrindo: Dashboard Intelligence Foundation (variables, revisions, SharingPolicy granular), Query-driven Widgets + NQL, Live/Cross-filter/Drill-down, AI-assisted Dashboards + Notebooks, Frontend Platform Uplift (tokens v2, Command Palette, WCAG 2.2, Storybook, perf budgets), Governance/Reports/Embedding, Real-time Collaboration via CRDT (Yjs), Marketplace + Plugin SDK (Module Federation), Advanced NQL + Alerting from widget + PWA on-call, **Persona-first Experience Suites (7 homes: Engineer/Tech Lead/Architect/Product/Executive/Platform Admin/Auditor)**, **Source-of-Truth Consolidation Surfaces (11 Centers: Compliance/Risk/FinOps/Change Confidence/Release Calendar/Rollback/Blast Radius/Evidence Pack/Operational Readiness/Drift/SLO+Chaos+Learning)**, **Contract Studio Visual (REST/SOAP/AsyncAPI/GraphQL/Protobuf) + AI Agent Marketplace + IDE Extensions Console (VS + VS Code) + Break Glass/JIT + Licensing Admin + Knowledge Hub Bridge + DaC GitOps**. Plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md). Alinhada com Copilot Instructions §§6, 7, 11, 12, 13, 16, 17, 18. Estimativa agregada ≥525 testes dedicados, além da cobertura backend existente. **Wave AA PLANEADA**.
 
+72. 🔲 **Wave AB.1** — `GetKnowledgeRelationGraph` — grafo semântico de relações entre entidades (Service/Contract/Runbook/Incident/Release/Team/OperationalNote): arestas nomeadas (OwnedBy/DependsOn/PublishesContract/ConsumesContract/CorrelatedWith/MitigatedBy), subgrafo por âncora (1–3 saltos), RelationStrength com decaimento temporal, KnowledgeGraphSummary. Catalog. Config: `catalog.knowledge_graph.*` sort 11760–11780.
+73. 🔲 **Wave AB.2** — `GetContractLineageReport` — linhagem de versões de contrato: LineageNode por versão (autor, aprovador, datas de promoção/deprecation), BreakingChangeCount por transição, ConsumerImpactAtDeprecation, VersionRetentionDays, StabilityScore de linhagem, LineageSummary. Catalog. Config: `catalog.contract_lineage.*` sort 11790–11800.
+74. 🔲 **Wave AB.3** — `GetIncidentKnowledgeBaseReport` — base de conhecimento de incidentes: ResolutionConfidence, MeanTimeToRunbook, RunbookEffectivenessScore por tipo de incidente, KnowledgeGap flag, StaleRunbook flag, KnowledgeMaturityScore global. OI. Config: `runtime.incident_knowledge.*` sort 11810–11830. **Wave AB PLANEADA**.
+75. 🔲 **Wave AC.1** — `GetOnboardingHealthReport` — scorecard de completude de onboarding por serviço: 5 dimensões ponderadas (Ownership 20% + Contracts 25% + Runbook 20% + SLO 20% + Profiling 15%), OnboardingTier (Complete/Advanced/Basic/Minimal), TeamOnboardingAvg, TenantOnboardingScore ponderado por tier de serviço. Catalog. Config: `catalog.onboarding_health.*` sort 11840–11860.
+76. 🔲 **Wave AC.2** — `GetDeveloperActivityReport` — atividade de developers na plataforma: TotalActions ponderado (contratos=3/runbooks=2/outros=1), ActivityTier (HighlyActive/Active/Occasional/Inactive) por percentil, TeamActivityScore, top 10 utilizadores/equipas, InactiveTeams list. IA/Audit. Config: `audit.developer_activity.*` sort 11870–11880.
+77. 🔲 **Wave AC.3** — `GetPlatformAdoptionReport` — adoção de 7 capacidades core por equipa: SloTracking/ChaosEngineering/ContinuousProfiling/ComplianceReports/ChangeConfidence/ReleaseCalendar/AiAssistant, AdoptionTier (Pioneer/Adopter/Explorer/Laggard), CapabilityAdoptionRate global, GrowthOpportunity (capacidades <30% adoção). OI. Config: `platform.adoption.*` sort 11890–11910. **Wave AC PLANEADA**.
+78. 🔲 **Wave AD.1** — `GetZeroTrustPostureReport` — postura Zero Trust por serviço: 4 dimensões (Authentication 30% + mTLS 25% + TokenRotation 20% + PolicyCoverage 25%), ZeroTrustTier (Enforced/Controlled/Partial/Exposed), CriticalExposure flag, TenantZeroTrustScore. CG. Config: `security.zero_trust.*` sort 11920–11930.
+79. 🔲 **Wave AD.2** — `GetSecretsExposureRiskReport` — deteção de segredos em artefactos: pattern matching leve (API keys/JWT/connection strings/IPs/emails), ExposureRisk por artefacto (None/Low/Medium/High/Critical), AffectedArtifacts list, AuditTrail por deteção, sem dependências externas. Catalog. Config: `catalog.secrets_exposure.*` sort 11940–11950.
+80. 🔲 **Wave AD.3** — `GetAccessPatternAnomalyReport` — anomalias de acesso: 5 AnomalySignal types (OffHours/VolumetricSpike/FirstAccessSensitive/UnusualResource/BulkExport), RiskScore composto por tipo+sensibilidade, AnomalyDensityByUser (risco insider threat), top recursos acedidos anomalamente. IA/Audit. Config: `audit.access_anomaly.*` sort 11960–11990. **Wave AD PLANEADA**.
+81. 🔲 **Wave AE.1** — `ContractTestRecord` + `IngestContractTestResult` + `GetContractTestCoverageReport` — cobertura de testes de contrato: ingestão de resultados de Pact/contract testing via pipeline, CoverageTier (Full/Good/Partial/None), TestPassRate, UncoveredConsumerPairs, migration `ContractTestRecords`. Catalog. Config: `contracts.test_coverage.*` sort 12000–12020.
+82. 🔲 **Wave AE.2** — `GetSchemaBreakingChangeImpactReport` — impacto transitivo de breaking changes: DirectConsumers + IndirectConsumers (até `max_hop_depth` saltos), ImpactScore ponderado por tier, BreakingChangeImpactTier (Contained/Moderate/Significant/Widespread), MitigationOptions, breakdown por ambiente. Catalog. Config: `contracts.breaking_change_impact.*` sort 12030–12040.
+83. 🔲 **Wave AE.3** — `GetApiBackwardCompatibilityReport` — compatibilidade retroativa longitudinal: BreakingChangeRate, ConsumerAdoptionLag, BackwardCompatibilityScore, CompatibilityTier (Stable/Evolving/Volatile/Unstable), StagnationFlag, TenantCompatibilityIndex. Catalog. Config: `contracts.backward_compat.*` sort 12050–12070. **Wave AE PLANEADA**.
+
 ### Riscos e recomendações transversais
 
 - **Feature sprawl** — resistir à tentação de criar módulos novos; preferir aprofundar existentes (Wave A > Wave B).
@@ -1777,3 +2161,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 8. **Wave S (completa):** S.1 `GetChangeWindowUtilizationReport` + S.2 `GetContractAdoptionReport` + S.3 `GetMttrTrendReport`. CG: 866/Catalog: 1873/OI: 1178 testes. +8 config keys (sort 11120–11190). **Wave T (completa):** T.1 `GetPostIncidentLearningReport` + T.2 `GetApiSchemaCoverageReport` + T.3 `GetEnvironmentStabilityReport`. CG: 879/Catalog: 1885/OI: 1192 testes. +8 config keys (sort 11200–11270). **Waves U–W (planeadas):** 3 waves detalhadas na secção 15, cobrindo itens 53–61 da lista de priorização.
 9. **Waves X–Z (planeadas):** 3 novas waves detalhadas na secção 15, cobrindo itens 62–70. Wave X: Frontend Intelligence (dashboards, visual builders, adaptive navigation). Wave Y: AI Governance Deep Dive (agentic runtime, NLP routing, token budget attribution). Wave Z: Integration Ecosystem Completion (Kafka consumer, SDK, ClickHouse). Adicionam 24 config keys (sort 11520–11750), 3×3–4 secções i18n.
 10. **Status das secções 1–12 revisto (Abril 2026):** §1.1 GraphQL e §1.2 Protobuf marcados como ✅ implementados (Waves G.3/H.1). §8.4 ML Correlation marcado como ✅ implementado (Wave A.5). §9.1 Compliance Packs marcado como ✅ parcialmente implementado (8 standards via Waves G–L). Tabela Priorização Recomendada actualizada para reflectir estado real.
+11. **Waves AB–AE (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 72–83 da lista de priorização. **Wave AB** (Knowledge Graph & Semantic Relations): AB.1 `GetKnowledgeRelationGraph` + AB.2 `GetContractLineageReport` + AB.3 `GetIncidentKnowledgeBaseReport`. +8 config keys (sort 11760–11830). **Wave AC** (Self-Service & Platform Adoption Intelligence): AC.1 `GetOnboardingHealthReport` + AC.2 `GetDeveloperActivityReport` + AC.3 `GetPlatformAdoptionReport`. +8 config keys (sort 11840–11910). **Wave AD** (Zero Trust & Security Posture Analytics): AD.1 `GetZeroTrustPostureReport` + AD.2 `GetSecretsExposureRiskReport` + AD.3 `GetAccessPatternAnomalyReport`. +8 config keys (sort 11920–11990). **Wave AE** (Contract Testing & API Backward Compatibility): AE.1 `ContractTestRecord`+`IngestContractTestResult`+`GetContractTestCoverageReport` + AE.2 `GetSchemaBreakingChangeImpactReport` + AE.3 `GetApiBackwardCompatibilityReport`. +8 config keys (sort 12000–12070). Total de config keys adicionadas: +32 (sort 11760–12070). Total de testes estimados: +186 (Catalog +~115, OI +~42, CG/IA +~29). Novas migrations: 1 (`ContractTestRecords` — Wave AE.1). i18n: +12 secções em 4 locales.
