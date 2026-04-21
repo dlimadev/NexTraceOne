@@ -3,13 +3,14 @@
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
 > **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → AU (81 features novas documentadas, aguardam implementação)  
+> **Waves planeadas:** U → AY (93 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
 > **Waves AJ–AM (backend avançado III):** 4 novas waves planeadas — Multi-Tenant Governance Intelligence, Developer Experience & Notification Management, Audit Intelligence & Traceability Analytics, Auto-Cataloging & Service Discovery Intelligence  
 > **Waves AN–AQ (backend avançado IV):** 4 novas waves planeadas — SRE Intelligence & Error Budget Management, Supply Chain & Dependency Provenance, Collaborative Governance & Workflow Automation, Data Observability & Schema Quality  
 > **Waves AR–AU (backend avançado V):** 4 novas waves planeadas — Service Topology Intelligence & Dependency Mapping, Feature Flag & Experimentation Governance, AI Model Quality & Drift Governance, Platform Self-Optimization & Adaptive Intelligence  
+> **Waves AV–AY (backend avançado VI):** 4 novas waves planeadas — Contract Lifecycle Automation & Deprecation Intelligence, Release Intelligence & Deployment Analytics, Security Posture & Vulnerability Intelligence, Organizational Knowledge & Documentation Intelligence  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -3628,6 +3629,431 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave AV — Contract Lifecycle Automation & Deprecation Intelligence
+
+**Objetivo:** Introduzir inteligência sobre o ciclo de vida dos contratos como capacidade analítica e de automação. O NexTraceOne já regista contratos com estados (Draft/Active/Deprecated/Sunset/Retired) mas não analisa a qualidade do processo de deprecação — se os owners notificaram os consumidores, se a migração está a progredir, se os prazos são cumpridos. Esta wave torna a deprecação de contratos um processo governado, transparente e auditável, fechando um gap crítico na maturidade de API governance.
+
+#### AV.1 — GetContractDeprecationPipelineReport (Catalog / ChangeGovernance)
+
+**Feature:** Relatório de pipeline de deprecação de contratos. Responde "como está a correr o processo de deprecação dos nossos contratos — os owners estão a notificar os consumidores, os prazos são realistas e a migração está a progredir?"
+
+**Domínio:** Agrega `ContractDefinition` (estados Deprecated/Sunset), `ContractConsumer`, `AuditEvent` (notificações enviadas), e `ServiceAsset` para construir uma visão end-to-end do pipeline de deprecação por tenant.
+
+**Capacidades:**
+- Por contrato em estado Deprecated ou Sunset:
+  - **DeprecationAge** — dias desde a transição para Deprecated
+  - **SunsetDeadline** — data limite de Sunset (se definida) + `DaysToSunset`
+  - **ConsumerCount** — número de consumidores activos ainda dependentes desta versão
+  - **NotifiedConsumers** — % de consumidores com notificação de deprecação registada (via AuditEvent)
+  - **MigratedConsumers** — % de consumidores que já migraram para versão mais recente (consumidores activos na versão sucessora)
+  - **MigrationProgress** — `MigratedConsumers / ConsumerCount * 100`
+  - **OwnerResponseTime** — dias desde a deprecação até à primeira notificação enviada (staleness de resposta do owner)
+  - **BlockingConsumers** — consumidores críticos (ServiceTier Critical/High) ainda não migrados (maior urgência)
+- **DeprecationPipelineTier por contrato:** `OnTrack` (MigrationProgress ≥ 70% + SunsetDeadline não expirado) / `AtRisk` / `Overdue` (SunsetDeadline expirado + ConsumerCount > 0) / `Blocked` (DeprecationAge > `deprecation_max_days` sem progresso)
+- **TenantDeprecationPipelineSummary:**
+  - **ActiveDeprecations** — contratos em Deprecated
+  - **ApproachingSunset** — contratos com `DaysToSunset ≤ deprecation_sunset_warning_days`
+  - **OverdueSunsets** — contratos com SunsetDeadline expirado + consumidores activos
+  - **TenantDeprecationHealthScore** (0–100) — % de contratos em pipeline com DeprecationPipelineTier `OnTrack`
+  - **TotalBlockingConsumers** — soma total de consumidores críticos bloqueados
+- **NotificationGaps** — contratos com `NotifiedConsumers < deprecation_min_notification_pct` (owners não cumpriram obrigação de notificação)
+- **FastestMigrations** e **SlowestMigrations** — top 3 contratos por MigrationProgress (benchmarking interno)
+
+**Orientado para Tech Lead, Architect e Platform Admin** — fecha o gap mais comum em API governance: contratos são deprecados mas a migração dos consumidores não é acompanhada sistematicamente, causando dependências em contratos sunset sem aviso adequado.
+
+#### AV.2 — GetApiVersionStrategyReport (Catalog)
+
+**Feature:** Análise da estratégia de versionamento de APIs no tenant. Responde "estamos a versionar as nossas APIs de forma consistente e sustentável — ou existe drift de estratégia entre equipas, breaking changes frequentes e proliferação descontrolada de versões paralelas?"
+
+**Domínio:** Agrega `ContractDefinition` por protocolo (REST, SOAP, AsyncAPI) para analisar padrões de versionamento: semver adoption, breaking change frequency, versões paralelas em produção simultaneamente, e velocidade de deprecação.
+
+**Capacidades:**
+- Por serviço com múltiplas versões de contrato:
+  - **ActiveVersionCount** — versões activas simultaneamente em produção
+  - **SemverAdherence** — bool (versão segue padrão semver)
+  - **BreakingChangesLast90d** — número de breaking changes registados nos últimos 90 dias
+  - **AvgVersionLifetimeDays** — tempo médio de vida de uma versão antes de ser deprecated
+  - **OldestActiveVersion** — versão mais antiga ainda activa (candidata a deprecação)
+  - **VersioningPattern:** `Linear` (1 versão activa de cada vez) / `Parallel` (2–3 versões activas) / `Fragmented` (>3 versões activas)
+- **TenantVersioningStrategySummary:**
+  - **SemverAdoptionRate** — % de contratos que seguem semver
+  - **AvgParallelVersionsPerService** — média de versões activas por serviço
+  - **HighBreakingChangeServices** — serviços com BreakingChangesLast90d > `breaking_change_warning_threshold`
+  - **TenantVersioningHealthTier:** `Mature` (SemverAdoption ≥90% + AvgParallel ≤2 + LowBreakingRate) / `Developing` / `Inconsistent` / `Chaotic`
+- **VersionProliferationRisk** — serviços com `ActiveVersionCount > version_proliferation_threshold` (custo operacional alto de manter múltiplas versões)
+- **BreakingChangeTrend** (90d, 30d, 7d) — detecção de aceleração de breaking changes (sinal de instabilidade de contrato)
+- **VersioningGapsByTeam** — equipas com SemverAdherence abaixo da média do tenant (candidatas a acção de enablement)
+- **BestPracticedServices** — serviços com VersioningPattern = Linear + SemverAdherence + BreakingChanges = 0 nos últimos 90d (exemplos internos a promover)
+
+**Orientado para Architect e Tech Lead** — suporta decisões de padronização de estratégia de versionamento antes que a proliferação se torne ingovernável, e identifica onde o investimento em enablement terá maior impacto.
+
+#### AV.3 — GetContractDeprecationForecast + ScheduleContractDeprecation (Catalog / Foundation)
+
+**Feature:** Previsão e planeamento de depre​cações futuras. Permite aos owners agendar formalmente a deprecação de um contrato (com data alvo, mensagem de migração e versão sucessora) e oferece um relatório preditivo de "o que vai entrar em pipeline de deprecação nas próximas semanas com base nos padrões actuais".
+
+**Domínio:** `ScheduleContractDeprecation` cria um registo de planeamento de deprecação com estado `Planned` antecipado à mudança de estado real; `GetContractDeprecationForecast` analisa contratos activos e prevê candidatos a deprecação com base em idade, padrões históricos e substituição disponível.
+
+**Capacidades:**
+- **ScheduleContractDeprecation** (command):
+  - Regista `DeprecationSchedule` com: `ContractId`, `PlannedDeprecationDate`, `PlannedSunsetDate`, `MigrationGuideUrl`, `SuccessorVersionId` (opcional), `NotificationDraftMessage`
+  - Gera `AuditEvent` com `UserId`, `reason` e datas planeadas
+  - Endpoint: `POST /api/v1/contracts/{id}/deprecation-schedule`
+- **GetContractDeprecationForecast** (query):
+  - Analisa contratos activos com base em:
+    - **AgeRisk** — versões com `CreatedAt` há mais de `contract_max_age_days` (envelhecimento)
+    - **SuccessorAvailable** — existe versão mais recente do mesmo contrato já activa (candidata óbvia a deprecação)
+    - **ConsumerDeclineRate** — consumidores activos declinando ≥ `consumer_decline_pct_threshold`% mês a mês (adopção a diminuir naturalmente)
+    - **OwnerSignalledDeprecation** — bool (owner já agendou via `ScheduleContractDeprecation`)
+  - **ForecastedDeprecationCandidates** — lista ordenada por probabilidade de deprecação nos próximos 90 dias
+  - **DeprecationProbabilityScore** (0–100): Age (35%) + SuccessorAvailable (30%) + ConsumerDecline (25%) + OwnerSignal (10%)
+  - **TenantDeprecationOutlook** — quantas deprecações se prevêem nos próximos 30/60/90 dias e impacto estimado em consumidores
+- **PlannedDeprecationCalendar** — calendário das deprecações agendadas pelos owners via `ScheduleContractDeprecation`
+
+**Orientado para Architect, Tech Lead e Product** — permite antecipar o volume de trabalho de migração dos próximos trimestres e planear o roadmap de contrato com base em dados objectivos em vez de intuição.
+
+#### Configuração Wave AV
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `contract.deprecation.max_days` | 180 | 13360 | Dias máximos em Deprecated sem atingir Sunset (DeprecationPipelineTier Blocked) |
+| `contract.deprecation.sunset_warning_days` | 30 | 13370 | Dias antes do SunsetDeadline para flag ApproachingSunset |
+| `contract.deprecation.min_notification_pct` | 80 | 13380 | % mínimo de consumidores notificados para evitar NotificationGap |
+| `contract.versioning.breaking_change_warning_threshold` | 3 | 13390 | Breaking changes em 90d para flag HighBreakingChangeServices |
+| `contract.versioning.proliferation_threshold` | 3 | 13400 | ActiveVersionCount para flag VersionProliferationRisk |
+| `contract.deprecation_forecast.max_age_days` | 365 | 13410 | Idade máxima de um contrato antes de AgeRisk elevar DeprecationProbability |
+| `contract.deprecation_forecast.consumer_decline_pct` | 20 | 13420 | % de declínio mensal de consumidores para ConsumerDeclineRate flag |
+| `contract.deprecation.schedule_endpoint_enabled` | `true` | 13430 | Activa endpoint de agendamento de deprecação de contratos |
+
+#### i18n Wave AV
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `contractDeprecationPipeline.*` — pipeline de deprecação, MigrationProgress, BlockingConsumers, NotificationGaps e TenantDeprecationHealthScore
+- `apiVersionStrategy.*` — estratégia de versionamento, SemverAdoption, VersionProliferationRisk, BreakingChangeTrend e TenantVersioningHealthTier
+- `contractDeprecationForecast.*` — previsão de deprecação, ForecastedCandidates, DeprecationProbabilityScore e PlannedDeprecationCalendar
+
+**Totais estimados Wave AV:** Catalog/CG/Foundation: ~46 testes (AV.1 ~15 + AV.2 ~14 + AV.3 ~17). Configuração: +8 config keys (sort 13360–13430). i18n: +3 secções (4 locales). 1 novo endpoint REST (`POST /contracts/{id}/deprecation-schedule`). **Wave AV PLANEADA**.
+
+---
+
+### Wave AW — Release Intelligence & Deployment Analytics
+
+**Objetivo:** Aprofundar a análise de inteligência de releases além das métricas DORA individuais já existentes. O NexTraceOne já tem `ReleaseRecord`, `ReleaseCalendarEntry` e `GetReleaseSuccessRateReport`. Esta wave eleva a camada analítica para identificar padrões sistémicos de release — clusters de risco, correlação entre batch size e falhas, lead time por estágio e anomalias de cadência — transformando o NexTraceOne em conselheiro activo de engenharia de release.
+
+#### AW.1 — GetReleasePatternAnalysisReport (ChangeGovernance / OperationalIntelligence)
+
+**Feature:** Análise de padrões sistémicos de release. Responde "como são os nossos releases do ponto de vista de padrões — estamos a fazer releases muito grandes, em momentos de risco, com clustering problemático?"
+
+**Domínio:** Agrega `ReleaseRecord` (batch size via services changed count), `ReleaseCalendarEntry` (janelas e freeze periods), `IncidentRecord` (correlação com releases) para identificar anti-padrões.
+
+**Capacidades:**
+- **BatchSizeAnalysis:**
+  - **AvgServiceChangesPerRelease** — média de serviços alterados por release
+  - **LargeReleaseCount** — releases com > `large_release_threshold` serviços (maior risco)
+  - **BatchSizeVsFailureCorrelation** — correlação observada entre batch size e failure rate (se significativa: aviso)
+  - **BatchSizeTrend** — batch médio a aumentar ou diminuir nos últimos 90 dias
+- **TemporalPatterns:**
+  - **HighRiskDayConcentration** — % de releases em dias identificados como alto risco (ex: sexta-feira, véspera de feriado, freeze period)
+  - **EndOfSprintCluster** — % de releases nos últimos 3 dias de cada sprint (sign of deadline pressure)
+  - **DeploymentHeatmapSummary** — distribuição de releases por hora e dia da semana (complementa `GetChangeFrequencyHeatmap`)
+- **ClusteringRisk:**
+  - **MultiServiceSameDayReleases** — dias com >3 releases simultâneos de serviços interdependentes (blast radius acumulado)
+  - **MaxDailyReleaseCount** — máximo de releases num único dia no período (pico de pressão)
+  - **ReleaseClusteringTier:** `Safe` / `Warning` (>3 clusters/semana) / `Risky` (>5) / `Critical` (clusters com incidentes correlacionados)
+- **IncidentPatternAfterRelease:**
+  - **IncidentInHour1Rate** — % de releases seguidos de incidente em < 1h (falha imediata — problema de smoke testing)
+  - **IncidentInDay1Rate** — % de releases com incidente em < 24h
+  - **RepeatFailureServices** — serviços com IncidentInHour1Rate > `repeat_failure_threshold` (padrão sistemático)
+- **TenantReleasePatternScore** (0–100) — composição de BatchSizeRisk + TemporalRisk + ClusteringRisk + IncidentPostRelease
+
+**Orientado para Tech Lead, SRE e Architect** — identifica anti-padrões de release antes que causem incidentes, com base em dados históricos objectivos.
+
+#### AW.2 — GetChangeLeadTimeReport (ChangeGovernance)
+
+**Feature:** Análise de lead time de mudança — o tempo total desde que uma mudança é iniciada até estar em produção, por estágio. Responde "onde está o nosso lead time a ser desperdiçado — no processo de aprovação, na promoção entre ambientes, ou na validação pós-change?"
+
+**Domínio:** Analisa `ReleaseRecord` com `PromotionHistory` e `ApprovalEvent` para calcular o tempo em cada estágio do pipeline de mudança, identificando gargalos.
+
+**Capacidades:**
+- Por release (ou sumarizado por serviço/equipa/ambiente):
+  - **StageBreakdown** — duração em cada estágio:
+    - `CreatedToApprovalRequested` — tempo até o owner pedir aprovação
+    - `ApprovalRequestedToApproved` — tempo de espera de aprovadores
+    - `ApprovedToPreProdDeploy` — tempo entre aprovação e deploy em PreProd
+    - `PreProdToProductionDeploy` — tempo de promoção PreProd→Prod
+    - `ProductionDeployToVerification` — tempo até verificação pós-change concluída
+  - **TotalLeadTime** — soma de todos os estágios
+  - **BottleneckStage** — estágio com maior duração média (gargalo identificado)
+- **LeadTimeTier:** baseado em DORA benchmarks — `Elite` ≤1h / `High` ≤1d / `Medium` ≤1w / `Low` >1w
+- **TenantLeadTimeSummary:**
+  - **MedianLeadTime** / **P95LeadTime** — latência mediana e worst case
+  - **TenantLeadTimeTier** — tier baseado na mediana
+  - **SlowestApprovalGroups** — aprovadores cujo tempo de resposta excede `approval_sla_hours` com frequência
+  - **SlowestPromotionServices** — serviços com tempo PreProd→Prod consistentemente elevado
+- **LeadTimeTrend** (90d, 30d, 7d) — está a melhorar ou a piorar?
+- **ApprovalBottleneckIndex** — % do TotalLeadTime gasto em espera de aprovação (> 50% = anti-padrão)
+- **EnvironmentWaitTime** — tempo médio de espera em cada ambiente antes da promoção (detecta ambientes bloqueadores)
+
+**Orientado para Tech Lead, SRE e Product** — traduz o lead time de mudança de métrica abstracta para mapa concreto de gargalos por estágio, equipa e serviço.
+
+#### AW.3 — GetDeploymentFrequencyHealthReport (ChangeGovernance / OperationalIntelligence)
+
+**Feature:** Análise de saúde da frequência de deploy por serviço e equipa. Responde "estamos a deployar com a frequência certa — ou temos serviços com deploy muito espaçado (acumulação de risco) e outros com deploy excessivo (instabilidade)?"
+
+**Domínio:** Agrega `ReleaseRecord` por serviço e equipa ao longo do tempo para calcular frequência de deploy, identificar outliers e comparar com benchmarks DORA e com o nível de maturidade (ServiceTier) esperado para cada serviço.
+
+**Capacidades:**
+- Por serviço:
+  - **DeployFrequencyPerMonth** — número médio de deploys/mês nos últimos 90d
+  - **LastDeployAge** — dias desde o último deploy
+  - **DeployGap** — intervalo médio entre deploys consecutivos
+  - **DeployFrequencyTier:** (baseado em ServiceTier esperado) `Optimal` / `Underdeploying` / `Overdeploying` / `Stale` (nenhum deploy em > `stale_deploy_days`)
+  - **HighVariabilityFlag** — bool (std deviation de deploy frequency > `high_variability_threshold` — inconsistência no ritmo de entrega)
+- **TenantDeployFrequencySummary:**
+  - **DeploysByTier** — distribuição de deploys por ServiceTier (são os serviços críticos deployados com mais frequência?)
+  - **StaleServices** — serviços sem deploy em > `stale_deploy_days` (possível abandono ou ausência de pipeline activo)
+  - **OverdeployingServices** — serviços com frequência muito superior à média (possível instabilidade ou breaking change loop)
+  - **TenantDeployFrequencyHealthScore** (0–100) — % de serviços com `DeployFrequencyTier = Optimal`
+- **TeamDeployFrequencyComparison** — frequência média de deploy por equipa (cross-team benchmarking interno)
+- **DeployFrequencyVsIncidentRate** — correlação por serviço entre frequência de deploy e taxa de incidentes (para cada serviço: alta frequência + baixa incidência = Elite; alta frequência + alta incidência = risco)
+- **StaleDeployPotentialImpact** — para serviços Stale: lista de vulnerabilidades conhecidas (via `SbomRecord` — Wave AO) que poderiam ter sido resolvidas com um deploy
+
+**Orientado para Tech Lead, SRE e Architect** — fecha o gap entre "métricas DORA abstractas" e "análise contextual de frequência por serviço, equipa e tier", permitindo intervenções precisas em vez de generalizações.
+
+#### Configuração Wave AW
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `release.pattern.large_release_threshold` | 5 | 13440 | Número de serviços por release para flag LargeRelease |
+| `release.pattern.repeat_failure_threshold` | 0.3 | 13450 | IncidentInHour1Rate mínima para RepeatFailureServices |
+| `release.lead_time.approval_sla_hours` | 24 | 13460 | Horas de SLA para resposta de aprovador |
+| `release.lead_time.bottleneck_approval_pct` | 50 | 13470 | % do lead time em aprovação para ApprovalBottleneckIndex |
+| `release.deploy_frequency.stale_deploy_days` | 60 | 13480 | Dias sem deploy para flag Stale |
+| `release.deploy_frequency.high_variability_threshold` | 0.5 | 13490 | Coeficiente de variação para HighVariabilityFlag |
+| `release.pattern.cluster_warning_per_week` | 3 | 13500 | Clusters multi-release por semana para tier Warning |
+| `release.pattern.end_of_sprint_days` | 3 | 13510 | Dias finais do sprint para detectar EndOfSprintCluster |
+
+#### i18n Wave AW
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `releasePatternAnalysis.*` — padrões sistémicos de release, BatchSizeRisk, ClusteringRisk, TemporalPatterns e RepeatFailureServices
+- `changeLeadTime.*` — lead time de mudança por estágio, BottleneckStage, ApprovalBottleneckIndex, LeadTimeTrend e LeadTimeTier DORA
+- `deployFrequencyHealth.*` — frequência de deploy por serviço, DeployFrequencyTier, StaleServices, OverdeployingServices e correlação com incidentes
+
+**Totais estimados Wave AW:** CG/OI: ~47 testes (AW.1 ~16 + AW.2 ~16 + AW.3 ~15). Configuração: +8 config keys (sort 13440–13510). i18n: +3 secções (4 locales). **Wave AW PLANEADA**.
+
+---
+
+### Wave AX — Security Posture & Vulnerability Intelligence
+
+**Objetivo:** Introduzir análise de postura de segurança e inteligência de vulnerabilidades como capacidade nativa do NexTraceOne — complementando o Supply Chain/SBOM da Wave AO e o Zero Trust Analytics da Wave AD com uma camada analítica orientada a **vulnerabilidades em produção**: quantas existem, quão graves são, quanto tempo demoram a ser patchadas, e quais os serviços mais expostos. Esta wave posiciona o NexTraceOne como a fonte de verdade de risco de segurança a nível de serviço, equipa e tenant.
+
+#### AX.1 — GetVulnerabilityExposureReport (Catalog / ChangeGovernance)
+
+**Feature:** Análise de exposição a vulnerabilidades (CVEs) por serviço e tenant. Agrega dados de `SbomRecord` (Wave AO) com informação de CVE para calcular o perfil de exposição actual.
+
+**Dependência:** Requer `SbomRecord` (Wave AO.1) com campos de `CVEId`, `CVESeverity` e `CVEStatus` por componente.
+
+**Capacidades:**
+- Por serviço com `SbomRecord` disponível:
+  - **CVECountBySeverity:** `Critical` / `High` / `Medium` / `Low` — distribuição de CVEs conhecidas
+  - **TotalVulnerableComponents** — número de componentes com ≥1 CVE activa
+  - **CriticalCVEUnpatchedCount** — CVEs Critical sem patch disponível ou sem patch aplicado
+  - **AvgCVEAge** — idade média das CVEs não remediadas (dias desde disclosure)
+  - **ExposureScore** (0–100): Critical CVEs × 40 + High × 30 + Medium × 20 + Low × 10, normalizado por total de componentes
+  - **VulnerabilityExposureTier:** `Minimal` (Exposure ≤20, 0 Critical) / `Moderate` / `Elevated` / `Critical` (Critical CVEs não remediadas > `critical_cve_threshold`)
+- **TenantVulnerabilityExposureSummary:**
+  - **TotalCVEs** por severity (Critical/High/Medium/Low)
+  - **ServicesWithCriticalCVEs** — contagem e lista
+  - **TenantExposureScore** — média ponderada por ServiceTier
+  - **UnpatchedCriticalCVEAge** — CVE Critical mais antiga não remediada (dias) — indicador de resposta de segurança
+- **TopExposedServices** — top 10 por ExposureScore (foco de esforço de remediation)
+- **ExposureByDomain** — distribuição de ExposureScore por domínio organizacional (para decisões de investimento de segurança)
+- **ExposureTrend** (últimas 4 semanas, baseado em snapshots SbomRecord) — o perfil está a melhorar ou a degradar?
+
+**Orientado para Platform Admin, Architect e Auditor** — fornece uma visão executiva e operacional de "qual é o nosso perfil de exposição a vulnerabilidades em produção agora?" — indispensável para relatórios de segurança, auditorias e priorização de patches.
+
+#### AX.2 — GetSecurityPatchComplianceReport (Catalog / ChangeGovernance)
+
+**Feature:** Relatório de compliance de patching de segurança. Responde "estamos a patchar as nossas vulnerabilidades dentro dos SLAs de segurança — ou existe dívida de patching que nos coloca em risco de compliance?"
+
+**Domínio:** Agrega histórico de `SbomRecord` (snapshots consecutivos) para calcular o tempo de resolução de CVEs e compará-lo com os SLAs de patching definidos por severidade.
+
+**Capacidades:**
+- Por CVE remediada (encontrada em snapshot antigo, ausente em snapshot recente):
+  - **CVEId** / **Severity** / **DiscoveredAt** (primeiro snapshot com esta CVE) / **RemediatedAt** (último snapshot sem ela) / **DaysToRemediate**
+  - **WithinSLA** — bool (`DaysToRemediate ≤ patch_sla_{severity}_days`)
+- **PatchComplianceRateBySeverity:**
+  - `Critical_WithinSLA_Rate` — % de CVEs Critical remediadas dentro do SLA definido
+  - `High_WithinSLA_Rate` / `Medium_WithinSLA_Rate` / `Low_WithinSLA_Rate`
+- **PatchComplianceTier:** `Compliant` (Critical ≥95% + High ≥90% within SLA) / `Partial` / `NonCompliant` / `AtRisk` (CVEs Critical overdue)
+- **TenantPatchComplianceSummary:**
+  - **OverallPatchComplianceRate** — % de todas as CVEs remediadas dentro de SLA
+  - **CriticalPatchBacklog** — CVEs Critical activas sem patch há > `patch_sla_critical_days` (dívida de patching crítica)
+  - **AvgPatchTimeByService** — tempo médio de remediation por serviço (para comparação de velocidade de resposta de equipas)
+  - **TenantPatchComplianceScore** (0–100) — ponderação PatchComplianceTier × VolumeOfCVEs
+- **SLABreaches** — todas as CVEs onde `DaysToRemediate > patch_sla_{severity}_days` (para relatório de auditoria)
+- **SlowPatchingTeams** — equipas com AvgPatchTime acima da mediana do tenant em CVEs High/Critical
+- **PatchComplianceTrend** — 4 semanas de `PatchComplianceTier` historizado (está a melhorar ou a regredir?)
+
+**Orientado para Platform Admin, Auditor e Executive** — fornece evidência formal de compliance de patching para auditorias de segurança, reguladores e clientes enterprise que exigem demonstração de processo de gestão de vulnerabilidades.
+
+#### AX.3 — GetSecurityIncidentCorrelationReport (ChangeGovernance / OperationalIntelligence)
+
+**Feature:** Correlação de incidentes de segurança com vulnerabilidades e mudanças. Responde "os nossos incidentes de segurança têm correlação com CVEs conhecidas não remediadas ou com mudanças recentes que introduziram componentes vulneráveis?"
+
+**Domínio:** Agrega `IncidentRecord` com tag/classificação `security` (ou `IncidentType = Security`), `SbomRecord` e `ReleaseRecord` para detectar padrões de causalidade entre exposição a CVEs e incidentes de segurança.
+
+**Capacidades:**
+- Por incidente de segurança:
+  - **ServiceId** e **OccurredAt**
+  - **ActiveCVEsAtTime** — número de CVEs activas no serviço afectado no momento do incidente (correlação de contexto)
+  - **CriticalCVEPresent** — bool (existia CVE Critical não remediada no serviço no momento do incidente)
+  - **RecentVulnerableComponentIntroduced** — bool (algum componente com CVE foi introduzido por release nas 72h anteriores ao incidente)
+  - **CorrelationSignals** — lista de sinais de correlação detectados (ex: `component_with_cve_introduced_in_recent_release`, `unpatched_critical_cve_present`)
+  - **SecurityIncidentCorrelationRisk:** `None` / `Possible` / `Likely` / `Strong` (score baseado nos CorrelationSignals)
+- **TenantSecurityIncidentCorrelationSummary:**
+  - **SecurityIncidentCount** (período) / **WithActiveUnpatchedCVE** — incidentes com CVE não remediada presente
+  - **StrongCorrelationIncidents** — incidentes com SecurityIncidentCorrelationRisk = Strong
+  - **TenantCVEIncidentCorrelationRate** — % de incidentes de segurança com pelo menos 1 sinal de correlação
+- **CVEsWithIncidentCorrelation** — CVEs que aparecem em múltiplos incidentes correlacionados (prioridade máxima de remediation)
+- **ComponentsIntroducedBeforeIncident** — componentes introduzidos em release recente antes de incidente correlacionado (evidência de supply chain risk)
+- **SecurityIncidentTimeline** — linha temporal de incidentes de segurança + overlaid com introdução de componentes vulneráveis (visualização de causalidade)
+- **RiskReductionOpportunity** — estimativa de quantos incidentes de segurança poderiam ter sido evitados se CVEs High/Critical tivessem sido remediadas no SLA (análise contrafactual)
+
+**Orientado para Platform Admin, Architect, Auditor e Executive** — fecha o loop entre gestão de vulnerabilidades e incidentes de segurança, transformando dados dispersos em evidência de causalidade que suporta decisões de investimento em segurança.
+
+#### Configuração Wave AX
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `security.vulnerability.critical_cve_threshold` | 1 | 13520 | CVEs Critical activas para VulnerabilityExposureTier Critical |
+| `security.patch_sla.critical_days` | 7 | 13530 | SLA de patching em dias para CVEs Critical |
+| `security.patch_sla.high_days` | 30 | 13540 | SLA de patching em dias para CVEs High |
+| `security.patch_sla.medium_days` | 90 | 13550 | SLA de patching em dias para CVEs Medium |
+| `security.patch_sla.low_days` | 180 | 13560 | SLA de patching em dias para CVEs Low |
+| `security.patch_compliance.compliant_critical_rate` | 95 | 13570 | % mínima de CVEs Critical dentro de SLA para PatchComplianceTier Compliant |
+| `security.incident.correlation_window_hours` | 72 | 13580 | Janela em horas para correlacionar componentes introduzidos com incidente |
+| `security.incident.sbom_snapshot_frequency_days` | 7 | 13590 | Frequência de snapshots SbomRecord para cálculo de patch timeline |
+
+#### i18n Wave AX
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `vulnerabilityExposure.*` — exposição a CVEs por serviço, ExposureScore, VulnerabilityExposureTier e ExposureTrend
+- `securityPatchCompliance.*` — compliance de patching, PatchComplianceTier, SLABreaches, CriticalPatchBacklog e PatchComplianceTrend
+- `securityIncidentCorrelation.*` — correlação de incidentes com CVEs, CorrelationSignals, RiskReductionOpportunity e SecurityIncidentTimeline
+
+**Totais estimados Wave AX:** Catalog/CG/OI: ~45 testes (AX.1 ~15 + AX.2 ~15 + AX.3 ~15). Configuração: +8 config keys (sort 13520–13590). i18n: +3 secções (4 locales). Dependência: `SbomRecord` (Wave AO.1). **Wave AX PLANEADA**.
+
+---
+
+### Wave AY — Organizational Knowledge & Documentation Intelligence
+
+**Objetivo:** Introduzir inteligência sobre o estado do conhecimento organizacional como capacidade analítica de primeira classe. O NexTraceOne já tem Knowledge Hub, runbooks e documentação inline. Esta wave fecha o gap analítico: não apenas armazenar documentação mas medir a sua cobertura, qualidade e utilização — transformando o NexTraceOne no responsável por garantir que o conhecimento operacional da organização está completo, actualizado e efectivamente usado.
+
+#### AY.1 — GetDocumentationHealthReport (Catalog / Knowledge)
+
+**Feature:** Relatório de saúde da documentação por serviço, equipa e tenant. Responde "a nossa documentação está completa e fresca — ou existem serviços críticos sem runbook, APIs sem documentação e documentação desactualizada que representa risco operacional?"
+
+**Domínio:** Agrega `ServiceAsset` (campo `RunbookUrl` / `DocumentationUrl`), `ContractDefinition` (campo de documentação inline), `ProposedRunbook` e metadados de actualização para calcular scores de cobertura e freshness de documentação.
+
+**Capacidades:**
+- Por serviço:
+  - **RunbookCoverage:** `Covered` (RunbookUrl válido + `RunbookLastUpdatedAt` dentro de `runbook_freshness_days`) / `Stale` (RunbookUrl presente mas desactualizado) / `Missing` (sem runbook)
+  - **ApiDocCoverage:** `Full` (todos os contratos com description, examples e error codes documentados) / `Partial` / `Absent`
+  - **ArchitectureDocPresence** — bool (link de documentação de arquitectura registado)
+  - **OnboardingDocPresence** — bool (guia de onboarding registado para novos contribuidores)
+  - **DocFreshnessTier:** `Fresh` (todas as docs actualizadas em ≤ `doc_freshness_days`) / `Aging` / `Stale` / `Critical` (docs de serviços críticos desactualizadas)
+  - **DocHealthScore** (0–100): RunbookCoverage (35%) + ApiDocCoverage (30%) + ArchitectureDoc (15%) + Freshness (20%)
+- **TenantDocumentationHealthSummary:**
+  - **ServicesWithRunbook** / **ServicesWithStaleRunbook** / **ServicesWithoutRunbook**
+  - **ApiContractsFullyDocumented** — % de contratos com documentação completa
+  - **TenantDocHealthTier:** `Excellent` (DocHealthScore ≥85% dos serviços) / `Good` / `Partial` / `Critical` (serviços críticos sem runbook)
+  - **TenantDocHealthScore** — média ponderada de DocHealthScore por ServiceTier
+- **CriticalServicesWithoutRunbook** — serviços com ServiceTier Critical ou High sem RunbookCoverage = Covered (máxima prioridade operacional)
+- **StaleDocsByTeam** — equipas com mais docs desactualizadas (candidatas a acção de manutenção)
+- **DocDebt** — número total de itens de documentação em falta ou desactualizados (para planear sprints de doc)
+- **BestDocumentedServices** — top 5 serviços por DocHealthScore (exemplos internos a promover)
+
+**Orientado para Tech Lead, Platform Admin e Architect** — fecha o gap mais recorrente em organizações em crescimento: documentação que existe no momento da criação mas é esquecida à medida que os serviços evoluem, aumentando o risco operacional durante incidentes.
+
+#### AY.2 — GetKnowledgeBaseUtilizationReport (Knowledge / Foundation)
+
+**Feature:** Análise de utilização do knowledge hub do NexTraceOne. Responde "o nosso knowledge hub está a ser usado — ou é um repositório de documentação que ninguém consulta, e onde existem lacunas de conteúdo que levam os engenheiros a procurar noutros locais?"
+
+**Domínio:** Agrega eventos de pesquisa e consulta de documentação (via `AuditEvent` ou `KnowledgeSearchEvent` dedicado) para calcular padrões de uso, gaps de conteúdo e cobertura efectiva do knowledge hub.
+
+**Capacidades:**
+- **SearchPatternAnalysis:**
+  - **TopSearchTerms** — termos de pesquisa mais frequentes no período (top 20)
+  - **SearchTermsWithNoResults** — termos pesquisados que retornaram 0 resultados (gap de conteúdo crítico — o utilizador procura algo que não existe)
+  - **SearchTermsWithLowRelevance** — termos com resultados mas baixa taxa de click (conteúdo existe mas não é relevante ou não está bem indexado)
+  - **SearchVolumeTrend** — volume de pesquisas por semana nos últimos 30 dias (adopção crescente ou decrescente?)
+- **ContentGapIdentification:**
+  - **KnowledgeGapCount** — número de termos pesquisados sem resultado
+  - **TopKnowledgeGaps** — top 10 termos sem resultado (candidatos prioritários para criação de conteúdo)
+  - **GapsByDomain** — distribuição de gaps por domínio ou módulo (onde falta mais conteúdo)
+- **ContentAccessPatterns:**
+  - **MostAccessedDocuments** — documentos mais consultados (top 10)
+  - **MostAccessedRunbooks** — runbooks mais consultados — indicador de incidentes recorrentes ou serviços problemáticos
+  - **LeastAccessedContent** — documentação que nunca é consultada (candidata a arquivar ou consolidar)
+- **KnowledgeHubUtilizationSummary:**
+  - **DailyActiveKnowledgeUsers** — utilizadores únicos que acederam ao knowledge hub no período
+  - **SearchPerUserPerWeek** — pesquisas médias por utilizador activo por semana (proxy de engagement)
+  - **KnowledgeResolutionRate** — % de sessões de pesquisa que terminaram com um clique em resultado (utilizador encontrou o que precisava)
+  - **KnowledgeHubHealthTier:** `Thriving` (ResolutionRate ≥70% + GapCount ≤10) / `Active` / `Underused` / `Gap-Heavy`
+
+**Orientado para Platform Admin, Product e Tech Lead** — garante que o investimento em knowledge hub produz valor real e que os gaps de conteúdo são identificados e priorizados antes de causarem perdas de produtividade ou incidentes por falta de documentação.
+
+#### AY.3 — GetTeamKnowledgeSharingReport (Knowledge / Foundation)
+
+**Feature:** Análise de partilha de conhecimento entre equipas. Responde "o conhecimento está a circular na organização — ou estamos a criar silos de conhecimento onde cada equipa só documenta o seu próprio trabalho e nunca contribui para o conhecimento partilhado?"
+
+**Domínio:** Agrega dados de autoria e contribuição de documentação (via `AuditEvent` de criação/edição de runbooks, docs e notas operacionais) para medir a saúde do sharing de conhecimento cross-team.
+
+**Capacidades:**
+- Por equipa:
+  - **DocContributionCount** — número de documentos criados ou actualizados no período
+  - **CrossTeamContributions** — contribuições para documentação de serviços de outras equipas (sharing activo)
+  - **DocConsumptionCount** — documentação de outras equipas consultada por esta equipa
+  - **KnowledgeSharingRatio** — `CrossTeamContributions / TotalContributions` (quanto do conhecimento criado beneficia outras equipas)
+  - **RunbookContributionCount** — runbooks criados ou actualizados (contribuição operacional)
+  - **KnowledgeSiloRisk** — bool (`KnowledgeSharingRatio < knowledge_silo_threshold` — equipa que só documenta para si)
+- **TenantKnowledgeSharingSummary:**
+  - **TeamsWithSiloRisk** — equipas com `KnowledgeSiloRisk = true`
+  - **TopKnowledgeContributors** — top 5 equipas por CrossTeamContributions (referências de cultura de partilha)
+  - **TenantKnowledgeSharingScore** (0–100) — % de equipas com `KnowledgeSharingRatio ≥ knowledge_silo_threshold`
+  - **KnowledgeFlowGraph** — resumo de quais equipas contribuem para o conhecimento de outras (para análise de colaboração)
+- **KnowledgeHotspots** — serviços ou domínios onde a documentação é criada por muitas equipas (alta relevância cross-funcional)
+- **KnowledgeColdSpots** — serviços ou domínios com contribuição exclusiva de uma única equipa (risco de bus factor = 1)
+- **CollaborationTrend** (90d) — o KnowledgeSharingRatio do tenant está a crescer ou a diminuir? (saúde da cultura de documentação)
+- **BusFactor1Services** — serviços onde todo o conhecimento documentado foi criado por um único contribuidor (risco de bus factor operacional)
+
+**Orientado para Tech Lead, Platform Admin e Executive** — fecha o ciclo de inteligência de conhecimento: não apenas medir se a documentação existe, mas se está a ser partilhada, usada e mantida de forma colaborativa — transformando o NexTraceOne no instrumento de diagnóstico da cultura de conhecimento da organização.
+
+#### Configuração Wave AY
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `knowledge.doc.freshness_days` | 180 | 13600 | Dias máximos para documentação ser considerada Fresh |
+| `knowledge.doc.runbook_freshness_days` | 90 | 13610 | Dias máximos para runbook ser considerado Fresh |
+| `knowledge.doc.critical_without_runbook_tier` | `"Critical,High"` | 13620 | ServiceTiers para flag CriticalServicesWithoutRunbook (CSV) |
+| `knowledge.hub.resolution_rate_thriving` | 70 | 13630 | % mínima de KnowledgeResolutionRate para KnowledgeHubHealthTier Thriving |
+| `knowledge.hub.gap_count_thriving` | 10 | 13640 | Máximo de gaps para KnowledgeHubHealthTier Thriving |
+| `knowledge.sharing.silo_threshold` | 0.15 | 13650 | KnowledgeSharingRatio mínimo para evitar KnowledgeSiloRisk |
+| `knowledge.sharing.bus_factor_max_contributors` | 1 | 13660 | Contribuidores únicos para flag BusFactor1Services |
+| `knowledge.hub.search_event_tracking_enabled` | `true` | 13670 | Activa tracking de eventos de pesquisa no knowledge hub |
+
+#### i18n Wave AY
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `documentationHealth.*` — saúde da documentação por serviço, RunbookCoverage, ApiDocCoverage, DocFreshnessTier e CriticalServicesWithoutRunbook
+- `knowledgeBaseUtilization.*` — utilização do knowledge hub, TopKnowledgeGaps, SearchPatterns, KnowledgeResolutionRate e KnowledgeHubHealthTier
+- `teamKnowledgeSharing.*` — partilha de conhecimento, KnowledgeSharingRatio, SiloRisk, BusFactor1Services e CollaborationTrend
+
+**Totais estimados Wave AY:** Catalog/Knowledge/Foundation: ~44 testes (AY.1 ~15 + AY.2 ~14 + AY.3 ~15). Configuração: +8 config keys (sort 13600–13670). i18n: +3 secções (4 locales). **Wave AY PLANEADA**.
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -3776,6 +4202,19 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 130. 🔲 **Wave AU.2** — `GetPlatformHealthIndexReport` — índice de saúde da plataforma NexTraceOne: 7 dimensões (ServiceCatalogCompleteness 15%+ContractCoverage 15%+ChangeGovernanceAdoption 15%+SloGovernanceAdoption 15%+ObservabilityContextualization 10%+AiGovernanceReadiness 15%+DataFreshness 15%), PlatformHealthTier (Optimized/Operational/Partial/Underutilized), TenantBenchmarkPosition (via Wave D.2 consent), ValueRealizationScore. Foundation. Config: `platform.health.*` sort 13300–13320.
 131. 🔲 **Wave AU.3** — `GetAdaptiveRecommendationReport` — motor de recomendações adaptativas cross-wave: Top10Recommendations por ImpactScore/EffortMultiplier, Category (Reliability/Security/Governance/Quality/Adoption), EffortEstimate (Low/Medium/High), EvidenceLinks para relatórios de origem, TenantActionPrioritySummary (3 bullet points executivos), job Quartz.NET refresh diário. Endpoint `/platform/recommendations`. Foundation. Config: `platform.recommendations.*` sort 13330–13350. **Wave AU PLANEADA**.
 
+132. 🔲 **Wave AV.1** — `GetContractDeprecationPipelineReport` — pipeline de deprecação: DeprecationPipelineTier (OnTrack/AtRisk/Overdue/Blocked), MigrationProgress por contrato, NotificationGaps (owners com <80% consumidores notificados), BlockingConsumers críticos, TenantDeprecationHealthScore. Catalog/CG. Config: `contract.deprecation.*` sort 13360–13380.
+133. 🔲 **Wave AV.2** — `GetApiVersionStrategyReport` — estratégia de versionamento: SemverAdoption, ActiveVersionCount, VersioningPattern (Linear/Parallel/Fragmented), BreakingChangeTrend, VersionProliferationRisk, TenantVersioningHealthTier (Mature/Developing/Inconsistent/Chaotic). Catalog. Config: `contract.versioning.*` sort 13390–13400.
+134. 🔲 **Wave AV.3** — `GetContractDeprecationForecast`+`ScheduleContractDeprecation` — previsão e agendamento de deprecação: DeprecationProbabilityScore (Age 35%+SuccessorAvailable 30%+ConsumerDecline 25%+OwnerSignal 10%), PlannedDeprecationCalendar, TenantDeprecationOutlook (30/60/90d). Endpoint `POST /contracts/{id}/deprecation-schedule`. Catalog/Foundation. Config: `contract.deprecation_forecast.*` sort 13410–13430. **Wave AV PLANEADA**.
+135. 🔲 **Wave AW.1** — `GetReleasePatternAnalysisReport` — padrões sistémicos de release: BatchSizeVsFailureCorrelation, EndOfSprintCluster, MultiServiceSameDayReleases, IncidentInHour1Rate, RepeatFailureServices, ReleaseClusteringTier (Safe/Warning/Risky/Critical), TenantReleasePatternScore. CG/OI. Config: `release.pattern.*` sort 13440–13450.
+136. 🔲 **Wave AW.2** — `GetChangeLeadTimeReport` — lead time de mudança por estágio (5 estágios: Created→ApprovalRequested→Approved→PreProdDeploy→Verification): BottleneckStage, ApprovalBottleneckIndex, LeadTimeTier DORA Elite/High/Medium/Low, SlowestApprovalGroups, SlowestPromotionServices, LeadTimeTrend. CG. Config: `release.lead_time.*` sort 13460–13470.
+137. 🔲 **Wave AW.3** — `GetDeploymentFrequencyHealthReport` — frequência de deploy por serviço/equipa: DeployFrequencyTier (Optimal/Underdeploying/Overdeploying/Stale), StaleServices (sem deploy em >60d), DeployFrequencyVsIncidentRate, StaleDeployPotentialImpact (CVEs que poderiam ter sido resolvidas com deploy), TenantDeployFrequencyHealthScore. CG/OI. Config: `release.deploy_frequency.*` sort 13480–13510. **Wave AW PLANEADA**.
+138. 🔲 **Wave AX.1** — `GetVulnerabilityExposureReport` — exposição a CVEs (requer Wave AO.1 `SbomRecord`): ExposureScore (Critical×40+High×30+Medium×20+Low×10), VulnerabilityExposureTier (Minimal/Moderate/Elevated/Critical), UnpatchedCriticalCVEAge, ExposureTrend 4 semanas, TopExposedServices top 10. Catalog/CG. Config: `security.vulnerability.*` sort 13520.
+139. 🔲 **Wave AX.2** — `GetSecurityPatchComplianceReport` — compliance de patching (SLAs: Critical 7d/High 30d/Medium 90d/Low 180d): PatchComplianceTier (Compliant/Partial/NonCompliant/AtRisk), CriticalPatchBacklog, SLABreaches, SlowPatchingTeams, PatchComplianceTrend 4 semanas, TenantPatchComplianceScore. Catalog/CG. Config: `security.patch_sla.*` sort 13530–13570.
+140. 🔲 **Wave AX.3** — `GetSecurityIncidentCorrelationReport` — correlação de incidentes de segurança com CVEs e mudanças: CorrelationSignals, SecurityIncidentCorrelationRisk (None/Possible/Likely/Strong), CVEsWithIncidentCorrelation, ComponentsIntroducedBeforeIncident, RiskReductionOpportunity (contrafactual). CG/OI. Config: `security.incident.*` sort 13580–13590. **Wave AX PLANEADA**.
+141. 🔲 **Wave AY.1** — `GetDocumentationHealthReport` — saúde da documentação: RunbookCoverage (Covered/Stale/Missing), ApiDocCoverage (Full/Partial/Absent), DocFreshnessTier (Fresh/Aging/Stale/Critical), DocHealthScore (Runbook 35%+ApiDoc 30%+ArchitectureDoc 15%+Freshness 20%), CriticalServicesWithoutRunbook, TenantDocHealthTier (Excellent/Good/Partial/Critical). Catalog/Knowledge. Config: `knowledge.doc.*` sort 13600–13620.
+142. 🔲 **Wave AY.2** — `GetKnowledgeBaseUtilizationReport` — utilização do knowledge hub: SearchTermsWithNoResults (gaps de conteúdo), KnowledgeResolutionRate (% sessões com click em resultado), MostAccessedRunbooks (proxy de incidentes recorrentes), KnowledgeHubHealthTier (Thriving/Active/Underused/Gap-Heavy), DailyActiveKnowledgeUsers. Knowledge/Foundation. Config: `knowledge.hub.*` sort 13630–13640.
+143. 🔲 **Wave AY.3** — `GetTeamKnowledgeSharingReport` — partilha de conhecimento: KnowledgeSharingRatio (CrossTeam/Total), KnowledgeSiloRisk (ratio < threshold), BusFactor1Services (conhecimento de um único contribuidor), KnowledgeColdSpots, CollaborationTrend 90d, TenantKnowledgeSharingScore. Knowledge/Foundation. Config: `knowledge.sharing.*` sort 13650–13670. **Wave AY PLANEADA**.
+
 ### Riscos e recomendações transversais
 
 - **Feature sprawl** — resistir à tentação de criar módulos novos; preferir aprofundar existentes (Wave A > Wave B).
@@ -3803,3 +4242,4 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 13. **Waves AJ–AM (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 96–107 da lista de priorização. **Wave AJ** (Multi-Tenant Governance Intelligence): AJ.1 `GetCrossTenantMaturityReport` + AJ.2 `GetTenantHealthScoreReport` + AJ.3 `GetPlatformPolicyComplianceReport`. +8 config keys (sort 12400–12470). 1 novo endpoint REST (`/governance/maturity/cross-tenant-benchmark`). 1 job Quartz.NET (TenantHealthScore refresh diário). **Wave AK** (Developer Experience & Notification Management): AK.1 IDE Context API + `IDESessionToken` + `IDEUsageRecord` + AK.2 Notification Engine (`NotificationChannel`+`NotificationSubscription`+`NotificationOutbox`+3 features) + AK.3 `GetNotificationEffectivenessReport`. +8 config keys (sort 12480–12550). Migrations: 3 (`IDEUsageRecords` + 2 Notification). **Wave AL** (Audit Intelligence & Traceability Analytics): AL.1 `GetAuditTrailCompletenessReport` + AL.2 `GetUserActionAuditReport` + AL.3 `GetChangeTraceabilityReport`. +8 config keys (sort 12560–12630). 2 novos endpoints REST (`/audit/users/{id}/action-report` + `/changes/releases/{id}/traceability`). **Wave AM** (Auto-Cataloging & Service Discovery Intelligence): AM.1 `GetUncatalogedServicesReport` + AM.2 `GetContractDriftFromRealityReport` + AM.3 `GetCatalogHealthMaintenanceReport`. +8 config keys (sort 12640–12710). Total: +32 config keys (sort 12400–12710). Testes estimados: +157 (CG +~45, IA +~30, Catalog +~46, Foundation +~36). i18n: +12 secções em 4 locales.
 14. **Waves AN–AQ (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 108–119 da lista de priorização. **Wave AN** (SRE Intelligence & Error Budget Management): AN.1 `GetErrorBudgetReport` (BurnRate, DaysToExhaustion, ErrorBudgetTier, FreezeRecommendations) + AN.2 `GetIncidentImpactScorecardReport` (4-dim score, TeamReliabilityTier, RepeatOffenderServices) + AN.3 `GetSreMaturityIndexReport` (6 práticas SRE, SreMaturityTier Elite/Advanced/Practicing/Foundational). +8 config keys (sort 12720–12790). 1 endpoint REST. **Wave AO** (Supply Chain & Dependency Provenance): AO.1 `SbomRecord`+`IngestSbomRecord`+`GetSbomCoverageReport` (SbomCoverageTier, LicenseRiskFlags) + AO.2 `GetDependencyProvenanceReport` (ProvenanceTier, SinglePointOfFailureComponents) + AO.3 `GetSupplyChainRiskReport` (ComponentRiskScore, SupplyChainRiskTier, PrioritizedPatchList). +8 config keys (sort 12800–12870). Migration `SbomRecords`. **Wave AP** (Collaborative Governance & Workflow Automation): AP.1 `GetApprovalWorkflowReport` (ApprovalTier, BottleneckApprovers, ApprovalHeatmap) + AP.2 `GetPeerReviewCoverageReport` (ReviewerConcentrationIndex, ReviewCompletionTier) + AP.3 `GetGovernanceEscalationReport` (BreakGlass, JIT, EscalationRiskTier). +8 config keys (sort 12880–12950). 1 endpoint REST. **Wave AQ** (Data Observability & Schema Quality): AQ.1 `DataContractRecord`+`RegisterDataContract`+`GetDataContractComplianceReport` (DataContractTier Governed/Partial/Unmanaged) + AQ.2 `GetSchemaQualityIndexReport` (5-dim SchemaQualityScore, QualityTrend mensal) + AQ.3 `GetSchemaEvolutionSafetyReport` (EvolutionSafetyTier Safe→Dangerous, ProtocolBreakingRateComparison). +8 config keys (sort 12960–13030). Migration `DataContractRecords`. 1 job Quartz.NET. Total: +32 config keys (sort 12720–13030). Testes estimados: +173 (OI +~39, Catalog +~91, CG +~43). i18n: +12 secções em 4 locales. 2 novas migrations. 3 novos endpoints REST.
 15. **Waves AR–AU (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 120–131 da lista de priorização. **Wave AR** (Service Topology Intelligence & Dependency Mapping): AR.1 `GetServiceTopologyHealthReport` (OrphanServices, CircularDependencies, HubServices, TopologyHealthTier) + AR.2 `GetCriticalPathReport` (CriticalPathChains, CascadeRiskScore, BottleneckServices; endpoint `/topology/critical-path`) + AR.3 `GetDependencyVersionAlignmentReport` (AlignmentTier Aligned→SecurityRisk, CrossTeamInconsistencies; requer Wave AO.1). +8 config keys (sort 13040–13110). **Wave AS** (Feature Flag & Experimentation Governance): AS.1 `FeatureFlagRecord`+`IngestFeatureFlagState`+`GetFeatureFlagInventoryReport` (FlagType Release/Experiment/Permission/Kill-switch; migration `FeatureFlagRecords`) + AS.2 `GetFeatureFlagRiskReport` (FlagRiskTier Safe→Urgent, ScheduledRemovalOverdue) + AS.3 `GetExperimentGovernanceReport` (ExperimentGovernanceTier Governed→Unmanaged, MetricImpact, ExperimentProdOnlyRisk). +8 config keys (sort 13120–13190). Migration `FeatureFlagRecords`. 2 endpoints REST. **Wave AT** (AI Model Quality & Drift Governance): AT.1 `ModelPredictionSample`+`IngestModelPredictionSample`+`GetModelDriftReport` (InputDriftScore PSI, ModelDriftTier Stable→Critical; migration `ModelPredictionSamples`) + AT.2 `GetAiModelQualityReport` (AccuracyRate, LowConfidencePredictionRate, InferenceLatencyP95, ModelQualityTier) + AT.3 `GetAiGovernanceComplianceReport` (ModelGovernanceTier Compliant→Untracked, AiGovernanceComplianceIndex; endpoint `/ai/governance/compliance-report`). +8 config keys (sort 13200–13270). Migration `ModelPredictionSamples`. 1 endpoint REST. **Wave AU** (Platform Self-Optimization & Adaptive Intelligence): AU.1 `GetConfigurationDriftReport` (DivergenceType Intentional/Unexplained/Stale, ConfigDriftTier, RolloutReadinessBlocks; endpoint `/platform/configuration-drift`) + AU.2 `GetPlatformHealthIndexReport` (7-dim index, PlatformHealthTier Optimized→Underutilized, ValueRealizationScore, TenantBenchmarkPosition) + AU.3 `GetAdaptiveRecommendationReport` (motor cross-wave, Top10 por ImpactScore/Effort, TenantActionPrioritySummary executivo; endpoint `/platform/recommendations`; job Quartz.NET diário). +8 config keys (sort 13280–13350). 3 endpoints REST. 1 job Quartz.NET. Total: +32 config keys (sort 13040–13350). Testes estimados: +182 (Catalog/Foundation +~92, AI/OI +~44, CG/Foundation +~46). i18n: +12 secções em 4 locales. 2 novas migrations. 6 novos endpoints REST. 1 job Quartz.NET adicional.
+16. **Waves AV–AY (planeadas):** 4 novas waves adicionadas em Abril 2026 cobrindo itens 132–143 da lista de priorização. **Wave AV** (Contract Lifecycle Automation & Deprecation Intelligence): AV.1 `GetContractDeprecationPipelineReport` (DeprecationPipelineTier OnTrack→Blocked, MigrationProgress, NotificationGaps, BlockingConsumers) + AV.2 `GetApiVersionStrategyReport` (SemverAdoptionRate, VersioningPattern Linear/Parallel/Fragmented, BreakingChangeTrend, TenantVersioningHealthTier Mature→Chaotic) + AV.3 `GetContractDeprecationForecast`+`ScheduleContractDeprecation` (DeprecationProbabilityScore 4-dim, PlannedDeprecationCalendar; endpoint `POST /contracts/{id}/deprecation-schedule`). +8 config keys (sort 13360–13430). 1 endpoint REST. **Wave AW** (Release Intelligence & Deployment Analytics): AW.1 `GetReleasePatternAnalysisReport` (BatchSizeVsFailureCorrelation, EndOfSprintCluster, ReleaseClusteringTier Safe→Critical, IncidentInHour1Rate, RepeatFailureServices) + AW.2 `GetChangeLeadTimeReport` (5-estágio StageBreakdown, BottleneckStage, LeadTimeTier DORA Elite→Low, ApprovalBottleneckIndex, LeadTimeTrend) + AW.3 `GetDeploymentFrequencyHealthReport` (DeployFrequencyTier Optimal/Underdeploying/Overdeploying/Stale, StaleDeployPotentialImpact via Wave AO). +8 config keys (sort 13440–13510). **Wave AX** (Security Posture & Vulnerability Intelligence): AX.1 `GetVulnerabilityExposureReport` (ExposureScore 4-dim, VulnerabilityExposureTier Minimal→Critical, ExposureTrend; requer Wave AO.1) + AX.2 `GetSecurityPatchComplianceReport` (SLAs 7/30/90/180d, PatchComplianceTier Compliant→AtRisk, SLABreaches, TenantPatchComplianceScore) + AX.3 `GetSecurityIncidentCorrelationReport` (CorrelationSignals, SecurityIncidentCorrelationRisk None→Strong, CVEsWithIncidentCorrelation, RiskReductionOpportunity). +8 config keys (sort 13520–13590). Dependência: `SbomRecord` (Wave AO.1). **Wave AY** (Organizational Knowledge & Documentation Intelligence): AY.1 `GetDocumentationHealthReport` (RunbookCoverage Covered/Stale/Missing, ApiDocCoverage, DocHealthScore 4-dim, TenantDocHealthTier Excellent→Critical) + AY.2 `GetKnowledgeBaseUtilizationReport` (SearchTermsWithNoResults gap detection, KnowledgeResolutionRate, KnowledgeHubHealthTier Thriving→Gap-Heavy) + AY.3 `GetTeamKnowledgeSharingReport` (KnowledgeSharingRatio, KnowledgeSiloRisk, BusFactor1Services, CollaborationTrend). +8 config keys (sort 13600–13670). Total: +32 config keys (sort 13360–13670). Testes estimados: +182 (Catalog/CG/Foundation +~92, OI/Knowledge +~46, CG/OI +~44). i18n: +12 secções em 4 locales. 1 novo endpoint REST. Dependências novas: Wave AO.1 (`SbomRecord`) para AX.
