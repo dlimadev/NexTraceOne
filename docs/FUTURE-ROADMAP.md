@@ -2,6 +2,8 @@
 
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
+> **Waves concluídas:** A → R (46 features analytics/governance implementadas e testadas)  
+> **Waves planeadas:** S → Z (24 features novas documentadas, aguardam implementação)  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -16,17 +18,15 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ## 1. Novos Tipos de Contrato
 
-### 1.1 GraphQL Contracts
-- **Estado:** Enum `ContractType.GraphQL` existe; implementação de parsing/validação pendente
-- **Escopo:** Parser de schema GraphQL, validação de breaking changes, visual builder
-- **Dependência:** Decisão de design sobre representação de queries/mutations/subscriptions
-- **Referência:** GAP-CTR-01
+### 1.1 GraphQL Contracts ✅ IMPLEMENTADO (Wave G.3 — Abril 2026)
+- **Estado:** ✅ `GraphQlSchemaSnapshot` entity + `AnalyzeGraphQlSchema` (Command) + `DetectGraphQlBreakingChanges` (Query) + `GetGraphQlSchemaHistory` (Query). Parsing SDL por keywords sem dependências externas. Breaking change detection: tipos/fields/operations removidos = breaking; adicionados = non-breaking. Migration `20260421160000_G3_AddGraphQlSchemaSnapshots`. 3 config keys (sort 10210–10230). i18n `graphqlSchema.*` em 4 locales. ~15 testes.
+- **Futuro:** Visual builder interativo de schemas SDL no Contract Studio — planeado para Wave X.
+- **Referência:** GAP-CTR-01, Wave G.3
 
-### 1.2 Protobuf / gRPC Contracts
-- **Estado:** Enum `ContractType.Protobuf` existe; implementação de parsing/validação pendente
-- **Escopo:** Parser de `.proto` files, validação de compatibilidade (wire format), visual builder
-- **Dependência:** Decisão sobre suporte de evolução de schema (field renumbering, reserved fields)
-- **Referência:** GAP-CTR-02
+### 1.2 Protobuf / gRPC Contracts ✅ IMPLEMENTADO (Wave H.1 — Abril 2026)
+- **Estado:** ✅ `ProtobufSchemaSnapshot` entity + `AnalyzeProtobufSchema` (Command) + `DetectProtobufBreakingChanges` (Query) + `GetProtobufSchemaHistory` (Query). Parsing `.proto` por keywords (message/enum/service/rpc/syntax). Breaking change detection: messages/services/fields/RPCs removidos = breaking. Migration `20260421170000_H1_AddProtobufSchemaSnapshots`. 3 config keys (sort 10240–10260). i18n `protobufSchema.*` em 4 locales. ~18 testes.
+- **Futuro:** Visual builder de `.proto` files e campo de comparação de wire compatibility — planeado para Wave X.
+- **Referência:** GAP-CTR-02, Wave H.1
 
 ---
 
@@ -137,17 +137,25 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 - **Estado:** Grounding básico funcional via `IKnowledgeModule`
 - **Escopo:** Enriquecer contexto de IA com entidades de todos os módulos
 
-### 8.4 ML-based Incident Correlation
-- **Estado:** Heurísticas básicas (timestamp + service matching)
-- **Escopo:** Correlação avançada baseada em ML/NLP
+### 8.4 ML-based Incident Correlation ✅ IMPLEMENTADO (Wave A.5 — Abril 2026)
+- **Estado:** ✅ `ScoreCorrelationFeatureSet` query com feature engineering sobre timestamps/services/ownership. Sub-scores: TemporalProximity + ServiceMatch + OwnershipAlignment + WeightedTotal com labels High/Medium/Low. `ICorrelationFeatureReader` abstraction + `NullCorrelationFeatureReader`. 3 config keys ponderáveis (sort 5200–5220). Wave A.5 completo.
+- **Futuro:** Enriquecimento com embedding de logs e traces OTel para correlação semântica — planeado para Wave Y.
 
 ---
 
 ## 9. Compliance as Code (Evolução)
 
-### 9.1 Advanced Compliance Packs
-- **Escopo:** PCI-DSS, HIPAA, SOC2 packs dedicados com checks automatizados
-- **Dependência:** Expertise regulatória + partnership com consultoras
+### 9.1 Advanced Compliance Packs ✅ PARCIALMENTE IMPLEMENTADO (Waves G–L — Abril 2026)
+- **Estado:** ✅ 8 standards implementados como queries independentes com scoring contextual:
+  - **SOC 2 Type II** — Wave G.1: 5 controlos (CC6/CC7/CC8/CC9/A1)
+  - **ISO/IEC 27001:2022** — Wave G.2: 5 controlos Annex A (A.8.8/A.8.32/A.5.26/A.5.29/A.8.9)
+  - **PCI-DSS v4.0** — Wave H.2: 5 requisitos (Req 1-2/6/10/11/12)
+  - **HIPAA Security Rule** — Wave I.1: 5 controlos (§164.312 a/b/c/d/e)
+  - **GDPR** — Wave J.1: 5 controlos (Art. 5/13/17/25/33)
+  - **FedRAMP Moderate** — Wave L.2: 5 controlos NIST SP 800-53 (AC-2/AU-2/CM-6/IR-4/SI-2)
+  - **NIS2** — Wave D.1.b: 5 controlos RCM
+  - **CMMC 2.0 Level 2** — Wave K.2: 5 práticas (AC.1.001/IA.1.076/AU.2.041/IR.2.092/RM.2.141)
+- **Futuro:** `GetComplianceCoverageMatrixReport` (visão unificada multi-standard) — planeado para Wave U.1. Controlos `NotAssessed` que dependem de fontes IAM externas — dependem de integração LDAP/AD avançada.
 
 ---
 
@@ -213,16 +221,21 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 |------------|---------------|---------|
 | ✅ **DONE** | Frontend Unit Tests (6.1) | Qualidade e confiança em contract builders |
 | ✅ **DONE** | E2E Tests (6.2) | Cobertura de fluxos críticos |
-| **Alta** | EF Designer Files (13.1) | Completar tooling de migrações |
-| **Média** | IDE Extensions (2.x) | Developer experience |
-| **Média** | GraphQL/Protobuf Contracts (1.x) | Expansão de tipos de contrato |
-| **Média** | SAML (4.1) | Enterprise SSO |
-| **Média** | Kafka Integration (3.2) | Event streaming real |
-| **Baixa** | SDK Externo (3.4) | Automação e integração |
-| **Baixa** | Contract Sandbox (7.1) | Testing avançado |
-| **Baixa** | Advanced Compliance (9.1) | Packs regulatórios |
-| **Roadmap** | Legacy/Mainframe (12.x) | Expansão para core systems |
-| **Roadmap** | Kubernetes (11.1) | Infraestrutura de deployment |
+| ✅ **DONE** | GraphQL Contracts (1.1) | Análise e breaking change detection de schemas SDL |
+| ✅ **DONE** | Protobuf/gRPC Contracts (1.2) | Análise e breaking change detection de schemas `.proto` |
+| ✅ **DONE** | SAML (4.1) | Enterprise SSO com mock IdP |
+| ✅ **DONE** | Compliance Packs SOC2/ISO27001/PCI-DSS/HIPAA/GDPR/FedRAMP/NIS2/CMMC (9.1) | 8 standards enterprise implementados |
+| **Alta** | EF Designer Files (13.1) | Completar tooling de migrações (requer PostgreSQL local) |
+| **Alta** | Waves S–W (Analytics Avançados) | 15 novas features planeadas — ver Secção 15 |
+| **Média** | IDE Extensions (2.x) | Developer experience inline no editor |
+| **Média** | Kafka Integration (3.2) | Event streaming real com consumer |
+| **Média** | Wave X — Frontend Dashboards Intelligence | Persona-aware views e executive dashboards |
+| **Média** | Wave Y — AI Governance Deep Dive | Agentic runtime, model routing, PII grounding |
+| **Baixa** | SDK Externo (3.4) | Automação e integração programática |
+| **Baixa** | Contract Sandbox (7.1) | Testing avançado com mock servers |
+| **Baixa** | Wave Z — Integration Ecosystem | Kafka consumer real, ClickHouse, SDK |
+| **Roadmap** | Legacy/Mainframe (12.x) | Expansão para core systems IBM Z / COBOL |
+| **Roadmap** | Kubernetes (11.1) | Helm charts, HPA, service mesh |
 
 ---
 
@@ -918,6 +931,700 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave S — Change Window Utilization + Contract Adoption + MTTR Trend ✅
+
+**Objetivo:** Fechar o loop entre Release Calendar e conformidade de deployment, medir a velocidade de adoção de versões de contrato pelos consumidores, e introduzir análise de tendência de MTTR (Mean Time To Restore) por serviço.
+
+#### S.1 — GetChangeWindowUtilizationReport (ChangeGovernance)
+
+**Feature:** Relatório de utilização de janelas de mudança registadas no Release Calendar. Responde à pergunta: "as equipas estão a respeitar as janelas de deployment definidas?"
+
+**Domínio:** Aproveita `ReleaseCalendarEntry` (Wave F) e os repositórios de `Release` já existentes.
+
+**Capacidades:**
+- Para cada janela do tipo `Scheduled` ou `HotfixAllowed` no período, calcula quantas releases ocorreram dentro (`InsideWindow`) e fora (`OutsideWindow`) da janela
+- **Taxa de compliance global:** `InsideWindow / TotalReleases * 100`
+- **Distribuição por tipo de janela:** Scheduled / HotfixAllowed / Maintenance
+- **Top equipas não-conformes:** equipas com maior taxa de deploys fora de janela
+- **Classificação de compliance:**
+  - `Excellent` — taxa ≥ `excellent_threshold` (default 90%)
+  - `Good` — taxa ≥ `good_threshold` (default 70%)
+  - `AtRisk` — taxa < `good_threshold`
+- Filtro por ambiente e período (7–90 dias)
+
+**Orientado para Platform Admin, Tech Lead e Architect** — alimenta o Release Calendar como fonte de verdade de compliance operacional.
+
+#### S.2 — GetContractAdoptionReport (Catalog)
+
+**Feature:** Progresso de adoção de versões de contrato pelos consumidores registados. Identifica contratos com migração lenta e consumidores presos em versões antigas.
+
+**Domínio:** Cruza `ApiAsset` + `ContractVersion` + `ConsumerExpectation` (consumidores registados por versão).
+
+**Capacidades:**
+- Para cada contrato com múltiplas versões e consumidores registados, calcula:
+  - `ConsumersOnLatestVersion` / `TotalConsumers` = **taxa de migração**
+  - Versão mais antiga ainda em uso (`OldestActiveVersion`) — identifica "stragglers"
+  - `DaysLatestVersionAge` — antiguidade da versão mais recente
+- **MigrationTier por contrato:**
+  - `Complete` — taxa ≥ 90% (todos os consumidores na versão mais recente)
+  - `InProgress` — taxa ≥ 50%
+  - `Lagging` — taxa < 50%
+  - `NoConsumers` — sem expectativas de consumo registadas
+- **Top contratos com migração mais lenta** (ordenados por taxa asc)
+- **Distribuição global de MigrationTier** no tenant
+- Filtro por protocolo (OpenAPI/AsyncAPI/GraphQL/Protobuf) e ambiente
+
+**Orientado para Architect e Tech Lead** — suporta decisões de deprecation e sunset de versões com visibilidade de impacto real.
+
+#### S.3 — GetMttrTrendReport (OperationalIntelligence)
+
+**Feature:** Tendência de MTTR (Mean Time To Restore) por serviço e equipa. Mede a velocidade de restauro de incidentes ao longo do tempo e compara com benchmarks DORA.
+
+**Domínio:** Cruza `Incident` (`CreatedAt` → `ResolvedAt`) agrupado por `ServiceName`/`TeamId`.
+
+**Capacidades:**
+- **MTTR médio por serviço** no período (em minutos)
+- **Classificação DORA de MTTR:**
+  - `Elite` — MTTR < 60 min
+  - `High` — MTTR < 240 min (4h)
+  - `Medium` — MTTR < 1440 min (24h)
+  - `Low` — MTTR ≥ 1440 min
+- **Distribuição global por DORA tier** no tenant
+- **Tendência em janelas diárias** (`TrendWindows`): 30 pontos com data + MTTR médio do dia
+- **Classificação de tendência:**
+  - `Worsening` — MTTR recente > 1.25× MTTR anterior
+  - `Improving` — MTTR recente < 0.75× MTTR anterior
+  - `Stable` — variação dentro da banda
+  - `Insufficient` — dados insuficientes (< 2 incidentes)
+- **Top serviços com pior MTTR** e **top serviços com maior pioria de MTTR** no período
+- Filtro por equipa, ambiente e período (7–90 dias)
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — alinha com DORA metrics e suporta objetivos de confiabilidade operacional.
+
+#### Configuração Wave S
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `changes.window_utilization.lookback_days` | 30 | 11120 | Período padrão para relatório de utilização de janelas |
+| `changes.window_utilization.excellent_threshold` | 90 | 11130 | Threshold (%) para classificação Excellent de compliance |
+| `changes.window_utilization.good_threshold` | 70 | 11140 | Threshold (%) para classificação Good de compliance |
+| `contracts.adoption.max_contracts` | 50 | 11150 | Máximo de contratos no relatório de adoção |
+| `contracts.adoption.migration_complete_threshold` | 90 | 11160 | Threshold (%) de consumidores na versão mais recente para MigrationTier Complete |
+| `contracts.adoption.migration_in_progress_threshold` | 50 | 11170 | Threshold (%) para MigrationTier InProgress |
+| `runtime.mttr.lookback_days` | 30 | 11180 | Período padrão para análise de MTTR |
+| `runtime.mttr.trend_window_count` | 30 | 11190 | Número de janelas diárias na tendência de MTTR |
+
+#### i18n Wave S
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `changeWindowUtilization.*` — conformidade de janelas de mudança
+- `contractAdoption.*` — adoção de versões de contratos por consumidores
+- `mttrTrend.*` — tendência de Mean Time To Restore
+
+**Totais reais Wave S:** CG: 866 testes (+14). Catalog: 1873 testes (+12). OI: 1178 testes (+17). Configuração: +8 config keys (sort 11120–11190). i18n: +3 secções (4 locales). **Wave S COMPLETA.**
+
+---
+
+### Wave T — Post-Incident Learning + API Schema Coverage + Environment Stability
+
+**Objetivo:** Medir o aprendizado organizacional pós-incidente, avaliar a completude de documentação dos schemas de API e monitorizar a estabilidade comparada de ambientes para suportar decisões de promoção entre ambientes.
+
+#### T.1 — GetPostIncidentLearningReport (ChangeGovernance)
+
+**Feature:** Relatório de aprendizado pós-incidente. Quantifica em que medida os incidentes geram conhecimento documentado (runbooks, notas) que previne recorrência.
+
+**Domínio:** Cruza `Incident` com `ProposedRunbook` (Knowledge module via abstração) e identifica incidentes repetidos no mesmo serviço.
+
+**Capacidades:**
+- Para cada incidente no período, verifica se foi criado um `ProposedRunbook` com status `Approved` pós-incidente
+- **Learning Rate:** `IncidentsWithRunbook / TotalIncidents * 100`
+- **Incidentes recorrentes:** mesmo serviço + mesmo `Category` com ≥ 2 ocorrências sem runbook aprovado = "recorrência sem aprendizado"
+- **Classificação de cobertura:**
+  - `Full` — taxa ≥ 80%
+  - `Partial` — taxa ≥ 40%
+  - `Low` — taxa < 40%
+- **Top serviços com menor learning rate** (piores primeiro)
+- **Total de incidentes recorrentes não documentados** (risco de reincidência)
+- Filtro por equipa, serviço e período (7–180 dias)
+
+**Orientado para Tech Lead, Architect e Platform Admin** — reforça o Knowledge Hub como ferramenta de melhoria contínua e não apenas repositório passivo.
+
+#### T.2 — GetApiSchemaCoverageReport (Catalog)
+
+**Feature:** Scorecard de completude de documentação de schemas de API. Revela contratos mal documentados que comprometem a qualidade do catálogo como Source of Truth.
+
+**Domínio:** Analisa `ApiAsset` + `ContractVersion` em estado `Approved` ou `Locked`.
+
+**Capacidades:**
+- Para cada contrato, score de completude de schema (0–100) por 4 dimensões:
+  - +25 **Response bodies documentados** (pelo menos 200 OK definido)
+  - +25 **Request body documentado** (onde aplicável — não GET/DELETE)
+  - +25 **Exemplos de payload presentes** (pelo menos 1 exemplo por contrato)
+  - +25 **Status codes complementares documentados** (além de 200: 4xx, 5xx, 201/204)
+- **CoverageGrade por contrato:**
+  - `A` — score ≥ 90
+  - `B` — score ≥ 70
+  - `C` — score ≥ 50
+  - `D` — score < 50
+- **Distribuição global por CoverageGrade** no tenant
+- **Score médio de cobertura de schema** do tenant
+- **Top contratos com menor cobertura** (prioridade para melhoria)
+- Filtro por protocolo, equipa e máximo de contratos (1–200)
+
+**Orientado para Architect e Tech Lead** — alimenta developer onboarding e garante que o catálogo tenha valor real para consumidores de contratos.
+
+#### T.3 — GetEnvironmentStabilityReport (OperationalIntelligence)
+
+**Feature:** Score de estabilidade comparado por ambiente (dev/staging/production). Responde à pergunta: "os ambientes não-produtivos são estáveis o suficiente para ser confiáveis como preditores de produção?"
+
+**Domínio:** Agrega sinais de `SloObservation` (breaches), `DriftFinding` (não reconhecidos), `ChaosExperiment` (falhas) e incidentes correlacionados a mudanças por ambiente.
+
+**Capacidades:**
+- **Score de estabilidade por ambiente (0–100)** com 4 dimensões ponderadas:
+  - SLO compliance (30%): `MetCount / TotalObservations`
+  - Drift-free ratio (30%): `1 - (OpenDriftFindings / MaxExpected)`
+  - Chaos success (20%): `CompletedExperiments / TotalExperiments`
+  - Post-change incident ratio (20%): `1 - (IncidentsPostChange / TotalReleases)`
+- **Classificação por ambiente:**
+  - `Stable` — score ≥ 80
+  - `Unstable` — score ≥ 50
+  - `Critical` — score < 50
+- **Sinal de alerta "Non-Prod mais instável que Prod"** — flag explícita quando staging/dev tem score inferior ao de production (inverte o valor preditivo)
+- **Top serviços desestabilizadores** por ambiente (maior contribuição negativa)
+- Comparação side-by-side entre todos os ambientes ativos do tenant
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — base para gates de promoção que consideram estabilidade de ambientes upstream.
+
+#### Configuração Wave T
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `compliance.learning.lookback_days` | 90 | 11200 | Período de análise para relatório de aprendizado pós-incidente |
+| `compliance.learning.full_coverage_threshold` | 80 | 11210 | Threshold (%) para classificação Full de cobertura |
+| `compliance.learning.partial_coverage_threshold` | 40 | 11220 | Threshold (%) para classificação Partial de cobertura |
+| `contracts.schema_coverage.max_contracts` | 100 | 11230 | Máximo de contratos no relatório de cobertura de schema |
+| `contracts.schema_coverage.grade_a_threshold` | 90 | 11240 | Threshold de score para CoverageGrade A |
+| `contracts.schema_coverage.grade_b_threshold` | 70 | 11250 | Threshold de score para CoverageGrade B |
+| `runtime.environment_stability.lookback_days` | 30 | 11260 | Período de análise para estabilidade de ambientes |
+| `runtime.environment_stability.stable_threshold` | 80 | 11270 | Threshold de score para classificação Stable |
+
+#### i18n Wave T
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `postIncidentLearning.*` — aprendizado pós-incidente e runbook coverage
+- `apiSchemaCoverage.*` — cobertura de documentação de schemas de API
+- `environmentStability.*` — estabilidade comparada de ambientes
+
+**Totais estimados Wave T:** CG: ~879 testes (+12). Catalog: ~1887 testes (+14). OI: ~1195 testes (+16). Configuração: +8 config keys (sort 11200–11270). i18n: +3 secções (4 locales).
+
+---
+
+### Wave U — Compliance Coverage Matrix + Dependency Freshness + Service Load Distribution
+
+**Objetivo:** Introduzir uma visão unificada de cobertura de compliance por serviço (matriz multi-standard), medir o envelhecimento das dependências entre serviços cruzado com vulnerabilidades, e mapear a distribuição de carga operacional para identificar outliers de custo por throughput.
+
+#### U.1 — GetComplianceCoverageMatrixReport (ChangeGovernance)
+
+**Feature:** Matriz de cobertura de standards de compliance por serviço ou equipa. Identifica "compliance blind spots" — serviços sem qualquer avaliação de conformidade.
+
+**Domínio:** Agrega resultados de todos os relatórios de compliance (SOC2, ISO 27001, PCI-DSS, HIPAA, GDPR, FedRAMP, NIS2, CMMC) por serviço/tenant.
+
+**Capacidades:**
+- Para cada serviço no tenant, lista quais standards foram avaliados e respetivo estado (`Compliant / PartiallyCompliant / NonCompliant / NotAssessed`)
+- **CoverageScore por serviço:** número de standards com estado diferente de `NotAssessed` / total de standards ativos × 100
+- **CoverageLevel por serviço:**
+  - `Full` — todos os standards ativos avaliados (score = 100%)
+  - `Partial` — ≥ 50% dos standards avaliados
+  - `Minimal` — < 50% avaliados
+  - `None` — nenhum standard avaliado (blind spot)
+- **Distribuição global de CoverageLevel** no tenant
+- **Top serviços com maior gap de compliance** (piores primeiros por CoverageScore)
+- **Score de compliance agregado por standard** (quantos serviços passaram em cada standard)
+- Filtro por equipa, tier de serviço e lista de standards ativos configurável
+
+**Orientado para Auditor, Platform Admin e Executive** — visão transversal que responde "quão cobertos estamos em compliance?" em vez de relatório por standard individual.
+
+#### U.2 — GetDependencyUpdateFreshnessReport (Catalog)
+
+**Feature:** Análise de "frescor" das dependências registadas entre serviços. Identifica serviços com dependências desatualizadas que aumentam o risco de exposição a vulnerabilidades conhecidas.
+
+**Domínio:** Cruza `ServiceDependency` (última mudança via `ContractChangelog` ou `Release`) com `VulnerabilityAdvisoryRecord` por serviço.
+
+**Capacidades:**
+- Para cada serviço, calcula `DaysSinceLastDependencyChange` (último `ContractChangelog` de um contrato consumido pelo serviço, ou último `Release` que tocou no serviço)
+- **FreshnessTier por serviço:**
+  - `Fresh` — últimos 30 dias
+  - `Aging` — 31–90 dias
+  - `Stale` — 91–180 dias
+  - `Critical` — mais de 180 dias sem atualização registada
+- **Correlação com vulnerabilidades:** serviços `Stale` ou `Critical` com `VulnerabilityAdvisoryRecord` aberto = flag `VulnerabilityGap`
+- **Top serviços mais desatualizados** com número de vulns abertas associadas
+- **Distribuição global por FreshnessTier** no tenant
+- Filtro por tier de serviço e threshold de criticidade de vulnerabilidade
+
+**Orientado para Architect, Tech Lead e Security** — alimenta decisões de upgrade de dependências priorizadas por risco real.
+
+#### U.3 — GetServiceLoadDistributionReport (OperationalIntelligence)
+
+**Feature:** Distribuição de carga operacional entre serviços do tenant, correlacionada com custo. Identifica outliers de custo por throughput (serviços caros com baixo uso — desperdício) e serviços sobrecarregados.
+
+**Domínio:** Cruza `RuntimeSnapshot` (latência, throughput, taxa de erro) com `ServiceCostAllocationRecord` (custo por serviço/ambiente).
+
+**Capacidades:**
+- Para cada serviço com snapshots de runtime no período, calcula:
+  - `AvgLatencyMs`, `AvgThroughput`, `AvgErrorRate` (médias dos snapshots)
+  - `TotalCostUsd` (do `ServiceCostAllocationRecord` no mesmo período e ambiente)
+  - `CostPerRequestUsd` = `TotalCostUsd / (AvgThroughput * PeriodDays * 86400)` — custo por request
+- **LoadBand por serviço** (baseado em throughput comparativo por quartil):
+  - `HighLoad` — throughput no quartil superior (top 25%)
+  - `MediumLoad` — quartis 2 e 3 (50%)
+  - `LowLoad` — quartil inferior (bottom 25%)
+- **WasteCandidate flag** — serviços `LowLoad` com custo > mediana dos pares (custo elevado, uso baixo)
+- **HighCostEfficiency flag** — serviços `HighLoad` com `CostPerRequest` abaixo da mediana (eficientes)
+- **Top 10 serviços com pior custo por request** (outliers de waste)
+- Filtro por ambiente e período (7–90 dias)
+
+**Orientado para Platform Admin, FinOps e Architect** — fecha o loop entre observabilidade operacional e custo real, habilitando decisões de rightsizing.
+
+#### Configuração Wave U
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `compliance.coverage.enabled_standards` | `SOC2,ISO27001,PCI-DSS,HIPAA,GDPR,FedRAMP,NIS2,CMMC` | 11280 | Standards ativos para a matriz de cobertura |
+| `compliance.coverage.full_threshold` | 100 | 11290 | Threshold (%) para CoverageLevel Full |
+| `compliance.coverage.partial_threshold` | 50 | 11300 | Threshold (%) para CoverageLevel Partial |
+| `catalog.dependency_freshness.fresh_threshold_days` | 30 | 11310 | Máximo de dias para FreshnessTier Fresh |
+| `catalog.dependency_freshness.aging_threshold_days` | 90 | 11320 | Máximo de dias para FreshnessTier Aging |
+| `catalog.dependency_freshness.stale_threshold_days` | 180 | 11330 | Máximo de dias para FreshnessTier Stale |
+| `runtime.load_distribution.max_services` | 50 | 11340 | Máximo de serviços no relatório de distribuição de carga |
+| `runtime.load_distribution.lookback_days` | 30 | 11350 | Período de análise para distribuição de carga |
+
+#### i18n Wave U
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `complianceCoverageMatrix.*` — matriz de cobertura de compliance por serviço
+- `dependencyFreshness.*` — frescor de dependências e gap de vulnerabilidades
+- `serviceLoadDistribution.*` — distribuição de carga operacional e custo por request
+
+**Totais estimados Wave U:** CG: ~892 testes (+13). Catalog: ~1898 testes (+11). OI: ~1210 testes (+15). Configuração: +8 config keys (sort 11280–11350). i18n: +3 secções (4 locales).
+
+---
+
+### Wave V — API Growth Rate + Chaos Coverage Gap + Release Frequency Deviation
+
+**Objetivo:** Detectar acumulação descontrolada de APIs em serviços (crescimento sem governance), identificar serviços críticos sem cobertura de chaos engineering, e revelar desvios bruscos de ritmo de deployment que podem indicar problemas organizacionais ou de confiança.
+
+#### V.1 — GetServiceApiGrowthReport (Catalog)
+
+**Feature:** Taxa de crescimento do número de APIs (contratos) por serviço ao longo do tempo. Identifica serviços a acumular APIs sem revisão de governance.
+
+**Domínio:** Compara `ApiAssetCount` por serviço entre dois períodos (atual vs. `comparison_period_days` atrás), cruzado com `GetContractHealthDistributionReport` para correlacionar crescimento com qualidade.
+
+**Capacidades:**
+- Para cada serviço, compara contagem de contratos em `Approved` ou `Locked` entre o período atual e o período de comparação
+- **GrowthRatePct:** `(CurrentCount - PreviousCount) / PreviousCount * 100`
+- **GrowthTier por serviço:**
+  - `Stable` — crescimento < 10%
+  - `Growing` — crescimento 10–50%
+  - `RapidGrowth` — crescimento 50–100%
+  - `Exploding` — crescimento > 100% (risco de governance sprawl)
+  - `Shrinking` — crescimento negativo (consolidação ou deprecation)
+- **GovernanceRisk flag** — serviços `RapidGrowth` ou `Exploding` com `ContractHealthScore` médio < 60 (crescimento com baixa qualidade)
+- **Top serviços com maior crescimento** e top serviços `GovernanceRisk`
+- **Distribuição global por GrowthTier** no tenant
+- Filtro por equipa e tier de serviço
+
+**Orientado para Architect e Platform Admin** — previne "API sprawl" e garante que o crescimento do catálogo acompanha a governance.
+
+#### V.2 — GetChaosCoverageGapReport (OperationalIntelligence)
+
+**Feature:** Análise de gaps de cobertura de chaos engineering por serviço. Identifica serviços críticos não testados quanto à sua resiliência.
+
+**Domínio:** Cruza `ServiceAsset` (tier, owner) com `ChaosExperiment` (por serviço, por ambiente) para identificar ausências de cobertura.
+
+**Capacidades:**
+- Para cada serviço no tenant, verifica presença de `ChaosExperiment` no período:
+  - Sem experimentos = `NoCoverage`
+  - Experimentos apenas em não-produção = `ProductionGap`
+  - Experimentos em produção mas todos `Failed` ou `Cancelled` = `FailedCoverage`
+  - Experimentos com pelo menos 1 `Completed` em produção = `FullCoverage`
+- **GapLevel enum:** `NoCoverage / ProductionGap / FailedCoverage / PartialCoverage / FullCoverage`
+- **CriticalGap flag** — serviços de tier `Critical` com `GapLevel != FullCoverage`
+- **Distribuição global por GapLevel** no tenant
+- **Top serviços críticos sem cobertura** (ordenados por tier e nome)
+- **CoverageRate geral** = serviços com `FullCoverage` / total de serviços ativos
+- Filtro por tier de serviço, ambiente e período (30–365 dias)
+
+**Orientado para Architect, Tech Lead e Platform Admin** — suporta a estratégia de chaos engineering como capacidade governada, não ad-hoc.
+
+#### V.3 — GetReleaseFrequencyDeviationReport (ChangeGovernance)
+
+**Feature:** Deteção de desvios bruscos de frequência de deployment por serviço. Identifica acelerações (possível rush sem qualidade) ou desacelerações (possível estagnação ou bloqueio).
+
+**Domínio:** Compara `DeploysPerDay` em dois períodos: recente (`recent_days`) vs. histórico (`historical_days`). Aprofunda a análise de cadência do `GetDeploymentCadenceReport` (Wave K) com perspetiva temporal.
+
+**Capacidades:**
+- Para cada serviço com releases no histórico, calcula:
+  - `DeploysPerDayRecent` = releases nos últimos `recent_days` / `recent_days`
+  - `DeploysPerDayHistorical` = releases nos `historical_days` anteriores / `historical_days`
+  - `DeviationPct` = `(recent - historical) / historical * 100`
+- **FrequencyDeviation enum:**
+  - `Accelerating` — desvio > +50% (rush de deployments — risco de qualidade)
+  - `Stable` — desvio entre -50% e +50%
+  - `Decelerating` — desvio < -50% (possível bloqueio ou loss of momentum)
+  - `Stalled` — zero releases recentes mas com histórico (potencial paralisia)
+  - `New` — sem histórico, apenas releases recentes (serviço novo)
+- **RiskFlag** — `Accelerating` com `ReleaseSuccessRate < 80%` ou `Stalled` com tier `Critical`
+- **Top serviços com maior desvio positivo e negativo**
+- **Distribuição global por FrequencyDeviation** no tenant
+- Filtro por equipa, ambiente e tier de serviço
+
+**Orientado para Tech Lead, Architect e Executive** — complementa a análise DORA de cadência com perspetiva de variação de ritmo, não só estado absoluto.
+
+#### Configuração Wave V
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `catalog.api_growth.comparison_period_days` | 90 | 11360 | Período de comparação para cálculo de crescimento de APIs |
+| `catalog.api_growth.stable_threshold_pct` | 10 | 11370 | Threshold (%) de crescimento para GrowthTier Stable |
+| `catalog.api_growth.rapid_threshold_pct` | 50 | 11380 | Threshold (%) de crescimento para GrowthTier RapidGrowth |
+| `chaos.coverage.lookback_days` | 90 | 11390 | Período de análise para gaps de cobertura de chaos |
+| `chaos.coverage.max_services` | 100 | 11400 | Máximo de serviços no relatório de gap de chaos |
+| `changes.frequency_deviation.historical_days` | 90 | 11410 | Período histórico para cálculo de frequência base |
+| `changes.frequency_deviation.recent_days` | 30 | 11420 | Período recente para cálculo de frequência de comparação |
+| `changes.frequency_deviation.max_services` | 50 | 11430 | Máximo de serviços no relatório de desvio de frequência |
+
+#### i18n Wave V
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `serviceApiGrowth.*` — taxa de crescimento de APIs por serviço
+- `chaosCoverageGap.*` — gaps de cobertura de chaos engineering
+- `releaseFrequencyDeviation.*` — desvio de frequência de deployments
+
+**Totais estimados Wave V:** CG: ~903 testes (+11). Catalog: ~1911 testes (+13). OI: ~1224 testes (+14). Configuração: +8 config keys (sort 11360–11430). i18n: +3 secções (4 locales).
+
+---
+
+### Wave W — Rollback Pattern Analysis + Service Coupling Index + Anomaly Detection Summary
+
+**Objetivo:** Analisar padrões sistemáticos de rollback para identificar anti-padrões de deployment, introduzir um índice de acoplamento entre serviços baseado em dependências registadas, e consolidar todas as anomalias detetadas pelo sistema numa visão unificada por serviço.
+
+#### W.1 — GetRollbackPatternReport (ChangeGovernance)
+
+**Feature:** Análise de padrões de rollback por serviço, equipa e ambiente. Distingue rollbacks isolados de padrões recorrentes ou seriais que indicam disfunções sistémicas.
+
+**Domínio:** Agrega `Release` com `DeploymentStatus = RolledBack` cruzado com `ChangeConfidenceBreakdown` e `EvidencePack` para correlacionar rollbacks com qualidade de preparação.
+
+**Capacidades:**
+- Para cada serviço com rollbacks no período, calcula:
+  - `TotalRollbacks` e `RollbackRate` = rollbacks / total releases
+  - `AvgConfidenceAtRollback` — confidence score médio das releases que foram revertidas
+  - `AvgEvidencePackCompleteness` — completude média dos evidence packs nas releases revertidas
+- **RollbackPattern por serviço:**
+  - `Isolated` — 1 rollback no período (one-off)
+  - `Recurring` — 2–3 rollbacks no período (padrão de atenção)
+  - `Serial` — ≥ 4 rollbacks no período (disfunção sistémica)
+  - `None` — zero rollbacks (clean record)
+- **SystemicRisk flag** — serviços `Serial` com `AvgConfidenceAtRollback < 50` (deploys de baixa confiança que resultam em rollback)
+- **Correlação com Evidence Packs** — serviços com rollbacks e `AvgEvidencePackCompleteness < 70%` = flag `EvidenceGap`
+- **Top serviços com maior RollbackRate** e top serviços `Serial`
+- **Distribuição por RollbackPattern** no tenant
+- Filtro por equipa, ambiente e período (7–180 dias)
+
+**Orientado para Tech Lead, Architect e Platform Admin** — fecha o loop entre rollback intelligence (Wave J.3) e análise de padrões de qualidade de deployment.
+
+#### W.2 — GetServiceCouplingIndexReport (Catalog)
+
+**Feature:** Índice de acoplamento estrutural entre serviços do tenant baseado em dependências registadas. Identifica "hub services" de alta criticidade e serviços isolados sem integração no ecossistema.
+
+**Domínio:** Analisa `ServiceDependency` (grafo dirigido de dependências) para calcular fan-in (quantos dependem de mim) e fan-out (de quantos eu dependo) por serviço.
+
+**Capacidades:**
+- Para cada serviço, calcula:
+  - `FanIn` — número de serviços que dependem deste serviço (upstream consumers)
+  - `FanOut` — número de serviços dos quais este serviço depende (downstream dependencies)
+  - `CouplingIndex` = normalizado 0–100: `min(100, (FanIn * 3 + FanOut * 2) / sqrt(max(1, TotalServices)) * 10)`
+- **CouplingTier por serviço:**
+  - `HubService` — CouplingIndex ≥ 70 (alto fan-in — alto blast radius potencial)
+  - `HighlyCoupled` — CouplingIndex ≥ 50 (alto fan-out — alta dependência de terceiros)
+  - `ModeratelyCoupled` — CouplingIndex ≥ 25
+  - `LooselyCoupled` — CouplingIndex ≥ 10
+  - `Isolated` — CouplingIndex < 10 e FanIn = 0 e FanOut = 0 (sem dependências registadas)
+- **ArchitecturalRisk flag** — serviços `HubService` com tier `Critical` e `FanIn ≥ 5`
+- **IsolationRisk flag** — serviços `Isolated` com tier `Critical` ou `Standard` (potencial governance gap)
+- **Top hub services** (maior fan-in) e top acoplados (maior fan-out)
+- **CouplingIndex médio do tenant** e **% de serviços Isolated**
+
+**Orientado para Architect e Platform Admin** — suporta análise de blast radius, decisões de decomposição de serviços e identificação de single points of failure estruturais.
+
+#### W.3 — GetAnomalyDetectionSummaryReport (OperationalIntelligence)
+
+**Feature:** Sumário consolidado de todas as anomalias detetadas pelo NexTraceOne num período, por serviço. Responde à pergunta: "quais serviços têm múltiplos sinais de problema simultâneos?"
+
+**Domínio:** Agrega anomalias de múltiplas fontes:
+- `WasteSignal` (FinOps — idle/overprovision)
+- `DriftFinding` (runtime — desvio de baseline)
+- `SloObservation` com status `Breached`
+- `ChaosExperiment` com status `Failed`
+- `VulnerabilityAdvisoryRecord` com severity `Critical` ou `High`
+- Incidentes correlacionados a mudanças recentes
+
+**Capacidades:**
+- Para cada serviço, lista todos os tipos de anomalia ativos no período com contagem
+- **AnomalyCount total** por serviço (soma de todos os tipos)
+- **AnomalyDensity tier:**
+  - `Clean` — 0 anomalias ativas
+  - `Moderate` — 1–2 tipos de anomalia
+  - `Dense` — 3–4 tipos de anomalia
+  - `Critical` — ≥ 5 tipos de anomalia simultâneos
+- **MultiAnomalyServices** — lista de serviços com ≥ 3 tipos simultâneos (requerem atenção imediata)
+- **Timeline de anomalias por dia** (30 pontos) — pico de anomalias por dia no tenant
+- **Distribuição por tipo de anomalia** no tenant
+- **Top serviços com maior AnomalyCount**
+
+**Orientado para Tech Lead, Engineer e Platform Admin** — funciona como "early warning dashboard" unificado que cruza todos os sinais de alerta disponíveis, eliminando a necessidade de consultar cada relatório individualmente.
+
+#### Configuração Wave W
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `changes.rollback_pattern.lookback_days` | 90 | 11440 | Período de análise para padrões de rollback |
+| `changes.rollback_pattern.serial_threshold` | 4 | 11450 | Número mínimo de rollbacks para padrão Serial |
+| `changes.rollback_pattern.max_services` | 50 | 11460 | Máximo de serviços no relatório de padrões |
+| `catalog.coupling_index.max_services` | 100 | 11470 | Máximo de serviços no relatório de acoplamento |
+| `catalog.coupling_index.hub_threshold` | 70 | 11480 | Threshold de CouplingIndex para HubService |
+| `catalog.coupling_index.high_coupled_threshold` | 50 | 11490 | Threshold de CouplingIndex para HighlyCoupled |
+| `runtime.anomaly_summary.lookback_days` | 30 | 11500 | Período de análise para sumário de anomalias |
+| `runtime.anomaly_summary.max_services` | 100 | 11510 | Máximo de serviços no sumário de anomalias |
+
+#### i18n Wave W
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `rollbackPattern.*` — padrões de rollback por serviço
+- `serviceCouplingIndex.*` — índice de acoplamento entre serviços
+- `anomalyDetectionSummary.*` — sumário consolidado de anomalias
+
+**Totais estimados Wave W:** CG: ~916 testes (+13). Catalog: ~1924 testes (+13). OI: ~1240 testes (+16). Configuração: +8 config keys (sort 11440–11510). i18n: +3 secções (4 locales).
+
+---
+
+### Wave X — Frontend Intelligence & Contract Studio Visual Builders
+
+**Objetivo:** Evoluir o frontend de superfície operacional para **plataforma de decisão inteligente por persona**, completar os visual builders para os novos tipos de contrato (GraphQL, Protobuf), e introduzir views executivas orientadas a KPIs consolidados. Esta wave fecha o gap entre a riqueza analítica do backend (Waves A–W) e a experiência de utilizador que a surfacia.
+
+#### X.1 — Executive Intelligence Dashboard
+
+**Feature:** Dashboard unificado para persona Executive/CTO com KPIs consolidados de todas as dimensões operacionais.
+
+**Componentes:**
+- **`ServiceHealthSummaryCard`** — score de saúde global do tenant: média ponderada de SLO compliance + risk center + ownership health + deployment success rate
+- **`ChangeConfidenceGauge`** — gauge de confiança média de deployment nas últimas 4 semanas por tier de serviço
+- **`ComplianceCoverageWidget`** — cobertura de compliance por standard (8 barras horizontais, % de serviços cobertos)
+- **`FinOpsBudgetBurnWidget`** — % de budget consumido vs. período, com flag de burn rate acelerado
+- **`TopRiskyServicesTable`** — top 5 serviços por score de risco com drill-down direto para Risk Center
+- **`MttrTrendMiniChart`** — sparkline de MTTR dos últimos 30 dias para os 3 serviços mais críticos
+- Todos os widgets ligados ao persona `Executive`; dados pré-filtrados por ownership relevante
+
+**Orientado para Executive, CTO e Product** — responde a "o produto está a degradar ou a melhorar?" sem precisar navegar módulo a módulo.
+
+#### X.2 — GraphQL & Protobuf Visual Studio no Contract Studio
+
+**Feature:** Experiência visual de edição/comparação de schemas GraphQL SDL e Protobuf `.proto` dentro do Contract Studio existente, complementando os backends implementados em Waves G.3 e H.1.
+
+**Componentes GraphQL:**
+- **`GraphQlSchemaDiffViewer`** — diff side-by-side entre dois snapshots SDL com highlighting de breaking changes (vermelho), non-breaking additions (verde) e unchanged (cinzento)
+- **`GraphQlSchemaExplorer`** — explorador de tipos, fields, queries, mutations e subscriptions com filtro e pesquisa
+- **`GraphQlBreakingChangeBadge`** — badge inline na listagem de contratos quando existe breaking change entre a versão current e anterior
+- Upload de ficheiro SDL ou textarea para `AnalyzeGraphQlSchema`
+
+**Componentes Protobuf:**
+- **`ProtobufSchemaDiffViewer`** — diff side-by-side de `.proto` com highlighting por tipo de change (message, field, service, rpc)
+- **`ProtobufSchemaExplorer`** — explorador de messages, fields, services e RPCs com indicação de deprecated fields
+- Upload de ficheiro `.proto` para `AnalyzeProtobufSchema`
+
+**Orientado para Architect e Tech Lead** — fecha o loop entre análise de backend (Wave G.3/H.1) e experiência visual no Contract Studio.
+
+#### X.3 — Persona-Aware Adaptive Navigation
+
+**Feature:** Navegação adaptativa que reordena o menu e os quick actions com base na persona ativa do utilizador autenticado, tornando a experiência mais focada e reduzindo o cognitive load.
+
+**Comportamentos por persona:**
+- **Engineer** — destaca: Service Catalog (own services), Contracts (own team), Change Status, AI Assistant
+- **Tech Lead** — destaca: Team Dashboard, Change Velocity, Operational Readiness, SLO Compliance
+- **Architect** — destaca: Dependency Graph, Contract Adoption, API Exposure, Service Coupling Index
+- **Platform Admin** — destaca: Risk Center, Compliance Coverage Matrix, EF Migrations Health, System Health
+- **Executive** — destaca: Executive Dashboard, FinOps Burn, MTTR Trend, Compliance Overview
+- **Auditor** — destaca: Audit Trail, Evidence Packs, Compliance Reports, Policy Compliance
+
+**Implementação:** `PersonaNavigationConfig` no frontend (Zustand store) alimentado por `GET /api/v1/identity/me/persona-config` que retorna `quickActions[]` e `prioritizedModules[]` com base em roles + ownership.
+
+**Orientado para todas as personas** — reforça o NexTraceOne como plataforma multi-persona e não apenas para Engineers.
+
+#### Configuração Wave X
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `ui.executive_dashboard.enabled` | true | 11520 | Ativa o Executive Intelligence Dashboard |
+| `ui.executive_dashboard.risk_threshold` | 60 | 11530 | Score mínimo de risco para destacar serviços no widget |
+| `ui.contract_studio.graphql_diff.max_snapshot_age_days` | 90 | 11540 | Máximo de dias de antiguidade de snapshot para diff GraphQL |
+| `ui.contract_studio.protobuf_diff.max_snapshot_age_days` | 90 | 11550 | Máximo de dias de antiguidade de snapshot para diff Protobuf |
+| `ui.adaptive_navigation.enabled` | true | 11560 | Ativa navegação adaptativa por persona |
+| `ui.adaptive_navigation.quick_actions_count` | 5 | 11570 | Número de quick actions em destaque por persona |
+| `ui.executive_dashboard.finops_burn_warn_threshold_pct` | 80 | 11580 | % de budget consumido para flag de burn acelerado |
+| `ui.executive_dashboard.mttr_sparkline_services` | 3 | 11590 | Número de serviços no sparkline de MTTR do Executive Dashboard |
+
+#### i18n Wave X
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `executiveDashboard.*` — labels e títulos do Executive Intelligence Dashboard
+- `graphqlDiffViewer.*` — interface do diff viewer de schemas GraphQL
+- `protobufDiffViewer.*` — interface do diff viewer de schemas Protobuf
+- `adaptiveNavigation.*` — quick actions e módulos priorizados por persona
+
+**Totais estimados Wave X:** Frontend: ~45 novos componentes/pages. Configuração: +8 config keys (sort 11520–11590). i18n: +4 secções (4 locales). Backend: 1 novo endpoint `GET /api/v1/identity/me/persona-config`.
+
+---
+
+### Wave Y — AI Governance Deep Dive & Agentic Platform
+
+**Objetivo:** Evoluir a capacidade de IA do NexTraceOne de "assistente com política" para **plataforma agentic governada**, com orquestração multi-step auditável, routing inteligente de modelos, redação contextual de PII/segredos nos prompts, e rastreabilidade completa de custo por equipa/caso de uso.
+
+#### Y.1 — Agentic Runtime com Human-in-the-Loop
+
+**Feature:** Execução de planos multi-step por agentes de IA, com pontos de aprovação humana configuráveis e auditoria completa de cada passo.
+
+**Domínio:** Novo aggregate `AgentExecutionPlan` em `AIKnowledge` ou novo módulo `AIOrchestration`.
+
+**Capacidades:**
+- **`AgentExecutionPlan`** aggregate — plano com lista de `AgentStep` (nome, tipo, input, output, status, duração, custo estimado), `PlanStatus` (Pending/Running/WaitingApproval/Completed/Failed/Cancelled)
+- **`AgentStepType`** enum — ContractLookup / IncidentCorrelation / DraftGeneration / RunbookProposal / AlertTriage / ExternalSearch
+- **Human-in-the-loop gate** — passos com `RequiresApproval = true` pausam a execução até aprovação/rejeição via `ApproveAgentStep` command
+- **Budget por plano** — plano define `MaxTokenBudget`; execução para automaticamente se orçamento excedido
+- **`BlastRadiusThreshold` gate** — passos que envolvem serviços Critical com BlastRadius > threshold requerm aprovação automática
+- **Audit trail completo** — cada passo registado com timestamp, modelo usado, tokens consumidos, custo, aprovador (se aplicável)
+- 4 features: `SubmitAgentExecutionPlan`, `ApproveAgentStep`, `GetAgentPlanStatus`, `ListAgentExecutionHistory`
+- Migration para tabelas `ai_agent_execution_plans` + `ai_agent_steps`
+
+#### Y.2 — NLP-based Model Routing
+
+**Feature:** Routing inteligente de prompts para o modelo mais adequado com base em análise semântica do intent, custo e latência esperados.
+
+**Domínio:** Evolui o `RoutingDecision` existente (keyword heuristics) para embedding-based intent classification.
+
+**Capacidades:**
+- **Intent classifier leve** — embedding de prompt (via modelo local) → classificação em `PromptIntent` (CodeGeneration/DocumentSummarization/IncidentAnalysis/ContractDraft/ComplianceCheck/GeneralQuery)
+- **`ModelRoutingPolicy`** entity — por `PromptIntent`: modelo preferido, fallback, max tokens, max cost per request, allowed tenants/groups
+- **Routing resolution** — para cada prompt: classify intent → lookup policy → select model → apply budget check → execute
+- **Cost-aware routing** — se modelo preferido excede budget restante do tenant, faz downgrade automático com nota na resposta
+- **`GetModelRoutingDecisionLog`** query — auditoria de todas as decisões de routing com intent, modelo selecionado e motivo
+- 3 config keys por intent (sort 11600+); i18n `modelRouting.*` em 4 locales; ~20 testes
+
+#### Y.3 — AI Token Budget Attribution & Cost Transparency
+
+**Feature:** Atribuição granular de custos de tokens de IA por equipa, serviço, caso de uso e modelo. Fecha o loop entre IA governada e FinOps contextual.
+
+**Domínio:** Cruza `AgentQueryRecord` (Wave D.4) + `AgentExecutionPlan` (Wave Y.1) com `ServiceCostAllocationRecord` (Wave I.2) para IA.
+
+**Capacidades:**
+- **`AiTokenUsageRecord`** entity — `TenantId`, `TeamId`, `ServiceName`, `UseCase` (enum), `ModelId`, `InputTokens`, `OutputTokens`, `TotalTokens`, `EstimatedCostUsd`, `RequestedAt`
+- **`GetAiTokenBudgetReport`** query — consumo de tokens por tenant, por equipa e por caso de uso no período. Inclui budget configurado vs. consumido, taxa de burn, top consumidores, top modelos
+- **`GetAiCostAttributionReport`** query — custo estimado de IA distribuído por serviço/equipa, com `CostPerQuery` médio por tipo de uso
+- **Budget enforcement** — `AiBudgetPolicy` por tenant/equipa: `MonthlyTokenBudget`, `AlertThresholdPct`, `BlockOnExhaustion`
+- 4 config keys (sort 11630+); i18n `aiTokenBudget.*` + `aiCostAttribution.*` em 4 locales; ~18 testes
+
+#### Configuração Wave Y
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `ai.agentic.max_steps_per_plan` | 10 | 11600 | Máximo de passos por plano de execução de agente |
+| `ai.agentic.blast_radius_approval_threshold` | 10 | 11610 | Consumidores afetados acima deste valor requerem aprovação |
+| `ai.agentic.default_token_budget_per_plan` | 50000 | 11620 | Budget padrão de tokens por plano de agente |
+| `ai.routing.default_intent` | GeneralQuery | 11630 | Intent padrão quando classificação não é conclusiva |
+| `ai.routing.cost_downgrade_enabled` | true | 11640 | Ativa downgrade de modelo por budget |
+| `ai.budget.monthly_token_limit_default` | 1000000 | 11650 | Limite mensal padrão de tokens por tenant |
+| `ai.budget.alert_threshold_pct` | 80 | 11660 | % de budget consumido para envio de alerta |
+| `ai.budget.block_on_exhaustion` | false | 11670 | Bloqueia requests quando budget esgotado |
+
+#### i18n Wave Y
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `agentExecutionPlan.*` — planos de execução agentic e aprovação humana
+- `modelRouting.*` — decisões de routing de modelo por intent
+- `aiTokenBudget.*` — orçamento e consumo de tokens por equipa/serviço
+- `aiCostAttribution.*` — atribuição de custo de IA por serviço e caso de uso
+
+**Totais estimados Wave Y:** AIKnowledge: ~50 testes novos. Configuração: +8 config keys (sort 11600–11670). i18n: +4 secções (4 locales). Novas migrations: 2 (AgentExecutionPlans + AiTokenUsageRecords).
+
+---
+
+### Wave Z — Integration Ecosystem Completion
+
+**Objetivo:** Completar as integrações de ecosistema que permitem ao NexTraceOne ser **autónomo na ingestão** de eventos externos e ser **consumível programaticamente** por ferramentas de automação — fechando os últimos gaps de integração identificados nas secções 3.2, 3.3, 3.4 e 11.2 do documento.
+
+#### Z.1 — Kafka / Message Queue Consumer Real
+
+**Feature:** Worker process dedicado para consumo real de eventos de filas externas (Kafka, RabbitMQ, Azure Service Bus, AWS SQS). Converte eventos externos no modelo canónico do NexTraceOne sem intervenção manual.
+
+**Domínio:** `NexTraceOne.Worker.EventConsumer` — processo `IHostedService` separado, configurável por tenant.
+
+**Capacidades:**
+- **`EventConsumerWorker`** — `BackgroundService` que lê de fila configurada (tipo, connection string, topic/queue) e normaliza eventos para `Release`, `IncidentEvent` ou `ExternalChangeRequest` via estratégia de mapeamento
+- **`IEventNormalizationStrategy`** abstraction — strategies por source type: `KafkaChangeEventStrategy`, `ServiceBusChangeEventStrategy`, `SqsChangeEventStrategy`, `RabbitMqChangeEventStrategy`
+- **Dead letter queue** — eventos que falham normalização após 3 tentativas vão para `EventConsumerDeadLetterRecord` (tabela auditável)
+- **Monitoring endpoint** `GET /api/v1/integrations/event-consumer/status` — estado de cada consumer (running/paused/error), throughput, last event timestamp, dead letter count
+- Config por tenant: `queue.consumer.type`, `queue.consumer.connection_string`, `queue.consumer.topic`, `queue.consumer.enabled`
+- ~25 testes de normalização e routing
+
+#### Z.2 — SDK NexTrace (`nexone` CLI + NuGet + npm)
+
+**Feature:** SDK público para integração programática com o NexTraceOne. Inclui CLI `nexone`, biblioteca NuGet para .NET e pacote npm para Node.js/scripts de pipeline.
+
+**Componentes:**
+- **CLI `nexone`** — `nexone service describe <name>`, `nexone contract diff <id>`, `nexone change status <sha>`, `nexone confidence score <release-id>`, `nexone compliance check --standard GDPR`
+- **`NexTrace.Sdk` (NuGet)** — cliente tipado para todos os módulos: `ServiceCatalogClient`, `ContractClient`, `ChangeClient`, `ComplianceClient`. Autenticação via `PlatformApiToken` (Wave D.4). Retry policies via Polly.
+- **`nexone-sdk` (npm)** — wrapper TypeScript sobre as mesmas APIs. Útil para GitHub Actions, GitLab CI e scripts de pipeline.
+- **GitHub Action oficial** `nexone/change-confidence-gate@v1` — action que consulta o score de confiança de uma release e falha o pipeline se abaixo de threshold configurável
+- **Versionamento semântico** — SDK versiona independentemente do produto; breaking changes requerem major bump; changelog automático
+- Documentação em `docs/sdk/` com exemplos por caso de uso (CI/CD integration, contract validation, compliance check)
+
+#### Z.3 — ClickHouse Analytics Provider
+
+**Feature:** Provider alternativo de storage analítico baseado em ClickHouse para workloads de observabilidade e telemetria de alto volume. Complementa o Elasticsearch como opção para clientes com requisitos de performance analítica extrema.
+
+**Domínio:** Novo adapter `NexTraceOne.Infrastructure.ClickHouse` no padrão provider existente.
+
+**Capacidades:**
+- **`IClickHouseAnalyticsWriter`** — interface para ingestão batch de telemetria (traces, logs, métricas)
+- **`IClickHouseAnalyticsReader`** — interface para queries analíticas (P50/P95/P99, aggregations por serviço/ambiente/período)
+- **Schema ClickHouse** — tabela `traces` (MergeTree, partition by toYYYYMM(timestamp)), `metrics` (SummingMergeTree), `logs` (ReplicatedMergeTree com TTL)
+- **`ClickHouseHealthCheck`** — health check integrado no `GET /api/v1/system/health`
+- Configuração via `appsettings`: `Analytics:Provider = "ClickHouse"` | `"Elasticsearch"` | `"InMemory"` (para testes)
+- Documentação de setup em `docs/observability/clickhouse-setup.md` com docker-compose snippet
+
+#### Configuração Wave Z
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `integrations.event_consumer.max_concurrent_consumers` | 4 | 11680 | Máximo de consumidores paralelos por tenant |
+| `integrations.event_consumer.dead_letter_max_attempts` | 3 | 11690 | Tentativas antes de mover para dead letter queue |
+| `integrations.event_consumer.processing_timeout_seconds` | 30 | 11700 | Timeout por evento antes de dead letter |
+| `sdk.platform_api.rate_limit_per_minute` | 300 | 11710 | Rate limit por token da Platform API |
+| `sdk.platform_api.max_page_size` | 100 | 11720 | Tamanho máximo de página nas queries do SDK |
+| `analytics.clickhouse.batch_size` | 1000 | 11730 | Tamanho do batch de ingestão para ClickHouse |
+| `analytics.clickhouse.flush_interval_seconds` | 5 | 11740 | Intervalo de flush do buffer de ingestão |
+| `analytics.clickhouse.default_ttl_days` | 90 | 11750 | TTL padrão dos dados analíticos em ClickHouse |
+
+#### i18n Wave Z
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `eventConsumer.*` — estado e monitorização do event consumer worker
+- `sdkIntegration.*` — documentação inline e tooltips de configuração do SDK
+- `clickhouseProvider.*` — configuração e estado do provider ClickHouse
+
+**Totais estimados Wave Z:** Worker: ~25 testes. SDK: documentação + 2 packages. Configuração: +8 config keys (sort 11680–11750). i18n: +3 secções (4 locales). Novas migrations: 1 (EventConsumerDeadLetterRecords).
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -974,6 +1681,30 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 45. ✅ **Wave R.2** — `GetApiSchemaStabilityReport` — estabilidade de schemas de API por frequência de changelogs. Agrega entradas de `ContractChangelog` no período por `ApiAssetId` via `ListByTenantInPeriodAsync`. Classifica estabilidade em `SchemaStabilityTier` (Stable=0 / Volatile≥1 / Unstable≥3 / Critical≥6). Produz: total de contratos com alterações, avg e max de changelogs por contrato, distribuição por tier, top contratos mais instáveis e mais estáveis. Adicionado `ListByTenantInPeriodAsync` a `IContractChangelogRepository` e implementação correspondente no repositório de infraestrutura. Catalog: 1861 testes (+16). Config: `contracts.schema_stability.*` sort 11060–11080.
 
 46. ✅ **Wave R.3** — `GetTeamOperationalHealthReport` — scorecard composto de saúde operacional por equipa. Usa nova abstração `ITeamOperationalMetricsReader` para obter métricas pré-agregadas por equipa (ServiceCount, SloComplianceRatePct, UnacknowledgedDriftCount, ChaosSuccessRatePct, ServicesWithProfilingCount, PostDeployIncidentCount). Computa score ponderado: SLO 40% + Drift 30% + Chaos 20% + Profiling 10%. Classifica em `OperationalHealthTier` (Excellent ≥90 / Good ≥70 / Fair ≥50 / Poor <50). Produz: média do tenant, distribuição por tier, top equipas saudáveis e em risco, ranking completo. OI: 1161 testes (+23). Config: `runtime.team_health.*` sort 11090–11110. **WAVE R COMPLETO**.
+47. ✅ **Wave S.1** — `GetChangeWindowUtilizationReport` — conformidade de janelas de mudança: taxa de deploys dentro vs. fora de janela (Scheduled/HotfixAllowed), top equipas não-conformes, classificação Excellent/Good/AtRisk. Aprofunda Release Calendar (Wave F) como mecanismo de governance de deployment. CG. Config: `changes.window_utilization.*` sort 11120–11140.
+48. ✅ **Wave S.2** — `GetContractAdoptionReport` — progresso de migração de versões de contrato pelos consumidores: taxa de adoção da versão mais recente por contrato, `MigrationTier` (Complete/InProgress/Lagging/NoConsumers), versão mais antiga ainda em uso, top contratos com migração mais lenta. Catalog. Config: `contracts.adoption.*` sort 11150–11170.
+49. ✅ **Wave S.3** — `GetMttrTrendReport` — tendência de MTTR por serviço: classificação DORA (Elite/High/Medium/Low), série temporal diária (30 pontos), tendência Worsening/Improving/Stable/Insufficient, top serviços com pior MTTR e maior pioria. OI. Config: `runtime.mttr.*` sort 11180–11190. **Wave S COMPLETA.**
+50. 🔲 **Wave T.1** — `GetPostIncidentLearningReport` — taxa de aprendizado pós-incidente: % de incidentes com runbook aprovado pós-evento, incidentes recorrentes sem documentação (`LearningCoverage`: Full/Partial/Low), top serviços com menor learning rate. CG. Config: `compliance.learning.*` sort 11200–11220.
+51. 🔲 **Wave T.2** — `GetApiSchemaCoverageReport` — completude de documentação de schemas de API: score por 4 dimensões (response body, request body, exemplos, status codes), `CoverageGrade` A/B/C/D por contrato, distribuição global, top contratos com menor cobertura. Catalog. Config: `contracts.schema_coverage.*` sort 11230–11250.
+52. 🔲 **Wave T.3** — `GetEnvironmentStabilityReport` — score de estabilidade comparado por ambiente (dev/staging/prod): 4 dimensões ponderadas (SLO/Drift/Chaos/incident correlation), `StabilityTier` Stable/Unstable/Critical, flag de alerta "non-prod mais instável que prod", top serviços desestabilizadores. OI. Config: `runtime.environment_stability.*` sort 11260–11270. **Wave T PLANEADA**.
+53. 🔲 **Wave U.1** — `GetComplianceCoverageMatrixReport` — matriz de cobertura de standards por serviço: quantos standards (SOC2/ISO27001/PCI-DSS/HIPAA/GDPR/FedRAMP/NIS2/CMMC) foram avaliados, `CoverageLevel` Full/Partial/Minimal/None, top serviços com maior gap de compliance, score de compliance por standard. CG. Config: `compliance.coverage.*` sort 11280–11300.
+54. 🔲 **Wave U.2** — `GetDependencyUpdateFreshnessReport` — análise de frescor de dependências entre serviços: `FreshnessTier` Fresh/Aging/Stale/Critical por serviço, flag `VulnerabilityGap` para serviços Stale/Critical com vulns abertas, top serviços mais desatualizados com contagem de vulns. Catalog. Config: `catalog.dependency_freshness.*` sort 11310–11330.
+55. 🔲 **Wave U.3** — `GetServiceLoadDistributionReport` — distribuição de carga operacional por serviço: `LoadBand` High/Medium/Low por quartil de throughput, correlação com custo (`CostPerRequestUsd`), flag `WasteCandidate` (baixo uso + alto custo), top 10 serviços com pior custo por request. OI. Config: `runtime.load_distribution.*` sort 11340–11350. **Wave U PLANEADA**.
+56. 🔲 **Wave V.1** — `GetServiceApiGrowthReport` — taxa de crescimento de APIs por serviço: `GrowthTier` Stable/Growing/RapidGrowth/Exploding/Shrinking, `GovernanceRisk` flag (crescimento acelerado + qualidade baixa), top serviços com maior crescimento. Catalog. Config: `catalog.api_growth.*` sort 11360–11380.
+57. 🔲 **Wave V.2** — `GetChaosCoverageGapReport` — gaps de cobertura de chaos engineering: `GapLevel` NoCoverage/ProductionGap/FailedCoverage/PartialCoverage/FullCoverage, flag `CriticalGap` para serviços Critical sem cobertura, `CoverageRate` global, top serviços críticos não cobertos. OI. Config: `chaos.coverage.*` sort 11390–11400.
+58. 🔲 **Wave V.3** — `GetReleaseFrequencyDeviationReport` — desvio de frequência de deployment: compara período recente vs. histórico, `FrequencyDeviation` Accelerating/Stable/Decelerating/Stalled/New, `RiskFlag` para aceleração com baixo success rate ou serviços críticos parados. CG. Config: `changes.frequency_deviation.*` sort 11410–11430. **Wave V PLANEADA**.
+59. 🔲 **Wave W.1** — `GetRollbackPatternReport` — padrões de rollback por serviço: `RollbackPattern` Isolated/Recurring/Serial/None, `SystemicRisk` flag (Serial + baixa confidence), `EvidenceGap` flag (rollbacks com evidence packs incompletos), correlação com ChangeConfidenceBreakdown. CG. Config: `changes.rollback_pattern.*` sort 11440–11460.
+60. 🔲 **Wave W.2** — `GetServiceCouplingIndexReport` — índice de acoplamento entre serviços: `CouplingIndex` 0–100 por fan-in/fan-out, `CouplingTier` HubService/HighlyCoupled/ModeratelyCoupled/LooselyCoupled/Isolated, `ArchitecturalRisk` e `IsolationRisk` flags, % de serviços Isolated, CouplingIndex médio do tenant. Catalog. Config: `catalog.coupling_index.*` sort 11470–11490.
+61. 🔲 **Wave W.3** — `GetAnomalyDetectionSummaryReport` — sumário consolidado de anomalias: agrega WasteSignal + DriftFinding + SLO breaches + Chaos failures + VulnerabilityAdvisory + incidentes pós-deploy por serviço, `AnomalyDensity` Clean/Moderate/Dense/Critical, lista de serviços multi-anomaly, timeline diária de 30 pontos. OI. Config: `runtime.anomaly_summary.*` sort 11500–11510. **Wave W PLANEADA**.
+62. 🔲 **Wave X.1** — Executive Intelligence Dashboard — `ServiceHealthSummaryCard` + `ChangeConfidenceGauge` + `ComplianceCoverageWidget` + `FinOpsBudgetBurnWidget` + `TopRiskyServicesTable` + `MttrTrendMiniChart`. Persona Executive/CTO. Frontend. Config: `ui.executive_dashboard.*` sort 11520–11580.
+63. 🔲 **Wave X.2** — GraphQL & Protobuf Visual Studio — `GraphQlSchemaDiffViewer` + `GraphQlSchemaExplorer` + `ProtobufSchemaDiffViewer` + `ProtobufSchemaExplorer` no Contract Studio. Frontend. Config: `ui.contract_studio.*` sort 11540–11550.
+64. 🔲 **Wave X.3** — Persona-Aware Adaptive Navigation — reordenação de menu e quick actions por persona (`Engineer/TechLead/Architect/PlatformAdmin/Executive/Auditor`). Endpoint `GET /api/v1/identity/me/persona-config`. Frontend + Backend. Config: `ui.adaptive_navigation.*` sort 11560–11570. **Wave X PLANEADA**.
+65. 🔲 **Wave Y.1** — Agentic Runtime com Human-in-the-Loop — `AgentExecutionPlan` aggregate + `AgentStep` multi-type + `ApproveAgentStep` gate + budget enforcement + audit trail por passo. AIKnowledge/AIOrchestration. Config: `ai.agentic.*` sort 11600–11620.
+66. 🔲 **Wave Y.2** — NLP-based Model Routing — intent classifier leve (embedding) → `PromptIntent` enum → `ModelRoutingPolicy` entity + cost-aware downgrade automático + `GetModelRoutingDecisionLog`. AIKnowledge. Config: `ai.routing.*` sort 11630–11640.
+67. 🔲 **Wave Y.3** — AI Token Budget Attribution — `AiTokenUsageRecord` + `GetAiTokenBudgetReport` + `GetAiCostAttributionReport` + `AiBudgetPolicy` enforcement por tenant/equipa. AIKnowledge + FinOps. Config: `ai.budget.*` sort 11650–11670. **Wave Y PLANEADA**.
+68. 🔲 **Wave Z.1** — Kafka / Message Queue Consumer Real — `EventConsumerWorker` (`BackgroundService`) + `IEventNormalizationStrategy` por source type + dead letter queue + monitoring endpoint. Worker. Config: `integrations.event_consumer.*` sort 11680–11700.
+69. 🔲 **Wave Z.2** — SDK NexTrace — CLI `nexone` + NuGet `NexTrace.Sdk` + npm `nexone-sdk` + GitHub Action `nexone/change-confidence-gate@v1`. Developer tooling. Config: `sdk.platform_api.*` sort 11710–11720.
+70. 🔲 **Wave Z.3** — ClickHouse Analytics Provider — `IClickHouseAnalyticsWriter/Reader` adapter + schema MergeTree/SummingMergeTree + health check + `analytics.Provider` config switch. Infrastructure. Config: `analytics.clickhouse.*` sort 11730–11750. **Wave Z PLANEADA**.
 
 ### Riscos e recomendações transversais
 
@@ -994,3 +1725,6 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 5. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura. A lista consolidada de gaps abertos está em [HONEST-GAPS.md](./HONEST-GAPS.md).
 6. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
 7. **Waves pós-v1.0.0:** Secção 15 consolida Waves A/B/C/D com ADRs associados (ADR-007/008/009).
+8. **Wave S (completa):** S.1 `GetChangeWindowUtilizationReport` + S.2 `GetContractAdoptionReport` + S.3 `GetMttrTrendReport`. CG: 866/Catalog: 1873/OI: 1178 testes. +8 config keys (sort 11120–11190). **Wave T–W (planeadas):** 4 waves detalhadas na secção 15, cobrindo itens 50–61 da lista de priorização. Adicionam 32 config keys (sort 11200–11510), 4×3 secções i18n e estimativa de +120 testes distribuídos por CG/Catalog/OI.
+9. **Waves X–Z (planeadas):** 3 novas waves detalhadas na secção 15, cobrindo itens 62–70. Wave X: Frontend Intelligence (dashboards, visual builders, adaptive navigation). Wave Y: AI Governance Deep Dive (agentic runtime, NLP routing, token budget attribution). Wave Z: Integration Ecosystem Completion (Kafka consumer, SDK, ClickHouse). Adicionam 24 config keys (sort 11520–11750), 3×3–4 secções i18n.
+10. **Status das secções 1–12 revisto (Abril 2026):** §1.1 GraphQL e §1.2 Protobuf marcados como ✅ implementados (Waves G.3/H.1). §8.4 ML Correlation marcado como ✅ implementado (Wave A.5). §9.1 Compliance Packs marcado como ✅ parcialmente implementado (8 standards via Waves G–L). Tabela Priorização Recomendada actualizada para reflectir estado real.
