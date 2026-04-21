@@ -14429,5 +14429,86 @@
       "invalidLookbackDays": "Os dias de retrospectiva devem ser entre 1 e 90.",
       "invalidMaxDriftPenaltyPerService": "A penalidade máxima de drift deve ser entre 1 e 20."
     }
+  },
+  "complianceCoverageMatrixReport": {
+    "title": "Matriz de Cobertura de Compliance",
+    "description": "Detecção de blind spots de compliance por serviço: quais serviços foram avaliados em cada standard ativo (SOC2, ISO27001, PCI-DSS, HIPAA, GDPR, FedRAMP, NIS2, CMMC) e com qual status de conformidade",
+    "lookbackDays": "Dias de Retrospectiva",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "totalStandardsActive": "Standards Ativos",
+    "tenantAvgCoverageScorePct": "Score Médio de Cobertura (%)",
+    "levelDistribution": "Distribuição por Nível de Cobertura",
+    "full": "Completa (100%)",
+    "partial": "Parcial (≥ threshold%)",
+    "minimal": "Mínima (≥ 1 standard)",
+    "none": "Nenhuma (blind spot)",
+    "byStandard": "Cobertura por Standard",
+    "standard": "Standard",
+    "assessedServiceCount": "Serviços Avaliados",
+    "coveredPct": "Cobertos (%)",
+    "topGapServices": "Top Serviços com Gap de Compliance",
+    "allServices": "Todos os Serviços",
+    "serviceName": "Serviço",
+    "coverageScorePct": "Score de Cobertura (%)",
+    "level": "Nível de Cobertura",
+    "errors": {
+      "invalidTenantId": "ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de retrospectiva devem ser entre 7 e 180.",
+      "invalidTopGapCount": "O número máximo de gap deve ser entre 1 e 100.",
+      "invalidPartialThresholdPct": "O threshold parcial deve ser entre 1% e 99%."
+    }
+  },
+  "dependencyUpdateFreshnessReport": {
+    "title": "Atualização de Dependências",
+    "description": "Dias desde a última alteração de contrato por serviço, cruzados com advisories de vulnerabilidade abertos: classificação por tier de frescor para priorizar upgrades de dependências por risco real",
+    "lookbackDays": "Dias de Retrospectiva",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "tierDistribution": "Distribuição por Tier de Frescor",
+    "fresh": "Atualizado (≤ 30 dias)",
+    "aging": "Envelhecendo (31–90 dias)",
+    "stale": "Desatualizado (91–180 dias)",
+    "critical": "Crítico (> 180 dias)",
+    "topStaleServices": "Serviços Mais Desatualizados",
+    "allServices": "Todos os Serviços",
+    "serviceName": "Serviço",
+    "daysSinceLastDependencyChange": "Dias Desde Última Mudança",
+    "tier": "Tier de Frescor",
+    "openVulnerabilityCount": "Vulnerabilidades Abertas",
+    "vulnerabilityGap": "Gap de Vulnerabilidade",
+    "errors": {
+      "invalidTenantId": "ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de retrospectiva devem ser entre 30 e 365.",
+      "invalidTopStaleCount": "O número máximo deve ser entre 1 e 100.",
+      "invalidThresholds": "O threshold de aging deve ser maior que o de fresh, e o de stale maior que o de aging."
+    }
+  },
+  "serviceLoadDistributionReport": {
+    "title": "Distribuição de Carga dos Serviços",
+    "description": "Classificação de banda de carga por throughput por serviço (HighLoad / MediumLoad / LowLoad por quartil) correlacionada com custo por request: identifica candidatos a waste e serviços de alta eficiência para decisões de rightsizing",
+    "lookbackDays": "Dias de Retrospectiva",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "medianRequestsPerSecond": "Mediana de Throughput (RPS)",
+    "medianCostPerRequestUsd": "Mediana de Custo por Request (USD)",
+    "bandDistribution": "Distribuição por Banda de Carga",
+    "highLoad": "Alta Carga (top 25%)",
+    "mediumLoad": "Carga Média",
+    "lowLoad": "Baixa Carga (bottom 25%)",
+    "topWasteServices": "Top Candidatos a Waste",
+    "allServices": "Todos os Serviços",
+    "serviceName": "Serviço",
+    "environment": "Ambiente",
+    "avgLatencyMs": "Latência Média (ms)",
+    "avgErrorRate": "Taxa de Erro Média",
+    "avgRequestsPerSecond": "RPS Médio",
+    "totalCostUsd": "Custo Total (USD)",
+    "costPerRequestUsd": "Custo por Request (USD)",
+    "band": "Banda de Carga",
+    "wasteCandidate": "Candidato a Waste",
+    "highCostEfficiency": "Alta Eficiência de Custo",
+    "errors": {
+      "invalidTenantId": "ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de retrospectiva devem ser entre 7 e 90.",
+      "invalidMaxTopServices": "O número máximo de serviços deve ser entre 1 e 100."
+    }
   }
 }

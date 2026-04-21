@@ -1127,7 +1127,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
-### Wave U — Compliance Coverage Matrix + Dependency Freshness + Service Load Distribution
+### Wave U — Compliance Coverage Matrix + Dependency Freshness + Service Load Distribution ✅
 
 **Objetivo:** Introduzir uma visão unificada de cobertura de compliance por serviço (matriz multi-standard), medir o envelhecimento das dependências entre serviços cruzado com vulnerabilidades, e mapear a distribuição de carga operacional para identificar outliers de custo por throughput.
 
@@ -1214,7 +1214,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `dependencyFreshness.*` — frescor de dependências e gap de vulnerabilidades
 - `serviceLoadDistribution.*` — distribuição de carga operacional e custo por request
 
-**Totais estimados Wave U:** CG: ~892 testes (+13). Catalog: ~1898 testes (+11). OI: ~1210 testes (+15). Configuração: +8 config keys (sort 11280–11350). i18n: +3 secções (4 locales).
+**Totais Wave U:** CG: 894 testes (+15). Catalog: 1897 testes (+12). OI: 1204 testes (+12). Configuração: +8 config keys (sort 11280–11350). i18n: +4 secções (4 locales). **Wave U COMPLETA.**
 
 ---
 
@@ -4543,9 +4543,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 50. ✅ **Wave T.1** — `GetPostIncidentLearningReport` — taxa de aprendizado pós-incidente: % de incidentes com runbook aprovado pós-evento, incidentes recorrentes sem documentação (`LearningCoverage`: Full/Partial/Low), top serviços com menor learning rate. CG. Config: `compliance.learning.*` sort 11200–11220.
 51. ✅ **Wave T.2** — `GetApiSchemaCoverageReport` — completude de documentação de schemas de API: score por 4 dimensões (response body, request body, exemplos, status codes), `CoverageGrade` A/B/C/D por contrato, distribuição global, top contratos com menor cobertura. Catalog. Config: `contracts.schema_coverage.*` sort 11230–11250.
 52. ✅ **Wave T.3** — `GetEnvironmentStabilityReport` — score de estabilidade comparado por ambiente (dev/staging/prod): 4 dimensões ponderadas (SLO/Drift/Chaos/incident correlation), `StabilityTier` Stable/Unstable/Critical, flag de alerta "non-prod mais instável que prod", top serviços desestabilizadores. OI. Config: `runtime.environment_stability.*` sort 11260–11270. **Wave T COMPLETA**.
-53. 🔲 **Wave U.1** — `GetComplianceCoverageMatrixReport` — matriz de cobertura de standards por serviço: quantos standards (SOC2/ISO27001/PCI-DSS/HIPAA/GDPR/FedRAMP/NIS2/CMMC) foram avaliados, `CoverageLevel` Full/Partial/Minimal/None, top serviços com maior gap de compliance, score de compliance por standard. CG. Config: `compliance.coverage.*` sort 11280–11300.
-54. 🔲 **Wave U.2** — `GetDependencyUpdateFreshnessReport` — análise de frescor de dependências entre serviços: `FreshnessTier` Fresh/Aging/Stale/Critical por serviço, flag `VulnerabilityGap` para serviços Stale/Critical com vulns abertas, top serviços mais desatualizados com contagem de vulns. Catalog. Config: `catalog.dependency_freshness.*` sort 11310–11330.
-55. 🔲 **Wave U.3** — `GetServiceLoadDistributionReport` — distribuição de carga operacional por serviço: `LoadBand` High/Medium/Low por quartil de throughput, correlação com custo (`CostPerRequestUsd`), flag `WasteCandidate` (baixo uso + alto custo), top 10 serviços com pior custo por request. OI. Config: `runtime.load_distribution.*` sort 11340–11350. **Wave U PLANEADA**.
+53. ✅ **Wave U.1** — `GetComplianceCoverageMatrixReport` — matriz de cobertura de standards por serviço: quantos standards (SOC2/ISO27001/PCI-DSS/HIPAA/GDPR/FedRAMP/NIS2/CMMC) foram avaliados, `CoverageLevel` Full/Partial/Minimal/None, top serviços com maior gap de compliance, score de compliance por standard. CG. Config: `compliance.coverage_matrix.*` sort 11280–11290.
+54. ✅ **Wave U.2** — `GetDependencyUpdateFreshnessReport` — análise de frescor de dependências entre serviços: `FreshnessTier` Fresh/Aging/Stale/Critical por serviço, flag `VulnerabilityGap` para serviços Stale/Critical com vulns abertas, top serviços mais desatualizados com contagem de vulns. Catalog. Config: `catalog.dependency_freshness.*` sort 11300–11310.
+55. ✅ **Wave U.3** — `GetServiceLoadDistributionReport` — distribuição de carga operacional por serviço: `LoadBand` High/Medium/Low por quartil de throughput, correlação com custo (`CostPerRequestUsd`), flag `WasteCandidate` (baixo uso + alto custo), top 10 serviços com pior custo por request. OI. Config: `runtime.service_load_distribution.*` sort 11320–11350. **Wave U COMPLETA**.
 56. 🔲 **Wave V.1** — `GetServiceApiGrowthReport` — taxa de crescimento de APIs por serviço: `GrowthTier` Stable/Growing/RapidGrowth/Exploding/Shrinking, `GovernanceRisk` flag (crescimento acelerado + qualidade baixa), top serviços com maior crescimento. Catalog. Config: `catalog.api_growth.*` sort 11360–11380.
 57. 🔲 **Wave V.2** — `GetChaosCoverageGapReport` — gaps de cobertura de chaos engineering: `GapLevel` NoCoverage/ProductionGap/FailedCoverage/PartialCoverage/FullCoverage, flag `CriticalGap` para serviços Critical sem cobertura, `CoverageRate` global, top serviços críticos não cobertos. OI. Config: `chaos.coverage.*` sort 11390–11400.
 58. 🔲 **Wave V.3** — `GetReleaseFrequencyDeviationReport` — desvio de frequência de deployment: compara período recente vs. histórico, `FrequencyDeviation` Accelerating/Stable/Decelerating/Stalled/New, `RiskFlag` para aceleração com baixo success rate ou serviços críticos parados. CG. Config: `changes.frequency_deviation.*` sort 11410–11430. **Wave V PLANEADA**.

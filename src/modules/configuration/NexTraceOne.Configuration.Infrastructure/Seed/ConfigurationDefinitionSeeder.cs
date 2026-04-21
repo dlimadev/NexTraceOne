@@ -8943,5 +8943,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "55",
             uiEditorType: "number",
             sortOrder: 11270),
+
+        // ── Wave U.1 — Compliance Coverage Matrix Report ───────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.coverage_matrix.lookback_days",
+            displayName: "config.compliance.coverage_matrix.lookback_days.name",
+            description: "config.compliance.coverage_matrix.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11280),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.coverage_matrix.partial_threshold_pct",
+            displayName: "config.compliance.coverage_matrix.partial_threshold_pct.name",
+            description: "config.compliance.coverage_matrix.partial_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 11290),
+
+        // ── Wave U.2 — Dependency Update Freshness Report ─────────────────
+        ConfigurationDefinition.Create(
+            key: "catalog.dependency_freshness.lookback_days",
+            displayName: "config.catalog.dependency_freshness.lookback_days.name",
+            description: "config.catalog.dependency_freshness.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 11300),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.dependency_freshness.stale_threshold_days",
+            displayName: "config.catalog.dependency_freshness.stale_threshold_days.name",
+            description: "config.catalog.dependency_freshness.stale_threshold_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 11310),
+
+        // ── Wave U.3 — Service Load Distribution Report ────────────────────
+        ConfigurationDefinition.Create(
+            key: "runtime.service_load_distribution.lookback_days",
+            displayName: "config.runtime.service_load_distribution.lookback_days.name",
+            description: "config.runtime.service_load_distribution.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11320),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.service_load_distribution.max_top_services",
+            displayName: "config.runtime.service_load_distribution.max_top_services.name",
+            description: "config.runtime.service_load_distribution.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11330),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.service_load_distribution.waste_cost_threshold_usd",
+            displayName: "config.runtime.service_load_distribution.waste_cost_threshold_usd.name",
+            description: "config.runtime.service_load_distribution.waste_cost_threshold_usd.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "0",
+            uiEditorType: "number",
+            sortOrder: 11340),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.service_load_distribution.top_gap_count",
+            displayName: "config.runtime.service_load_distribution.top_gap_count.name",
+            description: "config.runtime.service_load_distribution.top_gap_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11350),
     ];
 }

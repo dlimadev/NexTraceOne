@@ -81,6 +81,9 @@ public static class DependencyInjection
 
         // Wave T.1 — Post-Incident Learning Report (honest-null; bridge Knowledge → CG na composition root)
         services.AddScoped<IIncidentLearningReader, Services.NullIncidentLearningReader>();
+
+        // Wave U.1 — Compliance Coverage Matrix Report (honest-null; bridge per-service compliance on composition root)
+        services.AddScoped<IComplianceServiceCoverageReader, Services.NullComplianceServiceCoverageReader>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();
 

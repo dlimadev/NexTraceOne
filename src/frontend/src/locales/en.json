@@ -14418,5 +14418,86 @@
       "invalidLookbackDays": "Lookback days must be between 1 and 90.",
       "invalidMaxDriftPenaltyPerService": "Max drift penalty must be between 1 and 20."
     }
+  },
+  "complianceCoverageMatrixReport": {
+    "title": "Compliance Coverage Matrix",
+    "description": "Cross-service compliance blind spot detection: which services have been evaluated for each active standard (SOC2, ISO27001, PCI-DSS, HIPAA, GDPR, FedRAMP, NIS2, CMMC) and at what conformance status",
+    "lookbackDays": "Lookback Days",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "totalStandardsActive": "Active Standards",
+    "tenantAvgCoverageScorePct": "Avg Coverage Score (%)",
+    "levelDistribution": "Coverage Level Distribution",
+    "full": "Full (100%)",
+    "partial": "Partial (≥ threshold%)",
+    "minimal": "Minimal (≥ 1 standard)",
+    "none": "None (blind spot)",
+    "byStandard": "Coverage by Standard",
+    "standard": "Standard",
+    "assessedServiceCount": "Assessed Services",
+    "coveredPct": "Covered (%)",
+    "topGapServices": "Top Compliance Gap Services",
+    "allServices": "All Services",
+    "serviceName": "Service",
+    "coverageScorePct": "Coverage Score (%)",
+    "level": "Coverage Level",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 7 and 180.",
+      "invalidTopGapCount": "Top gap count must be between 1 and 100.",
+      "invalidPartialThresholdPct": "Partial threshold must be between 1% and 99%."
+    }
+  },
+  "dependencyUpdateFreshnessReport": {
+    "title": "Dependency Update Freshness",
+    "description": "Days since last recorded contract changelog per service, crossed with open vulnerability advisories: freshness tier classification to prioritize dependency upgrades by actual risk",
+    "lookbackDays": "Lookback Days",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "tierDistribution": "Freshness Tier Distribution",
+    "fresh": "Fresh (≤ 30 days)",
+    "aging": "Aging (31–90 days)",
+    "stale": "Stale (91–180 days)",
+    "critical": "Critical (> 180 days)",
+    "topStaleServices": "Most Outdated Services",
+    "allServices": "All Services",
+    "serviceName": "Service",
+    "daysSinceLastDependencyChange": "Days Since Last Change",
+    "tier": "Freshness Tier",
+    "openVulnerabilityCount": "Open Vulnerabilities",
+    "vulnerabilityGap": "Vulnerability Gap",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 30 and 365.",
+      "invalidTopStaleCount": "Top stale count must be between 1 and 100.",
+      "invalidThresholds": "Aging threshold must be greater than fresh threshold, and stale threshold must be greater than aging threshold."
+    }
+  },
+  "serviceLoadDistributionReport": {
+    "title": "Service Load Distribution",
+    "description": "Throughput-based load band classification per service (HighLoad / MediumLoad / LowLoad by quartile) correlated with cost per request: identifies waste candidates and high-efficiency services for rightsizing decisions",
+    "lookbackDays": "Lookback Days",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "medianRequestsPerSecond": "Median Throughput (RPS)",
+    "medianCostPerRequestUsd": "Median Cost Per Request (USD)",
+    "bandDistribution": "Load Band Distribution",
+    "highLoad": "High Load (top 25%)",
+    "mediumLoad": "Medium Load",
+    "lowLoad": "Low Load (bottom 25%)",
+    "topWasteServices": "Top Waste Candidates",
+    "allServices": "All Services",
+    "serviceName": "Service",
+    "environment": "Environment",
+    "avgLatencyMs": "Avg Latency (ms)",
+    "avgErrorRate": "Avg Error Rate",
+    "avgRequestsPerSecond": "Avg RPS",
+    "totalCostUsd": "Total Cost (USD)",
+    "costPerRequestUsd": "Cost Per Request (USD)",
+    "band": "Load Band",
+    "wasteCandidate": "Waste Candidate",
+    "highCostEfficiency": "High Cost Efficiency",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 7 and 90.",
+      "invalidMaxTopServices": "Max top services must be between 1 and 100."
+    }
   }
 }
