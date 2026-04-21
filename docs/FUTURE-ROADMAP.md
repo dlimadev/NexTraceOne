@@ -2,6 +2,8 @@
 
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
+> **Waves concluídas:** A → R (46 features analytics/governance implementadas e testadas)  
+> **Waves planeadas:** S → Z (24 features novas documentadas, aguardam implementação)  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
 ---
@@ -16,17 +18,15 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 
 ## 1. Novos Tipos de Contrato
 
-### 1.1 GraphQL Contracts
-- **Estado:** Enum `ContractType.GraphQL` existe; implementação de parsing/validação pendente
-- **Escopo:** Parser de schema GraphQL, validação de breaking changes, visual builder
-- **Dependência:** Decisão de design sobre representação de queries/mutations/subscriptions
-- **Referência:** GAP-CTR-01
+### 1.1 GraphQL Contracts ✅ IMPLEMENTADO (Wave G.3 — Abril 2026)
+- **Estado:** ✅ `GraphQlSchemaSnapshot` entity + `AnalyzeGraphQlSchema` (Command) + `DetectGraphQlBreakingChanges` (Query) + `GetGraphQlSchemaHistory` (Query). Parsing SDL por keywords sem dependências externas. Breaking change detection: tipos/fields/operations removidos = breaking; adicionados = non-breaking. Migration `20260421160000_G3_AddGraphQlSchemaSnapshots`. 3 config keys (sort 10210–10230). i18n `graphqlSchema.*` em 4 locales. ~15 testes.
+- **Futuro:** Visual builder interativo de schemas SDL no Contract Studio — planeado para Wave X.
+- **Referência:** GAP-CTR-01, Wave G.3
 
-### 1.2 Protobuf / gRPC Contracts
-- **Estado:** Enum `ContractType.Protobuf` existe; implementação de parsing/validação pendente
-- **Escopo:** Parser de `.proto` files, validação de compatibilidade (wire format), visual builder
-- **Dependência:** Decisão sobre suporte de evolução de schema (field renumbering, reserved fields)
-- **Referência:** GAP-CTR-02
+### 1.2 Protobuf / gRPC Contracts ✅ IMPLEMENTADO (Wave H.1 — Abril 2026)
+- **Estado:** ✅ `ProtobufSchemaSnapshot` entity + `AnalyzeProtobufSchema` (Command) + `DetectProtobufBreakingChanges` (Query) + `GetProtobufSchemaHistory` (Query). Parsing `.proto` por keywords (message/enum/service/rpc/syntax). Breaking change detection: messages/services/fields/RPCs removidos = breaking. Migration `20260421170000_H1_AddProtobufSchemaSnapshots`. 3 config keys (sort 10240–10260). i18n `protobufSchema.*` em 4 locales. ~18 testes.
+- **Futuro:** Visual builder de `.proto` files e campo de comparação de wire compatibility — planeado para Wave X.
+- **Referência:** GAP-CTR-02, Wave H.1
 
 ---
 
@@ -137,17 +137,25 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 - **Estado:** Grounding básico funcional via `IKnowledgeModule`
 - **Escopo:** Enriquecer contexto de IA com entidades de todos os módulos
 
-### 8.4 ML-based Incident Correlation
-- **Estado:** Heurísticas básicas (timestamp + service matching)
-- **Escopo:** Correlação avançada baseada em ML/NLP
+### 8.4 ML-based Incident Correlation ✅ IMPLEMENTADO (Wave A.5 — Abril 2026)
+- **Estado:** ✅ `ScoreCorrelationFeatureSet` query com feature engineering sobre timestamps/services/ownership. Sub-scores: TemporalProximity + ServiceMatch + OwnershipAlignment + WeightedTotal com labels High/Medium/Low. `ICorrelationFeatureReader` abstraction + `NullCorrelationFeatureReader`. 3 config keys ponderáveis (sort 5200–5220). Wave A.5 completo.
+- **Futuro:** Enriquecimento com embedding de logs e traces OTel para correlação semântica — planeado para Wave Y.
 
 ---
 
 ## 9. Compliance as Code (Evolução)
 
-### 9.1 Advanced Compliance Packs
-- **Escopo:** PCI-DSS, HIPAA, SOC2 packs dedicados com checks automatizados
-- **Dependência:** Expertise regulatória + partnership com consultoras
+### 9.1 Advanced Compliance Packs ✅ PARCIALMENTE IMPLEMENTADO (Waves G–L — Abril 2026)
+- **Estado:** ✅ 8 standards implementados como queries independentes com scoring contextual:
+  - **SOC 2 Type II** — Wave G.1: 5 controlos (CC6/CC7/CC8/CC9/A1)
+  - **ISO/IEC 27001:2022** — Wave G.2: 5 controlos Annex A (A.8.8/A.8.32/A.5.26/A.5.29/A.8.9)
+  - **PCI-DSS v4.0** — Wave H.2: 5 requisitos (Req 1-2/6/10/11/12)
+  - **HIPAA Security Rule** — Wave I.1: 5 controlos (§164.312 a/b/c/d/e)
+  - **GDPR** — Wave J.1: 5 controlos (Art. 5/13/17/25/33)
+  - **FedRAMP Moderate** — Wave L.2: 5 controlos NIST SP 800-53 (AC-2/AU-2/CM-6/IR-4/SI-2)
+  - **NIS2** — Wave D.1.b: 5 controlos RCM
+  - **CMMC 2.0 Level 2** — Wave K.2: 5 práticas (AC.1.001/IA.1.076/AU.2.041/IR.2.092/RM.2.141)
+- **Futuro:** `GetComplianceCoverageMatrixReport` (visão unificada multi-standard) — planeado para Wave U.1. Controlos `NotAssessed` que dependem de fontes IAM externas — dependem de integração LDAP/AD avançada.
 
 ---
 
@@ -213,16 +221,21 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 |------------|---------------|---------|
 | ✅ **DONE** | Frontend Unit Tests (6.1) | Qualidade e confiança em contract builders |
 | ✅ **DONE** | E2E Tests (6.2) | Cobertura de fluxos críticos |
-| **Alta** | EF Designer Files (13.1) | Completar tooling de migrações |
-| **Média** | IDE Extensions (2.x) | Developer experience |
-| **Média** | GraphQL/Protobuf Contracts (1.x) | Expansão de tipos de contrato |
-| **Média** | SAML (4.1) | Enterprise SSO |
-| **Média** | Kafka Integration (3.2) | Event streaming real |
-| **Baixa** | SDK Externo (3.4) | Automação e integração |
-| **Baixa** | Contract Sandbox (7.1) | Testing avançado |
-| **Baixa** | Advanced Compliance (9.1) | Packs regulatórios |
-| **Roadmap** | Legacy/Mainframe (12.x) | Expansão para core systems |
-| **Roadmap** | Kubernetes (11.1) | Infraestrutura de deployment |
+| ✅ **DONE** | GraphQL Contracts (1.1) | Análise e breaking change detection de schemas SDL |
+| ✅ **DONE** | Protobuf/gRPC Contracts (1.2) | Análise e breaking change detection de schemas `.proto` |
+| ✅ **DONE** | SAML (4.1) | Enterprise SSO com mock IdP |
+| ✅ **DONE** | Compliance Packs SOC2/ISO27001/PCI-DSS/HIPAA/GDPR/FedRAMP/NIS2/CMMC (9.1) | 8 standards enterprise implementados |
+| **Alta** | EF Designer Files (13.1) | Completar tooling de migrações (requer PostgreSQL local) |
+| **Alta** | Waves S–W (Analytics Avançados) | 15 novas features planeadas — ver Secção 15 |
+| **Média** | IDE Extensions (2.x) | Developer experience inline no editor |
+| **Média** | Kafka Integration (3.2) | Event streaming real com consumer |
+| **Média** | Wave X — Frontend Dashboards Intelligence | Persona-aware views e executive dashboards |
+| **Média** | Wave Y — AI Governance Deep Dive | Agentic runtime, model routing, PII grounding |
+| **Baixa** | SDK Externo (3.4) | Automação e integração programática |
+| **Baixa** | Contract Sandbox (7.1) | Testing avançado com mock servers |
+| **Baixa** | Wave Z — Integration Ecosystem | Kafka consumer real, ClickHouse, SDK |
+| **Roadmap** | Legacy/Mainframe (12.x) | Expansão para core systems IBM Z / COBOL |
+| **Roadmap** | Kubernetes (11.1) | Helm charts, HPA, service mesh |
 
 ---
 
@@ -1395,6 +1408,223 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
+### Wave X — Frontend Intelligence & Contract Studio Visual Builders
+
+**Objetivo:** Evoluir o frontend de superfície operacional para **plataforma de decisão inteligente por persona**, completar os visual builders para os novos tipos de contrato (GraphQL, Protobuf), e introduzir views executivas orientadas a KPIs consolidados. Esta wave fecha o gap entre a riqueza analítica do backend (Waves A–W) e a experiência de utilizador que a surfacia.
+
+#### X.1 — Executive Intelligence Dashboard
+
+**Feature:** Dashboard unificado para persona Executive/CTO com KPIs consolidados de todas as dimensões operacionais.
+
+**Componentes:**
+- **`ServiceHealthSummaryCard`** — score de saúde global do tenant: média ponderada de SLO compliance + risk center + ownership health + deployment success rate
+- **`ChangeConfidenceGauge`** — gauge de confiança média de deployment nas últimas 4 semanas por tier de serviço
+- **`ComplianceCoverageWidget`** — cobertura de compliance por standard (8 barras horizontais, % de serviços cobertos)
+- **`FinOpsBudgetBurnWidget`** — % de budget consumido vs. período, com flag de burn rate acelerado
+- **`TopRiskyServicesTable`** — top 5 serviços por score de risco com drill-down direto para Risk Center
+- **`MttrTrendMiniChart`** — sparkline de MTTR dos últimos 30 dias para os 3 serviços mais críticos
+- Todos os widgets ligados ao persona `Executive`; dados pré-filtrados por ownership relevante
+
+**Orientado para Executive, CTO e Product** — responde a "o produto está a degradar ou a melhorar?" sem precisar navegar módulo a módulo.
+
+#### X.2 — GraphQL & Protobuf Visual Studio no Contract Studio
+
+**Feature:** Experiência visual de edição/comparação de schemas GraphQL SDL e Protobuf `.proto` dentro do Contract Studio existente, complementando os backends implementados em Waves G.3 e H.1.
+
+**Componentes GraphQL:**
+- **`GraphQlSchemaDiffViewer`** — diff side-by-side entre dois snapshots SDL com highlighting de breaking changes (vermelho), non-breaking additions (verde) e unchanged (cinzento)
+- **`GraphQlSchemaExplorer`** — explorador de tipos, fields, queries, mutations e subscriptions com filtro e pesquisa
+- **`GraphQlBreakingChangeBadge`** — badge inline na listagem de contratos quando existe breaking change entre a versão current e anterior
+- Upload de ficheiro SDL ou textarea para `AnalyzeGraphQlSchema`
+
+**Componentes Protobuf:**
+- **`ProtobufSchemaDiffViewer`** — diff side-by-side de `.proto` com highlighting por tipo de change (message, field, service, rpc)
+- **`ProtobufSchemaExplorer`** — explorador de messages, fields, services e RPCs com indicação de deprecated fields
+- Upload de ficheiro `.proto` para `AnalyzeProtobufSchema`
+
+**Orientado para Architect e Tech Lead** — fecha o loop entre análise de backend (Wave G.3/H.1) e experiência visual no Contract Studio.
+
+#### X.3 — Persona-Aware Adaptive Navigation
+
+**Feature:** Navegação adaptativa que reordena o menu e os quick actions com base na persona ativa do utilizador autenticado, tornando a experiência mais focada e reduzindo o cognitive load.
+
+**Comportamentos por persona:**
+- **Engineer** — destaca: Service Catalog (own services), Contracts (own team), Change Status, AI Assistant
+- **Tech Lead** — destaca: Team Dashboard, Change Velocity, Operational Readiness, SLO Compliance
+- **Architect** — destaca: Dependency Graph, Contract Adoption, API Exposure, Service Coupling Index
+- **Platform Admin** — destaca: Risk Center, Compliance Coverage Matrix, EF Migrations Health, System Health
+- **Executive** — destaca: Executive Dashboard, FinOps Burn, MTTR Trend, Compliance Overview
+- **Auditor** — destaca: Audit Trail, Evidence Packs, Compliance Reports, Policy Compliance
+
+**Implementação:** `PersonaNavigationConfig` no frontend (Zustand store) alimentado por `GET /api/v1/identity/me/persona-config` que retorna `quickActions[]` e `prioritizedModules[]` com base em roles + ownership.
+
+**Orientado para todas as personas** — reforça o NexTraceOne como plataforma multi-persona e não apenas para Engineers.
+
+#### Configuração Wave X
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `ui.executive_dashboard.enabled` | true | 11520 | Ativa o Executive Intelligence Dashboard |
+| `ui.executive_dashboard.risk_threshold` | 60 | 11530 | Score mínimo de risco para destacar serviços no widget |
+| `ui.contract_studio.graphql_diff.max_snapshot_age_days` | 90 | 11540 | Máximo de dias de antiguidade de snapshot para diff GraphQL |
+| `ui.contract_studio.protobuf_diff.max_snapshot_age_days` | 90 | 11550 | Máximo de dias de antiguidade de snapshot para diff Protobuf |
+| `ui.adaptive_navigation.enabled` | true | 11560 | Ativa navegação adaptativa por persona |
+| `ui.adaptive_navigation.quick_actions_count` | 5 | 11570 | Número de quick actions em destaque por persona |
+| `ui.executive_dashboard.finops_burn_warn_threshold_pct` | 80 | 11580 | % de budget consumido para flag de burn acelerado |
+| `ui.executive_dashboard.mttr_sparkline_services` | 3 | 11590 | Número de serviços no sparkline de MTTR do Executive Dashboard |
+
+#### i18n Wave X
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `executiveDashboard.*` — labels e títulos do Executive Intelligence Dashboard
+- `graphqlDiffViewer.*` — interface do diff viewer de schemas GraphQL
+- `protobufDiffViewer.*` — interface do diff viewer de schemas Protobuf
+- `adaptiveNavigation.*` — quick actions e módulos priorizados por persona
+
+**Totais estimados Wave X:** Frontend: ~45 novos componentes/pages. Configuração: +8 config keys (sort 11520–11590). i18n: +4 secções (4 locales). Backend: 1 novo endpoint `GET /api/v1/identity/me/persona-config`.
+
+---
+
+### Wave Y — AI Governance Deep Dive & Agentic Platform
+
+**Objetivo:** Evoluir a capacidade de IA do NexTraceOne de "assistente com política" para **plataforma agentic governada**, com orquestração multi-step auditável, routing inteligente de modelos, redação contextual de PII/segredos nos prompts, e rastreabilidade completa de custo por equipa/caso de uso.
+
+#### Y.1 — Agentic Runtime com Human-in-the-Loop
+
+**Feature:** Execução de planos multi-step por agentes de IA, com pontos de aprovação humana configuráveis e auditoria completa de cada passo.
+
+**Domínio:** Novo aggregate `AgentExecutionPlan` em `AIKnowledge` ou novo módulo `AIOrchestration`.
+
+**Capacidades:**
+- **`AgentExecutionPlan`** aggregate — plano com lista de `AgentStep` (nome, tipo, input, output, status, duração, custo estimado), `PlanStatus` (Pending/Running/WaitingApproval/Completed/Failed/Cancelled)
+- **`AgentStepType`** enum — ContractLookup / IncidentCorrelation / DraftGeneration / RunbookProposal / AlertTriage / ExternalSearch
+- **Human-in-the-loop gate** — passos com `RequiresApproval = true` pausam a execução até aprovação/rejeição via `ApproveAgentStep` command
+- **Budget por plano** — plano define `MaxTokenBudget`; execução para automaticamente se orçamento excedido
+- **`BlastRadiusThreshold` gate** — passos que envolvem serviços Critical com BlastRadius > threshold requerm aprovação automática
+- **Audit trail completo** — cada passo registado com timestamp, modelo usado, tokens consumidos, custo, aprovador (se aplicável)
+- 4 features: `SubmitAgentExecutionPlan`, `ApproveAgentStep`, `GetAgentPlanStatus`, `ListAgentExecutionHistory`
+- Migration para tabelas `ai_agent_execution_plans` + `ai_agent_steps`
+
+#### Y.2 — NLP-based Model Routing
+
+**Feature:** Routing inteligente de prompts para o modelo mais adequado com base em análise semântica do intent, custo e latência esperados.
+
+**Domínio:** Evolui o `RoutingDecision` existente (keyword heuristics) para embedding-based intent classification.
+
+**Capacidades:**
+- **Intent classifier leve** — embedding de prompt (via modelo local) → classificação em `PromptIntent` (CodeGeneration/DocumentSummarization/IncidentAnalysis/ContractDraft/ComplianceCheck/GeneralQuery)
+- **`ModelRoutingPolicy`** entity — por `PromptIntent`: modelo preferido, fallback, max tokens, max cost per request, allowed tenants/groups
+- **Routing resolution** — para cada prompt: classify intent → lookup policy → select model → apply budget check → execute
+- **Cost-aware routing** — se modelo preferido excede budget restante do tenant, faz downgrade automático com nota na resposta
+- **`GetModelRoutingDecisionLog`** query — auditoria de todas as decisões de routing com intent, modelo selecionado e motivo
+- 3 config keys por intent (sort 11600+); i18n `modelRouting.*` em 4 locales; ~20 testes
+
+#### Y.3 — AI Token Budget Attribution & Cost Transparency
+
+**Feature:** Atribuição granular de custos de tokens de IA por equipa, serviço, caso de uso e modelo. Fecha o loop entre IA governada e FinOps contextual.
+
+**Domínio:** Cruza `AgentQueryRecord` (Wave D.4) + `AgentExecutionPlan` (Wave Y.1) com `ServiceCostAllocationRecord` (Wave I.2) para IA.
+
+**Capacidades:**
+- **`AiTokenUsageRecord`** entity — `TenantId`, `TeamId`, `ServiceName`, `UseCase` (enum), `ModelId`, `InputTokens`, `OutputTokens`, `TotalTokens`, `EstimatedCostUsd`, `RequestedAt`
+- **`GetAiTokenBudgetReport`** query — consumo de tokens por tenant, por equipa e por caso de uso no período. Inclui budget configurado vs. consumido, taxa de burn, top consumidores, top modelos
+- **`GetAiCostAttributionReport`** query — custo estimado de IA distribuído por serviço/equipa, com `CostPerQuery` médio por tipo de uso
+- **Budget enforcement** — `AiBudgetPolicy` por tenant/equipa: `MonthlyTokenBudget`, `AlertThresholdPct`, `BlockOnExhaustion`
+- 4 config keys (sort 11630+); i18n `aiTokenBudget.*` + `aiCostAttribution.*` em 4 locales; ~18 testes
+
+#### Configuração Wave Y
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `ai.agentic.max_steps_per_plan` | 10 | 11600 | Máximo de passos por plano de execução de agente |
+| `ai.agentic.blast_radius_approval_threshold` | 10 | 11610 | Consumidores afetados acima deste valor requerem aprovação |
+| `ai.agentic.default_token_budget_per_plan` | 50000 | 11620 | Budget padrão de tokens por plano de agente |
+| `ai.routing.default_intent` | GeneralQuery | 11630 | Intent padrão quando classificação não é conclusiva |
+| `ai.routing.cost_downgrade_enabled` | true | 11640 | Ativa downgrade de modelo por budget |
+| `ai.budget.monthly_token_limit_default` | 1000000 | 11650 | Limite mensal padrão de tokens por tenant |
+| `ai.budget.alert_threshold_pct` | 80 | 11660 | % de budget consumido para envio de alerta |
+| `ai.budget.block_on_exhaustion` | false | 11670 | Bloqueia requests quando budget esgotado |
+
+#### i18n Wave Y
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `agentExecutionPlan.*` — planos de execução agentic e aprovação humana
+- `modelRouting.*` — decisões de routing de modelo por intent
+- `aiTokenBudget.*` — orçamento e consumo de tokens por equipa/serviço
+- `aiCostAttribution.*` — atribuição de custo de IA por serviço e caso de uso
+
+**Totais estimados Wave Y:** AIKnowledge: ~50 testes novos. Configuração: +8 config keys (sort 11600–11670). i18n: +4 secções (4 locales). Novas migrations: 2 (AgentExecutionPlans + AiTokenUsageRecords).
+
+---
+
+### Wave Z — Integration Ecosystem Completion
+
+**Objetivo:** Completar as integrações de ecosistema que permitem ao NexTraceOne ser **autónomo na ingestão** de eventos externos e ser **consumível programaticamente** por ferramentas de automação — fechando os últimos gaps de integração identificados nas secções 3.2, 3.3, 3.4 e 11.2 do documento.
+
+#### Z.1 — Kafka / Message Queue Consumer Real
+
+**Feature:** Worker process dedicado para consumo real de eventos de filas externas (Kafka, RabbitMQ, Azure Service Bus, AWS SQS). Converte eventos externos no modelo canónico do NexTraceOne sem intervenção manual.
+
+**Domínio:** `NexTraceOne.Worker.EventConsumer` — processo `IHostedService` separado, configurável por tenant.
+
+**Capacidades:**
+- **`EventConsumerWorker`** — `BackgroundService` que lê de fila configurada (tipo, connection string, topic/queue) e normaliza eventos para `Release`, `IncidentEvent` ou `ExternalChangeRequest` via estratégia de mapeamento
+- **`IEventNormalizationStrategy`** abstraction — strategies por source type: `KafkaChangeEventStrategy`, `ServiceBusChangeEventStrategy`, `SqsChangeEventStrategy`, `RabbitMqChangeEventStrategy`
+- **Dead letter queue** — eventos que falham normalização após 3 tentativas vão para `EventConsumerDeadLetterRecord` (tabela auditável)
+- **Monitoring endpoint** `GET /api/v1/integrations/event-consumer/status` — estado de cada consumer (running/paused/error), throughput, last event timestamp, dead letter count
+- Config por tenant: `queue.consumer.type`, `queue.consumer.connection_string`, `queue.consumer.topic`, `queue.consumer.enabled`
+- ~25 testes de normalização e routing
+
+#### Z.2 — SDK NexTrace (`nexone` CLI + NuGet + npm)
+
+**Feature:** SDK público para integração programática com o NexTraceOne. Inclui CLI `nexone`, biblioteca NuGet para .NET e pacote npm para Node.js/scripts de pipeline.
+
+**Componentes:**
+- **CLI `nexone`** — `nexone service describe <name>`, `nexone contract diff <id>`, `nexone change status <sha>`, `nexone confidence score <release-id>`, `nexone compliance check --standard GDPR`
+- **`NexTrace.Sdk` (NuGet)** — cliente tipado para todos os módulos: `ServiceCatalogClient`, `ContractClient`, `ChangeClient`, `ComplianceClient`. Autenticação via `PlatformApiToken` (Wave D.4). Retry policies via Polly.
+- **`nexone-sdk` (npm)** — wrapper TypeScript sobre as mesmas APIs. Útil para GitHub Actions, GitLab CI e scripts de pipeline.
+- **GitHub Action oficial** `nexone/change-confidence-gate@v1` — action que consulta o score de confiança de uma release e falha o pipeline se abaixo de threshold configurável
+- **Versionamento semântico** — SDK versiona independentemente do produto; breaking changes requerem major bump; changelog automático
+- Documentação em `docs/sdk/` com exemplos por caso de uso (CI/CD integration, contract validation, compliance check)
+
+#### Z.3 — ClickHouse Analytics Provider
+
+**Feature:** Provider alternativo de storage analítico baseado em ClickHouse para workloads de observabilidade e telemetria de alto volume. Complementa o Elasticsearch como opção para clientes com requisitos de performance analítica extrema.
+
+**Domínio:** Novo adapter `NexTraceOne.Infrastructure.ClickHouse` no padrão provider existente.
+
+**Capacidades:**
+- **`IClickHouseAnalyticsWriter`** — interface para ingestão batch de telemetria (traces, logs, métricas)
+- **`IClickHouseAnalyticsReader`** — interface para queries analíticas (P50/P95/P99, aggregations por serviço/ambiente/período)
+- **Schema ClickHouse** — tabela `traces` (MergeTree, partition by toYYYYMM(timestamp)), `metrics` (SummingMergeTree), `logs` (ReplicatedMergeTree com TTL)
+- **`ClickHouseHealthCheck`** — health check integrado no `GET /api/v1/system/health`
+- Configuração via `appsettings`: `Analytics:Provider = "ClickHouse"` | `"Elasticsearch"` | `"InMemory"` (para testes)
+- Documentação de setup em `docs/observability/clickhouse-setup.md` com docker-compose snippet
+
+#### Configuração Wave Z
+
+| Key | Default | Sort | Descrição |
+|-----|---------|------|-----------|
+| `integrations.event_consumer.max_concurrent_consumers` | 4 | 11680 | Máximo de consumidores paralelos por tenant |
+| `integrations.event_consumer.dead_letter_max_attempts` | 3 | 11690 | Tentativas antes de mover para dead letter queue |
+| `integrations.event_consumer.processing_timeout_seconds` | 30 | 11700 | Timeout por evento antes de dead letter |
+| `sdk.platform_api.rate_limit_per_minute` | 300 | 11710 | Rate limit por token da Platform API |
+| `sdk.platform_api.max_page_size` | 100 | 11720 | Tamanho máximo de página nas queries do SDK |
+| `analytics.clickhouse.batch_size` | 1000 | 11730 | Tamanho do batch de ingestão para ClickHouse |
+| `analytics.clickhouse.flush_interval_seconds` | 5 | 11740 | Intervalo de flush do buffer de ingestão |
+| `analytics.clickhouse.default_ttl_days` | 90 | 11750 | TTL padrão dos dados analíticos em ClickHouse |
+
+#### i18n Wave Z
+
+Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
+- `eventConsumer.*` — estado e monitorização do event consumer worker
+- `sdkIntegration.*` — documentação inline e tooltips de configuração do SDK
+- `clickhouseProvider.*` — configuração e estado do provider ClickHouse
+
+**Totais estimados Wave Z:** Worker: ~25 testes. SDK: documentação + 2 packages. Configuração: +8 config keys (sort 11680–11750). i18n: +3 secções (4 locales). Novas migrations: 1 (EventConsumerDeadLetterRecords).
+
+---
+
 ### Priorização recomendada das Waves
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
@@ -1466,6 +1696,15 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 59. 🔲 **Wave W.1** — `GetRollbackPatternReport` — padrões de rollback por serviço: `RollbackPattern` Isolated/Recurring/Serial/None, `SystemicRisk` flag (Serial + baixa confidence), `EvidenceGap` flag (rollbacks com evidence packs incompletos), correlação com ChangeConfidenceBreakdown. CG. Config: `changes.rollback_pattern.*` sort 11440–11460.
 60. 🔲 **Wave W.2** — `GetServiceCouplingIndexReport` — índice de acoplamento entre serviços: `CouplingIndex` 0–100 por fan-in/fan-out, `CouplingTier` HubService/HighlyCoupled/ModeratelyCoupled/LooselyCoupled/Isolated, `ArchitecturalRisk` e `IsolationRisk` flags, % de serviços Isolated, CouplingIndex médio do tenant. Catalog. Config: `catalog.coupling_index.*` sort 11470–11490.
 61. 🔲 **Wave W.3** — `GetAnomalyDetectionSummaryReport` — sumário consolidado de anomalias: agrega WasteSignal + DriftFinding + SLO breaches + Chaos failures + VulnerabilityAdvisory + incidentes pós-deploy por serviço, `AnomalyDensity` Clean/Moderate/Dense/Critical, lista de serviços multi-anomaly, timeline diária de 30 pontos. OI. Config: `runtime.anomaly_summary.*` sort 11500–11510. **Wave W PLANEADA**.
+62. 🔲 **Wave X.1** — Executive Intelligence Dashboard — `ServiceHealthSummaryCard` + `ChangeConfidenceGauge` + `ComplianceCoverageWidget` + `FinOpsBudgetBurnWidget` + `TopRiskyServicesTable` + `MttrTrendMiniChart`. Persona Executive/CTO. Frontend. Config: `ui.executive_dashboard.*` sort 11520–11580.
+63. 🔲 **Wave X.2** — GraphQL & Protobuf Visual Studio — `GraphQlSchemaDiffViewer` + `GraphQlSchemaExplorer` + `ProtobufSchemaDiffViewer` + `ProtobufSchemaExplorer` no Contract Studio. Frontend. Config: `ui.contract_studio.*` sort 11540–11550.
+64. 🔲 **Wave X.3** — Persona-Aware Adaptive Navigation — reordenação de menu e quick actions por persona (`Engineer/TechLead/Architect/PlatformAdmin/Executive/Auditor`). Endpoint `GET /api/v1/identity/me/persona-config`. Frontend + Backend. Config: `ui.adaptive_navigation.*` sort 11560–11570. **Wave X PLANEADA**.
+65. 🔲 **Wave Y.1** — Agentic Runtime com Human-in-the-Loop — `AgentExecutionPlan` aggregate + `AgentStep` multi-type + `ApproveAgentStep` gate + budget enforcement + audit trail por passo. AIKnowledge/AIOrchestration. Config: `ai.agentic.*` sort 11600–11620.
+66. 🔲 **Wave Y.2** — NLP-based Model Routing — intent classifier leve (embedding) → `PromptIntent` enum → `ModelRoutingPolicy` entity + cost-aware downgrade automático + `GetModelRoutingDecisionLog`. AIKnowledge. Config: `ai.routing.*` sort 11630–11640.
+67. 🔲 **Wave Y.3** — AI Token Budget Attribution — `AiTokenUsageRecord` + `GetAiTokenBudgetReport` + `GetAiCostAttributionReport` + `AiBudgetPolicy` enforcement por tenant/equipa. AIKnowledge + FinOps. Config: `ai.budget.*` sort 11650–11670. **Wave Y PLANEADA**.
+68. 🔲 **Wave Z.1** — Kafka / Message Queue Consumer Real — `EventConsumerWorker` (`BackgroundService`) + `IEventNormalizationStrategy` por source type + dead letter queue + monitoring endpoint. Worker. Config: `integrations.event_consumer.*` sort 11680–11700.
+69. 🔲 **Wave Z.2** — SDK NexTrace — CLI `nexone` + NuGet `NexTrace.Sdk` + npm `nexone-sdk` + GitHub Action `nexone/change-confidence-gate@v1`. Developer tooling. Config: `sdk.platform_api.*` sort 11710–11720.
+70. 🔲 **Wave Z.3** — ClickHouse Analytics Provider — `IClickHouseAnalyticsWriter/Reader` adapter + schema MergeTree/SummingMergeTree + health check + `analytics.Provider` config switch. Infrastructure. Config: `analytics.clickhouse.*` sort 11730–11750. **Wave Z PLANEADA**.
 
 ### Riscos e recomendações transversais
 
@@ -1487,3 +1726,5 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 6. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
 7. **Waves pós-v1.0.0:** Secção 15 consolida Waves A/B/C/D com ADRs associados (ADR-007/008/009).
 8. **Waves S–W (planeadas):** 5 novas waves detalhadas na secção 15, cobrindo itens 47–61 da lista de priorização. Adicionam 40 config keys (sort 11120–11510), 5×3 secções i18n e estimativa de +150 testes distribuídos por CG/Catalog/OI.
+9. **Waves X–Z (planeadas):** 3 novas waves detalhadas na secção 15, cobrindo itens 62–70. Wave X: Frontend Intelligence (dashboards, visual builders, adaptive navigation). Wave Y: AI Governance Deep Dive (agentic runtime, NLP routing, token budget attribution). Wave Z: Integration Ecosystem Completion (Kafka consumer, SDK, ClickHouse). Adicionam 24 config keys (sort 11520–11750), 3×3–4 secções i18n.
+10. **Status das secções 1–12 revisto (Abril 2026):** §1.1 GraphQL e §1.2 Protobuf marcados como ✅ implementados (Waves G.3/H.1). §8.4 ML Correlation marcado como ✅ implementado (Wave A.5). §9.1 Compliance Packs marcado como ✅ parcialmente implementado (8 standards via Waves G–L). Tabela Priorização Recomendada actualizada para reflectir estado real.
