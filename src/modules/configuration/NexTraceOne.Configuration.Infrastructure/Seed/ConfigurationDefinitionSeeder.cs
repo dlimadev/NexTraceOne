@@ -8670,5 +8670,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "number",
             sortOrder: 11030),
+
+        // ── Wave R.1 — Incident-Change Correlation Report ─────────────────────
+        ConfigurationDefinition.Create(
+            key: "changes.incident_correlation.lookback_days",
+            displayName: "config.changes.incident_correlation.lookback_days.name",
+            description: "config.changes.incident_correlation.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11040),
+
+        ConfigurationDefinition.Create(
+            key: "changes.incident_correlation.top_services_count",
+            displayName: "config.changes.incident_correlation.top_services_count.name",
+            description: "config.changes.incident_correlation.top_services_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11050),
+
+        // ── Wave R.2 — API Schema Stability Report ────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "contracts.schema_stability.lookback_days",
+            displayName: "config.contracts.schema_stability.lookback_days.name",
+            description: "config.contracts.schema_stability.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11060),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.schema_stability.top_unstable_count",
+            displayName: "config.contracts.schema_stability.top_unstable_count.name",
+            description: "config.contracts.schema_stability.top_unstable_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11070),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.schema_stability.volatile_threshold",
+            displayName: "config.contracts.schema_stability.volatile_threshold.name",
+            description: "config.contracts.schema_stability.volatile_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "1",
+            uiEditorType: "number",
+            sortOrder: 11080),
+
+        // ── Wave R.3 — Team Operational Health Report ─────────────────────────
+        ConfigurationDefinition.Create(
+            key: "runtime.team_health.lookback_days",
+            displayName: "config.runtime.team_health.lookback_days.name",
+            description: "config.runtime.team_health.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11090),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.team_health.top_teams_count",
+            displayName: "config.runtime.team_health.top_teams_count.name",
+            description: "config.runtime.team_health.top_teams_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 11100),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.team_health.max_drift_penalty_per_service",
+            displayName: "config.runtime.team_health.max_drift_penalty_per_service.name",
+            description: "config.runtime.team_health.max_drift_penalty_per_service.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 11110),
     ];
 }
