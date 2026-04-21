@@ -137,7 +137,7 @@ Esta política aplica-se a **todas as waves V3.1–V3.9** e substitui qualquer s
 
 ## 3. Plano de Evolução v3
 
-O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave é auto-contido e entrega valor observável.
+O plano organiza-se em **12 waves** entregáveis de forma incremental (V3.1–V3.9 cobrem a fundação + extensibilidade + mobilidade; V3.10–V3.12 incrementam personas, Source-of-Truth Surfaces e consoles enterprise estratégicos). Cada wave é auto-contido e entrega valor observável.
 
 ---
 
@@ -404,7 +404,124 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 
 ---
 
+### WAVE V3.10 — Persona-first Experience Suites
+**Objetivo:** eliminar a "home genérica" e entregar experiências primárias **segmentadas por persona e por escopo organizacional**, conforme Copilot Instructions §6 (Engineer, Tech Lead, Architect, Product, Executive, Platform Admin, Auditor). Cada persona recebe uma *home* e *quick actions* pensadas para as suas decisões, sem clonar widgets entre personas apenas com filtros.
 
+> **Racional:** hoje a UI tem 130+ páginas feature-based mas não há um ponto de entrada que reflita o **papel funcional + escopo + ownership + ambiente** da persona. A consequência é que todos veem o mesmo produto e precisam navegar até ao valor. V3.10 inverte isso: o valor vem até à persona.
+
+#### Backend
+1. **Persona Home Resolver**
+   - Novo serviço `IPersonaHomeResolver` que, dado `(tenantId, environmentId, userId, persona, claims)`, devolve uma **composição de home** (top-level cards, quick actions, default scope) assente no aggregate `CustomDashboard` (system-owned, persona-tagged) + layout persistido.
+   - 7 dashboards system-owned, read-only por default, **cloneáveis por utilizador** (passam a user-owned sem perder origem).
+2. **Scope Resolver unificado**
+   - `IUserOperationalScopeResolver` resolve o escopo padrão da persona: teams próprias, serviços owned, domínios responsáveis, ambientes acessíveis. Alimenta todos os widgets por default (sem o utilizador filtrar).
+3. **Persona Quick Actions Registry**
+   - `IPersonaQuickActionsProvider` por persona, com ações ligadas a permissões reais (`change:approve`, `runbook:execute`, `contract:publish`, `policy:override-breakglass`, etc.). Apenas ações permitidas aparecem.
+
+#### Frontend — 7 suites entregáveis
+4. **Engineer Cockpit** — my on-call, my services health, open drifts on my services, failing SLOs on my services, incidents assigned, pending approvals I can execute, last deploys I made, runbooks para os meus serviços.
+5. **Tech Lead Team Command Center** — saúde das equipas que lidero (alinhado com `GetTeamOperationalHealthReport` Wave R.3, `GetTeamChangeVelocityReport` Wave M.2), ranking interno vs tenant, blockers de promotion, ownership gaps (Wave L.1), change window conformance (Wave S.1).
+6. **Architect Landscape View** — topology cross-domain, dependency risk (Wave I.3), service coupling (Wave W.2), contract adoption (Wave S.2), breaking changes recentes (GraphQL/Protobuf/OpenAPI/SOAP/AsyncAPI), API growth (Wave V.1), maturity distribution (Wave H.3).
+7. **Product Portfolio Home** — saúde de capacidades de negócio ligadas a serviços, entrega (velocity, release cadence), experiência (SLO compliance por produto), custo por produto (FinOps contextual Wave I.2/O.2), risco agregado.
+8. **Executive Brief Center** — 1-page weekly/monthly brief auto-gerado com: DORA tier tenant-wide (Wave K.3/S.3), compliance scorecard (waves G/H/I/J/K/L), FinOps trend (Wave O.2), risco agregado (Wave F.2/N.2), top incidentes, top changes, evidence pack coverage (Wave N.3). Export PDF agendado via SMTP (herdar V3.6).
+9. **Platform Admin Cockpit** — tenants, licensing & entitlements, integrações conectadas, event consumer status (Wave Z.1), AI token/budget utilização, audit volume, break glass ativos, access reviews pendentes, health de workers/hosts.
+10. **Auditor Console** — evidence packs por standard (SOC2/ISO27001/PCI/HIPAA/GDPR/CMMC/FedRAMP — waves G/H/I/J/K/L), integridade assinada (SLSA), trilha de auditoria pesquisável, break glass history, access reviews, policy violations, exports assinados com hash.
+
+#### Cross-cutting
+11. **Persona Switcher Governado** — utilizadores com múltiplos papéis podem alternar entre personas com re-resolve de home + re-scope + audit log de troca. Nunca cria permissão, apenas muda lente.
+12. **Persona Awareness em toda a UI** — `usePersonaContext()` disponível globalmente; widgets e páginas podem adaptar detalhe (densidade, granularidade métrica, linguagem) conforme persona, sem duplicação.
+
+#### Critérios de aceite
+- 7 suites publicadas, todas i18n em 4 locales, todas auditáveis, todas persona-aware.
+- Persona switcher sem elevação de privilégio (permissões continuam a ser verificadas no backend).
+- Default scope resolve em <200ms p95; re-scope em troca de environment/persona sem *flicker*.
+- Cobertura por persona: cada home apresenta ≥6 cards relevantes sem necessidade de customização.
+- Testes: ≥40 testes (resolver + scope + quick actions + renderização por persona).
+
+---
+
+### WAVE V3.11 — Source-of-Truth Consolidation Surfaces
+**Objetivo:** entregar **as superfícies que materializam o NexTraceOne como Source of Truth operacional**. Grande parte do trabalho backend já está feito (waves A–R concluídas) ou planeada (S–Z); o que falta é **transformar esses relatórios/scores em superfícies de decisão frontend coesas** — *não* como widgets isolados, mas como *Centers* dedicados, navegáveis e deep-linkáveis.
+
+> **Racional:** Copilot Instructions §§3.1, 5.1, 7.4, 9 e 26 exigem que Change, Contracts, Risk, FinOps e Compliance sejam **entidades de primeira classe** na UX — não só endpoints. V3.11 entrega cada uma como um **Center** dedicado.
+
+#### 11 Centers entregáveis
+1. **Compliance Scorecard Center** — consolida SOC2 (G.1), ISO27001 (G.2), PCI-DSS (H.2), HIPAA (I.1), GDPR (J.1), CMMC 2.0 (K.2), FedRAMP Moderate (L.2). Vista única por standard + consolidada; export PDF assinado por evidence pack; timeline de conformidade; gaps priorizados com ponteiros para mitigação.
+2. **Risk Center UX** — materializa Wave F.2 + N.2: heatmap por serviço/equipa, drivers de risco (vuln 40% / change_failure 25% / blast_radius 20% / policy 15%), top high-risk services, trend 30d, ações sugeridas por tipo de sinal.
+3. **FinOps Context Views** — materializa Waves I.2 + O.2 + V.3 (se concluído): custo por serviço/equipa/domínio/ambiente, anomalias (non-prod > prod, outliers P75), trend e delta período-a-período, top cost drivers, correlação custo × mudança × incidente. Nunca um "cloud cost dashboard" genérico — sempre contextual ao serviço.
+4. **Change Confidence Hub** — uma página por release com: score de confiança, blast radius (Wave Q.3), evidence pack integrity (incluindo SLSA), contract compatibility (OpenAPI/AsyncAPI/GraphQL/Protobuf/SOAP), post-change verification, incident correlation (Wave R.1), rollback recommendation (Wave J.3), promotion gates (Wave O.3). **Decisão de promover/bloquear/rollback feita aqui, com um clique governado.**
+5. **Release Calendar & Window Gate** — materializa Wave F.1 + S.1: calendário visual (day/week/month) com janelas Scheduled/Freeze/Hotfix/Maintenance, deploys planeados e executados, conformance por equipa, override com justificativa auditada, integração com approvals.
+6. **Rollback Intelligence Cockpit** — materializa Wave J.3: lista priorizada por urgency tier (None/Suggest/Recommend/Critical), detalhe do scoring, preview do impacto, 1-click rollback guiado (respeitando promotion gates inversos), timeline pós-rollback.
+7. **Blast Radius Explorer** — materializa Wave Q.3: visualizador interativo do grafo de impacto por release (consumidores diretos, indiretos, domínios, ambientes), buckets (Zero/Small/Medium/Large), comparação entre releases, what-if preview (ligação a Digital Twin — Wave D.1).
+8. **Evidence Pack Viewer** — reader dedicado para evidence packs: SLSA provenance (SlsaProvenanceUri), artifact digest, SBOM, cadeia de assinaturas, coverage (Wave N.3), export imutável. Primeiro consumidor é Auditor Console (V3.10.10).
+9. **Operational Readiness Board** — materializa Wave L.3: go/no-go visual por serviço para promoção a produção, 5 dimensões ponderadas (SLO 35% / Chaos 25% / Drift 20% / Profiling 10% / Baseline 10%), blockers explícitos com sugestão de ação, histórico.
+10. **Drift Center** — materializa Wave M.3 + Q.1: drifts abertos por serviço/ambiente, distribuição de severidade, desvios vs baseline (Wave Q.1), ack/resolve com audit, correlação com última mudança.
+11. **SLO Service Center + Chaos Engineering Lab + Post-Incident Learning Board** — três sub-surfaces combinando Waves J.2/N.1/S.3 (SLO compliance + ranking + MTTR trend DORA), Wave K.1/V.2 (chaos experiments + coverage gap), Wave T.1 (post-incident learning, recurring sem runbook). Cada uma deep-linkável e cross-filtrável com as outras via cross-filter da V3.3.
+
+#### Backend
+12. **Center Navigation Graph**
+    - Cada Center regista no `ISourceOfTruthNavigationGraph` as entidades que "possui" e as rotas de drill-down; AI Assistant (V3.4) usa este grafo para resolver referências em respostas (ex.: "mostra-me o blast radius da última release do Payment" → link direto para Blast Radius Explorer com contexto).
+13. **Cross-Center Deep Links** — URLs canônicos estáveis com preservação de tenant/env/persona/time-range/scope, partilháveis.
+
+#### Critérios de aceite
+- 11 Centers publicados, cada um com: EmptyState, LoadingState, ErrorState, i18n 4 locales, persona-aware, env-aware, tenant-aware.
+- AI Assistant consegue resolver referências cross-Center via `ISourceOfTruthNavigationGraph`.
+- Deep links sobrevivem refresh, re-login (quando autorizados) e partilha.
+- Testes: ≥60 testes.
+
+---
+
+### WAVE V3.12 — Contract Studio Visual, AI Agents, IDE Console & Admin Consoles
+**Objetivo:** completar superfícies enterprise estratégicas: edição visual governada de contratos (todos os tipos), gestão de agentes de IA próprios, console de integração IDE (VS/VS Code), Break Glass/JIT cockpit, Licensing & Entitlements Admin e bridge formal Knowledge Hub ↔ Notebooks ↔ Runbooks.
+
+> **Racional:** Copilot Instructions §§7.3, 7.7, 11, 12, 16.4, 17 — todos estes domínios têm backend forte ou em evolução, mas UX ainda é fragmentado, principalmente para Platform Admin, Architect e Product.
+
+#### 12.1 Contract Studio Visual Builders (todos os tipos)
+1. **REST/OpenAPI Visual Designer** — editor split (visual ← → OpenAPI 3.1 YAML/JSON no Monaco), validação contínua, linting governado por policies (V3.6), diff semântico em tempo real vs versão publicada, exemplos sincronizados, publication workflow com approval.
+2. **AsyncAPI 3.x Visual Designer** — canais, mensagens, bindings (Kafka/AMQP/SNS/SQS/WebSocket), schemas (Avro/JSON Schema/Protobuf), consumer expectations (Wave A.2 / Q.2), compatibility check.
+3. **SOAP/WSDL Visual Designer** — operations, messages, types, bindings; import/export WSDL; generation de XSD canónico; mapping para consumidores internos.
+4. **GraphQL Schema Builder** — SDL editor + visual (types/queries/mutations/subscriptions), breaking change detection (Wave G.3), deprecation workflow.
+5. **Protobuf Builder** — .proto editor + visual (messages/services/rpcs), breaking change detection (Wave H.1), compatibility (wire + semantic).
+6. **Unified Publication Center** — fluxo único independente do tipo: draft → review → approved → locked → published; evidence pack automático com hash + signer + policy check.
+
+#### 12.2 AI Agent Marketplace (interno governado)
+7. **Agent Registry UI** — lista de agentes system-provided (Contract Composer, Investigation Agent, Rollback Advisor, Test Scenario Generator, Incident Summarizer, Compliance Explainer) + agentes tenant-custom.
+8. **Agent Builder** — wizard para criar agentes próprios: prompt template, knowledge sources permitidos (governados), tools permitidos, modelo permitido por política, budget de tokens, escopo (tenant/team/persona), audit.
+9. **AI Token & Budget Governance Console** — consumo por agente/utilizador/persona/modelo, quotas, alertas de budget, bloqueio automático, trilha de auditoria (alinhado com §11.3/11.5).
+10. **External AI Integration Console** — providers (OpenAI/Azure/Anthropic/local) sob política por tenant/ambiente; data egress redaction policies visíveis e auditáveis.
+
+#### 12.3 IDE Extensions Console (§12)
+11. **IDE Extensions Admin** — gestão das extensões NexTraceOne para Visual Studio e VS Code: versões, enrollment de developers, scopes permitidos (read-only, contract-edit, AI-assist), auditoria de uso no IDE, revogação.
+12. **Developer Enrollment UX** — página self-service para o Engineer instalar a extensão, linkar conta OIDC, escolher persona no IDE, ver budget AI restante, abrir Source of Truth a partir do IDE.
+
+#### 12.4 Break Glass & JIT Access Cockpit (§16.4)
+13. **Break Glass Request UX** — solicitar acesso emergencial com justificativa, aprovador on-call, expiração compulsória, gravação de sessão, audit visível ao Auditor imediato.
+14. **JIT Privileged Access UX** — pedir elevação temporária com approval chain definido por policy; acompanhamento em tempo real e revogação.
+15. **Delegated Access Manager** — delegação a cobrir férias/sair do turno, com expiração e revogação.
+16. **Access Review Workflows UI** — campanhas periódicas de revisão, confirmações, revogações em massa auditadas.
+
+#### 12.5 Licensing & Entitlements Admin (§17)
+17. **License Overview** — status online/offline, expiração, entitlements ativos (features habilitadas), machine fingerprint, heartbeat status, histórico de ativações.
+18. **Entitlement Matrix** — visão por módulo/feature de quais planos habilitam o quê; preview de upgrade; trial activation UX.
+19. **Offline License Manager** — geração de token offline para ambientes air-gapped (alinhado Wave C.4), import/export do bundle assinado.
+
+#### 12.6 Knowledge Hub ↔ Notebooks ↔ Runbooks Bridge
+20. **Unified Knowledge Graph UX** — busca e navegação única entre docs governadas, runbooks, notebooks, operational notes, changelog; tags de freshness (Wave B.4) visíveis; `ProposedRunbook` com aprovação inline.
+21. **"Convert to Runbook"** a partir de Notebook (V3.4) com aprovação humana; "Open Runbook" a partir de Incident/Change; "Attach Knowledge" em qualquer widget.
+
+#### 12.7 Dashboards-as-Code GitOps Console
+22. **DaC Sync UI** — conectar repo Git (GitHub/GitLab/Azure DevOps), preview de diffs antes de apply, rollback a commit anterior, visualizar drift entre repo e plataforma, conflict resolution assistida.
+
+#### Critérios de aceite
+- Os 5 builders de contrato partilham a mesma shell, o mesmo publication workflow e a mesma política de evidência.
+- Agent Marketplace respeita AI Governance total (§11) — nenhum agente utilizável fora de política.
+- IDE console audita 100% das sessões; revogação propaga ≤5s.
+- Break Glass/JIT nunca bypass de audit; gravação imutável por tenant policy.
+- License Admin funciona em modo online e offline/air-gapped.
+- DaC roundtrip (Git ↔ plataforma) preserva 100% e mostra diff humano-legível.
+- Testes: ≥70 testes (builders + agents + IDE + access + licensing + DaC).
+
+---
 
 ### 4.1 Backend
 - **Módulo**: Custom Dashboards permanecem no `Governance` (aggregate root `CustomDashboard`); Notebooks podem ser novo submódulo `Governance.Notebooks` mantendo fronteira clara.
@@ -441,6 +558,9 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 7. **V3.7 Real-time Collaboration** → requer fundação de partilha granular (V3.1) e auditoria.
 8. **V3.8 Marketplace & Plugin SDK** → requer Widget SDK interno estável (V3.2) e governance (V3.6).
 9. **V3.9 Advanced NQL + Alerting + Mobile On-Call** → consolida o ciclo observação → ação → mobilidade.
+10. **V3.10 Persona-first Experience Suites** → pode começar em paralelo desde a V3.1 (depende apenas de `CustomDashboard` + persona claims), mas floresce após V3.2 (variables) e V3.3 (cross-filter/drill-down) estarem disponíveis.
+11. **V3.11 Source-of-Truth Consolidation Surfaces** → deve começar só após V3.1/V3.2/V3.3 estabilizadas e das waves backend A–R estarem em produção; cada Center é entregável independentemente, respeitando ordem de negócio (Compliance → Risk → Change Confidence → Release Calendar → FinOps → restantes).
+12. **V3.12 Contract Studio Visual + AI Agents + IDE + Admin Consoles** → trilho independente (não bloqueia V3.1–V3.11); os 7 subtrilhos (12.1–12.7) podem ser paralelizados entre equipas distintas.
 
 **Trilhos paralelos** viáveis:
 - Trilho A (Dashboards core): V3.1 → V3.2 → V3.3 → V3.4
@@ -448,6 +568,8 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 - Trilho C (Governance/Enterprise): V3.6 — inicia após V3.2 estar estável
 - Trilho D (Extensibilidade & colaboração): V3.7 → V3.8 — inicia após V3.1/V3.2/V3.6 estáveis
 - Trilho E (Ciclo de ação + mobilidade): V3.9 — inicia após V3.2/V3.3 estáveis
+- **Trilho F (Persona & Source of Truth surfaces): V3.10 → V3.11 — inicia após V3.1 e pode correr paralelo a V3.4/V3.5/V3.6**
+- **Trilho G (Contract Studio + AI Agents + IDE + Admin): V3.12 — totalmente independente; pode arrancar cedo com subtrilhos priorizados por urgência de negócio (Contract Studio e Licensing primeiro)**
 
 ---
 
@@ -467,6 +589,13 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 | Segurança | Violações CodeQL críticas | 0 |
 | Acessibilidade | Violações axe críticas | 0 |
 | i18n | Cobertura de keys por locale | 100% (4 locales) |
+| **Persona fit (V3.10)** | % de utilizadores que usam a sua *Persona Home* como ponto de entrada principal | **≥70%** |
+| **Source of Truth adoption (V3.11)** | % de decisões de promoção/rollback tomadas via Change Confidence Hub vs fora da plataforma | **≥80%** |
+| **Compliance time-to-report** | Tempo mediano para produzir report assinado de um standard (SOC2/ISO/PCI/HIPAA/GDPR/CMMC/FedRAMP) | **<10 minutos** |
+| **Contract Studio adoption (V3.12.1)** | % de contratos novos criados via Visual Designer (vs import puro) | **≥50%** |
+| **AI Agent governance (V3.12.2)** | % de invocações de IA por agentes registrados (vs prompts ad-hoc) | **≥85%** |
+| **IDE usage governance (V3.12.3)** | % de developers com extensão IDE ativa e audit trail completo | **≥60%** |
+| **Break Glass safety** | % de sessões Break Glass com gravação + audit + expiração cumprida | **100%** |
 
 ---
 
@@ -484,6 +613,14 @@ O plano organiza-se em **6 waves** entregáveis de forma incremental. Cada wave 
 | Colaboração em tempo real com conflitos de edição | CRDT para layout e texto; locking otimista para widgets pesados; histórico versionado (V3.1) |
 | PWA on-call pode expor dados sensíveis em dispositivo perdido | Tokens curtos; wipe remoto por admin; modo kiosk/read-only por default; redação conforme policy |
 | Scope creep em "Frontend Uplift" | Budget fixo de waves; backlog explícito rolado para a próxima major |
+| **V3.10 Persona homes podem virar "mais um dashboard" genérico** | Governar system-owned com review de Product; obrigar `IUserOperationalScopeResolver` como fonte do escopo padrão (não flexibilizar); limitar widgets repetidos entre personas (regra lint); auditoria de satisfação por persona. |
+| **V3.11 pode gerar 11 Centers dispersos sem narrativa** | Definir "Source of Truth Navigation Graph" antes do 1º Center; exigir deep-link canônico, EmptyState e 4 locales em cada um; cada Center tem Product owner nomeado. |
+| **V3.12 Contract Studio pode vazar lógica de domínio para o frontend** | Parsing/validação permanecem no backend (`Catalog` + `BuildingBlocks`); UI faz apenas apresentação e orquestração de policies; regra de revisão PR obrigatória. |
+| **Agentes de IA custom podem escapar à governança** | `IAgentRegistry` centralizado; nenhum agente executa fora do registry; budget+audit+model policy aplicados no gateway de IA, não no agente; bloqueio se política ausente. |
+| **IDE Extensions expondo Source of Truth fora da plataforma** | Enrollment OIDC obrigatório; scopes granulares no servidor; session tokens curtos e revogáveis; audit de cada chamada IDE → plataforma; data egress redaction conforme tenant policy. |
+| **Break Glass/JIT pode ser usado como atalho sem justificativa real** | Policy obrigatoriamente exige justificativa livre + approver on-call + gravação; review periódica das sessões; flag automático para padrões suspeitos. |
+| **Licensing offline pode ser contornado em ambientes air-gapped** | Machine fingerprint + assinatura do bundle + assembly integrity; heartbeat local assinado; revogação via próximo bundle; alinhado Copilot Instructions §17. |
+| **DaC Git↔plataforma pode gerar drift silencioso** | Sync job detecta drift e cria alerta em Risk Center; apply obrigatoriamente passa por aprovação quando tenant policy exigir. |
 
 ---
 
@@ -496,7 +633,7 @@ Ficam conscientemente de fora **apenas** os itens que não representam evoluçã
 - **Marketplace público aberto à internet (monetização/third-party público não revisto)** — a v3 entrega galeria/marketplace **interno e governado** (V3.8). Marketplace público não governado fica explicitamente fora por risco de segurança e curadoria até um programa formal de ISVs existir.
 - **Gamer/sci-fi/cyberpunk visual styling** — conforme Copilot Instructions §18.2.
 
-> **Nota:** todas as capacidades que anteriormente podiam parecer "adiáveis" — micro-frontends, marketplace/template gallery, plugin SDK externo, colaboração em tempo real, mobile companion (PWA), NQL avançado, alerting from widget — foram **absorvidas pelas waves V3.7, V3.8 e V3.9** por representarem evolução real e estratégica alinhada à visão do produto.
+> **Nota:** todas as capacidades que anteriormente podiam parecer "adiáveis" — micro-frontends, marketplace/template gallery, plugin SDK externo, colaboração em tempo real, mobile companion (PWA), NQL avançado, alerting from widget, **persona homes dedicadas, Compliance/Risk/FinOps/Change-Confidence Centers, Contract Studio visual, AI Agent Marketplace interno, IDE Extensions Console, Break Glass/JIT cockpit, Licensing & Entitlements Admin, Dashboards-as-Code GitOps** — foram **absorvidas pelas waves V3.7, V3.8, V3.9, V3.10, V3.11 e V3.12** por representarem evolução real e estratégica alinhada à visão do produto.
 
 ---
 
@@ -510,9 +647,14 @@ Ficam conscientemente de fora **apenas** os itens que não representam evoluçã
 - `src/frontend/src/features/governance/pages/DashboardViewPage.tsx` — viewer.
 - `src/frontend/src/features/governance/widgets/WidgetRegistry.ts` — registry atual (19 widgets).
 - `docs/FRONTEND-ARCHITECTURE.md`, `docs/DESIGN-SYSTEM.md`, `docs/UX-PRINCIPLES.md`, `docs/PERSONA-UX-MAPPING.md`.
-- `docs/AI-GOVERNANCE.md`, `docs/AI-ARCHITECTURE.md` — para Wave V3.4.
-- `docs/SECURITY-ARCHITECTURE.md` — para Wave V3.6 (public/embed).
-- `docs/FUTURE-ROADMAP.md` — este plano estende e detalha a vertente de "Dashboards & Frontend".
+- `docs/AI-GOVERNANCE.md`, `docs/AI-ARCHITECTURE.md` — para Wave V3.4 e V3.12.2 (AI Agent Marketplace, Token/Budget Governance).
+- `docs/SECURITY-ARCHITECTURE.md` — para Wave V3.6 (public/embed) e V3.12.4 (Break Glass/JIT).
+- `docs/FUTURE-ROADMAP.md` — este plano estende e detalha a vertente de "Dashboards & Frontend" (ver Wave AA — V3 Frontend Evolution).
+- `docs/LICENSING-ARCHITECTURE.md` (se existente) / Copilot Instructions §17 — para Wave V3.12.5.
+- `docs/INTEGRATIONS-ARCHITECTURE.md`, `docs/IDE-EXTENSIONS.md` (a criar se não existente) — para Wave V3.12.3 (IDE Extensions Console).
+- `docs/SOURCE-OF-TRUTH-STRATEGY.md` — para Wave V3.11 (Source-of-Truth Navigation Graph).
+- Waves backend A–R concluídas (ver `IMPLEMENTATION-STATUS.md`) — fornecem dados para Wave V3.11 Centers.
+- Waves backend S–Z planeadas (`FUTURE-ROADMAP.md`) — completam dados para V3.10/V3.11/V3.12.
 
 ---
 
@@ -522,7 +664,11 @@ Ficam conscientemente de fora **apenas** os itens que não representam evoluçã
 2. Transformar **Wave V3.1** em backlog executável (ADRs para `DashboardRevision`, `SharingPolicy`, `DashboardVariable`).
 3. Iniciar em paralelo o trilho **V3.5.1** (Design Tokens v2 + Storybook) — de baixo risco e alto retorno.
 4. Criar spike técnico para NQL (V3.2) com protótipo fechado em 1 módulo (Catalog) antes de generalizar.
-5. Atualizar `FUTURE-ROADMAP.md` com ponteiro para este documento.
+5. Atualizar `FUTURE-ROADMAP.md` com ponteiro para este documento. ✅ (Wave AA adicionada em Abril 2026.)
+6. **Priorizar desenho das 7 Persona Homes (V3.10)** com Product Design + representantes de cada persona — entregar duas primeiras homes (Engineer Cockpit + Executive Brief Center) ainda dentro do ciclo V3.1/V3.5 como *proof of value*.
+7. **Escolher ordem dos 11 Centers da V3.11** com base em valor de negócio: sugestão inicial — Compliance Scorecard Center → Change Confidence Hub → Risk Center → Release Calendar → FinOps Views → restantes.
+8. **Criar ADR "Source-of-Truth Navigation Graph"** (V3.11.12) antes de qualquer Center entrar em desenvolvimento — é fundação para deep-links canônicos e para a integração com AI Assistant.
+9. **Separar V3.12 em sub-épicos independentes** (12.1–12.7) com Product owner por sub-épico; Contract Studio Visual (12.1) e Licensing Admin (12.5) são candidatos a arrancar cedo por destrave comercial.
 
 ---
 
