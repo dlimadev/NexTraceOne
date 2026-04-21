@@ -13687,5 +13687,80 @@
       "serviceNotFound": "Service not found.",
       "computationFailed": "Failed to compute maturity score."
     }
+  },
+  "hipaaCompliance": {
+    "title": "HIPAA Security Rule Compliance Report",
+    "subtitle": "HIPAA Security Rule compliance status based on change management, audit trail and evidence packs.",
+    "controls": {
+      "accessControl": "Access Control",
+      "auditControls": "Audit Controls",
+      "integrity": "Integrity",
+      "authentication": "Person/Entity Authentication",
+      "transmissionSecurity": "Transmission Security"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "HIPAA compliance reporting is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "serviceCostAllocation": {
+    "title": "Service Cost Allocation",
+    "subtitle": "Contextual FinOps report: operational cost allocated by service, team, domain and environment.",
+    "categories": {
+      "Compute": "Compute",
+      "Storage": "Storage",
+      "Network": "Network",
+      "Licensing": "Licensing",
+      "Observability": "Observability",
+      "Other": "Other"
+    },
+    "grandTotal": "Grand Total (USD)",
+    "totalRecords": "Total Records",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Period (days)",
+    "ingest": {
+      "success": "Cost record ingested successfully.",
+      "invalidPeriod": "Period end must be after period start.",
+      "negativeAmount": "Amount must be non-negative."
+    },
+    "insights": {
+      "title": "FinOps Insights",
+      "subtitle": "Cost anomalies and optimization opportunities detected for this period.",
+      "types": {
+        "CostOutlier": "Cost Outlier",
+        "NonProdExceedsProd": "Non-Prod Exceeds Prod",
+        "CategoryGrowth": "Category Growth"
+      },
+      "noInsights": "No cost anomalies detected for this period."
+    }
+  },
+  "dependencyRisk": {
+    "title": "Dependency Risk Report",
+    "subtitle": "Graph-based risk scoring for services: tier, API fan-in and ownership governance gaps.",
+    "riskLevels": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "overallRisk": "Overall Graph Risk",
+    "highRiskCount": "High/Critical Risk Services",
+    "totalAnalyzed": "Services Analyzed",
+    "service": "Service",
+    "tier": "Tier",
+    "owner": "Owner Team",
+    "riskScore": "Risk Score",
+    "apiCount": "APIs Exposed",
+    "riskFactors": "Risk Factors",
+    "errors": {
+      "noServices": "No services found for the specified filter.",
+      "tenantRequired": "Tenant ID is required."
+    }
   }
 }

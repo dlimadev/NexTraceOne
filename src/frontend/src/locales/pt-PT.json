@@ -13694,4 +13694,80 @@
       "serviceNotFound": "Serviço não encontrado.",
       "computationFailed": "Falha ao calcular o score de maturidade."
     }
+  },
+  "hipaaCompliance": {
+    "title": "Relatório de Conformidade HIPAA Security Rule",
+    "subtitle": "Estado de conformidade com a HIPAA Security Rule baseado em gestão de mudanças, trilha de auditoria e pacotes de evidência.",
+    "controls": {
+      "accessControl": "Controlo de Acesso",
+      "auditControls": "Controlos de Auditoria",
+      "integrity": "Integridade",
+      "authentication": "Autenticação de Pessoa/Entidade",
+      "transmissionSecurity": "Segurança de Transmissão"
+    },
+    "overallStatus": "Estado Geral",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Pacotes de Evidência Assinados",
+    "totalEvidencePacks": "Total de Pacotes de Evidência",
+    "generatedAt": "Relatório Gerado Em",
+    "periodDays": "Período de Avaliação (dias)",
+    "errors": {
+      "notEnabled": "O relatório de conformidade HIPAA não está habilitado para este tenant.",
+      "invalidPeriod": "O período de avaliação deve ser entre 1 e 365 dias."
+    }
+  },
+  "serviceCostAllocation": {
+    "title": "Alocação de Custo por Serviço",
+    "subtitle": "Relatório FinOps contextual: custo operacional alocado por serviço, equipa, domínio e ambiente.",
+    "categories": {
+      "Compute": "Computação",
+      "Storage": "Armazenamento",
+      "Network": "Rede",
+      "Licensing": "Licenciamento",
+      "Observability": "Observabilidade",
+      "Other": "Outro"
+    },
+    "grandTotal": "Total Geral (USD)",
+    "totalRecords": "Total de Registos",
+    "generatedAt": "Relatório Gerado Em",
+    "periodDays": "Período (dias)",
+    "ingest": {
+      "success": "Registo de custo ingestado com sucesso.",
+      "invalidPeriod": "O fim do período deve ser posterior ao início.",
+      "negativeAmount": "O valor deve ser não-negativo."
+    },
+    "insights": {
+      "title": "Insights FinOps",
+      "subtitle": "Anomalias de custo e oportunidades de otimização detetadas para este período.",
+      "types": {
+        "CostOutlier": "Outlier de Custo",
+        "NonProdExceedsProd": "Não-Prod Supera Prod",
+        "CategoryGrowth": "Crescimento de Categoria"
+      },
+      "noInsights": "Nenhuma anomalia de custo detetada para este período."
+    }
+  },
+  "dependencyRisk": {
+    "title": "Relatório de Risco de Dependências",
+    "subtitle": "Pontuação de risco baseada no grafo: tier, fan-in de APIs e lacunas de governance de ownership.",
+    "riskLevels": {
+      "Low": "Baixo",
+      "Medium": "Médio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "overallRisk": "Risco Global do Grafo",
+    "highRiskCount": "Serviços de Alto/Crítico Risco",
+    "totalAnalyzed": "Serviços Analisados",
+    "service": "Serviço",
+    "tier": "Tier",
+    "owner": "Equipa Owner",
+    "riskScore": "Score de Risco",
+    "apiCount": "APIs Expostas",
+    "riskFactors": "Fatores de Risco",
+    "errors": {
+      "noServices": "Nenhum serviço encontrado para o filtro especificado.",
+      "tenantRequired": "O ID de tenant é obrigatório."
+    }
   }
+}

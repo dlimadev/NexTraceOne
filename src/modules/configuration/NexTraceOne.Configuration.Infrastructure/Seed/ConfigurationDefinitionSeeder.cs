@@ -7853,5 +7853,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "true",
             uiEditorType: "toggle",
             sortOrder: 10310),
+
+        // ── Wave I.1 — HIPAA Compliance Report ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.hipaa.evaluation.default_days",
+            displayName: "config.compliance.hipaa.evaluation.default_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.hipaa.evaluation.default_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10320),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.hipaa.integrity.require_signed_evidence",
+            displayName: "config.compliance.hipaa.integrity.require_signed_evidence.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.hipaa.integrity.require_signed_evidence.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10330),
+
+        // ── Wave I.2 — FinOps Contextual (ServiceCostAllocation) ────────────
+        ConfigurationDefinition.Create(
+            key: "finops.cost_allocation.default_period_days",
+            displayName: "config.finops.cost_allocation.default_period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.cost_allocation.default_period_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10340),
+
+        ConfigurationDefinition.Create(
+            key: "finops.insights.outlier_percentile",
+            displayName: "config.finops.insights.outlier_percentile.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.insights.outlier_percentile.description",
+            defaultValue: "75",
+            uiEditorType: "number",
+            sortOrder: 10350),
+
+        ConfigurationDefinition.Create(
+            key: "finops.insights.growth_alert_threshold_percent",
+            displayName: "config.finops.insights.growth_alert_threshold_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.insights.growth_alert_threshold_percent.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10360),
+
+        // ── Wave I.3 — Dependency Risk Report ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "dependency.risk.critical_tier.base_score",
+            displayName: "config.dependency.risk.critical_tier.base_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.dependency.risk.critical_tier.base_score.description",
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 10370),
+
+        ConfigurationDefinition.Create(
+            key: "dependency.risk.no_owner.penalty_score",
+            displayName: "config.dependency.risk.no_owner.penalty_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.dependency.risk.no_owner.penalty_score.description",
+            defaultValue: "15",
+            uiEditorType: "number",
+            sortOrder: 10380),
+
+        ConfigurationDefinition.Create(
+            key: "dependency.risk.report.max_services",
+            displayName: "config.dependency.risk.report.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.dependency.risk.report.max_services.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10390),
     ];
 }
