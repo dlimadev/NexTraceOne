@@ -931,7 +931,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
-### Wave S — Change Window Utilization + Contract Adoption + MTTR Trend
+### Wave S — Change Window Utilization + Contract Adoption + MTTR Trend ✅
 
 **Objetivo:** Fechar o loop entre Release Calendar e conformidade de deployment, medir a velocidade de adoção de versões de contrato pelos consumidores, e introduzir análise de tendência de MTTR (Mean Time To Restore) por serviço.
 
@@ -1021,7 +1021,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `contractAdoption.*` — adoção de versões de contratos por consumidores
 - `mttrTrend.*` — tendência de Mean Time To Restore
 
-**Totais estimados Wave S:** CG: ~867 testes (+15). Catalog: ~1873 testes (+12). OI: ~1179 testes (+18). Configuração: +8 config keys (sort 11120–11190). i18n: +3 secções (4 locales).
+**Totais reais Wave S:** CG: 866 testes (+14). Catalog: 1873 testes (+12). OI: 1178 testes (+17). Configuração: +8 config keys (sort 11120–11190). i18n: +3 secções (4 locales). **Wave S COMPLETA.**
 
 ---
 
@@ -1681,9 +1681,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 45. ✅ **Wave R.2** — `GetApiSchemaStabilityReport` — estabilidade de schemas de API por frequência de changelogs. Agrega entradas de `ContractChangelog` no período por `ApiAssetId` via `ListByTenantInPeriodAsync`. Classifica estabilidade em `SchemaStabilityTier` (Stable=0 / Volatile≥1 / Unstable≥3 / Critical≥6). Produz: total de contratos com alterações, avg e max de changelogs por contrato, distribuição por tier, top contratos mais instáveis e mais estáveis. Adicionado `ListByTenantInPeriodAsync` a `IContractChangelogRepository` e implementação correspondente no repositório de infraestrutura. Catalog: 1861 testes (+16). Config: `contracts.schema_stability.*` sort 11060–11080.
 
 46. ✅ **Wave R.3** — `GetTeamOperationalHealthReport` — scorecard composto de saúde operacional por equipa. Usa nova abstração `ITeamOperationalMetricsReader` para obter métricas pré-agregadas por equipa (ServiceCount, SloComplianceRatePct, UnacknowledgedDriftCount, ChaosSuccessRatePct, ServicesWithProfilingCount, PostDeployIncidentCount). Computa score ponderado: SLO 40% + Drift 30% + Chaos 20% + Profiling 10%. Classifica em `OperationalHealthTier` (Excellent ≥90 / Good ≥70 / Fair ≥50 / Poor <50). Produz: média do tenant, distribuição por tier, top equipas saudáveis e em risco, ranking completo. OI: 1161 testes (+23). Config: `runtime.team_health.*` sort 11090–11110. **WAVE R COMPLETO**.
-47. 🔲 **Wave S.1** — `GetChangeWindowUtilizationReport` — conformidade de janelas de mudança: taxa de deploys dentro vs. fora de janela (Scheduled/HotfixAllowed), top equipas não-conformes, classificação Excellent/Good/AtRisk. Aprofunda Release Calendar (Wave F) como mecanismo de governance de deployment. CG. Config: `changes.window_utilization.*` sort 11120–11140.
-48. 🔲 **Wave S.2** — `GetContractAdoptionReport` — progresso de migração de versões de contrato pelos consumidores: taxa de adoção da versão mais recente por contrato, `MigrationTier` (Complete/InProgress/Lagging/NoConsumers), versão mais antiga ainda em uso, top contratos com migração mais lenta. Catalog. Config: `contracts.adoption.*` sort 11150–11170.
-49. 🔲 **Wave S.3** — `GetMttrTrendReport` — tendência de MTTR por serviço: classificação DORA (Elite/High/Medium/Low), série temporal diária (30 pontos), tendência Worsening/Improving/Stable/Insufficient, top serviços com pior MTTR e maior pioria. OI. Config: `runtime.mttr.*` sort 11180–11190. **Wave S PLANEADA**.
+47. ✅ **Wave S.1** — `GetChangeWindowUtilizationReport` — conformidade de janelas de mudança: taxa de deploys dentro vs. fora de janela (Scheduled/HotfixAllowed), top equipas não-conformes, classificação Excellent/Good/AtRisk. Aprofunda Release Calendar (Wave F) como mecanismo de governance de deployment. CG. Config: `changes.window_utilization.*` sort 11120–11140.
+48. ✅ **Wave S.2** — `GetContractAdoptionReport` — progresso de migração de versões de contrato pelos consumidores: taxa de adoção da versão mais recente por contrato, `MigrationTier` (Complete/InProgress/Lagging/NoConsumers), versão mais antiga ainda em uso, top contratos com migração mais lenta. Catalog. Config: `contracts.adoption.*` sort 11150–11170.
+49. ✅ **Wave S.3** — `GetMttrTrendReport` — tendência de MTTR por serviço: classificação DORA (Elite/High/Medium/Low), série temporal diária (30 pontos), tendência Worsening/Improving/Stable/Insufficient, top serviços com pior MTTR e maior pioria. OI. Config: `runtime.mttr.*` sort 11180–11190. **Wave S COMPLETA.**
 50. 🔲 **Wave T.1** — `GetPostIncidentLearningReport` — taxa de aprendizado pós-incidente: % de incidentes com runbook aprovado pós-evento, incidentes recorrentes sem documentação (`LearningCoverage`: Full/Partial/Low), top serviços com menor learning rate. CG. Config: `compliance.learning.*` sort 11200–11220.
 51. 🔲 **Wave T.2** — `GetApiSchemaCoverageReport` — completude de documentação de schemas de API: score por 4 dimensões (response body, request body, exemplos, status codes), `CoverageGrade` A/B/C/D por contrato, distribuição global, top contratos com menor cobertura. Catalog. Config: `contracts.schema_coverage.*` sort 11230–11250.
 52. 🔲 **Wave T.3** — `GetEnvironmentStabilityReport` — score de estabilidade comparado por ambiente (dev/staging/prod): 4 dimensões ponderadas (SLO/Drift/Chaos/incident correlation), `StabilityTier` Stable/Unstable/Critical, flag de alerta "non-prod mais instável que prod", top serviços desestabilizadores. OI. Config: `runtime.environment_stability.*` sort 11260–11270. **Wave T PLANEADA**.
@@ -1725,6 +1725,6 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 5. **~98% do produto está implementado** — este roadmap cobre os ~2% restantes + evolução futura. A lista consolidada de gaps abertos está em [HONEST-GAPS.md](./HONEST-GAPS.md).
 6. **Customização da plataforma:** Plano detalhado em [PLATFORM-CUSTOMIZATION-EVOLUTION.md](./PLATFORM-CUSTOMIZATION-EVOLUTION.md)
 7. **Waves pós-v1.0.0:** Secção 15 consolida Waves A/B/C/D com ADRs associados (ADR-007/008/009).
-8. **Waves S–W (planeadas):** 5 novas waves detalhadas na secção 15, cobrindo itens 47–61 da lista de priorização. Adicionam 40 config keys (sort 11120–11510), 5×3 secções i18n e estimativa de +150 testes distribuídos por CG/Catalog/OI.
+8. **Wave S (completa):** S.1 `GetChangeWindowUtilizationReport` + S.2 `GetContractAdoptionReport` + S.3 `GetMttrTrendReport`. CG: 866/Catalog: 1873/OI: 1178 testes. +8 config keys (sort 11120–11190). **Wave T–W (planeadas):** 4 waves detalhadas na secção 15, cobrindo itens 50–61 da lista de priorização. Adicionam 32 config keys (sort 11200–11510), 4×3 secções i18n e estimativa de +120 testes distribuídos por CG/Catalog/OI.
 9. **Waves X–Z (planeadas):** 3 novas waves detalhadas na secção 15, cobrindo itens 62–70. Wave X: Frontend Intelligence (dashboards, visual builders, adaptive navigation). Wave Y: AI Governance Deep Dive (agentic runtime, NLP routing, token budget attribution). Wave Z: Integration Ecosystem Completion (Kafka consumer, SDK, ClickHouse). Adicionam 24 config keys (sort 11520–11750), 3×3–4 secções i18n.
 10. **Status das secções 1–12 revisto (Abril 2026):** §1.1 GraphQL e §1.2 Protobuf marcados como ✅ implementados (Waves G.3/H.1). §8.4 ML Correlation marcado como ✅ implementado (Wave A.5). §9.1 Compliance Packs marcado como ✅ parcialmente implementado (8 standards via Waves G–L). Tabela Priorização Recomendada actualizada para reflectir estado real.

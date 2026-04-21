@@ -8761,5 +8761,96 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "5",
             uiEditorType: "number",
             sortOrder: 11110),
+
+        // ── Wave S.1 — Change Window Utilization Report ───────────────────────
+        ConfigurationDefinition.Create(
+            key: "changes.window_utilization.lookback_days",
+            displayName: "config.changes.window_utilization.lookback_days.name",
+            description: "config.changes.window_utilization.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11120),
+
+        ConfigurationDefinition.Create(
+            key: "changes.window_utilization.top_non_compliant_count",
+            displayName: "config.changes.window_utilization.top_non_compliant_count.name",
+            description: "config.changes.window_utilization.top_non_compliant_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11130),
+
+        ConfigurationDefinition.Create(
+            key: "changes.window_utilization.excellent_threshold_pct",
+            displayName: "config.changes.window_utilization.excellent_threshold_pct.name",
+            description: "config.changes.window_utilization.excellent_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "95",
+            uiEditorType: "number",
+            sortOrder: 11140),
+
+        // ── Wave S.2 — Contract Adoption Report ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "contracts.adoption.top_lagging_count",
+            displayName: "config.contracts.adoption.top_lagging_count.name",
+            description: "config.contracts.adoption.top_lagging_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11150),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.adoption.page_size",
+            displayName: "config.contracts.adoption.page_size.name",
+            description: "config.contracts.adoption.page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 11160),
+
+        // ── Wave S.3 — MTTR Trend Report ──────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "runtime.mttr.lookback_days",
+            displayName: "config.runtime.mttr.lookback_days.name",
+            description: "config.runtime.mttr.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11170),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.mttr.top_worst_count",
+            displayName: "config.runtime.mttr.top_worst_count.name",
+            description: "config.runtime.mttr.top_worst_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11180),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.mttr.worsening_threshold_pct",
+            displayName: "config.runtime.mttr.worsening_threshold_pct.name",
+            description: "config.runtime.mttr.worsening_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11190),
     ];
 }
