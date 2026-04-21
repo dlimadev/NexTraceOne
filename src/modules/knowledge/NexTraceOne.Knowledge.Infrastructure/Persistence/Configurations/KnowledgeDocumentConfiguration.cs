@@ -76,6 +76,15 @@ internal sealed class KnowledgeDocumentConfiguration : IEntityTypeConfiguration<
         builder.Property(x => x.PublishedAt)
             .HasColumnType("timestamp with time zone");
 
+        builder.Property(x => x.FreshnessScore)
+            .HasDefaultValue(100);
+
+        builder.Property(x => x.LastReviewedAt)
+            .HasColumnType("timestamp with time zone");
+
+        builder.Property(x => x.ReviewedBy)
+            .HasMaxLength(200);
+
         // Índices para consultas frequentes
         builder.HasIndex(x => x.Slug).IsUnique();
         builder.HasIndex(x => x.Category);

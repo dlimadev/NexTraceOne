@@ -13193,5 +13193,66 @@
     },
     "importSuccess": "Solicitud de cambio importada",
     "alreadyExists": "Solicitud de cambio ya ingerida"
+  },
+  "wasteSignals": {
+    "title": "Señales de Desperdicio",
+    "detect": "Detectar Desperdicio",
+    "report": "Informe de Desperdicio",
+    "type": {
+      "IdleResources": "Recursos Inactivos",
+      "Overprovisioned": "Sobreaprovisionado",
+      "UnattachedStorage": "Almacenamiento No Adjunto",
+      "UnusedLicenses": "Licencias No Utilizadas",
+      "OrphanedResources": "Recursos Huérfanos",
+      "OverlappingServices": "Servicios Superpuestos"
+    },
+    "estimatedSavings": "Ahorro Mensual Est.",
+    "detected": "Detectado En",
+    "acknowledged": "Reconocido",
+    "focusExport": "Exportar FOCUS",
+    "changeGate": "Gate de Cambio por Costo",
+    "gateApproved": "Gate de costo aprobado",
+    "gateBlocked": "Gate de costo bloqueado",
+    "gateReview": "Revisión de costo requerida"
+  },
+  "knowledgeFreshness": {
+    "title": "Frescura del Conocimiento",
+    "report": "Informe de Frescura",
+    "score": "Puntuación de Frescura",
+    "lastReviewed": "Última Revisión",
+    "status": {
+      "Fresh": "Fresco",
+      "Aging": "Envejeciendo",
+      "Stale": "Desactualizado"
+    },
+    "markReviewed": "Marcar como Revisado"
+  },
+  "proposedRunbook": {
+    "title": "Runbooks Propuestos",
+    "propose": "Proponer Runbook",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "status": {
+      "Proposed": "Propuesto",
+      "UnderReview": "En Revisión",
+      "Approved": "Aprobado",
+      "Rejected": "Rechazado"
+    },
+    "fromIncident": "Generado a partir de incidente",
+    "reviewNote": "Nota de Revisión"
+  },
+  "crossModuleSearch": {
+    "title": "Búsqueda",
+    "placeholder": "Buscar en conocimiento, runbooks, notas...",
+    "noResults": "Sin resultados"
+  },
+  "aiCostAttribution": {
+    "title": "Atribución de Costo de IA",
+    "byModel": "Por Modelo",
+    "totalCost": "Costo Total (USD)",
+    "tokens": "Tokens",
+    "promptTokens": "Tokens de Prompt",
+    "completionTokens": "Tokens de Completado",
+    "period": "Período"
   }
 }

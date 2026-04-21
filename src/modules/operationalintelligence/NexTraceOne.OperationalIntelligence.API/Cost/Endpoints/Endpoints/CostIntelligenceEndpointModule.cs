@@ -29,6 +29,10 @@ using ListEfficiencyRecommendationsFeature = NexTraceOne.OperationalIntelligence
 using GetShowbackReportFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetShowbackReport.GetShowbackReport;
 using CorrelateCloudCostWithChangeFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.CorrelateCloudCostWithChange.CorrelateCloudCostWithChange;
 using DetectCostAnomaliesFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.DetectCostAnomalies.DetectCostAnomalies;
+using GetWasteReportFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetWasteReport.GetWasteReport;
+using DetectWasteSignalsFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.DetectWasteSignals.DetectWasteSignals;
+using GetFocusExportFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetFocusExport.GetFocusExport;
+using EvaluateCostAwareChangeGateFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.EvaluateCostAwareChangeGate.EvaluateCostAwareChangeGate;
 
 namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 
@@ -375,6 +379,60 @@ public sealed class CostIntelligenceEndpointModule
             CancellationToken ct) =>
         {
             var query = new DetectCostAnomaliesFeature.Query(environment, period);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        // ── WAVE A.6: FinOps Contextual ────────────────────────────────────
+
+        group.MapGet("/waste-signals", async (
+            string? teamName,
+            bool includeAcknowledged,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetWasteReportFeature.Query(teamName, includeAcknowledged);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapPost("/waste-signals/detect", async (
+            DetectWasteSignalsFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:write");
+
+        group.MapGet("/focus-export", async (
+            string period,
+            string? serviceName,
+            string? teamName,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new GetFocusExportFeature.Query(period, serviceName, teamName);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        group.MapGet("/change-gate", async (
+            string serviceName,
+            string targetEnvironment,
+            decimal? expectedCostImpact,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var query = new EvaluateCostAwareChangeGateFeature.Query(serviceName, targetEnvironment, expectedCostImpact);
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
         })

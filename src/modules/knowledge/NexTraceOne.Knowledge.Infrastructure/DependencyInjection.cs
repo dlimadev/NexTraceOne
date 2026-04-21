@@ -47,6 +47,7 @@ public static class DependencyInjection
         // Cross-module search provider
         services.AddScoped<IKnowledgeSearchProvider, KnowledgeSearchProvider>();
         services.AddScoped<IRunbookKnowledgeLinkingService, RunbookKnowledgeLinkingService>();
+        services.AddScoped<IProposedRunbookRepository, ProposedRunbookRepository>();
 
         // Cross-module contract: IKnowledgeModule — consumido pelo Governance e AI para métricas de conhecimento
         services.AddScoped<IKnowledgeModule, Knowledge.Infrastructure.Services.KnowledgeModuleService>();

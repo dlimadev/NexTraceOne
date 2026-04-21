@@ -7076,7 +7076,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.backstage.instanceUrl",
             displayName: "config.integrations.backstage.instanceUrl.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.String,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.backstage.instanceUrl.description",
@@ -7087,7 +7087,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.backstage.exportEnabled",
             displayName: "config.integrations.backstage.exportEnabled.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.Boolean,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.backstage.exportEnabled.description",
@@ -7098,7 +7098,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.externalChange.autoLinkEnabled",
             displayName: "config.integrations.externalChange.autoLinkEnabled.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.Boolean,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.externalChange.autoLinkEnabled.description",
@@ -7109,12 +7109,157 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.externalChange.allowedSystems",
             displayName: "config.integrations.externalChange.allowedSystems.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.Json,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.externalChange.allowedSystems.description",
             defaultValue: """["ServiceNow","Jira","AzureDevOps","Generic"]""",
             uiEditorType: "json-editor",
             sortOrder: 5480),
+
+        // ── Block: FinOps Contextual & Knowledge Hub ─────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.detection_enabled",
+            displayName: "config.finops.waste.detection_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.waste.detection_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5700),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.thresholds",
+            displayName: "config.finops.waste.thresholds.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.waste.thresholds.description",
+            defaultValue: """{"overbudgetPct":20,"idleZeroCostPeriods":2}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5710),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.categories",
+            displayName: "config.finops.waste.categories.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.waste.categories.description",
+            defaultValue: """["IdleResources","Overprovisioned","UnattachedStorage","UnusedLicenses","OrphanedResources","OverlappingServices"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5720),
+
+        ConfigurationDefinition.Create(
+            key: "finops.focus.export_enabled",
+            displayName: "config.finops.focus.export_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.focus.export_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5730),
+
+        ConfigurationDefinition.Create(
+            key: "finops.focus.schema_version",
+            displayName: "config.finops.focus.schema_version.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.finops.focus.schema_version.description",
+            defaultValue: "FOCUS_1.0",
+            uiEditorType: "text",
+            sortOrder: 5740),
+
+        ConfigurationDefinition.Create(
+            key: "finops.change_gate.enabled",
+            displayName: "config.finops.change_gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.change_gate.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5750),
+
+        ConfigurationDefinition.Create(
+            key: "ai.cost_attribution.enabled",
+            displayName: "config.ai.cost_attribution.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.cost_attribution.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5760),
+
+        ConfigurationDefinition.Create(
+            key: "ai.cost_attribution.period_days",
+            displayName: "config.ai.cost_attribution.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.cost_attribution.period_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 5770),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.freshness.score_enabled",
+            displayName: "config.knowledge.freshness.score_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.freshness.score_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5780),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.freshness.stale_threshold_days",
+            displayName: "config.knowledge.freshness.stale_threshold_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.freshness.stale_threshold_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 5790),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.runbook_proposal.enabled",
+            displayName: "config.knowledge.runbook_proposal.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.runbook_proposal.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5800),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.runbook_proposal.auto_approve_threshold",
+            displayName: "config.knowledge.runbook_proposal.auto_approve_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.runbook_proposal.auto_approve_threshold.description",
+            defaultValue: "0",
+            uiEditorType: "number",
+            sortOrder: 5810),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.search.max_results",
+            displayName: "config.knowledge.search.max_results.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.search.max_results.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 5820),
     ];
 }

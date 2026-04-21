@@ -13183,5 +13183,66 @@
     },
     "importSuccess": "Change request imported",
     "alreadyExists": "Change request already ingested"
+  },
+  "wasteSignals": {
+    "title": "Waste Signals",
+    "detect": "Detect Waste",
+    "report": "Waste Report",
+    "type": {
+      "IdleResources": "Idle Resources",
+      "Overprovisioned": "Overprovisioned",
+      "UnattachedStorage": "Unattached Storage",
+      "UnusedLicenses": "Unused Licenses",
+      "OrphanedResources": "Orphaned Resources",
+      "OverlappingServices": "Overlapping Services"
+    },
+    "estimatedSavings": "Est. Monthly Savings",
+    "detected": "Detected At",
+    "acknowledged": "Acknowledged",
+    "focusExport": "FOCUS Export",
+    "changeGate": "Cost-aware Change Gate",
+    "gateApproved": "Cost gate passed",
+    "gateBlocked": "Cost gate blocked",
+    "gateReview": "Cost review required"
+  },
+  "knowledgeFreshness": {
+    "title": "Knowledge Freshness",
+    "report": "Freshness Report",
+    "score": "Freshness Score",
+    "lastReviewed": "Last Reviewed",
+    "status": {
+      "Fresh": "Fresh",
+      "Aging": "Aging",
+      "Stale": "Stale"
+    },
+    "markReviewed": "Mark as Reviewed"
+  },
+  "proposedRunbook": {
+    "title": "Proposed Runbooks",
+    "propose": "Propose Runbook",
+    "approve": "Approve",
+    "reject": "Reject",
+    "status": {
+      "Proposed": "Proposed",
+      "UnderReview": "Under Review",
+      "Approved": "Approved",
+      "Rejected": "Rejected"
+    },
+    "fromIncident": "Generated from incident",
+    "reviewNote": "Review Note"
+  },
+  "crossModuleSearch": {
+    "title": "Search",
+    "placeholder": "Search across knowledge, runbooks, notes...",
+    "noResults": "No results found"
+  },
+  "aiCostAttribution": {
+    "title": "AI Cost Attribution",
+    "byModel": "By Model",
+    "totalCost": "Total Cost (USD)",
+    "tokens": "Tokens",
+    "promptTokens": "Prompt Tokens",
+    "completionTokens": "Completion Tokens",
+    "period": "Period"
   }
 }

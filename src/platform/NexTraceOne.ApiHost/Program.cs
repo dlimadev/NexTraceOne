@@ -36,6 +36,8 @@ using NexTraceOne.ChangeGovernance.API.GraphQL;
 using NexTraceOne.ChangeGovernance.API.Promotion.Endpoints;
 using NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints;
 using NexTraceOne.ChangeGovernance.API.Workflow.Endpoints;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
 using NexTraceOne.IdentityAccess.API.Endpoints;
 using NexTraceOne.Notifications.API.Endpoints;
 using NexTraceOne.OperationalIntelligence.API.Cost.Endpoints;
@@ -121,6 +123,10 @@ builder.Services.AddAiRuntimeModule(builder.Configuration);
 builder.Services.AddNotificationsModule(builder.Configuration);
 builder.Services.AddConfigurationModule(builder.Configuration);
 builder.Services.AddKnowledgeModule(builder.Configuration);
+
+// [5] Cross-module bridges — registered after all modules to override null readers
+// Bridges OtelRuntimeComparisonReader to OperationalIntelligence for ChangeGovernance
+builder.Services.AddScoped<IRuntimeComparisonReader, OtelRuntimeComparisonReader>();
 
 // [5] JSON — serialização de enums como strings para Minimal API
 builder.Services.ConfigureHttpJsonOptions(options =>

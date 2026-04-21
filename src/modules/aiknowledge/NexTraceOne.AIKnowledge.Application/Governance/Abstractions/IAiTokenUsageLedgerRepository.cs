@@ -24,6 +24,9 @@ public interface IAiTokenUsageLedgerRepository
         DateTimeOffset end,
         CancellationToken ct = default);
 
+    /// <summary>Lista entradas de consumo a partir de um cutoff de data, para relatórios de atribuição de custo.</summary>
+    Task<IReadOnlyList<AiTokenUsageLedger>> ListByPeriodAsync(DateTimeOffset cutoff, CancellationToken ct = default);
+
     /// <summary>
     /// Elimina entradas do ledger com CreatedAt anterior à data limite.
     /// Usado pelo AiDataRetentionJob para aplicar política de retenção de dados.
