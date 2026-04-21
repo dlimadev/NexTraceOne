@@ -128,6 +128,17 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("FreshnessScore")
+                        .HasDefaultValue(100)
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("LastReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReviewedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<int>("Version")
                         .HasColumnType("integer");
 
@@ -379,6 +390,70 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_knw_operational_notes_severity", "\"Severity\" IN ('Info','Warning','Critical')");
                         });
+                });
+            modelBuilder.Entity("NexTraceOne.Knowledge.Domain.Entities.ProposedRunbook", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ContentMarkdown")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content_markdown");
+
+                    b.Property<DateTimeOffset>("ProposedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("proposed_at");
+
+                    b.Property<string>("ReviewNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("review_note");
+
+                    b.Property<DateTimeOffset?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("reviewed_at");
+
+                    b.Property<string>("ReviewedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("reviewed_by");
+
+                    b.Property<string>("ServiceName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("service_name");
+
+                    b.Property<Guid>("SourceIncidentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_incident_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("TeamName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("team_name");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id")
+                        .HasName("pk_knw_proposed_runbooks");
+
+                    b.HasIndex("SourceIncidentId")
+                        .IsUnique()
+                        .HasDatabaseName("uix_knw_proposed_runbooks_incident");
+
+                    b.ToTable("knw_proposed_runbooks");
                 });
 #pragma warning restore 612, 618
         }
