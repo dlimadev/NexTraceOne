@@ -11,6 +11,7 @@ using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.EventHandlers;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Jobs;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Connectors;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -121,10 +122,27 @@ public static class DependencyInjection
         // Cross-module contract — consumed by AiOrchestration for token/model attribution
         services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();
 
+        // ── External Data Sources (Extensible RAG) ────────────────────────
+        services.AddScoped<IExternalDataSourceRepository, ExternalDataSourceRepository>();
+        services.AddScoped<IDataSourceSyncService, DataSourceSyncService>();
+        services.AddSingleton<IDataSourceConnectorFactory, DataSourceConnectorFactory>();
+
+        // Connectors — registered as singletons (stateless, config resolved per-call)
+        services.AddSingleton<IDataSourceConnector, BraveSearchConnector>();
+        services.AddSingleton<IDataSourceConnector, GitHubConnector>();
+        services.AddSingleton<IDataSourceConnector, GitLabConnector>();
+        services.AddSingleton<IDataSourceConnector, LocalDirectoryConnector>();
+        services.AddSingleton<IDataSourceConnector, CustomHttpConnector>();
+
+        // HTTP clients for connectors that use IHttpClientFactory
+        services.AddHttpClient("BraveSearch").SetHandlerLifetime(TimeSpan.FromMinutes(5));
+        services.AddHttpClient("GitHubConnector").SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
         // Background jobs
         services.AddHostedService<FeedbackThresholdJob>();
         services.AddHostedService<AiDataRetentionJob>();
         services.AddHostedService<EmbeddingIndexJob>();
+        services.AddHostedService<ExternalDataSourceSyncJob>();
 
         return services;
     }

@@ -368,6 +368,29 @@ public static class AiGovernanceErrors
             "Self-healing action '{0}' was not found.",
             id);
 
+    // ── External Data Sources ───────────────────────────────────────────
+
+    /// <summary>Fonte de dados externa não encontrada pelo identificador informado.</summary>
+    public static Error ExternalDataSourceNotFound(string id)
+        => Error.NotFound(
+            "AiGovernance.ExternalDataSource.NotFound",
+            "External data source '{0}' was not found.",
+            id);
+
+    /// <summary>Já existe uma fonte de dados com o nome especificado.</summary>
+    public static Error ExternalDataSourceDuplicateName(string name)
+        => Error.Conflict(
+            "AiGovernance.ExternalDataSource.DuplicateName",
+            "An external data source with name '{0}' already exists.",
+            name);
+
+    /// <summary>Sincronização da fonte de dados falhou.</summary>
+    public static Error ExternalDataSourceSyncFailed(string name, string reason)
+        => Error.Business(
+            "AiGovernance.ExternalDataSource.SyncFailed",
+            "Sync of external data source '{0}' failed: {1}.",
+            name, reason);
+
     /// <summary>Suite de avaliação não encontrada pelo identificador informado.</summary>
     public static Error EvaluationSuiteNotFound(string id)
         => Error.NotFound("AiGovernance.EvaluationSuiteNotFound", $"Evaluation suite '{id}' not found.");
