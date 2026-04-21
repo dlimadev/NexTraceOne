@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities;
+using NexTraceOne.ChangeGovernance.Domain.Compliance.Entities;
 
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 
@@ -84,6 +85,14 @@ public sealed class ChangeIntelligenceDbContext(
 
     /// <summary>Pedidos de mudança externos importados de ServiceNow, Jira, AzureDevOps e sistemas genéricos.</summary>
     public DbSet<ExternalChangeRequest> ExternalChangeRequests => Set<ExternalChangeRequest>();
+
+    // ── Wave D.2 — Cross-tenant Benchmarks ───────────────────────────────
+
+    /// <summary>Consentimentos de participação em benchmarks cross-tenant anonimizados (LGPD opt-in).</summary>
+    public DbSet<TenantBenchmarkConsent> BenchmarkConsents => Set<TenantBenchmarkConsent>();
+
+    /// <summary>Snapshots de métricas DORA para benchmarks cross-tenant.</summary>
+    public DbSet<BenchmarkSnapshotRecord> BenchmarkSnapshots => Set<BenchmarkSnapshotRecord>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

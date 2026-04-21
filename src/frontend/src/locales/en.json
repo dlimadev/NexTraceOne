@@ -13406,5 +13406,59 @@
     "totalModules": "Total Modules",
     "upgradeSteps": "Upgrade Steps",
     "maintenanceWindow": "Recommended Maintenance Window"
+  },
+  "benchmark": {
+    "title": "Cross-tenant Benchmarks",
+    "consent": {
+      "title": "Benchmark Participation Consent",
+      "status": "Consent Status",
+      "lgpdBasis": "LGPD/GDPR Lawful Basis",
+      "grant": "Grant Consent",
+      "revoke": "Revoke Consent",
+      "notGranted": "Consent not granted for benchmark participation"
+    },
+    "snapshot": {
+      "title": "Benchmark Snapshot",
+      "submit": "Submit Metrics Snapshot",
+      "deployFreq": "Deployment Frequency (per week)",
+      "leadTime": "Lead Time for Changes (hours)",
+      "failureRate": "Change Failure Rate (%)",
+      "mttr": "Mean Time to Restore (hours)",
+      "maturity": "Maturity Score",
+      "costPerRequest": "Cost per Request (USD)"
+    },
+    "ranking": {
+      "title": "Benchmark Ranking",
+      "peerSetSize": "Peer Set Size",
+      "percentile": "Percentile",
+      "insufficientPeers": "Insufficient peer data for ranking"
+    }
+  },
+  "policyStudio": {
+    "title": "Policy Studio",
+    "create": "Create Policy",
+    "update": "Update Policy",
+    "evaluate": "Evaluate Policy",
+    "name": "Policy Name",
+    "type": "Policy Type",
+    "isEnabled": "Enabled",
+    "version": "Version",
+    "appliesTo": "Applies To",
+    "environment": "Environment Filter",
+    "rulesJson": "Rules (JSON)",
+    "actionJson": "Action (JSON)",
+    "evaluation": {
+      "title": "Policy Evaluation",
+      "contextJson": "Context (JSON)",
+      "passed": "Passed",
+      "failed": "Failed",
+      "action": "Action",
+      "message": "Message",
+      "ruleTriggered": "Rule Triggered"
+    },
+    "errors": {
+      "notFound": "Policy definition not found",
+      "disabled": "Policy is disabled"
+    }
   }
 }

@@ -7539,5 +7539,75 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "500",
             uiEditorType: "number",
             sortOrder: 10050),
+
+        // ── Wave D.2 — Cross-tenant Benchmarks anonimizados ──────────────────
+
+        ConfigurationDefinition.Create(
+            key: "benchmark.consent.enabled",
+            displayName: "config.benchmark.consent.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.benchmark.consent.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10060),
+
+        ConfigurationDefinition.Create(
+            key: "benchmark.min_peer_set_size",
+            displayName: "config.benchmark.min_peer_set_size.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.benchmark.min_peer_set_size.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 10070),
+
+        ConfigurationDefinition.Create(
+            key: "benchmark.snapshot.retention_days",
+            displayName: "config.benchmark.snapshot.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.benchmark.snapshot.retention_days.description",
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 10075),
+
+        // ── Wave D.3 — No-code Policy Studio ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "policy_studio.enabled",
+            displayName: "config.policy_studio.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.policy_studio.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10080),
+
+        ConfigurationDefinition.Create(
+            key: "policy_studio.max_rules_per_policy",
+            displayName: "config.policy_studio.max_rules_per_policy.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.policy_studio.max_rules_per_policy.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10090),
+
+        ConfigurationDefinition.Create(
+            key: "policy_studio.evaluation.fail_open",
+            displayName: "config.policy_studio.evaluation.fail_open.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.policy_studio.evaluation.fail_open.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10100),
     ];
 }

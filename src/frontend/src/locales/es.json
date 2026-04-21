@@ -13416,5 +13416,59 @@
     "totalModules": "Total de Módulos",
     "upgradeSteps": "Pasos de Actualización",
     "maintenanceWindow": "Ventana de Mantenimiento Recomendada"
+  },
+  "benchmark": {
+    "title": "Benchmarks Entre Organizaciones",
+    "consent": {
+      "title": "Consentimiento de Participación en Benchmarks",
+      "status": "Estado del Consentimiento",
+      "lgpdBasis": "Base Legal LGPD/GDPR",
+      "grant": "Conceder Consentimiento",
+      "revoke": "Revocar Consentimiento",
+      "notGranted": "Consentimiento no otorgado para participación en benchmarks"
+    },
+    "snapshot": {
+      "title": "Snapshot de Benchmark",
+      "submit": "Enviar Snapshot de Métricas",
+      "deployFreq": "Frecuencia de Despliegue (por semana)",
+      "leadTime": "Lead Time para Cambios (horas)",
+      "failureRate": "Tasa de Fallo de Cambios (%)",
+      "mttr": "Tiempo Medio para Restaurar (horas)",
+      "maturity": "Puntuación de Madurez",
+      "costPerRequest": "Coste por Solicitud (USD)"
+    },
+    "ranking": {
+      "title": "Clasificación de Benchmark",
+      "peerSetSize": "Tamaño del Grupo de Referencia",
+      "percentile": "Percentil",
+      "insufficientPeers": "Datos de referencia insuficientes para clasificación"
+    }
+  },
+  "policyStudio": {
+    "title": "Policy Studio",
+    "create": "Crear Política",
+    "update": "Actualizar Política",
+    "evaluate": "Evaluar Política",
+    "name": "Nombre de la Política",
+    "type": "Tipo de Política",
+    "isEnabled": "Habilitado",
+    "version": "Versión",
+    "appliesTo": "Se aplica a",
+    "environment": "Filtro de Entorno",
+    "rulesJson": "Reglas (JSON)",
+    "actionJson": "Acción (JSON)",
+    "evaluation": {
+      "title": "Evaluación de Política",
+      "contextJson": "Contexto (JSON)",
+      "passed": "Aprobado",
+      "failed": "Rechazado",
+      "action": "Acción",
+      "message": "Mensaje",
+      "ruleTriggered": "Regla Activada"
+    },
+    "errors": {
+      "notFound": "Definición de política no encontrada",
+      "disabled": "La política está deshabilitada"
+    }
   }
 }

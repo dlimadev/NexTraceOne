@@ -13416,5 +13416,59 @@
     "totalModules": "Total de Módulos",
     "upgradeSteps": "Passos de Upgrade",
     "maintenanceWindow": "Janela de Manutenção Recomendada"
+  },
+  "benchmark": {
+    "title": "Benchmarks Cross-Tenant",
+    "consent": {
+      "title": "Consentimento de Participação em Benchmarks",
+      "status": "Estado do Consentimento",
+      "lgpdBasis": "Base Legal LGPD/GDPR",
+      "grant": "Conceder Consentimento",
+      "revoke": "Revogar Consentimento",
+      "notGranted": "Consentimento não concedido para participação nos benchmarks"
+    },
+    "snapshot": {
+      "title": "Snapshot de Benchmark",
+      "submit": "Enviar Snapshot de Métricas",
+      "deployFreq": "Frequência de Deploy (por semana)",
+      "leadTime": "Lead Time para Mudanças (horas)",
+      "failureRate": "Taxa de Falha de Mudanças (%)",
+      "mttr": "Tempo Médio para Restaurar (horas)",
+      "maturity": "Score de Maturidade",
+      "costPerRequest": "Custo por Request (USD)"
+    },
+    "ranking": {
+      "title": "Ranking de Benchmark",
+      "peerSetSize": "Tamanho do Peer Set",
+      "percentile": "Percentil",
+      "insufficientPeers": "Dados de peers insuficientes para ranking"
+    }
+  },
+  "policyStudio": {
+    "title": "Policy Studio",
+    "create": "Criar Política",
+    "update": "Atualizar Política",
+    "evaluate": "Avaliar Política",
+    "name": "Nome da Política",
+    "type": "Tipo de Política",
+    "isEnabled": "Ativado",
+    "version": "Versão",
+    "appliesTo": "Aplica-se a",
+    "environment": "Filtro de Ambiente",
+    "rulesJson": "Regras (JSON)",
+    "actionJson": "Ação (JSON)",
+    "evaluation": {
+      "title": "Avaliação de Política",
+      "contextJson": "Contexto (JSON)",
+      "passed": "Aprovado",
+      "failed": "Reprovado",
+      "action": "Ação",
+      "message": "Mensagem",
+      "ruleTriggered": "Regra Ativada"
+    },
+    "errors": {
+      "notFound": "Definição de política não encontrada",
+      "disabled": "Política está desativada"
+    }
   }
 }

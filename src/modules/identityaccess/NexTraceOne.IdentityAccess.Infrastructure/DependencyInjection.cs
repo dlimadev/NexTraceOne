@@ -74,6 +74,9 @@ public static class DependencyInjection
         services.AddScoped<IPlatformApiTokenRepository, EfPlatformApiTokenRepository>();
         services.AddScoped<IAgentQueryRepository, EfAgentQueryRepository>();
 
+        // Repositórios — v1.6 Policy Studio (Wave D.3)
+        services.AddScoped<IPolicyDefinitionRepository, PolicyDefinitionRepository>();
+
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();

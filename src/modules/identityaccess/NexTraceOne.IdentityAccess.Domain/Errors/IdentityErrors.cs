@@ -225,4 +225,14 @@ public static class IdentityErrors
     /// <summary>Step-up MFA necessário para operação privilegiada.</summary>
     public static Error MfaStepUpRequired()
         => Error.Forbidden("Identity.Mfa.StepUpRequired", "This operation requires MFA step-up verification. Please provide your MFA code.");
+
+    // ── Policy Studio ─────────────────────────────────────────────────────
+
+    /// <summary>Definição de política não encontrada.</summary>
+    public static Error PolicyDefinitionNotFound(string policyId)
+        => Error.NotFound("PolicyStudio.PolicyDefinition.NotFound", "Policy definition '{0}' was not found.", policyId);
+
+    /// <summary>Política desactivada — não pode ser avaliada.</summary>
+    public static Error PolicyDefinitionDisabled(string name)
+        => Error.Business("PolicyStudio.PolicyDefinition.Disabled", "Policy '{0}' is disabled and cannot be evaluated.", name);
 }

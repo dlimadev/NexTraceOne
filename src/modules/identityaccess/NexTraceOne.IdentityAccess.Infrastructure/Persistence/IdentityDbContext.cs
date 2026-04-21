@@ -111,6 +111,11 @@ public sealed class IdentityDbContext(
     /// <summary>Registos de auditoria de queries de agentes.</summary>
     public DbSet<AgentQueryRecord> AgentQueryRecords => Set<AgentQueryRecord>();
 
+    // ── v1.6 — Policy Studio (Wave D.3) ──────────────────────────────────
+
+    /// <summary>Definições de políticas configuráveis no Policy Studio (no-code DSL JSON).</summary>
+    public DbSet<PolicyDefinition> PolicyDefinitions => Set<PolicyDefinition>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;
 
