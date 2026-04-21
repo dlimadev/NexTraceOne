@@ -7261,5 +7261,110 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "20",
             uiEditorType: "number",
             sortOrder: 5820),
+
+        // ── Wave C.1 — Vulnerability Gate ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.gate.enabled",
+            displayName: "config.security.vulnerability.gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.gate.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5900),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.gate.max_critical",
+            displayName: "config.security.vulnerability.gate.max_critical.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.gate.max_critical.description",
+            defaultValue: "0",
+            uiEditorType: "number",
+            sortOrder: 5910),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.gate.max_high",
+            displayName: "config.security.vulnerability.gate.max_high.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.gate.max_high.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 5920),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.ingest.enabled",
+            displayName: "config.security.vulnerability.ingest.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.ingest.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5930),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.ingest.max_batch_size",
+            displayName: "config.security.vulnerability.ingest.max_batch_size.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.ingest.max_batch_size.description",
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 5940),
+
+        // ── Wave C.2 — Evidence Pack Signing ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.evidence_pack.signing_key",
+            displayName: "config.security.evidence_pack.signing_key.label",
+            category: ConfigurationCategory.SensitiveOperational,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.security.evidence_pack.signing_key.description",
+            defaultValue: "change-me-in-production",
+            uiEditorType: "password",
+            sortOrder: 5950),
+
+        ConfigurationDefinition.Create(
+            key: "security.evidence_pack.require_signature_for_audit",
+            displayName: "config.security.evidence_pack.require_signature_for_audit.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.evidence_pack.require_signature_for_audit.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 5960),
+
+        // ── Wave C.2 — Access Review Escalation ───────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.access_review.escalation.days_before_deadline",
+            displayName: "config.security.access_review.escalation.days_before_deadline.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.access_review.escalation.days_before_deadline.description",
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 5970),
+
+        ConfigurationDefinition.Create(
+            key: "security.access_review.escalation.enabled",
+            displayName: "config.security.access_review.escalation.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.access_review.escalation.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5980),
     ];
 }

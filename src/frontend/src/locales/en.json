@@ -13244,5 +13244,47 @@
     "promptTokens": "Prompt Tokens",
     "completionTokens": "Completion Tokens",
     "period": "Period"
+  },
+  "vulnerabilityGate": {
+    "title": "Vulnerability Gate",
+    "ingest": "Ingest Advisory Report",
+    "summary": "Vulnerability Summary",
+    "gate": "Vulnerability Promotion Gate",
+    "gatePassed": "No blocking vulnerabilities",
+    "gateBlockedCritical": "Blocked: critical vulnerabilities found",
+    "gateBlockedHigh": "Blocked: high vulnerabilities exceed threshold",
+    "severity": {
+      "Critical": "Critical",
+      "High": "High",
+      "Medium": "Medium",
+      "Low": "Low",
+      "None": "None"
+    },
+    "advisoryId": "Advisory ID",
+    "source": "Source",
+    "cvssScore": "CVSS Score",
+    "publishedAt": "Published At",
+    "fixedIn": "Fixed In",
+    "active": "Active"
+  },
+  "signedEvidencePack": {
+    "title": "Evidence Pack Integrity",
+    "sign": "Sign Evidence Pack",
+    "verify": "Verify Integrity",
+    "signed": "Signed",
+    "unsigned": "Not Signed",
+    "valid": "Integrity Valid",
+    "invalid": "Integrity INVALID",
+    "signedBy": "Signed By",
+    "signedAt": "Signed At",
+    "integrityHash": "Integrity Hash"
+  },
+  "accessReviewEscalation": {
+    "title": "Access Review Escalation",
+    "escalate": "Escalate Overdue Reviews",
+    "daysBeforeDeadline": "Days Before Deadline",
+    "escalated": "Campaigns Escalated",
+    "campaignExpiring": "Campaign expiring soon",
+    "pendingItems": "Pending items"
   }
 }

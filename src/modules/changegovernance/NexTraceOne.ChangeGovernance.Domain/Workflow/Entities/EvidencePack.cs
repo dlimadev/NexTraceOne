@@ -62,6 +62,20 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
     /// <summary>Data/hora UTC em que o evidence pack foi gerado.</summary>
     public DateTimeOffset GeneratedAt { get; private set; }
 
+    // ── Wave C.2 — Evidence Pack Integrity Signature ──────────────────────────
+
+    /// <summary>Hash HMAC-SHA256 do manifesto canónico do evidence pack (Wave C.2).</summary>
+    public string? IntegrityHash { get; private set; }
+
+    /// <summary>Manifesto JSON canónico que foi assinado.</summary>
+    public string? IntegrityManifest { get; private set; }
+
+    /// <summary>Data/hora em que a assinatura foi aplicada.</summary>
+    public DateTimeOffset? IntegritySignedAt { get; private set; }
+
+    /// <summary>Utilizador ou sistema que aplicou a assinatura.</summary>
+    public string? IntegritySignedBy { get; private set; }
+
     /// <summary>
     /// Cria um novo evidence pack vinculado a uma instância de workflow e release.
     /// </summary>
@@ -159,6 +173,24 @@ public sealed class EvidencePack : AggregateRoot<EvidencePackId>
 
         CompletenessPercentage = Math.Round((decimal)filledFields / TotalCompletenessFields * 100m, 2);
     }
+
+    /// <summary>
+    /// Aplica uma assinatura HMAC-SHA256 ao evidence pack.
+    /// O manifesto canónico inclui os campos imutáveis do pack para auditoria externa.
+    /// </summary>
+    public void ApplyIntegritySignature(string manifest, string hash, string signedBy, DateTimeOffset signedAt)
+    {
+        Guard.Against.NullOrWhiteSpace(manifest);
+        Guard.Against.NullOrWhiteSpace(hash);
+        Guard.Against.NullOrWhiteSpace(signedBy);
+        IntegrityManifest = manifest;
+        IntegrityHash = hash;
+        IntegritySignedBy = signedBy;
+        IntegritySignedAt = signedAt;
+    }
+
+    /// <summary>Indica se o evidence pack tem assinatura de integridade aplicada.</summary>
+    public bool IsIntegritySigned => IntegrityHash is not null;
 }
 
 /// <summary>Identificador fortemente tipado de EvidencePack.</summary>

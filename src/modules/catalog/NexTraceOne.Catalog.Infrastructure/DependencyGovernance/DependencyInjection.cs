@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DependencyGovernanceDbContext>());
         services.AddScoped<IDependencyGovernanceUnitOfWork>(sp => sp.GetRequiredService<DependencyGovernanceDbContext>());
         services.AddScoped<IServiceDependencyProfileRepository, ServiceDependencyProfileRepository>();
+        services.AddScoped<IVulnerabilityAdvisoryRepository, EfVulnerabilityAdvisoryRepository>();
 
         return services;
     }

@@ -13254,5 +13254,47 @@
     "promptTokens": "Tokens de Prompt",
     "completionTokens": "Tokens de Completado",
     "period": "Período"
+  },
+  "vulnerabilityGate": {
+    "title": "Gate de Vulnerabilidades",
+    "ingest": "Ingerir Informe de Advisory",
+    "summary": "Resumen de Vulnerabilidades",
+    "gate": "Gate de Promoción por Vulnerabilidad",
+    "gatePassed": "Sin vulnerabilidades bloqueantes",
+    "gateBlockedCritical": "Bloqueado: vulnerabilidades críticas encontradas",
+    "gateBlockedHigh": "Bloqueado: vulnerabilidades altas superan el umbral",
+    "severity": {
+      "Critical": "Crítica",
+      "High": "Alta",
+      "Medium": "Media",
+      "Low": "Baja",
+      "None": "Ninguna"
+    },
+    "advisoryId": "ID del Advisory",
+    "source": "Fuente",
+    "cvssScore": "Puntuación CVSS",
+    "publishedAt": "Publicado El",
+    "fixedIn": "Corregido En",
+    "active": "Activo"
+  },
+  "signedEvidencePack": {
+    "title": "Integridad del Evidence Pack",
+    "sign": "Firmar Evidence Pack",
+    "verify": "Verificar Integridad",
+    "signed": "Firmado",
+    "unsigned": "Sin Firmar",
+    "valid": "Integridad Válida",
+    "invalid": "Integridad INVÁLIDA",
+    "signedBy": "Firmado Por",
+    "signedAt": "Firmado El",
+    "integrityHash": "Hash de Integridad"
+  },
+  "accessReviewEscalation": {
+    "title": "Escalación de Revisión de Accesos",
+    "escalate": "Escalar Revisiones Vencidas",
+    "daysBeforeDeadline": "Días Antes del Plazo",
+    "escalated": "Campañas Escaladas",
+    "campaignExpiring": "Campaña próxima a vencer",
+    "pendingItems": "Ítems pendientes"
   }
 }

@@ -21,4 +21,10 @@ public interface IAccessReviewRepository
 
     /// <summary>Adiciona uma nova campanha para persistência.</summary>
     void Add(AccessReviewCampaign campaign);
+
+    /// <summary>Lista campanhas abertas cujo prazo está entre <paramref name="now"/> e <paramref name="deadlineBefore"/>.</summary>
+    Task<IReadOnlyList<AccessReviewCampaign>> ListOpenApproachingDeadlineAsync(
+        DateTimeOffset now,
+        DateTimeOffset deadlineBefore,
+        CancellationToken ct);
 }

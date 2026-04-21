@@ -34,6 +34,12 @@ internal sealed class EvidencePackConfiguration : IEntityTypeConfiguration<Evide
         builder.Property(x => x.CommitSha).HasMaxLength(100);
         builder.Property(x => x.CiChecksResult).HasMaxLength(50);
 
+        // ── Wave C.2 — Integrity Signature ───────────────────────────────────
+        builder.Property(x => x.IntegrityHash).HasMaxLength(64);
+        builder.Property(x => x.IntegrityManifest).HasColumnType("text");
+        builder.Property(x => x.IntegritySignedAt).HasColumnType("timestamp with time zone");
+        builder.Property(x => x.IntegritySignedBy).HasMaxLength(500);
+
         builder.HasIndex(x => x.WorkflowInstanceId).IsUnique();
         builder.HasIndex(x => x.ReleaseId);
     }
