@@ -7609,5 +7609,75 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "true",
             uiEditorType: "toggle",
             sortOrder: 10100),
+
+        // ── Wave F.1 — Release Calendar ──────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "release_calendar.enabled",
+            displayName: "config.release_calendar.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.release_calendar.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10110),
+
+        ConfigurationDefinition.Create(
+            key: "release_calendar.freeze.default_hours_before_release",
+            displayName: "config.release_calendar.freeze.default_hours_before_release.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.release_calendar.freeze.default_hours_before_release.description",
+            defaultValue: "48",
+            uiEditorType: "number",
+            sortOrder: 10120),
+
+        ConfigurationDefinition.Create(
+            key: "release_calendar.hotfix.requires_approval",
+            displayName: "config.release_calendar.hotfix.requires_approval.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.release_calendar.hotfix.requires_approval.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10130),
+
+        // ── Wave F.2 — Risk Center ────────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "risk_center.enabled",
+            displayName: "config.risk_center.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.risk_center.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10140),
+
+        ConfigurationDefinition.Create(
+            key: "risk_center.critical_score_threshold",
+            displayName: "config.risk_center.critical_score_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.risk_center.critical_score_threshold.description",
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10150),
+
+        ConfigurationDefinition.Create(
+            key: "risk_center.report.max_services",
+            displayName: "config.risk_center.report.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.risk_center.report.max_services.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10160),
     ];
 }

@@ -13460,5 +13460,74 @@
       "notFound": "Policy definition not found",
       "disabled": "Policy is disabled"
     }
+  },
+  "releaseCalendar": {
+    "title": "Release Calendar",
+    "window": "Release Window",
+    "registerWindow": "Register Window",
+    "closeWindow": "Close Window",
+    "cancelWindow": "Cancel Window",
+    "windowType": "Window Type",
+    "windowStatus": "Status",
+    "startsAt": "Starts At",
+    "endsAt": "Ends At",
+    "environmentFilter": "Environment Filter",
+    "recurrenceTag": "Recurrence Tag",
+    "blocksChanges": "Blocks Changes",
+    "isHotfixOnly": "Hotfix Only",
+    "isOpen": "Window Open",
+    "isClosed": "Window Closed",
+    "windowTypes": {
+      "Scheduled": "Scheduled Deployment",
+      "Freeze": "Freeze Window",
+      "HotfixAllowed": "Hotfix Allowed",
+      "Maintenance": "Maintenance"
+    },
+    "windowStatuses": {
+      "Active": "Active",
+      "Closed": "Closed",
+      "Cancelled": "Cancelled"
+    },
+    "changeBlocked": "Change is blocked by an active freeze or maintenance window.",
+    "changeAllowed": "Change is allowed in the current release window.",
+    "errors": {
+      "invalidWindow": "End date must be after start date.",
+      "alreadyClosed": "Window is not in Active status.",
+      "alreadyStarted": "Cannot cancel a window that has already started."
+    }
+  },
+  "riskCenter": {
+    "title": "Risk Center",
+    "report": "Risk Report",
+    "profile": "Risk Profile",
+    "compute": "Compute Risk Profile",
+    "overallRisk": "Overall Risk",
+    "overallScore": "Risk Score",
+    "vulnerabilityScore": "Vulnerability Score",
+    "changeFailureScore": "Change Failure Score",
+    "blastRadiusScore": "Blast Radius Score",
+    "policyViolationScore": "Policy Violation Score",
+    "activeSignals": "Active Risk Signals",
+    "computedAt": "Computed At",
+    "distribution": "Risk Distribution",
+    "riskLevels": {
+      "Negligible": "Negligible",
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "signalTypes": {
+      "VulnerabilityCritical": "Critical Vulnerability",
+      "HighChangeFailureRate": "High Change Failure Rate",
+      "LargeBlastRadius": "Large Blast Radius",
+      "PolicyViolation": "Policy Violation",
+      "NoOwner": "No Owner Defined",
+      "StaleContract": "Stale Contract",
+      "UnreviewedRelease": "Unreviewed Release"
+    },
+    "errors": {
+      "profileNotFound": "No risk profile found for this service."
+    }
   }
 }

@@ -13470,5 +13470,74 @@
       "notFound": "Definição de política não encontrada",
       "disabled": "Política está desativada"
     }
+  },
+  "releaseCalendar": {
+    "title": "Calendário de Releases",
+    "window": "Janela de Release",
+    "registerWindow": "Registrar Janela",
+    "closeWindow": "Encerrar Janela",
+    "cancelWindow": "Cancelar Janela",
+    "windowType": "Tipo de Janela",
+    "windowStatus": "Status",
+    "startsAt": "Início",
+    "endsAt": "Fim",
+    "environmentFilter": "Filtro de Ambiente",
+    "recurrenceTag": "Tag de Recorrência",
+    "blocksChanges": "Bloqueia Mudanças",
+    "isHotfixOnly": "Apenas Hotfix",
+    "isOpen": "Janela Aberta",
+    "isClosed": "Janela Fechada",
+    "windowTypes": {
+      "Scheduled": "Deploy Planejado",
+      "Freeze": "Congelamento",
+      "HotfixAllowed": "Hotfix Permitido",
+      "Maintenance": "Manutenção"
+    },
+    "windowStatuses": {
+      "Active": "Ativo",
+      "Closed": "Encerrado",
+      "Cancelled": "Cancelado"
+    },
+    "changeBlocked": "Mudança bloqueada por janela de congelamento ou manutenção ativa.",
+    "changeAllowed": "Mudança permitida na janela de release atual.",
+    "errors": {
+      "invalidWindow": "A data de fim deve ser posterior à data de início.",
+      "alreadyClosed": "A janela não está no status Ativo.",
+      "alreadyStarted": "Não é possível cancelar uma janela já iniciada."
+    }
+  },
+  "riskCenter": {
+    "title": "Centro de Risco",
+    "report": "Relatório de Risco",
+    "profile": "Perfil de Risco",
+    "compute": "Calcular Perfil de Risco",
+    "overallRisk": "Risco Geral",
+    "overallScore": "Score de Risco",
+    "vulnerabilityScore": "Score de Vulnerabilidade",
+    "changeFailureScore": "Score de Falha de Mudança",
+    "blastRadiusScore": "Score de Blast Radius",
+    "policyViolationScore": "Score de Violação de Política",
+    "activeSignals": "Sinais de Risco Ativos",
+    "computedAt": "Calculado em",
+    "distribution": "Distribuição de Risco",
+    "riskLevels": {
+      "Negligible": "Negligível",
+      "Low": "Baixo",
+      "Medium": "Médio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "signalTypes": {
+      "VulnerabilityCritical": "Vulnerabilidade Crítica",
+      "HighChangeFailureRate": "Alta Taxa de Falha",
+      "LargeBlastRadius": "Blast Radius Elevado",
+      "PolicyViolation": "Violação de Política",
+      "NoOwner": "Sem Owner Definido",
+      "StaleContract": "Contrato Desatualizado",
+      "UnreviewedRelease": "Release Não Revisada"
+    },
+    "errors": {
+      "profileNotFound": "Nenhum perfil de risco encontrado para este serviço."
+    }
   }
 }

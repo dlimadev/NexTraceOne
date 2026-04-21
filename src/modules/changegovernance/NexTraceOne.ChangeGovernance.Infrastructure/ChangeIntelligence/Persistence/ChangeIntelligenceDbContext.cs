@@ -94,6 +94,16 @@ public sealed class ChangeIntelligenceDbContext(
     /// <summary>Snapshots de métricas DORA para benchmarks cross-tenant.</summary>
     public DbSet<BenchmarkSnapshotRecord> BenchmarkSnapshots => Set<BenchmarkSnapshotRecord>();
 
+    // ── Wave F.1 — Release Calendar ──────────────────────────────────────
+
+    /// <summary>Janelas de deployment, freeze, hotfix e manutenção do Release Calendar.</summary>
+    public DbSet<ReleaseCalendarEntry> ReleaseCalendarEntries => Set<ReleaseCalendarEntry>();
+
+    // ── Wave F.2 — Risk Center ────────────────────────────────────────────
+
+    /// <summary>Perfis de risco de serviços calculados pelo Risk Center.</summary>
+    public DbSet<ServiceRiskProfile> ServiceRiskProfiles => Set<ServiceRiskProfile>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ChangeIntelligenceDbContext).Assembly;

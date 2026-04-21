@@ -13470,5 +13470,74 @@
       "notFound": "Definición de política no encontrada",
       "disabled": "La política está deshabilitada"
     }
+  },
+  "releaseCalendar": {
+    "title": "Calendario de Releases",
+    "window": "Ventana de Release",
+    "registerWindow": "Registrar Ventana",
+    "closeWindow": "Cerrar Ventana",
+    "cancelWindow": "Cancelar Ventana",
+    "windowType": "Tipo de Ventana",
+    "windowStatus": "Estado",
+    "startsAt": "Inicio",
+    "endsAt": "Fin",
+    "environmentFilter": "Filtro de Entorno",
+    "recurrenceTag": "Etiqueta de Recurrencia",
+    "blocksChanges": "Bloquea Cambios",
+    "isHotfixOnly": "Solo Hotfix",
+    "isOpen": "Ventana Abierta",
+    "isClosed": "Ventana Cerrada",
+    "windowTypes": {
+      "Scheduled": "Despliegue Planificado",
+      "Freeze": "Congelamiento",
+      "HotfixAllowed": "Hotfix Permitido",
+      "Maintenance": "Mantenimiento"
+    },
+    "windowStatuses": {
+      "Active": "Activo",
+      "Closed": "Cerrado",
+      "Cancelled": "Cancelado"
+    },
+    "changeBlocked": "El cambio está bloqueado por una ventana de congelamiento o mantenimiento activa.",
+    "changeAllowed": "El cambio está permitido en la ventana de release actual.",
+    "errors": {
+      "invalidWindow": "La fecha de fin debe ser posterior a la fecha de inicio.",
+      "alreadyClosed": "La ventana no está en estado Activo.",
+      "alreadyStarted": "No se puede cancelar una ventana que ya ha comenzado."
+    }
+  },
+  "riskCenter": {
+    "title": "Centro de Riesgo",
+    "report": "Informe de Riesgo",
+    "profile": "Perfil de Riesgo",
+    "compute": "Calcular Perfil de Riesgo",
+    "overallRisk": "Riesgo General",
+    "overallScore": "Puntuación de Riesgo",
+    "vulnerabilityScore": "Puntuación de Vulnerabilidad",
+    "changeFailureScore": "Puntuación de Fallos de Cambio",
+    "blastRadiusScore": "Puntuación de Blast Radius",
+    "policyViolationScore": "Puntuación de Violación de Política",
+    "activeSignals": "Señales de Riesgo Activas",
+    "computedAt": "Calculado el",
+    "distribution": "Distribución de Riesgo",
+    "riskLevels": {
+      "Negligible": "Negligible",
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "signalTypes": {
+      "VulnerabilityCritical": "Vulnerabilidad Crítica",
+      "HighChangeFailureRate": "Alta Tasa de Fallos",
+      "LargeBlastRadius": "Blast Radius Elevado",
+      "PolicyViolation": "Violación de Política",
+      "NoOwner": "Sin Propietario",
+      "StaleContract": "Contrato Desactualizado",
+      "UnreviewedRelease": "Release Sin Revisar"
+    },
+    "errors": {
+      "profileNotFound": "No se encontró perfil de riesgo para este servicio."
+    }
   }
 }

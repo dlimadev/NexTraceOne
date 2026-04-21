@@ -69,6 +69,12 @@ public static class DependencyInjection
         services.AddScoped<ITenantBenchmarkConsentRepository, TenantBenchmarkConsentRepository>();
         services.AddScoped<IBenchmarkSnapshotRepository, BenchmarkSnapshotRepository>();
 
+        // Wave F.1 — Release Calendar
+        services.AddScoped<IReleaseCalendarRepository, ReleaseCalendarRepository>();
+
+        // Wave F.2 — Risk Center
+        services.AddScoped<IServiceRiskProfileRepository, ServiceRiskProfileRepository>();
+
         // Default honest-null reader para Promotion Readiness Delta.
         // Uma bridge real p/ OperationalIntelligence substitui este default na composition root.
         services.AddScoped<IRuntimeComparisonReader, Services.NullRuntimeComparisonReader>();
