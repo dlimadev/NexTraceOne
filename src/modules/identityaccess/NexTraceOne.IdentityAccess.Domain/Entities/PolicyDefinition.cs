@@ -118,6 +118,9 @@ public sealed class PolicyDefinition : AuditableEntity<PolicyDefinitionId>
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(contextJson))
+                return new PolicyEvaluationResult(true, "Allow", "Empty context — fail-open applied.", null);
+
             var context = JsonSerializer.Deserialize<Dictionary<string, string>>(contextJson, JsonOptions)
                           ?? [];
 
@@ -129,6 +132,9 @@ public sealed class PolicyDefinition : AuditableEntity<PolicyDefinitionId>
 
             foreach (var rule in rules)
             {
+                if (string.IsNullOrWhiteSpace(rule.Field) || string.IsNullOrWhiteSpace(rule.Operator))
+                    continue;
+
                 if (!EvaluateRule(rule, context))
                 {
                     var passed = string.Equals(action.Action, "Allow", StringComparison.OrdinalIgnoreCase);
@@ -138,10 +144,13 @@ public sealed class PolicyDefinition : AuditableEntity<PolicyDefinitionId>
 
             return new PolicyEvaluationResult(true, "Allow", null, null);
         }
+        catch (JsonException ex)
+        {
+            return new PolicyEvaluationResult(true, "Allow", $"Policy JSON parse error ({ex.GetType().Name}) — fail-open applied.", null);
+        }
         catch
         {
-            // Fail-open — erro de parse não bloqueia operação
-            return new PolicyEvaluationResult(true, "Allow", "Policy parse error — fail-open applied.", null);
+            return new PolicyEvaluationResult(true, "Allow", "Policy evaluation error — fail-open applied.", null);
         }
     }
 
