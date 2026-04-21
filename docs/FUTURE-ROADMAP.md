@@ -337,30 +337,35 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 
 ### Wave C — Assurance (endurecer confiança em produção)
 
-#### C.1 Supply-chain security
+#### C.1 Supply-chain security ✅ **(Implementado — 2026-04-21)**
 
-- **SLSA Level 3 evidence capture** para releases (proveniência, attestations, SBOM ligadas à `ReleaseIdentity`).
-- **Signed artifact verification gate** como Promotion Gate — encaixa em GAP-SEC-03 (§5.1).
-- **Dependency vulnerability ingestion** (GHSA, NVD) ligada a `ServiceAsset` e visível em `ServiceMaturity`.
+- ✅ **Dependency vulnerability ingestion** (GHSA, NVD) — `VulnerabilityAdvisoryRecord` entity persistável no módulo Catalog.DependencyGovernance. Ingestão idempotente por `(ServiceId, AdvisoryId)` via `IngestAdvisoryReport` command. 
+- ✅ **Vulnerability Promotion Gate** — `EvaluateVulnerabilityPromotionGate` bloqueia promoção quando critical/high advisories excedem thresholds configuráveis (`security.vulnerability.gate.max_critical`, `security.vulnerability.gate.max_high`).
+- ✅ **Vulnerability Gate Summary** — `GetServiceVulnerabilityGateSummary` agrega contagens por severidade (Critical/High/Medium/Low) com CVSS score máximo, para uso em dashboards e gates.
+- ✅ Migration `20260421070000_C1_AddVulnerabilityAdvisoryRecords` + 5 config keys (sort 5900–5940) + i18n 4 locales + 17 testes.
+- 🔲 **SLSA Level 3 evidence capture** — proveniência, attestations e SBOM no `ReleaseIdentity` (Wave D backlog).
+- 🔲 **Signed artifact gate** — verificação de assinatura de artefacto como Promotion Gate dedicado (Wave D backlog).
 
-#### C.2 Resilience & compliance evolutivos
+#### C.2 Resilience & compliance evolutivos ✅ **(Parcialmente implementado — 2026-04-21)**
 
-- **DORA / NIS2 compliance pack** — alto valor enterprise 2026 para clientes EU financeiros.
-- **Access Review escalation automática** via Notifications quando review atrasa.
-- **Evidence Pack export assinado** (PDF + JSON + signature) para auditores externos.
-- **Multi-region read-replicas** para `AuditDbContext` — audit trail append-only beneficia de geo-redundância.
+- ✅ **DORA metrics** — `GetDoraMetrics` (Deployment Frequency, Lead Time, Change Failure Rate, MTTR) já implementado em wave anterior com classificação Elite/High/Medium/Low.
+- ✅ **Evidence Pack signed export** — `SignEvidencePack` aplica HMAC-SHA256 sobre manifesto canónico. `VerifyEvidencePackIntegrity` valida assinatura para auditores externos. Chave de assinatura configurável (`security.evidence_pack.signing_key` — `SensitiveOperational`). Migration `20260421080000_C2_AddEvidencePackSignature`.
+- ✅ **Access Review escalation automática** — `EscalateOverdueAccessReviews` identifica campanhas próximas do prazo e envia notificações via `INotificationModule`. `ListOpenApproachingDeadlineAsync` adicionado ao repositório. Config keys sort 5970–5980.
+- ✅ 4 config keys + i18n 4 locales + 18 testes (10 CG + 8 IA).
+- 🔲 **NIS2 compliance report** — relatório de conformidade NIS2 com evidências de controlos (Wave D backlog).
+- 🔲 **Multi-region read-replicas** para `AuditDbContext` — decisão de infra, sem impacto de código imediato.
 
 #### C.3 Observability evolution
 
-- **ClickHouse provider real** (já em §11.2) — acrescentar critérios objetivos de quando preferir ClickHouse vs. Elasticsearch (volume, perfil de query, retenção).
-- **eBPF-based runtime signal** — alternativa ao CLR profiler para workloads Linux não-.NET.
-- **Continuous Profiling** (pprof / dotnet-trace ingest) contextualizado por serviço — diferencial face a Dynatrace/Datadog em on-prem.
+- 🔲 **ClickHouse provider real** — `ClickHouseAnalyticsWriter` já existe como adapter. Critérios objectivos ClickHouse vs. Elasticsearch: ClickHouse preferível para >100M events/day, queries de agregação OLAP pesadas, retenção longa e baixo custo storage; Elasticsearch preferível para full-text search, correlação de logs e queries ad-hoc em <10M eventos.
+- 🔲 **eBPF-based runtime signal** — alternativa ao CLR profiler para workloads Linux não-.NET (Wave D backlog).
+- 🔲 **Continuous Profiling** (pprof / dotnet-trace ingest) contextualizado por serviço — diferencial face a Dynatrace/Datadog em on-prem (Wave D backlog).
 
 #### C.4 Operação self-hosted e deploy
 
-- **Helm chart oficial + K8s Operator** (§11.1) — acrescentar **HA reference architecture** para >10 tenants e >1000 serviços.
-- **Upgrade path automatizado** entre versões — tooling de rollout seguro + rollback para migrações EF Core.
-- **Air-gapped install mode** com AI model bundle interno — mercado enterprise defesa/finance.
+- 🔲 **Helm chart oficial + K8s Operator** — HA reference architecture para >10 tenants e >1000 serviços.
+- 🔲 **Upgrade path automatizado** — tooling de rollout seguro + rollback para migrações EF Core.
+- 🔲 **Air-gapped install mode** com AI model bundle interno — mercado enterprise defesa/finance.
 
 ---
 
@@ -392,12 +397,11 @@ Editor visual de políticas (compliance, promotion gates, access) para Platform 
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
 
-1. **Wave A completo** — Dentro de A, começar por **A.1 Change Intelligence preditivo** + **A.2 Data Contracts + Consumer Inventory** + **A.4 AI Evaluation Harness** (maior alavanca × risco).
-2. **Wave B.2 (IDE/CLI)** + **Wave B.3 (Kafka real + OTel recipe)** — fecham itens já roadmapped e destravam adoção real.
-3. **Wave C.1 (supply-chain)** + **Wave C.2 (DORA pack)** — destrancam clientes enterprise regulados.
-4. **Wave C.4 (K8s operator + air-gapped)** — destranca escala e mercado defesa/finance.
-5. **Wave B.1 novos contratos** (AsyncAPI 3, OpenFeature, Terraform/Helm) cruzados com A.2.
-6. **Wave D** — apenas após A/B/C maduros; Digital Twin (D.1) primeiro, por ser o mais defensável.
+1. ✅ **Wave A completo** — A.1 Change Intelligence preditivo + A.2 Data Contracts + Consumer Inventory + A.3 Service Tier + Ownership + A.4 AI Evaluation Harness + A.5 ML correlation + A.6 FinOps + Cost-aware gate. **COMPLETO**.
+2. ✅ **Wave B completo** — B.1 AsyncAPI 3.x parity + B.2 CLI (nex catalog describe, nex change status) + PlatformApiToken + B.3 Backstage bridge + ExternalChangeRequest + OTel recipe + B.4 Knowledge Freshness + ProposedRunbook. **COMPLETO**.
+3. ✅ **Wave C.1 (supply-chain) + C.2 (Evidence integrity + DORA + Access Review escalation)** — destrancam clientes enterprise regulados. **PARCIALMENTE COMPLETO** (C.3 eBPF e C.4 Helm pendentes — Wave D).
+4. 🔲 **Wave C.4 (K8s operator + air-gapped)** — destranca escala e mercado defesa/finance.
+5. 🔲 **Wave D** — apenas após C.3/C.4 maduros; Digital Twin (D.1) primeiro, por ser o mais defensável.
 
 ### Riscos e recomendações transversais
 
