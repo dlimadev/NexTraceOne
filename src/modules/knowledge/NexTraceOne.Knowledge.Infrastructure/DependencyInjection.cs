@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +32,7 @@ public static class DependencyInjection
 
         services.AddDbContext<KnowledgeDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)
+                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
                 .AddInterceptors(
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
