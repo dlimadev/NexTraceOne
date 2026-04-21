@@ -14596,5 +14596,57 @@
       "invalidHistoricalDays": "Los días históricos deben estar entre 30 y 365 y ser mayores que los días recientes.",
       "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 200."
     }
+  },
+  "rollbackPatternReport": {
+    "title": "Informe de Patrón de Rollback",
+    "description": "Analiza patrones de rollback por servicio para identificar problemas sistémicos de despliegue.",
+    "patterns": {
+      "None": "Ninguno",
+      "Isolated": "Aislado",
+      "Recurring": "Recurrente",
+      "Serial": "Serial"
+    },
+    "flags": {
+      "systemicRisk": "Riesgo Sistémico",
+      "evidenceGap": "Brecha de Evidencia"
+    },
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de retrovisión deben estar entre 7 y 180.",
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 100."
+    }
+  },
+  "serviceCouplingIndexReport": {
+    "title": "Informe de Índice de Acoplamiento de Servicios",
+    "description": "Analiza relaciones de fan-in y fan-out para identificar hub services y riesgos arquitectónicos.",
+    "tiers": {
+      "Isolated": "Aislado",
+      "LooselyCoupled": "Acoplamiento Bajo",
+      "ModeratelyCoupled": "Acoplamiento Moderado",
+      "HighlyCoupled": "Acoplamiento Alto",
+      "HubService": "Hub Service"
+    },
+    "flags": {
+      "architecturalRisk": "Riesgo Arquitectónico",
+      "isolationRisk": "Riesgo de Aislamiento"
+    },
+    "errors": {
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 100."
+    }
+  },
+  "anomalyDetectionSummaryReport": {
+    "title": "Informe Resumen de Detección de Anomalías",
+    "description": "Agrega señales de anomalía de 5 fuentes para identificar servicios con múltiples problemas simultáneos.",
+    "densityLevels": {
+      "Clean": "Limpio",
+      "Moderate": "Moderado",
+      "Dense": "Denso",
+      "Critical": "Crítico"
+    },
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de retrovisión deben estar entre 7 y 90.",
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 100."
+    }
   }
 }

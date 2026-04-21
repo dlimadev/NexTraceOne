@@ -14596,5 +14596,87 @@
       "invalidHistoricalDays": "Os dias históricos devem ser entre 30 e 365 e maiores que os dias recentes.",
       "invalidMaxTopServices": "O número máximo de serviços deve ser entre 1 e 200."
     }
+  },
+  "rollbackPatternReport": {
+    "title": "Relatório de Padrão de Rollback",
+    "description": "Analisa padrões de rollback por serviço para identificar problemas sistémicos de deployment.",
+    "lookbackDays": "Dias de Retrovisão",
+    "maxTopServices": "Máx. Serviços no Ranking",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "totalReleasesInPeriod": "Releases no Período",
+    "totalRollbacksInPeriod": "Rollbacks no Período",
+    "globalRollbackRatePct": "Taxa Global de Rollback (%)",
+    "distribution": "Distribuição por Padrão",
+    "topByRollbackRate": "Top por Taxa de Rollback",
+    "topSerialServices": "Top Serviços Seriais",
+    "patterns": {
+      "None": "Nenhum",
+      "Isolated": "Isolado",
+      "Recurring": "Recorrente",
+      "Serial": "Serial"
+    },
+    "flags": {
+      "systemicRisk": "Risco Sistémico",
+      "evidenceGap": "Lacuna de Evidência"
+    },
+    "errors": {
+      "invalidTenantId": "O ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de retrovisão devem ser entre 7 e 180.",
+      "invalidMaxTopServices": "O número máximo de serviços deve ser entre 1 e 100."
+    }
+  },
+  "serviceCouplingIndexReport": {
+    "title": "Relatório de Índice de Acoplamento de Serviços",
+    "description": "Analisa relações de fan-in e fan-out para identificar hub services e riscos arquiteturais.",
+    "maxTopServices": "Máx. Serviços no Ranking",
+    "totalServicesAnalyzed": "Serviços Analisados",
+    "avgCouplingIndex": "Índice de Acoplamento Médio",
+    "isolatedServicePct": "Serviços Isolados (%)",
+    "distribution": "Distribuição por Tier",
+    "topHubServices": "Top Hub Services",
+    "topHighlyCoupledServices": "Top Serviços Altamente Acoplados",
+    "tiers": {
+      "Isolated": "Isolado",
+      "LooselyCoupled": "Baixo Acoplamento",
+      "ModeratelyCoupled": "Acoplamento Moderado",
+      "HighlyCoupled": "Alto Acoplamento",
+      "HubService": "Hub Service"
+    },
+    "flags": {
+      "architecturalRisk": "Risco Arquitetural",
+      "isolationRisk": "Risco de Isolamento"
+    },
+    "errors": {
+      "invalidMaxTopServices": "O número máximo de serviços deve ser entre 1 e 100."
+    }
+  },
+  "anomalyDetectionSummaryReport": {
+    "title": "Relatório Sumário de Deteção de Anomalias",
+    "description": "Agrega sinais de anomalia de 5 fontes para identificar serviços com múltiplos problemas simultâneos.",
+    "lookbackDays": "Dias de Retrovisão",
+    "maxTopServices": "Máx. Serviços no Ranking",
+    "totalServicesWithAnomalies": "Serviços com Anomalias",
+    "multiAnomalyServices": "Serviços Multi-Anomalia",
+    "topByAnomalyCount": "Top por Contagem de Anomalias",
+    "anomalyTimeline": "Timeline de Anomalias (30 dias)",
+    "typeDistribution": "Distribuição por Tipo de Anomalia",
+    "typeLabels": {
+      "wasteSignal": "Sinais de Desperdício",
+      "driftFinding": "Findings de Drift",
+      "sloBreach": "Violações de SLO",
+      "chaosFailure": "Falhas de Chaos",
+      "vulnerability": "Vulnerabilidades"
+    },
+    "densityLevels": {
+      "Clean": "Limpo",
+      "Moderate": "Moderado",
+      "Dense": "Denso",
+      "Critical": "Crítico"
+    },
+    "errors": {
+      "invalidTenantId": "O ID do tenant é obrigatório.",
+      "invalidLookbackDays": "Os dias de retrovisão devem ser entre 7 e 90.",
+      "invalidMaxTopServices": "O número máximo de serviços deve ser entre 1 e 100."
+    }
   }
 }

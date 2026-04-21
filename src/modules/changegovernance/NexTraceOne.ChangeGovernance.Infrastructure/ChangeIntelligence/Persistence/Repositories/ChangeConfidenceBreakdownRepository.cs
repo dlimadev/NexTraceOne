@@ -18,6 +18,18 @@ internal sealed class ChangeConfidenceBreakdownRepository(ChangeIntelligenceDbCo
             .Include(x => x.SubScores)
             .FirstOrDefaultAsync(x => x.ReleaseId == releaseId, cancellationToken);
 
+    /// <summary>Busca breakdowns de confiança para um conjunto de releases (batch lookup para relatórios).</summary>
+    public async Task<IReadOnlyList<ChangeConfidenceBreakdown>> ListByReleaseIdsAsync(
+        IEnumerable<ReleaseId> releaseIds, CancellationToken cancellationToken = default)
+    {
+        var ids = releaseIds.ToList();
+        if (ids.Count == 0) return [];
+        return await context.ConfidenceBreakdowns
+            .Include(x => x.SubScores)
+            .Where(x => ids.Contains(x.ReleaseId))
+            .ToListAsync(cancellationToken);
+    }
+
     /// <summary>Adiciona um novo breakdown de confiança ao contexto.</summary>
     public void Add(ChangeConfidenceBreakdown breakdown)
         => context.ConfidenceBreakdowns.Add(breakdown);

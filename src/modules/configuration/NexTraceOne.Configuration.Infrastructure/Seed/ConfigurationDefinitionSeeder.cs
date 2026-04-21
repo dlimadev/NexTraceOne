@@ -9125,5 +9125,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "50",
             uiEditorType: "number",
             sortOrder: 11430),
+
+        // ── Wave W config keys (sort 11440–11510) ─────────────────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "changegovernance.rollback_pattern.lookback_days",
+            displayName: "config.changegovernance.rollback_pattern.lookback_days.name",
+            description: "config.changegovernance.rollback_pattern.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11440),
+
+        ConfigurationDefinition.Create(
+            key: "changegovernance.rollback_pattern.serial_threshold",
+            displayName: "config.changegovernance.rollback_pattern.serial_threshold.name",
+            description: "config.changegovernance.rollback_pattern.serial_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "4",
+            uiEditorType: "number",
+            sortOrder: 11450),
+
+        ConfigurationDefinition.Create(
+            key: "changegovernance.rollback_pattern.systemic_risk_confidence_threshold",
+            displayName: "config.changegovernance.rollback_pattern.systemic_risk_confidence_threshold.name",
+            description: "config.changegovernance.rollback_pattern.systemic_risk_confidence_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 11460),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service_coupling_index.max_top_services",
+            displayName: "config.catalog.service_coupling_index.max_top_services.name",
+            description: "config.catalog.service_coupling_index.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11470),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.service_coupling_index.hub_threshold",
+            displayName: "config.catalog.service_coupling_index.hub_threshold.name",
+            description: "config.catalog.service_coupling_index.hub_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "70",
+            uiEditorType: "number",
+            sortOrder: 11480),
+
+        ConfigurationDefinition.Create(
+            key: "operationalintelligence.anomaly_detection.lookback_days",
+            displayName: "config.operationalintelligence.anomaly_detection.lookback_days.name",
+            description: "config.operationalintelligence.anomaly_detection.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11490),
+
+        ConfigurationDefinition.Create(
+            key: "operationalintelligence.anomaly_detection.max_top_services",
+            displayName: "config.operationalintelligence.anomaly_detection.max_top_services.name",
+            description: "config.operationalintelligence.anomaly_detection.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11500),
+
+        ConfigurationDefinition.Create(
+            key: "operationalintelligence.anomaly_detection.dense_threshold",
+            displayName: "config.operationalintelligence.anomaly_detection.dense_threshold.name",
+            description: "config.operationalintelligence.anomaly_detection.dense_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 11510),
     ];
 }

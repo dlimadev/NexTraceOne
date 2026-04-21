@@ -14585,5 +14585,133 @@
       "invalidHistoricalDays": "Historical days must be between 30 and 365 and greater than recent days.",
       "invalidMaxTopServices": "Max top services must be between 1 and 200."
     }
+  },
+  "rollbackPatternReport": {
+    "title": "Rollback Pattern Report",
+    "description": "Analyzes rollback patterns per service to identify systemic deployment issues.",
+    "lookbackDays": "Lookback Days",
+    "maxTopServices": "Max Top Services",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "totalReleasesInPeriod": "Releases in Period",
+    "totalRollbacksInPeriod": "Rollbacks in Period",
+    "globalRollbackRatePct": "Global Rollback Rate (%)",
+    "distribution": "Pattern Distribution",
+    "topByRollbackRate": "Top by Rollback Rate",
+    "topSerialServices": "Top Serial Services",
+    "patterns": {
+      "None": "None",
+      "Isolated": "Isolated",
+      "Recurring": "Recurring",
+      "Serial": "Serial"
+    },
+    "flags": {
+      "systemicRisk": "Systemic Risk",
+      "evidenceGap": "Evidence Gap"
+    },
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 7 and 180.",
+      "invalidMaxTopServices": "Max top services must be between 1 and 100."
+    }
+  },
+  "serviceCouplingIndexReport": {
+    "title": "Service Coupling Index Report",
+    "description": "Analyzes fan-in and fan-out relationships to identify hub services and architectural risks.",
+    "maxTopServices": "Max Top Services",
+    "totalServicesAnalyzed": "Services Analyzed",
+    "avgCouplingIndex": "Avg Coupling Index",
+    "isolatedServicePct": "Isolated Services (%)",
+    "distribution": "Tier Distribution",
+    "topHubServices": "Top Hub Services",
+    "topHighlyCoupledServices": "Top Highly Coupled Services",
+    "tiers": {
+      "Isolated": "Isolated",
+      "LooselyCoupled": "Loosely Coupled",
+      "ModeratelyCoupled": "Moderately Coupled",
+      "HighlyCoupled": "Highly Coupled",
+      "HubService": "Hub Service"
+    },
+    "flags": {
+      "architecturalRisk": "Architectural Risk",
+      "isolationRisk": "Isolation Risk"
+    },
+    "errors": {
+      "invalidMaxTopServices": "Max top services must be between 1 and 100."
+    }
+  },
+  "anomalyDetectionSummaryReport": {
+    "title": "Anomaly Detection Summary Report",
+    "description": "Aggregates anomaly signals from 5 sources to identify services with multiple simultaneous issues.",
+    "lookbackDays": "Lookback Days",
+    "maxTopServices": "Max Top Services",
+    "totalServicesWithAnomalies": "Services with Anomalies",
+    "multiAnomalyServices": "Multi-Anomaly Services",
+    "topByAnomalyCount": "Top by Anomaly Count",
+    "anomalyTimeline": "Anomaly Timeline (30 days)",
+    "typeDistribution": "Anomaly Type Distribution",
+    "typeLabels": {
+      "wasteSignal": "Waste Signals",
+      "driftFinding": "Drift Findings",
+      "sloBreach": "SLO Breaches",
+      "chaosFailure": "Chaos Failures",
+      "vulnerability": "Vulnerabilities"
+    },
+    "densityLevels": {
+      "Clean": "Clean",
+      "Moderate": "Moderate",
+      "Dense": "Dense",
+      "Critical": "Critical"
+    },
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 7 and 90.",
+      "invalidMaxTopServices": "Max top services must be between 1 and 100."
+    }
+  },
+  "config": {
+    "changegovernance": {
+      "rollback_pattern": {
+        "lookback_days": {
+          "name": "Rollback Pattern: Lookback Days",
+          "description": "Lookback window in days for rollback pattern analysis (7–180)."
+        },
+        "serial_threshold": {
+          "name": "Rollback Pattern: Serial Threshold",
+          "description": "Minimum rollback count to classify a service as 'Serial' pattern."
+        },
+        "systemic_risk_confidence_threshold": {
+          "name": "Rollback Pattern: Systemic Risk Confidence Threshold",
+          "description": "Avg confidence score below which a Serial service is flagged as systemic risk."
+        }
+      }
+    },
+    "catalog": {
+      "service_coupling_index": {
+        "max_top_services": {
+          "name": "Coupling Index: Max Top Services",
+          "description": "Maximum number of services to return in each coupling ranking."
+        },
+        "hub_threshold": {
+          "name": "Coupling Index: Hub Service Threshold",
+          "description": "Coupling index value at or above which a service is classified as a Hub Service."
+        }
+      }
+    },
+    "operationalintelligence": {
+      "anomaly_detection": {
+        "lookback_days": {
+          "name": "Anomaly Detection: Lookback Days",
+          "description": "Lookback window in days for anomaly detection aggregation (7–90)."
+        },
+        "max_top_services": {
+          "name": "Anomaly Detection: Max Top Services",
+          "description": "Maximum number of services to return in anomaly rankings."
+        },
+        "dense_threshold": {
+          "name": "Anomaly Detection: Dense Threshold",
+          "description": "Minimum number of distinct anomaly types to classify a service as 'Dense' or above."
+        }
+      }
+    }
   }
 }
