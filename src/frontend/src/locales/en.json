@@ -14337,5 +14337,86 @@
       "invalidLookbackDays": "Lookback days must be between 1 and 90.",
       "invalidTopWorstCount": "Top worst count must be between 1 and 100."
     }
+  },
+  "postIncidentLearningReport": {
+    "title": "Post-Incident Learning Report",
+    "description": "Measures how consistently incidents generate approved runbooks that prevent recurrence: learning rate by service, recurring incidents without documentation and coverage tier distribution",
+    "lookbackDays": "Lookback Days",
+    "totalIncidentsAnalyzed": "Total Incidents Analyzed",
+    "totalIncidentsWithRunbook": "Incidents with Runbook",
+    "tenantLearningRatePct": "Tenant Learning Rate (%)",
+    "totalRecurringWithoutRunbook": "Recurring Without Runbook",
+    "coverageDistribution": "Learning Coverage Distribution",
+    "fullCoverage": "Full (≥80%)",
+    "partialCoverage": "Partial (≥40%)",
+    "lowCoverage": "Low (<40%)",
+    "topLowCoverageServices": "Top Services with Low Coverage",
+    "allServices": "All Services",
+    "serviceName": "Service",
+    "totalIncidents": "Incidents",
+    "incidentsWithRunbook": "With Runbook",
+    "recurringIncidentsWithoutRunbook": "Recurring w/o Runbook",
+    "learningRatePct": "Learning Rate (%)",
+    "coverage": "Coverage",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 7 and 180.",
+      "invalidTopServiceCount": "Top service count must be between 1 and 100.",
+      "invalidPartialThreshold": "Partial coverage threshold must be less than full coverage threshold."
+    }
+  },
+  "apiSchemaCoverageReport": {
+    "title": "API Schema Coverage Report",
+    "description": "Documentation completeness of approved and locked contracts: response bodies, request bodies, examples and error status codes scored per contract with grade classification",
+    "totalContractsAnalyzed": "Total Contracts Analyzed",
+    "averageScoreGlobal": "Average Coverage Score",
+    "gradeDistribution": "Coverage Grade Distribution",
+    "gradeA": "Grade A (≥90)",
+    "gradeB": "Grade B (≥70)",
+    "gradeC": "Grade C (≥50)",
+    "gradeD": "Grade D (<50)",
+    "topLowCoverageContracts": "Contracts Needing Improvement",
+    "allContracts": "All Contracts",
+    "apiAssetId": "Asset ID",
+    "semVer": "Version",
+    "protocol": "Protocol",
+    "coverageScore": "Score",
+    "grade": "Grade",
+    "hasResponseBody": "Has Response Body",
+    "hasRequestBody": "Has Request Body",
+    "hasExamples": "Has Examples",
+    "hasErrorStatusCodes": "Has Error Status Codes",
+    "errors": {
+      "invalidTopLowCoverageCount": "Top low coverage count must be between 1 and 100.",
+      "invalidPageSize": "Page size must be between 10 and 1000."
+    }
+  },
+  "environmentStabilityReport": {
+    "title": "Environment Stability Report",
+    "description": "Stability score by environment derived from SLO compliance, drift-free rate, chaos success rate and incident-free rate: tier classification and non-prod vs prod stability comparison",
+    "lookbackDays": "Lookback Days",
+    "totalEnvironmentsAnalyzed": "Environments Analyzed",
+    "nonProdMoreUnstableThanProd": "Non-Prod More Unstable Than Prod",
+    "tierDistribution": "Stability Tier Distribution",
+    "stableTier": "Stable (≥80)",
+    "unstableTier": "Unstable (≥55)",
+    "criticalTier": "Critical (<55)",
+    "environments": "Environments",
+    "environment": "Environment",
+    "isProduction": "Production",
+    "stabilityScore": "Stability Score",
+    "tier": "Tier",
+    "sloComplianceRatePct": "SLO Compliance (%)",
+    "driftFreeRatePct": "Drift-Free Rate (%)",
+    "chaosSuccessRatePct": "Chaos Success (%)",
+    "incidentFreeRatePct": "Incident-Free Rate (%)",
+    "totalSloObservations": "SLO Observations",
+    "unacknowledgedDriftCount": "Unacknowledged Drifts",
+    "totalChaosExperiments": "Chaos Experiments",
+    "errors": {
+      "invalidTenantId": "Tenant ID is required.",
+      "invalidLookbackDays": "Lookback days must be between 1 and 90.",
+      "invalidMaxDriftPenaltyPerService": "Max drift penalty must be between 1 and 20."
+    }
   }
 }

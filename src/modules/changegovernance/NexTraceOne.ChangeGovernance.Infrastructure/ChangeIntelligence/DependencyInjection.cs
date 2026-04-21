@@ -78,6 +78,9 @@ public static class DependencyInjection
         // Default honest-null reader para Promotion Readiness Delta.
         // Uma bridge real p/ OperationalIntelligence substitui este default na composition root.
         services.AddScoped<IRuntimeComparisonReader, Services.NullRuntimeComparisonReader>();
+
+        // Wave T.1 — Post-Incident Learning Report (honest-null; bridge Knowledge → CG na composition root)
+        services.AddScoped<IIncidentLearningReader, Services.NullIncidentLearningReader>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();
 
