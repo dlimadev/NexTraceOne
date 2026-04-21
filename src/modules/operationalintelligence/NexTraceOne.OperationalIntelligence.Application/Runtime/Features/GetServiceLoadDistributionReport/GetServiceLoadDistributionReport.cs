@@ -228,11 +228,23 @@ public static class GetServiceLoadDistributionReport
                 ? Percentile(sortedCostPerReq, 50)
                 : 0m;
 
+            // Median total cost across all services — used for WasteCandidate comparison (same unit: USD)
+            var sortedTotalCost = withCost
+                .Where(e => e.TotalCostUsd > 0m)
+                .Select(e => e.TotalCostUsd)
+                .OrderBy(x => x)
+                .ToList();
+            decimal medianTotalCost = sortedTotalCost.Count > 0
+                ? Percentile(sortedTotalCost, 50)
+                : 0m;
+
             var entries = withCost
                 .Select(e =>
                 {
                     var band = ClassifyBand(e.AvgRps, highLoadThreshold, lowLoadThreshold);
-                    bool wasteCandidate = band == LoadBand.LowLoad && e.TotalCostUsd > medianCostPerReq;
+                    // WasteCandidate: LowLoad service whose total cost exceeds the median total cost
+                    // (same unit comparison: total USD vs median total USD)
+                    bool wasteCandidate = band == LoadBand.LowLoad && e.TotalCostUsd > medianTotalCost;
                     bool highEfficiency = band == LoadBand.HighLoad && e.CostPerReq > 0m && e.CostPerReq < medianCostPerReq;
 
                     return new ServiceLoadEntry(

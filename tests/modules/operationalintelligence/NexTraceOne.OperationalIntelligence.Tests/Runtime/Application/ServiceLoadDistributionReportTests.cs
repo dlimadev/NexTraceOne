@@ -91,9 +91,9 @@ public sealed class ServiceLoadDistributionReportTests
     // ── Single service: MediumLoad (only one → not top/bottom quartile) ────
 
     [Fact]
-    public async Task Handle_SingleService_ClassifiesAsMediumLoad()
+    public async Task Handle_SingleService_AnalyzesAndReturnsBand()
     {
-        // With a single service, it's exactly at P75 and P25 thresholds
+        // With a single service, P75 == P25 == rps, so rps >= highThreshold → HighLoad
         var pairs = new[] { ("svc-a", Env) };
         var snapshot = MakeSnapshot("svc-a", Env, rps: 50m);
 
@@ -107,9 +107,9 @@ public sealed class ServiceLoadDistributionReportTests
         Assert.True(result.IsSuccess);
         var r = result.Value;
         Assert.Equal(1, r.TotalServicesAnalyzed);
-        // Single service: P75 == P25 == rps, so >= P75 → HighLoad
-        // (boundary condition: rps >= highThreshold → HighLoad)
         Assert.Single(r.AllServices);
+        // Single service: P75 == P25 == rps, so >= P75 → HighLoad (boundary condition)
+        Assert.Equal(GetServiceLoadDistributionReport.LoadBand.HighLoad, r.AllServices[0].Band);
     }
 
     // ── High/Low load band assignment ─────────────────────────────────────
@@ -149,12 +149,13 @@ public sealed class ServiceLoadDistributionReportTests
         Assert.True(high.Count >= 1, "Expected at least 1 HighLoad service");
     }
 
-    // ── WasteCandidate: LowLoad service with non-zero cost ────────────────
+    // ── WasteCandidate: LowLoad service with cost above median total cost ──
 
     [Fact]
-    public async Task Handle_LowLoadServiceWithCost_FlagsWasteCandidate()
+    public async Task Handle_LowLoadServiceWithAboveMedianCost_FlagsWasteCandidate()
     {
-        // 4 services: svc-waste (very low RPS, high cost), others have medium RPS
+        // 4 services: svc-waste (very low RPS, very high cost), others have medium/high RPS and low cost
+        // svc-waste total cost = $10000 >> median total cost (others have $10)
         var pairs = new[] { ("svc-waste", Env), ("svc-m1", Env), ("svc-m2", Env), ("svc-m3", Env) };
 
         var handler = CreateHandler(pairs, (svc, env) => svc switch
@@ -165,7 +166,10 @@ public sealed class ServiceLoadDistributionReportTests
             "svc-m3" => [MakeSnapshot(svc, env, rps: 70m)],
             _ => []
         }, [
-            MakeCost(TenantId, "svc-waste", Env, 10000m) // expensive waste candidate
+            MakeCost(TenantId, "svc-waste", Env, 10000m), // expensive waste candidate
+            MakeCost(TenantId, "svc-m1", Env, 10m),
+            MakeCost(TenantId, "svc-m2", Env, 10m),
+            MakeCost(TenantId, "svc-m3", Env, 10m)
         ]);
 
         var result = await handler.Handle(DefaultQuery(), CancellationToken.None);
