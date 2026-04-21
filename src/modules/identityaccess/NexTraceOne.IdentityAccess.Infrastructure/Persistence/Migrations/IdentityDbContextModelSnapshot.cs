@@ -1855,6 +1855,113 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                     b.ToTable("iam_user_role_assignments", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.PlatformApiToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("LastUsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RevokedReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("TokenPrefix")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_iam_platform_tokens_tenant");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("uix_iam_platform_tokens_hash");
+
+                    b.ToTable("iam_platform_api_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AgentQueryRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("DurationMs")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset>("ExecutedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("QueryParametersJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("QueryType")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("ResponseCode")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TokenId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_iam_agent_query_tenant");
+
+                    b.HasIndex("TokenId")
+                        .HasDatabaseName("ix_iam_agent_query_token");
+
+                    b.HasIndex("ExecutedAt")
+                        .HasDatabaseName("ix_iam_agent_query_executed");
+
+                    b.ToTable("iam_agent_query_records", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewItem", b =>
                 {
                     b.HasOne("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", null)
@@ -1907,6 +2014,92 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.PolicyDefinition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("PolicyType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("RulesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ActionJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AppliesTo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("EnvironmentFilter")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "PolicyType")
+                        .HasDatabaseName("ix_iam_policy_definitions_tenant_type");
+
+                    b.HasIndex("IsEnabled")
+                        .HasDatabaseName("ix_iam_policy_definitions_enabled")
+                        .HasFilter("\"IsEnabled\" = true");
+
+                    b.ToTable("iam_policy_definitions", (string)null);
                 });
 #pragma warning restore 612, 618
         }

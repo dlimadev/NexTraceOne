@@ -64,6 +64,15 @@ public sealed class KnowledgeDocument : Entity<KnowledgeDocumentId>
     /// <summary>Token de concorrência otimista (PostgreSQL xmin).</summary>
     public uint RowVersion { get; set; }
 
+    /// <summary>Score de frescura do documento (0–100). 100 = totalmente fresco.</summary>
+    public int FreshnessScore { get; private set; } = 100;
+
+    /// <summary>Data da última revisão do documento.</summary>
+    public DateTimeOffset? LastReviewedAt { get; private set; }
+
+    /// <summary>Utilizador que fez a última revisão.</summary>
+    public string? ReviewedBy { get; private set; }
+
     private KnowledgeDocument() { }
 
     /// <summary>Cria um novo documento de conhecimento.</summary>
@@ -155,6 +164,26 @@ public sealed class KnowledgeDocument : Entity<KnowledgeDocumentId>
     {
         Status = DocumentStatus.Draft;
         UpdatedAt = utcNow;
+    }
+
+    /// <summary>
+    /// Calcula e atualiza o FreshnessScore com base na idade do documento
+    /// e no tempo desde a última revisão.
+    /// Algoritmo: Score decresce linearmente ao longo de 180 dias sem revisão.
+    /// </summary>
+    public void ComputeFreshnessScore(DateTimeOffset now)
+    {
+        var referenceDate = LastReviewedAt ?? UpdatedAt ?? CreatedAt;
+        var daysSinceReview = (now - referenceDate).TotalDays;
+        FreshnessScore = Math.Max(0, (int)Math.Round(100 - daysSinceReview / 180.0 * 100));
+    }
+
+    /// <summary>Marca o documento como revisto.</summary>
+    public void MarkReviewed(string reviewedBy, DateTimeOffset at)
+    {
+        ReviewedBy = reviewedBy;
+        LastReviewedAt = at;
+        FreshnessScore = 100;
     }
 
     private static string GenerateSlug(string title)

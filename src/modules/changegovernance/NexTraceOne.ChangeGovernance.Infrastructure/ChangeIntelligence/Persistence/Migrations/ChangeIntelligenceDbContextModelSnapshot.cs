@@ -701,6 +701,11 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.Property<string>("ApprovalStatus")
                         .HasColumnType("text");
 
+                    b.Property<string>("ArtifactDigest")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("artifact_digest");
+
                     b.Property<int>("ChangeLevel")
                         .HasColumnType("integer");
 
@@ -776,6 +781,16 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("SbomUri")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("sbom_uri");
+
+                    b.Property<string>("SlsaProvenanceUri")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("slsa_provenance_uri");
+
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -814,6 +829,10 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                     b.HasIndex("ExternalReleaseId", "ExternalSystem")
                         .HasDatabaseName("ix_chg_releases_external_key")
                         .HasFilter("\"ExternalReleaseId\" IS NOT NULL AND \"ExternalSystem\" IS NOT NULL");
+
+                    b.HasIndex("ArtifactDigest")
+                        .HasDatabaseName("ix_chg_releases_artifact_digest")
+                        .HasFilter("\"artifact_digest\" IS NOT NULL");
 
                     b.ToTable("chg_releases", null, t =>
                         {
@@ -1190,6 +1209,309 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persist
                         });
 
                     b.Navigation("SubScores");
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Compliance.Entities.TenantBenchmarkConsent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("ConsentedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ConsentedByUserId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("LgpdLawfulBasis")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_chg_benchmark_consents_tenant_id");
+
+                    b.ToTable("chg_benchmark_consents", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Compliance.Entities.BenchmarkSnapshotRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("PeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("PeriodEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("DeploymentFrequencyPerWeek")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<decimal>("LeadTimeForChangesHours")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<decimal>("ChangeFailureRatePercent")
+                        .HasPrecision(7, 4)
+                        .HasColumnType("numeric(7,4)");
+
+                    b.Property<decimal>("MeanTimeToRestoreHours")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<decimal>("MaturityScore")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("numeric(6,2)");
+
+                    b.Property<decimal?>("CostPerRequestUsd")
+                        .HasPrecision(18, 8)
+                        .HasColumnType("numeric(18,8)");
+
+                    b.Property<int>("ServiceCount")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsAnonymizedForBenchmarks")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_chg_benchmark_snapshots_tenant_id");
+
+                    b.HasIndex("PeriodStart", "PeriodEnd")
+                        .HasDatabaseName("ix_chg_benchmark_snapshots_period");
+
+                    b.HasIndex("IsAnonymizedForBenchmarks")
+                        .HasDatabaseName("ix_chg_benchmark_snapshots_anonymized")
+                        .HasFilter("\"IsAnonymizedForBenchmarks\" = true");
+
+                    b.ToTable("chg_benchmark_snapshots", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.ChangeIntelligence.Entities.ReleaseCalendarEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("WindowType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("EnvironmentFilter")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("StartsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("EndsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RecurrenceTag")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ClosedByUserId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset?>("ClosedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_chg_release_calendar_tenant_id");
+
+                    b.HasIndex("TenantId", "WindowType", "Status")
+                        .HasDatabaseName("ix_chg_release_calendar_tenant_type_status");
+
+                    b.HasIndex("TenantId", "StartsAt", "EndsAt")
+                        .HasDatabaseName("ix_chg_release_calendar_tenant_period");
+
+                    b.ToTable("chg_release_calendar_entries", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Compliance.Entities.ServiceRiskProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("ServiceAssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<int>("OverallRiskLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OverallScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VulnerabilityScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChangeFailureScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BlastRadiusScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PolicyViolationScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ActiveSignalsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ActiveSignalCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("ComputedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "ServiceAssetId", "ComputedAt")
+                        .HasDatabaseName("ix_chg_risk_profiles_tenant_service_computed");
+
+                    b.HasIndex("TenantId", "OverallRiskLevel")
+                        .HasDatabaseName("ix_chg_risk_profiles_tenant_risk_level");
+
+                    b.HasIndex("TenantId", "OverallScore")
+                        .HasDatabaseName("ix_chg_risk_profiles_tenant_score");
+
+                    b.ToTable("chg_service_risk_profiles", (string)null);
                 });
 #pragma warning restore 612, 618
         }

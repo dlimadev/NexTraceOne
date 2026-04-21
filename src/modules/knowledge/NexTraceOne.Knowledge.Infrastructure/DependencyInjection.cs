@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +32,7 @@ public static class DependencyInjection
 
         services.AddDbContext<KnowledgeDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)
+                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
                 .AddInterceptors(
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
@@ -47,6 +49,7 @@ public static class DependencyInjection
         // Cross-module search provider
         services.AddScoped<IKnowledgeSearchProvider, KnowledgeSearchProvider>();
         services.AddScoped<IRunbookKnowledgeLinkingService, RunbookKnowledgeLinkingService>();
+        services.AddScoped<IProposedRunbookRepository, ProposedRunbookRepository>();
 
         // Cross-module contract: IKnowledgeModule — consumido pelo Governance e AI para métricas de conhecimento
         services.AddScoped<IKnowledgeModule, Knowledge.Infrastructure.Services.KnowledgeModuleService>();

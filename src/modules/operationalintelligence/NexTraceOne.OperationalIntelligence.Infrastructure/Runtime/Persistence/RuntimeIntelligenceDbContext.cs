@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
+using NexTraceOne.OperationalIntelligence.Domain.FinOps.Entities;
 using NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
@@ -52,6 +53,15 @@ public sealed class RuntimeIntelligenceDbContext(
 
     /// <summary>Relatórios de resiliência gerados após experimentos de chaos.</summary>
     public DbSet<ResilienceReport> ResilienceReports => Set<ResilienceReport>();
+
+    /// <summary>Sessões de profiling contínuo ingestadas por serviço.</summary>
+    public DbSet<ProfilingSession> ProfilingSessions => Set<ProfilingSession>();
+
+    /// <summary>Registos de alocação de custo operacional por serviço (FinOps Contextual).</summary>
+    public DbSet<ServiceCostAllocationRecord> ServiceCostAllocations => Set<ServiceCostAllocationRecord>();
+
+    /// <summary>Observações pontuais de SLO por serviço e métrica (SLO Tracking).</summary>
+    public DbSet<SloObservation> SloObservations => Set<SloObservation>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

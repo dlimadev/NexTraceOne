@@ -32,4 +32,16 @@ internal sealed class AccessReviewRepository(IdentityDbContext dbContext) : IAcc
 
     public void Add(AccessReviewCampaign campaign)
         => dbContext.AccessReviewCampaigns.Add(campaign);
+
+    public async Task<IReadOnlyList<AccessReviewCampaign>> ListOpenApproachingDeadlineAsync(
+        DateTimeOffset now,
+        DateTimeOffset deadlineBefore,
+        CancellationToken ct)
+        => await dbContext.AccessReviewCampaigns
+            .Include(x => x.Items)
+            .Where(x => x.Status == AccessReviewCampaignStatus.Open
+                        && x.Deadline > now
+                        && x.Deadline <= deadlineBefore)
+            .OrderBy(x => x.Deadline)
+            .ToListAsync(ct);
 }

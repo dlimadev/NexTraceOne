@@ -13183,5 +13183,663 @@
     },
     "importSuccess": "Change request imported",
     "alreadyExists": "Change request already ingested"
+  },
+  "wasteSignals": {
+    "title": "Waste Signals",
+    "detect": "Detect Waste",
+    "report": "Waste Report",
+    "type": {
+      "IdleResources": "Idle Resources",
+      "Overprovisioned": "Overprovisioned",
+      "UnattachedStorage": "Unattached Storage",
+      "UnusedLicenses": "Unused Licenses",
+      "OrphanedResources": "Orphaned Resources",
+      "OverlappingServices": "Overlapping Services"
+    },
+    "estimatedSavings": "Est. Monthly Savings",
+    "detected": "Detected At",
+    "acknowledged": "Acknowledged",
+    "focusExport": "FOCUS Export",
+    "changeGate": "Cost-aware Change Gate",
+    "gateApproved": "Cost gate passed",
+    "gateBlocked": "Cost gate blocked",
+    "gateReview": "Cost review required"
+  },
+  "knowledgeFreshness": {
+    "title": "Knowledge Freshness",
+    "report": "Freshness Report",
+    "score": "Freshness Score",
+    "lastReviewed": "Last Reviewed",
+    "status": {
+      "Fresh": "Fresh",
+      "Aging": "Aging",
+      "Stale": "Stale"
+    },
+    "markReviewed": "Mark as Reviewed"
+  },
+  "proposedRunbook": {
+    "title": "Proposed Runbooks",
+    "propose": "Propose Runbook",
+    "approve": "Approve",
+    "reject": "Reject",
+    "status": {
+      "Proposed": "Proposed",
+      "UnderReview": "Under Review",
+      "Approved": "Approved",
+      "Rejected": "Rejected"
+    },
+    "fromIncident": "Generated from incident",
+    "reviewNote": "Review Note"
+  },
+  "crossModuleSearch": {
+    "title": "Search",
+    "placeholder": "Search across knowledge, runbooks, notes...",
+    "noResults": "No results found"
+  },
+  "aiCostAttribution": {
+    "title": "AI Cost Attribution",
+    "byModel": "By Model",
+    "totalCost": "Total Cost (USD)",
+    "tokens": "Tokens",
+    "promptTokens": "Prompt Tokens",
+    "completionTokens": "Completion Tokens",
+    "period": "Period"
+  },
+  "vulnerabilityGate": {
+    "title": "Vulnerability Gate",
+    "ingest": "Ingest Advisory Report",
+    "summary": "Vulnerability Summary",
+    "gate": "Vulnerability Promotion Gate",
+    "gatePassed": "No blocking vulnerabilities",
+    "gateBlockedCritical": "Blocked: critical vulnerabilities found",
+    "gateBlockedHigh": "Blocked: high vulnerabilities exceed threshold",
+    "severity": {
+      "Critical": "Critical",
+      "High": "High",
+      "Medium": "Medium",
+      "Low": "Low",
+      "None": "None"
+    },
+    "advisoryId": "Advisory ID",
+    "source": "Source",
+    "cvssScore": "CVSS Score",
+    "publishedAt": "Published At",
+    "fixedIn": "Fixed In",
+    "active": "Active"
+  },
+  "signedEvidencePack": {
+    "title": "Evidence Pack Integrity",
+    "sign": "Sign Evidence Pack",
+    "verify": "Verify Integrity",
+    "signed": "Signed",
+    "unsigned": "Not Signed",
+    "valid": "Integrity Valid",
+    "invalid": "Integrity INVALID",
+    "signedBy": "Signed By",
+    "signedAt": "Signed At",
+    "integrityHash": "Integrity Hash"
+  },
+  "accessReviewEscalation": {
+    "title": "Access Review Escalation",
+    "escalate": "Escalate Overdue Reviews",
+    "daysBeforeDeadline": "Days Before Deadline",
+    "escalated": "Campaigns Escalated",
+    "campaignExpiring": "Campaign expiring soon",
+    "pendingItems": "Pending items"
+  },
+  "digitalTwin": {
+    "title": "Digital Twin",
+    "whatIf": "What-If Analysis",
+    "topologySnapshot": "Topology Snapshot",
+    "simulateChange": "Simulate Contract Change",
+    "changeType": {
+      "Additive": "Additive",
+      "NonBreaking": "Non-Breaking",
+      "Breaking": "Breaking",
+      "Deprecation": "Deprecation"
+    },
+    "impactLevel": {
+      "None": "No Impact",
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "overallRisk": "Overall Risk",
+    "affectedConsumers": "Affected Consumers",
+    "totalConsumers": "Total Consumers",
+    "consumerName": "Consumer Service",
+    "recommendation": "Recommendation",
+    "nodeCount": "Nodes",
+    "edgeCount": "Edges",
+    "capturedAt": "Captured At",
+    "noSnapshot": "No topology snapshot available",
+    "failureSim": {
+      "title": "Failure Impact Simulation",
+      "cascadeRisk": "Cascade Risk",
+      "exposedApis": "Exposed APIs",
+      "directImpact": "Direct Impact",
+      "transitiveImpact": "Transitive Impact",
+      "totalImpacted": "Total Impacted Services",
+      "consumerTeam": "Consumer Team"
+    }
+  },
+  "agentApi": {
+    "title": "Agent API Tokens",
+    "create": "Create Token",
+    "revoke": "Revoke",
+    "scope": {
+      "Read": "Read",
+      "ReadWrite": "Read & Write",
+      "Admin": "Admin"
+    },
+    "prefix": "Token Prefix",
+    "expiresAt": "Expires At",
+    "lastUsed": "Last Used",
+    "active": "Active",
+    "revoked": "Revoked",
+    "revokeReason": "Revocation Reason",
+    "auditLog": "Agent Query Audit Log",
+    "queryType": "Query Type",
+    "responseCode": "Response Code",
+    "durationMs": "Duration (ms)",
+    "executedAt": "Executed At",
+    "rawTokenHint": "This token is shown only once. Store it securely."
+  },
+  "nis2Compliance": {
+    "title": "NIS2 Compliance Report",
+    "overallStatus": "Overall Status",
+    "controlId": "Control ID",
+    "controlName": "Control",
+    "status": {
+      "NotAssessed": "Not Assessed",
+      "Compliant": "Compliant",
+      "PartiallyCompliant": "Partially Compliant",
+      "NonCompliant": "Non-Compliant"
+    },
+    "periodDays": "Evaluation Period (days)",
+    "generatedAt": "Generated At",
+    "signedPacks": "Signed Evidence Packs",
+    "totalReleases": "Total Releases"
+  },
+  "slsa": {
+    "title": "SLSA Level 3 Evidence",
+    "provenanceUri": "Provenance URI",
+    "artifactDigest": "Artifact Digest",
+    "sbomUri": "SBOM URI",
+    "hasAttestation": "Has Artifact Attestation",
+    "artifactGate": {
+      "title": "Signed Artifact Gate",
+      "passed": "Artifact attestation verified",
+      "failed": "No artifact attestation found",
+      "skipped": "Gate disabled"
+    }
+  },
+  "profiling": {
+    "title": "Continuous Profiling",
+    "frameType": "Frame Type",
+    "windowStart": "Window Start",
+    "windowEnd": "Window End",
+    "durationSeconds": "Duration (s)",
+    "totalCpuSamples": "Total CPU Samples",
+    "peakMemoryMb": "Peak Memory (MB)",
+    "peakThreadCount": "Peak Thread Count",
+    "hasAnomalies": "Has Anomalies",
+    "topFrames": "Top Frames (Hotspots)",
+    "rawDataUri": "Raw Data URI",
+    "releaseVersion": "Release Version",
+    "ingest": {
+      "title": "Ingest Profiling Session",
+      "success": "Profiling session ingested successfully"
+    },
+    "history": {
+      "title": "Profiling History",
+      "empty": "No profiling sessions found for this service"
+    },
+    "analysis": {
+      "title": "Profiling Analysis",
+      "notFound": "Profiling session not found"
+    }
+  },
+  "migrationHealth": {
+    "title": "Upgrade Readiness Report",
+    "totalModules": "Total Modules",
+    "upgradeSteps": "Upgrade Steps",
+    "maintenanceWindow": "Recommended Maintenance Window"
+  },
+  "benchmark": {
+    "title": "Cross-tenant Benchmarks",
+    "consent": {
+      "title": "Benchmark Participation Consent",
+      "status": "Consent Status",
+      "lgpdBasis": "LGPD/GDPR Lawful Basis",
+      "grant": "Grant Consent",
+      "revoke": "Revoke Consent",
+      "notGranted": "Consent not granted for benchmark participation"
+    },
+    "snapshot": {
+      "title": "Benchmark Snapshot",
+      "submit": "Submit Metrics Snapshot",
+      "deployFreq": "Deployment Frequency (per week)",
+      "leadTime": "Lead Time for Changes (hours)",
+      "failureRate": "Change Failure Rate (%)",
+      "mttr": "Mean Time to Restore (hours)",
+      "maturity": "Maturity Score",
+      "costPerRequest": "Cost per Request (USD)"
+    },
+    "ranking": {
+      "title": "Benchmark Ranking",
+      "peerSetSize": "Peer Set Size",
+      "percentile": "Percentile",
+      "insufficientPeers": "Insufficient peer data for ranking"
+    }
+  },
+  "policyStudio": {
+    "title": "Policy Studio",
+    "create": "Create Policy",
+    "update": "Update Policy",
+    "evaluate": "Evaluate Policy",
+    "name": "Policy Name",
+    "type": "Policy Type",
+    "isEnabled": "Enabled",
+    "version": "Version",
+    "appliesTo": "Applies To",
+    "environment": "Environment Filter",
+    "rulesJson": "Rules (JSON)",
+    "actionJson": "Action (JSON)",
+    "evaluation": {
+      "title": "Policy Evaluation",
+      "contextJson": "Context (JSON)",
+      "passed": "Passed",
+      "failed": "Failed",
+      "action": "Action",
+      "message": "Message",
+      "ruleTriggered": "Rule Triggered"
+    },
+    "errors": {
+      "notFound": "Policy definition not found",
+      "disabled": "Policy is disabled"
+    }
+  },
+  "releaseCalendar": {
+    "title": "Release Calendar",
+    "window": "Release Window",
+    "registerWindow": "Register Window",
+    "closeWindow": "Close Window",
+    "cancelWindow": "Cancel Window",
+    "windowType": "Window Type",
+    "windowStatus": "Status",
+    "startsAt": "Starts At",
+    "endsAt": "Ends At",
+    "environmentFilter": "Environment Filter",
+    "recurrenceTag": "Recurrence Tag",
+    "blocksChanges": "Blocks Changes",
+    "isHotfixOnly": "Hotfix Only",
+    "isOpen": "Window Open",
+    "isClosed": "Window Closed",
+    "windowTypes": {
+      "Scheduled": "Scheduled Deployment",
+      "Freeze": "Freeze Window",
+      "HotfixAllowed": "Hotfix Allowed",
+      "Maintenance": "Maintenance"
+    },
+    "windowStatuses": {
+      "Active": "Active",
+      "Closed": "Closed",
+      "Cancelled": "Cancelled"
+    },
+    "changeBlocked": "Change is blocked by an active freeze or maintenance window.",
+    "changeAllowed": "Change is allowed in the current release window.",
+    "errors": {
+      "invalidWindow": "End date must be after start date.",
+      "alreadyClosed": "Window is not in Active status.",
+      "alreadyStarted": "Cannot cancel a window that has already started."
+    }
+  },
+  "riskCenter": {
+    "title": "Risk Center",
+    "report": "Risk Report",
+    "profile": "Risk Profile",
+    "compute": "Compute Risk Profile",
+    "overallRisk": "Overall Risk",
+    "overallScore": "Risk Score",
+    "vulnerabilityScore": "Vulnerability Score",
+    "changeFailureScore": "Change Failure Score",
+    "blastRadiusScore": "Blast Radius Score",
+    "policyViolationScore": "Policy Violation Score",
+    "activeSignals": "Active Risk Signals",
+    "computedAt": "Computed At",
+    "distribution": "Risk Distribution",
+    "riskLevels": {
+      "Negligible": "Negligible",
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "signalTypes": {
+      "VulnerabilityCritical": "Critical Vulnerability",
+      "HighChangeFailureRate": "High Change Failure Rate",
+      "LargeBlastRadius": "Large Blast Radius",
+      "PolicyViolation": "Policy Violation",
+      "NoOwner": "No Owner Defined",
+      "StaleContract": "Stale Contract",
+      "UnreviewedRelease": "Unreviewed Release"
+    },
+    "errors": {
+      "profileNotFound": "No risk profile found for this service."
+    }
+  },
+  "soc2Compliance": {
+    "title": "SOC 2 Compliance Report",
+    "overallStatus": "Overall Status",
+    "controlId": "Control ID",
+    "controlName": "Control",
+    "periodDays": "Evaluation Period (days)",
+    "generatedAt": "Generated At",
+    "totalReleases": "Total Releases",
+    "signedPacks": "Signed Evidence Packs",
+    "controls": {
+      "CC6": "Logical and Physical Access Controls",
+      "CC7": "System Operations",
+      "CC8": "Change Management",
+      "CC9": "Risk Mitigation",
+      "A1": "Availability"
+    },
+    "errors": {
+      "notEnabled": "SOC 2 compliance report is not enabled for this tenant."
+    }
+  },
+  "iso27001Compliance": {
+    "title": "ISO/IEC 27001:2022 Compliance Report",
+    "overallStatus": "Overall Status",
+    "controlId": "Control ID",
+    "controlName": "Control",
+    "periodDays": "Evaluation Period (days)",
+    "generatedAt": "Generated At",
+    "totalReleases": "Total Releases",
+    "signedPacks": "Signed Evidence Packs",
+    "controls": {
+      "A.8.8": "Management of Technical Vulnerabilities",
+      "A.8.32": "Change Management",
+      "A.5.26": "Response to Information Security Incidents",
+      "A.5.29": "Information Security During Disruption",
+      "A.8.9": "Configuration Management"
+    },
+    "errors": {
+      "notEnabled": "ISO 27001 compliance report is not enabled for this tenant."
+    }
+  },
+  "graphqlSchema": {
+    "title": "GraphQL Schema Analysis",
+    "analyze": {
+      "title": "Analyze GraphQL Schema",
+      "success": "GraphQL schema analyzed and snapshot captured successfully."
+    },
+    "history": {
+      "title": "Schema History",
+      "empty": "No GraphQL schema snapshots found for this contract.",
+      "capturedAt": "Captured At",
+      "typeCount": "Types",
+      "fieldCount": "Fields",
+      "operationCount": "Operations"
+    },
+    "diff": {
+      "title": "Breaking Change Detection",
+      "hasBreakingChanges": "Has Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Non-Breaking Changes",
+      "changeTypes": {
+        "TypeRemoved": "Type Removed",
+        "TypeAdded": "Type Added",
+        "FieldRemoved": "Field Removed",
+        "FieldAdded": "Field Added",
+        "OperationRemoved": "Operation Removed",
+        "OperationAdded": "Operation Added"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "GraphQL schema snapshot not found.",
+      "schemaTooBig": "Schema content exceeds the maximum allowed size.",
+      "invalidSchema": "Schema content is invalid or could not be parsed."
+    }
+  },
+  "protobufSchema": {
+    "title": "Protobuf / gRPC Schema Analysis",
+    "analyze": {
+      "title": "Analyze Protobuf Schema",
+      "success": "Protobuf schema analyzed and snapshot captured successfully."
+    },
+    "history": {
+      "title": "Schema History",
+      "empty": "No Protobuf schema snapshots found for this contract.",
+      "capturedAt": "Captured At",
+      "messageCount": "Messages",
+      "fieldCount": "Fields",
+      "serviceCount": "Services",
+      "rpcCount": "RPCs",
+      "syntax": "Syntax"
+    },
+    "diff": {
+      "title": "Breaking Change Detection",
+      "hasBreakingChanges": "Has Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Non-Breaking Changes",
+      "changeTypes": {
+        "MessageRemoved": "Message Removed",
+        "MessageAdded": "Message Added",
+        "FieldRemoved": "Field Removed",
+        "FieldAdded": "Field Added",
+        "ServiceRemoved": "Service Removed",
+        "ServiceAdded": "Service Added",
+        "RpcRemoved": "RPC Removed",
+        "RpcAdded": "RPC Added"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "Protobuf schema snapshot not found.",
+      "schemaTooBig": "Schema content exceeds the maximum allowed size (256 KB).",
+      "invalidSchema": "Schema content is invalid or could not be parsed."
+    }
+  },
+  "pciDssCompliance": {
+    "title": "PCI-DSS Compliance Report",
+    "subtitle": "PCI-DSS v4.0 compliance status based on change management, audit trail and evidence packs.",
+    "requirements": {
+      "req12": "Network Security Controls",
+      "req6": "Secure Systems and Software",
+      "req10": "Log and Monitor All Access",
+      "req11": "Security Testing",
+      "req12policy": "Organizational Policies and Programs"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "PCI-DSS compliance reporting is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "maturityV2": {
+    "title": "Service Maturity Score v2",
+    "subtitle": "Dimensional maturity scoring with tier-aware weights and vulnerability posture.",
+    "levels": {
+      "Nascente": "Nascent",
+      "Em Desenvolvimento": "Developing",
+      "Maduro": "Mature",
+      "Excelente": "Excellent"
+    },
+    "dimensions": {
+      "ownership": "Ownership",
+      "contracts": "Contracts",
+      "documentation": "Documentation",
+      "operational_readiness": "Operational Readiness",
+      "tier_compliance": "Tier Compliance",
+      "vulnerability_posture": "Vulnerability Posture"
+    },
+    "tier": "Service Tier",
+    "overallScore": "Overall Score",
+    "computedAt": "Computed At",
+    "errors": {
+      "serviceNotFound": "Service not found.",
+      "computationFailed": "Failed to compute maturity score."
+    }
+  },
+  "hipaaCompliance": {
+    "title": "HIPAA Security Rule Compliance Report",
+    "subtitle": "HIPAA Security Rule compliance status based on change management, audit trail and evidence packs.",
+    "controls": {
+      "accessControl": "Access Control",
+      "auditControls": "Audit Controls",
+      "integrity": "Integrity",
+      "authentication": "Person/Entity Authentication",
+      "transmissionSecurity": "Transmission Security"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "HIPAA compliance reporting is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "serviceCostAllocation": {
+    "title": "Service Cost Allocation",
+    "subtitle": "Contextual FinOps report: operational cost allocated by service, team, domain and environment.",
+    "categories": {
+      "Compute": "Compute",
+      "Storage": "Storage",
+      "Network": "Network",
+      "Licensing": "Licensing",
+      "Observability": "Observability",
+      "Other": "Other"
+    },
+    "grandTotal": "Grand Total (USD)",
+    "totalRecords": "Total Records",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Period (days)",
+    "ingest": {
+      "success": "Cost record ingested successfully.",
+      "invalidPeriod": "Period end must be after period start.",
+      "negativeAmount": "Amount must be non-negative."
+    },
+    "insights": {
+      "title": "FinOps Insights",
+      "subtitle": "Cost anomalies and optimization opportunities detected for this period.",
+      "types": {
+        "CostOutlier": "Cost Outlier",
+        "NonProdExceedsProd": "Non-Prod Exceeds Prod",
+        "CategoryGrowth": "Category Growth"
+      },
+      "noInsights": "No cost anomalies detected for this period."
+    }
+  },
+  "dependencyRisk": {
+    "title": "Dependency Risk Report",
+    "subtitle": "Graph-based risk scoring for services: tier, API fan-in and ownership governance gaps.",
+    "riskLevels": {
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "overallRisk": "Overall Graph Risk",
+    "highRiskCount": "High/Critical Risk Services",
+    "totalAnalyzed": "Services Analyzed",
+    "service": "Service",
+    "tier": "Tier",
+    "owner": "Owner Team",
+    "riskScore": "Risk Score",
+    "apiCount": "APIs Exposed",
+    "riskFactors": "Risk Factors",
+    "errors": {
+      "noServices": "No services found for the specified filter.",
+      "tenantRequired": "Tenant ID is required."
+    }
+  },
+  "gdprCompliance": {
+    "title": "GDPR Compliance Report",
+    "subtitle": "General Data Protection Regulation compliance status based on change management, audit trail, evidence packs and data governance controls.",
+    "articles": {
+      "art5": "Principles of Processing",
+      "art13": "Transparency",
+      "art17": "Right to Erasure",
+      "art25": "Privacy by Design",
+      "art33": "Breach Notification Readiness"
+    },
+    "overallStatus": "Overall Status",
+    "totalReleases": "Total Releases",
+    "signedEvidencePacks": "Signed Evidence Packs",
+    "totalEvidencePacks": "Total Evidence Packs",
+    "generatedAt": "Report Generated At",
+    "periodDays": "Evaluation Period (days)",
+    "errors": {
+      "notEnabled": "GDPR compliance reporting is not enabled for this tenant.",
+      "invalidPeriod": "Evaluation period must be between 1 and 365 days."
+    }
+  },
+  "sloTracking": {
+    "title": "SLO Compliance Summary",
+    "trendTitle": "SLO Violation Trend",
+    "subtitle": "Service Level Objective compliance tracking: observed values vs targets, violation rates and trend analysis.",
+    "statuses": {
+      "Met": "Met",
+      "Warning": "Warning",
+      "Breached": "Breached"
+    },
+    "overallStatus": {
+      "AllMet": "All SLOs Met",
+      "Partial": "Partially Compliant",
+      "Violated": "SLO Violated",
+      "NoData": "No Data"
+    },
+    "complianceRate": "Compliance Rate (%)",
+    "totalObservations": "Total Observations",
+    "totalViolations": "Total Violations",
+    "trend": {
+      "Improving": "Improving",
+      "Stable": "Stable",
+      "Worsening": "Worsening",
+      "Insufficient": "Insufficient Data"
+    },
+    "peakViolationDate": "Peak Violation Date",
+    "ingest": {
+      "success": "SLO observation ingested successfully.",
+      "invalidPeriod": "Period end must be after period start.",
+      "invalidTarget": "SLO target must be greater than zero."
+    },
+    "errors": {
+      "noObservations": "No SLO observations found for the specified filter.",
+      "tenantRequired": "Tenant ID is required."
+    }
+  },
+  "rollbackRecommendation": {
+    "title": "Change Rollback Recommendation",
+    "subtitle": "Composite rollback urgency scoring based on change confidence, blast radius and evidence pack integrity.",
+    "urgency": {
+      "None": "Not Indicated",
+      "Suggest": "Consider Rollback",
+      "Recommend": "Rollback Recommended",
+      "Critical": "Rollback Urgent"
+    },
+    "rollbackScore": "Rollback Score",
+    "factors": {
+      "ChangeConfidence": "Change Confidence",
+      "BlastRadius": "Blast Radius",
+      "EvidenceIntegrity": "Evidence Pack Integrity"
+    },
+    "hasConfidenceData": "Confidence Data Available",
+    "hasBlastRadiusData": "Blast Radius Data Available",
+    "evidencePackCount": "Evidence Packs",
+    "errors": {
+      "releaseNotFound": "Release not found.",
+      "invalidReleaseId": "A valid release ID is required."
+    }
   }
 }

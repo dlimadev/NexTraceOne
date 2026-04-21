@@ -209,6 +209,80 @@ namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence.Mi
                 {
                     b.Navigation("Dependencies");
                 });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.VulnerabilityAdvisoryRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AdvisoryId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("AffectedVersionRange")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal>("CvssScore")
+                        .HasColumnType("numeric(4,1)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("FixedInVersion")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("IngestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PackageName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("ix_dep_vuln_advisory_active");
+
+                    b.HasIndex("ServiceId")
+                        .HasDatabaseName("ix_dep_vuln_advisory_service");
+
+                    b.HasIndex("Severity")
+                        .HasDatabaseName("ix_dep_vuln_advisory_severity");
+
+                    b.HasIndex("ServiceId", "AdvisoryId")
+                        .IsUnique()
+                        .HasDatabaseName("uix_dep_vuln_advisory_service_advisory");
+
+                    b.ToTable("dep_vulnerability_advisory_records", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }

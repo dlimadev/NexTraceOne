@@ -36,6 +36,9 @@ public sealed class KnowledgeDbContext(
     /// <summary>Snapshots do knowledge graph operacional.</summary>
     public DbSet<KnowledgeGraphSnapshot> KnowledgeGraphSnapshots => Set<KnowledgeGraphSnapshot>();
 
+    /// <summary>Runbooks propostos a partir de incidentes resolvidos.</summary>
+    public DbSet<ProposedRunbook> ProposedRunbooks => Set<ProposedRunbook>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(KnowledgeDbContext).Assembly;
 

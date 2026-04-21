@@ -44,6 +44,9 @@ public sealed class CostIntelligenceDbContext(
     /// <summary>Recomendações de eficiência de custo geradas por análise comparativa.</summary>
     public DbSet<EfficiencyRecommendation> EfficiencyRecommendations => Set<EfficiencyRecommendation>();
 
+    /// <summary>Sinais de desperdício operacional detetados por serviço.</summary>
+    public DbSet<WasteSignal> WasteSignals => Set<WasteSignal>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CostIntelligenceDbContext).Assembly;

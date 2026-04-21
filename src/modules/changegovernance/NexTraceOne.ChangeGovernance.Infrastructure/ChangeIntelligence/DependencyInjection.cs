@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
@@ -63,6 +64,16 @@ public static class DependencyInjection
         services.AddScoped<IPromotionGateEvaluationRepository, PromotionGateEvaluationRepository>();
         services.AddScoped<IExternalChangeRequestRepository, EfExternalChangeRequestRepository>();
         services.AddScoped<IReleaseContextSurface, ReleaseContextSurface>();
+
+        // Wave D.2 — Cross-tenant Benchmarks
+        services.AddScoped<ITenantBenchmarkConsentRepository, TenantBenchmarkConsentRepository>();
+        services.AddScoped<IBenchmarkSnapshotRepository, BenchmarkSnapshotRepository>();
+
+        // Wave F.1 — Release Calendar
+        services.AddScoped<IReleaseCalendarRepository, ReleaseCalendarRepository>();
+
+        // Wave F.2 — Risk Center
+        services.AddScoped<IServiceRiskProfileRepository, ServiceRiskProfileRepository>();
 
         // Default honest-null reader para Promotion Readiness Delta.
         // Uma bridge real p/ OperationalIntelligence substitui este default na composition root.

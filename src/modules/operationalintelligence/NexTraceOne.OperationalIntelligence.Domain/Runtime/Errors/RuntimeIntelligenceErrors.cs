@@ -155,4 +155,17 @@ public static class RuntimeIntelligenceErrors
             "RuntimeIntelligence.ResilienceReport.AlreadyArchived",
             "Resilience report '{0}' is already archived.",
             id);
+
+    /// <summary>Sessão de profiling não encontrada pelo identificador informado.</summary>
+    public static Error ProfilingSessionNotFound(string sessionId)
+        => Error.NotFound(
+            "RuntimeIntelligence.ProfilingSession.NotFound",
+            "Profiling session '{0}' was not found.",
+            sessionId);
+
+    /// <summary>Sessão de profiling inválida — janela temporal inválida.</summary>
+    public static Error InvalidProfilingWindow(string reason)
+        => Error.Validation(
+            "RuntimeIntelligence.ProfilingSession.InvalidWindow",
+            reason);
 }

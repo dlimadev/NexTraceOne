@@ -119,6 +119,12 @@ public sealed class ContractsDbContext(
     /// <summary>Entradas de changelog de evolução contratual.</summary>
     public DbSet<ContractChangelog> ContractChangelogs => Set<ContractChangelog>();
 
+    /// <summary>Snapshots analisados de schemas GraphQL para diff semântico e auditoria. Wave G.3.</summary>
+    public DbSet<GraphQlSchemaSnapshot> GraphQlSchemaSnapshots => Set<GraphQlSchemaSnapshot>();
+
+    /// <summary>Snapshots analisados de schemas Protobuf para diff semântico e auditoria. Wave H.1.</summary>
+    public DbSet<ProtobufSchemaSnapshot> ProtobufSchemaSnapshots => Set<ProtobufSchemaSnapshot>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

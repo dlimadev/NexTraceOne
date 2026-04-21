@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql;
 using Testcontainers.PostgreSql;
 
@@ -31,6 +32,7 @@ public sealed class KnowledgePersistenceAndSearchIntegrationTests : IAsyncLifeti
         await _container.StartAsync();
         _dbOptions = new DbContextOptionsBuilder<KnowledgeDbContext>()
             .UseNpgsql(_container.GetConnectionString())
+            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
             .Options;
 
         await using var context = CreateContext();

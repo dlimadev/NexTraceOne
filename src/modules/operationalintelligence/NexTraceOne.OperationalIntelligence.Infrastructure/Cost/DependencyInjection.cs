@@ -47,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<ICostTrendRepository, CostTrendRepository>();
         services.AddScoped<IBudgetForecastRepository, BudgetForecastRepository>();
         services.AddScoped<IEfficiencyRecommendationRepository, EfficiencyRecommendationRepository>();
+        services.AddScoped<IWasteSignalRepository, WasteSignalRepository>();
         services.AddScoped<ICostIntelligenceModule, CostIntelligenceModuleService>();
 
         return services;

@@ -171,6 +171,20 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Workflow.Persistence.Migra
                     b.Property<DateTimeOffset>("GeneratedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("IntegrityHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("IntegrityManifest")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("IntegritySignedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IntegritySignedBy")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("PipelineSource")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");

@@ -30,4 +30,10 @@ internal sealed class AiTokenUsageLedgerRepository(AiGovernanceDbContext context
 
     public async Task<int> DeleteOlderThanAsync(DateTimeOffset cutoff, CancellationToken ct)
         => await context.TokenUsageLedger.Where(e => e.Timestamp < cutoff).ExecuteDeleteAsync(ct);
+
+    public async Task<IReadOnlyList<AiTokenUsageLedger>> ListByPeriodAsync(DateTimeOffset cutoff, CancellationToken ct)
+        => await context.TokenUsageLedger
+            .Where(e => e.Timestamp >= cutoff)
+            .OrderByDescending(e => e.Timestamp)
+            .ToListAsync(ct);
 }

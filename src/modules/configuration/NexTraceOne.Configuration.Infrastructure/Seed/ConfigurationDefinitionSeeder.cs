@@ -7076,7 +7076,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.backstage.instanceUrl",
             displayName: "config.integrations.backstage.instanceUrl.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.String,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.backstage.instanceUrl.description",
@@ -7087,7 +7087,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.backstage.exportEnabled",
             displayName: "config.integrations.backstage.exportEnabled.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.Boolean,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.backstage.exportEnabled.description",
@@ -7098,7 +7098,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.externalChange.autoLinkEnabled",
             displayName: "config.integrations.externalChange.autoLinkEnabled.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.Boolean,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.externalChange.autoLinkEnabled.description",
@@ -7109,12 +7109,931 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
         ConfigurationDefinition.Create(
             key: "integrations.externalChange.allowedSystems",
             displayName: "config.integrations.externalChange.allowedSystems.label",
-            category: ConfigurationCategory.Integration,
+            category: ConfigurationCategory.Functional,
             valueType: ConfigurationValueType.Json,
             allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
             description: "config.integrations.externalChange.allowedSystems.description",
             defaultValue: """["ServiceNow","Jira","AzureDevOps","Generic"]""",
             uiEditorType: "json-editor",
             sortOrder: 5480),
+
+        // ── Block: FinOps Contextual & Knowledge Hub ─────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.detection_enabled",
+            displayName: "config.finops.waste.detection_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.waste.detection_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5700),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.thresholds",
+            displayName: "config.finops.waste.thresholds.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.waste.thresholds.description",
+            defaultValue: """{"overbudgetPct":20,"idleZeroCostPeriods":2}""",
+            uiEditorType: "json-editor",
+            sortOrder: 5710),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste.categories",
+            displayName: "config.finops.waste.categories.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Json,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.waste.categories.description",
+            defaultValue: """["IdleResources","Overprovisioned","UnattachedStorage","UnusedLicenses","OrphanedResources","OverlappingServices"]""",
+            uiEditorType: "json-editor",
+            sortOrder: 5720),
+
+        ConfigurationDefinition.Create(
+            key: "finops.focus.export_enabled",
+            displayName: "config.finops.focus.export_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.focus.export_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5730),
+
+        ConfigurationDefinition.Create(
+            key: "finops.focus.schema_version",
+            displayName: "config.finops.focus.schema_version.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.finops.focus.schema_version.description",
+            defaultValue: "FOCUS_1.0",
+            uiEditorType: "text",
+            sortOrder: 5740),
+
+        ConfigurationDefinition.Create(
+            key: "finops.change_gate.enabled",
+            displayName: "config.finops.change_gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.change_gate.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5750),
+
+        ConfigurationDefinition.Create(
+            key: "ai.cost_attribution.enabled",
+            displayName: "config.ai.cost_attribution.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.cost_attribution.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5760),
+
+        ConfigurationDefinition.Create(
+            key: "ai.cost_attribution.period_days",
+            displayName: "config.ai.cost_attribution.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.ai.cost_attribution.period_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 5770),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.freshness.score_enabled",
+            displayName: "config.knowledge.freshness.score_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.freshness.score_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5780),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.freshness.stale_threshold_days",
+            displayName: "config.knowledge.freshness.stale_threshold_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.freshness.stale_threshold_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 5790),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.runbook_proposal.enabled",
+            displayName: "config.knowledge.runbook_proposal.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.runbook_proposal.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5800),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.runbook_proposal.auto_approve_threshold",
+            displayName: "config.knowledge.runbook_proposal.auto_approve_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.runbook_proposal.auto_approve_threshold.description",
+            defaultValue: "0",
+            uiEditorType: "number",
+            sortOrder: 5810),
+
+        ConfigurationDefinition.Create(
+            key: "knowledge.search.max_results",
+            displayName: "config.knowledge.search.max_results.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.knowledge.search.max_results.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 5820),
+
+        // ── Wave C.1 — Vulnerability Gate ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.gate.enabled",
+            displayName: "config.security.vulnerability.gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.gate.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5900),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.gate.max_critical",
+            displayName: "config.security.vulnerability.gate.max_critical.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.gate.max_critical.description",
+            defaultValue: "0",
+            uiEditorType: "number",
+            sortOrder: 5910),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.gate.max_high",
+            displayName: "config.security.vulnerability.gate.max_high.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.gate.max_high.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 5920),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.ingest.enabled",
+            displayName: "config.security.vulnerability.ingest.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.ingest.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5930),
+
+        ConfigurationDefinition.Create(
+            key: "security.vulnerability.ingest.max_batch_size",
+            displayName: "config.security.vulnerability.ingest.max_batch_size.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.vulnerability.ingest.max_batch_size.description",
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 5940),
+
+        // ── Wave C.2 — Evidence Pack Signing ──────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.evidence_pack.signing_key",
+            displayName: "config.security.evidence_pack.signing_key.label",
+            category: ConfigurationCategory.SensitiveOperational,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.security.evidence_pack.signing_key.description",
+            defaultValue: "change-me-in-production",
+            uiEditorType: "password",
+            sortOrder: 5950),
+
+        ConfigurationDefinition.Create(
+            key: "security.evidence_pack.require_signature_for_audit",
+            displayName: "config.security.evidence_pack.require_signature_for_audit.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.evidence_pack.require_signature_for_audit.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 5960),
+
+        // ── Wave C.2 — Access Review Escalation ───────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.access_review.escalation.days_before_deadline",
+            displayName: "config.security.access_review.escalation.days_before_deadline.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.access_review.escalation.days_before_deadline.description",
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 5970),
+
+        ConfigurationDefinition.Create(
+            key: "security.access_review.escalation.enabled",
+            displayName: "config.security.access_review.escalation.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.security.access_review.escalation.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 5980),
+
+        // ── Wave D.1 — Digital Twin ────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.what_if.enabled",
+            displayName: "config.digital_twin.what_if.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.what_if.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9910),
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.what_if.max_consumers_analysis",
+            displayName: "config.digital_twin.what_if.max_consumers_analysis.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.what_if.max_consumers_analysis.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 9920),
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.topology_snapshot.enabled",
+            displayName: "config.digital_twin.topology_snapshot.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.topology_snapshot.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9930),
+
+        // ── Wave D.4 — Agent API ───────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.token.max_per_tenant",
+            displayName: "config.agent.api.token.max_per_tenant.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.token.max_per_tenant.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 9940),
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.token.default_expiry_days",
+            displayName: "config.agent.api.token.default_expiry_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.token.default_expiry_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 9950),
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.query_audit.enabled",
+            displayName: "config.agent.api.query_audit.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.query_audit.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9960),
+
+        ConfigurationDefinition.Create(
+            key: "agent.api.query_audit.retention_days",
+            displayName: "config.agent.api.query_audit.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.agent.api.query_audit.retention_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 9970),
+
+        // ── Wave D.1.b — Digital Twin: Failure Simulation ────────────────
+
+        ConfigurationDefinition.Create(
+            key: "digital_twin.failure_sim.max_depth",
+            displayName: "config.digital_twin.failure_sim.max_depth.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.digital_twin.failure_sim.max_depth.description",
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 9980),
+
+        // ── NIS2 Compliance Report ────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "compliance.nis2.enabled",
+            displayName: "config.compliance.nis2.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.nis2.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 9990),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.nis2.report.period_days",
+            displayName: "config.compliance.nis2.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.nis2.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10000),
+
+        ConfigurationDefinition.Create(
+            key: "slsa.provenance.required_for_production",
+            displayName: "config.slsa.provenance.required_for_production.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slsa.provenance.required_for_production.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 10010),
+
+        ConfigurationDefinition.Create(
+            key: "slsa.artifact_gate.enabled",
+            displayName: "config.slsa.artifact_gate.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slsa.artifact_gate.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 10020),
+
+        ConfigurationDefinition.Create(
+            key: "profiling.enabled",
+            displayName: "config.profiling.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.profiling.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10030),
+
+        ConfigurationDefinition.Create(
+            key: "profiling.retention.days",
+            displayName: "config.profiling.retention.days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.profiling.retention.days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10040),
+
+        ConfigurationDefinition.Create(
+            key: "profiling.max_sessions_per_service",
+            displayName: "config.profiling.max_sessions_per_service.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.profiling.max_sessions_per_service.description",
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 10050),
+
+        // ── Wave D.2 — Cross-tenant Benchmarks anonimizados ──────────────────
+
+        ConfigurationDefinition.Create(
+            key: "benchmark.consent.enabled",
+            displayName: "config.benchmark.consent.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.benchmark.consent.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10060),
+
+        ConfigurationDefinition.Create(
+            key: "benchmark.min_peer_set_size",
+            displayName: "config.benchmark.min_peer_set_size.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.benchmark.min_peer_set_size.description",
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 10070),
+
+        ConfigurationDefinition.Create(
+            key: "benchmark.snapshot.retention_days",
+            displayName: "config.benchmark.snapshot.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            description: "config.benchmark.snapshot.retention_days.description",
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 10075),
+
+        // ── Wave D.3 — No-code Policy Studio ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "policy_studio.enabled",
+            displayName: "config.policy_studio.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.policy_studio.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10080),
+
+        ConfigurationDefinition.Create(
+            key: "policy_studio.max_rules_per_policy",
+            displayName: "config.policy_studio.max_rules_per_policy.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.policy_studio.max_rules_per_policy.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10090),
+
+        ConfigurationDefinition.Create(
+            key: "policy_studio.evaluation.fail_open",
+            displayName: "config.policy_studio.evaluation.fail_open.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.policy_studio.evaluation.fail_open.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10100),
+
+        // ── Wave F.1 — Release Calendar ──────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "release_calendar.enabled",
+            displayName: "config.release_calendar.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.release_calendar.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10110),
+
+        ConfigurationDefinition.Create(
+            key: "release_calendar.freeze.default_hours_before_release",
+            displayName: "config.release_calendar.freeze.default_hours_before_release.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.release_calendar.freeze.default_hours_before_release.description",
+            defaultValue: "48",
+            uiEditorType: "number",
+            sortOrder: 10120),
+
+        ConfigurationDefinition.Create(
+            key: "release_calendar.hotfix.requires_approval",
+            displayName: "config.release_calendar.hotfix.requires_approval.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.release_calendar.hotfix.requires_approval.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10130),
+
+        // ── Wave F.2 — Risk Center ────────────────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "risk_center.enabled",
+            displayName: "config.risk_center.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.risk_center.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10140),
+
+        ConfigurationDefinition.Create(
+            key: "risk_center.critical_score_threshold",
+            displayName: "config.risk_center.critical_score_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.risk_center.critical_score_threshold.description",
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 10150),
+
+        ConfigurationDefinition.Create(
+            key: "risk_center.report.max_services",
+            displayName: "config.risk_center.report.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.risk_center.report.max_services.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10160),
+
+        // ── Wave G.1 — SOC 2 Compliance Report ──────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.soc2.enabled",
+            displayName: "config.compliance.soc2.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.soc2.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10170),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.soc2.report.period_days",
+            displayName: "config.compliance.soc2.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.soc2.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10180),
+
+        // ── Wave G.2 — ISO 27001 Compliance Report ───────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.iso27001.enabled",
+            displayName: "config.compliance.iso27001.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.iso27001.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10190),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.iso27001.report.period_days",
+            displayName: "config.compliance.iso27001.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.iso27001.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10200),
+
+        // ── Wave G.3 — GraphQL Schema Analysis ──────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "graphql.schema.max_size_kb",
+            displayName: "config.graphql.schema.max_size_kb.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.graphql.schema.max_size_kb.description",
+            defaultValue: "512",
+            uiEditorType: "number",
+            sortOrder: 10210),
+
+        ConfigurationDefinition.Create(
+            key: "graphql.schema.breaking_change.strict_mode",
+            displayName: "config.graphql.schema.breaking_change.strict_mode.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.graphql.schema.breaking_change.strict_mode.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10220),
+
+        ConfigurationDefinition.Create(
+            key: "graphql.schema.history.retention_days",
+            displayName: "config.graphql.schema.history.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.graphql.schema.history.retention_days.description",
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 10230),
+
+        // ── Wave H.1 — Protobuf Schema Analysis ──────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "protobuf.schema.max_size_kb",
+            displayName: "config.protobuf.schema.max_size_kb.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.protobuf.schema.max_size_kb.description",
+            defaultValue: "256",
+            uiEditorType: "number",
+            sortOrder: 10240),
+
+        ConfigurationDefinition.Create(
+            key: "protobuf.schema.breaking_change.strict_mode",
+            displayName: "config.protobuf.schema.breaking_change.strict_mode.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.protobuf.schema.breaking_change.strict_mode.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10250),
+
+        ConfigurationDefinition.Create(
+            key: "protobuf.schema.history.retention_days",
+            displayName: "config.protobuf.schema.history.retention_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.protobuf.schema.history.retention_days.description",
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 10260),
+
+        // ── Wave H.2 — PCI-DSS Compliance Report ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "compliance.pci_dss.enabled",
+            displayName: "config.compliance.pci_dss.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.pci_dss.enabled.description",
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 10270),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.pci_dss.report.period_days",
+            displayName: "config.compliance.pci_dss.report.period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.pci_dss.report.period_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10280),
+
+        // ── Wave H.3 — Service Maturity Score v2 ─────────────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "maturity.v2.critical_tier.min_score",
+            displayName: "config.maturity.v2.critical_tier.min_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.maturity.v2.critical_tier.min_score.description",
+            defaultValue: "65",
+            uiEditorType: "number",
+            sortOrder: 10290),
+
+        ConfigurationDefinition.Create(
+            key: "maturity.v2.standard_tier.min_score",
+            displayName: "config.maturity.v2.standard_tier.min_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.maturity.v2.standard_tier.min_score.description",
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 10300),
+
+        ConfigurationDefinition.Create(
+            key: "maturity.v2.vulnerability.gate.block_on_critical",
+            displayName: "config.maturity.v2.vulnerability.gate.block_on_critical.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.maturity.v2.vulnerability.gate.block_on_critical.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10310),
+
+        // ── Wave I.1 — HIPAA Compliance Report ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.hipaa.evaluation.default_days",
+            displayName: "config.compliance.hipaa.evaluation.default_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.hipaa.evaluation.default_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10320),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.hipaa.integrity.require_signed_evidence",
+            displayName: "config.compliance.hipaa.integrity.require_signed_evidence.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.hipaa.integrity.require_signed_evidence.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10330),
+
+        // ── Wave I.2 — FinOps Contextual (ServiceCostAllocation) ────────────
+        ConfigurationDefinition.Create(
+            key: "finops.cost_allocation.default_period_days",
+            displayName: "config.finops.cost_allocation.default_period_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.cost_allocation.default_period_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10340),
+
+        ConfigurationDefinition.Create(
+            key: "finops.insights.outlier_percentile",
+            displayName: "config.finops.insights.outlier_percentile.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.insights.outlier_percentile.description",
+            defaultValue: "75",
+            uiEditorType: "number",
+            sortOrder: 10350),
+
+        ConfigurationDefinition.Create(
+            key: "finops.insights.growth_alert_threshold_percent",
+            displayName: "config.finops.insights.growth_alert_threshold_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.finops.insights.growth_alert_threshold_percent.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10360),
+
+        // ── Wave I.3 — Dependency Risk Report ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "dependency.risk.critical_tier.base_score",
+            displayName: "config.dependency.risk.critical_tier.base_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.dependency.risk.critical_tier.base_score.description",
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 10370),
+
+        ConfigurationDefinition.Create(
+            key: "dependency.risk.no_owner.penalty_score",
+            displayName: "config.dependency.risk.no_owner.penalty_score.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.dependency.risk.no_owner.penalty_score.description",
+            defaultValue: "15",
+            uiEditorType: "number",
+            sortOrder: 10380),
+
+        ConfigurationDefinition.Create(
+            key: "dependency.risk.report.max_services",
+            displayName: "config.dependency.risk.report.max_services.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.dependency.risk.report.max_services.description",
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 10390),
+
+        // ── Wave J.1 — GDPR Compliance Report ───────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "compliance.gdpr.enabled",
+            displayName: "config.compliance.gdpr.enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.gdpr.enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10400),
+
+        ConfigurationDefinition.Create(
+            key: "compliance.gdpr.default_evaluation_days",
+            displayName: "config.compliance.gdpr.default_evaluation_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.compliance.gdpr.default_evaluation_days.description",
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 10410),
+
+        // ── Wave J.2 — SLO Tracking ──────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "slo.tracking.warning_threshold_percent",
+            displayName: "config.slo.tracking.warning_threshold_percent.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slo.tracking.warning_threshold_percent.description",
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 10420),
+
+        ConfigurationDefinition.Create(
+            key: "slo.tracking.violation_alert_enabled",
+            displayName: "config.slo.tracking.violation_alert_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slo.tracking.violation_alert_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10430),
+
+        ConfigurationDefinition.Create(
+            key: "slo.tracking.trend_analysis_days",
+            displayName: "config.slo.tracking.trend_analysis_days.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.slo.tracking.trend_analysis_days.description",
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 10440),
+
+        // ── Wave J.3 — Change Rollback Recommendation ────────────────────────
+        ConfigurationDefinition.Create(
+            key: "change.rollback.recommendation_enabled",
+            displayName: "config.change.rollback.recommendation_enabled.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.rollback.recommendation_enabled.description",
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 10450),
+
+        ConfigurationDefinition.Create(
+            key: "change.rollback.critical_urgency_threshold",
+            displayName: "config.change.rollback.critical_urgency_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.rollback.critical_urgency_threshold.description",
+            defaultValue: "75",
+            uiEditorType: "number",
+            sortOrder: 10460),
+
+        ConfigurationDefinition.Create(
+            key: "change.rollback.high_blast_radius_threshold",
+            displayName: "config.change.rollback.high_blast_radius_threshold.label",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            description: "config.change.rollback.high_blast_radius_threshold.description",
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 10470),
     ];
 }

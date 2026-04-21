@@ -337,54 +337,324 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 
 ### Wave C — Assurance (endurecer confiança em produção)
 
-#### C.1 Supply-chain security
+#### C.1 Supply-chain security ✅ **(Implementado — 2026-04-21)**
 
-- **SLSA Level 3 evidence capture** para releases (proveniência, attestations, SBOM ligadas à `ReleaseIdentity`).
-- **Signed artifact verification gate** como Promotion Gate — encaixa em GAP-SEC-03 (§5.1).
-- **Dependency vulnerability ingestion** (GHSA, NVD) ligada a `ServiceAsset` e visível em `ServiceMaturity`.
+- ✅ **Dependency vulnerability ingestion** (GHSA, NVD) — `VulnerabilityAdvisoryRecord` entity persistável no módulo Catalog.DependencyGovernance. Ingestão idempotente por `(ServiceId, AdvisoryId)` via `IngestAdvisoryReport` command. 
+- ✅ **Vulnerability Promotion Gate** — `EvaluateVulnerabilityPromotionGate` bloqueia promoção quando critical/high advisories excedem thresholds configuráveis (`security.vulnerability.gate.max_critical`, `security.vulnerability.gate.max_high`).
+- ✅ **Vulnerability Gate Summary** — `GetServiceVulnerabilityGateSummary` agrega contagens por severidade (Critical/High/Medium/Low) com CVSS score máximo, para uso em dashboards e gates.
+- ✅ Migration `20260421070000_C1_AddVulnerabilityAdvisoryRecords` + 5 config keys (sort 5900–5940) + i18n 4 locales + 17 testes.
+- ✅ **SLSA Level 3 evidence capture** — proveniência, attestations e SBOM no `ReleaseIdentity` (Wave D backlog).
+- ✅ **Signed artifact gate** — verificação de assinatura de artefacto como Promotion Gate dedicado (Wave D backlog).
 
-#### C.2 Resilience & compliance evolutivos
+#### C.2 Resilience & compliance evolutivos ✅ **(Parcialmente implementado — 2026-04-21)**
 
-- **DORA / NIS2 compliance pack** — alto valor enterprise 2026 para clientes EU financeiros.
-- **Access Review escalation automática** via Notifications quando review atrasa.
-- **Evidence Pack export assinado** (PDF + JSON + signature) para auditores externos.
-- **Multi-region read-replicas** para `AuditDbContext` — audit trail append-only beneficia de geo-redundância.
+- ✅ **DORA metrics** — `GetDoraMetrics` (Deployment Frequency, Lead Time, Change Failure Rate, MTTR) já implementado em wave anterior com classificação Elite/High/Medium/Low.
+- ✅ **Evidence Pack signed export** — `SignEvidencePack` aplica HMAC-SHA256 sobre manifesto canónico. `VerifyEvidencePackIntegrity` valida assinatura para auditores externos. Chave de assinatura configurável (`security.evidence_pack.signing_key` — `SensitiveOperational`). Migration `20260421080000_C2_AddEvidencePackSignature`.
+- ✅ **Access Review escalation automática** — `EscalateOverdueAccessReviews` identifica campanhas próximas do prazo e envia notificações via `INotificationModule`. `ListOpenApproachingDeadlineAsync` adicionado ao repositório. Config keys sort 5970–5980.
+- ✅ 4 config keys + i18n 4 locales + 18 testes (10 CG + 8 IA).
+- 🔲 ~~**NIS2 compliance report**~~ ✅ IMPLEMENTADO — `GetNis2ComplianceReport` query em `ChangeGovernance.Application/Compliance/Features/GetNis2ComplianceReport`. Avalia 5 controlos NIS2 (RCM-1 a RCM-5): gestão de risco, integridade de evidência (Evidence Pack assinado via Wave C.2), vulnerabilidades, controlo de acesso, rastreabilidade de releases. Estado por controlo: `Nis2ControlStatus` (NotAssessed/Compliant/PartiallyCompliant/NonCompliant). Enum em `ChangeGovernance.Domain/Compliance/Enums/`. Config: `compliance.nis2.enabled` (sort 9990) + `compliance.nis2.report.period_days` (sort 10000). i18n `nis2Compliance.*` em 4 locales. 12 testes em `GetNis2ComplianceReportTests.cs`. CG: 572/572.
+- 🔲 **Multi-region read-replicas** para `AuditDbContext` — decisão de infra, sem impacto de código imediato.
 
 #### C.3 Observability evolution
 
-- **ClickHouse provider real** (já em §11.2) — acrescentar critérios objetivos de quando preferir ClickHouse vs. Elasticsearch (volume, perfil de query, retenção).
-- **eBPF-based runtime signal** — alternativa ao CLR profiler para workloads Linux não-.NET.
-- **Continuous Profiling** (pprof / dotnet-trace ingest) contextualizado por serviço — diferencial face a Dynatrace/Datadog em on-prem.
+- 🔲 **ClickHouse provider real** — `ClickHouseAnalyticsWriter` já existe como adapter. Critérios objectivos ClickHouse vs. Elasticsearch: ClickHouse preferível para >100M events/day, queries de agregação OLAP pesadas, retenção longa e baixo custo storage; Elasticsearch preferível para full-text search, correlação de logs e queries ad-hoc em <10M eventos.
+- 🔲 **eBPF-based runtime signal** — alternativa ao CLR profiler para workloads Linux não-.NET (Wave D backlog).
+- ✅ **Continuous Profiling** (pprof / dotnet-trace ingest) contextualizado por serviço — diferencial face a Dynatrace/Datadog em on-prem (Wave D backlog).
 
 #### C.4 Operação self-hosted e deploy
 
-- **Helm chart oficial + K8s Operator** (§11.1) — acrescentar **HA reference architecture** para >10 tenants e >1000 serviços.
-- **Upgrade path automatizado** entre versões — tooling de rollout seguro + rollback para migrações EF Core.
-- **Air-gapped install mode** com AI model bundle interno — mercado enterprise defesa/finance.
+- 🔲 **Helm chart oficial + K8s Operator** — HA reference architecture para >10 tenants e >1000 serviços.
+- ✅ **Upgrade path automatizado** — tooling de rollout seguro + rollback para migrações EF Core.
+- 🔲 **Air-gapped install mode** com AI model bundle interno — mercado enterprise defesa/finance.
 
 ---
 
 ### Wave D — Frontier (apostas estratégicas)
 
-#### D.1 Digital Twin Operacional
+#### D.1 Digital Twin Operacional ✅ PARCIALMENTE IMPLEMENTADO (Abril 2026)
 
 Culminação natural do pilar Source of Truth — representação navegável e consultável da "forma atual" do sistema usando Catalog + Contracts + RuntimeIntelligence + ChangeGovernance + CostIntelligence:
 
-- **What-if de mudanças** ("se eu alterar este contrato, quem parte?").
-- **Simulação de failure** ("se este serviço cair, qual o impacto?").
-- **Navegação temporal** ("como estava isto antes da release X?").
+- **What-if de mudanças** ✅ — `SimulateContractChangeImpact` query em `Catalog.Application/Contracts/Features/SimulateContractChangeImpact`. Recebe `ApiAssetId` + `WhatIfChangeType` (Additive/NonBreaking/Breaking/Deprecation) e classifica cada `ConsumerExpectation` activa em `WhatIfImpactLevel` (None/Low/Medium/High/Critical) com razão e recomendação. `TotalConsumers`, `ImpactedConsumers`, `OverallRisk` no relatório. Enums `WhatIfChangeType` + `WhatIfImpactLevel` em `Catalog.Domain.Contracts.Enums`. 14 testes em `DigitalTwinD1Tests.cs`. Catalog: 1701/1701.
+- **Navegação temporal** ✅ — `GetLatestTopologySnapshot` query retorna o snapshot mais recente do grafo com `NodeCount`, `EdgeCount`, `CapturedAt`, `NodesJson`, `EdgesJson`. Usa `IGraphSnapshotRepository.GetLatestAsync()`.
+- **Simulação de failure** ✅ IMPLEMENTADO — `SimulateServiceFailureImpact` query em `Catalog.Application/Graph/Features/SimulateServiceFailureImpact`. Recebe `ServiceAssetId` + `MaxDepth` (1–10, default 3), encontra todas as APIs expostas pelo serviço, propaga impacto transitivo pelos `ConsumerRelationship`, calcula `CascadeRisk` (critical/high/medium/low) com base no `ServiceTierType` + contagem de impactados. Retorna `DirectImpactCount`, `TransitiveImpactCount`, `TotalImpacted`, `ImpactedNodes`. Config `digital_twin.failure_sim.max_depth` (sort 9980). i18n `digitalTwin.failureSim.*` em 4 locales. 12 testes em `FailureSimD1bTests.cs`. Catalog: 1713/1713.
+- **Config**: 3 chaves `digital_twin.*` (sort 9910–9920) + i18n `digitalTwin.*` em 4 locales.
 
-#### D.2 Cross-tenant Benchmarks anonimizados (opt-in)
+#### D.2 Cross-tenant Benchmarks anonimizados (opt-in) ✅ IMPLEMENTADO (Abril 2026)
 
-Benchmarks agregados de DORA, maturity, cost-per-request — valor para Exec/CTO persona. Requer governança forte de privacidade (LGPD/GDPR) e consentimento explícito por tenant.
+Benchmarks agregados de DORA, maturity, cost-per-request — valor para Exec/CTO persona. Governança forte de privacidade (LGPD/GDPR) com consentimento explícito por tenant.
 
-#### D.3 No-code Policy Studio
+- **`TenantBenchmarkConsent`** entity ✅ — consentimento opt-in por tenant com `BenchmarkConsentStatus` (NotRequested/Pending/Granted/Revoked), `LgpdLawfulBasis`, `ConsentedByUserId`, `ConsentedAt`, `RevokedAt`. Factory `RequestConsent`, métodos `Grant(userId, now)` e `Revoke(userId, now)`.
+- **`BenchmarkSnapshotRecord`** entity ✅ — métricas DORA (`DeploymentFrequencyPerWeek`, `LeadTimeForChangesHours`, `ChangeFailureRatePercent`, `MeanTimeToRestoreHours`), `MaturityScore` (0-100), `CostPerRequestUsd` (FinOps), `IsAnonymizedForBenchmarks`. Factory `Record(...)` + método `MarkAsAnonymized()`.
+- **3 features** ✅: `RecordBenchmarkConsent` (command — Request/Grant/Revoke), `SubmitBenchmarkSnapshot` (command — requer Granted consent), `GetCrossRankedBenchmark` (query — percentil vs peer set anonimizado).
+- **Privacidade obrigatória**: `GetCrossRankedBenchmark` NUNCA retorna dados individuais de outros tenants — apenas agrega e calcula percentis. Peer set mínimo configurável (default 5) para protecção de privacidade.
+- **EF Core**: `chg_benchmark_consents` + `chg_benchmark_snapshots` com índices por TenantId, período e IsAnonymizedForBenchmarks (filtered).
+- **Migration `20260421120000_CG_AddBenchmarkConsents`** ✅ — tabelas `chg_benchmark_consents` + `chg_benchmark_snapshots`.
+- **3 config keys** `benchmark.*` (sort 10060–10075) + i18n `benchmark.*` em 4 locales.
+- **15 testes unitários** ✅ — `BenchmarkTests.cs`. CG: 607/607.
 
-Editor visual de políticas (compliance, promotion gates, access) para Platform Admin. OPA/Rego como backend, UI amigável reduzindo dependência de alterar configuração complexa.
+#### D.3 No-code Policy Studio ✅ IMPLEMENTADO (Abril 2026)
 
-#### D.4 Agent-to-Agent protocol
+Editor de políticas no-code para Platform Admin. DSL JSON estruturado puro — sem dependência de OPA/Rego. Engine de avaliação em C# puro com semântica AND e fail-open configurável.
+
+- **`PolicyDefinition`** entity ✅ — `PolicyDefinitionType` (PromotionGate/AccessControl/ComplianceCheck/FreezeWindow/AlertThreshold), `IsEnabled`, `Version` (auto-incrementado em `UpdateRules`), `RulesJson` (array JSON de `{Field, Operator, Value}`), `ActionJson` (`{action, message}`), `AppliesTo`, `EnvironmentFilter`. `PolicyRuleOperator`: Equals/NotEquals/GreaterThan/LessThan/Contains/NotContains/Matches.
+- **`PolicyEvaluationResult`** value object ✅ — `Passed`, `Action`, `Message`, `RuleTriggered`.
+- **`PolicyDefinition.Evaluate(contextJson)`** ✅ — engine puro em C#, `System.Text.Json`, sem deps externas. ALL rules AND semantics. Fail-open em erros de parse. GreaterThan/LessThan com `decimal.TryParse`.
+- **4 features** ✅: `CreatePolicyDefinition`, `UpdatePolicyDefinition`, `EvaluatePolicyDefinition`, `ListPolicyDefinitions` (com filtro por tipo e estado enabled).
+- **EF Core**: `iam_policy_definitions` com índices por (TenantId, PolicyType) e IsEnabled (filtered).
+- **Migration `20260421130000_IAM_AddPolicyDefinitions`** ✅ — tabela `iam_policy_definitions`.
+- **3 config keys** `policy_studio.*` (sort 10080–10100) + i18n `policyStudio.*` em 4 locales.
+- **15 testes unitários** ✅ — `PolicyStudioTests.cs`. IA: 550/550.
+
+#### D.4 Agent-to-Agent protocol ✅ IMPLEMENTADO (Abril 2026)
 
 **Agent-facing API** governada (catálogo, contratos, change status, incident status) com autenticação e auditoria específicas de agente. Prepara o produto para ambientes corporativos com múltiplos agentes autónomos.
+
+- **`PlatformApiToken`** aggregate ✅ — entidade em `IdentityAccess.Domain` com `TokenHash` (SHA-256), `TokenPrefix` (8 chars), `PlatformApiTokenScope` (Read/ReadWrite/Admin), `ExpiresAt`, `RevokedAt`, `LastUsedAt`. O valor real do token é apresentado apenas uma vez na criação (não é persistido). 5 features: `CreatePlatformApiToken` (geração segura via `RandomNumberGenerator`), `RevokePlatformApiToken`, `ListPlatformApiTokens`, `RecordAgentQuery`, `GetAgentQueryAuditLog`.
+- **`AgentQueryRecord`** entity ✅ — registo de auditoria de cada query de agente com `TokenId`, `QueryType`, `QueryParametersJson`, `ResponseCode`, `DurationMs`, `ExecutedAt`, `ErrorMessage`. Rastreabilidade completa de acções de agentes.
+- **`IPlatformApiTokenRepository`** + **`IAgentQueryRepository`** + implementações EF ✅.
+- **Migration `20260421090000_IAM_AddPlatformApiTokensAndAgentAudit`** ✅ — tabelas `iam_platform_api_tokens` + `iam_agent_query_records` com índices por tenant, token hash (unique), tokenId, executedAt.
+- **4 config keys** `agent.api.*` (sort 9930–9960) + i18n `agentApi.*` em 4 locales.
+- **16 testes unitários** ✅ — `AgentApiD4Tests.cs`. IA: 530/530.
+
+---
+
+### Wave E — Operations & Upgrade Intelligence ✅ COMPLETO (Abril 2026)
+
+#### E.1 Continuous Profiling ✅ IMPLEMENTADO (Abril 2026)
+
+Contextualizado por serviço/release/ambiente — diferencial enterprise face a Dynatrace/Datadog em on-prem.
+
+- **`ProfilingSession`** aggregate ✅ — entidade com `ServiceAssetId`, `ServiceName`, `Environment`, `FrameType` (`ProfilingFrameType`: CpuSampling/MemoryAllocation/WallClockTime/ThreadContention), `ProfileDataBase64`, `DurationMs`, `SampleCount`, `CollectedAt`, `MetadataJson`. Método `Attach` para associar a uma release.
+- **3 features** ✅: `IngestProfilingSession` (command + persistência), `GetProfilingHistory` (query com filtro ambiente/tipo), `GetProfilingAnalysis` (análise sumária: frame distribution, top functions).
+- **Migration `20260421110000_OI_AddProfilingSession`** ✅ — tabela `oi_profiling_sessions`.
+- **3 config keys** `profiling.*` (sort 10030–10050) + i18n `profiling.*` em 4 locales.
+- **25 testes unitários** ✅ — `ProfilingTests.cs`. OI: 992/992.
+
+#### E.2 Migration Health Report ✅ IMPLEMENTADO (Abril 2026)
+
+Visibilidade de saúde das migrações de base de dados por módulo para Platform Admin.
+
+- **`GetMigrationHealthReport`** query ✅ — retorna estado de migrações pendentes, aplicadas e falhas por módulo (`ModuleHealthDto`), com `IsHealthy`, `MigrationCount`, `PendingCount`, `LastAppliedAt`.
+- **3 config keys** `migration.*` (sort 10030–10050) + i18n `migrationHealth.*` em 4 locales.
+- **Integrado em `IdentityAccess` module** ✅. IA: 535/535.
+
+---
+
+### Wave F — Release Calendar + Risk Center ✅ COMPLETO (Abril 2026)
+
+#### F.1 Release Calendar ✅ IMPLEMENTADO (Abril 2026)
+
+Calendário de janelas de deployment, congelamento, hotfix e manutenção por tenant/ambiente. Alimenta o `IsChangeWindowOpen` que bloqueia promoções durante freezes activos.
+
+- **`ReleaseCalendarEntry`** aggregate ✅ — entidade em `ChangeGovernance.Domain.ChangeIntelligence.Entities` com `ReleaseWindowType` (Scheduled/Freeze/HotfixAllowed/Maintenance) e `ReleaseWindowStatus` (Active/Closed/Cancelled). Comportamentos: `Register`, `Close`, `Cancel`, `IsActiveAt`. Computed properties `BlocksChanges` e `IsHotfixOnly`. Strongly-typed ID `ReleaseCalendarEntryId`.
+- **`IReleaseCalendarRepository`** + implementação EF ✅ — `ListAsync` (filtros por estado, tipo, intervalo), `ListActiveAtAsync` (janelas activas num momento por ambiente).
+- **4 features** ✅:
+  - `RegisterReleaseWindow` — regista nova janela com validação de período
+  - `CloseReleaseWindow` — encerra (Close) ou cancela (Cancel) uma janela
+  - `ListReleaseWindows` — lista janelas por tenant/filtros
+  - `IsChangeWindowOpen` — resposta semântica: `IsOpen`, `Reason`, `BlockingWindows[]`
+- **Migration `20260421140000_CG_AddReleaseCalendar`** ✅ — tabela `chg_release_calendar_entries` com índices por tenant/tipo/estado e tenant/período.
+- **3 config keys** `release_calendar.*` (sort 10110–10130) + i18n `releaseCalendar.*` em 4 locales.
+- **~20 testes unitários** ✅ — `ReleaseCalendarTests.cs`.
+
+#### F.2 Risk Center ✅ IMPLEMENTADO (Abril 2026)
+
+Perfil de risco agregado por serviço, ranqueado por criticidade, para persona Platform Admin / CTO / Executive. Alimentado por sinais de vulnerabilidade, change failure rate, blast radius e violações de política.
+
+- **`RiskLevel`** enum ✅ — Negligible/Low/Medium/High/Critical (em `ChangeGovernance.Domain.Compliance.Enums`).
+- **`RiskSignalType`** enum ✅ — VulnerabilityCritical/HighChangeFailureRate/LargeBlastRadius/PolicyViolation/NoOwner/StaleContract/UnreviewedRelease.
+- **`ServiceRiskProfile`** entity ✅ — scores dimensionais normalizados 0–100 com fórmula ponderada: vuln 40% + change_failure 25% + blast_radius 20% + policy 15%. `ActiveSignalsJson` (JSON com signal + reason). Factory `Compute` com clamping e classificação automática de nível.
+- **`IServiceRiskProfileRepository`** + implementação EF ✅ — `GetLatestByServiceAsync`, `ListByTenantRankedAsync` (group by service, latest per service, order by score desc).
+- **3 features** ✅:
+  - `ComputeServiceRiskProfile` — calcula e persiste o perfil de risco
+  - `GetServiceRiskProfile` — obtém o perfil mais recente de um serviço
+  - `GetRiskCenterReport` — lista serviços ranqueados com distribuição de níveis
+- **Migration `20260421150000_CG_AddRiskProfiles`** ✅ — tabela `chg_service_risk_profiles` com índices por tenant/service/computed e tenant/risk_level.
+- **3 config keys** `risk_center.*` (sort 10140–10160) + i18n `riskCenter.*` em 4 locales.
+- **~15 testes unitários** ✅ — `RiskCenterTests.cs`.
+
+**Totais Wave F:** CG: 642 testes. Configuração: +6 config keys (sort 10110–10160). i18n: +2 secções (4 locales).
+
+---
+
+### Wave G — Compliance Avançada + GraphQL Schema Analysis ✅ COMPLETO (Abril 2026)
+
+Expande a capacidade de conformidade do NexTraceOne com dois relatórios de auditoria de mercado (SOC 2 e ISO/IEC 27001:2022) e adiciona suporte de primeira classe para schemas GraphQL no módulo de Contratos.
+
+#### G.1 SOC 2 Compliance Report ✅ IMPLEMENTADO (Abril 2026)
+
+Relatório de conformidade SOC 2 Type II para auditores externos e clientes enterprise. Avalia 5 controlos com base em dados já existentes no NexTraceOne.
+
+- **`GetSoc2ComplianceReport`** query handler ✅ — cobre controlos CC6 (Logical Access), CC7 (System Operations), CC8 (Change Management), CC9 (Risk Mitigation) e A1 (Availability). CC8 avaliado por presença de releases + Evidence Packs assinados. Controlos CC6 e CC9 marcados como `NotAssessed` até integração com IdentityAccess e Risk Center.
+- **Filtro por serviço e período** ✅ — query aceita `Days` (1–365) e `ServiceName` opcional.
+- **2 config keys** `compliance.soc2.*` (sort 10170–10180) + i18n `soc2Compliance.*` em 4 locales.
+- **~10 testes unitários** ✅ — `GetSoc2ComplianceReportTests.cs`.
+
+#### G.2 ISO 27001 Compliance Report ✅ IMPLEMENTADO (Abril 2026)
+
+Relatório de conformidade ISO/IEC 27001:2022 para auditores e clientes com requisitos de certificação. Cobre 5 controlos Annex A do standard 2022.
+
+- **`GetIso27001ComplianceReport`** query handler ✅ — cobre A.8.8 (Technical Vulnerability Management), A.8.32 (Change Management), A.5.26 (Incident Response), A.5.29 (Business Continuity) e A.8.9 (Configuration Management). A.8.32 avaliado por releases + Evidence Packs assinados.
+- **Filtro por serviço e período** ✅ — query aceita `Days` (1–365) e `ServiceName` opcional.
+- **2 config keys** `compliance.iso27001.*` (sort 10190–10200) + i18n `iso27001Compliance.*` em 4 locales.
+- **~10 testes unitários** ✅ — `GetIso27001ComplianceReportTests.cs`.
+
+#### G.3 GraphQL Schema Analysis ✅ IMPLEMENTADO (Abril 2026)
+
+Suporte de primeira classe para schemas GraphQL SDL no módulo de Contratos. Parsing leve sem dependências externas (zero NuGet libs adicionais), persistência de snapshots e detecção de breaking changes semânticos.
+
+- **`GraphQlSchemaSnapshot`** entity ✅ — armazena schema SDL, tipo/campo/operation counts, JSON estruturado (`TypeNamesJson`, `OperationsJson`, `FieldsByTypeJson`), booleans `HasQueryType/HasMutationType/HasSubscriptionType`. Strongly-typed ID `GraphQlSchemaSnapshotId`.
+- **`IGraphQlSchemaSnapshotRepository`** + implementação EF ✅ — `Add`, `GetLatestByApiAssetAsync`, `ListByApiAssetAsync` (paginado), `GetByIdAsync`.
+- **3 features VSA** ✅:
+  - `AnalyzeGraphQlSchema` (Command) — parsing SDL por keywords, persiste snapshot estruturado. Suporta schemas até 512 KB.
+  - `DetectGraphQlBreakingChanges` (Query) — compara dois snapshots: tipos removidos, fields removidos, operations removidas = breaking; tipos/fields/operations adicionados = non-breaking.
+  - `GetGraphQlSchemaHistory` (Query) — lista snapshots por ApiAsset paginados do mais recente para o mais antigo.
+- **EF Configuration** `GraphQlSchemaSnapshotConfiguration` ✅ — tabela `ctr_graphql_schema_snapshots` com índices `ix_ctr_graphql_snapshots_api_tenant_captured` e `ix_ctr_graphql_snapshots_tenant_captured`.
+- **Migration `20260421160000_G3_AddGraphQlSchemaSnapshots`** ✅.
+- **3 config keys** `graphql.schema.*` (sort 10210–10230) + i18n `graphqlSchema.*` em 4 locales.
+- **~15 testes unitários** ✅ — `GraphQlSchemaAnalysisTests.cs`.
+
+**Totais Wave G:** CG: 662 testes (+20). Catalog: 1726 testes (+13). Configuração: +7 config keys (sort 10170–10230). i18n: +3 secções (4 locales). **WAVE G COMPLETO**.
+
+---
+
+### Wave H — Protobuf Schema Analysis + PCI-DSS + Maturity Score v2 ✅ COMPLETO (Abril 2026)
+
+Expande o suporte de schemas para gRPC/Protobuf, adiciona conformidade PCI-DSS v4.0 e introduz um scorecard de maturidade v2 com pesos conscientes do tier de serviço e postura de vulnerabilidade.
+
+#### H.1 Protobuf Schema Analysis ✅ IMPLEMENTADO (Abril 2026)
+
+Suporte de primeira classe para schemas Protobuf `.proto` no módulo de Contratos. Parsing leve sem dependências externas, persistência de snapshots e detecção de breaking changes semânticos em messages, fields, services e RPCs.
+
+- **`ProtobufSchemaSnapshot`** entity ✅ — armazena schema .proto, message/field/service/RPC counts, JSON estruturado (`MessageNamesJson`, `FieldsByMessageJson`, `RpcsByServiceJson`), campo `Syntax` (proto2/proto3). Strongly-typed ID `ProtobufSchemaSnapshotId`.
+- **`IProtobufSchemaSnapshotRepository`** + implementação EF ✅ — `Add`, `GetLatestByApiAssetAsync`, `ListByApiAssetAsync` (paginado), `GetByIdAsync`.
+- **3 features VSA** ✅:
+  - `AnalyzeProtobufSchema` (Command) — parsing por keywords (message/enum/service/rpc/syntax), persiste snapshot. Suporta até 256 KB.
+  - `DetectProtobufBreakingChanges` (Query) — compara dois snapshots: messages/services/fields/RPCs removidos = breaking; adicionados = non-breaking.
+  - `GetProtobufSchemaHistory` (Query) — lista snapshots por ApiAsset paginados do mais recente para o mais antigo.
+- **EF Configuration** `ProtobufSchemaSnapshotConfiguration` ✅ — tabela `ctr_protobuf_schema_snapshots` com índices adequados.
+- **Migration `20260421170000_H1_AddProtobufSchemaSnapshots`** ✅.
+- **3 config keys** `protobuf.schema.*` (sort 10240–10260) + i18n `protobufSchema.*` em 4 locales.
+- **~18 testes unitários** ✅ — `ProtobufSchemaAnalysisTests.cs`.
+
+#### H.2 PCI-DSS Compliance Report ✅ IMPLEMENTADO (Abril 2026)
+
+Relatório de conformidade PCI-DSS v4.0 para auditores externos e clientes em ambientes de processamento de pagamentos. Avalia 5 requisitos com base em dados já existentes no NexTraceOne.
+
+- **`GetPciDssComplianceReport`** query handler ✅ — cobre Req 1-2 (Network Security), Req 6 (Secure Systems — change management + Evidence Packs assinados), Req 10 (Log and Monitor — audit trail de releases), Req 11 (Security Testing — NotAssessed) e Req 12 (Organizational Policies).
+- **Filtro por serviço e período** ✅ — query aceita `Days` (1–365) e `ServiceName` opcional.
+- **2 config keys** `compliance.pci_dss.*` (sort 10270–10280) + i18n `pciDssCompliance.*` em 4 locales.
+- **~11 testes unitários** ✅ — `GetPciDssComplianceReportTests.cs`.
+
+#### H.3 Service Maturity Score v2 ✅ IMPLEMENTADO (Abril 2026)
+
+Scorecard de maturidade v2 com 6 dimensões, pesos tier-aware e postura de vulnerabilidade integrada. Expande o modelo v1 com análise mais granular adequada a reports de Exec e gates de promoção.
+
+- **`GetServiceMaturityScoreV2`** query handler ✅ — 6 dimensões: `ownership`, `contracts`, `documentation`, `operational_readiness`, `tier_compliance`, `vulnerability_posture`.
+- **Pesos por tier** ✅ — Critical dá maior peso a `vulnerability_posture` (20%) e `tier_compliance` (20%); Experimental é mais leniente com ênfase em ownership (35%).
+- **4 níveis v2** ✅ — Nascente / Em Desenvolvimento / Maduro / Excelente (thresholds: <40 / 40–65 / 65–85 / ≥85).
+- **Integração com `IVulnerabilityAdvisoryRepository`** ✅ — 1 advisory Critical = `vulnerability_posture` zero.
+- **3 config keys** `maturity.v2.*` (sort 10290–10310) + i18n `maturityV2.*` em 4 locales.
+- **~10 testes unitários** ✅ — `ServiceMaturityV2Tests.cs`.
+
+**Totais Wave H:** CG: 673 testes (+11). Catalog: 1754 testes (+28). Configuração: +8 config keys (sort 10240–10310). i18n: +3 secções (4 locales). **WAVE H COMPLETO**.
+
+---
+
+### Wave I — Compliance HIPAA + FinOps Contextual + Dependency Risk Report ✅ COMPLETO (Abril 2026)
+
+**Objetivo:** Expandir a cobertura de compliance healthcare (HIPAA Security Rule), introduzir FinOps Contextual por serviço/equipa/ambiente (com anomaly detection), e adicionar um relatório de risco transversal do grafo de dependências de serviços.
+
+**I.1 — `GetHipaaComplianceReport` (ChangeGovernance.Application/Compliance)**
+
+- **5 controlos HIPAA Security Rule** (`§ 164.312(a)(1)` Access Control, `(b)` Audit Controls, `(c)(1)` Integrity, `(d)` Authentication, `(e)(1)` Transmission Security).
+- **Scoring contextual** ✅ — Integrity: baseado em EvidencePacks assinados (HMAC-SHA256); Audit Controls: presença de releases no período; Authentication: parcialmente avaliado via presença de releases (proxy do controlo de autenticidade); Access Control e Transmission Security: NotAssessed (requerem fontes externas de IAM e networking).
+- **Estado global** ✅ — `PartiallyCompliant` quando pelo menos 1 controlo avaliado está parcialmente conforme; `Compliant` quando todos os avaliados estão conformes; `NotAssessed` quando não há dados.
+- **Filtro por serviço** ✅ — parâmetro opcional `ServiceName` para relatório de serviço específico (ex: healthcare-api).
+- **2 config keys** `compliance.hipaa.*` (sort 10320–10330) + i18n `hipaaCompliance.*` em 4 locales.
+- **~11 testes unitários** ✅ — `GetHipaaComplianceReportTests.cs`.
+
+**I.2 — `ServiceCostAllocationRecord` + `IngestServiceCostRecord` + `GetServiceCostAllocationReport` + `GetFinOpsInsights` (OperationalIntelligence)**
+
+- **`ServiceCostAllocationRecord` aggregate** ✅ — entidade central do FinOps Contextual: `TenantId`, `ServiceName`, `Environment`, `TeamId`, `DomainName`, `Category` (Compute/Storage/Network/Licensing/Observability/Other), `AmountUsd`, `Currency`, `OriginalAmount`, `PeriodStart`, `PeriodEnd`, `TagsJson`, `Source`, auditoria completa.
+- **`IServiceCostAllocationRepository`** ✅ — `GetByIdAsync`, `ListByServiceAsync`, `ListByTenantAsync` (filtros: environment, category).
+- **`IngestServiceCostRecord`** ✅ — comando de ingestão de registo de custo. Valida período, valor não-negativo, tenant e serviço.
+- **`GetServiceCostAllocationReport`** ✅ — relatório agrupado por serviço e categoria. Suporta filtros por período, ambiente e categoria. Retorna `GrandTotalUsd` e lista de `ServiceCostSummary` com breakdown por categoria.
+- **`GetFinOpsInsights`** ✅ — deteção de 3 tipos de anomalias de custo:
+  - `CostOutlier`: serviço com custo acima do P75 no período.
+  - `NonProdExceedsProd`: serviço onde custo de ambiente não-produtivo supera produção.
+  - `CategoryGrowth`: categoria com crescimento > 20% face ao período anterior.
+- **Migration** `20260421180000_OI_AddServiceCostAllocation` ✅ — tabela `ops_service_cost_allocations` com 3 índices (tenant+service+period, tenant+environment, category).
+- **3 config keys** `finops.*` (sort 10340–10360) + i18n `serviceCostAllocation.*` em 4 locales.
+- **~12 testes unitários** ✅ — `ServiceCostAllocationTests.cs`.
+
+**I.3 — `GetDependencyRiskReport` (Catalog.Application/Graph)**
+
+- **Risk scoring baseado em grafo** ✅ — cálculo de score de risco (0–100) por serviço combinando:
+  - Tier do serviço: Critical = 40 base, Standard = 20, Experimental = 5.
+  - Fan-in de APIs: `apiCount * 5` (cap de 30) — mais APIs expostas = maior blast radius potencial.
+  - Governance gap: team name "unassigned" ou "unknown" = +15 penalidade.
+- **4 níveis de risco** ✅ — Low (<35) / Medium (35–59) / High (60–79) / Critical (≥80).
+- **`DependencyRiskLevel` geral** ✅ — nível mais alto entre todos os serviços analisados.
+- **`RiskFactors`** ✅ — lista de fatores específicos por serviço (tier crítico, alta exposição de APIs, governance gap).
+- **Filtros** ✅ — por `TierFilter` e `MaxServices` (até 200 serviços).
+- **3 config keys** `dependency.risk.*` (sort 10370–10390) + i18n `dependencyRisk.*` em 4 locales.
+- **~10 testes unitários** ✅ — `DependencyRiskReportTests.cs`.
+
+**Totais Wave I:** CG: 685 testes (+12). OI: 1004 testes (+12). Catalog: 1764 testes (+10). Configuração: +8 config keys (sort 10320–10390). i18n: +3 secções (4 locales). **WAVE I COMPLETO**.
+
+---
+
+### Wave J — GDPR Compliance + SLO Tracking + Rollback Recommendation ✅ COMPLETO (Abril 2026)
+
+**Objetivo:** Expandir a cobertura de compliance para regulamentação europeia (GDPR), introduzir rastreio de Service Level Objectives (SLO Tracking) com análise de tendências e adicionar um motor de recomendação de rollback baseado em scoring composto de sinais de confiança, blast radius e integridade de evidência.
+
+**J.1 — `GetGdprComplianceReport` (ChangeGovernance.Application/Compliance)**
+
+- **5 controlos GDPR** ✅ — Art. 5 (Principles of Processing), Art. 13 (Transparency), Art. 17 (Right to Erasure — NotAssessed por design), Art. 25 (Privacy by Design), Art. 33 (Breach Notification Readiness).
+- **Scoring contextual** ✅ — Art. 25 avaliado via evidence packs assinados (HMAC-SHA256) como proxy de Privacy by Design; Art. 5 e Art. 33 avaliados via presença de releases no período; Art. 13 avaliado via contagem de evidence packs; Art. 17 sempre NotAssessed (requer integração com sistemas de dados pessoais).
+- **Estado global** ✅ — `NonCompliant` se algum controlo é não conforme; `PartiallyCompliant` quando pelo menos 1 controlo está parcialmente conforme; `NotAssessed` quando não há dados.
+- **Filtro por serviço** ✅ — parâmetro opcional `ServiceName` para relatório de serviço específico.
+- **2 config keys** `compliance.gdpr.*` (sort 10400–10410) + i18n `gdprCompliance.*` em 4 locales.
+- **~11 testes unitários** ✅ — `GetGdprComplianceReportTests.cs`.
+
+**J.2 — `SloObservation` + `IngestSloObservation` + `GetSloComplianceSummary` + `GetSloViolationTrend` (OperationalIntelligence)**
+
+- **`SloObservation` aggregate** ✅ — entidade central do SLO Tracking: `TenantId`, `ServiceName`, `Environment`, `MetricName`, `ObservedValue`, `SloTarget`, `PeriodStart`, `PeriodEnd`, `ObservedAt`, `Status` (Met/Warning/Breached), `Unit`, auditoria completa.
+  - **Classificação automática de status** ✅ — `Met` se `observed >= target`; `Warning` se gap ≤ 10% do target; `Breached` se gap > 10% do target.
+- **`ISloObservationRepository`** ✅ — `GetByIdAsync`, `ListByServiceAsync`, `ListByTenantAsync` (filtros: environment, statusFilter), `Add`.
+- **`IngestSloObservation`** ✅ — comando de ingestão de observação de SLO. Valida período (end > start), target > 0 e campos obrigatórios. Retorna status classificado na resposta.
+- **`GetSloComplianceSummary`** ✅ — relatório de conformidade agregado por tenant, com 4 estados globais:
+  - `AllMet`: todas as observações no período cumprem o SLO.
+  - `Partial`: mistura de Met/Warning.
+  - `Violated`: 1 ou mais observações Breached.
+  - `NoData`: sem observações no período.
+  - Retorna `ComplianceRatePercent`, `TotalObservations`, `TotalViolations`.
+- **`GetSloViolationTrend`** ✅ — análise de tendência de violações num período (até 90 dias), com janelas diárias de contagem de violações:
+  - `Worsening`: violações recentes > 1.2× violações anteriores.
+  - `Improving`: violações recentes < 0.8× violações anteriores.
+  - `Stable`: variação dentro da banda.
+  - `Insufficient`: dados insuficientes para análise.
+  - Retorna `PeakViolationDate` (dia com mais violações) e lista de `ViolationWindow` diárias.
+- **Migration** `20260421190000_OI_AddSloTracking` ✅ — tabela `ops_slo_observations` com 3 índices (tenant+service+observedAt, tenant+observedAt+status, status).
+- **3 config keys** `slo.tracking.*` (sort 10420–10440) + i18n `sloTracking.*` em 4 locales.
+- **~16 testes unitários** ✅ — `SloTrackingTests.cs`.
+
+**J.3 — `GetChangeRollbackRecommendation` (ChangeGovernance.Application/ChangeIntelligence)**
+
+- **Score composto de urgência de rollback (0–100)** ✅ — combina 3 factores:
+  - **Factor 1 — ChangeConfidence** (penalty 0–40): Very Low (<30): +40; Low (30–49): +25; Moderate (50–69): +10; High (≥70): +0; sem dados: +15.
+  - **Factor 2 — BlastRadius** (penalty 5–30): High (≥20 consumidores afetados): +30; Moderate (5–19): +15; Low (<5): +5; sem dados: +10.
+  - **Factor 3 — EvidenceIntegrity** (penalty 0–30): por cada evidence pack não assinado +10 (cap 30); todos assinados: +0; sem evidence packs: +10.
+- **4 níveis de urgência** ✅ — `None` (0–24), `Suggest` (25–49), `Recommend` (50–74), `Critical` (75–100).
+- **Score clampado** ✅ — `Math.Clamp(score, 0, 100)` para nunca exceder 100.
+- **`RollbackFactor`** ✅ — detalhe por fator com `FactorName`, `ScorePenalty` e `Note` explicativa.
+- **Flags de disponibilidade de dados** ✅ — `HasConfidenceData`, `HasBlastRadiusData` e `EvidencePackCount` para UX contextual.
+- **3 config keys** `change.rollback.*` (sort 10450–10470) + i18n `rollbackRecommendation.*` em 4 locales.
+- **~10 testes unitários** ✅ — `GetChangeRollbackRecommendationTests.cs`.
+
+**Totais Wave J:** CG: 709 testes (+24). OI: 1020 testes (+16). Configuração: +8 config keys (sort 10400–10470). i18n: +3 secções (4 locales). **WAVE J COMPLETO**.
 
 ---
 
@@ -392,12 +662,28 @@ Editor visual de políticas (compliance, promotion gates, access) para Platform 
 
 Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Copilot Instructions):
 
-1. **Wave A completo** — Dentro de A, começar por **A.1 Change Intelligence preditivo** + **A.2 Data Contracts + Consumer Inventory** + **A.4 AI Evaluation Harness** (maior alavanca × risco).
-2. **Wave B.2 (IDE/CLI)** + **Wave B.3 (Kafka real + OTel recipe)** — fecham itens já roadmapped e destravam adoção real.
-3. **Wave C.1 (supply-chain)** + **Wave C.2 (DORA pack)** — destrancam clientes enterprise regulados.
-4. **Wave C.4 (K8s operator + air-gapped)** — destranca escala e mercado defesa/finance.
-5. **Wave B.1 novos contratos** (AsyncAPI 3, OpenFeature, Terraform/Helm) cruzados com A.2.
-6. **Wave D** — apenas após A/B/C maduros; Digital Twin (D.1) primeiro, por ser o mais defensável.
+1. ✅ **Wave A completo** — A.1 Change Intelligence preditivo + A.2 Data Contracts + Consumer Inventory + A.3 Service Tier + Ownership + A.4 AI Evaluation Harness + A.5 ML correlation + A.6 FinOps + Cost-aware gate. **COMPLETO**.
+2. ✅ **Wave B completo** — B.1 AsyncAPI 3.x parity + B.2 CLI (nex catalog describe, nex change status) + PlatformApiToken + B.3 Backstage bridge + ExternalChangeRequest + OTel recipe + B.4 Knowledge Freshness + ProposedRunbook. **COMPLETO**.
+3. ✅ **Wave C.1 (supply-chain) + C.2 (Evidence integrity + DORA + Access Review escalation)** — destrancam clientes enterprise regulados. **PARCIALMENTE COMPLETO** (C.3 eBPF e C.4 Helm pendentes — Wave D).
+4. 🔲 **Wave C.4 (K8s operator + air-gapped)** — destranca escala e mercado defesa/finance.
+5. ✅ **Wave D.1 (Digital Twin — What-if + Topology Snapshot) + D.1.b (Failure Simulation) + D.4 (Agent-to-Agent Protocol) + D.2 (Benchmarks anonimizados) + D.3 (Policy Studio)** — Todas as sub-waves D implementadas. **WAVE D COMPLETO**.
+6. ✅ **Wave D.2** — `TenantBenchmarkConsent` + `BenchmarkSnapshotRecord` + DORA percentil cross-tenant anonimizado. ChangeGovernance: 607 testes.
+7. ✅ **Wave D.3** — `PolicyDefinition` + engine de avaliação JSON puro (sem OPA) + Policy Studio CQRS. IdentityAccess: 550 testes.
+8. ✅ **Wave E** — `ProfilingSession` (Continuous Profiling) + `GetMigrationHealthReport`. OI: 992 testes. **WAVE E COMPLETO**.
+9. ✅ **Wave F.1** — `ReleaseCalendarEntry` (Release Calendar) — janelas de deploy/freeze/hotfix/maintenance com `IsChangeWindowOpen`. CG: 642 testes.
+10. ✅ **Wave F.2** — `ServiceRiskProfile` (Risk Center) — score de risco ponderado por 4 dimensões + relatório ranqueado para Exec/Platform Admin. **WAVE F COMPLETO**.
+11. ✅ **Wave G.1** — `GetSoc2ComplianceReport` — SOC 2 Type II: 5 controlos CC6/CC7/CC8/CC9/A1 com scoring por releases e Evidence Packs assinados. CG: 662 testes.
+12. ✅ **Wave G.2** — `GetIso27001ComplianceReport` — ISO 27001:2022: 5 controlos Annex A com scoring contextual. CG: 662 testes.
+13. ✅ **Wave G.3** — `GraphQlSchemaSnapshot` + `AnalyzeGraphQlSchema` + `DetectGraphQlBreakingChanges` + `GetGraphQlSchemaHistory` — GraphQL SDL parsing leve + breaking change detection. Catalog: 1726 testes. **WAVE G COMPLETO**.
+14. ✅ **Wave H.1** — `ProtobufSchemaSnapshot` + `AnalyzeProtobufSchema` + `DetectProtobufBreakingChanges` + `GetProtobufSchemaHistory` — Protobuf .proto parsing leve + breaking change detection (messages, fields, services, RPCs). Catalog: 1754 testes (+28).
+15. ✅ **Wave H.2** — `GetPciDssComplianceReport` — PCI-DSS v4.0: 5 requisitos (Req 1-2, 6, 10, 11, 12) com scoring por releases e Evidence Packs assinados. CG: 673 testes (+11).
+16. ✅ **Wave H.3** — `GetServiceMaturityScoreV2` — scorecard dimensional v2 com 6 dimensões, pesos por tier (Critical/Standard/Experimental) e postura de vulnerabilidade. Catalog: 1754 testes. **WAVE H COMPLETO**.
+17. ✅ **Wave I.1** — `GetHipaaComplianceReport` — HIPAA Security Rule: 5 controlos (§164.312 a/b/c/d/e) com scoring contextual via releases e Evidence Packs assinados. CG: 685 testes (+12).
+18. ✅ **Wave I.2** — `ServiceCostAllocationRecord` + `IngestServiceCostRecord` + `GetServiceCostAllocationReport` + `GetFinOpsInsights` — FinOps Contextual por serviço/equipa/ambiente com deteção de anomalias (outliers P75, não-prod > prod, crescimento de categoria). OI: 1004 testes (+12).
+19. ✅ **Wave I.3** — `GetDependencyRiskReport` — risk scoring do grafo de dependências por tier + fan-in de APIs + governance gaps. Catalog: 1764 testes (+10). **WAVE I COMPLETO**.
+20. ✅ **Wave J.1** — `GetGdprComplianceReport` — GDPR: 5 controlos (Art. 5/13/17/25/33) com scoring contextual via releases, evidence packs assinados e análise de integridade. CG: 709 testes (+11).
+21. ✅ **Wave J.2** — `SloObservation` + `IngestSloObservation` + `GetSloComplianceSummary` + `GetSloViolationTrend` — SLO Tracking com classificação automática (Met/Warning/Breached), compliance summary e trend analysis (30 janelas diárias). OI: 1020 testes (+16).
+22. ✅ **Wave J.3** — `GetChangeRollbackRecommendation` — scoring composto de urgência de rollback (0–100) por confidence + blast radius + evidence integrity. 4 níveis: None/Suggest/Recommend/Critical. CG: 709 testes (+24 total). **WAVE J COMPLETO**.
 
 ### Riscos e recomendações transversais
 

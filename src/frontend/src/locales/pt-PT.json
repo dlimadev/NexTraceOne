@@ -13190,5 +13190,663 @@
     },
     "importSuccess": "Pedido de alteração importado",
     "alreadyExists": "Pedido de alteração já ingerido"
+  },
+  "wasteSignals": {
+    "title": "Sinais de Desperdício",
+    "detect": "Detetar Desperdício",
+    "report": "Relatório de Desperdício",
+    "type": {
+      "IdleResources": "Recursos Inativos",
+      "Overprovisioned": "Sobreprovisionado",
+      "UnattachedStorage": "Armazenamento Não Anexado",
+      "UnusedLicenses": "Licenças Não Utilizadas",
+      "OrphanedResources": "Recursos Órfãos",
+      "OverlappingServices": "Serviços Sobrepostos"
+    },
+    "estimatedSavings": "Poupança Mensal Est.",
+    "detected": "Detetado Em",
+    "acknowledged": "Reconhecido",
+    "focusExport": "Exportar FOCUS",
+    "changeGate": "Gate de Alteração por Custo",
+    "gateApproved": "Gate de custo aprovado",
+    "gateBlocked": "Gate de custo bloqueado",
+    "gateReview": "Revisão de custo necessária"
+  },
+  "knowledgeFreshness": {
+    "title": "Frescura do Conhecimento",
+    "report": "Relatório de Frescura",
+    "score": "Score de Frescura",
+    "lastReviewed": "Última Revisão",
+    "status": {
+      "Fresh": "Fresco",
+      "Aging": "A Envelhecer",
+      "Stale": "Desatualizado"
+    },
+    "markReviewed": "Marcar como Revisto"
+  },
+  "proposedRunbook": {
+    "title": "Runbooks Propostos",
+    "propose": "Propor Runbook",
+    "approve": "Aprovar",
+    "reject": "Rejeitar",
+    "status": {
+      "Proposed": "Proposto",
+      "UnderReview": "Em Revisão",
+      "Approved": "Aprovado",
+      "Rejected": "Rejeitado"
+    },
+    "fromIncident": "Gerado a partir de incidente",
+    "reviewNote": "Nota de Revisão"
+  },
+  "crossModuleSearch": {
+    "title": "Pesquisa",
+    "placeholder": "Pesquisar em conhecimento, runbooks, notas...",
+    "noResults": "Nenhum resultado encontrado"
+  },
+  "aiCostAttribution": {
+    "title": "Atribuição de Custo de IA",
+    "byModel": "Por Modelo",
+    "totalCost": "Custo Total (USD)",
+    "tokens": "Tokens",
+    "promptTokens": "Tokens de Prompt",
+    "completionTokens": "Tokens de Conclusão",
+    "period": "Período"
+  },
+  "vulnerabilityGate": {
+    "title": "Gate de Vulnerabilidades",
+    "ingest": "Ingerir Relatório de Advisory",
+    "summary": "Sumário de Vulnerabilidades",
+    "gate": "Gate de Promoção por Vulnerabilidade",
+    "gatePassed": "Sem vulnerabilidades bloqueantes",
+    "gateBlockedCritical": "Bloqueado: vulnerabilidades críticas encontradas",
+    "gateBlockedHigh": "Bloqueado: vulnerabilidades altas excedem o limite",
+    "severity": {
+      "Critical": "Crítica",
+      "High": "Alta",
+      "Medium": "Média",
+      "Low": "Baixa",
+      "None": "Nenhuma"
+    },
+    "advisoryId": "ID do Advisory",
+    "source": "Fonte",
+    "cvssScore": "Score CVSS",
+    "publishedAt": "Publicado Em",
+    "fixedIn": "Corrigido Na Versão",
+    "active": "Ativo"
+  },
+  "signedEvidencePack": {
+    "title": "Integridade do Evidence Pack",
+    "sign": "Assinar Evidence Pack",
+    "verify": "Verificar Integridade",
+    "signed": "Assinado",
+    "unsigned": "Não Assinado",
+    "valid": "Integridade Válida",
+    "invalid": "Integridade INVÁLIDA",
+    "signedBy": "Assinado Por",
+    "signedAt": "Assinado Em",
+    "integrityHash": "Hash de Integridade"
+  },
+  "accessReviewEscalation": {
+    "title": "Escalação de Revisão de Acessos",
+    "escalate": "Escalar Revisões em Atraso",
+    "daysBeforeDeadline": "Dias Antes do Prazo",
+    "escalated": "Campanhas Escaladas",
+    "campaignExpiring": "Campanha a expirar brevemente",
+    "pendingItems": "Itens pendentes"
+  },
+  "digitalTwin": {
+    "title": "Digital Twin",
+    "whatIf": "Análise What-If",
+    "topologySnapshot": "Snapshot de Topologia",
+    "simulateChange": "Simular Mudança de Contrato",
+    "changeType": {
+      "Additive": "Aditiva",
+      "NonBreaking": "Não-Breaking",
+      "Breaking": "Breaking",
+      "Deprecation": "Deprecação"
+    },
+    "impactLevel": {
+      "None": "Sem Impacto",
+      "Low": "Baixo",
+      "Medium": "Médio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "overallRisk": "Risco Geral",
+    "affectedConsumers": "Consumidores Afetados",
+    "totalConsumers": "Total de Consumidores",
+    "consumerName": "Serviço Consumidor",
+    "recommendation": "Recomendação",
+    "nodeCount": "Nós",
+    "edgeCount": "Arestas",
+    "capturedAt": "Capturado Em",
+    "noSnapshot": "Nenhum snapshot de topologia disponível",
+    "failureSim": {
+      "title": "Simulação de Impacto de Falha",
+      "cascadeRisk": "Risco em Cascata",
+      "exposedApis": "APIs Expostas",
+      "directImpact": "Impacto Direto",
+      "transitiveImpact": "Impacto Transitivo",
+      "totalImpacted": "Total de Serviços Impactados",
+      "consumerTeam": "Equipa Consumidora"
+    }
+  },
+  "agentApi": {
+    "title": "Tokens de API de Agente",
+    "create": "Criar Token",
+    "revoke": "Revogar",
+    "scope": {
+      "Read": "Leitura",
+      "ReadWrite": "Leitura e Escrita",
+      "Admin": "Administrador"
+    },
+    "prefix": "Prefixo do Token",
+    "expiresAt": "Expira Em",
+    "lastUsed": "Último Uso",
+    "active": "Ativo",
+    "revoked": "Revogado",
+    "revokeReason": "Motivo de Revogação",
+    "auditLog": "Log de Auditoria de Queries de Agente",
+    "queryType": "Tipo de Query",
+    "responseCode": "Código de Resposta",
+    "durationMs": "Duração (ms)",
+    "executedAt": "Executado Em",
+    "rawTokenHint": "Este token é apresentado apenas uma vez. Guarde-o em segurança."
+  },
+  "nis2Compliance": {
+    "title": "Relatório de Conformidade NIS2",
+    "overallStatus": "Estado Geral",
+    "controlId": "ID do Controlo",
+    "controlName": "Controlo",
+    "status": {
+      "NotAssessed": "Não Avaliado",
+      "Compliant": "Conforme",
+      "PartiallyCompliant": "Parcialmente Conforme",
+      "NonCompliant": "Não Conforme"
+    },
+    "periodDays": "Período de Avaliação (dias)",
+    "generatedAt": "Gerado Em",
+    "signedPacks": "Pacotes de Evidência Assinados",
+    "totalReleases": "Total de Releases"
+  },
+  "slsa": {
+    "title": "Evidência SLSA Nível 3",
+    "provenanceUri": "URI de Proveniência",
+    "artifactDigest": "Digest do Artefacto",
+    "sbomUri": "URI do SBOM",
+    "hasAttestation": "Tem Attestation de Artefacto",
+    "artifactGate": {
+      "title": "Gate de Artefacto Assinado",
+      "passed": "Attestation do artefacto verificada",
+      "failed": "Nenhuma attestation de artefacto encontrada",
+      "skipped": "Gate desativado"
+    }
+  },
+  "profiling": {
+    "title": "Profiling Contínuo",
+    "frameType": "Tipo de Frame",
+    "windowStart": "Início da Janela",
+    "windowEnd": "Fim da Janela",
+    "durationSeconds": "Duração (s)",
+    "totalCpuSamples": "Total de Amostras de CPU",
+    "peakMemoryMb": "Pico de Memória (MB)",
+    "peakThreadCount": "Pico de Threads",
+    "hasAnomalies": "Tem Anomalias",
+    "topFrames": "Top Frames (Hotspots)",
+    "rawDataUri": "URI dos Dados Brutos",
+    "releaseVersion": "Versão da Release",
+    "ingest": {
+      "title": "Ingestar Sessão de Profiling",
+      "success": "Sessão de profiling ingestada com sucesso"
+    },
+    "history": {
+      "title": "Histórico de Profiling",
+      "empty": "Nenhuma sessão de profiling encontrada para este serviço"
+    },
+    "analysis": {
+      "title": "Análise de Profiling",
+      "notFound": "Sessão de profiling não encontrada"
+    }
+  },
+  "migrationHealth": {
+    "title": "Relatório de Prontidão de Upgrade",
+    "totalModules": "Total de Módulos",
+    "upgradeSteps": "Passos de Upgrade",
+    "maintenanceWindow": "Janela de Manutenção Recomendada"
+  },
+  "benchmark": {
+    "title": "Benchmarks Cross-Tenant",
+    "consent": {
+      "title": "Consentimento de Participação em Benchmarks",
+      "status": "Estado do Consentimento",
+      "lgpdBasis": "Base Legal LGPD/GDPR",
+      "grant": "Conceder Consentimento",
+      "revoke": "Revogar Consentimento",
+      "notGranted": "Consentimento não concedido para participação nos benchmarks"
+    },
+    "snapshot": {
+      "title": "Snapshot de Benchmark",
+      "submit": "Submeter Snapshot de Métricas",
+      "deployFreq": "Frequência de Deploy (por semana)",
+      "leadTime": "Lead Time para Mudanças (horas)",
+      "failureRate": "Taxa de Falha de Mudanças (%)",
+      "mttr": "Tempo Médio para Restaurar (horas)",
+      "maturity": "Score de Maturidade",
+      "costPerRequest": "Custo por Pedido (USD)"
+    },
+    "ranking": {
+      "title": "Ranking de Benchmark",
+      "peerSetSize": "Dimensão do Peer Set",
+      "percentile": "Percentil",
+      "insufficientPeers": "Dados de peers insuficientes para ranking"
+    }
+  },
+  "policyStudio": {
+    "title": "Policy Studio",
+    "create": "Criar Política",
+    "update": "Actualizar Política",
+    "evaluate": "Avaliar Política",
+    "name": "Nome da Política",
+    "type": "Tipo de Política",
+    "isEnabled": "Activado",
+    "version": "Versão",
+    "appliesTo": "Aplica-se a",
+    "environment": "Filtro de Ambiente",
+    "rulesJson": "Regras (JSON)",
+    "actionJson": "Acção (JSON)",
+    "evaluation": {
+      "title": "Avaliação de Política",
+      "contextJson": "Contexto (JSON)",
+      "passed": "Aprovado",
+      "failed": "Reprovado",
+      "action": "Acção",
+      "message": "Mensagem",
+      "ruleTriggered": "Regra Activada"
+    },
+    "errors": {
+      "notFound": "Definição de política não encontrada",
+      "disabled": "Política está desactivada"
+    }
+  },
+  "releaseCalendar": {
+    "title": "Calendário de Releases",
+    "window": "Janela de Release",
+    "registerWindow": "Registar Janela",
+    "closeWindow": "Encerrar Janela",
+    "cancelWindow": "Cancelar Janela",
+    "windowType": "Tipo de Janela",
+    "windowStatus": "Estado",
+    "startsAt": "Início",
+    "endsAt": "Fim",
+    "environmentFilter": "Filtro de Ambiente",
+    "recurrenceTag": "Tag de Recorrência",
+    "blocksChanges": "Bloqueia Mudanças",
+    "isHotfixOnly": "Apenas Hotfix",
+    "isOpen": "Janela Aberta",
+    "isClosed": "Janela Fechada",
+    "windowTypes": {
+      "Scheduled": "Deployment Planeado",
+      "Freeze": "Congelamento",
+      "HotfixAllowed": "Hotfix Permitido",
+      "Maintenance": "Manutenção"
+    },
+    "windowStatuses": {
+      "Active": "Activo",
+      "Closed": "Encerrado",
+      "Cancelled": "Cancelado"
+    },
+    "changeBlocked": "Mudança bloqueada por janela de congelamento ou manutenção activa.",
+    "changeAllowed": "Mudança permitida na janela de release actual.",
+    "errors": {
+      "invalidWindow": "A data de fim deve ser posterior à data de início.",
+      "alreadyClosed": "A janela não está no estado Activo.",
+      "alreadyStarted": "Não é possível cancelar uma janela já iniciada."
+    }
+  },
+  "riskCenter": {
+    "title": "Centro de Risco",
+    "report": "Relatório de Risco",
+    "profile": "Perfil de Risco",
+    "compute": "Calcular Perfil de Risco",
+    "overallRisk": "Risco Global",
+    "overallScore": "Score de Risco",
+    "vulnerabilityScore": "Score de Vulnerabilidade",
+    "changeFailureScore": "Score de Falha de Mudança",
+    "blastRadiusScore": "Score de Blast Radius",
+    "policyViolationScore": "Score de Violação de Política",
+    "activeSignals": "Sinais de Risco Activos",
+    "computedAt": "Calculado em",
+    "distribution": "Distribuição de Risco",
+    "riskLevels": {
+      "Negligible": "Negligenciável",
+      "Low": "Baixo",
+      "Medium": "Médio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "signalTypes": {
+      "VulnerabilityCritical": "Vulnerabilidade Crítica",
+      "HighChangeFailureRate": "Taxa de Falha Elevada",
+      "LargeBlastRadius": "Blast Radius Elevado",
+      "PolicyViolation": "Violação de Política",
+      "NoOwner": "Sem Owner Definido",
+      "StaleContract": "Contrato Desactualizado",
+      "UnreviewedRelease": "Release Não Revista"
+    },
+    "errors": {
+      "profileNotFound": "Nenhum perfil de risco encontrado para este serviço."
+    }
+  },
+  "soc2Compliance": {
+    "title": "Relatório de Conformidade SOC 2",
+    "overallStatus": "Estado Global",
+    "controlId": "ID do Controlo",
+    "controlName": "Controlo",
+    "periodDays": "Período de Avaliação (dias)",
+    "generatedAt": "Gerado Em",
+    "totalReleases": "Total de Releases",
+    "signedPacks": "Evidence Packs Assinados",
+    "controls": {
+      "CC6": "Controlos de Acesso Lógico e Físico",
+      "CC7": "Operações do Sistema",
+      "CC8": "Gestão de Mudanças",
+      "CC9": "Mitigação de Risco",
+      "A1": "Disponibilidade"
+    },
+    "errors": {
+      "notEnabled": "O relatório de conformidade SOC 2 não está habilitado para este tenant."
+    }
+  },
+  "iso27001Compliance": {
+    "title": "Relatório de Conformidade ISO/IEC 27001:2022",
+    "overallStatus": "Estado Global",
+    "controlId": "ID do Controlo",
+    "controlName": "Controlo",
+    "periodDays": "Período de Avaliação (dias)",
+    "generatedAt": "Gerado Em",
+    "totalReleases": "Total de Releases",
+    "signedPacks": "Evidence Packs Assinados",
+    "controls": {
+      "A.8.8": "Gestão de Vulnerabilidades Técnicas",
+      "A.8.32": "Gestão de Mudanças",
+      "A.5.26": "Resposta a Incidentes de Segurança",
+      "A.5.29": "Segurança de Informação em Perturbações",
+      "A.8.9": "Gestão de Configuração"
+    },
+    "errors": {
+      "notEnabled": "O relatório de conformidade ISO 27001 não está habilitado para este tenant."
+    }
+  },
+  "graphqlSchema": {
+    "title": "Análise de Schema GraphQL",
+    "analyze": {
+      "title": "Analisar Schema GraphQL",
+      "success": "Schema GraphQL analisado e snapshot capturado com sucesso."
+    },
+    "history": {
+      "title": "Histórico de Schemas",
+      "empty": "Nenhum snapshot de schema GraphQL encontrado para este contrato.",
+      "capturedAt": "Capturado Em",
+      "typeCount": "Tipos",
+      "fieldCount": "Campos",
+      "operationCount": "Operações"
+    },
+    "diff": {
+      "title": "Detecção de Breaking Changes",
+      "hasBreakingChanges": "Tem Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Mudanças Não-Breaking",
+      "changeTypes": {
+        "TypeRemoved": "Tipo Removido",
+        "TypeAdded": "Tipo Adicionado",
+        "FieldRemoved": "Campo Removido",
+        "FieldAdded": "Campo Adicionado",
+        "OperationRemoved": "Operação Removida",
+        "OperationAdded": "Operação Adicionada"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "Snapshot de schema GraphQL não encontrado.",
+      "schemaTooBig": "O conteúdo do schema excede o tamanho máximo permitido.",
+      "invalidSchema": "O conteúdo do schema é inválido ou não pode ser analisado."
+    }
+  },
+  "protobufSchema": {
+    "title": "Análise de Schema Protobuf / gRPC",
+    "analyze": {
+      "title": "Analisar Schema Protobuf",
+      "success": "Schema Protobuf analisado e snapshot capturado com sucesso."
+    },
+    "history": {
+      "title": "Histórico de Schemas",
+      "empty": "Nenhum snapshot de schema Protobuf encontrado para este contrato.",
+      "capturedAt": "Capturado Em",
+      "messageCount": "Messages",
+      "fieldCount": "Campos",
+      "serviceCount": "Services",
+      "rpcCount": "RPCs",
+      "syntax": "Sintaxe"
+    },
+    "diff": {
+      "title": "Detecção de Breaking Changes",
+      "hasBreakingChanges": "Tem Breaking Changes",
+      "breakingCount": "Breaking Changes",
+      "nonBreakingCount": "Mudanças Não-Breaking",
+      "changeTypes": {
+        "MessageRemoved": "Message Removida",
+        "MessageAdded": "Message Adicionada",
+        "FieldRemoved": "Campo Removido",
+        "FieldAdded": "Campo Adicionado",
+        "ServiceRemoved": "Service Removido",
+        "ServiceAdded": "Service Adicionado",
+        "RpcRemoved": "RPC Removido",
+        "RpcAdded": "RPC Adicionado"
+      }
+    },
+    "errors": {
+      "snapshotNotFound": "Snapshot de schema Protobuf não encontrado.",
+      "schemaTooBig": "O conteúdo do schema excede o tamanho máximo permitido (256 KB).",
+      "invalidSchema": "O conteúdo do schema é inválido ou não pode ser analisado."
+    }
+  },
+  "pciDssCompliance": {
+    "title": "Relatório de Conformidade PCI-DSS",
+    "subtitle": "Estado de conformidade PCI-DSS v4.0 com base em gestão de mudanças, trilha de auditoria e pacotes de evidência.",
+    "requirements": {
+      "req12": "Controlos de Segurança de Rede",
+      "req6": "Sistemas e Software Seguros",
+      "req10": "Registar e Monitorizar Todo o Acesso",
+      "req11": "Testes de Segurança",
+      "req12policy": "Políticas e Programas Organizacionais"
+    },
+    "overallStatus": "Estado Geral",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Pacotes de Evidência Assinados",
+    "totalEvidencePacks": "Total de Pacotes de Evidência",
+    "generatedAt": "Relatório Gerado Em",
+    "periodDays": "Período de Avaliação (dias)",
+    "errors": {
+      "notEnabled": "O relatório de conformidade PCI-DSS não está habilitado para este tenant.",
+      "invalidPeriod": "O período de avaliação deve ser entre 1 e 365 dias."
+    }
+  },
+  "maturityV2": {
+    "title": "Score de Maturidade de Serviço v2",
+    "subtitle": "Pontuação dimensional de maturidade com pesos conscientes de tier e postura de vulnerabilidade.",
+    "levels": {
+      "Nascente": "Nascente",
+      "Em Desenvolvimento": "Em Desenvolvimento",
+      "Maduro": "Maduro",
+      "Excelente": "Excelente"
+    },
+    "dimensions": {
+      "ownership": "Ownership",
+      "contracts": "Contratos",
+      "documentation": "Documentação",
+      "operational_readiness": "Prontidão Operacional",
+      "tier_compliance": "Conformidade com Tier",
+      "vulnerability_posture": "Postura de Vulnerabilidade"
+    },
+    "tier": "Tier do Serviço",
+    "overallScore": "Score Geral",
+    "computedAt": "Calculado Em",
+    "errors": {
+      "serviceNotFound": "Serviço não encontrado.",
+      "computationFailed": "Falha ao calcular o score de maturidade."
+    }
+  },
+  "hipaaCompliance": {
+    "title": "Relatório de Conformidade HIPAA Security Rule",
+    "subtitle": "Estado de conformidade com a HIPAA Security Rule baseado em gestão de mudanças, trilha de auditoria e pacotes de evidência.",
+    "controls": {
+      "accessControl": "Controlo de Acesso",
+      "auditControls": "Controlos de Auditoria",
+      "integrity": "Integridade",
+      "authentication": "Autenticação de Pessoa/Entidade",
+      "transmissionSecurity": "Segurança de Transmissão"
+    },
+    "overallStatus": "Estado Geral",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Pacotes de Evidência Assinados",
+    "totalEvidencePacks": "Total de Pacotes de Evidência",
+    "generatedAt": "Relatório Gerado Em",
+    "periodDays": "Período de Avaliação (dias)",
+    "errors": {
+      "notEnabled": "O relatório de conformidade HIPAA não está habilitado para este tenant.",
+      "invalidPeriod": "O período de avaliação deve ser entre 1 e 365 dias."
+    }
+  },
+  "serviceCostAllocation": {
+    "title": "Alocação de Custo por Serviço",
+    "subtitle": "Relatório FinOps contextual: custo operacional alocado por serviço, equipa, domínio e ambiente.",
+    "categories": {
+      "Compute": "Computação",
+      "Storage": "Armazenamento",
+      "Network": "Rede",
+      "Licensing": "Licenciamento",
+      "Observability": "Observabilidade",
+      "Other": "Outro"
+    },
+    "grandTotal": "Total Geral (USD)",
+    "totalRecords": "Total de Registos",
+    "generatedAt": "Relatório Gerado Em",
+    "periodDays": "Período (dias)",
+    "ingest": {
+      "success": "Registo de custo ingestado com sucesso.",
+      "invalidPeriod": "O fim do período deve ser posterior ao início.",
+      "negativeAmount": "O valor deve ser não-negativo."
+    },
+    "insights": {
+      "title": "Insights FinOps",
+      "subtitle": "Anomalias de custo e oportunidades de otimização detetadas para este período.",
+      "types": {
+        "CostOutlier": "Outlier de Custo",
+        "NonProdExceedsProd": "Não-Prod Supera Prod",
+        "CategoryGrowth": "Crescimento de Categoria"
+      },
+      "noInsights": "Nenhuma anomalia de custo detetada para este período."
+    }
+  },
+  "dependencyRisk": {
+    "title": "Relatório de Risco de Dependências",
+    "subtitle": "Pontuação de risco baseada no grafo: tier, fan-in de APIs e lacunas de governance de ownership.",
+    "riskLevels": {
+      "Low": "Baixo",
+      "Medium": "Médio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "overallRisk": "Risco Global do Grafo",
+    "highRiskCount": "Serviços de Alto/Crítico Risco",
+    "totalAnalyzed": "Serviços Analisados",
+    "service": "Serviço",
+    "tier": "Tier",
+    "owner": "Equipa Owner",
+    "riskScore": "Score de Risco",
+    "apiCount": "APIs Expostas",
+    "riskFactors": "Fatores de Risco",
+    "errors": {
+      "noServices": "Nenhum serviço encontrado para o filtro especificado.",
+      "tenantRequired": "O ID de tenant é obrigatório."
+    }
+  },
+  "gdprCompliance": {
+    "title": "Relatório de Conformidade GDPR",
+    "subtitle": "Estado de conformidade com o Regulamento Geral de Proteção de Dados com base na gestão de mudanças, trilha de auditoria, evidence packs e controlos de governança de dados.",
+    "articles": {
+      "art5": "Princípios do Tratamento",
+      "art13": "Transparência",
+      "art17": "Direito ao Apagamento",
+      "art25": "Proteção de Dados por Design",
+      "art33": "Preparação para Notificação de Violação"
+    },
+    "overallStatus": "Estado Global",
+    "totalReleases": "Total de Releases",
+    "signedEvidencePacks": "Evidence Packs Assinados",
+    "totalEvidencePacks": "Total de Evidence Packs",
+    "generatedAt": "Relatório Gerado Em",
+    "periodDays": "Período de Avaliação (dias)",
+    "errors": {
+      "notEnabled": "O relatório de conformidade GDPR não está ativo para este tenant.",
+      "invalidPeriod": "O período de avaliação deve ser entre 1 e 365 dias."
+    }
+  },
+  "sloTracking": {
+    "title": "Resumo de Conformidade de SLO",
+    "trendTitle": "Tendência de Violações de SLO",
+    "subtitle": "Rastreio de conformidade de Service Level Objectives: valores observados vs objetivos, taxa de violações e análise de tendências.",
+    "statuses": {
+      "Met": "Cumprido",
+      "Warning": "Alerta",
+      "Breached": "Violado"
+    },
+    "overallStatus": {
+      "AllMet": "Todos os SLOs Cumpridos",
+      "Partial": "Parcialmente Conforme",
+      "Violated": "SLO Violado",
+      "NoData": "Sem Dados"
+    },
+    "complianceRate": "Taxa de Conformidade (%)",
+    "totalObservations": "Total de Observações",
+    "totalViolations": "Total de Violações",
+    "trend": {
+      "Improving": "A Melhorar",
+      "Stable": "Estável",
+      "Worsening": "A Piorar",
+      "Insufficient": "Dados Insuficientes"
+    },
+    "peakViolationDate": "Data de Pico de Violações",
+    "ingest": {
+      "success": "Observação de SLO ingestada com sucesso.",
+      "invalidPeriod": "O fim do período deve ser posterior ao início.",
+      "invalidTarget": "O objetivo de SLO deve ser superior a zero."
+    },
+    "errors": {
+      "noObservations": "Nenhuma observação de SLO encontrada para o filtro especificado.",
+      "tenantRequired": "O ID de tenant é obrigatório."
+    }
+  },
+  "rollbackRecommendation": {
+    "title": "Recomendação de Rollback de Mudança",
+    "subtitle": "Score composto de urgência de rollback baseado em confiança na mudança, blast radius e integridade de evidence packs.",
+    "urgency": {
+      "None": "Não Indicado",
+      "Suggest": "Considerar Rollback",
+      "Recommend": "Rollback Recomendado",
+      "Critical": "Rollback Urgente"
+    },
+    "rollbackScore": "Score de Rollback",
+    "factors": {
+      "ChangeConfidence": "Confiança na Mudança",
+      "BlastRadius": "Blast Radius",
+      "EvidenceIntegrity": "Integridade de Evidence Pack"
+    },
+    "hasConfidenceData": "Dados de Confiança Disponíveis",
+    "hasBlastRadiusData": "Dados de Blast Radius Disponíveis",
+    "evidencePackCount": "Evidence Packs",
+    "errors": {
+      "releaseNotFound": "Release não encontrada.",
+      "invalidReleaseId": "É necessário um ID de release válido."
+    }
   }
 }

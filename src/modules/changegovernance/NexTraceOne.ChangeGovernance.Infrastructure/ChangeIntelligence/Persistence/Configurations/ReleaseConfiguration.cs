@@ -62,5 +62,20 @@ internal sealed class ReleaseConfiguration : IEntityTypeConfiguration<Release>
 
         // ── Concorrência otimista (PostgreSQL xmin) ──────────────────────────
         builder.Property(x => x.RowVersion).IsRowVersion();
+
+        // ── SLSA Level 3 evidence ─────────────────────────────────────────────
+        builder.Property(x => x.SlsaProvenanceUri)
+            .HasMaxLength(2000)
+            .HasColumnName("slsa_provenance_uri");
+        builder.Property(x => x.ArtifactDigest)
+            .HasMaxLength(200)
+            .HasColumnName("artifact_digest");
+        builder.Property(x => x.SbomUri)
+            .HasMaxLength(2000)
+            .HasColumnName("sbom_uri");
+
+        builder.HasIndex(x => x.ArtifactDigest)
+            .HasDatabaseName("ix_chg_releases_artifact_digest")
+            .HasFilter("\"artifact_digest\" IS NOT NULL");
     }
 }

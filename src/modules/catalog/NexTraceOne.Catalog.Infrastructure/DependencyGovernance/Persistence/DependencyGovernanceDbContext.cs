@@ -20,6 +20,7 @@ public sealed class DependencyGovernanceDbContext(
 {
     public DbSet<ServiceDependencyProfile> ServiceDependencyProfiles => Set<ServiceDependencyProfile>();
     public DbSet<PackageDependency> PackageDependencies => Set<PackageDependency>();
+    public DbSet<VulnerabilityAdvisoryRecord> VulnerabilityAdvisoryRecords => Set<VulnerabilityAdvisoryRecord>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly => typeof(DependencyGovernanceDbContext).Assembly;
     protected override string? ConfigurationsNamespace => "NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence.Configurations";
