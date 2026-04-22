@@ -13978,5 +13978,61 @@
       "Significant": "Significant",
       "Critical": "Critical"
     }
+  },
+  "eventSchemaEvolution": {
+    "title": "Event Schema Evolution Report",
+    "description": "Tracks the evolution of AsyncAPI/Kafka event schemas over time, identifying events with frequent breaking changes and consumers still on old schema versions.",
+    "totalContracts": "Total Event Contracts",
+    "topUnstableContracts": "Top Unstable Event Schemas",
+    "migrationLagContracts": "Contracts with Migration Lag",
+    "breakingChangeRate": "Breaking Change Rate",
+    "schemaLagDays": "Schema Lag (Days)",
+    "consumersOnOldVersion": "Consumers on Old Version",
+    "stabilityTier": "Stability Tier",
+    "migrationLag": "Migration Lag",
+    "avgBreakingChangeRate": "Avg. Breaking Change Rate",
+    "tiers": {
+      "Stable": "Stable",
+      "Evolving": "Evolving",
+      "Volatile": "Volatile",
+      "Unstable": "Unstable"
+    }
+  },
+  "eventProducerConsumerBalance": {
+    "title": "Event Producer-Consumer Balance Report",
+    "description": "Analyses the balance between event producers and consumers, identifying orphaned events, blind consumers, and high fan-out events.",
+    "totalEvents": "Total Events",
+    "orphanedEvents": "Orphaned Events",
+    "blindConsumers": "Blind Consumers",
+    "highFanOutEvents": "High Fan-Out Events",
+    "producerCount": "Producer Count",
+    "consumerCount": "Consumer Count",
+    "isOrphaned": "Orphaned",
+    "isBlind": "Blind Consumer",
+    "fanOutRisk": "Fan-Out Risk",
+    "orphanedPct": "Orphaned %",
+    "blindConsumerPct": "Blind Consumer %",
+    "fanOutRiskPct": "Fan-Out Risk %"
+  },
+  "eventContractCompliance": {
+    "title": "Event Contract Compliance Report",
+    "description": "Validates that event producers conform to their registered AsyncAPI schemas, measuring compliance rate, payload violations, and unregistered fields.",
+    "tenantComplianceScore": "Tenant Event Compliance Score",
+    "schemaComplianceRate": "Schema Compliance Rate",
+    "payloadViolationCount": "Payload Violations",
+    "unregisteredFields": "Unregistered Fields",
+    "missingRequiredFields": "Missing Required Fields",
+    "violationTimeline": "Violation Timeline (30d)",
+    "topNonCompliant": "Top Non-Compliant Contracts",
+    "compliantCount": "Compliant",
+    "minorViolationsCount": "Minor Violations",
+    "degradedCount": "Degraded",
+    "nonCompliantCount": "Non-Compliant",
+    "tiers": {
+      "Compliant": "Compliant",
+      "MinorViolations": "Minor Violations",
+      "Degraded": "Degraded",
+      "NonCompliant": "Non-Compliant"
+    }
   }
 }

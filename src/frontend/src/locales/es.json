@@ -15213,5 +15213,61 @@
       "Significant": "Significativo",
       "Critical": "Crítico"
     }
+  },
+  "eventSchemaEvolution": {
+    "title": "Informe de Evolución de Esquemas de Eventos",
+    "description": "Rastrea la evolución de esquemas de eventos AsyncAPI/Kafka, identificando eventos con cambios breaking frecuentes y consumidores aún en versiones antiguas.",
+    "totalContracts": "Total de Contratos de Eventos",
+    "topUnstableContracts": "Esquemas de Eventos Más Inestables",
+    "migrationLagContracts": "Contratos con Retraso de Migración",
+    "breakingChangeRate": "Tasa de Cambios Breaking",
+    "schemaLagDays": "Retraso de Esquema (Días)",
+    "consumersOnOldVersion": "Consumidores en Versión Antigua",
+    "stabilityTier": "Nivel de Estabilidad",
+    "migrationLag": "Retraso de Migración",
+    "avgBreakingChangeRate": "Tasa Media de Cambios Breaking",
+    "tiers": {
+      "Stable": "Estable",
+      "Evolving": "En Evolución",
+      "Volatile": "Volátil",
+      "Unstable": "Inestable"
+    }
+  },
+  "eventProducerConsumerBalance": {
+    "title": "Informe de Equilibrio Productor-Consumidor de Eventos",
+    "description": "Analiza el equilibrio entre productores y consumidores de eventos, identificando eventos huérfanos, consumidores ciegos y eventos de alto fan-out.",
+    "totalEvents": "Total de Eventos",
+    "orphanedEvents": "Eventos Huérfanos",
+    "blindConsumers": "Consumidores Ciegos",
+    "highFanOutEvents": "Eventos de Alto Fan-Out",
+    "producerCount": "Productores",
+    "consumerCount": "Consumidores",
+    "isOrphaned": "Huérfano",
+    "isBlind": "Consumidor Ciego",
+    "fanOutRisk": "Riesgo de Fan-Out",
+    "orphanedPct": "% Huérfanos",
+    "blindConsumerPct": "% Consumidores Ciegos",
+    "fanOutRiskPct": "% Riesgo Fan-Out"
+  },
+  "eventContractCompliance": {
+    "title": "Informe de Conformidad de Contratos de Eventos",
+    "description": "Valida que los productores de eventos cumplan con los esquemas AsyncAPI registrados, midiendo tasa de conformidad, violaciones de payload y campos no registrados.",
+    "tenantComplianceScore": "Puntuación de Conformidad de Eventos del Tenant",
+    "schemaComplianceRate": "Tasa de Conformidad de Esquema",
+    "payloadViolationCount": "Violaciones de Payload",
+    "unregisteredFields": "Campos No Registrados",
+    "missingRequiredFields": "Campos Obligatorios Ausentes",
+    "violationTimeline": "Cronología de Violaciones (30d)",
+    "topNonCompliant": "Top Contratos No Conformes",
+    "compliantCount": "Conforme",
+    "minorViolationsCount": "Violaciones Menores",
+    "degradedCount": "Degradado",
+    "nonCompliantCount": "No Conforme",
+    "tiers": {
+      "Compliant": "Conforme",
+      "MinorViolations": "Violaciones Menores",
+      "Degraded": "Degradado",
+      "NonCompliant": "No Conforme"
+    }
   }
 }

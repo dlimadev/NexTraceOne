@@ -15243,5 +15243,61 @@
       "Significant": "Significativo",
       "Critical": "Crítico"
     }
+  },
+  "eventSchemaEvolution": {
+    "title": "Relatório de Evolução de Schemas de Eventos",
+    "description": "Rastreia a evolução de schemas de eventos AsyncAPI/Kafka, identificando eventos com mudanças breaking frequentes e consumidores ainda em versões antigas.",
+    "totalContracts": "Total de Contratos de Eventos",
+    "topUnstableContracts": "Schemas de Eventos Mais Instáveis",
+    "migrationLagContracts": "Contratos com Atraso de Migração",
+    "breakingChangeRate": "Taxa de Breaking Changes",
+    "schemaLagDays": "Atraso de Schema (Dias)",
+    "consumersOnOldVersion": "Consumidores em Versão Antiga",
+    "stabilityTier": "Tier de Estabilidade",
+    "migrationLag": "Atraso de Migração",
+    "avgBreakingChangeRate": "Taxa Média de Breaking Changes",
+    "tiers": {
+      "Stable": "Estável",
+      "Evolving": "Em Evolução",
+      "Volatile": "Volátil",
+      "Unstable": "Instável"
+    }
+  },
+  "eventProducerConsumerBalance": {
+    "title": "Relatório de Equilíbrio Produtor-Consumidor de Eventos",
+    "description": "Analisa o equilíbrio entre produtores e consumidores de eventos, identificando eventos órfãos, consumidores cegos e eventos de alto fan-out.",
+    "totalEvents": "Total de Eventos",
+    "orphanedEvents": "Eventos Órfãos",
+    "blindConsumers": "Consumidores Cegos",
+    "highFanOutEvents": "Eventos de Alto Fan-Out",
+    "producerCount": "Produtores",
+    "consumerCount": "Consumidores",
+    "isOrphaned": "Órfão",
+    "isBlind": "Consumidor Cego",
+    "fanOutRisk": "Risco de Fan-Out",
+    "orphanedPct": "% Órfãos",
+    "blindConsumerPct": "% Consumidores Cegos",
+    "fanOutRiskPct": "% Risco Fan-Out"
+  },
+  "eventContractCompliance": {
+    "title": "Relatório de Conformidade de Contratos de Eventos",
+    "description": "Valida se os produtores de eventos estão em conformidade com os schemas AsyncAPI registados, medindo taxa de conformidade, violações de payload e campos não registados.",
+    "tenantComplianceScore": "Score de Conformidade de Eventos do Tenant",
+    "schemaComplianceRate": "Taxa de Conformidade de Schema",
+    "payloadViolationCount": "Violações de Payload",
+    "unregisteredFields": "Campos Não Registados",
+    "missingRequiredFields": "Campos Obrigatórios Ausentes",
+    "violationTimeline": "Timeline de Violações (30d)",
+    "topNonCompliant": "Top Contratos Não Conformes",
+    "compliantCount": "Conforme",
+    "minorViolationsCount": "Violações Menores",
+    "degradedCount": "Degradado",
+    "nonCompliantCount": "Não Conforme",
+    "tiers": {
+      "Compliant": "Conforme",
+      "MinorViolations": "Violações Menores",
+      "Degraded": "Degradado",
+      "NonCompliant": "Não Conforme"
+    }
   }
 }
