@@ -14827,5 +14827,44 @@
     "attributionEntries": "Atribuição",
     "avgCostPerRequest": "Custo Médio / Pedido",
     "requestCount": "Pedidos"
+  },
+  "eventConsumer": {
+    "title": "Consumidor de Eventos",
+    "status": "Estado do Consumidor",
+    "running": "Em Execução",
+    "paused": "Pausado",
+    "error": "Erro",
+    "throughput": "Throughput",
+    "lastEvent": "Último Evento",
+    "deadLetterCount": "Dead Letters",
+    "deadLetterQueue": "Fila de Dead Letter",
+    "topic": "Tópico",
+    "sourceType": "Tipo de Fonte"
+  },
+  "sdkIntegration": {
+    "title": "Integração SDK",
+    "nuget": "Pacote NuGet",
+    "npm": "Pacote npm",
+    "cli": "Ferramenta CLI",
+    "githubAction": "GitHub Action",
+    "apiToken": "Token de API",
+    "baseUrl": "URL Base da API",
+    "confidenceGate": "Gate de Confiança de Mudança",
+    "minScore": "Pontuação Mínima de Confiança"
+  },
+  "clickhouseProvider": {
+    "title": "Analytics ClickHouse",
+    "provider": "Fornecedor de Analytics",
+    "healthy": "Saudável",
+    "unhealthy": "Com Problemas",
+    "batchSize": "Tamanho do Lote",
+    "flushInterval": "Intervalo de Flush (s)",
+    "ttlDays": "TTL (dias)",
+    "switchProvider": "Trocar Fornecedor",
+    "providers": {
+      "ClickHouse": "ClickHouse",
+      "Elasticsearch": "Elasticsearch",
+      "InMemory": "Em Memória (testes)"
+    }
   }
 }

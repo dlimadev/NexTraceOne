@@ -13595,5 +13595,44 @@
     "attributionEntries": "Attribution",
     "avgCostPerRequest": "Avg Cost / Request",
     "requestCount": "Requests"
+  },
+  "eventConsumer": {
+    "title": "Event Consumer",
+    "status": "Consumer Status",
+    "running": "Running",
+    "paused": "Paused",
+    "error": "Error",
+    "throughput": "Throughput",
+    "lastEvent": "Last Event",
+    "deadLetterCount": "Dead Letters",
+    "deadLetterQueue": "Dead Letter Queue",
+    "topic": "Topic",
+    "sourceType": "Source Type"
+  },
+  "sdkIntegration": {
+    "title": "SDK Integration",
+    "nuget": "NuGet Package",
+    "npm": "npm Package",
+    "cli": "CLI Tool",
+    "githubAction": "GitHub Action",
+    "apiToken": "API Token",
+    "baseUrl": "API Base URL",
+    "confidenceGate": "Change Confidence Gate",
+    "minScore": "Minimum Confidence Score"
+  },
+  "clickhouseProvider": {
+    "title": "ClickHouse Analytics",
+    "provider": "Analytics Provider",
+    "healthy": "Healthy",
+    "unhealthy": "Unhealthy",
+    "batchSize": "Batch Size",
+    "flushInterval": "Flush Interval (s)",
+    "ttlDays": "TTL (days)",
+    "switchProvider": "Switch Provider",
+    "providers": {
+      "ClickHouse": "ClickHouse",
+      "Elasticsearch": "Elasticsearch",
+      "InMemory": "In-Memory (testing)"
+    }
   }
 }

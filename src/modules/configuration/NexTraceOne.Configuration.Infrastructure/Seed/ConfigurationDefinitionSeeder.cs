@@ -9394,5 +9394,93 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "false",
             uiEditorType: "toggle",
             sortOrder: 11670),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.event_consumer.max_concurrent_consumers",
+            displayName: "config.integrations.event_consumer.max_concurrent_consumers.name",
+            description: "config.integrations.event_consumer.max_concurrent_consumers.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "4",
+            uiEditorType: "number",
+            sortOrder: 11680),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.event_consumer.dead_letter_max_attempts",
+            displayName: "config.integrations.event_consumer.dead_letter_max_attempts.name",
+            description: "config.integrations.event_consumer.dead_letter_max_attempts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 11690),
+
+        ConfigurationDefinition.Create(
+            key: "integrations.event_consumer.processing_timeout_seconds",
+            displayName: "config.integrations.event_consumer.processing_timeout_seconds.name",
+            description: "config.integrations.event_consumer.processing_timeout_seconds.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11700),
+
+        ConfigurationDefinition.Create(
+            key: "sdk.platform_api.rate_limit_per_minute",
+            displayName: "config.sdk.platform_api.rate_limit_per_minute.name",
+            description: "config.sdk.platform_api.rate_limit_per_minute.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "300",
+            uiEditorType: "number",
+            sortOrder: 11710),
+
+        ConfigurationDefinition.Create(
+            key: "sdk.platform_api.max_page_size",
+            displayName: "config.sdk.platform_api.max_page_size.name",
+            description: "config.sdk.platform_api.max_page_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 11720),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.clickhouse.batch_size",
+            displayName: "config.analytics.clickhouse.batch_size.name",
+            description: "config.analytics.clickhouse.batch_size.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "1000",
+            uiEditorType: "number",
+            sortOrder: 11730),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.clickhouse.flush_interval_seconds",
+            displayName: "config.analytics.clickhouse.flush_interval_seconds.name",
+            description: "config.analytics.clickhouse.flush_interval_seconds.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 11740),
+
+        ConfigurationDefinition.Create(
+            key: "analytics.clickhouse.default_ttl_days",
+            displayName: "config.analytics.clickhouse.default_ttl_days.name",
+            description: "config.analytics.clickhouse.default_ttl_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11750),
     ];
 }

@@ -1569,9 +1569,11 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
-### Wave Z — Integration Ecosystem Completion
+### Wave Z — Integration Ecosystem Completion ✅
 
 **Objetivo:** Completar as integrações de ecosistema que permitem ao NexTraceOne ser **autónomo na ingestão** de eventos externos e ser **consumível programaticamente** por ferramentas de automação — fechando os últimos gaps de integração identificados nas secções 3.2, 3.3, 3.4 e 11.2 do documento.
+
+**Estado:** ✅ COMPLETA
 
 #### Z.1 — Kafka / Message Queue Consumer Real
 
@@ -1634,6 +1636,8 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `clickhouseProvider.*` — configuração e estado do provider ClickHouse
 
 **Totais estimados Wave Z:** Worker: ~25 testes. SDK: documentação + 2 packages. Configuração: +8 config keys (sort 11680–11750). i18n: +3 secções (4 locales). Novas migrations: 1 (EventConsumerDeadLetterRecords).
+
+**Wave Z COMPLETA** ✅
 
 ---
 
@@ -4562,9 +4566,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 65. ✅ **Wave Y.1** — Agentic Runtime com Human-in-the-Loop — `AgentExecutionPlan` aggregate + `AgentStep` multi-type + `ApproveAgentStep` gate + budget enforcement + audit trail por passo. AIKnowledge/AIOrchestration. Config: `ai.agentic.*` sort 11600–11620.
 66. ✅ **Wave Y.2** — NLP-based Model Routing — intent classifier leve (embedding) → `PromptIntent` enum → `ModelRoutingPolicy` entity + cost-aware downgrade automático + `GetModelRoutingDecisionLog`. AIKnowledge. Config: `ai.routing.*` sort 11630–11640.
 67. ✅ **Wave Y.3** — AI Token Budget Attribution — `AiTokenUsageRecord` + `GetAiTokenBudgetReport` + `GetAiCostAttributionReport` + `AiBudgetPolicy` enforcement por tenant/equipa. AIKnowledge + FinOps. Config: `ai.budget.*` sort 11650–11670. **Wave Y COMPLETA** ✅.
-68. 🔲 **Wave Z.1** — Kafka / Message Queue Consumer Real — `EventConsumerWorker` (`BackgroundService`) + `IEventNormalizationStrategy` por source type + dead letter queue + monitoring endpoint. Worker. Config: `integrations.event_consumer.*` sort 11680–11700.
-69. 🔲 **Wave Z.2** — SDK NexTrace — CLI `nexone` + NuGet `NexTrace.Sdk` + npm `nexone-sdk` + GitHub Action `nexone/change-confidence-gate@v1`. Developer tooling. Config: `sdk.platform_api.*` sort 11710–11720.
-70. 🔲 **Wave Z.3** — ClickHouse Analytics Provider — `IClickHouseAnalyticsWriter/Reader` adapter + schema MergeTree/SummingMergeTree + health check + `analytics.Provider` config switch. Infrastructure. Config: `analytics.clickhouse.*` sort 11730–11750. **Wave Z PLANEADA**.
+68. ✅ **Wave Z.1** — Kafka / Message Queue Consumer Real — `EventConsumerWorker` (`BackgroundService`) + `IEventNormalizationStrategy` por source type + dead letter queue + monitoring endpoint. Worker. Config: `integrations.event_consumer.*` sort 11680–11700.
+69. ✅ **Wave Z.2** — SDK NexTrace — CLI `nexone` + NuGet `NexTrace.Sdk` + npm `nexone-sdk` + GitHub Action `nexone/change-confidence-gate@v1`. Developer tooling. Config: `sdk.platform_api.*` sort 11710–11720.
+70. ✅ **Wave Z.3** — ClickHouse Analytics Provider — `IClickHouseAnalyticsWriter/Reader` adapter + schema MergeTree/SummingMergeTree + health check + `analytics.Provider` config switch. Infrastructure. Config: `analytics.clickhouse.*` sort 11730–11750. **Wave Z COMPLETA** ✅.
 
 71. 📘 **Wave AA — V3 Frontend Evolution** — 12 sub-waves (V3.1→V3.12) cobrindo: Dashboard Intelligence Foundation (variables, revisions, SharingPolicy granular), Query-driven Widgets + NQL, Live/Cross-filter/Drill-down, AI-assisted Dashboards + Notebooks, Frontend Platform Uplift (tokens v2, Command Palette, WCAG 2.2, Storybook, perf budgets), Governance/Reports/Embedding, Real-time Collaboration via CRDT (Yjs), Marketplace + Plugin SDK (Module Federation), Advanced NQL + Alerting from widget + PWA on-call, **Persona-first Experience Suites (7 homes: Engineer/Tech Lead/Architect/Product/Executive/Platform Admin/Auditor)**, **Source-of-Truth Consolidation Surfaces (11 Centers: Compliance/Risk/FinOps/Change Confidence/Release Calendar/Rollback/Blast Radius/Evidence Pack/Operational Readiness/Drift/SLO+Chaos+Learning)**, **Contract Studio Visual (REST/SOAP/AsyncAPI/GraphQL/Protobuf) + AI Agent Marketplace + IDE Extensions Console (VS + VS Code) + Break Glass/JIT + Licensing Admin + Knowledge Hub Bridge + DaC GitOps**. Plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md). Alinhada com Copilot Instructions §§6, 7, 11, 12, 13, 16, 17, 18. Estimativa agregada ≥525 testes dedicados, além da cobertura backend existente. **Wave AA PLANEADA**.
 

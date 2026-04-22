@@ -21,6 +21,8 @@ rootCommand.Add(McpCommand.Create());
 rootCommand.Add(ReportCommand.Create());
 rootCommand.Add(ScaffoldCommand.Create());
 rootCommand.Add(CompletionCommand.Create());
+rootCommand.Add(ConfidenceCommand.Create());
+rootCommand.Add(ComplianceCommand.Create());
 
 // Show banner only when invoked with no arguments
 if (args.Length == 0)

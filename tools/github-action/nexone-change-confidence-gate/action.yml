@@ -1,0 +1,67 @@
+name: "NexOne Change Confidence Gate"
+description: "Fails the workflow if the change confidence score for a release is below the configured threshold."
+
+inputs:
+  release-id:
+    description: "Release identifier to check confidence score for."
+    required: true
+  api-url:
+    description: "NexTraceOne API base URL."
+    required: true
+  api-token:
+    description: "API authentication token (Bearer)."
+    required: true
+  min-confidence-score:
+    description: "Minimum acceptable confidence score (0–100). Workflow fails if score is below this value."
+    required: false
+    default: "70"
+
+outputs:
+  score:
+    description: "The confidence score returned by the API."
+    value: ${{ steps.check.outputs.score }}
+  tier:
+    description: "The confidence tier returned by the API."
+    value: ${{ steps.check.outputs.tier }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check change confidence score
+      id: check
+      shell: bash
+      env:
+        RELEASE_ID: ${{ inputs.release-id }}
+        API_URL: ${{ inputs.api-url }}
+        API_TOKEN: ${{ inputs.api-token }}
+        MIN_SCORE: ${{ inputs.min-confidence-score }}
+      run: |
+        RESPONSE=$(curl -sf \
+          -H "Authorization: Bearer ${API_TOKEN}" \
+          -H "Accept: application/json" \
+          "${API_URL%/}/api/v1/changes/${RELEASE_ID}/confidence") || {
+          echo "::error::Failed to reach NexTraceOne API at ${API_URL}"
+          exit 1
+        }
+
+        SCORE=$(echo "$RESPONSE" | grep -o '"score":[^,}]*' | head -1 | grep -o '[0-9.]*')
+        TIER=$(echo "$RESPONSE" | grep -o '"tier":"[^"]*"' | head -1 | sed 's/"tier":"//;s/"//')
+
+        echo "score=${SCORE}" >> "$GITHUB_OUTPUT"
+        echo "tier=${TIER}" >> "$GITHUB_OUTPUT"
+
+        echo "::notice::Change confidence score for release '${RELEASE_ID}': ${SCORE} (${TIER})"
+
+        if [ -z "$SCORE" ]; then
+          echo "::error::Could not parse confidence score from API response."
+          exit 1
+        fi
+
+        # Compare using awk for float comparison
+        BELOW=$(awk -v score="$SCORE" -v min="$MIN_SCORE" 'BEGIN { print (score + 0 < min + 0) ? "yes" : "no" }')
+        if [ "$BELOW" = "yes" ]; then
+          echo "::error::Confidence score ${SCORE} is below minimum threshold ${MIN_SCORE}. Blocking promotion."
+          exit 1
+        fi
+
+        echo "::notice::Confidence gate passed: ${SCORE} >= ${MIN_SCORE}"
