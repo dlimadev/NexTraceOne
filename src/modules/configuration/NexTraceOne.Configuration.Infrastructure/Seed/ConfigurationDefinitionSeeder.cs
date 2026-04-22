@@ -9661,5 +9661,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "80",
             uiEditorType: "number",
             sortOrder: 11910),
+
+        // ── Wave AD — Zero Trust & Security Posture Analytics ─────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.zero_trust.enforced_threshold",
+            displayName: "config.security.zero_trust.enforced_threshold.name",
+            description: "config.security.zero_trust.enforced_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 11920),
+
+        ConfigurationDefinition.Create(
+            key: "security.zero_trust.critical_exposure_threshold",
+            displayName: "config.security.zero_trust.critical_exposure_threshold.name",
+            description: "config.security.zero_trust.critical_exposure_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 11930),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.secrets_exposure.max_artifacts",
+            displayName: "config.catalog.secrets_exposure.max_artifacts.name",
+            description: "config.catalog.secrets_exposure.max_artifacts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 11940),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.secrets_exposure.min_risk_level",
+            displayName: "config.catalog.secrets_exposure.min_risk_level.name",
+            description: "config.catalog.secrets_exposure.min_risk_level.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "Medium",
+            uiEditorType: "text",
+            sortOrder: 11950),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.lookback_days",
+            displayName: "config.audit.access_anomaly.lookback_days.name",
+            description: "config.audit.access_anomaly.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11960),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.volumetric_spike_multiplier",
+            displayName: "config.audit.access_anomaly.volumetric_spike_multiplier.name",
+            description: "config.audit.access_anomaly.volumetric_spike_multiplier.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 11970),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.bulk_export_threshold",
+            displayName: "config.audit.access_anomaly.bulk_export_threshold.name",
+            description: "config.audit.access_anomaly.bulk_export_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 11980),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.max_users",
+            displayName: "config.audit.access_anomaly.max_users.name",
+            description: "config.audit.access_anomaly.max_users.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 11990),
     ];
 }

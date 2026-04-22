@@ -13742,5 +13742,61 @@
       "releaseCalendar": "Release Calendar",
       "aiAssistant": "AI Assistant"
     }
+  },
+  "zeroTrustPosture": {
+    "title": "Zero Trust Posture",
+    "tenantScore": "Tenant Zero Trust Score",
+    "zeroTrustTier": "Zero Trust Tier",
+    "criticalExposureCount": "Critical Exposures",
+    "topExposedServices": "Top Exposed Services",
+    "tiers": {
+      "Enforced": "Enforced",
+      "Controlled": "Controlled",
+      "Partial": "Partial",
+      "Exposed": "Exposed"
+    },
+    "dimensions": {
+      "authentication": "Authentication",
+      "mutualTls": "Mutual TLS",
+      "tokenRotation": "Token Rotation",
+      "policyCoverage": "Policy Coverage"
+    }
+  },
+  "secretsExposureRisk": {
+    "title": "Secrets Exposure Risk",
+    "totalScanned": "Total Scanned",
+    "totalAtRisk": "Total At Risk",
+    "exposureRisk": "Exposure Risk",
+    "exposureCategory": "Exposure Category",
+    "affectedArtifacts": "Affected Artifacts",
+    "riskLevels": {
+      "None": "None",
+      "Low": "Low",
+      "Medium": "Medium",
+      "High": "High",
+      "Critical": "Critical"
+    },
+    "categories": {
+      "ApiKey": "API Key",
+      "JwtToken": "JWT Token",
+      "ConnectionString": "Connection String",
+      "PrivateIp": "Private IP",
+      "PersonalEmail": "Personal Email"
+    }
+  },
+  "accessPatternAnomaly": {
+    "title": "Access Pattern Anomalies",
+    "totalAnalyzed": "Total Users Analyzed",
+    "totalAnomalous": "Anomalous Users",
+    "highDensityUsers": "High Density Users",
+    "riskScore": "Risk Score",
+    "anomalySignals": "Anomaly Signals",
+    "signals": {
+      "OffHours": "Off-Hours Access",
+      "VolumetricSpike": "Volumetric Spike",
+      "FirstAccessSensitive": "First Access to Sensitive Resource",
+      "UnusualResource": "Unusual Resource Access",
+      "BulkExport": "Bulk Export"
+    }
   }
 }

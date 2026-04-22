@@ -14977,5 +14977,61 @@
       "releaseCalendar": "Calendario de Releases",
       "aiAssistant": "Asistente de IA"
     }
+  },
+  "zeroTrustPosture": {
+    "title": "Postura Zero Trust",
+    "tenantScore": "Score Zero Trust del Tenant",
+    "zeroTrustTier": "Nivel Zero Trust",
+    "criticalExposureCount": "Exposiciones Críticas",
+    "topExposedServices": "Servicios Más Expuestos",
+    "tiers": {
+      "Enforced": "Aplicado",
+      "Controlled": "Controlado",
+      "Partial": "Parcial",
+      "Exposed": "Expuesto"
+    },
+    "dimensions": {
+      "authentication": "Autenticación",
+      "mutualTls": "mTLS Mutuo",
+      "tokenRotation": "Rotación de Token",
+      "policyCoverage": "Cobertura de Política"
+    }
+  },
+  "secretsExposureRisk": {
+    "title": "Riesgo de Exposición de Secretos",
+    "totalScanned": "Total Analizado",
+    "totalAtRisk": "Total en Riesgo",
+    "exposureRisk": "Riesgo de Exposición",
+    "exposureCategory": "Categoría de Exposición",
+    "affectedArtifacts": "Artefactos Afectados",
+    "riskLevels": {
+      "None": "Ninguno",
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "categories": {
+      "ApiKey": "Clave de API",
+      "JwtToken": "Token JWT",
+      "ConnectionString": "Cadena de Conexión",
+      "PrivateIp": "IP Privada",
+      "PersonalEmail": "Correo Personal"
+    }
+  },
+  "accessPatternAnomaly": {
+    "title": "Anomalías de Patrón de Acceso",
+    "totalAnalyzed": "Total de Usuarios Analizados",
+    "totalAnomalous": "Usuarios Anómalos",
+    "highDensityUsers": "Usuarios de Alta Densidad",
+    "riskScore": "Score de Riesgo",
+    "anomalySignals": "Señales de Anomalía",
+    "signals": {
+      "OffHours": "Acceso Fuera de Horario",
+      "VolumetricSpike": "Pico Volumétrico",
+      "FirstAccessSensitive": "Primer Acceso a Recurso Sensible",
+      "UnusualResource": "Acceso a Recurso Inusual",
+      "BulkExport": "Exportación Masiva"
+    }
   }
 }

@@ -2,8 +2,8 @@
 
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
-> **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → BC (105 features novas documentadas, aguardam implementação)  
+> **Waves concluídas:** A → AD (80 features analytics/governance implementadas e testadas)  
+> **Waves planeadas:** AE → BC (102 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
@@ -1966,7 +1966,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `secretsExposureRisk.*` — risco de exposição de segredos em artefactos governados
 - `accessPatternAnomaly.*` — anomalias de padrão de acesso e sinais de risco comportamental
 
-**Totais estimados Wave AD:** CG: ~13 testes (AD.1). Catalog: ~13 testes (AD.2). IA/Audit: ~14 testes (AD.3). Configuração: +8 config keys (sort 11920–11990). i18n: +3 secções (4 locales). Nota: AD.2 requer apenas regex scanning leve, sem dependências externas de SAST. **Wave AD PLANEADA**.
+**Totais Wave AD:** CG: 18 testes (AD.1). Catalog: 14 testes (AD.2). IA/Audit: 16 testes (AD.3). Configuração: +8 config keys (sort 11920–11990). i18n: +3 secções (4 locales). **Wave AD COMPLETA** ✅.
 
 ---
 
@@ -4584,9 +4584,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 75. ✅ **Wave AC.1** — `GetOnboardingHealthReport` — scorecard de completude de onboarding por serviço: 5 dimensões ponderadas (Ownership 20% + Contracts 25% + Runbook 20% + SLO 20% + Profiling 15%), OnboardingTier (Complete/Advanced/Basic/Minimal), TeamOnboardingAvg, TenantOnboardingScore ponderado por tier de serviço. Catalog. Config: `catalog.onboarding_health.*` sort 11840–11860.
 76. ✅ **Wave AC.2** — `GetDeveloperActivityReport` — atividade de developers na plataforma: TotalActions ponderado (contratos=3/runbooks=2/outros=1), ActivityTier (HighlyActive/Active/Occasional/Inactive) por percentil, TeamActivityScore, top 10 utilizadores/equipas, InactiveTeams list. IA/Audit. Config: `audit.developer_activity.*` sort 11870–11880.
 77. ✅ **Wave AC.3** — `GetPlatformAdoptionReport` — adoção de 7 capacidades core por equipa: SloTracking/ChaosEngineering/ContinuousProfiling/ComplianceReports/ChangeConfidence/ReleaseCalendar/AiAssistant, AdoptionTier (Pioneer/Adopter/Explorer/Laggard), CapabilityAdoptionRate global, GrowthOpportunity (capacidades <30% adoção). OI. Config: `platform.adoption.*` sort 11890–11910. **Wave AC COMPLETA** ✅.
-78. 🔲 **Wave AD.1** — `GetZeroTrustPostureReport` — postura Zero Trust por serviço: 4 dimensões (Authentication 30% + mTLS 25% + TokenRotation 20% + PolicyCoverage 25%), ZeroTrustTier (Enforced/Controlled/Partial/Exposed), CriticalExposure flag, TenantZeroTrustScore. CG. Config: `security.zero_trust.*` sort 11920–11930.
-79. 🔲 **Wave AD.2** — `GetSecretsExposureRiskReport` — deteção de segredos em artefactos: pattern matching leve (API keys/JWT/connection strings/IPs/emails), ExposureRisk por artefacto (None/Low/Medium/High/Critical), AffectedArtifacts list, AuditTrail por deteção, sem dependências externas. Catalog. Config: `catalog.secrets_exposure.*` sort 11940–11950.
-80. 🔲 **Wave AD.3** — `GetAccessPatternAnomalyReport` — anomalias de acesso: 5 AnomalySignal types (OffHours/VolumetricSpike/FirstAccessSensitive/UnusualResource/BulkExport), RiskScore composto por tipo+sensibilidade, AnomalyDensityByUser (risco insider threat), top recursos acedidos anomalamente. IA/Audit. Config: `audit.access_anomaly.*` sort 11960–11990. **Wave AD PLANEADA**.
+78. ✅ **Wave AD.1** — `GetZeroTrustPostureReport` — postura Zero Trust por serviço: 4 dimensões (Authentication 30% + mTLS 25% + TokenRotation 20% + PolicyCoverage 25%), ZeroTrustTier (Enforced/Controlled/Partial/Exposed), CriticalExposure flag, TenantZeroTrustScore. CG. Config: `security.zero_trust.*` sort 11920–11930.
+79. ✅ **Wave AD.2** — `GetSecretsExposureRiskReport` — deteção de segredos em artefactos: pattern matching leve (API keys/JWT/connection strings/IPs privados RFC 1918/emails pessoais), ExposureRisk por artefacto (None/Low/Medium/High/Critical), AffectedArtifacts list, CategoryDistribution, sem dependências externas. Catalog. Config: `catalog.secrets_exposure.*` sort 11940–11950.
+80. ✅ **Wave AD.3** — `GetAccessPatternAnomalyReport` — anomalias de acesso: 5 AnomalySignal types (OffHours/VolumetricSpike/FirstAccessSensitive/UnusualResource/BulkExport), RiskScore composto 0–100, AnomalyDensityFlag (>=3 sinais), HighDensityUsers list. IA/Audit. Config: `audit.access_anomaly.*` sort 11960–11990. **Wave AD COMPLETA** ✅.
 81. 🔲 **Wave AE.1** — `ContractTestRecord` + `IngestContractTestResult` + `GetContractTestCoverageReport` — cobertura de testes de contrato: ingestão de resultados de Pact/contract testing via pipeline, CoverageTier (Full/Good/Partial/None), TestPassRate, UncoveredConsumerPairs, migration `ContractTestRecords`. Catalog. Config: `contracts.test_coverage.*` sort 12000–12020.
 82. 🔲 **Wave AE.2** — `GetSchemaBreakingChangeImpactReport` — impacto transitivo de breaking changes: DirectConsumers + IndirectConsumers (até `max_hop_depth` saltos), ImpactScore ponderado por tier, BreakingChangeImpactTier (Contained/Moderate/Significant/Widespread), MitigationOptions, breakdown por ambiente. Catalog. Config: `contracts.breaking_change_impact.*` sort 12030–12040.
 83. 🔲 **Wave AE.3** — `GetApiBackwardCompatibilityReport` — compatibilidade retroativa longitudinal: BreakingChangeRate, ConsumerAdoptionLag, BackwardCompatibilityScore, CompatibilityTier (Stable/Evolving/Volatile/Unstable), StagnationFlag, TenantCompatibilityIndex. Catalog. Config: `contracts.backward_compat.*` sort 12050–12070. **Wave AE PLANEADA**.
