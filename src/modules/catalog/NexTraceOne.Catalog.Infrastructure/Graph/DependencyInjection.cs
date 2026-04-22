@@ -102,6 +102,14 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISupplyChainRiskReader,
             NexTraceOne.Catalog.Application.Contracts.NullSupplyChainRiskReader>();
 
+        // ── Wave AQ — Data Observability & Schema Quality null readers ───────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDataContractRepository,
+            NexTraceOne.Catalog.Application.Contracts.NullDataContractRepository>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaQualityReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSchemaQualityReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaEvolutionSafetyReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSchemaEvolutionSafetyReader>();
+
         return services;
     }
 }

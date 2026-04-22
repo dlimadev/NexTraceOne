@@ -15636,5 +15636,39 @@
       "High": "Risco Alto",
       "Critical": "Risco Crítico"
     }
+  },
+  "dataContractCompliance": {
+    "title": "Relatório de Conformidade de Contratos de Dados",
+    "staleDays": "Dias para Obsolescência",
+    "minFieldCompletenessPct": "Completude Mínima de Campos %",
+    "tier": {
+      "Governed": "Governado",
+      "Partial": "Parcial",
+      "Unmanaged": "Não Gerido"
+    }
+  },
+  "schemaQualityIndex": {
+    "title": "Relatório de Índice de Qualidade de Schema",
+    "minDescWords": "Palavras Mínimas na Descrição",
+    "snapshotCron": "Cron de Snapshot",
+    "tier": {
+      "Excellent": "Excelente",
+      "Good": "Bom",
+      "Fair": "Razoável",
+      "Poor": "Fraco"
+    }
+  },
+  "schemaEvolutionSafety": {
+    "title": "Relatório de Segurança de Evolução de Schema",
+    "breakingChangeLowPct": "% Baixo de Breaking Changes",
+    "breakingChangeDangerousPct": "% Perigoso de Breaking Changes",
+    "incidentCorrelationHours": "Horas de Correlação com Incidentes",
+    "lookbackDays": "Dias de Lookback",
+    "tier": {
+      "Safe": "Seguro",
+      "Cautious": "Cauteloso",
+      "Risky": "Arriscado",
+      "Dangerous": "Perigoso"
+    }
   }
 }

@@ -14404,5 +14404,39 @@
       "High": "High Risk",
       "Critical": "Critical Risk"
     }
+  },
+  "dataContractCompliance": {
+    "title": "Data Contract Compliance Report",
+    "staleDays": "Stale Days",
+    "minFieldCompletenessPct": "Min Field Completeness %",
+    "tier": {
+      "Governed": "Governed",
+      "Partial": "Partial",
+      "Unmanaged": "Unmanaged"
+    }
+  },
+  "schemaQualityIndex": {
+    "title": "Schema Quality Index Report",
+    "minDescWords": "Min Description Words",
+    "snapshotCron": "Snapshot Cron",
+    "tier": {
+      "Excellent": "Excellent",
+      "Good": "Good",
+      "Fair": "Fair",
+      "Poor": "Poor"
+    }
+  },
+  "schemaEvolutionSafety": {
+    "title": "Schema Evolution Safety Report",
+    "breakingChangeLowPct": "Breaking Change Low %",
+    "breakingChangeDangerousPct": "Breaking Change Dangerous %",
+    "incidentCorrelationHours": "Incident Correlation Hours",
+    "lookbackDays": "Lookback Days",
+    "tier": {
+      "Safe": "Safe",
+      "Cautious": "Cautious",
+      "Risky": "Risky",
+      "Dangerous": "Dangerous"
+    }
   }
 }
