@@ -3121,7 +3121,51 @@
     "env.behavior.change.ingest.enabled.label": "Ingesta de Eventos de Cambio Habilitada",
     "env.behavior.change.ingest.enabled.description": "Habilita la ingesta de eventos de deploy y cambio para este entorno.",
     "env.behavior.change.post_change_verification.enabled.label": "Verificación Post-Cambio Habilitada",
-    "env.behavior.change.post_change_verification.enabled.description": "Habilita las verificaciones automáticas post-cambio tras los deploys en este entorno."
+    "env.behavior.change.post_change_verification.enabled.description": "Habilita las verificaciones automáticas post-cambio tras los deploys en este entorno.",
+    "ui": {
+      "executive_dashboard": {
+        "enabled": {
+          "name": "Executive Dashboard: Enabled",
+          "description": "Enables the Executive Intelligence Dashboard."
+        },
+        "risk_threshold": {
+          "name": "Executive Dashboard: Risk Threshold",
+          "description": "Minimum risk score (0–100) to highlight services in the risky services widget."
+        },
+        "finops_burn_warn_threshold_pct": {
+          "name": "Executive Dashboard: FinOps Burn Warning Threshold (%)",
+          "description": "Budget consumption percentage that triggers the accelerated burn rate flag."
+        },
+        "mttr_sparkline_services": {
+          "name": "Executive Dashboard: MTTR Sparkline Services",
+          "description": "Number of services shown in the MTTR sparkline on the Executive Dashboard."
+        }
+      },
+      "contract_studio": {
+        "graphql_diff": {
+          "max_snapshot_age_days": {
+            "name": "Contract Studio: GraphQL Diff Max Snapshot Age (Days)",
+            "description": "Maximum age in days for a GraphQL snapshot to be eligible for diff comparison."
+          }
+        },
+        "protobuf_diff": {
+          "max_snapshot_age_days": {
+            "name": "Contract Studio: Protobuf Diff Max Snapshot Age (Days)",
+            "description": "Maximum age in days for a Protobuf snapshot to be eligible for diff comparison."
+          }
+        }
+      },
+      "adaptive_navigation": {
+        "enabled": {
+          "name": "Adaptive Navigation: Enabled",
+          "description": "Enables persona-aware adaptive navigation and quick actions."
+        },
+        "quick_actions_count": {
+          "name": "Adaptive Navigation: Quick Actions Count",
+          "description": "Number of quick actions highlighted per persona in the navigation."
+        }
+      }
+    }
   },
   "configuration": {
     "actions": {
@@ -14428,6 +14472,510 @@
       "invalidTenantId": "El ID del tenant es obligatorio.",
       "invalidLookbackDays": "Los días de retrospectiva deben ser entre 1 y 90.",
       "invalidMaxDriftPenaltyPerService": "La penalización máxima de drift debe ser entre 1 y 20."
+    }
+  },
+  "complianceCoverageMatrixReport": {
+    "title": "Matriz de Cobertura de Compliance",
+    "description": "Detección de blind spots de compliance por servicio: qué servicios han sido evaluados en cada estándar activo (SOC2, ISO27001, PCI-DSS, HIPAA, GDPR, FedRAMP, NIS2, CMMC) y con qué estado de conformidad",
+    "lookbackDays": "Días de Retrospectiva",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "totalStandardsActive": "Estándares Activos",
+    "tenantAvgCoverageScorePct": "Score Medio de Cobertura (%)",
+    "levelDistribution": "Distribución por Nivel de Cobertura",
+    "full": "Completa (100%)",
+    "partial": "Parcial (≥ umbral%)",
+    "minimal": "Mínima (≥ 1 estándar)",
+    "none": "Ninguna (blind spot)",
+    "byStandard": "Cobertura por Estándar",
+    "standard": "Estándar",
+    "assessedServiceCount": "Servicios Evaluados",
+    "coveredPct": "Cubiertos (%)",
+    "topGapServices": "Top Servicios con Gap de Compliance",
+    "allServices": "Todos los Servicios",
+    "serviceName": "Servicio",
+    "coverageScorePct": "Score de Cobertura (%)",
+    "level": "Nivel de Cobertura",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de retrospectiva deben ser entre 7 y 180.",
+      "invalidTopGapCount": "El número máximo de gap debe ser entre 1 y 100.",
+      "invalidPartialThresholdPct": "El umbral parcial debe ser entre 1% y 99%."
+    }
+  },
+  "dependencyUpdateFreshnessReport": {
+    "title": "Actualización de Dependencias",
+    "description": "Días desde el último cambio de contrato por servicio, cruzados con advisories de vulnerabilidad abiertos: clasificación por tier de frescura para priorizar actualizaciones de dependencias por riesgo real",
+    "lookbackDays": "Días de Retrospectiva",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "tierDistribution": "Distribución por Tier de Frescura",
+    "fresh": "Actualizado (≤ 30 días)",
+    "aging": "Envejeciendo (31–90 días)",
+    "stale": "Desactualizado (91–180 días)",
+    "critical": "Crítico (> 180 días)",
+    "topStaleServices": "Servicios Más Desactualizados",
+    "allServices": "Todos los Servicios",
+    "serviceName": "Servicio",
+    "daysSinceLastDependencyChange": "Días Desde Último Cambio",
+    "tier": "Tier de Frescura",
+    "openVulnerabilityCount": "Vulnerabilidades Abiertas",
+    "vulnerabilityGap": "Gap de Vulnerabilidad",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de retrospectiva deben ser entre 30 y 365.",
+      "invalidTopStaleCount": "El número máximo debe ser entre 1 y 100.",
+      "invalidThresholds": "El umbral de aging debe ser mayor que el de fresh, y el de stale mayor que el de aging."
+    }
+  },
+  "serviceLoadDistributionReport": {
+    "title": "Distribución de Carga de Servicios",
+    "description": "Clasificación de banda de carga por throughput por servicio (HighLoad / MediumLoad / LowLoad por cuartil) correlacionada con coste por request: identifica candidatos a waste y servicios de alta eficiencia para decisiones de rightsizing",
+    "lookbackDays": "Días de Retrospectiva",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "medianRequestsPerSecond": "Mediana de Throughput (RPS)",
+    "medianCostPerRequestUsd": "Mediana de Coste por Request (USD)",
+    "bandDistribution": "Distribución por Banda de Carga",
+    "highLoad": "Alta Carga (top 25%)",
+    "mediumLoad": "Carga Media",
+    "lowLoad": "Baja Carga (bottom 25%)",
+    "topWasteServices": "Top Candidatos a Waste",
+    "allServices": "Todos los Servicios",
+    "serviceName": "Servicio",
+    "environment": "Entorno",
+    "avgLatencyMs": "Latencia Media (ms)",
+    "avgErrorRate": "Tasa de Error Media",
+    "avgRequestsPerSecond": "RPS Medio",
+    "totalCostUsd": "Coste Total (USD)",
+    "costPerRequestUsd": "Coste por Request (USD)",
+    "band": "Banda de Carga",
+    "wasteCandidate": "Candidato a Waste",
+    "highCostEfficiency": "Alta Eficiencia de Coste",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de retrospectiva deben ser entre 7 y 90.",
+      "invalidMaxTopServices": "El número máximo de servicios debe ser entre 1 y 100."
+    }
+  },
+  "serviceApiGrowthReport": {
+    "title": "Informe de Crecimiento de APIs por Servicio",
+    "description": "Compara contratos activos distintos por servicio entre el período actual y el de comparación para detectar API sprawl: clasificación por GrowthTier (Stable / Growing / RapidGrowth / Exploding / Shrinking) con flag GovernanceRisk",
+    "lookbackDays": "Días de Análisis",
+    "comparisonPeriodDays": "Período de Comparación (Días)",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "tierDistribution": "Distribución por Tier de Crecimiento",
+    "stable": "Estable",
+    "growing": "Creciendo",
+    "rapidGrowth": "Crecimiento Rápido",
+    "exploding": "Explosivo",
+    "shrinking": "Disminuyendo",
+    "topGrowingServices": "Top Servicios en Crecimiento",
+    "topGovernanceRiskServices": "Top Servicios con Riesgo de Governance",
+    "allServices": "Todos los Servicios",
+    "serviceName": "Servicio",
+    "currentContractCount": "Contratos Actuales",
+    "previousContractCount": "Contratos Anteriores",
+    "growthRatePct": "Tasa de Crecimiento (%)",
+    "tier": "Tier de Crecimiento",
+    "governanceRisk": "Riesgo de Governance",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de análisis deben estar entre 7 y 180.",
+      "invalidComparisonPeriodDays": "El período de comparación debe estar entre 30 y 365.",
+      "invalidStableThresholdPct": "El umbral estable debe estar entre 1 y 49."
+    }
+  },
+  "chaosCoverageGapReport": {
+    "title": "Informe de Brechas de Cobertura de Chaos",
+    "description": "Identifica servicios sin cobertura adecuada de chaos engineering en producción: clasificación por GapLevel con flag CriticalGap y CoverageRate global",
+    "lookbackDays": "Días de Análisis",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "coverageRatePct": "Tasa de Cobertura (%)",
+    "gapDistribution": "Distribución por Gap Level",
+    "noCoverage": "Sin Cobertura",
+    "productionGap": "Brecha en Producción",
+    "failedCoverage": "Cobertura Fallida",
+    "partialCoverage": "Cobertura Parcial",
+    "fullCoverage": "Cobertura Completa",
+    "topCriticalGapServices": "Top Servicios con Brecha Crítica",
+    "allServices": "Todos los Servicios",
+    "serviceName": "Servicio",
+    "gap": "Nivel de Brecha",
+    "criticalGap": "Brecha Crítica",
+    "totalExperimentsInPeriod": "Total de Experimentos",
+    "productionExperimentsInPeriod": "Experimentos en Producción",
+    "completedProductionExperiments": "Completados en Producción",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de análisis deben estar entre 30 y 365.",
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 100.",
+      "invalidProductionEnvironmentName": "El nombre del entorno de producción es obligatorio."
+    }
+  },
+  "releaseFrequencyDeviationReport": {
+    "title": "Informe de Desviación de Frecuencia de Releases",
+    "description": "Detecta cambios bruscos en la frecuencia de deployment por servicio: compara DeploysPerDay en la ventana reciente vs baseline histórico, clasificando como Accelerating / Stable / Decelerating / Stalled / New con RiskFlag",
+    "recentDays": "Ventana Reciente (Días)",
+    "historicalDays": "Baseline Histórico (Días)",
+    "totalServicesAnalyzed": "Servicios Analizados",
+    "deviationDistribution": "Distribución por Desviación",
+    "accelerating": "Acelerando",
+    "stable": "Estable",
+    "decelerating": "Desacelerando",
+    "stalled": "Paralizado",
+    "new": "Nuevo",
+    "topAcceleratingServices": "Top Servicios en Aceleración",
+    "topDeceleratingServices": "Top Servicios en Desaceleración / Paralizados",
+    "allServices": "Todos los Servicios",
+    "serviceName": "Servicio",
+    "recentReleasesCount": "Releases Recientes",
+    "historicalReleasesCount": "Releases Históricas",
+    "deploysPerDayRecent": "Deploys/Día (Reciente)",
+    "deploysPerDayHistorical": "Deploys/Día (Histórico)",
+    "deviationPct": "Desviación (%)",
+    "recentSuccessRatePct": "Tasa de Éxito Reciente (%)",
+    "deviation": "Desviación",
+    "riskFlag": "Flag de Riesgo",
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidRecentDays": "Los días recientes deben estar entre 7 y 60.",
+      "invalidHistoricalDays": "Los días históricos deben estar entre 30 y 365 y ser mayores que los días recientes.",
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 200."
+    }
+  },
+  "rollbackPatternReport": {
+    "title": "Informe de Patrón de Rollback",
+    "description": "Analiza patrones de rollback por servicio para identificar problemas sistémicos de despliegue.",
+    "patterns": {
+      "None": "Ninguno",
+      "Isolated": "Aislado",
+      "Recurring": "Recurrente",
+      "Serial": "Serial"
+    },
+    "flags": {
+      "systemicRisk": "Riesgo Sistémico",
+      "evidenceGap": "Brecha de Evidencia"
+    },
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de retrovisión deben estar entre 7 y 180.",
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 100."
+    }
+  },
+  "serviceCouplingIndexReport": {
+    "title": "Informe de Índice de Acoplamiento de Servicios",
+    "description": "Analiza relaciones de fan-in y fan-out para identificar hub services y riesgos arquitectónicos.",
+    "tiers": {
+      "Isolated": "Aislado",
+      "LooselyCoupled": "Acoplamiento Bajo",
+      "ModeratelyCoupled": "Acoplamiento Moderado",
+      "HighlyCoupled": "Acoplamiento Alto",
+      "HubService": "Hub Service"
+    },
+    "flags": {
+      "architecturalRisk": "Riesgo Arquitectónico",
+      "isolationRisk": "Riesgo de Aislamiento"
+    },
+    "errors": {
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 100."
+    }
+  },
+  "anomalyDetectionSummaryReport": {
+    "title": "Informe Resumen de Detección de Anomalías",
+    "description": "Agrega señales de anomalía de 5 fuentes para identificar servicios con múltiples problemas simultáneos.",
+    "densityLevels": {
+      "Clean": "Limpio",
+      "Moderate": "Moderado",
+      "Dense": "Denso",
+      "Critical": "Crítico"
+    },
+    "errors": {
+      "invalidTenantId": "El ID del tenant es obligatorio.",
+      "invalidLookbackDays": "Los días de retrovisión deben estar entre 7 y 90.",
+      "invalidMaxTopServices": "El número máximo de servicios debe estar entre 1 y 100."
+    }
+  },
+  "executiveDashboard": {
+    "title": "Dashboard Ejecutivo de Inteligencia",
+    "serviceHealth": "Salud de Servicios",
+    "serviceHealthDesc": "Puntuación de salud global de todos los servicios del tenant",
+    "changeConfidence": "Confianza en Cambios",
+    "changeConfidenceDesc": "Confianza promedio de despliegue en las últimas 4 semanas",
+    "complianceCoverage": "Cobertura de Cumplimiento",
+    "complianceCoverageDesc": "Cobertura por estándar de cumplimiento",
+    "finopsBudget": "Consumo de Presupuesto FinOps",
+    "finopsBudgetDesc": "Presupuesto consumido vs. período",
+    "topRiskyServices": "Servicios de Mayor Riesgo",
+    "topRiskyServicesDesc": "Servicios con mayor puntuación de riesgo",
+    "mttrTrend": "Tendencia de MTTR",
+    "mttrTrendDesc": "Tiempo medio de recuperación de servicios críticos (últimos 30 días)",
+    "burnAccelerated": "Tasa de consumo acelerada",
+    "drillDown": "Ver detalles",
+    "noData": "Sin datos disponibles para este período",
+    "loadingWidgets": "Cargando widgets del dashboard...",
+    "errorLoading": "Error al cargar el dashboard ejecutivo"
+  },
+  "graphqlDiffViewer": {
+    "title": "Diff de Esquema GraphQL",
+    "explorer": "Explorador de Esquema",
+    "diffViewer": "Visualizador de Diff",
+    "breakingChanges": "Cambios Incompatibles",
+    "nonBreakingChanges": "Cambios Compatibles",
+    "unchanged": "Sin cambios",
+    "selectSnapshot": "Seleccionar snapshot",
+    "noSnapshots": "No hay snapshots disponibles",
+    "uploadSdl": "Subir archivo SDL",
+    "pasteSdl": "Pegar esquema SDL",
+    "types": "Tipos",
+    "fields": "Campos",
+    "queries": "Queries",
+    "mutations": "Mutations",
+    "subscriptions": "Subscriptions",
+    "filter": "Filtrar esquema",
+    "breakingBadge": "Incompatible",
+    "analyzing": "Analizando esquema...",
+    "noBreakingChanges": "No se detectaron cambios incompatibles"
+  },
+  "protobufDiffViewer": {
+    "title": "Diff de Esquema Protobuf",
+    "explorer": "Explorador de Esquema",
+    "diffViewer": "Visualizador de Diff",
+    "breakingChanges": "Cambios Incompatibles",
+    "nonBreakingChanges": "Cambios Compatibles",
+    "unchanged": "Sin cambios",
+    "selectSnapshot": "Seleccionar snapshot",
+    "noSnapshots": "No hay snapshots disponibles",
+    "uploadProto": "Subir archivo .proto",
+    "pasteProto": "Pegar esquema .proto",
+    "messages": "Messages",
+    "fields": "Campos",
+    "services": "Servicios",
+    "rpcs": "RPCs",
+    "filter": "Filtrar esquema",
+    "deprecatedField": "Obsoleto",
+    "analyzing": "Analizando esquema...",
+    "noBreakingChanges": "No se detectaron cambios incompatibles"
+  },
+  "adaptiveNavigation": {
+    "title": "Acciones Rápidas",
+    "personaLabel": "Perfil",
+    "customizeHint": "Acciones personalizadas según tu rol y contexto",
+    "modules": {
+      "services": "Servicios",
+      "operations": "Operaciones",
+      "changes": "Cambios",
+      "contracts": "Contratos",
+      "knowledge": "Conocimiento",
+      "governance": "Gobernanza",
+      "analytics": "Analytics",
+      "organization": "Organización",
+      "admin": "Admin",
+      "aiHub": "AI Hub",
+      "integrations": "Integraciones"
+    }
+  },
+  "agentExecutionPlan": {
+    "title": "Planes de Ejecución de Agente",
+    "submit": "Enviar Plan",
+    "approve": "Aprobar Paso",
+    "status": {
+      "Pending": "Pendiente",
+      "Running": "En Ejecución",
+      "WaitingApproval": "Esperando Aprobación",
+      "Completed": "Completado",
+      "Failed": "Fallido",
+      "Cancelled": "Cancelado"
+    },
+    "stepType": {
+      "ContractLookup": "Búsqueda de Contrato",
+      "IncidentCorrelation": "Correlación de Incidente",
+      "DraftGeneration": "Generación de Borrador",
+      "RunbookProposal": "Propuesta de Runbook",
+      "AlertTriage": "Triaje de Alerta",
+      "ExternalSearch": "Búsqueda Externa"
+    },
+    "steps": "Pasos",
+    "approvedBy": "Aprobado Por",
+    "tokenBudget": "Presupuesto de Tokens",
+    "tokensConsumed": "Tokens Consumidos"
+  },
+  "modelRouting": {
+    "title": "Enrutamiento de Modelo",
+    "intent": "Intención",
+    "preferredModel": "Modelo Preferido",
+    "fallbackModel": "Modelo de Reserva",
+    "log": "Registro de Decisiones",
+    "classify": "Clasificar Intención",
+    "intents": {
+      "CodeGeneration": "Generación de Código",
+      "DocumentSummarization": "Resumen de Documento",
+      "IncidentAnalysis": "Análisis de Incidente",
+      "ContractDraft": "Borrador de Contrato",
+      "ComplianceCheck": "Verificación de Cumplimiento",
+      "GeneralQuery": "Consulta General"
+    }
+  },
+  "aiTokenBudget": {
+    "title": "Presupuesto de Tokens de IA",
+    "totalTokens": "Tokens Totales",
+    "totalCost": "Costo Total (USD)",
+    "burnRate": "Tasa de Consumo",
+    "approaching": "Acercándose al Límite",
+    "byTeam": "Por Equipo",
+    "byUseCase": "Por Caso de Uso",
+    "topConsumers": "Principales Consumidores",
+    "timeline": "Uso Diario"
+  },
+  "aiCostAttributionReport": {
+    "title": "Informe de Atribución de Costo de IA",
+    "groupBy": "Agrupar Por",
+    "attributionEntries": "Atribución",
+    "avgCostPerRequest": "Costo Promedio / Solicitud",
+    "requestCount": "Solicitudes"
+  },
+  "eventConsumer": {
+    "title": "Consumidor de Eventos",
+    "status": "Estado del Consumidor",
+    "running": "En Ejecución",
+    "paused": "Pausado",
+    "error": "Error",
+    "throughput": "Rendimiento",
+    "lastEvent": "Último Evento",
+    "deadLetterCount": "Dead Letters",
+    "deadLetterQueue": "Cola de Dead Letter",
+    "topic": "Tópico",
+    "sourceType": "Tipo de Fuente"
+  },
+  "sdkIntegration": {
+    "title": "Integración SDK",
+    "nuget": "Paquete NuGet",
+    "npm": "Paquete npm",
+    "cli": "Herramienta CLI",
+    "githubAction": "GitHub Action",
+    "apiToken": "Token de API",
+    "baseUrl": "URL Base de la API",
+    "confidenceGate": "Gate de Confianza de Cambio",
+    "minScore": "Puntuación Mínima de Confianza"
+  },
+  "clickhouseProvider": {
+    "title": "Analytics ClickHouse",
+    "provider": "Proveedor de Analytics",
+    "healthy": "Saludable",
+    "unhealthy": "Con Problemas",
+    "batchSize": "Tamaño del Lote",
+    "flushInterval": "Intervalo de Flush (s)",
+    "ttlDays": "TTL (días)",
+    "switchProvider": "Cambiar Proveedor",
+    "providers": {
+      "ClickHouse": "ClickHouse",
+      "Elasticsearch": "Elasticsearch",
+      "InMemory": "En Memoria (pruebas)"
+    }
+  },
+  "knowledgeRelationGraph": {
+    "title": "Grafo de Relaciones de Conocimiento",
+    "anchor": "Entidad Ancla",
+    "maxDepth": "Profundidad Máxima",
+    "nodes": "Nodos",
+    "edges": "Aristas",
+    "relationStrength": "Fuerza de Relación",
+    "summary": "Resumen del Grafo",
+    "graphDensity": "Densidad del Grafo",
+    "nodeTypes": {
+      "Service": "Servicio",
+      "Contract": "Contrato",
+      "Runbook": "Runbook",
+      "Incident": "Incidente",
+      "Release": "Release",
+      "Team": "Equipo",
+      "OperationalNote": "Nota Operacional"
+    },
+    "edgeTypes": {
+      "OwnedBy": "Pertenece a",
+      "DependsOn": "Depende de",
+      "PublishesContract": "Publica Contrato",
+      "ConsumesContract": "Consume Contrato",
+      "CorrelatedWith": "Correlacionado con",
+      "MitigatedBy": "Mitigado por",
+      "DocumentedIn": "Documentado en",
+      "DeployedAs": "Desplegado como"
+    }
+  },
+  "contractLineage": {
+    "title": "Linaje de Contrato",
+    "version": "Versión",
+    "lifecycle": "Estado del Ciclo de Vida",
+    "author": "Autor",
+    "approver": "Aprobador",
+    "retentionDays": "Retención (días)",
+    "breakingChanges": "Cambios Incompatibles",
+    "consumersAtDeprecation": "Consumidores en Deprecación",
+    "stabilityScore": "Puntuación de Estabilidad",
+    "stabilityBand": "Banda de Estabilidad",
+    "longestRetention": "Mayor Retención",
+    "shortestRetention": "Menor Retención",
+    "bands": {
+      "Stable": "Estable",
+      "Moderate": "Moderado",
+      "Volatile": "Volátil",
+      "HighlyVolatile": "Altamente Volátil"
+    }
+  },
+  "incidentKnowledgeBase": {
+    "title": "Base de Conocimiento de Incidentes",
+    "incidentType": "Tipo de Incidente",
+    "occurrences": "Ocurrencias",
+    "resolutionConfidence": "Confianza de Resolución",
+    "meanTimeToRunbook": "Tiempo Medio hasta Runbook (min)",
+    "runbookEffectiveness": "Efectividad del Runbook",
+    "knowledgeGap": "Brecha de Conocimiento",
+    "staleRunbook": "Runbook Desactualizado",
+    "trendIncreasing": "Tendencia Creciente",
+    "maturityScore": "Puntuación de Madurez del Conocimiento",
+    "maturityLevel": "Nivel de Madurez",
+    "levels": {
+      "Nascent": "Incipiente",
+      "Developing": "En Desarrollo",
+      "Mature": "Maduro",
+      "Exemplary": "Ejemplar"
+    }
+  },
+  "onboardingHealth": {
+    "title": "Salud de Onboarding",
+    "score": "Puntuación de Onboarding",
+    "tier": "Nivel de Onboarding",
+    "teamAvg": "Promedio del Equipo",
+    "tenantScore": "Puntuación del Tenant",
+    "tiers": { "Complete": "Completo", "Advanced": "Avanzado", "Basic": "Básico", "Minimal": "Mínimo" },
+    "dimensions": {
+      "ownership": "Ownership",
+      "contracts": "Contratos",
+      "runbook": "Runbook",
+      "slo": "SLO",
+      "profiling": "Profiling"
+    }
+  },
+  "developerActivity": {
+    "title": "Actividad de Developer",
+    "totalActions": "Total de Acciones",
+    "activityTier": "Nivel de Actividad",
+    "teamScore": "Puntuación del Equipo",
+    "inactiveTeams": "Equipos Inactivos",
+    "tiers": { "HighlyActive": "Muy Activo", "Active": "Activo", "Occasional": "Ocasional", "Inactive": "Inactivo" }
+  },
+  "platformAdoption": {
+    "title": "Adopción de la Plataforma",
+    "adoptionScore": "Puntuación de Adopción",
+    "adoptionTier": "Nivel de Adopción",
+    "capabilityRate": "Tasa de Capacidad",
+    "growthOpportunity": "Oportunidad de Crecimiento",
+    "tiers": { "Pioneer": "Pionero", "Adopter": "Adoptante", "Explorer": "Explorador", "Laggard": "Rezagado" },
+    "capabilities": {
+      "sloTracking": "Seguimiento de SLO",
+      "chaosEngineering": "Ingeniería del Caos",
+      "continuousProfiling": "Profiling Continuo",
+      "complianceReports": "Informes de Cumplimiento",
+      "changeConfidence": "Confianza en Cambios",
+      "releaseCalendar": "Calendario de Releases",
+      "aiAssistant": "Asistente de IA"
     }
   }
 }

@@ -17,6 +17,7 @@ using ReprocessExecutionFeature = NexTraceOne.Integrations.Application.Features.
 using RegisterWebhookSubscriptionFeature = NexTraceOne.Integrations.Application.Features.RegisterWebhookSubscription.RegisterWebhookSubscription;
 using ListWebhookSubscriptionsFeature = NexTraceOne.Integrations.Application.Features.ListWebhookSubscriptions.ListWebhookSubscriptions;
 using GetWebhookEventTypesFeature = NexTraceOne.Integrations.Application.Features.GetWebhookEventTypes.GetWebhookEventTypes;
+using GetEventConsumerStatusFeature = NexTraceOne.Integrations.Application.Features.GetEventConsumerStatus.GetEventConsumerStatus;
 
 namespace NexTraceOne.Integrations.API.Endpoints;
 
@@ -192,5 +193,16 @@ public sealed class IntegrationHubEndpointModule
             var result = await sender.Send(new GetWebhookEventTypesFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("integrations:connectors:read");
+
+        // ── Event Consumer Status ──────────────────────────────────────────
+
+        integrations.MapGet("/event-consumer/status", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetEventConsumerStatusFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("integrations:read");
     }
 }

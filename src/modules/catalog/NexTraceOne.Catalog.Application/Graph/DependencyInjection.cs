@@ -34,6 +34,7 @@ using NexTraceOne.Catalog.Application.Graph.Features.MatchDiscoveredService;
 using NexTraceOne.Catalog.Application.Graph.Features.RegisterFromDiscovery;
 using NexTraceOne.Catalog.Application.Graph.Features.IgnoreDiscoveredService;
 using NexTraceOne.Catalog.Application.Graph.Features.GetDiscoveryDashboard;
+using NexTraceOne.Catalog.Application.Services.Features.GetOnboardingHealthReport;
 
 namespace NexTraceOne.Catalog.Application.Graph;
 
@@ -102,6 +103,9 @@ public static class DependencyInjection
 
         // P5.2 — Developer Experience Score
         services.AddDeveloperExperienceApplication(configuration);
+
+        // ── Wave AC.1 — Onboarding Health Report ──────────────────────────
+        services.AddTransient<IValidator<GetOnboardingHealthReport.Query>, GetOnboardingHealthReport.Validator>();
 
         return services;
     }

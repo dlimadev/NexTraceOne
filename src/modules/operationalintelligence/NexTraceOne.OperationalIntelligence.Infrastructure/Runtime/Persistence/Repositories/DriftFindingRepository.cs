@@ -44,4 +44,14 @@ internal sealed class DriftFindingRepository(RuntimeIntelligenceDbContext contex
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
+
+    /// <summary>Lista todos os drift findings no tenant num período temporal (para relatórios de anomalias).</summary>
+    public async Task<IReadOnlyList<DriftFinding>> ListByTenantInPeriodAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default)
+        => await context.DriftFindings
+            .Where(f => f.DetectedAt >= from && f.DetectedAt <= to)
+            .OrderByDescending(f => f.DetectedAt)
+            .ToListAsync(cancellationToken);
 }

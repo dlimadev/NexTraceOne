@@ -18,6 +18,8 @@ using NexTraceOne.Integrations.Infrastructure.EventHandlers;
 using NexTraceOne.Integrations.Infrastructure.Integrations;
 using NexTraceOne.Integrations.Infrastructure.Kafka;
 using NexTraceOne.Integrations.Infrastructure.LegacyTelemetry;
+using NexTraceOne.Integrations.Application.Services;
+using NexTraceOne.Integrations.Application.Services.NormalizationStrategies;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Integrations.Infrastructure.Saml;
@@ -106,6 +108,16 @@ public static class DependencyInjection
         {
             services.AddSingleton<ISamlProvider, NullSamlProvider>();
         }
+
+        // Event Consumer Worker — Dead Letter Repository e Status Reader (null por defeito)
+        services.AddSingleton<IEventConsumerDeadLetterRepository, NullEventConsumerDeadLetterRepository>();
+        services.AddSingleton<IEventConsumerStatusReader, NullEventConsumerStatusReader>();
+
+        // Normalization Strategies — registadas como IEventNormalizationStrategy para injecção no worker
+        services.AddSingleton<IEventNormalizationStrategy, KafkaChangeEventStrategy>();
+        services.AddSingleton<IEventNormalizationStrategy, ServiceBusChangeEventStrategy>();
+        services.AddSingleton<IEventNormalizationStrategy, SqsChangeEventStrategy>();
+        services.AddSingleton<IEventNormalizationStrategy, RabbitMqChangeEventStrategy>();
 
         return services;
     }

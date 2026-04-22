@@ -32,6 +32,15 @@ public interface IDriftFindingRepository
         int pageSize,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Lista todos os drift findings no tenant num período temporal (para relatórios de anomalias).
+    /// Inclui findings reconhecidos e não-reconhecidos, ordenados por data de detecção descendente.
+    /// </summary>
+    Task<IReadOnlyList<DriftFinding>> ListByTenantInPeriodAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Adiciona um novo drift finding ao repositório.</summary>
     void Add(DriftFinding finding);
 }

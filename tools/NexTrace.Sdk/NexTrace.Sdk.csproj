@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>NexTrace.Sdk</RootNamespace>
+    <AssemblyName>NexTrace.Sdk</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <PackageId>NexTrace.Sdk</PackageId>
+    <Version>1.0.0</Version>
+    <Description>Official .NET SDK client for the NexTraceOne platform API.</Description>
+    <Authors>NexTraceOne</Authors>
+  </PropertyGroup>
+</Project>

@@ -57,6 +57,14 @@ public static class DependencyInjection
         services.AddScoped<IProfilingSessionRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.ProfilingSessionRepository>();
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.FinOps.Abstractions.IServiceCostAllocationRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.ServiceCostAllocationRepository>();
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.ISloObservationRepository, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories.SloObservationRepository>();
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IActiveServiceNamesReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullActiveServiceNamesReader>();
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.ITeamOperationalMetricsReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullTeamOperationalMetricsReader>();
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IVulnerabilityAdvisoryReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullVulnerabilityAdvisoryReader>();
+        // ── Wave AB.3 — Incident Knowledge Base Report (null reader) ──────
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IIncidentKnowledgeReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullIncidentKnowledgeReader>();
+
+        // ── Wave AC.3 — Platform Adoption Report (null reader) ────────────
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IPlatformAdoptionReader, NexTraceOne.OperationalIntelligence.Application.Runtime.Services.NullPlatformAdoptionReader>();
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);

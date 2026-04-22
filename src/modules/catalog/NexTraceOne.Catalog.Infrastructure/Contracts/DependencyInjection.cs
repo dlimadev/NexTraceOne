@@ -80,6 +80,9 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<DeploymentCompletedIntegrationEvent>,
             DeploymentCompletedContractImpactHandler>();
 
+        // ── Wave AB.2 — Contract Lineage Report (null reader) ─────────────
+        services.AddScoped<IContractVersionHistoryReader, NullContractVersionHistoryReader>();
+
         return services;
     }
 }

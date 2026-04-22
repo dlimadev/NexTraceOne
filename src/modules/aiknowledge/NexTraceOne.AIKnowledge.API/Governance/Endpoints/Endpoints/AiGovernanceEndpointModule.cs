@@ -108,6 +108,16 @@ using UpdateExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Gove
 using ToggleExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ToggleExternalDataSource.ToggleExternalDataSource;
 using SyncExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SyncExternalDataSource.SyncExternalDataSource;
 
+// ── Wave Y: AI Governance Deep Dive & Agentic Platform ──────────────────
+using SubmitAgentExecutionPlanFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SubmitAgentExecutionPlan.SubmitAgentExecutionPlan;
+using ApproveAgentStepFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ApproveAgentStep.ApproveAgentStep;
+using GetAgentPlanStatusFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentPlanStatus.GetAgentPlanStatus;
+using ListAgentExecutionHistoryFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListAgentExecutionHistory.ListAgentExecutionHistory;
+using ClassifyPromptIntentFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ClassifyPromptIntent.ClassifyPromptIntent;
+using GetModelRoutingDecisionLogFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetModelRoutingDecisionLog.GetModelRoutingDecisionLog;
+using GetAiTokenBudgetReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiTokenBudgetReport.GetAiTokenBudgetReport;
+using GetAiCostAttributionReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiCostAttributionReport.GetAiCostAttributionReport;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -155,6 +165,9 @@ public sealed class AiGovernanceEndpointModule
         MapAnalyticsEndpoints(app);
         MapSelfHealingEndpoints(app);
         MapExternalDataSourceEndpoints(app);
+        MapAgentExecutionPlanEndpoints(app);
+        MapModelRoutingEndpoints(app);
+        MapAiTokenBudgetEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1588,6 +1601,174 @@ public sealed class AiGovernanceEndpointModule
         .WithTags("AI Data Sources")
         .WithSummary("Trigger manual sync of an external data source");
     }
+
+    // ── Wave Y: Agent Execution Plans (Human-in-the-Loop) ───────────────
+
+    private static void MapAgentExecutionPlanEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/execution-plans");
+
+        group.MapPost("/", async (
+            SubmitAgentPlanRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var steps = body.Steps.Select(s =>
+                new SubmitAgentExecutionPlanFeature.StepRequest(
+                    s.StepIndex, s.Name, s.StepType, s.InputJson, s.RequiresApproval))
+                .ToList();
+
+            var result = await sender.Send(
+                new SubmitAgentExecutionPlanFeature.Command(
+                    TenantId: body.TenantId,
+                    RequestedBy: body.RequestedBy,
+                    Description: body.Description,
+                    Steps: steps,
+                    MaxTokenBudget: body.MaxTokenBudget,
+                    RequiresApproval: body.RequiresApproval,
+                    BlastRadiusThreshold: body.BlastRadiusThreshold,
+                    CorrelationId: body.CorrelationId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Agent Execution Plans")
+        .WithSummary("Submit an agentic execution plan");
+
+        group.MapPost("/{planId:guid}/steps/{stepIndex:int}/approve", async (
+            Guid planId,
+            int stepIndex,
+            ApproveAgentStepRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ApproveAgentStepFeature.Command(
+                    PlanId: planId,
+                    StepIndex: stepIndex,
+                    ApprovedBy: body.ApprovedBy,
+                    TenantId: body.TenantId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Agent Execution Plans")
+        .WithSummary("Approve a Human-in-the-Loop step");
+
+        group.MapGet("/{planId:guid}", async (
+            Guid planId,
+            Guid tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAgentPlanStatusFeature.Query(planId, tenantId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Agent Execution Plans")
+        .WithSummary("Get execution plan status and step details");
+
+        group.MapGet("/", async (
+            Guid tenantId,
+            string? statusFilter,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListAgentExecutionHistoryFeature.Query(tenantId, statusFilter, pageSize > 0 ? pageSize : 50),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Agent Execution Plans")
+        .WithSummary("List agent execution plans for a tenant");
+    }
+
+    // ── Wave Y: Model Routing (NLP Intent Classifier) ────────────────────
+
+    private static void MapModelRoutingEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/v1/ai/routing/classify-intent", async (
+            ClassifyIntentRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ClassifyPromptIntentFeature.Query(body.Prompt, body.TenantId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Model Routing")
+        .WithSummary("Classify prompt intent for model routing");
+
+        app.MapGet("/api/v1/ai/routing/decisions", async (
+            string? intentFilter,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetModelRoutingDecisionLogFeature.Query(intentFilter, pageSize > 0 ? pageSize : 50),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Model Routing")
+        .WithSummary("List model routing decision log");
+    }
+
+    // ── Wave Y: AI Token Budget & Cost Attribution ────────────────────────
+
+    private static void MapAiTokenBudgetEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        app.MapGet("/api/v1/ai/budget/report", async (
+            Guid? tenantId,
+            string? teamId,
+            int periodDays,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAiTokenBudgetReportFeature.Query(
+                    tenantId, teamId, periodDays > 0 ? periodDays : 30),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Token Budget")
+        .WithSummary("Get AI token budget report with burn rate");
+
+        app.MapGet("/api/v1/ai/budget/cost-attribution", async (
+            Guid? tenantId,
+            int periodDays,
+            string? groupBy,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAiCostAttributionReportFeature.Query(
+                    tenantId,
+                    periodDays > 0 ? periodDays : 30,
+                    groupBy ?? "model"),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Token Budget")
+        .WithSummary("Get AI cost attribution report by dimension");
+    }
 }
 
 // ── Request DTOs para endpoints PATCH ───────────────────────────────────
@@ -1782,3 +1963,34 @@ public sealed record UpdateExternalDataSourceRequest(
     string ConnectorConfigJson,
     int Priority,
     int SyncIntervalMinutes);
+
+// ── Wave Y: Request DTOs ─────────────────────────────────────────────────
+
+/// <summary>Corpo de pedido para step num plano de execução agentic.</summary>
+public sealed record AgentStepRequest(
+    int StepIndex,
+    string Name,
+    string StepType,
+    string InputJson,
+    bool RequiresApproval);
+
+/// <summary>Corpo de pedido para submissão de plano de execução agentic.</summary>
+public sealed record SubmitAgentPlanRequest(
+    Guid TenantId,
+    string RequestedBy,
+    string Description,
+    IReadOnlyList<AgentStepRequest> Steps,
+    int MaxTokenBudget,
+    bool RequiresApproval,
+    int BlastRadiusThreshold,
+    string? CorrelationId);
+
+/// <summary>Corpo de pedido para aprovação de passo agentic.</summary>
+public sealed record ApproveAgentStepRequest(
+    string ApprovedBy,
+    Guid TenantId);
+
+/// <summary>Corpo de pedido para classificação de intenção de prompt.</summary>
+public sealed record ClassifyIntentRequest(
+    string Prompt,
+    Guid? TenantId);

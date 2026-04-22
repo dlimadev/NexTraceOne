@@ -31,6 +31,7 @@ using NexTraceOne.IdentityAccess.Application.Features.SelectTenant;
 using NexTraceOne.IdentityAccess.Application.Features.StartAccessReviewCampaign;
 using NexTraceOne.IdentityAccess.Application.Features.StartOidcLogin;
 using NexTraceOne.IdentityAccess.Application.Features.VerifyMfaChallenge;
+using NexTraceOne.IdentityAccess.Application.Features.GetDeveloperActivityReport;
 
 namespace NexTraceOne.IdentityAccess.Application;
 
@@ -90,6 +91,9 @@ public static class DependencyInjection
 
         // Segurança
         services.AddTransient<IValidator<ListSecurityEvents.Query>, ListSecurityEvents.Validator>();
+
+        // ── Wave AC.2 — Developer Activity Report ─────────────────────────
+        services.AddTransient<IValidator<GetDeveloperActivityReport.Query>, GetDeveloperActivityReport.Validator>();
 
         return services;
     }

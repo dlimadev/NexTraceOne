@@ -81,6 +81,12 @@ public static class DependencyInjection
         services.AddScoped<IServiceInterfaceRepository, ServiceInterfaceRepository>();
         services.AddScoped<IContractBindingRepository, ContractBindingRepository>();
 
+        // ── Wave AB.1 — Knowledge Relation Graph (null reader) ────────────
+        services.AddScoped<IKnowledgeRelationReader, NexTraceOne.Catalog.Application.Graph.Services.NullKnowledgeRelationReader>();
+
+        // ── Wave AC.1 — Onboarding Health Report (null reader) ────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IOnboardingHealthReader, NexTraceOne.Catalog.Application.Services.NullOnboardingHealthReader>();
+
         return services;
     }
 }
