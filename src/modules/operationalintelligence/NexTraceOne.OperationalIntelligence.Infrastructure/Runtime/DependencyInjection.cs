@@ -60,6 +60,8 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IActiveServiceNamesReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullActiveServiceNamesReader>();
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.ITeamOperationalMetricsReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullTeamOperationalMetricsReader>();
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IVulnerabilityAdvisoryReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullVulnerabilityAdvisoryReader>();
+        // ── Wave AB.3 — Incident Knowledge Base Report (null reader) ──────
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IIncidentKnowledgeReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullIncidentKnowledgeReader>();
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);

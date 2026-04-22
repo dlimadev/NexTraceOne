@@ -14869,5 +14869,73 @@
       "Elasticsearch": "Elasticsearch",
       "InMemory": "En Memoria (pruebas)"
     }
+  },
+  "knowledgeRelationGraph": {
+    "title": "Grafo de Relaciones de Conocimiento",
+    "anchor": "Entidad Ancla",
+    "maxDepth": "Profundidad Máxima",
+    "nodes": "Nodos",
+    "edges": "Aristas",
+    "relationStrength": "Fuerza de Relación",
+    "summary": "Resumen del Grafo",
+    "graphDensity": "Densidad del Grafo",
+    "nodeTypes": {
+      "Service": "Servicio",
+      "Contract": "Contrato",
+      "Runbook": "Runbook",
+      "Incident": "Incidente",
+      "Release": "Release",
+      "Team": "Equipo",
+      "OperationalNote": "Nota Operacional"
+    },
+    "edgeTypes": {
+      "OwnedBy": "Pertenece a",
+      "DependsOn": "Depende de",
+      "PublishesContract": "Publica Contrato",
+      "ConsumesContract": "Consume Contrato",
+      "CorrelatedWith": "Correlacionado con",
+      "MitigatedBy": "Mitigado por",
+      "DocumentedIn": "Documentado en",
+      "DeployedAs": "Desplegado como"
+    }
+  },
+  "contractLineage": {
+    "title": "Linaje de Contrato",
+    "version": "Versión",
+    "lifecycle": "Estado del Ciclo de Vida",
+    "author": "Autor",
+    "approver": "Aprobador",
+    "retentionDays": "Retención (días)",
+    "breakingChanges": "Cambios Incompatibles",
+    "consumersAtDeprecation": "Consumidores en Deprecación",
+    "stabilityScore": "Puntuación de Estabilidad",
+    "stabilityBand": "Banda de Estabilidad",
+    "longestRetention": "Mayor Retención",
+    "shortestRetention": "Menor Retención",
+    "bands": {
+      "Stable": "Estable",
+      "Moderate": "Moderado",
+      "Volatile": "Volátil",
+      "HighlyVolatile": "Altamente Volátil"
+    }
+  },
+  "incidentKnowledgeBase": {
+    "title": "Base de Conocimiento de Incidentes",
+    "incidentType": "Tipo de Incidente",
+    "occurrences": "Ocurrencias",
+    "resolutionConfidence": "Confianza de Resolución",
+    "meanTimeToRunbook": "Tiempo Medio hasta Runbook (min)",
+    "runbookEffectiveness": "Efectividad del Runbook",
+    "knowledgeGap": "Brecha de Conocimiento",
+    "staleRunbook": "Runbook Desactualizado",
+    "trendIncreasing": "Tendencia Creciente",
+    "maturityScore": "Puntuación de Madurez del Conocimiento",
+    "maturityLevel": "Nivel de Madurez",
+    "levels": {
+      "Nascent": "Incipiente",
+      "Developing": "En Desarrollo",
+      "Mature": "Maduro",
+      "Exemplary": "Ejemplar"
+    }
   }
 }

@@ -9482,5 +9482,94 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "90",
             uiEditorType: "number",
             sortOrder: 11750),
+
+        // ── Wave AB — Knowledge Graph & Semantic Relations ─────────────────
+        ConfigurationDefinition.Create(
+            key: "catalog.knowledge_graph.max_depth",
+            displayName: "config.catalog.knowledge_graph.max_depth.name",
+            description: "config.catalog.knowledge_graph.max_depth.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "2",
+            uiEditorType: "number",
+            sortOrder: 11760),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.knowledge_graph.max_nodes",
+            displayName: "config.catalog.knowledge_graph.max_nodes.name",
+            description: "config.catalog.knowledge_graph.max_nodes.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 11770),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.knowledge_graph.relation_strength_decay_days",
+            displayName: "config.catalog.knowledge_graph.relation_strength_decay_days.name",
+            description: "config.catalog.knowledge_graph.relation_strength_decay_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11780),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract_lineage.max_versions",
+            displayName: "config.catalog.contract_lineage.max_versions.name",
+            description: "config.catalog.contract_lineage.max_versions.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 11790),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.contract_lineage.lookback_days",
+            displayName: "config.catalog.contract_lineage.lookback_days.name",
+            description: "config.catalog.contract_lineage.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 11800),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.incident_knowledge.stale_runbook_days",
+            displayName: "config.runtime.incident_knowledge.stale_runbook_days.name",
+            description: "config.runtime.incident_knowledge.stale_runbook_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 11810),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.incident_knowledge.lookback_days",
+            displayName: "config.runtime.incident_knowledge.lookback_days.name",
+            description: "config.runtime.incident_knowledge.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "365",
+            uiEditorType: "number",
+            sortOrder: 11820),
+
+        ConfigurationDefinition.Create(
+            key: "runtime.incident_knowledge.top_incidents",
+            displayName: "config.runtime.incident_knowledge.top_incidents.name",
+            description: "config.runtime.incident_knowledge.top_incidents.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11830),
     ];
 }

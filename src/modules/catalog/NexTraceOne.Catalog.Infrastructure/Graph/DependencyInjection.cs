@@ -81,6 +81,9 @@ public static class DependencyInjection
         services.AddScoped<IServiceInterfaceRepository, ServiceInterfaceRepository>();
         services.AddScoped<IContractBindingRepository, ContractBindingRepository>();
 
+        // ── Wave AB.1 — Knowledge Relation Graph (null reader) ────────────
+        services.AddScoped<IKnowledgeRelationReader, NexTraceOne.Catalog.Application.Graph.Services.NullKnowledgeRelationReader>();
+
         return services;
     }
 }

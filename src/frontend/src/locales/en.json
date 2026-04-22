@@ -13634,5 +13634,73 @@
       "Elasticsearch": "Elasticsearch",
       "InMemory": "In-Memory (testing)"
     }
+  },
+  "knowledgeRelationGraph": {
+    "title": "Knowledge Relation Graph",
+    "anchor": "Anchor Entity",
+    "maxDepth": "Max Depth",
+    "nodes": "Nodes",
+    "edges": "Edges",
+    "relationStrength": "Relation Strength",
+    "summary": "Graph Summary",
+    "graphDensity": "Graph Density",
+    "nodeTypes": {
+      "Service": "Service",
+      "Contract": "Contract",
+      "Runbook": "Runbook",
+      "Incident": "Incident",
+      "Release": "Release",
+      "Team": "Team",
+      "OperationalNote": "Operational Note"
+    },
+    "edgeTypes": {
+      "OwnedBy": "Owned By",
+      "DependsOn": "Depends On",
+      "PublishesContract": "Publishes Contract",
+      "ConsumesContract": "Consumes Contract",
+      "CorrelatedWith": "Correlated With",
+      "MitigatedBy": "Mitigated By",
+      "DocumentedIn": "Documented In",
+      "DeployedAs": "Deployed As"
+    }
+  },
+  "contractLineage": {
+    "title": "Contract Lineage",
+    "version": "Version",
+    "lifecycle": "Lifecycle State",
+    "author": "Author",
+    "approver": "Approver",
+    "retentionDays": "Retention (days)",
+    "breakingChanges": "Breaking Changes",
+    "consumersAtDeprecation": "Consumers at Deprecation",
+    "stabilityScore": "Stability Score",
+    "stabilityBand": "Stability Band",
+    "longestRetention": "Longest Retention",
+    "shortestRetention": "Shortest Retention",
+    "bands": {
+      "Stable": "Stable",
+      "Moderate": "Moderate",
+      "Volatile": "Volatile",
+      "HighlyVolatile": "Highly Volatile"
+    }
+  },
+  "incidentKnowledgeBase": {
+    "title": "Incident Knowledge Base",
+    "incidentType": "Incident Type",
+    "occurrences": "Occurrences",
+    "resolutionConfidence": "Resolution Confidence",
+    "meanTimeToRunbook": "Mean Time to Runbook (min)",
+    "runbookEffectiveness": "Runbook Effectiveness",
+    "knowledgeGap": "Knowledge Gap",
+    "staleRunbook": "Stale Runbook",
+    "trendIncreasing": "Trend Increasing",
+    "maturityScore": "Knowledge Maturity Score",
+    "maturityLevel": "Maturity Level",
+    "levels": {
+      "Nascent": "Nascent",
+      "Developing": "Developing",
+      "Mature": "Mature",
+      "Exemplary": "Exemplary"
+    }
   }
 }
