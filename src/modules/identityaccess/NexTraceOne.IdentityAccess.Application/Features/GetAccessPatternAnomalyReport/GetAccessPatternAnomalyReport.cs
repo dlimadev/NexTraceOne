@@ -11,7 +11,7 @@ namespace NexTraceOne.IdentityAccess.Application.Features.GetAccessPatternAnomal
 ///
 /// Para cada utilizador, detecta os seguintes sinais de anomalia:
 /// - OffHours (10 pts): pedidos fora do horário 08:00–20:00 UTC
-/// - VolumetricSpike (25 pts): MaxDailyRequests > VolumetricSpikeMultiplier × AvgDailyRequests e TotalRequests > 5
+/// - VolumetricSpike (25 pts): MaxDailyRequests > VolumetricSpikeMultiplier × AvgDailyRequests e TotalRequests > VolumetricSpikeMinTotalRequests
 /// - FirstAccessSensitive (20 pts): primeiro acesso a recursos marcados como Restricted/Partner
 /// - UnusualResource (15 pts): acesso a tipo de recurso nunca acedido anteriormente
 /// - BulkExport (30 pts): exportações em massa acima do threshold configurado
@@ -47,7 +47,8 @@ public static class GetAccessPatternAnomalyReport
         BulkExport
     }
 
-    // ── Query ──────────────────────────────────────────────────────────────
+    // ── Limiar mínimo de pedidos para activar VolumetricSpike ─────────────
+    private const int VolumetricSpikeMinTotalRequests = 5;
 
     /// <summary>
     /// <para><c>TenantId</c>: identificador do tenant (obrigatório).</para>
@@ -176,7 +177,7 @@ public static class GetAccessPatternAnomalyReport
             if (entry.OffHoursRequests > 0)
                 signals.Add(AnomalySignalType.OffHours);
 
-            if (entry.TotalRequests > 5
+            if (entry.TotalRequests > VolumetricSpikeMinTotalRequests
                 && entry.AvgDailyRequests > 0
                 && entry.MaxDailyRequests > spikeMultiplier * entry.AvgDailyRequests)
                 signals.Add(AnomalySignalType.VolumetricSpike);

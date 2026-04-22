@@ -69,11 +69,11 @@ public static class GetSecretsExposureRiskReport
             RegexOptions.Compiled, TimeSpan.FromSeconds(2));
 
     private static readonly Regex ConnectionStringRegex =
-        new(@"(password|pwd|secret)\s*=\s*(?!placeholder|example|changeme|your-|<|{|\[)[^\s;'""]{4,}",
+        new(@"(password|pwd|secret)\s*=\s*(?!placeholder|example|changeme|your-|<|{|\[)[a-zA-Z0-9@#$%^&*!_\-+]{4,}",
             RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromSeconds(2));
 
     private static readonly Regex PrivateIpRegex =
-        new(@"\b(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})\b",
+        new(@"\b(10\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|172\.(1[6-9]|2[0-9]|3[01])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|192\.168\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\b",
             RegexOptions.Compiled, TimeSpan.FromSeconds(2));
 
     private static readonly Regex PersonalEmailRegex =
