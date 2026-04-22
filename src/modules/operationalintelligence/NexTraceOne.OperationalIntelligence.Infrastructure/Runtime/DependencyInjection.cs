@@ -69,6 +69,14 @@ public static class DependencyInjection
         // ── Wave AI.3 — Deployment Risk Forecast Reader (null bridge — CG) ─
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IDeploymentRiskForecastReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullDeploymentRiskForecastReader>();
 
+        // ── Wave AN — SRE null readers ─────────────────────────────────────
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IErrorBudgetReader,
+            NexTraceOne.OperationalIntelligence.Application.Runtime.NullErrorBudgetReader>();
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IIncidentImpactScorecardReader,
+            NexTraceOne.OperationalIntelligence.Application.Runtime.NullIncidentImpactScorecardReader>();
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.ISreMaturityReader,
+            NexTraceOne.OperationalIntelligence.Application.Runtime.NullSreMaturityReader>();
+
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);
 

@@ -14253,5 +14253,50 @@
     "contractCoverage": "Contract Coverage",
     "dependencyMapFreshness": "Dependency Map Freshness",
     "runbookLinked": "Runbook Linked"
+  },
+  "errorBudget": {
+    "title": "Error Budget Report",
+    "errorBudgetPct": "Error Budget",
+    "budgetConsumedPct": "Budget Consumed",
+    "budgetRemainingPct": "Budget Remaining",
+    "burnRate": "Burn Rate",
+    "daysToExhaustion": "Days to Exhaustion",
+    "healthy": "Healthy",
+    "warning": "Warning",
+    "exhausted": "Exhausted",
+    "burned": "Burned",
+    "freezeRecommendations": "Freeze Recommendations",
+    "topBurningServices": "Top Burning Services"
+  },
+  "incidentImpactScorecard": {
+    "title": "Incident Impact Scorecard",
+    "incidentImpactScore": "Incident Impact Score",
+    "minor": "Minor",
+    "moderate": "Moderate",
+    "severe": "Severe",
+    "critical": "Critical",
+    "teamReliabilityTier": "Team Reliability Tier",
+    "excellent": "Excellent",
+    "good": "Good",
+    "atRisk": "At Risk",
+    "struggling": "Struggling",
+    "repeatOffenderServices": "Repeat Offender Services",
+    "tenantHealthIndex": "Tenant Incident Health Index"
+  },
+  "sreMaturityIndex": {
+    "title": "SRE Maturity Index Report",
+    "sreMaturityScore": "SRE Maturity Score",
+    "elite": "Elite",
+    "advanced": "Advanced",
+    "practicing": "Practicing",
+    "foundational": "Foundational",
+    "weakestPractices": "Weakest Practices",
+    "tenantSreMaturityIndex": "Tenant SRE Maturity Index",
+    "sloDefinitionCoverage": "SLO Definition Coverage",
+    "errorBudgetTracking": "Error Budget Tracking",
+    "chaosEngineeringAdoption": "Chaos Engineering Adoption",
+    "toilReductionEvidence": "Toil Reduction Evidence",
+    "postIncidentReviewRate": "Post-Incident Review Rate",
+    "runbookCompleteness": "Runbook Completeness"
   }
 }

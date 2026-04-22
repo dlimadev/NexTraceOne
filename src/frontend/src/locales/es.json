@@ -15488,5 +15488,50 @@
     "contractCoverage": "Cobertura de Contratos",
     "dependencyMapFreshness": "Actualidad del Mapa de Dependencias",
     "runbookLinked": "Runbook Vinculado"
+  },
+  "errorBudget": {
+    "title": "Informe de Error Budget",
+    "errorBudgetPct": "Error Budget",
+    "budgetConsumedPct": "Presupuesto Consumido",
+    "budgetRemainingPct": "Presupuesto Restante",
+    "burnRate": "Tasa de Consumo",
+    "daysToExhaustion": "Días hasta Agotamiento",
+    "healthy": "Saludable",
+    "warning": "Advertencia",
+    "exhausted": "Agotado",
+    "burned": "En Déficit",
+    "freezeRecommendations": "Recomendaciones de Freeze",
+    "topBurningServices": "Servicios con Mayor Consumo"
+  },
+  "incidentImpactScorecard": {
+    "title": "Scorecard de Impacto de Incidentes",
+    "incidentImpactScore": "Puntuación de Impacto del Incidente",
+    "minor": "Menor",
+    "moderate": "Moderado",
+    "severe": "Grave",
+    "critical": "Crítico",
+    "teamReliabilityTier": "Nivel de Confiabilidad del Equipo",
+    "excellent": "Excelente",
+    "good": "Bueno",
+    "atRisk": "En Riesgo",
+    "struggling": "Con Dificultades",
+    "repeatOffenderServices": "Servicios Reincidentes",
+    "tenantHealthIndex": "Índice de Salud de Incidentes del Tenant"
+  },
+  "sreMaturityIndex": {
+    "title": "Informe de Índice de Madurez SRE",
+    "sreMaturityScore": "Puntuación de Madurez SRE",
+    "elite": "Élite",
+    "advanced": "Avanzado",
+    "practicing": "En Práctica",
+    "foundational": "Fundacional",
+    "weakestPractices": "Prácticas más Débiles",
+    "tenantSreMaturityIndex": "Índice de Madurez SRE del Tenant",
+    "sloDefinitionCoverage": "Cobertura de Definición de SLO",
+    "errorBudgetTracking": "Seguimiento del Error Budget",
+    "chaosEngineeringAdoption": "Adopción de Chaos Engineering",
+    "toilReductionEvidence": "Evidencia de Reducción de Toil",
+    "postIncidentReviewRate": "Tasa de Post-Incident Review",
+    "runbookCompleteness": "Completitud de Runbooks"
   }
 }

@@ -21,6 +21,9 @@ using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetPlatfo
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetCapacityTrendForecastReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetIncidentProbabilityReport;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetErrorBudgetReport;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetIncidentImpactScorecardReport;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetSreMaturityIndexReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline;
@@ -88,6 +91,11 @@ public static class DependencyInjection
         // ── Wave AI.3 — Incident Probability Report ───────────────────────
         services.AddTransient<IValidator<GetIncidentProbabilityReport.Query>,
             GetIncidentProbabilityReport.Validator>();
+
+        // ── Wave AN — SRE Intelligence & Error Budget Management ───────────
+        services.AddTransient<IValidator<GetErrorBudgetReport.Query>, GetErrorBudgetReport.Validator>();
+        services.AddTransient<IValidator<GetIncidentImpactScorecardReport.Query>, GetIncidentImpactScorecardReport.Validator>();
+        services.AddTransient<IValidator<GetSreMaturityIndexReport.Query>, GetSreMaturityIndexReport.Validator>();
 
         return services;
     }

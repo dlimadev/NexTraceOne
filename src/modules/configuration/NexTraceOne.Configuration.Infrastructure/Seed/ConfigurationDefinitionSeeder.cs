@@ -10468,5 +10468,94 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "180",
             uiEditorType: "number",
             sortOrder: 12710),
+
+        // ── Wave AN — SRE Intelligence & Error Budget Management ────────────
+        ConfigurationDefinition.Create(
+            key: "sre.error_budget.default_period_days",
+            displayName: "config.sre.error_budget.default_period_days.name",
+            description: "config.sre.error_budget.default_period_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12720),
+
+        ConfigurationDefinition.Create(
+            key: "sre.error_budget.healthy_remaining_pct",
+            displayName: "config.sre.error_budget.healthy_remaining_pct.name",
+            description: "config.sre.error_budget.healthy_remaining_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "70",
+            uiEditorType: "number",
+            sortOrder: 12730),
+
+        ConfigurationDefinition.Create(
+            key: "sre.error_budget.warning_remaining_pct",
+            displayName: "config.sre.error_budget.warning_remaining_pct.name",
+            description: "config.sre.error_budget.warning_remaining_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12740),
+
+        ConfigurationDefinition.Create(
+            key: "sre.incident_scorecard.repeat_incident_threshold",
+            displayName: "config.sre.incident_scorecard.repeat_incident_threshold.name",
+            description: "config.sre.incident_scorecard.repeat_incident_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 12750),
+
+        ConfigurationDefinition.Create(
+            key: "sre.incident_scorecard.lookback_days",
+            displayName: "config.sre.incident_scorecard.lookback_days.name",
+            description: "config.sre.incident_scorecard.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12760),
+
+        ConfigurationDefinition.Create(
+            key: "sre.maturity.chaos_lookback_months",
+            displayName: "config.sre.maturity.chaos_lookback_months.name",
+            description: "config.sre.maturity.chaos_lookback_months.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 12770),
+
+        ConfigurationDefinition.Create(
+            key: "sre.maturity.postincident_required_tiers",
+            displayName: "config.sre.maturity.postincident_required_tiers.name",
+            description: "config.sre.maturity.postincident_required_tiers.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "Severe,Critical",
+            uiEditorType: "text",
+            sortOrder: 12780),
+
+        ConfigurationDefinition.Create(
+            key: "sre.maturity.evolution_lookback_months",
+            displayName: "config.sre.maturity.evolution_lookback_months.name",
+            description: "config.sre.maturity.evolution_lookback_months.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 12790),
     ];
 }
