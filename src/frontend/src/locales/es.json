@@ -15448,5 +15448,45 @@
     "recommendedAdjustments": "Ajustes Recomendados",
     "actionWindowHours": "Ventana de Acción (horas)",
     "noiseVolumeThreshold": "Umbral de Volumen de Ruido"
+  },
+  "uncatalogedServices": {
+    "title": "Informe de Servicios No Catalogados",
+    "shadowServiceRisk": "Riesgo de Shadow Services",
+    "catalogCoverageRate": "Tasa de Cobertura del Catálogo",
+    "uncatalogedCount": "Total de Servicios No Catalogados",
+    "suggestedTier": "Nivel Sugerido",
+    "possibleOwner": "Posible Owner",
+    "quickRegisterList": "Lista de Registro Rápido",
+    "critical": "Crítico",
+    "standard": "Estándar",
+    "internal": "Interno"
+  },
+  "contractDriftFromReality": {
+    "title": "Informe de Divergencia Contrato vs. Realidad",
+    "undocumentedCalls": "Llamadas No Documentadas",
+    "unusedDocumentedOps": "Operaciones Documentadas No Usadas",
+    "parameterMismatches": "Discrepancias de Parámetros",
+    "aligned": "Alineado",
+    "minorDrift": "Pequeña Divergencia",
+    "significantDrift": "Divergencia Significativa",
+    "misaligned": "Desalineado",
+    "tenantRealityScore": "Puntuación de Realidad de Contratos del Tenant",
+    "autoDocumentationHints": "Sugerencias de Auto-Documentación"
+  },
+  "catalogHealthMaintenance": {
+    "title": "Informe de Salud de Mantenimiento del Catálogo",
+    "catalogQualityScore": "Puntuación de Calidad del Catálogo",
+    "excellent": "Excelente",
+    "good": "Bueno",
+    "fair": "Regular",
+    "poor": "Deficiente",
+    "tenantHealthScore": "Puntuación de Salud del Catálogo del Tenant",
+    "campaignList": "Lista de Campaña",
+    "staleEntryList": "Lista de Entradas Obsoletas",
+    "descriptionCompleteness": "Completitud de la Descripción",
+    "ownershipFreshness": "Actualidad del Ownership",
+    "contractCoverage": "Cobertura de Contratos",
+    "dependencyMapFreshness": "Actualidad del Mapa de Dependencias",
+    "runbookLinked": "Runbook Vinculado"
   }
 }

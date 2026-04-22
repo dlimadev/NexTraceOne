@@ -10379,5 +10379,94 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "20",
             uiEditorType: "number",
             sortOrder: 12550),
+
+        // ── Wave AM — Auto-Cataloging & Service Discovery Intelligence ──────
+        ConfigurationDefinition.Create(
+            key: "catalog.discovery.lookback_days",
+            displayName: "config.catalog.discovery.lookback_days.name",
+            description: "config.catalog.discovery.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12640),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.discovery.min_daily_calls",
+            displayName: "config.catalog.discovery.min_daily_calls.name",
+            description: "config.catalog.discovery.min_daily_calls.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 12650),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.reality_drift.lookback_days",
+            displayName: "config.catalog.reality_drift.lookback_days.name",
+            description: "config.catalog.reality_drift.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12660),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.reality_drift.unused_ops_stagnation_days",
+            displayName: "config.catalog.reality_drift.unused_ops_stagnation_days.name",
+            description: "config.catalog.reality_drift.unused_ops_stagnation_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12670),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.maintenance.min_description_words",
+            displayName: "config.catalog.maintenance.min_description_words.name",
+            description: "config.catalog.maintenance.min_description_words.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 12680),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.maintenance.ownership_stale_days",
+            displayName: "config.catalog.maintenance.ownership_stale_days.name",
+            description: "config.catalog.maintenance.ownership_stale_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12690),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.maintenance.dependency_stale_days",
+            displayName: "config.catalog.maintenance.dependency_stale_days.name",
+            description: "config.catalog.maintenance.dependency_stale_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 12700),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.maintenance.maintenance_stale_days",
+            displayName: "config.catalog.maintenance.maintenance_stale_days.name",
+            description: "config.catalog.maintenance.maintenance_stale_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 12710),
     ];
 }
