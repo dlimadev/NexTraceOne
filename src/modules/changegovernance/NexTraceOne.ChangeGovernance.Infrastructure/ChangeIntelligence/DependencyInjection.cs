@@ -118,6 +118,15 @@ public static class DependencyInjection
         // Wave AJ.3 — honest-null bridge para policy evaluation history (IA)
         services.AddScoped<IPolicyEvaluationHistoryReader, Services.NullPolicyEvaluationHistoryReader>();
 
+        // Wave AP.1 — honest-null bridge para approval workflow reader
+        services.AddScoped<IApprovalWorkflowReader, Services.NullApprovalWorkflowReader>();
+
+        // Wave AP.2 — honest-null bridge para peer review coverage
+        services.AddScoped<IPeerReviewCoverageReader, Services.NullPeerReviewCoverageReader>();
+
+        // Wave AP.3 — honest-null bridge para governance escalation
+        services.AddScoped<IGovernanceEscalationReader, Services.NullGovernanceEscalationReader>();
+
         // Distributed signal correlation and promotion risk signals for AI-assisted analysis
         services.AddScoped<IDistributedSignalCorrelationService, DistributedSignalCorrelationService>();
         services.AddScoped<IPromotionRiskSignalProvider, PromotionRiskSignalProvider>();

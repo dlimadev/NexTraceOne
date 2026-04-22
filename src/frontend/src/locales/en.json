@@ -13709,7 +13709,12 @@
     "tier": "Onboarding Tier",
     "teamAvg": "Team Average",
     "tenantScore": "Tenant Score",
-    "tiers": { "Complete": "Complete", "Advanced": "Advanced", "Basic": "Basic", "Minimal": "Minimal" },
+    "tiers": {
+      "Complete": "Complete",
+      "Advanced": "Advanced",
+      "Basic": "Basic",
+      "Minimal": "Minimal"
+    },
     "dimensions": {
       "ownership": "Ownership",
       "contracts": "Contracts",
@@ -13724,7 +13729,12 @@
     "activityTier": "Activity Tier",
     "teamScore": "Team Score",
     "inactiveTeams": "Inactive Teams",
-    "tiers": { "HighlyActive": "Highly Active", "Active": "Active", "Occasional": "Occasional", "Inactive": "Inactive" }
+    "tiers": {
+      "HighlyActive": "Highly Active",
+      "Active": "Active",
+      "Occasional": "Occasional",
+      "Inactive": "Inactive"
+    }
   },
   "platformAdoption": {
     "title": "Platform Adoption",
@@ -13732,7 +13742,12 @@
     "adoptionTier": "Adoption Tier",
     "capabilityRate": "Capability Rate",
     "growthOpportunity": "Growth Opportunity",
-    "tiers": { "Pioneer": "Pioneer", "Adopter": "Adopter", "Explorer": "Explorer", "Laggard": "Laggard" },
+    "tiers": {
+      "Pioneer": "Pioneer",
+      "Adopter": "Adopter",
+      "Explorer": "Explorer",
+      "Laggard": "Laggard"
+    },
     "capabilities": {
       "sloTracking": "SLO Tracking",
       "chaosEngineering": "Chaos Engineering",
@@ -14330,5 +14345,64 @@
     "prioritizedPatchList": "Prioritized Patch List",
     "unpatchedWindowDays": "Unpatched Window (days)",
     "tenantRiskScore": "Tenant Risk Score"
+  },
+  "approvalWorkflow": {
+    "title": "Approval Workflow Report",
+    "tenantApprovalHealthScore": "Tenant Approval Health Score",
+    "approvalEfficiencyIndex": "Approval Efficiency Index",
+    "autoApprovalRate": "Auto-Approval Rate",
+    "totalPendingApprovals": "Total Pending Approvals",
+    "bottleneckApprovers": "Bottleneck Approvers",
+    "environments": "Environments",
+    "enabled": "Approval Workflow Report Enabled",
+    "lookbackDays": "Lookback Days",
+    "tier": {
+      "Efficient": "Efficient",
+      "Normal": "Normal",
+      "Delayed": "Delayed",
+      "Blocked": "Blocked"
+    }
+  },
+  "peerReviewCoverage": {
+    "title": "Peer Review Coverage Report",
+    "reviewCoverageRate": "Review Coverage Rate",
+    "highRiskReviewRate": "High-Risk Review Rate",
+    "contractChangeReviewRate": "Contract Change Review Rate",
+    "tenantPeerReviewScore": "Tenant Peer Review Score",
+    "reviewThrottleRisk": "Review Throttle Risk",
+    "unreviewedHighRiskChanges": "Unreviewed High-Risk Changes",
+    "breakingContractChangesWithoutReview": "Breaking Contract Changes Without Review",
+    "reviewBacklogs": "Review Backlogs",
+    "enabled": "Peer Review Coverage Report Enabled",
+    "highRiskThreshold": "High-Risk Blast Radius Threshold",
+    "tier": {
+      "Full": "Full Coverage",
+      "Good": "Good Coverage",
+      "Partial": "Partial Coverage",
+      "AtRisk": "At Risk"
+    }
+  },
+  "governanceEscalation": {
+    "title": "Governance Escalation Report",
+    "breakGlassCount": "Break Glass Events",
+    "productionBreakGlassCount": "Production Break Glass Events",
+    "jitTotalRequests": "JIT Total Requests",
+    "jitApprovedRate": "JIT Approved Rate",
+    "jitAutoApprovedRate": "JIT Auto-Approved Rate",
+    "jitNeverUsedCount": "JIT Never Used",
+    "tenantEscalationRiskScore": "Tenant Escalation Risk Score",
+    "topEscalatingUsers": "Top Escalating Users",
+    "escalationPatternFlags": "Escalation Pattern Flags",
+    "previousPeriodBreakGlassCount": "Previous Period Break Glass Count",
+    "enabled": "Governance Escalation Report Enabled",
+    "breakGlassCriticalThreshold": "Break Glass Critical Threshold",
+    "jitAutoApprovedMaxPct": "JIT Auto-Approved Max Pct",
+    "jitUnusedMaxCount": "JIT Unused Max Count",
+    "tier": {
+      "Low": "Low Risk",
+      "Medium": "Medium Risk",
+      "High": "High Risk",
+      "Critical": "Critical Risk"
+    }
   }
 }

@@ -14944,7 +14944,12 @@
     "tier": "Nivel de Onboarding",
     "teamAvg": "Promedio del Equipo",
     "tenantScore": "Puntuación del Tenant",
-    "tiers": { "Complete": "Completo", "Advanced": "Avanzado", "Basic": "Básico", "Minimal": "Mínimo" },
+    "tiers": {
+      "Complete": "Completo",
+      "Advanced": "Avanzado",
+      "Basic": "Básico",
+      "Minimal": "Mínimo"
+    },
     "dimensions": {
       "ownership": "Ownership",
       "contracts": "Contratos",
@@ -14959,7 +14964,12 @@
     "activityTier": "Nivel de Actividad",
     "teamScore": "Puntuación del Equipo",
     "inactiveTeams": "Equipos Inactivos",
-    "tiers": { "HighlyActive": "Muy Activo", "Active": "Activo", "Occasional": "Ocasional", "Inactive": "Inactivo" }
+    "tiers": {
+      "HighlyActive": "Muy Activo",
+      "Active": "Activo",
+      "Occasional": "Ocasional",
+      "Inactive": "Inactivo"
+    }
   },
   "platformAdoption": {
     "title": "Adopción de la Plataforma",
@@ -14967,7 +14977,12 @@
     "adoptionTier": "Nivel de Adopción",
     "capabilityRate": "Tasa de Capacidad",
     "growthOpportunity": "Oportunidad de Crecimiento",
-    "tiers": { "Pioneer": "Pionero", "Adopter": "Adoptante", "Explorer": "Explorador", "Laggard": "Rezagado" },
+    "tiers": {
+      "Pioneer": "Pionero",
+      "Adopter": "Adoptante",
+      "Explorer": "Explorador",
+      "Laggard": "Rezagado"
+    },
     "capabilities": {
       "sloTracking": "Seguimiento de SLO",
       "chaosEngineering": "Ingeniería del Caos",
@@ -15565,5 +15580,64 @@
     "prioritizedPatchList": "Lista de Parches Priorizados",
     "unpatchedWindowDays": "Ventana Sin Parche (días)",
     "tenantRiskScore": "Puntuación de Riesgo del Tenant"
+  },
+  "approvalWorkflow": {
+    "title": "Informe de Flujo de Aprobación",
+    "tenantApprovalHealthScore": "Puntuación de Salud de Aprobación del Tenant",
+    "approvalEfficiencyIndex": "Índice de Eficiencia de Aprobación",
+    "autoApprovalRate": "Tasa de Auto-Aprobación",
+    "totalPendingApprovals": "Total de Aprobaciones Pendientes",
+    "bottleneckApprovers": "Aprobadores Cuello de Botella",
+    "environments": "Entornos",
+    "enabled": "Informe de Flujo de Aprobación Habilitado",
+    "lookbackDays": "Días de Retrospectiva",
+    "tier": {
+      "Efficient": "Eficiente",
+      "Normal": "Normal",
+      "Delayed": "Retrasado",
+      "Blocked": "Bloqueado"
+    }
+  },
+  "peerReviewCoverage": {
+    "title": "Informe de Cobertura de Revisión por Pares",
+    "reviewCoverageRate": "Tasa de Cobertura de Revisión",
+    "highRiskReviewRate": "Tasa de Revisión de Alto Riesgo",
+    "contractChangeReviewRate": "Tasa de Revisión de Cambios de Contrato",
+    "tenantPeerReviewScore": "Puntuación de Revisión por Pares del Tenant",
+    "reviewThrottleRisk": "Riesgo de Throttle de Revisión",
+    "unreviewedHighRiskChanges": "Cambios de Alto Riesgo sin Revisión",
+    "breakingContractChangesWithoutReview": "Cambios Disruptivos de Contrato sin Revisión",
+    "reviewBacklogs": "Backlogs de Revisión",
+    "enabled": "Informe de Cobertura de Revisión por Pares Habilitado",
+    "highRiskThreshold": "Umbral de Blast Radius de Alto Riesgo",
+    "tier": {
+      "Full": "Cobertura Total",
+      "Good": "Buena Cobertura",
+      "Partial": "Cobertura Parcial",
+      "AtRisk": "En Riesgo"
+    }
+  },
+  "governanceEscalation": {
+    "title": "Informe de Escalada de Gobernanza",
+    "breakGlassCount": "Eventos Break Glass",
+    "productionBreakGlassCount": "Eventos Break Glass en Producción",
+    "jitTotalRequests": "Total de Solicitudes JIT",
+    "jitApprovedRate": "Tasa de Aprobación JIT",
+    "jitAutoApprovedRate": "Tasa de Auto-Aprobación JIT",
+    "jitNeverUsedCount": "JIT Nunca Utilizado",
+    "tenantEscalationRiskScore": "Puntuación de Riesgo de Escalada del Tenant",
+    "topEscalatingUsers": "Usuarios con Más Escaladas",
+    "escalationPatternFlags": "Indicadores de Patrón de Escalada",
+    "previousPeriodBreakGlassCount": "Conteo de Break Glass del Período Anterior",
+    "enabled": "Informe de Escalada de Gobernanza Habilitado",
+    "breakGlassCriticalThreshold": "Umbral Crítico de Break Glass",
+    "jitAutoApprovedMaxPct": "Pct Máximo de JIT Auto-Aprobado",
+    "jitUnusedMaxCount": "Conteo Máximo de JIT No Utilizado",
+    "tier": {
+      "Low": "Riesgo Bajo",
+      "Medium": "Riesgo Medio",
+      "High": "Riesgo Alto",
+      "Critical": "Riesgo Crítico"
+    }
   }
 }
