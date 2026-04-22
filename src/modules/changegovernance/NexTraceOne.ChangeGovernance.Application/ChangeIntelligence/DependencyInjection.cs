@@ -42,6 +42,7 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.Recor
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.RegisterRollback;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJiraWorkItems;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.UpdateDeploymentState;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDeploymentRiskForecastReport;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
@@ -111,6 +112,9 @@ public static class DependencyInjection
 
         // Phase 5: Impact Report
         services.AddTransient<IValidator<GetReleaseImpactReport.Query>, GetReleaseImpactReport.Validator>();
+
+        // Wave AI.1 — Deployment Risk Forecast Report
+        services.AddTransient<IValidator<GetDeploymentRiskForecastReport.Query>, GetDeploymentRiskForecastReport.Validator>();
 
         return services;
     }

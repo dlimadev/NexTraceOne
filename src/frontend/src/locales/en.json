@@ -14034,5 +14034,73 @@
       "Degraded": "Degraded",
       "NonCompliant": "Non-Compliant"
     }
+  },
+  "deploymentRiskForecast": {
+    "title": "Deployment Risk Forecast Report",
+    "description": "Predictive risk scoring for a release before deployment, combining historical rollback rate, environment instability, service risk profile, change confidence and recent incident rate.",
+    "forecastRiskScore": "Forecast Risk Score",
+    "riskForecastTier": "Risk Forecast Tier",
+    "dimensions": "Risk Dimensions",
+    "forecastExplanation": "Top Contributing Factors",
+    "recommendedActions": "Recommended Actions",
+    "topPendingHighRiskReleases": "Top Pending High-Risk Releases",
+    "historicalRollbackRate": "Historical Rollback Rate",
+    "environmentInstability": "Environment Instability",
+    "serviceRiskProfileScore": "Service Risk Profile Score",
+    "changeConfidenceInverse": "Change Confidence (Inverse)",
+    "recentIncidentRate": "Recent Incident Rate",
+    "tiers": {
+      "Low": "Low",
+      "Moderate": "Moderate",
+      "High": "High",
+      "Critical": "Critical"
+    }
+  },
+  "capacityTrendForecast": {
+    "title": "Capacity Trend Forecast Report",
+    "description": "Projects capacity trends for services using linear regression on runtime snapshots (latency, throughput, error rate), estimating days to threshold breach.",
+    "totalServicesAnalyzed": "Total Services Analyzed",
+    "servicesWithInsufficientData": "Insufficient Data",
+    "imminentPct": "Imminent %",
+    "atRiskPct": "At Risk %",
+    "watchListPct": "Watch List %",
+    "stablePct": "Stable %",
+    "topUrgentServices": "Top Urgent Services",
+    "projectedLatency": "Projected Latency (30d)",
+    "projectedThroughput": "Projected Throughput (30d)",
+    "daysToLatencyThreshold": "Days to Latency Threshold",
+    "daysToErrorRateThreshold": "Days to Error Rate Threshold",
+    "latencyTrend": "Latency Trend (slope/day)",
+    "throughputTrend": "Throughput Trend (slope/day)",
+    "tiers": {
+      "Stable": "Stable",
+      "WatchList": "Watch List",
+      "AtRisk": "At Risk",
+      "Imminent": "Imminent"
+    }
+  },
+  "incidentProbability": {
+    "title": "Incident Probability Report",
+    "description": "Early warning system that scores the probability of a service incident in the next 48–72 hours using five convergent signals: drift, SLO breaches, chaos gap, high-risk releases and open vulnerabilities.",
+    "incidentProbabilityScore": "Incident Probability Score",
+    "probabilityTier": "Probability Tier",
+    "alertServicesList": "Alert Services",
+    "tenantRiskHeatmap": "Tenant Risk Heatmap",
+    "imminentPct": "Imminent %",
+    "probablePct": "Probable %",
+    "possiblePct": "Possible %",
+    "unlikelyPct": "Unlikely %",
+    "openDriftSignals": "Open Drift Signals",
+    "sloBreachTrend": "SLO Breach Trend",
+    "chaosGap": "Chaos Coverage Gap",
+    "recentHighRiskRelease": "Recent High-Risk Release",
+    "openVulnerabilities": "Open Vulnerabilities",
+    "probabilityExplanation": "Top Risk Factors",
+    "tiers": {
+      "Unlikely": "Unlikely",
+      "Possible": "Possible",
+      "Probable": "Probable",
+      "Imminent": "Imminent"
+    }
   }
 }

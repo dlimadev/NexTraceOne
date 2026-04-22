@@ -106,6 +106,9 @@ public static class DependencyInjection
         // Cross-module public interface — outros módulos consomem IChangeIntelligenceModule
         services.AddScoped<IChangeIntelligenceModule, ChangeIntelligenceModule>();
 
+        // Wave AI.1 — honest-null bridge para environment instability (OI)
+        services.AddScoped<IEnvironmentInstabilityReader, NullEnvironmentInstabilityReader>();
+
         // Distributed signal correlation and promotion risk signals for AI-assisted analysis
         services.AddScoped<IDistributedSignalCorrelationService, DistributedSignalCorrelationService>();
         services.AddScoped<IPromotionRiskSignalProvider, PromotionRiskSignalProvider>();

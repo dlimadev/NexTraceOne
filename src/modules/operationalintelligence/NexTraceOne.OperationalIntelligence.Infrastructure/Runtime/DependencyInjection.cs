@@ -66,6 +66,9 @@ public static class DependencyInjection
         // ── Wave AC.3 — Platform Adoption Report (null reader) ────────────
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IPlatformAdoptionReader, NexTraceOne.OperationalIntelligence.Application.Runtime.Services.NullPlatformAdoptionReader>();
 
+        // ── Wave AI.3 — Deployment Risk Forecast Reader (null bridge — CG) ─
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IDeploymentRiskForecastReader, NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services.NullDeploymentRiskForecastReader>();
+
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);
 

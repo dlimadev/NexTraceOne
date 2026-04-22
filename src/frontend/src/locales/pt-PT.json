@@ -15266,5 +15266,73 @@
       "Degraded": "Degradado",
       "NonCompliant": "Não Conforme"
     }
+  },
+  "deploymentRiskForecast": {
+    "title": "Relatório de Previsão de Risco de Deployment",
+    "description": "Scoring preditivo de risco para uma release antes do deployment, combinando taxa histórica de rollback, instabilidade do ambiente, perfil de risco do serviço, confiança na mudança e taxa recente de incidentes.",
+    "forecastRiskScore": "Score de Risco Previsto",
+    "riskForecastTier": "Tier de Risco Previsto",
+    "dimensions": "Dimensões de Risco",
+    "forecastExplanation": "Principais Factores Contribuintes",
+    "recommendedActions": "Acções Recomendadas",
+    "topPendingHighRiskReleases": "Top Releases Pendentes de Alto Risco",
+    "historicalRollbackRate": "Taxa Histórica de Rollback",
+    "environmentInstability": "Instabilidade do Ambiente",
+    "serviceRiskProfileScore": "Score do Perfil de Risco do Serviço",
+    "changeConfidenceInverse": "Confiança na Mudança (Inverso)",
+    "recentIncidentRate": "Taxa Recente de Incidentes",
+    "tiers": {
+      "Low": "Baixo",
+      "Moderate": "Moderado",
+      "High": "Alto",
+      "Critical": "Crítico"
+    }
+  },
+  "capacityTrendForecast": {
+    "title": "Relatório de Previsão de Tendência de Capacidade",
+    "description": "Projecta tendências de capacidade para serviços usando regressão linear sobre snapshots de runtime (latência, throughput, taxa de erro), estimando dias até violação de threshold.",
+    "totalServicesAnalyzed": "Total de Serviços Analisados",
+    "servicesWithInsufficientData": "Dados Insuficientes",
+    "imminentPct": "Iminente %",
+    "atRiskPct": "Em Risco %",
+    "watchListPct": "Lista de Observação %",
+    "stablePct": "Estável %",
+    "topUrgentServices": "Top Serviços Urgentes",
+    "projectedLatency": "Latência Projectada (30d)",
+    "projectedThroughput": "Throughput Projectado (30d)",
+    "daysToLatencyThreshold": "Dias até Threshold de Latência",
+    "daysToErrorRateThreshold": "Dias até Threshold de Taxa de Erro",
+    "latencyTrend": "Tendência de Latência (slope/dia)",
+    "throughputTrend": "Tendência de Throughput (slope/dia)",
+    "tiers": {
+      "Stable": "Estável",
+      "WatchList": "Lista de Observação",
+      "AtRisk": "Em Risco",
+      "Imminent": "Iminente"
+    }
+  },
+  "incidentProbability": {
+    "title": "Relatório de Probabilidade de Incidente",
+    "description": "Sistema de alerta precoce que pontua a probabilidade de um incidente de serviço nas próximas 48–72 horas usando cinco sinais convergentes: drift, violações de SLO, gap de chaos, releases de alto risco e vulnerabilidades abertas.",
+    "incidentProbabilityScore": "Score de Probabilidade de Incidente",
+    "probabilityTier": "Tier de Probabilidade",
+    "alertServicesList": "Serviços em Alerta",
+    "tenantRiskHeatmap": "Mapa de Calor de Risco do Tenant",
+    "imminentPct": "Iminente %",
+    "probablePct": "Provável %",
+    "possiblePct": "Possível %",
+    "unlikelyPct": "Improvável %",
+    "openDriftSignals": "Sinais de Drift Abertos",
+    "sloBreachTrend": "Tendência de Violação de SLO",
+    "chaosGap": "Gap de Cobertura de Chaos",
+    "recentHighRiskRelease": "Release Recente de Alto Risco",
+    "openVulnerabilities": "Vulnerabilidades Abertas",
+    "probabilityExplanation": "Principais Factores de Risco",
+    "tiers": {
+      "Unlikely": "Improvável",
+      "Possible": "Possível",
+      "Probable": "Provável",
+      "Imminent": "Iminente"
+    }
   }
 }

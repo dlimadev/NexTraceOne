@@ -10110,5 +10110,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "200",
             uiEditorType: "number",
             sortOrder: 12310),
+
+        // ── Wave AI — Predictive Intelligence & Forecasting ────────────────
+
+        ConfigurationDefinition.Create(
+            key: "changeintelligence.risk_forecast.lookback_days",
+            displayName: "config.changeintelligence.risk_forecast.lookback_days.name",
+            description: "config.changeintelligence.risk_forecast.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12320),
+
+        ConfigurationDefinition.Create(
+            key: "changeintelligence.risk_forecast.critical_threshold",
+            displayName: "config.changeintelligence.risk_forecast.critical_threshold.name",
+            description: "config.changeintelligence.risk_forecast.critical_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "75",
+            uiEditorType: "number",
+            sortOrder: 12330),
+
+        ConfigurationDefinition.Create(
+            key: "oi.capacity_forecast.lookback_days",
+            displayName: "config.oi.capacity_forecast.lookback_days.name",
+            description: "config.oi.capacity_forecast.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 12340),
+
+        ConfigurationDefinition.Create(
+            key: "oi.capacity_forecast.latency_critical_ms",
+            displayName: "config.oi.capacity_forecast.latency_critical_ms.name",
+            description: "config.oi.capacity_forecast.latency_critical_ms.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "2000",
+            uiEditorType: "number",
+            sortOrder: 12350),
+
+        ConfigurationDefinition.Create(
+            key: "oi.capacity_forecast.error_rate_critical_pct",
+            displayName: "config.oi.capacity_forecast.error_rate_critical_pct.name",
+            description: "config.oi.capacity_forecast.error_rate_critical_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5.0",
+            uiEditorType: "number",
+            sortOrder: 12360),
+
+        ConfigurationDefinition.Create(
+            key: "oi.incident_probability.imminent_threshold",
+            displayName: "config.oi.incident_probability.imminent_threshold.name",
+            description: "config.oi.incident_probability.imminent_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "65",
+            uiEditorType: "number",
+            sortOrder: 12370),
+
+        ConfigurationDefinition.Create(
+            key: "oi.incident_probability.cache_ttl_minutes",
+            displayName: "config.oi.incident_probability.cache_ttl_minutes.name",
+            description: "config.oi.incident_probability.cache_ttl_minutes.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12380),
+
+        ConfigurationDefinition.Create(
+            key: "oi.incident_probability.max_top_services",
+            displayName: "config.oi.incident_probability.max_top_services.name",
+            description: "config.oi.incident_probability.max_top_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 12390),
     ];
 }

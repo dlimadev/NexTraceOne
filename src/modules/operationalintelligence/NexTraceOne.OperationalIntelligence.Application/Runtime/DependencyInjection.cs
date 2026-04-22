@@ -19,6 +19,8 @@ using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectRun
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTopologyAwareAlerts;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetPlatformAdoptionReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetCapacityTrendForecastReport;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetIncidentProbabilityReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline;
@@ -78,6 +80,14 @@ public static class DependencyInjection
 
         // ── Wave AC.3 — Platform Adoption Report ──────────────────────────
         services.AddTransient<IValidator<GetPlatformAdoptionReport.Query>, GetPlatformAdoptionReport.Validator>();
+
+        // ── Wave AI.2 — Capacity Trend Forecast Report ────────────────────
+        services.AddTransient<IValidator<GetCapacityTrendForecastReport.Query>,
+            GetCapacityTrendForecastReport.Validator>();
+
+        // ── Wave AI.3 — Incident Probability Report ───────────────────────
+        services.AddTransient<IValidator<GetIncidentProbabilityReport.Query>,
+            GetIncidentProbabilityReport.Validator>();
 
         return services;
     }
