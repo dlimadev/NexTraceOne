@@ -17,6 +17,7 @@ using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.Correlate
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectLogAnomaly;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectRuntimeDrift;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTopologyAwareAlerts;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetPlatformAdoptionReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.EstablishRuntimeBaseline;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
@@ -74,6 +75,9 @@ public static class DependencyInjection
 
         // ── Automation (Operational Automation Workflows) validators ──
         services.AddAutomationApplication(configuration);
+
+        // ── Wave AC.3 — Platform Adoption Report ──────────────────────────
+        services.AddTransient<IValidator<GetPlatformAdoptionReport.Query>, GetPlatformAdoptionReport.Validator>();
 
         return services;
     }

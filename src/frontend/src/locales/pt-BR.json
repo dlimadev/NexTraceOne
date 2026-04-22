@@ -14967,5 +14967,45 @@
       "Mature": "Maduro",
       "Exemplary": "Exemplar"
     }
+  },
+  "onboardingHealth": {
+    "title": "Saúde de Onboarding",
+    "score": "Pontuação de Onboarding",
+    "tier": "Nível de Onboarding",
+    "teamAvg": "Média da Equipa",
+    "tenantScore": "Pontuação do Tenant",
+    "tiers": { "Complete": "Completo", "Advanced": "Avançado", "Basic": "Básico", "Minimal": "Mínimo" },
+    "dimensions": {
+      "ownership": "Ownership",
+      "contracts": "Contratos",
+      "runbook": "Runbook",
+      "slo": "SLO",
+      "profiling": "Profiling"
+    }
+  },
+  "developerActivity": {
+    "title": "Atividade de Developer",
+    "totalActions": "Total de Ações",
+    "activityTier": "Nível de Atividade",
+    "teamScore": "Pontuação da Equipa",
+    "inactiveTeams": "Equipas Inativas",
+    "tiers": { "HighlyActive": "Muito Ativo", "Active": "Ativo", "Occasional": "Ocasional", "Inactive": "Inativo" }
+  },
+  "platformAdoption": {
+    "title": "Adoção da Plataforma",
+    "adoptionScore": "Pontuação de Adoção",
+    "adoptionTier": "Nível de Adoção",
+    "capabilityRate": "Taxa de Capacidade",
+    "growthOpportunity": "Oportunidade de Crescimento",
+    "tiers": { "Pioneer": "Pioneiro", "Adopter": "Adotante", "Explorer": "Explorador", "Laggard": "Retardatário" },
+    "capabilities": {
+      "sloTracking": "Rastreamento de SLO",
+      "chaosEngineering": "Engenharia de Caos",
+      "continuousProfiling": "Profiling Contínuo",
+      "complianceReports": "Relatórios de Conformidade",
+      "changeConfidence": "Confiança em Mudanças",
+      "releaseCalendar": "Calendário de Releases",
+      "aiAssistant": "Assistente de IA"
+    }
   }
 }

@@ -134,6 +134,9 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<UserCreatedDomainEvent>, UserCreatedDomainEventHandler>();
         services.AddScoped<IIntegrationEventHandler<UserLockedDomainEvent>, UserLockedDomainEventHandler>();
 
+        // ── Wave AC.2 — Developer Activity Report (null reader) ───────────
+        services.AddScoped<NexTraceOne.IdentityAccess.Application.Abstractions.IDeveloperActivityReader, NexTraceOne.IdentityAccess.Application.Services.NullDeveloperActivityReader>();
+
         return services;
     }
 }

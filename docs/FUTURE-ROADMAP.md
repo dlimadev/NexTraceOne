@@ -1772,7 +1772,9 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
-### Wave AC — Self-Service & Platform Adoption Intelligence
+### Wave AC — Self-Service & Platform Adoption Intelligence ✅
+
+**Estado:** ✅ COMPLETA
 
 **Objetivo:** Introduzir métricas de adoção e saúde de onboarding que respondam "as equipas estão a usar o NexTraceOne eficazmente?" — habilitando Platform Admins a medir o valor real da plataforma, identificar equipas que precisam de suporte para adotar capacidades críticas, e quantificar o ROI da adoção por equipa.
 
@@ -1869,7 +1871,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `developerActivity.*` — atividade de desenvolvedores e equipas na plataforma
 - `platformAdoption.*` — adoção de capacidades da plataforma por equipa
 
-**Totais estimados Wave AC:** Catalog: ~13 testes (AC.1). IA/Audit: ~12 testes (AC.2). OI: ~14 testes (AC.3). Configuração: +8 config keys (sort 11840–11910). i18n: +3 secções (4 locales). **Wave AC PLANEADA**.
+**Totais estimados Wave AC:** Catalog: ~13 testes (AC.1). IA/Audit: ~12 testes (AC.2). OI: ~14 testes (AC.3). Configuração: +8 config keys (sort 11840–11910). i18n: +3 secções (4 locales). **Wave AC COMPLETA** ✅.
 
 ---
 
@@ -4579,9 +4581,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 72. ✅ **Wave AB.1** — `GetKnowledgeRelationGraph` — grafo semântico de relações entre entidades (Service/Contract/Runbook/Incident/Release/Team/OperationalNote): arestas nomeadas (OwnedBy/DependsOn/PublishesContract/ConsumesContract/CorrelatedWith/MitigatedBy), subgrafo por âncora (1–3 saltos), RelationStrength com decaimento temporal, KnowledgeGraphSummary. Catalog. Config: `catalog.knowledge_graph.*` sort 11760–11780.
 73. ✅ **Wave AB.2** — `GetContractLineageReport` — linhagem de versões de contrato: LineageNode por versão (autor, aprovador, datas de promoção/deprecation), BreakingChangeCount por transição, ConsumerImpactAtDeprecation, VersionRetentionDays, StabilityScore de linhagem, LineageSummary. Catalog. Config: `catalog.contract_lineage.*` sort 11790–11800.
 74. ✅ **Wave AB.3** — `GetIncidentKnowledgeBaseReport` — base de conhecimento de incidentes: ResolutionConfidence, MeanTimeToRunbook, RunbookEffectivenessScore por tipo de incidente, KnowledgeGap flag, StaleRunbook flag, KnowledgeMaturityScore global. OI. Config: `runtime.incident_knowledge.*` sort 11810–11830. **Wave AB PLANEADA**.
-75. 🔲 **Wave AC.1** — `GetOnboardingHealthReport` — scorecard de completude de onboarding por serviço: 5 dimensões ponderadas (Ownership 20% + Contracts 25% + Runbook 20% + SLO 20% + Profiling 15%), OnboardingTier (Complete/Advanced/Basic/Minimal), TeamOnboardingAvg, TenantOnboardingScore ponderado por tier de serviço. Catalog. Config: `catalog.onboarding_health.*` sort 11840–11860.
-76. 🔲 **Wave AC.2** — `GetDeveloperActivityReport` — atividade de developers na plataforma: TotalActions ponderado (contratos=3/runbooks=2/outros=1), ActivityTier (HighlyActive/Active/Occasional/Inactive) por percentil, TeamActivityScore, top 10 utilizadores/equipas, InactiveTeams list. IA/Audit. Config: `audit.developer_activity.*` sort 11870–11880.
-77. 🔲 **Wave AC.3** — `GetPlatformAdoptionReport` — adoção de 7 capacidades core por equipa: SloTracking/ChaosEngineering/ContinuousProfiling/ComplianceReports/ChangeConfidence/ReleaseCalendar/AiAssistant, AdoptionTier (Pioneer/Adopter/Explorer/Laggard), CapabilityAdoptionRate global, GrowthOpportunity (capacidades <30% adoção). OI. Config: `platform.adoption.*` sort 11890–11910. **Wave AC PLANEADA**.
+75. ✅ **Wave AC.1** — `GetOnboardingHealthReport` — scorecard de completude de onboarding por serviço: 5 dimensões ponderadas (Ownership 20% + Contracts 25% + Runbook 20% + SLO 20% + Profiling 15%), OnboardingTier (Complete/Advanced/Basic/Minimal), TeamOnboardingAvg, TenantOnboardingScore ponderado por tier de serviço. Catalog. Config: `catalog.onboarding_health.*` sort 11840–11860.
+76. ✅ **Wave AC.2** — `GetDeveloperActivityReport` — atividade de developers na plataforma: TotalActions ponderado (contratos=3/runbooks=2/outros=1), ActivityTier (HighlyActive/Active/Occasional/Inactive) por percentil, TeamActivityScore, top 10 utilizadores/equipas, InactiveTeams list. IA/Audit. Config: `audit.developer_activity.*` sort 11870–11880.
+77. ✅ **Wave AC.3** — `GetPlatformAdoptionReport` — adoção de 7 capacidades core por equipa: SloTracking/ChaosEngineering/ContinuousProfiling/ComplianceReports/ChangeConfidence/ReleaseCalendar/AiAssistant, AdoptionTier (Pioneer/Adopter/Explorer/Laggard), CapabilityAdoptionRate global, GrowthOpportunity (capacidades <30% adoção). OI. Config: `platform.adoption.*` sort 11890–11910. **Wave AC COMPLETA** ✅.
 78. 🔲 **Wave AD.1** — `GetZeroTrustPostureReport` — postura Zero Trust por serviço: 4 dimensões (Authentication 30% + mTLS 25% + TokenRotation 20% + PolicyCoverage 25%), ZeroTrustTier (Enforced/Controlled/Partial/Exposed), CriticalExposure flag, TenantZeroTrustScore. CG. Config: `security.zero_trust.*` sort 11920–11930.
 79. 🔲 **Wave AD.2** — `GetSecretsExposureRiskReport` — deteção de segredos em artefactos: pattern matching leve (API keys/JWT/connection strings/IPs/emails), ExposureRisk por artefacto (None/Low/Medium/High/Critical), AffectedArtifacts list, AuditTrail por deteção, sem dependências externas. Catalog. Config: `catalog.secrets_exposure.*` sort 11940–11950.
 80. 🔲 **Wave AD.3** — `GetAccessPatternAnomalyReport` — anomalias de acesso: 5 AnomalySignal types (OffHours/VolumetricSpike/FirstAccessSensitive/UnusualResource/BulkExport), RiskScore composto por tipo+sensibilidade, AnomalyDensityByUser (risco insider threat), top recursos acedidos anomalamente. IA/Audit. Config: `audit.access_anomaly.*` sort 11960–11990. **Wave AD PLANEADA**.

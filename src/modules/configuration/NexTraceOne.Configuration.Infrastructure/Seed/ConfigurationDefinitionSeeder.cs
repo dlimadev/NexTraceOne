@@ -9571,5 +9571,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "number",
             sortOrder: 11830),
+
+        // ── Wave AC — Self-Service & Platform Adoption Intelligence ──────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.onboarding_health.complete_threshold",
+            displayName: "config.catalog.onboarding_health.complete_threshold.name",
+            description: "config.catalog.onboarding_health.complete_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11840),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.onboarding_health.advanced_threshold",
+            displayName: "config.catalog.onboarding_health.advanced_threshold.name",
+            description: "config.catalog.onboarding_health.advanced_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "70",
+            uiEditorType: "number",
+            sortOrder: 11850),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.onboarding_health.basic_threshold",
+            displayName: "config.catalog.onboarding_health.basic_threshold.name",
+            description: "config.catalog.onboarding_health.basic_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 11860),
+
+        ConfigurationDefinition.Create(
+            key: "audit.developer_activity.lookback_days",
+            displayName: "config.audit.developer_activity.lookback_days.name",
+            description: "config.audit.developer_activity.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11870),
+
+        ConfigurationDefinition.Create(
+            key: "audit.developer_activity.highly_active_percentile",
+            displayName: "config.audit.developer_activity.highly_active_percentile.name",
+            description: "config.audit.developer_activity.highly_active_percentile.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "75",
+            uiEditorType: "number",
+            sortOrder: 11880),
+
+        ConfigurationDefinition.Create(
+            key: "platform.adoption.slo_lookback_days",
+            displayName: "config.platform.adoption.slo_lookback_days.name",
+            description: "config.platform.adoption.slo_lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11890),
+
+        ConfigurationDefinition.Create(
+            key: "platform.adoption.feature_lookback_days",
+            displayName: "config.platform.adoption.feature_lookback_days.name",
+            description: "config.platform.adoption.feature_lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11900),
+
+        ConfigurationDefinition.Create(
+            key: "platform.adoption.pioneer_threshold",
+            displayName: "config.platform.adoption.pioneer_threshold.name",
+            description: "config.platform.adoption.pioneer_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 11910),
     ];
 }
