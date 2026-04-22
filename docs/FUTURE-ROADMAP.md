@@ -2,7 +2,7 @@
 
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
-> **Waves concluídas:** A → AF (86 features analytics/governance implementadas e testadas)  
+> **Waves concluídas:** A → AG (89 features analytics/governance implementadas e testadas)  
 > **Waves planeadas:** AF → BC (99 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
@@ -2248,7 +2248,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `costPerRelease.*` — custo operacional por release e identificação de cost spikes pós-deploy
 - `finOpsWasteAnalysis.*` — análise consolidada de desperdício por categoria e serviço
 
-**Totais estimados Wave AG:** OI: ~43 testes (AG.1 ~13 + AG.2 ~15 + AG.3 ~15). Configuração: +8 config keys (sort 12160–12230). i18n: +3 secções (4 locales). **Wave AG PLANEADA**.
+**Totais estimados Wave AG:** OI: ~48 testes (AG.1 ~13 + AG.2 ~15 + AG.3 ~15 + extras). Configuração: +8 config keys (sort 12160–12230). i18n: +3 secções (4 locales). **Wave AG COMPLETA**.
 
 ---
 
@@ -4594,9 +4594,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 84. ✅ **Wave AF.1** — `GetServiceLifecycleTransitionReport` — transições de estado no ciclo de vida dos serviços: DaysInCurrentState, StagnationFlag (Deprecated sem progresso), AcceleratedRetirementFlag (salto rápido para Sunset), BlockedTransitionFlag (consumidores Critical ativos). Catalog. Config: `catalog.lifecycle.*` sort 12080–12100.
 85. ✅ **Wave AF.2** — `GetServiceRetirementReadinessReport` — prontidão para retirada de serviço: RetirementReadinessScore (ConsumerMigrated 40% + ContractsDeprecated 25% + RunbookDocumented 15% + DependantsNotified 20%), RetirementReadinessTier (Ready/NearReady/Blocked/NotReady), BlockerList, MigrationProgress. Endpoint `/retirement-readiness`. Catalog. Config: `catalog.retirement_readiness.*` sort 12110–12120.
 86. ✅ **Wave AF.3** — `GetServiceMigrationProgressReport` — progresso de migração de consumidores de serviços deprecated: MigrationCompletionRate, MigrationTier (Complete/Advanced/InProgress/Lagging), EstimatedCompletionDate (linear projection), StuckConsumers, DailyMigrationTimeline 30d. Catalog. Config: `catalog.migration_progress.*` sort 12130–12150. **Wave AF COMPLETA**.
-87. 🔲 **Wave AG.1** — `GetEnvironmentCostComparisonReport` — comparação de custo non-prod vs. prod por serviço: NonProdToProdRatio, EnvironmentEfficiencyTier (Optimal/Acceptable/Overprovisioned/WasteAlert), NonProdWasteCostUsd, TotalNonProdWasteUsd do tenant. OI. Config: `finops.environment_cost.*` sort 12160–12170.
-88. 🔲 **Wave AG.2** — `GetCostPerReleaseReport` — custo operacional por release: PreRelease vs. PostRelease daily avg, CostDeltaPct, CostImpactTier (Neutral/CostSaving/MinorIncrease/MajorIncrease/CostSpike), WastedDeploymentCost flag (Failed+CostSpike). OI. Config: `finops.cost_per_release.*` sort 12180–12200.
-89. 🔲 **Wave AG.3** — `GetFinOpsWasteAnalysisReport` — análise consolidada de waste: 4 categorias (IdleWaste/OverProvisioningWaste/FailedDeploymentWaste/DriftWaste), WasteScore 0–100, WasteTier (Clean/Minor/Significant/Critical), TotalEstimatedWasteUsd, WasteOpportunity (top 10 savings). OI. Config: `finops.waste_analysis.*` sort 12210–12230. **Wave AG PLANEADA**.
+87. ✅ **Wave AG.1** — `GetEnvironmentCostComparisonReport` — comparação de custo non-prod vs. prod por serviço: NonProdToProdRatio, EnvironmentEfficiencyTier (Optimal/Acceptable/Overprovisioned/WasteAlert), NonProdWasteCostUsd, TotalNonProdWasteUsd do tenant. OI. Config: `finops.environment_cost.*` sort 12160–12170.
+88. ✅ **Wave AG.2** — `GetCostPerReleaseReport` — custo operacional por release: PreRelease vs. PostRelease daily avg, CostDeltaPct, CostImpactTier (Neutral/CostSaving/MinorIncrease/MajorIncrease/CostSpike), WastedDeploymentCost flag (Failed+CostSpike). OI. Config: `finops.cost_per_release.*` sort 12180–12200.
+89. ✅ **Wave AG.3** — `GetFinOpsWasteAnalysisReport` — análise consolidada de waste: 4 categorias (IdleWaste/OverProvisioningWaste/FailedDeploymentWaste/DriftWaste), WasteScore 0–100, WasteTier (Clean/Minor/Significant/Critical), TotalEstimatedWasteUsd, WasteOpportunity (top 10 savings). OI. Config: `finops.waste_analysis.*` sort 12210–12230. **Wave AG COMPLETA**.
 90. 🔲 **Wave AH.1** — `GetEventSchemaEvolutionReport` — evolução de schemas AsyncAPI/Kafka: BreakingSchemaChanges, EventSchemaStabilityTier (Stable/Evolving/Volatile/Unstable), MigrationLag flag (consumidores em versão antiga > `lag_alert_days`), top eventos mais instáveis. Catalog. Config: `catalog.event_schema.*` sort 12240–12250.
 91. 🔲 **Wave AH.2** — `GetEventProducerConsumerBalanceReport` — equilíbrio produtor-consumidor de eventos: OrphanedEvents (produzidos sem consumidores), BlindConsumers (consumidores sem produtor registado), HighFanOutEvents (`FanOutRisk`), BalanceSummary global. Catalog. Config: `catalog.event_balance.*` sort 12260–12270.
 92. 🔲 **Wave AH.3** — `GetEventContractComplianceReport` — conformidade de produtores com contratos AsyncAPI: SchemaComplianceRate, PayloadViolationCount, UnregisteredFields, MissingRequiredFields, ComplianceTier (Compliant/MinorViolations/Degraded/NonCompliant), ViolationTimeline 30d. Catalog. Config: `catalog.event_compliance.*` sort 12280–12310. **Wave AH PLANEADA**.

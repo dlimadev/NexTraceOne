@@ -9931,5 +9931,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "100",
             uiEditorType: "number",
             sortOrder: 12150),
+
+        // ── Wave AG — FinOps Advanced Attribution ──────────────────────────
+
+        ConfigDef(
+            key: "finops.environment_cost.expected_nonprod_ratio",
+            displayName: "config.finops.environment_cost.expected_nonprod_ratio.name",
+            description: "config.finops.environment_cost.expected_nonprod_ratio.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "0.5",
+            uiEditorType: "number",
+            sortOrder: 12160),
+
+        ConfigDef(
+            key: "finops.environment_cost.lookback_days",
+            displayName: "config.finops.environment_cost.lookback_days.name",
+            description: "config.finops.environment_cost.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12170),
+
+        ConfigDef(
+            key: "finops.cost_per_release.pre_release_days",
+            displayName: "config.finops.cost_per_release.pre_release_days.name",
+            description: "config.finops.cost_per_release.pre_release_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "7",
+            uiEditorType: "number",
+            sortOrder: 12180),
+
+        ConfigDef(
+            key: "finops.cost_per_release.post_release_days",
+            displayName: "config.finops.cost_per_release.post_release_days.name",
+            description: "config.finops.cost_per_release.post_release_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "7",
+            uiEditorType: "number",
+            sortOrder: 12190),
+
+        ConfigDef(
+            key: "finops.cost_per_release.spike_threshold_pct",
+            displayName: "config.finops.cost_per_release.spike_threshold_pct.name",
+            description: "config.finops.cost_per_release.spike_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12200),
+
+        ConfigDef(
+            key: "finops.waste_analysis.lookback_days",
+            displayName: "config.finops.waste_analysis.lookback_days.name",
+            description: "config.finops.waste_analysis.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12210),
+
+        ConfigDef(
+            key: "finops.waste_analysis.max_services",
+            displayName: "config.finops.waste_analysis.max_services.name",
+            description: "config.finops.waste_analysis.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12220),
+
+        ConfigDef(
+            key: "finops.waste_analysis.significant_waste_threshold",
+            displayName: "config.finops.waste_analysis.significant_waste_threshold.name",
+            description: "config.finops.waste_analysis.significant_waste_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12230),
     ];
 }

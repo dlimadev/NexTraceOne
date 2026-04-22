@@ -15147,5 +15147,68 @@
       "InProgress": "Em Curso",
       "Lagging": "Atrasado"
     }
+  },
+  "environmentCostComparison": {
+    "title": "Comparação de Custo por Ambiente",
+    "description": "Compara o custo operacional entre ambientes não-prod e produção por serviço para identificar desperdício em ambientes de teste.",
+    "totalServicesAnalyzed": "Total de Serviços Analisados",
+    "totalNonProdWasteUsd": "Desperdício Total Não-Prod (USD)",
+    "totalProdCostUsd": "Custo Total de Produção (USD)",
+    "totalNonProdCostUsd": "Custo Total Não-Prod (USD)",
+    "nonProdToProdRatio": "Ratio Não-Prod / Prod",
+    "nonProdWasteCostUsd": "Custo de Desperdício Não-Prod (USD)",
+    "topWasteServices": "Top Serviços com Desperdício",
+    "distributionByTier": "Distribuição por Tier de Eficiência",
+    "tiers": {
+      "Optimal": "Ótimo",
+      "Acceptable": "Aceitável",
+      "Overprovisioned": "Sobreprovisionado",
+      "WasteAlert": "Alerta de Desperdício"
+    }
+  },
+  "costPerRelease": {
+    "title": "Custo por Release",
+    "description": "Atribui custo operacional a cada release de serviço, identificando cost spikes e custo desperdiçado em deploys falhados ou revertidos.",
+    "totalReleasesAnalyzed": "Total de Releases Analisadas",
+    "avgCostPerRelease": "Custo Médio por Release (USD)",
+    "costSpikeRatePct": "Taxa de Cost Spike (%)",
+    "costSavingRatePct": "Taxa de Redução de Custo (%)",
+    "totalWastedDeploymentCostUsd": "Custo Total Desperdiçado em Deploy (USD)",
+    "costDeltaPct": "Delta de Custo (%)",
+    "preReleaseDailyAvgCostUsd": "Média Diária Pré-Release (USD)",
+    "postReleaseDailyAvgCostUsd": "Média Diária Pós-Release (USD)",
+    "wastedDeploymentCost": "Custo Desperdiçado em Deploy",
+    "topCostSpikeReleases": "Top Releases com Cost Spike",
+    "topCostSavingReleases": "Top Releases com Redução de Custo",
+    "tiers": {
+      "CostSaving": "Redução de Custo",
+      "Neutral": "Neutro",
+      "MinorIncrease": "Aumento Menor",
+      "MajorIncrease": "Aumento Significativo",
+      "CostSpike": "Spike de Custo"
+    }
+  },
+  "finOpsWasteAnalysis": {
+    "title": "Análise de Desperdício FinOps",
+    "description": "Análise consolidada de desperdício por serviço, cruzando recursos idle, sobreprovisionamento, deploys falhados e drift de alta severidade.",
+    "totalServicesAnalyzed": "Total de Serviços Analisados",
+    "totalEstimatedWasteUsd": "Desperdício Total Estimado (USD)",
+    "wasteOpportunitySavingsUsd": "Poupança por Oportunidade de Desperdício (USD)",
+    "wasteScore": "Score de Desperdício",
+    "topWasteServices": "Top Serviços com Desperdício",
+    "wasteOpportunities": "Top Oportunidades de Poupança",
+    "wasteByCategory": "Desperdício por Categoria",
+    "categories": {
+      "IdleWaste": "Desperdício por Inactividade",
+      "OverProvisioningWaste": "Desperdício por Sobreprovisionamento",
+      "FailedDeploymentWaste": "Desperdício por Deploy Falhado",
+      "DriftWaste": "Desperdício por Drift"
+    },
+    "tiers": {
+      "Clean": "Limpo",
+      "Minor": "Menor",
+      "Significant": "Significativo",
+      "Critical": "Crítico"
+    }
   }
 }

@@ -13915,5 +13915,68 @@
       "InProgress": "In Progress",
       "Lagging": "Lagging"
     }
+  },
+  "environmentCostComparison": {
+    "title": "Environment Cost Comparison",
+    "description": "Compares operational cost between non-production and production environments per service to identify waste in test environments.",
+    "totalServicesAnalyzed": "Total Services Analyzed",
+    "totalNonProdWasteUsd": "Total Non-Prod Waste (USD)",
+    "totalProdCostUsd": "Total Production Cost (USD)",
+    "totalNonProdCostUsd": "Total Non-Prod Cost (USD)",
+    "nonProdToProdRatio": "Non-Prod / Prod Ratio",
+    "nonProdWasteCostUsd": "Non-Prod Waste Cost (USD)",
+    "topWasteServices": "Top Waste Services",
+    "distributionByTier": "Distribution by Efficiency Tier",
+    "tiers": {
+      "Optimal": "Optimal",
+      "Acceptable": "Acceptable",
+      "Overprovisioned": "Overprovisioned",
+      "WasteAlert": "Waste Alert"
+    }
+  },
+  "costPerRelease": {
+    "title": "Cost Per Release",
+    "description": "Attributes operational cost to each service release, identifying cost spikes and wasted deployment cost for failed or rolled-back deploys.",
+    "totalReleasesAnalyzed": "Total Releases Analyzed",
+    "avgCostPerRelease": "Avg Cost Per Release (USD)",
+    "costSpikeRatePct": "Cost Spike Rate (%)",
+    "costSavingRatePct": "Cost Saving Rate (%)",
+    "totalWastedDeploymentCostUsd": "Total Wasted Deployment Cost (USD)",
+    "costDeltaPct": "Cost Delta (%)",
+    "preReleaseDailyAvgCostUsd": "Pre-Release Daily Avg Cost (USD)",
+    "postReleaseDailyAvgCostUsd": "Post-Release Daily Avg Cost (USD)",
+    "wastedDeploymentCost": "Wasted Deployment Cost",
+    "topCostSpikeReleases": "Top Cost Spike Releases",
+    "topCostSavingReleases": "Top Cost Saving Releases",
+    "tiers": {
+      "CostSaving": "Cost Saving",
+      "Neutral": "Neutral",
+      "MinorIncrease": "Minor Increase",
+      "MajorIncrease": "Major Increase",
+      "CostSpike": "Cost Spike"
+    }
+  },
+  "finOpsWasteAnalysis": {
+    "title": "FinOps Waste Analysis",
+    "description": "Consolidated waste analysis per service, crossing idle resources, over-provisioning, failed deployments, and high-severity drift signals.",
+    "totalServicesAnalyzed": "Total Services Analyzed",
+    "totalEstimatedWasteUsd": "Total Estimated Waste (USD)",
+    "wasteOpportunitySavingsUsd": "Waste Opportunity Savings (USD)",
+    "wasteScore": "Waste Score",
+    "topWasteServices": "Top Waste Services",
+    "wasteOpportunities": "Top Savings Opportunities",
+    "wasteByCategory": "Waste by Category",
+    "categories": {
+      "IdleWaste": "Idle Waste",
+      "OverProvisioningWaste": "Over-Provisioning Waste",
+      "FailedDeploymentWaste": "Failed Deployment Waste",
+      "DriftWaste": "Drift Waste"
+    },
+    "tiers": {
+      "Clean": "Clean",
+      "Minor": "Minor",
+      "Significant": "Significant",
+      "Critical": "Critical"
+    }
   }
 }
