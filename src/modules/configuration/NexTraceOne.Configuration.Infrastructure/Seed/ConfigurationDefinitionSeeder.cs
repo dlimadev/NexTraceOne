@@ -9661,5 +9661,454 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "80",
             uiEditorType: "number",
             sortOrder: 11910),
+
+        // ── Wave AD — Zero Trust & Security Posture Analytics ─────────────
+
+        ConfigurationDefinition.Create(
+            key: "security.zero_trust.enforced_threshold",
+            displayName: "config.security.zero_trust.enforced_threshold.name",
+            description: "config.security.zero_trust.enforced_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 11920),
+
+        ConfigurationDefinition.Create(
+            key: "security.zero_trust.critical_exposure_threshold",
+            displayName: "config.security.zero_trust.critical_exposure_threshold.name",
+            description: "config.security.zero_trust.critical_exposure_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "40",
+            uiEditorType: "number",
+            sortOrder: 11930),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.secrets_exposure.max_artifacts",
+            displayName: "config.catalog.secrets_exposure.max_artifacts.name",
+            description: "config.catalog.secrets_exposure.max_artifacts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "500",
+            uiEditorType: "number",
+            sortOrder: 11940),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.secrets_exposure.min_risk_level",
+            displayName: "config.catalog.secrets_exposure.min_risk_level.name",
+            description: "config.catalog.secrets_exposure.min_risk_level.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "Medium",
+            uiEditorType: "text",
+            sortOrder: 11950),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.lookback_days",
+            displayName: "config.audit.access_anomaly.lookback_days.name",
+            description: "config.audit.access_anomaly.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 11960),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.volumetric_spike_multiplier",
+            displayName: "config.audit.access_anomaly.volumetric_spike_multiplier.name",
+            description: "config.audit.access_anomaly.volumetric_spike_multiplier.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 11970),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.bulk_export_threshold",
+            displayName: "config.audit.access_anomaly.bulk_export_threshold.name",
+            description: "config.audit.access_anomaly.bulk_export_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 11980),
+
+        ConfigurationDefinition.Create(
+            key: "audit.access_anomaly.max_users",
+            displayName: "config.audit.access_anomaly.max_users.name",
+            description: "config.audit.access_anomaly.max_users.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 11990),
+
+        // ── Wave AE — Contract Testing & API Backward Compatibility ────────
+
+        ConfigurationDefinition.Create(
+            key: "contracts.test_coverage.full_threshold",
+            displayName: "config.contracts.test_coverage.full_threshold.name",
+            description: "config.contracts.test_coverage.full_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12000),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.test_coverage.good_threshold",
+            displayName: "config.contracts.test_coverage.good_threshold.name",
+            description: "config.contracts.test_coverage.good_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "70",
+            uiEditorType: "number",
+            sortOrder: 12010),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.test_coverage.max_services",
+            displayName: "config.contracts.test_coverage.max_services.name",
+            description: "config.contracts.test_coverage.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12020),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.breaking_change_impact.max_hop_depth",
+            displayName: "config.contracts.breaking_change_impact.max_hop_depth.name",
+            description: "config.contracts.breaking_change_impact.max_hop_depth.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "2",
+            uiEditorType: "number",
+            sortOrder: 12030),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.breaking_change_impact.max_consumers",
+            displayName: "config.contracts.breaking_change_impact.max_consumers.name",
+            description: "config.contracts.breaking_change_impact.max_consumers.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12040),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.backward_compat.stable_threshold",
+            displayName: "config.contracts.backward_compat.stable_threshold.name",
+            description: "config.contracts.backward_compat.stable_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 12050),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.backward_compat.stagnation_days",
+            displayName: "config.contracts.backward_compat.stagnation_days.name",
+            description: "config.contracts.backward_compat.stagnation_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 12060),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.backward_compat.max_contracts",
+            displayName: "config.contracts.backward_compat.max_contracts.name",
+            description: "config.contracts.backward_compat.max_contracts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12070),
+
+        // ── Wave AF — Service Lifecycle Governance ───────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.lifecycle.stagnation_days",
+            displayName: "config.catalog.lifecycle.stagnation_days.name",
+            description: "config.catalog.lifecycle.stagnation_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12080),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.lifecycle.min_deprecation_days",
+            displayName: "config.catalog.lifecycle.min_deprecation_days.name",
+            description: "config.catalog.lifecycle.min_deprecation_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12090),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.lifecycle.max_services",
+            displayName: "config.catalog.lifecycle.max_services.name",
+            description: "config.catalog.lifecycle.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12100),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.retirement_readiness.ready_threshold",
+            displayName: "config.catalog.retirement_readiness.ready_threshold.name",
+            description: "config.catalog.retirement_readiness.ready_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 12110),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.retirement_readiness.near_ready_threshold",
+            displayName: "config.catalog.retirement_readiness.near_ready_threshold.name",
+            description: "config.catalog.retirement_readiness.near_ready_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "65",
+            uiEditorType: "number",
+            sortOrder: 12120),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.migration_progress.lookback_days",
+            displayName: "config.catalog.migration_progress.lookback_days.name",
+            description: "config.catalog.migration_progress.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12130),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.migration_progress.stuck_threshold_days",
+            displayName: "config.catalog.migration_progress.stuck_threshold_days.name",
+            description: "config.catalog.migration_progress.stuck_threshold_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12140),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.migration_progress.max_services",
+            displayName: "config.catalog.migration_progress.max_services.name",
+            description: "config.catalog.migration_progress.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12150),
+
+        // ── Wave AG — FinOps Advanced Attribution ──────────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "finops.environment_cost.expected_nonprod_ratio",
+            displayName: "config.finops.environment_cost.expected_nonprod_ratio.name",
+            description: "config.finops.environment_cost.expected_nonprod_ratio.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "0.5",
+            uiEditorType: "number",
+            sortOrder: 12160),
+
+        ConfigurationDefinition.Create(
+            key: "finops.environment_cost.lookback_days",
+            displayName: "config.finops.environment_cost.lookback_days.name",
+            description: "config.finops.environment_cost.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12170),
+
+        ConfigurationDefinition.Create(
+            key: "finops.cost_per_release.pre_release_days",
+            displayName: "config.finops.cost_per_release.pre_release_days.name",
+            description: "config.finops.cost_per_release.pre_release_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "7",
+            uiEditorType: "number",
+            sortOrder: 12180),
+
+        ConfigurationDefinition.Create(
+            key: "finops.cost_per_release.post_release_days",
+            displayName: "config.finops.cost_per_release.post_release_days.name",
+            description: "config.finops.cost_per_release.post_release_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "7",
+            uiEditorType: "number",
+            sortOrder: 12190),
+
+        ConfigurationDefinition.Create(
+            key: "finops.cost_per_release.spike_threshold_pct",
+            displayName: "config.finops.cost_per_release.spike_threshold_pct.name",
+            description: "config.finops.cost_per_release.spike_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12200),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste_analysis.lookback_days",
+            displayName: "config.finops.waste_analysis.lookback_days.name",
+            description: "config.finops.waste_analysis.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12210),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste_analysis.max_services",
+            displayName: "config.finops.waste_analysis.max_services.name",
+            description: "config.finops.waste_analysis.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12220),
+
+        ConfigurationDefinition.Create(
+            key: "finops.waste_analysis.significant_waste_threshold",
+            displayName: "config.finops.waste_analysis.significant_waste_threshold.name",
+            description: "config.finops.waste_analysis.significant_waste_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12230),
+
+        // ── Wave AH — Event-Driven Architecture Governance ────────────────────
+        ConfigurationDefinition.Create(
+            key: "catalog.event_schema.lag_alert_days",
+            displayName: "config.catalog.event_schema.lag_alert_days.name",
+            description: "config.catalog.event_schema.lag_alert_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12240),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.event_schema.max_contracts",
+            displayName: "config.catalog.event_schema.max_contracts.name",
+            description: "config.catalog.event_schema.max_contracts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12250),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.event_balance.fan_out_threshold",
+            displayName: "config.catalog.event_balance.fan_out_threshold.name",
+            description: "config.catalog.event_balance.fan_out_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 12260),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.event_balance.max_contracts",
+            displayName: "config.catalog.event_balance.max_contracts.name",
+            description: "config.catalog.event_balance.max_contracts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12270),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.event_compliance.lookback_days",
+            displayName: "config.catalog.event_compliance.lookback_days.name",
+            description: "config.catalog.event_compliance.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12280),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.event_compliance.compliant_threshold",
+            displayName: "config.catalog.event_compliance.compliant_threshold.name",
+            description: "config.catalog.event_compliance.compliant_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "99",
+            uiEditorType: "number",
+            sortOrder: 12290),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.event_compliance.degraded_threshold",
+            displayName: "config.catalog.event_compliance.degraded_threshold.name",
+            description: "config.catalog.event_compliance.degraded_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 12300),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.event_compliance.max_contracts",
+            displayName: "config.catalog.event_compliance.max_contracts.name",
+            description: "config.catalog.event_compliance.max_contracts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12310),
     ];
 }

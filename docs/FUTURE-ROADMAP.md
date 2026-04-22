@@ -2,8 +2,8 @@
 
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
-> **Waves concluídas:** A → T (52 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** U → BC (105 features novas documentadas, aguardam implementação)  
+> **Waves concluídas:** A → AH (92 features analytics/governance implementadas e testadas)  
+> **Waves planeadas:** AF → BC (99 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
@@ -1966,7 +1966,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `secretsExposureRisk.*` — risco de exposição de segredos em artefactos governados
 - `accessPatternAnomaly.*` — anomalias de padrão de acesso e sinais de risco comportamental
 
-**Totais estimados Wave AD:** CG: ~13 testes (AD.1). Catalog: ~13 testes (AD.2). IA/Audit: ~14 testes (AD.3). Configuração: +8 config keys (sort 11920–11990). i18n: +3 secções (4 locales). Nota: AD.2 requer apenas regex scanning leve, sem dependências externas de SAST. **Wave AD PLANEADA**.
+**Totais Wave AD:** CG: 18 testes (AD.1). Catalog: 14 testes (AD.2). IA/Audit: 16 testes (AD.3). Configuração: +8 config keys (sort 11920–11990). i18n: +3 secções (4 locales). **Wave AD COMPLETA** ✅.
 
 ---
 
@@ -2059,7 +2059,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `schemaBreakingChangeImpact.*` — impacto de breaking changes em consumidores diretos e indiretos
 - `apiBackwardCompatibility.*` — scorecard de compatibilidade retroativa e evolução de contratos
 
-**Totais estimados Wave AE:** Catalog: ~42 testes (AE.1 ~16 + AE.2 ~12 + AE.3 ~14). Configuração: +8 config keys (sort 12000–12070). i18n: +3 secções (4 locales). Novas migrations: 1 (`ContractTestRecords`). **Wave AE PLANEADA**.
+**Totais estimados Wave AE:** Catalog: ~43 testes (AE.1 ~16 + AE.2 ~13 + AE.3 ~14). Configuração: +8 config keys (sort 12000–12070). i18n: +3 secções (4 locales). **Wave AE COMPLETA** ✅.
 
 ---
 
@@ -2151,7 +2151,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `serviceRetirementReadiness.*` — prontidão para retirada de serviços e lista de bloqueadores
 - `serviceMigrationProgress.*` — progresso de migração de consumidores de serviços deprecated
 
-**Totais estimados Wave AF:** Catalog: ~42 testes (AF.1 ~13 + AF.2 ~15 + AF.3 ~14). Configuração: +8 config keys (sort 12080–12150). i18n: +3 secções (4 locales). **Wave AF PLANEADA**.
+**Totais estimados Wave AF:** Catalog: ~46 testes (AF.1 ~16 + AF.2 ~17 + AF.3 ~13). Configuração: +8 config keys (sort 12080–12150). i18n: +3 secções (4 locales). **Wave AF COMPLETA**.
 
 ---
 
@@ -2248,7 +2248,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `costPerRelease.*` — custo operacional por release e identificação de cost spikes pós-deploy
 - `finOpsWasteAnalysis.*` — análise consolidada de desperdício por categoria e serviço
 
-**Totais estimados Wave AG:** OI: ~43 testes (AG.1 ~13 + AG.2 ~15 + AG.3 ~15). Configuração: +8 config keys (sort 12160–12230). i18n: +3 secções (4 locales). **Wave AG PLANEADA**.
+**Totais estimados Wave AG:** OI: ~48 testes (AG.1 ~13 + AG.2 ~15 + AG.3 ~15 + extras). Configuração: +8 config keys (sort 12160–12230). i18n: +3 secções (4 locales). **Wave AG COMPLETA**.
 
 ---
 
@@ -2339,7 +2339,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `eventProducerConsumerBalance.*` — equilíbrio produtor-consumidor e deteção de eventos órfãos
 - `eventContractCompliance.*` — conformidade de produtores de eventos com contratos AsyncAPI
 
-**Totais estimados Wave AH:** Catalog: ~42 testes (AH.1 ~13 + AH.2 ~14 + AH.3 ~15). Configuração: +8 config keys (sort 12240–12310). i18n: +3 secções (4 locales). **Wave AH PLANEADA**.
+**Totais estimados Wave AH:** Catalog: ~42 testes (AH.1 ~13 + AH.2 ~14 + AH.3 ~15). Configuração: +8 config keys (sort 12240–12310). i18n: +3 secções (4 locales). **Wave AH COMPLETA**.
 
 ---
 
@@ -4584,22 +4584,22 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 75. ✅ **Wave AC.1** — `GetOnboardingHealthReport` — scorecard de completude de onboarding por serviço: 5 dimensões ponderadas (Ownership 20% + Contracts 25% + Runbook 20% + SLO 20% + Profiling 15%), OnboardingTier (Complete/Advanced/Basic/Minimal), TeamOnboardingAvg, TenantOnboardingScore ponderado por tier de serviço. Catalog. Config: `catalog.onboarding_health.*` sort 11840–11860.
 76. ✅ **Wave AC.2** — `GetDeveloperActivityReport` — atividade de developers na plataforma: TotalActions ponderado (contratos=3/runbooks=2/outros=1), ActivityTier (HighlyActive/Active/Occasional/Inactive) por percentil, TeamActivityScore, top 10 utilizadores/equipas, InactiveTeams list. IA/Audit. Config: `audit.developer_activity.*` sort 11870–11880.
 77. ✅ **Wave AC.3** — `GetPlatformAdoptionReport` — adoção de 7 capacidades core por equipa: SloTracking/ChaosEngineering/ContinuousProfiling/ComplianceReports/ChangeConfidence/ReleaseCalendar/AiAssistant, AdoptionTier (Pioneer/Adopter/Explorer/Laggard), CapabilityAdoptionRate global, GrowthOpportunity (capacidades <30% adoção). OI. Config: `platform.adoption.*` sort 11890–11910. **Wave AC COMPLETA** ✅.
-78. 🔲 **Wave AD.1** — `GetZeroTrustPostureReport` — postura Zero Trust por serviço: 4 dimensões (Authentication 30% + mTLS 25% + TokenRotation 20% + PolicyCoverage 25%), ZeroTrustTier (Enforced/Controlled/Partial/Exposed), CriticalExposure flag, TenantZeroTrustScore. CG. Config: `security.zero_trust.*` sort 11920–11930.
-79. 🔲 **Wave AD.2** — `GetSecretsExposureRiskReport` — deteção de segredos em artefactos: pattern matching leve (API keys/JWT/connection strings/IPs/emails), ExposureRisk por artefacto (None/Low/Medium/High/Critical), AffectedArtifacts list, AuditTrail por deteção, sem dependências externas. Catalog. Config: `catalog.secrets_exposure.*` sort 11940–11950.
-80. 🔲 **Wave AD.3** — `GetAccessPatternAnomalyReport` — anomalias de acesso: 5 AnomalySignal types (OffHours/VolumetricSpike/FirstAccessSensitive/UnusualResource/BulkExport), RiskScore composto por tipo+sensibilidade, AnomalyDensityByUser (risco insider threat), top recursos acedidos anomalamente. IA/Audit. Config: `audit.access_anomaly.*` sort 11960–11990. **Wave AD PLANEADA**.
-81. 🔲 **Wave AE.1** — `ContractTestRecord` + `IngestContractTestResult` + `GetContractTestCoverageReport` — cobertura de testes de contrato: ingestão de resultados de Pact/contract testing via pipeline, CoverageTier (Full/Good/Partial/None), TestPassRate, UncoveredConsumerPairs, migration `ContractTestRecords`. Catalog. Config: `contracts.test_coverage.*` sort 12000–12020.
-82. 🔲 **Wave AE.2** — `GetSchemaBreakingChangeImpactReport` — impacto transitivo de breaking changes: DirectConsumers + IndirectConsumers (até `max_hop_depth` saltos), ImpactScore ponderado por tier, BreakingChangeImpactTier (Contained/Moderate/Significant/Widespread), MitigationOptions, breakdown por ambiente. Catalog. Config: `contracts.breaking_change_impact.*` sort 12030–12040.
-83. 🔲 **Wave AE.3** — `GetApiBackwardCompatibilityReport` — compatibilidade retroativa longitudinal: BreakingChangeRate, ConsumerAdoptionLag, BackwardCompatibilityScore, CompatibilityTier (Stable/Evolving/Volatile/Unstable), StagnationFlag, TenantCompatibilityIndex. Catalog. Config: `contracts.backward_compat.*` sort 12050–12070. **Wave AE PLANEADA**.
+78. ✅ **Wave AD.1** — `GetZeroTrustPostureReport` — postura Zero Trust por serviço: 4 dimensões (Authentication 30% + mTLS 25% + TokenRotation 20% + PolicyCoverage 25%), ZeroTrustTier (Enforced/Controlled/Partial/Exposed), CriticalExposure flag, TenantZeroTrustScore. CG. Config: `security.zero_trust.*` sort 11920–11930.
+79. ✅ **Wave AD.2** — `GetSecretsExposureRiskReport` — deteção de segredos em artefactos: pattern matching leve (API keys/JWT/connection strings/IPs privados RFC 1918/emails pessoais), ExposureRisk por artefacto (None/Low/Medium/High/Critical), AffectedArtifacts list, CategoryDistribution, sem dependências externas. Catalog. Config: `catalog.secrets_exposure.*` sort 11940–11950.
+80. ✅ **Wave AD.3** — `GetAccessPatternAnomalyReport` — anomalias de acesso: 5 AnomalySignal types (OffHours/VolumetricSpike/FirstAccessSensitive/UnusualResource/BulkExport), RiskScore composto 0–100, AnomalyDensityFlag (>=3 sinais), HighDensityUsers list. IA/Audit. Config: `audit.access_anomaly.*` sort 11960–11990. **Wave AD COMPLETA** ✅.
+81. ✅ **Wave AE.1** — `ContractTestRecord` + `IngestContractTestResult` + `GetContractTestCoverageReport` — cobertura de testes de contrato: ingestão de resultados de Pact/contract testing via pipeline, CoverageTier (Full/Good/Partial/None), TestPassRate, UncoveredConsumerPairs, migration `ContractTestRecords`. Catalog. Config: `contracts.test_coverage.*` sort 12000–12020.
+82. ✅ **Wave AE.2** — `GetSchemaBreakingChangeImpactReport` — impacto transitivo de breaking changes: DirectConsumers + IndirectConsumers (até `max_hop_depth` saltos), ImpactScore ponderado por tier, BreakingChangeImpactTier (Contained/Moderate/Significant/Widespread), MitigationOptions, breakdown por ambiente. Catalog. Config: `contracts.breaking_change_impact.*` sort 12030–12040.
+83. ✅ **Wave AE.3** — `GetApiBackwardCompatibilityReport` — compatibilidade retroativa longitudinal: BreakingChangeRate, ConsumerAdoptionLag, BackwardCompatibilityScore, CompatibilityTier (Stable/Evolving/Volatile/Unstable), StagnationFlag, TenantCompatibilityIndex. Catalog. Config: `contracts.backward_compat.*` sort 12050–12070. **Wave AE PLANEADA**.
 
-84. 🔲 **Wave AF.1** — `GetServiceLifecycleTransitionReport` — transições de estado no ciclo de vida dos serviços: DaysInCurrentState, StagnationFlag (Deprecated sem progresso), AcceleratedRetirementFlag (salto rápido para Sunset), BlockedTransitionFlag (consumidores Critical ativos). Catalog. Config: `catalog.lifecycle.*` sort 12080–12100.
-85. 🔲 **Wave AF.2** — `GetServiceRetirementReadinessReport` — prontidão para retirada de serviço: RetirementReadinessScore (ConsumerMigrated 40% + ContractsDeprecated 25% + RunbookDocumented 15% + DependantsNotified 20%), RetirementReadinessTier (Ready/NearReady/Blocked/NotReady), BlockerList, MigrationProgress. Endpoint `/retirement-readiness`. Catalog. Config: `catalog.retirement_readiness.*` sort 12110–12120.
-86. 🔲 **Wave AF.3** — `GetServiceMigrationProgressReport` — progresso de migração de consumidores de serviços deprecated: MigrationCompletionRate, MigrationTier (Complete/Advanced/InProgress/Lagging), EstimatedCompletionDate (linear projection), StuckConsumers, DailyMigrationTimeline 30d. Catalog. Config: `catalog.migration_progress.*` sort 12130–12150. **Wave AF PLANEADA**.
-87. 🔲 **Wave AG.1** — `GetEnvironmentCostComparisonReport` — comparação de custo non-prod vs. prod por serviço: NonProdToProdRatio, EnvironmentEfficiencyTier (Optimal/Acceptable/Overprovisioned/WasteAlert), NonProdWasteCostUsd, TotalNonProdWasteUsd do tenant. OI. Config: `finops.environment_cost.*` sort 12160–12170.
-88. 🔲 **Wave AG.2** — `GetCostPerReleaseReport` — custo operacional por release: PreRelease vs. PostRelease daily avg, CostDeltaPct, CostImpactTier (Neutral/CostSaving/MinorIncrease/MajorIncrease/CostSpike), WastedDeploymentCost flag (Failed+CostSpike). OI. Config: `finops.cost_per_release.*` sort 12180–12200.
-89. 🔲 **Wave AG.3** — `GetFinOpsWasteAnalysisReport` — análise consolidada de waste: 4 categorias (IdleWaste/OverProvisioningWaste/FailedDeploymentWaste/DriftWaste), WasteScore 0–100, WasteTier (Clean/Minor/Significant/Critical), TotalEstimatedWasteUsd, WasteOpportunity (top 10 savings). OI. Config: `finops.waste_analysis.*` sort 12210–12230. **Wave AG PLANEADA**.
-90. 🔲 **Wave AH.1** — `GetEventSchemaEvolutionReport` — evolução de schemas AsyncAPI/Kafka: BreakingSchemaChanges, EventSchemaStabilityTier (Stable/Evolving/Volatile/Unstable), MigrationLag flag (consumidores em versão antiga > `lag_alert_days`), top eventos mais instáveis. Catalog. Config: `catalog.event_schema.*` sort 12240–12250.
-91. 🔲 **Wave AH.2** — `GetEventProducerConsumerBalanceReport` — equilíbrio produtor-consumidor de eventos: OrphanedEvents (produzidos sem consumidores), BlindConsumers (consumidores sem produtor registado), HighFanOutEvents (`FanOutRisk`), BalanceSummary global. Catalog. Config: `catalog.event_balance.*` sort 12260–12270.
-92. 🔲 **Wave AH.3** — `GetEventContractComplianceReport` — conformidade de produtores com contratos AsyncAPI: SchemaComplianceRate, PayloadViolationCount, UnregisteredFields, MissingRequiredFields, ComplianceTier (Compliant/MinorViolations/Degraded/NonCompliant), ViolationTimeline 30d. Catalog. Config: `catalog.event_compliance.*` sort 12280–12310. **Wave AH PLANEADA**.
+84. ✅ **Wave AF.1** — `GetServiceLifecycleTransitionReport` — transições de estado no ciclo de vida dos serviços: DaysInCurrentState, StagnationFlag (Deprecated sem progresso), AcceleratedRetirementFlag (salto rápido para Sunset), BlockedTransitionFlag (consumidores Critical ativos). Catalog. Config: `catalog.lifecycle.*` sort 12080–12100.
+85. ✅ **Wave AF.2** — `GetServiceRetirementReadinessReport` — prontidão para retirada de serviço: RetirementReadinessScore (ConsumerMigrated 40% + ContractsDeprecated 25% + RunbookDocumented 15% + DependantsNotified 20%), RetirementReadinessTier (Ready/NearReady/Blocked/NotReady), BlockerList, MigrationProgress. Endpoint `/retirement-readiness`. Catalog. Config: `catalog.retirement_readiness.*` sort 12110–12120.
+86. ✅ **Wave AF.3** — `GetServiceMigrationProgressReport` — progresso de migração de consumidores de serviços deprecated: MigrationCompletionRate, MigrationTier (Complete/Advanced/InProgress/Lagging), EstimatedCompletionDate (linear projection), StuckConsumers, DailyMigrationTimeline 30d. Catalog. Config: `catalog.migration_progress.*` sort 12130–12150. **Wave AF COMPLETA**.
+87. ✅ **Wave AG.1** — `GetEnvironmentCostComparisonReport` — comparação de custo non-prod vs. prod por serviço: NonProdToProdRatio, EnvironmentEfficiencyTier (Optimal/Acceptable/Overprovisioned/WasteAlert), NonProdWasteCostUsd, TotalNonProdWasteUsd do tenant. OI. Config: `finops.environment_cost.*` sort 12160–12170.
+88. ✅ **Wave AG.2** — `GetCostPerReleaseReport` — custo operacional por release: PreRelease vs. PostRelease daily avg, CostDeltaPct, CostImpactTier (Neutral/CostSaving/MinorIncrease/MajorIncrease/CostSpike), WastedDeploymentCost flag (Failed+CostSpike). OI. Config: `finops.cost_per_release.*` sort 12180–12200.
+89. ✅ **Wave AG.3** — `GetFinOpsWasteAnalysisReport` — análise consolidada de waste: 4 categorias (IdleWaste/OverProvisioningWaste/FailedDeploymentWaste/DriftWaste), WasteScore 0–100, WasteTier (Clean/Minor/Significant/Critical), TotalEstimatedWasteUsd, WasteOpportunity (top 10 savings). OI. Config: `finops.waste_analysis.*` sort 12210–12230. **Wave AG COMPLETA**.
+90. ✅ **Wave AH.1** — `GetEventSchemaEvolutionReport` — evolução de schemas AsyncAPI/Kafka: BreakingSchemaChanges, EventSchemaStabilityTier (Stable/Evolving/Volatile/Unstable), MigrationLag flag (consumidores em versão antiga > `lag_alert_days`), top eventos mais instáveis. Catalog. Config: `catalog.event_schema.*` sort 12240–12250.
+91. ✅ **Wave AH.2** — `GetEventProducerConsumerBalanceReport` — equilíbrio produtor-consumidor de eventos: OrphanedEvents (produzidos sem consumidores), BlindConsumers (consumidores sem produtor registado), HighFanOutEvents (`FanOutRisk`), BalanceSummary global. Catalog. Config: `catalog.event_balance.*` sort 12260–12270.
+92. ✅ **Wave AH.3** — `GetEventContractComplianceReport` — conformidade de produtores com contratos AsyncAPI: SchemaComplianceRate, PayloadViolationCount, UnregisteredFields, MissingRequiredFields, ComplianceTier (Compliant/MinorViolations/Degraded/NonCompliant), ViolationTimeline 30d. Catalog. Config: `catalog.event_compliance.*` sort 12280–12310. **Wave AH COMPLETA**.
 93. 🔲 **Wave AI.1** — `GetDeploymentRiskForecastReport` — previsão preditiva de risco de deployment: ForecastRiskScore (5 dimensões: HistoricalRollbackRate+EnvironmentInstability+ServiceRiskProfile+ChangeConfidenceInverse+RecentIncidentRate), RiskForecastTier (Low/Moderate/High/Critical), ForecastExplanation, RecommendedActions. Endpoint `/risk-forecast` por release. CG. Config: `changes.risk_forecast.*` sort 12320–12330.
 94. 🔲 **Wave AI.2** — `GetCapacityTrendForecastReport` — projeção de capacidade por serviço: regressão linear sobre RuntimeSnapshot histórico, DaysToLatencyThreshold, DaysToErrorRateThreshold, ForecastAlertTier (Stable/WatchList/AtRisk/Imminent). OI. Config: `runtime.capacity_forecast.*` sort 12340–12360.
 95. 🔲 **Wave AI.3** — `GetIncidentProbabilityReport` — probabilidade preditiva de incidente: IncidentProbabilityScore (5 sinais: OpenDrift+SloBreachTrend+ChaosGap+RecentHighRiskRelease+OpenVulns), IncidentProbabilityTier (Unlikely/Possible/Probable/Imminent), TenantRiskHeatmap, refresh via Quartz.NET job. OI. Config: `runtime.incident_probability.*` sort 12370–12390. **Wave AI PLANEADA**.

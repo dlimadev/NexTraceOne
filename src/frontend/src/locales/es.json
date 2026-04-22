@@ -14977,5 +14977,297 @@
       "releaseCalendar": "Calendario de Releases",
       "aiAssistant": "Asistente de IA"
     }
+  },
+  "zeroTrustPosture": {
+    "title": "Postura Zero Trust",
+    "tenantScore": "Score Zero Trust del Tenant",
+    "zeroTrustTier": "Nivel Zero Trust",
+    "criticalExposureCount": "Exposiciones Críticas",
+    "topExposedServices": "Servicios Más Expuestos",
+    "tiers": {
+      "Enforced": "Aplicado",
+      "Controlled": "Controlado",
+      "Partial": "Parcial",
+      "Exposed": "Expuesto"
+    },
+    "dimensions": {
+      "authentication": "Autenticación",
+      "mutualTls": "mTLS Mutuo",
+      "tokenRotation": "Rotación de Token",
+      "policyCoverage": "Cobertura de Política"
+    }
+  },
+  "secretsExposureRisk": {
+    "title": "Riesgo de Exposición de Secretos",
+    "totalScanned": "Total Analizado",
+    "totalAtRisk": "Total en Riesgo",
+    "exposureRisk": "Riesgo de Exposición",
+    "exposureCategory": "Categoría de Exposición",
+    "affectedArtifacts": "Artefactos Afectados",
+    "riskLevels": {
+      "None": "Ninguno",
+      "Low": "Bajo",
+      "Medium": "Medio",
+      "High": "Alto",
+      "Critical": "Crítico"
+    },
+    "categories": {
+      "ApiKey": "Clave de API",
+      "JwtToken": "Token JWT",
+      "ConnectionString": "Cadena de Conexión",
+      "PrivateIp": "IP Privada",
+      "PersonalEmail": "Correo Personal"
+    }
+  },
+  "accessPatternAnomaly": {
+    "title": "Anomalías de Patrón de Acceso",
+    "totalAnalyzed": "Total de Usuarios Analizados",
+    "totalAnomalous": "Usuarios Anómalos",
+    "highDensityUsers": "Usuarios de Alta Densidad",
+    "riskScore": "Score de Riesgo",
+    "anomalySignals": "Señales de Anomalía",
+    "signals": {
+      "OffHours": "Acceso Fuera de Horario",
+      "VolumetricSpike": "Pico Volumétrico",
+      "FirstAccessSensitive": "Primer Acceso a Recurso Sensible",
+      "UnusualResource": "Acceso a Recurso Inusual",
+      "BulkExport": "Exportación Masiva"
+    }
+  },
+  "contractTestCoverage": {
+    "title": "Cobertura de Pruebas de Contrato",
+    "totalProducerServices": "Total de Servicios Productores",
+    "totalTestedConsumerPairs": "Pares Consumidor Probados",
+    "tenantCoverageRate": "Tasa de Cobertura del Tenant (%)",
+    "tenantTestPassRate": "Tasa de Aprobación de Pruebas del Tenant (%)",
+    "tiers": {
+      "Full": "Completa",
+      "Good": "Buena",
+      "Partial": "Parcial",
+      "None": "Ninguna"
+    },
+    "topUncoveredServices": "Top Servicios Sin Cobertura",
+    "topFailingContracts": "Top Contratos Fallando",
+    "uncoveredConsumerPairs": "Pares Consumidor Sin Cobertura"
+  },
+  "schemaBreakingChangeImpact": {
+    "title": "Impacto de Breaking Changes en el Schema",
+    "totalBreakingChanges": "Total de Breaking Changes",
+    "highImpactBreakingChanges": "Breaking Changes de Alto Impacto",
+    "tiers": {
+      "Contained": "Contenido",
+      "Moderate": "Moderado",
+      "Significant": "Significativo",
+      "Widespread": "Generalizado"
+    },
+    "directConsumers": "Consumidores Directos",
+    "indirectConsumers": "Consumidores Indirectos",
+    "impactScore": "Puntuación de Impacto",
+    "mitigationOptions": "Opciones de Mitigación",
+    "byEnvironment": "Impacto por Entorno"
+  },
+  "apiBackwardCompatibility": {
+    "title": "Compatibilidad Retroactiva de APIs",
+    "totalContractsAnalyzed": "Total de Contratos Analizados",
+    "tenantCompatibilityIndex": "Índice de Compatibilidad del Tenant",
+    "stagnationFlagCount": "Contratos con Señal de Estancamiento",
+    "tiers": {
+      "Stable": "Estable",
+      "Evolving": "En Evolución",
+      "Volatile": "Volátil",
+      "Unstable": "Inestable"
+    },
+    "breakingChangeRate": "Tasa de Breaking Changes (%)",
+    "majorVersionCount": "Versiones Major",
+    "consumerAdoptionLag": "Retraso de Adopción por Consumidores (días)",
+    "backwardCompatibilityScore": "Puntuación de Compatibilidad Retroactiva",
+    "stagnationFlag": "Señal de Estancamiento",
+    "topStableContracts": "Top Contratos Estables",
+    "topVolatileContracts": "Top Contratos Volátiles"
+  },
+  "serviceLifecycleTransition": {
+    "title": "Informe de Transiciones del Ciclo de Vida",
+    "totalServicesAnalyzed": "Total de Servicios Analizados",
+    "stagnationFlagCount": "Servicios con Señal de Estancamiento",
+    "acceleratedRetirementFlagCount": "Servicios con Retiro Acelerado",
+    "blockedTransitionFlagCount": "Servicios con Transición Bloqueada",
+    "daysInCurrentState": "Días en el Estado Actual",
+    "transitionCount": "Número de Transiciones",
+    "lifecycleDistribution": "Distribución por Estado",
+    "topStagnatedServices": "Top Servicios Estancados",
+    "topBlockedServices": "Top Servicios Bloqueados",
+    "flags": {
+      "stagnation": "Estancamiento",
+      "acceleratedRetirement": "Retiro Acelerado",
+      "blockedTransition": "Transición Bloqueada"
+    },
+    "states": {
+      "PreProduction": "Pre-Producción",
+      "Active": "Activo",
+      "Deprecating": "En Discontinuación",
+      "Deprecated": "Discontinuado",
+      "Retired": "Retirado"
+    }
+  },
+  "serviceRetirementReadiness": {
+    "title": "Preparación para el Retiro del Servicio",
+    "retirementReadinessScore": "Puntuación de Preparación para Retiro",
+    "tier": "Nivel de Preparación",
+    "blockerList": "Lista de Bloqueadores",
+    "consumerMigrationProgress": "Progreso de Migración de Consumidores",
+    "dimensions": {
+      "consumerMigrated": "Consumidores Migrados",
+      "contractsDeprecated": "Contratos Discontinuados",
+      "runbookDocumented": "Runbook Documentado",
+      "dependantsNotified": "Dependientes Notificados"
+    },
+    "tiers": {
+      "Ready": "Listo",
+      "NearReady": "Casi Listo",
+      "Blocked": "Bloqueado",
+      "NotReady": "No Listo"
+    },
+    "blockerTypes": {
+      "active-consumers": "Consumidores Activos",
+      "active-contracts": "Contratos Activos",
+      "missing-runbook": "Runbook Faltante",
+      "unnotified-teams": "Equipos No Notificados"
+    }
+  },
+  "serviceMigrationProgress": {
+    "title": "Progreso de Migración de Servicios",
+    "totalDeprecatedServices": "Total de Servicios Discontinuados",
+    "tenantMigrationCompletionRate": "Tasa de Finalización de Migración del Tenant (%)",
+    "totalStuckConsumers": "Total de Consumidores Bloqueados",
+    "migrationCompletionRate": "Tasa de Finalización de Migración (%)",
+    "estimatedCompletionDate": "Fecha Estimada de Finalización",
+    "stuckConsumers": "Consumidores Bloqueados",
+    "topLaggingServices": "Top Servicios con Migración Retrasada",
+    "dailyMigrationTimeline": "Línea de Tiempo de Migración Diaria",
+    "tiers": {
+      "Complete": "Completo",
+      "Advanced": "Avanzado",
+      "InProgress": "En Progreso",
+      "Lagging": "Retrasado"
+    }
+  },
+  "environmentCostComparison": {
+    "title": "Comparación de Coste por Entorno",
+    "description": "Compara el coste operacional entre entornos no-prod y producción por servicio para identificar desperdicio en entornos de prueba.",
+    "totalServicesAnalyzed": "Total de Servicios Analizados",
+    "totalNonProdWasteUsd": "Desperdicio Total No-Prod (USD)",
+    "totalProdCostUsd": "Coste Total de Producción (USD)",
+    "totalNonProdCostUsd": "Coste Total No-Prod (USD)",
+    "nonProdToProdRatio": "Ratio No-Prod / Prod",
+    "nonProdWasteCostUsd": "Coste de Desperdicio No-Prod (USD)",
+    "topWasteServices": "Top Servicios con Desperdicio",
+    "distributionByTier": "Distribución por Tier de Eficiencia",
+    "tiers": {
+      "Optimal": "Óptimo",
+      "Acceptable": "Aceptable",
+      "Overprovisioned": "Sobreaprovisionado",
+      "WasteAlert": "Alerta de Desperdicio"
+    }
+  },
+  "costPerRelease": {
+    "title": "Coste por Release",
+    "description": "Atribuye coste operacional a cada release de servicio, identificando picos de coste y coste desperdiciado en despliegues fallidos o revertidos.",
+    "totalReleasesAnalyzed": "Total de Releases Analizadas",
+    "avgCostPerRelease": "Coste Medio por Release (USD)",
+    "costSpikeRatePct": "Tasa de Pico de Coste (%)",
+    "costSavingRatePct": "Tasa de Ahorro de Coste (%)",
+    "totalWastedDeploymentCostUsd": "Coste Total Desperdiciado en Deploy (USD)",
+    "costDeltaPct": "Delta de Coste (%)",
+    "preReleaseDailyAvgCostUsd": "Media Diaria Pre-Release (USD)",
+    "postReleaseDailyAvgCostUsd": "Media Diaria Post-Release (USD)",
+    "wastedDeploymentCost": "Coste Desperdiciado en Deploy",
+    "topCostSpikeReleases": "Top Releases con Pico de Coste",
+    "topCostSavingReleases": "Top Releases con Ahorro de Coste",
+    "tiers": {
+      "CostSaving": "Ahorro de Coste",
+      "Neutral": "Neutro",
+      "MinorIncrease": "Incremento Menor",
+      "MajorIncrease": "Incremento Mayor",
+      "CostSpike": "Pico de Coste"
+    }
+  },
+  "finOpsWasteAnalysis": {
+    "title": "Análisis de Desperdicio FinOps",
+    "description": "Análisis consolidado de desperdicio por servicio, cruzando recursos inactivos, sobreaprovisionamiento, despliegues fallidos y drift de alta severidad.",
+    "totalServicesAnalyzed": "Total de Servicios Analizados",
+    "totalEstimatedWasteUsd": "Desperdicio Total Estimado (USD)",
+    "wasteOpportunitySavingsUsd": "Ahorro por Oportunidad de Desperdicio (USD)",
+    "wasteScore": "Puntuación de Desperdicio",
+    "topWasteServices": "Top Servicios con Desperdicio",
+    "wasteOpportunities": "Top Oportunidades de Ahorro",
+    "wasteByCategory": "Desperdicio por Categoría",
+    "categories": {
+      "IdleWaste": "Desperdicio por Inactividad",
+      "OverProvisioningWaste": "Desperdicio por Sobreaprovisionamiento",
+      "FailedDeploymentWaste": "Desperdicio por Deploy Fallido",
+      "DriftWaste": "Desperdicio por Drift"
+    },
+    "tiers": {
+      "Clean": "Limpio",
+      "Minor": "Menor",
+      "Significant": "Significativo",
+      "Critical": "Crítico"
+    }
+  },
+  "eventSchemaEvolution": {
+    "title": "Informe de Evolución de Esquemas de Eventos",
+    "description": "Rastrea la evolución de esquemas de eventos AsyncAPI/Kafka, identificando eventos con cambios breaking frecuentes y consumidores aún en versiones antiguas.",
+    "totalContracts": "Total de Contratos de Eventos",
+    "topUnstableContracts": "Esquemas de Eventos Más Inestables",
+    "migrationLagContracts": "Contratos con Retraso de Migración",
+    "breakingChangeRate": "Tasa de Cambios Breaking",
+    "schemaLagDays": "Retraso de Esquema (Días)",
+    "consumersOnOldVersion": "Consumidores en Versión Antigua",
+    "stabilityTier": "Nivel de Estabilidad",
+    "migrationLag": "Retraso de Migración",
+    "avgBreakingChangeRate": "Tasa Media de Cambios Breaking",
+    "tiers": {
+      "Stable": "Estable",
+      "Evolving": "En Evolución",
+      "Volatile": "Volátil",
+      "Unstable": "Inestable"
+    }
+  },
+  "eventProducerConsumerBalance": {
+    "title": "Informe de Equilibrio Productor-Consumidor de Eventos",
+    "description": "Analiza el equilibrio entre productores y consumidores de eventos, identificando eventos huérfanos, consumidores ciegos y eventos de alto fan-out.",
+    "totalEvents": "Total de Eventos",
+    "orphanedEvents": "Eventos Huérfanos",
+    "blindConsumers": "Consumidores Ciegos",
+    "highFanOutEvents": "Eventos de Alto Fan-Out",
+    "producerCount": "Productores",
+    "consumerCount": "Consumidores",
+    "isOrphaned": "Huérfano",
+    "isBlind": "Consumidor Ciego",
+    "fanOutRisk": "Riesgo de Fan-Out",
+    "orphanedPct": "% Huérfanos",
+    "blindConsumerPct": "% Consumidores Ciegos",
+    "fanOutRiskPct": "% Riesgo Fan-Out"
+  },
+  "eventContractCompliance": {
+    "title": "Informe de Conformidad de Contratos de Eventos",
+    "description": "Valida que los productores de eventos cumplan con los esquemas AsyncAPI registrados, midiendo tasa de conformidad, violaciones de payload y campos no registrados.",
+    "tenantComplianceScore": "Puntuación de Conformidad de Eventos del Tenant",
+    "schemaComplianceRate": "Tasa de Conformidad de Esquema",
+    "payloadViolationCount": "Violaciones de Payload",
+    "unregisteredFields": "Campos No Registrados",
+    "missingRequiredFields": "Campos Obligatorios Ausentes",
+    "violationTimeline": "Cronología de Violaciones (30d)",
+    "topNonCompliant": "Top Contratos No Conformes",
+    "compliantCount": "Conforme",
+    "minorViolationsCount": "Violaciones Menores",
+    "degradedCount": "Degradado",
+    "nonCompliantCount": "No Conforme",
+    "tiers": {
+      "Compliant": "Conforme",
+      "MinorViolations": "Violaciones Menores",
+      "Degraded": "Degradado",
+      "NonCompliant": "No Conforme"
+    }
   }
 }
