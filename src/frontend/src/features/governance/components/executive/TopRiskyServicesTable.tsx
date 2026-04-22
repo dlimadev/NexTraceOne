@@ -47,7 +47,7 @@ export function TopRiskyServicesTable({ data }: Props) {
                 key={svc.serviceId}
                 type="button"
                 className="w-full flex items-center justify-between text-left hover:bg-muted/50 rounded p-1 transition-colors"
-                onClick={() => navigate(`/governance/risk?service=${svc.serviceId}`)}
+                onClick={() => navigate(`/governance/risk?service=${encodeURIComponent(svc.serviceId)}`)}
               >
                 <div className="min-w-0">
                   <p className="text-xs font-medium truncate">{svc.serviceName}</p>
