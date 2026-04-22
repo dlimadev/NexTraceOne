@@ -178,9 +178,13 @@ public static class GetServiceTopologyHealthReport
             int isolatedClusterCount = 0;
             if (componentMap.Count > 0)
             {
-                var distinctComponents = componentMap.Values.Distinct().Count();
-                // All components except one (the largest/main) are considered isolated
-                isolatedClusterCount = Math.Max(0, distinctComponents - 1);
+                var componentSizes = componentMap.Values.GroupBy(x => x).Select(g => g.Count()).ToList();
+                int largestSize = componentSizes.Count > 0 ? componentSizes.Max() : 0;
+                // Components smaller than the largest are considered isolated from the main cluster.
+                // When all components are equal size (e.g. two disconnected pairs), all but one are isolated.
+                int componentsOfLargestSize = componentSizes.Count(s => s == largestSize);
+                isolatedClusterCount = componentSizes.Count - componentsOfLargestSize
+                    + Math.Max(0, componentsOfLargestSize - 1);
             }
 
             int circularCount = cycles.Count;
