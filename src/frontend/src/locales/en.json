@@ -13798,5 +13798,56 @@
       "UnusualResource": "Unusual Resource Access",
       "BulkExport": "Bulk Export"
     }
+  },
+  "contractTestCoverage": {
+    "title": "Contract Test Coverage",
+    "totalProducerServices": "Total Producer Services",
+    "totalTestedConsumerPairs": "Tested Consumer Pairs",
+    "tenantCoverageRate": "Tenant Coverage Rate (%)",
+    "tenantTestPassRate": "Tenant Test Pass Rate (%)",
+    "tiers": {
+      "Full": "Full",
+      "Good": "Good",
+      "Partial": "Partial",
+      "None": "None"
+    },
+    "topUncoveredServices": "Top Uncovered Services",
+    "topFailingContracts": "Top Failing Contracts",
+    "uncoveredConsumerPairs": "Uncovered Consumer Pairs"
+  },
+  "schemaBreakingChangeImpact": {
+    "title": "Schema Breaking Change Impact",
+    "totalBreakingChanges": "Total Breaking Changes",
+    "highImpactBreakingChanges": "High Impact Breaking Changes",
+    "tiers": {
+      "Contained": "Contained",
+      "Moderate": "Moderate",
+      "Significant": "Significant",
+      "Widespread": "Widespread"
+    },
+    "directConsumers": "Direct Consumers",
+    "indirectConsumers": "Indirect Consumers",
+    "impactScore": "Impact Score",
+    "mitigationOptions": "Mitigation Options",
+    "byEnvironment": "Impact by Environment"
+  },
+  "apiBackwardCompatibility": {
+    "title": "API Backward Compatibility",
+    "totalContractsAnalyzed": "Total Contracts Analyzed",
+    "tenantCompatibilityIndex": "Tenant Compatibility Index",
+    "stagnationFlagCount": "Stagnation Flag Count",
+    "tiers": {
+      "Stable": "Stable",
+      "Evolving": "Evolving",
+      "Volatile": "Volatile",
+      "Unstable": "Unstable"
+    },
+    "breakingChangeRate": "Breaking Change Rate (%)",
+    "majorVersionCount": "Major Versions",
+    "consumerAdoptionLag": "Consumer Adoption Lag (days)",
+    "backwardCompatibilityScore": "Backward Compatibility Score",
+    "stagnationFlag": "Stagnation Flag",
+    "topStableContracts": "Top Stable Contracts",
+    "topVolatileContracts": "Top Volatile Contracts"
   }
 }

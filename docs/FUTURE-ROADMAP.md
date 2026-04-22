@@ -2,8 +2,8 @@
 
 > **Data:** Abril 2026  
 > **Estado atual:** ~98% implementado — todos os módulos core estão READY  
-> **Waves concluídas:** A → AD (80 features analytics/governance implementadas e testadas)  
-> **Waves planeadas:** AE → BC (102 features novas documentadas, aguardam implementação)  
+> **Waves concluídas:** A → AE (83 features analytics/governance implementadas e testadas)  
+> **Waves planeadas:** AF → BC (99 features novas documentadas, aguardam implementação)  
 > **Wave AA (frontend):** 📘 plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE (backend avançado):** 4 novas waves planeadas — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI (backend avançado II):** 4 novas waves planeadas — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
@@ -2059,7 +2059,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `schemaBreakingChangeImpact.*` — impacto de breaking changes em consumidores diretos e indiretos
 - `apiBackwardCompatibility.*` — scorecard de compatibilidade retroativa e evolução de contratos
 
-**Totais estimados Wave AE:** Catalog: ~42 testes (AE.1 ~16 + AE.2 ~12 + AE.3 ~14). Configuração: +8 config keys (sort 12000–12070). i18n: +3 secções (4 locales). Novas migrations: 1 (`ContractTestRecords`). **Wave AE PLANEADA**.
+**Totais estimados Wave AE:** Catalog: ~43 testes (AE.1 ~16 + AE.2 ~13 + AE.3 ~14). Configuração: +8 config keys (sort 12000–12070). i18n: +3 secções (4 locales). **Wave AE COMPLETA** ✅.
 
 ---
 
@@ -4587,9 +4587,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 78. ✅ **Wave AD.1** — `GetZeroTrustPostureReport` — postura Zero Trust por serviço: 4 dimensões (Authentication 30% + mTLS 25% + TokenRotation 20% + PolicyCoverage 25%), ZeroTrustTier (Enforced/Controlled/Partial/Exposed), CriticalExposure flag, TenantZeroTrustScore. CG. Config: `security.zero_trust.*` sort 11920–11930.
 79. ✅ **Wave AD.2** — `GetSecretsExposureRiskReport` — deteção de segredos em artefactos: pattern matching leve (API keys/JWT/connection strings/IPs privados RFC 1918/emails pessoais), ExposureRisk por artefacto (None/Low/Medium/High/Critical), AffectedArtifacts list, CategoryDistribution, sem dependências externas. Catalog. Config: `catalog.secrets_exposure.*` sort 11940–11950.
 80. ✅ **Wave AD.3** — `GetAccessPatternAnomalyReport` — anomalias de acesso: 5 AnomalySignal types (OffHours/VolumetricSpike/FirstAccessSensitive/UnusualResource/BulkExport), RiskScore composto 0–100, AnomalyDensityFlag (>=3 sinais), HighDensityUsers list. IA/Audit. Config: `audit.access_anomaly.*` sort 11960–11990. **Wave AD COMPLETA** ✅.
-81. 🔲 **Wave AE.1** — `ContractTestRecord` + `IngestContractTestResult` + `GetContractTestCoverageReport` — cobertura de testes de contrato: ingestão de resultados de Pact/contract testing via pipeline, CoverageTier (Full/Good/Partial/None), TestPassRate, UncoveredConsumerPairs, migration `ContractTestRecords`. Catalog. Config: `contracts.test_coverage.*` sort 12000–12020.
-82. 🔲 **Wave AE.2** — `GetSchemaBreakingChangeImpactReport` — impacto transitivo de breaking changes: DirectConsumers + IndirectConsumers (até `max_hop_depth` saltos), ImpactScore ponderado por tier, BreakingChangeImpactTier (Contained/Moderate/Significant/Widespread), MitigationOptions, breakdown por ambiente. Catalog. Config: `contracts.breaking_change_impact.*` sort 12030–12040.
-83. 🔲 **Wave AE.3** — `GetApiBackwardCompatibilityReport` — compatibilidade retroativa longitudinal: BreakingChangeRate, ConsumerAdoptionLag, BackwardCompatibilityScore, CompatibilityTier (Stable/Evolving/Volatile/Unstable), StagnationFlag, TenantCompatibilityIndex. Catalog. Config: `contracts.backward_compat.*` sort 12050–12070. **Wave AE PLANEADA**.
+81. ✅ **Wave AE.1** — `ContractTestRecord` + `IngestContractTestResult` + `GetContractTestCoverageReport` — cobertura de testes de contrato: ingestão de resultados de Pact/contract testing via pipeline, CoverageTier (Full/Good/Partial/None), TestPassRate, UncoveredConsumerPairs, migration `ContractTestRecords`. Catalog. Config: `contracts.test_coverage.*` sort 12000–12020.
+82. ✅ **Wave AE.2** — `GetSchemaBreakingChangeImpactReport` — impacto transitivo de breaking changes: DirectConsumers + IndirectConsumers (até `max_hop_depth` saltos), ImpactScore ponderado por tier, BreakingChangeImpactTier (Contained/Moderate/Significant/Widespread), MitigationOptions, breakdown por ambiente. Catalog. Config: `contracts.breaking_change_impact.*` sort 12030–12040.
+83. ✅ **Wave AE.3** — `GetApiBackwardCompatibilityReport` — compatibilidade retroativa longitudinal: BreakingChangeRate, ConsumerAdoptionLag, BackwardCompatibilityScore, CompatibilityTier (Stable/Evolving/Volatile/Unstable), StagnationFlag, TenantCompatibilityIndex. Catalog. Config: `contracts.backward_compat.*` sort 12050–12070. **Wave AE PLANEADA**.
 
 84. 🔲 **Wave AF.1** — `GetServiceLifecycleTransitionReport` — transições de estado no ciclo de vida dos serviços: DaysInCurrentState, StagnationFlag (Deprecated sem progresso), AcceleratedRetirementFlag (salto rápido para Sunset), BlockedTransitionFlag (consumidores Critical ativos). Catalog. Config: `catalog.lifecycle.*` sort 12080–12100.
 85. 🔲 **Wave AF.2** — `GetServiceRetirementReadinessReport` — prontidão para retirada de serviço: RetirementReadinessScore (ConsumerMigrated 40% + ContractsDeprecated 25% + RunbookDocumented 15% + DependantsNotified 20%), RetirementReadinessTier (Ready/NearReady/Blocked/NotReady), BlockerList, MigrationProgress. Endpoint `/retirement-readiness`. Catalog. Config: `catalog.retirement_readiness.*` sort 12110–12120.

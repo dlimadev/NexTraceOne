@@ -15063,5 +15063,56 @@
       "UnusualResource": "Acesso a Recurso Incomum",
       "BulkExport": "Exportação em Massa"
     }
+  },
+  "contractTestCoverage": {
+    "title": "Cobertura de Testes de Contrato",
+    "totalProducerServices": "Total de Serviços Produtores",
+    "totalTestedConsumerPairs": "Pares Consumidor Testados",
+    "tenantCoverageRate": "Taxa de Cobertura do Tenant (%)",
+    "tenantTestPassRate": "Taxa de Aprovação de Testes do Tenant (%)",
+    "tiers": {
+      "Full": "Completa",
+      "Good": "Boa",
+      "Partial": "Parcial",
+      "None": "Nenhuma"
+    },
+    "topUncoveredServices": "Top Serviços Sem Cobertura",
+    "topFailingContracts": "Top Contratos Falhando",
+    "uncoveredConsumerPairs": "Pares Consumidor Sem Cobertura"
+  },
+  "schemaBreakingChangeImpact": {
+    "title": "Impacto de Breaking Changes no Schema",
+    "totalBreakingChanges": "Total de Breaking Changes",
+    "highImpactBreakingChanges": "Breaking Changes de Alto Impacto",
+    "tiers": {
+      "Contained": "Contido",
+      "Moderate": "Moderado",
+      "Significant": "Significativo",
+      "Widespread": "Abrangente"
+    },
+    "directConsumers": "Consumidores Diretos",
+    "indirectConsumers": "Consumidores Indiretos",
+    "impactScore": "Score de Impacto",
+    "mitigationOptions": "Opções de Mitigação",
+    "byEnvironment": "Impacto por Ambiente"
+  },
+  "apiBackwardCompatibility": {
+    "title": "Compatibilidade Retroativa de APIs",
+    "totalContractsAnalyzed": "Total de Contratos Analisados",
+    "tenantCompatibilityIndex": "Índice de Compatibilidade do Tenant",
+    "stagnationFlagCount": "Contratos com Sinal de Estagnação",
+    "tiers": {
+      "Stable": "Estável",
+      "Evolving": "Em Evolução",
+      "Volatile": "Volátil",
+      "Unstable": "Instável"
+    },
+    "breakingChangeRate": "Taxa de Breaking Changes (%)",
+    "majorVersionCount": "Versões Major",
+    "consumerAdoptionLag": "Atraso de Adoção pelos Consumidores (dias)",
+    "backwardCompatibilityScore": "Score de Compatibilidade Retroativa",
+    "stagnationFlag": "Sinal de Estagnação",
+    "topStableContracts": "Top Contratos Estáveis",
+    "topVolatileContracts": "Top Contratos Voláteis"
   }
 }

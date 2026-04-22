@@ -9751,5 +9751,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "100",
             uiEditorType: "number",
             sortOrder: 11990),
+
+        // ── Wave AE — Contract Testing & API Backward Compatibility ────────
+
+        ConfigurationDefinition.Create(
+            key: "contracts.test_coverage.full_threshold",
+            displayName: "config.contracts.test_coverage.full_threshold.name",
+            description: "config.contracts.test_coverage.full_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12000),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.test_coverage.good_threshold",
+            displayName: "config.contracts.test_coverage.good_threshold.name",
+            description: "config.contracts.test_coverage.good_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "70",
+            uiEditorType: "number",
+            sortOrder: 12010),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.test_coverage.max_services",
+            displayName: "config.contracts.test_coverage.max_services.name",
+            description: "config.contracts.test_coverage.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12020),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.breaking_change_impact.max_hop_depth",
+            displayName: "config.contracts.breaking_change_impact.max_hop_depth.name",
+            description: "config.contracts.breaking_change_impact.max_hop_depth.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "2",
+            uiEditorType: "number",
+            sortOrder: 12030),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.breaking_change_impact.max_consumers",
+            displayName: "config.contracts.breaking_change_impact.max_consumers.name",
+            description: "config.contracts.breaking_change_impact.max_consumers.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12040),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.backward_compat.stable_threshold",
+            displayName: "config.contracts.backward_compat.stable_threshold.name",
+            description: "config.contracts.backward_compat.stable_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 12050),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.backward_compat.stagnation_days",
+            displayName: "config.contracts.backward_compat.stagnation_days.name",
+            description: "config.contracts.backward_compat.stagnation_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "180",
+            uiEditorType: "number",
+            sortOrder: 12060),
+
+        ConfigurationDefinition.Create(
+            key: "contracts.backward_compat.max_contracts",
+            displayName: "config.contracts.backward_compat.max_contracts.name",
+            description: "config.contracts.backward_compat.max_contracts.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12070),
     ];
 }
