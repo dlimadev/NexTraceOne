@@ -27,4 +27,12 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13010, key: "schema_evolution.breaking_change_dangerous_pct", label: "reports.schemaEvolutionSafety.breakingChangeDangerousPct", defaultValue: 25 },
   { sort: 13020, key: "schema_evolution.incident_correlation_hours", label: "reports.schemaEvolutionSafety.incidentCorrelationHours", defaultValue: 48 },
   { sort: 13030, key: "schema_evolution.lookback_days", label: "reports.schemaEvolutionSafety.lookbackDays", defaultValue: 30 },
+  { sort: 13040, key: "topology.freshness_days", label: "reports.serviceTopologyHealth.freshnessDays", defaultValue: 30 },
+  { sort: 13050, key: "topology.hub_fanin_threshold", label: "reports.serviceTopologyHealth.hubFanInThreshold", defaultValue: 5 },
+  { sort: 13060, key: "topology.health.hub_penalty", label: "reports.serviceTopologyHealth.hubPenalty", defaultValue: 15 },
+  { sort: 13070, key: "topology.health.circular_penalty", label: "reports.serviceTopologyHealth.circularPenalty", defaultValue: 20 },
+  { sort: 13080, key: "topology.critical_path.top_n_chains", label: "reports.criticalPath.topNChains", defaultValue: 10 },
+  { sort: 13090, key: "topology.critical_path.bottleneck_path_count", label: "reports.criticalPath.bottleneckPathCount", defaultValue: 3 },
+  { sort: 13100, key: "topology.alignment.major_drift_threshold", label: "reports.dependencyVersionAlignment.majorDriftThreshold", defaultValue: 3 },
+  { sort: 13110, key: "topology.alignment.critical_service_count", label: "reports.dependencyVersionAlignment.criticalServiceCount", defaultValue: 2 },
 ];

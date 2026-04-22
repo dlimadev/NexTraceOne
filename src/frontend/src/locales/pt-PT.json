@@ -15670,5 +15670,36 @@
       "Risky": "Arriscado",
       "Dangerous": "Perigoso"
     }
+  },
+  "serviceTopologyHealth": {
+    "title": "Relatório de Saúde da Topologia de Serviços",
+    "freshnessDays": "Dias de Atualização",
+    "hubFanInThreshold": "Limiar de Fan-In do Hub",
+    "hubPenalty": "Penalidade de Hub",
+    "circularPenalty": "Penalidade de Circular",
+    "tier": {
+      "Healthy": "Saudável",
+      "Warning": "Alerta",
+      "Degraded": "Degradado",
+      "Critical": "Crítico"
+    }
+  },
+  "criticalPath": {
+    "title": "Relatório de Caminho Crítico",
+    "cascadeRiskScore": "Score de Risco em Cascata",
+    "bottleneckServices": "Serviços Gargalo",
+    "topNChains": "Top N Cadeias",
+    "bottleneckPathCount": "Contagem de Caminhos Gargalo"
+  },
+  "dependencyVersionAlignment": {
+    "title": "Relatório de Alinhamento de Versões de Dependências",
+    "majorDriftThreshold": "Limiar de Desvio Maior",
+    "criticalServiceCount": "Contagem de Serviços Críticos",
+    "tier": {
+      "Aligned": "Alinhado",
+      "MinorDrift": "Desvio Menor",
+      "MajorDrift": "Desvio Maior",
+      "SecurityRisk": "Risco de Segurança"
+    }
   }
 }

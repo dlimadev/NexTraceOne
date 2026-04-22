@@ -110,6 +110,14 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaEvolutionSafetyReader,
             NexTraceOne.Catalog.Application.Contracts.NullSchemaEvolutionSafetyReader>();
 
+        // ── Wave AR — Service Topology Intelligence null readers ─────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IServiceTopologyReader,
+            NexTraceOne.Catalog.Application.Contracts.NullServiceTopologyReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ICriticalPathReader,
+            NexTraceOne.Catalog.Application.Contracts.NullCriticalPathReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyVersionAlignmentReader,
+            NexTraceOne.Catalog.Application.Contracts.NullDependencyVersionAlignmentReader>();
+
         return services;
     }
 }

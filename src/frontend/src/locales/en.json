@@ -14438,5 +14438,36 @@
       "Risky": "Risky",
       "Dangerous": "Dangerous"
     }
+  },
+  "serviceTopologyHealth": {
+    "title": "Service Topology Health Report",
+    "freshnessDays": "Freshness Days",
+    "hubFanInThreshold": "Hub Fan-In Threshold",
+    "hubPenalty": "Hub Penalty",
+    "circularPenalty": "Circular Penalty",
+    "tier": {
+      "Healthy": "Healthy",
+      "Warning": "Warning",
+      "Degraded": "Degraded",
+      "Critical": "Critical"
+    }
+  },
+  "criticalPath": {
+    "title": "Critical Path Report",
+    "cascadeRiskScore": "Cascade Risk Score",
+    "bottleneckServices": "Bottleneck Services",
+    "topNChains": "Top N Chains",
+    "bottleneckPathCount": "Bottleneck Path Count"
+  },
+  "dependencyVersionAlignment": {
+    "title": "Dependency Version Alignment Report",
+    "majorDriftThreshold": "Major Drift Threshold",
+    "criticalServiceCount": "Critical Service Count",
+    "tier": {
+      "Aligned": "Aligned",
+      "MinorDrift": "Minor Drift",
+      "MajorDrift": "Major Drift",
+      "SecurityRisk": "Security Risk"
+    }
   }
 }
