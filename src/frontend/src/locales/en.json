@@ -14102,5 +14102,78 @@
       "Probable": "Probable",
       "Imminent": "Imminent"
     }
+  },
+  "crossTenantMaturity": {
+    "title": "Cross-Tenant Maturity Report",
+    "description": "Anonymous and consented comparison of platform maturity dimensions across tenants. Reveals where you stand vs. the ecosystem benchmark without exposing individual tenant data.",
+    "tenantMaturityScore": "Tenant Maturity Score",
+    "maturityTier": "Maturity Tier",
+    "benchmarkPercentile": "Benchmark Percentile",
+    "insufficientBenchmarkPeers": "Insufficient Benchmark Peers",
+    "weakestDimensions": "Weakest Dimensions",
+    "improvementPotential": "Improvement Potential",
+    "dimensions": {
+      "ContractGoverned": "Contract Governed",
+      "ChangeConfidenceEnabled": "Change Confidence Enabled",
+      "SloTracked": "SLO Tracked",
+      "RunbookCovered": "Runbook Covered",
+      "ProfilingActive": "Profiling Active",
+      "ComplianceEvaluated": "Compliance Evaluated",
+      "AiAssistantUsed": "AI Assistant Used"
+    },
+    "tiers": {
+      "Emerging": "Emerging",
+      "Developing": "Developing",
+      "Advanced": "Advanced",
+      "Pioneer": "Pioneer"
+    }
+  },
+  "tenantHealthScore": {
+    "title": "Tenant Health Score",
+    "description": "Global health scorecard of the tenant by operational dimension. Aggregates signals from services, contracts, changes, operations, compliance and FinOps into a single health score.",
+    "tenantHealthScore": "Tenant Health Score",
+    "healthTier": "Health Tier",
+    "pillarBreakdown": "Pillar Breakdown",
+    "trendComparison": "Trend Comparison",
+    "topIssues": "Top Issues",
+    "actionableItems": "Actionable Items",
+    "pillars": {
+      "ServiceGovernance": "Service Governance",
+      "ChangeConfidence": "Change Confidence",
+      "OperationalReliability": "Operational Reliability",
+      "ContractHealth": "Contract Health",
+      "ComplianceCoverage": "Compliance Coverage",
+      "FinOpsEfficiency": "FinOps Efficiency"
+    },
+    "tiers": {
+      "AtRisk": "At Risk",
+      "Fair": "Fair",
+      "Good": "Good",
+      "Excellent": "Excellent"
+    }
+  },
+  "platformPolicyCompliance": {
+    "title": "Platform Policy Compliance Report",
+    "description": "Evaluates conformance of services and teams with active platform policies defined in Policy Studio. Identifies which policies are failing and which entities are the worst offenders.",
+    "tenantPolicyComplianceScore": "Tenant Policy Compliance Score",
+    "totalPoliciesAnalyzed": "Total Policies Analyzed",
+    "escalationRequired": "Escalation Required",
+    "violatingEntities": "Violating Entities",
+    "worstOffenders": "Worst Offenders",
+    "passRate": "Pass Rate",
+    "evaluationCount": "Evaluation Count",
+    "governanceType": "Governance Type",
+    "distribution": "Compliance Distribution",
+    "governanceTypes": {
+      "Mandatory": "Mandatory",
+      "Advisory": "Advisory",
+      "Informational": "Informational"
+    },
+    "tiers": {
+      "Enforced": "Enforced",
+      "Partial": "Partial",
+      "AtRisk": "At Risk",
+      "Failing": "Failing"
+    }
   }
 }

@@ -10200,5 +10200,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "number",
             sortOrder: 12390),
+
+        // ── Wave AJ — Multi-Tenant Governance Intelligence ─────────────────
+
+        ConfigurationDefinition.Create(
+            key: "governance.maturity.lookback_months",
+            displayName: "config.governance.maturity.lookback_months.name",
+            description: "config.governance.maturity.lookback_months.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "1",
+            uiEditorType: "number",
+            sortOrder: 12400),
+
+        ConfigurationDefinition.Create(
+            key: "governance.maturity.compliance_lookback_months",
+            displayName: "config.governance.maturity.compliance_lookback_months.name",
+            description: "config.governance.maturity.compliance_lookback_months.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 12410),
+
+        ConfigurationDefinition.Create(
+            key: "governance.maturity.min_tenants_for_benchmark",
+            displayName: "config.governance.maturity.min_tenants_for_benchmark.name",
+            description: "config.governance.maturity.min_tenants_for_benchmark.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 12420),
+
+        ConfigurationDefinition.Create(
+            key: "governance.health_score.lookback_releases",
+            displayName: "config.governance.health_score.lookback_releases.name",
+            description: "config.governance.health_score.lookback_releases.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12430),
+
+        ConfigurationDefinition.Create(
+            key: "governance.health_score.refresh_cron",
+            displayName: "config.governance.health_score.refresh_cron.name",
+            description: "config.governance.health_score.refresh_cron.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "0 2 * * *",
+            uiEditorType: "text",
+            sortOrder: 12440),
+
+        ConfigurationDefinition.Create(
+            key: "governance.policy_compliance.lookback_days",
+            displayName: "config.governance.policy_compliance.lookback_days.name",
+            description: "config.governance.policy_compliance.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12450),
+
+        ConfigurationDefinition.Create(
+            key: "governance.policy_compliance.failing_threshold",
+            displayName: "config.governance.policy_compliance.failing_threshold.name",
+            description: "config.governance.policy_compliance.failing_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 12460),
+
+        ConfigurationDefinition.Create(
+            key: "governance.policy_compliance.max_policies",
+            displayName: "config.governance.policy_compliance.max_policies.name",
+            description: "config.governance.policy_compliance.max_policies.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12470),
     ];
 }

@@ -109,6 +109,15 @@ public static class DependencyInjection
         // Wave AI.1 — honest-null bridge para environment instability (OI)
         services.AddScoped<IEnvironmentInstabilityReader, NullEnvironmentInstabilityReader>();
 
+        // Wave AJ.1 — honest-null bridge para cross-tenant maturity dimensions
+        services.AddScoped<ICrossTenantMaturityReader, Services.NullCrossTenantMaturityReader>();
+
+        // Wave AJ.2 — honest-null bridge para tenant health pillar data
+        services.AddScoped<ITenantHealthDataReader, Services.NullTenantHealthDataReader>();
+
+        // Wave AJ.3 — honest-null bridge para policy evaluation history (IA)
+        services.AddScoped<IPolicyEvaluationHistoryReader, Services.NullPolicyEvaluationHistoryReader>();
+
         // Distributed signal correlation and promotion risk signals for AI-assisted analysis
         services.AddScoped<IDistributedSignalCorrelationService, DistributedSignalCorrelationService>();
         services.AddScoped<IPromotionRiskSignalProvider, PromotionRiskSignalProvider>();

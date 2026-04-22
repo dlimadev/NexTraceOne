@@ -15334,5 +15334,78 @@
       "Probable": "Provável",
       "Imminent": "Iminente"
     }
+  },
+  "crossTenantMaturity": {
+    "title": "Relatório de Maturidade Cross-Tenant",
+    "description": "Comparação anónima e consentida de dimensões de maturidade de plataforma entre tenants. Revela onde estamos vs. o benchmark do ecossistema sem expor dados de tenants individuais.",
+    "tenantMaturityScore": "Score de Maturidade do Tenant",
+    "maturityTier": "Tier de Maturidade",
+    "benchmarkPercentile": "Percentil no Benchmark",
+    "insufficientBenchmarkPeers": "Peers Insuficientes para Benchmark",
+    "weakestDimensions": "Dimensões Mais Fracas",
+    "improvementPotential": "Potencial de Melhoria",
+    "dimensions": {
+      "ContractGoverned": "Contratos Governados",
+      "ChangeConfidenceEnabled": "Change Confidence Activado",
+      "SloTracked": "SLO Monitorizado",
+      "RunbookCovered": "Runbook Coberto",
+      "ProfilingActive": "Profiling Activo",
+      "ComplianceEvaluated": "Compliance Avaliado",
+      "AiAssistantUsed": "AI Assistant Utilizado"
+    },
+    "tiers": {
+      "Emerging": "Emergente",
+      "Developing": "Em Desenvolvimento",
+      "Advanced": "Avançado",
+      "Pioneer": "Pioneiro"
+    }
+  },
+  "tenantHealthScore": {
+    "title": "Score de Saúde do Tenant",
+    "description": "Scorecard de saúde global do tenant por dimensão operacional. Agrega sinais de serviços, contratos, mudanças, operação, compliance e FinOps num único score de saúde.",
+    "tenantHealthScore": "Score de Saúde do Tenant",
+    "healthTier": "Tier de Saúde",
+    "pillarBreakdown": "Breakdown por Pilar",
+    "trendComparison": "Comparação de Tendência",
+    "topIssues": "Principais Problemas",
+    "actionableItems": "Ações Recomendadas",
+    "pillars": {
+      "ServiceGovernance": "Governança de Serviços",
+      "ChangeConfidence": "Confiança em Mudanças",
+      "OperationalReliability": "Fiabilidade Operacional",
+      "ContractHealth": "Saúde de Contratos",
+      "ComplianceCoverage": "Cobertura de Compliance",
+      "FinOpsEfficiency": "Eficiência FinOps"
+    },
+    "tiers": {
+      "AtRisk": "Em Risco",
+      "Fair": "Razoável",
+      "Good": "Bom",
+      "Excellent": "Excelente"
+    }
+  },
+  "platformPolicyCompliance": {
+    "title": "Relatório de Conformidade com Políticas de Plataforma",
+    "description": "Avalia a conformidade de serviços e equipas com as políticas activas definidas no Policy Studio. Identifica quais políticas estão a falhar e quais entidades são os principais infractores.",
+    "tenantPolicyComplianceScore": "Score de Conformidade do Tenant",
+    "totalPoliciesAnalyzed": "Total de Políticas Analisadas",
+    "escalationRequired": "Escalação Necessária",
+    "violatingEntities": "Entidades Violadoras",
+    "worstOffenders": "Piores Infractores",
+    "passRate": "Taxa de Aprovação",
+    "evaluationCount": "Total de Avaliações",
+    "governanceType": "Tipo de Governança",
+    "distribution": "Distribuição de Conformidade",
+    "governanceTypes": {
+      "Mandatory": "Obrigatória",
+      "Advisory": "Aconselhada",
+      "Informational": "Informativa"
+    },
+    "tiers": {
+      "Enforced": "Aplicada",
+      "Partial": "Parcial",
+      "AtRisk": "Em Risco",
+      "Failing": "A Falhar"
+    }
   }
 }
