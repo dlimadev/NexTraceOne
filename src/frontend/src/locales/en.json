@@ -13849,5 +13849,71 @@
     "stagnationFlag": "Stagnation Flag",
     "topStableContracts": "Top Stable Contracts",
     "topVolatileContracts": "Top Volatile Contracts"
+  },
+  "serviceLifecycleTransition": {
+    "title": "Service Lifecycle Transition Report",
+    "totalServicesAnalyzed": "Total Services Analyzed",
+    "stagnationFlagCount": "Stagnation Flag Count",
+    "acceleratedRetirementFlagCount": "Accelerated Retirement Flag Count",
+    "blockedTransitionFlagCount": "Blocked Transition Flag Count",
+    "daysInCurrentState": "Days in Current State",
+    "transitionCount": "Transition Count",
+    "lifecycleDistribution": "Lifecycle Distribution",
+    "topStagnatedServices": "Top Stagnated Services",
+    "topBlockedServices": "Top Blocked Services",
+    "flags": {
+      "stagnation": "Stagnation",
+      "acceleratedRetirement": "Accelerated Retirement",
+      "blockedTransition": "Blocked Transition"
+    },
+    "states": {
+      "PreProduction": "Pre-Production",
+      "Active": "Active",
+      "Deprecating": "Deprecating",
+      "Deprecated": "Deprecated",
+      "Retired": "Retired"
+    }
+  },
+  "serviceRetirementReadiness": {
+    "title": "Service Retirement Readiness",
+    "retirementReadinessScore": "Retirement Readiness Score",
+    "tier": "Readiness Tier",
+    "blockerList": "Blocker List",
+    "consumerMigrationProgress": "Consumer Migration Progress",
+    "dimensions": {
+      "consumerMigrated": "Consumers Migrated",
+      "contractsDeprecated": "Contracts Deprecated",
+      "runbookDocumented": "Runbook Documented",
+      "dependantsNotified": "Dependants Notified"
+    },
+    "tiers": {
+      "Ready": "Ready",
+      "NearReady": "Near Ready",
+      "Blocked": "Blocked",
+      "NotReady": "Not Ready"
+    },
+    "blockerTypes": {
+      "active-consumers": "Active Consumers",
+      "active-contracts": "Active Contracts",
+      "missing-runbook": "Missing Runbook",
+      "unnotified-teams": "Unnotified Teams"
+    }
+  },
+  "serviceMigrationProgress": {
+    "title": "Service Migration Progress",
+    "totalDeprecatedServices": "Total Deprecated Services",
+    "tenantMigrationCompletionRate": "Tenant Migration Completion Rate (%)",
+    "totalStuckConsumers": "Total Stuck Consumers",
+    "migrationCompletionRate": "Migration Completion Rate (%)",
+    "estimatedCompletionDate": "Estimated Completion Date",
+    "stuckConsumers": "Stuck Consumers",
+    "topLaggingServices": "Top Lagging Services",
+    "dailyMigrationTimeline": "Daily Migration Timeline",
+    "tiers": {
+      "Complete": "Complete",
+      "Advanced": "Advanced",
+      "InProgress": "In Progress",
+      "Lagging": "Lagging"
+    }
   }
 }

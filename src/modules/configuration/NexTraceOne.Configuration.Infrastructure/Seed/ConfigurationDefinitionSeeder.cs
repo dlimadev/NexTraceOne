@@ -9841,5 +9841,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "200",
             uiEditorType: "number",
             sortOrder: 12070),
+
+        // ── Wave AF — Service Lifecycle Governance ───────────────────────
+
+        ConfigurationDefinition.Create(
+            key: "catalog.lifecycle.stagnation_days",
+            displayName: "config.catalog.lifecycle.stagnation_days.name",
+            description: "config.catalog.lifecycle.stagnation_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12080),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.lifecycle.min_deprecation_days",
+            displayName: "config.catalog.lifecycle.min_deprecation_days.name",
+            description: "config.catalog.lifecycle.min_deprecation_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12090),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.lifecycle.max_services",
+            displayName: "config.catalog.lifecycle.max_services.name",
+            description: "config.catalog.lifecycle.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "200",
+            uiEditorType: "number",
+            sortOrder: 12100),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.retirement_readiness.ready_threshold",
+            displayName: "config.catalog.retirement_readiness.ready_threshold.name",
+            description: "config.catalog.retirement_readiness.ready_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "85",
+            uiEditorType: "number",
+            sortOrder: 12110),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.retirement_readiness.near_ready_threshold",
+            displayName: "config.catalog.retirement_readiness.near_ready_threshold.name",
+            description: "config.catalog.retirement_readiness.near_ready_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "65",
+            uiEditorType: "number",
+            sortOrder: 12120),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.migration_progress.lookback_days",
+            displayName: "config.catalog.migration_progress.lookback_days.name",
+            description: "config.catalog.migration_progress.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12130),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.migration_progress.stuck_threshold_days",
+            displayName: "config.catalog.migration_progress.stuck_threshold_days.name",
+            description: "config.catalog.migration_progress.stuck_threshold_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12140),
+
+        ConfigurationDefinition.Create(
+            key: "catalog.migration_progress.max_services",
+            displayName: "config.catalog.migration_progress.max_services.name",
+            description: "config.catalog.migration_progress.max_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System],
+            defaultValue: "100",
+            uiEditorType: "number",
+            sortOrder: 12150),
     ];
 }

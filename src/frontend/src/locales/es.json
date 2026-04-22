@@ -15084,5 +15084,71 @@
     "stagnationFlag": "Señal de Estancamiento",
     "topStableContracts": "Top Contratos Estables",
     "topVolatileContracts": "Top Contratos Volátiles"
+  },
+  "serviceLifecycleTransition": {
+    "title": "Informe de Transiciones del Ciclo de Vida",
+    "totalServicesAnalyzed": "Total de Servicios Analizados",
+    "stagnationFlagCount": "Servicios con Señal de Estancamiento",
+    "acceleratedRetirementFlagCount": "Servicios con Retiro Acelerado",
+    "blockedTransitionFlagCount": "Servicios con Transición Bloqueada",
+    "daysInCurrentState": "Días en el Estado Actual",
+    "transitionCount": "Número de Transiciones",
+    "lifecycleDistribution": "Distribución por Estado",
+    "topStagnatedServices": "Top Servicios Estancados",
+    "topBlockedServices": "Top Servicios Bloqueados",
+    "flags": {
+      "stagnation": "Estancamiento",
+      "acceleratedRetirement": "Retiro Acelerado",
+      "blockedTransition": "Transición Bloqueada"
+    },
+    "states": {
+      "PreProduction": "Pre-Producción",
+      "Active": "Activo",
+      "Deprecating": "En Discontinuación",
+      "Deprecated": "Discontinuado",
+      "Retired": "Retirado"
+    }
+  },
+  "serviceRetirementReadiness": {
+    "title": "Preparación para el Retiro del Servicio",
+    "retirementReadinessScore": "Puntuación de Preparación para Retiro",
+    "tier": "Nivel de Preparación",
+    "blockerList": "Lista de Bloqueadores",
+    "consumerMigrationProgress": "Progreso de Migración de Consumidores",
+    "dimensions": {
+      "consumerMigrated": "Consumidores Migrados",
+      "contractsDeprecated": "Contratos Discontinuados",
+      "runbookDocumented": "Runbook Documentado",
+      "dependantsNotified": "Dependientes Notificados"
+    },
+    "tiers": {
+      "Ready": "Listo",
+      "NearReady": "Casi Listo",
+      "Blocked": "Bloqueado",
+      "NotReady": "No Listo"
+    },
+    "blockerTypes": {
+      "active-consumers": "Consumidores Activos",
+      "active-contracts": "Contratos Activos",
+      "missing-runbook": "Runbook Faltante",
+      "unnotified-teams": "Equipos No Notificados"
+    }
+  },
+  "serviceMigrationProgress": {
+    "title": "Progreso de Migración de Servicios",
+    "totalDeprecatedServices": "Total de Servicios Discontinuados",
+    "tenantMigrationCompletionRate": "Tasa de Finalización de Migración del Tenant (%)",
+    "totalStuckConsumers": "Total de Consumidores Bloqueados",
+    "migrationCompletionRate": "Tasa de Finalización de Migración (%)",
+    "estimatedCompletionDate": "Fecha Estimada de Finalización",
+    "stuckConsumers": "Consumidores Bloqueados",
+    "topLaggingServices": "Top Servicios con Migración Retrasada",
+    "dailyMigrationTimeline": "Línea de Tiempo de Migración Diaria",
+    "tiers": {
+      "Complete": "Completo",
+      "Advanced": "Avanzado",
+      "InProgress": "En Progreso",
+      "Lagging": "Retrasado"
+    }
   }
 }
