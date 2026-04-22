@@ -9304,5 +9304,95 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "3",
             uiEditorType: "number",
             sortOrder: 11590),
+
+        // ── Wave Y: AI Governance Deep Dive & Agentic Platform ────────────────
+
+        ConfigurationDefinition.Create(
+            key: "ai.agentic.max_steps_per_plan",
+            displayName: "config.ai.agentic.max_steps_per_plan.name",
+            description: "config.ai.agentic.max_steps_per_plan.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11600),
+
+        ConfigurationDefinition.Create(
+            key: "ai.agentic.blast_radius_approval_threshold",
+            displayName: "config.ai.agentic.blast_radius_approval_threshold.name",
+            description: "config.ai.agentic.blast_radius_approval_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 11610),
+
+        ConfigurationDefinition.Create(
+            key: "ai.agentic.default_token_budget_per_plan",
+            displayName: "config.ai.agentic.default_token_budget_per_plan.name",
+            description: "config.ai.agentic.default_token_budget_per_plan.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50000",
+            uiEditorType: "number",
+            sortOrder: 11620),
+
+        ConfigurationDefinition.Create(
+            key: "ai.routing.default_intent",
+            displayName: "config.ai.routing.default_intent.name",
+            description: "config.ai.routing.default_intent.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "GeneralQuery",
+            uiEditorType: "text",
+            sortOrder: 11630),
+
+        ConfigurationDefinition.Create(
+            key: "ai.routing.cost_downgrade_enabled",
+            displayName: "config.ai.routing.cost_downgrade_enabled.name",
+            description: "config.ai.routing.cost_downgrade_enabled.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 11640),
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.monthly_token_limit_default",
+            displayName: "config.ai.budget.monthly_token_limit_default.name",
+            description: "config.ai.budget.monthly_token_limit_default.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "1000000",
+            uiEditorType: "number",
+            sortOrder: 11650),
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.alert_threshold_pct",
+            displayName: "config.ai.budget.alert_threshold_pct.name",
+            description: "config.ai.budget.alert_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 11660),
+
+        ConfigurationDefinition.Create(
+            key: "ai.budget.block_on_exhaustion",
+            displayName: "config.ai.budget.block_on_exhaustion.name",
+            description: "config.ai.budget.block_on_exhaustion.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 11670),
     ];
 }

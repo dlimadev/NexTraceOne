@@ -13536,5 +13536,64 @@
       "aiHub": "AI Hub",
       "integrations": "Integrations"
     }
+  },
+  "agentExecutionPlan": {
+    "title": "Agent Execution Plans",
+    "submit": "Submit Plan",
+    "approve": "Approve Step",
+    "status": {
+      "Pending": "Pending",
+      "Running": "Running",
+      "WaitingApproval": "Waiting Approval",
+      "Completed": "Completed",
+      "Failed": "Failed",
+      "Cancelled": "Cancelled"
+    },
+    "stepType": {
+      "ContractLookup": "Contract Lookup",
+      "IncidentCorrelation": "Incident Correlation",
+      "DraftGeneration": "Draft Generation",
+      "RunbookProposal": "Runbook Proposal",
+      "AlertTriage": "Alert Triage",
+      "ExternalSearch": "External Search"
+    },
+    "steps": "Steps",
+    "approvedBy": "Approved By",
+    "tokenBudget": "Token Budget",
+    "tokensConsumed": "Tokens Consumed"
+  },
+  "modelRouting": {
+    "title": "Model Routing",
+    "intent": "Intent",
+    "preferredModel": "Preferred Model",
+    "fallbackModel": "Fallback Model",
+    "log": "Routing Decision Log",
+    "classify": "Classify Intent",
+    "intents": {
+      "CodeGeneration": "Code Generation",
+      "DocumentSummarization": "Document Summarization",
+      "IncidentAnalysis": "Incident Analysis",
+      "ContractDraft": "Contract Draft",
+      "ComplianceCheck": "Compliance Check",
+      "GeneralQuery": "General Query"
+    }
+  },
+  "aiTokenBudget": {
+    "title": "AI Token Budget",
+    "totalTokens": "Total Tokens",
+    "totalCost": "Total Cost (USD)",
+    "burnRate": "Burn Rate",
+    "approaching": "Approaching Limit",
+    "byTeam": "By Team",
+    "byUseCase": "By Use Case",
+    "topConsumers": "Top Consumers",
+    "timeline": "Daily Usage"
+  },
+  "aiCostAttributionReport": {
+    "title": "AI Cost Attribution Report",
+    "groupBy": "Group By",
+    "attributionEntries": "Attribution",
+    "avgCostPerRequest": "Avg Cost / Request",
+    "requestCount": "Requests"
   }
 }

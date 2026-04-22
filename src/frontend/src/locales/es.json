@@ -14771,5 +14771,64 @@
       "aiHub": "AI Hub",
       "integrations": "Integraciones"
     }
+  },
+  "agentExecutionPlan": {
+    "title": "Planes de Ejecución de Agente",
+    "submit": "Enviar Plan",
+    "approve": "Aprobar Paso",
+    "status": {
+      "Pending": "Pendiente",
+      "Running": "En Ejecución",
+      "WaitingApproval": "Esperando Aprobación",
+      "Completed": "Completado",
+      "Failed": "Fallido",
+      "Cancelled": "Cancelado"
+    },
+    "stepType": {
+      "ContractLookup": "Búsqueda de Contrato",
+      "IncidentCorrelation": "Correlación de Incidente",
+      "DraftGeneration": "Generación de Borrador",
+      "RunbookProposal": "Propuesta de Runbook",
+      "AlertTriage": "Triaje de Alerta",
+      "ExternalSearch": "Búsqueda Externa"
+    },
+    "steps": "Pasos",
+    "approvedBy": "Aprobado Por",
+    "tokenBudget": "Presupuesto de Tokens",
+    "tokensConsumed": "Tokens Consumidos"
+  },
+  "modelRouting": {
+    "title": "Enrutamiento de Modelo",
+    "intent": "Intención",
+    "preferredModel": "Modelo Preferido",
+    "fallbackModel": "Modelo de Reserva",
+    "log": "Registro de Decisiones",
+    "classify": "Clasificar Intención",
+    "intents": {
+      "CodeGeneration": "Generación de Código",
+      "DocumentSummarization": "Resumen de Documento",
+      "IncidentAnalysis": "Análisis de Incidente",
+      "ContractDraft": "Borrador de Contrato",
+      "ComplianceCheck": "Verificación de Cumplimiento",
+      "GeneralQuery": "Consulta General"
+    }
+  },
+  "aiTokenBudget": {
+    "title": "Presupuesto de Tokens de IA",
+    "totalTokens": "Tokens Totales",
+    "totalCost": "Costo Total (USD)",
+    "burnRate": "Tasa de Consumo",
+    "approaching": "Acercándose al Límite",
+    "byTeam": "Por Equipo",
+    "byUseCase": "Por Caso de Uso",
+    "topConsumers": "Principales Consumidores",
+    "timeline": "Uso Diario"
+  },
+  "aiCostAttributionReport": {
+    "title": "Informe de Atribución de Costo de IA",
+    "groupBy": "Agrupar Por",
+    "attributionEntries": "Atribución",
+    "avgCostPerRequest": "Costo Promedio / Solicitud",
+    "requestCount": "Solicitudes"
   }
 }

@@ -14801,5 +14801,64 @@
       "aiHub": "AI Hub",
       "integrations": "Integrações"
     }
+  },
+  "agentExecutionPlan": {
+    "title": "Planos de Execução de Agente",
+    "submit": "Enviar Plano",
+    "approve": "Aprovar Passo",
+    "status": {
+      "Pending": "Pendente",
+      "Running": "Em Execução",
+      "WaitingApproval": "Aguardando Aprovação",
+      "Completed": "Concluído",
+      "Failed": "Falhou",
+      "Cancelled": "Cancelado"
+    },
+    "stepType": {
+      "ContractLookup": "Consulta de Contrato",
+      "IncidentCorrelation": "Correlação de Incidente",
+      "DraftGeneration": "Geração de Rascunho",
+      "RunbookProposal": "Proposta de Runbook",
+      "AlertTriage": "Triagem de Alerta",
+      "ExternalSearch": "Busca Externa"
+    },
+    "steps": "Passos",
+    "approvedBy": "Aprovado Por",
+    "tokenBudget": "Orçamento de Tokens",
+    "tokensConsumed": "Tokens Consumidos"
+  },
+  "modelRouting": {
+    "title": "Roteamento de Modelo",
+    "intent": "Intenção",
+    "preferredModel": "Modelo Preferido",
+    "fallbackModel": "Modelo de Fallback",
+    "log": "Log de Decisões de Roteamento",
+    "classify": "Classificar Intenção",
+    "intents": {
+      "CodeGeneration": "Geração de Código",
+      "DocumentSummarization": "Sumarização de Documento",
+      "IncidentAnalysis": "Análise de Incidente",
+      "ContractDraft": "Rascunho de Contrato",
+      "ComplianceCheck": "Verificação de Conformidade",
+      "GeneralQuery": "Consulta Geral"
+    }
+  },
+  "aiTokenBudget": {
+    "title": "Orçamento de Tokens de IA",
+    "totalTokens": "Total de Tokens",
+    "totalCost": "Custo Total (USD)",
+    "burnRate": "Taxa de Consumo",
+    "approaching": "Aproximando do Limite",
+    "byTeam": "Por Equipe",
+    "byUseCase": "Por Caso de Uso",
+    "topConsumers": "Maiores Consumidores",
+    "timeline": "Uso Diário"
+  },
+  "aiCostAttributionReport": {
+    "title": "Relatório de Atribuição de Custo de IA",
+    "groupBy": "Agrupar Por",
+    "attributionEntries": "Atribuição",
+    "avgCostPerRequest": "Custo Médio / Requisição",
+    "requestCount": "Requisições"
   }
 }
