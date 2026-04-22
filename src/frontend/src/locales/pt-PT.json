@@ -3121,7 +3121,51 @@
     "env.behavior.change.ingest.enabled.label": "Ingestão de Eventos de Mudança Ativada",
     "env.behavior.change.ingest.enabled.description": "Ativa a ingestão de eventos de deploy e mudança para este ambiente.",
     "env.behavior.change.post_change_verification.enabled.label": "Verificação Pós-Mudança Ativada",
-    "env.behavior.change.post_change_verification.enabled.description": "Ativa verificações automáticas pós-mudança após deploys neste ambiente."
+    "env.behavior.change.post_change_verification.enabled.description": "Ativa verificações automáticas pós-mudança após deploys neste ambiente.",
+    "ui": {
+      "executive_dashboard": {
+        "enabled": {
+          "name": "Executive Dashboard: Enabled",
+          "description": "Enables the Executive Intelligence Dashboard."
+        },
+        "risk_threshold": {
+          "name": "Executive Dashboard: Risk Threshold",
+          "description": "Minimum risk score (0–100) to highlight services in the risky services widget."
+        },
+        "finops_burn_warn_threshold_pct": {
+          "name": "Executive Dashboard: FinOps Burn Warning Threshold (%)",
+          "description": "Budget consumption percentage that triggers the accelerated burn rate flag."
+        },
+        "mttr_sparkline_services": {
+          "name": "Executive Dashboard: MTTR Sparkline Services",
+          "description": "Number of services shown in the MTTR sparkline on the Executive Dashboard."
+        }
+      },
+      "contract_studio": {
+        "graphql_diff": {
+          "max_snapshot_age_days": {
+            "name": "Contract Studio: GraphQL Diff Max Snapshot Age (Days)",
+            "description": "Maximum age in days for a GraphQL snapshot to be eligible for diff comparison."
+          }
+        },
+        "protobuf_diff": {
+          "max_snapshot_age_days": {
+            "name": "Contract Studio: Protobuf Diff Max Snapshot Age (Days)",
+            "description": "Maximum age in days for a Protobuf snapshot to be eligible for diff comparison."
+          }
+        }
+      },
+      "adaptive_navigation": {
+        "enabled": {
+          "name": "Adaptive Navigation: Enabled",
+          "description": "Enables persona-aware adaptive navigation and quick actions."
+        },
+        "quick_actions_count": {
+          "name": "Adaptive Navigation: Quick Actions Count",
+          "description": "Number of quick actions highlighted per persona in the navigation."
+        }
+      }
+    }
   },
   "configuration": {
     "actions": {
@@ -14644,6 +14688,85 @@
       "invalidTenantId": "O ID do tenant é obrigatório.",
       "invalidLookbackDays": "Os dias de retrovisão devem estar entre 7 e 90.",
       "invalidMaxTopServices": "O número máximo de serviços deve estar entre 1 e 100."
+    }
+  },
+  "executiveDashboard": {
+    "title": "Dashboard Executivo de Inteligência",
+    "serviceHealth": "Saúde dos Serviços",
+    "serviceHealthDesc": "Score de saúde global de todos os serviços do tenant",
+    "changeConfidence": "Confiança em Mudanças",
+    "changeConfidenceDesc": "Confiança média de deployment nas últimas 4 semanas",
+    "complianceCoverage": "Cobertura de Compliance",
+    "complianceCoverageDesc": "Cobertura por standard de compliance",
+    "finopsBudget": "Consumo de Budget FinOps",
+    "finopsBudgetDesc": "Budget consumido vs. período",
+    "topRiskyServices": "Top Serviços de Risco",
+    "topRiskyServicesDesc": "Serviços com maior score de risco",
+    "mttrTrend": "Tendência de MTTR",
+    "mttrTrendDesc": "Tempo médio de recuperação dos serviços críticos (últimos 30 dias)",
+    "burnAccelerated": "Taxa de consumo acelerada",
+    "drillDown": "Ver detalhes",
+    "noData": "Sem dados disponíveis para este período",
+    "loadingWidgets": "A carregar widgets do dashboard...",
+    "errorLoading": "Falha ao carregar o dashboard executivo"
+  },
+  "graphqlDiffViewer": {
+    "title": "Diff de Schema GraphQL",
+    "explorer": "Explorador de Schema",
+    "diffViewer": "Visualizador de Diff",
+    "breakingChanges": "Alterações Incompatíveis",
+    "nonBreakingChanges": "Alterações Compatíveis",
+    "unchanged": "Sem alterações",
+    "selectSnapshot": "Selecionar snapshot",
+    "noSnapshots": "Nenhum snapshot disponível",
+    "uploadSdl": "Carregar ficheiro SDL",
+    "pasteSdl": "Colar schema SDL",
+    "types": "Tipos",
+    "fields": "Campos",
+    "queries": "Queries",
+    "mutations": "Mutations",
+    "subscriptions": "Subscriptions",
+    "filter": "Filtrar schema",
+    "breakingBadge": "Incompatível",
+    "analyzing": "A analisar schema...",
+    "noBreakingChanges": "Nenhuma alteração incompatível detectada"
+  },
+  "protobufDiffViewer": {
+    "title": "Diff de Schema Protobuf",
+    "explorer": "Explorador de Schema",
+    "diffViewer": "Visualizador de Diff",
+    "breakingChanges": "Alterações Incompatíveis",
+    "nonBreakingChanges": "Alterações Compatíveis",
+    "unchanged": "Sem alterações",
+    "selectSnapshot": "Selecionar snapshot",
+    "noSnapshots": "Nenhum snapshot disponível",
+    "uploadProto": "Carregar ficheiro .proto",
+    "pasteProto": "Colar schema .proto",
+    "messages": "Messages",
+    "fields": "Campos",
+    "services": "Serviços",
+    "rpcs": "RPCs",
+    "filter": "Filtrar schema",
+    "deprecatedField": "Descontinuado",
+    "analyzing": "A analisar schema...",
+    "noBreakingChanges": "Nenhuma alteração incompatível detectada"
+  },
+  "adaptiveNavigation": {
+    "title": "Acções Rápidas",
+    "personaLabel": "Persona",
+    "customizeHint": "Acções personalizadas com base no seu perfil e contexto",
+    "modules": {
+      "services": "Serviços",
+      "operations": "Operações",
+      "changes": "Mudanças",
+      "contracts": "Contratos",
+      "knowledge": "Conhecimento",
+      "governance": "Governança",
+      "analytics": "Analytics",
+      "organization": "Organização",
+      "admin": "Admin",
+      "aiHub": "AI Hub",
+      "integrations": "Integrações"
     }
   }
 }

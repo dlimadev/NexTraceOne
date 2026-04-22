@@ -1416,11 +1416,11 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ---
 
-### Wave X — Frontend Intelligence & Contract Studio Visual Builders
+### Wave X — Frontend Intelligence & Contract Studio Visual Builders ✅
 
 **Objetivo:** Evoluir o frontend de superfície operacional para **plataforma de decisão inteligente por persona**, completar os visual builders para os novos tipos de contrato (GraphQL, Protobuf), e introduzir views executivas orientadas a KPIs consolidados. Esta wave fecha o gap entre a riqueza analítica do backend (Waves A–W) e a experiência de utilizador que a surfacia.
 
-#### X.1 — Executive Intelligence Dashboard
+#### X.1 — Executive Intelligence Dashboard ✅
 
 **Feature:** Dashboard unificado para persona Executive/CTO com KPIs consolidados de todas as dimensões operacionais.
 
@@ -1435,7 +1435,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 **Orientado para Executive, CTO e Product** — responde a "o produto está a degradar ou a melhorar?" sem precisar navegar módulo a módulo.
 
-#### X.2 — GraphQL & Protobuf Visual Studio no Contract Studio
+#### X.2 — GraphQL & Protobuf Visual Studio no Contract Studio ✅
 
 **Feature:** Experiência visual de edição/comparação de schemas GraphQL SDL e Protobuf `.proto` dentro do Contract Studio existente, complementando os backends implementados em Waves G.3 e H.1.
 
@@ -1452,7 +1452,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 **Orientado para Architect e Tech Lead** — fecha o loop entre análise de backend (Wave G.3/H.1) e experiência visual no Contract Studio.
 
-#### X.3 — Persona-Aware Adaptive Navigation
+#### X.3 — Persona-Aware Adaptive Navigation ✅
 
 **Feature:** Navegação adaptativa que reordena o menu e os quick actions com base na persona ativa do utilizador autenticado, tornando a experiência mais focada e reduzindo o cognitive load.
 
@@ -1489,7 +1489,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `protobufDiffViewer.*` — interface do diff viewer de schemas Protobuf
 - `adaptiveNavigation.*` — quick actions e módulos priorizados por persona
 
-**Totais estimados Wave X:** Frontend: ~45 novos componentes/pages. Configuração: +8 config keys (sort 11520–11590). i18n: +4 secções (4 locales). Backend: 1 novo endpoint `GET /api/v1/identity/me/persona-config`.
+**Totais Wave X:** Frontend: 6 widgets + 4 schema viewers + 1 page + 1 hook = 12 novos ficheiros. Configuração: +8 config keys (sort 11520–11590). i18n: +4 secções (4 locales). Backend: 1 nova feature `GetPersonaConfig` + endpoint `GET /api/v1/identity/me/persona-config` + 19 testes. Frontend: 25 testes. **Wave X COMPLETA.**
 
 ---
 
@@ -4552,9 +4552,9 @@ Respeita a "Ordem recomendada de priorização do produto" (capítulo 26 das Cop
 59. ✅ **Wave W.1** — `GetRollbackPatternReport` — padrões de rollback por serviço: `RollbackPattern` Isolated/Recurring/Serial/None, `SystemicRisk` flag (Serial + baixa confidence), `EvidenceGap` flag (rollbacks com evidence packs incompletos), correlação com ChangeConfidenceBreakdown. CG. Config: `changes.rollback_pattern.*` sort 11440–11460.
 60. ✅ **Wave W.2** — `GetServiceCouplingIndexReport` — índice de acoplamento entre serviços: `CouplingIndex` 0–100 por fan-in/fan-out, `CouplingTier` HubService/HighlyCoupled/ModeratelyCoupled/LooselyCoupled/Isolated, `ArchitecturalRisk` e `IsolationRisk` flags, % de serviços Isolated, CouplingIndex médio do tenant. Catalog. Config: `catalog.coupling_index.*` sort 11470–11490.
 61. ✅ **Wave W.3** — `GetAnomalyDetectionSummaryReport` — sumário consolidado de anomalias: agrega WasteSignal + DriftFinding + SLO breaches + Chaos failures + VulnerabilityAdvisory + incidentes pós-deploy por serviço, `AnomalyDensity` Clean/Moderate/Dense/Critical, lista de serviços multi-anomaly, timeline diária de 30 pontos. OI. Config: `runtime.anomaly_summary.*` sort 11500–11510. **Wave W COMPLETA**.
-62. 🔲 **Wave X.1** — Executive Intelligence Dashboard — `ServiceHealthSummaryCard` + `ChangeConfidenceGauge` + `ComplianceCoverageWidget` + `FinOpsBudgetBurnWidget` + `TopRiskyServicesTable` + `MttrTrendMiniChart`. Persona Executive/CTO. Frontend. Config: `ui.executive_dashboard.*` sort 11520–11580.
-63. 🔲 **Wave X.2** — GraphQL & Protobuf Visual Studio — `GraphQlSchemaDiffViewer` + `GraphQlSchemaExplorer` + `ProtobufSchemaDiffViewer` + `ProtobufSchemaExplorer` no Contract Studio. Frontend. Config: `ui.contract_studio.*` sort 11540–11550.
-64. 🔲 **Wave X.3** — Persona-Aware Adaptive Navigation — reordenação de menu e quick actions por persona (`Engineer/TechLead/Architect/PlatformAdmin/Executive/Auditor`). Endpoint `GET /api/v1/identity/me/persona-config`. Frontend + Backend. Config: `ui.adaptive_navigation.*` sort 11560–11570. **Wave X PLANEADA**.
+62. ✅ **Wave X.1** — Executive Intelligence Dashboard — `ServiceHealthSummaryCard` + `ChangeConfidenceGauge` + `ComplianceCoverageWidget` + `FinOpsBudgetBurnWidget` + `TopRiskyServicesTable` + `MttrTrendMiniChart`. Persona Executive/CTO. Frontend. Config: `ui.executive_dashboard.*` sort 11520–11580.
+63. ✅ **Wave X.2** — GraphQL & Protobuf Visual Studio — `GraphQlSchemaDiffViewer` + `GraphQlSchemaExplorer` + `ProtobufSchemaDiffViewer` + `ProtobufSchemaExplorer` no Contract Studio. Frontend. Config: `ui.contract_studio.*` sort 11540–11550.
+64. ✅ **Wave X.3** — Persona-Aware Adaptive Navigation — reordenação de menu e quick actions por persona (`Engineer/TechLead/Architect/PlatformAdmin/Executive/Auditor`). Endpoint `GET /api/v1/identity/me/persona-config`. Frontend + Backend. Config: `ui.adaptive_navigation.*` sort 11560–11570. **Wave X COMPLETA.**
 65. 🔲 **Wave Y.1** — Agentic Runtime com Human-in-the-Loop — `AgentExecutionPlan` aggregate + `AgentStep` multi-type + `ApproveAgentStep` gate + budget enforcement + audit trail por passo. AIKnowledge/AIOrchestration. Config: `ai.agentic.*` sort 11600–11620.
 66. 🔲 **Wave Y.2** — NLP-based Model Routing — intent classifier leve (embedding) → `PromptIntent` enum → `ModelRoutingPolicy` entity + cost-aware downgrade automático + `GetModelRoutingDecisionLog`. AIKnowledge. Config: `ai.routing.*` sort 11630–11640.
 67. 🔲 **Wave Y.3** — AI Token Budget Attribution — `AiTokenUsageRecord` + `GetAiTokenBudgetReport` + `GetAiCostAttributionReport` + `AiBudgetPolicy` enforcement por tenant/equipa. AIKnowledge + FinOps. Config: `ai.budget.*` sort 11650–11670. **Wave Y PLANEADA**.

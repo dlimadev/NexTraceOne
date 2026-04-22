@@ -98,6 +98,13 @@ export interface UpdateTenantRequest {
   taxId?: string;
 }
 
+/** Resposta do endpoint GET /identity/me/persona-config (Wave X.3). */
+export interface PersonaConfigResponse {
+  persona: string;
+  quickActions: Array<{ id: string; labelKey: string; icon: string; to: string }>;
+  prioritizedModules: string[];
+}
+
 /**
  * Cliente de API do módulo Identity.
  * Cobre autenticação, gestão de usuários, papéis, permissões, sessões,
@@ -335,4 +342,9 @@ export const identityApi = {
 
   activateTenantAdmin: (tenantId: string) =>
     client.patch(`/identity/admin/tenants/${encodeURIComponent(tenantId)}/activate`).then((r) => r.data),
+
+  // ── Wave X.3 — Persona-Aware Adaptive Navigation ─────────────────────────────
+  /** Obtém a configuração de navegação adaptativa para a persona do utilizador autenticado. */
+  getPersonaConfig: () =>
+    client.get<PersonaConfigResponse>('/identity/me/persona-config').then((r) => r.data),
 };

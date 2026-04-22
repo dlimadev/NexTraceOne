@@ -11,6 +11,7 @@ using ActivateUserFeature = NexTraceOne.IdentityAccess.Application.Features.Acti
 using AssignRoleFeature = NexTraceOne.IdentityAccess.Application.Features.AssignRole.AssignRole;
 using CreateUserFeature = NexTraceOne.IdentityAccess.Application.Features.CreateUser.CreateUser;
 using DeactivateUserFeature = NexTraceOne.IdentityAccess.Application.Features.DeactivateUser.DeactivateUser;
+using GetPersonaConfigFeature = NexTraceOne.IdentityAccess.Application.Features.GetPersonaConfig.GetPersonaConfig;
 using GetUserProfileFeature = NexTraceOne.IdentityAccess.Application.Features.GetUserProfile.GetUserProfile;
 using ListActiveSessionsFeature = NexTraceOne.IdentityAccess.Application.Features.ListActiveSessions.ListActiveSessions;
 using ListTenantUsersFeature = NexTraceOne.IdentityAccess.Application.Features.ListTenantUsers.ListTenantUsers;
@@ -107,6 +108,17 @@ internal static class UserEndpoints
             var result = await sender.Send(new ListActiveSessionsFeature.Query(userId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("identity:sessions:read");
+
+        // ── Wave X.3 — Persona-Aware Adaptive Navigation ───────────────────────────────────────────
+        group.MapGet("/me/persona-config", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetPersonaConfigFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequireAuthorization()
+          .WithName("GetPersonaConfig");
     }
 
     /// <summary>

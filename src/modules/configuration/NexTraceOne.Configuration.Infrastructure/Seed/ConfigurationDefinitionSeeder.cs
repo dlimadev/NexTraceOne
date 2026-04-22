@@ -9215,5 +9215,94 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "3",
             uiEditorType: "number",
             sortOrder: 11510),
+
+        // ── Wave X config keys (sort 11520–11590) ─────────────────────────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "ui.executive_dashboard.enabled",
+            displayName: "config.ui.executive_dashboard.enabled.name",
+            description: "config.ui.executive_dashboard.enabled.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 11520),
+
+        ConfigurationDefinition.Create(
+            key: "ui.executive_dashboard.risk_threshold",
+            displayName: "config.ui.executive_dashboard.risk_threshold.name",
+            description: "config.ui.executive_dashboard.risk_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 11530),
+
+        ConfigurationDefinition.Create(
+            key: "ui.contract_studio.graphql_diff.max_snapshot_age_days",
+            displayName: "config.ui.contract_studio.graphql_diff.max_snapshot_age_days.name",
+            description: "config.ui.contract_studio.graphql_diff.max_snapshot_age_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11540),
+
+        ConfigurationDefinition.Create(
+            key: "ui.contract_studio.protobuf_diff.max_snapshot_age_days",
+            displayName: "config.ui.contract_studio.protobuf_diff.max_snapshot_age_days.name",
+            description: "config.ui.contract_studio.protobuf_diff.max_snapshot_age_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 11550),
+
+        ConfigurationDefinition.Create(
+            key: "ui.adaptive_navigation.enabled",
+            displayName: "config.ui.adaptive_navigation.enabled.name",
+            description: "config.ui.adaptive_navigation.enabled.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 11560),
+
+        ConfigurationDefinition.Create(
+            key: "ui.adaptive_navigation.quick_actions_count",
+            displayName: "config.ui.adaptive_navigation.quick_actions_count.name",
+            description: "config.ui.adaptive_navigation.quick_actions_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 11570),
+
+        ConfigurationDefinition.Create(
+            key: "ui.executive_dashboard.finops_burn_warn_threshold_pct",
+            displayName: "config.ui.executive_dashboard.finops_burn_warn_threshold_pct.name",
+            description: "config.ui.executive_dashboard.finops_burn_warn_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "80",
+            uiEditorType: "number",
+            sortOrder: 11580),
+
+        ConfigurationDefinition.Create(
+            key: "ui.executive_dashboard.mttr_sparkline_services",
+            displayName: "config.ui.executive_dashboard.mttr_sparkline_services.name",
+            description: "config.ui.executive_dashboard.mttr_sparkline_services.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 11590),
     ];
 }
