@@ -14175,5 +14175,43 @@
       "AtRisk": "At Risk",
       "Failing": "Failing"
     }
+  },
+  "ideContextApi": {
+    "title": "IDE Context API",
+    "serviceContext": "Service Context",
+    "contractContext": "Contract Context",
+    "usageRecorded": "IDE usage recorded",
+    "notFound": "Resource not found in IDE context",
+    "sessionTokenTtl": "IDE Session Token TTL",
+    "cacheTtl": "Context Cache TTL",
+    "maxTokensPerRequest": "Max AI Tokens per Request"
+  },
+  "notificationChannel": {
+    "title": "Notification Delivery Report",
+    "channelHealth": "Channel Health",
+    "healthy": "Healthy",
+    "degraded": "Degraded",
+    "failing": "Failing",
+    "deliverySuccessRate": "Delivery Success Rate",
+    "deadLetterCount": "Dead Letter Count",
+    "eventTypeDistribution": "Event Type Distribution",
+    "topRecipients": "Top Recipients",
+    "retryCount": "Max Retry Count",
+    "retryDelay": "Retry Delay (seconds)"
+  },
+  "notificationEffectiveness": {
+    "title": "Notification Effectiveness Report",
+    "actionRate": "Action Rate",
+    "silenceRate": "Silence Rate",
+    "medianTimeToAction": "Median Time to Action",
+    "highImpact": "High Impact",
+    "moderate": "Moderate",
+    "lowImpact": "Low Impact",
+    "noise": "Noise",
+    "alertFatigue": "Alert Fatigue Candidates",
+    "tenantHealthScore": "Tenant Notification Health Score",
+    "recommendedAdjustments": "Recommended Adjustments",
+    "actionWindowHours": "Action Window (hours)",
+    "noiseVolumeThreshold": "Noise Volume Threshold"
   }
 }

@@ -15410,5 +15410,43 @@
       "AtRisk": "En Riesgo",
       "Failing": "Fallando"
     }
+  },
+  "ideContextApi": {
+    "title": "API de Contexto IDE",
+    "serviceContext": "Contexto de Servicio",
+    "contractContext": "Contexto de Contrato",
+    "usageRecorded": "Uso IDE registrado",
+    "notFound": "Recurso no encontrado en el contexto IDE",
+    "sessionTokenTtl": "TTL del Token de Sesión IDE",
+    "cacheTtl": "TTL de la Caché de Contexto",
+    "maxTokensPerRequest": "Máx. Tokens AI por Solicitud"
+  },
+  "notificationChannel": {
+    "title": "Informe de Entrega de Notificaciones",
+    "channelHealth": "Salud del Canal",
+    "healthy": "Saludable",
+    "degraded": "Degradado",
+    "failing": "Fallando",
+    "deliverySuccessRate": "Tasa de Éxito de Entrega",
+    "deadLetterCount": "Conteo de Dead Letter",
+    "eventTypeDistribution": "Distribución por Tipo de Evento",
+    "topRecipients": "Principales Destinatarios",
+    "retryCount": "Máx. Intentos",
+    "retryDelay": "Retraso entre Intentos (segundos)"
+  },
+  "notificationEffectiveness": {
+    "title": "Informe de Efectividad de Notificaciones",
+    "actionRate": "Tasa de Acción",
+    "silenceRate": "Tasa de Silencio",
+    "medianTimeToAction": "Mediana del Tiempo hasta Acción",
+    "highImpact": "Alto Impacto",
+    "moderate": "Moderado",
+    "lowImpact": "Bajo Impacto",
+    "noise": "Ruido",
+    "alertFatigue": "Candidatos a Fatiga de Alertas",
+    "tenantHealthScore": "Puntuación de Salud de Notificaciones del Tenant",
+    "recommendedAdjustments": "Ajustes Recomendados",
+    "actionWindowHours": "Ventana de Acción (horas)",
+    "noiseVolumeThreshold": "Umbral de Volumen de Ruido"
   }
 }

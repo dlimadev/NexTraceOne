@@ -10290,5 +10290,94 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "100",
             uiEditorType: "number",
             sortOrder: 12470),
+
+        // ── Wave AK — Developer Experience & Notification Management ──────────
+        ConfigurationDefinition.Create(
+            key: "ide.session_token.ttl_minutes",
+            displayName: "config.ide.session_token.ttl_minutes.name",
+            description: "config.ide.session_token.ttl_minutes.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 12480),
+
+        ConfigurationDefinition.Create(
+            key: "ide.context.cache_ttl_seconds",
+            displayName: "config.ide.context.cache_ttl_seconds.name",
+            description: "config.ide.context.cache_ttl_seconds.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12490),
+
+        ConfigurationDefinition.Create(
+            key: "ide.ai.max_tokens_per_request",
+            displayName: "config.ide.ai.max_tokens_per_request.name",
+            description: "config.ide.ai.max_tokens_per_request.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "2000",
+            uiEditorType: "number",
+            sortOrder: 12500),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.outbox.retry_count",
+            displayName: "config.notifications.outbox.retry_count.name",
+            description: "config.notifications.outbox.retry_count.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "3",
+            uiEditorType: "number",
+            sortOrder: 12510),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.outbox.retry_delay_seconds",
+            displayName: "config.notifications.outbox.retry_delay_seconds.name",
+            description: "config.notifications.outbox.retry_delay_seconds.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "60",
+            uiEditorType: "number",
+            sortOrder: 12520),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.effectiveness.action_window_hours",
+            displayName: "config.notifications.effectiveness.action_window_hours.name",
+            description: "config.notifications.effectiveness.action_window_hours.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "4",
+            uiEditorType: "number",
+            sortOrder: 12530),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.effectiveness.noise_volume_threshold",
+            displayName: "config.notifications.effectiveness.noise_volume_threshold.name",
+            description: "config.notifications.effectiveness.noise_volume_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 12540),
+
+        ConfigurationDefinition.Create(
+            key: "notifications.channels.max_per_tenant",
+            displayName: "config.notifications.channels.max_per_tenant.name",
+            description: "config.notifications.channels.max_per_tenant.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 12550),
     ];
 }
