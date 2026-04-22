@@ -15563,5 +15563,37 @@
     "toilReductionEvidence": "Evidência de Redução de Toil",
     "postIncidentReviewRate": "Taxa de Post-Incident Review",
     "runbookCompleteness": "Completude de Runbooks"
+  },
+  "sbomCoverage": {
+    "title": "Relatório de Cobertura SBOM",
+    "covered": "Coberto",
+    "stale": "Desactualizado",
+    "outdated": "Obsoleto",
+    "missing": "Em Falta",
+    "componentCount": "Contagem de Componentes",
+    "criticalCveCount": "Contagem de CVEs Críticos",
+    "licenseRiskFlags": "Alertas de Risco de Licença",
+    "topVulnerableServices": "Serviços Mais Vulneráveis"
+  },
+  "dependencyProvenance": {
+    "title": "Relatório de Proveniência de Dependências",
+    "trusted": "Confiável",
+    "review": "Em Revisão",
+    "highRisk": "Alto Risco",
+    "blocked": "Bloqueado",
+    "unapprovedRegistryComponents": "Componentes de Registos Não Aprovados",
+    "highRiskLicenseComponents": "Componentes com Licença de Alto Risco",
+    "mostUsedComponents": "Componentes Mais Usados",
+    "singlePointOfFailure": "Ponto Único de Falha"
+  },
+  "supplyChainRisk": {
+    "title": "Relatório de Risco da Cadeia de Fornecimento",
+    "secure": "Seguro",
+    "monitored": "Monitorizado",
+    "exposed": "Exposto",
+    "critical": "Crítico",
+    "prioritizedPatchList": "Lista de Patches Prioritários",
+    "unpatchedWindowDays": "Janela Sem Patch (dias)",
+    "tenantRiskScore": "Score de Risco do Tenant"
   }
 }

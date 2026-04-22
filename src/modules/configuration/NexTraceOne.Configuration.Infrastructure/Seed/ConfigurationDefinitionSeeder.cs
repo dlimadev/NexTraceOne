@@ -10557,5 +10557,93 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "3",
             uiEditorType: "number",
             sortOrder: 12790),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.coverage.fresh_days",
+            displayName: "config.sbom.coverage.fresh_days.name",
+            description: "config.sbom.coverage.fresh_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12800),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.coverage.stale_days",
+            displayName: "config.sbom.coverage.stale_days.name",
+            description: "config.sbom.coverage.stale_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12810),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.provenance.approved_registries",
+            displayName: "config.sbom.provenance.approved_registries.name",
+            description: "config.sbom.provenance.approved_registries.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "nuget.org,npmjs.com",
+            uiEditorType: "text",
+            sortOrder: 12820),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.provenance.high_risk_licenses",
+            displayName: "config.sbom.provenance.high_risk_licenses.name",
+            description: "config.sbom.provenance.high_risk_licenses.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "GPL,AGPL",
+            uiEditorType: "text",
+            sortOrder: 12830),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.risk.spof_service_threshold",
+            displayName: "config.sbom.risk.spof_service_threshold.name",
+            description: "config.sbom.risk.spof_service_threshold.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 12840),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.risk.critical_cve_weight",
+            displayName: "config.sbom.risk.critical_cve_weight.name",
+            description: "config.sbom.risk.critical_cve_weight.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 12850),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.risk.exposure_weight",
+            displayName: "config.sbom.risk.exposure_weight.name",
+            description: "config.sbom.risk.exposure_weight.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 12860),
+
+        ConfigurationDefinition.Create(
+            key: "sbom.risk.customer_facing_weight",
+            displayName: "config.sbom.risk.customer_facing_weight.name",
+            description: "config.sbom.risk.customer_facing_weight.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 12870),
     ];
 }

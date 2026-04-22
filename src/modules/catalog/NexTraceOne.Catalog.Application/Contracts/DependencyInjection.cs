@@ -5,6 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetDependencyProvenanceReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetSbomCoverageReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetSupplyChainRiskReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.IngestSbomRecord;
 using NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
 using NexTraceOne.Catalog.Application.Contracts.Features.ComputeContractHealthDashboard;
@@ -140,6 +144,12 @@ public static class DependencyInjection
         services.AddTransient<IValidator<SubmitContractReview.Command>, SubmitContractReview.Validator>();
         services.AddTransient<IValidator<SearchMarketplace.Query>, SearchMarketplace.Validator>();
         services.AddTransient<IValidator<GetContractListing.Query>, GetContractListing.Validator>();
+
+        // ── Wave AO — Supply Chain & Dependency Provenance ─────────────────
+        services.AddTransient<IValidator<IngestSbomRecord.Command>, IngestSbomRecord.Validator>();
+        services.AddTransient<IValidator<GetSbomCoverageReport.Query>, GetSbomCoverageReport.Validator>();
+        services.AddTransient<IValidator<GetDependencyProvenanceReport.Query>, GetDependencyProvenanceReport.Validator>();
+        services.AddTransient<IValidator<GetSupplyChainRiskReport.Query>, GetSupplyChainRiskReport.Validator>();
 
         return services;
     }

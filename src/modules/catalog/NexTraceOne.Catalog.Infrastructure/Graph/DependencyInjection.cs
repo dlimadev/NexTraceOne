@@ -92,6 +92,16 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDriftReader, NexTraceOne.Catalog.Application.Contracts.NullContractDriftReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ICatalogHealthMaintenanceReader, NexTraceOne.Catalog.Application.Services.NullCatalogHealthMaintenanceReader>();
 
+        // ── Wave AO — Supply Chain null readers ─────────────────────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISbomRepository,
+            NexTraceOne.Catalog.Application.Contracts.NullSbomRepository>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISbomCoverageReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSbomCoverageReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader,
+            NexTraceOne.Catalog.Application.Contracts.NullDependencyProvenanceReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISupplyChainRiskReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSupplyChainRiskReader>();
+
         return services;
     }
 }

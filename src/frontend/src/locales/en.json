@@ -14298,5 +14298,37 @@
     "toilReductionEvidence": "Toil Reduction Evidence",
     "postIncidentReviewRate": "Post-Incident Review Rate",
     "runbookCompleteness": "Runbook Completeness"
+  },
+  "sbomCoverage": {
+    "title": "SBOM Coverage Report",
+    "covered": "Covered",
+    "stale": "Stale",
+    "outdated": "Outdated",
+    "missing": "Missing",
+    "componentCount": "Component Count",
+    "criticalCveCount": "Critical CVE Count",
+    "licenseRiskFlags": "License Risk Flags",
+    "topVulnerableServices": "Top Vulnerable Services"
+  },
+  "dependencyProvenance": {
+    "title": "Dependency Provenance Report",
+    "trusted": "Trusted",
+    "review": "Review",
+    "highRisk": "High Risk",
+    "blocked": "Blocked",
+    "unapprovedRegistryComponents": "Unapproved Registry Components",
+    "highRiskLicenseComponents": "High Risk License Components",
+    "mostUsedComponents": "Most Used Components",
+    "singlePointOfFailure": "Single Point of Failure"
+  },
+  "supplyChainRisk": {
+    "title": "Supply Chain Risk Report",
+    "secure": "Secure",
+    "monitored": "Monitored",
+    "exposed": "Exposed",
+    "critical": "Critical",
+    "prioritizedPatchList": "Prioritized Patch List",
+    "unpatchedWindowDays": "Unpatched Window (days)",
+    "tenantRiskScore": "Tenant Risk Score"
   }
 }
