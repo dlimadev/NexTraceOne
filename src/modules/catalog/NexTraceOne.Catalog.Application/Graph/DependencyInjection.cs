@@ -35,6 +35,9 @@ using NexTraceOne.Catalog.Application.Graph.Features.RegisterFromDiscovery;
 using NexTraceOne.Catalog.Application.Graph.Features.IgnoreDiscoveredService;
 using NexTraceOne.Catalog.Application.Graph.Features.GetDiscoveryDashboard;
 using NexTraceOne.Catalog.Application.Services.Features.GetOnboardingHealthReport;
+using NexTraceOne.Catalog.Application.Services.Features.GetUncatalogedServicesReport;
+using NexTraceOne.Catalog.Application.Services.Features.GetCatalogHealthMaintenanceReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetContractDriftFromRealityReport;
 
 namespace NexTraceOne.Catalog.Application.Graph;
 
@@ -106,6 +109,11 @@ public static class DependencyInjection
 
         // ── Wave AC.1 — Onboarding Health Report ──────────────────────────
         services.AddTransient<IValidator<GetOnboardingHealthReport.Query>, GetOnboardingHealthReport.Validator>();
+
+        // ── Wave AM — Auto-Cataloging & Service Discovery Intelligence ─────
+        services.AddTransient<IValidator<GetUncatalogedServicesReport.Query>, GetUncatalogedServicesReport.Validator>();
+        services.AddTransient<IValidator<GetContractDriftFromRealityReport.Query>, GetContractDriftFromRealityReport.Validator>();
+        services.AddTransient<IValidator<GetCatalogHealthMaintenanceReport.Query>, GetCatalogHealthMaintenanceReport.Validator>();
 
         return services;
     }

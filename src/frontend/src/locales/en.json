@@ -14213,5 +14213,45 @@
     "recommendedAdjustments": "Recommended Adjustments",
     "actionWindowHours": "Action Window (hours)",
     "noiseVolumeThreshold": "Noise Volume Threshold"
+  },
+  "uncatalogedServices": {
+    "title": "Uncataloged Services Report",
+    "shadowServiceRisk": "Shadow Service Risk",
+    "catalogCoverageRate": "Catalog Coverage Rate",
+    "uncatalogedCount": "Uncataloged Service Count",
+    "suggestedTier": "Suggested Tier",
+    "possibleOwner": "Possible Owner",
+    "quickRegisterList": "Quick Register List",
+    "critical": "Critical",
+    "standard": "Standard",
+    "internal": "Internal"
+  },
+  "contractDriftFromReality": {
+    "title": "Contract Drift From Reality Report",
+    "undocumentedCalls": "Undocumented Calls",
+    "unusedDocumentedOps": "Unused Documented Operations",
+    "parameterMismatches": "Parameter Mismatches",
+    "aligned": "Aligned",
+    "minorDrift": "Minor Drift",
+    "significantDrift": "Significant Drift",
+    "misaligned": "Misaligned",
+    "tenantRealityScore": "Tenant Contract Reality Score",
+    "autoDocumentationHints": "Auto-Documentation Hints"
+  },
+  "catalogHealthMaintenance": {
+    "title": "Catalog Health Maintenance Report",
+    "catalogQualityScore": "Catalog Quality Score",
+    "excellent": "Excellent",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor",
+    "tenantHealthScore": "Tenant Catalog Health Score",
+    "campaignList": "Campaign List",
+    "staleEntryList": "Stale Entry List",
+    "descriptionCompleteness": "Description Completeness",
+    "ownershipFreshness": "Ownership Freshness",
+    "contractCoverage": "Contract Coverage",
+    "dependencyMapFreshness": "Dependency Map Freshness",
+    "runbookLinked": "Runbook Linked"
   }
 }

@@ -87,6 +87,11 @@ public static class DependencyInjection
         // ── Wave AC.1 — Onboarding Health Report (null reader) ────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IOnboardingHealthReader, NexTraceOne.Catalog.Application.Services.NullOnboardingHealthReader>();
 
+        // ── Wave AM — null readers ─────────────────────────────────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IUncatalogedServicesReader, NexTraceOne.Catalog.Application.Services.NullUncatalogedServicesReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDriftReader, NexTraceOne.Catalog.Application.Contracts.NullContractDriftReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ICatalogHealthMaintenanceReader, NexTraceOne.Catalog.Application.Services.NullCatalogHealthMaintenanceReader>();
+
         return services;
     }
 }

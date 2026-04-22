@@ -15445,5 +15445,45 @@
     "recommendedAdjustments": "Ajustes Recomendados",
     "actionWindowHours": "Janela de Acção (horas)",
     "noiseVolumeThreshold": "Threshold de Volume de Ruído"
+  },
+  "uncatalogedServices": {
+    "title": "Relatório de Serviços Não Catalogados",
+    "shadowServiceRisk": "Risco de Shadow Services",
+    "catalogCoverageRate": "Taxa de Cobertura do Catálogo",
+    "uncatalogedCount": "Total de Serviços Não Catalogados",
+    "suggestedTier": "Tier Sugerido",
+    "possibleOwner": "Possível Owner",
+    "quickRegisterList": "Lista de Registo Rápido",
+    "critical": "Crítico",
+    "standard": "Standard",
+    "internal": "Interno"
+  },
+  "contractDriftFromReality": {
+    "title": "Relatório de Divergência Contrato vs. Realidade",
+    "undocumentedCalls": "Chamadas Não Documentadas",
+    "unusedDocumentedOps": "Operações Documentadas Não Usadas",
+    "parameterMismatches": "Parâmetros Divergentes",
+    "aligned": "Alinhado",
+    "minorDrift": "Pequena Divergência",
+    "significantDrift": "Divergência Significativa",
+    "misaligned": "Desalinhado",
+    "tenantRealityScore": "Score de Realidade de Contratos do Tenant",
+    "autoDocumentationHints": "Sugestões de Auto-Documentação"
+  },
+  "catalogHealthMaintenance": {
+    "title": "Relatório de Saúde de Manutenção do Catálogo",
+    "catalogQualityScore": "Score de Qualidade do Catálogo",
+    "excellent": "Excelente",
+    "good": "Bom",
+    "fair": "Regular",
+    "poor": "Fraco",
+    "tenantHealthScore": "Score de Saúde do Catálogo do Tenant",
+    "campaignList": "Lista de Campanha",
+    "staleEntryList": "Lista de Entradas Desactualizadas",
+    "descriptionCompleteness": "Completude da Descrição",
+    "ownershipFreshness": "Actualidade do Ownership",
+    "contractCoverage": "Cobertura de Contratos",
+    "dependencyMapFreshness": "Actualidade do Mapa de Dependências",
+    "runbookLinked": "Runbook Ligado"
   }
 }
