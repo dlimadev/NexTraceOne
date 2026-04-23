@@ -14873,5 +14873,95 @@
     },
     "correlationWindowHours": "Correlation Window (hours)",
     "sbomSnapshotFrequencyDays": "SBOM Snapshot Frequency (days)"
+  },
+  "documentationHealth": {
+    "title": "Documentation Health",
+    "runbookCoverage": "Runbook Coverage",
+    "apiDocCoverage": "API Documentation Coverage",
+    "architectureDocPresence": "Architecture Doc Present",
+    "onboardingDocPresence": "Onboarding Doc Present",
+    "docFreshnessTier": "Documentation Freshness",
+    "docHealthScore": "Doc Health Score",
+    "servicesWithRunbook": "Services with Runbook",
+    "servicesWithStaleRunbook": "Services with Stale Runbook",
+    "servicesWithoutRunbook": "Services without Runbook",
+    "apiContractsFullyDocumentedPct": "API Contracts Fully Documented (%)",
+    "tenantDocHealthScore": "Tenant Documentation Health Score",
+    "criticalServicesWithoutRunbook": "Critical Services without Runbook",
+    "staleDocsByTeam": "Teams with Stale Documentation",
+    "docDebt": "Documentation Debt",
+    "bestDocumentedServices": "Best Documented Services",
+    "freshnessDays": "Documentation Freshness (days)",
+    "runbookFreshnessDays": "Runbook Freshness (days)",
+    "criticalWithoutRunbookTier": "Service Tiers Requiring Runbook",
+    "runbookCoverageStatuses": {
+      "covered": "Covered",
+      "stale": "Stale",
+      "missing": "Missing"
+    },
+    "apiDocCoverageStatuses": {
+      "full": "Full",
+      "partial": "Partial",
+      "absent": "Absent"
+    },
+    "freshnessTiers": {
+      "fresh": "Fresh",
+      "aging": "Aging",
+      "stale": "Stale",
+      "critical": "Critical"
+    },
+    "tiers": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "partial": "Partial",
+      "critical": "Critical"
+    }
+  },
+  "knowledgeBaseUtilization": {
+    "title": "Knowledge Base Utilization",
+    "topSearchTerms": "Top Search Terms",
+    "searchTermsWithNoResults": "Search Terms with No Results",
+    "searchTermsWithLowRelevance": "Search Terms with Low Relevance",
+    "searchVolumeTrend": "Search Volume Trend",
+    "topKnowledgeGaps": "Top Knowledge Gaps",
+    "mostAccessedDocuments": "Most Accessed Documents",
+    "mostAccessedRunbooks": "Most Accessed Runbooks",
+    "dailyActiveKnowledgeUsers": "Daily Active Knowledge Users",
+    "searchPerUserPerWeek": "Searches per User per Week",
+    "knowledgeResolutionRate": "Knowledge Resolution Rate",
+    "knowledgeGapCount": "Knowledge Gap Count",
+    "resolutionRateThriving": "Resolution Rate Threshold for Thriving (%)",
+    "gapCountThriving": "Max Gaps for Thriving",
+    "searchEventTrackingEnabled": "Search Event Tracking Enabled",
+    "tiers": {
+      "thriving": "Thriving",
+      "active": "Active",
+      "underused": "Underused",
+      "gapHeavy": "Gap-Heavy"
+    }
+  },
+  "teamKnowledgeSharing": {
+    "title": "Team Knowledge Sharing",
+    "docContributionCount": "Doc Contribution Count",
+    "crossTeamContributions": "Cross-Team Contributions",
+    "docConsumptionCount": "Doc Consumption Count",
+    "runbookContributionCount": "Runbook Contribution Count",
+    "knowledgeSharingRatio": "Knowledge Sharing Ratio",
+    "knowledgeSiloRisk": "Knowledge Silo Risk",
+    "teamsWithSiloRisk": "Teams with Silo Risk",
+    "topKnowledgeContributors": "Top Knowledge Contributors",
+    "tenantKnowledgeSharingScore": "Tenant Knowledge Sharing Score",
+    "knowledgeFlowGraph": "Knowledge Flow Graph",
+    "knowledgeHotspots": "Knowledge Hotspots",
+    "knowledgeColdSpots": "Knowledge Cold Spots",
+    "collaborationTrend": "Collaboration Trend (90d)",
+    "busFactor1Services": "Bus Factor 1 Services",
+    "siloThreshold": "Silo Threshold",
+    "busFactorMaxContributors": "Bus Factor Max Contributors",
+    "trendDirections": {
+      "growing": "Growing",
+      "stable": "Stable",
+      "declining": "Declining"
+    }
   }
 }

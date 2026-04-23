@@ -4065,7 +4065,16 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `knowledgeBaseUtilization.*` — utilização do knowledge hub, TopKnowledgeGaps, SearchPatterns, KnowledgeResolutionRate e KnowledgeHubHealthTier
 - `teamKnowledgeSharing.*` — partilha de conhecimento, KnowledgeSharingRatio, SiloRisk, BusFactor1Services e CollaborationTrend
 
-**Totais estimados Wave AY:** Catalog/Knowledge/Foundation: ~44 testes (AY.1 ~15 + AY.2 ~14 + AY.3 ~15). Configuração: +8 config keys (sort 13600–13670). i18n: +3 secções (4 locales). **Wave AY PLANEADA**.
+**Totais estimados Wave AY:** Catalog/Knowledge/Foundation: ~44 testes (AY.1 ~15 + AY.2 ~14 + AY.3 ~15). Configuração: +8 config keys (sort 13600–13670). i18n: +3 secções (4 locales). **Wave AY COMPLETA**.
+
+**Implementação Wave AY:**
+- AY.1: `IDocumentationHealthReader`, `NullDocumentationHealthReader`, `GetDocumentationHealthReport` handler (Catalog Application) — 17 testes unitários
+- AY.2: `IKnowledgeBaseUtilizationReader`, `NullKnowledgeBaseUtilizationReader`, `GetKnowledgeBaseUtilizationReport` handler (Knowledge Application) — 14 testes unitários
+- AY.3: `ITeamKnowledgeSharingReader`, `NullTeamKnowledgeSharingReader`, `GetTeamKnowledgeSharingReport` handler (Knowledge Application) — 10 testes unitários
+- 8 config keys adicionados ao `featureConfig.ts` (sort 13600–13670)
+- i18n: secções `documentationHealth`, `knowledgeBaseUtilization`, `teamKnowledgeSharing` em 4 locales (en, pt-BR, pt-PT, es)
+- DI registado em `Catalog.Application/Contracts/DependencyInjection.cs` e `Knowledge.Application/DependencyInjection.cs`
+- `InternalsVisibleTo` adicionado ao `NexTraceOne.Knowledge.Application.csproj`
 
 ---
 

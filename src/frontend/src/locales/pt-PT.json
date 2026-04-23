@@ -16105,5 +16105,95 @@
     },
     "correlationWindowHours": "Janela de Correlação (horas)",
     "sbomSnapshotFrequencyDays": "Frequência de Snapshot SBOM (dias)"
+  },
+  "documentationHealth": {
+    "title": "Saúde da Documentação",
+    "runbookCoverage": "Cobertura de Runbook",
+    "apiDocCoverage": "Cobertura de Documentação de API",
+    "architectureDocPresence": "Documentação de Arquitectura Presente",
+    "onboardingDocPresence": "Guia de Onboarding Presente",
+    "docFreshnessTier": "Frescura da Documentação",
+    "docHealthScore": "Score de Saúde da Documentação",
+    "servicesWithRunbook": "Serviços com Runbook",
+    "servicesWithStaleRunbook": "Serviços com Runbook Desactualizado",
+    "servicesWithoutRunbook": "Serviços sem Runbook",
+    "apiContractsFullyDocumentedPct": "Contratos de API Totalmente Documentados (%)",
+    "tenantDocHealthScore": "Score de Saúde da Documentação do Tenant",
+    "criticalServicesWithoutRunbook": "Serviços Críticos sem Runbook",
+    "staleDocsByTeam": "Equipas com Documentação Desactualizada",
+    "docDebt": "Débito de Documentação",
+    "bestDocumentedServices": "Serviços Melhor Documentados",
+    "freshnessDays": "Frescura da Documentação (dias)",
+    "runbookFreshnessDays": "Frescura do Runbook (dias)",
+    "criticalWithoutRunbookTier": "Tiers de Serviço que Requerem Runbook",
+    "runbookCoverageStatuses": {
+      "covered": "Coberto",
+      "stale": "Desactualizado",
+      "missing": "Ausente"
+    },
+    "apiDocCoverageStatuses": {
+      "full": "Completa",
+      "partial": "Parcial",
+      "absent": "Ausente"
+    },
+    "freshnessTiers": {
+      "fresh": "Fresco",
+      "aging": "A Envelhecer",
+      "stale": "Desactualizado",
+      "critical": "Crítico"
+    },
+    "tiers": {
+      "excellent": "Excelente",
+      "good": "Bom",
+      "partial": "Parcial",
+      "critical": "Crítico"
+    }
+  },
+  "knowledgeBaseUtilization": {
+    "title": "Utilização da Base de Conhecimento",
+    "topSearchTerms": "Termos de Pesquisa Mais Frequentes",
+    "searchTermsWithNoResults": "Termos sem Resultados",
+    "searchTermsWithLowRelevance": "Termos com Baixa Relevância",
+    "searchVolumeTrend": "Tendência de Volume de Pesquisa",
+    "topKnowledgeGaps": "Principais Lacunas de Conhecimento",
+    "mostAccessedDocuments": "Documentos Mais Acedidos",
+    "mostAccessedRunbooks": "Runbooks Mais Acedidos",
+    "dailyActiveKnowledgeUsers": "Utilizadores Diários do Knowledge Hub",
+    "searchPerUserPerWeek": "Pesquisas por Utilizador por Semana",
+    "knowledgeResolutionRate": "Taxa de Resolução do Conhecimento",
+    "knowledgeGapCount": "Contagem de Lacunas de Conhecimento",
+    "resolutionRateThriving": "Taxa de Resolução para Thriving (%)",
+    "gapCountThriving": "Máx. Lacunas para Thriving",
+    "searchEventTrackingEnabled": "Tracking de Eventos de Pesquisa Activo",
+    "tiers": {
+      "thriving": "Florescendo",
+      "active": "Activo",
+      "underused": "Subutilizado",
+      "gapHeavy": "Cheio de Lacunas"
+    }
+  },
+  "teamKnowledgeSharing": {
+    "title": "Partilha de Conhecimento por Equipa",
+    "docContributionCount": "Contribuições de Documentação",
+    "crossTeamContributions": "Contribuições Cross-Team",
+    "docConsumptionCount": "Consumo de Documentação",
+    "runbookContributionCount": "Contribuições de Runbook",
+    "knowledgeSharingRatio": "Rácio de Partilha de Conhecimento",
+    "knowledgeSiloRisk": "Risco de Silo de Conhecimento",
+    "teamsWithSiloRisk": "Equipas com Risco de Silo",
+    "topKnowledgeContributors": "Top Contribuidores de Conhecimento",
+    "tenantKnowledgeSharingScore": "Score de Partilha de Conhecimento do Tenant",
+    "knowledgeFlowGraph": "Grafo de Fluxo de Conhecimento",
+    "knowledgeHotspots": "Hotspots de Conhecimento",
+    "knowledgeColdSpots": "Cold Spots de Conhecimento",
+    "collaborationTrend": "Tendência de Colaboração (90d)",
+    "busFactor1Services": "Serviços com Bus Factor = 1",
+    "siloThreshold": "Limiar de Silo",
+    "busFactorMaxContributors": "Máx. Contribuidores Bus Factor",
+    "trendDirections": {
+      "growing": "A Crescer",
+      "stable": "Estável",
+      "declining": "A Diminuir"
+    }
   }
 }

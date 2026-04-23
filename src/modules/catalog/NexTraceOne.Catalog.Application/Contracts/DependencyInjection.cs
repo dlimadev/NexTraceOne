@@ -12,6 +12,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GetFeatureFlagInventory
 using NexTraceOne.Catalog.Application.Contracts.Features.GetFeatureFlagRiskReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetVulnerabilityExposureReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSecurityPatchComplianceReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetDocumentationHealthReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSbomCoverageReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSupplyChainRiskReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.IngestFeatureFlagState;
@@ -173,6 +174,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetSecurityPatchComplianceReport.Query>, GetSecurityPatchComplianceReport.Validator>();
         services.AddSingleton<IVulnerabilityExposureReader, NullVulnerabilityExposureReader>();
         services.AddSingleton<ISecurityPatchComplianceReader, NullSecurityPatchComplianceReader>();
+
+        // ── Wave AY — Organizational Knowledge & Documentation Intelligence ─
+        services.AddTransient<IValidator<GetDocumentationHealthReport.Query>, GetDocumentationHealthReport.Validator>();
+        services.AddSingleton<IDocumentationHealthReader, NullDocumentationHealthReader>();
 
         return services;
     }

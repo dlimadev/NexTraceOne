@@ -16108,5 +16108,95 @@
     },
     "correlationWindowHours": "Ventana de Correlación (horas)",
     "sbomSnapshotFrequencyDays": "Frecuencia de Snapshot SBOM (días)"
+  },
+  "documentationHealth": {
+    "title": "Salud de la Documentación",
+    "runbookCoverage": "Cobertura de Runbook",
+    "apiDocCoverage": "Cobertura de Documentación de API",
+    "architectureDocPresence": "Documentación de Arquitectura Presente",
+    "onboardingDocPresence": "Guía de Onboarding Presente",
+    "docFreshnessTier": "Frescura de la Documentación",
+    "docHealthScore": "Puntuación de Salud Documental",
+    "servicesWithRunbook": "Servicios con Runbook",
+    "servicesWithStaleRunbook": "Servicios con Runbook Desactualizado",
+    "servicesWithoutRunbook": "Servicios sin Runbook",
+    "apiContractsFullyDocumentedPct": "Contratos API Completamente Documentados (%)",
+    "tenantDocHealthScore": "Puntuación de Salud Documental del Tenant",
+    "criticalServicesWithoutRunbook": "Servicios Críticos sin Runbook",
+    "staleDocsByTeam": "Equipos con Documentación Desactualizada",
+    "docDebt": "Deuda de Documentación",
+    "bestDocumentedServices": "Servicios Mejor Documentados",
+    "freshnessDays": "Frescura de la Documentación (días)",
+    "runbookFreshnessDays": "Frescura del Runbook (días)",
+    "criticalWithoutRunbookTier": "Niveles de Servicio que Requieren Runbook",
+    "runbookCoverageStatuses": {
+      "covered": "Cubierto",
+      "stale": "Desactualizado",
+      "missing": "Ausente"
+    },
+    "apiDocCoverageStatuses": {
+      "full": "Completa",
+      "partial": "Parcial",
+      "absent": "Ausente"
+    },
+    "freshnessTiers": {
+      "fresh": "Fresco",
+      "aging": "Envejeciendo",
+      "stale": "Desactualizado",
+      "critical": "Crítico"
+    },
+    "tiers": {
+      "excellent": "Excelente",
+      "good": "Bueno",
+      "partial": "Parcial",
+      "critical": "Crítico"
+    }
+  },
+  "knowledgeBaseUtilization": {
+    "title": "Utilización de la Base de Conocimiento",
+    "topSearchTerms": "Términos de Búsqueda Más Frecuentes",
+    "searchTermsWithNoResults": "Términos sin Resultados",
+    "searchTermsWithLowRelevance": "Términos con Baja Relevancia",
+    "searchVolumeTrend": "Tendencia de Volumen de Búsqueda",
+    "topKnowledgeGaps": "Principales Brechas de Conocimiento",
+    "mostAccessedDocuments": "Documentos Más Accedidos",
+    "mostAccessedRunbooks": "Runbooks Más Accedidos",
+    "dailyActiveKnowledgeUsers": "Usuarios Diarios del Hub de Conocimiento",
+    "searchPerUserPerWeek": "Búsquedas por Usuario por Semana",
+    "knowledgeResolutionRate": "Tasa de Resolución del Conocimiento",
+    "knowledgeGapCount": "Conteo de Brechas de Conocimiento",
+    "resolutionRateThriving": "Tasa de Resolución para Thriving (%)",
+    "gapCountThriving": "Máx. Brechas para Thriving",
+    "searchEventTrackingEnabled": "Seguimiento de Eventos de Búsqueda Activo",
+    "tiers": {
+      "thriving": "Floreciendo",
+      "active": "Activo",
+      "underused": "Infrautilizado",
+      "gapHeavy": "Con Muchas Brechas"
+    }
+  },
+  "teamKnowledgeSharing": {
+    "title": "Compartición de Conocimiento por Equipo",
+    "docContributionCount": "Contribuciones de Documentación",
+    "crossTeamContributions": "Contribuciones Cross-Team",
+    "docConsumptionCount": "Consumo de Documentación",
+    "runbookContributionCount": "Contribuciones de Runbook",
+    "knowledgeSharingRatio": "Ratio de Compartición de Conocimiento",
+    "knowledgeSiloRisk": "Riesgo de Silos de Conocimiento",
+    "teamsWithSiloRisk": "Equipos con Riesgo de Silo",
+    "topKnowledgeContributors": "Top Contribuidores de Conocimiento",
+    "tenantKnowledgeSharingScore": "Puntuación de Compartición de Conocimiento del Tenant",
+    "knowledgeFlowGraph": "Grafo de Flujo de Conocimiento",
+    "knowledgeHotspots": "Hotspots de Conocimiento",
+    "knowledgeColdSpots": "Cold Spots de Conocimiento",
+    "collaborationTrend": "Tendencia de Colaboración (90d)",
+    "busFactor1Services": "Servicios con Bus Factor = 1",
+    "siloThreshold": "Umbral de Silo",
+    "busFactorMaxContributors": "Máx. Contribuidores Bus Factor",
+    "trendDirections": {
+      "growing": "Creciendo",
+      "stable": "Estable",
+      "declining": "Disminuyendo"
+    }
   }
 }

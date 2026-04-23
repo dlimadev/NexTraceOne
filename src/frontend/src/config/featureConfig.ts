@@ -88,4 +88,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13570, key: "security.patch_compliance.compliant_critical_rate", label: "securityPatchCompliance.compliantCriticalRate", defaultValue: 95 },
   { sort: 13580, key: "security.incident.correlation_window_hours", label: "securityIncidentCorrelation.correlationWindowHours", defaultValue: 72 },
   { sort: 13590, key: "security.incident.sbom_snapshot_frequency_days", label: "securityIncidentCorrelation.sbomSnapshotFrequencyDays", defaultValue: 7 },
+  // ── Wave AY — Organizational Knowledge & Documentation Intelligence ──
+  { sort: 13600, key: "knowledge.doc.freshness_days", label: "documentationHealth.freshnessDays", defaultValue: 180 },
+  { sort: 13610, key: "knowledge.doc.runbook_freshness_days", label: "documentationHealth.runbookFreshnessDays", defaultValue: 90 },
+  { sort: 13620, key: "knowledge.doc.critical_without_runbook_tier", label: "documentationHealth.criticalWithoutRunbookTier", defaultValue: "Critical,High" },
+  { sort: 13630, key: "knowledge.hub.resolution_rate_thriving", label: "knowledgeBaseUtilization.resolutionRateThriving", defaultValue: 70 },
+  { sort: 13640, key: "knowledge.hub.gap_count_thriving", label: "knowledgeBaseUtilization.gapCountThriving", defaultValue: 10 },
+  { sort: 13650, key: "knowledge.sharing.silo_threshold", label: "teamKnowledgeSharing.siloThreshold", defaultValue: 0.15 },
+  { sort: 13660, key: "knowledge.sharing.bus_factor_max_contributors", label: "teamKnowledgeSharing.busFactorMaxContributors", defaultValue: 1 },
+  { sort: 13670, key: "knowledge.hub.search_event_tracking_enabled", label: "knowledgeBaseUtilization.searchEventTrackingEnabled", defaultValue: true },
 ];
