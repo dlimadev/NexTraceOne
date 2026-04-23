@@ -2,25 +2,58 @@
 
 O NexTrace Agent é uma distribuição customizada do **OpenTelemetry Collector** construída com o `ocb` (OpenTelemetry Collector Builder). É o equivalente ao Dynatrace OneAgent ou Datadog Agent — um binário único que coleta APM, infraestrutura, databases e messaging sem depender de agentes separados por tecnologia.
 
+> **O agent é o mesmo binário independentemente do modelo de deployment.**  
+> A diferença entre SaaS e Self-Hosted está exclusivamente na configuração — concretamente nos endpoints e na API Key. Não existe uma versão "SaaS" e uma versão "on-prem" do binário.
+
 ---
 
-## 1. Princípios de Design
+## 1. Modelos de Deployment
+
+O NexTrace Agent suporta dois modos operacionais, controlados pela variável de ambiente `NEXTTRACE_DEPLOYMENT_MODE`:
+
+| Aspecto | `saas` | `self-hosted` |
+|---|---|---|
+| **Endpoint de ingestão** | `https://ingest.nextraceone.io` (gerido pela NexTraceOne) | URL interna definida pelo cliente, ex.: `http://nextraceone:4319` |
+| **Endpoint de controlo OpAMP** | `wss://control.nextraceone.io/v1/opamp` (gerido pela NexTraceOne) | `ws://<nextraceone-host>:4320/v1/opamp` |
+| **API Key** | Chave do tenant gerada no painel SaaS | Chave gerada no painel do servidor NexTraceOne local |
+| **TLS** | Automático (certificados da plataforma) | Configurável; suporta self-signed com `NEXTTRACE_TLS_SKIP_VERIFY=true` |
+| **Actualizações de config remota** | Via OpAMP gerido pela NexTraceOne | Via OpAMP no servidor local |
+| **Retenção de dados** | Gerida pela plataforma SaaS | Gerida pelo cliente no servidor local |
+| **Binário** | Idêntico | Idêntico |
+
+### Variáveis de ambiente fundamentais
+
+| Variável | Obrigatório | Default SaaS | Default Self-Hosted |
+|---|---|---|---|
+| `NEXTTRACE_DEPLOYMENT_MODE` | Não | `saas` | `self-hosted` |
+| `NEXTTRACE_API_KEY` | **Sim** | — | — |
+| `NEXTTRACE_INGEST_ENDPOINT` | Não | `https://ingest.nextraceone.io` | `http://<nextraceone-host>:4319` |
+| `NEXTTRACE_CONTROL_ENDPOINT` | Não | `wss://control.nextraceone.io/v1/opamp` | `ws://<nextraceone-host>:4320/v1/opamp` |
+
+> Para referência completa de todas as variáveis de ambiente, consultar [`sdk/NEXTTRACE-AGENT-PARAMETRIZATION.md`](./sdk/NEXTTRACE-AGENT-PARAMETRIZATION.md).  
+> Para instruções de instalação por plataforma, consultar [`sdk/NEXTTRACE-AGENT-INSTALLER.md`](./sdk/NEXTTRACE-AGENT-INSTALLER.md).
+
+---
+
+## 2. Princípios de Design
 
 - **Baseado em OTel Collector**: não construído do zero — reutiliza 100% do ecossistema OTel contrib
-- **Binário único**: um executável para Linux, Windows e contêiner Docker
+- **Binário único**: um executável para Linux, Windows e contêiner Docker; sem versões separadas por deployment mode
 - **Zero-config auto-discovery**: detecta serviços via `k8s_observer` (K8s) e `host_observer` (Linux/Windows)
 - **Disk-backed queue**: dados sobrevivem a restart e falhas de rede transitórias
-- **Remote config via OpAMP**: configuração atualizada remotamente sem restart do agent
-- **Auth nativa**: API Key para o endpoint de ingestion do NexTraceOne
+- **Remote config via OpAMP**: configuração atualizada remotamente sem restart do agent, quer via servidor SaaS quer via servidor local
+- **Auth nativa**: API Key injectada em todos os requests para o endpoint de ingestão configurado
+- **Deployment-agnostic**: endpoints, TLS e modo controlados exclusivamente por variáveis de ambiente ou ficheiro `.env`
 
 ---
 
-## 2. Componentes Customizados
+## 3. Componentes Customizados
 
 O agent inclui componentes OTel padrão + 3 componentes próprios:
 
 ### `nextraceexporter`
-- Envia dados OTLP para `https://ingest.nextraceone.io`
+- Envia dados OTLP para o endpoint definido em `NEXTTRACE_INGEST_ENDPOINT`
+- Em SaaS o default é `https://ingest.nextraceone.io`; em Self-Hosted o cliente define o endpoint interno
 - Disk-backed queue com retry automático (exponential backoff)
 - Injeta `Authorization: ApiKey <key>` em todos os requests
 - Compressão gzip por padrão
@@ -28,19 +61,20 @@ O agent inclui componentes OTel padrão + 3 componentes próprios:
 ### `nextraceprocessor`
 - Enriquece spans/métricas/logs com:
   - `nextraceone.agent_version`
+  - `nextraceone.deployment_mode` (valor de `NEXTTRACE_DEPLOYMENT_MODE`)
   - `nextraceone.deployment_id` (lido de config ou variável de ambiente)
   - `nextraceone.release_id` (lido de deployment annotation em K8s)
   - `nextraceone.host_unit_id` (UUID estável por host, persiste entre restarts)
 
 ### `nextraceconfigurator`
 - Implementa protocolo **OpAMP** (Open Agent Management Protocol)
-- Conecta ao NexTraceOne Server para receber config remota
+- Conecta ao endpoint definido em `NEXTTRACE_CONTROL_ENDPOINT` — SaaS ou servidor local
 - Permite ativar/desativar receivers específicos sem restart
 - Reporta health e métricas do próprio agent ao servidor
 
 ---
 
-## 3. Builder Config (`ocb`)
+## 4. Builder Config (`ocb`)
 
 ```yaml
 # build/nexttrace-agent/builder-config.yaml
@@ -110,7 +144,38 @@ connectors:
 
 ---
 
-## 4. Configuração por Perfil
+## 5. Configuração por Perfil
+
+Os perfis abaixo usam variáveis de ambiente nos campos de endpoint e API Key. Independentemente do deployment mode, o ficheiro de configuração YAML é o mesmo — apenas os valores das variáveis de ambiente diferem.
+
+### Ficheiro de parametrização — `nexttrace-agent.env`
+
+O agent carrega variáveis a partir de `/etc/nexttrace-agent/agent.env` (Linux) ou `C:\ProgramData\NexTraceAgent\agent.env` (Windows) antes de ler o config YAML. A precedência é:
+
+```
+ENV do sistema operativo  >  agent.env  >  config YAML  >  defaults internos
+```
+
+**Exemplo SaaS (`agent.env`):**
+```dotenv
+NEXTTRACE_DEPLOYMENT_MODE=saas
+NEXTTRACE_API_KEY=nt_live_xxxxxxxxxxxxxxxxxxxxxxxxxx
+# Endpoints opcionais — defaults SaaS já configurados no binário
+# NEXTTRACE_INGEST_ENDPOINT=https://ingest.nextraceone.io
+# NEXTTRACE_CONTROL_ENDPOINT=wss://control.nextraceone.io/v1/opamp
+```
+
+**Exemplo Self-Hosted (`agent.env`):**
+```dotenv
+NEXTTRACE_DEPLOYMENT_MODE=self-hosted
+NEXTTRACE_API_KEY=nt_local_xxxxxxxxxxxxxxxxxxxxxxxxxx
+NEXTTRACE_INGEST_ENDPOINT=http://nextraceone.internal:4319
+NEXTTRACE_CONTROL_ENDPOINT=ws://nextraceone.internal:4320/v1/opamp
+# Para certificados self-signed:
+# NEXTTRACE_TLS_SKIP_VERIFY=true
+```
+
+---
 
 ### Perfil 1: Linux / Kubernetes
 
@@ -124,7 +189,7 @@ extensions:
   opamp:
     server:
       ws:
-        endpoint: wss://control.nextraceone.io/v1/opamp
+        endpoint: "${NEXTTRACE_CONTROL_ENDPOINT}"
     agent_description:
       identifying_attributes:
         - key: service.name
@@ -198,7 +263,7 @@ processors:
 
   nextraceprocessor:
     api_key: "${NEXTTRACE_API_KEY}"
-    endpoint: "https://ingest.nextraceone.io"
+    endpoint: "${NEXTTRACE_INGEST_ENDPOINT}"
 
   tail_sampling:
     decision_wait: 10s
@@ -225,7 +290,7 @@ processors:
 
 exporters:
   nextraceexporter:
-    endpoint: "https://ingest.nextraceone.io"
+    endpoint: "${NEXTTRACE_INGEST_ENDPOINT}"
     api_key: "${NEXTTRACE_API_KEY}"
     sending_queue:
       enabled: true
@@ -305,9 +370,57 @@ receivers:
         expr: 'body.EventID.Value in [1000, 1001, 1002]'  # Crash events
 ```
 
+### Perfil 3: Self-Hosted — Docker Compose
+
+Para ambientes self-hosted com Docker Compose, o agent corre na mesma rede interna que o servidor NexTraceOne. Os endpoints apontam para os serviços internos do compose.
+
+```yaml
+# docker-compose.yml (trecho — adicionar ao compose do NexTraceOne)
+services:
+  nexttrace-agent:
+    image: nextraceone/nexttrace-agent:latest
+    restart: unless-stopped
+    env_file:
+      - ./nexttrace-agent.env          # contém NEXTTRACE_API_KEY e restantes variáveis
+    environment:
+      NEXTTRACE_DEPLOYMENT_MODE: "self-hosted"
+      NEXTTRACE_INGEST_ENDPOINT: "http://nextraceone-api:4319"
+      NEXTTRACE_CONTROL_ENDPOINT: "ws://nextraceone-api:4320/v1/opamp"
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nexttrace-agent-queue:/var/lib/nexttrace-agent/queue
+    ports:
+      - "4317:4317"   # OTLP gRPC — apps instrumentadas enviam para cá
+      - "4318:4318"   # OTLP HTTP
+      - "13133:13133" # Health check
+    networks:
+      - nextraceone-internal
+    depends_on:
+      - nextraceone-api
+
+volumes:
+  nexttrace-agent-queue:
+
+networks:
+  nextraceone-internal:
+    external: true
+```
+
+Ficheiro `nexttrace-agent.env` para self-hosted com Docker Compose:
+
+```dotenv
+NEXTTRACE_DEPLOYMENT_MODE=self-hosted
+NEXTTRACE_API_KEY=nt_local_xxxxxxxxxxxxxxxxxxxxxxxxxx
+NEXTTRACE_INGEST_ENDPOINT=http://nextraceone-api:4319
+NEXTTRACE_CONTROL_ENDPOINT=ws://nextraceone-api:4320/v1/opamp
+# Descomente se usar certificado self-signed:
+# NEXTTRACE_TLS_SKIP_VERIFY=true
+```
+
 ---
 
-## 5. Auto-Instrumentação IIS (.NET CLR Profiler)
+## 6. Auto-Instrumentação IIS (.NET CLR Profiler)
 
 Para aplicações .NET no IIS sem mudança de código, o NexTrace Agent instala o **OTel .NET Auto-Instrumentation** via CLR Profiler:
 
@@ -316,7 +429,7 @@ Para aplicações .NET no IIS sem mudança de código, o NexTrace Agent instala 
 param(
     [string]$AppPoolName = "*",
     [string]$ApiKey,
-    [string]$Endpoint = "https://ingest.nextraceone.io"
+    [string]$IngestEndpoint = $env:NEXTTRACE_INGEST_ENDPOINT
 )
 
 $profilerPath = "C:\Program Files\NexTraceAgent\otel-dotnet-auto\OpenTelemetry.AutoInstrumentation.Native.dll"
@@ -365,15 +478,15 @@ OTel .NET Auto-Instrumentation
 localhost:4318 (NexTrace Agent)
     │ tail_sampling + redaction + batch
     ▼
-https://ingest.nextraceone.io
+${NEXTTRACE_INGEST_ENDPOINT}
     │ nextraceexporter (disk-backed queue)
     ▼
-NexTraceOne Ingestion API
+NexTraceOne Ingestion API (SaaS ou Self-Hosted)
 ```
 
 ---
 
-## 6. Auto-Instrumentação Kubernetes
+## 7. Auto-Instrumentação Kubernetes
 
 ### Via OTel Operator
 
@@ -461,7 +574,7 @@ spec:
 
 ---
 
-## 7. Monitoramento de Databases
+## 8. Monitoramento de Databases
 
 ### Databases com Receiver Nativo
 
@@ -529,7 +642,7 @@ receivers:
 
 ---
 
-## 8. Monitoramento de Messaging Systems
+## 9. Monitoramento de Messaging Systems
 
 ### Kafka
 
@@ -586,7 +699,7 @@ receivers:
 
 ---
 
-## 9. Estrutura do Repositório
+## 10. Estrutura do Repositório
 
 ```
 nexttrace-agent/
@@ -598,27 +711,29 @@ nexttrace-agent/
 │   └── nextraceprocessor/
 │       ├── config.go
 │       ├── factory.go
-│       └── processor.go          # enriquece com agent_version, host_unit_id
+│       └── processor.go          # enriquece com agent_version, deployment_mode, host_unit_id
 ├── exporter/
 │   └── nextraceexporter/
 │       ├── config.go
 │       ├── factory.go
-│       └── exporter.go           # disk-backed queue + API key auth
+│       └── exporter.go           # disk-backed queue + API key auth; endpoint via ENV
 ├── extension/
 │   └── nextraceconfigurator/
 │       ├── config.go
 │       ├── factory.go
-│       └── extension.go          # OpAMP client
+│       └── extension.go          # OpAMP client; endpoint via ENV
 ├── config/
 │   ├── nexttrace-agent-linux.yaml
 │   ├── nexttrace-agent-windows.yaml
-│   └── nexttrace-agent-k8s.yaml
+│   ├── nexttrace-agent-k8s.yaml
+│   └── nexttrace-agent-compose.yaml   # perfil self-hosted Docker Compose
 ├── install/
-│   ├── install.sh                # Linux installer
-│   ├── install.ps1               # Windows/IIS installer
+│   ├── install.sh                # Linux installer (suporta --mode saas|self-hosted)
+│   ├── install.ps1               # Windows/IIS installer (suporta -Mode Saas|SelfHosted)
 │   └── helm/                     # Helm chart para K8s
 │       ├── Chart.yaml
-│       ├── values.yaml
+│       ├── values.yaml            # defaults SaaS
+│       ├── values-selfhosted.yaml # overrides self-hosted
 │       └── templates/
 │           ├── daemonset.yaml
 │           ├── configmap.yaml
@@ -630,7 +745,7 @@ nexttrace-agent/
 
 ---
 
-## 10. Build e Release
+## 11. Build e Release
 
 ```makefile
 # Makefile
@@ -663,4 +778,4 @@ docker:
 
 ---
 
-*Ver também: `SAAS-STRATEGY.md`, `SAAS-LICENSING.md`, `SAAS-ROADMAP.md`*
+*Ver também: [`sdk/NEXTTRACE-AGENT-INSTALLER.md`](./sdk/NEXTTRACE-AGENT-INSTALLER.md), [`sdk/NEXTTRACE-AGENT-PARAMETRIZATION.md`](./sdk/NEXTTRACE-AGENT-PARAMETRIZATION.md), `SAAS-STRATEGY.md`, `SAAS-LICENSING.md`, `SAAS-ROADMAP.md`, `DEPLOYMENT-ARCHITECTURE.md`, [`onprem/WAVE-01-INSTALLATION.md`](./onprem/WAVE-01-INSTALLATION.md)*
