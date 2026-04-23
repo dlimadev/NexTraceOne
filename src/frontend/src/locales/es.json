@@ -16198,5 +16198,103 @@
       "stable": "Estable",
       "declining": "Disminuyendo"
     }
+  },
+  "trafficContractDeviation": {
+    "title": "Desviaciones de Tráfico Real vs Contrato",
+    "undocumentedEndpointCalls": "Llamadas a Endpoints No Documentados",
+    "undeclaredConsumers": "Consumers No Declarados",
+    "payloadDeviationRate": "Tasa de Desviación de Payload (%)",
+    "observedVsContractedStatusCodes": "Status Codes Observados vs Contratados",
+    "trafficContractDeviationTier": "Tier de Desviación Tráfico vs Contrato",
+    "tenantDeviationHealthScore": "Puntuación de Salud de Desviación del Tenant",
+    "servicesWithUndocumentedEndpoints": "Servicios con Endpoints No Documentados",
+    "servicesWithUndeclaredConsumers": "Servicios con Consumers No Declarados",
+    "topDeviatingServices": "Top Servicios con Desviación",
+    "undocumentedEndpointHotspots": "Hotspots de Endpoints No Documentados",
+    "contractGapOpportunities": "Oportunidades de Actualización de Contrato",
+    "historicalDeviationTrend": "Tendencia Histórica de Desviaciones",
+    "minorDriftThreshold": "Umbral de Minor Drift (endpoints)",
+    "undeclaredConsumerCritical": "Umbral Crítico de Consumer No Declarado",
+    "tiers": {
+      "aligned": "Alineado",
+      "minorDrift": "Desviación Menor",
+      "significant": "Significativo",
+      "critical": "Crítico"
+    },
+    "trendDirections": {
+      "improving": "Mejorando",
+      "stable": "Estable",
+      "worsening": "Empeorando"
+    }
+  },
+  "highTrafficEndpointRisk": {
+    "title": "Riesgo de Endpoints de Alto Tráfico",
+    "endpointRiskScore": "Puntuación de Riesgo del Endpoint",
+    "endpointRiskTier": "Tier de Riesgo del Endpoint",
+    "callVolume": "Volumen de Llamadas",
+    "rpsAvg": "RPS Promedio",
+    "latencyP50Ms": "Latencia P50 (ms)",
+    "latencyP95Ms": "Latencia P95 (ms)",
+    "latencyP99Ms": "Latencia P99 (ms)",
+    "errorRatePct": "Tasa de Error (%)",
+    "contractCoverage": "Cobertura de Contrato",
+    "hasActiveSlo": "Tiene SLO Activo",
+    "wasChaosTestedInPeriod": "Probado con Chaos en el Período",
+    "criticalUncoveredEndpoints": "Endpoints Críticos Sin Cobertura",
+    "tenantEndpointRiskScore": "Puntuación de Riesgo de Endpoints del Tenant",
+    "topRiskByVolume": "Top Riesgo por Volumen",
+    "documentationOpportunity": "Oportunidad de Documentación",
+    "chaosGapByTrafficVolume": "Brecha de Chaos por Volumen de Tráfico",
+    "sloGapForHighTraffic": "Brecha de SLO para Alto Tráfico",
+    "rpsThreshold": "Umbral RPS de Alto Tráfico",
+    "topN": "Top N Endpoints a Analizar",
+    "chaosCoverageDays": "Lookback de Cobertura Chaos (días)",
+    "tiers": {
+      "safe": "Seguro",
+      "monitored": "Monitorizado",
+      "atRisk": "En Riesgo",
+      "critical": "Crítico"
+    },
+    "coverage": {
+      "documented": "Documentado",
+      "undocumented": "No Documentado",
+      "deprecated": "Deprecado"
+    }
+  },
+  "trafficAnomaly": {
+    "title": "Informe de Anomalías de Tráfico",
+    "totalAnomalies": "Total de Anomalías",
+    "criticalAnomalies": "Anomalías Críticas",
+    "unexplainedAnomalies": "Anomalías Inexplicadas",
+    "anomalyResolutionRate": "Tasa de Resolución de Anomalías (%)",
+    "mostAnomalousServices": "Servicios con Más Anomalías",
+    "unexplainedAnomalyList": "Lista de Anomalías Inexplicadas",
+    "anomalyTimeline": "Línea Temporal de Anomalías",
+    "recurringAnomalyPatterns": "Patrones Recurrentes de Anomalías",
+    "anomalyType": "Tipo de Anomalía",
+    "detectedAt": "Detectada En",
+    "resolvedAt": "Resuelta En",
+    "durationMinutes": "Duración (minutos)",
+    "anomalyCorrelation": "Correlación de Anomalía",
+    "anomalySeverity": "Severidad de Anomalía",
+    "spikeSigma": "Sigma de Pico",
+    "dropPct": "Porcentaje de Caída (%)",
+    "errorRateSpikeThreshold": "Umbral de Pico de Tasa de Error (%)",
+    "anomalyTypes": {
+      "spikeAnomaly": "Anomalía de Pico",
+      "dropAnomaly": "Anomalía de Caída",
+      "latencySpike": "Pico de Latencia",
+      "errorRateSpike": "Pico de Tasa de Error"
+    },
+    "correlations": {
+      "correlatedWithDeploy": "Correlacionado con Deploy",
+      "correlatedWithIncident": "Correlacionado con Incidente",
+      "unexplained": "Inexplicado"
+    },
+    "severities": {
+      "informational": "Informacional",
+      "warning": "Aviso",
+      "critical": "Crítico"
+    }
   }
 }

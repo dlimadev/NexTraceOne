@@ -13,6 +13,8 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GetFeatureFlagRiskRepor
 using NexTraceOne.Catalog.Application.Contracts.Features.GetVulnerabilityExposureReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSecurityPatchComplianceReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDocumentationHealthReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetRuntimeTrafficContractDeviationReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetHighTrafficEndpointRiskReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSbomCoverageReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSupplyChainRiskReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.IngestFeatureFlagState;
@@ -178,6 +180,14 @@ public static class DependencyInjection
         // ── Wave AY — Organizational Knowledge & Documentation Intelligence ─
         services.AddTransient<IValidator<GetDocumentationHealthReport.Query>, GetDocumentationHealthReport.Validator>();
         services.AddSingleton<IDocumentationHealthReader, NullDocumentationHealthReader>();
+
+        // ── Wave AZ — Service Mesh & Runtime Traffic Intelligence ──────────
+        services.AddTransient<IValidator<GetRuntimeTrafficContractDeviationReport.Query>,
+            GetRuntimeTrafficContractDeviationReport.Validator>();
+        services.AddTransient<IValidator<GetHighTrafficEndpointRiskReport.Query>,
+            GetHighTrafficEndpointRiskReport.Validator>();
+        services.AddSingleton<ITrafficObservationReader, NullTrafficObservationReader>();
+        services.AddSingleton<IHighTrafficEndpointReader, NullHighTrafficEndpointReader>();
 
         return services;
     }

@@ -97,4 +97,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13650, key: "knowledge.sharing.silo_threshold", label: "teamKnowledgeSharing.siloThreshold", defaultValue: 0.15 },
   { sort: 13660, key: "knowledge.sharing.bus_factor_max_contributors", label: "teamKnowledgeSharing.busFactorMaxContributors", defaultValue: 1 },
   { sort: 13670, key: "knowledge.hub.search_event_tracking_enabled", label: "knowledgeBaseUtilization.searchEventTrackingEnabled", defaultValue: true },
+  // Wave AZ — Service Mesh & Runtime Traffic Intelligence
+  { sort: 13680, key: "traffic.contract.minor_drift_threshold", label: "trafficContractDeviation.minorDriftThreshold", defaultValue: 3 },
+  { sort: 13690, key: "traffic.contract.undeclared_consumer_critical", label: "trafficContractDeviation.undeclaredConsumerCritical", defaultValue: 1 },
+  { sort: 13700, key: "traffic.high_risk.rps_threshold", label: "highTrafficEndpointRisk.rpsThreshold", defaultValue: 100 },
+  { sort: 13710, key: "traffic.high_risk.top_n", label: "highTrafficEndpointRisk.topN", defaultValue: 20 },
+  { sort: 13720, key: "traffic.high_risk.chaos_coverage_days", label: "highTrafficEndpointRisk.chaosCoverageDays", defaultValue: 90 },
+  { sort: 13730, key: "traffic.anomaly.spike_sigma", label: "trafficAnomaly.spikeSigma", defaultValue: 3 },
+  { sort: 13740, key: "traffic.anomaly.drop_pct", label: "trafficAnomaly.dropPct", defaultValue: 50 },
+  { sort: 13750, key: "traffic.anomaly.error_rate_spike_threshold", label: "trafficAnomaly.errorRateSpikeThreshold", defaultValue: 5 },
 ];

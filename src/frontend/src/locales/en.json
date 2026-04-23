@@ -14963,5 +14963,103 @@
       "stable": "Stable",
       "declining": "Declining"
     }
+  },
+  "trafficContractDeviation": {
+    "title": "Runtime Traffic vs Contract Deviation",
+    "undocumentedEndpointCalls": "Undocumented Endpoint Calls",
+    "undeclaredConsumers": "Undeclared Consumers",
+    "payloadDeviationRate": "Payload Deviation Rate (%)",
+    "observedVsContractedStatusCodes": "Observed vs Contracted Status Codes",
+    "trafficContractDeviationTier": "Traffic Contract Deviation Tier",
+    "tenantDeviationHealthScore": "Tenant Deviation Health Score",
+    "servicesWithUndocumentedEndpoints": "Services with Undocumented Endpoints",
+    "servicesWithUndeclaredConsumers": "Services with Undeclared Consumers",
+    "topDeviatingServices": "Top Deviating Services",
+    "undocumentedEndpointHotspots": "Undocumented Endpoint Hotspots",
+    "contractGapOpportunities": "Contract Gap Opportunities",
+    "historicalDeviationTrend": "Historical Deviation Trend",
+    "minorDriftThreshold": "Minor Drift Threshold (endpoints)",
+    "undeclaredConsumerCritical": "Undeclared Consumer Critical Threshold",
+    "tiers": {
+      "aligned": "Aligned",
+      "minorDrift": "Minor Drift",
+      "significant": "Significant",
+      "critical": "Critical"
+    },
+    "trendDirections": {
+      "improving": "Improving",
+      "stable": "Stable",
+      "worsening": "Worsening"
+    }
+  },
+  "highTrafficEndpointRisk": {
+    "title": "High-Traffic Endpoint Risk",
+    "endpointRiskScore": "Endpoint Risk Score",
+    "endpointRiskTier": "Endpoint Risk Tier",
+    "callVolume": "Call Volume",
+    "rpsAvg": "Avg RPS",
+    "latencyP50Ms": "P50 Latency (ms)",
+    "latencyP95Ms": "P95 Latency (ms)",
+    "latencyP99Ms": "P99 Latency (ms)",
+    "errorRatePct": "Error Rate (%)",
+    "contractCoverage": "Contract Coverage",
+    "hasActiveSlo": "Has Active SLO",
+    "wasChaosTestedInPeriod": "Chaos Tested in Period",
+    "criticalUncoveredEndpoints": "Critical Uncovered Endpoints",
+    "tenantEndpointRiskScore": "Tenant Endpoint Risk Score",
+    "topRiskByVolume": "Top Risk by Volume",
+    "documentationOpportunity": "Documentation Opportunity",
+    "chaosGapByTrafficVolume": "Chaos Gap by Traffic Volume",
+    "sloGapForHighTraffic": "SLO Gap for High Traffic",
+    "rpsThreshold": "High Traffic RPS Threshold",
+    "topN": "Top N Endpoints to Analyse",
+    "chaosCoverageDays": "Chaos Coverage Lookback (days)",
+    "tiers": {
+      "safe": "Safe",
+      "monitored": "Monitored",
+      "atRisk": "At Risk",
+      "critical": "Critical"
+    },
+    "coverage": {
+      "documented": "Documented",
+      "undocumented": "Undocumented",
+      "deprecated": "Deprecated"
+    }
+  },
+  "trafficAnomaly": {
+    "title": "Traffic Anomaly Report",
+    "totalAnomalies": "Total Anomalies",
+    "criticalAnomalies": "Critical Anomalies",
+    "unexplainedAnomalies": "Unexplained Anomalies",
+    "anomalyResolutionRate": "Anomaly Resolution Rate (%)",
+    "mostAnomalousServices": "Most Anomalous Services",
+    "unexplainedAnomalyList": "Unexplained Anomaly List",
+    "anomalyTimeline": "Anomaly Timeline",
+    "recurringAnomalyPatterns": "Recurring Anomaly Patterns",
+    "anomalyType": "Anomaly Type",
+    "detectedAt": "Detected At",
+    "resolvedAt": "Resolved At",
+    "durationMinutes": "Duration (minutes)",
+    "anomalyCorrelation": "Anomaly Correlation",
+    "anomalySeverity": "Anomaly Severity",
+    "spikeSigma": "Spike Sigma",
+    "dropPct": "Drop Percentage (%)",
+    "errorRateSpikeThreshold": "Error Rate Spike Threshold (%)",
+    "anomalyTypes": {
+      "spikeAnomaly": "Spike Anomaly",
+      "dropAnomaly": "Drop Anomaly",
+      "latencySpike": "Latency Spike",
+      "errorRateSpike": "Error Rate Spike"
+    },
+    "correlations": {
+      "correlatedWithDeploy": "Correlated with Deploy",
+      "correlatedWithIncident": "Correlated with Incident",
+      "unexplained": "Unexplained"
+    },
+    "severities": {
+      "informational": "Informational",
+      "warning": "Warning",
+      "critical": "Critical"
+    }
   }
 }
