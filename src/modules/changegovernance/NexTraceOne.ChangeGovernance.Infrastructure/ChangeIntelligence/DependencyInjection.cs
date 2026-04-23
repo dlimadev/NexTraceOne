@@ -11,6 +11,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.Platform.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
@@ -130,6 +131,11 @@ public static class DependencyInjection
         // Distributed signal correlation and promotion risk signals for AI-assisted analysis
         services.AddScoped<IDistributedSignalCorrelationService, DistributedSignalCorrelationService>();
         services.AddScoped<IPromotionRiskSignalProvider, PromotionRiskSignalProvider>();
+
+        // Wave AU — Platform Self-Optimization & Adaptive Intelligence
+        services.AddScoped<IConfigurationDriftReader, Services.NullConfigurationDriftReader>();
+        services.AddScoped<IPlatformHealthIndexReader, Services.NullPlatformHealthIndexReader>();
+        services.AddScoped<IAdaptiveRecommendationReader, Services.NullAdaptiveRecommendationReader>();
 
         return services;
     }

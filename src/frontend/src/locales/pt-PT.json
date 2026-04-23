@@ -15853,5 +15853,54 @@
       "nonCompliant": "Não Conforme",
       "untracked": "Sem Dados"
     }
+  },
+  "configurationDrift": {
+    "title": "Relatório de Deriva de Configuração",
+    "description": "Detecção e classificação de divergências de chaves de configuração entre ambientes",
+    "staleDays": "Limiar de Dias Obsoletos",
+    "highImpactModules": "Módulos de Alto Impacto",
+    "tier": {
+      "aligned": "Alinhado",
+      "minorDrift": "Deriva Menor",
+      "majorDrift": "Deriva Maior",
+      "critical": "Crítico"
+    },
+    "divergenceType": {
+      "intentional": "Intencional",
+      "unexplained": "Inexplicada",
+      "stale": "Obsoleta"
+    }
+  },
+  "platformHealthIndex": {
+    "title": "Relatório do Índice de Saúde da Plataforma",
+    "description": "Índice composto que mede a profundidade de adopção das capacidades NexTraceOne em 7 dimensões",
+    "freshnessDays": "Dias de Frescura de Dados",
+    "optimizedThreshold": "Limiar Optimizado",
+    "operationalThreshold": "Limiar Operacional",
+    "tier": {
+      "optimized": "Optimizado",
+      "operational": "Operacional",
+      "partial": "Parcial",
+      "underutilized": "Subutilizado"
+    }
+  },
+  "adaptiveRecommendations": {
+    "title": "Relatório de Recomendações Adaptativas",
+    "description": "Recomendações cross-wave priorizadas para melhorar governança, fiabilidade, segurança, qualidade e adopção",
+    "topN": "Top N Recomendações",
+    "refreshCron": "Periodicidade de Actualização (Cron)",
+    "lowEffortSprints": "Número de Sprints de Baixo Esforço",
+    "category": {
+      "reliability": "Fiabilidade",
+      "security": "Segurança",
+      "governance": "Governança",
+      "quality": "Qualidade",
+      "adoption": "Adopção"
+    },
+    "effort": {
+      "low": "Baixo",
+      "medium": "Médio",
+      "high": "Alto"
+    }
   }
 }

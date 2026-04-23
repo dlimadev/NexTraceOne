@@ -14621,5 +14621,54 @@
       "nonCompliant": "Non-Compliant",
       "untracked": "Untracked"
     }
+  },
+  "configurationDrift": {
+    "title": "Configuration Drift Report",
+    "description": "Detection and classification of configuration key divergences between environments",
+    "staleDays": "Stale Days Threshold",
+    "highImpactModules": "High Impact Modules",
+    "tier": {
+      "aligned": "Aligned",
+      "minorDrift": "Minor Drift",
+      "majorDrift": "Major Drift",
+      "critical": "Critical"
+    },
+    "divergenceType": {
+      "intentional": "Intentional",
+      "unexplained": "Unexplained",
+      "stale": "Stale"
+    }
+  },
+  "platformHealthIndex": {
+    "title": "Platform Health Index Report",
+    "description": "Composite index measuring depth of NexTraceOne capability adoption across 7 dimensions",
+    "freshnessDays": "Data Freshness Days",
+    "optimizedThreshold": "Optimized Threshold",
+    "operationalThreshold": "Operational Threshold",
+    "tier": {
+      "optimized": "Optimized",
+      "operational": "Operational",
+      "partial": "Partial",
+      "underutilized": "Underutilized"
+    }
+  },
+  "adaptiveRecommendations": {
+    "title": "Adaptive Recommendation Report",
+    "description": "Prioritized cross-wave recommendations to improve governance, reliability, security, quality and adoption",
+    "topN": "Top N Recommendations",
+    "refreshCron": "Refresh Schedule (Cron)",
+    "lowEffortSprints": "Low Effort Sprint Count",
+    "category": {
+      "reliability": "Reliability",
+      "security": "Security",
+      "governance": "Governance",
+      "quality": "Quality",
+      "adoption": "Adoption"
+    },
+    "effort": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
   }
 }

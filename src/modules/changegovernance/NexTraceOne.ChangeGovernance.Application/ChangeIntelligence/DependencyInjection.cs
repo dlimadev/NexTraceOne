@@ -44,6 +44,9 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.SyncJ
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.UpdateDeploymentState;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDeploymentRiskForecastReport;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
+using NexTraceOne.ChangeGovernance.Application.Platform.Features.GetConfigurationDriftReport;
+using NexTraceOne.ChangeGovernance.Application.Platform.Features.GetPlatformHealthIndexReport;
+using NexTraceOne.ChangeGovernance.Application.Platform.Features.GetAdaptiveRecommendationReport;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
 
@@ -115,6 +118,11 @@ public static class DependencyInjection
 
         // Wave AI.1 — Deployment Risk Forecast Report
         services.AddTransient<IValidator<GetDeploymentRiskForecastReport.Query>, GetDeploymentRiskForecastReport.Validator>();
+
+        // Wave AU — Platform Self-Optimization & Adaptive Intelligence
+        services.AddTransient<IValidator<GetConfigurationDriftReport.Query>, GetConfigurationDriftReport.Validator>();
+        services.AddTransient<IValidator<GetPlatformHealthIndexReport.Query>, GetPlatformHealthIndexReport.Validator>();
+        services.AddTransient<IValidator<GetAdaptiveRecommendationReport.Query>, GetAdaptiveRecommendationReport.Validator>();
 
         return services;
     }

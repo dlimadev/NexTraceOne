@@ -52,4 +52,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13250, key: "ai.governance.model_review_days", label: "aiGovernanceCompliance.modelReviewDays", defaultValue: 90 },
   { sort: 13260, key: "ai.governance.budget_overrun_threshold", label: "aiGovernanceCompliance.budgetOverrunThreshold", defaultValue: 2 },
   { sort: 13270, key: "ai.governance.audit_trail_lookback_days", label: "aiGovernanceCompliance.auditTrailLookbackDays", defaultValue: 30 },
+  // ── Wave AU — Platform Self-Optimization & Adaptive Intelligence ─────────
+  { sort: 13280, key: "platform.config_drift.stale_days", label: "configurationDrift.staleDays", defaultValue: 90 },
+  { sort: 13290, key: "platform.config_drift.high_impact_modules", label: "configurationDrift.highImpactModules", defaultValue: "governance,sre,sbom" },
+  { sort: 13300, key: "platform.health.freshness_days", label: "platformHealthIndex.freshnessDays", defaultValue: 30 },
+  { sort: 13310, key: "platform.health.optimized_threshold", label: "platformHealthIndex.optimizedThreshold", defaultValue: 85 },
+  { sort: 13320, key: "platform.health.operational_threshold", label: "platformHealthIndex.operationalThreshold", defaultValue: 65 },
+  { sort: 13330, key: "platform.recommendations.top_n", label: "adaptiveRecommendations.topN", defaultValue: 10 },
+  { sort: 13340, key: "platform.recommendations.refresh_cron", label: "adaptiveRecommendations.refreshCron", defaultValue: "0 6 * * *" },
+  { sort: 13350, key: "platform.recommendations.low_effort_sprints", label: "adaptiveRecommendations.lowEffortSprints", defaultValue: 1 },
 ];
