@@ -170,6 +170,10 @@ public static class DependencyInjection
         services.AddScoped<INotificationHealthProvider, NotificationHealthProvider>();
         services.AddScoped<INotificationCatalogGovernance, NotificationCatalogGovernance>();
 
+        // ── Wave AK: Null readers for delivery report and effectiveness ───────
+        services.AddScoped<INotificationDeliveryReportReader, NullNotificationDeliveryReportReader>();
+        services.AddScoped<INotificationEffectivenessReader, NullNotificationEffectivenessReader>();
+
         // ── Domain Event Handlers (via Notifications Outbox → IEventBus) ─────────────
         // O outbox do módulo Notifications é processado por ModuleOutboxProcessorJob<NotificationsDbContext>,
         // registado no BackgroundWorkers. Estes handlers são invocados automaticamente

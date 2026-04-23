@@ -7,6 +7,8 @@ using NexTraceOne.Notifications.Application.Engine;
 using NexTraceOne.Notifications.Application.Features.AcknowledgeNotification;
 using NexTraceOne.Notifications.Application.Features.ArchiveNotification;
 using NexTraceOne.Notifications.Application.Features.DismissNotification;
+using NexTraceOne.Notifications.Application.Features.GetNotificationDeliveryReport;
+using NexTraceOne.Notifications.Application.Features.GetNotificationEffectivenessReport;
 using NexTraceOne.Notifications.Application.Features.ListNotifications;
 using NexTraceOne.Notifications.Application.Features.MarkNotificationRead;
 using NexTraceOne.Notifications.Application.Features.MarkNotificationUnread;
@@ -37,6 +39,8 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ArchiveNotification.Command>, ArchiveNotification.Validator>();
         services.AddTransient<IValidator<DismissNotification.Command>, DismissNotification.Validator>();
         services.AddTransient<IValidator<SnoozeNotification.Command>, SnoozeNotification.Validator>();
+        services.AddTransient<IValidator<GetNotificationDeliveryReport.Query>, GetNotificationDeliveryReport.Validator>();
+        services.AddTransient<IValidator<GetNotificationEffectivenessReport.Query>, GetNotificationEffectivenessReport.Validator>();
 
         // Engine de notificações — Fase 2
         services.AddScoped<INotificationOrchestrator, NotificationOrchestrator>();

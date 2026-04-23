@@ -17,6 +17,7 @@ using AttachWorkItemContextFeature = NexTraceOne.ChangeGovernance.Application.Ch
 using GetPreProductionComparisonFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPreProductionComparison.GetPreProductionComparison;
 using GetRiskScoreTrendFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRiskScoreTrend.GetRiskScoreTrend;
 using EvaluateReleaseTrainFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluateReleaseTrain.EvaluateReleaseTrain;
+using GetDeploymentRiskForecastReportFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDeploymentRiskForecastReport.GetDeploymentRiskForecastReport;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -150,5 +151,25 @@ internal static class AnalysisEndpoints
         .RequirePermission("change-intelligence:read")
         .WithName("EvaluateReleaseTrain")
         .WithSummary("Evaluates a multi-service Release Train: aggregates risk scores, blast radius and readiness signal");
+
+        // ── GET /api/v1/changes/releases/{releaseId}/risk-forecast — Deployment Risk Forecast ─────
+        group.MapGet("/{releaseId:guid}/risk-forecast", async (
+            Guid releaseId,
+            Guid tenantId,
+            int? maxTopPendingReleases,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetDeploymentRiskForecastReportFeature.Query(
+                ReleaseId: releaseId,
+                TenantId: tenantId,
+                MaxTopPendingReleases: maxTopPendingReleases ?? 10);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("change-intelligence:read")
+        .WithName("GetDeploymentRiskForecastReport")
+        .WithSummary("Returns predictive risk forecast for a release, combining historical rollback rate, environment instability, service risk profile and change confidence");
     }
 }

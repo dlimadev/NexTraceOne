@@ -3,6 +3,13 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiGovernanceComplianceReport;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiModelQualityReport;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetModelDriftReport;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.IngestModelPredictionSample;
+using NexTraceOne.AIKnowledge.Application.Governance.Services;
+
 using NexTraceOne.AIKnowledge.Application.Governance.Features.CreateConversation;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.CreatePolicy;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.EnrichContext;
@@ -45,7 +52,6 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.SyncExternalDataSo
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ToggleExternalDataSource;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateExternalDataSource;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePolicy;
-using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.BuildingBlocks.Application;
 
 namespace NexTraceOne.AIKnowledge.Application.Governance;
@@ -127,6 +133,16 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ToggleExternalDataSource.Command>, ToggleExternalDataSource.Validator>();
         services.AddTransient<IValidator<SyncExternalDataSource.Command>, SyncExternalDataSource.Validator>();
         services.AddTransient<IValidator<GetExternalDataSource.Query>, GetExternalDataSource.Validator>();
+
+        // ── Wave AT — AI Model Quality & Drift Governance ─────────────────
+        services.AddTransient<IValidator<IngestModelPredictionSample.Command>, IngestModelPredictionSample.Validator>();
+        services.AddTransient<IValidator<GetModelDriftReport.Query>, GetModelDriftReport.Validator>();
+        services.AddTransient<IValidator<GetAiModelQualityReport.Query>, GetAiModelQualityReport.Validator>();
+        services.AddTransient<IValidator<GetAiGovernanceComplianceReport.Query>, GetAiGovernanceComplianceReport.Validator>();
+        services.AddSingleton<IModelPredictionRepository, NullModelPredictionRepository>();
+        services.AddSingleton<IModelDriftReader, NullModelDriftReader>();
+        services.AddSingleton<IAiModelQualityReader, NullAiModelQualityReader>();
+        services.AddSingleton<IAiGovernanceComplianceReader, NullAiGovernanceComplianceReader>();
 
         return services;
     }

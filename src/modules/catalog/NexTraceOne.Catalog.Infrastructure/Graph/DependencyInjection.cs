@@ -87,6 +87,47 @@ public static class DependencyInjection
         // ── Wave AC.1 — Onboarding Health Report (null reader) ────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IOnboardingHealthReader, NexTraceOne.Catalog.Application.Services.NullOnboardingHealthReader>();
 
+        // ── Wave AM — null readers ─────────────────────────────────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IUncatalogedServicesReader, NexTraceOne.Catalog.Application.Services.NullUncatalogedServicesReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDriftReader, NexTraceOne.Catalog.Application.Contracts.NullContractDriftReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ICatalogHealthMaintenanceReader, NexTraceOne.Catalog.Application.Services.NullCatalogHealthMaintenanceReader>();
+
+        // ── Wave AO — Supply Chain null readers ─────────────────────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISbomRepository,
+            NexTraceOne.Catalog.Application.Contracts.NullSbomRepository>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISbomCoverageReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSbomCoverageReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader,
+            NexTraceOne.Catalog.Application.Contracts.NullDependencyProvenanceReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISupplyChainRiskReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSupplyChainRiskReader>();
+
+        // ── Wave AQ — Data Observability & Schema Quality null readers ───────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDataContractRepository,
+            NexTraceOne.Catalog.Application.Contracts.NullDataContractRepository>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaQualityReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSchemaQualityReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaEvolutionSafetyReader,
+            NexTraceOne.Catalog.Application.Contracts.NullSchemaEvolutionSafetyReader>();
+
+        // ── Wave AR — Service Topology Intelligence null readers ─────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IServiceTopologyReader,
+            NexTraceOne.Catalog.Application.Contracts.NullServiceTopologyReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ICriticalPathReader,
+            NexTraceOne.Catalog.Application.Contracts.NullCriticalPathReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyVersionAlignmentReader,
+            NexTraceOne.Catalog.Application.Contracts.NullDependencyVersionAlignmentReader>();
+
+        // ── Wave AV — Contract Lifecycle Automation null readers ─────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDeprecationPipelineReader,
+            NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationPipelineReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IApiVersionStrategyReader,
+            NexTraceOne.Catalog.Application.Contracts.NullApiVersionStrategyReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDeprecationScheduleRepository,
+            NexTraceOne.Catalog.Application.Contracts.NullDeprecationScheduleRepository>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDeprecationForecastReader,
+            NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationForecastReader>();
+
         return services;
     }
 }

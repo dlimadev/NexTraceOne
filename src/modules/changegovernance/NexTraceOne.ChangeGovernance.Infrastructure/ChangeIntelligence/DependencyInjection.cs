@@ -11,6 +11,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.Platform.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
@@ -106,9 +107,35 @@ public static class DependencyInjection
         // Cross-module public interface — outros módulos consomem IChangeIntelligenceModule
         services.AddScoped<IChangeIntelligenceModule, ChangeIntelligenceModule>();
 
+        // Wave AI.1 — honest-null bridge para environment instability (OI)
+        services.AddScoped<IEnvironmentInstabilityReader, NullEnvironmentInstabilityReader>();
+
+        // Wave AJ.1 — honest-null bridge para cross-tenant maturity dimensions
+        services.AddScoped<ICrossTenantMaturityReader, Services.NullCrossTenantMaturityReader>();
+
+        // Wave AJ.2 — honest-null bridge para tenant health pillar data
+        services.AddScoped<ITenantHealthDataReader, Services.NullTenantHealthDataReader>();
+
+        // Wave AJ.3 — honest-null bridge para policy evaluation history (IA)
+        services.AddScoped<IPolicyEvaluationHistoryReader, Services.NullPolicyEvaluationHistoryReader>();
+
+        // Wave AP.1 — honest-null bridge para approval workflow reader
+        services.AddScoped<IApprovalWorkflowReader, Services.NullApprovalWorkflowReader>();
+
+        // Wave AP.2 — honest-null bridge para peer review coverage
+        services.AddScoped<IPeerReviewCoverageReader, Services.NullPeerReviewCoverageReader>();
+
+        // Wave AP.3 — honest-null bridge para governance escalation
+        services.AddScoped<IGovernanceEscalationReader, Services.NullGovernanceEscalationReader>();
+
         // Distributed signal correlation and promotion risk signals for AI-assisted analysis
         services.AddScoped<IDistributedSignalCorrelationService, DistributedSignalCorrelationService>();
         services.AddScoped<IPromotionRiskSignalProvider, PromotionRiskSignalProvider>();
+
+        // Wave AU — Platform Self-Optimization & Adaptive Intelligence
+        services.AddScoped<IConfigurationDriftReader, Services.NullConfigurationDriftReader>();
+        services.AddScoped<IPlatformHealthIndexReader, Services.NullPlatformHealthIndexReader>();
+        services.AddScoped<IAdaptiveRecommendationReader, Services.NullAdaptiveRecommendationReader>();
 
         return services;
     }

@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
 using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
 using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Repositories;
+using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Services;
 
 namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience;
 
@@ -34,6 +35,8 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DeveloperExperienceDbContext>());
         services.AddScoped<IDeveloperExperienceUnitOfWork>(sp => sp.GetRequiredService<DeveloperExperienceDbContext>());
         services.AddScoped<IDeveloperSurveyRepository, EfDeveloperSurveyRepository>();
+        services.AddScoped<IIdeContextReader, NullIdeContextReader>();
+        services.AddScoped<IIDEUsageRepository, NullIDEUsageRepository>();
 
         return services;
     }

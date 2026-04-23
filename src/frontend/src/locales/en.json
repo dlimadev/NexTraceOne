@@ -13709,7 +13709,12 @@
     "tier": "Onboarding Tier",
     "teamAvg": "Team Average",
     "tenantScore": "Tenant Score",
-    "tiers": { "Complete": "Complete", "Advanced": "Advanced", "Basic": "Basic", "Minimal": "Minimal" },
+    "tiers": {
+      "Complete": "Complete",
+      "Advanced": "Advanced",
+      "Basic": "Basic",
+      "Minimal": "Minimal"
+    },
     "dimensions": {
       "ownership": "Ownership",
       "contracts": "Contracts",
@@ -13724,7 +13729,12 @@
     "activityTier": "Activity Tier",
     "teamScore": "Team Score",
     "inactiveTeams": "Inactive Teams",
-    "tiers": { "HighlyActive": "Highly Active", "Active": "Active", "Occasional": "Occasional", "Inactive": "Inactive" }
+    "tiers": {
+      "HighlyActive": "Highly Active",
+      "Active": "Active",
+      "Occasional": "Occasional",
+      "Inactive": "Inactive"
+    }
   },
   "platformAdoption": {
     "title": "Platform Adoption",
@@ -13732,7 +13742,12 @@
     "adoptionTier": "Adoption Tier",
     "capabilityRate": "Capability Rate",
     "growthOpportunity": "Growth Opportunity",
-    "tiers": { "Pioneer": "Pioneer", "Adopter": "Adopter", "Explorer": "Explorer", "Laggard": "Laggard" },
+    "tiers": {
+      "Pioneer": "Pioneer",
+      "Adopter": "Adopter",
+      "Explorer": "Explorer",
+      "Laggard": "Laggard"
+    },
     "capabilities": {
       "sloTracking": "SLO Tracking",
       "chaosEngineering": "Chaos Engineering",
@@ -14034,5 +14049,689 @@
       "Degraded": "Degraded",
       "NonCompliant": "Non-Compliant"
     }
+  },
+  "deploymentRiskForecast": {
+    "title": "Deployment Risk Forecast Report",
+    "description": "Predictive risk scoring for a release before deployment, combining historical rollback rate, environment instability, service risk profile, change confidence and recent incident rate.",
+    "forecastRiskScore": "Forecast Risk Score",
+    "riskForecastTier": "Risk Forecast Tier",
+    "dimensions": "Risk Dimensions",
+    "forecastExplanation": "Top Contributing Factors",
+    "recommendedActions": "Recommended Actions",
+    "topPendingHighRiskReleases": "Top Pending High-Risk Releases",
+    "historicalRollbackRate": "Historical Rollback Rate",
+    "environmentInstability": "Environment Instability",
+    "serviceRiskProfileScore": "Service Risk Profile Score",
+    "changeConfidenceInverse": "Change Confidence (Inverse)",
+    "recentIncidentRate": "Recent Incident Rate",
+    "tiers": {
+      "Low": "Low",
+      "Moderate": "Moderate",
+      "High": "High",
+      "Critical": "Critical"
+    }
+  },
+  "capacityTrendForecast": {
+    "title": "Capacity Trend Forecast Report",
+    "description": "Projects capacity trends for services using linear regression on runtime snapshots (latency, throughput, error rate), estimating days to threshold breach.",
+    "totalServicesAnalyzed": "Total Services Analyzed",
+    "servicesWithInsufficientData": "Insufficient Data",
+    "imminentPct": "Imminent %",
+    "atRiskPct": "At Risk %",
+    "watchListPct": "Watch List %",
+    "stablePct": "Stable %",
+    "topUrgentServices": "Top Urgent Services",
+    "projectedLatency": "Projected Latency (30d)",
+    "projectedThroughput": "Projected Throughput (30d)",
+    "daysToLatencyThreshold": "Days to Latency Threshold",
+    "daysToErrorRateThreshold": "Days to Error Rate Threshold",
+    "latencyTrend": "Latency Trend (slope/day)",
+    "throughputTrend": "Throughput Trend (slope/day)",
+    "tiers": {
+      "Stable": "Stable",
+      "WatchList": "Watch List",
+      "AtRisk": "At Risk",
+      "Imminent": "Imminent"
+    }
+  },
+  "incidentProbability": {
+    "title": "Incident Probability Report",
+    "description": "Early warning system that scores the probability of a service incident in the next 48–72 hours using five convergent signals: drift, SLO breaches, chaos gap, high-risk releases and open vulnerabilities.",
+    "incidentProbabilityScore": "Incident Probability Score",
+    "probabilityTier": "Probability Tier",
+    "alertServicesList": "Alert Services",
+    "tenantRiskHeatmap": "Tenant Risk Heatmap",
+    "imminentPct": "Imminent %",
+    "probablePct": "Probable %",
+    "possiblePct": "Possible %",
+    "unlikelyPct": "Unlikely %",
+    "openDriftSignals": "Open Drift Signals",
+    "sloBreachTrend": "SLO Breach Trend",
+    "chaosGap": "Chaos Coverage Gap",
+    "recentHighRiskRelease": "Recent High-Risk Release",
+    "openVulnerabilities": "Open Vulnerabilities",
+    "probabilityExplanation": "Top Risk Factors",
+    "tiers": {
+      "Unlikely": "Unlikely",
+      "Possible": "Possible",
+      "Probable": "Probable",
+      "Imminent": "Imminent"
+    }
+  },
+  "crossTenantMaturity": {
+    "title": "Cross-Tenant Maturity Report",
+    "description": "Anonymous and consented comparison of platform maturity dimensions across tenants. Reveals where you stand vs. the ecosystem benchmark without exposing individual tenant data.",
+    "tenantMaturityScore": "Tenant Maturity Score",
+    "maturityTier": "Maturity Tier",
+    "benchmarkPercentile": "Benchmark Percentile",
+    "insufficientBenchmarkPeers": "Insufficient Benchmark Peers",
+    "weakestDimensions": "Weakest Dimensions",
+    "improvementPotential": "Improvement Potential",
+    "dimensions": {
+      "ContractGoverned": "Contract Governed",
+      "ChangeConfidenceEnabled": "Change Confidence Enabled",
+      "SloTracked": "SLO Tracked",
+      "RunbookCovered": "Runbook Covered",
+      "ProfilingActive": "Profiling Active",
+      "ComplianceEvaluated": "Compliance Evaluated",
+      "AiAssistantUsed": "AI Assistant Used"
+    },
+    "tiers": {
+      "Emerging": "Emerging",
+      "Developing": "Developing",
+      "Advanced": "Advanced",
+      "Pioneer": "Pioneer"
+    }
+  },
+  "tenantHealthScore": {
+    "title": "Tenant Health Score",
+    "description": "Global health scorecard of the tenant by operational dimension. Aggregates signals from services, contracts, changes, operations, compliance and FinOps into a single health score.",
+    "tenantHealthScore": "Tenant Health Score",
+    "healthTier": "Health Tier",
+    "pillarBreakdown": "Pillar Breakdown",
+    "trendComparison": "Trend Comparison",
+    "topIssues": "Top Issues",
+    "actionableItems": "Actionable Items",
+    "pillars": {
+      "ServiceGovernance": "Service Governance",
+      "ChangeConfidence": "Change Confidence",
+      "OperationalReliability": "Operational Reliability",
+      "ContractHealth": "Contract Health",
+      "ComplianceCoverage": "Compliance Coverage",
+      "FinOpsEfficiency": "FinOps Efficiency"
+    },
+    "tiers": {
+      "AtRisk": "At Risk",
+      "Fair": "Fair",
+      "Good": "Good",
+      "Excellent": "Excellent"
+    }
+  },
+  "platformPolicyCompliance": {
+    "title": "Platform Policy Compliance Report",
+    "description": "Evaluates conformance of services and teams with active platform policies defined in Policy Studio. Identifies which policies are failing and which entities are the worst offenders.",
+    "tenantPolicyComplianceScore": "Tenant Policy Compliance Score",
+    "totalPoliciesAnalyzed": "Total Policies Analyzed",
+    "escalationRequired": "Escalation Required",
+    "violatingEntities": "Violating Entities",
+    "worstOffenders": "Worst Offenders",
+    "passRate": "Pass Rate",
+    "evaluationCount": "Evaluation Count",
+    "governanceType": "Governance Type",
+    "distribution": "Compliance Distribution",
+    "governanceTypes": {
+      "Mandatory": "Mandatory",
+      "Advisory": "Advisory",
+      "Informational": "Informational"
+    },
+    "tiers": {
+      "Enforced": "Enforced",
+      "Partial": "Partial",
+      "AtRisk": "At Risk",
+      "Failing": "Failing"
+    }
+  },
+  "ideContextApi": {
+    "title": "IDE Context API",
+    "serviceContext": "Service Context",
+    "contractContext": "Contract Context",
+    "usageRecorded": "IDE usage recorded",
+    "notFound": "Resource not found in IDE context",
+    "sessionTokenTtl": "IDE Session Token TTL",
+    "cacheTtl": "Context Cache TTL",
+    "maxTokensPerRequest": "Max AI Tokens per Request"
+  },
+  "notificationChannel": {
+    "title": "Notification Delivery Report",
+    "channelHealth": "Channel Health",
+    "healthy": "Healthy",
+    "degraded": "Degraded",
+    "failing": "Failing",
+    "deliverySuccessRate": "Delivery Success Rate",
+    "deadLetterCount": "Dead Letter Count",
+    "eventTypeDistribution": "Event Type Distribution",
+    "topRecipients": "Top Recipients",
+    "retryCount": "Max Retry Count",
+    "retryDelay": "Retry Delay (seconds)"
+  },
+  "notificationEffectiveness": {
+    "title": "Notification Effectiveness Report",
+    "actionRate": "Action Rate",
+    "silenceRate": "Silence Rate",
+    "medianTimeToAction": "Median Time to Action",
+    "highImpact": "High Impact",
+    "moderate": "Moderate",
+    "lowImpact": "Low Impact",
+    "noise": "Noise",
+    "alertFatigue": "Alert Fatigue Candidates",
+    "tenantHealthScore": "Tenant Notification Health Score",
+    "recommendedAdjustments": "Recommended Adjustments",
+    "actionWindowHours": "Action Window (hours)",
+    "noiseVolumeThreshold": "Noise Volume Threshold"
+  },
+  "uncatalogedServices": {
+    "title": "Uncataloged Services Report",
+    "shadowServiceRisk": "Shadow Service Risk",
+    "catalogCoverageRate": "Catalog Coverage Rate",
+    "uncatalogedCount": "Uncataloged Service Count",
+    "suggestedTier": "Suggested Tier",
+    "possibleOwner": "Possible Owner",
+    "quickRegisterList": "Quick Register List",
+    "critical": "Critical",
+    "standard": "Standard",
+    "internal": "Internal"
+  },
+  "contractDriftFromReality": {
+    "title": "Contract Drift From Reality Report",
+    "undocumentedCalls": "Undocumented Calls",
+    "unusedDocumentedOps": "Unused Documented Operations",
+    "parameterMismatches": "Parameter Mismatches",
+    "aligned": "Aligned",
+    "minorDrift": "Minor Drift",
+    "significantDrift": "Significant Drift",
+    "misaligned": "Misaligned",
+    "tenantRealityScore": "Tenant Contract Reality Score",
+    "autoDocumentationHints": "Auto-Documentation Hints"
+  },
+  "catalogHealthMaintenance": {
+    "title": "Catalog Health Maintenance Report",
+    "catalogQualityScore": "Catalog Quality Score",
+    "excellent": "Excellent",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor",
+    "tenantHealthScore": "Tenant Catalog Health Score",
+    "campaignList": "Campaign List",
+    "staleEntryList": "Stale Entry List",
+    "descriptionCompleteness": "Description Completeness",
+    "ownershipFreshness": "Ownership Freshness",
+    "contractCoverage": "Contract Coverage",
+    "dependencyMapFreshness": "Dependency Map Freshness",
+    "runbookLinked": "Runbook Linked"
+  },
+  "errorBudget": {
+    "title": "Error Budget Report",
+    "errorBudgetPct": "Error Budget",
+    "budgetConsumedPct": "Budget Consumed",
+    "budgetRemainingPct": "Budget Remaining",
+    "burnRate": "Burn Rate",
+    "daysToExhaustion": "Days to Exhaustion",
+    "healthy": "Healthy",
+    "warning": "Warning",
+    "exhausted": "Exhausted",
+    "burned": "Burned",
+    "freezeRecommendations": "Freeze Recommendations",
+    "topBurningServices": "Top Burning Services"
+  },
+  "incidentImpactScorecard": {
+    "title": "Incident Impact Scorecard",
+    "incidentImpactScore": "Incident Impact Score",
+    "minor": "Minor",
+    "moderate": "Moderate",
+    "severe": "Severe",
+    "critical": "Critical",
+    "teamReliabilityTier": "Team Reliability Tier",
+    "excellent": "Excellent",
+    "good": "Good",
+    "atRisk": "At Risk",
+    "struggling": "Struggling",
+    "repeatOffenderServices": "Repeat Offender Services",
+    "tenantHealthIndex": "Tenant Incident Health Index"
+  },
+  "sreMaturityIndex": {
+    "title": "SRE Maturity Index Report",
+    "sreMaturityScore": "SRE Maturity Score",
+    "elite": "Elite",
+    "advanced": "Advanced",
+    "practicing": "Practicing",
+    "foundational": "Foundational",
+    "weakestPractices": "Weakest Practices",
+    "tenantSreMaturityIndex": "Tenant SRE Maturity Index",
+    "sloDefinitionCoverage": "SLO Definition Coverage",
+    "errorBudgetTracking": "Error Budget Tracking",
+    "chaosEngineeringAdoption": "Chaos Engineering Adoption",
+    "toilReductionEvidence": "Toil Reduction Evidence",
+    "postIncidentReviewRate": "Post-Incident Review Rate",
+    "runbookCompleteness": "Runbook Completeness"
+  },
+  "sbomCoverage": {
+    "title": "SBOM Coverage Report",
+    "covered": "Covered",
+    "stale": "Stale",
+    "outdated": "Outdated",
+    "missing": "Missing",
+    "componentCount": "Component Count",
+    "criticalCveCount": "Critical CVE Count",
+    "licenseRiskFlags": "License Risk Flags",
+    "topVulnerableServices": "Top Vulnerable Services"
+  },
+  "dependencyProvenance": {
+    "title": "Dependency Provenance Report",
+    "trusted": "Trusted",
+    "review": "Review",
+    "highRisk": "High Risk",
+    "blocked": "Blocked",
+    "unapprovedRegistryComponents": "Unapproved Registry Components",
+    "highRiskLicenseComponents": "High Risk License Components",
+    "mostUsedComponents": "Most Used Components",
+    "singlePointOfFailure": "Single Point of Failure"
+  },
+  "supplyChainRisk": {
+    "title": "Supply Chain Risk Report",
+    "secure": "Secure",
+    "monitored": "Monitored",
+    "exposed": "Exposed",
+    "critical": "Critical",
+    "prioritizedPatchList": "Prioritized Patch List",
+    "unpatchedWindowDays": "Unpatched Window (days)",
+    "tenantRiskScore": "Tenant Risk Score"
+  },
+  "approvalWorkflow": {
+    "title": "Approval Workflow Report",
+    "tenantApprovalHealthScore": "Tenant Approval Health Score",
+    "approvalEfficiencyIndex": "Approval Efficiency Index",
+    "autoApprovalRate": "Auto-Approval Rate",
+    "totalPendingApprovals": "Total Pending Approvals",
+    "bottleneckApprovers": "Bottleneck Approvers",
+    "environments": "Environments",
+    "enabled": "Approval Workflow Report Enabled",
+    "lookbackDays": "Lookback Days",
+    "tier": {
+      "Efficient": "Efficient",
+      "Normal": "Normal",
+      "Delayed": "Delayed",
+      "Blocked": "Blocked"
+    }
+  },
+  "peerReviewCoverage": {
+    "title": "Peer Review Coverage Report",
+    "reviewCoverageRate": "Review Coverage Rate",
+    "highRiskReviewRate": "High-Risk Review Rate",
+    "contractChangeReviewRate": "Contract Change Review Rate",
+    "tenantPeerReviewScore": "Tenant Peer Review Score",
+    "reviewThrottleRisk": "Review Throttle Risk",
+    "unreviewedHighRiskChanges": "Unreviewed High-Risk Changes",
+    "breakingContractChangesWithoutReview": "Breaking Contract Changes Without Review",
+    "reviewBacklogs": "Review Backlogs",
+    "enabled": "Peer Review Coverage Report Enabled",
+    "highRiskThreshold": "High-Risk Blast Radius Threshold",
+    "tier": {
+      "Full": "Full Coverage",
+      "Good": "Good Coverage",
+      "Partial": "Partial Coverage",
+      "AtRisk": "At Risk"
+    }
+  },
+  "governanceEscalation": {
+    "title": "Governance Escalation Report",
+    "breakGlassCount": "Break Glass Events",
+    "productionBreakGlassCount": "Production Break Glass Events",
+    "jitTotalRequests": "JIT Total Requests",
+    "jitApprovedRate": "JIT Approved Rate",
+    "jitAutoApprovedRate": "JIT Auto-Approved Rate",
+    "jitNeverUsedCount": "JIT Never Used",
+    "tenantEscalationRiskScore": "Tenant Escalation Risk Score",
+    "topEscalatingUsers": "Top Escalating Users",
+    "escalationPatternFlags": "Escalation Pattern Flags",
+    "previousPeriodBreakGlassCount": "Previous Period Break Glass Count",
+    "enabled": "Governance Escalation Report Enabled",
+    "breakGlassCriticalThreshold": "Break Glass Critical Threshold",
+    "jitAutoApprovedMaxPct": "JIT Auto-Approved Max Pct",
+    "jitUnusedMaxCount": "JIT Unused Max Count",
+    "tier": {
+      "Low": "Low Risk",
+      "Medium": "Medium Risk",
+      "High": "High Risk",
+      "Critical": "Critical Risk"
+    }
+  },
+  "dataContractCompliance": {
+    "title": "Data Contract Compliance Report",
+    "staleDays": "Stale Days",
+    "minFieldCompletenessPct": "Min Field Completeness %",
+    "tier": {
+      "Governed": "Governed",
+      "Partial": "Partial",
+      "Unmanaged": "Unmanaged"
+    }
+  },
+  "schemaQualityIndex": {
+    "title": "Schema Quality Index Report",
+    "minDescWords": "Min Description Words",
+    "snapshotCron": "Snapshot Cron",
+    "tier": {
+      "Excellent": "Excellent",
+      "Good": "Good",
+      "Fair": "Fair",
+      "Poor": "Poor"
+    }
+  },
+  "schemaEvolutionSafety": {
+    "title": "Schema Evolution Safety Report",
+    "breakingChangeLowPct": "Breaking Change Low %",
+    "breakingChangeDangerousPct": "Breaking Change Dangerous %",
+    "incidentCorrelationHours": "Incident Correlation Hours",
+    "lookbackDays": "Lookback Days",
+    "tier": {
+      "Safe": "Safe",
+      "Cautious": "Cautious",
+      "Risky": "Risky",
+      "Dangerous": "Dangerous"
+    }
+  },
+  "serviceTopologyHealth": {
+    "title": "Service Topology Health Report",
+    "freshnessDays": "Freshness Days",
+    "hubFanInThreshold": "Hub Fan-In Threshold",
+    "hubPenalty": "Hub Penalty",
+    "circularPenalty": "Circular Penalty",
+    "tier": {
+      "Healthy": "Healthy",
+      "Warning": "Warning",
+      "Degraded": "Degraded",
+      "Critical": "Critical"
+    }
+  },
+  "criticalPath": {
+    "title": "Critical Path Report",
+    "cascadeRiskScore": "Cascade Risk Score",
+    "bottleneckServices": "Bottleneck Services",
+    "topNChains": "Top N Chains",
+    "bottleneckPathCount": "Bottleneck Path Count"
+  },
+  "dependencyVersionAlignment": {
+    "title": "Dependency Version Alignment Report",
+    "majorDriftThreshold": "Major Drift Threshold",
+    "criticalServiceCount": "Critical Service Count",
+    "tier": {
+      "Aligned": "Aligned",
+      "MinorDrift": "Minor Drift",
+      "MajorDrift": "Major Drift",
+      "SecurityRisk": "Security Risk"
+    }
+  },
+  "featureFlagInventory": {
+    "title": "Feature Flag Inventory Report",
+    "description": "Inventory of feature flags per service, types, stale flags and kill-switches",
+    "totalFlags": "Total Flags",
+    "activeFlags": "Active Flags",
+    "staleFlags": "Stale Flags",
+    "ownerlessFlags": "Ownerless Flags",
+    "killSwitchCount": "Kill Switch Count",
+    "flagsInAllEnvironments": "Flags in All Environments",
+    "staleFlagDays": "Stale Flag Days",
+    "ingestEndpointEnabled": "Ingest Endpoint Enabled",
+    "byType": "By Type",
+    "flagsByEnvironment": "Flags by Environment",
+    "topServicesWithStaleFlags": "Top Services with Stale Flags",
+    "type": {
+      "release": "Release",
+      "experiment": "Experiment",
+      "permission": "Permission",
+      "killSwitch": "Kill Switch"
+    }
+  },
+  "featureFlagRisk": {
+    "title": "Feature Flag Risk Report",
+    "description": "Risk assessment of feature flags by staleness, ownership and production presence",
+    "flagRiskScore": "Flag Risk Score",
+    "stalenessRisk": "Staleness Risk",
+    "ownershipRisk": "Ownership Risk",
+    "productionPresenceRisk": "Production Presence Risk",
+    "incidentCorrelated": "Incident Correlated",
+    "scheduledRemovalOverdue": "Scheduled Removal Overdue",
+    "toggleWithIncidentCorrelation": "Toggle with Incident Correlation",
+    "recommendedRemovals": "Recommended Removals",
+    "tenantFlagRiskIndex": "Tenant Flag Risk Index",
+    "urgentFlagCount": "Urgent Flag Count",
+    "reviewFlagCount": "Review Flag Count",
+    "prodPresenceDays": "Prod Presence Days",
+    "incidentWindowHours": "Incident Window Hours",
+    "stalenessWeight": "Staleness Weight",
+    "tier": {
+      "safe": "Safe",
+      "monitor": "Monitor",
+      "review": "Review",
+      "urgent": "Urgent"
+    }
+  },
+  "experimentGovernance": {
+    "title": "Experiment Governance Report",
+    "description": "Governance assessment of A/B experiments: status, duration, success criteria and production risk",
+    "activeExperiments": "Active Experiments",
+    "overdueExperiments": "Overdue Experiments",
+    "experimentsWithoutSuccessCriteria": "Experiments Without Success Criteria",
+    "medianExperimentDurationDays": "Median Experiment Duration (days)",
+    "experimentVelocity": "Experiment Velocity",
+    "longRunningExperiments": "Long Running Experiments",
+    "experimentProdOnlyRisk": "Experiments with Production-Only Risk",
+    "tenantExperimentGovernanceScore": "Tenant Experiment Governance Score",
+    "experimentMaxDays": "Experiment Max Days",
+    "governedOverduePct": "Governed Overdue (%)",
+    "governedNoCriteriaPct": "Governed No Criteria (%)",
+    "environmentCoverage": "Environment Coverage",
+    "status": {
+      "active": "Active",
+      "overdue": "Overdue",
+      "stale": "Stale",
+      "concluded": "Concluded"
+    },
+    "tier": {
+      "governed": "Governed",
+      "improving": "Improving",
+      "atRisk": "At Risk",
+      "unmanaged": "Unmanaged"
+    }
+  },
+  "modelDrift": {
+    "title": "Model Drift Report",
+    "description": "Detects drift in AI model input/output distributions vs. baseline period",
+    "inputDriftScore": "Input Drift Score",
+    "outputDriftScore": "Output Drift Score",
+    "confidenceDrift": "Confidence Drift",
+    "nullRateIncrease": "Null Rate Increase",
+    "driftDetectionAlgorithm": "Detection Algorithm",
+    "driftAcknowledged": "Drift Acknowledged",
+    "driftAlerts": "Drift Alerts",
+    "topDriftingModels": "Top Drifting Models",
+    "stableModels": "Stable Models",
+    "driftingModels": "Drifting Models",
+    "criticalModels": "Critical Models",
+    "inputDriftWarningScore": "Input Drift Warning Score",
+    "outputDriftWarningScore": "Output Drift Warning Score",
+    "baselineDays": "Baseline Days",
+    "tier": {
+      "stable": "Stable",
+      "warning": "Warning",
+      "drifting": "Drifting",
+      "critical": "Critical"
+    }
+  },
+  "aiModelQuality": {
+    "title": "AI Model Quality Report",
+    "description": "Quality metrics for AI models in production: accuracy, confidence, latency and fallback rate",
+    "accuracyRate": "Accuracy Rate",
+    "feedbackCoverageRate": "Feedback Coverage Rate",
+    "avgConfidenceScore": "Avg Confidence Score",
+    "lowConfidencePredictionRate": "Low Confidence Prediction Rate",
+    "inferenceLatencyP50Ms": "Inference Latency P50 (ms)",
+    "inferenceLatencyP95Ms": "Inference Latency P95 (ms)",
+    "fallbackRate": "Fallback Rate",
+    "qualityAnomalies": "Quality Anomalies",
+    "modelsWithFeedback": "Models With Feedback",
+    "tenantAiQualityScore": "Tenant AI Quality Score",
+    "lowConfidenceModelCount": "Low Confidence Model Count",
+    "minSamplesForQuality": "Min Samples for Quality",
+    "lowConfidenceThreshold": "Low Confidence Threshold",
+    "latencyBudgetMs": "Latency Budget (ms)",
+    "tier": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "degraded": "Degraded",
+      "poor": "Poor"
+    },
+    "trend": {
+      "improving": "Improving",
+      "stable": "Stable",
+      "degrading": "Degrading"
+    }
+  },
+  "aiGovernanceCompliance": {
+    "title": "AI Governance Compliance Report",
+    "description": "Compliance of active AI models with governance requirements: approval, audit trail, budget and policy",
+    "hasFormalApproval": "Has Formal Approval",
+    "hasAuditTrail": "Has Audit Trail",
+    "budgetComplianceRate": "Budget Compliance Rate",
+    "policyAdherence": "Policy Adherence",
+    "lastReviewDate": "Last Review Date",
+    "reviewOverdue": "Review Overdue",
+    "budgetOverrunPeriods": "Budget Overrun Periods",
+    "tenantAiGovernanceScore": "Tenant AI Governance Score",
+    "aiGovernanceComplianceIndex": "AI Governance Compliance Index",
+    "modelsWithoutApproval": "Models Without Approval",
+    "modelsWithoutAuditTrail": "Models Without Audit Trail",
+    "budgetOverrunModels": "Budget Overrun Models",
+    "policyViolatingCalls": "Policy Violating Calls",
+    "modelReviewDays": "Model Review Days",
+    "budgetOverrunThreshold": "Budget Overrun Threshold",
+    "auditTrailLookbackDays": "Audit Trail Lookback Days",
+    "tier": {
+      "compliant": "Compliant",
+      "partial": "Partial",
+      "nonCompliant": "Non-Compliant",
+      "untracked": "Untracked"
+    }
+  },
+  "configurationDrift": {
+    "title": "Configuration Drift Report",
+    "description": "Detection and classification of configuration key divergences between environments",
+    "staleDays": "Stale Days Threshold",
+    "highImpactModules": "High Impact Modules",
+    "tier": {
+      "aligned": "Aligned",
+      "minorDrift": "Minor Drift",
+      "majorDrift": "Major Drift",
+      "critical": "Critical"
+    },
+    "divergenceType": {
+      "intentional": "Intentional",
+      "unexplained": "Unexplained",
+      "stale": "Stale"
+    }
+  },
+  "platformHealthIndex": {
+    "title": "Platform Health Index Report",
+    "description": "Composite index measuring depth of NexTraceOne capability adoption across 7 dimensions",
+    "freshnessDays": "Data Freshness Days",
+    "optimizedThreshold": "Optimized Threshold",
+    "operationalThreshold": "Operational Threshold",
+    "tier": {
+      "optimized": "Optimized",
+      "operational": "Operational",
+      "partial": "Partial",
+      "underutilized": "Underutilized"
+    }
+  },
+  "adaptiveRecommendations": {
+    "title": "Adaptive Recommendation Report",
+    "description": "Prioritized cross-wave recommendations to improve governance, reliability, security, quality and adoption",
+    "topN": "Top N Recommendations",
+    "refreshCron": "Refresh Schedule (Cron)",
+    "lowEffortSprints": "Low Effort Sprint Count",
+    "category": {
+      "reliability": "Reliability",
+      "security": "Security",
+      "governance": "Governance",
+      "quality": "Quality",
+      "adoption": "Adoption"
+    },
+    "effort": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
+  "contractDeprecationPipeline": {
+    "title": "Contract Deprecation Pipeline Report",
+    "description": "End-to-end view of active contract deprecation pipelines: migration progress, notification gaps and blocking consumers",
+    "maxDays": "Max Days in Deprecated State",
+    "sunsetWarningDays": "Sunset Warning Days",
+    "minNotificationPct": "Min Notification Percentage",
+    "migrationProgress": "Migration Progress",
+    "notificationGaps": "Notification Gaps",
+    "blockingConsumers": "Blocking Consumers",
+    "tenantDeprecationHealthScore": "Tenant Deprecation Health Score",
+    "approachingSunset": "Approaching Sunset",
+    "overdueSunsets": "Overdue Sunsets",
+    "totalBlockingConsumers": "Total Blocking Consumers",
+    "fastestMigrations": "Fastest Migrations",
+    "slowestMigrations": "Slowest Migrations",
+    "tier": {
+      "onTrack": "On Track",
+      "atRisk": "At Risk",
+      "overdue": "Overdue",
+      "blocked": "Blocked"
+    }
+  },
+  "apiVersionStrategy": {
+    "title": "API Version Strategy Report",
+    "description": "Analysis of API versioning strategy: semver adoption, parallel versions, breaking change trends and proliferation risks",
+    "breakingChangeWarningThreshold": "Breaking Change Warning Threshold",
+    "proliferationThreshold": "Proliferation Threshold",
+    "semverAdoptionRate": "Semver Adoption Rate",
+    "avgParallelVersionsPerService": "Avg Parallel Versions Per Service",
+    "highBreakingChangeServices": "High Breaking Change Services",
+    "versionProliferationRisk": "Version Proliferation Risk",
+    "breakingChangeTrend": "Breaking Change Trend",
+    "versioningGapsByTeam": "Versioning Gaps by Team",
+    "bestPracticedServices": "Best Practiced Services",
+    "pattern": {
+      "linear": "Linear",
+      "parallel": "Parallel",
+      "fragmented": "Fragmented"
+    },
+    "tier": {
+      "mature": "Mature",
+      "developing": "Developing",
+      "inconsistent": "Inconsistent",
+      "chaotic": "Chaotic"
+    }
+  },
+  "contractDeprecationForecast": {
+    "title": "Contract Deprecation Forecast",
+    "description": "Predictive analysis of contracts likely to be deprecated in the next 30/60/90 days and planned deprecation calendar",
+    "maxAgeDays": "Max Contract Age Days",
+    "consumerDeclinePct": "Consumer Decline Percentage Threshold",
+    "scheduleEndpointEnabled": "Schedule Endpoint Enabled",
+    "forecastedCandidates": "Forecasted Deprecation Candidates",
+    "deprecationProbabilityScore": "Deprecation Probability Score",
+    "plannedDeprecationCalendar": "Planned Deprecation Calendar",
+    "ageRiskScore": "Age Risk Score",
+    "successorScore": "Successor Available Score",
+    "consumerDeclineScore": "Consumer Decline Score",
+    "ownerSignalScore": "Owner Signal Score",
+    "estimatedIn30Days": "Estimated Deprecations in 30 Days",
+    "estimatedIn60Days": "Estimated Deprecations in 60 Days",
+    "estimatedIn90Days": "Estimated Deprecations in 90 Days"
   }
 }

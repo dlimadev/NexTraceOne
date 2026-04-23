@@ -4,7 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.ComputeDeveloperExperienceScore;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.GetDeveloperExperienceScore;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.GetDeveloperNpsSummary;
+using NexTraceOne.Catalog.Application.DeveloperExperience.Features.GetIdeContractContext;
+using NexTraceOne.Catalog.Application.DeveloperExperience.Features.GetIdeServiceContext;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.ListDeveloperExperienceScores;
+using NexTraceOne.Catalog.Application.DeveloperExperience.Features.RecordIdeUsage;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.RecordProductivitySnapshot;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.SubmitDeveloperSurvey;
 
@@ -25,6 +28,9 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListDeveloperExperienceScores.Query>, ListDeveloperExperienceScores.Validator>();
         services.AddTransient<IValidator<SubmitDeveloperSurvey.Command>, SubmitDeveloperSurvey.Validator>();
         services.AddTransient<IValidator<GetDeveloperNpsSummary.Query>, GetDeveloperNpsSummary.Validator>();
+        services.AddTransient<IValidator<GetIdeServiceContext.Query>, GetIdeServiceContext.Validator>();
+        services.AddTransient<IValidator<GetIdeContractContext.Query>, GetIdeContractContext.Validator>();
+        services.AddTransient<IValidator<RecordIdeUsage.Command>, RecordIdeUsage.Validator>();
         return services;
     }
 }
