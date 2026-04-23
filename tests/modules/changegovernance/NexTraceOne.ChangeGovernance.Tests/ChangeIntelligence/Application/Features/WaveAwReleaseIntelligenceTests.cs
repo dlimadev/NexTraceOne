@@ -1,4 +1,3 @@
-using System.Linq;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;

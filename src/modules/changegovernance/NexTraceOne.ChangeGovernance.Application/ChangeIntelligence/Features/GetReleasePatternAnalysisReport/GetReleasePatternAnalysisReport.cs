@@ -199,7 +199,7 @@ public static class GetReleasePatternAnalysisReport
                 .GroupBy(r => (r.DeployedAt.Date, r.Environment), (k, g) => g.Count())
                 .ToList();
             var clusterDays = releasesByDayAndEnv.Count(c => c > 3);
-            var maxDailyCount = releasesByDayAndEnv.Count > 0 ? releasesByDayAndEnv.Max() : 0;
+            var maxDailyReleaseCount = releasesByDayAndEnv.Count > 0 ? releasesByDayAndEnv.Max() : 0;
 
             var weeksInPeriod = Math.Max(1.0, query.LookbackDays / 7.0);
             var clusteringPerWeek = clusterDays / weeksInPeriod;
@@ -207,7 +207,7 @@ public static class GetReleasePatternAnalysisReport
 
             var clusteringRisk = new ClusteringRiskResult(
                 MultiServiceSameDayReleases: clusterDays,
-                MaxDailyReleaseCount: maxDailyCount,
+                MaxDailyReleaseCount: maxDailyReleaseCount,
                 Tier: clusteringTier);
 
             // ── Incident Pattern After Release ────────────────────────────────

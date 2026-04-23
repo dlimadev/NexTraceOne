@@ -272,10 +272,14 @@ public static class GetChangeLeadTimeReport
                 BottleneckStage: bottleneck);
         }
 
+        private const double EliteThresholdMinutes = 60;
+        private const double HighThresholdMinutes = 60 * 24;
+        private const double MediumThresholdMinutes = 60 * 24 * 7;
+
         private static LeadTimeTier ClassifyLeadTimeTier(double medianMinutes) =>
-            medianMinutes <= 60 ? LeadTimeTier.Elite
-            : medianMinutes <= 60 * 24 ? LeadTimeTier.High
-            : medianMinutes <= 60 * 24 * 7 ? LeadTimeTier.Medium
+            medianMinutes <= EliteThresholdMinutes ? LeadTimeTier.Elite
+            : medianMinutes <= HighThresholdMinutes ? LeadTimeTier.High
+            : medianMinutes <= MediumThresholdMinutes ? LeadTimeTier.Medium
             : LeadTimeTier.Low;
 
         private static double Percentile(List<double> sortedValues, int percentile)

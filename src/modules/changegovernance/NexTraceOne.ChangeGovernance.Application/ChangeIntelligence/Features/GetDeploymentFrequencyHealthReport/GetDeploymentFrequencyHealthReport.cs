@@ -157,7 +157,7 @@ public static class GetDeploymentFrequencyHealthReport
                         avgGap = Math.Round(gaps.Average(), 2);
 
                         var stdDev = gaps.Count > 1
-                            ? Math.Sqrt(gaps.Average(gap => Math.Pow(gap - avgGap, 2)))
+                            ? CalculateStandardDeviation(gaps, avgGap)
                             : 0;
                         var highVariability = avgGap > 0 && (decimal)(stdDev / avgGap) > query.HighVariabilityThreshold;
 
@@ -241,6 +241,9 @@ public static class GetDeploymentFrequencyHealthReport
                 To: to,
                 GeneratedAt: clock.UtcNow));
         }
+
+        private static double CalculateStandardDeviation(List<double> values, double mean) =>
+            Math.Sqrt(values.Average(v => Math.Pow(v - mean, 2)));
 
         private static DeployFrequencyTier ClassifyTier(double lastDeployAge, double freqPerMonth, int staleDeployDays)
         {
