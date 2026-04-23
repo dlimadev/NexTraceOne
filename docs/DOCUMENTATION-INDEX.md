@@ -12,8 +12,11 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
 | [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | Roadmap histórico de funcionalidades — waves A → BC (155 features, 100% concluídas) |
-| [`PLANO-DE-ACAO-V2.md`](PLANO-DE-ACAO-V2.md) | **Plano de acção consolidado pós-v1.0.0** — substitui e consolida todos os planos anteriores |
+| [`PLANO-DE-ACAO-V2.md`](PLANO-DE-ACAO-V2.md) | **Plano de acção consolidado pós-v1.0.0** — substitui e consolida todos os planos anteriores (inclui P14 SaaS) |
 | [`NEXT-ACTION-PLAN.md`](NEXT-ACTION-PLAN.md) | Referência histórica — evoluções pós-v1.0.0 (ver PLANO-DE-ACAO-V2.md para versão completa) |
+| [`SAAS-STRATEGY.md`](SAAS-STRATEGY.md) | Estratégia SaaS — posicionamento, modelos de distribuição, feature matrix SaaS vs self-hosted |
+| [`SAAS-ROADMAP.md`](SAAS-ROADMAP.md) | Roadmap SaaS — Fases 0..3 (Licensing, NexTrace Agent, Features competitivas, Diferenciais enterprise) |
+| [`SAAS-LICENSING.md`](SAAS-LICENSING.md) | Modelo de licenciamento — planos Starter/Professional/Enterprise/Self-hosted, Host Units, billing |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`HONEST-GAPS.md`](HONEST-GAPS.md) | Referência de padrões OOS, stubs by design e providers DEG-01..15 |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |

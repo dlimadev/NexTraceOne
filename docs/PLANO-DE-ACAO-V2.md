@@ -302,6 +302,71 @@
 
 ---
 
+## Prioridade 14 — SaaS Evolution 🟢 P4
+
+**Objectivo:** Transformar o NexTraceOne num produto SaaS competitivo com Dynatrace/Datadog, mantendo o modelo self-hosted como opção de primeiro nível.
+
+**Referências:** [SAAS-STRATEGY.md](./SAAS-STRATEGY.md) · [SAAS-ROADMAP.md](./SAAS-ROADMAP.md) · [SAAS-LICENSING.md](./SAAS-LICENSING.md)
+
+> O NexTraceOne já tem multi-tenancy via PostgreSQL RLS, APM via OTel, AI Governance, Change Confidence, e Operational Intelligence. A base técnica para SaaS **já existe**. O que falta é o modelo comercial e de distribuição SaaS.
+
+### Fase 0 — Fundação SaaS (6 semanas)
+
+| ID | Item | Prioridade |
+|----|------|-----------|
+| SAAS-01 | **Capabilities no JWT** — popular claims `capabilities` em `JwtTokenGenerator` + gates `HasCapability()` nas features Premium | 🔴 P0 — bloqueante |
+| SAAS-02 | **Módulo `Licensing`** — `TenantLicense`, `AgentRegistration`, `LicenseRecalculationJob` (Quartz), endpoint `POST /v1/agent/heartbeat` | 🔴 P0 — bloqueante |
+| SAAS-03 | **Tenant Provisioning** — self-service signup → criar Tenant → TenantLicense Starter → API Key → email com instruções | 🔴 P0 — bloqueante |
+| SAAS-04 | **Integração de Billing** — Stripe (ou equivalente) para cobrança automática por Host Units (HU) | 🔴 P0 — bloqueante |
+| SAAS-05 | **UI de Onboarding** — wizard pós-signup: instalar agent, verificar heartbeat, ver primeiros dados | 🟡 P1 |
+
+### Fase 1 — NexTrace Agent v1 (8 semanas)
+
+| ID | Item | Prioridade |
+|----|------|-----------|
+| SAAS-06 | **Agent distribuível** — binário cross-platform (Windows/Linux) que envia OTLP para `https://ingest.nextraceone.io` | 🔴 P0 — sem agent não há SaaS real |
+| SAAS-07 | **Heartbeat endpoint** — `POST /v1/agent/heartbeat` com `AgentId`, `HostName`, `HostUnits` | 🔴 P0 |
+| SAAS-08 | **CLR Profiler (Windows)** — captura automática de traces em apps .NET sem instrumentação manual | 🟡 P1 |
+| SAAS-09 | **IIS Integration** — auto-instrumentação de apps IIS sem redeploy | 🟡 P1 |
+| SAAS-10 | **Agent auto-update** — mecanismo de actualização automática via canal de update | 🟠 P2 |
+
+### Fase 2 — Features SaaS Competitivas (12 semanas)
+
+| ID | Item | Prioridade |
+|----|------|-----------|
+| SAAS-11 | **Log Search UI** — interface tipo Kibana para pesquisa de logs com filtros e contexto de serviço | 🟡 P1 |
+| SAAS-12 | **Alerting Engine completo** — criação de alertas por threshold/anomalia, integração com Slack/PagerDuty/Teams | 🟡 P1 |
+| SAAS-13 | **Real User Monitoring (RUM)** — SDK JS para browser, sessões de utilizador, Core Web Vitals | 🟡 P1 |
+| SAAS-14 | **Dashboard Builder** — drag-and-drop, widgets configuráveis, partilha de dashboards | 🟠 P2 |
+| SAAS-15 | **Mobile APM SDK** — SDK iOS/Android com crash reporting e traces | 🟠 P2 |
+| SAAS-16 | **Synthetic Monitoring** — probes HTTP/HTTPS programáveis com alertas de disponibilidade | 🟠 P2 |
+
+### Fase 3 — Diferenciais Enterprise (16 semanas)
+
+| ID | Item | Prioridade |
+|----|------|-----------|
+| SAAS-17 | **AIOps / Anomaly Detection** — detecção automática de anomalias com correlação causal (Davis AI analogy) | 🔵 P3 |
+| SAAS-18 | **Session Replay** (RUM avançado) — gravação de sessões de utilizador com anonimização GDPR | 🔵 P3 |
+| SAAS-19 | **Multi-region SaaS** — sharding geográfico (EU, US, APAC) com conformidade de residência de dados | 🔵 P3 |
+| SAAS-20 | **Marketplace de Integrações** — catálogo de plugins: GitLab, Jenkins, Azure DevOps, Jira, ServiceNow | 🔵 P3 |
+
+### Modelo de Licenciamento (referência)
+
+Ver [SAAS-LICENSING.md](./SAAS-LICENSING.md) para detalhe completo. Sumário dos planos:
+
+| Plano | Host Units | Features | Billing |
+|-------|-----------|----------|---------|
+| **Starter** (Free) | ≤3 HU | APM + Catalog básico | Gratuito |
+| **Professional** | ≤20 HU | + AI Governance + Contract Gov. | Por HU/mês |
+| **Enterprise** | Ilimitado | Tudo + SLA + Suporte dedicado | Contrato anual |
+| **Self-hosted** | Ilimitado | Tudo | Licença perpétua |
+
+### Arquitectura SaaS (referência)
+
+Ver [SAAS-STRATEGY.md](./SAAS-STRATEGY.md) para o detalhe da arquitetura multi-tenant SaaS, feature matrix, e distinção entre Platform AI (interno) e Customer AI Governance (exposto).
+
+---
+
 ## Providers Nível B → A (Dívida Técnica de Provider Pattern)
 
 Baseado na auditoria CFG-02 em [HONEST-GAPS.md](./HONEST-GAPS.md). Estes providers funcionam em modo de degradação graciosa (Nível B — simulated in handler). Promover para Nível A apenas quando o cliente externo real for implementado.
@@ -374,6 +439,16 @@ ADR-009 (Evaluation Harness)
 
 Fase 2 AI (Agent Lightning RL)
   └── dependem de: AiAgentTrajectoryFeedback já existente ✅
+
+SaaS Fase 0 (SAAS-01..05)
+  └── dependem de: INF-01 (PgBouncer) + multi-tenancy já existe ✅
+  └── SAAS-01 (JWT Capabilities) — pode começar já, sem dependências de infra
+
+SaaS Fase 1 (SAAS-06..10 — NexTrace Agent)
+  └── dependem de: SAAS-02 (heartbeat endpoint) + SAAS-03 (provisioning)
+
+SaaS Fase 2 (SAAS-11..16 — Features competitivas)
+  └── dependem de: SaaS Fase 0 completa + V3 Frontend waves base
 ```
 
 ---
@@ -381,16 +456,16 @@ Fase 2 AI (Agent Lightning RL)
 ## Ordem Recomendada de Execução
 
 ```
-Semana 1–2:   SAM-01..03 (Quick Win) + PIP-01..02 (Dead Letter + Observability)
+Semana 1–2:   SAM-01..03 (Quick Win) + PIP-01..02 (Dead Letter + Observability) + SAAS-01 (JWT Capabilities)
 Semana 1–5:   INF-01..04 (PostgreSQL Hardening) em paralelo
-Semana 3–7:   INF-05..08 (ClickHouse as default)
-Semana 6–10:  PIP-03..06 (Pipeline completo)
-Semana 8–12:  HI-01..05 (Host Infrastructure)
+Semana 3–7:   INF-05..08 (ClickHouse as default) + SAAS-02..05 (Licensing + Provisioning)
+Semana 6–10:  PIP-03..06 (Pipeline completo) + SAAS-06..07 (NexTrace Agent v1)
+Semana 8–12:  HI-01..05 (Host Infrastructure) + SAAS-08..10 (Agent CLR/IIS/auto-update)
 Semana 10–14: TOP-01..04 (Topology completions)
 Semana 12–16: CC2-01..05 (Change Confidence 2.0) + AEH-01..05 (Evaluation Harness)
-Semana 14–22: V3 Frontend waves (em paralelo com backend)
+Semana 14–22: V3 Frontend waves (em paralelo com backend) + SAAS-11..16 (Features SaaS)
 Semana 16–24: IDE Extensions publicação + maturação
-Semana 20+:   AI Fase 2..4 (Agent Lightning, Enterprise, Inovação)
+Semana 20+:   AI Fase 2..4 (Agent Lightning, Enterprise, Inovação) + SAAS-17..20 (Diferenciais Enterprise)
 Semana 24+:   Kubernetes Helm charts
 ```
 

@@ -25,7 +25,7 @@ Cada entrada segue o padrão:
 
 | ID | Item | Razão | Alternativa real |
 |---|---|---|---|
-| OOS-01 | **Product Licensing** (license online/offline, heartbeat, entitlements, anti-tampering) | Removido do produto. `Licensing` module não consta no código-base nem no `FUTURE-ROADMAP.md` (linha 249 do roadmap confirma). | Entitlements são geridos via contrato comercial + feature-flags em `Configuration`. |
+| OOS-01 | **Product Licensing** (license online/offline, heartbeat, entitlements, anti-tampering) | **Reclassificado como evolução futura SaaS** — ver `SAAS-ROADMAP.md` Fase 0 e `PLANO-DE-ACAO-V2.md` Prioridade 14. Atualmente, entitlements são geridos via contrato comercial + feature-flags em `Configuration`. A implementação do módulo `Licensing` faz parte do roadmap SaaS. | Ver `SAAS-LICENSING.md` e `PLANO-DE-ACAO-V2.md §P14`. |
 | OOS-02 | **Convites in-app** (`POST /invitations/accept`, `GET /invitations/{token}`) | Produto é **SSO-first**. Provisionamento via IdP corporativo (OIDC/SAML + JIT/SCIM quando aplicável). Endpoints, página FE e i18n foram removidos em Abril/2026. | `StartOidcLogin` + `StartSamlLogin` já cobrem o onboarding de utilizadores. |
 | OOS-03 | **TanStack Router** | Documentação antiga mencionava TanStack Router; o frontend usa **`react-router-dom` v7** desde sempre. `docs/FRONTEND-ARCHITECTURE.md` já está correto. | N/A — sem ação. |
 
