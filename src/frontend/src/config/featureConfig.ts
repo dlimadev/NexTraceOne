@@ -106,4 +106,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13730, key: "traffic.anomaly.spike_sigma", label: "trafficAnomaly.spikeSigma", defaultValue: 3 },
   { sort: 13740, key: "traffic.anomaly.drop_pct", label: "trafficAnomaly.dropPct", defaultValue: 50 },
   { sort: 13750, key: "traffic.anomaly.error_rate_spike_threshold", label: "trafficAnomaly.errorRateSpikeThreshold", defaultValue: 5 },
+  // ── Wave BA — Platform Engineering & Developer Portal Intelligence ──
+  { sort: 13760, key: "portal.adoption.active_usage_sessions", label: "portalAdoptionFunnel.activeUsageSessions", defaultValue: 3 },
+  { sort: 13770, key: "portal.adoption.inactive_user_days", label: "portalAdoptionFunnel.inactiveUserDays", defaultValue: 30 },
+  { sort: 13780, key: "portal.adoption.funnel_period_days", label: "portalAdoptionFunnel.funnelPeriodDays", defaultValue: 30 },
+  { sort: 13790, key: "portal.workflow.timeout_hours", label: "selfServiceWorkflowHealth.timeoutHours", defaultValue: 48 },
+  { sort: 13800, key: "portal.workflow.smooth_completion_rate", label: "selfServiceWorkflowHealth.smoothCompletionRate", defaultValue: 90 },
+  { sort: 13810, key: "portal.workflow.smooth_admin_rate", label: "selfServiceWorkflowHealth.smoothAdminRate", defaultValue: 5 },
+  { sort: 13820, key: "integration.health.sync_freshness_hours", label: "integrationHealth.syncFreshnessHours", defaultValue: 24 },
+  { sort: 13830, key: "integration.health.sync_health_window_hours", label: "integrationHealth.syncHealthWindowHours", defaultValue: 72 },
 ];

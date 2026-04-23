@@ -15061,5 +15061,84 @@
       "warning": "Warning",
       "critical": "Critical"
     }
+  },
+  "portalAdoptionFunnel": {
+    "title": "Portal Adoption Funnel",
+    "description": "Adoption funnel analysis for the NexTraceOne developer portal",
+    "activeUsageSessions": "Minimum sessions to classify user as Active",
+    "inactiveUserDays": "Days without login to flag user as Inactive",
+    "funnelPeriodDays": "Adoption funnel analysis period (days)",
+    "adoptionTiers": {
+      "leader": "Leader",
+      "active": "Active",
+      "lagging": "Lagging",
+      "inactive": "Inactive"
+    },
+    "trends": {
+      "growing": "Growing",
+      "stable": "Stable",
+      "declining": "Declining"
+    },
+    "labels": {
+      "teamAdoptionMatrix": "Team Adoption Matrix",
+      "inactiveUsers": "Inactive Users",
+      "enablementOpportunities": "Enablement Opportunities",
+      "featureGaps": "Feature Gaps",
+      "funnelDropRate": "Funnel Drop Rate",
+      "tenantAdoptionScore": "Tenant Adoption Score",
+      "activeUserRate": "Active User Rate"
+    }
+  },
+  "selfServiceWorkflowHealth": {
+    "title": "Self-Service Workflow Health",
+    "description": "Health of NexTraceOne self-service workflows",
+    "timeoutHours": "Hours without completion to mark workflow as Abandoned",
+    "smoothCompletionRate": "Minimum completion rate for Smooth tier (%)",
+    "smoothAdminRate": "Maximum admin intervention rate for Smooth tier (%)",
+    "workflowHealthTiers": {
+      "smooth": "Smooth",
+      "functional": "Functional",
+      "frictionHeavy": "Friction-Heavy",
+      "broken": "Broken"
+    },
+    "labels": {
+      "completionRate": "Completion Rate",
+      "abandonmentRate": "Abandonment Rate",
+      "adminInterventionRate": "Admin Intervention Rate",
+      "avgCompletionTime": "Avg Completion Time",
+      "adminDependencyIndex": "Admin Dependency Index",
+      "overallSelfServiceScore": "Overall Self-Service Score",
+      "frictionWorkflows": "Friction Workflows",
+      "slowestWorkflows": "Slowest Workflows",
+      "abandonmentHotspots": "Abandonment Hotspots"
+    }
+  },
+  "integrationHealth": {
+    "title": "Integration Health",
+    "description": "Health of active integrations with external systems",
+    "syncFreshnessHours": "Max hours of sync age for Fresh status",
+    "syncHealthWindowHours": "Hours window for sync success rate calculation",
+    "freshnessStatuses": {
+      "fresh": "Fresh",
+      "aging": "Aging",
+      "stale": "Stale",
+      "offline": "Offline"
+    },
+    "healthTiers": {
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "failing": "Failing",
+      "offline": "Offline"
+    },
+    "labels": {
+      "syncSuccessRate": "Sync Success Rate",
+      "syncAge": "Sync Age",
+      "lastSyncAt": "Last Sync",
+      "tenantIntegrationHealthScore": "Tenant Integration Health Score",
+      "criticalOfflineIntegrations": "Critical Offline Integrations",
+      "dataFreshnessImpact": "Data Freshness Impact",
+      "topErrorIntegrations": "Top Error Integrations",
+      "integrationHealthHistory": "Integration Health History (7d)"
+    }
   }
 }

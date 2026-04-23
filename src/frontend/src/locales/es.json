@@ -16296,5 +16296,84 @@
       "warning": "Aviso",
       "critical": "Crítico"
     }
+  },
+  "portalAdoptionFunnel": {
+    "title": "Embudo de Adopción del Portal",
+    "description": "Análisis del embudo de adopción de NexTraceOne como Developer Portal",
+    "activeUsageSessions": "Sesiones mínimas para clasificar usuario como Activo",
+    "inactiveUserDays": "Días sin inicio de sesión para marcar usuario como Inactivo",
+    "funnelPeriodDays": "Período de análisis del embudo de adopción (días)",
+    "adoptionTiers": {
+      "leader": "Líder",
+      "active": "Activo",
+      "lagging": "Rezagado",
+      "inactive": "Inactivo"
+    },
+    "trends": {
+      "growing": "Creciendo",
+      "stable": "Estable",
+      "declining": "Declinando"
+    },
+    "labels": {
+      "teamAdoptionMatrix": "Matriz de Adopción por Equipo",
+      "inactiveUsers": "Usuarios Inactivos",
+      "enablementOpportunities": "Oportunidades de Habilitación",
+      "featureGaps": "Brechas de Funcionalidades",
+      "funnelDropRate": "Tasa de Abandono del Embudo",
+      "tenantAdoptionScore": "Puntuación de Adopción del Tenant",
+      "activeUserRate": "Tasa de Usuarios Activos"
+    }
+  },
+  "selfServiceWorkflowHealth": {
+    "title": "Salud de Workflows de Autoservicio",
+    "description": "Salud de los workflows de autoservicio de NexTraceOne",
+    "timeoutHours": "Horas sin completar para marcar workflow como Abandonado",
+    "smoothCompletionRate": "Tasa mínima de completación para nivel Smooth (%)",
+    "smoothAdminRate": "Tasa máxima de intervención admin para nivel Smooth (%)",
+    "workflowHealthTiers": {
+      "smooth": "Fluido",
+      "functional": "Funcional",
+      "frictionHeavy": "Con Fricción",
+      "broken": "Roto"
+    },
+    "labels": {
+      "completionRate": "Tasa de Completación",
+      "abandonmentRate": "Tasa de Abandono",
+      "adminInterventionRate": "Tasa de Intervención Admin",
+      "avgCompletionTime": "Tiempo Promedio de Completación",
+      "adminDependencyIndex": "Índice de Dependencia Admin",
+      "overallSelfServiceScore": "Puntuación General de Autoservicio",
+      "frictionWorkflows": "Workflows con Fricción",
+      "slowestWorkflows": "Workflows más Lentos",
+      "abandonmentHotspots": "Puntos de Abandono"
+    }
+  },
+  "integrationHealth": {
+    "title": "Salud de Integraciones",
+    "description": "Salud de las integraciones activas con sistemas externos",
+    "syncFreshnessHours": "Horas máximas de antigüedad de sincronización para estado Fresh",
+    "syncHealthWindowHours": "Ventana de horas para calcular tasa de éxito de sincronización",
+    "freshnessStatuses": {
+      "fresh": "Fresco",
+      "aging": "Envejeciendo",
+      "stale": "Desactualizado",
+      "offline": "Sin conexión"
+    },
+    "healthTiers": {
+      "healthy": "Saludable",
+      "degraded": "Degradado",
+      "failing": "Fallando",
+      "offline": "Sin conexión"
+    },
+    "labels": {
+      "syncSuccessRate": "Tasa de Éxito de Sincronización",
+      "syncAge": "Antigüedad de Sincronización",
+      "lastSyncAt": "Última Sincronización",
+      "tenantIntegrationHealthScore": "Puntuación de Salud de Integraciones",
+      "criticalOfflineIntegrations": "Integraciones Críticas Sin Conexión",
+      "dataFreshnessImpact": "Impacto en la Frescura de Datos",
+      "topErrorIntegrations": "Integraciones con Más Errores",
+      "integrationHealthHistory": "Historial de Salud (7d)"
+    }
   }
 }

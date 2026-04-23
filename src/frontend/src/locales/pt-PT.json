@@ -16293,5 +16293,84 @@
       "warning": "Aviso",
       "critical": "Crítico"
     }
+  },
+  "portalAdoptionFunnel": {
+    "title": "Funil de Adopção do Portal",
+    "description": "Análise do funil de adopção do NexTraceOne como Developer Portal",
+    "activeUsageSessions": "Sessões mínimas para classificar utilizador como Activo",
+    "inactiveUserDays": "Dias sem login para marcar utilizador como Inactivo",
+    "funnelPeriodDays": "Período de análise do funil de adopção (dias)",
+    "adoptionTiers": {
+      "leader": "Líder",
+      "active": "Activo",
+      "lagging": "Atrasado",
+      "inactive": "Inactivo"
+    },
+    "trends": {
+      "growing": "A Crescer",
+      "stable": "Estável",
+      "declining": "A Declinar"
+    },
+    "labels": {
+      "teamAdoptionMatrix": "Matriz de Adopção por Equipa",
+      "inactiveUsers": "Utilizadores Inactivos",
+      "enablementOpportunities": "Oportunidades de Capacitação",
+      "featureGaps": "Gaps de Funcionalidade",
+      "funnelDropRate": "Taxa de Abandono do Funil",
+      "tenantAdoptionScore": "Score de Adopção do Tenant",
+      "activeUserRate": "Taxa de Utilizadores Activos"
+    }
+  },
+  "selfServiceWorkflowHealth": {
+    "title": "Saúde dos Workflows de Self-Service",
+    "description": "Saúde dos workflows de self-service do NexTraceOne",
+    "timeoutHours": "Horas sem conclusão para marcar workflow como Abandonado",
+    "smoothCompletionRate": "Taxa mínima de conclusão para tier Smooth (%)",
+    "smoothAdminRate": "Taxa máxima de intervenção admin para tier Smooth (%)",
+    "workflowHealthTiers": {
+      "smooth": "Fluído",
+      "functional": "Funcional",
+      "frictionHeavy": "Com Fricção",
+      "broken": "Quebrado"
+    },
+    "labels": {
+      "completionRate": "Taxa de Conclusão",
+      "abandonmentRate": "Taxa de Abandono",
+      "adminInterventionRate": "Taxa de Intervenção Admin",
+      "avgCompletionTime": "Tempo Médio de Conclusão",
+      "adminDependencyIndex": "Índice de Dependência Admin",
+      "overallSelfServiceScore": "Score Global de Self-Service",
+      "frictionWorkflows": "Workflows com Fricção",
+      "slowestWorkflows": "Workflows Mais Lentos",
+      "abandonmentHotspots": "Pontos de Abandono"
+    }
+  },
+  "integrationHealth": {
+    "title": "Saúde das Integrações",
+    "description": "Saúde das integrações activas com sistemas externos",
+    "syncFreshnessHours": "Horas máximas de SyncAge para estado Fresh",
+    "syncHealthWindowHours": "Janela de horas para cálculo de SyncSuccessRate",
+    "freshnessStatuses": {
+      "fresh": "Fresco",
+      "aging": "A Envelhecer",
+      "stale": "Desactualizado",
+      "offline": "Offline"
+    },
+    "healthTiers": {
+      "healthy": "Saudável",
+      "degraded": "Degradado",
+      "failing": "A Falhar",
+      "offline": "Offline"
+    },
+    "labels": {
+      "syncSuccessRate": "Taxa de Sucesso de Sincronização",
+      "syncAge": "Idade da Sincronização",
+      "lastSyncAt": "Última Sincronização",
+      "tenantIntegrationHealthScore": "Score de Saúde das Integrações",
+      "criticalOfflineIntegrations": "Integrações Críticas Offline",
+      "dataFreshnessImpact": "Impacto na Frescura dos Dados",
+      "topErrorIntegrations": "Integrações com Mais Erros",
+      "integrationHealthHistory": "Histórico de Saúde (7d)"
+    }
   }
 }
