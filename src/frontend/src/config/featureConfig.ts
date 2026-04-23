@@ -79,4 +79,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13490, key: "release.deploy_frequency.high_variability_threshold", label: "deployFrequencyHealth.highVariabilityThreshold", defaultValue: 0.5 },
   { sort: 13500, key: "release.pattern.cluster_warning_per_week", label: "releasePatternAnalysis.clusterWarningPerWeek", defaultValue: 3 },
   { sort: 13510, key: "release.pattern.end_of_sprint_days", label: "releasePatternAnalysis.endOfSprintDays", defaultValue: 3 },
+  // ── Wave AX — Security Posture & Vulnerability Intelligence ──────────
+  { sort: 13520, key: "security.vulnerability.critical_cve_threshold", label: "vulnerabilityExposure.criticalCveThreshold", defaultValue: 1 },
+  { sort: 13530, key: "security.patch_sla.critical_days", label: "securityPatchCompliance.patchSlaCriticalDays", defaultValue: 7 },
+  { sort: 13540, key: "security.patch_sla.high_days", label: "securityPatchCompliance.patchSlaHighDays", defaultValue: 30 },
+  { sort: 13550, key: "security.patch_sla.medium_days", label: "securityPatchCompliance.patchSlaMediumDays", defaultValue: 90 },
+  { sort: 13560, key: "security.patch_sla.low_days", label: "securityPatchCompliance.patchSlaLowDays", defaultValue: 180 },
+  { sort: 13570, key: "security.patch_compliance.compliant_critical_rate", label: "securityPatchCompliance.compliantCriticalRate", defaultValue: 95 },
+  { sort: 13580, key: "security.incident.correlation_window_hours", label: "securityIncidentCorrelation.correlationWindowHours", defaultValue: 72 },
+  { sort: 13590, key: "security.incident.sbom_snapshot_frequency_days", label: "securityIncidentCorrelation.sbomSnapshotFrequencyDays", defaultValue: 7 },
 ];

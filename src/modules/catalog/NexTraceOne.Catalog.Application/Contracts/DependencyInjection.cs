@@ -10,6 +10,8 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GetDependencyProvenance
 using NexTraceOne.Catalog.Application.Contracts.Features.GetExperimentGovernanceReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetFeatureFlagInventoryReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetFeatureFlagRiskReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetVulnerabilityExposureReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetSecurityPatchComplianceReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSbomCoverageReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSupplyChainRiskReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.IngestFeatureFlagState;
@@ -165,6 +167,12 @@ public static class DependencyInjection
         services.AddSingleton<IFeatureFlagRepository, NullFeatureFlagRepository>();
         services.AddSingleton<IFeatureFlagRiskReader, NullFeatureFlagRiskReader>();
         services.AddSingleton<IExperimentGovernanceReader, NullExperimentGovernanceReader>();
+
+        // ── Wave AX — Security Posture & Vulnerability Intelligence ──────────
+        services.AddTransient<IValidator<GetVulnerabilityExposureReport.Query>, GetVulnerabilityExposureReport.Validator>();
+        services.AddTransient<IValidator<GetSecurityPatchComplianceReport.Query>, GetSecurityPatchComplianceReport.Validator>();
+        services.AddSingleton<IVulnerabilityExposureReader, NullVulnerabilityExposureReader>();
+        services.AddSingleton<ISecurityPatchComplianceReader, NullSecurityPatchComplianceReader>();
 
         return services;
     }

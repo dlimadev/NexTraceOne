@@ -50,6 +50,9 @@ using NexTraceOne.ChangeGovernance.Application.Platform.Features.GetAdaptiveReco
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleasePatternAnalysisReport;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeLeadTimeReport;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDeploymentFrequencyHealthReport;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.Compliance;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetSecurityIncidentCorrelationReport;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
 
@@ -134,6 +137,10 @@ public static class DependencyInjection
         services.AddSingleton<IReleasePatternReader, NullReleasePatternReader>();
         services.AddSingleton<IChangeLeadTimeReader, NullChangeLeadTimeReader>();
         services.AddSingleton<IDeploymentFrequencyReader, NullDeploymentFrequencyReader>();
+
+        // ── Wave AX — Security Incident Correlation ───────────────────────────
+        services.AddTransient<IValidator<GetSecurityIncidentCorrelationReport.Query>, GetSecurityIncidentCorrelationReport.Validator>();
+        services.AddSingleton<ISecurityIncidentCorrelationReader, NullSecurityIncidentCorrelationReader>();
 
         return services;
     }

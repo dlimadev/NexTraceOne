@@ -16036,5 +16036,74 @@
     "deployFrequencyVsIncidentRate": "Frequência de Deploy vs Taxa de Incidentes",
     "staleDeployDays": "Dias para Deploy Desatualizado",
     "highVariabilityThreshold": "Limite de Alta Variabilidade"
+  },
+  "vulnerabilityExposure": {
+    "title": "Exposição a Vulnerabilidades",
+    "exposureScore": "Pontuação de Exposição",
+    "criticalCveCount": "Contagem de CVEs Críticos",
+    "highCveCount": "Contagem de CVEs Altos",
+    "mediumCveCount": "Contagem de CVEs Médios",
+    "lowCveCount": "Contagem de CVEs Baixos",
+    "totalVulnerableComponents": "Total de Componentes Vulneráveis",
+    "unpatchedCriticalCveCount": "Contagem de CVEs Críticos Sem Patch",
+    "avgCveAgeDays": "Idade Média de CVEs (dias)",
+    "topExposedServices": "Serviços Mais Expostos",
+    "tenantExposureScore": "Pontuação de Exposição do Tenant",
+    "unpatchedCriticalCveAge": "Idade de CVEs Críticos Sem Patch",
+    "servicesWithCriticalCves": "Serviços com CVEs Críticos",
+    "tiers": {
+      "minimal": "Mínimo",
+      "moderate": "Moderado",
+      "elevated": "Elevado",
+      "critical": "Crítico"
+    },
+    "trends": {
+      "improving": "A Melhorar",
+      "stable": "Estável",
+      "worsening": "A Piorar"
+    },
+    "criticalCveThreshold": "Limite de CVE Crítico"
+  },
+  "securityPatchCompliance": {
+    "title": "Conformidade de Patching de Segurança",
+    "daysToRemediate": "Dias para Remediar",
+    "withinSla": "Dentro do SLA",
+    "overallPatchComplianceRate": "Taxa Geral de Conformidade de Patch",
+    "criticalPatchBacklog": "Backlog de Patch Crítico",
+    "tenantPatchComplianceScore": "Pontuação de Conformidade de Patch do Tenant",
+    "slaBreaches": "Violações de SLA",
+    "slowPatchingTeams": "Equipas com Patch Lento",
+    "patchComplianceTrend": "Tendência de Conformidade de Patch",
+    "tiers": {
+      "compliant": "Conforme",
+      "partial": "Parcial",
+      "nonCompliant": "Não Conforme",
+      "atRisk": "Em Risco"
+    },
+    "patchSlaCriticalDays": "SLA de Patch Crítico (dias)",
+    "patchSlaHighDays": "SLA de Patch Alto (dias)",
+    "patchSlaMediumDays": "SLA de Patch Médio (dias)",
+    "patchSlaLowDays": "SLA de Patch Baixo (dias)",
+    "compliantCriticalRate": "Taxa de Conformidade Crítica (%)"
+  },
+  "securityIncidentCorrelation": {
+    "title": "Correlação de Incidentes de Segurança",
+    "correlationSignals": "Sinais de Correlação",
+    "correlationRisk": "Risco de Correlação",
+    "securityIncidentCount": "Contagem de Incidentes de Segurança",
+    "withActiveUnpatchedCve": "Com CVE Crítico Activo Sem Patch",
+    "strongCorrelationIncidents": "Incidentes com Correlação Forte",
+    "tenantCveIncidentCorrelationRate": "Taxa de Correlação CVE-Incidente do Tenant",
+    "cvesWithIncidentCorrelation": "CVEs com Correlação de Incidente",
+    "componentsIntroducedBeforeIncident": "Componentes Introduzidos Antes do Incidente",
+    "riskReductionOpportunity": "Oportunidade de Redução de Risco",
+    "tiers": {
+      "none": "Nenhum",
+      "possible": "Possível",
+      "likely": "Provável",
+      "strong": "Forte"
+    },
+    "correlationWindowHours": "Janela de Correlação (horas)",
+    "sbomSnapshotFrequencyDays": "Frequência de Snapshot SBOM (dias)"
   }
 }
