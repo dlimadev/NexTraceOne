@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Knowledge.Application.Abstractions;
 
 namespace NexTraceOne.Knowledge.Application;
 
@@ -18,6 +19,11 @@ public static class DependencyInjection
     {
         services.AddBuildingBlocksApplication(configuration);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
+        // ── Wave AY — Organizational Knowledge & Documentation Intelligence ─
+        services.AddSingleton<IKnowledgeBaseUtilizationReader, NullKnowledgeBaseUtilizationReader>();
+        services.AddSingleton<ITeamKnowledgeSharingReader, NullTeamKnowledgeSharingReader>();
+
         return services;
     }
 }

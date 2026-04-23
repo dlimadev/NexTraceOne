@@ -16105,5 +16105,325 @@
     },
     "correlationWindowHours": "Janela de Correlação (horas)",
     "sbomSnapshotFrequencyDays": "Frequência de Snapshot SBOM (dias)"
+  },
+  "documentationHealth": {
+    "title": "Saúde da Documentação",
+    "runbookCoverage": "Cobertura de Runbook",
+    "apiDocCoverage": "Cobertura de Documentação de API",
+    "architectureDocPresence": "Documentação de Arquitectura Presente",
+    "onboardingDocPresence": "Guia de Onboarding Presente",
+    "docFreshnessTier": "Frescura da Documentação",
+    "docHealthScore": "Score de Saúde da Documentação",
+    "servicesWithRunbook": "Serviços com Runbook",
+    "servicesWithStaleRunbook": "Serviços com Runbook Desactualizado",
+    "servicesWithoutRunbook": "Serviços sem Runbook",
+    "apiContractsFullyDocumentedPct": "Contratos de API Totalmente Documentados (%)",
+    "tenantDocHealthScore": "Score de Saúde da Documentação do Tenant",
+    "criticalServicesWithoutRunbook": "Serviços Críticos sem Runbook",
+    "staleDocsByTeam": "Equipas com Documentação Desactualizada",
+    "docDebt": "Débito de Documentação",
+    "bestDocumentedServices": "Serviços Melhor Documentados",
+    "freshnessDays": "Frescura da Documentação (dias)",
+    "runbookFreshnessDays": "Frescura do Runbook (dias)",
+    "criticalWithoutRunbookTier": "Tiers de Serviço que Requerem Runbook",
+    "runbookCoverageStatuses": {
+      "covered": "Coberto",
+      "stale": "Desactualizado",
+      "missing": "Ausente"
+    },
+    "apiDocCoverageStatuses": {
+      "full": "Completa",
+      "partial": "Parcial",
+      "absent": "Ausente"
+    },
+    "freshnessTiers": {
+      "fresh": "Fresco",
+      "aging": "A Envelhecer",
+      "stale": "Desactualizado",
+      "critical": "Crítico"
+    },
+    "tiers": {
+      "excellent": "Excelente",
+      "good": "Bom",
+      "partial": "Parcial",
+      "critical": "Crítico"
+    }
+  },
+  "knowledgeBaseUtilization": {
+    "title": "Utilização da Base de Conhecimento",
+    "topSearchTerms": "Termos de Pesquisa Mais Frequentes",
+    "searchTermsWithNoResults": "Termos sem Resultados",
+    "searchTermsWithLowRelevance": "Termos com Baixa Relevância",
+    "searchVolumeTrend": "Tendência de Volume de Pesquisa",
+    "topKnowledgeGaps": "Principais Lacunas de Conhecimento",
+    "mostAccessedDocuments": "Documentos Mais Acedidos",
+    "mostAccessedRunbooks": "Runbooks Mais Acedidos",
+    "dailyActiveKnowledgeUsers": "Utilizadores Diários do Knowledge Hub",
+    "searchPerUserPerWeek": "Pesquisas por Utilizador por Semana",
+    "knowledgeResolutionRate": "Taxa de Resolução do Conhecimento",
+    "knowledgeGapCount": "Contagem de Lacunas de Conhecimento",
+    "resolutionRateThriving": "Taxa de Resolução para Thriving (%)",
+    "gapCountThriving": "Máx. Lacunas para Thriving",
+    "searchEventTrackingEnabled": "Tracking de Eventos de Pesquisa Activo",
+    "tiers": {
+      "thriving": "Florescendo",
+      "active": "Activo",
+      "underused": "Subutilizado",
+      "gapHeavy": "Cheio de Lacunas"
+    }
+  },
+  "teamKnowledgeSharing": {
+    "title": "Partilha de Conhecimento por Equipa",
+    "docContributionCount": "Contribuições de Documentação",
+    "crossTeamContributions": "Contribuições Cross-Team",
+    "docConsumptionCount": "Consumo de Documentação",
+    "runbookContributionCount": "Contribuições de Runbook",
+    "knowledgeSharingRatio": "Rácio de Partilha de Conhecimento",
+    "knowledgeSiloRisk": "Risco de Silo de Conhecimento",
+    "teamsWithSiloRisk": "Equipas com Risco de Silo",
+    "topKnowledgeContributors": "Top Contribuidores de Conhecimento",
+    "tenantKnowledgeSharingScore": "Score de Partilha de Conhecimento do Tenant",
+    "knowledgeFlowGraph": "Grafo de Fluxo de Conhecimento",
+    "knowledgeHotspots": "Hotspots de Conhecimento",
+    "knowledgeColdSpots": "Cold Spots de Conhecimento",
+    "collaborationTrend": "Tendência de Colaboração (90d)",
+    "busFactor1Services": "Serviços com Bus Factor = 1",
+    "siloThreshold": "Limiar de Silo",
+    "busFactorMaxContributors": "Máx. Contribuidores Bus Factor",
+    "trendDirections": {
+      "growing": "A Crescer",
+      "stable": "Estável",
+      "declining": "A Diminuir"
+    }
+  },
+  "trafficContractDeviation": {
+    "title": "Desvios de Tráfego Real vs Contrato",
+    "undocumentedEndpointCalls": "Chamadas a Endpoints Não Documentados",
+    "undeclaredConsumers": "Consumers Não Declarados",
+    "payloadDeviationRate": "Taxa de Desvio de Payload (%)",
+    "observedVsContractedStatusCodes": "Status Codes Observados vs Contratados",
+    "trafficContractDeviationTier": "Tier de Desvio Tráfego vs Contrato",
+    "tenantDeviationHealthScore": "Score de Saúde de Desvio do Tenant",
+    "servicesWithUndocumentedEndpoints": "Serviços com Endpoints Não Documentados",
+    "servicesWithUndeclaredConsumers": "Serviços com Consumers Não Declarados",
+    "topDeviatingServices": "Top Serviços com Desvio",
+    "undocumentedEndpointHotspots": "Hotspots de Endpoints Não Documentados",
+    "contractGapOpportunities": "Oportunidades de Actualização de Contrato",
+    "historicalDeviationTrend": "Tendência Histórica de Desvios",
+    "minorDriftThreshold": "Limiar de Minor Drift (endpoints)",
+    "undeclaredConsumerCritical": "Limiar Crítico de Consumer Não Declarado",
+    "tiers": {
+      "aligned": "Alinhado",
+      "minorDrift": "Desvio Menor",
+      "significant": "Significativo",
+      "critical": "Crítico"
+    },
+    "trendDirections": {
+      "improving": "A Melhorar",
+      "stable": "Estável",
+      "worsening": "A Piorar"
+    }
+  },
+  "highTrafficEndpointRisk": {
+    "title": "Risco de Endpoints de Alto Tráfego",
+    "endpointRiskScore": "Score de Risco do Endpoint",
+    "endpointRiskTier": "Tier de Risco do Endpoint",
+    "callVolume": "Volume de Chamadas",
+    "rpsAvg": "RPS Médio",
+    "latencyP50Ms": "Latência P50 (ms)",
+    "latencyP95Ms": "Latência P95 (ms)",
+    "latencyP99Ms": "Latência P99 (ms)",
+    "errorRatePct": "Taxa de Erro (%)",
+    "contractCoverage": "Cobertura de Contrato",
+    "hasActiveSlo": "Tem SLO Activo",
+    "wasChaosTestedInPeriod": "Testado com Chaos no Período",
+    "criticalUncoveredEndpoints": "Endpoints Críticos Sem Cobertura",
+    "tenantEndpointRiskScore": "Score de Risco de Endpoints do Tenant",
+    "topRiskByVolume": "Top Risco por Volume",
+    "documentationOpportunity": "Oportunidade de Documentação",
+    "chaosGapByTrafficVolume": "Lacuna de Chaos por Volume de Tráfego",
+    "sloGapForHighTraffic": "Lacuna de SLO para Alto Tráfego",
+    "rpsThreshold": "Limiar RPS de Alto Tráfego",
+    "topN": "Top N Endpoints a Analisar",
+    "chaosCoverageDays": "Lookback de Cobertura Chaos (dias)",
+    "tiers": {
+      "safe": "Seguro",
+      "monitored": "Monitorizado",
+      "atRisk": "Em Risco",
+      "critical": "Crítico"
+    },
+    "coverage": {
+      "documented": "Documentado",
+      "undocumented": "Não Documentado",
+      "deprecated": "Depreciado"
+    }
+  },
+  "trafficAnomaly": {
+    "title": "Relatório de Anomalias de Tráfego",
+    "totalAnomalies": "Total de Anomalias",
+    "criticalAnomalies": "Anomalias Críticas",
+    "unexplainedAnomalies": "Anomalias Inexplicadas",
+    "anomalyResolutionRate": "Taxa de Resolução de Anomalias (%)",
+    "mostAnomalousServices": "Serviços com Mais Anomalias",
+    "unexplainedAnomalyList": "Lista de Anomalias Inexplicadas",
+    "anomalyTimeline": "Linha Temporal de Anomalias",
+    "recurringAnomalyPatterns": "Padrões Recorrentes de Anomalias",
+    "anomalyType": "Tipo de Anomalia",
+    "detectedAt": "Detectada Em",
+    "resolvedAt": "Resolvida Em",
+    "durationMinutes": "Duração (minutos)",
+    "anomalyCorrelation": "Correlação da Anomalia",
+    "anomalySeverity": "Severidade da Anomalia",
+    "spikeSigma": "Sigma de Pico",
+    "dropPct": "Percentagem de Queda (%)",
+    "errorRateSpikeThreshold": "Limiar de Pico de Taxa de Erro (%)",
+    "anomalyTypes": {
+      "spikeAnomaly": "Anomalia de Pico",
+      "dropAnomaly": "Anomalia de Queda",
+      "latencySpike": "Pico de Latência",
+      "errorRateSpike": "Pico de Taxa de Erro"
+    },
+    "correlations": {
+      "correlatedWithDeploy": "Correlacionado com Deploy",
+      "correlatedWithIncident": "Correlacionado com Incidente",
+      "unexplained": "Inexplicado"
+    },
+    "severities": {
+      "informational": "Informacional",
+      "warning": "Aviso",
+      "critical": "Crítico"
+    }
+  },
+  "portalAdoptionFunnel": {
+    "title": "Funil de Adopção do Portal",
+    "description": "Análise do funil de adopção do NexTraceOne como Developer Portal",
+    "activeUsageSessions": "Sessões mínimas para classificar utilizador como Activo",
+    "inactiveUserDays": "Dias sem login para marcar utilizador como Inactivo",
+    "funnelPeriodDays": "Período de análise do funil de adopção (dias)",
+    "adoptionTiers": {
+      "leader": "Líder",
+      "active": "Activo",
+      "lagging": "Atrasado",
+      "inactive": "Inactivo"
+    },
+    "trends": {
+      "growing": "A Crescer",
+      "stable": "Estável",
+      "declining": "A Declinar"
+    },
+    "labels": {
+      "teamAdoptionMatrix": "Matriz de Adopção por Equipa",
+      "inactiveUsers": "Utilizadores Inactivos",
+      "enablementOpportunities": "Oportunidades de Capacitação",
+      "featureGaps": "Gaps de Funcionalidade",
+      "funnelDropRate": "Taxa de Abandono do Funil",
+      "tenantAdoptionScore": "Score de Adopção do Tenant",
+      "activeUserRate": "Taxa de Utilizadores Activos"
+    }
+  },
+  "selfServiceWorkflowHealth": {
+    "title": "Saúde dos Workflows de Self-Service",
+    "description": "Saúde dos workflows de self-service do NexTraceOne",
+    "timeoutHours": "Horas sem conclusão para marcar workflow como Abandonado",
+    "smoothCompletionRate": "Taxa mínima de conclusão para tier Smooth (%)",
+    "smoothAdminRate": "Taxa máxima de intervenção admin para tier Smooth (%)",
+    "workflowHealthTiers": {
+      "smooth": "Fluído",
+      "functional": "Funcional",
+      "frictionHeavy": "Com Fricção",
+      "broken": "Quebrado"
+    },
+    "labels": {
+      "completionRate": "Taxa de Conclusão",
+      "abandonmentRate": "Taxa de Abandono",
+      "adminInterventionRate": "Taxa de Intervenção Admin",
+      "avgCompletionTime": "Tempo Médio de Conclusão",
+      "adminDependencyIndex": "Índice de Dependência Admin",
+      "overallSelfServiceScore": "Score Global de Self-Service",
+      "frictionWorkflows": "Workflows com Fricção",
+      "slowestWorkflows": "Workflows Mais Lentos",
+      "abandonmentHotspots": "Pontos de Abandono"
+    }
+  },
+  "integrationHealth": {
+    "title": "Saúde das Integrações",
+    "description": "Saúde das integrações activas com sistemas externos",
+    "syncFreshnessHours": "Horas máximas de SyncAge para estado Fresh",
+    "syncHealthWindowHours": "Janela de horas para cálculo de SyncSuccessRate",
+    "freshnessStatuses": {
+      "fresh": "Fresco",
+      "aging": "A Envelhecer",
+      "stale": "Desactualizado",
+      "offline": "Offline"
+    },
+    "healthTiers": {
+      "healthy": "Saudável",
+      "degraded": "Degradado",
+      "failing": "A Falhar",
+      "offline": "Offline"
+    },
+    "labels": {
+      "syncSuccessRate": "Taxa de Sucesso de Sincronização",
+      "syncAge": "Idade da Sincronização",
+      "lastSyncAt": "Última Sincronização",
+      "tenantIntegrationHealthScore": "Score de Saúde das Integrações",
+      "criticalOfflineIntegrations": "Integrações Críticas Offline",
+      "dataFreshnessImpact": "Impacto na Frescura dos Dados",
+      "topErrorIntegrations": "Integrações com Mais Erros",
+      "integrationHealthHistory": "Histórico de Saúde (7d)"
+    }
+  },
+  "crossStandardComplianceGap": {
+    "title": "Relatório de Gaps Cross-Standard de Compliance",
+    "tier_minimal": "Mínimo",
+    "tier_partial": "Parcial",
+    "tier_significant": "Significativo",
+    "tier_critical": "Crítico",
+    "maxCrossStandardGaps": "Máx. Gaps Cross-Standard (Tier Mínimo)",
+    "criticalImpactScore": "Threshold de Score de Impacto Crítico"
+  },
+  "evidenceCollectionStatus": {
+    "title": "Relatório de Estado de Recolha de Evidências",
+    "tier_ready": "Pronto",
+    "tier_almost_ready": "Quase Pronto",
+    "tier_needs_work": "Necessita Trabalho",
+    "tier_not_ready": "Não Está Pronto",
+    "staleDays": "Dias de Evidência Obsoleta",
+    "auditWarningDays": "Dias de Aviso Antes da Auditoria"
+  },
+  "regulatoryChangeImpact": {
+    "title": "Relatório de Impacto de Mudança Regulatória",
+    "effort_low": "Baixo",
+    "effort_medium": "Médio",
+    "effort_high": "Alto",
+    "impactHighThreshold": "Threshold de Nº de Serviços Alto Impacto",
+    "effortHighDays": "Threshold de Dias para Esforço Alto"
+  },
+  "environmentBehaviorComparison": {
+    "title": "Relatório de Comparação de Comportamento por Ambiente",
+    "tier_ready": "Pronto",
+    "tier_conditionally_ready": "Condicionalmente Pronto",
+    "tier_not_ready": "Não Está Pronto",
+    "tier_insufficient_data": "Dados Insuficientes"
+  },
+  "evidencePackIntegrity": {
+    "title": "Relatório de Integridade de Evidence Packs",
+    "tier_trustworthy": "Fiável",
+    "tier_acceptable": "Aceitável",
+    "tier_questionable": "Questionável",
+    "tier_invalid": "Inválido"
+  },
+  "promotionConfidence": {
+    "title": "Relatório de Confiança Multi-Dimensional para Promoção",
+    "tier_high": "Alta Confiança",
+    "tier_medium": "Confiança Média",
+    "tier_low": "Baixa Confiança",
+    "tier_blocking": "Factores de Bloqueio",
+    "recommendation_proceed_auto": "Prosseguir Automaticamente",
+    "recommendation_proceed_conditions": "Prosseguir com Condições",
+    "recommendation_manual_approval": "Requerer Aprovação Manual",
+    "recommendation_block": "Bloquear",
+    "blockingThreshold": "Threshold de Score de Bloqueio por Dimensão",
+    "highConfidenceThreshold": "Threshold de Score de Alta Confiança"
   }
 }

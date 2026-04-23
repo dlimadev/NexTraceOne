@@ -24,6 +24,8 @@ using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetIncide
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetErrorBudgetReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetIncidentImpactScorecardReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetSreMaturityIndexReport;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTrafficAnomalyReport;
+using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetEnvironmentBehaviorComparisonReport;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetDriftFindings;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetObservabilityScore;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetReleaseHealthTimeline;
@@ -96,6 +98,13 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetErrorBudgetReport.Query>, GetErrorBudgetReport.Validator>();
         services.AddTransient<IValidator<GetIncidentImpactScorecardReport.Query>, GetIncidentImpactScorecardReport.Validator>();
         services.AddTransient<IValidator<GetSreMaturityIndexReport.Query>, GetSreMaturityIndexReport.Validator>();
+
+        // ── Wave AZ — Traffic Anomaly Report ──────────────────────────────
+        services.AddTransient<IValidator<GetTrafficAnomalyReport.Query>, GetTrafficAnomalyReport.Validator>();
+
+        // ── Wave BC.1 — Environment Behavior Comparison Report ────────────
+        services.AddTransient<IValidator<GetEnvironmentBehaviorComparisonReport.Query>,
+            GetEnvironmentBehaviorComparisonReport.Validator>();
 
         return services;
     }

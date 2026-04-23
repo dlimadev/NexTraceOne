@@ -53,6 +53,11 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDe
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Compliance;
 using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetSecurityIncidentCorrelationReport;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetCrossStandardComplianceGapReport;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetEvidenceCollectionStatusReport;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetRegulatoryChangeImpactReport;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetEvidencePackIntegrityReport;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetMultiDimensionalPromotionConfidenceReport;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
 
@@ -141,6 +146,15 @@ public static class DependencyInjection
         // ── Wave AX — Security Incident Correlation ───────────────────────────
         services.AddTransient<IValidator<GetSecurityIncidentCorrelationReport.Query>, GetSecurityIncidentCorrelationReport.Validator>();
         services.AddSingleton<ISecurityIncidentCorrelationReader, NullSecurityIncidentCorrelationReader>();
+
+        // ── Wave BB — Compliance Automation & Regulatory Reporting ────────────
+        services.AddTransient<IValidator<GetCrossStandardComplianceGapReport.Query>, GetCrossStandardComplianceGapReport.Validator>();
+        services.AddTransient<IValidator<GetEvidenceCollectionStatusReport.Query>, GetEvidenceCollectionStatusReport.Validator>();
+        services.AddTransient<IValidator<GetRegulatoryChangeImpactReport.Command>, GetRegulatoryChangeImpactReport.Validator>();
+
+        // ── Wave BC — Production Change Confidence ────────────────────────────
+        services.AddTransient<IValidator<GetEvidencePackIntegrityReport.Query>, GetEvidencePackIntegrityReport.Validator>();
+        services.AddTransient<IValidator<GetMultiDimensionalPromotionConfidenceReport.Query>, GetMultiDimensionalPromotionConfidenceReport.Validator>();
 
         return services;
     }

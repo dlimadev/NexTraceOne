@@ -5,6 +5,9 @@
     <AssemblyName>NexTraceOne.Knowledge.Application</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.Knowledge.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.Knowledge.Domain\NexTraceOne.Knowledge.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\..\configuration\NexTraceOne.Configuration.Application\NexTraceOne.Configuration.Application.csproj" />

@@ -77,6 +77,14 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.ISreMaturityReader,
             NexTraceOne.OperationalIntelligence.Application.Runtime.NullSreMaturityReader>();
 
+        // ── Wave AZ — Traffic Anomaly null reader ─────────────────────────
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.ITrafficAnomalyReader,
+            NexTraceOne.OperationalIntelligence.Application.Runtime.NullTrafficAnomalyReader>();
+
+        // ── Wave BC.1 — Environment Behavior Comparison null reader ───────
+        services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IEnvironmentBehaviorComparisonReader,
+            NexTraceOne.OperationalIntelligence.Application.Runtime.NullEnvironmentBehaviorComparisonReader>();
+
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);
 
