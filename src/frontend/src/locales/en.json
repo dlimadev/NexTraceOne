@@ -14469,5 +14469,78 @@
       "MajorDrift": "Major Drift",
       "SecurityRisk": "Security Risk"
     }
+  },
+  "featureFlagInventory": {
+    "title": "Feature Flag Inventory Report",
+    "description": "Inventory of feature flags per service, types, stale flags and kill-switches",
+    "totalFlags": "Total Flags",
+    "activeFlags": "Active Flags",
+    "staleFlags": "Stale Flags",
+    "ownerlessFlags": "Ownerless Flags",
+    "killSwitchCount": "Kill Switch Count",
+    "flagsInAllEnvironments": "Flags in All Environments",
+    "staleFlagDays": "Stale Flag Days",
+    "ingestEndpointEnabled": "Ingest Endpoint Enabled",
+    "byType": "By Type",
+    "flagsByEnvironment": "Flags by Environment",
+    "topServicesWithStaleFlags": "Top Services with Stale Flags",
+    "type": {
+      "release": "Release",
+      "experiment": "Experiment",
+      "permission": "Permission",
+      "killSwitch": "Kill Switch"
+    }
+  },
+  "featureFlagRisk": {
+    "title": "Feature Flag Risk Report",
+    "description": "Risk assessment of feature flags by staleness, ownership and production presence",
+    "flagRiskScore": "Flag Risk Score",
+    "stalenessRisk": "Staleness Risk",
+    "ownershipRisk": "Ownership Risk",
+    "productionPresenceRisk": "Production Presence Risk",
+    "incidentCorrelated": "Incident Correlated",
+    "scheduledRemovalOverdue": "Scheduled Removal Overdue",
+    "toggleWithIncidentCorrelation": "Toggle with Incident Correlation",
+    "recommendedRemovals": "Recommended Removals",
+    "tenantFlagRiskIndex": "Tenant Flag Risk Index",
+    "urgentFlagCount": "Urgent Flag Count",
+    "reviewFlagCount": "Review Flag Count",
+    "prodPresenceDays": "Prod Presence Days",
+    "incidentWindowHours": "Incident Window Hours",
+    "stalenessWeight": "Staleness Weight",
+    "tier": {
+      "safe": "Safe",
+      "monitor": "Monitor",
+      "review": "Review",
+      "urgent": "Urgent"
+    }
+  },
+  "experimentGovernance": {
+    "title": "Experiment Governance Report",
+    "description": "Governance assessment of A/B experiments: status, duration, success criteria and production risk",
+    "activeExperiments": "Active Experiments",
+    "overdueExperiments": "Overdue Experiments",
+    "experimentsWithoutSuccessCriteria": "Experiments Without Success Criteria",
+    "medianExperimentDurationDays": "Median Experiment Duration (days)",
+    "experimentVelocity": "Experiment Velocity",
+    "longRunningExperiments": "Long Running Experiments",
+    "experimentProdOnlyRisk": "Experiments with Production-Only Risk",
+    "tenantExperimentGovernanceScore": "Tenant Experiment Governance Score",
+    "experimentMaxDays": "Experiment Max Days",
+    "governedOverduePct": "Governed Overdue (%)",
+    "governedNoCriteriaPct": "Governed No Criteria (%)",
+    "environmentCoverage": "Environment Coverage",
+    "status": {
+      "active": "Active",
+      "overdue": "Overdue",
+      "stale": "Stale",
+      "concluded": "Concluded"
+    },
+    "tier": {
+      "governed": "Governed",
+      "improving": "Improving",
+      "atRisk": "At Risk",
+      "unmanaged": "Unmanaged"
+    }
   }
 }

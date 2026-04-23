@@ -15734,5 +15734,78 @@
       "MajorDrift": "Desvio Maior",
       "SecurityRisk": "Risco de Segurança"
     }
+  },
+  "featureFlagInventory": {
+    "title": "Relatório de Inventário de Feature Flags",
+    "description": "Inventário de feature flags por serviço, tipos, flags obsoletas e kill-switches",
+    "totalFlags": "Total de Flags",
+    "activeFlags": "Flags Activas",
+    "staleFlags": "Flags Obsoletas",
+    "ownerlessFlags": "Flags Sem Dono",
+    "killSwitchCount": "Quantidade de Kill Switches",
+    "flagsInAllEnvironments": "Flags em Todos os Ambientes",
+    "staleFlagDays": "Dias para Flag Obsoleta",
+    "ingestEndpointEnabled": "Endpoint de Ingestão Habilitado",
+    "byType": "Por Tipo",
+    "flagsByEnvironment": "Flags por Ambiente",
+    "topServicesWithStaleFlags": "Serviços com Mais Flags Obsoletas",
+    "type": {
+      "release": "Lançamento",
+      "experiment": "Experimento",
+      "permission": "Permissão",
+      "killSwitch": "Kill Switch"
+    }
+  },
+  "featureFlagRisk": {
+    "title": "Relatório de Risco de Feature Flags",
+    "description": "Avaliação de risco de feature flags por obsolescência, ownership e presença em produção",
+    "flagRiskScore": "Pontuação de Risco da Flag",
+    "stalenessRisk": "Risco de Obsolescência",
+    "ownershipRisk": "Risco de Ownership",
+    "productionPresenceRisk": "Risco de Presença em Produção",
+    "incidentCorrelated": "Correlacionado com Incidente",
+    "scheduledRemovalOverdue": "Remoção Agendada Vencida",
+    "toggleWithIncidentCorrelation": "Toggle com Correlação de Incidente",
+    "recommendedRemovals": "Remoções Recomendadas",
+    "tenantFlagRiskIndex": "Índice de Risco de Flags do Tenant",
+    "urgentFlagCount": "Quantidade de Flags Urgentes",
+    "reviewFlagCount": "Quantidade de Flags em Revisão",
+    "prodPresenceDays": "Dias de Presença em Produção",
+    "incidentWindowHours": "Janela de Incidente (horas)",
+    "stalenessWeight": "Peso de Obsolescência",
+    "tier": {
+      "safe": "Seguro",
+      "monitor": "Monitorar",
+      "review": "Revisar",
+      "urgent": "Urgente"
+    }
+  },
+  "experimentGovernance": {
+    "title": "Relatório de Governança de Experimentos",
+    "description": "Avaliação de governança de experimentos A/B: status, duração, critérios de sucesso e risco em produção",
+    "activeExperiments": "Experimentos Ativos",
+    "overdueExperiments": "Experimentos Atrasados",
+    "experimentsWithoutSuccessCriteria": "Experimentos Sem Critérios de Sucesso",
+    "medianExperimentDurationDays": "Duração Mediana do Experimento (dias)",
+    "experimentVelocity": "Velocidade de Experimentos",
+    "longRunningExperiments": "Experimentos de Longa Duração",
+    "experimentProdOnlyRisk": "Experimentos com Risco Apenas em Produção",
+    "tenantExperimentGovernanceScore": "Pontuação de Governança de Experimentos do Tenant",
+    "experimentMaxDays": "Máximo de Dias do Experimento",
+    "governedOverduePct": "Percentual de Atraso Governado (%)",
+    "governedNoCriteriaPct": "Percentual Sem Critérios Governado (%)",
+    "environmentCoverage": "Cobertura de Ambiente",
+    "status": {
+      "active": "Ativo",
+      "overdue": "Atrasado",
+      "stale": "Obsoleto",
+      "concluded": "Concluído"
+    },
+    "tier": {
+      "governed": "Governado",
+      "improving": "Em Melhoria",
+      "atRisk": "Em Risco",
+      "unmanaged": "Não Gerenciado"
+    }
   }
 }

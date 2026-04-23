@@ -4,10 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Contracts.Features.AddDraftExample;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDependencyProvenanceReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetExperimentGovernanceReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetFeatureFlagInventoryReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.GetFeatureFlagRiskReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSbomCoverageReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetSupplyChainRiskReport;
+using NexTraceOne.Catalog.Application.Contracts.Features.IngestFeatureFlagState;
 using NexTraceOne.Catalog.Application.Contracts.Features.IngestSbomRecord;
 using NexTraceOne.Catalog.Application.Contracts.Features.ApproveDraft;
 using NexTraceOne.Catalog.Application.Contracts.Features.ClassifyBreakingChange;
@@ -150,6 +155,16 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetSbomCoverageReport.Query>, GetSbomCoverageReport.Validator>();
         services.AddTransient<IValidator<GetDependencyProvenanceReport.Query>, GetDependencyProvenanceReport.Validator>();
         services.AddTransient<IValidator<GetSupplyChainRiskReport.Query>, GetSupplyChainRiskReport.Validator>();
+
+        // ── Wave AS — Feature Flag & Experimentation Governance ────────────
+        services.AddTransient<IValidator<IngestFeatureFlagState.Command>, IngestFeatureFlagState.Validator>();
+        services.AddTransient<IValidator<GetFeatureFlagInventoryReport.Query>, GetFeatureFlagInventoryReport.Validator>();
+        services.AddTransient<IValidator<GetFeatureFlagRiskReport.Query>, GetFeatureFlagRiskReport.Validator>();
+        services.AddTransient<IValidator<GetExperimentGovernanceReport.Query>, GetExperimentGovernanceReport.Validator>();
+
+        services.AddSingleton<IFeatureFlagRepository, NullFeatureFlagRepository>();
+        services.AddSingleton<IFeatureFlagRiskReader, NullFeatureFlagRiskReader>();
+        services.AddSingleton<IExperimentGovernanceReader, NullExperimentGovernanceReader>();
 
         return services;
     }

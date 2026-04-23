@@ -35,4 +35,12 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13090, key: "topology.critical_path.bottleneck_path_count", label: "reports.criticalPath.bottleneckPathCount", defaultValue: 3 },
   { sort: 13100, key: "topology.alignment.major_drift_threshold", label: "reports.dependencyVersionAlignment.majorDriftThreshold", defaultValue: 3 },
   { sort: 13110, key: "topology.alignment.critical_service_count", label: "reports.dependencyVersionAlignment.criticalServiceCount", defaultValue: 2 },
+  { sort: 13120, key: "feature_flags.stale_flag_days", label: "featureFlagInventory.staleFlagDays", defaultValue: 60 },
+  { sort: 13130, key: "feature_flags.prod_presence_days", label: "featureFlagRisk.prodPresenceDays", defaultValue: 90 },
+  { sort: 13140, key: "feature_flags.incident_window_hours", label: "featureFlagRisk.incidentWindowHours", defaultValue: 24 },
+  { sort: 13150, key: "feature_flags.risk.staleness_weight", label: "featureFlagRisk.stalenessWeight", defaultValue: 30 },
+  { sort: 13160, key: "feature_flags.experiment.max_days", label: "experimentGovernance.experimentMaxDays", defaultValue: 30 },
+  { sort: 13170, key: "feature_flags.experiment.governed_overdue_pct", label: "experimentGovernance.governedOverduePct", defaultValue: 20 },
+  { sort: 13180, key: "feature_flags.experiment.governed_no_criteria_pct", label: "experimentGovernance.governedNoCriteriaPct", defaultValue: 10 },
+  { sort: 13190, key: "feature_flags.inventory.ingest_endpoint_enabled", label: "featureFlagInventory.ingestEndpointEnabled", defaultValue: true },
 ];
