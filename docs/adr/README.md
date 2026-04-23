@@ -18,3 +18,4 @@ Each ADR follows the format: number, title, status, context, decision, and conse
 | [007](007-data-contracts.md) | Data Contracts as First-Class Citizens | Proposed |
 | [008](008-change-confidence-score-v2.md) | Change Confidence Score 2.0 — Explainable Decomposition | Proposed |
 | [009](009-ai-evaluation-harness.md) | Internal AI Evaluation Harness | Proposed |
+| [010](010-server-side-ingestion-pipeline.md) | Server-Side Ingestion Pipeline — Configurável por Tenant | Proposed |
