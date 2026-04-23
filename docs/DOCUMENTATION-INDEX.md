@@ -11,8 +11,10 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
-| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | Roadmap de funcionalidades futuras |
+| [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | Roadmap histórico de funcionalidades — waves A → BC (155 features, 100% concluídas) |
+| [`NEXT-ACTION-PLAN.md`](NEXT-ACTION-PLAN.md) | Próximas evoluções pós-v1.0.0 — infraestrutura, V3 frontend, IDE extensions, inovação |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
+| [`HONEST-GAPS.md`](HONEST-GAPS.md) | Referência de padrões OOS, stubs by design e providers DEG-01..15 |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`NEXTRACEONE-PRESENTATION.md`](NEXTRACEONE-PRESENTATION.md) | **Documento formal de apresentação** — O que é, que problemas resolve, diferenciação, proposta de valor e ROI |
 | [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
@@ -189,6 +191,12 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`analysis/INOVACAO-ROADMAP.md`](analysis/INOVACAO-ROADMAP.md) | Roadmap de inovação e propostas de novas funcionalidades |
+| [`analysis/INFRA-EVOLUTION-OVERVIEW.md`](analysis/INFRA-EVOLUTION-OVERVIEW.md) | Visão geral das 4 fases de evolução de infraestrutura |
+| [`analysis/INFRA-PHASE-1-POSTGRES-HARDENING.md`](analysis/INFRA-PHASE-1-POSTGRES-HARDENING.md) | Fase 1 — PostgreSQL Hardening (PgBouncer, partitioning, read replica) |
+| [`analysis/INFRA-PHASE-2-CLICKHOUSE-MIGRATION.md`](analysis/INFRA-PHASE-2-CLICKHOUSE-MIGRATION.md) | Fase 2 — ClickHouse como provider padrão de observabilidade |
+| [`analysis/INFRA-PHASE-3-HOST-INFRASTRUCTURE.md`](analysis/INFRA-PHASE-3-HOST-INFRASTRUCTURE.md) | Fase 3 — Host Infrastructure Module (novo bounded context) |
+| [`analysis/INFRA-PHASE-4-TOPOLOGY-COMPLETIONS.md`](analysis/INFRA-PHASE-4-TOPOLOGY-COMPLETIONS.md) | Fase 4 — Topology UI Time-Travel e SignalR real-time |
+| [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](V3-EVOLUTION-FRONTEND-DASHBOARDS.md) | V3 Frontend Evolution — 12 waves de evolução da superfície operacional |
 
 ---
 

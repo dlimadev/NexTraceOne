@@ -133,7 +133,7 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 ## 🔴 Dívida aberta — backlog priorizado para fechar
 
 > Estes são os itens que, quando fechados, permitem publicar `v1.0.0` com "zero gaps abertos".
-> Cada linha é rastreável a um item do plano executivo (`ACTION-PLAN.md`).
+> Cada linha é rastreável a um item do plano executivo (`NEXT-ACTION-PLAN.md`).
 
 ### Fase 1 — Honestidade documental (esta iteração)
 - [x] **D-01** Identity: declarar Invitation/Reset/Activation fora de escopo — ver OOS-02 e DES-02.
