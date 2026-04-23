@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-23
+> **Última actualização:** 2026-04-25
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -12,12 +12,14 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 |---------|-----------|
 | [`README.md`](README.md) | Introdução e navegação |
 | [`FUTURE-ROADMAP.md`](FUTURE-ROADMAP.md) | Roadmap histórico de funcionalidades — waves A → BC (155 features, 100% concluídas) |
-| [`NEXT-ACTION-PLAN.md`](NEXT-ACTION-PLAN.md) | Próximas evoluções pós-v1.0.0 — infraestrutura, V3 frontend, IDE extensions, inovação |
+| [`PLANO-DE-ACAO-V2.md`](PLANO-DE-ACAO-V2.md) | **Plano de acção consolidado pós-v1.0.0** — substitui e consolida todos os planos anteriores |
+| [`NEXT-ACTION-PLAN.md`](NEXT-ACTION-PLAN.md) | Referência histórica — evoluções pós-v1.0.0 (ver PLANO-DE-ACAO-V2.md para versão completa) |
 | [`IMPLEMENTATION-STATUS.md`](IMPLEMENTATION-STATUS.md) | Estado de implementação por módulo |
 | [`HONEST-GAPS.md`](HONEST-GAPS.md) | Referência de padrões OOS, stubs by design e providers DEG-01..15 |
 | [`PRODUCT-VISION.md`](PRODUCT-VISION.md) | Visão do produto |
 | [`NEXTRACEONE-PRESENTATION.md`](NEXTRACEONE-PRESENTATION.md) | **Documento formal de apresentação** — O que é, que problemas resolve, diferenciação, proposta de valor e ROI |
-| [`PLATFORM-CAPABILITIES.md`](PLATFORM-CAPABILITIES.md) | Capacidades da plataforma |
+| [`PITCH.md`](PITCH.md) | Resumo de investimento e posicionamento comercial |
+| [`CHANGELOG.md`](CHANGELOG.md) | Histórico de versões (Keep a Changelog) |
 
 ---
 
@@ -26,12 +28,9 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | Ficheiro | Descrição |
 |---------|-----------|
 | [`ARCHITECTURE-OVERVIEW.md`](ARCHITECTURE-OVERVIEW.md) | Visão geral da arquitectura |
-| [`DATA-ARCHITECTURE.md`](DATA-ARCHITECTURE.md) | Arquitectura de dados |
 | [`SECURITY-ARCHITECTURE.md`](SECURITY-ARCHITECTURE.md) | Arquitectura de segurança |
 | [`FRONTEND-ARCHITECTURE.md`](FRONTEND-ARCHITECTURE.md) | Arquitectura frontend |
 | [`DEPLOYMENT-ARCHITECTURE.md`](DEPLOYMENT-ARCHITECTURE.md) | Arquitectura de deployment |
-| [`INTEGRATIONS-ARCHITECTURE.md`](INTEGRATIONS-ARCHITECTURE.md) | Arquitectura de integrações |
-| [`SOURCE-OF-TRUTH-STRATEGY.md`](SOURCE-OF-TRUTH-STRATEGY.md) | Estratégia Source of Truth |
 | [`OBSERVABILITY-STRATEGY.md`](OBSERVABILITY-STRATEGY.md) | Estratégia de observabilidade |
 
 ---
@@ -45,7 +44,7 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`adr/003-elasticsearch-observability.md`](adr/003-elasticsearch-observability.md) | Elasticsearch para observabilidade |
 | [`adr/004-local-ai-first.md`](adr/004-local-ai-first.md) | Local AI first |
 | [`adr/005-react-frontend-stack.md`](adr/005-react-frontend-stack.md) | React frontend stack |
-| [`adr/006-graphql-protobuf-roadmap.md`](adr/006-graphql-protobuf-roadmap.md) | GraphQL/Protobuf — implementados em Wave G.3 e H.1 (Superseded) |
+| [`adr/006-graphql-protobuf-roadmap.md`](adr/006-graphql-protobuf-roadmap.md) | GraphQL/Protobuf — Superseded (implementados em Wave G.3 e H.1) |
 | [`adr/007-data-contracts.md`](adr/007-data-contracts.md) | Data Contracts como cidadão de primeira classe (Partially Implemented — Wave AQ.1) |
 | [`adr/008-change-confidence-score-v2.md`](adr/008-change-confidence-score-v2.md) | Change Confidence Score 2.0 decomponível com sub-scores explicáveis (Proposed) |
 | [`adr/009-ai-evaluation-harness.md`](adr/009-ai-evaluation-harness.md) | AI Evaluation Harness interno para benchmarking de modelos (Proposed) |
@@ -57,11 +56,11 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`AI-ARCHITECTURE.md`](AI-ARCHITECTURE.md) | Arquitectura AI |
-| [`AI-GOVERNANCE.md`](AI-GOVERNANCE.md) | Governança AI |
-| [`AI-ASSISTED-OPERATIONS.md`](AI-ASSISTED-OPERATIONS.md) | Operações assistidas por AI |
-| [`AI-DEVELOPER-EXPERIENCE.md`](AI-DEVELOPER-EXPERIENCE.md) | Developer Experience AI |
+| [`AI-EVOLUTION-ROADMAP.md`](AI-EVOLUTION-ROADMAP.md) | Roadmap de evolução AI — Fases 0–1 ✅ implementadas; Fases 2–4 pendentes |
+| [`AI-INNOVATION-BLUEPRINT.md`](AI-INNOVATION-BLUEPRINT.md) | Blueprint de inovações AI sem concorrência — OME, Adaptive Contracts, etc. (Fase 4) |
+| [`AI-AGENT-LIGHTNING.md`](AI-AGENT-LIGHTNING.md) | Agent Lightning (RL) — plano de integração para Fase 2 |
 | [`AI-MODELS-ANALYSIS.md`](AI-MODELS-ANALYSIS.md) | **Análise de modelos de IA** — recomendações, requisitos de servidor, licenciamento |
+| [`AI-ENTERPRISE-CAPABILITIES.md`](AI-ENTERPRISE-CAPABILITIES.md) | Capacidades enterprise da plataforma AI |
 
 ---
 
@@ -69,9 +68,8 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`CONTRACT-STUDIO-VISION.md`](CONTRACT-STUDIO-VISION.md) | Visão do Contract Studio |
-| [`SERVICE-CONTRACT-GOVERNANCE.md`](SERVICE-CONTRACT-GOVERNANCE.md) | Governança de serviços e contratos |
-| [`CHANGE-CONFIDENCE.md`](CHANGE-CONFIDENCE.md) | Change Confidence |
+| [`SERVICE-CONTRACT-GOVERNANCE.md`](SERVICE-CONTRACT-GOVERNANCE.md) | Governança de serviços e contratos — modelo de domínio implementado |
+| [`INGESTION-PIPELINE-IMPLEMENTATION.md`](INGESTION-PIPELINE-IMPLEMENTATION.md) | Plano de implementação do Ingestion Pipeline avançado (PIP-01..06) |
 
 ---
 
@@ -82,10 +80,8 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md) | Design system |
 | [`DESIGN.md`](DESIGN.md) | UX e design visual |
 | [`BRAND-IDENTITY.md`](BRAND-IDENTITY.md) | Identidade visual |
-| [`UX-PRINCIPLES.md`](UX-PRINCIPLES.md) | Princípios UX |
 | [`PERSONA-MATRIX.md`](PERSONA-MATRIX.md) | Matriz de personas |
-| [`PERSONA-UX-MAPPING.md`](PERSONA-UX-MAPPING.md) | Mapeamento UX por persona |
-| [`I18N-STRATEGY.md`](I18N-STRATEGY.md) | Estratégia de internacionalização |
+| [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](V3-EVOLUTION-FRONTEND-DASHBOARDS.md) | V3 Frontend Evolution — 12 waves de evolução da superfície operacional |
 
 ---
 
@@ -97,6 +93,7 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`GUIDELINE.md`](GUIDELINE.md) | Guidelines gerais |
 | [`LOCAL-SETUP.md`](LOCAL-SETUP.md) | Setup local de desenvolvimento |
 | [`ENVIRONMENT-VARIABLES.md`](ENVIRONMENT-VARIABLES.md) | Variáveis de ambiente |
+| [`TESTING-STRATEGY.md`](TESTING-STRATEGY.md) | Estratégia de testes |
 | [`dev-setup/user-secrets-guide.md`](dev-setup/user-secrets-guide.md) | Guia de user secrets |
 | [`dev/VALIDATOR-TEMPLATE.md`](dev/VALIDATOR-TEMPLATE.md) | Template de validator |
 
@@ -164,14 +161,21 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`observability/configuration/`](observability/configuration/) | Configuração de observabilidade |
 | [`observability/collection/`](observability/collection/) | Colecção (IIS/CLR, Kafka, K8s) |
 | [`observability/providers/`](observability/providers/) | Providers (ClickHouse, Elastic) |
+| [`OTEL-INTEGRATION-GUIDE.md`](OTEL-INTEGRATION-GUIDE.md) | Guia de integração OTel Collector |
+| [`telemetry/TELEMETRY-ARCHITECTURE.md`](telemetry/TELEMETRY-ARCHITECTURE.md) | Arquitectura de telemetria |
 
 ---
 
-## 12. Telemetria — `docs/telemetry/`
+## 12. SDK / NexTrace Agent — `docs/sdk/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
-| [`telemetry/TELEMETRY-ARCHITECTURE.md`](telemetry/TELEMETRY-ARCHITECTURE.md) | Arquitectura de telemetria |
+| [`sdk/README.md`](sdk/README.md) | Índice do SDK |
+| [`NEXTTRACE-AGENT.md`](NEXTTRACE-AGENT.md) | Visão geral do NexTrace Agent (OTel Collector custom) |
+| [`sdk/NEXTTRACE-AGENT-INSTALLER.md`](sdk/NEXTTRACE-AGENT-INSTALLER.md) | Instalação do agent por plataforma |
+| [`sdk/NEXTTRACE-AGENT-PARAMETRIZATION.md`](sdk/NEXTTRACE-AGENT-PARAMETRIZATION.md) | Parametrização e variáveis de ambiente |
+| [`sdk/github-action.md`](sdk/github-action.md) | GitHub Action integration |
+| [`sdk/nuget-client.md`](sdk/nuget-client.md) | NuGet client SDK |
 
 ---
 
@@ -190,7 +194,23 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 
 ---
 
-## 14. Roadmap e Inovação — `docs/analysis/`
+## 14. On-Prem — `docs/onprem/`
+
+| Ficheiro | Descrição |
+|---------|-----------|
+| [`onprem/INDEX.md`](onprem/INDEX.md) | Índice on-prem |
+| [`onprem/WAVE-01-INSTALLATION.md`](onprem/WAVE-01-INSTALLATION.md) | Instalação |
+| [`onprem/WAVE-02-SELF-MONITORING.md`](onprem/WAVE-02-SELF-MONITORING.md) | Self-monitoring |
+| [`onprem/WAVE-03-UPDATE-RECOVERY.md`](onprem/WAVE-03-UPDATE-RECOVERY.md) | Update e recovery |
+| [`onprem/WAVE-04-AI-LOCAL.md`](onprem/WAVE-04-AI-LOCAL.md) | AI local |
+| [`onprem/WAVE-05-SECURITY-NETWORK.md`](onprem/WAVE-05-SECURITY-NETWORK.md) | Segurança e rede |
+| [`onprem/WAVE-06-RESOURCES-FINOPS.md`](onprem/WAVE-06-RESOURCES-FINOPS.md) | Recursos e FinOps |
+| [`onprem/WAVE-07-OBSERVABILITY.md`](onprem/WAVE-07-OBSERVABILITY.md) | Observabilidade |
+| [`onprem/WAVE-08-FUTURE.md`](onprem/WAVE-08-FUTURE.md) | Futuro |
+
+---
+
+## 15. Roadmap e Inovação — `docs/analysis/`
 
 | Ficheiro | Descrição |
 |---------|-----------|
@@ -200,8 +220,7 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`analysis/INFRA-PHASE-2-CLICKHOUSE-MIGRATION.md`](analysis/INFRA-PHASE-2-CLICKHOUSE-MIGRATION.md) | Fase 2 — ClickHouse como provider padrão de observabilidade |
 | [`analysis/INFRA-PHASE-3-HOST-INFRASTRUCTURE.md`](analysis/INFRA-PHASE-3-HOST-INFRASTRUCTURE.md) | Fase 3 — Host Infrastructure Module (novo bounded context) |
 | [`analysis/INFRA-PHASE-4-TOPOLOGY-COMPLETIONS.md`](analysis/INFRA-PHASE-4-TOPOLOGY-COMPLETIONS.md) | Fase 4 — Topology UI Time-Travel e SignalR real-time |
-| [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](V3-EVOLUTION-FRONTEND-DASHBOARDS.md) | V3 Frontend Evolution — 12 waves de evolução da superfície operacional |
 
 ---
 
-*Última consolidação: 2026-04-19*
+*Última consolidação: 2026-04-25*

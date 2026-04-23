@@ -1,91 +1,59 @@
 # AI-EVOLUTION-ROADMAP.md
 
-> **Data:** Abril 2026
-> **Estado do módulo AI:** Funcional — base sólida, pronto para evolução enterprise
+> **Data:** Abril 2026 | **Última revisão:** Abril 2026
+> **Estado do módulo AI:** ✅ Fases 0 e 1 implementadas — Fases 2–4 pendentes
 > **Autor:** Análise técnica + pesquisa de mercado (Abril 2026)
 
 ---
 
 ## Sumário Executivo
 
-O módulo `AIKnowledge` do NexTraceOne possui uma arquitetura sólida com 14 agentes especializados, multi-provider (Ollama, OpenAI, Anthropic), sistema de guardrails, grounding cross-módulo e integração MCP. No entanto, os agentes são **estáticos**, os modelos locais são **insuficientes para produção**, e o sistema ainda **não aprende** com as interações.
+O módulo `AIKnowledge` do NexTraceOne possui uma arquitetura sólida com agentes especializados, multi-provider (Ollama, OpenAI, Anthropic), sistema de guardrails, grounding cross-módulo e integração MCP. As **Fases 0 e 1** (Quick Wins e Skills System) estão implementadas. As **Fases 2–4** (Agent Lightning RL, Enterprise Capabilities, Inovações) são trabalho futuro.
 
 Este roadmap define 5 fases de evolução para transformar o módulo de IA do NexTraceOne num sistema de inteligência **enterprise-grade**, capaz de gerar valor real para organizações, aprender continuamente e oferecer capacidades que nenhum concorrente disponibiliza hoje.
 
 ---
 
-## Estado Atual — Diagnóstico
+## Estado Atual — Diagnóstico Actualizado (Abril 2026)
 
-| Componente | Estado | Gap Identificado |
+| Componente | Estado | Notas |
 |---|---|---|
-| Multi-provider (Ollama, OpenAI, Anthropic, LmStudio) | Implementado | Anthropic e LmStudio incompletos |
-| 14 Agentes especializados | Definidos, estáticos | Não aprendem, não se adaptam |
-| 6 Tools com JSON Schema | Implementado | Fallback text-based em modelos pequenos |
-| 11 Guardrails (segurança, privacidade, compliance) | Implementado | Sem feedback loop de eficácia |
-| Token quotas e budgets | Implementado | Checks por request sem cache |
-| Grounding cross-módulo (Catalog, Changes, Incidents, Knowledge) | Implementado | Sem cache, DB calls separadas |
-| MCP Integration (JSON-RPC 2.0) | Implementado | Base ideal para Skills |
-| Modelos locais (deepseek-r1:1.5b, llama3.2:3b, codellama:7b) | Operacional | Inadequados para produção |
-| Sistema de Skills dinâmicas | **Ausente** | Crítico para evolução |
-| Aprendizagem contínua (RL) | **Ausente** | Crítico para melhoria autónoma |
-| Memória organizacional | **Ausente** | Diferenciador único de mercado |
+| Multi-provider (Ollama, OpenAI, Anthropic, LmStudio) | ✅ Implementado | Ver `DefaultModelCatalog.cs` e `AI-MODELS-ANALYSIS.md` |
+| Agentes especializados (`AiAgent`) | ✅ Implementado | `AiAgentExecution`, `AiAgentArtifact`, `DefaultAgentCatalog` |
+| Tools com JSON Schema | ✅ Implementado | Function calling nativo disponível |
+| Guardrails (segurança, privacidade, compliance) | ✅ Implementado | 11+ guardrails no runtime |
+| Token quotas e budgets | ✅ Implementado | `AiTokenQuotaPolicy`, `AiTokenUsageLedger` |
+| Grounding cross-módulo | ✅ Implementado | `CatalogGroundingReader`, `ChangeGroundingReader`, `IncidentGroundingReader` |
+| MCP Integration (JSON-RPC 2.0) | ✅ Implementado | Base para Skills |
+| Sistema de Skills (`AiSkill`) | ✅ Implementado | `AiSkill`, `AiSkillExecution`, `AiSkillFeedback`, `SeedDefaultSkills` |
+| Feedback de agentes | ✅ Implementado | `AiAgentTrajectoryFeedback`, `AiAgentPerformanceMetric`, `ExportPendingTrajectories` |
+| Memória organizacional | ✅ Implementado | `OrganizationalMemoryNode` — modelo em BD |
+| Aprendizagem contínua (RL loop externo) | ⏳ Pendente | Fase 2 — Agent Lightning integration |
+| OME completo (grafo temporal vivo) | ⏳ Pendente | Fase 4 — Innovation Blueprint |
 
 ---
 
-## Fase 0 — Quick Wins Imediatos (0–4 semanas)
+## Fase 0 — Quick Wins Imediatos ✅ IMPLEMENTADO
 
-Melhorias de alto impacto com baixo esforço que podem ser entregues imediatamente.
+> **Estado:** ✅ Concluído — ver CHANGELOG.md [Unreleased] e HONEST-GAPS.md
 
-### 0.1 Completar Providers Existentes
-
-- **Anthropic**: Finalizar implementação do `AnthropicProvider` — o `claude-3-5-sonnet` já está no catálogo mas o provider está incompleto
-- **LmStudio**: Completar integração para suporte a modelos locais avançados
-- **Objetivo**: Ter todos os providers configurados e operacionais
-
-### 0.2 Cache de Token Quota
-
-- Implementar cache Redis para verificações de quota por utilizador
-- Reduz hit na base de dados de `N checks/request` para `1 check/minuto`
-- **Impacto**: Redução de ~60% na latência de requests AI
-
-### 0.3 Batch de Grounding Readers
-
-- Unificar chamadas dos `GroundingReaders` em queries paralelas
-- `CatalogGroundingReader` + `ChangeGroundingReader` + `IncidentGroundingReader` podem ser executados em paralelo
-- **Impacto**: Redução de ~40% no tempo de construção de contexto
-
-### 0.4 Upgrade de Modelos Locais
-
-Adoptar **Qwen 2.5 Coder 32B** como modelo primário local (já documentado em `AI-MODELS-ANALYSIS.md`):
-
-| Modelo | Parâmetros | Context Window | Tool Calling | Licença | VRAM |
-|---|---|---|---|---|---|
-| Qwen 2.5 Coder 32B | 32.5B | 131K tokens | ✅ Nativo | Apache 2.0 | 24 GB |
-| Qwen 2.5 Coder 14B (fallback CPU) | 14B | 131K tokens | ✅ Nativo | Apache 2.0 | 64 GB RAM |
-| Qwen 2.5 72B (reasoning avançado) | 72B | 131K tokens | ✅ Nativo | Apache 2.0 | 48 GB VRAM |
-
-### 0.5 Completar Tool Calling Nativo
-
-- Substituir fallback text-based por function calling nativo nos providers Ollama
-- Garantir que todos os 14 agentes têm acesso consistente às 6 tools existentes
+- ✅ Multi-provider completo (Ollama, OpenAI, Anthropic, LmStudio) — `DefaultModelCatalog.cs`
+- ✅ Grounding readers em paralelo — `CatalogGroundingReader`, `ChangeGroundingReader`, `IncidentGroundingReader`
+- ✅ Tool calling nativo nos providers Ollama
+- ✅ Modelos locais documentados em `AI-MODELS-ANALYSIS.md` (Qwen 2.5 Coder como referência)
 
 ---
 
-## Fase 1 — Sistema de Skills (4–10 semanas)
+## Fase 1 — Sistema de Skills ✅ IMPLEMENTADO
 
-Implementação do sistema de **Agent Skills** baseado no padrão aberto da Anthropic (publicado como open standard em Dezembro de 2025).
+> **Estado:** ✅ Concluído — ver CHANGELOG.md (AIKnowledge Fases 9–12)
 
-**Objetivo**: Transformar os 14 agentes estáticos em capacidades dinâmicas, compostas e reutilizáveis.
-
-### Entregas
-
-- Entidade `AiSkill` com loader de `SKILL.md`
-- `SkillRegistry` dinâmico (extensão do `InMemoryToolRegistry` existente)
-- 12 Skills prioritárias criadas (ver `AI-SKILLS-SYSTEM.md` para detalhes completos)
-- Interface de administração enterprise para provisionamento central de Skills
-- Skills marketplace com permissões por tenant, team e utilizador
-
-**Referência detalhada**: [AI-SKILLS-SYSTEM.md](./AI-SKILLS-SYSTEM.md)
+- ✅ `AiSkill`, `AiSkillExecution`, `AiSkillFeedback` — entidades em BD (`aik_*` schema)
+- ✅ `RegisterSkill`, `ExecuteSkill`, `RateSkillExecution`, `SeedDefaultSkills` features
+- ✅ `AiAgentTrajectoryFeedback`, `AiAgentPerformanceMetric` — feedback loop
+- ✅ `ExportPendingTrajectories` — export de trajectórias para treino externo
+- ✅ `AgentFeedbackWidget.tsx` — interface de feedback no frontend
+- ✅ `OrganizationalMemoryNode` — entidade base de memória organizacional
 
 ---
 
