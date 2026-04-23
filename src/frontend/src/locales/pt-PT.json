@@ -15965,5 +15965,76 @@
     "estimatedIn30Days": "Deprecações Estimadas em 30 Dias",
     "estimatedIn60Days": "Deprecações Estimadas em 60 Dias",
     "estimatedIn90Days": "Deprecações Estimadas em 90 Dias"
+  },
+  "releasePatternAnalysis": {
+    "title": "Análise de Padrões de Release",
+    "batchSizeAnalysis": "Análise de Dimensão de Lote",
+    "avgServiceChangesPerRelease": "Média de Alterações por Release",
+    "largeReleaseCount": "Número de Releases Grandes",
+    "batchSizeVsFailureCorrelation": "Correlação Dimensão de Lote vs Falha",
+    "batchSizeTrend": "Tendência de Dimensão de Lote",
+    "temporalPatterns": "Padrões Temporais",
+    "highRiskDayConcentration": "Concentração em Dias de Alto Risco",
+    "endOfSprintCluster": "Cluster de Fim de Sprint",
+    "clusteringRisk": "Risco de Agrupamento",
+    "multiServiceSameDayReleases": "Releases Multi-Serviço no Mesmo Dia",
+    "incidentInHour1Rate": "Taxa de Incidente na 1.ª Hora",
+    "incidentInDay1Rate": "Taxa de Incidente no 1.º Dia",
+    "repeatFailureServices": "Serviços com Falhas Repetidas",
+    "tenantReleasePatternScore": "Score de Padrão de Release do Tenant",
+    "tiers": {
+      "safe": "Seguro",
+      "warning": "Aviso",
+      "risky": "Arriscado",
+      "critical": "Crítico"
+    },
+    "largeReleaseThreshold": "Limite de Release Grande",
+    "repeatFailureThreshold": "Limite de Falha Repetida",
+    "clusterWarningPerWeek": "Aviso de Agrupamento por Semana",
+    "endOfSprintDays": "Dias de Fim de Sprint"
+  },
+  "changeLeadTime": {
+    "title": "Lead Time de Mudança",
+    "stageBreakdown": "Detalhe por Fase",
+    "createdToApprovalRequested": "Criação até Pedido de Aprovação",
+    "approvalRequestedToApproved": "Pedido até Aprovação",
+    "approvedToPreProdDeploy": "Aprovação até Deploy em Pré-Prod",
+    "preProdToProductionDeploy": "Pré-Prod até Deploy em Produção",
+    "productionDeployToVerification": "Deploy em Produção até Verificação",
+    "totalLeadTime": "Lead Time Total",
+    "bottleneckStage": "Fase Gargalo",
+    "medianLeadTime": "Lead Time Mediano",
+    "p95LeadTime": "Lead Time P95",
+    "tiers": {
+      "elite": "Elite",
+      "high": "Alto",
+      "medium": "Médio",
+      "low": "Baixo"
+    },
+    "slowestApprovalGroups": "Grupos com Aprovação mais Lenta",
+    "slowestPromotionServices": "Serviços com Promoção mais Lenta",
+    "leadTimeTrend": "Tendência de Lead Time",
+    "approvalBottleneckIndex": "Índice de Gargalo de Aprovação",
+    "approvalSlaHours": "SLA de Aprovação em Horas",
+    "bottleneckApprovalPct": "Percentagem de Gargalo de Aprovação"
+  },
+  "deployFrequencyHealth": {
+    "title": "Saúde da Frequência de Deployments",
+    "deployFrequencyPerMonth": "Frequência de Deploy por Mês",
+    "lastDeployAge": "Idade do Último Deploy (dias)",
+    "deployGap": "Intervalo entre Deploys (dias)",
+    "tiers": {
+      "optimal": "Ótimo",
+      "underdeploying": "Deploy Insuficiente",
+      "overdeploying": "Deploy Excessivo",
+      "stale": "Desatualizado"
+    },
+    "staleServices": "Serviços Desatualizados",
+    "overdeployingServices": "Serviços com Deploy Excessivo",
+    "tenantDeployFrequencyHealthScore": "Score de Saúde de Frequência de Deploy do Tenant",
+    "teamDeployFrequencyComparison": "Comparação de Frequência de Deploy por Equipa",
+    "deployFrequencyVsIncidentRate": "Frequência de Deploy vs Taxa de Incidentes",
+    "staleDeployDays": "Dias para Deploy Desatualizado",
+    "highVariabilityThreshold": "Limite de Alta Variabilidade"
   }
 }

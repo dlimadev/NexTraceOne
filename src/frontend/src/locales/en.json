@@ -14733,5 +14733,76 @@
     "estimatedIn30Days": "Estimated Deprecations in 30 Days",
     "estimatedIn60Days": "Estimated Deprecations in 60 Days",
     "estimatedIn90Days": "Estimated Deprecations in 90 Days"
+  },
+  "releasePatternAnalysis": {
+    "title": "Release Pattern Analysis",
+    "batchSizeAnalysis": "Batch Size Analysis",
+    "avgServiceChangesPerRelease": "Avg Service Changes per Release",
+    "largeReleaseCount": "Large Release Count",
+    "batchSizeVsFailureCorrelation": "Batch Size vs Failure Correlation",
+    "batchSizeTrend": "Batch Size Trend",
+    "temporalPatterns": "Temporal Patterns",
+    "highRiskDayConcentration": "High-Risk Day Concentration",
+    "endOfSprintCluster": "End-of-Sprint Cluster",
+    "clusteringRisk": "Clustering Risk",
+    "multiServiceSameDayReleases": "Multi-Service Same-Day Releases",
+    "incidentInHour1Rate": "Incident in Hour 1 Rate",
+    "incidentInDay1Rate": "Incident in Day 1 Rate",
+    "repeatFailureServices": "Repeat Failure Services",
+    "tenantReleasePatternScore": "Tenant Release Pattern Score",
+    "tiers": {
+      "safe": "Safe",
+      "warning": "Warning",
+      "risky": "Risky",
+      "critical": "Critical"
+    },
+    "largeReleaseThreshold": "Large Release Threshold",
+    "repeatFailureThreshold": "Repeat Failure Threshold",
+    "clusterWarningPerWeek": "Cluster Warning per Week",
+    "endOfSprintDays": "End-of-Sprint Days"
+  },
+  "changeLeadTime": {
+    "title": "Change Lead Time",
+    "stageBreakdown": "Stage Breakdown",
+    "createdToApprovalRequested": "Created to Approval Requested",
+    "approvalRequestedToApproved": "Approval Requested to Approved",
+    "approvedToPreProdDeploy": "Approved to Pre-Prod Deploy",
+    "preProdToProductionDeploy": "Pre-Prod to Production Deploy",
+    "productionDeployToVerification": "Production Deploy to Verification",
+    "totalLeadTime": "Total Lead Time",
+    "bottleneckStage": "Bottleneck Stage",
+    "medianLeadTime": "Median Lead Time",
+    "p95LeadTime": "P95 Lead Time",
+    "tiers": {
+      "elite": "Elite",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "slowestApprovalGroups": "Slowest Approval Groups",
+    "slowestPromotionServices": "Slowest Promotion Services",
+    "leadTimeTrend": "Lead Time Trend",
+    "approvalBottleneckIndex": "Approval Bottleneck Index",
+    "approvalSlaHours": "Approval SLA Hours",
+    "bottleneckApprovalPct": "Bottleneck Approval Pct"
+  },
+  "deployFrequencyHealth": {
+    "title": "Deployment Frequency Health",
+    "deployFrequencyPerMonth": "Deploy Frequency per Month",
+    "lastDeployAge": "Last Deploy Age (days)",
+    "deployGap": "Deploy Gap (days)",
+    "tiers": {
+      "optimal": "Optimal",
+      "underdeploying": "Underdeploying",
+      "overdeploying": "Overdeploying",
+      "stale": "Stale"
+    },
+    "staleServices": "Stale Services",
+    "overdeployingServices": "Overdeploying Services",
+    "tenantDeployFrequencyHealthScore": "Tenant Deploy Frequency Health Score",
+    "teamDeployFrequencyComparison": "Team Deploy Frequency Comparison",
+    "deployFrequencyVsIncidentRate": "Deploy Frequency vs Incident Rate",
+    "staleDeployDays": "Stale Deploy Days",
+    "highVariabilityThreshold": "High Variability Threshold"
   }
 }

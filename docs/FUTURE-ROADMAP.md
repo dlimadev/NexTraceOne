@@ -10,7 +10,7 @@
 > **Waves AJ–AM (backend avançado III):** 4 novas waves planeadas — Multi-Tenant Governance Intelligence, Developer Experience & Notification Management, Audit Intelligence & Traceability Analytics, Auto-Cataloging & Service Discovery Intelligence  
 > **Waves AN–AQ (backend avançado IV):** 4 novas waves planeadas — SRE Intelligence & Error Budget Management, Supply Chain & Dependency Provenance, Collaborative Governance & Workflow Automation, Data Observability & Schema Quality  
 > **Waves AR–AU (backend avançado V):** 4 novas waves planeadas — Service Topology Intelligence & Dependency Mapping, Feature Flag & Experimentation Governance, AI Model Quality & Drift Governance, Platform Self-Optimization & Adaptive Intelligence  
-> **Waves AV–AY (backend avançado VI):** 4 novas waves planeadas — Contract Lifecycle Automation & Deprecation Intelligence, Release Intelligence & Deployment Analytics, Security Posture & Vulnerability Intelligence, Organizational Knowledge & Documentation Intelligence  
+> **Waves AV–AY (backend avançado VI):** 4 novas waves planeadas — Contract Lifecycle Automation & Deprecation Intelligence, **Release Intelligence & Deployment Analytics ✅**, Security Posture & Vulnerability Intelligence, Organizational Knowledge & Documentation Intelligence  
 > **Waves AZ–BC (backend avançado VII):** 4 novas waves planeadas — Service Mesh & Runtime Traffic Intelligence, Platform Engineering & Developer Portal Intelligence, Compliance Automation & Regulatory Reporting, Advanced Change Confidence & Promotion Intelligence  
 > **Referência:** [IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)
 
@@ -3854,7 +3854,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 - `changeLeadTime.*` — lead time de mudança por estágio, BottleneckStage, ApprovalBottleneckIndex, LeadTimeTrend e LeadTimeTier DORA
 - `deployFrequencyHealth.*` — frequência de deploy por serviço, DeployFrequencyTier, StaleServices, OverdeployingServices e correlação com incidentes
 
-**Totais estimados Wave AW:** CG/OI: ~47 testes (AW.1 ~16 + AW.2 ~16 + AW.3 ~15). Configuração: +8 config keys (sort 13440–13510). i18n: +3 secções (4 locales). **Wave AW PLANEADA**.
+**Totais estimados Wave AW:** CG/OI: ~47 testes (AW.1 ~16 + AW.2 ~16 + AW.3 ~15). Configuração: +8 config keys (sort 13440–13510). i18n: +3 secções (4 locales). **Wave AW COMPLETA** ✅
 
 ---
 

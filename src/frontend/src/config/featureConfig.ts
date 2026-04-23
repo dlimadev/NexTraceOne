@@ -70,4 +70,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13410, key: "contract.deprecation_forecast.max_age_days", label: "contractDeprecationForecast.maxAgeDays", defaultValue: 365 },
   { sort: 13420, key: "contract.deprecation_forecast.consumer_decline_pct", label: "contractDeprecationForecast.consumerDeclinePct", defaultValue: 20 },
   { sort: 13430, key: "contract.deprecation.schedule_endpoint_enabled", label: "contractDeprecationForecast.scheduleEndpointEnabled", defaultValue: true },
+  // ── Wave AW — Release Intelligence & Deployment Analytics ─────────────
+  { sort: 13440, key: "release.pattern.large_release_threshold", label: "releasePatternAnalysis.largeReleaseThreshold", defaultValue: 5 },
+  { sort: 13450, key: "release.pattern.repeat_failure_threshold", label: "releasePatternAnalysis.repeatFailureThreshold", defaultValue: 0.3 },
+  { sort: 13460, key: "release.lead_time.approval_sla_hours", label: "changeLeadTime.approvalSlaHours", defaultValue: 24 },
+  { sort: 13470, key: "release.lead_time.bottleneck_approval_pct", label: "changeLeadTime.bottleneckApprovalPct", defaultValue: 50 },
+  { sort: 13480, key: "release.deploy_frequency.stale_deploy_days", label: "deployFrequencyHealth.staleDeployDays", defaultValue: 60 },
+  { sort: 13490, key: "release.deploy_frequency.high_variability_threshold", label: "deployFrequencyHealth.highVariabilityThreshold", defaultValue: 0.5 },
+  { sort: 13500, key: "release.pattern.cluster_warning_per_week", label: "releasePatternAnalysis.clusterWarningPerWeek", defaultValue: 3 },
+  { sort: 13510, key: "release.pattern.end_of_sprint_days", label: "releasePatternAnalysis.endOfSprintDays", defaultValue: 3 },
 ];
