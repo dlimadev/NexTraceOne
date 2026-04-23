@@ -15140,5 +15140,58 @@
       "topErrorIntegrations": "Top Error Integrations",
       "integrationHealthHistory": "Integration Health History (7d)"
     }
+  },
+  "crossStandardComplianceGap": {
+    "title": "Cross-Standard Compliance Gap Report",
+    "tier_minimal": "Minimal",
+    "tier_partial": "Partial",
+    "tier_significant": "Significant",
+    "tier_critical": "Critical",
+    "maxCrossStandardGaps": "Max Cross-Standard Gaps (Minimal Tier)",
+    "criticalImpactScore": "Critical Impact Score Threshold"
+  },
+  "evidenceCollectionStatus": {
+    "title": "Evidence Collection Status Report",
+    "tier_ready": "Ready",
+    "tier_almost_ready": "Almost Ready",
+    "tier_needs_work": "Needs Work",
+    "tier_not_ready": "Not Ready",
+    "staleDays": "Stale Evidence Days",
+    "auditWarningDays": "Days Before Audit Warning"
+  },
+  "regulatoryChangeImpact": {
+    "title": "Regulatory Change Impact Report",
+    "effort_low": "Low",
+    "effort_medium": "Medium",
+    "effort_high": "High",
+    "impactHighThreshold": "Impact High Service Count Threshold",
+    "effortHighDays": "High Effort Days Threshold"
+  },
+  "environmentBehaviorComparison": {
+    "title": "Environment Behavior Comparison Report",
+    "tier_ready": "Ready",
+    "tier_conditionally_ready": "Conditionally Ready",
+    "tier_not_ready": "Not Ready",
+    "tier_insufficient_data": "Insufficient Data"
+  },
+  "evidencePackIntegrity": {
+    "title": "Evidence Pack Integrity Report",
+    "tier_trustworthy": "Trustworthy",
+    "tier_acceptable": "Acceptable",
+    "tier_questionable": "Questionable",
+    "tier_invalid": "Invalid"
+  },
+  "promotionConfidence": {
+    "title": "Multi-Dimensional Promotion Confidence Report",
+    "tier_high": "High Confidence",
+    "tier_medium": "Medium Confidence",
+    "tier_low": "Low Confidence",
+    "tier_blocking": "Blocking Issues",
+    "recommendation_proceed_auto": "Proceed Automatically",
+    "recommendation_proceed_conditions": "Proceed With Conditions",
+    "recommendation_manual_approval": "Require Manual Approval",
+    "recommendation_block": "Block",
+    "blockingThreshold": "Blocking Dimension Score Threshold",
+    "highConfidenceThreshold": "High Confidence Score Threshold"
   }
 }

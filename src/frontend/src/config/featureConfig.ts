@@ -115,4 +115,14 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13810, key: "portal.workflow.smooth_admin_rate", label: "selfServiceWorkflowHealth.smoothAdminRate", defaultValue: 5 },
   { sort: 13820, key: "integration.health.sync_freshness_hours", label: "integrationHealth.syncFreshnessHours", defaultValue: 24 },
   { sort: 13830, key: "integration.health.sync_health_window_hours", label: "integrationHealth.syncHealthWindowHours", defaultValue: 72 },
+  // ── Wave BB — Compliance Automation & Regulatory Reporting ───────────
+  { sort: 13840, key: "compliance.cross_standard.max_cross_standard_gaps", label: "crossStandardComplianceGap.maxCrossStandardGaps", defaultValue: 5 },
+  { sort: 13850, key: "compliance.cross_standard.critical_impact_score", label: "crossStandardComplianceGap.criticalImpactScore", defaultValue: 9 },
+  { sort: 13860, key: "compliance.evidence.stale_days", label: "evidenceCollectionStatus.staleDays", defaultValue: 90 },
+  { sort: 13870, key: "compliance.evidence.audit_warning_days", label: "evidenceCollectionStatus.auditWarningDays", defaultValue: 30 },
+  { sort: 13880, key: "compliance.regulatory.impact_high_threshold", label: "regulatoryChangeImpact.impactHighThreshold", defaultValue: 10 },
+  { sort: 13890, key: "compliance.regulatory.effort_high_days", label: "regulatoryChangeImpact.effortHighDays", defaultValue: 30 },
+  // ── Wave BC — Production Change Confidence ───────────────────────────
+  { sort: 13920, key: "promotion.confidence.blocking_threshold", label: "promotionConfidence.blockingThreshold", defaultValue: 30 },
+  { sort: 13930, key: "promotion.confidence.high_confidence_threshold", label: "promotionConfidence.highConfidenceThreshold", defaultValue: 80 },
 ];

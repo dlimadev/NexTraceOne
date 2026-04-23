@@ -16375,5 +16375,58 @@
       "topErrorIntegrations": "Integraciones con Más Errores",
       "integrationHealthHistory": "Historial de Salud (7d)"
     }
+  },
+  "crossStandardComplianceGap": {
+    "title": "Informe de Brechas Cross-Standard de Cumplimiento",
+    "tier_minimal": "Mínimo",
+    "tier_partial": "Parcial",
+    "tier_significant": "Significativo",
+    "tier_critical": "Crítico",
+    "maxCrossStandardGaps": "Máx. Brechas Cross-Standard (Tier Mínimo)",
+    "criticalImpactScore": "Umbral de Puntuación de Impacto Crítico"
+  },
+  "evidenceCollectionStatus": {
+    "title": "Informe de Estado de Recolección de Evidencias",
+    "tier_ready": "Listo",
+    "tier_almost_ready": "Casi Listo",
+    "tier_needs_work": "Necesita Trabajo",
+    "tier_not_ready": "No Está Listo",
+    "staleDays": "Días de Evidencia Obsoleta",
+    "auditWarningDays": "Días de Aviso Antes de Auditoría"
+  },
+  "regulatoryChangeImpact": {
+    "title": "Informe de Impacto de Cambio Regulatorio",
+    "effort_low": "Bajo",
+    "effort_medium": "Medio",
+    "effort_high": "Alto",
+    "impactHighThreshold": "Umbral de Nº de Servicios Alto Impacto",
+    "effortHighDays": "Umbral de Días para Esfuerzo Alto"
+  },
+  "environmentBehaviorComparison": {
+    "title": "Informe de Comparación de Comportamiento por Entorno",
+    "tier_ready": "Listo",
+    "tier_conditionally_ready": "Condicionalmente Listo",
+    "tier_not_ready": "No Está Listo",
+    "tier_insufficient_data": "Datos Insuficientes"
+  },
+  "evidencePackIntegrity": {
+    "title": "Informe de Integridad de Evidence Packs",
+    "tier_trustworthy": "Fiable",
+    "tier_acceptable": "Aceptable",
+    "tier_questionable": "Cuestionable",
+    "tier_invalid": "Inválido"
+  },
+  "promotionConfidence": {
+    "title": "Informe de Confianza Multi-Dimensional para Promoción",
+    "tier_high": "Alta Confianza",
+    "tier_medium": "Confianza Media",
+    "tier_low": "Baja Confianza",
+    "tier_blocking": "Factores de Bloqueo",
+    "recommendation_proceed_auto": "Proceder Automáticamente",
+    "recommendation_proceed_conditions": "Proceder con Condiciones",
+    "recommendation_manual_approval": "Requerir Aprobación Manual",
+    "recommendation_block": "Bloquear",
+    "blockingThreshold": "Umbral de Puntuación de Bloqueo por Dimensión",
+    "highConfidenceThreshold": "Umbral de Puntuación de Alta Confianza"
   }
 }

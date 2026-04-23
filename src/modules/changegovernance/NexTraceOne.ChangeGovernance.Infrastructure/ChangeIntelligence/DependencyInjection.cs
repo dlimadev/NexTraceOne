@@ -137,6 +137,15 @@ public static class DependencyInjection
         services.AddScoped<IPlatformHealthIndexReader, Services.NullPlatformHealthIndexReader>();
         services.AddScoped<IAdaptiveRecommendationReader, Services.NullAdaptiveRecommendationReader>();
 
+        // Wave BB — Compliance Automation & Regulatory Reporting
+        services.AddScoped<ICrossStandardComplianceGapReader, Services.NullCrossStandardComplianceGapReader>();
+        services.AddScoped<IEvidenceCollectionStatusReader, Services.NullEvidenceCollectionStatusReader>();
+        services.AddScoped<IRegulatoryChangeImpactReader, Services.NullRegulatoryChangeImpactReader>();
+
+        // Wave BC — Production Change Confidence
+        services.AddScoped<IEvidencePackIntegrityReader, Services.NullEvidencePackIntegrityReader>();
+        services.AddScoped<IMultiDimensionalPromotionConfidenceReader, Services.NullMultiDimensionalPromotionConfidenceReader>();
+
         return services;
     }
 }
