@@ -43,4 +43,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13170, key: "feature_flags.experiment.governed_overdue_pct", label: "experimentGovernance.governedOverduePct", defaultValue: 20 },
   { sort: 13180, key: "feature_flags.experiment.governed_no_criteria_pct", label: "experimentGovernance.governedNoCriteriaPct", defaultValue: 10 },
   { sort: 13190, key: "feature_flags.inventory.ingest_endpoint_enabled", label: "featureFlagInventory.ingestEndpointEnabled", defaultValue: true },
+  // ── Wave AT — AI Model Quality & Drift Governance ─────────────────────
+  { sort: 13200, key: "ai.model_drift.input_drift_warning_score", label: "modelDrift.inputDriftWarningScore", defaultValue: 20 },
+  { sort: 13210, key: "ai.model_drift.output_drift_warning_score", label: "modelDrift.outputDriftWarningScore", defaultValue: 15 },
+  { sort: 13220, key: "ai.model_quality.min_samples_for_quality", label: "aiModelQuality.minSamplesForQuality", defaultValue: 100 },
+  { sort: 13230, key: "ai.model_quality.low_confidence_threshold", label: "aiModelQuality.lowConfidenceThreshold", defaultValue: 0.6 },
+  { sort: 13240, key: "ai.model_quality.latency_budget_ms", label: "aiModelQuality.latencyBudgetMs", defaultValue: 500 },
+  { sort: 13250, key: "ai.governance.model_review_days", label: "aiGovernanceCompliance.modelReviewDays", defaultValue: 90 },
+  { sort: 13260, key: "ai.governance.budget_overrun_threshold", label: "aiGovernanceCompliance.budgetOverrunThreshold", defaultValue: 2 },
+  { sort: 13270, key: "ai.governance.audit_trail_lookback_days", label: "aiGovernanceCompliance.auditTrailLookbackDays", defaultValue: 30 },
 ];

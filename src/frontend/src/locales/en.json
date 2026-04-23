@@ -14542,5 +14542,84 @@
       "atRisk": "At Risk",
       "unmanaged": "Unmanaged"
     }
+  },
+  "modelDrift": {
+    "title": "Model Drift Report",
+    "description": "Detects drift in AI model input/output distributions vs. baseline period",
+    "inputDriftScore": "Input Drift Score",
+    "outputDriftScore": "Output Drift Score",
+    "confidenceDrift": "Confidence Drift",
+    "nullRateIncrease": "Null Rate Increase",
+    "driftDetectionAlgorithm": "Detection Algorithm",
+    "driftAcknowledged": "Drift Acknowledged",
+    "driftAlerts": "Drift Alerts",
+    "topDriftingModels": "Top Drifting Models",
+    "stableModels": "Stable Models",
+    "driftingModels": "Drifting Models",
+    "criticalModels": "Critical Models",
+    "inputDriftWarningScore": "Input Drift Warning Score",
+    "outputDriftWarningScore": "Output Drift Warning Score",
+    "baselineDays": "Baseline Days",
+    "tier": {
+      "stable": "Stable",
+      "warning": "Warning",
+      "drifting": "Drifting",
+      "critical": "Critical"
+    }
+  },
+  "aiModelQuality": {
+    "title": "AI Model Quality Report",
+    "description": "Quality metrics for AI models in production: accuracy, confidence, latency and fallback rate",
+    "accuracyRate": "Accuracy Rate",
+    "feedbackCoverageRate": "Feedback Coverage Rate",
+    "avgConfidenceScore": "Avg Confidence Score",
+    "lowConfidencePredictionRate": "Low Confidence Prediction Rate",
+    "inferenceLatencyP50Ms": "Inference Latency P50 (ms)",
+    "inferenceLatencyP95Ms": "Inference Latency P95 (ms)",
+    "fallbackRate": "Fallback Rate",
+    "qualityAnomalies": "Quality Anomalies",
+    "modelsWithFeedback": "Models With Feedback",
+    "tenantAiQualityScore": "Tenant AI Quality Score",
+    "lowConfidenceModelCount": "Low Confidence Model Count",
+    "minSamplesForQuality": "Min Samples for Quality",
+    "lowConfidenceThreshold": "Low Confidence Threshold",
+    "latencyBudgetMs": "Latency Budget (ms)",
+    "tier": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "degraded": "Degraded",
+      "poor": "Poor"
+    },
+    "trend": {
+      "improving": "Improving",
+      "stable": "Stable",
+      "degrading": "Degrading"
+    }
+  },
+  "aiGovernanceCompliance": {
+    "title": "AI Governance Compliance Report",
+    "description": "Compliance of active AI models with governance requirements: approval, audit trail, budget and policy",
+    "hasFormalApproval": "Has Formal Approval",
+    "hasAuditTrail": "Has Audit Trail",
+    "budgetComplianceRate": "Budget Compliance Rate",
+    "policyAdherence": "Policy Adherence",
+    "lastReviewDate": "Last Review Date",
+    "reviewOverdue": "Review Overdue",
+    "budgetOverrunPeriods": "Budget Overrun Periods",
+    "tenantAiGovernanceScore": "Tenant AI Governance Score",
+    "aiGovernanceComplianceIndex": "AI Governance Compliance Index",
+    "modelsWithoutApproval": "Models Without Approval",
+    "modelsWithoutAuditTrail": "Models Without Audit Trail",
+    "budgetOverrunModels": "Budget Overrun Models",
+    "policyViolatingCalls": "Policy Violating Calls",
+    "modelReviewDays": "Model Review Days",
+    "budgetOverrunThreshold": "Budget Overrun Threshold",
+    "auditTrailLookbackDays": "Audit Trail Lookback Days",
+    "tier": {
+      "compliant": "Compliant",
+      "partial": "Partial",
+      "nonCompliant": "Non-Compliant",
+      "untracked": "Untracked"
+    }
   }
 }

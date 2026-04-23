@@ -15774,5 +15774,84 @@
       "atRisk": "Em Risco",
       "unmanaged": "Não Gerido"
     }
+  },
+  "modelDrift": {
+    "title": "Relatório de Drift de Modelo",
+    "description": "Detecta drift nas distribuições de input/output de modelos de IA em relação ao período baseline",
+    "inputDriftScore": "Score de Drift de Input",
+    "outputDriftScore": "Score de Drift de Output",
+    "confidenceDrift": "Drift de Confiança",
+    "nullRateIncrease": "Aumento de Taxa Nula",
+    "driftDetectionAlgorithm": "Algoritmo de Detecção",
+    "driftAcknowledged": "Drift Reconhecido",
+    "driftAlerts": "Alertas de Drift",
+    "topDriftingModels": "Top Modelos com Drift",
+    "stableModels": "Modelos Estáveis",
+    "driftingModels": "Modelos com Drift",
+    "criticalModels": "Modelos Críticos",
+    "inputDriftWarningScore": "Score de Aviso de Drift de Input",
+    "outputDriftWarningScore": "Score de Aviso de Drift de Output",
+    "baselineDays": "Dias de Baseline",
+    "tier": {
+      "stable": "Estável",
+      "warning": "Aviso",
+      "drifting": "Em Deriva",
+      "critical": "Crítico"
+    }
+  },
+  "aiModelQuality": {
+    "title": "Relatório de Qualidade de Modelos de IA",
+    "description": "Métricas de qualidade de modelos de IA em produção: precisão, confiança, latência e taxa de fallback",
+    "accuracyRate": "Taxa de Precisão",
+    "feedbackCoverageRate": "Taxa de Cobertura de Feedback",
+    "avgConfidenceScore": "Score Médio de Confiança",
+    "lowConfidencePredictionRate": "Taxa de Predições de Baixa Confiança",
+    "inferenceLatencyP50Ms": "Latência de Inferência P50 (ms)",
+    "inferenceLatencyP95Ms": "Latência de Inferência P95 (ms)",
+    "fallbackRate": "Taxa de Fallback",
+    "qualityAnomalies": "Anomalias de Qualidade",
+    "modelsWithFeedback": "Modelos com Feedback",
+    "tenantAiQualityScore": "Score de Qualidade de IA do Tenant",
+    "lowConfidenceModelCount": "Modelos com Baixa Confiança",
+    "minSamplesForQuality": "Amostras Mínimas para Qualidade",
+    "lowConfidenceThreshold": "Limiar de Baixa Confiança",
+    "latencyBudgetMs": "Budget de Latência (ms)",
+    "tier": {
+      "excellent": "Excelente",
+      "good": "Bom",
+      "degraded": "Degradado",
+      "poor": "Fraco"
+    },
+    "trend": {
+      "improving": "A Melhorar",
+      "stable": "Estável",
+      "degrading": "A Degradar"
+    }
+  },
+  "aiGovernanceCompliance": {
+    "title": "Relatório de Conformidade de Governança de IA",
+    "description": "Conformidade de modelos de IA activos com requisitos de governança: aprovação, audit trail, budget e política",
+    "hasFormalApproval": "Tem Aprovação Formal",
+    "hasAuditTrail": "Tem Audit Trail",
+    "budgetComplianceRate": "Taxa de Conformidade de Budget",
+    "policyAdherence": "Adesão à Política",
+    "lastReviewDate": "Data da Última Revisão",
+    "reviewOverdue": "Revisão em Atraso",
+    "budgetOverrunPeriods": "Períodos com Excesso de Budget",
+    "tenantAiGovernanceScore": "Score de Governança de IA do Tenant",
+    "aiGovernanceComplianceIndex": "Índice de Conformidade de Governança de IA",
+    "modelsWithoutApproval": "Modelos sem Aprovação",
+    "modelsWithoutAuditTrail": "Modelos sem Audit Trail",
+    "budgetOverrunModels": "Modelos com Excesso de Budget",
+    "policyViolatingCalls": "Chamadas em Violação de Política",
+    "modelReviewDays": "Dias de Revisão de Modelo",
+    "budgetOverrunThreshold": "Limiar de Excesso de Budget",
+    "auditTrailLookbackDays": "Dias de Retrospecção do Audit Trail",
+    "tier": {
+      "compliant": "Conforme",
+      "partial": "Parcial",
+      "nonCompliant": "Não Conforme",
+      "untracked": "Sem Dados"
+    }
   }
 }
