@@ -113,6 +113,23 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 
 ---
 
+## 🔴 Pipeline de Ingestão — pós-v1.0.0
+
+> Gaps identificados por análise comparativa com o Dynatrace OpenPipeline (Abril 2026).
+> ADR de referência: [ADR-010](./adr/010-server-side-ingestion-pipeline.md)
+> Plano de implementação: [INGESTION-PIPELINE-IMPLEMENTATION.md](./INGESTION-PIPELINE-IMPLEMENTATION.md)
+
+| ID | Descrição | Fase | Estado |
+|---|---|---|---|
+| PIP-01 | Dead Letter Queue — `ModuleOutboxProcessorJob` descarta silenciosamente após 5 retries | Fase 1 | 🔴 Aberto |
+| PIP-02 | Ingestion Observability — sem métricas de throughput/latência/falhas por tenant | Fase 1 | 🔴 Aberto |
+| PIP-03 | `TenantPipelineRule` — pipeline configurável por tenant (masking, filtering, enrichment) | Fase 2 | 🔴 Aberto |
+| PIP-04 | `StorageBucket` — routing condicional e retenção configurável por tenant | Fase 3 | 🔴 Aberto |
+| PIP-05 | `CatalogEnrichmentProcessor` — enriquecimento de spans/logs com contexto do Service Catalog | Fase 4 | 🔴 Aberto |
+| PIP-06 | `LogToMetricProcessor` — transformação log → metric server-side | Fase 5 | 🔴 Aberto |
+
+---
+
 ## 🔴 Dívida aberta — backlog priorizado para fechar
 
 > Estes são os itens que, quando fechados, permitem publicar `v1.0.0` com "zero gaps abertos".
