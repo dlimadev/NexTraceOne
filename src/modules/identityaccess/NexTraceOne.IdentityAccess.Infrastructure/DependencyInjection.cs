@@ -117,6 +117,9 @@ public static class DependencyInjection
         // Contrato público do módulo para consumo por outros módulos
         services.AddScoped<IIdentityModule, IdentityModuleService>();
 
+        // Leitura de padrões de acesso para detecção de anomalias (Wave AD.3)
+        services.AddScoped<IAccessPatternReader, AccessPatternReader>();
+
         // Fase 2 — Contexto operacional e resolução de ambiente
         services.AddScoped<EnvironmentContextAccessor>();
         services.AddScoped<IEnvironmentContextAccessor>(sp => sp.GetRequiredService<EnvironmentContextAccessor>());

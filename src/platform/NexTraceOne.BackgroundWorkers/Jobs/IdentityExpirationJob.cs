@@ -1,7 +1,6 @@
 using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
-using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 
 namespace NexTraceOne.BackgroundWorkers.Jobs;
 
@@ -30,7 +29,7 @@ public sealed class IdentityExpirationJob(
     WorkerJobHealthRegistry jobHealthRegistry,
     ILogger<IdentityExpirationJob> logger) : BackgroundService
 {
-    private const int BatchSize = 100;
+    private const int _batchSize = 100;
     internal const string HealthCheckName = "identity-expiration";
 
     /// <inheritdoc />
@@ -69,7 +68,7 @@ public sealed class IdentityExpirationJob(
         {
             try
             {
-                var count = await handler.HandleAsync(dbContext, now, BatchSize, cancellationToken);
+                var count = await handler.HandleAsync(dbContext, now, _batchSize, cancellationToken);
 
                 if (count > 0)
                 {

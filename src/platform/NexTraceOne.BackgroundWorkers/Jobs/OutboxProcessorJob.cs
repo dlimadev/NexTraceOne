@@ -4,8 +4,6 @@ using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using System.Text.Json;
 
-using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
-
 namespace NexTraceOne.BackgroundWorkers.Jobs;
 
 /// <summary>
@@ -22,8 +20,8 @@ public sealed class OutboxProcessorJob(
     WorkerJobHealthRegistry jobHealthRegistry,
     ILogger<OutboxProcessorJob> logger) : BackgroundService
 {
-    private const int BatchSize = 50;
-    private const int MaxRetryCount = 5;
+    private const int _batchSize = 50;
+    private const int _maxRetryCount = 5;
     internal const string HealthCheckName = "outbox-processor";
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -56,9 +54,9 @@ public sealed class OutboxProcessorJob(
 
         var pendingMessages = await dbContext
             .Set<OutboxMessage>()
-            .Where(message => message.ProcessedAt == null && message.RetryCount < MaxRetryCount)
+            .Where(message => message.ProcessedAt == null && message.RetryCount < _maxRetryCount)
             .OrderBy(message => message.CreatedAt)
-            .Take(BatchSize)
+            .Take(_batchSize)
             .ToListAsync(cancellationToken);
 
         if (pendingMessages.Count == 0)
@@ -114,7 +112,7 @@ public sealed class OutboxProcessorJob(
             }
         }
 
-        var exhaustedMessages = pendingMessages.Where(message => message.ProcessedAt == null && message.RetryCount >= MaxRetryCount).ToArray();
+        var exhaustedMessages = pendingMessages.Where(message => message.ProcessedAt == null && message.RetryCount >= _maxRetryCount).ToArray();
         foreach (var exhaustedMessage in exhaustedMessages)
         {
             logger.LogError(

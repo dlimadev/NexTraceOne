@@ -9,7 +9,7 @@ namespace NexTraceOne.CLI.Services;
 /// </summary>
 public sealed partial class ContractValidator
 {
-    private static readonly HashSet<string> ValidTypes = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly HashSet<string> _validTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "rest-api",
         "soap",
@@ -17,7 +17,7 @@ public sealed partial class ContractValidator
         "background-service"
     };
 
-    private static readonly string[] ValidHttpMethods =
+    private static readonly string[] _validHttpMethods =
     [
         "GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "TRACE"
     ];
@@ -66,9 +66,9 @@ public sealed partial class ContractValidator
         if (string.IsNullOrWhiteSpace(manifest.Type))
             return;
 
-        if (!ValidTypes.Contains(manifest.Type))
+        if (!_validTypes.Contains(manifest.Type))
         {
-            var allowed = string.Join(", ", ValidTypes.Order());
+            var allowed = string.Join(", ", _validTypes.Order());
             issues.Add(CreateIssue(
                 "CLI004", "invalid-type", ValidationSeverity.Error,
                 $"Field 'type' has invalid value '{manifest.Type}'. Allowed: {allowed}.",
@@ -117,13 +117,13 @@ public sealed partial class ContractValidator
                     $"Endpoint at index {i} is missing required field 'method'.",
                     $"{basePath}.method"));
             }
-            else if (!ValidHttpMethods.Contains(endpoint.Method, StringComparer.OrdinalIgnoreCase))
+            else if (!_validHttpMethods.Contains(endpoint.Method, StringComparer.OrdinalIgnoreCase))
             {
                 issues.Add(CreateIssue(
                     "CLI008", "endpoint-invalid-method", ValidationSeverity.Warning,
                     $"Endpoint at index {i} has non-standard HTTP method '{endpoint.Method}'.",
                     $"{basePath}.method",
-                    suggestedFix: $"Use one of: {string.Join(", ", ValidHttpMethods)}"));
+                    suggestedFix: $"Use one of: {string.Join(", ", _validHttpMethods)}"));
             }
         }
     }

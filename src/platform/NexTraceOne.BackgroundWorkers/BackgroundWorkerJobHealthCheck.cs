@@ -20,22 +20,22 @@ internal sealed class BackgroundWorkerJobHealthCheck(
         }
 
         var now = DateTimeOffset.UtcNow;
-        var data = new Dictionary<string, object?>
+        var data = new Dictionary<string, object>
         {
             ["jobName"] = snapshot.JobName,
             ["isRunning"] = snapshot.IsRunning,
-            ["lastStartedAtUtc"] = snapshot.LastStartedAt,
-            ["lastSuccessAtUtc"] = snapshot.LastSuccessAt,
-            ["lastErrorAtUtc"] = snapshot.LastErrorAt,
-            ["lastError"] = snapshot.LastError
+            ["lastStartedAtUtc"] = (object?)snapshot.LastStartedAt ?? new object(),
+            ["lastSuccessAtUtc"] = (object?)snapshot.LastSuccessAt ?? new object(),
+            ["lastErrorAtUtc"] = (object?)snapshot.LastErrorAt ?? new object(),
+            ["lastError"] = snapshot.LastError ?? string.Empty
         };
 
         if (snapshot.LastSuccessAt is null)
         {
             var hasRecentStart = snapshot.LastStartedAt is not null && now - snapshot.LastStartedAt <= maxSuccessAge;
             return Task.FromResult(hasRecentStart
-                ? HealthCheckResult.Healthy($"Background job '{jobName}' started and is awaiting its first successful cycle.", data)
-                : new HealthCheckResult(context.Registration.FailureStatus, $"Background job '{jobName}' has not completed a successful cycle yet.", data: data));
+                ? HealthCheckResult.Healthy($"Background job '{jobName}' started and is awaiting its first successful cycle.", (IReadOnlyDictionary<string, object>)data)
+                : new HealthCheckResult(context.Registration.FailureStatus, $"Background job '{jobName}' has not completed a successful cycle yet.", data: (IReadOnlyDictionary<string, object>)data));
         }
 
         var successAge = now - snapshot.LastSuccessAt.Value;
@@ -45,11 +45,11 @@ internal sealed class BackgroundWorkerJobHealthCheck(
         {
             return Task.FromResult(HealthCheckResult.Degraded(
                 $"Background job '{jobName}' is overdue for a successful cycle.",
-                data: data));
+                data: (IReadOnlyDictionary<string, object>)data));
         }
 
         return Task.FromResult(HealthCheckResult.Healthy(
             $"Background job '{jobName}' is operating within the expected interval.",
-            data));
+            (IReadOnlyDictionary<string, object>)data));
     }
 }
