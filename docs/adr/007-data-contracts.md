@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed
+Partially Implemented — Wave AQ.1 (Abril 2026)
+
+> **Nota de revisão (Abril 2026):** `DataContractRecord` (entidade), `RegisterDataContract` (Command), `GetDataContractComplianceReport` (Query), `IDataContractRepository` e métricas `DataContractTier`/`FieldDefinitionCompleteness`/`TeamDataGovernanceScore` foram implementados na Wave AQ.1. A extensão para streams analíticos, pipelines BI e modelos ML mencionada neste ADR permanece como evolução futura.
 
 ## Data
 

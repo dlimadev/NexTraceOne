@@ -1,6 +1,6 @@
 # Índice de Documentação — NexTraceOne
 
-> **Última actualização:** 2026-04-19
+> **Última actualização:** 2026-04-23
 
 Este índice serve como ponto de entrada único para navegar toda a documentação do repositório.
 
@@ -45,7 +45,11 @@ Este índice serve como ponto de entrada único para navegar toda a documentaç�
 | [`adr/003-elasticsearch-observability.md`](adr/003-elasticsearch-observability.md) | Elasticsearch para observabilidade |
 | [`adr/004-local-ai-first.md`](adr/004-local-ai-first.md) | Local AI first |
 | [`adr/005-react-frontend-stack.md`](adr/005-react-frontend-stack.md) | React frontend stack |
-| [`adr/006-graphql-protobuf-roadmap.md`](adr/006-graphql-protobuf-roadmap.md) | GraphQL/Protobuf roadmap |
+| [`adr/006-graphql-protobuf-roadmap.md`](adr/006-graphql-protobuf-roadmap.md) | GraphQL/Protobuf — implementados em Wave G.3 e H.1 (Superseded) |
+| [`adr/007-data-contracts.md`](adr/007-data-contracts.md) | Data Contracts como cidadão de primeira classe (Partially Implemented — Wave AQ.1) |
+| [`adr/008-change-confidence-score-v2.md`](adr/008-change-confidence-score-v2.md) | Change Confidence Score 2.0 decomponível com sub-scores explicáveis (Proposed) |
+| [`adr/009-ai-evaluation-harness.md`](adr/009-ai-evaluation-harness.md) | AI Evaluation Harness interno para benchmarking de modelos (Proposed) |
+| [`adr/010-server-side-ingestion-pipeline.md`](adr/010-server-side-ingestion-pipeline.md) | Ingestion Pipeline configurável por tenant — DLQ, observabilidade, regras (Proposed) |
 
 ---
 

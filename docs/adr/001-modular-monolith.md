@@ -27,9 +27,9 @@ Key constraints:
 
 We chose a **modular monolith** architecture with the following characteristics:
 
-- **27 DbContexts** across 12 modules, all sharing a single PostgreSQL database with table-prefix isolation per module.
-- **20 cross-module contract interfaces** defining explicit boundaries between modules.
-- **19 outbox processors** for reliable asynchronous cross-module communication.
+- **28 DbContexts** across 12 modules, all sharing a single PostgreSQL database with table-prefix isolation per module (27 at time of initial decision; grew to 28 as product evolved — run `./tools/count-dbcontexts.sh --count` for authoritative current count).
+- **20+ cross-module contract interfaces** defining explicit boundaries between modules.
+- **19+ outbox processors** for reliable asynchronous cross-module communication.
 - **Clean Architecture** within each module: Domain → Application → Infrastructure → API.
 - **CQRS with MediatR** for command/query separation.
 - **Row-Level Security (RLS)** in PostgreSQL for tenant isolation as defence-in-depth.

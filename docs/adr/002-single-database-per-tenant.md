@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-With 12 bounded context modules and 27 DbContexts, we needed a data isolation strategy that balances:
+With 12 bounded context modules and 28 DbContexts (27 at time of initial decision; grew as product evolved), we needed a data isolation strategy that balances:
 
 - **Tenant isolation** for multi-tenant SaaS and self-hosted deployments.
 - **Module isolation** to prevent one module from accessing another's data directly.

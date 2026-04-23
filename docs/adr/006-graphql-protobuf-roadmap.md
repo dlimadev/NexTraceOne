@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted
+Superseded — por Wave G.3 e Wave H.1 (Abril 2026)
+
+> **Nota de revisão (Abril 2026):** Esta decisão foi superada pela evolução do produto. Tanto GraphQL (Wave G.3) como Protobuf/gRPC (Wave H.1) foram implementados antes do v1.0.0. O ADR permanece como registo histórico da avaliação inicial e das razões que motivaram o adiamento. Ver `FUTURE-ROADMAP.md §1.1` e `§1.2` para o estado actual.
 
 ## Data
 
@@ -75,4 +77,4 @@ O modelo de domínio já contempla os valores `GraphQl` e `Protobuf` no enum `Co
 - [ADR-001: Modular Monolith](./001-modular-monolith.md)
 - [Contract Studio Vision](../CONTRACT-STUDIO-VISION.md)
 - [Service Contract Governance](../SERVICE-CONTRACT-GOVERNANCE.md)
-- [Roadmap](../ROADMAP.md)
+- [Roadmap](../FUTURE-ROADMAP.md)
