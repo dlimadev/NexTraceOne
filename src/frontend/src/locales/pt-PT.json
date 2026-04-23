@@ -15902,5 +15902,68 @@
       "medium": "Médio",
       "high": "Alto"
     }
+  },
+  "contractDeprecationPipeline": {
+    "title": "Relatório de Pipeline de Deprecação de Contratos",
+    "description": "Visão end-to-end dos pipelines de deprecação activos: progresso de migração, gaps de notificação e consumidores bloqueadores",
+    "maxDays": "Dias Máximos em Estado Deprecated",
+    "sunsetWarningDays": "Dias de Aviso de Sunset",
+    "minNotificationPct": "Percentagem Mínima de Notificação",
+    "migrationProgress": "Progresso de Migração",
+    "notificationGaps": "Gaps de Notificação",
+    "blockingConsumers": "Consumidores Bloqueadores",
+    "tenantDeprecationHealthScore": "Pontuação de Saúde de Deprecação",
+    "approachingSunset": "A Aproximar Sunset",
+    "overdueSunsets": "Sunsets em Atraso",
+    "totalBlockingConsumers": "Total de Consumidores Bloqueadores",
+    "fastestMigrations": "Migrações Mais Rápidas",
+    "slowestMigrations": "Migrações Mais Lentas",
+    "tier": {
+      "onTrack": "No Prazo",
+      "atRisk": "Em Risco",
+      "overdue": "Em Atraso",
+      "blocked": "Bloqueado"
+    }
+  },
+  "apiVersionStrategy": {
+    "title": "Relatório de Estratégia de Versionamento de APIs",
+    "description": "Análise da estratégia de versionamento: adopção semver, versões paralelas, tendência de breaking changes e riscos de proliferação",
+    "breakingChangeWarningThreshold": "Limiar de Aviso de Breaking Changes",
+    "proliferationThreshold": "Limiar de Proliferação",
+    "semverAdoptionRate": "Taxa de Adopção Semver",
+    "avgParallelVersionsPerService": "Média de Versões Paralelas por Serviço",
+    "highBreakingChangeServices": "Serviços com Breaking Changes Elevados",
+    "versionProliferationRisk": "Risco de Proliferação de Versões",
+    "breakingChangeTrend": "Tendência de Breaking Changes",
+    "versioningGapsByTeam": "Gaps de Versionamento por Equipa",
+    "bestPracticedServices": "Serviços com Melhores Práticas",
+    "pattern": {
+      "linear": "Linear",
+      "parallel": "Paralelo",
+      "fragmented": "Fragmentado"
+    },
+    "tier": {
+      "mature": "Maduro",
+      "developing": "Em Desenvolvimento",
+      "inconsistent": "Inconsistente",
+      "chaotic": "Caótico"
+    }
+  },
+  "contractDeprecationForecast": {
+    "title": "Previsão de Deprecação de Contratos",
+    "description": "Análise preditiva de contratos prováveis de ser deprecados nos próximos 30/60/90 dias e calendário de deprecações planeadas",
+    "maxAgeDays": "Idade Máxima de Contrato (Dias)",
+    "consumerDeclinePct": "Limiar de Declínio de Consumidores (%)",
+    "scheduleEndpointEnabled": "Endpoint de Agendamento Activo",
+    "forecastedCandidates": "Candidatos Previstos para Deprecação",
+    "deprecationProbabilityScore": "Pontuação de Probabilidade de Deprecação",
+    "plannedDeprecationCalendar": "Calendário de Deprecações Planeadas",
+    "ageRiskScore": "Pontuação de Risco de Idade",
+    "successorScore": "Pontuação de Sucessor Disponível",
+    "consumerDeclineScore": "Pontuação de Declínio de Consumidores",
+    "ownerSignalScore": "Pontuação de Sinal do Owner",
+    "estimatedIn30Days": "Deprecações Estimadas em 30 Dias",
+    "estimatedIn60Days": "Deprecações Estimadas em 60 Dias",
+    "estimatedIn90Days": "Deprecações Estimadas em 90 Dias"
   }
 }

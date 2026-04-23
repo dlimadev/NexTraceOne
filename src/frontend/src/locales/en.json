@@ -14670,5 +14670,68 @@
       "medium": "Medium",
       "high": "High"
     }
+  },
+  "contractDeprecationPipeline": {
+    "title": "Contract Deprecation Pipeline Report",
+    "description": "End-to-end view of active contract deprecation pipelines: migration progress, notification gaps and blocking consumers",
+    "maxDays": "Max Days in Deprecated State",
+    "sunsetWarningDays": "Sunset Warning Days",
+    "minNotificationPct": "Min Notification Percentage",
+    "migrationProgress": "Migration Progress",
+    "notificationGaps": "Notification Gaps",
+    "blockingConsumers": "Blocking Consumers",
+    "tenantDeprecationHealthScore": "Tenant Deprecation Health Score",
+    "approachingSunset": "Approaching Sunset",
+    "overdueSunsets": "Overdue Sunsets",
+    "totalBlockingConsumers": "Total Blocking Consumers",
+    "fastestMigrations": "Fastest Migrations",
+    "slowestMigrations": "Slowest Migrations",
+    "tier": {
+      "onTrack": "On Track",
+      "atRisk": "At Risk",
+      "overdue": "Overdue",
+      "blocked": "Blocked"
+    }
+  },
+  "apiVersionStrategy": {
+    "title": "API Version Strategy Report",
+    "description": "Analysis of API versioning strategy: semver adoption, parallel versions, breaking change trends and proliferation risks",
+    "breakingChangeWarningThreshold": "Breaking Change Warning Threshold",
+    "proliferationThreshold": "Proliferation Threshold",
+    "semverAdoptionRate": "Semver Adoption Rate",
+    "avgParallelVersionsPerService": "Avg Parallel Versions Per Service",
+    "highBreakingChangeServices": "High Breaking Change Services",
+    "versionProliferationRisk": "Version Proliferation Risk",
+    "breakingChangeTrend": "Breaking Change Trend",
+    "versioningGapsByTeam": "Versioning Gaps by Team",
+    "bestPracticedServices": "Best Practiced Services",
+    "pattern": {
+      "linear": "Linear",
+      "parallel": "Parallel",
+      "fragmented": "Fragmented"
+    },
+    "tier": {
+      "mature": "Mature",
+      "developing": "Developing",
+      "inconsistent": "Inconsistent",
+      "chaotic": "Chaotic"
+    }
+  },
+  "contractDeprecationForecast": {
+    "title": "Contract Deprecation Forecast",
+    "description": "Predictive analysis of contracts likely to be deprecated in the next 30/60/90 days and planned deprecation calendar",
+    "maxAgeDays": "Max Contract Age Days",
+    "consumerDeclinePct": "Consumer Decline Percentage Threshold",
+    "scheduleEndpointEnabled": "Schedule Endpoint Enabled",
+    "forecastedCandidates": "Forecasted Deprecation Candidates",
+    "deprecationProbabilityScore": "Deprecation Probability Score",
+    "plannedDeprecationCalendar": "Planned Deprecation Calendar",
+    "ageRiskScore": "Age Risk Score",
+    "successorScore": "Successor Available Score",
+    "consumerDeclineScore": "Consumer Decline Score",
+    "ownerSignalScore": "Owner Signal Score",
+    "estimatedIn30Days": "Estimated Deprecations in 30 Days",
+    "estimatedIn60Days": "Estimated Deprecations in 60 Days",
+    "estimatedIn90Days": "Estimated Deprecations in 90 Days"
   }
 }

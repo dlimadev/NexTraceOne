@@ -61,4 +61,13 @@ export const featureConfig: FeatureConfigEntry[] = [
   { sort: 13330, key: "platform.recommendations.top_n", label: "adaptiveRecommendations.topN", defaultValue: 10 },
   { sort: 13340, key: "platform.recommendations.refresh_cron", label: "adaptiveRecommendations.refreshCron", defaultValue: "0 6 * * *" },
   { sort: 13350, key: "platform.recommendations.low_effort_sprints", label: "adaptiveRecommendations.lowEffortSprints", defaultValue: 1 },
+  // ── Wave AV — Contract Lifecycle Automation & Deprecation Intelligence ─
+  { sort: 13360, key: "contract.deprecation.max_days", label: "contractDeprecationPipeline.maxDays", defaultValue: 180 },
+  { sort: 13370, key: "contract.deprecation.sunset_warning_days", label: "contractDeprecationPipeline.sunsetWarningDays", defaultValue: 30 },
+  { sort: 13380, key: "contract.deprecation.min_notification_pct", label: "contractDeprecationPipeline.minNotificationPct", defaultValue: 80 },
+  { sort: 13390, key: "contract.versioning.breaking_change_warning_threshold", label: "apiVersionStrategy.breakingChangeWarningThreshold", defaultValue: 3 },
+  { sort: 13400, key: "contract.versioning.proliferation_threshold", label: "apiVersionStrategy.proliferationThreshold", defaultValue: 3 },
+  { sort: 13410, key: "contract.deprecation_forecast.max_age_days", label: "contractDeprecationForecast.maxAgeDays", defaultValue: 365 },
+  { sort: 13420, key: "contract.deprecation_forecast.consumer_decline_pct", label: "contractDeprecationForecast.consumerDeclinePct", defaultValue: 20 },
+  { sort: 13430, key: "contract.deprecation.schedule_endpoint_enabled", label: "contractDeprecationForecast.scheduleEndpointEnabled", defaultValue: true },
 ];

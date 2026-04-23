@@ -118,6 +118,16 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyVersionAlignmentReader,
             NexTraceOne.Catalog.Application.Contracts.NullDependencyVersionAlignmentReader>();
 
+        // ── Wave AV — Contract Lifecycle Automation null readers ─────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDeprecationPipelineReader,
+            NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationPipelineReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IApiVersionStrategyReader,
+            NexTraceOne.Catalog.Application.Contracts.NullApiVersionStrategyReader>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDeprecationScheduleRepository,
+            NexTraceOne.Catalog.Application.Contracts.NullDeprecationScheduleRepository>();
+        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDeprecationForecastReader,
+            NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationForecastReader>();
+
         return services;
     }
 }
