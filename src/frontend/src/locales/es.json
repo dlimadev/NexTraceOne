@@ -15968,5 +15968,145 @@
     "estimatedIn30Days": "Deprecaciones Estimadas en 30 Días",
     "estimatedIn60Days": "Deprecaciones Estimadas en 60 Días",
     "estimatedIn90Days": "Deprecaciones Estimadas en 90 Días"
+  },
+  "releasePatternAnalysis": {
+    "title": "Análisis de Patrones de Release",
+    "batchSizeAnalysis": "Análisis de Tamaño de Lote",
+    "avgServiceChangesPerRelease": "Promedio de Cambios por Release",
+    "largeReleaseCount": "Cantidad de Releases Grandes",
+    "batchSizeVsFailureCorrelation": "Correlación Tamaño de Lote vs Fallo",
+    "batchSizeTrend": "Tendencia de Tamaño de Lote",
+    "temporalPatterns": "Patrones Temporales",
+    "highRiskDayConcentration": "Concentración en Días de Alto Riesgo",
+    "endOfSprintCluster": "Clúster de Fin de Sprint",
+    "clusteringRisk": "Riesgo de Agrupamiento",
+    "multiServiceSameDayReleases": "Releases Multi-Servicio el Mismo Día",
+    "incidentInHour1Rate": "Tasa de Incidente en la 1.ª Hora",
+    "incidentInDay1Rate": "Tasa de Incidente en el 1.er Día",
+    "repeatFailureServices": "Servicios con Fallos Repetidos",
+    "tenantReleasePatternScore": "Puntuación de Patrón de Release del Tenant",
+    "tiers": {
+      "safe": "Seguro",
+      "warning": "Advertencia",
+      "risky": "Arriesgado",
+      "critical": "Crítico"
+    },
+    "largeReleaseThreshold": "Umbral de Release Grande",
+    "repeatFailureThreshold": "Umbral de Fallo Repetido",
+    "clusterWarningPerWeek": "Advertencia de Agrupamiento por Semana",
+    "endOfSprintDays": "Días de Fin de Sprint"
+  },
+  "changeLeadTime": {
+    "title": "Lead Time de Cambio",
+    "stageBreakdown": "Desglose por Etapa",
+    "createdToApprovalRequested": "Creación hasta Solicitud de Aprobación",
+    "approvalRequestedToApproved": "Solicitud hasta Aprobación",
+    "approvedToPreProdDeploy": "Aprobación hasta Despliegue en Pre-Prod",
+    "preProdToProductionDeploy": "Pre-Prod hasta Despliegue en Producción",
+    "productionDeployToVerification": "Despliegue en Producción hasta Verificación",
+    "totalLeadTime": "Lead Time Total",
+    "bottleneckStage": "Etapa Cuello de Botella",
+    "medianLeadTime": "Lead Time Mediano",
+    "p95LeadTime": "Lead Time P95",
+    "tiers": {
+      "elite": "Elite",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "slowestApprovalGroups": "Grupos con Aprobación más Lenta",
+    "slowestPromotionServices": "Servicios con Promoción más Lenta",
+    "leadTimeTrend": "Tendencia de Lead Time",
+    "approvalBottleneckIndex": "Índice de Cuello de Botella de Aprobación",
+    "approvalSlaHours": "SLA de Aprobación en Horas",
+    "bottleneckApprovalPct": "Porcentaje de Cuello de Botella de Aprobación"
+  },
+  "deployFrequencyHealth": {
+    "title": "Salud de la Frecuencia de Despliegues",
+    "deployFrequencyPerMonth": "Frecuencia de Despliegue por Mes",
+    "lastDeployAge": "Antigüedad del Último Despliegue (días)",
+    "deployGap": "Intervalo entre Despliegues (días)",
+    "tiers": {
+      "optimal": "Óptimo",
+      "underdeploying": "Despliegue Insuficiente",
+      "overdeploying": "Despliegue Excesivo",
+      "stale": "Desactualizado"
+    },
+    "staleServices": "Servicios Desactualizados",
+    "overdeployingServices": "Servicios con Despliegue Excesivo",
+    "tenantDeployFrequencyHealthScore": "Puntuación de Salud de Frecuencia de Despliegue del Tenant",
+    "teamDeployFrequencyComparison": "Comparación de Frecuencia de Despliegue por Equipo",
+    "deployFrequencyVsIncidentRate": "Frecuencia de Despliegue vs Tasa de Incidentes",
+    "staleDeployDays": "Días para Despliegue Desactualizado",
+    "highVariabilityThreshold": "Umbral de Alta Variabilidad"
+  },
+  "vulnerabilityExposure": {
+    "title": "Exposición a Vulnerabilidades",
+    "exposureScore": "Puntuación de Exposición",
+    "criticalCveCount": "Recuento de CVEs Críticos",
+    "highCveCount": "Recuento de CVEs Altos",
+    "mediumCveCount": "Recuento de CVEs Medios",
+    "lowCveCount": "Recuento de CVEs Bajos",
+    "totalVulnerableComponents": "Total de Componentes Vulnerables",
+    "unpatchedCriticalCveCount": "Recuento de CVEs Críticos Sin Parche",
+    "avgCveAgeDays": "Edad Media de CVEs (días)",
+    "topExposedServices": "Servicios Más Expuestos",
+    "tenantExposureScore": "Puntuación de Exposición del Tenant",
+    "unpatchedCriticalCveAge": "Edad de CVEs Críticos Sin Parche",
+    "servicesWithCriticalCves": "Servicios con CVEs Críticos",
+    "tiers": {
+      "minimal": "Mínimo",
+      "moderate": "Moderado",
+      "elevated": "Elevado",
+      "critical": "Crítico"
+    },
+    "trends": {
+      "improving": "Mejorando",
+      "stable": "Estable",
+      "worsening": "Empeorando"
+    },
+    "criticalCveThreshold": "Umbral de CVE Crítico"
+  },
+  "securityPatchCompliance": {
+    "title": "Conformidad de Parcheo de Seguridad",
+    "daysToRemediate": "Días para Remediar",
+    "withinSla": "Dentro del SLA",
+    "overallPatchComplianceRate": "Tasa General de Conformidad de Parche",
+    "criticalPatchBacklog": "Backlog de Parche Crítico",
+    "tenantPatchComplianceScore": "Puntuación de Conformidad de Parche del Tenant",
+    "slaBreaches": "Incumplimientos de SLA",
+    "slowPatchingTeams": "Equipos con Parcheo Lento",
+    "patchComplianceTrend": "Tendencia de Conformidad de Parche",
+    "tiers": {
+      "compliant": "Conforme",
+      "partial": "Parcial",
+      "nonCompliant": "No Conforme",
+      "atRisk": "En Riesgo"
+    },
+    "patchSlaCriticalDays": "SLA de Parche Crítico (días)",
+    "patchSlaHighDays": "SLA de Parche Alto (días)",
+    "patchSlaMediumDays": "SLA de Parche Medio (días)",
+    "patchSlaLowDays": "SLA de Parche Bajo (días)",
+    "compliantCriticalRate": "Tasa de Conformidad Crítica (%)"
+  },
+  "securityIncidentCorrelation": {
+    "title": "Correlación de Incidentes de Seguridad",
+    "correlationSignals": "Señales de Correlación",
+    "correlationRisk": "Riesgo de Correlación",
+    "securityIncidentCount": "Recuento de Incidentes de Seguridad",
+    "withActiveUnpatchedCve": "Con CVE Crítico Activo Sin Parche",
+    "strongCorrelationIncidents": "Incidentes con Correlación Fuerte",
+    "tenantCveIncidentCorrelationRate": "Tasa de Correlación CVE-Incidente del Tenant",
+    "cvesWithIncidentCorrelation": "CVEs con Correlación de Incidente",
+    "componentsIntroducedBeforeIncident": "Componentes Introducidos Antes del Incidente",
+    "riskReductionOpportunity": "Oportunidad de Reducción de Riesgo",
+    "tiers": {
+      "none": "Ninguno",
+      "possible": "Posible",
+      "likely": "Probable",
+      "strong": "Fuerte"
+    },
+    "correlationWindowHours": "Ventana de Correlación (horas)",
+    "sbomSnapshotFrequencyDays": "Frecuencia de Snapshot SBOM (días)"
   }
 }

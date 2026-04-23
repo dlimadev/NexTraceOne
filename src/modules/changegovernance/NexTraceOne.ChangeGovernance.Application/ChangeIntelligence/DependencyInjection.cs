@@ -47,6 +47,12 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Services;
 using NexTraceOne.ChangeGovernance.Application.Platform.Features.GetConfigurationDriftReport;
 using NexTraceOne.ChangeGovernance.Application.Platform.Features.GetPlatformHealthIndexReport;
 using NexTraceOne.ChangeGovernance.Application.Platform.Features.GetAdaptiveRecommendationReport;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetReleasePatternAnalysisReport;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeLeadTimeReport;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDeploymentFrequencyHealthReport;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.Compliance;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Features.GetSecurityIncidentCorrelationReport;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence;
 
@@ -123,6 +129,18 @@ public static class DependencyInjection
         services.AddTransient<IValidator<GetConfigurationDriftReport.Query>, GetConfigurationDriftReport.Validator>();
         services.AddTransient<IValidator<GetPlatformHealthIndexReport.Query>, GetPlatformHealthIndexReport.Validator>();
         services.AddTransient<IValidator<GetAdaptiveRecommendationReport.Query>, GetAdaptiveRecommendationReport.Validator>();
+
+        // Wave AW — Release Intelligence & Deployment Analytics
+        services.AddTransient<IValidator<GetReleasePatternAnalysisReport.Query>, GetReleasePatternAnalysisReport.Validator>();
+        services.AddTransient<IValidator<GetChangeLeadTimeReport.Query>, GetChangeLeadTimeReport.Validator>();
+        services.AddTransient<IValidator<GetDeploymentFrequencyHealthReport.Query>, GetDeploymentFrequencyHealthReport.Validator>();
+        services.AddSingleton<IReleasePatternReader, NullReleasePatternReader>();
+        services.AddSingleton<IChangeLeadTimeReader, NullChangeLeadTimeReader>();
+        services.AddSingleton<IDeploymentFrequencyReader, NullDeploymentFrequencyReader>();
+
+        // ── Wave AX — Security Incident Correlation ───────────────────────────
+        services.AddTransient<IValidator<GetSecurityIncidentCorrelationReport.Query>, GetSecurityIncidentCorrelationReport.Validator>();
+        services.AddSingleton<ISecurityIncidentCorrelationReader, NullSecurityIncidentCorrelationReader>();
 
         return services;
     }
