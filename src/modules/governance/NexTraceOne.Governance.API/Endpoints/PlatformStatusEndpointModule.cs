@@ -18,6 +18,7 @@ using GetTenantSchemasFeature = NexTraceOne.Governance.Application.Features.GetT
 using ProvisionTenantSchemaFeature = NexTraceOne.Governance.Application.Features.GetTenantSchemas.ProvisionTenantSchema;
 using GetCanaryRolloutsFeature = NexTraceOne.Governance.Application.Features.GetCanaryRollouts.GetCanaryRollouts;
 using GetOptionalProvidersFeature = NexTraceOne.Governance.Application.Features.GetOptionalProviders.GetOptionalProviders;
+using GetIngestionObservabilityFeature = NexTraceOne.Governance.Application.Features.GetIngestionObservability.GetIngestionObservability;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -172,6 +173,17 @@ public sealed class PlatformStatusEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetOptionalProvidersFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        // PIP-02 — Ingestion Observability. Returns DLQ stats from bb_dead_letter_messages.
+        platform.MapGet("/ingestion-observability", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetIngestionObservabilityFeature.Query();
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");

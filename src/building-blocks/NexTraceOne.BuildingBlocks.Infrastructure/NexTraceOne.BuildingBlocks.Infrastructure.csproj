@@ -5,6 +5,9 @@
     <AssemblyName>NexTraceOne.BuildingBlocks.Infrastructure</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="NexTraceOne.BuildingBlocks.Infrastructure.Tests" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Application\NexTraceOne.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Core\NexTraceOne.BuildingBlocks.Core.csproj" />
     <ProjectReference Include="..\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />

@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Observability.Analytics.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Analytics.Configuration;
 using NexTraceOne.BuildingBlocks.Observability.Analytics.Writers;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
+using NexTraceOne.BuildingBlocks.Observability.Ingestion;
 using NexTraceOne.BuildingBlocks.Observability.Metrics;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.ClrProfiler;
@@ -117,7 +118,30 @@ public static class DependencyInjection
         // Registrar estratégia de coleta baseada na configuração
         RegisterCollectionModeStrategy(services, configuration);
 
+        services.AddIngestionMetrics(configuration);
+
         services.AddNexTraceHealthChecks();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registra IIngestionMetricsCollector para emissão de métricas do pipeline de ingestão.
+    /// Pode ser chamado independentemente do AddBuildingBlocksObservability (ex: Ingestion.Api, BackgroundWorkers).
+    /// </summary>
+    public static IServiceCollection AddIngestionMetrics(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<IngestionObservabilityOptions>(
+            configuration.GetSection(IngestionObservabilityOptions.SectionName));
+
+        var enabled = configuration.GetValue<bool>($"{IngestionObservabilityOptions.SectionName}:Enabled", defaultValue: true);
+
+        if (enabled)
+            services.AddSingleton<IIngestionMetricsCollector, IngestionMetricsCollector>();
+        else
+            services.AddSingleton<IIngestionMetricsCollector, NullIngestionMetricsCollector>();
 
         return services;
     }

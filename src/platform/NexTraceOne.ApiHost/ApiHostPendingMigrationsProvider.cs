@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
@@ -51,6 +52,7 @@ internal sealed class ApiHostPendingMigrationsProvider(IServiceScopeFactory scop
         await using var scope = scopeFactory.CreateAsyncScope();
         var sp = scope.ServiceProvider;
 
+        await CollectPendingAsync<BuildingBlocksDbContext>(sp, "BuildingBlocks", allPending, cancellationToken);
         await CollectPendingAsync<ConfigurationDbContext>(sp, "Configuration", allPending, cancellationToken);
         await CollectPendingAsync<IdentityDbContext>(sp, "Identity", allPending, cancellationToken);
         await CollectPendingAsync<CatalogGraphDbContext>(sp, "CatalogGraph", allPending, cancellationToken);

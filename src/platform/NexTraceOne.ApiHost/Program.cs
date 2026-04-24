@@ -63,6 +63,7 @@ builder.Host.ConfigureNexTraceSerilog(builder.Configuration);
 
 // [3] Building Blocks transversais
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
+builder.Services.AddBuildingBlocksDbContext(builder.Configuration);
 builder.Services.AddBuildingBlocksObservability(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 builder.Services.AddApiHostOperationalHealthChecks();
