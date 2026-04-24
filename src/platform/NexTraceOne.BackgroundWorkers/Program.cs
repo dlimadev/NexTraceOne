@@ -78,6 +78,7 @@ builder.Services.AddSingleton<ICurrentTenant, WorkerCurrentTenant>();
 builder.Services.AddSingleton<WorkerJobHealthRegistry>();
 
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
+builder.Services.AddBuildingBlocksDbContext(builder.Configuration);
 
 // ── Module infrastructure registration ──
 // Cada módulo registra seu DbContext, repositórios e serviços necessários

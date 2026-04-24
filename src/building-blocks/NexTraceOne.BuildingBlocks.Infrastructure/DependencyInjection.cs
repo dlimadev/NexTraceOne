@@ -1,9 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.InProcess;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
+using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
+using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 
 namespace NexTraceOne.BuildingBlocks.Infrastructure;
 
@@ -29,6 +32,26 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddScoped<IEventBus, InProcessEventBus>();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registra o BuildingBlocksDbContext (tabela bb_dead_letter_messages) e o IDeadLetterRepository.
+    /// Deve ser chamado em ApiHost e BackgroundWorkers.
+    /// </summary>
+    public static IServiceCollection AddBuildingBlocksDbContext(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("BuildingBlocks")
+            ?? configuration.GetConnectionString("Default")
+            ?? string.Empty;
+
+        services.AddDbContext<BuildingBlocksDbContext>(opts =>
+            opts.UseNpgsql(connectionString));
+
+        services.AddScoped<IDeadLetterRepository, DeadLetterRepository>();
 
         return services;
     }

@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NexTraceOne.BackgroundWorkers.Jobs;
 
@@ -17,7 +18,7 @@ namespace NexTraceOne.BackgroundWorkers.Jobs;
 /// Comportamento:
 /// - Processa em ciclos de 5 segundos
 /// - Cada ciclo processa até 50 mensagens pendentes
-/// - Mensagens com mais de 5 falhas são marcadas como exaustas
+/// - Mensagens que esgotam as 5 tentativas são persistidas em bb_dead_letter_messages (DLQ)
 /// - Erros de um módulo não propagam para outros módulos
 /// - Cada mensagem é salva atomicamente após processamento
 /// </summary>
@@ -69,6 +70,9 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+        // IDeadLetterRepository é resolvido de forma lazy — apenas quando uma mensagem
+        // esgota retries — para não quebrar environments sem DLQ configurada (ex: testes).
+        IDeadLetterRepository? dlqRepository = null;
 
         var pendingMessages = await dbContext
             .Set<OutboxMessage>()
@@ -141,6 +145,15 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
                 message.RetryCount++;
                 // Segurança: não armazenar detalhes internos da exceção no banco.
                 message.LastError = $"Processing failed at attempt {message.RetryCount}.";
+
+                if (message.RetryCount >= MaxRetryCount)
+                {
+                    dlqRepository ??= scope.ServiceProvider.GetService<IDeadLetterRepository>();
+                    await PersistToDeadLetterQueueAsync(message, ex, dlqRepository, cancellationToken);
+                    // ProcessedAt não é definido: a mensagem outbox permanece como registo de auditoria.
+                    // Não será re-selecionada pois o query filtra RetryCount < MaxRetryCount.
+                }
+
                 await dbContext.SaveChangesAsync(cancellationToken);
                 failedCount++;
                 logger.LogError(ex,
@@ -155,18 +168,37 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
                 "Outbox cycle completed for {Module}: {Processed} processed, {Failed} failed out of {Total} messages",
                 ModuleName, processedCount, failedCount, pendingMessages.Count);
         }
+    }
 
-        var exhaustedMessages = pendingMessages
-            .Where(message => message.ProcessedAt == null && message.RetryCount >= MaxRetryCount)
-            .ToArray();
-
-        foreach (var exhaustedMessage in exhaustedMessages)
+    private async Task PersistToDeadLetterQueueAsync(
+        OutboxMessage message,
+        Exception exception,
+        IDeadLetterRepository? dlqRepository,
+        CancellationToken cancellationToken)
+    {
+        if (dlqRepository is null)
         {
+            logger.LogCritical(
+                "CRITICAL: IDeadLetterRepository not registered — outbox message {OutboxMessageId} from {Module} exhausted retries and will not be persisted to DLQ.",
+                message.Id, ModuleName);
+            return;
+        }
+
+        try
+        {
+            var dlqMessage = DeadLetterMessage.From(message, exception, dateTimeProvider.UtcNow);
+            await dlqRepository.SaveAsync(dlqMessage, cancellationToken);
+
             logger.LogError(
-                "Outbox message {OutboxMessageId} in {Module} reached max retry count with last error: {LastError}",
-                exhaustedMessage.Id,
-                ModuleName,
-                exhaustedMessage.LastError);
+                "Outbox message {OutboxMessageId} in {Module} exhausted {RetryCount} retries — persisted to DLQ as {DlqId}",
+                message.Id, ModuleName, message.RetryCount, dlqMessage.Id);
+        }
+        catch (Exception dlqEx)
+        {
+            // Falha ao escrever na DLQ não deve interromper o processamento do outbox.
+            logger.LogCritical(dlqEx,
+                "CRITICAL: Failed to persist outbox message {OutboxMessageId} from {Module} to DLQ. Message may be lost.",
+                message.Id, ModuleName);
         }
     }
 }
