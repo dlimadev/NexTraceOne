@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
+using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.Authentication;
@@ -51,6 +52,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler(_ => { });
 builder.Services.AddBuildingBlocksApplication(builder.Configuration);
 builder.Services.AddNexTraceHealthChecks();
+builder.Services.AddIngestionMetrics(builder.Configuration);
 
 // OpenAPI — documentação do serviço de ingestão para consumidores externos
 builder.Services.AddOpenApi("ingestion", options =>

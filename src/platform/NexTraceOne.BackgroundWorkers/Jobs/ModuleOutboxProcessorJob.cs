@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
+using NexTraceOne.BuildingBlocks.Observability.Ingestion;
+using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -70,9 +72,12 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
 
         var dbContext = scope.ServiceProvider.GetRequiredService<TContext>();
         var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-        // IDeadLetterRepository é resolvido de forma lazy — apenas quando uma mensagem
-        // esgota retries — para não quebrar environments sem DLQ configurada (ex: testes).
+        // IDeadLetterRepository e IIngestionMetricsCollector são resolvidos de forma lazy
+        // para não quebrar environments sem DLQ/métricas configurados (ex: testes).
         IDeadLetterRepository? dlqRepository = null;
+        IIngestionMetricsCollector? metricsCollector = null;
+
+        var cycleStopwatch = Stopwatch.StartNew();
 
         var pendingMessages = await dbContext
             .Set<OutboxMessage>()
@@ -134,6 +139,9 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
                 // Atomic per-message save: prevents duplicate delivery on crash.
                 await dbContext.SaveChangesAsync(cancellationToken);
 
+                metricsCollector ??= scope.ServiceProvider.GetService<IIngestionMetricsCollector>();
+                metricsCollector?.RecordEventProcessed(message.TenantId.ToString(), "success");
+
                 processedCount++;
 
                 logger.LogInformation(
@@ -152,6 +160,14 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
                     await PersistToDeadLetterQueueAsync(message, ex, dlqRepository, cancellationToken);
                     // ProcessedAt não é definido: a mensagem outbox permanece como registo de auditoria.
                     // Não será re-selecionada pois o query filtra RetryCount < MaxRetryCount.
+                    metricsCollector ??= scope.ServiceProvider.GetService<IIngestionMetricsCollector>();
+                    metricsCollector?.RecordEventProcessed(message.TenantId.ToString(), "dlq");
+                    metricsCollector?.RecordDlqEntry(message.TenantId.ToString());
+                }
+                else
+                {
+                    metricsCollector ??= scope.ServiceProvider.GetService<IIngestionMetricsCollector>();
+                    metricsCollector?.RecordEventProcessed(message.TenantId.ToString(), "failure");
                 }
 
                 await dbContext.SaveChangesAsync(cancellationToken);
@@ -161,6 +177,10 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
                     message.Id, ModuleName);
             }
         }
+
+        cycleStopwatch.Stop();
+        metricsCollector ??= scope.ServiceProvider.GetService<IIngestionMetricsCollector>();
+        metricsCollector?.RecordProcessingDuration("system", "outbox-cycle", cycleStopwatch.Elapsed.TotalMilliseconds);
 
         if (processedCount > 0 || failedCount > 0)
         {

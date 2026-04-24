@@ -112,6 +112,9 @@ public static class DependencyInjection
         // HTTP Audit Reader — consulta IObservabilityProvider para auditoria de chamadas HTTP externas
         services.AddScoped<IHttpAuditReader, ObservabilityHttpAuditReader>();
 
+        // Ingestion Observability — DLQ stats da bb_dead_letter_messages para dashboard de ingestão
+        services.AddScoped<IIngestionObservabilityProvider, IngestionObservabilityProvider>();
+
         return services;
     }
 }

@@ -1,5 +1,6 @@
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Observability.Ingestion;
 using NexTraceOne.Ingestion.Api.Models;
 using NexTraceOne.Ingestion.Api.Security;
 using NexTraceOne.Integrations.Application.Abstractions;
@@ -34,6 +35,11 @@ internal static class DeploymentEventEndpoints
             CancellationToken ct) =>
         {
             var logger = loggerFactory.CreateLogger(nameof(DeploymentEventEndpoints));
+
+            // Record ingestion event received — lazily resolved so the endpoint works
+            // without IIngestionMetricsCollector registered (backward-compat).
+            var metrics = httpContext.RequestServices.GetService<IIngestionMetricsCollector>();
+            metrics?.RecordEventReceived("system", request.Provider);
             var correlationId = IngestionCorrelationHelper.ResolveCorrelationId(httpContext, request.CorrelationId);
 
             // Find or create connector
