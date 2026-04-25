@@ -131,5 +131,37 @@ public static class DefaultSkillCatalog
             requiredTools: ["list_services", "get_contract_details", "search_incidents"],
             preferredModels: [],
             isComposable: false),
+
+        // ── AI-1.2 — 3 additional built-in skills ────────────────────────────
+
+        AiSkill.CreateSystem(
+            name: "incident-summarizer",
+            displayName: "Resumo de Incidente",
+            description: "Resume um incidente com root cause, timeline e passos de mitigação numa narrativa concisa.",
+            skillContent: "# Incident Summarizer Skill\n\nGiven incident details, produce a structured summary with:\n1. **Root Cause**: what caused the incident\n2. **Timeline**: key events from detection to resolution\n3. **Impact**: affected services and users\n4. **Mitigation Steps**: what resolved it\n5. **Prevention**: recommendations to avoid recurrence\n\nBe concise and use technical language appropriate for an SRE audience.",
+            tags: ["ops", "incident", "summary", "sre"],
+            requiredTools: ["search_incidents", "get_service_health"],
+            preferredModels: ["claude-sonnet-4-6"],
+            isComposable: true),
+
+        AiSkill.CreateSystem(
+            name: "release-notes-generator",
+            displayName: "Geração de Release Notes",
+            description: "Gera release notes estruturadas por persona (eng, ops, business) a partir de mudanças e contratos.",
+            skillContent: "# Release Notes Generator Skill\n\nGenerate structured release notes for the given change set. Produce three variants:\n1. **Engineering**: technical detail, API changes, performance improvements, breaking changes\n2. **Operations**: deployment steps, config changes, monitoring updates, rollback plan\n3. **Business**: customer-facing changes, new features, resolved issues in plain language\n\nHighlight breaking changes prominently. Include version number and release date.",
+            tags: ["eng", "release", "changelog", "docs"],
+            requiredTools: ["list_recent_changes", "get_contract_details", "list_services"],
+            preferredModels: ["claude-sonnet-4-6"],
+            isComposable: false),
+
+        AiSkill.CreateSystem(
+            name: "runbook-generator",
+            displayName: "Geração de Runbook",
+            description: "Propõe um runbook operacional a partir de um incidente resolvido com passos de diagnóstico e recuperação.",
+            skillContent: "# Runbook Generator Skill\n\nUsing the resolved incident as input, generate a structured operational runbook with:\n1. **Overview**: what this runbook covers and when to use it\n2. **Prerequisites**: access, tools, and knowledge required\n3. **Diagnosis Steps**: step-by-step commands and checks with expected outputs\n4. **Recovery Procedures**: ordered recovery steps with verification criteria\n5. **Escalation Path**: when to escalate and to whom\n6. **Post-Incident**: cleanup steps and links to related runbooks\n\nFormat as markdown suitable for a wiki page.",
+            tags: ["ops", "runbook", "sre", "incident"],
+            requiredTools: ["search_incidents", "get_service_health", "list_recent_changes"],
+            preferredModels: ["claude-sonnet-4-6"],
+            isComposable: false),
     ];
 }

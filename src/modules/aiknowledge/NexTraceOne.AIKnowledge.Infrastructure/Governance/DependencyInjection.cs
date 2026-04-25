@@ -100,6 +100,7 @@ public static class DependencyInjection
         services.AddScoped<ISkillLoader, SkillLoader>();
         services.AddScoped<ISkillRegistry, SkillRegistry>();
         services.AddScoped<ISkillContextInjector, SkillContextInjector>();
+        services.AddScoped<ISkillExecutor, SkillExecutorService>();
         services.AddScoped<IAiWarRoomRepository, WarRoomRepository>();
         services.AddScoped<IAiChangeConfidenceRepository, ChangeConfidenceRepository>();
         services.AddScoped<IGuardianAlertRepository, GuardianAlertRepository>();

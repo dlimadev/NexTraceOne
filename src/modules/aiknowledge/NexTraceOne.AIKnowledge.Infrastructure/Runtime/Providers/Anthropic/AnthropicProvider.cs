@@ -17,8 +17,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Anthropic;
 /// O campo "content" da resposta é uma lista de blocos; extraímos o primeiro bloco do tipo "text".
 /// Referência: https://docs.anthropic.com/en/api/messages
 /// </summary>
-public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider
+public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider, INativeToolCallProvider
 {
+    public bool SupportsNativeToolCalls => true;
+
     public const string ProviderIdentifier = "anthropic";
 
     private static readonly string[] DefaultCapabilities = ["chat", "completion", "reasoning", "long_context"];

@@ -129,6 +129,11 @@ public static class DependencyInjection
         // Health — scoped (depends on scoped factory)
         services.AddScoped<IAiProviderHealthService, AiProviderHealthService>();
 
+        // Token quota cache — singleton (shared across requests, thread-safe via MemoryCache)
+        services.Configure<TokenQuotaCacheOptions>(
+            configuration.GetSection(TokenQuotaCacheOptions.SectionName));
+        services.AddSingleton<ITokenQuotaCache, InMemoryTokenQuotaCache>();
+
         // Token quota — scoped (depends on scoped repositories)
         services.AddScoped<IAiTokenQuotaService, AiTokenQuotaService>();
 

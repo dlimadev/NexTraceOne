@@ -1,7 +1,10 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
@@ -16,12 +19,17 @@ public sealed class AiTokenQuotaServiceTests
     private readonly IAiTokenQuotaPolicyRepository _policyRepo = Substitute.For<IAiTokenQuotaPolicyRepository>();
     private readonly IAiTokenUsageLedgerRepository _ledgerRepo = Substitute.For<IAiTokenUsageLedgerRepository>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
+    private readonly ITokenQuotaCache _quotaCache = Substitute.For<ITokenQuotaCache>();
     private readonly ILogger<AiTokenQuotaService> _logger = Substitute.For<ILogger<AiTokenQuotaService>>();
 
     private AiTokenQuotaService CreateService()
     {
         _dateTimeProvider.UtcNow.Returns(FixedNow);
-        return new AiTokenQuotaService(_policyRepo, _ledgerRepo, _dateTimeProvider, _logger);
+        // Cache always returns null (miss) so tests hit the DB mock as before
+        _quotaCache.GetUsageAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns((long?)null);
+        var cacheOptions = Options.Create(new TokenQuotaCacheOptions());
+        return new AiTokenQuotaService(_policyRepo, _ledgerRepo, _dateTimeProvider, _quotaCache, cacheOptions, _logger);
     }
 
     [Fact]
@@ -147,5 +155,35 @@ public sealed class AiTokenQuotaServiceTests
                 e.ExecutionId == "exec-001" &&
                 e.Status == "Success"),
             Arg.Any<CancellationToken>());
+
+        await _quotaCache.Received(1).InvalidateUserAsync("user-1", Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ValidateQuota_CacheHit_ShouldNotQueryLedger()
+    {
+        var policy = AiTokenQuotaPolicy.Create(
+            "quota", "desc", "user", "user-1", null, null,
+            4000, 4000, 8000, 100_000, 2_000_000, 50_000_000,
+            true, false, true);
+
+        _policyRepo.GetForUserAsync("user-1", Arg.Any<CancellationToken>())
+            .Returns(new List<AiTokenQuotaPolicy> { policy });
+        _policyRepo.GetForTenantAsync(TenantId, Arg.Any<CancellationToken>())
+            .Returns(new List<AiTokenQuotaPolicy>());
+
+        // Both daily and monthly are cached
+        _quotaCache.GetUsageAsync("user-1", "daily", Arg.Any<CancellationToken>()).Returns((long?)1_000L);
+        _quotaCache.GetUsageAsync("user-1", "monthly", Arg.Any<CancellationToken>()).Returns((long?)5_000L);
+
+        _dateTimeProvider.UtcNow.Returns(FixedNow);
+        var cacheOptions = Options.Create(new TokenQuotaCacheOptions());
+        var svc = new AiTokenQuotaService(_policyRepo, _ledgerRepo, _dateTimeProvider, _quotaCache, cacheOptions, _logger);
+
+        var result = await svc.ValidateQuotaAsync("user-1", TenantId, "openai", "gpt-4o", 500);
+
+        result.IsAllowed.Should().BeTrue();
+        await _ledgerRepo.DidNotReceive().GetTotalTokensForPeriodAsync(
+            Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>());
     }
 }

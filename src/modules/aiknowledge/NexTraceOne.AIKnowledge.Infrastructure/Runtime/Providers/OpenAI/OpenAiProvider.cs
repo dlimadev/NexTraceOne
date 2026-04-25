@@ -13,8 +13,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 /// Implementa IAiProvider, IChatCompletionProvider e IFunctionCallingChatProvider para integração no AI Runtime.
 /// Activo apenas quando ApiKey está configurada em AiRuntime:OpenAI.
 /// </summary>
-public sealed class OpenAiProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider
+public sealed class OpenAiProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider, INativeToolCallProvider
 {
+    public bool SupportsNativeToolCalls => true;
+
     public const string ProviderIdentifier = "openai";
 
     private static readonly string[] DefaultCapabilities = ["chat", "completion", "reasoning"];

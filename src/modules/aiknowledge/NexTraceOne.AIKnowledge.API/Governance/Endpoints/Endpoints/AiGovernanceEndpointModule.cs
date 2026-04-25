@@ -68,6 +68,8 @@ using UpdateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Featur
 using PublishSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.PublishSkill.PublishSkill;
 using DeprecateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.DeprecateSkill.DeprecateSkill;
 using ExecuteSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteSkill.ExecuteSkill;
+using ExecuteSkillPipelineFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteSkillPipeline.ExecuteSkillPipeline;
+using OrchestrateSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.OrchestrateSkills.OrchestrateSkills;
 using RateSkillExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RateSkillExecution.RateSkillExecution;
 using SeedDefaultSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultSkills.SeedDefaultSkills;
 
@@ -1139,6 +1141,42 @@ public sealed class AiGovernanceEndpointModule
             var result = await sender.Send(new LoadSkillFeature.Query(skillName, tenantId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:skills:read");
+
+        // ── AI-1.3: Pipeline + Orchestrator ──────────────────────────────────
+        group.MapPost("/pipeline", async (
+            ExecuteSkillPipelineRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ExecuteSkillPipelineFeature.Command(
+                body.Steps.Select(s => new ExecuteSkillPipelineFeature.PipelineStep(s.SkillId, s.ModelOverride)).ToList(),
+                body.InitialInputJson,
+                body.ExecutedBy,
+                TenantId: Guid.Empty);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute")
+          .WithTags("AI Skills")
+          .WithSummary("Executa uma sequência de skills em pipeline");
+
+        group.MapPost("/orchestrate", async (
+            OrchestrateSkillsRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new OrchestrateSkillsFeature.Command(
+                body.TaskDescription,
+                body.InputJson,
+                body.ExecutedBy,
+                TenantId: Guid.Empty,
+                body.ModelOverride);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute")
+          .WithTags("AI Skills")
+          .WithSummary("Orquestra skills automaticamente para resolver uma task");
     }
 
     // ── Agent Lightning ─────────────────────────────────────────────────
@@ -1924,6 +1962,24 @@ public sealed record ExecuteSkillRequest(
     string? ModelOverride,
     Guid? AgentId,
     string ExecutedBy);
+
+/// <summary>Step individual de um pipeline de skills.</summary>
+public sealed record PipelineStepRequest(
+    Guid SkillId,
+    string? ModelOverride = null);
+
+/// <summary>Corpo de pedido para execução de pipeline de skills.</summary>
+public sealed record ExecuteSkillPipelineRequest(
+    IReadOnlyList<PipelineStepRequest> Steps,
+    string InitialInputJson,
+    string ExecutedBy);
+
+/// <summary>Corpo de pedido para orquestração automática de skills.</summary>
+public sealed record OrchestrateSkillsRequest(
+    string TaskDescription,
+    string InputJson,
+    string ExecutedBy,
+    string? ModelOverride = null);
 
 /// <summary>Corpo de pedido para feedback de execução de skill.</summary>
 public sealed record RateSkillExecutionRequest(

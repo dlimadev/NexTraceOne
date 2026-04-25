@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
@@ -11,23 +13,30 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
 /// Implementação do serviço de validação e registo de quotas de tokens.
 /// Consulta políticas de quota aplicáveis e o ledger de consumo para validar
 /// se o utilizador/tenant pode executar a inferência pretendida.
+/// Usa ITokenQuotaCache para evitar DB calls repetidos dentro da janela de cache.
 /// </summary>
 public sealed class AiTokenQuotaService : IAiTokenQuotaService
 {
     private readonly IAiTokenQuotaPolicyRepository _policyRepository;
     private readonly IAiTokenUsageLedgerRepository _ledgerRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly ITokenQuotaCache _quotaCache;
+    private readonly TokenQuotaCacheOptions _cacheOptions;
     private readonly ILogger<AiTokenQuotaService> _logger;
 
     public AiTokenQuotaService(
         IAiTokenQuotaPolicyRepository policyRepository,
         IAiTokenUsageLedgerRepository ledgerRepository,
         IDateTimeProvider dateTimeProvider,
+        ITokenQuotaCache quotaCache,
+        IOptions<TokenQuotaCacheOptions> cacheOptions,
         ILogger<AiTokenQuotaService> logger)
     {
         _policyRepository = policyRepository;
         _ledgerRepository = ledgerRepository;
         _dateTimeProvider = dateTimeProvider;
+        _quotaCache = quotaCache;
+        _cacheOptions = cacheOptions.Value;
         _logger = logger;
     }
 
@@ -60,8 +69,17 @@ public sealed class AiTokenQuotaService : IAiTokenQuotaService
         var startOfDay = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero);
         var startOfMonth = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
 
-        var dailyUsage = await _ledgerRepository.GetTotalTokensForPeriodAsync(userId, startOfDay, now, ct);
-        var monthlyUsage = await _ledgerRepository.GetTotalTokensForPeriodAsync(userId, startOfMonth, now, ct);
+        var usageTtl = TimeSpan.FromSeconds(_cacheOptions.UsageTtlSeconds);
+
+        var cachedDaily = await _quotaCache.GetUsageAsync(userId, "daily", ct);
+        var dailyUsage = cachedDaily ?? await _ledgerRepository.GetTotalTokensForPeriodAsync(userId, startOfDay, now, ct);
+        if (cachedDaily is null)
+            await _quotaCache.SetUsageAsync(userId, "daily", dailyUsage, usageTtl, ct);
+
+        var cachedMonthly = await _quotaCache.GetUsageAsync(userId, "monthly", ct);
+        var monthlyUsage = cachedMonthly ?? await _ledgerRepository.GetTotalTokensForPeriodAsync(userId, startOfMonth, now, ct);
+        if (cachedMonthly is null)
+            await _quotaCache.SetUsageAsync(userId, "monthly", monthlyUsage, usageTtl, ct);
 
         foreach (var policy in allPolicies)
         {
@@ -148,6 +166,8 @@ public sealed class AiTokenQuotaService : IAiTokenQuotaService
             durationMs: durationMs);
 
         await _ledgerRepository.AddAsync(entry, ct);
+
+        await _quotaCache.InvalidateUserAsync(userId, ct);
 
         _logger.LogInformation(
             "Recorded token usage: user {UserId}, provider {ProviderId}, model {ModelId}, total {TotalTokens}, request {RequestId}",

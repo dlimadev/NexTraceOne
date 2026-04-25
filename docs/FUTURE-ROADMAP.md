@@ -1,11 +1,12 @@
 # NexTraceOne — Future Roadmap
 
 > **Data:** Abril 2026  
-> **Estado atual:** Backend 100% implementado — 155 waves analytics/governance concluídas (A → BC) + PIP-01..06 + CC-01..08 + AI-0.1 implementados. Wave AA (frontend v3) planeada.  
+> **Estado atual:** Backend 100% implementado — 155 waves analytics/governance concluídas (A → BC) + PIP-01..06 + CC-01..08 + AI-0.1..0.5 + AI-1.1..1.3 implementados. Wave AA (frontend v3) planeada.  
 > **Waves backend concluídas:** A → BC (155 features — todas ✅ COMPLETAS) + Supplementary Waves A–K + L–M + S–W + X–Z + AA (frontend planeada)  
 > **Ingestion Pipeline:** ✅ PIP-01..06 COMPLETOS — Dead Letter Queue, Ingestion Observability, TenantPipelineEngine, StorageBucket routing, CatalogEnrichmentProcessor, LogToMetricProcessor  
 > **Core Completions:** ✅ CC-01..08 COMPLETOS — SAML Level A, Promotion Readiness Delta Gate, Data Contracts, Consumer Tracking, AI Eval Harness, Breaking Change Workflow, Blast Radius v2, Spectral Marketplace  
-> **AI Evolution Phase 0:** ✅ AI-0.1 COMPLETO — Anthropic Claude 4.x (Opus 4.7, Sonnet 4.6, Haiku 4.5) model catalog atualizado  
+> **AI Evolution Phase 0:** ✅ AI-0.1..0.5 COMPLETOS — Claude 4.x catalog, Redis-compatible quota cache, parallel grounding, model upgrade, native tool calling + StructuredOutputFallback  
+> **AI Evolution Phase 1:** ✅ AI-1.1..1.3 COMPLETOS — ISkillExecutor + SkillExecutorService, 15 built-in skills (incl. incident-summarizer, release-notes-generator, runbook-generator), ExecuteSkillPipeline + OrchestrateSkills  
 > **Wave AA (frontend v3):** 📘 PLANEADA — plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 sub-waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
 > **Waves AB–AE:** ✅ CONCLUÍDAS — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI:** ✅ CONCLUÍDAS — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
@@ -246,7 +247,9 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 | ✅ **DONE** | Ingestion Pipeline (PIP-01..06) | Dead Letter Queue, observabilidade, regras por tenant, storage routing, enrichment, log→metric |
 | ✅ **DONE** | Core Completions (CC-01..08) | SAML Level A, Promotion Readiness Gate, Data Contracts, Consumer Tracking, AI Eval Harness, Breaking Change Workflow, Blast Radius v2, Spectral Marketplace |
 | **Próximo** | Wave AA — V3 Frontend Evolution | 12 sub-waves (V3.1→V3.12) — ver MASTER-ACTION-PLAN.md |
-| **Roadmap** | AI Evolution (Fases 0–5) | Skills system, Agent Lightning (RL), memória organizacional |
+| ✅ **DONE** | AI Evolution Fase 0 (AI-0.1..0.5) | Claude 4.x catalog, quota cache, native tool calling, StructuredOutputFallback |
+| ✅ **DONE** | AI Evolution Fase 1 (AI-1.1..1.3) | ISkillExecutor, 15 built-in skills, SkillPipeline, SkillOrchestrator |
+| **Roadmap** | AI Evolution Fases 2–5 | Agent Lightning (RL), memória organizacional, enterprise integrations, marketplace |
 | **Roadmap** | SaaS Evolution | NexTrace Agent binário, provisioning, licensing |
 | **Roadmap** | Infrastructure Evolution (Fases 1–4) | PgBouncer, ClickHouse primário, host infra, topology |
 | **Roadmap** | Legacy/Mainframe (12.x) | Expansão para core systems IBM Z / COBOL |
