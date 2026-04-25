@@ -88,6 +88,10 @@ public sealed class AiGovernanceDbContext(
     // ── External Data Sources (Extensible RAG) ───────────────────────────────
     public DbSet<ExternalDataSource> ExternalDataSources => Set<ExternalDataSource>();
 
+    // ── AI-5.2: Prompt Asset Registry ────────────────────────────────────────
+    public DbSet<PromptAsset> PromptAssets => Set<PromptAsset>();
+    public DbSet<PromptVersion> PromptVersions => Set<PromptVersion>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

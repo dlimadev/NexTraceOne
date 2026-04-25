@@ -52,6 +52,8 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.SyncExternalDataSo
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ToggleExternalDataSource;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateExternalDataSource;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePolicy;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterPromptAsset;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.ComparePromptVersions;
 using NexTraceOne.BuildingBlocks.Application;
 
 namespace NexTraceOne.AIKnowledge.Application.Governance;
@@ -133,6 +135,10 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ToggleExternalDataSource.Command>, ToggleExternalDataSource.Validator>();
         services.AddTransient<IValidator<SyncExternalDataSource.Command>, SyncExternalDataSource.Validator>();
         services.AddTransient<IValidator<GetExternalDataSource.Query>, GetExternalDataSource.Validator>();
+
+        // ── AI-5.2: Prompt Asset Registry ────────────────────────────────
+        services.AddTransient<IValidator<RegisterPromptAsset.Command>, RegisterPromptAsset.Validator>();
+        services.AddTransient<IValidator<ComparePromptVersions.Query>, ComparePromptVersions.Validator>();
 
         // ── Wave AT — AI Model Quality & Drift Governance ─────────────────
         services.AddTransient<IValidator<IngestModelPredictionSample.Command>, IngestModelPredictionSample.Validator>();

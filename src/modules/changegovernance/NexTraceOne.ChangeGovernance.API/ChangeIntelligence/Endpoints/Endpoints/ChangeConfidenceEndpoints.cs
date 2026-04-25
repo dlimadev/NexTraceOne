@@ -28,6 +28,7 @@ using GetCanaryRolloutStatusFeature = NexTraceOne.ChangeGovernance.Application.C
 using GetChangeConfidenceBreakdownFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetChangeConfidenceBreakdown.GetChangeConfidenceBreakdown;
 using ComputeChangeConfidenceBreakdownFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.ComputeChangeConfidenceBreakdown.ComputeChangeConfidenceBreakdown;
 using GetPromotionReadinessDeltaFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPromotionReadinessDelta.GetPromotionReadinessDelta;
+using EvaluatePromotionReadinessDeltaGateFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate.EvaluatePromotionReadinessDeltaGate;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -357,6 +358,28 @@ internal static class ChangeConfidenceEndpoints
         }).RequirePermission("change-intelligence:read")
           .WithTags("Change Intelligence")
           .WithSummary("Deltas runtime entre ambientes para decisão de promoção");
+
+        // CC-02b — Promotion Readiness Delta Gate
+        // Avalia o gate de readiness de promoção baseado em deltas de runtime.
+        // Bloqueante apenas para Blocked; Review é não-bloqueante por defeito
+        // (configurável via promotion.readiness_delta.block_on_review).
+
+        group.MapGet("/promotion-readiness-delta/gate", async (
+            string service,
+            string from,
+            string to,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken,
+            int? days = null) =>
+        {
+            var result = await sender.Send(
+                new EvaluatePromotionReadinessDeltaGateFeature.Query(service, from, to, days),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("change-intelligence:read")
+          .WithTags("Change Intelligence")
+          .WithSummary("Gate de readiness de promoção baseado em deltas de runtime");
     }
 
     private sealed record ChangeFilterOptionsResponse(

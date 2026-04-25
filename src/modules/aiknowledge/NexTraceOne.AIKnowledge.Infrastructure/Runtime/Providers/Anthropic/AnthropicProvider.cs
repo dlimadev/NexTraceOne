@@ -17,8 +17,10 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Anthropic;
 /// O campo "content" da resposta é uma lista de blocos; extraímos o primeiro bloco do tipo "text".
 /// Referência: https://docs.anthropic.com/en/api/messages
 /// </summary>
-public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider
+public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider, IFunctionCallingChatProvider, INativeToolCallProvider
 {
+    public bool SupportsNativeToolCalls => true;
+
     public const string ProviderIdentifier = "anthropic";
 
     private static readonly string[] DefaultCapabilities = ["chat", "completion", "reasoning", "long_context"];
@@ -67,14 +69,17 @@ public sealed class AnthropicProvider : IAiProvider, IChatCompletionProvider, IF
     public Task<IReadOnlyList<AiProviderModelInfo>> ListAvailableModelsAsync(
         CancellationToken cancellationToken = default)
     {
-        // Static list — Anthropic model catalogue doesn't change frequently
+        // Static list — Anthropic model catalogue (updated April 2026 — Claude 4.x family)
         IReadOnlyList<AiProviderModelInfo> models =
         [
+            // Claude 4.x — latest generation (April 2026)
+            new AiProviderModelInfo("claude-opus-4-7", "Claude Opus 4.7", null, DefaultCapabilities),
+            new AiProviderModelInfo("claude-sonnet-4-6", "Claude Sonnet 4.6", null, DefaultCapabilities),
+            new AiProviderModelInfo("claude-haiku-4-5", "Claude Haiku 4.5", null, DefaultCapabilities),
+            // Claude 3.x — previous generation (kept for backwards compatibility)
             new AiProviderModelInfo("claude-3-5-sonnet-20241022", "Claude 3.5 Sonnet", null, DefaultCapabilities),
             new AiProviderModelInfo("claude-3-5-haiku-20241022", "Claude 3.5 Haiku", null, DefaultCapabilities),
             new AiProviderModelInfo("claude-3-opus-20240229", "Claude 3 Opus", null, DefaultCapabilities),
-            new AiProviderModelInfo("claude-3-sonnet-20240229", "Claude 3 Sonnet", null, DefaultCapabilities),
-            new AiProviderModelInfo("claude-3-haiku-20240307", "Claude 3 Haiku", null, DefaultCapabilities),
         ];
         return Task.FromResult(models);
     }

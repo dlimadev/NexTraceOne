@@ -68,6 +68,8 @@ using UpdateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Featur
 using PublishSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.PublishSkill.PublishSkill;
 using DeprecateSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.DeprecateSkill.DeprecateSkill;
 using ExecuteSkillFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteSkill.ExecuteSkill;
+using ExecuteSkillPipelineFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteSkillPipeline.ExecuteSkillPipeline;
+using OrchestrateSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.OrchestrateSkills.OrchestrateSkills;
 using RateSkillExecutionFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RateSkillExecution.RateSkillExecution;
 using SeedDefaultSkillsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.SeedDefaultSkills.SeedDefaultSkills;
 
@@ -123,6 +125,10 @@ using GetModelRoutingDecisionLogFeature = NexTraceOne.AIKnowledge.Application.Go
 using GetAiTokenBudgetReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiTokenBudgetReport.GetAiTokenBudgetReport;
 using GetAiCostAttributionReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiCostAttributionReport.GetAiCostAttributionReport;
 
+// ── AI-5.2: Prompt Asset Registry ────────────────────────────────────────────
+using RegisterPromptAssetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterPromptAsset.RegisterPromptAsset;
+using ComparePromptVersionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ComparePromptVersions.ComparePromptVersions;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -174,6 +180,7 @@ public sealed class AiGovernanceEndpointModule
         MapModelRoutingEndpoints(app);
         MapAiTokenBudgetEndpoints(app);
         MapAiEvalHarnessEndpoints(app);
+        MapPromptAssetEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1139,6 +1146,42 @@ public sealed class AiGovernanceEndpointModule
             var result = await sender.Send(new LoadSkillFeature.Query(skillName, tenantId), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:skills:read");
+
+        // ── AI-1.3: Pipeline + Orchestrator ──────────────────────────────────
+        group.MapPost("/pipeline", async (
+            ExecuteSkillPipelineRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new ExecuteSkillPipelineFeature.Command(
+                body.Steps.Select(s => new ExecuteSkillPipelineFeature.PipelineStep(s.SkillId, s.ModelOverride)).ToList(),
+                body.InitialInputJson,
+                body.ExecutedBy,
+                TenantId: Guid.Empty);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute")
+          .WithTags("AI Skills")
+          .WithSummary("Executa uma sequência de skills em pipeline");
+
+        group.MapPost("/orchestrate", async (
+            OrchestrateSkillsRequest body,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var command = new OrchestrateSkillsFeature.Command(
+                body.TaskDescription,
+                body.InputJson,
+                body.ExecutedBy,
+                TenantId: Guid.Empty,
+                body.ModelOverride);
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("ai:skills:execute")
+          .WithTags("AI Skills")
+          .WithSummary("Orquestra skills automaticamente para resolver uma task");
     }
 
     // ── Agent Lightning ─────────────────────────────────────────────────
@@ -1835,9 +1878,57 @@ public sealed class AiGovernanceEndpointModule
         .WithTags("AI Eval Harness CC-05")
         .WithSummary("Get model comparison report for a dataset");
     }
+
+    // ── AI-5.2: Prompt Asset Registry ───────────────��──────────────────────
+
+    private static void MapPromptAssetEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/prompt-assets");
+
+        group.MapPost("/", async (
+            RegisterPromptAssetRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new RegisterPromptAssetFeature.Command(
+                    req.Slug,
+                    req.Name,
+                    req.Description ?? string.Empty,
+                    req.Category,
+                    req.InitialContent,
+                    req.Variables ?? string.Empty,
+                    req.Tags ?? string.Empty,
+                    req.TenantId,
+                    req.CreatedBy),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Prompt Assets")
+        .WithSummary("Register a new versioned prompt asset");
+
+        group.MapGet("/{assetId:guid}/compare", async (
+            Guid assetId,
+            int versionA,
+            int versionB,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ComparePromptVersionsFeature.Query(assetId, versionA, versionB),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Prompt Assets")
+        .WithSummary("Compare two versions of a prompt asset side-by-side");
+    }
 }
 
-// ── Request DTOs para endpoints PATCH ───────────────────────────────────
+// ── Request DTOs para endpoints PATCH ─────────────────────────────────��─
 
 /// <summary>Corpo de pedido para atualização de um modelo de IA.</summary>
 public sealed record UpdateModelRequest(
@@ -1924,6 +2015,24 @@ public sealed record ExecuteSkillRequest(
     string? ModelOverride,
     Guid? AgentId,
     string ExecutedBy);
+
+/// <summary>Step individual de um pipeline de skills.</summary>
+public sealed record PipelineStepRequest(
+    Guid SkillId,
+    string? ModelOverride = null);
+
+/// <summary>Corpo de pedido para execução de pipeline de skills.</summary>
+public sealed record ExecuteSkillPipelineRequest(
+    IReadOnlyList<PipelineStepRequest> Steps,
+    string InitialInputJson,
+    string ExecutedBy);
+
+/// <summary>Corpo de pedido para orquestração automática de skills.</summary>
+public sealed record OrchestrateSkillsRequest(
+    string TaskDescription,
+    string InputJson,
+    string ExecutedBy,
+    string? ModelOverride = null);
 
 /// <summary>Corpo de pedido para feedback de execução de skill.</summary>
 public sealed record RateSkillExecutionRequest(
@@ -2074,3 +2183,15 @@ public sealed record CreateAiEvalDatasetRequest(
 public sealed record RunAiEvaluationRequest(
     string TenantId,
     string ModelId);
+
+/// <summary>Corpo de pedido para registo de um PromptAsset (AI-5.2).</summary>
+public sealed record RegisterPromptAssetRequest(
+    string Slug,
+    string Name,
+    string? Description,
+    string Category,
+    string InitialContent,
+    string? Variables,
+    string? Tags,
+    Guid? TenantId,
+    string CreatedBy);

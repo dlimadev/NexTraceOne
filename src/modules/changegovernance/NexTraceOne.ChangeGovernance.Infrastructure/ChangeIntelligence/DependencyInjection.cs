@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate;
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Platform.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
@@ -79,6 +80,10 @@ public static class DependencyInjection
         // Default honest-null reader para Promotion Readiness Delta.
         // Uma bridge real p/ OperationalIntelligence substitui este default na composition root.
         services.AddScoped<IRuntimeComparisonReader, Services.NullRuntimeComparisonReader>();
+
+        // CC-02b — Promotion Readiness Delta Gate options (non-blocking by default)
+        services.Configure<PromotionReadinessDeltaOptions>(
+            configuration.GetSection(PromotionReadinessDeltaOptions.SectionKey));
 
         // Wave T.1 — Post-Incident Learning Report (honest-null; bridge Knowledge → CG na composition root)
         services.AddScoped<IIncidentLearningReader, Services.NullIncidentLearningReader>();

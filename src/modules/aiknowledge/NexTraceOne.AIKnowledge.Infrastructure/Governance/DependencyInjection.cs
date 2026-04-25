@@ -100,6 +100,7 @@ public static class DependencyInjection
         services.AddScoped<ISkillLoader, SkillLoader>();
         services.AddScoped<ISkillRegistry, SkillRegistry>();
         services.AddScoped<ISkillContextInjector, SkillContextInjector>();
+        services.AddScoped<ISkillExecutor, SkillExecutorService>();
         services.AddScoped<IAiWarRoomRepository, WarRoomRepository>();
         services.AddScoped<IAiChangeConfidenceRepository, ChangeConfidenceRepository>();
         services.AddScoped<IGuardianAlertRepository, GuardianAlertRepository>();
@@ -125,6 +126,9 @@ public static class DependencyInjection
 
         // Cross-module contract — consumed by AiOrchestration for token/model attribution
         services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();
+
+        // ── AI-5.2: Prompt Asset Registry ─────────────────────────────────
+        services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();
 
         // ── External Data Sources (Extensible RAG) ────────────────────────
         services.AddScoped<IExternalDataSourceRepository, ExternalDataSourceRepository>();
