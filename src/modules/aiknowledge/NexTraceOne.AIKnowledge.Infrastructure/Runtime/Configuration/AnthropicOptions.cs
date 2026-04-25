@@ -18,8 +18,8 @@ public sealed class AnthropicOptions
     /// <summary>Versão da API Anthropic (default: 2023-06-01).</summary>
     public string ApiVersion { get; set; } = "2023-06-01";
 
-    /// <summary>Modelo de chat padrão (default: claude-3-5-haiku-20241022).</summary>
-    public string DefaultChatModel { get; set; } = "claude-3-5-haiku-20241022";
+    /// <summary>Modelo de chat padrão (default: claude-haiku-4-5 — Claude 4.x family).</summary>
+    public string DefaultChatModel { get; set; } = "claude-haiku-4-5";
 
     /// <summary>Timeout em segundos para cada requisição (default: 60).</summary>
     public int TimeoutSeconds { get; set; } = 60;

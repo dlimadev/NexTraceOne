@@ -10680,5 +10680,28 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "true",
             uiEditorType: "toggle",
             sortOrder: 12900),
+
+        // ── CC-02b: Promotion Readiness Delta Gate ────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "promotion.readiness_delta.block_on_review",
+            displayName: "config.promotion.readiness_delta.block_on_review.label",
+            description: "config.promotion.readiness_delta.block_on_review.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 12910),
+
+        ConfigurationDefinition.Create(
+            key: "promotion.readiness_delta.window_days",
+            displayName: "config.promotion.readiness_delta.window_days.label",
+            description: "config.promotion.readiness_delta.window_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "7",
+            uiEditorType: "number",
+            sortOrder: 12920),
     ];
 }

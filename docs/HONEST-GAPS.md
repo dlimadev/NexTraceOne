@@ -92,7 +92,7 @@ Todos os itens abaixo retornam `simulatedNote` na UI enquanto o provider externo
 | **DEG-08** Feature flags externo | B | — | — | ❌ não | Por design: BD local é a fonte primária. Read-through a LaunchDarkly/Unleash é feature futura opcional. |
 | **DEG-09** Kafka | **A** | `IKafkaEventProducer` | `NullKafkaEventProducer` | ✅ sim | `OptionalProviderNames.Kafka`. Real impl: `ConfluentKafkaEventProducer`. |
 | **DEG-10** Cloud billing | **A** | `ICloudBillingProvider` | `NullCloudBillingProvider` | ✅ sim | `OptionalProviderNames.CloudBilling`. |
-| **DEG-11** SAML SSO | **A′** | `ISamlService` / `ISamlConfigProvider` | metadata vazia = "não configurado" | ❌ ainda não | Pattern completo mas com *shape* próprio de IdP (metadata XML). Não aparece em `/admin/system-health` porque não expõe `IsConfigured` — a verificação é feita no fluxo (`StartSamlLogin` retorna `SamlNotConfigured`). **Ação recomendada:** expor derivado via `ISamlConfigProvider.HasAnyActiveProvider` para incluir no dashboard. |
+| **DEG-11** SAML SSO | **A** | `ISamlProvider` / `ISamlConfigProvider` / `ConfigurationSamlProvider` | `NullSamlProvider` | ✅ sim | Promovido a Nível A (Abril 2026). `ISamlProvider.IsConfigured` exposto via `GetOptionalProviders` + `OptionalProviderNames.Saml`. Aparece em `/admin/system-health` como 5º provider opcional. E2E: `saml-sso-flows.spec.ts` (14 testes Playwright). |
 | **DEG-12** External AI | B | — | — | ❌ não | `ModelRegistry` + `AiAccessPolicy` decidem runtime-side (interno vs externo). Não cabe num único `IExternalAiProvider` — cada vendor tem driver próprio. |
 | **DEG-13** Elasticsearch | B | — | — | ❌ não | `telemetry.elastic.*` via `IElasticQueryClient`. PostgreSQL Product Store é fallback parcial documentado. |
 | **DEG-14** ClickHouse | B | — | — | ❌ não | `telemetry.clickhouse.*` análogo a DEG-13. |
@@ -100,8 +100,8 @@ Todos os itens abaixo retornam `simulatedNote` na UI enquanto o provider externo
 
 ### Conclusões da auditoria
 
-1. **Nível A confirmado em 4/15** (DEG-01, DEG-02, DEG-09, DEG-10). São exatamente os 4 providers expostos em `/admin/system-health` via `OptionalProviderNames`.
-2. **Nível A′ em 1/15** (DEG-11 SAML). Tem a maquinaria de configuração mas não se integra ao dashboard — **próximo passo concreto**: adicionar `bool IsConfigured { get; }` em `ISamlConfigProvider` e expor como quinto provider em `OptionalProviderNames.Saml` + `GetOptionalProviders`.
+1. **Nível A confirmado em 5/15** (DEG-01, DEG-02, DEG-09, DEG-10, DEG-11). São exatamente os 5 providers expostos em `/admin/system-health` via `OptionalProviderNames`.
+2. **Nível B em 10/15** (DEG-03..08, DEG-12..15) — degradações graciosas legítimas sem ação imediata.
 3. **Nível B em 10/15**. São legítimos como degradação graciosa interna ao handler enquanto não há cliente real atrás deles. Promover para A só compensa quando alguém implementa o cliente externo correspondente.
 4. **Nenhum DEG promovido a A deixa de aparecer em `/admin/system-health`** — a convenção é: se tem pattern completo, entra no dashboard (e no startup log via `OptionalProviderStartupLogger`).
 
@@ -113,20 +113,21 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 
 ---
 
-## 🔴 Pipeline de Ingestão — pós-v1.0.0
+## ✅ Pipeline de Ingestão — COMPLETO (Abril 2026)
 
 > Gaps identificados por análise comparativa com o Dynatrace OpenPipeline (Abril 2026).
 > ADR de referência: [ADR-010](./adr/010-server-side-ingestion-pipeline.md)
 > Plano de implementação: [INGESTION-PIPELINE-IMPLEMENTATION.md](./INGESTION-PIPELINE-IMPLEMENTATION.md)
+> **Implementado em PRs #301 e #302 — todos os PIP-01..06 concluídos.**
 
 | ID | Descrição | Fase | Estado |
 |---|---|---|---|
-| PIP-01 | Dead Letter Queue — `ModuleOutboxProcessorJob` descarta silenciosamente após 5 retries | Fase 1 | 🔴 Aberto |
-| PIP-02 | Ingestion Observability — sem métricas de throughput/latência/falhas por tenant | Fase 1 | 🔴 Aberto |
-| PIP-03 | `TenantPipelineRule` — pipeline configurável por tenant (masking, filtering, enrichment) | Fase 2 | 🔴 Aberto |
-| PIP-04 | `StorageBucket` — routing condicional e retenção configurável por tenant | Fase 3 | 🔴 Aberto |
-| PIP-05 | `CatalogEnrichmentProcessor` — enriquecimento de spans/logs com contexto do Service Catalog | Fase 4 | 🔴 Aberto |
-| PIP-06 | `LogToMetricProcessor` — transformação log → metric server-side | Fase 5 | 🔴 Aberto |
+| PIP-01 | Dead Letter Queue — `DeadLetterMessage` entity + `bb_dead_letter_messages` migration + `ModuleOutboxProcessorJob` atualizado | Fase 1 | ✅ Concluído |
+| PIP-02 | Ingestion Observability — `IngestionMetricsCollector` + dashboard widget "Ingestion Health" | Fase 1 | ✅ Concluído |
+| PIP-03 | `TenantPipelineRule` — pipeline configurável por tenant (masking, filtering, enrichment) + `TenantPipelineEngine` | Fase 2 | ✅ Concluído |
+| PIP-04 | `StorageBucket` — routing condicional e retenção configurável por tenant + `StorageBucketRouter` | Fase 3 | ✅ Concluído |
+| PIP-05 | `CatalogEnrichmentProcessor` — enriquecimento de spans/logs com contexto do Service Catalog | Fase 4 | ✅ Concluído |
+| PIP-06 | `LogToMetricProcessor` — transformação log → metric server-side + `LogToMetricRule` entity | Fase 5 | ✅ Concluído |
 
 ---
 

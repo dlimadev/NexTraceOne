@@ -13663,6 +13663,30 @@
       "invalidReleaseId": "Se requiere un ID de release válido."
     }
   },
+  "promotionReadinessDeltaGate": {
+    "title": "Gate de Preparación para Promoción",
+    "subtitle": "Evalúa si un servicio está listo para promoción basándose en deltas de comportamiento runtime entre entornos.",
+    "passed": "Gate Aprobado",
+    "failed": "Gate Fallido",
+    "readiness": {
+      "Ready": "Listo",
+      "Review": "Revisión Requerida",
+      "Blocked": "Bloqueado",
+      "Unknown": "Datos Insuficientes"
+    },
+    "reason": "Motivo del Gate",
+    "dataQuality": "Calidad de Datos",
+    "simulatedNote": "Nota Simulada",
+    "windowDays": "Ventana de Observación (días)",
+    "config": {
+      "blockOnReview": "Bloquear promoción cuando la preparación sea Review",
+      "windowDays": "Ventana de observación por defecto en días"
+    },
+    "errors": {
+      "sameEnvironment": "Los entornos de origen y destino deben ser diferentes.",
+      "windowTooLarge": "La ventana de observación no debe superar {{max}} días."
+    }
+  },
   "chaosExperimentReport": {
     "title": "Informe de Chaos Engineering",
     "subtitle": "Informe analítico de experimentos de chaos: tasa de éxito, distribución de experimentos y servicios más probados.",

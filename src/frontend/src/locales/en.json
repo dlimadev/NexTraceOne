@@ -12398,6 +12398,30 @@
       "invalidReleaseId": "A valid release ID is required."
     }
   },
+  "promotionReadinessDeltaGate": {
+    "title": "Promotion Readiness Delta Gate",
+    "subtitle": "Evaluates whether a service is ready for promotion based on runtime behaviour deltas between environments.",
+    "passed": "Gate Passed",
+    "failed": "Gate Failed",
+    "readiness": {
+      "Ready": "Ready",
+      "Review": "Review Required",
+      "Blocked": "Blocked",
+      "Unknown": "Insufficient Data"
+    },
+    "reason": "Gate Reason",
+    "dataQuality": "Data Quality",
+    "simulatedNote": "Simulated Note",
+    "windowDays": "Observation Window (days)",
+    "config": {
+      "blockOnReview": "Block promotion when readiness is Review",
+      "windowDays": "Default observation window in days"
+    },
+    "errors": {
+      "sameEnvironment": "Source and destination environments must differ.",
+      "windowTooLarge": "Observation window must not exceed {{max}} days."
+    }
+  },
   "chaosExperimentReport": {
     "title": "Chaos Engineering Report",
     "subtitle": "Analytics report for chaos experiments: success rate, experiment distribution and top services tested.",
