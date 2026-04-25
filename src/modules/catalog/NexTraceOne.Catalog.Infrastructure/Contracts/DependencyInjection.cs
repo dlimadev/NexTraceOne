@@ -70,6 +70,15 @@ public static class DependencyInjection
         services.AddScoped<IGraphQlSchemaSnapshotRepository, GraphQlSchemaSnapshotRepository>();
         services.AddScoped<IProtobufSchemaSnapshotRepository, ProtobufSchemaSnapshotRepository>();
 
+        // CC-03: Data Contract Schema Analysis
+        services.AddScoped<IDataContractSchemaRepository, DataContractSchemaRepository>();
+
+        // CC-04: Contract Consumer Inventory (OTel-derived)
+        services.AddScoped<IContractConsumerInventoryRepository, ContractConsumerInventoryRepository>();
+
+        // CC-06: Breaking Change Proposal Workflow
+        services.AddScoped<IBreakingChangeProposalRepository, BreakingChangeProposalRepository>();
+
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();
         services.AddScoped<IContractsModule, ContractsModuleService>();

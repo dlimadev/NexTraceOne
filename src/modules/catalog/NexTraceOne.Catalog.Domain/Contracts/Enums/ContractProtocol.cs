@@ -54,5 +54,11 @@ public enum ContractProtocol
     CicsCommarea = 10,
 
     /// <summary>IMS Segment — segmento de dados IMS/DB.</summary>
-    ImsSegment = 11
+    ImsSegment = 11,
+
+    /// <summary>
+    /// Data Contract — contrato de dados para tabelas/vistas/streams analíticos.
+    /// Define owner, SLA de frescura, schema de colunas, classificação PII e sistema de origem.
+    /// </summary>
+    DataContract = 12
 }

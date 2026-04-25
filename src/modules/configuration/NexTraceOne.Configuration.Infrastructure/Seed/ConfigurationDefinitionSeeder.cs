@@ -10645,5 +10645,40 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "20",
             uiEditorType: "number",
             sortOrder: 12870),
+
+        // ── CC-07: Predictive Blast Radius v2 ────────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "blast_radius.v2.historical_lookback_days",
+            displayName: "config.blast_radius.v2.historical_lookback_days.label",
+            description: "config.blast_radius.v2.historical_lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 12880),
+
+        ConfigurationDefinition.Create(
+            key: "blast_radius.v2.min_call_frequency",
+            displayName: "config.blast_radius.v2.min_call_frequency.label",
+            description: "config.blast_radius.v2.min_call_frequency.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Decimal,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10.0",
+            uiEditorType: "number",
+            sortOrder: 12890),
+
+        // ── CC-08: Contract Linting Marketplace ──────────────────────────────
+        ConfigurationDefinition.Create(
+            key: "spectral.marketplace.packages_enabled",
+            displayName: "config.spectral.marketplace.packages_enabled.label",
+            description: "config.spectral.marketplace.packages_enabled.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "true",
+            uiEditorType: "toggle",
+            sortOrder: 12900),
     ];
 }
