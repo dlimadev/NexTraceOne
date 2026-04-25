@@ -191,6 +191,13 @@ public static class DependencyInjection
         services.AddScoped<IAgentTool, SearchKnowledgeTool>();
         services.AddScoped<IAgentTool, GetRunbookTool>();
         services.AddScoped<IAgentTool, ListContractVersionsTool>();
+        // ── AI-4.2: 6 new cross-module tools ────────────────────────────
+        services.AddScoped<IAgentTool, GetKnowledgeDocsTool>();
+        services.AddScoped<IAgentTool, TriggerBlastRadiusTool>();
+        services.AddScoped<IAgentTool, GetEvidencePackTool>();
+        services.AddScoped<IAgentTool, CheckSloStatusTool>();
+        services.AddScoped<IAgentTool, GetComplianceStatusTool>();
+        services.AddScoped<IAgentTool, GetCostContextTool>();
         // Registry is Scoped (not Singleton) so that it can capture scoped tool instances
         services.AddScoped<IToolRegistry, InMemoryToolRegistry>();
         services.AddScoped<IToolExecutor, AgentToolExecutor>();

@@ -127,6 +127,9 @@ public static class DependencyInjection
         // Cross-module contract — consumed by AiOrchestration for token/model attribution
         services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();
 
+        // ── AI-5.2: Prompt Asset Registry ─────────────────────────────────
+        services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();
+
         // ── External Data Sources (Extensible RAG) ────────────────────────
         services.AddScoped<IExternalDataSourceRepository, ExternalDataSourceRepository>();
         services.AddScoped<IDataSourceSyncService, DataSourceSyncService>();

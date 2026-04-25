@@ -125,6 +125,10 @@ using GetModelRoutingDecisionLogFeature = NexTraceOne.AIKnowledge.Application.Go
 using GetAiTokenBudgetReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiTokenBudgetReport.GetAiTokenBudgetReport;
 using GetAiCostAttributionReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiCostAttributionReport.GetAiCostAttributionReport;
 
+// ── AI-5.2: Prompt Asset Registry ────────────────────────────────────────────
+using RegisterPromptAssetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterPromptAsset.RegisterPromptAsset;
+using ComparePromptVersionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ComparePromptVersions.ComparePromptVersions;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -176,6 +180,7 @@ public sealed class AiGovernanceEndpointModule
         MapModelRoutingEndpoints(app);
         MapAiTokenBudgetEndpoints(app);
         MapAiEvalHarnessEndpoints(app);
+        MapPromptAssetEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1873,9 +1878,57 @@ public sealed class AiGovernanceEndpointModule
         .WithTags("AI Eval Harness CC-05")
         .WithSummary("Get model comparison report for a dataset");
     }
+
+    // ── AI-5.2: Prompt Asset Registry ───────────────��──────────────────────
+
+    private static void MapPromptAssetEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/prompt-assets");
+
+        group.MapPost("/", async (
+            RegisterPromptAssetRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new RegisterPromptAssetFeature.Command(
+                    req.Slug,
+                    req.Name,
+                    req.Description ?? string.Empty,
+                    req.Category,
+                    req.InitialContent,
+                    req.Variables ?? string.Empty,
+                    req.Tags ?? string.Empty,
+                    req.TenantId,
+                    req.CreatedBy),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:write")
+        .WithTags("AI Prompt Assets")
+        .WithSummary("Register a new versioned prompt asset");
+
+        group.MapGet("/{assetId:guid}/compare", async (
+            Guid assetId,
+            int versionA,
+            int versionB,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ComparePromptVersionsFeature.Query(assetId, versionA, versionB),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Prompt Assets")
+        .WithSummary("Compare two versions of a prompt asset side-by-side");
+    }
 }
 
-// ── Request DTOs para endpoints PATCH ───────────────────────────────────
+// ── Request DTOs para endpoints PATCH ─────────────────────────────────��─
 
 /// <summary>Corpo de pedido para atualização de um modelo de IA.</summary>
 public sealed record UpdateModelRequest(
@@ -2130,3 +2183,15 @@ public sealed record CreateAiEvalDatasetRequest(
 public sealed record RunAiEvaluationRequest(
     string TenantId,
     string ModelId);
+
+/// <summary>Corpo de pedido para registo de um PromptAsset (AI-5.2).</summary>
+public sealed record RegisterPromptAssetRequest(
+    string Slug,
+    string Name,
+    string? Description,
+    string Category,
+    string InitialContent,
+    string? Variables,
+    string? Tags,
+    Guid? TenantId,
+    string CreatedBy);

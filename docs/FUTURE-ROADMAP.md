@@ -312,9 +312,9 @@ Prioridade **máxima**. Reforça pilares já fortes sem criar módulos novos.
 #### A.4 AI Governance — de capacidade para plataforma
 
 - **Agentic Runtime governado** — multi-step plans com policy-bounded tool invocation, budget por plano, human-in-the-loop para ações com blast radius > threshold, auditoria completa do plano.
-- **Prompt/Context Registry versionado** — `PromptAsset` com versionamento, eval set associado (prompts como contratos).
+- **Prompt/Context Registry versionado** ✅ — `PromptAsset` + `PromptVersion` com versionamento (AI-5.2): `RegisterPromptAsset` command + `ComparePromptVersions` query; tabelas `aik_prompt_assets`/`aik_prompt_versions`; migração `20260425010000_AI52_AddPromptAssets`; 2 endpoints `POST /api/v1/ai/prompt-assets` + `GET /api/v1/ai/prompt-assets/{id}/compare`.
 - **AI Evaluation Harness** — dataset + métricas por caso de uso, permite trocar modelo com confiança. Ver [ADR-009](./adr/009-ai-evaluation-harness.md).
-- **Model Cost Attribution** — cruzar `ExternalAi` com `CostIntelligence` por serviço/equipa/tenant/caso de uso.
+- **Model Cost Attribution** ✅ — `GetAiCostAttributionReport` query agrega tokens por modelo/serviço/equipa com custo estimado USD; endpoint `GET /api/v1/ai/budget/cost-attribution`; 6 cross-module grounding tools (AI-4.2): `GetKnowledgeDocsTool`, `TriggerBlastRadiusTool`, `GetEvidencePackTool`, `CheckSloStatusTool`, `GetComplianceStatusTool`, `GetCostContextTool`.
 - **PII/Secret-aware redaction** ✅ — estendido `DefaultGuardrailCatalog` para **mascarar** (não só detectar): `pii-email-detection` e `pii-phone-detection` actualizados para `GuardrailAction.Sanitize`; adicionados `pii-credit-card-redaction` (PAN 13–19 dígitos, Critical), `pii-national-id-redaction` (SSN/NIF/tax-id, High) e `secret-bearer-token-redaction` (bearer + JWT, Critical), todos com `Action = Sanitize`. Catálogo oficial cresce de 8 → 11 guardrails. 2 novos testes de domínio (`Catalog_Has_Expected_Count`, `Contains_Pii_Redaction_Guardrails_With_Sanitize_Action`).
 
 #### A.5 Operational Intelligence — correlação real ✅
