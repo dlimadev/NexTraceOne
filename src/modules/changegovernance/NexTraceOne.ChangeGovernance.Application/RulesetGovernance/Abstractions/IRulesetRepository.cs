@@ -14,6 +14,9 @@ public interface IRulesetRepository
     /// <summary>Conta o total de rulesets ativos.</summary>
     Task<int> CountAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>Busca um Ruleset pelo nome (para idempotência no marketplace).</summary>
+    Task<Ruleset?> FindByNameAsync(string name, CancellationToken cancellationToken = default);
+
     /// <summary>Adiciona um novo Ruleset ao repositório.</summary>
     void Add(Ruleset ruleset);
 

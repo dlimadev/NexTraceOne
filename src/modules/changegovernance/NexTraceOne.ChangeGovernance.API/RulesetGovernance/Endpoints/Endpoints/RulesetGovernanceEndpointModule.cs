@@ -17,6 +17,8 @@ using GetRulesetFindingsFeature = NexTraceOne.ChangeGovernance.Application.Rules
 using GetRulesetScoreFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetRulesetScore.GetRulesetScore;
 using InstallDefaultRulesetsFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.InstallDefaultRulesets.InstallDefaultRulesets;
 using ComputeRulesetScoreFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ComputeRulesetScore.ComputeRulesetScore;
+using GetSpectralMarketplaceFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.GetSpectralMarketplace.GetSpectralMarketplace;
+using ActivateSpectralPackageFeature = NexTraceOne.ChangeGovernance.Application.RulesetGovernance.Features.ActivateSpectralPackage.ActivateSpectralPackage;
 
 namespace NexTraceOne.ChangeGovernance.API.RulesetGovernance.Endpoints.Endpoints;
 
@@ -153,5 +155,35 @@ public sealed class RulesetGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("rulesets:execute");
+
+        // ── CC-08: Contract Linting Marketplace ──────────────────────────
+        var marketplaceGroup = app.MapGroup("/api/v1/rulesets/marketplace");
+
+        marketplaceGroup.MapGet("/", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(new GetSpectralMarketplaceFeature.Query(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("rulesets:read")
+        .WithTags("Contract Linting Marketplace")
+        .WithSummary("List available Spectral packages in the marketplace");
+
+        marketplaceGroup.MapPost("/{packageId}/activate", async (
+            string packageId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ActivateSpectralPackageFeature.Command(packageId),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("rulesets:write")
+        .WithTags("Contract Linting Marketplace")
+        .WithSummary("Activate a Spectral package from the marketplace");
     }
 }

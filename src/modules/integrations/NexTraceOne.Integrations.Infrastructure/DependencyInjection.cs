@@ -58,6 +58,17 @@ public static class DependencyInjection
         // Repositories — Webhook Subscriptions
         services.AddScoped<IWebhookSubscriptionRepository, WebhookSubscriptionRepository>();
 
+        // Repositories — Pipeline (PIP-03/04/06)
+        services.AddScoped<ITenantPipelineRuleRepository, TenantPipelineRuleRepository>();
+        services.AddScoped<IStorageBucketRepository, StorageBucketRepository>();
+        services.AddScoped<ILogToMetricRuleRepository, LogToMetricRuleRepository>();
+
+        // Pipeline engine services (PIP-03/04/05/06) — IMemoryCache já registado no host
+        services.AddScoped<TenantPipelineEngine>();
+        services.AddScoped<StorageBucketRouter>();
+        services.AddScoped<LogToMetricProcessor>();
+        services.AddScoped<CatalogEnrichmentProcessor>();
+
         // Legacy Telemetry — Elastic writer (padrão)
         services.Configure<ElasticLegacyWriterOptions>(
             configuration.GetSection(ElasticLegacyWriterOptions.SectionName));

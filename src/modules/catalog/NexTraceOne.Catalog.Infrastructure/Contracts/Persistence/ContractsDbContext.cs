@@ -125,6 +125,15 @@ public sealed class ContractsDbContext(
     /// <summary>Snapshots analisados de schemas Protobuf para diff semântico e auditoria. Wave H.1.</summary>
     public DbSet<ProtobufSchemaSnapshot> ProtobufSchemaSnapshots => Set<ProtobufSchemaSnapshot>();
 
+    /// <summary>Schemas de Data Contracts (tabelas/vistas/streams analíticos) com classificação PII. CC-03.</summary>
+    public DbSet<DataContractSchema> DataContractSchemas => Set<DataContractSchema>();
+
+    /// <summary>Inventário de consumidores reais de contratos derivado de traces OTel. CC-04.</summary>
+    public DbSet<ContractConsumerInventory> ContractConsumerInventories => Set<ContractConsumerInventory>();
+
+    /// <summary>Propostas de breaking change com workflow de consulta de consumidores. CC-06.</summary>
+    public DbSet<BreakingChangeProposal> BreakingChangeProposals => Set<BreakingChangeProposal>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;

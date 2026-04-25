@@ -18,6 +18,7 @@ using GetPreProductionComparisonFeature = NexTraceOne.ChangeGovernance.Applicati
 using GetRiskScoreTrendFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetRiskScoreTrend.GetRiskScoreTrend;
 using EvaluateReleaseTrainFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluateReleaseTrain.EvaluateReleaseTrain;
 using GetDeploymentRiskForecastReportFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetDeploymentRiskForecastReport.GetDeploymentRiskForecastReport;
+using GetPredictiveBlastRadiusFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPredictiveBlastRadius.GetPredictiveBlastRadius;
 
 namespace NexTraceOne.ChangeGovernance.API.ChangeIntelligence.Endpoints.Endpoints;
 
@@ -171,5 +172,26 @@ internal static class AnalysisEndpoints
         .RequirePermission("change-intelligence:read")
         .WithName("GetDeploymentRiskForecastReport")
         .WithSummary("Returns predictive risk forecast for a release, combining historical rollback rate, environment instability, service risk profile and change confidence");
+
+        // ── CC-07: Predictive Blast Radius v2 — ProbabilityOfRegression ──
+        group.MapGet("/{releaseId:guid}/blast-radius/predictive", async (
+            Guid releaseId,
+            int? historicalLookbackDays,
+            double? minCallFrequency,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetPredictiveBlastRadiusFeature.Query(
+                    releaseId,
+                    historicalLookbackDays ?? 90,
+                    minCallFrequency ?? 10.0),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("change-intelligence:read")
+        .WithName("GetPredictiveBlastRadius")
+        .WithSummary("CC-07: Returns blast radius enriched with ProbabilityOfRegression per consumer");
     }
 }

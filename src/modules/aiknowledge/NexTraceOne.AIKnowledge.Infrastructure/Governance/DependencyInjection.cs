@@ -113,6 +113,10 @@ public static class DependencyInjection
         services.AddScoped<IEvaluationRunRepository, EvaluationRunRepository>();
         services.AddScoped<IEvaluationDatasetRepository, EvaluationDatasetRepository>();
 
+        // ── CC-05: AI Eval Harness — model comparison ─────────────────────
+        services.AddScoped<IAiEvalDatasetRepository, AiEvalDatasetRepository>();
+        services.AddScoped<IAiEvalRunRepository, AiEvalRunRepository>();
+
         // ── Integration Event Handlers (E-M02) ───────────────────────────
         services.AddScoped<HandleModelFeedbackThresholdExceededHandler>();
         services.AddScoped<

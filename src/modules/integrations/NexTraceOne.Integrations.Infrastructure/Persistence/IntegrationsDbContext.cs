@@ -34,6 +34,15 @@ public sealed class IntegrationsDbContext(
     /// <summary>Subscrições de webhook outbound por tenant.</summary>
     public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();
 
+    /// <summary>Regras de pipeline de ingestão configuráveis por tenant (PIP-03).</summary>
+    public DbSet<TenantPipelineRule> TenantPipelineRules => Set<TenantPipelineRule>();
+
+    /// <summary>Buckets de routing de storage por tenant (PIP-04).</summary>
+    public DbSet<StorageBucket> StorageBuckets => Set<StorageBucket>();
+
+    /// <summary>Regras de transformação de log em métrica por tenant (PIP-06).</summary>
+    public DbSet<LogToMetricRule> LogToMetricRules => Set<LogToMetricRule>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IntegrationsDbContext).Assembly;
 

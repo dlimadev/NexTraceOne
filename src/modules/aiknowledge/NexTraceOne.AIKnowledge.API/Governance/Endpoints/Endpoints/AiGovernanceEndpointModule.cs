@@ -101,6 +101,11 @@ using CreateEvaluationRunFeature = NexTraceOne.AIKnowledge.Application.Governanc
 using GetEvaluationRunFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetEvaluationRun.GetEvaluationRun;
 using CreateEvaluationDatasetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateEvaluationDataset.CreateEvaluationDataset;
 
+// ── CC-05: AI Eval Harness — model comparison ──────────────────────────
+using CreateAiEvalDatasetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.CreateAiEvalDataset.CreateAiEvalDataset;
+using RunAiEvaluationFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RunAiEvaluation.RunAiEvaluation;
+using GetAiEvalReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiEvalReport.GetAiEvalReport;
+
 using ListExternalDataSourcesFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ListExternalDataSources.ListExternalDataSources;
 using GetExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetExternalDataSource.GetExternalDataSource;
 using RegisterExternalDataSourceFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterExternalDataSource.RegisterExternalDataSource;
@@ -168,6 +173,7 @@ public sealed class AiGovernanceEndpointModule
         MapAgentExecutionPlanEndpoints(app);
         MapModelRoutingEndpoints(app);
         MapAiTokenBudgetEndpoints(app);
+        MapAiEvalHarnessEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1769,6 +1775,66 @@ public sealed class AiGovernanceEndpointModule
         .WithTags("AI Token Budget")
         .WithSummary("Get AI cost attribution report by dimension");
     }
+
+    // ── CC-05: AI Eval Harness — model comparison datasets & runs ───────────
+
+    private static void MapAiEvalHarnessEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var datasetsGroup = app.MapGroup("/api/v1/ai/eval/datasets");
+
+        datasetsGroup.MapPost("/", async (
+            CreateAiEvalDatasetRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(
+                new CreateAiEvalDatasetFeature.Command(
+                    req.TenantId,
+                    req.Name,
+                    req.UseCase,
+                    req.Description,
+                    req.TestCasesJson,
+                    req.TestCaseCount),
+                ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:evaluation:author")
+        .WithTags("AI Eval Harness CC-05")
+        .WithSummary("Create AI evaluation dataset");
+
+        datasetsGroup.MapPost("/{datasetId:guid}/run", async (
+            Guid datasetId,
+            RunAiEvaluationRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(
+                new RunAiEvaluationFeature.Command(req.TenantId, datasetId, req.ModelId),
+                ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:evaluation:author")
+        .WithTags("AI Eval Harness CC-05")
+        .WithSummary("Run evaluation of a dataset against a model");
+
+        datasetsGroup.MapGet("/{datasetId:guid}/report", async (
+            Guid datasetId,
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(
+                new GetAiEvalReportFeature.Query(tenantId, datasetId),
+                ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:evaluation:read")
+        .WithTags("AI Eval Harness CC-05")
+        .WithSummary("Get model comparison report for a dataset");
+    }
 }
 
 // ── Request DTOs para endpoints PATCH ───────────────────────────────────
@@ -1994,3 +2060,17 @@ public sealed record ApproveAgentStepRequest(
 public sealed record ClassifyIntentRequest(
     string Prompt,
     Guid? TenantId);
+
+/// <summary>Corpo de pedido para criação de dataset de avaliação CC-05.</summary>
+public sealed record CreateAiEvalDatasetRequest(
+    string TenantId,
+    string Name,
+    string UseCase,
+    string? Description,
+    string TestCasesJson,
+    int TestCaseCount);
+
+/// <summary>Corpo de pedido para execução de avaliação CC-05.</summary>
+public sealed record RunAiEvaluationRequest(
+    string TenantId,
+    string ModelId);

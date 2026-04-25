@@ -30,4 +30,9 @@ internal sealed class RulesetRepository(RulesetGovernanceDbContext context)
     public async Task<int> CountAsync(CancellationToken cancellationToken = default)
         => await context.Rulesets
             .CountAsync(r => !r.IsDeleted, cancellationToken);
+
+    /// <summary>Busca um Ruleset pelo nome (para idempotência no marketplace).</summary>
+    public async Task<Ruleset?> FindByNameAsync(string name, CancellationToken cancellationToken = default)
+        => await context.Rulesets
+            .FirstOrDefaultAsync(r => r.Name == name && !r.IsDeleted, cancellationToken);
 }

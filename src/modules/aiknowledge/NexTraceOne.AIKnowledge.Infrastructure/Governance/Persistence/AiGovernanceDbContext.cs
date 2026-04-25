@@ -81,6 +81,10 @@ public sealed class AiGovernanceDbContext(
     public DbSet<EvaluationRun> EvaluationRuns => Set<EvaluationRun>();
     public DbSet<EvaluationDataset> EvaluationDatasets => Set<EvaluationDataset>();
 
+    // ── CC-05: AI Eval Harness — model comparison datasets & runs ────────────
+    public DbSet<AiEvalDataset> EvalDatasets => Set<AiEvalDataset>();
+    public DbSet<AiEvalRun> EvalRuns => Set<AiEvalRun>();
+
     // ── External Data Sources (Extensible RAG) ───────────────────────────────
     public DbSet<ExternalDataSource> ExternalDataSources => Set<ExternalDataSource>();
 
