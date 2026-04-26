@@ -120,6 +120,9 @@ public static class DependencyInjection
         // NQL Query Governance — Wave V3.2
         services.AddScoped<IQueryGovernanceService, DefaultQueryGovernanceService>();
 
+        // Notebooks — Wave V3.4
+        services.AddScoped<INotebookRepository, NotebookRepository>();
+
         return services;
     }
 }

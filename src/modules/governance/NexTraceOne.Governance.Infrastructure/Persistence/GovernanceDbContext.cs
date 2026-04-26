@@ -114,6 +114,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Jobs de recovery de dados iniciados via plataforma.</summary>
     public DbSet<RecoveryJob> RecoveryJobs => Set<RecoveryJob>();
 
+    /// <summary>Notebooks operacionais (V3.4 — AI-assisted Dashboard Creation &amp; Notebook Mode).</summary>
+    public DbSet<Notebook> Notebooks => Set<Notebook>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

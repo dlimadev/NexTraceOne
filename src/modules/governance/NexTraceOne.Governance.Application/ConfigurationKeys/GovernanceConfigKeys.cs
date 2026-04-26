@@ -104,4 +104,44 @@ public static class GovernanceConfigKeys
 
     /// <summary>Thresholds de burn rate para classificação de confiabilidade (JSON: {elevated, critical}).</summary>
     public const string FinOpsEfficiencyBurnRateThresholds = "finops.efficiency.burn_rate_thresholds";
+
+    // ── Wave V3.4 — Notebooks &amp; AI Composer (sort 11000–11060) ─────────────────
+
+    /// <summary>Número máximo de células por notebook (default: 50).</summary>
+    public const string NotebookMaxCells = "notebook.max_cells";
+
+    /// <summary>Número máximo de notebooks por tenant (default: 500).</summary>
+    public const string NotebookMaxPerTenant = "notebook.max_per_tenant";
+
+    /// <summary>Habilita a execução de células Query (NQL) nas notebooks.</summary>
+    public const string NotebookQueryExecutionEnabled = "notebook.query_execution.enabled";
+
+    /// <summary>Número máximo de widgets propostos pelo AI Composer por chamada (default: 12).</summary>
+    public const string AiComposerMaxWidgets = "notebook.ai_composer.max_widgets";
+
+    /// <summary>Modelo de IA preferido para o AI Dashboard Composer (default: claude-sonnet-4-6).</summary>
+    public const string AiComposerModel = "notebook.ai_composer.model";
+
+    /// <summary>Habilita o AI Dashboard Composer para o tenant.</summary>
+    public const string AiComposerEnabled = "notebook.ai_composer.enabled";
+
+    // ── Wave V3.5 — Frontend Platform Uplift (sort 11100–11160) ──────────────
+
+    /// <summary>Habilita a Command Palette global (Ctrl+K / Cmd+K) no frontend.</summary>
+    public const string CommandPaletteEnabled = "frontend.command_palette.enabled";
+
+    /// <summary>Número máximo de resultados de busca semântica na Command Palette (default: 20).</summary>
+    public const string CommandPaletteMaxResults = "frontend.command_palette.max_results";
+
+    /// <summary>Habilita View Transitions API no frontend para transições de rota premium.</summary>
+    public const string ViewTransitionsEnabled = "frontend.view_transitions.enabled";
+
+    /// <summary>Budget de tamanho máximo do bundle JS em KB (default: 800).</summary>
+    public const string PerfBudgetBundleSizeKb = "frontend.perf_budget.bundle_size_kb";
+
+    /// <summary>Threshold de LCP (Largest Contentful Paint) em ms para CI pass/fail (default: 2500).</summary>
+    public const string PerfBudgetLcpMs = "frontend.perf_budget.lcp_ms";
+
+    /// <summary>Habilita telemetria de UX (eventos de uso por módulo alimentando ProductAnalytics).</summary>
+    public const string UxTelemetryEnabled = "frontend.ux_telemetry.enabled";
 }
