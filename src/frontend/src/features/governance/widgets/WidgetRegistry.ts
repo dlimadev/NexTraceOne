@@ -2,6 +2,7 @@
  * Dashboard widget types and registry for NexTraceOne custom dashboards.
  * Each widget is a self-contained React component that fetches its own data.
  * Registry maps widget type strings to React components.
+ * Wave V3.2 — adds query-widget type, nqlQuery config field, and widget categories.
  */
 import type { ComponentType } from 'react';
 
@@ -26,7 +27,8 @@ export type WidgetType =
   | 'contract-coverage'
   | 'blast-radius'
   | 'team-health'
-  | 'release-calendar';
+  | 'release-calendar'
+  | 'query-widget';
 
 export const ALL_WIDGET_TYPES: WidgetType[] = [
   'dora-metrics',
@@ -48,6 +50,7 @@ export const ALL_WIDGET_TYPES: WidgetType[] = [
   'blast-radius',
   'team-health',
   'release-calendar',
+  'query-widget',
 ];
 
 export interface WidgetConfig {
@@ -59,6 +62,10 @@ export interface WidgetConfig {
   metric?: string | null;
   /** TextMarkdownWidget: markdown content stored in widget config */
   content?: string | null;
+  /** QueryWidget (V3.2): NQL query string */
+  nqlQuery?: string | null;
+  /** QueryWidget (V3.2): render hint override (table|line|bar|area|stat|heatmap) */
+  renderHint?: string | null;
 }
 
 export interface WidgetSlot {
@@ -74,6 +81,8 @@ export interface WidgetSlot {
   customTitle?: string | null;
   metric?: string | null;
   content?: string | null;
+  nqlQuery?: string | null;
+  renderHint?: string | null;
 }
 
 export interface WidgetProps {
@@ -84,7 +93,35 @@ export interface WidgetProps {
   timeRange: string;
   /** Display title override */
   title?: string | null;
+  /** V3.3: Called when a widget wants to apply a cross-filter to other widgets */
+  onCrossFilter?: (filter: { serviceId?: string | null; teamId?: string | null; from?: string | null; to?: string | null }) => void;
+  /** V3.3: Called when a widget requests drill-down navigation */
+  onDrillDown?: (path: string) => void;
+  /** V3.3: Active cross-filter state (from context) so widgets can dim un-matching data */
+  activeCrossFilter?: { serviceId?: string | null; teamId?: string | null; from?: string | null; to?: string | null } | null;
 }
+
+// ── Widget categories (V3.2) ───────────────────────────────────────────────
+
+export type WidgetCategory =
+  | 'all'
+  | 'services'
+  | 'changes'
+  | 'operations'
+  | 'knowledge'
+  | 'finops'
+  | 'ai'
+  | 'customQuery';
+
+export const WIDGET_CATEGORIES: { value: WidgetCategory; labelKey: string }[] = [
+  { value: 'all',         labelKey: 'widgetCategories.all' },
+  { value: 'services',    labelKey: 'widgetCategories.services' },
+  { value: 'changes',     labelKey: 'widgetCategories.changes' },
+  { value: 'operations',  labelKey: 'widgetCategories.operations' },
+  { value: 'knowledge',   labelKey: 'widgetCategories.knowledge' },
+  { value: 'finops',      labelKey: 'widgetCategories.finops' },
+  { value: 'customQuery', labelKey: 'widgetCategories.customQuery' },
+];
 
 // ── Registry ───────────────────────────────────────────────────────────────
 
@@ -100,6 +137,8 @@ export interface WidgetMeta {
   defaultHeight: number;
   /** Persona relevance hint */
   personas: string[];
+  /** Widget category for the palette (V3.2) */
+  category: WidgetCategory;
 }
 
 export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
@@ -109,6 +148,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
+    category: 'changes',
   },
   'service-scorecard': {
     type: 'service-scorecard',
@@ -116,6 +156,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect'],
+    category: 'services',
   },
   'incident-summary': {
     type: 'incident-summary',
@@ -123,6 +164,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Executive'],
+    category: 'operations',
   },
   'change-confidence': {
     type: 'change-confidence',
@@ -130,6 +172,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect'],
+    category: 'changes',
   },
   'cost-trend': {
     type: 'cost-trend',
@@ -137,6 +180,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Executive', 'Product', 'Architect'],
+    category: 'finops',
   },
   'reliability-slo': {
     type: 'reliability-slo',
@@ -144,6 +188,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Executive'],
+    category: 'operations',
   },
   'knowledge-graph': {
     type: 'knowledge-graph',
@@ -151,6 +196,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 3,
     defaultHeight: 3,
     personas: ['Architect', 'TechLead'],
+    category: 'knowledge',
   },
   'on-call-status': {
     type: 'on-call-status',
@@ -158,6 +204,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 1,
     personas: ['Engineer', 'TechLead'],
+    category: 'operations',
   },
   'alert-status': {
     type: 'alert-status',
@@ -165,6 +212,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Executive', 'Auditor'],
+    category: 'operations',
   },
   'change-timeline': {
     type: 'change-timeline',
@@ -172,6 +220,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 3,
     defaultHeight: 3,
     personas: ['Engineer', 'TechLead', 'Architect', 'Auditor'],
+    category: 'changes',
   },
   'slo-gauge': {
     type: 'slo-gauge',
@@ -179,6 +228,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Executive', 'Product'],
+    category: 'operations',
   },
   'deployment-frequency': {
     type: 'deployment-frequency',
@@ -186,6 +236,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 3,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Executive', 'Product'],
+    category: 'changes',
   },
   'stat': {
     type: 'stat',
@@ -193,6 +244,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 1,
     defaultHeight: 1,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'Auditor'],
+    category: 'services',
   },
   'text-markdown': {
     type: 'text-markdown',
@@ -200,6 +252,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 1,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
+    category: 'knowledge',
   },
   'top-services': {
     type: 'top-services',
@@ -207,6 +260,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Executive', 'Auditor'],
+    category: 'services',
   },
   'contract-coverage': {
     type: 'contract-coverage',
@@ -214,6 +268,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Architect', 'TechLead', 'PlatformAdmin', 'Auditor', 'Executive'],
+    category: 'services',
   },
   'blast-radius': {
     type: 'blast-radius',
@@ -221,6 +276,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect', 'Executive'],
+    category: 'changes',
   },
   'team-health': {
     type: 'team-health',
@@ -228,6 +284,7 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 2,
     defaultHeight: 2,
     personas: ['TechLead', 'Engineer', 'Executive', 'PlatformAdmin'],
+    category: 'services',
   },
   'release-calendar': {
     type: 'release-calendar',
@@ -235,8 +292,24 @@ export const WIDGET_META: Record<WidgetType, WidgetMeta> = {
     defaultWidth: 3,
     defaultHeight: 2,
     personas: ['Engineer', 'TechLead', 'Architect', 'Product'],
+    category: 'changes',
+  },
+  'query-widget': {
+    type: 'query-widget',
+    labelKey: 'governance.customDashboards.widgets.queryWidget',
+    defaultWidth: 3,
+    defaultHeight: 3,
+    personas: ['Engineer', 'TechLead', 'Architect', 'Executive', 'Product', 'PlatformAdmin', 'Auditor'],
+    category: 'customQuery',
   },
 };
+
+/** Filter WIDGET_META by category (V3.2) */
+export function getWidgetsByCategory(category: WidgetCategory): WidgetMeta[] {
+  const all = Object.values(WIDGET_META);
+  if (category === 'all') return all;
+  return all.filter(w => w.category === category);
+}
 
 /** Convert a time range string (e.g. '7d') to an approximate number of days for API calls */
 export function timeRangeToDays(timeRange: string): number {
@@ -271,3 +344,15 @@ export const TIME_RANGE_OPTIONS = [
   { value: '7d', labelKey: 'governance.dashboardView.timeRange.7d' },
   { value: '30d', labelKey: 'governance.dashboardView.timeRange.30d' },
 ] as const;
+
+/** NQL render hint options (V3.2) */
+export const NQL_RENDER_HINTS = [
+  { value: 'table',   labelKey: 'nqlEditor.renderHintTable' },
+  { value: 'line',    labelKey: 'nqlEditor.renderHintLine' },
+  { value: 'bar',     labelKey: 'nqlEditor.renderHintBar' },
+  { value: 'area',    labelKey: 'nqlEditor.renderHintArea' },
+  { value: 'stat',    labelKey: 'nqlEditor.renderHintStat' },
+  { value: 'heatmap', labelKey: 'nqlEditor.renderHintHeatmap' },
+] as const;
+
+export type NqlRenderHint = (typeof NQL_RENDER_HINTS)[number]['value'];
