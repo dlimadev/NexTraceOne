@@ -93,6 +93,12 @@ export interface WidgetProps {
   timeRange: string;
   /** Display title override */
   title?: string | null;
+  /** V3.3: Called when a widget wants to apply a cross-filter to other widgets */
+  onCrossFilter?: (filter: { serviceId?: string | null; teamId?: string | null; from?: string | null; to?: string | null }) => void;
+  /** V3.3: Called when a widget requests drill-down navigation */
+  onDrillDown?: (path: string) => void;
+  /** V3.3: Active cross-filter state (from context) so widgets can dim un-matching data */
+  activeCrossFilter?: { serviceId?: string | null; teamId?: string | null; from?: string | null; to?: string | null } | null;
 }
 
 // ── Widget categories (V3.2) ───────────────────────────────────────────────

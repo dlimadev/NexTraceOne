@@ -10,6 +10,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { CrossFilterProvider, useCrossFilter } from '../context/CrossFilterContext';
+import { CrossFilterBreadcrumb } from '../components/CrossFilterBreadcrumb';
+import { useDashboardLive } from '../hooks/useDashboardLive';
+import { getDrillRoute } from '../widgets/drillRoutes';
 import {
   ArrowLeft,
   RefreshCw,
@@ -161,28 +165,63 @@ const AUTO_REFRESH_OPTIONS = [
 ];
 
 export function DashboardViewPage() {
+  return (
+    <CrossFilterProvider>
+      <DashboardViewInner />
+    </CrossFilterProvider>
+  );
+}
+
+function DashboardViewInner() {
   const { t } = useTranslation();
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { activeEnvironmentId } = useEnvironment();
   const TENANT_ID = 'default';
+  const { filter: crossFilter, hasFilter: hasCrossFilter, applyFilter: applyCrossFilter } = useCrossFilter();
 
   const isKiosk = searchParams.get('kiosk') === 'tv';
 
-  const [timeRange, setTimeRange] = useState('24h');
+  // ── Deep-link: initialise from URL params ──────────────────────────────
+  const [timeRange, setTimeRange] = useState(() => searchParams.get('timeRange') ?? '24h');
   const [autoRefreshSeconds, setAutoRefreshSeconds] = useState(0);
   // Dashboard variables — Grafana-style global overrides applied to all widgets
-  const [varService, setVarService] = useState('');
-  const [varTeam, setVarTeam] = useState('');
+  const [varService, setVarService] = useState(() => searchParams.get('service') ?? '');
+  const [varTeam, setVarTeam] = useState(() => searchParams.get('team') ?? '');
   const [showVars, setShowVars] = useState(false);
   // Fullscreen expand: stores the widgetId of the widget being expanded (null = closed)
   const [expandedWidgetId, setExpandedWidgetId] = useState<string | null>(null);
   // V3.1 — History drawer + Sharing modal
   const [showHistory, setShowHistory] = useState(false);
   const [showSharingModal, setShowSharingModal] = useState(false);
+  // V3.3 — Live toggle
+  const [isLiveEnabled, setIsLiveEnabled] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const qc = useQueryClient();
+
+  // ── Deep-link: sync state → URL params ────────────────────────────────
+  useEffect(() => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (timeRange !== '24h') next.set('timeRange', timeRange); else next.delete('timeRange');
+      if (varService) next.set('service', varService); else next.delete('service');
+      if (varTeam) next.set('team', varTeam); else next.delete('team');
+      if (crossFilter.serviceId) next.set('filterService', crossFilter.serviceId); else next.delete('filterService');
+      if (crossFilter.teamId) next.set('filterTeam', crossFilter.teamId); else next.delete('filterTeam');
+      if (crossFilter.from) next.set('filterFrom', crossFilter.from); else next.delete('filterFrom');
+      if (crossFilter.to) next.set('filterTo', crossFilter.to); else next.delete('filterTo');
+      return next;
+    }, { replace: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeRange, varService, varTeam, crossFilter.serviceId, crossFilter.teamId, crossFilter.from, crossFilter.to]);
+
+  // ── V3.3 live hook ────────────────────────────────────────────────────
+  const { isLive, isSimulated: liveSimulated, error: liveError, reconnect: liveReconnect } = useDashboardLive({
+    dashboardId: dashboardId ?? '',
+    tenantId: TENANT_ID,
+    enabled: isLiveEnabled && Boolean(dashboardId),
+  });
 
   const { data, isLoading, isError, refetch } = useRenderData(
     dashboardId ?? '',
@@ -307,6 +346,9 @@ export function DashboardViewPage() {
                       environmentId={activeEnvironmentId}
                       timeRange={slot.effectiveTimeRange}
                       title={slot.customTitle}
+                      onCrossFilter={(f) => applyCrossFilter({ ...f, sourceWidgetId: slot.widgetId })}
+                      onDrillDown={(path) => navigate(path)}
+                      activeCrossFilter={hasCrossFilter ? crossFilter : null}
                     />
                   ) : (
                     <div className="h-full flex items-center justify-center p-2">
@@ -390,6 +432,24 @@ export function DashboardViewPage() {
             >
               <RefreshCw size={12} />
             </Button>
+
+            {/* Live toggle (V3.3) */}
+            <button
+              type="button"
+              onClick={() => setIsLiveEnabled(v => !v)}
+              aria-label={isLiveEnabled ? t('dashboardLive.liveOn', 'Live updates on') : t('dashboardLive.liveOff', 'Live updates off')}
+              aria-pressed={isLiveEnabled}
+              className={`flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors ${
+                isLiveEnabled
+                  ? isLive
+                    ? 'border-green-600 bg-green-950 text-green-300'
+                    : 'border-yellow-600 bg-yellow-950 text-yellow-300 animate-pulse'
+                  : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-500 hover:text-accent'
+              }`}
+            >
+              <span className={`inline-block h-2 w-2 rounded-full ${isLiveEnabled && isLive ? 'bg-green-400' : isLiveEnabled ? 'bg-yellow-400' : 'bg-gray-500'}`} />
+              <span>{t('dashboardLive.liveToggle', 'Live')}</span>
+            </button>
 
             {/* History (V3.1) */}
             <Button
@@ -491,6 +551,30 @@ export function DashboardViewPage() {
         </div>
       )}
 
+      {/* V3.3 — Live error banner */}
+      {isLiveEnabled && liveError && (
+        <div className="mb-3 flex items-center justify-between rounded-md border border-yellow-700 bg-yellow-950 px-3 py-2 text-xs text-yellow-300">
+          <span>⚠ {t('dashboardLive.errorBanner', 'Live connection lost')} — {liveError}</span>
+          <button type="button" onClick={liveReconnect} className="ml-4 underline hover:no-underline">
+            {t('dashboardLive.reconnect', 'Reconnect')}
+          </button>
+        </div>
+      )}
+
+      {/* V3.3 — Live simulated banner */}
+      {isLiveEnabled && isLive && liveSimulated && (
+        <div className="mb-3 rounded-md border border-blue-800 bg-blue-950/50 px-3 py-1.5 text-xs text-blue-300">
+          ⚠ {t('dashboardLive.simulatedBanner', 'Live data is simulated')} — {t('dashboardLive.simulatedNote', 'Connect real-time ingestion to enable live widget updates.')}
+        </div>
+      )}
+
+      {/* V3.3 — Cross-filter breadcrumb */}
+      {hasCrossFilter && (
+        <div className="mb-3">
+          <CrossFilterBreadcrumb />
+        </div>
+      )}
+
       {/* Widget grid */}
       {data.widgets.length === 0 ? (
         <div className="flex items-center justify-center h-48 text-sm text-gray-400">
@@ -504,6 +588,14 @@ export function DashboardViewPage() {
             // Variables override: if a variable is set it takes precedence over the slot's effectiveServiceId/TeamId
             const resolvedServiceId = varService || slot.effectiveServiceId;
             const resolvedTeamId = varTeam || slot.effectiveTeamId;
+            // V3.3 — Drill-down destination for this widget
+            const drillDest = getDrillRoute(slot.type as WidgetType, {
+              serviceId: resolvedServiceId,
+              teamId: resolvedTeamId,
+              environmentId: activeEnvironmentId,
+              from: crossFilter.from,
+              to: crossFilter.to,
+            });
 
             return (
               <div
@@ -527,20 +619,37 @@ export function DashboardViewPage() {
                     environmentId={activeEnvironmentId}
                     timeRange={slot.effectiveTimeRange}
                     title={slot.customTitle}
+                    onCrossFilter={(f) => applyCrossFilter({ ...f, sourceWidgetId: slot.widgetId })}
+                    onDrillDown={(path) => navigate(path)}
+                    activeCrossFilter={hasCrossFilter ? crossFilter : null}
                   />
                 ) : (
                   <div className="h-full flex items-center justify-center p-2">
                     <Skeleton variant="rectangular" className="h-full w-full" />
                   </div>
                 )}
-                {/* Fullscreen expand button — visible on hover */}
-                <button
-                  onClick={() => setExpandedWidgetId(slot.widgetId)}
-                  className="absolute top-1 right-1 p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
-                  aria-label={t('governance.dashboardView.expandWidget', 'Expand widget')}
-                >
-                  <Maximize2 size={12} />
-                </button>
+                {/* Hover controls row: Drill-down + Expand */}
+                <div className="absolute top-1 right-1 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
+                  {drillDest && (
+                    <button
+                      type="button"
+                      onClick={() => navigate(drillDest.path)}
+                      className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent text-xs"
+                      title={t(drillDest.labelKey, drillDest.label)}
+                      aria-label={t(drillDest.labelKey, drillDest.label)}
+                    >
+                      ↗
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setExpandedWidgetId(slot.widgetId)}
+                    className="p-1 rounded bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-accent"
+                    aria-label={t('governance.dashboardView.expandWidget', 'Expand widget')}
+                  >
+                    <Maximize2 size={12} />
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -587,6 +696,9 @@ export function DashboardViewPage() {
                     environmentId={activeEnvironmentId}
                     timeRange={slot.effectiveTimeRange}
                     title={slot.customTitle}
+                    onCrossFilter={(f) => applyCrossFilter({ ...f, sourceWidgetId: slot.widgetId })}
+                    onDrillDown={(path) => { setExpandedWidgetId(null); navigate(path); }}
+                    activeCrossFilter={hasCrossFilter ? crossFilter : null}
                   />
                 ) : (
                   <div className="h-full flex items-center justify-center p-2">

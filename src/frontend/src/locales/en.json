@@ -15324,5 +15324,40 @@
     "ai": "AI",
     "customQuery": "Custom Query",
     "all": "All widgets"
+  },
+  "crossFilter": {
+    "activeFilters": "Active filters",
+    "clearAll": "Clear all",
+    "removeFilter": "Remove {{label}} filter",
+    "service": "Service",
+    "team": "Team",
+    "from": "From",
+    "to": "To"
+  },
+  "drillDown": {
+    "openWith": "Open with…",
+    "openIncidents": "Open Incidents",
+    "openSlos": "Open SLOs",
+    "openDora": "Open DORA Metrics",
+    "openReleaseCalendar": "Open Release Calendar",
+    "openChangeScores": "Open Change Scores",
+    "openCatalog": "Open Service Catalog",
+    "openDependencyMap": "Open Dependency Map",
+    "openTeams": "Open Team Dashboard",
+    "openCompliance": "Open Compliance",
+    "openRisk": "Open Risk Center",
+    "openFinOps": "Open FinOps",
+    "openTechDebt": "Open Technical Debt",
+    "openExecutive": "Open Executive Overview"
+  },
+  "dashboardLive": {
+    "liveToggle": "Live",
+    "liveOn": "Live updates on",
+    "liveOff": "Live updates off",
+    "simulatedBanner": "Live data is simulated",
+    "simulatedNote": "Connect real-time ingestion to enable live widget updates.",
+    "reconnect": "Reconnect",
+    "errorBanner": "Live connection lost",
+    "fallbackPolling": "Using polling fallback"
   }
 }

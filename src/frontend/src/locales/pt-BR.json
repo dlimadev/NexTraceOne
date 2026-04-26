@@ -16589,5 +16589,40 @@
     "ai": "IA",
     "customQuery": "Query Personalizada",
     "all": "Todos os widgets"
+  },
+  "crossFilter": {
+    "activeFilters": "Filtros ativos",
+    "clearAll": "Limpar tudo",
+    "removeFilter": "Remover filtro {{label}}",
+    "service": "Serviço",
+    "team": "Equipa",
+    "from": "De",
+    "to": "Até"
+  },
+  "drillDown": {
+    "openWith": "Abrir com…",
+    "openIncidents": "Abrir Incidentes",
+    "openSlos": "Abrir SLOs",
+    "openDora": "Abrir Métricas DORA",
+    "openReleaseCalendar": "Abrir Calendário de Releases",
+    "openChangeScores": "Abrir Scores de Mudanças",
+    "openCatalog": "Abrir Catálogo de Serviços",
+    "openDependencyMap": "Abrir Mapa de Dependências",
+    "openTeams": "Abrir Dashboard da Equipa",
+    "openCompliance": "Abrir Conformidade",
+    "openRisk": "Abrir Centro de Risco",
+    "openFinOps": "Abrir FinOps",
+    "openTechDebt": "Abrir Dívida Técnica",
+    "openExecutive": "Abrir Visão Executiva"
+  },
+  "dashboardLive": {
+    "liveToggle": "Ao Vivo",
+    "liveOn": "Atualizações ao vivo ativadas",
+    "liveOff": "Atualizações ao vivo desativadas",
+    "simulatedBanner": "Dados ao vivo simulados",
+    "simulatedNote": "Conecte a ingestão em tempo real para ativar atualizações ao vivo.",
+    "reconnect": "Reconectar",
+    "errorBanner": "Conexão ao vivo perdida",
+    "fallbackPolling": "A usar polling como fallback"
   }
 }

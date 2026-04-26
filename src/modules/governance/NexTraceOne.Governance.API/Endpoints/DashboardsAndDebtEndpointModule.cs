@@ -20,6 +20,8 @@ using GetTechnicalDebtSummaryFeature = NexTraceOne.Governance.Application.Featur
 using ExecuteNqlQueryFeature = NexTraceOne.Governance.Application.Features.ExecuteNqlQuery.ExecuteNqlQuery;
 using ValidateNqlQueryFeature = NexTraceOne.Governance.Application.Features.ValidateNqlQuery.ValidateNqlQuery;
 using GetDashboardAnnotationsFeature = NexTraceOne.Governance.Application.Features.GetDashboardAnnotations.GetDashboardAnnotations;
+using GetDashboardLiveStreamFeature = NexTraceOne.Governance.Application.Features.GetDashboardLiveStream.GetDashboardLiveStream;
+using GetWidgetDeltaFeature = NexTraceOne.Governance.Application.Features.GetWidgetDelta.GetWidgetDelta;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -35,6 +37,7 @@ public sealed class DashboardsAndDebtEndpointModule
         MapDashboardEndpoints(app);
         MapTechnicalDebtEndpoints(app);
         MapNqlEndpoints(app);
+        MapLiveEndpoints(app);
     }
 
     private static void MapDashboardEndpoints(IEndpointRouteBuilder app)
@@ -218,6 +221,52 @@ public sealed class DashboardsAndDebtEndpointModule
                 ? null
                 : (IReadOnlyList<string>)services.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var query = new GetDashboardAnnotationsFeature.Query(tenantId, from, to, serviceList, maxPerSource);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+    }
+
+    private static void MapLiveEndpoints(IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/governance/dashboards");
+
+        // ── SSE live stream para um dashboard (Wave V3.3) ──
+        group.MapGet("/{dashboardId:guid}/live", async (
+            Guid dashboardId,
+            string tenantId,
+            string? widgetIds,
+            HttpContext ctx,
+            CancellationToken cancellationToken) =>
+        {
+            ctx.Response.Headers.ContentType  = "text/event-stream";
+            ctx.Response.Headers.CacheControl = "no-cache";
+            ctx.Response.Headers.Connection   = "keep-alive";
+
+            var widgetList = string.IsNullOrWhiteSpace(widgetIds)
+                ? null
+                : (IReadOnlyList<string>)widgetIds.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            var query = new GetDashboardLiveStreamFeature.Query(dashboardId, tenantId, widgetList);
+
+            await foreach (var evt in GetDashboardLiveStreamFeature.GenerateEventsAsync(query, cancellationToken))
+            {
+                var frame = GetDashboardLiveStreamFeature.ToSseFrame(evt);
+                await ctx.Response.WriteAsync(frame, cancellationToken);
+                await ctx.Response.Body.FlushAsync(cancellationToken);
+            }
+        }).RequirePermission("governance:reports:read");
+
+        // ── Delta de widget desde timestamp (Wave V3.3) ──
+        group.MapGet("/{dashboardId:guid}/widgets/{widgetId}/delta", async (
+            Guid dashboardId,
+            string widgetId,
+            string tenantId,
+            DateTimeOffset since,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetWidgetDeltaFeature.Query(dashboardId, widgetId, tenantId, since);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");
