@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Nql;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
@@ -115,6 +116,9 @@ public static class DependencyInjection
 
         // Ingestion Observability — DLQ stats da bb_dead_letter_messages para dashboard de ingestão
         services.AddScoped<IIngestionObservabilityProvider, IngestionObservabilityProvider>();
+
+        // NQL Query Governance — Wave V3.2
+        services.AddScoped<IQueryGovernanceService, DefaultQueryGovernanceService>();
 
         return services;
     }

@@ -51,6 +51,7 @@ import { ContractCoverageWidget } from '../widgets/ContractCoverageWidget';
 import { BlastRadiusWidget } from '../widgets/BlastRadiusWidget';
 import { TeamHealthWidget } from '../widgets/TeamHealthWidget';
 import { ReleaseCalendarWidget } from '../widgets/ReleaseCalendarWidget';
+import { QueryWidget } from '../widgets/QueryWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
@@ -79,6 +80,7 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'blast-radius': BlastRadiusWidget,
   'team-health': TeamHealthWidget,
   'release-calendar': ReleaseCalendarWidget,
+  'query-widget': QueryWidget,
 };
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -96,6 +98,8 @@ interface WidgetSlot {
   customTitle?: string | null;
   metric?: string | null;
   content?: string | null;
+  nqlQuery?: string | null;
+  renderHint?: string | null;
 }
 
 interface RenderDataResponse {
@@ -297,6 +301,8 @@ export function DashboardViewPage() {
                         customTitle: slot.customTitle,
                         metric: slot.metric,
                         content: slot.content,
+                        nqlQuery: slot.nqlQuery,
+                        renderHint: slot.renderHint,
                       }}
                       environmentId={activeEnvironmentId}
                       timeRange={slot.effectiveTimeRange}
@@ -515,6 +521,8 @@ export function DashboardViewPage() {
                       customTitle: slot.customTitle,
                       metric: slot.metric,
                       content: slot.content,
+                      nqlQuery: slot.nqlQuery,
+                      renderHint: slot.renderHint,
                     }}
                     environmentId={activeEnvironmentId}
                     timeRange={slot.effectiveTimeRange}
@@ -573,6 +581,8 @@ export function DashboardViewPage() {
                       customTitle: slot.customTitle,
                       metric: slot.metric,
                       content: slot.content,
+                      nqlQuery: slot.nqlQuery,
+                      renderHint: slot.renderHint,
                     }}
                     environmentId={activeEnvironmentId}
                     timeRange={slot.effectiveTimeRange}

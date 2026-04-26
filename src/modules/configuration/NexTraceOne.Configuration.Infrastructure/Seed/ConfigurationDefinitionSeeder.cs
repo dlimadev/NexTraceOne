@@ -10748,5 +10748,50 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "10",
             uiEditorType: "number",
             sortOrder: 12960),
+
+        // ── Wave V3.2 — Query-driven Widgets & Widget SDK ─────────────────────
+        ConfigurationDefinition.Create(
+            key: "governance.nql.row_cap",
+            displayName: "config.governance.nql.row_cap.label",
+            description: "config.governance.nql.row_cap.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "1000",
+            uiEditorType: "number",
+            sortOrder: 12970),
+
+        ConfigurationDefinition.Create(
+            key: "governance.nql.timeout_ms",
+            displayName: "config.governance.nql.timeout_ms.label",
+            description: "config.governance.nql.timeout_ms.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5000",
+            uiEditorType: "number",
+            sortOrder: 12980),
+
+        ConfigurationDefinition.Create(
+            key: "governance.annotations.max_per_source",
+            displayName: "config.governance.annotations.max_per_source.label",
+            description: "config.governance.annotations.max_per_source.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 12990),
+
+        ConfigurationDefinition.Create(
+            key: "governance.nql.enabled_modules",
+            displayName: "config.governance.nql.enabled_modules.label",
+            description: "config.governance.nql.enabled_modules.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.String,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "catalog,changes,operations,knowledge,finops,governance",
+            uiEditorType: "text",
+            sortOrder: 13000),
     ];
 }
