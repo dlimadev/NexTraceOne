@@ -238,7 +238,7 @@ public sealed class DashboardsAndDebtEndpointModule
             HttpContext ctx,
             CancellationToken cancellationToken) =>
         {
-            ctx.Response.Headers.ContentType  = "text/event-stream";
+            ctx.Response.ContentType = "text/event-stream";
             ctx.Response.Headers.CacheControl = "no-cache";
             ctx.Response.Headers.Connection   = "keep-alive";
 

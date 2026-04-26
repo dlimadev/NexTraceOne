@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using NexTraceOne.BuildingBlocks.Application.Cqrs;
-using NexTraceOne.BuildingBlocks.Core.Results;
 
 namespace NexTraceOne.Governance.Application.Features.GetDashboardLiveStream;
 
