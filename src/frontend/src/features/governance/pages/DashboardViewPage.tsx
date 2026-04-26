@@ -8,7 +8,7 @@
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -16,7 +16,6 @@ import {
   Settings,
   Clock,
   Share2,
-  Check,
   LayoutDashboard,
   SlidersHorizontal,
   ChevronDown,
@@ -55,6 +54,8 @@ import { ReleaseCalendarWidget } from '../widgets/ReleaseCalendarWidget';
 import { TIME_RANGE_OPTIONS, type WidgetType } from '../widgets/WidgetRegistry';
 import type { WidgetProps } from '../widgets/WidgetRegistry';
 import type { ComponentType } from 'react';
+import { DashboardHistoryDrawer } from '../components/DashboardHistoryDrawer';
+import { DashboardSharingModal } from '../components/DashboardSharingModal';
 
 // ── Widget registry map ────────────────────────────────────────────────────
 
@@ -123,19 +124,7 @@ const useRenderData = (dashboardId: string, tenantId: string, environmentId?: st
     enabled: Boolean(dashboardId),
   });
 
-const useShareDashboard = (dashboardId: string) => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: () =>
-      client.put(`/governance/dashboards/${dashboardId}`, {
-        isShared: true,
-      }).then((r) => r.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['dashboard-render-data', dashboardId] });
-      qc.invalidateQueries({ queryKey: ['governance-dashboards'] });
-    },
-  });
-};
+// useShareDashboard removed in V3.1 — replaced by DashboardSharingModal (granular policy)
 
 // ── CSS Grid helpers ───────────────────────────────────────────────────────
 
@@ -179,13 +168,15 @@ export function DashboardViewPage() {
 
   const [timeRange, setTimeRange] = useState('24h');
   const [autoRefreshSeconds, setAutoRefreshSeconds] = useState(0);
-  const [copied, setCopied] = useState(false);
   // Dashboard variables — Grafana-style global overrides applied to all widgets
   const [varService, setVarService] = useState('');
   const [varTeam, setVarTeam] = useState('');
   const [showVars, setShowVars] = useState(false);
   // Fullscreen expand: stores the widgetId of the widget being expanded (null = closed)
   const [expandedWidgetId, setExpandedWidgetId] = useState<string | null>(null);
+  // V3.1 — History drawer + Sharing modal
+  const [showHistory, setShowHistory] = useState(false);
+  const [showSharingModal, setShowSharingModal] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const qc = useQueryClient();
 
@@ -195,8 +186,6 @@ export function DashboardViewPage() {
     activeEnvironmentId,
     timeRange,
   );
-
-  const shareMutation = useShareDashboard(dashboardId ?? '');
 
   // ── Auto-refresh ──────────────────────────────────────────────────────
   const doRefresh = useCallback(() => {
@@ -214,14 +203,6 @@ export function DashboardViewPage() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [autoRefreshSeconds, doRefresh]);
-
-  const handleShare = async () => {
-    await shareMutation.mutateAsync();
-    const url = window.location.href;
-    await navigator.clipboard.writeText(url).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   const handleToggleKiosk = () => {
     setSearchParams((prev) => {
@@ -404,19 +385,25 @@ export function DashboardViewPage() {
               <RefreshCw size={12} />
             </Button>
 
-            {/* Share */}
+            {/* History (V3.1) */}
             <Button
               size="sm"
               variant="secondary"
-              onClick={handleShare}
-              disabled={shareMutation.isPending}
+              onClick={() => setShowHistory(true)}
+              aria-label={t('dashboardHistory.title', 'Dashboard History')}
             >
-              {copied ? <Check size={12} className="text-green-500" /> : <Share2 size={12} />}
-              <span className="ml-1">
-                {copied
-                  ? t('governance.dashboardView.copied', 'Copied!')
-                  : t('governance.dashboardView.share', 'Share')}
-              </span>
+              <Clock size={12} />
+              <span className="ml-1">{t('dashboardHistory.title', 'History')}</span>
+            </Button>
+
+            {/* Share (V3.1 — granular) */}
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setShowSharingModal(true)}
+            >
+              <Share2 size={12} />
+              <span className="ml-1">{t('governance.dashboardView.share', 'Share')}</span>
             </Button>
 
             {/* Edit */}
@@ -606,6 +593,25 @@ export function DashboardViewPage() {
         {t('governance.dashboardView.generatedAt', 'Generated at')}{' '}
         {new Date(data.generatedAt).toLocaleTimeString()}
       </p>
+
+      {/* V3.1 — History Drawer */}
+      <DashboardHistoryDrawer
+        dashboardId={dashboardId}
+        tenantId={TENANT_ID}
+        currentRevisionNumber={0}
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
+      />
+
+      {/* V3.1 — Sharing Modal */}
+      <DashboardSharingModal
+        dashboardId={dashboardId}
+        tenantId={TENANT_ID}
+        currentScope={0}
+        currentPermission={0}
+        isOpen={showSharingModal}
+        onClose={() => setShowSharingModal(false)}
+      />
     </PageContainer>
   );
 }

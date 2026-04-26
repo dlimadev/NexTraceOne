@@ -1,6 +1,7 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Domain.Entities;
 
@@ -56,8 +57,26 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     /// <summary>Widgets configurados no dashboard com posição e config contextual (JSONB).</summary>
     public IReadOnlyList<DashboardWidget> Widgets { get; private set; } = [];
 
-    /// <summary>Indica se o dashboard é partilhado com a equipa.</summary>
-    public bool IsShared { get; private set; }
+    /// <summary>
+    /// Política de partilha granular do dashboard (V3.1).
+    /// Substitui o legacy IsShared (bool) com âmbito e permissões finas.
+    /// </summary>
+    public SharingPolicy SharingPolicy { get; private set; } = SharingPolicy.Private;
+
+    /// <summary>
+    /// Variáveis (tokens) do dashboard — permitem parametrizar widgets com contexto dinâmico.
+    /// Ex: $service, $team, $env, $timeRange.
+    /// </summary>
+    public IReadOnlyList<DashboardVariable> Variables { get; private set; } = [];
+
+    /// <summary>Número da revisão atual do dashboard (auto-incrementado em cada Update).</summary>
+    public int CurrentRevisionNumber { get; private set; }
+
+    /// <summary>
+    /// Retrocompat: indica se o dashboard é partilhado (deriva de SharingPolicy).
+    /// Legacy callers que ainda usam IsShared continuam a funcionar.
+    /// </summary>
+    public bool IsShared => SharingPolicy.IsVisible;
 
     /// <summary>Indica se é um dashboard de sistema criado pelo PlatformAdmin (não editável por outros).</summary>
     public bool IsSystem { get; private init; }
@@ -119,7 +138,9 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
             Layout = layout.Trim(),
             Persona = persona.Trim(),
             Widgets = widgets,
-            IsShared = false,
+            SharingPolicy = SharingPolicy.Private,
+            Variables = [],
+            CurrentRevisionNumber = 0,
             IsSystem = isSystem,
             TeamId = teamId,
             TenantId = tenantId,
@@ -145,7 +166,9 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
             Layout = Layout,
             Persona = Persona,
             Widgets = Widgets.ToList(),
-            IsShared = false,
+            Variables = Variables.ToList(),
+            SharingPolicy = SharingPolicy.Private,
+            CurrentRevisionNumber = 0,
             IsSystem = false,
             TeamId = TeamId,
             TenantId = TenantId,
@@ -178,15 +201,57 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
         Layout = layout.Trim();
         Widgets = widgets;
         TeamId = teamId;
+        CurrentRevisionNumber++;
         UpdatedAt = now;
     }
 
     /// <summary>
-    /// Partilha ou retira a partilha do dashboard.
+    /// Define as variáveis (tokens) do dashboard.
     /// </summary>
-    public void SetShared(bool isShared, DateTimeOffset now)
+    public void SetVariables(IReadOnlyList<DashboardVariable> variables, DateTimeOffset now)
     {
-        IsShared = isShared;
+        Guard.Against.Null(variables, nameof(variables));
+        Variables = variables;
         UpdatedAt = now;
     }
+
+    /// <summary>
+    /// Define a política de partilha granular do dashboard (V3.1).
+    /// </summary>
+    public void SetSharingPolicy(SharingPolicy policy, DateTimeOffset now)
+    {
+        Guard.Against.Null(policy, nameof(policy));
+        SharingPolicy = policy;
+        UpdatedAt = now;
+    }
+
+    /// <summary>
+    /// Retrocompat: partilha ou retira a partilha via bool (converte para SharingPolicy).
+    /// </summary>
+    public void SetShared(bool shared, DateTimeOffset now)
+        => SetSharingPolicy(SharingPolicy.FromLegacyIsShared(shared), now);
+
+    /// <summary>
+    /// Cria um snapshot de revisão do estado atual para persistência no histórico.
+    /// Deve ser chamado ANTES de qualquer Update() para capturar o estado anterior,
+    /// ou DEPOIS para capturar o estado resultante — por convenção: capturar após update.
+    /// </summary>
+    public DashboardRevision CreateRevisionSnapshot(
+        string widgetsJson,
+        string variablesJson,
+        string authorUserId,
+        DateTimeOffset now,
+        string? changeNote = null)
+        => DashboardRevision.Create(
+            dashboardId: Id,
+            revisionNumber: CurrentRevisionNumber,
+            name: Name,
+            description: Description,
+            layout: Layout,
+            widgetsJson: widgetsJson,
+            variablesJson: variablesJson,
+            authorUserId: authorUserId,
+            tenantId: TenantId,
+            now: now,
+            changeNote: changeNote);
 }

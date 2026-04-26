@@ -15217,5 +15217,62 @@
     "recommendation_block": "Block",
     "blockingThreshold": "Blocking Dimension Score Threshold",
     "highConfidenceThreshold": "High Confidence Score Threshold"
+  },
+  "dashboardHistory": {
+    "title": "Dashboard History",
+    "subtitle": "Revision history for this dashboard",
+    "revisionNumber": "Revision #{{number}}",
+    "author": "by {{user}}",
+    "changeNote": "Note",
+    "noHistory": "No revision history yet",
+    "noHistorySubtitle": "Revisions are recorded automatically on every save",
+    "widgetCount": "{{count}} widget(s)",
+    "revert": "Revert to this revision",
+    "revertConfirmTitle": "Revert Dashboard",
+    "revertConfirmMessage": "This will restore the dashboard to revision #{{number}}. A new revision will be created before the revert.",
+    "revertSuccess": "Dashboard reverted to revision #{{number}}",
+    "close": "Close"
+  },
+  "dashboardSharing": {
+    "title": "Share Dashboard",
+    "scopeLabel": "Visibility",
+    "permissionLabel": "Permission",
+    "scopePrivate": "Private",
+    "scopeTeam": "Team",
+    "scopeTenant": "Everyone in tenant",
+    "scopePublicLink": "Public link",
+    "permissionRead": "View only",
+    "permissionEdit": "Can edit",
+    "expiryLabel": "Link expiry",
+    "expiryPlaceholder": "Never",
+    "save": "Save sharing settings",
+    "success": "Sharing settings updated",
+    "currentScope": "Current: {{scope}}",
+    "warningPublicLink": "Public links allow access without authentication. Use carefully."
+  },
+  "dashboardRevision": {
+    "savedAt": "Saved {{time}}",
+    "currentRevision": "Current revision: #{{number}}",
+    "autoSaveNote": "Revisions are saved automatically on every update",
+    "viewHistory": "View history",
+    "maxRevisionsReached": "Maximum revisions reached. Oldest revisions will be pruned."
+  },
+  "dashboardVariables": {
+    "title": "Dashboard Variables",
+    "addVariable": "Add variable",
+    "keyLabel": "Key",
+    "labelLabel": "Label",
+    "typeLabel": "Type",
+    "defaultLabel": "Default value",
+    "typeService": "Service",
+    "typeTeam": "Team",
+    "typeEnvironment": "Environment",
+    "typeTimeRange": "Time range",
+    "typeText": "Text",
+    "typeEnum": "Enum",
+    "noVariables": "No variables defined",
+    "noVariablesSubtitle": "Variables let you parametrize widgets dynamically (e.g. $service, $team)",
+    "deleteVariable": "Remove variable",
+    "saveVariables": "Save variables"
   }
 }

@@ -59,6 +59,7 @@ public static class DependencyInjection
 
         // Custom Dashboards & Technical Debt
         services.AddScoped<ICustomDashboardRepository, CustomDashboardRepository>();
+        services.AddScoped<IDashboardRevisionRepository, DashboardRevisionRepository>();
         services.AddScoped<ITechnicalDebtRepository, TechnicalDebtRepository>();
 
         // Service Maturity Assessments

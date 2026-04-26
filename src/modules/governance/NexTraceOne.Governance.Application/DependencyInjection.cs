@@ -5,7 +5,11 @@ using NexTraceOne.BuildingBlocks.Application;
 using NexTraceOne.Governance.Application.Features.ApplyGovernancePack;
 using NexTraceOne.Governance.Application.Features.CreateCustomDashboard;
 using NexTraceOne.Governance.Application.Features.GetCustomDashboard;
+using NexTraceOne.Governance.Application.Features.GetDashboardHistory;
 using NexTraceOne.Governance.Application.Features.ListCustomDashboards;
+using NexTraceOne.Governance.Application.Features.RevertDashboard;
+using NexTraceOne.Governance.Application.Features.ShareDashboard;
+using NexTraceOne.Governance.Application.Features.UpdateCustomDashboard;
 using NexTraceOne.Governance.Application.Features.RecordTechnicalDebt;
 using NexTraceOne.Governance.Application.Features.GetTechnicalDebtSummary;
 using NexTraceOne.Governance.Application.Features.GetCostContextPerDay;
@@ -161,10 +165,14 @@ public static class DependencyInjection
         services.AddTransient<IValidator<EvaluateSecurityGate.Command>, EvaluateSecurityGate.Validator>();
         services.AddTransient<IValidator<GenerateSecurityReport.Query>, GenerateSecurityReport.Validator>();
 
-        // Custom Dashboards
+        // Custom Dashboards (V3.1 — Dashboard Intelligence Foundation)
         services.AddTransient<IValidator<CreateCustomDashboard.Command>, CreateCustomDashboard.Validator>();
         services.AddTransient<IValidator<GetCustomDashboard.Query>, GetCustomDashboard.Validator>();
         services.AddTransient<IValidator<ListCustomDashboards.Query>, ListCustomDashboards.Validator>();
+        services.AddTransient<IValidator<UpdateCustomDashboard.Command>, UpdateCustomDashboard.Validator>();
+        services.AddTransient<IValidator<GetDashboardHistory.Query>, GetDashboardHistory.Validator>();
+        services.AddTransient<IValidator<RevertDashboard.Command>, RevertDashboard.Validator>();
+        services.AddTransient<IValidator<ShareDashboard.Command>, ShareDashboard.Validator>();
 
         // Technical Debt
         services.AddTransient<IValidator<RecordTechnicalDebt.Command>, RecordTechnicalDebt.Validator>();

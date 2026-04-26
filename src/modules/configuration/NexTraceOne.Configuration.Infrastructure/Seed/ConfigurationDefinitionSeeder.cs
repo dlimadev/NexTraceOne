@@ -10703,5 +10703,50 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "7",
             uiEditorType: "number",
             sortOrder: 12920),
+
+        // ── Wave V3.1 — Dashboard Intelligence Foundation ─────────────────────
+        ConfigurationDefinition.Create(
+            key: "governance.dashboard.revision.max_per_dashboard",
+            displayName: "config.governance.dashboard.revision.max_per_dashboard.label",
+            description: "config.governance.dashboard.revision.max_per_dashboard.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "50",
+            uiEditorType: "number",
+            sortOrder: 12930),
+
+        ConfigurationDefinition.Create(
+            key: "governance.dashboard.sharing.allow_public_links",
+            displayName: "config.governance.dashboard.sharing.allow_public_links.label",
+            description: "config.governance.dashboard.sharing.allow_public_links.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 12940),
+
+        ConfigurationDefinition.Create(
+            key: "governance.dashboard.sharing.allow_embed",
+            displayName: "config.governance.dashboard.sharing.allow_embed.label",
+            description: "config.governance.dashboard.sharing.allow_embed.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Boolean,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "false",
+            uiEditorType: "toggle",
+            sortOrder: 12950),
+
+        ConfigurationDefinition.Create(
+            key: "governance.dashboard.variables.max_per_dashboard",
+            displayName: "config.governance.dashboard.variables.max_per_dashboard.label",
+            description: "config.governance.dashboard.variables.max_per_dashboard.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 12960),
     ];
 }

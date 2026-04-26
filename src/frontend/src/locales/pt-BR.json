@@ -16482,5 +16482,62 @@
     "recommendation_block": "Bloquear",
     "blockingThreshold": "Limite de Score de Bloqueio por Dimensão",
     "highConfidenceThreshold": "Limite de Score de Alta Confiança"
+  },
+  "dashboardHistory": {
+    "title": "Histórico do Dashboard",
+    "subtitle": "Histórico de revisões deste dashboard",
+    "revisionNumber": "Revisão #{{number}}",
+    "author": "por {{user}}",
+    "changeNote": "Nota",
+    "noHistory": "Sem histórico de revisões",
+    "noHistorySubtitle": "As revisões são registadas automaticamente a cada gravação",
+    "widgetCount": "{{count}} widget(s)",
+    "revert": "Reverter para esta revisão",
+    "revertConfirmTitle": "Reverter Dashboard",
+    "revertConfirmMessage": "Isto irá restaurar o dashboard para a revisão #{{number}}. Uma nova revisão será criada antes do revert.",
+    "revertSuccess": "Dashboard revertido para a revisão #{{number}}",
+    "close": "Fechar"
+  },
+  "dashboardSharing": {
+    "title": "Compartilhar Dashboard",
+    "scopeLabel": "Visibilidade",
+    "permissionLabel": "Permissão",
+    "scopePrivate": "Privado",
+    "scopeTeam": "Equipe",
+    "scopeTenant": "Todos no tenant",
+    "scopePublicLink": "Link público",
+    "permissionRead": "Somente leitura",
+    "permissionEdit": "Pode editar",
+    "expiryLabel": "Expiração do link",
+    "expiryPlaceholder": "Nunca",
+    "save": "Salvar configurações",
+    "success": "Configurações de compartilhamento atualizadas",
+    "currentScope": "Atual: {{scope}}",
+    "warningPublicLink": "Links públicos permitem acesso sem autenticação. Use com cuidado."
+  },
+  "dashboardRevision": {
+    "savedAt": "Salvo {{time}}",
+    "currentRevision": "Revisão atual: #{{number}}",
+    "autoSaveNote": "As revisões são salvas automaticamente a cada atualização",
+    "viewHistory": "Ver histórico",
+    "maxRevisionsReached": "Máximo de revisões atingido. As revisões mais antigas serão removidas."
+  },
+  "dashboardVariables": {
+    "title": "Variáveis do Dashboard",
+    "addVariable": "Adicionar variável",
+    "keyLabel": "Chave",
+    "labelLabel": "Rótulo",
+    "typeLabel": "Tipo",
+    "defaultLabel": "Valor padrão",
+    "typeService": "Serviço",
+    "typeTeam": "Equipe",
+    "typeEnvironment": "Ambiente",
+    "typeTimeRange": "Intervalo de tempo",
+    "typeText": "Texto",
+    "typeEnum": "Enum",
+    "noVariables": "Nenhuma variável definida",
+    "noVariablesSubtitle": "Variáveis permitem parametrizar widgets dinamicamente (ex: $service, $team)",
+    "deleteVariable": "Remover variável",
+    "saveVariables": "Salvar variáveis"
   }
 }
