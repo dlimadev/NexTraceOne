@@ -10,8 +10,11 @@ using CreateCustomDashboardFeature = NexTraceOne.Governance.Application.Features
 using DeleteCustomDashboardFeature = NexTraceOne.Governance.Application.Features.DeleteCustomDashboard.DeleteCustomDashboard;
 using GetCustomDashboardFeature = NexTraceOne.Governance.Application.Features.GetCustomDashboard.GetCustomDashboard;
 using GetDashboardRenderDataFeature = NexTraceOne.Governance.Application.Features.GetDashboardRenderData.GetDashboardRenderData;
+using GetDashboardHistoryFeature = NexTraceOne.Governance.Application.Features.GetDashboardHistory.GetDashboardHistory;
 using ListCustomDashboardsFeature = NexTraceOne.Governance.Application.Features.ListCustomDashboards.ListCustomDashboards;
 using UpdateCustomDashboardFeature = NexTraceOne.Governance.Application.Features.UpdateCustomDashboard.UpdateCustomDashboard;
+using RevertDashboardFeature = NexTraceOne.Governance.Application.Features.RevertDashboard.RevertDashboard;
+using ShareDashboardFeature = NexTraceOne.Governance.Application.Features.ShareDashboard.ShareDashboard;
 using RecordTechnicalDebtFeature = NexTraceOne.Governance.Application.Features.RecordTechnicalDebt.RecordTechnicalDebt;
 using GetTechnicalDebtSummaryFeature = NexTraceOne.Governance.Application.Features.GetTechnicalDebtSummary.GetTechnicalDebtSummary;
 
@@ -126,6 +129,46 @@ public sealed class DashboardsAndDebtEndpointModule
             var cmd = command with { SourceDashboardId = dashboardId };
             var result = await sender.Send(cmd, cancellationToken);
             return result.ToCreatedResult(r => $"/api/v1/governance/dashboards/{r.CloneId}", localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // ── Histórico de revisões do dashboard (V3.1) ──
+        group.MapGet("/{dashboardId:guid}/history", async (
+            Guid dashboardId,
+            string tenantId,
+            int maxResults,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetDashboardHistoryFeature.Query(dashboardId, tenantId, maxResults);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        // ── Reverter dashboard para revisão anterior (V3.1) ──
+        group.MapPost("/{dashboardId:guid}/revert", async (
+            Guid dashboardId,
+            RevertDashboardFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { DashboardId = dashboardId };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // ── Definir política de partilha granular (V3.1) ──
+        group.MapPost("/{dashboardId:guid}/share", async (
+            Guid dashboardId,
+            ShareDashboardFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { DashboardId = dashboardId };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:write");
     }
 

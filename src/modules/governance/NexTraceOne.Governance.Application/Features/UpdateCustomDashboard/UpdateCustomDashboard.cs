@@ -1,10 +1,11 @@
 using FluentValidation;
+using MediatR;
+using System.Text.Json;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Domain.Entities;
-using MediatR;
 
 namespace NexTraceOne.Governance.Application.Features.UpdateCustomDashboard;
 
@@ -31,15 +32,22 @@ public static class UpdateCustomDashboard
         string? TimeRange = null,
         string? CustomTitle = null);
 
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     /// <summary>Comando para atualizar um dashboard customizado existente.</summary>
     public sealed record Command(
         Guid DashboardId,
         string TenantId,
+        string UserId,
         string Name,
         string? Description,
         string Layout,
         IReadOnlyList<WidgetInput> Widgets,
-        string? TeamId = null) : ICommand;
+        string? TeamId = null,
+        string? ChangeNote = null) : ICommand;
 
     /// <summary>Validação do comando de atualização.</summary>
     public sealed class Validator : AbstractValidator<Command>
@@ -51,6 +59,7 @@ public static class UpdateCustomDashboard
         {
             RuleFor(x => x.DashboardId).NotEmpty();
             RuleFor(x => x.TenantId).NotEmpty();
+            RuleFor(x => x.UserId).NotEmpty();
             RuleFor(x => x.Name).NotEmpty().MaximumLength(100);
             RuleFor(x => x.Layout).NotEmpty()
                 .Must(l => ValidLayouts.Contains(l))
@@ -63,9 +72,10 @@ public static class UpdateCustomDashboard
         }
     }
 
-    /// <summary>Handler que atualiza e persiste o dashboard.</summary>
+    /// <summary>Handler que atualiza, cria revisão e persiste o dashboard.</summary>
     public sealed class Handler(
         ICustomDashboardRepository repository,
+        IDashboardRevisionRepository revisionRepository,
         IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : ICommandHandler<Command>
     {
@@ -100,14 +110,27 @@ public static class UpdateCustomDashboard
                 Config: new WidgetConfig(w.ServiceId, w.TeamId, w.TimeRange, w.CustomTitle)))
                 .ToList();
 
+            var now = clock.UtcNow;
+
             dashboard.Update(
                 name: request.Name,
                 description: request.Description,
                 layout: request.Layout,
                 widgets: widgets,
                 teamId: request.TeamId,
-                now: clock.UtcNow);
+                now: now);
 
+            // Criar snapshot de revisão após cada Update (V3.1 — audit trail)
+            var widgetsJson = JsonSerializer.Serialize(dashboard.Widgets, _jsonOptions);
+            var variablesJson = JsonSerializer.Serialize(dashboard.Variables, _jsonOptions);
+            var revision = dashboard.CreateRevisionSnapshot(
+                widgetsJson,
+                variablesJson,
+                request.UserId,
+                now,
+                request.ChangeNote);
+
+            await revisionRepository.AddAsync(revision, cancellationToken);
             await repository.UpdateAsync(dashboard, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
 

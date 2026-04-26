@@ -66,6 +66,9 @@ public sealed class GovernanceDbContext(
     /// <summary>Dashboards customizados por persona e tenant.</summary>
     public DbSet<CustomDashboard> CustomDashboards => Set<CustomDashboard>();
 
+    /// <summary>Histórico de revisões de dashboards customizados (V3.1).</summary>
+    public DbSet<DashboardRevision> DashboardRevisions => Set<DashboardRevision>();
+
     /// <summary>Itens de dívida técnica registados por serviço.</summary>
     public DbSet<TechnicalDebtItem> TechnicalDebtItems => Set<TechnicalDebtItem>();
 

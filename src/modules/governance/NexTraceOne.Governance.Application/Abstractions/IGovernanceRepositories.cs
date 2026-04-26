@@ -354,6 +354,31 @@ public interface IPolicyAsCodeRepository
 }
 
 /// <summary>
+/// Interface do repositório de DashboardRevision (V3.1 — Dashboard Intelligence Foundation).
+/// Persiste snapshots imutáveis de dashboards para histórico, diff e revert.
+/// </summary>
+public interface IDashboardRevisionRepository
+{
+    /// <summary>Lista revisões de um dashboard, ordenadas da mais recente para a mais antiga.</summary>
+    Task<IReadOnlyList<DashboardRevision>> ListByDashboardIdAsync(
+        CustomDashboardId dashboardId,
+        int maxResults,
+        CancellationToken ct);
+
+    /// <summary>Obtém uma revisão específica pelo número de revisão.</summary>
+    Task<DashboardRevision?> GetByRevisionNumberAsync(
+        CustomDashboardId dashboardId,
+        int revisionNumber,
+        CancellationToken ct);
+
+    /// <summary>Obtém o número total de revisões de um dashboard.</summary>
+    Task<int> CountByDashboardIdAsync(CustomDashboardId dashboardId, CancellationToken ct);
+
+    /// <summary>Adiciona uma nova revisão ao repositório.</summary>
+    Task AddAsync(DashboardRevision revision, CancellationToken ct);
+}
+
+/// <summary>
 /// Interface do repositório de Custom Dashboards para o módulo Governance.
 /// Define operações CRUD e consultas para dashboards customizados por persona.
 /// </summary>
