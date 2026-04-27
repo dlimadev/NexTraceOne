@@ -15405,5 +15405,354 @@
     "variablesSection": "Variables",
     "widgetsSection": "Widgets ({{count}})",
     "layoutSection": "Layout"
+  },
+  "sotCenter": {
+    "simulatedBanner": "Data shown is simulated — connect real integrations to enable live source-of-truth views."
+  },
+  "warRoom": {
+    "title": "War Room",
+    "subtitle": "Real-time collaboration for incident response and critical operations",
+    "activeUsers": "Active users",
+    "comments": "Comments",
+    "resolve": "Resolve",
+    "resolved": "Resolved",
+    "addComment": "Add comment",
+    "commentPlaceholder": "Type a message...",
+    "noComments": "No comments yet",
+    "presence": "Participants",
+    "status": "Status",
+    "incident": "Incident",
+    "simulatedBanner": "Presence and comments are simulated"
+  },
+  "pluginMarketplace": {
+    "title": "Dashboard Marketplace",
+    "subtitle": "Browse and install dashboard templates and widget packs",
+    "search": "Search templates...",
+    "install": "Install",
+    "installed": "Installed",
+    "category": "Category",
+    "persona": "Persona",
+    "noTemplates": "No templates found",
+    "simulatedBanner": "Template data is simulated"
+  },
+  "mobileOnCall": {
+    "title": "Mobile On-Call",
+    "subtitle": "On-call dashboard optimized for mobile and PWA",
+    "installPwa": "Install app",
+    "activeIncidents": "Active Incidents",
+    "criticalAlerts": "Critical Alerts",
+    "pendingApprovals": "Pending Approvals",
+    "onCallStatus": "On-Call",
+    "openIncidents": "Open Incidents",
+    "pendingApprovalsSection": "Pending Approvals",
+    "approve": "Approve",
+    "reject": "Reject",
+    "quickLinks": "Quick Links",
+    "noIncidents": "No active incidents"
+  },
+  "engineerCockpit": {
+    "title": "Engineer Cockpit",
+    "subtitle": "Your personal engineering dashboard"
+  },
+  "techLeadCenter": {
+    "title": "Tech Lead Command Center",
+    "subtitle": "Team health and delivery metrics"
+  },
+  "architectLandscape": {
+    "title": "Architect Landscape",
+    "subtitle": "System topology, coupling and contract health"
+  },
+  "productPortfolio": {
+    "title": "Product Portfolio Home",
+    "subtitle": "Capabilities, delivery, SLO and cost overview"
+  },
+  "executiveBrief": {
+    "title": "Executive Brief Center",
+    "subtitle": "KPIs, DORA, compliance and FinOps at a glance",
+    "downloadPdf": "Download PDF"
+  },
+  "platformAdminCockpit": {
+    "title": "Platform Admin Cockpit",
+    "subtitle": "Tenant administration, integrations and platform health"
+  },
+  "auditorConsole": {
+    "title": "Auditor Console",
+    "subtitle": "Compliance standards, audit surfaces and evidence"
+  },
+  "changeConfidenceHub": {
+    "title": "Change Confidence Hub",
+    "subtitle": "Change confidence scoring and promotion decisions",
+    "confidenceScore": "Confidence Score",
+    "level": {
+      "high": "High Confidence",
+      "medium": "Review Needed",
+      "low": "Not Ready"
+    },
+    "blastRadius": "Blast Radius",
+    "evidencePack": "Evidence Pack",
+    "contractCompat": "Contract Compat",
+    "incidentCorrelation": "Incident Correlation",
+    "subScores": "Sub-scores",
+    "promotionDecision": "Promotion Decision",
+    "promote": "Promote",
+    "requestReview": "Request Review",
+    "rollback": "Rollback"
+  },
+  "blastRadius": {
+    "title": "Blast Radius Explorer",
+    "subtitle": "Impact analysis for releases and changes",
+    "bucket": "Impact Bucket",
+    "directImpact": "Direct Impact",
+    "transitiveImpact": "Transitive Impact",
+    "domains": "Domains",
+    "impactedServices": "Impacted Services",
+    "noImpact": "No impacted services found"
+  },
+  "operationalReadiness": {
+    "title": "Operational Readiness Board",
+    "subtitle": "Go/NoGo readiness scoring across all services",
+    "slo": "SLO",
+    "chaos": "Chaos",
+    "drift": "Drift",
+    "profiling": "Profiling",
+    "baseline": "Baseline",
+    "empty": "No services found"
+  },
+  "driftCenter": {
+    "title": "Drift Center",
+    "subtitle": "Configuration and runtime drift detection",
+    "openDrifts": "Open Drifts",
+    "criticalDrifts": "Critical",
+    "acked": "Acknowledged",
+    "acknowledge": "Acknowledge",
+    "correlatedChange": "Correlated Change",
+    "noDrifts": "No open drifts — all clear"
+  },
+  "complianceScorecard": {
+    "title": "Compliance Scorecard Center",
+    "subtitle": "Control status across all compliance standards",
+    "score": "Score",
+    "compliant": "Compliant",
+    "partial": "Partial",
+    "nonCompliant": "Non-Compliant",
+    "notAssessed": "Not Assessed",
+    "owner": "Owner",
+    "empty": "No compliance controls found"
+  },
+  "finOpsContext": {
+    "title": "FinOps Context Views",
+    "subtitle": "Contextual cost intelligence by service, team, domain and environment",
+    "totalCost": "Total Cost (MTD)",
+    "anomaly": "Anomaly",
+    "empty": "No cost data found"
+  },
+  "releaseCalendar": {
+    "title": "Release Calendar & Window Gate",
+    "subtitle": "Deployment windows and scheduled release approvals",
+    "windowsTab": "Deployment Windows",
+    "releasesTab": "Scheduled Releases",
+    "approvalRequired": "Approval Required",
+    "confidence": "Confidence",
+    "approve": "Approve",
+    "empty": "No scheduled releases"
+  },
+  "rollbackCockpit": {
+    "title": "Rollback Intelligence Cockpit",
+    "subtitle": "Smart rollback candidates with risk assessment",
+    "available": "Available",
+    "inProgress": "In Progress",
+    "highRisk": "High Risk",
+    "downtime": "Est. Downtime",
+    "rollback": "Rollback",
+    "noRollbacks": "No rollback candidates — all deployments are stable"
+  },
+  "evidencePack": {
+    "title": "Evidence Pack Viewer",
+    "subtitle": "SLSA-signed artifacts and compliance evidence for releases",
+    "export": "Export",
+    "artifacts": "Artifacts",
+    "filterArtifacts": "Filter artifacts...",
+    "noArtifacts": "No artifacts in this pack",
+    "owner": "Owner"
+  },
+  "sloCenter": {
+    "title": "SLO Service Center",
+    "subtitle": "SLOs, Chaos experiments and Post-incident learning",
+    "tabSLO": "SLO",
+    "tabChaos": "Chaos Lab",
+    "tabPostmortem": "Post-Incident",
+    "target": "Target",
+    "current": "Current",
+    "errorBudget": "Error Budget",
+    "lastRun": "Last run",
+    "never": "Never",
+    "actionItems": "Actions",
+    "open": "open",
+    "empty": "No SLO data found"
+  },
+  "contractStudio": {
+    "title": "Contract Studio",
+    "subtitle": "Design, validate and publish API contracts across all protocols",
+    "chooseType": "Choose contract type",
+    "openBuilder": "Open builder",
+    "unifiedPublication": "Unified Publication Workflow",
+    "publicationFlow": "Design → Validate → Publish → Govern"
+  },
+  "restBuilder": {
+    "title": "REST / OpenAPI Designer",
+    "subtitle": "Visual REST API designer with OpenAPI 3.1 export",
+    "importSpec": "Import Spec",
+    "publish": "Publish",
+    "apiInfo": "API Info",
+    "title": "Title",
+    "version": "Version",
+    "baseUrl": "Base URL",
+    "summary": "Summary",
+    "total": "Total",
+    "endpoints": "Endpoints",
+    "addEndpoint": "Add Endpoint",
+    "method": "Method",
+    "path": "Path",
+    "remove": "Remove",
+    "openApiBanner": "Exports OpenAPI 3.1 YAML — connect to Publication Center to publish and govern."
+  },
+  "asyncApiBuilder": {
+    "title": "AsyncAPI 3.x Designer",
+    "subtitle": "Visual event-driven API designer with AsyncAPI 3.x export",
+    "publish": "Publish",
+    "apiInfo": "API Info",
+    "apiTitle": "Title",
+    "version": "Version",
+    "channels": "Channels",
+    "addChannel": "Add Channel",
+    "channelDetail": "Channel Detail",
+    "address": "Address",
+    "protocol": "Protocol",
+    "operation": "Operation",
+    "description": "Description",
+    "messageSchema": "Message Schema (JSON)",
+    "remove": "Remove",
+    "selectChannel": "Select a channel to edit",
+    "asyncApiBanner": "Exports AsyncAPI 3.x YAML — supports Kafka, AMQP, SNS, WebSocket, MQTT, NATS."
+  },
+  "soapBuilder": {
+    "title": "SOAP / WSDL Designer",
+    "subtitle": "Visual SOAP service designer with WSDL 1.1/2.0 export",
+    "publish": "Publish",
+    "serviceInfo": "Service Info",
+    "serviceName": "Service Name",
+    "targetNamespace": "Target Namespace",
+    "wsdlVersion": "WSDL Version",
+    "operations": "Operations",
+    "addOperation": "Add Operation",
+    "operationDetail": "Operation Detail",
+    "operationName": "Name",
+    "style": "Style",
+    "inputMessage": "Input Message",
+    "outputMessage": "Output Message",
+    "documentation": "Documentation",
+    "remove": "Remove",
+    "selectOperation": "Select an operation to edit",
+    "wsdlBanner": "Exports WSDL 1.1 or 2.0 — connect to Publication Center to publish."
+  },
+  "graphqlBuilder": {
+    "title": "GraphQL Schema Builder",
+    "subtitle": "SDL editor with breaking-change detection",
+    "validate": "Validate",
+    "publish": "Publish",
+    "schemaSummary": "Schema Summary",
+    "types": "Types",
+    "inputs": "Inputs",
+    "fields": "Fields",
+    "breakingChanges": "Breaking Changes",
+    "noBreakingChanges": "No breaking changes detected",
+    "tab": {
+      "editor": "SDL Editor",
+      "diff": "Diff",
+      "explorer": "Explorer"
+    },
+    "noDiff": "No previous version to diff against",
+    "sdlBanner": "GraphQL SDL editor — exports schema for publication and consumer-driven contract testing."
+  },
+  "protobufBuilder": {
+    "title": "Protobuf / gRPC Builder",
+    "subtitle": ".proto file editor with compatibility checking",
+    "checkCompat": "Check Compatibility",
+    "publish": "Publish",
+    "protoSummary": "Proto Summary",
+    "services": "Services",
+    "rpcs": "RPCs",
+    "messages": "Messages",
+    "compatibility": "Compatibility",
+    "backwardCompat": "Backward Compatible",
+    "tab": {
+      "editor": ".proto Editor",
+      "services": "Services",
+      "messages": "Messages"
+    },
+    "protoBanner": "Proto3 editor — exports .proto files for gRPC service publication."
+  },
+  "aiAgentMarketplace": {
+    "title": "AI Agent Registry & Marketplace",
+    "subtitle": "Manage AI agents, token budgets and governance policies",
+    "totalAgents": "Total Agents",
+    "tokensUsed": "Tokens Used (MTD)",
+    "budgetRemaining": "Budget Remaining",
+    "search": "Search agents...",
+    "audited": "Audited",
+    "budget": "Token Budget",
+    "pause": "Pause",
+    "activate": "Activate",
+    "configure": "Configure",
+    "empty": "No agents found"
+  },
+  "ideConsole": {
+    "title": "IDE Extensions Console",
+    "subtitle": "Manage VS Code, Visual Studio and JetBrains extensions and developer enrollments",
+    "extensions": "Extensions",
+    "installed": "Installed",
+    "enrolled": "Enrolled",
+    "pushUpdate": "Push Update",
+    "configure": "Configure",
+    "developerEnrollments": "Developer Enrollments",
+    "lastSeen": "Last seen",
+    "noEnrollments": "No developer enrollments found"
+  },
+  "breakGlass": {
+    "title": "Break Glass & JIT Access",
+    "subtitle": "Just-in-time privileged access requests and approvals",
+    "requestAccess": "Request Access",
+    "resource": "Resource",
+    "role": "Role",
+    "environment": "Environment",
+    "justification": "Justification",
+    "justificationPlaceholder": "Describe why you need this access...",
+    "submit": "Request Access",
+    "activeSessions": "Active Sessions",
+    "pendingApprovals": "Pending Approvals",
+    "history": "History",
+    "active": "Active",
+    "noPending": "No pending requests",
+    "expires": "Expires"
+  },
+  "licensing": {
+    "title": "Licensing & Entitlements",
+    "subtitle": "License management for online and air-gapped deployments",
+    "exportOfflinePack": "Export Offline Pack",
+    "renewLicense": "Renew License",
+    "validate": "Validate Now",
+    "lastValidated": "Last validated",
+    "entitlements": "Entitlements",
+    "expires": "Expires",
+    "seats": "Seats"
+  },
+  "dacGitOps": {
+    "title": "Dashboards-as-Code GitOps",
+    "subtitle": "Manage dashboards via Git repositories with automated sync",
+    "repositories": "Repositories",
+    "sync": "Sync",
+    "dashboards": "dashboards",
+    "recentChanges": "Recent Changes",
+    "noChanges": "No recent changes"
   }
 }

@@ -34,6 +34,16 @@ using DeprecateDashboardFeature = NexTraceOne.Governance.Application.Features.De
 using PublishDashboardFeature = NexTraceOne.Governance.Application.Features.PublishDashboard.PublishDashboard;
 using RecordDashboardUsageFeature = NexTraceOne.Governance.Application.Features.RecordDashboardUsage.RecordDashboardUsage;
 using GetDashboardUsageAnalyticsFeature = NexTraceOne.Governance.Application.Features.GetDashboardUsageAnalytics.GetDashboardUsageAnalytics;
+using JoinPresenceSessionFeature = NexTraceOne.Governance.Application.Features.JoinPresenceSession.JoinPresenceSession;
+using GetPresenceSessionsFeature = NexTraceOne.Governance.Application.Features.GetPresenceSessions.GetPresenceSessions;
+using AddDashboardCommentFeature = NexTraceOne.Governance.Application.Features.AddDashboardComment.AddDashboardComment;
+using GetDashboardCommentsFeature = NexTraceOne.Governance.Application.Features.GetDashboardComments.GetDashboardComments;
+using ResolveCommentFeature = NexTraceOne.Governance.Application.Features.ResolveComment.ResolveComment;
+using CreateDashboardMonitorFeature = NexTraceOne.Governance.Application.Features.CreateDashboardMonitor.CreateDashboardMonitor;
+using ListDashboardMonitorsFeature = NexTraceOne.Governance.Application.Features.ListDashboardMonitors.ListDashboardMonitors;
+using ListDashboardTemplatesFeature = NexTraceOne.Governance.Application.Features.ListDashboardTemplates.ListDashboardTemplates;
+using InstantiateTemplateFeature = NexTraceOne.Governance.Application.Features.InstantiateTemplate.InstantiateTemplate;
+using GetPersonaHomeFeature = NexTraceOne.Governance.Application.Features.GetPersonaHome.GetPersonaHome;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -53,6 +63,10 @@ public sealed class DashboardsAndDebtEndpointModule
         MapNotebookEndpoints(app);
         MapAiComposerEndpoints(app);
         MapReportsAndEmbedEndpoints(app);
+        MapCollaborationEndpoints(app);
+        MapMonitorEndpoints(app);
+        MapTemplatesEndpoints(app);
+        MapPersonaHomeEndpoints(app);
     }
 
     private static void MapDashboardEndpoints(IEndpointRouteBuilder app)
@@ -490,6 +504,109 @@ public sealed class DashboardsAndDebtEndpointModule
         {
             var query = new GetDashboardUsageAnalyticsFeature.Query(tenantId, dashboardId, windowDays > 0 ? windowDays : 30);
             var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+    }
+
+    // ── V3.7 — Real-time Collaboration ─────────────────────────────────────────
+    private static void MapCollaborationEndpoints(IEndpointRouteBuilder app)
+    {
+        var collab = app.MapGroup("/api/v1/governance/collaboration");
+
+        collab.MapPost("/presence", async (
+            JoinPresenceSessionFeature.Command command,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        collab.MapGet("/presence", async (
+            string resourceType, Guid resourceId, string tenantId,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetPresenceSessionsFeature.Query(resourceType, resourceId, tenantId), ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        collab.MapPost("/comments", async (
+            AddDashboardCommentFeature.Command command,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        collab.MapGet("/comments", async (
+            Guid dashboardId, string tenantId, string? widgetId, bool includeResolved,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetDashboardCommentsFeature.Query(dashboardId, tenantId, widgetId, includeResolved), ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        collab.MapPost("/comments/{id:guid}/resolve", async (
+            Guid id, string tenantId, string userId,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new ResolveCommentFeature.Command(id, tenantId, userId), ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+    }
+
+    // ── V3.9 — Alerting from Widget ────────────────────────────────────────────
+    private static void MapMonitorEndpoints(IEndpointRouteBuilder app)
+    {
+        var monitors = app.MapGroup("/api/v1/governance/monitors");
+
+        monitors.MapPost("/", async (
+            CreateDashboardMonitorFeature.Command command,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        monitors.MapGet("/", async (
+            Guid dashboardId, string tenantId,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new ListDashboardMonitorsFeature.Query(dashboardId, tenantId), ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+    }
+
+    // ── V3.8 — Template Marketplace ────────────────────────────────────────────
+    private static void MapTemplatesEndpoints(IEndpointRouteBuilder app)
+    {
+        var templates = app.MapGroup("/api/v1/governance/dashboard-templates");
+
+        templates.MapGet("/", async (
+            string tenantId, string? persona, string? category,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new ListDashboardTemplatesFeature.Query(tenantId, persona, category), ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        templates.MapPost("/{id:guid}/instantiate", async (
+            Guid id, InstantiateTemplateFeature.Command command,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var cmd = command with { TemplateId = id };
+            var result = await sender.Send(cmd, ct);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+    }
+
+    // ── V3.10 — Persona Home ───────────────────────────────────────────────────
+    private static void MapPersonaHomeEndpoints(IEndpointRouteBuilder app)
+    {
+        app.MapGet("/api/v1/governance/persona-home", async (
+            string tenantId, string userId, string persona,
+            ISender sender, IErrorLocalizer localizer, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetPersonaHomeFeature.Query(tenantId, userId, persona), ct);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");
     }

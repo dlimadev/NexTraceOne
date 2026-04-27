@@ -45,6 +45,44 @@ const WasteDetectionPage = lazy(() => import('../features/governance/pages/Waste
 // Wave V3.4 — AI-assisted Dashboard Creation & Notebook Mode
 const NotebooksPage = lazy(() => import('../features/governance/pages/NotebooksPage').then(m => ({ default: m.NotebooksPage })));
 const NotebookEditorPage = lazy(() => import('../features/governance/pages/NotebookEditorPage').then(m => ({ default: m.NotebookEditorPage })));
+// Wave V3.5 — Dashboard templates, reports, usage analytics
+const DashboardTemplatesPage = lazy(() => import('../features/governance/pages/DashboardTemplatesPage').then(m => ({ default: m.DashboardTemplatesPage })));
+const DashboardReportsPage = lazy(() => import('../features/governance/pages/DashboardReportsPage').then(m => ({ default: m.DashboardReportsPage })));
+const DashboardUsageAnalyticsPage = lazy(() => import('../features/governance/pages/DashboardUsageAnalyticsPage').then(m => ({ default: m.DashboardUsageAnalyticsPage })));
+// Wave V3.6 — Executive Intelligence + Scheduled Reports
+const ExecutiveIntelligenceDashboardPage = lazy(() => import('../features/governance/pages/ExecutiveIntelligenceDashboardPage').then(m => ({ default: m.ExecutiveIntelligenceDashboardPage })));
+const ScheduledReportsPage = lazy(() => import('../features/governance/pages/ScheduledReportsPage').then(m => ({ default: m.ScheduledReportsPage })));
+// Wave V3.7 — War Room
+const WarRoomPage = lazy(() => import('../features/governance/pages/WarRoomPage').then(m => ({ default: m.WarRoomPage })));
+// Wave V3.8 — Marketplace
+const PluginMarketplacePage = lazy(() => import('../features/governance/pages/PluginMarketplacePage').then(m => ({ default: m.PluginMarketplacePage })));
+// Wave V3.9 — Mobile On-Call
+const MobileOnCallPage = lazy(() => import('../features/governance/pages/MobileOnCallPage').then(m => ({ default: m.MobileOnCallPage })));
+// Wave V3.10 — Persona Suites
+const EngineerCockpitPage = lazy(() => import('../features/governance/pages/persona-suites/EngineerCockpitPage').then(m => ({ default: m.EngineerCockpitPage })));
+const TechLeadCommandCenterPage = lazy(() => import('../features/governance/pages/persona-suites/TechLeadCommandCenterPage').then(m => ({ default: m.TechLeadCommandCenterPage })));
+const ArchitectLandscapePage = lazy(() => import('../features/governance/pages/persona-suites/ArchitectLandscapePage').then(m => ({ default: m.ArchitectLandscapePage })));
+const ProductPortfolioHomePage = lazy(() => import('../features/governance/pages/persona-suites/ProductPortfolioHomePage').then(m => ({ default: m.ProductPortfolioHomePage })));
+const ExecutiveBriefCenterPage = lazy(() => import('../features/governance/pages/persona-suites/ExecutiveBriefCenterPage').then(m => ({ default: m.ExecutiveBriefCenterPage })));
+const PlatformAdminCockpitPage = lazy(() => import('../features/governance/pages/persona-suites/PlatformAdminCockpitPage').then(m => ({ default: m.PlatformAdminCockpitPage })));
+const AuditorConsolePage = lazy(() => import('../features/governance/pages/persona-suites/AuditorConsolePage').then(m => ({ default: m.AuditorConsolePage })));
+// Wave V3.11 — Source-of-Truth Centers
+const ChangeConfidenceHubPage = lazy(() => import('../features/governance/pages/centers/ChangeConfidenceHubPage').then(m => ({ default: m.ChangeConfidenceHubPage })));
+const BlastRadiusExplorerPage = lazy(() => import('../features/governance/pages/centers/BlastRadiusExplorerPage').then(m => ({ default: m.BlastRadiusExplorerPage })));
+const OperationalReadinessBoardPage = lazy(() => import('../features/governance/pages/centers/OperationalReadinessBoardPage').then(m => ({ default: m.OperationalReadinessBoardPage })));
+const DriftCenterPage = lazy(() => import('../features/governance/pages/centers/DriftCenterPage').then(m => ({ default: m.DriftCenterPage })));
+const ComplianceScorecardCenterPage = lazy(() => import('../features/governance/pages/centers/ComplianceScorecardCenterPage').then(m => ({ default: m.ComplianceScorecardCenterPage })));
+const FinOpsContextViewsPage = lazy(() => import('../features/governance/pages/centers/FinOpsContextViewsPage').then(m => ({ default: m.FinOpsContextViewsPage })));
+const ReleaseCalendarGatePage = lazy(() => import('../features/governance/pages/centers/ReleaseCalendarGatePage').then(m => ({ default: m.ReleaseCalendarGatePage })));
+const RollbackCockpitPage = lazy(() => import('../features/governance/pages/centers/RollbackCockpitPage').then(m => ({ default: m.RollbackCockpitPage })));
+const EvidencePackViewerPage = lazy(() => import('../features/governance/pages/centers/EvidencePackViewerPage').then(m => ({ default: m.EvidencePackViewerPage })));
+const SLOServiceCenterPage = lazy(() => import('../features/governance/pages/centers/SLOServiceCenterPage').then(m => ({ default: m.SLOServiceCenterPage })));
+// Wave V3.12 — AI Agents, IDE Console, Admin Consoles
+const AiAgentMarketplacePage = lazy(() => import('../features/governance/pages/AiAgentMarketplacePage').then(m => ({ default: m.AiAgentMarketplacePage })));
+const IdeExtensionsConsolePage = lazy(() => import('../features/governance/pages/IdeExtensionsConsolePage').then(m => ({ default: m.IdeExtensionsConsolePage })));
+const BreakGlassAccessPage = lazy(() => import('../features/governance/pages/BreakGlassAccessPage').then(m => ({ default: m.BreakGlassAccessPage })));
+const LicensingAdminPage = lazy(() => import('../features/governance/pages/LicensingAdminPage').then(m => ({ default: m.LicensingAdminPage })));
+const DashboardsAsCodePage = lazy(() => import('../features/governance/pages/DashboardsAsCodePage').then(m => ({ default: m.DashboardsAsCodePage })));
 
 export function GovernanceRoutes() {
   return (
@@ -367,6 +405,278 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:reports:write" redirectTo="/unauthorized">
             <NotebookEditorPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.5 — Dashboard Templates */}
+      <Route
+        path="/governance/dashboard-templates"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <DashboardTemplatesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/dashboard-reports"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <DashboardReportsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/dashboard-usage-analytics"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <DashboardUsageAnalyticsPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.6 — Executive Intelligence + Scheduled Reports */}
+      <Route
+        path="/governance/executive-intelligence"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ExecutiveIntelligenceDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/scheduled-reports"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ScheduledReportsPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.7 — Real-time Collaboration & War Room */}
+      <Route
+        path="/governance/war-room"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <WarRoomPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.8 — Marketplace & Plugin SDK */}
+      <Route
+        path="/governance/marketplace"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <PluginMarketplacePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.9 — Mobile PWA On-Call */}
+      <Route
+        path="/governance/mobile-oncall"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <MobileOnCallPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.10 — Persona Suites */}
+      <Route
+        path="/governance/persona/engineer"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <EngineerCockpitPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/persona/tech-lead"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <TechLeadCommandCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/persona/architect"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ArchitectLandscapePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/persona/product"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ProductPortfolioHomePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/persona/executive"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ExecutiveBriefCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/persona/platform-admin"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <PlatformAdminCockpitPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/persona/auditor"
+        element={
+          <ProtectedRoute permission="governance:compliance:read" redirectTo="/unauthorized">
+            <AuditorConsolePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.11 — Source-of-Truth Centers */}
+      <Route
+        path="/governance/centers/change-confidence"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ChangeConfidenceHubPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/change-confidence/:changeId"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ChangeConfidenceHubPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/blast-radius"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <BlastRadiusExplorerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/blast-radius/:releaseId"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <BlastRadiusExplorerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/operational-readiness"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <OperationalReadinessBoardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/drift"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <DriftCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/compliance-scorecard"
+        element={
+          <ProtectedRoute permission="governance:compliance:read" redirectTo="/unauthorized">
+            <ComplianceScorecardCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/finops-context"
+        element={
+          <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
+            <FinOpsContextViewsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/release-calendar"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <ReleaseCalendarGatePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/rollback"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <RollbackCockpitPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/evidence-pack"
+        element={
+          <ProtectedRoute permission="governance:evidence:read" redirectTo="/unauthorized">
+            <EvidencePackViewerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/evidence-pack/:packId"
+        element={
+          <ProtectedRoute permission="governance:evidence:read" redirectTo="/unauthorized">
+            <EvidencePackViewerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/centers/slo"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <SLOServiceCenterPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.12 — AI Agent Marketplace, IDE Console, Admin Consoles */}
+      <Route
+        path="/governance/ai-agents"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <AiAgentMarketplacePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/ide-extensions"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <IdeExtensionsConsolePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/break-glass"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <BreakGlassAccessPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/licensing"
+        element={
+          <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
+            <LicensingAdminPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/dashboards-as-code"
+        element={
+          <ProtectedRoute permission="governance:reports:write" redirectTo="/unauthorized">
+            <DashboardsAsCodePage />
           </ProtectedRoute>
         }
       />
