@@ -1,3 +1,4 @@
+using System.Linq;
 using NexTraceOne.Governance.Application.Features.GetDashboardLiveStream;
 using NexTraceOne.Governance.Application.Features.GetWidgetDelta;
 

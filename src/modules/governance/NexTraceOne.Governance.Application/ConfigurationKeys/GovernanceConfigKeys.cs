@@ -125,6 +125,32 @@ public static class GovernanceConfigKeys
     /// <summary>Habilita o AI Dashboard Composer para o tenant.</summary>
     public const string AiComposerEnabled = "notebook.ai_composer.enabled";
 
+    // ── Wave V3.6 — Governance, Reports &amp; Embedding (sort 11060–11100) ─────────
+
+    /// <summary>Retenção padrão em dias para snapshots de relatórios agendados (default: 90).</summary>
+    public const string DashboardReportDefaultRetentionDays = "dashboard.report.default_retention_days";
+
+    /// <summary>Formato padrão para snapshots de relatórios: "pdf" ou "png" (default: pdf).</summary>
+    public const string DashboardReportDefaultFormat = "dashboard.report.default_format";
+
+    /// <summary>Habilita links públicos assinados para embedding de dashboards.</summary>
+    public const string DashboardPublicLinksEnabled = "dashboard.public_links.enabled";
+
+    /// <summary>Origens permitidas para embedding de dashboards via iframe (JSON array de URLs).</summary>
+    public const string DashboardEmbedAllowedOrigins = "dashboard.embed.allowed_origins";
+
+    /// <summary>Duração padrão em horas de validade dos links públicos assinados (default: 168 = 7 dias).</summary>
+    public const string DashboardPublicLinkDefaultTtlHours = "dashboard.public_links.default_ttl_hours";
+
+    /// <summary>Habilita tracking de uso/analytics de dashboards.</summary>
+    public const string DashboardUsageTrackingEnabled = "dashboard.usage_tracking.enabled";
+
+    /// <summary>Política de naming de dashboards (JSON: maxLength, requireOwner, forbiddenPrefixes).</summary>
+    public const string DashboardNamingPolicy = "dashboard.governance.naming_policy";
+
+    /// <summary>Número máximo de widgets por dashboard (default: 50).</summary>
+    public const string DashboardMaxWidgets = "dashboard.governance.max_widgets";
+
     // ── Wave V3.5 — Frontend Platform Uplift (sort 11100–11160) ──────────────
 
     /// <summary>Habilita a Command Palette global (Ctrl+K / Cmd+K) no frontend.</summary>

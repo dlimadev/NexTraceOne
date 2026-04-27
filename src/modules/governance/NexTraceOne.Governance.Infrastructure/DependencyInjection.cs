@@ -123,6 +123,19 @@ public static class DependencyInjection
         // Notebooks — Wave V3.4
         services.AddScoped<INotebookRepository, NotebookRepository>();
 
+        // Scheduled Dashboard Reports + Usage Analytics — Wave V3.6
+        services.AddScoped<IScheduledDashboardReportRepository, ScheduledDashboardReportRepository>();
+        services.AddScoped<IDashboardUsageRepository, DashboardUsageRepository>();
+
+        // Dashboard Comments — Wave V3.7 (Real-time Collaboration)
+        services.AddScoped<IDashboardCommentRepository, DashboardCommentRepository>();
+
+        // Dashboard Templates Marketplace — Wave V3.8
+        services.AddScoped<IDashboardTemplateRepository, DashboardTemplateRepository>();
+
+        // Persona Home Configuration — Wave V3.10
+        services.AddScoped<IPersonaHomeConfigurationRepository, PersonaHomeConfigurationRepository>();
+
         return services;
     }
 }

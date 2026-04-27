@@ -64,7 +64,7 @@ public static class GetNotebook
             return Result<Response>.Success(MapToResponse(notebook));
         }
 
-        internal static Response MapToResponse(Notebook notebook)
+        public static Response MapToResponse(Notebook notebook)
             => new(
                 notebook.Id.Value,
                 notebook.Title,

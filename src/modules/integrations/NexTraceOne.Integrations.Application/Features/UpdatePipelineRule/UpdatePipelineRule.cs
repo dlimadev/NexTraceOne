@@ -54,7 +54,7 @@ public static class UpdatePipelineRule
         {
             var rule = await repository.GetByIdAsync(new TenantPipelineRuleId(request.RuleId), cancellationToken);
             if (rule is null)
-                return Result<Response>.Failure(Error.NotFound("PipelineRule.NotFound", $"Pipeline rule '{request.RuleId}' not found."));
+                return Error.NotFound("PipelineRule.NotFound", $"Pipeline rule '{request.RuleId}' not found.");
 
             rule.Update(
                 name: request.Name,

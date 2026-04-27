@@ -2,10 +2,10 @@ using Microsoft.Extensions.Options;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
-using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPromotionReadinessDelta;
 
 using Feature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate.EvaluatePromotionReadinessDeltaGate;
 using FeatureOptions = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate.PromotionReadinessDeltaOptions;
+using PromotionReadinessLevel = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPromotionReadinessDelta.GetPromotionReadinessDelta.PromotionReadinessLevel;
 
 namespace NexTraceOne.ChangeGovernance.Tests.ChangeIntelligence.Application.Features;
 

@@ -44,10 +44,10 @@ public static class RunAiEvaluation
 
             var dataset = await datasetRepository.GetByIdAsync(new AiEvalDatasetId(request.DatasetId), cancellationToken);
             if (dataset is null)
-                return Result<Response>.NotFound($"Dataset '{request.DatasetId}' not found.");
+                return Error.NotFound("AiEvalDataset.NotFound", $"Dataset '{request.DatasetId}' not found.");
 
             if (!dataset.IsActive)
-                return Result<Response>.Failure("Dataset is not active.");
+                return Error.Business("AiEvalDataset.Inactive", "Dataset is not active.");
 
             var run = AiEvalRun.Create(request.TenantId, request.DatasetId, request.ModelId, clock.UtcNow);
             await runRepository.AddAsync(run, cancellationToken);

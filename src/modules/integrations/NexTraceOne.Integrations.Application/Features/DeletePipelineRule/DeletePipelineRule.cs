@@ -37,7 +37,7 @@ public static class DeletePipelineRule
         {
             var rule = await repository.GetByIdAsync(new TenantPipelineRuleId(request.RuleId), cancellationToken);
             if (rule is null)
-                return Result<Response>.Failure(Error.NotFound("PipelineRule.NotFound", $"Pipeline rule '{request.RuleId}' not found."));
+                return Error.NotFound("PipelineRule.NotFound", $"Pipeline rule '{request.RuleId}' not found.");
 
             await repository.DeleteAsync(rule, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);

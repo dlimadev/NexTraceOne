@@ -117,6 +117,21 @@ public sealed class GovernanceDbContext(
     /// <summary>Notebooks operacionais (V3.4 — AI-assisted Dashboard Creation &amp; Notebook Mode).</summary>
     public DbSet<Notebook> Notebooks => Set<Notebook>();
 
+    /// <summary>Agendamentos de relatórios de dashboard (V3.6 — Governance, Reports &amp; Embedding).</summary>
+    public DbSet<ScheduledDashboardReport> ScheduledDashboardReports => Set<ScheduledDashboardReport>();
+
+    /// <summary>Eventos de uso de dashboards para analytics de curadoria (V3.6).</summary>
+    public DbSet<DashboardUsageEvent> DashboardUsageEvents => Set<DashboardUsageEvent>();
+
+    /// <summary>Comentários ancorados em widgets de dashboards (V3.7 — Real-time Collaboration).</summary>
+    public DbSet<DashboardComment> DashboardComments => Set<DashboardComment>();
+
+    /// <summary>Templates de dashboard da galeria interna (V3.8 — Marketplace &amp; Plugin SDK).</summary>
+    public DbSet<DashboardTemplate> DashboardTemplates => Set<DashboardTemplate>();
+
+    /// <summary>Configurações de home personalizadas por utilizador e persona (V3.10 — Persona-first).</summary>
+    public DbSet<PersonaHomeConfiguration> PersonaHomeConfigurations => Set<PersonaHomeConfiguration>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

@@ -29,7 +29,7 @@ public sealed class GetKnowledgeDocsTool : IAgentTool
         "Searches the knowledge base for documents, runbooks, ADRs, and guides matching a query.",
         "knowledge",
         [
-            new ToolParameterDefinition("query", "Search query text", "string", required: true),
+            new ToolParameterDefinition("query", "Search query text", "string", Required: true),
             new ToolParameterDefinition("limit", "Maximum results to return (default: 5)", "integer"),
         ]);
 

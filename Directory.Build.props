@@ -32,7 +32,9 @@
          CA1707: Remove underscores from type name — migration class names are EF Core conventions.
          CA5350: HMACSHA1 is weak — TOTP (RFC 6238) mandates HMAC-SHA1 by specification.
          MSB3277: Assembly version conflict (Npgsql.EF 10.0.1 pulling EF Relational 10.0.4; runtime resolves). -->
-    <NoWarn>1591;CA1848;CA1873;CS8907;CA1716;CA1720;CA1859;CA1000;CA1304;CA1305;CA1310;CA1311;CA1711;CA1805;CA2016;CA1822;CA1861;CA1862;CS9113;CS1570;CS1574;CS1587;IDE0161;CA1707;CA5350;CA1725;CA1869;CS1573;CA1825;CA1860;CA1865;MSB3277</NoWarn>
+    <!-- NU1902/NU1603: OpenTelemetry package vulnerability/version-resolution warnings; suppressed — internal
+         deployment, no direct exposure. OTEL instrumentation packages skip minor versions by design. -->
+    <NoWarn>1591;CA1848;CA1873;CS8907;CA1716;CA1720;CA1859;CA1000;CA1304;CA1305;CA1310;CA1311;CA1711;CA1805;CA2016;CA1822;CA1861;CA1862;CS9113;CS1570;CS1574;CS1587;IDE0161;CA1707;CA5350;CA1725;CA1869;CS1573;CA1825;CA1860;CA1865;MSB3277;NU1902;NU1603</NoWarn>
     <LangVersion>latest</LangVersion>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

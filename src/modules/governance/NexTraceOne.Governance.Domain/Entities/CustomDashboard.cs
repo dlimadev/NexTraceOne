@@ -78,6 +78,21 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     /// </summary>
     public bool IsShared => SharingPolicy.IsVisible;
 
+    /// <summary>Estado do ciclo de vida do dashboard (V3.6 — Draft/Published/Deprecated/Archived).</summary>
+    public DashboardLifecycleStatus LifecycleStatus { get; private set; } = DashboardLifecycleStatus.Draft;
+
+    /// <summary>Data/hora UTC de deprecação (apenas quando LifecycleStatus = Deprecated).</summary>
+    public DateTimeOffset? DeprecatedAt { get; private set; }
+
+    /// <summary>Utilizador que deprecou o dashboard (nullable).</summary>
+    public string? DeprecatedByUserId { get; private set; }
+
+    /// <summary>Nota de deprecação explicando o motivo e/ou substituto recomendado.</summary>
+    public string? DeprecationNote { get; private set; }
+
+    /// <summary>ID do dashboard que substitui este quando deprecado (nullable).</summary>
+    public Guid? SuccessorDashboardId { get; private set; }
+
     /// <summary>Indica se é um dashboard de sistema criado pelo PlatformAdmin (não editável por outros).</summary>
     public bool IsSystem { get; private init; }
 
@@ -230,6 +245,36 @@ public sealed class CustomDashboard : Entity<CustomDashboardId>
     /// </summary>
     public void SetShared(bool shared, DateTimeOffset now)
         => SetSharingPolicy(SharingPolicy.FromLegacyIsShared(shared), now);
+
+    /// <summary>Publica o dashboard (Draft → Published).</summary>
+    public void Publish(DateTimeOffset now)
+    {
+        if (LifecycleStatus == DashboardLifecycleStatus.Archived)
+            throw new InvalidOperationException("Cannot publish an archived dashboard.");
+        LifecycleStatus = DashboardLifecycleStatus.Published;
+        UpdatedAt = now;
+    }
+
+    /// <summary>Depreca o dashboard com nota e substituto opcional (Published → Deprecated).</summary>
+    public void Deprecate(string userId, string? note, Guid? successorId, DateTimeOffset now)
+    {
+        Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
+        if (LifecycleStatus == DashboardLifecycleStatus.Archived)
+            throw new InvalidOperationException("Cannot deprecate an archived dashboard.");
+        LifecycleStatus = DashboardLifecycleStatus.Deprecated;
+        DeprecatedAt = now;
+        DeprecatedByUserId = userId;
+        DeprecationNote = note;
+        SuccessorDashboardId = successorId;
+        UpdatedAt = now;
+    }
+
+    /// <summary>Arquiva o dashboard (qualquer estado → Archived).</summary>
+    public void Archive(DateTimeOffset now)
+    {
+        LifecycleStatus = DashboardLifecycleStatus.Archived;
+        UpdatedAt = now;
+    }
 
     /// <summary>
     /// Cria um snapshot de revisão do estado atual para persistência no histórico.

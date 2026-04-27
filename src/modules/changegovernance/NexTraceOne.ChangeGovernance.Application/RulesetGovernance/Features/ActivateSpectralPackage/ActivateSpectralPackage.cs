@@ -63,14 +63,14 @@ public static class ActivateSpectralPackage
             {
                 existing.Activate();
                 await unitOfWork.CommitAsync(cancellationToken);
-                return new Response(existing.Id.Value, packageName, activated: false, reactivated: true);
+                return new Response(existing.Id.Value, packageName, Activated: false, Reactivated: true);
             }
 
             var ruleset = Ruleset.Create(packageName, description, content, RulesetType.Default, clock.UtcNow);
             repository.Add(ruleset);
             await unitOfWork.CommitAsync(cancellationToken);
 
-            return new Response(ruleset.Id.Value, packageName, activated: true, reactivated: false);
+            return new Response(ruleset.Id.Value, packageName, Activated: true, Reactivated: false);
         }
     }
 

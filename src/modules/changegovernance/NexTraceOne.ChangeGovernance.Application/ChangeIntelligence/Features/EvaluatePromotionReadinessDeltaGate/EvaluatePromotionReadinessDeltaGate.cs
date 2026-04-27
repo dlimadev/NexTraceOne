@@ -8,7 +8,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
-using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPromotionReadinessDelta;
+using ReadinessDeltaFeature = NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.GetPromotionReadinessDelta.GetPromotionReadinessDelta;
 
 namespace NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate;
 
@@ -92,11 +92,11 @@ public static class EvaluatePromotionReadinessDeltaGate
                 SimulatedNote: snapshot.SimulatedNote);
         }
 
-        private static GetPromotionReadinessDelta.PromotionReadinessLevel ComputeReadiness(
+        private static ReadinessDeltaFeature.PromotionReadinessLevel ComputeReadiness(
             RuntimeComparisonSnapshot snapshot)
         {
             if (snapshot.DataQuality <= 0m)
-                return GetPromotionReadinessDelta.PromotionReadinessLevel.Unknown;
+                return ReadinessDeltaFeature.PromotionReadinessLevel.Unknown;
 
             var error = snapshot.ErrorRateDelta;
             var latency = snapshot.LatencyP95DeltaMs;
@@ -106,38 +106,38 @@ public static class EvaluatePromotionReadinessDeltaGate
                 || (latency.HasValue && latency.Value > 250m)
                 || (incidents.HasValue && incidents.Value > 0))
             {
-                return GetPromotionReadinessDelta.PromotionReadinessLevel.Blocked;
+                return ReadinessDeltaFeature.PromotionReadinessLevel.Blocked;
             }
 
             if ((error.HasValue && error.Value > 0.01m)
                 || (latency.HasValue && latency.Value > 75m))
             {
-                return GetPromotionReadinessDelta.PromotionReadinessLevel.Review;
+                return ReadinessDeltaFeature.PromotionReadinessLevel.Review;
             }
 
-            return GetPromotionReadinessDelta.PromotionReadinessLevel.Ready;
+            return ReadinessDeltaFeature.PromotionReadinessLevel.Ready;
         }
 
         private static (bool Passed, string Reason) EvaluateGate(
-            GetPromotionReadinessDelta.PromotionReadinessLevel readiness,
+            ReadinessDeltaFeature.PromotionReadinessLevel readiness,
             RuntimeComparisonSnapshot snapshot,
             PromotionReadinessDeltaOptions opts)
         {
             return readiness switch
             {
-                GetPromotionReadinessDelta.PromotionReadinessLevel.Ready =>
+                ReadinessDeltaFeature.PromotionReadinessLevel.Ready =>
                     (true, "Runtime delta is within acceptable thresholds."),
 
-                GetPromotionReadinessDelta.PromotionReadinessLevel.Review when opts.BlockOnReview =>
+                ReadinessDeltaFeature.PromotionReadinessLevel.Review when opts.BlockOnReview =>
                     (false, BuildReviewReason(snapshot)),
 
-                GetPromotionReadinessDelta.PromotionReadinessLevel.Review =>
+                ReadinessDeltaFeature.PromotionReadinessLevel.Review =>
                     (true, $"Runtime delta requires review but gate is non-blocking. {BuildReviewReason(snapshot)}"),
 
-                GetPromotionReadinessDelta.PromotionReadinessLevel.Blocked =>
+                ReadinessDeltaFeature.PromotionReadinessLevel.Blocked =>
                     (false, BuildBlockedReason(snapshot)),
 
-                GetPromotionReadinessDelta.PromotionReadinessLevel.Unknown =>
+                ReadinessDeltaFeature.PromotionReadinessLevel.Unknown =>
                     (true, "Insufficient runtime data; gate is non-blocking when data quality is zero."),
 
                 _ => (true, "Gate passed.")
@@ -178,7 +178,7 @@ public static class EvaluatePromotionReadinessDeltaGate
         string EnvironmentTo,
         int WindowDays,
         bool Passed,
-        GetPromotionReadinessDelta.PromotionReadinessLevel Readiness,
+        ReadinessDeltaFeature.PromotionReadinessLevel Readiness,
         string Reason,
         decimal DataQuality,
         string? SimulatedNote);

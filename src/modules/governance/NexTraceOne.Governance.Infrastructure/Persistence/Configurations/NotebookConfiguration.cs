@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using System.Text.Json;
 using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.Governance.Domain.Enums;
@@ -16,6 +17,8 @@ internal sealed class NotebookConfiguration : IEntityTypeConfiguration<Notebook>
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
+
+    private static readonly List<NotebookCell> _emptyCells = [];
 
     public void Configure(EntityTypeBuilder<Notebook> builder)
     {
@@ -68,7 +71,7 @@ internal sealed class NotebookConfiguration : IEntityTypeConfiguration<Notebook>
             .HasColumnType("jsonb")
             .HasConversion(
                 v => JsonSerializer.Serialize(v, _json),
-                v => (IReadOnlyList<NotebookCell>)(JsonSerializer.Deserialize<List<NotebookCell>>(v, _json) ?? []))
+                v => (IReadOnlyList<NotebookCell>)(JsonSerializer.Deserialize<List<NotebookCell>>(v, _json) ?? _emptyCells))
             .IsRequired();
 
         builder.Property(x => x.CurrentRevisionNumber)
@@ -87,8 +90,12 @@ internal sealed class NotebookConfiguration : IEntityTypeConfiguration<Notebook>
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        // Optimistic concurrency via xmin (PostgreSQL row version)
-        builder.UseXminAsConcurrencyToken();
+        // Optimistic concurrency via PostgreSQL xmin row version
+        builder.Property<uint>("xmin")
+            .HasColumnType("xid")
+            .HasColumnName("xmin")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
 
         // Indexes
         builder.HasIndex(x => new { x.TenantId, x.Status })
