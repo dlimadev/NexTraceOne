@@ -136,6 +136,12 @@ public static class DependencyInjection
         // Persona Home Configuration — Wave V3.10
         services.AddScoped<IPersonaHomeConfigurationRepository, PersonaHomeConfigurationRepository>();
 
+        // Presence Sessions — Wave V3.7 (Collaboration)
+        services.AddScoped<IPresenceSessionRepository, PresenceSessionRepository>();
+
+        // Dashboard Monitors — Wave V3.9 (Alerting from Widget)
+        services.AddScoped<IDashboardMonitorRepository, DashboardMonitorRepository>();
+
         return services;
     }
 }

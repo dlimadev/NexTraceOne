@@ -132,6 +132,12 @@ public sealed class GovernanceDbContext(
     /// <summary>Configurações de home personalizadas por utilizador e persona (V3.10 — Persona-first).</summary>
     public DbSet<PersonaHomeConfiguration> PersonaHomeConfigurations => Set<PersonaHomeConfiguration>();
 
+    /// <summary>Sessões de presença em tempo real em dashboards e notebooks (V3.7 — Collaboration).</summary>
+    public DbSet<PresenceSession> PresenceSessions => Set<PresenceSession>();
+
+    /// <summary>Monitores de alerta criados a partir de widgets (V3.9 — Alerting from Widget).</summary>
+    public DbSet<DashboardMonitorDefinition> DashboardMonitors => Set<DashboardMonitorDefinition>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

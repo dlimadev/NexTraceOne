@@ -21,6 +21,13 @@ const ContractHealthTimelinePage = lazy(() => import('../features/contracts/gove
 const ContractPlaygroundPage = lazy(() => import('../features/contracts/playground/ContractPlaygroundPage').then(m => ({ default: m.ContractPlaygroundPage })));
 const ConsumerDrivenContractPage = lazy(() => import('../features/contracts/cdct/ConsumerDrivenContractPage').then(m => ({ default: m.ConsumerDrivenContractPage })));
 const ContractMigrationPage = lazy(() => import('../features/contracts/governance/ContractMigrationPage').then(m => ({ default: m.ContractMigrationPage })));
+// Wave V3.12 — Contract Studio Visual Builders
+const ContractStudioPage = lazy(() => import('../features/contracts/pages/ContractStudioPage').then(m => ({ default: m.ContractStudioPage })));
+const RestOpenApiBuilderPage = lazy(() => import('../features/contracts/pages/RestOpenApiBuilderPage').then(m => ({ default: m.RestOpenApiBuilderPage })));
+const AsyncApiBuilderPage = lazy(() => import('../features/contracts/pages/AsyncApiBuilderPage').then(m => ({ default: m.AsyncApiBuilderPage })));
+const SoapWsdlBuilderPage = lazy(() => import('../features/contracts/pages/SoapWsdlBuilderPage').then(m => ({ default: m.SoapWsdlBuilderPage })));
+const GraphQLBuilderPage = lazy(() => import('../features/contracts/pages/GraphQLBuilderPage').then(m => ({ default: m.GraphQLBuilderPage })));
+const ProtobufBuilderPage = lazy(() => import('../features/contracts/pages/ProtobufBuilderPage').then(m => ({ default: m.ProtobufBuilderPage })));
 
 export function ContractsRoutes() {
   return (
@@ -49,7 +56,55 @@ export function ContractsRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route path="/contracts/studio" element={<Navigate to="/contracts" replace />} />
+      {/* Wave V3.12 — Contract Studio type-specific builders (must come before :draftId catch-all) */}
+      <Route
+        path="/contracts/studio/new"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <ContractStudioPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/studio/rest"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <RestOpenApiBuilderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/studio/async"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <AsyncApiBuilderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/studio/soap"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <SoapWsdlBuilderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/studio/graphql"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <GraphQLBuilderPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contracts/studio/protobuf"
+        element={
+          <ProtectedRoute permission="contracts:write" redirectTo="/unauthorized">
+            <ProtobufBuilderPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/contracts/legacy" element={<Navigate to="/contracts" replace />} />
       <Route
         path="/contracts/governance"

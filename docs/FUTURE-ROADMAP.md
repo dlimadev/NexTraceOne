@@ -1,13 +1,13 @@
 # NexTraceOne — Future Roadmap
 
 > **Data:** Abril 2026  
-> **Estado atual:** Backend 100% implementado — 155 waves analytics/governance concluídas (A → BC) + PIP-01..06 + CC-01..08 + AI-0.1..0.5 + AI-1.1..1.3 implementados. Wave AA (frontend v3) planeada.  
+> **Estado atual:** Backend 100% implementado — 155 waves analytics/governance concluídas (A → BC) + PIP-01..06 + CC-01..08 + AI-0.1..0.5 + AI-1.1..1.3 implementados. Wave AA (frontend v3) ✅ COMPLETA — todas as 12 sub-waves (V3.1→V3.12) implementadas.  
 > **Waves backend concluídas:** A → BC (155 features — todas ✅ COMPLETAS) + Supplementary Waves A–K + L–M + S–W + X–Z + AA (frontend planeada)  
 > **Ingestion Pipeline:** ✅ PIP-01..06 COMPLETOS — Dead Letter Queue, Ingestion Observability, TenantPipelineEngine, StorageBucket routing, CatalogEnrichmentProcessor, LogToMetricProcessor  
 > **Core Completions:** ✅ CC-01..08 COMPLETOS — SAML Level A, Promotion Readiness Delta Gate, Data Contracts, Consumer Tracking, AI Eval Harness, Breaking Change Workflow, Blast Radius v2, Spectral Marketplace  
 > **AI Evolution Phase 0:** ✅ AI-0.1..0.5 COMPLETOS — Claude 4.x catalog, Redis-compatible quota cache, parallel grounding, model upgrade, native tool calling + StructuredOutputFallback  
 > **AI Evolution Phase 1:** ✅ AI-1.1..1.3 COMPLETOS — ISkillExecutor + SkillExecutorService, 15 built-in skills (incl. incident-summarizer, release-notes-generator, runbook-generator), ExecuteSkillPipeline + OrchestrateSkills  
-> **Wave AA (frontend v3):** 📘 PLANEADA — plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 sub-waves (V3.1→V3.12) cobrindo Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace/Plugins, Mobile on-call, Persona Suites, Source-of-Truth Centers e Contract Studio/AI Agents/IDE/Admin consoles  
+> **Wave AA (frontend v3):** ✅ COMPLETA — plano detalhado em [`V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md) — 12 sub-waves (V3.1→V3.12) todas implementadas: Dashboard Intelligence (V3.1–V3.4), Frontend Uplift (V3.5), Governance/Reports (V3.6), Real-time Collaboration & War Room (V3.7), Marketplace/Plugins (V3.8), NQL+Alerting+PWA Mobile (V3.9), 7 Persona Suites (V3.10), 11 Source-of-Truth Centers (V3.11), Contract Studio Visual + AI Agents + IDE Console + Break Glass + Licensing + DaC GitOps (V3.12)  
 > **Waves AB–AE:** ✅ CONCLUÍDAS — Knowledge Graph & Semantic Relations, Self-Service & Platform Adoption Intelligence, Zero Trust & Security Posture Analytics, Contract Testing & API Backward Compatibility  
 > **Waves AF–AI:** ✅ CONCLUÍDAS — Service Lifecycle Governance, FinOps Advanced Attribution, Event-Driven Architecture Governance, Predictive Intelligence & Forecasting  
 > **Waves AJ–AM:** ✅ CONCLUÍDAS — Multi-Tenant Governance Intelligence, Developer Experience & Notification Management, Audit Intelligence & Traceability Analytics, Auto-Cataloging & Service Discovery Intelligence  
@@ -246,7 +246,7 @@ O NexTraceOne está operacional com 12 módulos backend, 130+ páginas frontend,
 | ✅ **DONE** | Waves AB–BC | 84 features backend avançado — todas implementadas |
 | ✅ **DONE** | Ingestion Pipeline (PIP-01..06) | Dead Letter Queue, observabilidade, regras por tenant, storage routing, enrichment, log→metric |
 | ✅ **DONE** | Core Completions (CC-01..08) | SAML Level A, Promotion Readiness Gate, Data Contracts, Consumer Tracking, AI Eval Harness, Breaking Change Workflow, Blast Radius v2, Spectral Marketplace |
-| **Próximo** | Wave AA — V3 Frontend Evolution | 12 sub-waves (V3.1→V3.12) — ver MASTER-ACTION-PLAN.md |
+| ✅ **DONE** | Wave AA — V3 Frontend Evolution | 12 sub-waves (V3.1→V3.12) — Dashboard Intelligence, Frontend Uplift, Collaboration, Marketplace, Mobile PWA, 7 Persona Suites, 11 SoT Centers, Contract Studio Visual + AI Agents + IDE + Admin |
 | ✅ **DONE** | AI Evolution Fase 0 (AI-0.1..0.5) | Claude 4.x catalog, quota cache, native tool calling, StructuredOutputFallback |
 | ✅ **DONE** | AI Evolution Fase 1 (AI-1.1..1.3) | ISkillExecutor, 15 built-in skills, SkillPipeline, SkillOrchestrator |
 | **Roadmap** | AI Evolution Fases 2–5 | Agent Lightning (RL), memória organizacional, enterprise integrations, marketplace |
@@ -1653,7 +1653,7 @@ Secções adicionadas em **4 locales** (en, pt-BR, pt-PT, es):
 
 ### Wave AA — V3 Frontend Evolution (Dashboards + Persona Suites + Source-of-Truth Surfaces)
 
-**Estado:** 📘 PLANEADA — documento detalhado em [`docs/V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md).
+**Estado:** ✅ COMPLETA — todas as 12 sub-waves implementadas. Documento de planeamento: [`docs/V3-EVOLUTION-FRONTEND-DASHBOARDS.md`](./V3-EVOLUTION-FRONTEND-DASHBOARDS.md).
 
 **Objetivo:** elevar o frontend do NexTraceOne de "app de módulos" para **Operational Intelligence Surface persona-aware** e os Custom Dashboards para **Governed Intelligence Boards**, consolidando simultaneamente as superfícies que materializam o NexTraceOne como **Source of Truth** operacional. Wave AA é a contraparte frontend das waves backend A–Z — transforma os ~46 features analytics/governance já entregues (waves A–R) e os 24 planeados (S–Z) em **superfícies de decisão enterprise** coesas.
 
