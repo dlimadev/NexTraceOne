@@ -10795,7 +10795,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             sortOrder: 13000),
 
         // ── Wave V3.3 — Live, Cross-filter, Drill-down ──────────────────
-        BuildDefinition(
+        ConfigurationDefinition.Create(
             key: "governance.live.sse_enabled",
             displayName: "config.governance.live.sse_enabled.label",
             description: "config.governance.live.sse_enabled.description",
@@ -10806,7 +10806,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "toggle",
             sortOrder: 13010),
 
-        BuildDefinition(
+        ConfigurationDefinition.Create(
             key: "governance.live.heartbeat_interval_ms",
             displayName: "config.governance.live.heartbeat_interval_ms.label",
             description: "config.governance.live.heartbeat_interval_ms.description",
@@ -10817,7 +10817,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "number",
             sortOrder: 13020),
 
-        BuildDefinition(
+        ConfigurationDefinition.Create(
             key: "governance.live.max_concurrent_streams",
             displayName: "config.governance.live.max_concurrent_streams.label",
             description: "config.governance.live.max_concurrent_streams.description",
@@ -10828,7 +10828,7 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             uiEditorType: "number",
             sortOrder: 13030),
 
-        BuildDefinition(
+        ConfigurationDefinition.Create(
             key: "governance.crossfilter.enabled",
             displayName: "config.governance.crossfilter.enabled.label",
             description: "config.governance.crossfilter.enabled.description",

@@ -30,7 +30,7 @@ public sealed class GetComplianceStatusTool : IAgentTool
         "Checks compliance status of a service against a regulatory standard (LGPD, GDPR, SOC2, ISO27001).",
         "compliance",
         [
-            new ToolParameterDefinition("serviceId", "Service identifier", "string", required: true),
+            new ToolParameterDefinition("serviceId", "Service identifier", "string", Required: true),
             new ToolParameterDefinition("standard", "Compliance standard: LGPD | GDPR | SOC2 | ISO27001", "string"),
         ]);
 
@@ -48,7 +48,7 @@ public sealed class GetComplianceStatusTool : IAgentTool
                 serviceId, standard);
 
             var services = await _catalogReader.FindServicesAsync(serviceId, serviceId, 3, cancellationToken);
-            var service = services.FirstOrDefault();
+            var service = services.Count > 0 ? services[0] : null;
 
             var hasRegulatoryScope = !string.IsNullOrWhiteSpace(service?.RegulatoryScope);
             var hasDataClassification = !string.IsNullOrWhiteSpace(service?.DataClassification);

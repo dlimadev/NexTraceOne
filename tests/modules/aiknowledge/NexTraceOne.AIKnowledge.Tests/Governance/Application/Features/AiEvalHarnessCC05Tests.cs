@@ -153,8 +153,8 @@ public sealed class AiEvalHarnessCC05Tests
         result.IsSuccess.Should().BeTrue();
         result.Value.TotalRuns.Should().Be(2);
         result.Value.ByModel.Should().HaveCount(2);
-        result.Value.ByModel[0].AverageSemanticSimilarity.Should().BeGreaterThanOrEqualTo(
-            result.Value.ByModel[1].AverageSemanticSimilarity);
+        result.Value.ByModel[0].LatestSemanticSimilarity.Should().BeGreaterThanOrEqualTo(
+            result.Value.ByModel[1].LatestSemanticSimilarity);
     }
 
     // ── Domain entity ────────────────────────────────────────────────────────

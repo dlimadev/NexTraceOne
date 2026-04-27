@@ -38,7 +38,7 @@ public sealed class PromptAsset : AuditableEntity<PromptAssetId>
     public Guid? TenantId { get; private set; }
 
     /// <summary>Utilizador que registou o asset.</summary>
-    public string CreatedBy { get; private set; } = string.Empty;
+    public new string CreatedBy { get; private set; } = string.Empty;
 
     /// <summary>Número da versão activa actualmente.</summary>
     public int CurrentVersionNumber { get; private set; }

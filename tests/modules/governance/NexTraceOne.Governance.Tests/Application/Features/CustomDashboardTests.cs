@@ -21,12 +21,15 @@ public sealed class CustomDashboardTests
 
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly ICustomDashboardRepository _repository = Substitute.For<ICustomDashboardRepository>();
+    private readonly IDashboardRevisionRepository _revisionRepository = Substitute.For<IDashboardRevisionRepository>();
     private readonly IGovernanceUnitOfWork _unitOfWork = Substitute.For<IGovernanceUnitOfWork>();
 
     public CustomDashboardTests()
     {
         _clock.UtcNow.Returns(FixedNow);
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(1));
+        _revisionRepository.AddAsync(Arg.Any<DashboardRevision>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
@@ -193,7 +196,7 @@ public sealed class CustomDashboardTests
         _repository.GetByIdAsync(Arg.Any<CustomDashboardId>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<CustomDashboard?>(dashboard));
 
-        var handler = new UpdateCustomDashboard.Handler(_repository, _unitOfWork, _clock);
+        var handler = new UpdateCustomDashboard.Handler(_repository, _revisionRepository, _unitOfWork, _clock);
         var newWidgets = new List<UpdateCustomDashboard.WidgetInput>
         {
             new(null, "service-scorecard", 0, 0, 3, 3, ServiceId: "svc-1")
@@ -202,6 +205,7 @@ public sealed class CustomDashboardTests
         var command = new UpdateCustomDashboard.Command(
             DashboardId: dashboard.Id.Value,
             TenantId: "tenant-1",
+            UserId: "user-1",
             Name: "Updated",
             Description: "Updated desc",
             Layout: "grid",
@@ -226,10 +230,11 @@ public sealed class CustomDashboardTests
         _repository.GetByIdAsync(Arg.Any<CustomDashboardId>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<CustomDashboard?>(null));
 
-        var handler = new UpdateCustomDashboard.Handler(_repository, _unitOfWork, _clock);
+        var handler = new UpdateCustomDashboard.Handler(_repository, _revisionRepository, _unitOfWork, _clock);
         var command = new UpdateCustomDashboard.Command(
             DashboardId: Guid.NewGuid(),
             TenantId: "tenant-1",
+            UserId: "user-1",
             Name: "X",
             Description: null,
             Layout: "grid",
@@ -248,10 +253,11 @@ public sealed class CustomDashboardTests
         _repository.GetByIdAsync(Arg.Any<CustomDashboardId>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<CustomDashboard?>(dashboard));
 
-        var handler = new UpdateCustomDashboard.Handler(_repository, _unitOfWork, _clock);
+        var handler = new UpdateCustomDashboard.Handler(_repository, _revisionRepository, _unitOfWork, _clock);
         var command = new UpdateCustomDashboard.Command(
             DashboardId: dashboard.Id.Value,
             TenantId: "tenant-B",
+            UserId: "user-1",
             Name: "X",
             Description: null,
             Layout: "grid",

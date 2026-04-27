@@ -60,7 +60,7 @@ public sealed class CatalogEnrichmentProcessor(
 
             var services = await catalogModule.ListAllServicesAsync(ct);
             var serviceInfo = services.FirstOrDefault(s =>
-                string.Equals(s.ServiceName, serviceName, StringComparison.OrdinalIgnoreCase));
+                string.Equals(s.Name, serviceName, StringComparison.OrdinalIgnoreCase));
 
             if (serviceInfo is null)
             {
@@ -68,12 +68,12 @@ public sealed class CatalogEnrichmentProcessor(
                 return null;
             }
 
-            var contracts = await catalogModule.ListContractsByTeamAsync(serviceInfo.TeamName, ct);
+            var contracts = await catalogModule.ListContractsByTeamAsync(serviceInfo.Domain, ct);
             var contractCount = contracts.Count;
 
             var data = new ServiceEnrichmentData(
                 ServiceName: serviceName,
-                TeamName: serviceInfo.TeamName,
+                TeamName: serviceInfo.Domain,
                 ContractCount: contractCount);
 
             cache.Set(cacheKey, data, CacheTtl);

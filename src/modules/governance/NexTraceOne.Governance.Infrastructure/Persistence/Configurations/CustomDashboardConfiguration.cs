@@ -110,6 +110,20 @@ internal sealed class CustomDashboardConfiguration : IEntityTypeConfiguration<Cu
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
+        // ── V3.6: Lifecycle columns ──────────────────────────────────────────────
+        builder.Property(x => x.LifecycleStatus)
+            .HasConversion<int>()
+            .HasDefaultValue(DashboardLifecycleStatus.Published);
+
+        builder.Property(x => x.DeprecatedAt)
+            .HasColumnType("timestamp with time zone");
+
+        builder.Property(x => x.DeprecatedByUserId)
+            .HasMaxLength(100);
+
+        builder.Property(x => x.DeprecationNote)
+            .HasMaxLength(500);
+
         // WidgetCount é calculado — ignorar persistência
         builder.Ignore(x => x.WidgetCount);
 

@@ -32,7 +32,7 @@ public sealed class PromptVersion : AuditableEntity<PromptVersionId>
     public bool IsActive { get; private set; }
 
     /// <summary>Utilizador que criou esta versão.</summary>
-    public string CreatedBy { get; private set; } = string.Empty;
+    public new string CreatedBy { get; private set; } = string.Empty;
 
     internal static PromptVersion Create(
         PromptAssetId assetId,

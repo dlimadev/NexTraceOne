@@ -22,6 +22,18 @@ using ValidateNqlQueryFeature = NexTraceOne.Governance.Application.Features.Vali
 using GetDashboardAnnotationsFeature = NexTraceOne.Governance.Application.Features.GetDashboardAnnotations.GetDashboardAnnotations;
 using GetDashboardLiveStreamFeature = NexTraceOne.Governance.Application.Features.GetDashboardLiveStream.GetDashboardLiveStream;
 using GetWidgetDeltaFeature = NexTraceOne.Governance.Application.Features.GetWidgetDelta.GetWidgetDelta;
+using CreateNotebookFeature = NexTraceOne.Governance.Application.Features.CreateNotebook.CreateNotebook;
+using GetNotebookFeature = NexTraceOne.Governance.Application.Features.GetNotebook.GetNotebook;
+using ListNotebooksFeature = NexTraceOne.Governance.Application.Features.ListNotebooks.ListNotebooks;
+using UpdateNotebookFeature = NexTraceOne.Governance.Application.Features.UpdateNotebook.UpdateNotebook;
+using DeleteNotebookFeature = NexTraceOne.Governance.Application.Features.DeleteNotebook.DeleteNotebook;
+using ComposeAiDashboardFeature = NexTraceOne.Governance.Application.Features.ComposeAiDashboard.ComposeAiDashboard;
+using ScheduleDashboardReportFeature = NexTraceOne.Governance.Application.Features.ScheduleDashboardReport.ScheduleDashboardReport;
+using ExportDashboardAsYamlFeature = NexTraceOne.Governance.Application.Features.ExportDashboardAsYaml.ExportDashboardAsYaml;
+using DeprecateDashboardFeature = NexTraceOne.Governance.Application.Features.DeprecateDashboard.DeprecateDashboard;
+using PublishDashboardFeature = NexTraceOne.Governance.Application.Features.PublishDashboard.PublishDashboard;
+using RecordDashboardUsageFeature = NexTraceOne.Governance.Application.Features.RecordDashboardUsage.RecordDashboardUsage;
+using GetDashboardUsageAnalyticsFeature = NexTraceOne.Governance.Application.Features.GetDashboardUsageAnalytics.GetDashboardUsageAnalytics;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -38,6 +50,9 @@ public sealed class DashboardsAndDebtEndpointModule
         MapTechnicalDebtEndpoints(app);
         MapNqlEndpoints(app);
         MapLiveEndpoints(app);
+        MapNotebookEndpoints(app);
+        MapAiComposerEndpoints(app);
+        MapReportsAndEmbedEndpoints(app);
     }
 
     private static void MapDashboardEndpoints(IEndpointRouteBuilder app)
@@ -297,6 +312,183 @@ public sealed class DashboardsAndDebtEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetTechnicalDebtSummaryFeature.Query(serviceName, teamName, topN);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+    }
+
+    // ── Wave V3.4 — Notebooks ────────────────────────────────────────────────
+
+    private static void MapNotebookEndpoints(IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/governance/notebooks");
+
+        // POST /api/v1/governance/notebooks
+        group.MapPost("/", async (
+            CreateNotebookFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/governance/notebooks/{r.NotebookId}", localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // GET /api/v1/governance/notebooks
+        group.MapGet("/", async (
+            string tenantId,
+            string? persona,
+            string? status,
+            int page,
+            int pageSize,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ListNotebooksFeature.Query(tenantId, persona, status, page, pageSize);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        // GET /api/v1/governance/notebooks/{notebookId}
+        group.MapGet("/{notebookId:guid}", async (
+            Guid notebookId,
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetNotebookFeature.Query(notebookId, tenantId);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        // PUT /api/v1/governance/notebooks/{notebookId}
+        group.MapPut("/{notebookId:guid}", async (
+            Guid notebookId,
+            UpdateNotebookFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { NotebookId = notebookId };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // DELETE /api/v1/governance/notebooks/{notebookId}
+        group.MapDelete("/{notebookId:guid}", async (
+            Guid notebookId,
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = new DeleteNotebookFeature.Command(notebookId, tenantId);
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+    }
+
+    // ── Wave V3.4 — AI Dashboard Composer ────────────────────────────────────
+
+    private static void MapAiComposerEndpoints(IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/governance/ai");
+
+        // POST /api/v1/governance/ai/compose-dashboard
+        group.MapPost("/compose-dashboard", async (
+            ComposeAiDashboardFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+    }
+
+    // ── Wave V3.6 — Governance, Reports &amp; Embedding ──────────────────────────
+
+    private static void MapReportsAndEmbedEndpoints(IEndpointRouteBuilder app)
+    {
+        var dashboards = app.MapGroup("/api/v1/governance/dashboards");
+
+        // POST /api/v1/governance/dashboards/{id}/schedule-report
+        dashboards.MapPost("/{id:guid}/schedule-report", async (
+            Guid id,
+            ScheduleDashboardReportFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { DashboardId = id };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // GET /api/v1/governance/dashboards/{id}/export-yaml
+        dashboards.MapGet("/{id:guid}/export-yaml", async (
+            Guid id,
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new ExportDashboardAsYamlFeature.Query(id, tenantId);
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        // POST /api/v1/governance/dashboards/{id}/publish
+        dashboards.MapPost("/{id:guid}/publish", async (
+            Guid id,
+            PublishDashboardFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { DashboardId = id };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // POST /api/v1/governance/dashboards/{id}/deprecate
+        dashboards.MapPost("/{id:guid}/deprecate", async (
+            Guid id,
+            DeprecateDashboardFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { DashboardId = id };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:write");
+
+        // POST /api/v1/governance/dashboards/{id}/record-usage
+        dashboards.MapPost("/{id:guid}/record-usage", async (
+            Guid id,
+            RecordDashboardUsageFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { DashboardId = id };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
+
+        // GET /api/v1/governance/dashboards/usage-analytics
+        dashboards.MapGet("/usage-analytics", async (
+            string tenantId,
+            Guid? dashboardId,
+            int windowDays,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetDashboardUsageAnalyticsFeature.Query(tenantId, dashboardId, windowDays > 0 ? windowDays : 30);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("governance:reports:read");

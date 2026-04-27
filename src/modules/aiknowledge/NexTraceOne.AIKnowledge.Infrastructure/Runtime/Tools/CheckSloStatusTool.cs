@@ -32,7 +32,7 @@ public sealed class CheckSloStatusTool : IAgentTool
         "Checks the SLO targets and interface compliance status for a service.",
         "service_catalog",
         [
-            new ToolParameterDefinition("serviceId", "Service name or identifier", "string", required: true),
+            new ToolParameterDefinition("serviceId", "Service name or identifier", "string", Required: true),
         ]);
 
     public async Task<ToolExecutionResult> ExecuteAsync(
@@ -53,7 +53,7 @@ public sealed class CheckSloStatusTool : IAgentTool
 
             var interfaces = interfacesTask.Result;
             var services = servicesTask.Result;
-            var service = services.FirstOrDefault();
+            var service = services.Count > 0 ? services[0] : null;
 
             var sloInterfaces = interfaces
                 .Where(i => !string.IsNullOrWhiteSpace(i.SloTarget))

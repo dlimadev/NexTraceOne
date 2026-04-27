@@ -30,7 +30,7 @@ public sealed class GetCostContextTool : IAgentTool
         "Returns AI token consumption costs for a service over the last 24h and 30 days.",
         "cost_intelligence",
         [
-            new ToolParameterDefinition("userId", "User or service account identifier to query", "string", required: true),
+            new ToolParameterDefinition("userId", "User or service account identifier to query", "string", Required: true),
         ]);
 
     public async Task<ToolExecutionResult> ExecuteAsync(

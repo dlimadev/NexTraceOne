@@ -1,4 +1,5 @@
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.DeprecateSkill;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ExecuteSkill;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.GetSkillDetails;
@@ -21,8 +22,19 @@ public sealed class SkillsSystemTests
     private readonly IAiSkillRepository _skillRepo = Substitute.For<IAiSkillRepository>();
     private readonly IAiSkillExecutionRepository _executionRepo = Substitute.For<IAiSkillExecutionRepository>();
     private readonly IAiSkillFeedbackRepository _feedbackRepo = Substitute.For<IAiSkillFeedbackRepository>();
+    private readonly ISkillExecutor _skillExecutor = Substitute.For<ISkillExecutor>();
+    private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
     private static readonly Guid _tenantId = Guid.NewGuid();
+
+    public SkillsSystemTests()
+    {
+        _clock.UtcNow.Returns(DateTimeOffset.UtcNow);
+        _skillExecutor.ExecuteAsync(Arg.Any<AiSkill>(), Arg.Any<string>(), Arg.Any<string?>(),
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(new SkillExecutionOutput(true, """{"result":"ok"}""", "gpt-4o", "openai",
+                100, 50, TimeSpan.FromMilliseconds(320)));
+    }
 
     // ── AiSkill.CreateSystem ───────────────────────────────────────────────
 
@@ -282,7 +294,7 @@ public sealed class SkillsSystemTests
             ExecutedBy: "user-1",
             TenantId: _tenantId);
 
-        var handler = new ExecuteSkill.Handler(_skillRepo, _executionRepo);
+        var handler = new ExecuteSkill.Handler(_skillRepo, _executionRepo, _skillExecutor, _clock);
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -300,7 +312,7 @@ public sealed class SkillsSystemTests
         var command = new ExecuteSkill.Command(
             Guid.NewGuid(), """{"input":"test"}""", null, null, "user-1", _tenantId);
 
-        var handler = new ExecuteSkill.Handler(_skillRepo, _executionRepo);
+        var handler = new ExecuteSkill.Handler(_skillRepo, _executionRepo, _skillExecutor, _clock);
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
@@ -318,7 +330,7 @@ public sealed class SkillsSystemTests
         var command = new ExecuteSkill.Command(
             skillId, """{"input":"test"}""", null, null, "user-1", _tenantId);
 
-        var handler = new ExecuteSkill.Handler(_skillRepo, _executionRepo);
+        var handler = new ExecuteSkill.Handler(_skillRepo, _executionRepo, _skillExecutor, _clock);
         var result = await handler.Handle(command, CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();

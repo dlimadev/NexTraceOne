@@ -576,3 +576,30 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ─── View Transitions API (Wave V3.5 — Frontend Platform Uplift) ────────────── */
+
+@supports (view-transition-name: none) {
+  ::view-transition-old(root) {
+    animation: 120ms ease-out both nexttrace-fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation: 180ms ease-in both nexttrace-fade-in;
+  }
+
+  @keyframes nexttrace-fade-out {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-4px); }
+  }
+
+  @keyframes nexttrace-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ─── Notebook cells (Wave V3.4) ─────────────────────────────────────────────── */
+.notebook-cell-markdown { font-family: var(--font-sans); }
+.notebook-cell-query    { font-family: var(--font-mono); background: rgba(0,0,0,.03); }
+.notebook-cell-ai       { border-left: 3px solid var(--color-brand-500, #6366f1); }

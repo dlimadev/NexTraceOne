@@ -79,16 +79,17 @@ public sealed class DataContractFeaturesTests
         var assetId = Guid.NewGuid();
         var snapshots = new List<DataContractSchema>
         {
-            DataContractSchema.Create("t1", assetId, "owner", 24,
-                """[{"name":"id","type":"uuid","pii":"None"}]""", "None", "postgres", 1, 1, _now)
+            DataContractSchema.Create(assetId, "t1", "owner", 24,
+                """[{"name":"id","type":"uuid","pii":"None"}]""", PiiClassification.None, "postgres", 1, 1, _now)
         };
-        _schemaRepo.ListByApiAssetAsync("t1", assetId, 10, CancellationToken.None).Returns(snapshots);
+        _schemaRepo.ListByApiAssetAsync(assetId, "t1", Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(((IReadOnlyList<DataContractSchema>)snapshots, snapshots.Count));
 
         var handler = new GetDataContractSchemaHistory.Handler(_schemaRepo);
-        var result = await handler.Handle(new GetDataContractSchemaHistory.Query("t1", assetId, 10), CancellationToken.None);
+        var result = await handler.Handle(new GetDataContractSchemaHistory.Query("t1", assetId, 1, 10), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Snapshots.Should().HaveCount(1);
+        result.Value.Items.Should().HaveCount(1);
     }
 
     // ── CC-04: GetContractConsumerInventory ─────────────────────────────────
@@ -99,7 +100,7 @@ public sealed class DataContractFeaturesTests
         var contractId = Guid.NewGuid();
         var consumers = new List<ContractConsumerInventory>
         {
-            ContractConsumerInventory.CreateOrUpdate("t1", contractId, "svc-a", "production", "v1.2", 50.0, _now)
+            ContractConsumerInventory.Create("t1", contractId, "svc-a", "production", "v1.2", 50.0, _now, _now)
         };
         _consumerRepo.ListByContractAsync(contractId, "t1", CancellationToken.None).Returns(consumers);
 
@@ -194,18 +195,18 @@ public sealed class DataContractFeaturesTests
     [Fact]
     public void DataContractSchema_IsFreshnessViolated_WhenExpired()
     {
-        var schema = DataContractSchema.Create("t1", Guid.NewGuid(), "owner", 1,
-            "[]", "None", "postgres", 0, 1, _now.AddHours(-2));
+        var schema = DataContractSchema.Create(Guid.NewGuid(), "t1", "owner", 1,
+            "[]", PiiClassification.None, "postgres", 0, 1, _now.AddHours(-2));
 
-        schema.IsFreshnessViolated(_now).Should().BeTrue();
+        schema.IsFreshnessViolated(schema.CapturedAt, _now).Should().BeTrue();
     }
 
     [Fact]
     public void DataContractSchema_IsNotFreshnessViolated_WhenFresh()
     {
-        var schema = DataContractSchema.Create("t1", Guid.NewGuid(), "owner", 24,
-            "[]", "None", "postgres", 0, 1, _now);
+        var schema = DataContractSchema.Create(Guid.NewGuid(), "t1", "owner", 24,
+            "[]", PiiClassification.None, "postgres", 0, 1, _now);
 
-        schema.IsFreshnessViolated(_now).Should().BeFalse();
+        schema.IsFreshnessViolated(schema.CapturedAt, _now).Should().BeFalse();
     }
 }

@@ -56,7 +56,7 @@ public static class GetAiEvalReport
                         latest.TotalTokenCost,
                         latest.StartedAt);
                 })
-                .OrderByDescending(m => m.AverageSemanticSimilarity)
+                .OrderByDescending(m => m.LatestSemanticSimilarity)
                 .ToList();
 
             return new Response(request.DatasetId, runs.Count, byModel);

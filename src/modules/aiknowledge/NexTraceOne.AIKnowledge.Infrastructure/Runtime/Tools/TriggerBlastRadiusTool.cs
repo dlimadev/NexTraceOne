@@ -32,7 +32,7 @@ public sealed class TriggerBlastRadiusTool : IAgentTool
         "Calculates the blast radius of a proposed change by examining recent releases, dependencies and risk score.",
         "change_intelligence",
         [
-            new ToolParameterDefinition("serviceId", "Service identifier to analyse", "string", required: true),
+            new ToolParameterDefinition("serviceId", "Service identifier to analyse", "string", Required: true),
             new ToolParameterDefinition("environment", "Target environment (default: production)", "string"),
             new ToolParameterDefinition("days", "Look-back window in days (default: 7)", "integer"),
         ]);

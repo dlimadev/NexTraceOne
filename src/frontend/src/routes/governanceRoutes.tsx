@@ -42,6 +42,9 @@ const TechnicalDebtPage = lazy(() => import('../features/governance/pages/Techni
 const ApiPolicyAsCodePage = lazy(() => import('../features/governance/pages/ApiPolicyAsCodePage').then(m => ({ default: m.ApiPolicyAsCodePage })));
 const GovernanceGatesPage = lazy(() => import('../features/governance/pages/GovernanceGatesPage').then(m => ({ default: m.GovernanceGatesPage })));
 const WasteDetectionPage = lazy(() => import('../features/governance/pages/WasteDetectionPage').then(m => ({ default: m.WasteDetectionPage })));
+// Wave V3.4 — AI-assisted Dashboard Creation & Notebook Mode
+const NotebooksPage = lazy(() => import('../features/governance/pages/NotebooksPage').then(m => ({ default: m.NotebooksPage })));
+const NotebookEditorPage = lazy(() => import('../features/governance/pages/NotebookEditorPage').then(m => ({ default: m.NotebookEditorPage })));
 
 export function GovernanceRoutes() {
   return (
@@ -339,6 +342,31 @@ export function GovernanceRoutes() {
         element={
           <ProtectedRoute permission="governance:finops:read" redirectTo="/unauthorized">
             <WasteDetectionPage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Wave V3.4 — Notebooks */}
+      <Route
+        path="/governance/notebooks"
+        element={
+          <ProtectedRoute permission="governance:reports:read" redirectTo="/unauthorized">
+            <NotebooksPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/notebooks/new"
+        element={
+          <ProtectedRoute permission="governance:reports:write" redirectTo="/unauthorized">
+            <NotebookEditorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/governance/notebooks/:notebookId"
+        element={
+          <ProtectedRoute permission="governance:reports:write" redirectTo="/unauthorized">
+            <NotebookEditorPage />
           </ProtectedRoute>
         }
       />
