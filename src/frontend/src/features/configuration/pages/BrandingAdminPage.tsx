@@ -144,6 +144,7 @@ export function BrandingAdminPage() {
   const linkFields = BRANDING_FIELDS.filter((f) => f.section === 'links');
 
   const loginLogoUrl = values['branding.login_logo_url'];
+  const accentColor = values['branding.accent_color'] ?? '#3B82F6';
 
   return (
     <PageContainer>
@@ -495,8 +496,8 @@ function BrandingFieldEditor({
           type="button"
           onClick={() => onReset(field.key)}
           className="p-1 rounded text-muted hover:text-heading transition-colors"
-          title={t('common.reset', 'Reset')}
-          aria-label={t('common.reset', 'Reset')}
+          title={t('common.reset', { defaultValue: 'Reset' })}
+          aria-label={t('common.reset', { defaultValue: 'Reset' })}
         >
           <RotateCcw size={12} />
         </button>
@@ -528,7 +529,7 @@ function BrandingFieldEditor({
             type="text"
             value={value}
             onChange={(e) => onChange(field.key, e.target.value)}
-            placeholder={t('configuration.branding.placeholder.colorHex', '#3B82F6')}
+            placeholder={t('configuration.branding.placeholder.colorHex', { defaultValue: '#3B82F6' })}
             className="flex-1 rounded-md border border-edge bg-input px-3 py-2 text-sm text-heading placeholder:text-faded focus:ring-2 focus:ring-accent focus:border-accent"
             maxLength={7}
           />

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
-import { Activity, TrendingDown, RefreshCw, Minus } from 'lucide-react';
+import { Activity, TrendingDown, TrendingUp, RefreshCw, Minus } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { PageLoadingState } from '../../../components/PageLoadingState';
@@ -168,7 +168,14 @@ export function DoraMetricsPage() {
         }
       />
 
-      <StatsGrid stats={stats} />
+      <StatsGrid>
+        {stats.map((s) => (
+          <div key={s.label} className="bg-card rounded-lg border border-edge p-4">
+            <p className="text-xs text-muted mb-1">{s.label}</p>
+            <p className="text-xl font-bold text-heading">{s.value}</p>
+          </div>
+        ))}
+      </StatsGrid>
 
       {/* DORA 4 Metrics */}
       <PageSection title={t('governance.dora.metricsSection')}>

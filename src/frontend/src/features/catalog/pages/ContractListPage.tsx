@@ -313,7 +313,7 @@ export function ContractListPage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-muted text-xs">
-                        {new Date(c.createdAt).toLocaleDateString()}
+                        {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}
                       </td>
                       <td className="px-4 py-3">
                         <Link
@@ -347,7 +347,7 @@ function SummaryCard({
 }: {
   icon: React.ReactNode;
   label: string;
-  value: number;
+  value: number | undefined;
   accent: string;
 }) {
   return (
@@ -356,7 +356,7 @@ function SummaryCard({
         {icon}
         <span className="text-xs text-muted">{label}</span>
       </div>
-      <span className="text-xl font-bold text-heading">{value}</span>
+      <span className="text-xl font-bold text-heading">{value ?? 0}</span>
     </div>
   );
 }

@@ -18,7 +18,7 @@ import {
   Bot,
 } from 'lucide-react';
 import { notebooksApi, type NotebookCellDto, type UpdateNotebookRequest } from '../api/notebooks';
-import { useAuth } from '../../../auth/useAuth';
+import { useAuth } from '../../../contexts/AuthContext';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { Button } from '../../../components/Button';
@@ -62,15 +62,19 @@ export function NotebookEditorPage() {
   const [dirty, setDirty] = React.useState(false);
   const [savedAt, setSavedAt] = React.useState<Date | null>(null);
 
-  const { isLoading, isError } = useQuery({
+  const { isLoading, isError, data: notebookData } = useQuery({
     queryKey: ['notebook', notebookId, tenantId],
     queryFn: () => notebooksApi.get(notebookId!, tenantId),
     enabled: !isNew && !!tenantId,
-    onSuccess(nb) {
+  });
+
+  React.useEffect(() => {
+    if (notebookData) {
+      const nb = notebookData;
       setTitle(nb.title);
       setDescription(nb.description ?? '');
       setCells(
-        nb.cells.map((c) => ({
+        nb.cells.map((c: { cellId?: string; cellType: LocalCell['cellType']; sortOrder: number; content: string; outputJson?: string | null; isCollapsed: boolean }) => ({
           localId: makeCellId(),
           cellId: c.cellId,
           cellType: c.cellType,
@@ -80,8 +84,8 @@ export function NotebookEditorPage() {
           isCollapsed: c.isCollapsed,
         })),
       );
-    },
-  });
+    }
+  }, [notebookData]);
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -91,7 +95,7 @@ export function NotebookEditorPage() {
         tenantId,
         userId: user?.id ?? '',
         persona: user?.persona ?? 'Engineer',
-        cells: cells.map((c) => ({ cellType: c.cellType, sortOrder: c.sortOrder, content: c.content })),
+        initialCells: cells.map((c) => ({ cellType: c.cellType, sortOrder: c.sortOrder, content: c.content })),
       }),
     onSuccess(res) {
       setDirty(false);

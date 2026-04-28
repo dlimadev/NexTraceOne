@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useId, useMemo, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, X, Search, Plus } from 'lucide-react';
+import { ChevronDown, X, Search, Plus, Check } from 'lucide-react';
 import { cn } from '../lib/cn';
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */

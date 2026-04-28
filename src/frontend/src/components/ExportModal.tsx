@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download } from 'lucide-react';
-import Modal from './Modal';
+import { Modal } from './Modal';
 import { Button } from './Button';
 
 export type ExportFormat = 'csv' | 'json' | 'pdf';

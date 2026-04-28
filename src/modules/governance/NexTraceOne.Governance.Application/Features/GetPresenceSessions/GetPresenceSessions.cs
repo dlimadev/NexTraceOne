@@ -28,7 +28,7 @@ public static class GetPresenceSessions
         {
             var sessions = await repository.ListActiveAsync(request.TenantId, request.ResourceType, request.ResourceId, cancellationToken);
             var users = sessions.Select(s => new PresenceDto(s.UserId, s.DisplayName, s.AvatarColor, s.LastSeenAt)).ToList();
-            return Result.Success(new Response(users, users.Count));
+            return Result<Response>.Success(new Response(users, users.Count));
         }
     }
 }

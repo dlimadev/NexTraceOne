@@ -13,18 +13,20 @@ import client from '../../../api/client';
 // ── Types ──────────────────────────────────────────────────────────────────
 
 /** Mirrors DashboardSharingScope enum (backend) */
-enum SharingScope {
-  Private = 0,
-  Team = 1,
-  Tenant = 2,
-  PublicLink = 3,
-}
+const SharingScope = {
+  Private: 0,
+  Team: 1,
+  Tenant: 2,
+  PublicLink: 3,
+} as const;
+type SharingScope = (typeof SharingScope)[keyof typeof SharingScope];
 
 /** Mirrors DashboardSharingPermission enum (backend) */
-enum SharingPermission {
-  Read = 0,
-  Edit = 1,
-}
+const SharingPermission = {
+  Read: 0,
+  Edit: 1,
+} as const;
+type SharingPermission = (typeof SharingPermission)[keyof typeof SharingPermission];
 
 interface ShareDashboardPayload {
   dashboardId: string;

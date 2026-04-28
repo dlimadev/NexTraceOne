@@ -162,7 +162,7 @@ export function DataTable<T>({
     return (
       <div className={cn('bg-card rounded-2xl border border-edge shadow-surface overflow-hidden', className)}>
         <EmptyState
-          title={emptyTitle}
+          title={emptyTitle ?? ''}
           description={emptyDescription}
           action={emptyAction}
         />

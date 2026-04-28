@@ -82,7 +82,7 @@ export const contractStudioApi = {
     author: string;
     contractType: ContractType;
     protocol: ContractProtocol;
-    serviceId: string;
+    serviceId?: string;
     description?: string;
   }) =>
     client.post('/contracts/drafts', data).then((r) => mapDraftCreationResult(r.data)),
@@ -160,7 +160,7 @@ export const contractStudioApi = {
     serviceName: string;
     targetNamespace: string;
     soapVersion?: '1.1' | '1.2';
-    serviceId: string;
+    serviceId?: string;
     description?: string;
     endpointUrl?: string;
     portTypeName?: string;
@@ -189,7 +189,7 @@ export const contractStudioApi = {
     title: string;
     author: string;
     asyncApiVersion?: string;
-    serviceId: string;
+    serviceId?: string;
     description?: string;
     defaultContentType?: string;
     channelsJson?: string;
@@ -216,7 +216,7 @@ export const contractStudioApi = {
     serviceName: string;
     category?: string;
     triggerType?: string;
-    serviceId: string;
+    serviceId?: string;
     description?: string;
     scheduleExpression?: string;
     inputsJson?: string;
@@ -249,7 +249,7 @@ export const contractStudioApi = {
     contractType: ContractType;
     protocol: ContractProtocol;
     prompt: string;
-    serviceId: string;
+    serviceId?: string;
   }) =>
     client.post('/contracts/drafts/ai/generate', data).then((r) => mapDraftCreationResult(r.data)),
 

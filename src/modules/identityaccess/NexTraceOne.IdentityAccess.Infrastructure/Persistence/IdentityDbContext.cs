@@ -22,6 +22,8 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 /// - v1.3: RolePermission, ModuleAccessPolicy
 /// - v1.4: UserRoleAssignment, Tenant hierarquia (ParentTenantId, TenantType)
 /// - v1.5: PlatformApiToken, AgentQueryRecord (Agent-to-Agent Protocol — Wave D.4)
+/// - v1.6: PolicyDefinition (Policy Studio — Wave D.3)
+/// - v2.0: TenantLicense, AgentRegistration, AlertFiringRecord (SaaS Evolution)
 /// </summary>
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
@@ -115,6 +117,17 @@ public sealed class IdentityDbContext(
 
     /// <summary>Definições de políticas configuráveis no Policy Studio (no-code DSL JSON).</summary>
     public DbSet<PolicyDefinition> PolicyDefinitions => Set<PolicyDefinition>();
+
+    // ── v2.0 — SaaS Evolution ─────────────────────────────────────────────
+
+    /// <summary>Licenças SaaS por tenant (plano, host units, validade).</summary>
+    public DbSet<TenantLicense> TenantLicenses => Set<TenantLicense>();
+
+    /// <summary>Registos de agentes NexTrace instalados (heartbeat, host units).</summary>
+    public DbSet<AgentRegistration> AgentRegistrations => Set<AgentRegistration>();
+
+    /// <summary>Histórico de alertas disparados (AlertEvaluationJob).</summary>
+    public DbSet<AlertFiringRecord> AlertFiringRecords => Set<AlertFiringRecord>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;

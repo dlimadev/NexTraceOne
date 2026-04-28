@@ -46,8 +46,8 @@ public static class JoinPresenceSession
             {
                 existing.Heartbeat(clock.UtcNow);
                 await repository.SaveAsync(existing, cancellationToken);
-                await unitOfWork.SaveChangesAsync(cancellationToken);
-                return Result.Success(new Response(existing.Id.Value, existing.UserId, existing.DisplayName, existing.AvatarColor, existing.JoinedAt));
+                await unitOfWork.CommitAsync(cancellationToken);
+                return Result<Response>.Success(new Response(existing.Id.Value, existing.UserId, existing.DisplayName, existing.AvatarColor, existing.JoinedAt));
             }
 
             var session = PresenceSession.Join(
@@ -55,8 +55,8 @@ public static class JoinPresenceSession
                 request.UserId, request.DisplayName, request.AvatarColor, clock.UtcNow);
 
             await repository.AddAsync(session, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result.Success(new Response(session.Id.Value, session.UserId, session.DisplayName, session.AvatarColor, session.JoinedAt));
+            await unitOfWork.CommitAsync(cancellationToken);
+            return Result<Response>.Success(new Response(session.Id.Value, session.UserId, session.DisplayName, session.AvatarColor, session.JoinedAt));
         }
     }
 }

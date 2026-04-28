@@ -745,6 +745,10 @@ export interface ContractProvenance {
   sourceReference?: string;
   importedAt?: string;
   importedBy?: string;
+  origin?: string;
+  originalFormat?: string;
+  isAiGenerated?: boolean;
+  parserUsed?: string;
 }
 
 // ─── Governance ───────────────────────────────────────────────────────────────
@@ -1711,6 +1715,7 @@ export interface SignatureVerificationResult {
   fingerprint?: string | null;
   algorithm?: string | null;
   verificationMessage: string;
+  message?: string;
 }
 
 // ─── Change Governance / Workflow ─────────────────────────────────────────────
@@ -1732,6 +1737,7 @@ export interface Release {
   commitSha?: string;
   pipelineSource?: string | null;
   workItemReference?: string | null;
+  serviceName?: string;
   createdAt: string;
 }
 
@@ -1820,6 +1826,7 @@ export interface WorkflowInstance {
   releaseId?: string;
   status: 'Pending' | 'InProgress' | 'Approved' | 'Rejected' | 'Cancelled';
   currentStage?: string | null;
+  templateName?: string;
   createdAt: string;
 }
 
@@ -2943,7 +2950,7 @@ export interface ServiceOperationalTimelineResponse {
   totalPages: number;
 }
 
-
+export interface KnowledgeDocumentRelationItem {
   relationId: string;
   documentId: string;
   title: string;

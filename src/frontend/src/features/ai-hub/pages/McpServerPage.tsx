@@ -265,7 +265,7 @@ export function McpServerPage() {
       {tools.length === 0 ? (
         <EmptyState
           title={t('mcpServer.tools.emptyTitle')}
-          message={t('mcpServer.tools.emptyMessage')}
+          description={t('mcpServer.tools.emptyMessage')}
         />
       ) : (
         <div className="space-y-2">

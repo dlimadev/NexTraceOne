@@ -83,7 +83,14 @@ export function KnowledgeGraphPage() {
         }
       />
 
-      <StatsGrid stats={stats} />
+      <StatsGrid>
+        {stats.map((s) => (
+          <div key={s.label} className="bg-card rounded-lg border border-edge p-4">
+            <p className="text-xs text-muted mb-1">{s.label}</p>
+            <p className="text-xl font-bold text-heading">{s.value}</p>
+          </div>
+        ))}
+      </StatsGrid>
 
       <PageSection title={t('knowledge.graph.nodesSection')}>
         {!data?.nodes?.length ? (

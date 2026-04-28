@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   DollarSign, Search,
-  AlertTriangle, XCircle,
+  AlertTriangle, XCircle, CheckCircle,
   Activity, Zap, ArrowRight, Target, PieChart, TrendingUp,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';

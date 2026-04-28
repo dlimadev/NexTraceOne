@@ -2,10 +2,13 @@ import { memo } from 'react';
 import type { ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
-interface BadgeProps {
+export interface BadgeProps {
   children: ReactNode;
-  variant?: 'default' | 'neutral' | 'success' | 'warning' | 'danger' | 'info';
-  size?: 'sm' | 'md';
+  variant?: 'default' | 'neutral' | 'success' | 'warning' | 'danger' | 'info'
+    // Aliases for legacy call sites
+    | 'secondary' | 'error' | 'destructive' | 'critical' | 'outline' | 'muted'
+    | 'primary' | 'blue' | 'gray' | 'green' | 'yellow' | 'purple';
+  size?: 'xs' | 'sm' | 'md';
   icon?: ReactNode;
   className?: string;
 }
@@ -23,9 +26,23 @@ const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
   warning: 'bg-warning/12 text-warning border border-warning/25',
   danger: 'bg-critical/12 text-critical border border-critical/25',
   info: 'bg-info/12 text-info border border-info/25',
+  // Aliases
+  secondary: 'bg-elevated text-muted border border-edge',
+  error: 'bg-critical/12 text-critical border border-critical/25',
+  destructive: 'bg-critical/12 text-critical border border-critical/25',
+  critical: 'bg-critical/12 text-critical border border-critical/25',
+  outline: 'bg-transparent text-body border border-edge',
+  muted: 'bg-elevated text-muted border border-edge',
+  primary: 'bg-info/12 text-info border border-info/25',
+  blue: 'bg-info/12 text-info border border-info/25',
+  gray: 'bg-elevated text-muted border border-edge',
+  green: 'bg-success/12 text-success border border-success/25',
+  yellow: 'bg-warning/12 text-warning border border-warning/25',
+  purple: 'bg-info/12 text-info border border-info/25',
 };
 
 const sizeClasses: Record<NonNullable<BadgeProps['size']>, string> = {
+  xs: 'px-1 py-px text-[10px]',
   sm: 'px-1.5 py-px type-micro',
   md: 'px-2.5 py-0.5 text-xs',
 };

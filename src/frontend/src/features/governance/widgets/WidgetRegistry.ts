@@ -28,7 +28,23 @@ export type WidgetType =
   | 'blast-radius'
   | 'team-health'
   | 'release-calendar'
-  | 'query-widget';
+  | 'query-widget'
+  // Extended widget types used in drill routes
+  | 'incident-count'
+  | 'mttr-widget'
+  | 'slo-tracker'
+  | 'change-failure-rate'
+  | 'change-score-trend'
+  | 'service-health-matrix'
+  | 'maturity-score'
+  | 'dependency-map'
+  | 'compliance-summary'
+  | 'policy-violations'
+  | 'risk-heatmap'
+  | 'cost-attribution'
+  | 'finops-summary'
+  | 'tech-debt-trend'
+  | 'executive-kpis';
 
 export const ALL_WIDGET_TYPES: WidgetType[] = [
   'dora-metrics',

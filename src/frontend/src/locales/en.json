@@ -6978,39 +6978,14 @@
     }
   },
   "releaseCalendar": {
-    "title": "Release Calendar",
-    "window": "Release Window",
-    "registerWindow": "Register Window",
-    "closeWindow": "Close Window",
-    "cancelWindow": "Cancel Window",
-    "windowType": "Window Type",
-    "windowStatus": "Status",
-    "startsAt": "Starts At",
-    "endsAt": "Ends At",
-    "environmentFilter": "Environment Filter",
-    "recurrenceTag": "Recurrence Tag",
-    "blocksChanges": "Blocks Changes",
-    "isHotfixOnly": "Hotfix Only",
-    "isOpen": "Window Open",
-    "isClosed": "Window Closed",
-    "windowTypes": {
-      "Scheduled": "Scheduled Deployment",
-      "Freeze": "Freeze Window",
-      "HotfixAllowed": "Hotfix Allowed",
-      "Maintenance": "Maintenance"
-    },
-    "windowStatuses": {
-      "Active": "Active",
-      "Closed": "Closed",
-      "Cancelled": "Cancelled"
-    },
-    "changeBlocked": "Change is blocked by an active freeze or maintenance window.",
-    "changeAllowed": "Change is allowed in the current release window.",
-    "errors": {
-      "invalidWindow": "End date must be after start date.",
-      "alreadyClosed": "Window is not in Active status.",
-      "alreadyStarted": "Cannot cancel a window that has already started."
-    }
+    "title": "Release Calendar & Window Gate",
+    "subtitle": "Deployment windows and scheduled release approvals",
+    "windowsTab": "Deployment Windows",
+    "releasesTab": "Scheduled Releases",
+    "approvalRequired": "Approval Required",
+    "confidence": "Confidence",
+    "approve": "Approve",
+    "empty": "No scheduled releases"
   },
   "releaseScope": {
     "excludedDescription": "This area remains in the codebase but is intentionally outside the final production release scope. It is not part of the supported production surface.",
@@ -12567,29 +12542,14 @@
     }
   },
   "operationalReadiness": {
-    "title": "Operational Readiness Report",
-    "subtitle": "Pre-production operational readiness scorecard. Evaluates SLO compliance, chaos resilience, profiling coverage, drift-free status, and runtime baseline across environments.",
-    "compositeScore": "Composite Score",
-    "classification": {
-      "ReadyForProduction": "Ready for Production",
-      "ConditionallyReady": "Conditionally Ready",
-      "NotReady": "Not Ready"
-    },
-    "dimensions": {
-      "slo": "SLO Compliance",
-      "chaos": "Chaos Resilience",
-      "profiling": "Profiling Coverage",
-      "drift": "Drift Free",
-      "baseline": "Baseline Coverage"
-    },
-    "blockers": "Blockers",
-    "noBlockers": "No blockers detected.",
-    "sourceEnvironment": "Source Environment",
-    "targetEnvironment": "Target Environment",
-    "errors": {
-      "serviceRequired": "Service name is required.",
-      "invalidDays": "Lookback period must be between 1 and 90 days."
-    }
+    "title": "Operational Readiness Board",
+    "subtitle": "Go/NoGo readiness scoring across all services",
+    "slo": "SLO",
+    "chaos": "Chaos",
+    "drift": "Drift",
+    "profiling": "Profiling",
+    "baseline": "Baseline",
+    "empty": "No services found"
   },
   "contractHealthDistribution": {
     "title": "Contract Health Distribution",
@@ -15359,8 +15319,7 @@
     "reconnect": "Reconnect",
     "errorBanner": "Live connection lost",
     "fallbackPolling": "Using polling fallback"
-  }
-,
+  },
   "notebook": {
     "title": "Notebooks",
     "new": "New Notebook",
@@ -15508,16 +15467,6 @@
     "impactedServices": "Impacted Services",
     "noImpact": "No impacted services found"
   },
-  "operationalReadiness": {
-    "title": "Operational Readiness Board",
-    "subtitle": "Go/NoGo readiness scoring across all services",
-    "slo": "SLO",
-    "chaos": "Chaos",
-    "drift": "Drift",
-    "profiling": "Profiling",
-    "baseline": "Baseline",
-    "empty": "No services found"
-  },
   "driftCenter": {
     "title": "Drift Center",
     "subtitle": "Configuration and runtime drift detection",
@@ -15545,16 +15494,6 @@
     "totalCost": "Total Cost (MTD)",
     "anomaly": "Anomaly",
     "empty": "No cost data found"
-  },
-  "releaseCalendar": {
-    "title": "Release Calendar & Window Gate",
-    "subtitle": "Deployment windows and scheduled release approvals",
-    "windowsTab": "Deployment Windows",
-    "releasesTab": "Scheduled Releases",
-    "approvalRequired": "Approval Required",
-    "confidence": "Confidence",
-    "approve": "Approve",
-    "empty": "No scheduled releases"
   },
   "rollbackCockpit": {
     "title": "Rollback Intelligence Cockpit",
@@ -15599,12 +15538,11 @@
     "publicationFlow": "Design → Validate → Publish → Govern"
   },
   "restBuilder": {
-    "title": "REST / OpenAPI Designer",
+    "title": "Title",
     "subtitle": "Visual REST API designer with OpenAPI 3.1 export",
     "importSpec": "Import Spec",
     "publish": "Publish",
     "apiInfo": "API Info",
-    "title": "Title",
     "version": "Version",
     "baseUrl": "Base URL",
     "summary": "Summary",
@@ -15754,5 +15692,107 @@
     "dashboards": "dashboards",
     "recentChanges": "Recent Changes",
     "noChanges": "No recent changes"
+  },
+  "saasLicensing": {
+    "title": "SaaS Licensing",
+    "subtitle": "Manage your plan, capabilities and host unit consumption",
+    "refresh": "Refresh",
+    "loadError": "Failed to load license. Please try again.",
+    "currentPlan": "Current Plan",
+    "hostUnits": "Host Units",
+    "included": "included",
+    "overage": "overage",
+    "validity": "Validity",
+    "from": "From",
+    "until": "Until",
+    "noExpiry": "No expiry",
+    "capabilities": "Enabled Capabilities",
+    "capabilitiesEnabled": "enabled",
+    "upgradePlan": "Upgrade Plan",
+    "upgradeTo": "Upgrade to",
+    "confirmUpgrade": "Upgrade to",
+    "confirmUpgradeDescription": "This action will upgrade your plan. The new capabilities will be available immediately.",
+    "cancel": "Cancel",
+    "confirm": "Confirm Upgrade",
+    "upgrading": "Upgrading..."
+  },
+  "agentRegistrations": {
+    "title": "Agent Registrations",
+    "subtitle": "View and monitor all registered host agents and their host unit consumption",
+    "refresh": "Refresh",
+    "loadError": "Failed to load agents. Please try again.",
+    "totalAgents": "Total Agents",
+    "activeAgents": "Active",
+    "totalHostUnits": "Total Host Units",
+    "loading": "Loading agents...",
+    "noAgents": "No agents registered yet. Install the NexTrace agent on your hosts to start monitoring.",
+    "col": {
+      "hostname": "Hostname",
+      "status": "Status",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "hostUnits": "Host Units",
+      "lastHeartbeat": "Last Heartbeat",
+      "version": "Version"
+    }
+  },
+  "tenantProvisioning": {
+    "title": "Provision Tenant",
+    "subtitle": "Create a new tenant with plan and license in a single operation",
+    "next": "Next",
+    "back": "Back",
+    "provision": "Provision",
+    "provisioning": "Provisioning...",
+    "provisionError": "Provisioning failed. Please check the values and try again.",
+    "step1": {
+      "title": "Tenant Identity",
+      "name": "Name",
+      "namePlaceholder": "Acme Corporation",
+      "slug": "Slug",
+      "slugHint": "Unique identifier: lowercase letters, numbers, and hyphens only",
+      "legalName": "Legal Name (optional)",
+      "legalNamePlaceholder": "Acme Corporation Ltd.",
+      "taxId": "Tax ID (optional)"
+    },
+    "step2": {
+      "title": "Plan & Capacity",
+      "includedHostUnits": "Included Host Units",
+      "hostUnitsHint": "Number of host units included in this plan. Each agent contributes max(RAM/8, CPU/4) units."
+    },
+    "step3": {
+      "title": "Tenant Provisioned!",
+      "tenantId": "Tenant ID",
+      "name": "Name",
+      "plan": "Plan",
+      "license": "License",
+      "licenseOk": "Provisioned",
+      "licensePartial": "Partial — retry license provisioning",
+      "goToTenants": "Go to Tenants",
+      "provisionAnother": "Provision Another"
+    }
+  },
+  "saasAlerts": {
+    "title": "Alert Firing History",
+    "subtitle": "Monitor and resolve alerts triggered by your configured alert rules",
+    "refresh": "Refresh",
+    "loadError": "Failed to load alerts. Please try again.",
+    "loading": "Loading alerts...",
+    "noAlerts": "No alerts found for the selected period and status.",
+    "firing": "Firing",
+    "resolved": "Resolved",
+    "silenced": "Silenced",
+    "periodDays": "Period",
+    "clearFilter": "Clear filter",
+    "resolve": "Resolve",
+    "silence": "Silence",
+    "resolvedAt": "Resolved at",
+    "col": {
+      "rule": "Alert Rule",
+      "status": "Status",
+      "severity": "Severity",
+      "condition": "Condition",
+      "firedAt": "Fired At",
+      "actions": "Actions"
+    }
   }
 }

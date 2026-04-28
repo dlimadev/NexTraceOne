@@ -1,10 +1,14 @@
 import type { ReactNode, ButtonHTMLAttributes } from 'react';
 import { cn } from '../lib/cn';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'subtle' | 'institutional' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   loading?: boolean;
+  /** Icon rendered before children. */
+  icon?: ReactNode;
+  /** Render as a child element (polymorphic slot). */
+  asChild?: boolean;
   children: ReactNode;
 }
 
@@ -38,6 +42,7 @@ const variantClasses: Record<NonNullable<ButtonProps['variant']>, string> = {
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps['size']>, string> = {
+  xs: 'h-7 px-2.5 text-xs gap-1',
   sm: 'h-9 px-4 text-sm gap-1.5',
   md: 'h-11 px-5 text-sm gap-2',
   lg: 'h-14 px-7 text-base font-bold gap-2.5',
@@ -47,6 +52,8 @@ export function Button({
   variant = 'primary',
   size = 'md',
   loading,
+  icon,
+  asChild: _asChild,
   children,
   disabled,
   className,
@@ -72,6 +79,7 @@ export function Button({
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3V4a8 8 0 00-8 8h4z" />
         </svg>
       )}
+      {!loading && icon && <span className="shrink-0" aria-hidden="true">{icon}</span>}
       {children}
     </button>
   );

@@ -77,6 +77,17 @@ public static class DependencyInjection
         // Repositórios — v1.6 Policy Studio (Wave D.3)
         services.AddScoped<IPolicyDefinitionRepository, PolicyDefinitionRepository>();
 
+        // Repositórios — v2.0 SaaS Evolution (licensing, agent heartbeat, alerts)
+        services.AddScoped<ITenantLicenseRepository, EfTenantLicenseRepository>();
+        services.AddScoped<IAgentRegistrationRepository, EfAgentRegistrationRepository>();
+        services.AddScoped<IAlertFiringRecordRepository, EfAlertFiringRecordRepository>();
+
+        // SaaS-01: Capability resolver para claims JWT
+        services.AddScoped<ICapabilityResolver, DefaultCapabilityResolver>();
+
+        // SaaS-08: Alert evaluation background job
+        services.AddHostedService<Jobs.AlertEvaluationJob>();
+
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
