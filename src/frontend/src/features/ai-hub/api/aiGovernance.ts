@@ -347,4 +347,26 @@ export const aiGovernanceApi = {
   /** Lista todas as tools disponíveis no servidor MCP no formato JSON Schema. */
   listMcpTools: (params?: { category?: string }) =>
     client.get('/ai/mcp/tools', { params }).then(r => r.data),
+
+  // ── Wave BD: AI Organizational Intelligence & Memory Analytics ────────
+  getOrganizationalMemoryHealthReport: (params: {
+    tenantId: string;
+    lookbackDays?: number;
+    staleThresholdDays?: number;
+  }) =>
+    client.get('/ai/intelligence/memory-health', { params }).then(r => r.data),
+
+  getAgentPerformanceBenchmarkReport: (params: {
+    tenantId: string;
+    minExecutions?: number;
+  }) =>
+    client.get('/ai/intelligence/agent-benchmark', { params }).then(r => r.data),
+
+  getAiCapabilityMaturityReport: (params: {
+    tenantId: string;
+    lookbackDays?: number;
+    pioneerThresholdPct?: number;
+    minTeamExecutions?: number;
+  }) =>
+    client.get('/ai/intelligence/capability-maturity', { params }).then(r => r.data),
 };

@@ -54,6 +54,9 @@ using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdateExternalData
 using NexTraceOne.AIKnowledge.Application.Governance.Features.UpdatePolicy;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterPromptAsset;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.ComparePromptVersions;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetOrganizationalMemoryHealthReport;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentPerformanceBenchmarkReport;
+using NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiCapabilityMaturityReport;
 using NexTraceOne.BuildingBlocks.Application;
 
 namespace NexTraceOne.AIKnowledge.Application.Governance;
@@ -139,6 +142,11 @@ public static class DependencyInjection
         // ── AI-5.2: Prompt Asset Registry ────────────────────────────────
         services.AddTransient<IValidator<RegisterPromptAsset.Command>, RegisterPromptAsset.Validator>();
         services.AddTransient<IValidator<ComparePromptVersions.Query>, ComparePromptVersions.Validator>();
+
+        // ── Wave BD — AI Organizational Intelligence & Memory Analytics ──────
+        services.AddTransient<IValidator<GetOrganizationalMemoryHealthReport.Query>, GetOrganizationalMemoryHealthReport.Validator>();
+        services.AddTransient<IValidator<GetAgentPerformanceBenchmarkReport.Query>, GetAgentPerformanceBenchmarkReport.Validator>();
+        services.AddTransient<IValidator<GetAiCapabilityMaturityReport.Query>, GetAiCapabilityMaturityReport.Validator>();
 
         // ── Wave AT — AI Model Quality & Drift Governance ─────────────────
         services.AddTransient<IValidator<IngestModelPredictionSample.Command>, IngestModelPredictionSample.Validator>();

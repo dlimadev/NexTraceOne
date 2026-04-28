@@ -10,6 +10,7 @@ export { IdeIntegrationsPage } from './pages/IdeIntegrationsPage';
 export { AiRoutingPage } from './pages/AiRoutingPage';
 export { AiAnalysisPage } from './pages/AiAnalysisPage';
 export { AiIntegrationsConfigurationPage } from './pages/AiIntegrationsConfigurationPage';
+export { AiMemoryIntelligencePage } from './pages/AiMemoryIntelligencePage';
 export { aiGovernanceApi } from './api/aiGovernance';
 export { AssistantPanel } from './components/AssistantPanel';
 export type { AssistantPanelProps, AssistantContextType, ContextSummary } from './components/AssistantPanel';

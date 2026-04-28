@@ -9026,6 +9026,7 @@
     "aiAnalysis": "Análise de IA",
     "aiAssistant": "Assistente IA",
     "aiAudit": "Auditoria IA",
+    "aiIntelligence": "Inteligência de IA",
     "aiBudgets": "Orçamentos de Tokens",
     "aiIde": "Integrações IDE",
     "aiPolicies": "Políticas de IA",
@@ -17058,6 +17059,83 @@
       "condition": "Condição",
       "firedAt": "Disparado em",
       "actions": "Ações"
+    }
+  },
+  "organizationalMemoryHealth": {
+    "pageTitle": "Inteligência de Memória",
+    "pageSubtitle": "Saúde e cobertura do grafo de conhecimento organizacional",
+    "memoryHealthTier": "Nível de Saúde da Memória",
+    "totalNodes": "Total de Nós",
+    "freshNodes": "Nós Recentes",
+    "staleNodes": "Nós Desatualizados",
+    "linkedNodes": "Nós Conectados",
+    "freshnessRate": "Taxa de Frescor",
+    "connectivityRate": "Taxa de Conectividade",
+    "avgRelevance": "Relevância Média",
+    "lookbackDays": "Período de Análise",
+    "nodeTypeBreakdown": "Distribuição por Tipo",
+    "recentNodes": "Nós Recentes",
+    "tiers": {
+      "Thriving": "Excelente",
+      "Active": "Ativo",
+      "Building": "Em Construção",
+      "Sparse": "Esparso",
+      "Empty": "Vazio"
+    },
+    "nodeTypes": {
+      "decision": "Decisão",
+      "incident": "Incidente",
+      "contract_evolution": "Evolução de Contrato",
+      "pattern_learned": "Padrão Aprendido",
+      "adr": "ADR"
+    }
+  },
+  "agentPerformanceBenchmark": {
+    "pageTitle": "Benchmark de Agentes",
+    "pageSubtitle": "Comparação de performance entre agentes e classificação por nível",
+    "totalAgents": "Total de Agentes",
+    "qualifiedAgents": "Agentes Qualificados",
+    "avgBenchmarkScore": "Score Médio de Benchmark",
+    "topPerformer": "Melhor Agente",
+    "benchmarkTier": "Nível",
+    "benchmarkScore": "Score",
+    "accuracyRate": "Acurácia",
+    "avgRating": "Avaliação Média",
+    "feedbackCoverage": "Cobertura de Feedback",
+    "rlCycles": "Ciclos RL",
+    "totalExecutions": "Execuções",
+    "tierSummary": "Distribuição por Nível",
+    "minExecutions": "Execuções Mínimas",
+    "tiers": {
+      "Champion": "Campeão",
+      "HighPerformer": "Alto Desempenho",
+      "Active": "Ativo",
+      "Developing": "Em Desenvolvimento",
+      "Underperforming": "Abaixo do Esperado"
+    }
+  },
+  "aiCapabilityMaturity": {
+    "pageTitle": "Maturidade de IA",
+    "pageSubtitle": "Adoção de capacidades de IA e avaliação de maturidade organizacional",
+    "maturityScore": "Score de Maturidade",
+    "maturityLevel": "Nível de Maturidade",
+    "activeAgents": "Agentes Ativos",
+    "publishedSkills": "Skills Ativas",
+    "memoryNodes": "Nós de Memória",
+    "feedbackLoopScore": "Loop de Feedback",
+    "rlAdoption": "Adoção de RL",
+    "pioneerAdoption": "Adoção Pioneira",
+    "dimensions": "Dimensões de Maturidade",
+    "dimension": "Dimensão",
+    "score": "Score",
+    "actual": "Atual",
+    "lookbackDays": "Período de Análise",
+    "levels": {
+      "Innovating": "Inovando",
+      "Scaling": "Escalando",
+      "Adopting": "Adotando",
+      "Exploring": "Explorando",
+      "Initiating": "Iniciando"
     }
   }
 }
