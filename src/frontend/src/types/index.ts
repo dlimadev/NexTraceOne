@@ -2943,7 +2943,7 @@ export interface ServiceOperationalTimelineResponse {
   totalPages: number;
 }
 
-
+export interface KnowledgeDocumentRelationItem {
   relationId: string;
   documentId: string;
   title: string;

@@ -4,7 +4,7 @@ import { cn } from '../lib/cn';
 
 /* ─── DatePicker ───────────────────────────────────────────────────────────── */
 
-interface DatePickerProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
+interface DatePickerProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'size'> {
   /** Current ISO date string (YYYY-MM-DD). */
   value?: string;
   onChange?: (value: string) => void;

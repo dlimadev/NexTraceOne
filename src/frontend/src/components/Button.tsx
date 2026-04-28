@@ -1,10 +1,14 @@
 import type { ReactNode, ButtonHTMLAttributes } from 'react';
 import { cn } from '../lib/cn';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'subtle' | 'institutional' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
+  /** Icon rendered before children. */
+  icon?: ReactNode;
+  /** Render as a child element (polymorphic slot). */
+  asChild?: boolean;
   children: ReactNode;
 }
 

@@ -121,6 +121,7 @@ export type Permission =
   // ── Product Analytics ──
   | 'analytics:read'
   | 'analytics:write'
+  | 'analytics:configure'
   // ── Audit ──
   | 'audit:trail:read'
   | 'audit:reports:read'
@@ -130,11 +131,15 @@ export type Permission =
   // ── Integrations ──
   | 'integrations:read'
   | 'integrations:write'
+  | 'integrations:connectors:read'
   // ── Configuration ──
   | 'configuration:read'
   | 'configuration:write'
+  | 'configuration:admin'
+  | 'configuration:analytics:read'
   // ── Platform ──
   | 'platform:admin:read'
+  | 'platform:admin:write'
   | 'platform:settings:read'
   | 'platform:settings:write'
   // ── Notifications ──
@@ -152,4 +157,11 @@ export type Permission =
   | 'env:environments:write'
   | 'env:environments:admin'
   | 'env:access:read'
-  | 'env:access:admin';
+  | 'env:access:admin'
+  // ── Identity Tenant Admin ──
+  | 'identity:tenants:admin'
+  // ── Operations: Telemetry ──
+  | 'operations:telemetry:read'
+  // ── Governance: Gates & Reports ──
+  | 'governance:gates:read'
+  | 'governance:reports:write';

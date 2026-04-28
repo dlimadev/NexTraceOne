@@ -49,7 +49,6 @@ export interface NotificationDetailDto {
 export interface NotificationDetailResponse {
   notification: NotificationDetailDto;
 }
-}
 
 export interface NotificationListResponse {
   items: NotificationDto[];
