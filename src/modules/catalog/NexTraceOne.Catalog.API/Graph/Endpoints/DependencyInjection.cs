@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using NexTraceOne.Catalog.Application.Graph;
+using NexTraceOne.Catalog.Application.Services;
 using NexTraceOne.Catalog.Application.SourceOfTruth;
 using NexTraceOne.Catalog.Infrastructure.Graph;
 
@@ -18,6 +19,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddCatalogGraphApplication(configuration);
+        services.AddCatalogServicesApplication(configuration);
         services.AddSourceOfTruthApplication(configuration);
         services.AddCatalogGraphInfrastructure(configuration);
         return services;

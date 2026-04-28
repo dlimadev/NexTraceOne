@@ -40,11 +40,11 @@ public static class GetOnboardingHealthReport
 
     // ── Constantes de pontuação ───────────────────────────────────────────
 
-    private const int OwnershipWeight = 20;
-    private const int ContractsWeight = 25;
-    private const int RunbookWeight = 20;
-    private const int SloWeight = 20;
-    private const int ProfilingWeight = 15;
+    private const int _ownershipWeight = 20;
+    private const int _contractsWeight = 25;
+    private const int _runbookWeight = 20;
+    private const int _sloWeight = 20;
+    private const int _profilingWeight = 15;
 
     // ── Value objects ─────────────────────────────────────────────────────
 
@@ -178,11 +178,11 @@ public static class GetOnboardingHealthReport
         private static ServiceOnboardingScore ComputeScore(ServiceOnboardingEntry entry, Query query)
         {
             var score =
-                (entry.HasOwnership ? OwnershipWeight : 0) +
-                (entry.HasApprovedContract ? ContractsWeight : 0) +
-                (entry.HasApprovedRunbook ? RunbookWeight : 0) +
-                (entry.HasRecentSloObservation ? SloWeight : 0) +
-                (entry.HasRecentProfiling ? ProfilingWeight : 0);
+                (entry.HasOwnership ? _ownershipWeight : 0) +
+                (entry.HasApprovedContract ? _contractsWeight : 0) +
+                (entry.HasApprovedRunbook ? _runbookWeight : 0) +
+                (entry.HasRecentSloObservation ? _sloWeight : 0) +
+                (entry.HasRecentProfiling ? _profilingWeight : 0);
 
             var tier = score >= query.CompleteThreshold ? OnboardingTier.Complete
                 : score >= query.AdvancedThreshold ? OnboardingTier.Advanced
