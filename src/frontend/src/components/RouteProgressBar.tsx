@@ -20,7 +20,7 @@ function hide() { barVisible = false; listeners.forEach(cb => cb()); }
 export function RouteProgressBar() {
   const { pathname } = useLocation();
   const prevPath = useRef(pathname);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const visible = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   useEffect(() => {

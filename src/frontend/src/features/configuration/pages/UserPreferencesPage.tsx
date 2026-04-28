@@ -590,7 +590,7 @@ export function UserPreferencesPage() {
                     </label>
                     <select
                       value={digestFrequency}
-                      onChange={(e) => setDigestFrequency(parseInt(e.target.value, 10))}
+                      onChange={(e) => setDigestFrequency(e.target.value)}
                       className="rounded-md border border-edge bg-input px-3 py-1.5 text-sm text-heading"
                     >
                       <option value={6}>6h</option>
@@ -706,7 +706,7 @@ export function UserPreferencesPage() {
               <div>
                 <label className="block text-sm font-medium mb-1">{t('userPreferences.timezone.timezone')}</label>
                 <select value={timezone} onChange={e => setTimezone(e.target.value)} className="w-full px-3 py-1.5 text-sm border rounded">
-                  {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                  {TIMEZONES.map(tz => <option key={tz.value} value={tz.value}>{tz.label}</option>)}
                 </select>
               </div>
               <div>
@@ -823,7 +823,7 @@ export function UserPreferencesPage() {
                       onChange={e => setQuietHoursTimezone(e.target.value)}
                       className="w-full px-3 py-1.5 text-sm border rounded bg-white dark:bg-gray-900"
                     >
-                      {TIMEZONES.map(tz => <option key={tz} value={tz}>{tz}</option>)}
+                      {TIMEZONES.map(tz => <option key={tz.value} value={tz.value}>{tz.label}</option>)}
                     </select>
                   </div>
                 </div>

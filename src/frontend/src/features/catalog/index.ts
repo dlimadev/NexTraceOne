@@ -3,7 +3,7 @@ export { ContractsPage } from './pages/ContractsPage';
 export { ServiceCatalogPage } from './pages/ServiceCatalogPage';
 export { ServiceCatalogListPage } from './pages/ServiceCatalogListPage';
 export { ServiceDetailPage } from './pages/ServiceDetailPage';
-export { ServiceDiscoveryPage } from './pages/ServiceDiscoveryPage';
+export { default as ServiceDiscoveryPage } from './pages/ServiceDiscoveryPage';
 export { ServiceMaturityPage } from './pages/ServiceMaturityPage';
 export { CatalogContractsConfigurationPage } from './pages/CatalogContractsConfigurationPage';
 export { DeveloperPortalPage } from './pages/DeveloperPortalPage';

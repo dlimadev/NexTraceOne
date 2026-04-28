@@ -1,4 +1,5 @@
 import client from '../../../api/client';
+import type { MigrationPatchResult } from '../../../types';
 import type {
   ContractVersion,
   ContractVersionDetail,

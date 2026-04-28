@@ -49,7 +49,7 @@ export function ContractPlaygroundPage() {
 
   const { data: contractDetail, isLoading: loadingDetail } = useQuery({
     queryKey: ['contract-playground-detail', contractVersionId],
-    queryFn: () => contractsApi.getVersionDetail(contractVersionId),
+    queryFn: () => contractsApi.getDetail(contractVersionId),
     enabled: !!contractVersionId,
   });
 

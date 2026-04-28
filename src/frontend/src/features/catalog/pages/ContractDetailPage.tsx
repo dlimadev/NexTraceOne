@@ -443,13 +443,13 @@ function DetailRow({
   mono = false,
 }: {
   label: string;
-  value: string;
+  value: string | undefined;
   mono?: boolean;
 }) {
   return (
     <div>
       <dt className="text-xs text-muted mb-0.5">{label}</dt>
-      <dd className={`text-sm text-heading ${mono ? 'font-mono' : ''}`}>{value}</dd>
+      <dd className={`text-sm text-heading ${mono ? 'font-mono' : ''}`}>{value ?? '—'}</dd>
     </div>
   );
 }

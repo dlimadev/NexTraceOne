@@ -5,7 +5,7 @@ interface PageSectionProps {
   children: ReactNode;
   className?: string;
   /** Optional section title. */
-  title?: string;
+  title?: ReactNode;
   /** Optional icon alongside title. */
   icon?: ReactNode;
   /** Optional actions in the header row. */

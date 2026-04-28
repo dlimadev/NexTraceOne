@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { BookOpen, Plus, Bot, Clock, Layers } from 'lucide-react';
 import { notebooksApi } from '../api/notebooks';
-import { useAuth } from '../../../auth/useAuth';
+import { useAuth } from '../../../contexts/AuthContext';
 import { PageLoadingState } from '../../../components/PageLoadingState';
 import { PageErrorState } from '../../../components/PageErrorState';
 import { EmptyState } from '../../../components/EmptyState';
@@ -112,7 +112,7 @@ export function NotebooksPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    <FormattedTimestamp value={nb.updatedAt} relative />
+                    <FormattedTimestamp value={nb.updatedAt} format="relative" />
                   </span>
                   <span className="capitalize text-indigo-500">{nb.persona}</span>
                 </div>

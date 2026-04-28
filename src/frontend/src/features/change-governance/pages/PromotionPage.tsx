@@ -620,7 +620,7 @@ export function PromotionPage() {
                 {t('common.cancel')}
               </Button>
               <Button
-                variant="warning"
+                variant="secondary"
                 onClick={() => {
                   promoteMutation.mutate(budgetGateDialog.requestId);
                   setBudgetGateDialog(null);
@@ -659,7 +659,7 @@ export function PromotionPage() {
                 {t('common.close')}
               </Button>
               <a href="/governance/finops/configuration">
-                <Button variant="default">
+                <Button variant="outline">
                   {t('promotion.budgetGate.goToFinOpsConfig')}
                 </Button>
               </a>
@@ -697,7 +697,7 @@ export function PromotionPage() {
                 {t('common.close')}
               </Button>
               <a href="/governance/finops/approvals">
-                <Button variant="default">
+                <Button variant="outline">
                   {t('promotion.budgetGate.goToApprovals')}
                 </Button>
               </a>

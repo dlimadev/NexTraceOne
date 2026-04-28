@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-interface FormattedTimestampProps {
+export interface FormattedTimestampProps {
   value: string | Date | null | undefined;
   format?: 'datetime' | 'date' | 'time' | 'relative';
 }

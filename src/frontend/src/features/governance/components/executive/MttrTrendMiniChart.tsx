@@ -9,9 +9,9 @@ interface Props {
 }
 
 const trendIcon = (trend: string) => {
-  if (trend === 'Improving') return <TrendingDown className="h-3 w-3 text-green-500" title="Improving" />;
-  if (trend === 'Worsening') return <TrendingUp className="h-3 w-3 text-red-500" title="Worsening" />;
-  return <Minus className="h-3 w-3 text-yellow-500" title="Stable" />;
+  if (trend === 'Improving') return <TrendingDown className="h-3 w-3 text-green-500" aria-label="Improving" />;
+  if (trend === 'Worsening') return <TrendingUp className="h-3 w-3 text-red-500" aria-label="Worsening" />;
+  return <Minus className="h-3 w-3 text-yellow-500" aria-label="Stable" />;
 };
 
 /**

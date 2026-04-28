@@ -19,10 +19,10 @@ import { changeIntelligenceApi, type PromotionGateItem } from '../api/changeInte
 import { useEnvironment } from '../../../contexts/EnvironmentContext';
 
 // Pares de ambientes padrão cobertos pelo produto
-const ENV_PAIRS = [
+const ENV_PAIRS: Array<{ from: string; to: string }> = [
   { from: 'Development', to: 'Pre-Production' },
   { from: 'Pre-Production', to: 'Production' },
-] as const;
+];
 
 /**
  * ReleaseGatesDashboardPage — painel de gates de promoção entre ambientes.

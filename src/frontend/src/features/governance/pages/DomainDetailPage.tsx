@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import {
   Globe, Users, Server, Shield, GitBranch,
   ArrowRight, TrendingUp, Minus, AlertTriangle, Activity,
-  CheckCircle, Tag, Calendar, ArrowLeft, TrendingUp,
+  CheckCircle, Tag, Calendar, ArrowLeft,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';

@@ -29,6 +29,7 @@ const stepRoutes: Record<Persona, QuickstartStepRoute[]> = {
   Executive: [{ to: '/governance/executive' }, { to: '/governance/risk' }, { to: '/services' }, { to: '/governance/compliance' }],
   PlatformAdmin: [{ to: '/governance/policies' }, { to: '/ai/models' }, { to: '/users' }, { to: '/governance/reports' }],
   Auditor: [{ to: '/audit' }, { to: '/governance/evidence' }, { to: '/governance/compliance' }, { to: '/ai/policies' }],
+  AiUser: [{ to: '/ai' }, { to: '/ai/agents' }, { to: '/ai/models' }, { to: '/ai/policies' }],
 };
 
 function getCompleted(): Set<string> {

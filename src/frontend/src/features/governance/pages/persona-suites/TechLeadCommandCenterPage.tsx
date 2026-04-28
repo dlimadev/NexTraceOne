@@ -48,7 +48,7 @@ export function TechLeadCommandCenterPage() {
                   <StatCard
                     title={card.title}
                     value={card.value ?? '—'}
-                    trend={card.severity === 'ok' ? 'up' : card.severity === 'warning' ? 'neutral' : 'down'}
+                    trend={card.severity === 'ok' ? { direction: 'up' as const, label: '' } : card.severity !== 'warning' ? { direction: 'down' as const, label: '' } : undefined}
                   />
                 </Link>
               ))}

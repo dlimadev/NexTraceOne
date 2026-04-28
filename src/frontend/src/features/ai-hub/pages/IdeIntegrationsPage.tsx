@@ -496,7 +496,7 @@ export function IdeIntegrationsPage() {
                             {s.status === 'Responded' && <Badge variant="success">{t('aiHub.ideQueryStatusResponded')}</Badge>}
                             {s.status === 'Processing' && <Badge variant="info">{t('aiHub.ideQueryStatusProcessing')}</Badge>}
                             {s.status === 'Blocked' && <Badge variant="warning">{t('aiHub.ideQueryStatusBlocked')}</Badge>}
-                            {s.status === 'Failed' && <Badge variant="error">{t('aiHub.ideQueryStatusFailed')}</Badge>}
+                            {s.status === 'Failed' && <Badge variant="danger">{t('aiHub.ideQueryStatusFailed')}</Badge>}
                           </td>
                           <td className="px-4 py-2 text-muted">
                             <Clock size={10} className="inline mr-1" />{timeAgo(s.submittedAt)}
