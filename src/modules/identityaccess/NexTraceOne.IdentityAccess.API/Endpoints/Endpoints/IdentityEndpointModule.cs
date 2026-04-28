@@ -36,6 +36,10 @@ public sealed class IdentityEndpointModule
         RuntimeContextEndpoints.Map(group);
         SecurityEventsEndpoints.Map(group);
 
+        // SaaS Evolution (v2.0)
+        LicensingEndpoints.Map(group);
+        AlertsEndpoints.Map(group);
+
         // Endpoints de sessão cookie — apenas quando feature flag ativa
         var cookieSessionOptions = app.ServiceProvider
             .GetRequiredService<IOptions<CookieSessionOptions>>().Value;

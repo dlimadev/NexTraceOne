@@ -97,6 +97,12 @@ const CanaryDashboardPage = lazy(() => import('../features/platform-admin/pages/
 const MultiTenantSchemaPage = lazy(() => import('../features/platform-admin/pages/MultiTenantSchemaPage').then(m => ({ default: m.MultiTenantSchemaPage })));
 const SystemHealthPage = lazy(() => import('../features/platform-admin/pages/SystemHealthPage').then(m => ({ default: m.SystemHealthPage })));
 
+// SaaS Evolution (v2.0)
+const LicensingPage = lazy(() => import('../features/saas/pages/LicensingPage').then(m => ({ default: m.LicensingPage })));
+const AgentRegistrationsPage = lazy(() => import('../features/saas/pages/AgentRegistrationsPage').then(m => ({ default: m.AgentRegistrationsPage })));
+const TenantProvisioningPage = lazy(() => import('../features/saas/pages/TenantProvisioningPage').then(m => ({ default: m.TenantProvisioningPage })));
+const AlertsPage = lazy(() => import('../features/saas/pages/AlertsPage').then(m => ({ default: m.AlertsPage })));
+
 export function AdminRoutes() {
   return (
     <>
@@ -743,6 +749,40 @@ export function AdminRoutes() {
         element={
           <ProtectedRoute permission="platform:admin:read" redirectTo="/unauthorized">
             <SystemHealthPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ── SaaS Evolution (v2.0) ── */}
+      <Route
+        path="/admin/licensing"
+        element={
+          <ProtectedRoute permission="identity:tenants:admin" redirectTo="/unauthorized">
+            <LicensingPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/agent-registrations"
+        element={
+          <ProtectedRoute permission="identity:tenants:admin" redirectTo="/unauthorized">
+            <AgentRegistrationsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/provision-tenant"
+        element={
+          <ProtectedRoute permission="identity:tenants:admin" redirectTo="/unauthorized">
+            <TenantProvisioningPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/alerts"
+        element={
+          <ProtectedRoute permission="identity:tenants:admin" redirectTo="/unauthorized">
+            <AlertsPage />
           </ProtectedRoute>
         }
       />

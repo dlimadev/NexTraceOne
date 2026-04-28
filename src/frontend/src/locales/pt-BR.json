@@ -8250,39 +8250,14 @@
     }
   },
   "releaseCalendar": {
-    "title": "Calendário de Releases",
-    "window": "Janela de Release",
-    "registerWindow": "Registrar Janela",
-    "closeWindow": "Encerrar Janela",
-    "cancelWindow": "Cancelar Janela",
-    "windowType": "Tipo de Janela",
-    "windowStatus": "Status",
-    "startsAt": "Início",
-    "endsAt": "Fim",
-    "environmentFilter": "Filtro de Ambiente",
-    "recurrenceTag": "Tag de Recorrência",
-    "blocksChanges": "Bloqueia Mudanças",
-    "isHotfixOnly": "Apenas Hotfix",
-    "isOpen": "Janela Aberta",
-    "isClosed": "Janela Fechada",
-    "windowTypes": {
-      "Scheduled": "Deploy Planejado",
-      "Freeze": "Congelamento",
-      "HotfixAllowed": "Hotfix Permitido",
-      "Maintenance": "Manutenção"
-    },
-    "windowStatuses": {
-      "Active": "Ativo",
-      "Closed": "Encerrado",
-      "Cancelled": "Cancelado"
-    },
-    "changeBlocked": "Mudança bloqueada por janela de congelamento ou manutenção ativa.",
-    "changeAllowed": "Mudança permitida na janela de release atual.",
-    "errors": {
-      "invalidWindow": "A data de fim deve ser posterior à data de início.",
-      "alreadyClosed": "A janela não está no status Ativo.",
-      "alreadyStarted": "Não é possível cancelar uma janela já iniciada."
-    }
+    "title": "Calendário de Releases & Gate",
+    "subtitle": "Janelas de deploy e aprovações de releases",
+    "windowsTab": "Janelas de Deploy",
+    "releasesTab": "Releases Agendadas",
+    "approvalRequired": "Aprovação Obrigatória",
+    "confidence": "Confiança",
+    "approve": "Aprovar",
+    "empty": "Nenhuma release agendada"
   },
   "releaseScope": {
     "excludedDescription": "Esta área continua no código, mas foi deliberadamente retirada do escopo do release produtivo final. Não faz parte da superfície suportada em produção.",
@@ -13832,29 +13807,14 @@
     }
   },
   "operationalReadiness": {
-    "title": "Relatório de Prontidão Operacional",
-    "subtitle": "Scorecard de prontidão operacional pré-produção. Avalia conformidade de SLO, resiliência a chaos, cobertura de profiling, ausência de drift e baseline de runtime entre ambientes.",
-    "compositeScore": "Score Composto",
-    "classification": {
-      "ReadyForProduction": "Pronto para Produção",
-      "ConditionallyReady": "Condicionalmente Pronto",
-      "NotReady": "Não Pronto"
-    },
-    "dimensions": {
-      "slo": "Conformidade de SLO",
-      "chaos": "Resiliência a Chaos",
-      "profiling": "Cobertura de Profiling",
-      "drift": "Livre de Drift",
-      "baseline": "Cobertura de Baseline"
-    },
-    "blockers": "Bloqueadores",
-    "noBlockers": "Nenhum bloqueador detectado.",
-    "sourceEnvironment": "Ambiente de Origem",
-    "targetEnvironment": "Ambiente Destino",
-    "errors": {
-      "serviceRequired": "O nome do serviço é obrigatório.",
-      "invalidDays": "O período de lookback deve ser entre 1 e 90 dias."
-    }
+    "title": "Board de Prontidão Operacional",
+    "subtitle": "Pontuação Go/NoGo de prontidão por serviço",
+    "slo": "SLO",
+    "chaos": "Chaos",
+    "drift": "Drift",
+    "profiling": "Profiling",
+    "baseline": "Baseline",
+    "empty": "Nenhum serviço encontrado"
   },
   "contractHealthDistribution": {
     "title": "Distribuição de Saúde de Contratos",
@@ -16624,8 +16584,7 @@
     "reconnect": "Reconectar",
     "errorBanner": "Conexão ao vivo perdida",
     "fallbackPolling": "A usar polling como fallback"
-  }
-,
+  },
   "notebook": {
     "title": "Notebooks",
     "new": "Novo Notebook",
@@ -16653,7 +16612,7 @@
     "cellCount_other": "{{count}} células",
     "savedAt": "Salvo {{time}}",
     "revision": "Rev. {{number}}"
-},
+  },
   "aiCompose": {
     "title": "Compor com IA",
     "subtitle": "Descreva o dashboard que você precisa e a IA proporá layout, variáveis e widgets.",
@@ -16671,36 +16630,434 @@
     "widgetsSection": "Widgets ({{count}})",
     "layoutSection": "Layout"
   },
-  "sotCenter": { "simulatedBanner": "Os dados exibidos são simulados — conecte integrações reais para habilitar as visões de source-of-truth." },
-  "warRoom": { "title": "War Room", "subtitle": "Colaboração em tempo real para resposta a incidentes", "activeUsers": "Usuários ativos", "comments": "Comentários", "resolve": "Resolver", "resolved": "Resolvido", "addComment": "Adicionar comentário", "commentPlaceholder": "Digite uma mensagem...", "noComments": "Nenhum comentário ainda", "presence": "Participantes", "status": "Status", "incident": "Incidente", "simulatedBanner": "Presença e comentários são simulados" },
-  "pluginMarketplace": { "title": "Marketplace de Dashboards", "subtitle": "Navegue e instale templates de dashboards e packs de widgets", "search": "Buscar templates...", "install": "Instalar", "installed": "Instalado", "category": "Categoria", "persona": "Persona", "noTemplates": "Nenhum template encontrado", "simulatedBanner": "Dados de templates são simulados" },
-  "mobileOnCall": { "title": "On-Call Mobile", "subtitle": "Dashboard de on-call otimizado para mobile e PWA", "installPwa": "Instalar app", "activeIncidents": "Incidentes Ativos", "criticalAlerts": "Alertas Críticos", "pendingApprovals": "Aprovações Pendentes", "onCallStatus": "On-Call", "openIncidents": "Incidentes Abertos", "pendingApprovalsSection": "Aprovações Pendentes", "approve": "Aprovar", "reject": "Rejeitar", "quickLinks": "Links Rápidos", "noIncidents": "Sem incidentes ativos" },
-  "engineerCockpit": { "title": "Cockpit do Engenheiro", "subtitle": "Seu dashboard pessoal de engenharia" },
-  "techLeadCenter": { "title": "Centro de Comando do Tech Lead", "subtitle": "Saúde do time e métricas de entrega" },
-  "architectLandscape": { "title": "Landscape do Arquiteto", "subtitle": "Topologia, acoplamento e saúde dos contratos" },
-  "productPortfolio": { "title": "Home de Portfolio de Produto", "subtitle": "Capacidades, entrega, SLO e custos" },
-  "executiveBrief": { "title": "Centro de Briefing Executivo", "subtitle": "KPIs, DORA, compliance e FinOps", "downloadPdf": "Baixar PDF" },
-  "platformAdminCockpit": { "title": "Cockpit de Admin de Plataforma", "subtitle": "Administração de tenant, integrações e saúde" },
-  "auditorConsole": { "title": "Console do Auditor", "subtitle": "Padrões de compliance, superfícies de auditoria e evidências" },
-  "changeConfidenceHub": { "title": "Hub de Confiança de Mudança", "subtitle": "Pontuação de confiança e decisões de promoção", "confidenceScore": "Pontuação de Confiança", "level": { "high": "Alta Confiança", "medium": "Revisão Necessária", "low": "Não Pronto" }, "blastRadius": "Raio de Impacto", "evidencePack": "Pacote de Evidências", "contractCompat": "Compat. Contrato", "incidentCorrelation": "Correlação de Incidentes", "subScores": "Sub-pontuações", "promotionDecision": "Decisão de Promoção", "promote": "Promover", "requestReview": "Solicitar Revisão", "rollback": "Rollback" },
-  "blastRadius": { "title": "Explorador de Raio de Impacto", "subtitle": "Análise de impacto para releases e mudanças", "bucket": "Nível de Impacto", "directImpact": "Impacto Direto", "transitiveImpact": "Impacto Transitivo", "domains": "Domínios", "impactedServices": "Serviços Impactados", "noImpact": "Nenhum serviço impactado" },
-  "operationalReadiness": { "title": "Board de Prontidão Operacional", "subtitle": "Pontuação Go/NoGo de prontidão por serviço", "slo": "SLO", "chaos": "Chaos", "drift": "Drift", "profiling": "Profiling", "baseline": "Baseline", "empty": "Nenhum serviço encontrado" },
-  "driftCenter": { "title": "Centro de Drift", "subtitle": "Detecção de drift de configuração e runtime", "openDrifts": "Drifts Abertos", "criticalDrifts": "Críticos", "acked": "Confirmados", "acknowledge": "Confirmar", "correlatedChange": "Mudança Correlacionada", "noDrifts": "Nenhum drift aberto — tudo limpo" },
-  "complianceScorecard": { "title": "Centro de Scorecard de Compliance", "subtitle": "Status de controles em todos os padrões", "score": "Pontuação", "compliant": "Conforme", "partial": "Parcial", "nonCompliant": "Não Conforme", "notAssessed": "Não Avaliado", "owner": "Responsável", "empty": "Nenhum controle encontrado" },
-  "finOpsContext": { "title": "Visões Contextuais de FinOps", "subtitle": "Inteligência de custos contextual por serviço, time, domínio e ambiente", "totalCost": "Custo Total (MTD)", "anomaly": "Anomalia", "empty": "Nenhum dado de custo" },
-  "releaseCalendar": { "title": "Calendário de Releases & Gate", "subtitle": "Janelas de deploy e aprovações de releases", "windowsTab": "Janelas de Deploy", "releasesTab": "Releases Agendadas", "approvalRequired": "Aprovação Obrigatória", "confidence": "Confiança", "approve": "Aprovar", "empty": "Nenhuma release agendada" },
-  "rollbackCockpit": { "title": "Cockpit de Rollback Inteligente", "subtitle": "Candidatos a rollback com avaliação de risco", "available": "Disponíveis", "inProgress": "Em Progresso", "highRisk": "Alto Risco", "downtime": "Downtime Est.", "rollback": "Rollback", "noRollbacks": "Nenhum candidato a rollback" },
-  "evidencePack": { "title": "Visualizador de Pacote de Evidências", "subtitle": "Artefatos assinados SLSA e evidências de compliance", "export": "Exportar", "artifacts": "Artefatos", "filterArtifacts": "Filtrar artefatos...", "noArtifacts": "Nenhum artefato", "owner": "Responsável" },
-  "sloCenter": { "title": "Centro de Serviço SLO", "subtitle": "SLOs, Chaos e aprendizado pós-incidente", "tabSLO": "SLO", "tabChaos": "Chaos Lab", "tabPostmortem": "Pós-Incidente", "target": "Meta", "current": "Atual", "errorBudget": "Error Budget", "lastRun": "Última execução", "never": "Nunca", "actionItems": "Ações", "open": "abertas", "empty": "Nenhum dado de SLO" },
-  "contractStudio": { "title": "Contract Studio", "subtitle": "Projete, valide e publique contratos de API em todos os protocolos", "chooseType": "Escolha o tipo de contrato", "openBuilder": "Abrir builder", "unifiedPublication": "Fluxo de Publicação Unificado", "publicationFlow": "Projetar → Validar → Publicar → Governar" },
-  "restBuilder": { "title": "Designer REST / OpenAPI", "subtitle": "Designer visual de REST API com exportação OpenAPI 3.1", "importSpec": "Importar Spec", "publish": "Publicar", "apiInfo": "Info da API", "version": "Versão", "baseUrl": "URL Base", "summary": "Resumo", "total": "Total", "endpoints": "Endpoints", "addEndpoint": "Adicionar Endpoint", "method": "Método", "path": "Caminho", "remove": "Remover", "openApiBanner": "Exporta YAML OpenAPI 3.1." },
-  "asyncApiBuilder": { "title": "Designer AsyncAPI 3.x", "subtitle": "Designer visual de API orientada a eventos", "publish": "Publicar", "apiInfo": "Info da API", "apiTitle": "Título", "version": "Versão", "channels": "Canais", "addChannel": "Adicionar Canal", "channelDetail": "Detalhe do Canal", "address": "Endereço", "protocol": "Protocolo", "operation": "Operação", "description": "Descrição", "messageSchema": "Schema da Mensagem (JSON)", "remove": "Remover", "selectChannel": "Selecione um canal para editar", "asyncApiBanner": "Exporta YAML AsyncAPI 3.x." },
-  "soapBuilder": { "title": "Designer SOAP / WSDL", "subtitle": "Designer visual de serviço SOAP", "publish": "Publicar", "serviceInfo": "Info do Serviço", "serviceName": "Nome do Serviço", "targetNamespace": "Namespace Alvo", "wsdlVersion": "Versão WSDL", "operations": "Operações", "addOperation": "Adicionar Operação", "operationDetail": "Detalhe da Operação", "operationName": "Nome", "style": "Estilo", "inputMessage": "Mensagem de Entrada", "outputMessage": "Mensagem de Saída", "documentation": "Documentação", "remove": "Remover", "selectOperation": "Selecione uma operação para editar", "wsdlBanner": "Exporta WSDL 1.1 ou 2.0." },
-  "graphqlBuilder": { "title": "Builder de Schema GraphQL", "subtitle": "Editor SDL com detecção de mudanças breaking", "validate": "Validar", "publish": "Publicar", "schemaSummary": "Resumo do Schema", "types": "Tipos", "inputs": "Inputs", "fields": "Campos", "breakingChanges": "Mudanças Breaking", "noBreakingChanges": "Nenhuma mudança breaking detectada", "tab": { "editor": "Editor SDL", "diff": "Diff", "explorer": "Explorador" }, "noDiff": "Nenhuma versão anterior", "sdlBanner": "Editor SDL GraphQL." },
-  "protobufBuilder": { "title": "Builder Protobuf / gRPC", "subtitle": "Editor .proto com verificação de compatibilidade", "checkCompat": "Verificar Compatibilidade", "publish": "Publicar", "protoSummary": "Resumo do Proto", "services": "Serviços", "rpcs": "RPCs", "messages": "Mensagens", "compatibility": "Compatibilidade", "backwardCompat": "Compatível com versões anteriores", "tab": { "editor": "Editor .proto", "services": "Serviços", "messages": "Mensagens" }, "protoBanner": "Editor Proto3." },
-  "aiAgentMarketplace": { "title": "Marketplace de Agentes IA", "subtitle": "Gerencie agentes IA, orçamentos de tokens e políticas", "totalAgents": "Total de Agentes", "tokensUsed": "Tokens Usados (MTD)", "budgetRemaining": "Orçamento Restante", "search": "Buscar agentes...", "audited": "Auditado", "budget": "Orçamento de Tokens", "pause": "Pausar", "activate": "Ativar", "configure": "Configurar", "empty": "Nenhum agente encontrado" },
-  "ideConsole": { "title": "Console de Extensões IDE", "subtitle": "Gerencie extensões e matrículas de desenvolvedores", "extensions": "Extensões", "installed": "Instalados", "enrolled": "Matriculados", "pushUpdate": "Enviar Atualização", "configure": "Configurar", "developerEnrollments": "Matrículas de Desenvolvedores", "lastSeen": "Visto pela última vez", "noEnrollments": "Nenhuma matrícula encontrada" },
-  "breakGlass": { "title": "Break Glass & Acesso JIT", "subtitle": "Solicitações e aprovações de acesso privilegiado just-in-time", "requestAccess": "Solicitar Acesso", "resource": "Recurso", "role": "Papel", "environment": "Ambiente", "justification": "Justificativa", "justificationPlaceholder": "Descreva por que precisa deste acesso...", "submit": "Solicitar Acesso", "activeSessions": "Sessões Ativas", "pendingApprovals": "Aprovações Pendentes", "history": "Histórico", "active": "Ativo", "noPending": "Nenhuma solicitação pendente", "expires": "Expira" },
-  "licensing": { "title": "Licenciamento & Direitos", "subtitle": "Gestão de licença para deployments online e air-gapped", "exportOfflinePack": "Exportar Pacote Offline", "renewLicense": "Renovar Licença", "validate": "Validar Agora", "lastValidated": "Última validação", "entitlements": "Direitos", "expires": "Expira", "seats": "Assentos" },
-  "dacGitOps": { "title": "Dashboards-as-Code GitOps", "subtitle": "Gerencie dashboards via repositórios Git com sincronização automatizada", "repositories": "Repositórios", "sync": "Sincronizar", "dashboards": "dashboards", "recentChanges": "Mudanças Recentes", "noChanges": "Nenhuma mudança recente" }
+  "sotCenter": {
+    "simulatedBanner": "Os dados exibidos são simulados — conecte integrações reais para habilitar as visões de source-of-truth."
+  },
+  "warRoom": {
+    "title": "War Room",
+    "subtitle": "Colaboração em tempo real para resposta a incidentes",
+    "activeUsers": "Usuários ativos",
+    "comments": "Comentários",
+    "resolve": "Resolver",
+    "resolved": "Resolvido",
+    "addComment": "Adicionar comentário",
+    "commentPlaceholder": "Digite uma mensagem...",
+    "noComments": "Nenhum comentário ainda",
+    "presence": "Participantes",
+    "status": "Status",
+    "incident": "Incidente",
+    "simulatedBanner": "Presença e comentários são simulados"
+  },
+  "pluginMarketplace": {
+    "title": "Marketplace de Dashboards",
+    "subtitle": "Navegue e instale templates de dashboards e packs de widgets",
+    "search": "Buscar templates...",
+    "install": "Instalar",
+    "installed": "Instalado",
+    "category": "Categoria",
+    "persona": "Persona",
+    "noTemplates": "Nenhum template encontrado",
+    "simulatedBanner": "Dados de templates são simulados"
+  },
+  "mobileOnCall": {
+    "title": "On-Call Mobile",
+    "subtitle": "Dashboard de on-call otimizado para mobile e PWA",
+    "installPwa": "Instalar app",
+    "activeIncidents": "Incidentes Ativos",
+    "criticalAlerts": "Alertas Críticos",
+    "pendingApprovals": "Aprovações Pendentes",
+    "onCallStatus": "On-Call",
+    "openIncidents": "Incidentes Abertos",
+    "pendingApprovalsSection": "Aprovações Pendentes",
+    "approve": "Aprovar",
+    "reject": "Rejeitar",
+    "quickLinks": "Links Rápidos",
+    "noIncidents": "Sem incidentes ativos"
+  },
+  "engineerCockpit": {
+    "title": "Cockpit do Engenheiro",
+    "subtitle": "Seu dashboard pessoal de engenharia"
+  },
+  "techLeadCenter": {
+    "title": "Centro de Comando do Tech Lead",
+    "subtitle": "Saúde do time e métricas de entrega"
+  },
+  "architectLandscape": {
+    "title": "Landscape do Arquiteto",
+    "subtitle": "Topologia, acoplamento e saúde dos contratos"
+  },
+  "productPortfolio": {
+    "title": "Home de Portfolio de Produto",
+    "subtitle": "Capacidades, entrega, SLO e custos"
+  },
+  "executiveBrief": {
+    "title": "Centro de Briefing Executivo",
+    "subtitle": "KPIs, DORA, compliance e FinOps",
+    "downloadPdf": "Baixar PDF"
+  },
+  "platformAdminCockpit": {
+    "title": "Cockpit de Admin de Plataforma",
+    "subtitle": "Administração de tenant, integrações e saúde"
+  },
+  "auditorConsole": {
+    "title": "Console do Auditor",
+    "subtitle": "Padrões de compliance, superfícies de auditoria e evidências"
+  },
+  "changeConfidenceHub": {
+    "title": "Hub de Confiança de Mudança",
+    "subtitle": "Pontuação de confiança e decisões de promoção",
+    "confidenceScore": "Pontuação de Confiança",
+    "level": {
+      "high": "Alta Confiança",
+      "medium": "Revisão Necessária",
+      "low": "Não Pronto"
+    },
+    "blastRadius": "Raio de Impacto",
+    "evidencePack": "Pacote de Evidências",
+    "contractCompat": "Compat. Contrato",
+    "incidentCorrelation": "Correlação de Incidentes",
+    "subScores": "Sub-pontuações",
+    "promotionDecision": "Decisão de Promoção",
+    "promote": "Promover",
+    "requestReview": "Solicitar Revisão",
+    "rollback": "Rollback"
+  },
+  "blastRadius": {
+    "title": "Explorador de Raio de Impacto",
+    "subtitle": "Análise de impacto para releases e mudanças",
+    "bucket": "Nível de Impacto",
+    "directImpact": "Impacto Direto",
+    "transitiveImpact": "Impacto Transitivo",
+    "domains": "Domínios",
+    "impactedServices": "Serviços Impactados",
+    "noImpact": "Nenhum serviço impactado"
+  },
+  "driftCenter": {
+    "title": "Centro de Drift",
+    "subtitle": "Detecção de drift de configuração e runtime",
+    "openDrifts": "Drifts Abertos",
+    "criticalDrifts": "Críticos",
+    "acked": "Confirmados",
+    "acknowledge": "Confirmar",
+    "correlatedChange": "Mudança Correlacionada",
+    "noDrifts": "Nenhum drift aberto — tudo limpo"
+  },
+  "complianceScorecard": {
+    "title": "Centro de Scorecard de Compliance",
+    "subtitle": "Status de controles em todos os padrões",
+    "score": "Pontuação",
+    "compliant": "Conforme",
+    "partial": "Parcial",
+    "nonCompliant": "Não Conforme",
+    "notAssessed": "Não Avaliado",
+    "owner": "Responsável",
+    "empty": "Nenhum controle encontrado"
+  },
+  "finOpsContext": {
+    "title": "Visões Contextuais de FinOps",
+    "subtitle": "Inteligência de custos contextual por serviço, time, domínio e ambiente",
+    "totalCost": "Custo Total (MTD)",
+    "anomaly": "Anomalia",
+    "empty": "Nenhum dado de custo"
+  },
+  "rollbackCockpit": {
+    "title": "Cockpit de Rollback Inteligente",
+    "subtitle": "Candidatos a rollback com avaliação de risco",
+    "available": "Disponíveis",
+    "inProgress": "Em Progresso",
+    "highRisk": "Alto Risco",
+    "downtime": "Downtime Est.",
+    "rollback": "Rollback",
+    "noRollbacks": "Nenhum candidato a rollback"
+  },
+  "evidencePack": {
+    "title": "Visualizador de Pacote de Evidências",
+    "subtitle": "Artefatos assinados SLSA e evidências de compliance",
+    "export": "Exportar",
+    "artifacts": "Artefatos",
+    "filterArtifacts": "Filtrar artefatos...",
+    "noArtifacts": "Nenhum artefato",
+    "owner": "Responsável"
+  },
+  "sloCenter": {
+    "title": "Centro de Serviço SLO",
+    "subtitle": "SLOs, Chaos e aprendizado pós-incidente",
+    "tabSLO": "SLO",
+    "tabChaos": "Chaos Lab",
+    "tabPostmortem": "Pós-Incidente",
+    "target": "Meta",
+    "current": "Atual",
+    "errorBudget": "Error Budget",
+    "lastRun": "Última execução",
+    "never": "Nunca",
+    "actionItems": "Ações",
+    "open": "abertas",
+    "empty": "Nenhum dado de SLO"
+  },
+  "contractStudio": {
+    "title": "Contract Studio",
+    "subtitle": "Projete, valide e publique contratos de API em todos os protocolos",
+    "chooseType": "Escolha o tipo de contrato",
+    "openBuilder": "Abrir builder",
+    "unifiedPublication": "Fluxo de Publicação Unificado",
+    "publicationFlow": "Projetar → Validar → Publicar → Governar"
+  },
+  "restBuilder": {
+    "title": "Designer REST / OpenAPI",
+    "subtitle": "Designer visual de REST API com exportação OpenAPI 3.1",
+    "importSpec": "Importar Spec",
+    "publish": "Publicar",
+    "apiInfo": "Info da API",
+    "version": "Versão",
+    "baseUrl": "URL Base",
+    "summary": "Resumo",
+    "total": "Total",
+    "endpoints": "Endpoints",
+    "addEndpoint": "Adicionar Endpoint",
+    "method": "Método",
+    "path": "Caminho",
+    "remove": "Remover",
+    "openApiBanner": "Exporta YAML OpenAPI 3.1."
+  },
+  "asyncApiBuilder": {
+    "title": "Designer AsyncAPI 3.x",
+    "subtitle": "Designer visual de API orientada a eventos",
+    "publish": "Publicar",
+    "apiInfo": "Info da API",
+    "apiTitle": "Título",
+    "version": "Versão",
+    "channels": "Canais",
+    "addChannel": "Adicionar Canal",
+    "channelDetail": "Detalhe do Canal",
+    "address": "Endereço",
+    "protocol": "Protocolo",
+    "operation": "Operação",
+    "description": "Descrição",
+    "messageSchema": "Schema da Mensagem (JSON)",
+    "remove": "Remover",
+    "selectChannel": "Selecione um canal para editar",
+    "asyncApiBanner": "Exporta YAML AsyncAPI 3.x."
+  },
+  "soapBuilder": {
+    "title": "Designer SOAP / WSDL",
+    "subtitle": "Designer visual de serviço SOAP",
+    "publish": "Publicar",
+    "serviceInfo": "Info do Serviço",
+    "serviceName": "Nome do Serviço",
+    "targetNamespace": "Namespace Alvo",
+    "wsdlVersion": "Versão WSDL",
+    "operations": "Operações",
+    "addOperation": "Adicionar Operação",
+    "operationDetail": "Detalhe da Operação",
+    "operationName": "Nome",
+    "style": "Estilo",
+    "inputMessage": "Mensagem de Entrada",
+    "outputMessage": "Mensagem de Saída",
+    "documentation": "Documentação",
+    "remove": "Remover",
+    "selectOperation": "Selecione uma operação para editar",
+    "wsdlBanner": "Exporta WSDL 1.1 ou 2.0."
+  },
+  "graphqlBuilder": {
+    "title": "Builder de Schema GraphQL",
+    "subtitle": "Editor SDL com detecção de mudanças breaking",
+    "validate": "Validar",
+    "publish": "Publicar",
+    "schemaSummary": "Resumo do Schema",
+    "types": "Tipos",
+    "inputs": "Inputs",
+    "fields": "Campos",
+    "breakingChanges": "Mudanças Breaking",
+    "noBreakingChanges": "Nenhuma mudança breaking detectada",
+    "tab": {
+      "editor": "Editor SDL",
+      "diff": "Diff",
+      "explorer": "Explorador"
+    },
+    "noDiff": "Nenhuma versão anterior",
+    "sdlBanner": "Editor SDL GraphQL."
+  },
+  "protobufBuilder": {
+    "title": "Builder Protobuf / gRPC",
+    "subtitle": "Editor .proto com verificação de compatibilidade",
+    "checkCompat": "Verificar Compatibilidade",
+    "publish": "Publicar",
+    "protoSummary": "Resumo do Proto",
+    "services": "Serviços",
+    "rpcs": "RPCs",
+    "messages": "Mensagens",
+    "compatibility": "Compatibilidade",
+    "backwardCompat": "Compatível com versões anteriores",
+    "tab": {
+      "editor": "Editor .proto",
+      "services": "Serviços",
+      "messages": "Mensagens"
+    },
+    "protoBanner": "Editor Proto3."
+  },
+  "aiAgentMarketplace": {
+    "title": "Marketplace de Agentes IA",
+    "subtitle": "Gerencie agentes IA, orçamentos de tokens e políticas",
+    "totalAgents": "Total de Agentes",
+    "tokensUsed": "Tokens Usados (MTD)",
+    "budgetRemaining": "Orçamento Restante",
+    "search": "Buscar agentes...",
+    "audited": "Auditado",
+    "budget": "Orçamento de Tokens",
+    "pause": "Pausar",
+    "activate": "Ativar",
+    "configure": "Configurar",
+    "empty": "Nenhum agente encontrado"
+  },
+  "ideConsole": {
+    "title": "Console de Extensões IDE",
+    "subtitle": "Gerencie extensões e matrículas de desenvolvedores",
+    "extensions": "Extensões",
+    "installed": "Instalados",
+    "enrolled": "Matriculados",
+    "pushUpdate": "Enviar Atualização",
+    "configure": "Configurar",
+    "developerEnrollments": "Matrículas de Desenvolvedores",
+    "lastSeen": "Visto pela última vez",
+    "noEnrollments": "Nenhuma matrícula encontrada"
+  },
+  "breakGlass": {
+    "title": "Break Glass & Acesso JIT",
+    "subtitle": "Solicitações e aprovações de acesso privilegiado just-in-time",
+    "requestAccess": "Solicitar Acesso",
+    "resource": "Recurso",
+    "role": "Papel",
+    "environment": "Ambiente",
+    "justification": "Justificativa",
+    "justificationPlaceholder": "Descreva por que precisa deste acesso...",
+    "submit": "Solicitar Acesso",
+    "activeSessions": "Sessões Ativas",
+    "pendingApprovals": "Aprovações Pendentes",
+    "history": "Histórico",
+    "active": "Ativo",
+    "noPending": "Nenhuma solicitação pendente",
+    "expires": "Expira"
+  },
+  "licensing": {
+    "title": "Licenciamento & Direitos",
+    "subtitle": "Gestão de licença para deployments online e air-gapped",
+    "exportOfflinePack": "Exportar Pacote Offline",
+    "renewLicense": "Renovar Licença",
+    "validate": "Validar Agora",
+    "lastValidated": "Última validação",
+    "entitlements": "Direitos",
+    "expires": "Expira",
+    "seats": "Assentos"
+  },
+  "dacGitOps": {
+    "title": "Dashboards-as-Code GitOps",
+    "subtitle": "Gerencie dashboards via repositórios Git com sincronização automatizada",
+    "repositories": "Repositórios",
+    "sync": "Sincronizar",
+    "dashboards": "dashboards",
+    "recentChanges": "Mudanças Recentes",
+    "noChanges": "Nenhuma mudança recente"
+  },
+  "saasLicensing": {
+    "title": "Licenciamento SaaS",
+    "subtitle": "Gerencie seu plano, capacidades e consumo de unidades de host",
+    "refresh": "Atualizar",
+    "loadError": "Falha ao carregar licença. Tente novamente.",
+    "currentPlan": "Plano Atual",
+    "hostUnits": "Unidades de Host",
+    "included": "incluídas",
+    "overage": "excesso",
+    "validity": "Validade",
+    "from": "De",
+    "until": "Até",
+    "noExpiry": "Sem expiração",
+    "capabilities": "Capacidades Habilitadas",
+    "capabilitiesEnabled": "habilitadas",
+    "upgradePlan": "Upgrade de Plano",
+    "upgradeTo": "Upgrade para",
+    "confirmUpgrade": "Fazer upgrade para",
+    "confirmUpgradeDescription": "Esta ação irá fazer o upgrade do seu plano. As novas capacidades estarão disponíveis imediatamente.",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar Upgrade",
+    "upgrading": "Fazendo upgrade..."
+  },
+  "agentRegistrations": {
+    "title": "Registros de Agentes",
+    "subtitle": "Visualize e monitore todos os agentes de host registrados e o consumo de unidades",
+    "refresh": "Atualizar",
+    "loadError": "Falha ao carregar agentes. Tente novamente.",
+    "totalAgents": "Total de Agentes",
+    "activeAgents": "Ativos",
+    "totalHostUnits": "Total de Unidades de Host",
+    "loading": "Carregando agentes...",
+    "noAgents": "Nenhum agente registrado ainda. Instale o agente NexTrace nos seus hosts para começar a monitorar.",
+    "col": {
+      "hostname": "Hostname",
+      "status": "Status",
+      "cpu": "CPU",
+      "ram": "RAM",
+      "hostUnits": "Unidades de Host",
+      "lastHeartbeat": "Último Heartbeat",
+      "version": "Versão"
+    }
+  },
+  "tenantProvisioning": {
+    "title": "Provisionar Tenant",
+    "subtitle": "Crie um novo tenant com plano e licença em uma única operação",
+    "next": "Próximo",
+    "back": "Voltar",
+    "provision": "Provisionar",
+    "provisioning": "Provisionando...",
+    "provisionError": "Falha no provisionamento. Verifique os valores e tente novamente.",
+    "step1": {
+      "title": "Identidade do Tenant",
+      "name": "Nome",
+      "namePlaceholder": "Acme Corporation",
+      "slug": "Slug",
+      "slugHint": "Identificador único: apenas letras minúsculas, números e hífens",
+      "legalName": "Nome Legal (opcional)",
+      "legalNamePlaceholder": "Acme Corporation Ltda.",
+      "taxId": "CNPJ/CPF (opcional)"
+    },
+    "step2": {
+      "title": "Plano e Capacidade",
+      "includedHostUnits": "Unidades de Host Incluídas",
+      "hostUnitsHint": "Quantidade de unidades de host incluídas no plano. Cada agente contribui com max(RAM/8, CPU/4) unidades."
+    },
+    "step3": {
+      "title": "Tenant Provisionado!",
+      "tenantId": "ID do Tenant",
+      "name": "Nome",
+      "plan": "Plano",
+      "license": "Licença",
+      "licenseOk": "Provisionada",
+      "licensePartial": "Parcial — reprovisionne a licença",
+      "goToTenants": "Ir para Tenants",
+      "provisionAnother": "Provisionar Outro"
+    }
+  },
+  "saasAlerts": {
+    "title": "Histórico de Alertas",
+    "subtitle": "Monitore e resolva alertas disparados pelas suas regras de alerta",
+    "refresh": "Atualizar",
+    "loadError": "Falha ao carregar alertas. Tente novamente.",
+    "loading": "Carregando alertas...",
+    "noAlerts": "Nenhum alerta encontrado para o período e status selecionados.",
+    "firing": "Disparando",
+    "resolved": "Resolvidos",
+    "silenced": "Silenciados",
+    "periodDays": "Período",
+    "clearFilter": "Limpar filtro",
+    "resolve": "Resolver",
+    "silence": "Silenciar",
+    "resolvedAt": "Resolvido em",
+    "col": {
+      "rule": "Regra de Alerta",
+      "status": "Status",
+      "severity": "Severidade",
+      "condition": "Condição",
+      "firedAt": "Disparado em",
+      "actions": "Ações"
+    }
+  }
 }

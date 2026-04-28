@@ -18,13 +18,14 @@ public interface IJwtTokenGenerator
 
     /// <summary>
     /// Gera um access token JWT para o usuário autenticado com múltiplos papéis.
-    /// Claims: sub, email, name, tenant_id, role_ids[] (multi-valued), permissions[].
+    /// Claims: sub, email, name, tenant_id, role_ids[] (multi-valued), permissions[], capabilities[].
     /// </summary>
     /// <param name="user">Usuário autenticado.</param>
     /// <param name="tenantId">Tenant selecionado.</param>
     /// <param name="roleIds">Identificadores dos papéis ativos.</param>
     /// <param name="permissions">Permissões efetivas (união de todos os papéis).</param>
-    string GenerateAccessToken(User user, TenantId tenantId, IReadOnlyCollection<RoleId> roleIds, IReadOnlyCollection<string> permissions);
+    /// <param name="capabilities">Capabilities do plano SaaS do tenant (opcional).</param>
+    string GenerateAccessToken(User user, TenantId tenantId, IReadOnlyCollection<RoleId> roleIds, IReadOnlyCollection<string> permissions, IReadOnlyCollection<string>? capabilities = null);
 
     /// <summary>Gera um refresh token aleatório em texto plano.</summary>
     string GenerateRefreshToken();

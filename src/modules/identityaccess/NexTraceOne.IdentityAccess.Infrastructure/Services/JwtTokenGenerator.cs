@@ -59,7 +59,7 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
     }
 
     /// <inheritdoc />
-    public string GenerateAccessToken(User user, TenantId tenantId, IReadOnlyCollection<RoleId> roleIds, IReadOnlyCollection<string> permissions)
+    public string GenerateAccessToken(User user, TenantId tenantId, IReadOnlyCollection<RoleId> roleIds, IReadOnlyCollection<string> permissions, IReadOnlyCollection<string>? capabilities = null)
     {
         var now = dateTimeProvider.UtcNow;
 
@@ -86,6 +86,13 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
         foreach (var permission in permissions)
         {
             claims.Add(new Claim("permissions", permission));
+        }
+
+        // SaaS-01: capabilities claim — plano de licença do tenant.
+        if (capabilities is not null)
+        {
+            foreach (var cap in capabilities)
+                claims.Add(new Claim("capabilities", cap));
         }
 
         var credentials = new SigningCredentials(

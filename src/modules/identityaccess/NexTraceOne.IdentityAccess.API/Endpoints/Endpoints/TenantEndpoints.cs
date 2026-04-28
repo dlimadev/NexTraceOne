@@ -10,6 +10,7 @@ using NexTraceOne.BuildingBlocks.Security.CookieSession;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 using ListMyTenantsFeature = NexTraceOne.IdentityAccess.Application.Features.ListMyTenants.ListMyTenants;
+using ProvisionTenantFeature = NexTraceOne.IdentityAccess.Application.Features.ProvisionTenant.ProvisionTenant;
 using SelectTenantFeature = NexTraceOne.IdentityAccess.Application.Features.SelectTenant.SelectTenant;
 using ListTenantsFeature = NexTraceOne.IdentityAccess.Application.Features.ListTenants.ListTenants;
 using GetTenantFeature = NexTraceOne.IdentityAccess.Application.Features.GetTenant.GetTenant;
@@ -154,6 +155,17 @@ internal static class TenantEndpoints
         {
             var result = await sender.Send(new ActivateTenantFeature.Command(tenantId), cancellationToken);
             return result.ToHttpResult(localizer);
+        }).RequirePermission("identity:tenants:admin");
+
+        // SaaS-05: Provisiona novo tenant com licença — wizard de onboarding
+        group.MapPost("/admin/tenants/provision", async (
+            ProvisionTenantFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToCreatedResult(r => $"/api/v1/identity/admin/tenants/{r.TenantId}", localizer);
         }).RequirePermission("identity:tenants:admin");
     }
 
