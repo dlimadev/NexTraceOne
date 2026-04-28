@@ -33,13 +33,13 @@ public static class GetTenantLicense
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
-            var tenantId = currentTenant.TenantId;
+            var tenantId = currentTenant.Id;
 
             var license = await repository.GetByTenantIdAsync(tenantId, cancellationToken);
             if (license is null)
             {
                 // Tenant sem licença provisionada — retorna Starter trial por defeito
-                return Result.Success(new Response(
+                return Result<Response>.Success(new Response(
                     Guid.Empty,
                     TenantPlan.Starter.ToString(),
                     TenantLicenseStatus.Active.ToString(),
@@ -51,7 +51,7 @@ public static class GetTenantLicense
                     TenantCapabilities.ForPlan(TenantPlan.Starter)));
             }
 
-            return Result.Success(new Response(
+            return Result<Response>.Success(new Response(
                 license.Id.Value,
                 license.Plan.ToString(),
                 license.Status.ToString(),

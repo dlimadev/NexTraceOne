@@ -64,11 +64,11 @@ public static class ProvisionTenant
             var now = dateTimeProvider.UtcNow;
 
             if (!Enum.TryParse<TenantPlan>(request.Plan, ignoreCase: true, out var plan))
-                return Result.Failure<Response>("Invalid plan.");
+                return Error.Validation("tenant.invalidPlan", "Invalid plan.");
 
             var normalizedSlug = request.Slug.ToLowerInvariant();
             if (await tenantRepository.SlugExistsAsync(normalizedSlug, cancellationToken))
-                return Result.Failure<Response>($"Slug '{normalizedSlug}' is already in use.");
+                return Error.Conflict("tenant.slugInUse", $"Slug '{normalizedSlug}' is already in use.");
 
             // Step 1: Create tenant
             var tenant = Tenant.Create(request.Name, normalizedSlug, now);
@@ -89,9 +89,9 @@ public static class ProvisionTenant
                 now);
             licenseRepository.Add(license);
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
-            return Result.Success(new Response(
+            return Result<Response>.Success(new Response(
                 tenant.Id.Value,
                 tenant.Name,
                 tenant.Slug,

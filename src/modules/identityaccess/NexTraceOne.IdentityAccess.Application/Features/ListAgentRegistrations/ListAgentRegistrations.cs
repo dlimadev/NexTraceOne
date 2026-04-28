@@ -39,7 +39,7 @@ public static class ListAgentRegistrations
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
-            var tenantId = currentTenant.TenantId;
+            var tenantId = currentTenant.Id;
 
             var agents = await repository.ListByTenantAsync(tenantId, cancellationToken);
 
@@ -60,7 +60,7 @@ public static class ListAgentRegistrations
                 .Sum(a => a.HostUnits);
             var activeCount = agents.Count(a => a.Status == Domain.Entities.AgentRegistrationStatus.Active);
 
-            return Result.Success(new Response(dtos, totalHostUnits, activeCount));
+            return Result<Response>.Success(new Response(dtos, totalHostUnits, activeCount));
         }
     }
 }

@@ -44,7 +44,7 @@ public static class ListDashboardMonitors
                 m.Id.Value, m.WidgetId, m.Name, m.NqlQuery, m.ConditionField,
                 m.ConditionOperator.ToString(), m.ConditionThreshold, m.EvaluationWindowMinutes,
                 m.Severity.ToString(), m.Status.ToString(), m.LastFiredAt, m.FiredCount)).ToList();
-            return Result.Success(new Response(dtos, dtos.Count));
+            return Result<Response>.Success(new Response(dtos, dtos.Count));
         }
     }
 }

@@ -53,7 +53,7 @@ public static class ProvisionTenantLicense
             var now = dateTimeProvider.UtcNow;
 
             if (!Enum.TryParse<TenantPlan>(request.Plan, ignoreCase: true, out var plan))
-                return Result.Failure<Response>("Invalid plan value.");
+                return Error.Validation("license.invalidPlan", "Invalid plan value.");
 
             var existing = await repository.GetByTenantIdAsync(request.TenantId, cancellationToken);
 
@@ -76,9 +76,9 @@ public static class ProvisionTenantLicense
                 repository.Update(license);
             }
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
-            return Result.Success(new Response(
+            return Result<Response>.Success(new Response(
                 license.Id.Value,
                 license.Plan.ToString(),
                 license.Status,

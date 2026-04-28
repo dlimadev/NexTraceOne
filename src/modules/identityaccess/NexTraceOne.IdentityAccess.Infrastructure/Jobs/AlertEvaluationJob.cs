@@ -145,7 +145,7 @@ internal sealed class AlertEvaluationJob(
             clock.UtcNow);
 
         firingRepo.Add(record);
-        await uow.SaveChangesAsync(ct);
+        await uow.CommitAsync(ct);
 
         logger.LogInformation("Alert fired: {RuleName} for tenant {TenantId}.", rule.Name, rule.TenantId);
     }

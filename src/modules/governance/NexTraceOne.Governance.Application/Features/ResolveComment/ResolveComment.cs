@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Application.Features.ResolveComment;
 
@@ -30,11 +31,11 @@ public static class ResolveComment
         {
             var comment = await repository.GetByIdAsync(new DashboardCommentId(request.CommentId), request.TenantId, cancellationToken);
             if (comment is null)
-                return Result.Failure<Response>(Error.NotFound("comment.notFound", "Comment not found."));
+                return Error.NotFound("comment.notFound", "Comment not found.");
 
             comment.Resolve(request.UserId, clock.UtcNow);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result.Success(new Response(comment.Id.Value, comment.IsResolved, comment.ResolvedByUserId!, comment.ResolvedAt!.Value));
+            await unitOfWork.CommitAsync(cancellationToken);
+            return Result<Response>.Success(new Response(comment.Id.Value, comment.IsResolved, comment.ResolvedByUserId!, comment.ResolvedAt!.Value));
         }
     }
 }

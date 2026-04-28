@@ -45,7 +45,7 @@ public static class ResolveAlert
 
             var record = await repository.GetByIdAsync(AlertFiringRecordId.From(request.RecordId), cancellationToken);
             if (record is null)
-                return Result.Failure<Response>("Alert firing record not found.");
+                return Error.NotFound("alert.notFound", "Alert firing record not found.");
 
             if (request.Action == "silence")
                 record.Silence(now);
@@ -53,9 +53,9 @@ public static class ResolveAlert
                 record.Resolve(request.Reason, now);
 
             repository.Update(record);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
-            return Result.Success(new Response(record.Id.Value, record.Status.ToString()));
+            return Result<Response>.Success(new Response(record.Id.Value, record.Status.ToString()));
         }
     }
 }

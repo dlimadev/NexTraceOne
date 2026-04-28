@@ -52,7 +52,7 @@ public static class GetAlertFiringHistory
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
-            var tenantId = currentTenant.TenantId;
+            var tenantId = currentTenant.Id;
 
             AlertFiringStatus? statusFilter = null;
             if (!string.IsNullOrWhiteSpace(request.StatusFilter) &&
@@ -75,7 +75,7 @@ public static class GetAlertFiringHistory
                 r.ResolvedAt,
                 r.ResolvedReason)).ToList();
 
-            return Result.Success(new Response(
+            return Result<Response>.Success(new Response(
                 dtos,
                 records.Count(r => r.Status == AlertFiringStatus.Firing),
                 records.Count(r => r.Status == AlertFiringStatus.Resolved),

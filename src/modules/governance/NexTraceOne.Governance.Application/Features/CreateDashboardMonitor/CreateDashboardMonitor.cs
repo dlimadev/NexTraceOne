@@ -62,8 +62,8 @@ public static class CreateDashboardMonitor
                 request.NotificationChannels, clock.UtcNow);
 
             await repository.AddAsync(monitor, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result.Success(new Response(monitor.Id.Value, monitor.Name, monitor.Severity, monitor.Status));
+            await unitOfWork.CommitAsync(cancellationToken);
+            return Result<Response>.Success(new Response(monitor.Id.Value, monitor.Name, monitor.Severity, monitor.Status));
         }
     }
 }

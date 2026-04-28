@@ -51,7 +51,7 @@ public static class RecordAgentHeartbeat
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request);
-            var tenantId = currentTenant.TenantId;
+            var tenantId = currentTenant.Id;
             var now = dateTimeProvider.UtcNow;
 
             var existing = await repository.GetByHostUnitIdAsync(tenantId, request.HostUnitId, cancellationToken);
@@ -86,9 +86,9 @@ public static class RecordAgentHeartbeat
                 licenseRepository.Update(license);
             }
 
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
 
-            return Result.Success(new Response(
+            return Result<Response>.Success(new Response(
                 registration.Id.Value,
                 registration.HostUnits,
                 registration.Status.ToString()));
