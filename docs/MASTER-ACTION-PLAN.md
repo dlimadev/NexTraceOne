@@ -10,6 +10,7 @@
 
 | Grupo | Ficheiro de Plano | Prioridade | Esforço estimado |
 |-------|-------------------|------------|-----------------|
+| **0 — Forensic Fixes (gaps reais)** | [PLAN-08-FORENSIC-FIXES.md](./plans/PLAN-08-FORENSIC-FIXES.md) | 🔴 Urgente | 3–6 semanas |
 | **1 — Ingestion Pipeline** | [PLAN-01-INGESTION-PIPELINE.md](./plans/PLAN-01-INGESTION-PIPELINE.md) | 🔴 Alta | 6–10 semanas |
 | **2 — Core Completions** | [PLAN-02-CORE-COMPLETIONS.md](./plans/PLAN-02-CORE-COMPLETIONS.md) | 🔴 Alta | 4–6 semanas |
 | **3 — Frontend V3 (Wave AA)** | [PLAN-03-FRONTEND-V3.md](./plans/PLAN-03-FRONTEND-V3.md) | 🟡 Média | 16–24 semanas |
@@ -18,7 +19,10 @@
 | **6 — SaaS Evolution** | [PLAN-06-SAAS-EVOLUTION.md](./plans/PLAN-06-SAAS-EVOLUTION.md) | 🟠 Roadmap | 12–20 semanas |
 | **7 — Legacy/Mainframe** | [PLAN-07-LEGACY.md](./plans/PLAN-07-LEGACY.md) | 🔵 Futuro | 24+ semanas |
 
-**Total estimado:** 91–133 semanas de esforço (paralelizável em múltiplas frentes)
+**Total estimado:** 94–139 semanas de esforço (paralelizável em múltiplas frentes)
+
+> **Análise forense completa:** [FORENSIC-ANALYSIS-2026-04.md](./FORENSIC-ANALYSIS-2026-04.md) — estado real do projeto com problemas concretos identificados.  
+> **Plano de ação executivo:** [PLAN-ACTION-2026-04.md](./PLAN-ACTION-2026-04.md) — tasks detalhadas com critérios de aceite.
 
 ---
 
