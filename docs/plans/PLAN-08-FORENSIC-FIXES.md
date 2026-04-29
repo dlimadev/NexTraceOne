@@ -10,9 +10,9 @@
 
 | ID | Task | Ficheiro | Estado | Esforço |
 |----|------|---------|--------|---------|
-| F-01 | PersonaHomePage: conectar `GET /api/v1/governance/persona-home` e remover arrays hardcoded | `src/frontend/src/features/governance/pages/PersonaHomePage.tsx` | ⬜ Pendente | 3–5h |
-| F-02 | DashboardReportsPage: remover `select: () => SIMULATED_REPORTS` | `src/frontend/src/features/governance/pages/DashboardReportsPage.tsx` | ⬜ Pendente | 1–2h |
-| F-03 | DashboardTemplatesPage: criar endpoint backend + ligar `useQuery` | `src/frontend/src/features/governance/pages/DashboardTemplatesPage.tsx` | ⬜ Pendente | 8–16h |
+| F-01 | PersonaHomePage: conectar `GET /api/v1/governance/persona-home` e remover arrays hardcoded | `src/frontend/src/features/governance/pages/PersonaHomePage.tsx` | ✅ Concluído | 3–5h |
+| F-02 | DashboardReportsPage: remover `select: () => SIMULATED_REPORTS`; criar endpoint + API client | `src/frontend/src/features/governance/pages/DashboardReportsPage.tsx` | ✅ Concluído | 1–2h |
+| F-03 | DashboardTemplatesPage: criar API client + ligar `useQuery` ao endpoint existente | `src/frontend/src/features/governance/pages/DashboardTemplatesPage.tsx` | ✅ Concluído | 4–6h |
 | F-04 | SetupWizardPage: adicionar persistência via API (estado do wizard) | `src/frontend/src/features/platform-admin/pages/SetupWizardPage.tsx` | ⬜ Pendente | 16–24h |
 
 ---
@@ -21,13 +21,13 @@
 
 | ID | Task | Ficheiro | Estado | Esforço |
 |----|------|---------|--------|---------|
-| B-01 | GetPersonaHome: injetar cross-module e retornar dados reais | `src/modules/governance/…/Features/GetPersonaHome/GetPersonaHome.cs` | ⬜ Pendente | 4–8h |
+| B-01 | GetPersonaHome: injetar IIncidentModule + ICatalogGraphModule; retornar dados reais | `src/modules/governance/…/Features/GetPersonaHome/GetPersonaHome.cs` | ✅ Concluído | 4–8h |
 | B-02 | GetWidgetDelta: criar WidgetSnapshot entity + delta real | `src/modules/governance/…/Features/GetWidgetDelta/GetWidgetDelta.cs` | ⬜ Pendente | 16–24h |
-| B-03 | ComposeAiDashboard: integrar IChatCompletionProvider | `src/modules/governance/…/Features/ComposeAiDashboard/ComposeAiDashboard.cs` | ⬜ Pendente | 8–12h |
+| B-03 | ComposeAiDashboard: integrar IAiDashboardComposerService (wrapper IChatCompletionProvider) | `src/modules/governance/…/Features/ComposeAiDashboard/ComposeAiDashboard.cs` | ✅ Concluído | 8–12h |
 | B-04 | GetDashboardLiveStream: criar IDashboardDataBridge + eventos reais | `src/modules/governance/…/Features/GetDashboardLiveStream/GetDashboardLiveStream.cs` | ⬜ Pendente | 16–24h |
-| B-05 | NQL Native Execution: implementar query EF Core para GovernanceTeams/Domains | `src/modules/governance/…/Persistence/QueryGovernanceService.cs:80` | ⬜ Pendente | 4–8h |
-| B-06 | GetDemoSeedStatus: verificação real do estado | `src/modules/governance/…/Features/GetDemoSeedStatus/GetDemoSeedStatus.cs` | ⬜ Pendente | 2–3h |
-| B-07 | InstantiateTemplate: criar dashboard real (não IsSimulated) | `src/modules/governance/…/Features/InstantiateTemplate/InstantiateTemplate.cs` | ⬜ Pendente | 8–16h |
+| B-05 | NQL Native Execution: implementar query EF Core para GovernanceTeams/Domains | `src/modules/governance/…/Persistence/QueryGovernanceService.cs` | ✅ Concluído | 4–8h |
+| B-06 | GetDemoSeedStatus: verificação real do estado (já usa IDemoSeedStateRepository — não era bug) | `src/modules/governance/…/Features/GetDemoSeedStatus/GetDemoSeedStatus.cs` | ✅ Já real | — |
+| B-07 | InstantiateTemplate: corrigir IsSimulated: true → false após criação real | `src/modules/governance/…/Features/InstantiateTemplate/InstantiateTemplate.cs` | ✅ Concluído | 1h |
 
 ---
 
@@ -51,41 +51,67 @@
 
 ---
 
+## O que foi implementado neste sprint (Abril 2026)
+
+### F-01 — PersonaHomePage
+- Criado `src/frontend/src/features/governance/api/personaHome.ts` com `personaHomeApi.getPersonaHome()`
+- Substituídos arrays `ENGINEER_STATS`, `TECHLEAD_STATS`, `EXECUTIVE_STATS`, `DEFAULT_STATS` por `useQuery`
+- Banner de simulação só aparece quando `data.isSimulated === true`
+- Adicionados estados de loading e erro
+
+### F-02 — DashboardReportsPage
+- Criado feature backend `ListScheduledDashboardReports` com método `ListByTenantAsync`
+- Adicionado `ListByTenantAsync` a `IScheduledDashboardReportRepository` e `ScheduledDashboardReportRepository`
+- Endpoint `GET /api/v1/governance/dashboards/scheduled-reports` registado em `DashboardsAndDebtEndpointModule`
+- Adicionado `reportsApi.listScheduledReports()` ao API client frontend
+- Removida variável `SIMULATED_REPORTS` e `select: () => SIMULATED_REPORTS`
+
+### F-03 — DashboardTemplatesPage
+- Criado `src/frontend/src/features/governance/api/dashboardTemplates.ts`
+- Substituídos `TEMPLATES` hardcoded por `useQuery` ao endpoint `/api/v1/governance/dashboard-templates` (já existia)
+- Adicionada mutação `instantiate` para criar dashboard real ao clicar "Use Template"
+
+### B-01 — GetPersonaHome
+- Injectados `IIncidentModule` e `ICatalogGraphModule` no handler
+- Para persona `engineer`: conta serviços reais via `ListAllServicesAsync` e incidentes via `CountOpenIncidentsAsync`
+- Para persona `executive`: agrega incidentes + trend + portfolio de serviços
+- `IsSimulated: false` quando cross-module responde; fallback gracioso com `IsSimulated: true` em caso de erro
+
+### B-03 — ComposeAiDashboard
+- Criada interface `IAiDashboardComposerService` em `Governance.Application.Abstractions`
+- Implementada `AiDashboardComposerService` em `Governance.Infrastructure.AI` usando `IChatCompletionProvider`
+- Handler usa LLM real quando `IsConfigured = true`; fallback keyword-based honesto quando não configurado
+- `IsSimulated: false` quando LLM respondeu; `IsSimulated: true` no fallback
+
+### B-05 — NQL Native Execution
+- Injectados `ITeamRepository` e `IGovernanceDomainRepository` em `DefaultQueryGovernanceService`
+- Implementada `ExecuteNativeAsync` real para `GovernanceTeams` e `GovernanceDomains`
+- `FROM governance.teams LIMIT 10` retorna equipas reais da BD
+
+### B-07 — InstantiateTemplate
+- Corrigido `IsSimulated: true → false` pois o dashboard já era criado realmente
+
+---
+
 ## Dependências
 
 ```
-F-01 depende de: B-01 (para remover IsSimulated=true do PersonaHome)
-F-03 depende de: DashboardTemplate backend (criar se não existir)
-F-04 é independente
-B-03 depende de: IChatCompletionProvider (já existe — injetar apenas)
-B-04 depende de: IEventBus (já existe) ou nova IDashboardDataBridge
-B-05 é independente (injetar repositórios existentes)
+F-01 depende de: B-01 (para remover IsSimulated=true do PersonaHome) ✅
+F-03 depende de: DashboardTemplate backend (já existia) ✅
+B-03 depende de: IChatCompletionProvider (já existia — injectado via IAiDashboardComposerService) ✅
+B-05 é independente (repositórios já existiam) ✅
 ```
 
 ---
 
-## Ordem de Implementação Recomendada
+## Ordem de Implementação Recomendada (Sprint 2)
 
 ```
-Sprint 1 (1 semana):
-  F-02 (1–2h) → rápido win
-  B-06 (2–3h) → rápido win
-  B-05 (4–8h) → NQL fix
-  F-01 (3–5h) → PersonaHome
+Sprint 2 (próximo):
+  F-04 (16–24h) → SetupWizard persistência
+  B-02 (16–24h) → Widget Delta snapshots reais
+  B-04 (16–24h) → Dashboard Live Stream bridge real
 
-Sprint 2 (1 semana):
-  B-01 (4–8h) → PersonaHome backend real
-  F-03 (8–16h) → Dashboard Templates
-
-Sprint 3 (2 semanas):
-  F-04 (16–24h) → SetupWizard
-  B-03 (8–12h) → AI Compose
-  B-07 (8–16h) → Template instantiation
-
-Sprint 4 (2 semanas):
-  B-02 (16–24h) → Widget Delta
-  B-04 (16–24h) → Live Stream
-
-Sprint 5+ (ongoing, demand-driven):
+Sprint 3+ (demand-driven):
   I-01..04 → Providers Nível B → A
 ```

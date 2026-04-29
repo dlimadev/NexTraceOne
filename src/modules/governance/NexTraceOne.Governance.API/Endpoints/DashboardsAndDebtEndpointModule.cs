@@ -44,6 +44,7 @@ using ListDashboardMonitorsFeature = NexTraceOne.Governance.Application.Features
 using ListDashboardTemplatesFeature = NexTraceOne.Governance.Application.Features.ListDashboardTemplates.ListDashboardTemplates;
 using InstantiateTemplateFeature = NexTraceOne.Governance.Application.Features.InstantiateTemplate.InstantiateTemplate;
 using GetPersonaHomeFeature = NexTraceOne.Governance.Application.Features.GetPersonaHome.GetPersonaHome;
+using ListScheduledDashboardReportsFeature = NexTraceOne.Governance.Application.Features.ListScheduledDashboardReports.ListScheduledDashboardReports;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -427,6 +428,18 @@ public sealed class DashboardsAndDebtEndpointModule
     private static void MapReportsAndEmbedEndpoints(IEndpointRouteBuilder app)
     {
         var dashboards = app.MapGroup("/api/v1/governance/dashboards");
+
+        // GET /api/v1/governance/dashboards/scheduled-reports
+        dashboards.MapGet("/scheduled-reports", async (
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListScheduledDashboardReportsFeature.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
 
         // POST /api/v1/governance/dashboards/{id}/schedule-report
         dashboards.MapPost("/{id:guid}/schedule-report", async (

@@ -88,7 +88,7 @@ public static class InstantiateTemplate
                 dashboard.Id.Value,
                 dashboard.Name,
                 template.Id.Value,
-                IsSimulated: true));
+                IsSimulated: false));
         }
     }
 }

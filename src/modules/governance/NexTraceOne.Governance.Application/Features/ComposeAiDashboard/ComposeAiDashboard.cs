@@ -1,6 +1,7 @@
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 
 namespace NexTraceOne.Governance.Application.Features.ComposeAiDashboard;
 
@@ -10,10 +11,8 @@ namespace NexTraceOne.Governance.Application.Features.ComposeAiDashboard;
 /// e devolve uma PROPOSTA estruturada de dashboard (variáveis, layout, widgets, NQL)
 /// como DRAFT — nunca aplica sem aprovação humana.
 ///
-/// Honest gap: o grounding real em Catalog/Contracts/Changes/Incidents e a invocação
-/// de LLM requerem bridges que serão ligadas na camada de infraestrutura.
-/// O handler atual devolve IsSimulated=true + proposta estruturada determinística
-/// baseada em keyword analysis do prompt para uso no frontend sem um LLM ativo.
+/// Quando IAiDashboardComposerService.IsConfigured = true, usa o LLM real.
+/// Quando não configurado, usa keyword analysis como fallback honesto (IsSimulated: true).
 ///
 /// Wave V3.4 — AI-assisted Dashboard Creation &amp; Notebook Mode.
 /// </summary>
@@ -65,32 +64,69 @@ public static class ComposeAiDashboard
         }
     }
 
-    public sealed class Handler : ICommandHandler<Command, Response>
+    public sealed class Handler(IAiDashboardComposerService aiComposer) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // Honest-gap: keyword analysis generates a deterministic proposal
-            // until AI bridge is connected in infrastructure.
-            var prompt = request.Prompt.ToLowerInvariant();
+            var groundingContext = BuildGroundingContext(request);
 
+            if (aiComposer.IsConfigured)
+            {
+                var aiRequest = new AiDashboardCompositionRequest(
+                    request.Prompt,
+                    request.Persona,
+                    request.TenantId,
+                    request.TeamId,
+                    request.EnvironmentId,
+                    request.ServiceIds);
+
+                var proposal = await aiComposer.ComposeAsync(aiRequest, cancellationToken);
+
+                if (proposal is not null)
+                {
+                    var aiVariables = proposal.Variables
+                        .Select(v => new ProposedVariableDto(v.Key, v.Label, v.Type, v.DefaultValue))
+                        .ToList();
+                    var aiWidgets = proposal.Widgets
+                        .Select(w => new ProposedWidgetDto(
+                            w.WidgetType, w.Title, w.ServiceFilter, w.NqlQuery,
+                            w.GridX, w.GridY, w.GridWidth, w.GridHeight))
+                        .ToList();
+
+                    return Result<Response>.Success(new Response(
+                        IsSimulated: false,
+                        SimulatedNote: null,
+                        ProposedTitle: proposal.Title,
+                        ProposedLayout: proposal.Layout,
+                        ProposedVariables: aiVariables,
+                        ProposedWidgets: aiWidgets,
+                        GroundingContext: groundingContext,
+                        GeneratedAt: DateTimeOffset.UtcNow));
+                }
+            }
+
+            // Fallback: keyword analysis quando LLM não configurado ou falhou
+            var prompt = request.Prompt.ToLowerInvariant();
             var title = InferTitle(prompt, request.Persona);
             var variables = BuildVariables(request.Persona, request.TeamId, request.EnvironmentId);
             var widgets = BuildWidgets(prompt, request.Persona, request.ServiceIds);
 
-            var response = new Response(
+            var simulatedNote = aiComposer.IsConfigured
+                ? "AI provider returned no content; keyword analysis used as fallback."
+                : "Dashboard proposal generated via keyword analysis. Connect AI model for LLM-grounded composition.";
+
+            return Result<Response>.Success(new Response(
                 IsSimulated: true,
-                SimulatedNote: "Dashboard proposal generated via keyword analysis. Connect AI model for LLM-grounded composition.",
+                SimulatedNote: simulatedNote,
                 ProposedTitle: title,
                 ProposedLayout: "grid",
                 ProposedVariables: variables,
                 ProposedWidgets: widgets,
-                GroundingContext: BuildGroundingContext(request),
-                GeneratedAt: DateTimeOffset.UtcNow);
-
-            return Task.FromResult(Result<Response>.Success(response));
+                GroundingContext: groundingContext,
+                GeneratedAt: DateTimeOffset.UtcNow));
         }
 
-        // ── helpers ───────────────────────────────────────────────────────────
+        // ── keyword analysis fallback helpers ─────────────────────────────────
 
         private static string InferTitle(string prompt, string persona)
         {
@@ -128,10 +164,8 @@ public static class ComposeAiDashboard
         {
             var widgets = new List<ProposedWidgetDto>();
             var serviceFilter = serviceIds is { Count: > 0 } ? serviceIds[0] : null;
-
             var row = 0;
 
-            // Always include a service health overview
             widgets.Add(new("service-scorecard", "Service Health", serviceFilter, null, 0, row, 6, 4));
 
             if (prompt.Contains("slo") || prompt.Contains("reliability") || persona is "Engineer" or "TechLead")
@@ -171,7 +205,6 @@ public static class ComposeAiDashboard
                 row += 5;
             }
 
-            // Persona-specific additions
             if (persona is "Executive" or "CTO")
             {
                 widgets.Add(new("top-services", "Top Risk Services", null, null, 0, row, 6, 4));

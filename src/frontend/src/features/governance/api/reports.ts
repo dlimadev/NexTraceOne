@@ -138,4 +138,15 @@ export const reportsApi = {
         params: { tenantId, windowDays },
       })
       .then((r) => r.data),
+
+  /**
+   * GET /api/v1/governance/dashboards/scheduled-reports
+   * Lists all scheduled reports for the tenant.
+   */
+  listScheduledReports: (tenantId: string) =>
+    client
+      .get<{ items: ScheduledReport[] }>('/governance/dashboards/scheduled-reports', {
+        params: { tenantId },
+      })
+      .then((r) => r.data.items),
 };

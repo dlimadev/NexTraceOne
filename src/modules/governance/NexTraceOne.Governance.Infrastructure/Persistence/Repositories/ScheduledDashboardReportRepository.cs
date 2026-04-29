@@ -21,6 +21,13 @@ public sealed class ScheduledDashboardReportRepository(GovernanceDbContext db)
             .OrderBy(r => r.CreatedAt)
             .ToListAsync(ct);
 
+    public async Task<IReadOnlyList<ScheduledDashboardReport>> ListByTenantAsync(
+        string tenantId, CancellationToken ct = default)
+        => await db.ScheduledDashboardReports
+            .Where(r => r.TenantId == tenantId)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync(ct);
+
     public async Task<IReadOnlyList<ScheduledDashboardReport>> ListDueAsync(
         DateTimeOffset asOf, CancellationToken ct = default)
         => await db.ScheduledDashboardReports

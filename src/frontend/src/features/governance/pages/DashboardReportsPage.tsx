@@ -22,53 +22,6 @@ import { PageContainer, PageSection } from '../../../components/shell';
 import { reportsApi } from '../api/reports';
 import type { ReportFormat, ScheduledReport } from '../api/reports';
 
-// ── Simulated data ────────────────────────────────────────────────────────────
-
-const SIMULATED_REPORTS: ScheduledReport[] = [
-  {
-    id: 'sr-001',
-    dashboardId: 'db-engineer-home',
-    dashboardName: 'Engineer Home',
-    cronExpression: '0 8 * * 1',
-    format: 'PDF',
-    recipients: ['eng-team@acme.com', 'platform@acme.com'],
-    retentionDays: 30,
-    isActive: true,
-    lastRunAt: new Date(Date.now() - 7 * 86_400_000).toISOString(),
-    nextRunAt: new Date(Date.now() + 1 * 86_400_000).toISOString(),
-    successCount: 12,
-    failureCount: 0,
-  },
-  {
-    id: 'sr-002',
-    dashboardId: 'db-exec-overview',
-    dashboardName: 'Executive Overview',
-    cronExpression: '0 7 * * *',
-    format: 'PDF',
-    recipients: ['cto@acme.com', 'cpo@acme.com', 'cfo@acme.com'],
-    retentionDays: 90,
-    isActive: true,
-    lastRunAt: new Date(Date.now() - 86_400_000).toISOString(),
-    nextRunAt: new Date(Date.now() + 3_600_000).toISOString(),
-    successCount: 45,
-    failureCount: 1,
-  },
-  {
-    id: 'sr-003',
-    dashboardId: 'db-finops',
-    dashboardName: 'FinOps Budget Tracker',
-    cronExpression: '0 9 1 * *',
-    format: 'PNG',
-    recipients: ['finops@acme.com'],
-    retentionDays: 365,
-    isActive: false,
-    lastRunAt: new Date(Date.now() - 35 * 86_400_000).toISOString(),
-    nextRunAt: null,
-    successCount: 3,
-    failureCount: 2,
-  },
-];
-
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 
 const QUERY_KEY = ['dashboard-scheduled-reports'] as const;
@@ -76,10 +29,7 @@ const QUERY_KEY = ['dashboard-scheduled-reports'] as const;
 const useDashboardReports = () =>
   useQuery({
     queryKey: QUERY_KEY,
-    queryFn: () => reportsApi.getUsageAnalytics('default', 30),
-    // returns simulated list via the analytics endpoint; in production this
-    // would be a dedicated GET /api/v1/governance/dashboards/scheduled-reports
-    select: () => SIMULATED_REPORTS,
+    queryFn: () => reportsApi.listScheduledReports('default'),
     staleTime: 60_000,
   });
 
@@ -179,12 +129,6 @@ export function DashboardReportsPage() {
 
   return (
     <PageContainer>
-      {/* IsSimulated banner */}
-      <div className="mb-4 rounded-lg border border-warning/30 bg-warning/8 px-4 py-2 text-xs text-warning font-medium flex items-center gap-2">
-        <CalendarClock size={14} />
-        {t('governance.simulated', 'Simulated data — live scheduling via API in production')}
-      </div>
-
       <PageHeader
         title={t('governance.dashboardReports.title', 'Scheduled Reports')}
         subtitle={t(

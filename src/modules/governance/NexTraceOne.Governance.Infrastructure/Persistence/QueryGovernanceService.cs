@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Nql;
+using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.Governance.Domain.Enums;
 
 namespace NexTraceOne.Governance.Infrastructure.Persistence;
 
@@ -16,6 +18,8 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence;
 /// Wave V3.2 — Query-driven Widgets &amp; Widget SDK.
 /// </summary>
 internal sealed class DefaultQueryGovernanceService(
+    ITeamRepository teamRepository,
+    IGovernanceDomainRepository domainRepository,
     ILogger<DefaultQueryGovernanceService> logger) : IQueryGovernanceService
 {
     private const int HardRowCap = 1000;
@@ -77,17 +81,67 @@ internal sealed class DefaultQueryGovernanceService(
 
     // ─── Native execution (Governance-owned entities) ────────────────────────
 
-    private static Task<List<IReadOnlyList<object?>>> ExecuteNativeAsync(
+    private async Task<List<IReadOnlyList<object?>>> ExecuteNativeAsync(
         NqlPlan plan,
         NqlExecutionContext context,
         int limit,
         CancellationToken ct)
     {
-        // For now, native execution for Governance entities returns empty result sets;
-        // real DB execution will be wired in a follow-up as repositories become queryable.
-        // The simulated data already covers the demonstration use case.
-        ct.ThrowIfCancellationRequested();
-        return Task.FromResult(new List<IReadOnlyList<object?>>());
+        return plan.Entity switch
+        {
+            NqlEntity.GovernanceTeams => await ExecuteTeamsAsync(plan, limit, ct),
+            NqlEntity.GovernanceDomains => await ExecuteDomainsAsync(plan, limit, ct),
+            _ => []
+        };
+    }
+
+    private async Task<List<IReadOnlyList<object?>>> ExecuteTeamsAsync(
+        NqlPlan plan, int limit, CancellationToken ct)
+    {
+        TeamStatus? statusFilter = null;
+        foreach (var filter in plan.Filters)
+        {
+            if (filter.Field.Equals("status", StringComparison.OrdinalIgnoreCase) &&
+                Enum.TryParse<TeamStatus>(filter.Value, ignoreCase: true, out var s))
+                statusFilter = s;
+        }
+
+        var teams = await teamRepository.ListAsync(statusFilter, ct);
+
+        return teams
+            .Take(limit)
+            .Select(t => (IReadOnlyList<object?>)new object?[]
+            {
+                t.DisplayName,
+                t.Name,
+                t.Status.ToString(),
+                0  // member_count: bridge cross-module pendente
+            })
+            .ToList();
+    }
+
+    private async Task<List<IReadOnlyList<object?>>> ExecuteDomainsAsync(
+        NqlPlan plan, int limit, CancellationToken ct)
+    {
+        DomainCriticality? critFilter = null;
+        foreach (var filter in plan.Filters)
+        {
+            if (filter.Field.Equals("criticality", StringComparison.OrdinalIgnoreCase) &&
+                Enum.TryParse<DomainCriticality>(filter.Value, ignoreCase: true, out var c))
+                critFilter = c;
+        }
+
+        var domains = await domainRepository.ListAsync(critFilter, ct);
+
+        return domains
+            .Take(limit)
+            .Select(d => (IReadOnlyList<object?>)new object?[]
+            {
+                d.DisplayName,
+                d.Criticality.ToString(),
+                0  // team_count: bridge cross-module pendente
+            })
+            .ToList();
     }
 
     // ─── Simulated results (honest gap) ──────────────────────────────────────

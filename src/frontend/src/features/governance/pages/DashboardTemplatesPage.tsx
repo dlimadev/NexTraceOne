@@ -1,163 +1,19 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, BarChart3, DollarSign, ShieldCheck, Users, Layers, FlaskConical } from 'lucide-react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { LayoutDashboard, BarChart3, DollarSign, ShieldCheck, Users, Layers } from 'lucide-react';
 import { Card, CardBody, CardFooter } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
 import { PageHeader } from '../../../components/PageHeader';
 import { EmptyState } from '../../../components/EmptyState';
 import { PageContainer, PageSection } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { dashboardTemplatesApi, type DashboardTemplateDto } from '../api/dashboardTemplates';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type TemplateCategory = 'All' | 'Services' | 'Operations' | 'FinOps' | 'Compliance' | 'Teams';
-
-interface DashboardTemplate {
-  id: string;
-  name: string;
-  description: string;
-  category: Exclude<TemplateCategory, 'All'>;
-  persona: string;
-  widgetCount: number;
-  layout: string;
-  isNew?: boolean;
-  isFeatured?: boolean;
-}
-
-// ── Simulated data ────────────────────────────────────────────────────────────
-
-const TEMPLATES: DashboardTemplate[] = [
-  // Services
-  {
-    id: 'tpl-svc-health',
-    name: 'Service Health Overview',
-    description: 'Real-time health status, SLO burn rates, error budgets, and alert counts for all services.',
-    category: 'Services',
-    persona: 'Engineer',
-    widgetCount: 8,
-    layout: 'two-column',
-    isFeatured: true,
-  },
-  {
-    id: 'tpl-svc-dep-map',
-    name: 'Dependency Map',
-    description: 'Visualise service dependency graphs, blast radius indicators, and upstream/downstream contract coverage.',
-    category: 'Services',
-    persona: 'Architect',
-    widgetCount: 5,
-    layout: 'single-column',
-  },
-  {
-    id: 'tpl-svc-dora',
-    name: 'DORA Metrics by Service',
-    description: 'Deployment frequency, change failure rate, MTTR, and lead time broken down per service.',
-    category: 'Services',
-    persona: 'TechLead',
-    widgetCount: 6,
-    layout: 'two-column',
-    isNew: true,
-  },
-  // Operations
-  {
-    id: 'tpl-ops-incidents',
-    name: 'Incident Command Center',
-    description: 'Active incidents, MTTR trend, on-call assignments, and SLO impact summary for Ops teams.',
-    category: 'Operations',
-    persona: 'Engineer',
-    widgetCount: 9,
-    layout: 'three-column',
-    isFeatured: true,
-  },
-  {
-    id: 'tpl-ops-oncall',
-    name: 'On-Call Summary',
-    description: 'Escalation chains, current on-call roster, recent pages, and runbook quick-links.',
-    category: 'Operations',
-    persona: 'Engineer',
-    widgetCount: 5,
-    layout: 'two-column',
-  },
-  {
-    id: 'tpl-ops-change',
-    name: 'Change Management Board',
-    description: 'Pending changes, approval queue, Change Confidence scores, and deployment timeline.',
-    category: 'Operations',
-    persona: 'TechLead',
-    widgetCount: 7,
-    layout: 'two-column',
-    isNew: true,
-  },
-  // FinOps
-  {
-    id: 'tpl-finops-budget',
-    name: 'Budget Burn Tracker',
-    description: 'Cloud spend vs. budget, forecast burn, anomaly flags, and cost-per-service breakdown.',
-    category: 'FinOps',
-    persona: 'Executive',
-    widgetCount: 8,
-    layout: 'two-column',
-    isFeatured: true,
-  },
-  {
-    id: 'tpl-finops-waste',
-    name: 'Waste & Optimisation',
-    description: 'Idle resource detection, rightsizing recommendations, and savings opportunity timeline.',
-    category: 'FinOps',
-    persona: 'Executive',
-    widgetCount: 6,
-    layout: 'two-column',
-  },
-  {
-    id: 'tpl-finops-team',
-    name: 'Team Cost Allocation',
-    description: 'Cost attribution by team and service, with chargeback summaries and MoM trend.',
-    category: 'FinOps',
-    persona: 'TechLead',
-    widgetCount: 5,
-    layout: 'two-column',
-  },
-  // Compliance
-  {
-    id: 'tpl-comp-posture',
-    name: 'Compliance Posture',
-    description: 'Policy pass rates, open waivers, audit evidence gaps, and maturity scores by domain.',
-    category: 'Compliance',
-    persona: 'Auditor',
-    widgetCount: 10,
-    layout: 'three-column',
-    isFeatured: true,
-  },
-  {
-    id: 'tpl-comp-gates',
-    name: 'Governance Gates',
-    description: 'Gates status per service, blocked deployments, approval queue, and policy violations.',
-    category: 'Compliance',
-    persona: 'Auditor',
-    widgetCount: 7,
-    layout: 'two-column',
-  },
-  // Teams
-  {
-    id: 'tpl-team-health',
-    name: 'Team Health Dashboard',
-    description: 'Velocity, cycle time, blockers, SLO ownership gaps, and on-call burden for a team.',
-    category: 'Teams',
-    persona: 'TechLead',
-    widgetCount: 8,
-    layout: 'two-column',
-    isFeatured: true,
-  },
-  {
-    id: 'tpl-team-ownership',
-    name: 'Ownership Coverage',
-    description: 'Services missing owners, stale contacts, and team-to-service assignment overview.',
-    category: 'Teams',
-    persona: 'TechLead',
-    widgetCount: 4,
-    layout: 'two-column',
-    isNew: true,
-  },
-];
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -194,24 +50,27 @@ function personaVariant(persona: string): 'info' | 'success' | 'warning' | 'defa
 // ── TemplateCard ──────────────────────────────────────────────────────────────
 
 interface TemplateCardProps {
-  template: DashboardTemplate;
-  onUse: (id: string) => void;
+  template: DashboardTemplateDto;
+  onUse: (id: string, name: string) => void;
+  isUsingId: string | null;
 }
 
-function TemplateCard({ template, onUse }: TemplateCardProps) {
+function TemplateCard({ template, onUse, isUsingId }: TemplateCardProps) {
   const { t } = useTranslation();
+  const isFeatured = template.tags.includes('featured');
+  const isNew = template.tags.includes('new');
 
   return (
     <Card variant="interactive" className="flex flex-col h-full">
       <CardBody className="flex-1">
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex items-center gap-1.5 flex-wrap">
-            {template.isFeatured && (
+            {isFeatured && (
               <Badge variant="warning" size="sm">
                 {t('governance.templates.featured', 'Featured')}
               </Badge>
             )}
-            {template.isNew && (
+            {isNew && (
               <Badge variant="success" size="sm">
                 {t('governance.templates.new', 'New')}
               </Badge>
@@ -227,13 +86,12 @@ function TemplateCard({ template, onUse }: TemplateCardProps) {
 
         <div className="flex items-center gap-3 text-xs text-muted">
           <span className="flex items-center gap-1">
-            <LayoutDashboard size={11} />
-            {template.widgetCount}{' '}
-            {t('governance.templates.widgets', 'widgets')}
+            <Layers size={11} />
+            {template.category}
           </span>
           <span className="flex items-center gap-1">
-            <Layers size={11} />
-            {template.layout}
+            <LayoutDashboard size={11} />
+            {template.installCount} {t('governance.templates.installs', 'installs')}
           </span>
         </div>
       </CardBody>
@@ -242,9 +100,12 @@ function TemplateCard({ template, onUse }: TemplateCardProps) {
         <Button
           size="sm"
           className="w-full"
-          onClick={() => onUse(template.id)}
+          disabled={isUsingId === template.id}
+          onClick={() => onUse(template.id, template.name)}
         >
-          {t('governance.templates.useTemplate', 'Use Template')}
+          {isUsingId === template.id
+            ? t('governance.templates.applying', 'Applying…')
+            : t('governance.templates.useTemplate', 'Use Template')}
         </Button>
       </CardFooter>
     </Card>
@@ -256,36 +117,51 @@ function TemplateCard({ template, onUse }: TemplateCardProps) {
 /**
  * DashboardTemplatesPage — V3.8 Marketplace/Templates gallery.
  *
- * Provides a filterable grid of pre-built dashboard templates organised by
- * category (Services, Operations, FinOps, Compliance, Teams). Users can
- * select a template to seed a new dashboard in the builder.
+ * Filterable grid of pre-built dashboard templates from the backend.
+ * Falls back gracefully when API returns no templates.
  */
 export function DashboardTemplatesPage() {
   const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<TemplateCategory>('All');
   const [usedId, setUsedId] = useState<string | null>(null);
+  const [isUsingId, setIsUsingId] = useState<string | null>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['dashboard-templates'],
+    queryFn: () => dashboardTemplatesApi.list('default'),
+    staleTime: 5 * 60_000,
+  });
+
+  const instantiate = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) =>
+      dashboardTemplatesApi.instantiate(id, {
+        tenantId: 'default',
+        userId: 'current',
+        customName: name,
+      }),
+    onSuccess: (result, vars) => {
+      setUsedId(vars.id);
+      setIsUsingId(null);
+    },
+    onError: () => setIsUsingId(null),
+  });
+
+  const allTemplates = data?.items ?? [];
 
   const filtered =
     activeCategory === 'All'
-      ? TEMPLATES
-      : TEMPLATES.filter((tpl) => tpl.category === activeCategory);
+      ? allTemplates
+      : allTemplates.filter(
+          (tpl) => tpl.category.toLowerCase() === activeCategory.toLowerCase(),
+        );
 
-  const handleUse = (id: string) => {
-    setUsedId(id);
-    // In production: navigate to /governance/dashboards/new?templateId=id
+  const handleUse = (id: string, name: string) => {
+    setIsUsingId(id);
+    instantiate.mutate({ id, name });
   };
 
   return (
     <PageContainer>
-      {/* IsSimulated banner */}
-      <div className="mb-4 rounded-lg border border-warning/30 bg-warning/8 px-4 py-2 text-xs text-warning font-medium flex items-center gap-2">
-        <FlaskConical size={14} />
-        {t(
-          'governance.simulated',
-          'Simulated data — templates are seeded locally; live marketplace in production',
-        )}
-      </div>
-
       <PageHeader
         title={t('governance.templates.title', 'Dashboard Templates')}
         subtitle={t(
@@ -294,7 +170,7 @@ export function DashboardTemplatesPage() {
         )}
         badge={
           <Badge variant="info">
-            {TEMPLATES.length} {t('governance.templates.count', 'templates')}
+            {allTemplates.length} {t('governance.templates.count', 'templates')}
           </Badge>
         }
       />
@@ -327,7 +203,7 @@ export function DashboardTemplatesPage() {
           <span>
             {t(
               'governance.templates.usedConfirm',
-              'Template applied — opening Dashboard Builder...',
+              'Template applied — opening Dashboard Builder…',
             )}
           </span>
           <button
@@ -341,7 +217,9 @@ export function DashboardTemplatesPage() {
       )}
 
       <PageSection>
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <PageLoadingState />
+        ) : filtered.length === 0 ? (
           <EmptyState
             icon={<LayoutDashboard size={24} />}
             title={t('governance.templates.empty', 'No templates in this category')}
@@ -362,7 +240,12 @@ export function DashboardTemplatesPage() {
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((tpl) => (
-              <TemplateCard key={tpl.id} template={tpl} onUse={handleUse} />
+              <TemplateCard
+                key={tpl.id}
+                template={tpl}
+                onUse={handleUse}
+                isUsingId={isUsingId}
+              />
             ))}
           </div>
         )}
