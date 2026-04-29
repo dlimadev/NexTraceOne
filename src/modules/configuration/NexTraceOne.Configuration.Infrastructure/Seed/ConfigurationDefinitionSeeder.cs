@@ -10838,5 +10838,94 @@ public sealed class ConfigurationDefinitionSeeder(ConfigurationDbContext dbConte
             defaultValue: "true",
             uiEditorType: "toggle",
             sortOrder: 13040),
+
+        // ── Wave BD: AI Organizational Intelligence & Memory Analytics ────────
+        ConfigurationDefinition.Create(
+            key: "ai.memory_health.lookback_days",
+            displayName: "config.ai.memory_health.lookback_days.label",
+            description: "config.ai.memory_health.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 14000),
+
+        ConfigurationDefinition.Create(
+            key: "ai.memory_health.stale_threshold_days",
+            displayName: "config.ai.memory_health.stale_threshold_days.label",
+            description: "config.ai.memory_health.stale_threshold_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "30",
+            uiEditorType: "number",
+            sortOrder: 14010),
+
+        ConfigurationDefinition.Create(
+            key: "ai.memory_health.min_nodes_active",
+            displayName: "config.ai.memory_health.min_nodes_active.label",
+            description: "config.ai.memory_health.min_nodes_active.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 14020),
+
+        ConfigurationDefinition.Create(
+            key: "ai.agent_benchmark.lookback_days",
+            displayName: "config.ai.agent_benchmark.lookback_days.label",
+            description: "config.ai.agent_benchmark.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 14030),
+
+        ConfigurationDefinition.Create(
+            key: "ai.agent_benchmark.min_executions",
+            displayName: "config.ai.agent_benchmark.min_executions.label",
+            description: "config.ai.agent_benchmark.min_executions.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "5",
+            uiEditorType: "number",
+            sortOrder: 14040),
+
+        ConfigurationDefinition.Create(
+            key: "ai.capability_maturity.lookback_days",
+            displayName: "config.ai.capability_maturity.lookback_days.label",
+            description: "config.ai.capability_maturity.lookback_days.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "90",
+            uiEditorType: "number",
+            sortOrder: 14050),
+
+        ConfigurationDefinition.Create(
+            key: "ai.capability_maturity.pioneer_threshold_pct",
+            displayName: "config.ai.capability_maturity.pioneer_threshold_pct.label",
+            description: "config.ai.capability_maturity.pioneer_threshold_pct.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "20",
+            uiEditorType: "number",
+            sortOrder: 14060),
+
+        ConfigurationDefinition.Create(
+            key: "ai.capability_maturity.min_team_executions",
+            displayName: "config.ai.capability_maturity.min_team_executions.label",
+            description: "config.ai.capability_maturity.min_team_executions.description",
+            category: ConfigurationCategory.Functional,
+            valueType: ConfigurationValueType.Integer,
+            allowedScopes: [ConfigurationScope.System, ConfigurationScope.Tenant],
+            defaultValue: "10",
+            uiEditorType: "number",
+            sortOrder: 14070),
     ];
 }

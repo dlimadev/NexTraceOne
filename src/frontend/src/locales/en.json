@@ -7754,6 +7754,7 @@
     "aiAnalysis": "AI Analysis",
     "aiAssistant": "AI Assistant",
     "aiAudit": "AI Audit",
+    "aiIntelligence": "AI Intelligence",
     "aiBudgets": "Token Budgets",
     "aiIde": "IDE Integrations",
     "aiPolicies": "AI Policies",
@@ -15793,6 +15794,83 @@
       "condition": "Condition",
       "firedAt": "Fired At",
       "actions": "Actions"
+    }
+  },
+  "organizationalMemoryHealth": {
+    "pageTitle": "Memory Intelligence",
+    "pageSubtitle": "Organizational knowledge graph health and coverage",
+    "memoryHealthTier": "Memory Health Tier",
+    "totalNodes": "Total Nodes",
+    "freshNodes": "Fresh Nodes",
+    "staleNodes": "Stale Nodes",
+    "linkedNodes": "Linked Nodes",
+    "freshnessRate": "Freshness Rate",
+    "connectivityRate": "Connectivity Rate",
+    "avgRelevance": "Avg. Relevance",
+    "lookbackDays": "Lookback Period",
+    "nodeTypeBreakdown": "Node Type Breakdown",
+    "recentNodes": "Recent Nodes",
+    "tiers": {
+      "Thriving": "Thriving",
+      "Active": "Active",
+      "Building": "Building",
+      "Sparse": "Sparse",
+      "Empty": "Empty"
+    },
+    "nodeTypes": {
+      "decision": "Decision",
+      "incident": "Incident",
+      "contract_evolution": "Contract Evolution",
+      "pattern_learned": "Pattern Learned",
+      "adr": "ADR"
+    }
+  },
+  "agentPerformanceBenchmark": {
+    "pageTitle": "Agent Benchmark",
+    "pageSubtitle": "Cross-agent performance comparison and tier classification",
+    "totalAgents": "Total Agents",
+    "qualifiedAgents": "Qualified Agents",
+    "avgBenchmarkScore": "Avg. Benchmark Score",
+    "topPerformer": "Top Performer",
+    "benchmarkTier": "Tier",
+    "benchmarkScore": "Score",
+    "accuracyRate": "Accuracy",
+    "avgRating": "Avg. Rating",
+    "feedbackCoverage": "Feedback Coverage",
+    "rlCycles": "RL Cycles",
+    "totalExecutions": "Executions",
+    "tierSummary": "Tier Distribution",
+    "minExecutions": "Min. Executions",
+    "tiers": {
+      "Champion": "Champion",
+      "HighPerformer": "High Performer",
+      "Active": "Active",
+      "Developing": "Developing",
+      "Underperforming": "Underperforming"
+    }
+  },
+  "aiCapabilityMaturity": {
+    "pageTitle": "AI Maturity",
+    "pageSubtitle": "AI capability adoption and organizational maturity assessment",
+    "maturityScore": "Maturity Score",
+    "maturityLevel": "Maturity Level",
+    "activeAgents": "Active Agents",
+    "publishedSkills": "Active Skills",
+    "memoryNodes": "Memory Nodes",
+    "feedbackLoopScore": "Feedback Loop",
+    "rlAdoption": "RL Adoption",
+    "pioneerAdoption": "Pioneer Adoption",
+    "dimensions": "Maturity Dimensions",
+    "dimension": "Dimension",
+    "score": "Score",
+    "actual": "Actual",
+    "lookbackDays": "Lookback Period",
+    "levels": {
+      "Innovating": "Innovating",
+      "Scaling": "Scaling",
+      "Adopting": "Adopting",
+      "Exploring": "Exploring",
+      "Initiating": "Initiating"
     }
   }
 }

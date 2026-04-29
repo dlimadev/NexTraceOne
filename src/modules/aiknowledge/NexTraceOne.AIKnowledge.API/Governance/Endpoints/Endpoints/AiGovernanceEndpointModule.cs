@@ -129,6 +129,11 @@ using GetAiCostAttributionReportFeature = NexTraceOne.AIKnowledge.Application.Go
 using RegisterPromptAssetFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.RegisterPromptAsset.RegisterPromptAsset;
 using ComparePromptVersionsFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.ComparePromptVersions.ComparePromptVersions;
 
+// ── Wave BD: AI Organizational Intelligence & Memory Analytics ────────────────
+using GetOrganizationalMemoryHealthReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetOrganizationalMemoryHealthReport.GetOrganizationalMemoryHealthReport;
+using GetAgentPerformanceBenchmarkReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAgentPerformanceBenchmarkReport.GetAgentPerformanceBenchmarkReport;
+using GetAiCapabilityMaturityReportFeature = NexTraceOne.AIKnowledge.Application.Governance.Features.GetAiCapabilityMaturityReport.GetAiCapabilityMaturityReport;
+
 namespace NexTraceOne.AIKnowledge.API.Governance.Endpoints.Endpoints;
 
 /// <summary>
@@ -181,6 +186,7 @@ public sealed class AiGovernanceEndpointModule
         MapAiTokenBudgetEndpoints(app);
         MapAiEvalHarnessEndpoints(app);
         MapPromptAssetEndpoints(app);
+        MapAiIntelligenceReportEndpoints(app);
     }
 
     // ── Model Registry ──────────────────────────────────────────────────
@@ -1925,6 +1931,72 @@ public sealed class AiGovernanceEndpointModule
         .RequirePermission("ai:governance:read")
         .WithTags("AI Prompt Assets")
         .WithSummary("Compare two versions of a prompt asset side-by-side");
+    }
+
+    // ── Wave BD: AI Organizational Intelligence & Memory Analytics ──────────
+    private static void MapAiIntelligenceReportEndpoints(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/v1/ai/intelligence");
+
+        group.MapGet("/memory-health", async (
+            Guid tenantId,
+            int? lookbackDays,
+            int? staleThresholdDays,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetOrganizationalMemoryHealthReportFeature.Query(
+                    tenantId,
+                    lookbackDays ?? 90,
+                    staleThresholdDays ?? 30),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Intelligence Reports")
+        .WithSummary("Get organizational memory health report");
+
+        group.MapGet("/agent-benchmark", async (
+            Guid tenantId,
+            int? minExecutions,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAgentPerformanceBenchmarkReportFeature.Query(
+                    tenantId,
+                    minExecutions ?? 5),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Intelligence Reports")
+        .WithSummary("Get agent performance benchmark report");
+
+        group.MapGet("/capability-maturity", async (
+            Guid tenantId,
+            int? lookbackDays,
+            int? pioneerThresholdPct,
+            int? minTeamExecutions,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetAiCapabilityMaturityReportFeature.Query(
+                    tenantId,
+                    lookbackDays ?? 90,
+                    pioneerThresholdPct ?? 20,
+                    minTeamExecutions ?? 10),
+                cancellationToken);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("ai:governance:read")
+        .WithTags("AI Intelligence Reports")
+        .WithSummary("Get AI capability maturity report");
     }
 }
 
