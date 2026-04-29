@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.Governance.Application.Abstractions;
+using IDashboardDataBridge = NexTraceOne.Governance.Application.Abstractions.IDashboardDataBridge;
 using CloneDashboardFeature = NexTraceOne.Governance.Application.Features.CloneDashboard.CloneDashboard;
 using CreateCustomDashboardFeature = NexTraceOne.Governance.Application.Features.CreateCustomDashboard.CreateCustomDashboard;
 using DeleteCustomDashboardFeature = NexTraceOne.Governance.Application.Features.DeleteCustomDashboard.DeleteCustomDashboard;
@@ -44,6 +46,7 @@ using ListDashboardMonitorsFeature = NexTraceOne.Governance.Application.Features
 using ListDashboardTemplatesFeature = NexTraceOne.Governance.Application.Features.ListDashboardTemplates.ListDashboardTemplates;
 using InstantiateTemplateFeature = NexTraceOne.Governance.Application.Features.InstantiateTemplate.InstantiateTemplate;
 using GetPersonaHomeFeature = NexTraceOne.Governance.Application.Features.GetPersonaHome.GetPersonaHome;
+using ListScheduledDashboardReportsFeature = NexTraceOne.Governance.Application.Features.ListScheduledDashboardReports.ListScheduledDashboardReports;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -265,6 +268,7 @@ public sealed class DashboardsAndDebtEndpointModule
             string tenantId,
             string? widgetIds,
             HttpContext ctx,
+            IDashboardDataBridge bridge,
             CancellationToken cancellationToken) =>
         {
             ctx.Response.ContentType = "text/event-stream";
@@ -277,7 +281,7 @@ public sealed class DashboardsAndDebtEndpointModule
 
             var query = new GetDashboardLiveStreamFeature.Query(dashboardId, tenantId, widgetList);
 
-            await foreach (var evt in GetDashboardLiveStreamFeature.GenerateEventsAsync(query, cancellationToken))
+            await foreach (var evt in GetDashboardLiveStreamFeature.GenerateEventsAsync(query, bridge, cancellationToken))
             {
                 var frame = GetDashboardLiveStreamFeature.ToSseFrame(evt);
                 await ctx.Response.WriteAsync(frame, cancellationToken);
@@ -427,6 +431,18 @@ public sealed class DashboardsAndDebtEndpointModule
     private static void MapReportsAndEmbedEndpoints(IEndpointRouteBuilder app)
     {
         var dashboards = app.MapGroup("/api/v1/governance/dashboards");
+
+        // GET /api/v1/governance/dashboards/scheduled-reports
+        dashboards.MapGet("/scheduled-reports", async (
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new ListScheduledDashboardReportsFeature.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("governance:reports:read");
 
         // POST /api/v1/governance/dashboards/{id}/schedule-report
         dashboards.MapPost("/{id:guid}/schedule-report", async (

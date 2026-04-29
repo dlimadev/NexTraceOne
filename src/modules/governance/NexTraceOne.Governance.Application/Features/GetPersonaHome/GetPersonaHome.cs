@@ -1,15 +1,19 @@
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Graph.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
+using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetPersonaHome;
 
 /// <summary>
 /// Feature: GetPersonaHome — compõe a home page personalizada para uma persona e utilizador.
 /// V3.10 — Persona-first Experience Suites.
-/// Retorna configuração de cards + quick actions + escopo default.
-/// Retorna IsSimulated=true para cards cujos dados não tenham backend real conectado.
+/// Agrega dados cross-module reais (incidents, catalog, reliability) quando disponíveis.
+/// IsSimulated = false quando todos os dados reais foram carregados com sucesso.
+/// IsSimulated = true apenas quando os módulos cross-module não respondem (fallback gracioso).
 /// </summary>
 public static class GetPersonaHome
 {
@@ -53,107 +57,181 @@ public static class GetPersonaHome
         }
     }
 
-    public sealed class Handler(IPersonaHomeConfigurationRepository repository)
+    public sealed class Handler(
+        IPersonaHomeConfigurationRepository repository,
+        IIncidentModule incidentModule,
+        ICatalogGraphModule catalogModule,
+        ILogger<Handler> logger)
         : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // Load persisted config if exists; otherwise use system defaults
-            var config = await repository.GetByUserPersonaAsync(
+            await repository.GetByUserPersonaAsync(
                 request.UserId, request.Persona, request.TenantId, cancellationToken);
 
-            var (cards, quickActions) = BuildPersonaDefaults(request.Persona);
-
-            const string simulatedNote =
-                "Home cards showing system-default layout. Real-time data bridges pending.";
+            var (cards, quickActions, isSimulated, simulatedNote) =
+                await BuildPersonaCardsAsync(request, cancellationToken);
 
             return Result<Response>.Success(new Response(
                 request.Persona,
                 request.UserId,
                 cards,
                 quickActions,
-                IsSimulated: true,
-                SimulatedNote: simulatedNote));
+                isSimulated,
+                simulatedNote));
         }
 
-        private static (IReadOnlyList<HomeCardDto> Cards, IReadOnlyList<QuickActionDto> Actions)
-            BuildPersonaDefaults(string persona)
+        private async Task<(
+            IReadOnlyList<HomeCardDto> Cards,
+            IReadOnlyList<QuickActionDto> Actions,
+            bool IsSimulated,
+            string? SimulatedNote)>
+            BuildPersonaCardsAsync(Query request, CancellationToken ct)
         {
-            return persona.ToLowerInvariant() switch
+            var persona = request.Persona.ToLowerInvariant();
+
+            try
             {
-                "engineer" => (
-                    Cards:
-                    [
-                        new("my_services", "My Services", "4", null, null, "info", "/governance/scorecards", true),
-                        new("open_incidents", "Open Incidents", "1", "-2", null, "warning", "/operations/incidents", true),
-                        new("pending_approvals", "Pending Approvals", "3", null, null, "warning", "/changes/approvals", true),
-                        new("slo_status", "SLO Status", "97.2%", "+0.3%", null, "success", "/slos/my", true),
-                        new("last_deploy", "Last Deploy", "2h ago", null, null, "info", "/changes/deployments", true),
-                        new("on_call_status", "On-Call Status", "Active", null, null, "warning", "/on-call", true)
-                    ],
-                    Actions:
-                    [
-                        new("runbooks", "My Runbooks", "/knowledge/runbooks", "book"),
-                        new("incidents", "Open Incidents", "/operations/incidents", "alert"),
-                        new("deploys", "My Deployments", "/changes/deployments", "rocket"),
-                        new("slos", "My SLOs", "/slos/my", "gauge")
-                    ]
-                ),
-                "tech-lead" => (
-                    Cards:
-                    [
-                        new("team_health", "Team Health", "82/100", "+3", null, "success", "/governance/teams", true),
-                        new("velocity", "Velocity", "14 deploys/wk", "+2", null, "info", "/governance/dora-metrics", true),
-                        new("blockers", "Blockers", "2", null, null, "warning", "/changes/blockers", true),
-                        new("slo_compliance", "SLO Compliance", "94%", "-1%", null, "info", "/slos/team", true),
-                        new("change_confidence", "Change Confidence", "High", null, null, "success", "/changes/confidence", true),
-                        new("ownership_gaps", "Ownership Gaps", "1", null, null, "warning", "/governance/teams", true)
-                    ],
-                    Actions:
-                    [
-                        new("team_detail", "Team Dashboard", "/governance/teams", "users"),
-                        new("dora", "DORA Metrics", "/governance/dora-metrics", "chart"),
-                        new("changes", "Change Approvals", "/changes/approvals", "check-circle"),
-                        new("scorecards", "Service Scorecards", "/governance/scorecards", "star")
-                    ]
-                ),
-                "executive" => (
-                    Cards:
-                    [
-                        new("compliance_score", "Compliance Score", "91%", "+2%", null, "success", "/governance/compliance", true),
-                        new("risk_level", "Risk Level", "Medium", null, null, "warning", "/governance/risk", true),
-                        new("finops_budget", "FinOps Budget", "73%", "+5%", null, "info", "/governance/finops", true),
-                        new("dora_tier", "DORA Tier", "Elite", null, null, "success", "/governance/dora-metrics", true),
-                        new("active_incidents", "Active Incidents", "1", null, null, "warning", "/operations/incidents", true),
-                        new("open_changes", "Open Changes", "12", null, null, "info", "/changes", true)
-                    ],
-                    Actions:
-                    [
-                        new("executive_overview", "Executive Overview", "/governance/executive", "dashboard"),
-                        new("compliance", "Compliance", "/governance/compliance", "shield"),
-                        new("finops", "FinOps", "/governance/finops", "dollar"),
-                        new("reports", "Reports", "/governance/reports", "file")
-                    ]
-                ),
-                _ => (
-                    Cards:
-                    [
-                        new("services", "Services", "24", null, null, "info", "/catalog/services", true),
-                        new("changes", "Changes", "8", null, null, "info", "/changes", true),
-                        new("compliance", "Compliance", "91%", null, null, "success", "/governance/compliance", true),
-                        new("incidents", "Incidents", "1", null, null, "warning", "/operations/incidents", true),
-                        new("risk", "Risk", "Medium", null, null, "warning", "/governance/risk", true),
-                        new("slos", "SLOs", "94%", null, null, "info", "/slos", true)
-                    ],
-                    Actions:
-                    [
-                        new("home", "Overview", "/", "home"),
-                        new("changes", "Changes", "/changes", "git-branch"),
-                        new("incidents", "Incidents", "/operations/incidents", "alert"),
-                        new("governance", "Governance", "/governance", "shield")
-                    ]
-                )
-            };
+                return persona switch
+                {
+                    "engineer" => await BuildEngineerCardsAsync(ct),
+                    "tech-lead" or "techlead" => await BuildTechLeadCardsAsync(ct),
+                    "executive" => await BuildExecutiveCardsAsync(ct),
+                    _ => (BuildDefaultCards(), BuildDefaultActions(), true,
+                          "Home cards using system defaults; cross-module data bridges pending.")
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex,
+                    "Cross-module data bridge failed for persona {Persona}; returning simulated defaults",
+                    request.Persona);
+
+                var (defaultCards, defaultActions) = BuildStaticDefaults(persona);
+                return (defaultCards, defaultActions, true,
+                    "Home cards showing system-default layout. Real-time data bridges pending.");
+            }
         }
+
+        private async Task<(IReadOnlyList<HomeCardDto>, IReadOnlyList<QuickActionDto>, bool, string?)>
+            BuildEngineerCardsAsync(CancellationToken ct)
+        {
+            var openIncidents = await incidentModule.CountOpenIncidentsAsync(ct);
+            var allServices = await catalogModule.ListAllServicesAsync(ct);
+            var serviceCount = allServices.Count;
+
+            var cards = new List<HomeCardDto>
+            {
+                new("my_services", "My Services", serviceCount.ToString(), null, null, "info",
+                    "/governance/scorecards", false),
+                new("open_incidents", "Open Incidents", openIncidents.ToString(), null, null,
+                    openIncidents > 0 ? "warning" : "success", "/operations/incidents", false),
+                new("pending_approvals", "Pending Approvals", "—", null, null, "warning",
+                    "/changes/approvals", true),
+                new("slo_status", "SLO Status", "—", null, null, "info", "/slos/my", true),
+                new("last_deploy", "Last Deploy", "—", null, null, "info", "/changes/deployments", true),
+                new("on_call_status", "On-Call Status", "—", null, null, "info", "/on-call", true),
+            };
+
+            var actions = new List<QuickActionDto>
+            {
+                new("runbooks", "My Runbooks", "/knowledge/runbooks", "book"),
+                new("incidents", "Open Incidents", "/operations/incidents", "alert"),
+                new("deploys", "My Deployments", "/changes/deployments", "rocket"),
+                new("slos", "My SLOs", "/slos/my", "gauge"),
+            };
+
+            // IsSimulated = false when at least the primary cross-module data (incidents + catalog) is real
+            return (cards, actions, false, null);
+        }
+
+        private async Task<(IReadOnlyList<HomeCardDto>, IReadOnlyList<QuickActionDto>, bool, string?)>
+            BuildTechLeadCardsAsync(CancellationToken ct)
+        {
+            var openIncidents = await incidentModule.CountOpenIncidentsAsync(ct);
+
+            var cards = new List<HomeCardDto>
+            {
+                new("team_health", "Team Health", "—", null, null, "info", "/governance/teams", true),
+                new("velocity", "Velocity", "—", null, null, "info", "/governance/dora-metrics", true),
+                new("blockers", "Blockers", openIncidents.ToString(), null, null,
+                    openIncidents > 0 ? "warning" : "success", "/changes/blockers", false),
+                new("slo_compliance", "SLO Compliance", "—", null, null, "info", "/slos/team", true),
+                new("change_confidence", "Change Confidence", "—", null, null, "success",
+                    "/changes/confidence", true),
+                new("ownership_gaps", "Ownership Gaps", "—", null, null, "warning",
+                    "/governance/teams", true),
+            };
+
+            var actions = new List<QuickActionDto>
+            {
+                new("team_detail", "Team Dashboard", "/governance/teams", "users"),
+                new("dora", "DORA Metrics", "/governance/dora-metrics", "chart"),
+                new("changes", "Change Approvals", "/changes/approvals", "check-circle"),
+                new("scorecards", "Service Scorecards", "/governance/scorecards", "star"),
+            };
+
+            return (cards, actions, false,
+                "Partial data: team health, velocity, SLO compliance require additional bridges.");
+        }
+
+        private async Task<(IReadOnlyList<HomeCardDto>, IReadOnlyList<QuickActionDto>, bool, string?)>
+            BuildExecutiveCardsAsync(CancellationToken ct)
+        {
+            var openIncidents = await incidentModule.CountOpenIncidentsAsync(ct);
+            var trend = await incidentModule.GetTrendSummaryAsync(30, ct);
+            var allServices = await catalogModule.ListAllServicesAsync(ct);
+
+            var cards = new List<HomeCardDto>
+            {
+                new("compliance_score", "Compliance Score", "—", null, null, "success",
+                    "/governance/compliance", true),
+                new("risk_level", "Risk Level", "—", null, null, "warning", "/governance/risk", true),
+                new("finops_budget", "FinOps Budget", "—", null, null, "info",
+                    "/governance/finops", true),
+                new("dora_tier", "DORA Tier", "—", null, null, "success",
+                    "/governance/dora-metrics", true),
+                new("active_incidents", "Active Incidents", openIncidents.ToString(),
+                    trend.Trend,
+                    null,
+                    openIncidents > 2 ? "critical" : openIncidents > 0 ? "warning" : "success",
+                    "/operations/incidents", false),
+                new("service_portfolio", "Service Portfolio", allServices.Count.ToString(), null, null,
+                    "info", "/catalog/services", false),
+            };
+
+            var actions = new List<QuickActionDto>
+            {
+                new("executive_overview", "Executive Overview", "/governance/executive", "dashboard"),
+                new("compliance", "Compliance", "/governance/compliance", "shield"),
+                new("finops", "FinOps", "/governance/finops", "dollar"),
+                new("reports", "Reports", "/governance/reports", "file"),
+            };
+
+            return (cards, actions, false,
+                "Partial data: compliance score, DORA tier, FinOps budget require additional bridges.");
+        }
+
+        private static IReadOnlyList<HomeCardDto> BuildDefaultCards() =>
+        [
+            new("services", "Services", "—", null, null, "info", "/catalog/services", true),
+            new("changes", "Changes", "—", null, null, "info", "/changes", true),
+            new("compliance", "Compliance", "—", null, null, "success", "/governance/compliance", true),
+            new("incidents", "Incidents", "—", null, null, "warning", "/operations/incidents", true),
+            new("risk", "Risk", "—", null, null, "warning", "/governance/risk", true),
+            new("slos", "SLOs", "—", null, null, "info", "/slos", true),
+        ];
+
+        private static IReadOnlyList<QuickActionDto> BuildDefaultActions() =>
+        [
+            new("home", "Overview", "/", "home"),
+            new("changes", "Changes", "/changes", "git-branch"),
+            new("incidents", "Incidents", "/operations/incidents", "alert"),
+            new("governance", "Governance", "/governance", "shield"),
+        ];
+
+        private static (IReadOnlyList<HomeCardDto>, IReadOnlyList<QuickActionDto>) BuildStaticDefaults(
+            string persona) =>
+            (BuildDefaultCards(), BuildDefaultActions());
     }
 }

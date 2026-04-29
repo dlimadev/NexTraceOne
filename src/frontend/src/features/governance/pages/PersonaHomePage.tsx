@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   Server,
   AlertTriangle,
@@ -24,212 +25,53 @@ import { Badge } from '../../../components/Badge';
 import { PageHeader } from '../../../components/PageHeader';
 import { StatCard } from '../../../components/StatCard';
 import { PageContainer, StatsGrid } from '../../../components/shell';
+import { PageLoadingState } from '../../../components/PageLoadingState';
+import { PageErrorState } from '../../../components/PageErrorState';
 import { usePersona } from '../../../contexts/PersonaContext';
 import type { Persona } from '../../../auth/persona';
+import { personaHomeApi, type HomeCardDto } from '../api/personaHome';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Icon mapping ──────────────────────────────────────────────────────────────
 
-interface StatDef {
-  title: string;
-  value: string | number;
-  icon: React.ReactNode;
-  color: string;
-  trend?: { direction: 'up' | 'down'; label: string };
-  context?: string;
+const ICON_MAP: Record<string, React.ReactNode> = {
+  my_services: <Server size={18} />,
+  open_incidents: <AlertTriangle size={18} />,
+  pending_approvals: <ClipboardCheck size={18} />,
+  slo_status: <Activity size={18} />,
+  last_deploy: <Rocket size={18} />,
+  on_call_status: <PhoneCall size={18} />,
+  team_health: <HeartPulse size={18} />,
+  velocity: <Zap size={18} />,
+  blockers: <ShieldAlert size={18} />,
+  slo_compliance: <Activity size={18} />,
+  change_confidence: <TrendingUp size={18} />,
+  ownership_gaps: <UserX size={18} />,
+  compliance_score: <ShieldCheck size={18} />,
+  risk_level: <ShieldAlert size={18} />,
+  finops_budget: <DollarSign size={18} />,
+  dora_tier: <BarChart3 size={18} />,
+  active_incidents: <AlertCircle size={18} />,
+  open_changes: <GitPullRequest size={18} />,
+  services: <Server size={18} />,
+  changes: <GitPullRequest size={18} />,
+  compliance: <ShieldCheck size={18} />,
+  incidents: <AlertTriangle size={18} />,
+  risk: <ShieldAlert size={18} />,
+  slos: <Activity size={18} />,
+};
+
+const SEVERITY_COLOR: Record<string, string> = {
+  info: 'text-info',
+  success: 'text-success',
+  warning: 'text-warning',
+  critical: 'text-critical',
+};
+
+function cardIcon(key: string): React.ReactNode {
+  return ICON_MAP[key] ?? <RefreshCw size={18} />;
 }
-
-// ── Simulated stat definitions per persona ────────────────────────────────────
-
-const ENGINEER_STATS: StatDef[] = [
-  {
-    title: 'My Services',
-    value: '7',
-    icon: <Server size={18} />,
-    color: 'text-accent',
-    context: '2 degraded',
-  },
-  {
-    title: 'Open Incidents',
-    value: '3',
-    icon: <AlertTriangle size={18} />,
-    color: 'text-critical',
-    trend: { direction: 'up', label: '+1 today' },
-  },
-  {
-    title: 'Pending Approvals',
-    value: '5',
-    icon: <ClipboardCheck size={18} />,
-    color: 'text-warning',
-    context: '2 urgent',
-  },
-  {
-    title: 'SLO Status',
-    value: '94.2%',
-    icon: <Activity size={18} />,
-    color: 'text-success',
-    trend: { direction: 'up', label: '+0.4%' },
-  },
-  {
-    title: 'Last Deploy',
-    value: '2h ago',
-    icon: <Rocket size={18} />,
-    color: 'text-info',
-    context: 'payment-svc v2.4.1',
-  },
-  {
-    title: 'On-Call Status',
-    value: 'Active',
-    icon: <PhoneCall size={18} />,
-    color: 'text-warning',
-    context: 'Until 09:00 tomorrow',
-  },
-];
-
-const TECHLEAD_STATS: StatDef[] = [
-  {
-    title: 'Team Health',
-    value: '82 / 100',
-    icon: <HeartPulse size={18} />,
-    color: 'text-success',
-    trend: { direction: 'up', label: '+4 pts' },
-  },
-  {
-    title: 'Velocity',
-    value: '41 pts',
-    icon: <Zap size={18} />,
-    color: 'text-accent',
-    trend: { direction: 'down', label: '-3 pts' },
-  },
-  {
-    title: 'Blockers',
-    value: '2',
-    icon: <ShieldAlert size={18} />,
-    color: 'text-critical',
-    context: '1 external dependency',
-  },
-  {
-    title: 'SLO Compliance',
-    value: '96.8%',
-    icon: <Activity size={18} />,
-    color: 'text-success',
-    trend: { direction: 'up', label: '+0.2%' },
-  },
-  {
-    title: 'Change Confidence',
-    value: 'High',
-    icon: <TrendingUp size={18} />,
-    color: 'text-success',
-    context: '3 pending merges',
-  },
-  {
-    title: 'Ownership Gaps',
-    value: '4',
-    icon: <UserX size={18} />,
-    color: 'text-warning',
-    context: 'Services without owner',
-  },
-];
-
-const EXECUTIVE_STATS: StatDef[] = [
-  {
-    title: 'Compliance Score',
-    value: '87%',
-    icon: <ShieldCheck size={18} />,
-    color: 'text-success',
-    trend: { direction: 'up', label: '+2% MoM' },
-  },
-  {
-    title: 'Risk Level',
-    value: 'Medium',
-    icon: <ShieldAlert size={18} />,
-    color: 'text-warning',
-    context: '3 unmitigated',
-  },
-  {
-    title: 'FinOps Budget',
-    value: '71% used',
-    icon: <DollarSign size={18} />,
-    color: 'text-warning',
-    context: '$42k remaining',
-    trend: { direction: 'up', label: '+5% vs last month' },
-  },
-  {
-    title: 'DORA Tier',
-    value: 'Elite',
-    icon: <BarChart3 size={18} />,
-    color: 'text-accent',
-    context: 'Top 10% industry',
-  },
-  {
-    title: 'Active Incidents',
-    value: '2',
-    icon: <AlertCircle size={18} />,
-    color: 'text-critical',
-    context: '0 P1, 2 P2',
-  },
-  {
-    title: 'Open Changes',
-    value: '14',
-    icon: <GitPullRequest size={18} />,
-    color: 'text-info',
-    trend: { direction: 'up', label: '+3 today' },
-  },
-];
-
-const DEFAULT_STATS: StatDef[] = [
-  {
-    title: 'Policies Active',
-    value: '34',
-    icon: <ShieldCheck size={18} />,
-    color: 'text-success',
-  },
-  {
-    title: 'Open Violations',
-    value: '7',
-    icon: <AlertTriangle size={18} />,
-    color: 'text-critical',
-    trend: { direction: 'down', label: '-2 today' },
-  },
-  {
-    title: 'Pending Reviews',
-    value: '12',
-    icon: <ClipboardCheck size={18} />,
-    color: 'text-warning',
-  },
-  {
-    title: 'Compliance',
-    value: '88%',
-    icon: <Activity size={18} />,
-    color: 'text-success',
-  },
-  {
-    title: 'Risk Score',
-    value: 'Low',
-    icon: <ShieldAlert size={18} />,
-    color: 'text-success',
-  },
-  {
-    title: 'Last Sync',
-    value: '5m ago',
-    icon: <RefreshCw size={18} />,
-    color: 'text-info',
-  },
-];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function getPersonaStats(persona: Persona): StatDef[] {
-  switch (persona) {
-    case 'Engineer':
-      return ENGINEER_STATS;
-    case 'TechLead':
-      return TECHLEAD_STATS;
-    case 'Executive':
-      return EXECUTIVE_STATS;
-    default:
-      return DEFAULT_STATS;
-  }
-}
 
 function getPersonaDisplayName(persona: Persona): string {
   const names: Partial<Record<Persona, string>> = {
@@ -259,35 +101,44 @@ function getPersonaSubtitle(persona: Persona): string {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-/**
- * PersonaHomePage — V3.10 persona-first home page.
- *
- * Renders 6 KPI stat cards tailored to the active persona (Engineer, TechLead,
- * Executive, or a sensible default). Persona is derived from PersonaContext;
- * an override can be passed via URL param `?persona=Engineer`.
- */
 export function PersonaHomePage() {
   const { t } = useTranslation();
   const { persona: ctxPersona } = usePersona();
   const { persona: urlPersona } = useParams<{ persona?: string }>();
 
-  // Allow URL param override for demo / testing purposes
   const resolvedPersona: Persona = (urlPersona as Persona) ?? ctxPersona;
-
-  const stats = getPersonaStats(resolvedPersona);
   const displayName = getPersonaDisplayName(resolvedPersona);
   const subtitle = getPersonaSubtitle(resolvedPersona);
 
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ['persona-home', resolvedPersona],
+    queryFn: () =>
+      personaHomeApi.getPersonaHome('current', resolvedPersona, 'default'),
+    staleTime: 60_000,
+  });
+
+  if (isLoading) return <PageContainer><PageLoadingState /></PageContainer>;
+  if (isError)
+    return (
+      <PageContainer>
+        <PageErrorState onRetry={() => refetch()} />
+      </PageContainer>
+    );
+
+  const cards: HomeCardDto[] = data?.cards ?? [];
+
   return (
     <PageContainer>
-      {/* IsSimulated banner */}
-      <div className="mb-4 rounded-lg border border-warning/30 bg-warning/8 px-4 py-2 text-xs text-warning font-medium flex items-center gap-2">
-        <FlaskConical size={14} />
-        {t(
-          'governance.simulated',
-          'Simulated data — metrics will connect to live API in production',
-        )}
-      </div>
+      {data?.isSimulated && (
+        <div className="mb-4 rounded-lg border border-warning/30 bg-warning/8 px-4 py-2 text-xs text-warning font-medium flex items-center gap-2">
+          <FlaskConical size={14} />
+          {data.simulatedNote ??
+            t(
+              'governance.simulated',
+              'Simulated data — metrics will connect to live API in production',
+            )}
+        </div>
+      )}
 
       <PageHeader
         title={t('governance.personaHome.title', '{{persona}} Home', {
@@ -301,17 +152,19 @@ export function PersonaHomePage() {
         }
       />
 
-      {/* 6 KPI stat cards */}
       <StatsGrid columns={3}>
-        {stats.map((stat) => (
+        {cards.map((card) => (
           <StatCard
-            key={stat.title}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            color={stat.color}
-            trend={stat.trend}
-            context={stat.context}
+            key={card.key}
+            title={card.title}
+            value={card.value ?? '—'}
+            icon={cardIcon(card.key)}
+            color={SEVERITY_COLOR[card.severity] ?? 'text-muted'}
+            trend={
+              card.trend
+                ? { direction: 'up', label: card.trend }
+                : undefined
+            }
           />
         ))}
       </StatsGrid>

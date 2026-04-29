@@ -27,7 +27,11 @@ public static class GetOptionalProviders
         IBackupProvider backupProvider,
         IKafkaEventProducer kafkaProducer,
         ICloudBillingProvider cloudBillingProvider,
-        ISamlProvider samlProvider) : IQueryHandler<Query, Response>
+        ISamlProvider samlProvider,
+        IRuntimeProvider runtimeProvider,
+        IChaosProvider chaosProvider,
+        ICertificateProvider certificateProvider,
+        ISchemaPlanner schemaPlanner) : IQueryHandler<Query, Response>
     {
         public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
@@ -72,6 +76,38 @@ public static class GetOptionalProviders
                     configKeyPrefix: "Saml",
                     docsPath: "docs/deployment/PRODUCTION-BOOTSTRAP.md#saml-sso",
                     description: "SAML 2.0 SSO IdP integration. When not configured, StartSamlLogin returns SamlNotConfigured."),
+
+                BuildDto(
+                    name: OptionalProviderNames.Runtime,
+                    category: "observability",
+                    isConfigured: runtimeProvider.IsConfigured,
+                    configKeyPrefix: "Runtime",
+                    docsPath: "docs/deployment/PRODUCTION-BOOTSTRAP.md#runtime-provider",
+                    description: "Runtime intelligence agent (CLR profiler, eBPF, OpenTelemetry runtime metrics). DEG-03."),
+
+                BuildDto(
+                    name: OptionalProviderNames.Chaos,
+                    category: "reliability",
+                    isConfigured: chaosProvider.IsConfigured,
+                    configKeyPrefix: "Chaos",
+                    docsPath: "docs/deployment/PRODUCTION-BOOTSTRAP.md#chaos-provider",
+                    description: "Chaos engineering engine (Litmus, Chaos Mesh, Gremlin). DEG-04."),
+
+                BuildDto(
+                    name: OptionalProviderNames.Certificate,
+                    category: "security",
+                    isConfigured: certificateProvider.IsConfigured,
+                    configKeyPrefix: "Mtls",
+                    docsPath: "docs/deployment/PRODUCTION-BOOTSTRAP.md#certificate-provider",
+                    description: "PKI certificate manager for mTLS (cert-manager, Vault PKI, AWS ACM). DEG-05."),
+
+                BuildDto(
+                    name: OptionalProviderNames.SchemaPlanner,
+                    category: "platform",
+                    isConfigured: schemaPlanner.IsConfigured,
+                    configKeyPrefix: "SchemaPlanner",
+                    docsPath: "docs/deployment/PRODUCTION-BOOTSTRAP.md#schema-planner",
+                    description: "Multi-tenant schema IaC executor (Terraform, Pulumi, Flyway). DEG-06."),
             };
 
             var configuredCount = providers.Count(p => p.Status == OptionalProviderStatus.Configured);

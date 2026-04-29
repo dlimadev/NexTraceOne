@@ -24,4 +24,16 @@ public static class OptionalProviderNames
 
     /// <summary>SAML 2.0 SSO IdP integration; returns <c>SamlNotConfigured</c> error while absent.</summary>
     public const string Saml = "saml";
+
+    /// <summary>Runtime intelligence agent (CLR profiler, eBPF, OpenTelemetry runtime); DEG-03.</summary>
+    public const string Runtime = "runtime";
+
+    /// <summary>Chaos engineering engine (Litmus, Chaos Mesh, Gremlin); DEG-04.</summary>
+    public const string Chaos = "chaos";
+
+    /// <summary>PKI certificate manager (cert-manager, Vault PKI, AWS ACM); DEG-05.</summary>
+    public const string Certificate = "certificate";
+
+    /// <summary>Multi-tenant schema planner IaC executor (Terraform, Pulumi, Flyway); DEG-06.</summary>
+    public const string SchemaPlanner = "schemaPlanner";
 }

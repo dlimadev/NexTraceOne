@@ -7,8 +7,10 @@ using NexTraceOne.BuildingBlocks.Application.Nql;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.SecurityGate.Ports;
+using NexTraceOne.Governance.Infrastructure.AI;
 using NexTraceOne.Governance.Infrastructure.Observability;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Providers;
@@ -141,6 +143,21 @@ public static class DependencyInjection
 
         // Dashboard Monitors — Wave V3.9 (Alerting from Widget)
         services.AddScoped<IDashboardMonitorRepository, DashboardMonitorRepository>();
+
+        // Setup Wizard State — F-04
+        services.AddScoped<ISetupWizardRepository, SetupWizardRepository>();
+
+        // Widget Snapshots — B-02 (real delta computation)
+        services.AddScoped<IWidgetSnapshotRepository, WidgetSnapshotRepository>();
+
+        // Dashboard Data Bridge — B-04 (SSE live stream real events via snapshots)
+        services.AddScoped<IDashboardDataBridge, SnapshotDashboardDataBridge>();
+
+        // AI Dashboard Composer — Wave V3.4; uses IChatCompletionProvider when configured
+        services.AddScoped<IAiDashboardComposerService>(sp =>
+            new AiDashboardComposerService(
+                sp.GetService<IChatCompletionProvider>(),
+                sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AiDashboardComposerService>>()));
 
         return services;
     }
