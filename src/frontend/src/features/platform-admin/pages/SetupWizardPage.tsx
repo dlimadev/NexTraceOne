@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   Server,
   Database,
@@ -18,6 +19,7 @@ import {
 import { Card, CardBody } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
 import { Button } from '../../../components/Button';
+import { setupWizardApi } from '../api/setupWizard';
 
 // ─── Wizard step definitions ──────────────────────────────────────────────────
 
@@ -38,6 +40,8 @@ const STEPS: WizardStep[] = [
   { id: 'network', icon: <Globe size={20} />, required: false },
   { id: 'review', icon: <CheckCircle2 size={20} />, required: true },
 ];
+
+const TENANT_ID = 'default';
 
 // ─── Helper components ────────────────────────────────────────────────────────
 
@@ -248,7 +252,6 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
             <p className="text-xs text-muted">{t('setup.ai.intro')}</p>
           </div>
 
-          {/* Deployment mode selector */}
           <FormField label={t('setup.ai.deploymentModeLabel')}>
             <div className="grid grid-cols-1 gap-2">
               {[
@@ -263,11 +266,8 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
                     type="button"
                     onClick={() => {
                       onFormChange('ai_deployment_mode', option.id);
-                      if (option.id === 'local') {
-                        onFormChange('ollama_url', 'http://localhost:11434');
-                      } else if (option.id === 'disabled') {
-                        onFormChange('ollama_url', '');
-                      }
+                      if (option.id === 'local') onFormChange('ollama_url', 'http://localhost:11434');
+                      else if (option.id === 'disabled') onFormChange('ollama_url', '');
                     }}
                     className={`flex items-start gap-3 w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${
                       selected
@@ -275,18 +275,13 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
                         : 'border-border bg-surface text-muted hover:border-accent/40'
                     }`}
                     aria-pressed={selected}
-                    data-testid={`ai-mode-${option.id}`}
                   >
                     <span className={`mt-0.5 shrink-0 ${selected ? 'text-accent' : 'text-muted'}`}>
                       {option.icon}
                     </span>
                     <span className="flex flex-col gap-0.5">
-                      <span className="text-sm font-medium leading-tight">
-                        {t(option.labelKey)}
-                      </span>
-                      <span className="text-xs text-muted leading-tight">
-                        {t(option.hintKey)}
-                      </span>
+                      <span className="text-sm font-medium leading-tight">{t(option.labelKey)}</span>
+                      <span className="text-xs text-muted leading-tight">{t(option.hintKey)}</span>
                     </span>
                     {selected && <CheckCircle2 size={14} className="ml-auto mt-0.5 shrink-0 text-accent" />}
                   </button>
@@ -295,7 +290,6 @@ function StepPanel({ stepId, t, formData, onFormChange }: StepPanelProps) {
             </div>
           </FormField>
 
-          {/* URL + model fields — shown only for local/remote modes */}
           {aiMode !== 'disabled' && (
             <>
               <FormField
@@ -399,17 +393,65 @@ export function SetupWizardPage() {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [completed, setCompleted] = useState(false);
 
+  // Load persisted state from backend
+  const { data: statusData } = useQuery({
+    queryKey: ['setup-wizard-status'],
+    queryFn: () => setupWizardApi.getStatus(TENANT_ID),
+    staleTime: 60_000,
+  });
+
+  // Restore form data and advance to first incomplete step on mount
+  useEffect(() => {
+    if (!statusData) return;
+
+    const restored: Record<string, string> = {};
+    for (const step of statusData.completedSteps) {
+      try {
+        const parsed = JSON.parse(step.dataJson) as Record<string, string>;
+        Object.assign(restored, parsed);
+      } catch {
+        // ignore malformed JSON
+      }
+    }
+    setFormData(restored);
+
+    if (statusData.isFullyConfigured) {
+      setCompleted(true);
+      return;
+    }
+
+    const completedIds = new Set(statusData.completedSteps.map((s) => s.stepId));
+    const firstPending = STEPS.findIndex((s) => s.id !== 'welcome' && !completedIds.has(s.id));
+    if (firstPending > 0) setCurrentStep(firstPending);
+  }, [statusData]);
+
+  // Persist step on Next
+  const saveStep = useMutation({
+    mutationFn: (stepId: string) =>
+      setupWizardApi.saveStep(stepId, {
+        tenantId: TENANT_ID,
+        stepId,
+        dataJson: JSON.stringify(formData),
+      }),
+  });
+
   const step = STEPS[currentStep];
   const isFirst = currentStep === 0;
   const isLast = currentStep === STEPS.length - 1;
 
   const getStepStatus = (idx: number): StepStatus => {
-    if (idx < currentStep) return 'completed';
+    const stepId = STEPS[idx].id;
+    const completedIds = new Set(statusData?.completedSteps.map((s) => s.stepId) ?? []);
+    if (idx < currentStep || completedIds.has(stepId)) return 'completed';
     if (idx === currentStep) return 'active';
     return 'pending';
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Persist current step before advancing (skip welcome)
+    if (step.id !== 'welcome') {
+      await saveStep.mutateAsync(step.id);
+    }
     if (isLast) {
       setCompleted(true);
     } else {
@@ -421,9 +463,7 @@ export function SetupWizardPage() {
     if (!isFirst) setCurrentStep((prev) => prev - 1);
   };
 
-  const handleSkip = () => {
-    setCurrentStep((prev) => prev + 1);
-  };
+  const handleSkip = () => setCurrentStep((prev) => prev + 1);
 
   const handleFormChange = (key: string, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -503,12 +543,7 @@ export function SetupWizardPage() {
 
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            disabled={isFirst}
-          >
+          <Button variant="ghost" size="sm" onClick={handleBack} disabled={isFirst}>
             <ArrowLeft size={14} />
             {t('setup.back')}
           </Button>
@@ -519,9 +554,18 @@ export function SetupWizardPage() {
                 {t('setup.skip')}
               </Button>
             )}
-            <Button variant="primary" size="sm" onClick={handleNext}>
-              {isLast ? t('setup.finish') : t('setup.next')}
-              {!isLast && <ArrowRight size={14} />}
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleNext}
+              disabled={saveStep.isPending}
+            >
+              {saveStep.isPending
+                ? t('common.saving', 'Saving…')
+                : isLast
+                ? t('setup.finish')
+                : t('setup.next')}
+              {!isLast && !saveStep.isPending && <ArrowRight size={14} />}
             </Button>
           </div>
         </div>

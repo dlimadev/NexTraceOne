@@ -1,18 +1,16 @@
+using System.Text.Json;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Governance.Application.Abstractions;
 
 namespace NexTraceOne.Governance.Application.Features.GetWidgetDelta;
 
 /// <summary>
 /// Feature: GetWidgetDelta — retorna as variações de um widget desde um timestamp.
 ///
-/// Usado pelo frontend para fazer polling leve quando SSE está indisponível,
-/// ou para sincronizar o estado após reconexão.
-///
-/// As variações reais requerem bridge com a fonte de dados do widget.
-/// O retorno é honestamente simulado (IsSimulated=true) até que esses bridges
-/// estejam disponíveis.
+/// Compara snapshots reais armazenados na tabela gov_widget_snapshots.
+/// Se não existirem snapshots suficientes, retorna IsSimulated=true com nota honesta.
 ///
 /// Wave V3.3 — Live, Cross-filter, Drill-down.
 /// </summary>
@@ -56,56 +54,121 @@ public static class GetWidgetDelta
 
     // ── Handler ───────────────────────────────────────────────────────────
 
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(IWidgetSnapshotRepository snapshots) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query query, CancellationToken ct)
+        public async Task<Result<Response>> Handle(Query query, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(query.TenantId))
-                return Task.FromResult<Result<Response>>(
-                    Error.Validation("WidgetDelta.TenantId", "TenantId is required."));
-
-            if (string.IsNullOrWhiteSpace(query.WidgetId))
-                return Task.FromResult<Result<Response>>(
-                    Error.Validation("WidgetDelta.WidgetId", "WidgetId is required."));
-
             var asOf = DateTimeOffset.UtcNow;
-            var elapsed = (asOf - query.Since).TotalSeconds;
 
-            // Simulate: more changes the longer it's been since last poll
-            var addedCount   = elapsed > 60  ? Random.Shared.Next(1, 4)  : elapsed > 20 ? 1 : 0;
-            var changedCount = elapsed > 10  ? Random.Shared.Next(0, 6)  : 0;
-            var removedCount = elapsed > 120 ? Random.Shared.Next(0, 2)  : 0;
+            var recentSnapshots = await snapshots.ListSinceAsync(
+                query.TenantId, query.DashboardId, query.WidgetId, query.Since, ct);
 
-            var changes = new List<DeltaRow>(addedCount + changedCount + removedCount);
+            if (recentSnapshots.Count == 0)
+            {
+                return new Response(
+                    WidgetId: query.WidgetId,
+                    Since: query.Since,
+                    AsOf: asOf,
+                    AddedCount: 0,
+                    RemovedCount: 0,
+                    ChangedCount: 0,
+                    Changes: [],
+                    IsSimulated: true,
+                    SimulatedNote: "No snapshots captured yet for this widget. Deltas will be available after the first snapshot cycle completes.");
+            }
 
-            for (var i = 0; i < addedCount; i++)
-                changes.Add(new DeltaRow(
-                    RowKey: $"row-new-{i}",
-                    ChangeType: "added",
-                    Fields: new Dictionary<string, string?> { ["status"] = "active", ["createdAt"] = asOf.ToString("O") }));
+            var baseSnapshot = await snapshots.GetLatestBeforeAsync(
+                query.TenantId, query.DashboardId, query.WidgetId, query.Since, ct);
 
-            for (var i = 0; i < changedCount; i++)
-                changes.Add(new DeltaRow(
-                    RowKey: $"row-upd-{i}",
-                    ChangeType: "changed",
-                    Fields: new Dictionary<string, string?> { ["status"] = "updated", ["updatedAt"] = asOf.ToString("O") }));
+            var changes = new List<DeltaRow>();
 
-            for (var i = 0; i < removedCount; i++)
-                changes.Add(new DeltaRow(
-                    RowKey: $"row-del-{i}",
-                    ChangeType: "removed",
-                    Fields: new Dictionary<string, string?> { ["reason"] = "expired" }));
+            if (baseSnapshot is null)
+            {
+                // All recent snapshots are "new" relative to this window
+                foreach (var snap in recentSnapshots)
+                {
+                    var fields = ParseFlatFields(snap.DataJson);
+                    changes.Add(new DeltaRow(
+                        RowKey: snap.Id.Value.ToString("N"),
+                        ChangeType: "added",
+                        Fields: fields));
+                }
 
-            return Task.FromResult<Result<Response>>(new Response(
+                return new Response(
+                    WidgetId: query.WidgetId,
+                    Since: query.Since,
+                    AsOf: asOf,
+                    AddedCount: changes.Count,
+                    RemovedCount: 0,
+                    ChangedCount: 0,
+                    Changes: changes,
+                    IsSimulated: false,
+                    SimulatedNote: null);
+            }
+
+            // Compare base snapshot hash with each subsequent snapshot
+            var prevHash = baseSnapshot.DataHash;
+            var prevFields = ParseFlatFields(baseSnapshot.DataJson);
+
+            foreach (var snap in recentSnapshots)
+            {
+                if (snap.DataHash == prevHash)
+                    continue;
+
+                var currentFields = ParseFlatFields(snap.DataJson);
+                var changedFields = new Dictionary<string, string?>();
+
+                foreach (var kv in currentFields)
+                {
+                    if (!prevFields.TryGetValue(kv.Key, out var prevVal) || prevVal != kv.Value)
+                        changedFields[kv.Key] = kv.Value;
+                }
+
+                foreach (var key in prevFields.Keys.Except(currentFields.Keys))
+                    changedFields[key] = null;
+
+                if (changedFields.Count > 0)
+                    changes.Add(new DeltaRow(
+                        RowKey: snap.Id.Value.ToString("N"),
+                        ChangeType: "changed",
+                        Fields: changedFields));
+
+                prevHash = snap.DataHash;
+                prevFields = currentFields;
+            }
+
+            return new Response(
                 WidgetId: query.WidgetId,
                 Since: query.Since,
                 AsOf: asOf,
-                AddedCount: addedCount,
-                RemovedCount: removedCount,
-                ChangedCount: changedCount,
+                AddedCount: 0,
+                RemovedCount: 0,
+                ChangedCount: changes.Count,
                 Changes: changes,
-                IsSimulated: true,
-                SimulatedNote: "Widget delta data is simulated — real-time ingestion bridge required for live deltas."));
+                IsSimulated: false,
+                SimulatedNote: null);
+        }
+
+        private static Dictionary<string, string?> ParseFlatFields(string dataJson)
+        {
+            var result = new Dictionary<string, string?>(StringComparer.Ordinal);
+            if (string.IsNullOrWhiteSpace(dataJson))
+                return result;
+
+            try
+            {
+                using var doc = JsonDocument.Parse(dataJson);
+                foreach (var prop in doc.RootElement.EnumerateObject())
+                    result[prop.Name] = prop.Value.ValueKind == JsonValueKind.Null
+                        ? null
+                        : prop.Value.ToString();
+            }
+            catch (JsonException)
+            {
+                result["raw"] = dataJson;
+            }
+
+            return result;
         }
     }
 }

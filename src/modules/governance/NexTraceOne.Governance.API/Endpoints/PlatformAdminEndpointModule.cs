@@ -29,6 +29,8 @@ using GetRightsizingReportFeature = NexTraceOne.Governance.Application.Features.
 using GetObservabilityModeFeature = NexTraceOne.Governance.Application.Features.GetObservabilityMode.GetObservabilityMode;
 using GetCompliancePacksFeature = NexTraceOne.Governance.Application.Features.GetCompliancePacks.GetCompliancePacks;
 using GetHardwareAssessmentFeature = NexTraceOne.Governance.Application.Features.GetHardwareAssessment.GetHardwareAssessment;
+using GetSetupWizardStatusFeature = NexTraceOne.Governance.Application.Features.GetSetupWizardStatus.GetSetupWizardStatus;
+using SaveSetupWizardStepFeature = NexTraceOne.Governance.Application.Features.SaveSetupWizardStep.SaveSetupWizardStep;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -552,5 +554,30 @@ public sealed class PlatformAdminEndpointModule
             var result = await sender.Send(new GetCompliancePacksFeature.Query(), cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");
+
+        // ── Setup Wizard (F-04) ───────────────────────────────────────────────────
+
+        admin.MapGet("/setup/status", async (
+            string tenantId,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetSetupWizardStatusFeature.Query(tenantId), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        admin.MapPost("/setup/steps/{stepId}", async (
+            string stepId,
+            SaveSetupWizardStepFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var cmd = command with { StepId = stepId };
+            var result = await sender.Send(cmd, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:write");
     }
 }

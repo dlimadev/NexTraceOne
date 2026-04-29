@@ -138,6 +138,12 @@ public sealed class GovernanceDbContext(
     /// <summary>Monitores de alerta criados a partir de widgets (V3.9 — Alerting from Widget).</summary>
     public DbSet<DashboardMonitorDefinition> DashboardMonitors => Set<DashboardMonitorDefinition>();
 
+    /// <summary>Estado persistido dos passos do SetupWizard por tenant (F-04).</summary>
+    public DbSet<SetupWizardStep> SetupWizardSteps => Set<SetupWizardStep>();
+
+    /// <summary>Snapshots de widgets para cálculo de delta real (B-02).</summary>
+    public DbSet<WidgetSnapshot> WidgetSnapshots => Set<WidgetSnapshot>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(GovernanceDbContext).Assembly;
 

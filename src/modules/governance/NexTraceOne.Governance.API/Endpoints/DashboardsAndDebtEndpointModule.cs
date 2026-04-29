@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
+using NexTraceOne.Governance.Application.Abstractions;
+using IDashboardDataBridge = NexTraceOne.Governance.Application.Abstractions.IDashboardDataBridge;
 using CloneDashboardFeature = NexTraceOne.Governance.Application.Features.CloneDashboard.CloneDashboard;
 using CreateCustomDashboardFeature = NexTraceOne.Governance.Application.Features.CreateCustomDashboard.CreateCustomDashboard;
 using DeleteCustomDashboardFeature = NexTraceOne.Governance.Application.Features.DeleteCustomDashboard.DeleteCustomDashboard;
@@ -266,6 +268,7 @@ public sealed class DashboardsAndDebtEndpointModule
             string tenantId,
             string? widgetIds,
             HttpContext ctx,
+            IDashboardDataBridge bridge,
             CancellationToken cancellationToken) =>
         {
             ctx.Response.ContentType = "text/event-stream";
@@ -278,7 +281,7 @@ public sealed class DashboardsAndDebtEndpointModule
 
             var query = new GetDashboardLiveStreamFeature.Query(dashboardId, tenantId, widgetList);
 
-            await foreach (var evt in GetDashboardLiveStreamFeature.GenerateEventsAsync(query, cancellationToken))
+            await foreach (var evt in GetDashboardLiveStreamFeature.GenerateEventsAsync(query, bridge, cancellationToken))
             {
                 var frame = GetDashboardLiveStreamFeature.ToSseFrame(evt);
                 await ctx.Response.WriteAsync(frame, cancellationToken);

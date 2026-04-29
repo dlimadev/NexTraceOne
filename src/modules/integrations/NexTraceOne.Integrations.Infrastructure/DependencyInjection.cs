@@ -23,6 +23,10 @@ using NexTraceOne.Integrations.Application.Services.NormalizationStrategies;
 using NexTraceOne.Integrations.Infrastructure.Persistence;
 using NexTraceOne.Integrations.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Integrations.Infrastructure.Saml;
+using NexTraceOne.Integrations.Infrastructure.Runtime;
+using NexTraceOne.Integrations.Infrastructure.Chaos;
+using NexTraceOne.Integrations.Infrastructure.Certificate;
+using NexTraceOne.Integrations.Infrastructure.SchemaPlanner;
 
 namespace NexTraceOne.Integrations.Infrastructure;
 
@@ -119,6 +123,18 @@ public static class DependencyInjection
         {
             services.AddSingleton<ISamlProvider, NullSamlProvider>();
         }
+
+        // Runtime Intelligence Provider — DEG-03 (NullRuntimeProvider por default; substituir por agente CLR/eBPF real)
+        services.AddSingleton<IRuntimeProvider, NullRuntimeProvider>();
+
+        // Chaos Engineering Provider — DEG-04 (NullChaosProvider por default; substituir por Litmus/Chaos Mesh)
+        services.AddSingleton<IChaosProvider, NullChaosProvider>();
+
+        // Certificate (mTLS) Provider — DEG-05 (NullCertificateProvider lê Mtls:* de config; substituir por cert-manager/Vault PKI)
+        services.AddSingleton<ICertificateProvider, NullCertificateProvider>();
+
+        // Schema Planner — DEG-06 (NullSchemaPlanner por default; substituir por executor IaC real)
+        services.AddSingleton<ISchemaPlanner, NullSchemaPlanner>();
 
         // Event Consumer Worker — Dead Letter Repository e Status Reader (null por defeito)
         services.AddSingleton<IEventConsumerDeadLetterRepository, NullEventConsumerDeadLetterRepository>();

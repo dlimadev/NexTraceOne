@@ -2,12 +2,14 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Integrations.Domain;
 
 namespace NexTraceOne.Governance.Application.Features.GetMtlsManager;
 
 /// <summary>
 /// Feature: GetMtlsManager — gestão de política mTLS e certificados da plataforma.
-/// Lê de IConfiguration "Mtls:*". Integração PKI real é pendente.
+/// Usa ICertificateProvider para listar certificados reais quando configurado.
+/// Cai para lista vazia com nota honesta quando ICertificateProvider.IsConfigured = false (DEG-05).
 /// </summary>
 public static class GetMtlsManager
 {
@@ -24,9 +26,11 @@ public static class GetMtlsManager
     public sealed record RevokeMtlsCertificate(string CertId) : ICommand<Unit>;
 
     /// <summary>Handler de leitura da política mTLS.</summary>
-    public sealed class Handler(IConfiguration configuration) : IQueryHandler<Query, MtlsManagerResponse>
+    public sealed class Handler(
+        IConfiguration configuration,
+        ICertificateProvider certificateProvider) : IQueryHandler<Query, MtlsManagerResponse>
     {
-        public Task<Result<MtlsManagerResponse>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<MtlsManagerResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
             var mode = configuration["Mtls:Mode"] ?? "Disabled";
             var rootCaCertPresent = bool.TryParse(configuration["Mtls:RootCaCertPresent"], out var v) && v;
@@ -36,13 +40,30 @@ public static class GetMtlsManager
                 RootCaCertPresent: rootCaCertPresent,
                 RootCaCertExpiry: null);
 
+            IReadOnlyList<MtlsCertificateDto> certs = [];
+            string simulatedNote = string.Empty;
+
+            if (certificateProvider.IsConfigured)
+            {
+                var rawCerts = await certificateProvider.ListCertificatesAsync(cancellationToken: cancellationToken);
+                certs = rawCerts.Select(c => new MtlsCertificateDto(
+                    CertId: c.CertId,
+                    Subject: c.Subject,
+                    Expiry: c.NotAfter,
+                    Status: c.Status)).ToList();
+            }
+            else
+            {
+                simulatedNote = "Certificate list unavailable — no PKI provider configured (cert-manager / Vault PKI). Configure Mtls:CertManagerEndpoint or Mtls:VaultPkiEndpoint.";
+            }
+
             var response = new MtlsManagerResponse(
                 Policy: policy,
-                Certificates: [],
+                Certificates: certs,
                 LastSyncAt: DateTimeOffset.UtcNow,
-                SimulatedNote: string.Empty);
+                SimulatedNote: simulatedNote);
 
-            return Task.FromResult(Result<MtlsManagerResponse>.Success(response));
+            return Result<MtlsManagerResponse>.Success(response);
         }
     }
 
@@ -67,10 +88,16 @@ public static class GetMtlsManager
     }
 
     /// <summary>Handler de revogação de certificado mTLS.</summary>
-    public sealed class RevokeHandler : ICommandHandler<RevokeMtlsCertificate, Unit>
+    public sealed class RevokeHandler(ICertificateProvider certificateProvider)
+        : ICommandHandler<RevokeMtlsCertificate, Unit>
     {
-        public Task<Result<Unit>> Handle(RevokeMtlsCertificate request, CancellationToken cancellationToken)
-            => Task.FromResult(Result<Unit>.Success(Unit.Value));
+        public async Task<Result<Unit>> Handle(RevokeMtlsCertificate request, CancellationToken cancellationToken)
+        {
+            if (certificateProvider.IsConfigured)
+                await certificateProvider.RevokeCertificateAsync(request.CertId, "manual-revoke", cancellationToken);
+
+            return Result<Unit>.Success(Unit.Value);
+        }
     }
 
     /// <summary>Resposta com política mTLS e certificados.</summary>
