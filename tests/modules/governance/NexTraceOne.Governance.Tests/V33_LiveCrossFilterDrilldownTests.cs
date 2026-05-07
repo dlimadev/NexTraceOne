@@ -1,6 +1,8 @@
 using System.Linq;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.GetDashboardLiveStream;
 using NexTraceOne.Governance.Application.Features.GetWidgetDelta;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Tests;
 
@@ -10,6 +12,16 @@ namespace NexTraceOne.Governance.Tests;
 /// </summary>
 public sealed class V33_LiveCrossFilterDrilldownTests
 {
+    private static GetWidgetDelta.Handler MakeDeltaHandler()
+    {
+        var snapshots = Substitute.For<IWidgetSnapshotRepository>();
+        snapshots.ListSinceAsync(
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<WidgetSnapshot>>([]));
+        return new GetWidgetDelta.Handler(snapshots);
+    }
+
     // ── GetDashboardLiveStream: GenerateEventsAsync ───────────────────────
 
     [Fact]
@@ -160,7 +172,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_ReturnsSimulatedResult()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(
             DashboardId: Guid.NewGuid(),
             WidgetId: "widget-1",
@@ -178,7 +190,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_SinceTimestampPreserved()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var since = DateTimeOffset.UtcNow.AddMinutes(-30);
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", since);
 
@@ -191,7 +203,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_EmptyTenantId_ReturnsError()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "", DateTimeOffset.UtcNow.AddMinutes(-1));
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -203,7 +215,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_EmptyWidgetId_ReturnsError()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "", "tenant-1", DateTimeOffset.UtcNow.AddMinutes(-1));
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -215,7 +227,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_CountsAreNonNegative()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", DateTimeOffset.UtcNow.AddMinutes(-10));
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -228,7 +240,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_ChangesMatchCounts()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         // Use a past timestamp far enough back to generate changes
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", DateTimeOffset.UtcNow.AddMinutes(-15));
 
@@ -241,7 +253,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_AddedRows_HaveCorrectChangeType()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var since = DateTimeOffset.UtcNow.AddHours(-2);   // long elapsed → guaranteed adds
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", since);
 
@@ -328,7 +340,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
         // With MaxEvents=0 (unlimited) and a cancelled token, the stream should stop after heartbeat
         try
         {
-            await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, cts.Token))
+            await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, ct: cts.Token))
             {
                 events.Add(evt);
                 if (events.Count >= 2) break;  // safety cap for the test

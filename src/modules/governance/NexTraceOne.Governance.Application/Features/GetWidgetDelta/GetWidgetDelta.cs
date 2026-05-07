@@ -58,10 +58,15 @@ public static class GetWidgetDelta
     {
         public async Task<Result<Response>> Handle(Query query, CancellationToken ct)
         {
+            if (string.IsNullOrWhiteSpace(query.TenantId))
+                return Result.Failure<Response>(Error.Validation("WidgetDelta.TenantId", "TenantId is required."));
+            if (string.IsNullOrWhiteSpace(query.WidgetId))
+                return Result.Failure<Response>(Error.Validation("WidgetDelta.WidgetId", "WidgetId is required."));
+
             var asOf = DateTimeOffset.UtcNow;
 
-            var recentSnapshots = await snapshots.ListSinceAsync(
-                query.TenantId, query.DashboardId, query.WidgetId, query.Since, ct);
+            var recentSnapshots = (await snapshots.ListSinceAsync(
+                query.TenantId, query.DashboardId, query.WidgetId, query.Since, ct)) ?? [];
 
             if (recentSnapshots.Count == 0)
             {

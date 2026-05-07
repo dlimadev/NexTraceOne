@@ -1,3 +1,4 @@
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ComposeAiDashboard;
 using NexTraceOne.Governance.Application.Features.CreateNotebook;
 using NexTraceOne.Governance.Application.Features.GetNotebook;
@@ -178,7 +179,7 @@ public sealed class V34_NotebookAndAiComposerTests
     [Fact]
     public async Task ComposeAiDashboard_SloPrompt_ShouldProposeSloWidgets()
     {
-        var handler = new ComposeAiDashboard.Handler();
+        var handler = new ComposeAiDashboard.Handler(Substitute.For<IAiDashboardComposerService>());
         var cmd = new ComposeAiDashboard.Command(
             "SLO and reliability dashboard for payment service",
             "tenant1", "user1", "Engineer",
@@ -195,7 +196,7 @@ public sealed class V34_NotebookAndAiComposerTests
     [Fact]
     public async Task ComposeAiDashboard_IncidentPrompt_ShouldProposeIncidentWidgets()
     {
-        var handler = new ComposeAiDashboard.Handler();
+        var handler = new ComposeAiDashboard.Handler(Substitute.For<IAiDashboardComposerService>());
         var cmd = new ComposeAiDashboard.Command(
             "incident on-call overview",
             "tenant1", "user1", "Engineer",
@@ -210,7 +211,7 @@ public sealed class V34_NotebookAndAiComposerTests
     [Fact]
     public async Task ComposeAiDashboard_DoraPrompt_ShouldProposeDoraWidget()
     {
-        var handler = new ComposeAiDashboard.Handler();
+        var handler = new ComposeAiDashboard.Handler(Substitute.For<IAiDashboardComposerService>());
         var cmd = new ComposeAiDashboard.Command(
             "DORA metrics overview",
             "tenant1", "user1", "TechLead",
@@ -225,7 +226,7 @@ public sealed class V34_NotebookAndAiComposerTests
     [Fact]
     public async Task ComposeAiDashboard_ExecPersona_ShouldProposeTopServicesWidget()
     {
-        var handler = new ComposeAiDashboard.Handler();
+        var handler = new ComposeAiDashboard.Handler(Substitute.For<IAiDashboardComposerService>());
         var cmd = new ComposeAiDashboard.Command(
             "executive overview",
             "tenant1", "user1", "Executive",
@@ -240,7 +241,7 @@ public sealed class V34_NotebookAndAiComposerTests
     [Fact]
     public async Task ComposeAiDashboard_CostPrompt_ShouldProposeCostWidget()
     {
-        var handler = new ComposeAiDashboard.Handler();
+        var handler = new ComposeAiDashboard.Handler(Substitute.For<IAiDashboardComposerService>());
         var cmd = new ComposeAiDashboard.Command(
             "FinOps cost trend budget",
             "tenant1", "user1", "Executive",
@@ -255,7 +256,7 @@ public sealed class V34_NotebookAndAiComposerTests
     [Fact]
     public async Task ComposeAiDashboard_AlwaysContainsTimeRangeVariable()
     {
-        var handler = new ComposeAiDashboard.Handler();
+        var handler = new ComposeAiDashboard.Handler(Substitute.For<IAiDashboardComposerService>());
         var cmd = new ComposeAiDashboard.Command(
             "anything", "t1", "u1", "Engineer", null, null, null);
 
@@ -267,7 +268,7 @@ public sealed class V34_NotebookAndAiComposerTests
     [Fact]
     public async Task ComposeAiDashboard_WithTeam_ShouldIncludeTeamVariable()
     {
-        var handler = new ComposeAiDashboard.Handler();
+        var handler = new ComposeAiDashboard.Handler(Substitute.For<IAiDashboardComposerService>());
         var cmd = new ComposeAiDashboard.Command(
             "team health", "t1", "u1", "TechLead", "team-alpha", null, null);
 

@@ -21,6 +21,7 @@ using GetServiceOperationalTimelineFeature = NexTraceOne.Knowledge.Application.F
 
 using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.Knowledge.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 namespace NexTraceOne.Knowledge.API.Endpoints;
 

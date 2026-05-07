@@ -80,5 +80,8 @@ public enum AnalyticsEventType
     ReliabilityDashboardViewed = 23,
 
     /// <summary>Automation workflow criado ou editado.</summary>
-    AutomationWorkflowManaged = 24
+    AutomationWorkflowManaged = 24,
+
+    /// <summary>Novo serviço criado no catálogo.</summary>
+    ServiceCreated = 25
 }

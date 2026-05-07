@@ -34,7 +34,11 @@ public sealed class GetOptionalProvidersTests
         samlProvider.IsConfigured.Returns(saml);
 
         return new GetOptionalProviders.Handler(
-            canaryProvider, backupProvider, kafkaProducer, cloudBillingProvider, samlProvider);
+            canaryProvider, backupProvider, kafkaProducer, cloudBillingProvider, samlProvider,
+            Substitute.For<IRuntimeProvider>(),
+            Substitute.For<IChaosProvider>(),
+            Substitute.For<ICertificateProvider>(),
+            Substitute.For<ISchemaPlanner>());
     }
 
     [Fact]
