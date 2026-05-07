@@ -24,6 +24,7 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 /// - v1.5: PlatformApiToken, AgentQueryRecord (Agent-to-Agent Protocol — Wave D.4)
 /// - v1.6: PolicyDefinition (Policy Studio — Wave D.3)
 /// - v2.0: TenantLicense, AgentRegistration, AlertFiringRecord (SaaS Evolution)
+/// - v2.1: AccountActivationToken, PasswordResetToken (Token Infrastructure)
 /// </summary>
 public sealed class IdentityDbContext(
     DbContextOptions<IdentityDbContext> options,
@@ -128,6 +129,14 @@ public sealed class IdentityDbContext(
 
     /// <summary>Histórico de alertas disparados (AlertEvaluationJob).</summary>
     public DbSet<AlertFiringRecord> AlertFiringRecords => Set<AlertFiringRecord>();
+
+    // ── v2.1 — Token Infrastructure ───────────────────────────────────────
+
+    /// <summary>Tokens de activação de conta (hash SHA-256, expiry 48h).</summary>
+    public DbSet<AccountActivationToken> AccountActivationTokens => Set<AccountActivationToken>();
+
+    /// <summary>Tokens de reset de password (hash SHA-256, expiry 1h).</summary>
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;

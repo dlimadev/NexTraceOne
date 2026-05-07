@@ -19,6 +19,7 @@ using VerifyMfaChallengeFeature = NexTraceOne.IdentityAccess.Application.Feature
 using ForgotPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ForgotPassword.ForgotPassword;
 using ResetPasswordFeature = NexTraceOne.IdentityAccess.Application.Features.ResetPassword.ResetPassword;
 using ActivateAccountFeature = NexTraceOne.IdentityAccess.Application.Features.ActivateAccount.ActivateAccount;
+using RequestAccountActivationFeature = NexTraceOne.IdentityAccess.Application.Features.RequestAccountActivation.RequestAccountActivation;
 using ResendMfaCodeFeature = NexTraceOne.IdentityAccess.Application.Features.ResendMfaCode.ResendMfaCode;
 using StartSamlLoginFeature = NexTraceOne.IdentityAccess.Application.Features.StartSamlLogin.StartSamlLogin;
 using SamlAcsCallbackFeature = NexTraceOne.IdentityAccess.Application.Features.SamlAcsCallback.SamlAcsCallback;
@@ -196,6 +197,18 @@ internal static class AuthEndpoints
             var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).AllowAnonymous()
+          .RequireRateLimiting("auth");
+
+        // POST /auth/request-activation — reenviar email de activação (admin ou self-service)
+        authGroup.MapPost("/request-activation", async (
+            RequestAccountActivationFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequireAuthorization()
           .RequireRateLimiting("auth");
 
         // POST /auth/mfa/resend — reenviar código MFA

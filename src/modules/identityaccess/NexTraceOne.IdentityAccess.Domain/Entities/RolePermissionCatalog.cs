@@ -155,6 +155,10 @@ public static class RolePermissionCatalog
                 "notifications:configuration:write",
                 "notifications:delivery:read",
 
+                // Knowledge Hub
+                "knowledge:read",
+                "knowledge:write",
+
                 // Environment Management
                 "env:environments:read",
                 "env:environments:write",
@@ -217,6 +221,8 @@ public static class RolePermissionCatalog
                 "notifications:preferences:write",
                 "notifications:configuration:read",
                 "configuration:read",
+                "knowledge:read",
+                "knowledge:write",
                 "env:environments:read",
                 "env:environments:write",
                 "env:access:read"],
@@ -252,6 +258,8 @@ public static class RolePermissionCatalog
                 "notifications:preferences:read",
                 "notifications:preferences:write",
                 "configuration:read",
+                "knowledge:read",
+                "knowledge:write",
                 "env:environments:read",
                 "env:access:read"],
             Role.Viewer => [
@@ -276,6 +284,7 @@ public static class RolePermissionCatalog
                 "notifications:inbox:read",
                 "notifications:preferences:read",
                 "configuration:read",
+                "knowledge:read",
                 "env:environments:read"],
             Role.Auditor => [
                 "identity:users:read",
@@ -304,7 +313,8 @@ public static class RolePermissionCatalog
                 "env:access:read",
                 "notifications:inbox:read",
                 "notifications:preferences:read",
-                "configuration:read"],
+                "configuration:read",
+                "knowledge:read"],
             Role.SecurityReview => [
                 "identity:users:read",
                 "identity:roles:read",
@@ -333,6 +343,7 @@ public static class RolePermissionCatalog
                 "notifications:inbox:read",
                 "notifications:preferences:read",
                 "configuration:read",
+                "knowledge:read",
                 "env:environments:read",
                 "env:access:read"],
             Role.ApprovalOnly => [

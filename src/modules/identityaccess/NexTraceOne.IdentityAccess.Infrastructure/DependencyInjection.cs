@@ -82,6 +82,13 @@ public static class DependencyInjection
         services.AddScoped<IAgentRegistrationRepository, EfAgentRegistrationRepository>();
         services.AddScoped<IAlertFiringRecordRepository, EfAlertFiringRecordRepository>();
 
+        // Repositórios — v2.1 Token Infrastructure
+        services.AddScoped<IAccountActivationTokenRepository, AccountActivationTokenRepository>();
+        services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
+
+        // Notifier — envia emails de activação e reset (Null implementation por defeito)
+        services.AddScoped<IIdentityNotifier, NullIdentityNotifier>();
+
         // SaaS-01: Capability resolver para claims JWT
         services.AddScoped<ICapabilityResolver, DefaultCapabilityResolver>();
 
