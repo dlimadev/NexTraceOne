@@ -11,14 +11,14 @@
 
 NexTraceOne is a .NET 10 modular monolith with 12 domain modules, 5 building blocks, and comprehensive test coverage. The codebase is structurally sound: zero `NotImplementedException` throws, correct CQRS architecture, complete project reference graph, and 10,000+ unit/integration tests with real assertions.
 
-**Three items were found requiring immediate action before production deployment:**
+**Todos os P0 foram implementados nesta sessão. Itens P1 são config/ops:**
 
 | # | Severity | Item | Status |
 |---|----------|------|--------|
-| 1 | 🔴 CRITICAL | Knowledge module — all endpoints unprotected | **FIXED in this session** |
-| 2 | 🔴 CRITICAL | ActivateAccount / ResetPassword — token infrastructure not implemented | Pending |
-| 3 | 🟡 HIGH | appsettings.json — empty API keys, CORS, telemetry endpoints | Config/Ops |
-| 4 | 🟡 HIGH | Contract Pipeline — generates boilerplate stubs, not real contract parsing | Documented |
+| 1 | 🔴 CRITICAL | Knowledge module — all endpoints unprotected | **FIXED** |
+| 2 | 🔴 CRITICAL | ActivateAccount / ResetPassword — token infrastructure not implemented | **IMPLEMENTED** |
+| 3 | 🟡 HIGH | appsettings.json — empty API keys, CORS, telemetry endpoints | Config/Ops (startup preflight checks já presentes) |
+| 4 | 🟡 P2 | Contract Pipeline — stateless design (by decision) | Documented |
 
 ---
 
@@ -92,23 +92,22 @@ GET  /api/v1/knowledge/status                          → AllowAnonymous
 
 ## 3. Incomplete Features (Intentional Stubs)
 
-### 3.1 🔴 CRITICAL: ActivateAccount & ResetPassword — Token Infrastructure Missing
+### 3.1 ✅ IMPLEMENTED: ActivateAccount & ResetPassword — Token Infrastructure
 
-**Files:**
-- `src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/ActivateAccount/ActivateAccount.cs:40`
-- `src/modules/identityaccess/NexTraceOne.IdentityAccess.Application/Features/ResetPassword/ResetPassword.cs:40`
+**Implemented in this session.** Full token infrastructure now in place:
 
-Both handlers return a hardcoded validation error: _"Account activation token infrastructure not yet implemented"_ / _"Reset token infrastructure not yet implemented"_. These are live endpoints that will always return error responses.
+- `AccountActivationToken` entity — SHA-256 hash, 48h expiry, `MarkUsed` pattern
+- `PasswordResetToken` entity — SHA-256 hash, 1h expiry, `MarkUsed` pattern
+- Both tokens stored by hash only (raw token sent once via email, never persisted)
+- `ActivateAccount.Handler` validates token → activates user → sets password
+- `ForgotPassword.Handler` generates token → stores hash → calls `IIdentityNotifier`
+- `ResetPassword.Handler` validates token → updates password hash
+- `RequestAccountActivation` new command for admin-triggered resend
+- `IIdentityNotifier` port with `NullIdentityNotifier` (logs warning in dev)
+- Migration `20260507120000_IAM_AddActivationAndResetTokens` with both tables
+- 16 new tests (domain + handler levels) covering valid, expired, used, not-found cases
 
-**Impact:** Users cannot complete account registration via email or reset their password — two core identity flows.
-
-**Action required:**
-1. Implement token generation (secure random, SHA-256 hashed, stored in DB with expiry)
-2. Add `AccountActivationToken` and `PasswordResetToken` entities to `IdentityAccessDbContext`
-3. Wire email delivery via `INotificationService` / outbox pattern
-4. Implement `VerifyTokenAsync` in handler using time-constant comparison
-
-**Estimated effort:** 2–3 days
+**Remaining item:** Wire `IIdentityNotifier` to real email delivery via Notifications module integration event when SMTP is configured.
 
 ### 3.2 🟡 HIGH: Contract Pipeline — Generates Boilerplate, Not Real Contract Parsing
 
@@ -356,3 +355,23 @@ The following areas were audited and found to be complete and production-quality
 | File | Change |
 |------|--------|
 | `src/modules/knowledge/NexTraceOne.Knowledge.API/Endpoints/KnowledgeEndpointModule.cs` | Added `RequirePermission("knowledge:read/write")` to all 14 endpoints; `AllowAnonymous` on `/status` |
+| `src/modules/identityaccess/...Domain/Entities/AccountActivationToken.cs` | New entity — token hash, 48h expiry |
+| `src/modules/identityaccess/...Domain/Entities/PasswordResetToken.cs` | New entity — token hash, 1h expiry |
+| `src/modules/identityaccess/...Domain/Entities/RolePermissionCatalog.cs` | Added `knowledge:read/write` to all roles |
+| `src/modules/identityaccess/...Application/Abstractions/I*Repository.cs` (×2) | Token repository ports |
+| `src/modules/identityaccess/...Application/Abstractions/IIdentityNotifier.cs` | Email notification port |
+| `src/modules/identityaccess/...Application/Features/ActivateAccount/ActivateAccount.cs` | Implemented real token validation logic |
+| `src/modules/identityaccess/...Application/Features/ForgotPassword/ForgotPassword.cs` | Now generates and stores reset token |
+| `src/modules/identityaccess/...Application/Features/ResetPassword/ResetPassword.cs` | Implemented real password reset logic |
+| `src/modules/identityaccess/...Application/Features/RequestAccountActivation/` | New feature — generate + send activation token |
+| `src/modules/identityaccess/...Infrastructure/Persistence/Configurations/` (×2) | EF Core table configs |
+| `src/modules/identityaccess/...Infrastructure/Persistence/Repositories/` (×2) | EF Core repository implementations |
+| `src/modules/identityaccess/...Infrastructure/Services/NullIdentityNotifier.cs` | Dev-mode notifier (logs token) |
+| `src/modules/identityaccess/...Infrastructure/Persistence/IdentityDbContext.cs` | Added DbSets for both token tables |
+| `src/modules/identityaccess/...Infrastructure/DependencyInjection.cs` | Registered repos + notifier |
+| `src/modules/identityaccess/...Infrastructure/Persistence/Migrations/20260507120000_*` | Migration for both token tables |
+| `src/modules/identityaccess/...API/Endpoints/Endpoints/AuthEndpoints.cs` | Added `/request-activation` endpoint |
+| `tests/...ActivateAccountTests.cs` | 4 handler tests |
+| `tests/...ResetPasswordTests.cs` | 4 handler tests |
+| `tests/...AccountActivationTokenTests.cs` | 6 domain tests |
+| `tests/...PasswordResetTokenTests.cs` | 6 domain tests |
