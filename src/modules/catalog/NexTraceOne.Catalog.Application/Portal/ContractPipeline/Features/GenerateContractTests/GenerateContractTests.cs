@@ -55,7 +55,8 @@ public static class GenerateContractTests
                 ContractVersionId: request.ContractVersionId,
                 TestFramework: request.TestFramework,
                 Files: files,
-                TestCount: endpoints.Count)));
+                TestCount: endpoints.Count,
+                PreviewNote: PipelinePreviewNote.Text)));
         }
 
         private static List<(string Method, string Path)> ExtractEndpoints(string contractJson)
@@ -201,7 +202,8 @@ public static class GenerateContractTests
         Guid ContractVersionId,
         string TestFramework,
         IReadOnlyList<GeneratedFile> Files,
-        int TestCount);
+        int TestCount,
+        string PreviewNote);
 }
 
 internal static class StringHelperExtensions

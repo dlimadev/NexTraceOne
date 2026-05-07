@@ -52,7 +52,8 @@ public static class GenerateServerFromContract
             return Task.FromResult(Result<Response>.Success(new Response(
                 ContractVersionId: request.ContractVersionId,
                 TargetLanguage: request.TargetLanguage,
-                Files: files)));
+                Files: files,
+                PreviewNote: PipelinePreviewNote.Text)));
         }
 
         private static List<GeneratedFile> GenerateDotNetServerStubs(string serviceName)
@@ -602,5 +603,6 @@ public static class GenerateServerFromContract
     public sealed record Response(
         Guid ContractVersionId,
         string TargetLanguage,
-        IReadOnlyList<GeneratedFile> Files);
+        IReadOnlyList<GeneratedFile> Files,
+        string PreviewNote);
 }

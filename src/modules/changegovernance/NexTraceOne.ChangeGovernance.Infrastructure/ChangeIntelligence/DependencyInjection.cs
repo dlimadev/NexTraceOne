@@ -8,7 +8,6 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
-using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate;
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
@@ -104,9 +103,8 @@ public static class DependencyInjection
             .ConfigureHttpClient(c => c.Timeout = TimeSpan.FromSeconds(30));
         services.AddScoped<IExternalApprovalWebhookSender, ExternalApprovalWebhookSender>();
 
-        // Analytics writer: correlated traces → Elasticsearch chg_trace_release_mapping
-        // Graceful degradation via NullAnalyticsWriter when Analytics:Enabled = false
-        services.AddBuildingBlocksAnalytics(configuration);
+        // Analytics writer: registrado globalmente no ApiHost via AddBuildingBlocksAnalytics.
+        // IAnalyticsWriter é resolvido do container já configurado (Elastic ou ClickHouse).
         services.AddScoped<ITraceCorrelationWriter, TraceCorrelationAnalyticsWriter>();
 
         // Cross-module public interface — outros módulos consomem IChangeIntelligenceModule

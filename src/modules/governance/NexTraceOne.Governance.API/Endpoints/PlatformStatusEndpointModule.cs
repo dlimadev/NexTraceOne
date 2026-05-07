@@ -19,6 +19,7 @@ using ProvisionTenantSchemaFeature = NexTraceOne.Governance.Application.Features
 using GetCanaryRolloutsFeature = NexTraceOne.Governance.Application.Features.GetCanaryRollouts.GetCanaryRollouts;
 using GetOptionalProvidersFeature = NexTraceOne.Governance.Application.Features.GetOptionalProviders.GetOptionalProviders;
 using GetIngestionObservabilityFeature = NexTraceOne.Governance.Application.Features.GetIngestionObservability.GetIngestionObservability;
+using GetObservabilityProviderFeature = NexTraceOne.Governance.Application.Features.GetObservabilityProvider.GetObservabilityProvider;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -184,6 +185,17 @@ public sealed class PlatformStatusEndpointModule
             CancellationToken cancellationToken) =>
         {
             var query = new GetIngestionObservabilityFeature.Query();
+            var result = await sender.Send(query, cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:read");
+
+        // F4.3 — Active observability backend (Elastic/ClickHouse) and reachability.
+        platform.MapGet("/observability/provider", async (
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var query = new GetObservabilityProviderFeature.Query();
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:read");

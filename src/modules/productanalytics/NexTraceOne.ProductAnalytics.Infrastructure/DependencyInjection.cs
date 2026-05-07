@@ -10,6 +10,8 @@ using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
 using NexTraceOne.ProductAnalytics.Infrastructure.Services;
 
+// Readers concretos sobrescrevem os Null registrados na Application layer
+
 namespace NexTraceOne.ProductAnalytics.Infrastructure;
 
 /// <summary>
@@ -34,8 +36,29 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         // Repositories — P2.3
-        services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
+        // Provider-aware: ClickHouse for high-cardinality analytic reads, PostgreSQL as default.
+        var analyticsProvider = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
+        if (string.Equals(analyticsProvider, "ClickHouse", StringComparison.OrdinalIgnoreCase))
+        {
+            services.Configure<ClickHouseAnalyticsOptions>(
+                configuration.GetSection(ClickHouseAnalyticsOptions.SectionName));
+            services.AddHttpClient<ClickHouseAnalyticsEventRepository>();
+            services.AddScoped<IAnalyticsEventRepository>(
+                sp => sp.GetRequiredService<ClickHouseAnalyticsEventRepository>());
+        }
+        else
+        {
+            services.AddScoped<IAnalyticsEventRepository, AnalyticsEventRepository>();
+        }
         services.AddScoped<IJourneyDefinitionRepository, JourneyDefinitionRepository>();
+
+        // Readers concretos — sobrescrevem NullPortalAdoptionReader e NullSelfServiceWorkflowReader
+        // registrados na Application layer. O último registro vence no .NET DI container.
+        services.AddScoped<IPortalAdoptionReader, PortalAdoptionReader>();
+        services.AddScoped<ISelfServiceWorkflowReader, SelfServiceWorkflowReader>();
+
+        // Analytics forwarder — propaga eventos do PostgreSQL para o analytics store (Elastic/ClickHouse)
+        services.AddScoped<IAnalyticsEventForwarder, AnalyticsEventForwarder>();
 
         // Cross-module contract — consumed by Governance for adoption metrics
         services.AddScoped<IProductAnalyticsModule, ProductAnalyticsModuleService>();

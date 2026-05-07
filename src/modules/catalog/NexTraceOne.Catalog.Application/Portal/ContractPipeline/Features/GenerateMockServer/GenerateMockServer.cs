@@ -48,7 +48,8 @@ public static class GenerateMockServer
                 ContractVersionId: request.ContractVersionId,
                 MockServerType: request.MockServerType,
                 Files: files,
-                Instructions: instructions)));
+                Instructions: instructions,
+                PreviewNote: PipelinePreviewNote.Text)));
         }
 
         private (IReadOnlyList<GeneratedFile> Files, string Instructions) GenerateWireMock(Guid id, string contractJson)
@@ -123,5 +124,6 @@ public static class GenerateMockServer
         Guid ContractVersionId,
         string MockServerType,
         IReadOnlyList<GeneratedFile> Files,
-        string Instructions);
+        string Instructions,
+        string PreviewNote);
 }

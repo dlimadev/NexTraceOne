@@ -65,6 +65,7 @@ builder.Host.ConfigureNexTraceSerilog(builder.Configuration);
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
 builder.Services.AddBuildingBlocksDbContext(builder.Configuration);
 builder.Services.AddBuildingBlocksObservability(builder.Configuration);
+builder.Services.AddBuildingBlocksAnalytics(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 builder.Services.AddApiHostOperationalHealthChecks();
 

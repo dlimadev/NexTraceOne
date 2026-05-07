@@ -48,7 +48,9 @@ public static class GetExternalHttpAudit
 
             var simulatedNote = page.IsLiveData
                 ? string.Empty
-                : "HTTP audit data requires Elasticsearch integration. Configure Telemetry:ObservabilityProvider:Provider=Elastic to enable live data.";
+                : "HTTP audit data requires an active observability backend. " +
+                  "Configure Telemetry:ObservabilityProvider:Provider to 'Elastic' or 'ClickHouse' " +
+                  "and ensure the backend is reachable to enable live data.";
 
             var response = new ExternalHttpAuditResponse(
                 Entries: entries,

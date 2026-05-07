@@ -9,6 +9,8 @@ using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 
+// IAnalyticsEventForwarder is resolved from Infrastructure (registered in AddProductAnalyticsInfrastructure)
+
 namespace NexTraceOne.ProductAnalytics.Application.Features.RecordAnalyticsEvent;
 
 /// <summary>
@@ -57,7 +59,8 @@ public static class RecordAnalyticsEvent
         IUnitOfWork unitOfWork,
         ICurrentTenant tenant,
         ICurrentUser user,
-        IDateTimeProvider clock) : ICommandHandler<Command, Response>
+        IDateTimeProvider clock,
+        IAnalyticsEventForwarder analyticsForwarder) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -82,6 +85,10 @@ public static class RecordAnalyticsEvent
 
             await repository.AddAsync(analyticsEvent, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            // Propaga para o analytics store (Elastic ou ClickHouse) de forma assíncrona.
+            // Falhas são suprimidas via SuppressWriteErrors — o domínio nunca é bloqueado.
+            await analyticsForwarder.ForwardAsync(analyticsEvent, cancellationToken);
 
             var response = new Response(
                 EventId: analyticsEvent.Id.Value.ToString("N")[..12],

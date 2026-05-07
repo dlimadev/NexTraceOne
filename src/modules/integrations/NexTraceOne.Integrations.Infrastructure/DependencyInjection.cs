@@ -73,10 +73,20 @@ public static class DependencyInjection
         services.AddScoped<LogToMetricProcessor>();
         services.AddScoped<CatalogEnrichmentProcessor>();
 
-        // Legacy Telemetry — Elastic writer (padrão)
-        services.Configure<ElasticLegacyWriterOptions>(
-            configuration.GetSection(ElasticLegacyWriterOptions.SectionName));
-        services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>();
+        // Legacy Telemetry — writer selecionado pelo provider de observabilidade configurado
+        var legacyProvider = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
+        if (string.Equals(legacyProvider, "ClickHouse", StringComparison.OrdinalIgnoreCase))
+        {
+            services.Configure<ClickHouseLegacyWriterOptions>(
+                configuration.GetSection(ClickHouseLegacyWriterOptions.SectionName));
+            services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>();
+        }
+        else
+        {
+            services.Configure<ElasticLegacyWriterOptions>(
+                configuration.GetSection(ElasticLegacyWriterOptions.SectionName));
+            services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>();
+        }
 
         // Integration Context Resolver — resolves active binding descriptors by type, tenant and environment
         services.AddScoped<IIntegrationContextResolver, IntegrationContextResolver>();
