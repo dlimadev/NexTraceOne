@@ -3967,6 +3967,32 @@
           "refArrayItem": "#/components/schemas/OrderItem",
           "pattern": "^[a-z]+$"
         }
+      },
+      "dataContract": {
+        "contractInfo": "Informações do Data Contract",
+        "title": "Título",
+        "titlePlaceholder": "Data Contract de Perfil de Utilizador",
+        "version": "Versão",
+        "owner": "Responsável",
+        "ownerPlaceholder": "equipa-plataforma-dados",
+        "sourceSystem": "Sistema de Origem",
+        "sourceSystemPlaceholder": "postgres-utilizadores-db",
+        "sourceSystemRequired": "Sistema de origem é obrigatório",
+        "slaFreshnessHours": "SLA de Frescura (horas)",
+        "description": "Descrição",
+        "columns": "Colunas",
+        "addColumn": "Adicionar Coluna",
+        "noColumns": "Sem colunas. Clique em \"Adicionar Coluna\" para definir o schema.",
+        "columnsRequired": "É obrigatória pelo menos uma coluna",
+        "unnamedColumn": "Coluna sem nome",
+        "columnName": "Nome da Coluna",
+        "columnNamePlaceholder": "ex: user_id",
+        "columnType": "Tipo",
+        "piiLevel": "Classificação PII",
+        "nullable": "Nulo",
+        "columnDescription": "Descrição",
+        "validate": "Validar",
+        "generateSource": "Gerar JSON de Schema"
       }
     },
     "canonical": {

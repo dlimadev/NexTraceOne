@@ -21,6 +21,7 @@ import type {
   SchemaProperty,
   WebhookBuilderState,
   LegacyContractBuilderState,
+  DataContractBuilderState,
   SyncResult,
 } from './builderTypes';
 
@@ -824,4 +825,37 @@ export function legacyContractBuilderToYaml(state: LegacyContractBuilderState): 
   }
 
   return { success: true, content: yaml, warnings, unsupportedFeatures: unsupported };
+}
+
+// ── Data Contract → JSON array (CC-03) ───────────────────────────────────────
+
+export function dataContractBuilderToJson(state: DataContractBuilderState): SyncResult {
+  const warnings: string[] = [];
+
+  const columns = state.columns.map((col) => ({
+    name: col.name || 'unnamed',
+    type: col.type,
+    nullable: col.nullable,
+    pii: col.pii,
+    ...(col.description ? { description: col.description } : {}),
+  }));
+
+  const doc = {
+    'x-nto-data-contract': {
+      title: state.title || 'Unnamed Data Contract',
+      version: state.version || '1.0.0',
+      owner: state.owner || '',
+      sourceSystem: state.sourceSystem || '',
+      slaFreshnessHours: state.slaFreshnessHours || 24,
+      ...(state.description ? { description: state.description } : {}),
+    },
+    schema: columns,
+  };
+
+  return {
+    success: true,
+    content: JSON.stringify(doc, null, 2),
+    warnings,
+    unsupportedFeatures: [],
+  };
 }

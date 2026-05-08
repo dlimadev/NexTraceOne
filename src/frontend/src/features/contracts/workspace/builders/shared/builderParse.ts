@@ -39,6 +39,10 @@ import type {
   LegacyField,
   LegacyFieldType,
   LegacyEncoding,
+  DataContractBuilderState,
+  DataContractColumn,
+  ColumnType,
+  PiiLevel,
 } from './builderTypes';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -870,4 +874,56 @@ function defaultLegacyState(kind: LegacyContractKind): LegacyContractBuilderStat
     totalLength: '', owner: '', programName: '', queueManager: '', queueName: '',
     messageFormat: '', transactionId: '', commareaLength: '', fields: [], observabilityNotes: '',
   };
+}
+
+// ── Data Contract JSON → Builder state (CC-03) ───────────────────────────────
+
+const VALID_COLUMN_TYPES = new Set<ColumnType>([
+  'uuid', 'varchar', 'text', 'int', 'bigint', 'decimal', 'boolean',
+  'timestamp', 'date', 'json', 'array', 'other',
+]);
+const VALID_PII = new Set<PiiLevel>(['None', 'Low', 'Medium', 'High', 'Critical']);
+
+let colId = 1;
+function genColId() { return `col-${colId++}`; }
+
+export function parseDataContractJson(
+  content: string,
+  _format?: string,
+): { state: DataContractBuilderState } | null {
+  try {
+    const doc = JSON.parse(content);
+    const meta = doc['x-nto-data-contract'] ?? {};
+    const rawColumns: unknown[] = Array.isArray(doc.schema) ? doc.schema : [];
+
+    const columns: DataContractColumn[] = rawColumns.map((c) => {
+      const col = c as Record<string, unknown>;
+      const rawType = String(col.type ?? 'varchar').toLowerCase() as ColumnType;
+      const type: ColumnType = VALID_COLUMN_TYPES.has(rawType) ? rawType : 'other';
+      const rawPii = String(col.pii ?? 'None') as PiiLevel;
+      const pii: PiiLevel = VALID_PII.has(rawPii) ? rawPii : 'None';
+      return {
+        id: genColId(),
+        name: String(col.name ?? ''),
+        type,
+        nullable: col.nullable === true,
+        pii,
+        description: String(col.description ?? ''),
+      };
+    });
+
+    return {
+      state: {
+        title: String(meta.title ?? ''),
+        version: String(meta.version ?? '1.0.0'),
+        owner: String(meta.owner ?? ''),
+        sourceSystem: String(meta.sourceSystem ?? ''),
+        slaFreshnessHours: Number(meta.slaFreshnessHours ?? 24),
+        description: String(meta.description ?? ''),
+        columns,
+      },
+    };
+  } catch {
+    return null;
+  }
 }

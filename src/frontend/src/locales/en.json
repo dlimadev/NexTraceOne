@@ -2713,6 +2713,32 @@
           "refArrayItem": "#/components/schemas/OrderItem",
           "pattern": "^[a-z]+$"
         }
+      },
+      "dataContract": {
+        "contractInfo": "Data Contract Information",
+        "title": "Title",
+        "titlePlaceholder": "User Profile Data Contract",
+        "version": "Version",
+        "owner": "Owner",
+        "ownerPlaceholder": "team-data-platform",
+        "sourceSystem": "Source System",
+        "sourceSystemPlaceholder": "postgres-users-db",
+        "sourceSystemRequired": "Source system is required",
+        "slaFreshnessHours": "SLA Freshness (hours)",
+        "description": "Description",
+        "columns": "Columns",
+        "addColumn": "Add Column",
+        "noColumns": "No columns yet. Click \"Add Column\" to define the schema.",
+        "columnsRequired": "At least one column is required",
+        "unnamedColumn": "Unnamed Column",
+        "columnName": "Column Name",
+        "columnNamePlaceholder": "e.g. user_id",
+        "columnType": "Type",
+        "piiLevel": "PII Classification",
+        "nullable": "Nullable",
+        "columnDescription": "Description",
+        "validate": "Validate",
+        "generateSource": "Generate Schema JSON"
       }
     },
     "canonical": {
