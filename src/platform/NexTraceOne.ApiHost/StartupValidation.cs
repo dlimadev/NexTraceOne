@@ -79,7 +79,7 @@ public static class StartupValidation
         // Validação de política de cookies seguros — proibido desabilitar fora de Development
         ValidateSecureCookiesPolicy(app, configuration, logger);
 
-        // Validação básica de connection strings — em non-Development, connection strings vazias são fatais
+        // Validação básica de connection strings — em non-Development, strings vazias ou com placeholder são fatais
         var connectionStrings = configuration.GetSection("ConnectionStrings");
         if (connectionStrings.Exists())
         {
@@ -99,6 +99,25 @@ public static class StartupValidation
                     }
 
                     logger.LogWarning("Connection string '{Key}' is empty.", child.Key);
+                }
+                else if (child.Value.Contains("REPLACE_VIA_ENV", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!app.Environment.IsDevelopment())
+                    {
+                        logger.LogCritical(
+                            "Connection string '{Key}' contains placeholder 'REPLACE_VIA_ENV' in {Environment} environment. Aborting startup.",
+                            child.Key,
+                            app.Environment.EnvironmentName);
+                        throw new InvalidOperationException(
+                            $"NexTraceOne startup aborted: connection string '{child.Key}' contains the placeholder 'REPLACE_VIA_ENV'. " +
+                            "Replace all REPLACE_VIA_ENV values with real credentials via environment variables or a secrets manager.");
+                    }
+
+                    validationWarnings.Add($"ConnectionStrings:{child.Key} (placeholder)");
+                    logger.LogWarning(
+                        "Connection string '{Key}' contains placeholder 'REPLACE_VIA_ENV' in Development environment. " +
+                        "Ensure real credentials are used in non-Development environments.",
+                        child.Key);
                 }
             }
         }
@@ -145,6 +164,25 @@ public static class StartupValidation
                 $"NexTraceOne startup aborted: Jwt:Secret must be configured in all environments. " +
                 "Set the 'Jwt__Secret' environment variable, use dotnet user-secrets, or provision it via a secrets manager. " +
                 $"Minimum {MinimumJwtSecretLength} characters required for HS256 key material. " +
+                "Generate a strong key with: openssl rand -base64 48");
+        }
+
+        if (jwtSecret.Contains("REPLACE_VIA_ENV", StringComparison.OrdinalIgnoreCase))
+        {
+            if (app.Environment.IsDevelopment())
+            {
+                logger.LogWarning(
+                    "Jwt:Secret contains placeholder 'REPLACE_VIA_ENV' in Development environment. " +
+                    "Configure a real secret via: dotnet user-secrets set \"Jwt:Secret\" \"<key>\"");
+                return;
+            }
+
+            logger.LogCritical(
+                "Jwt:Secret contains placeholder 'REPLACE_VIA_ENV' in {Environment} environment. Aborting startup.",
+                app.Environment.EnvironmentName);
+            throw new InvalidOperationException(
+                $"NexTraceOne startup aborted: Jwt:Secret contains the placeholder 'REPLACE_VIA_ENV'. " +
+                "Set a real secret via the 'Jwt__Secret' environment variable or a secrets manager. " +
                 "Generate a strong key with: openssl rand -base64 48");
         }
 

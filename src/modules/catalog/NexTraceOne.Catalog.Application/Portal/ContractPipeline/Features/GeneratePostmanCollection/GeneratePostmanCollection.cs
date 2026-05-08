@@ -1,10 +1,10 @@
-using System.Text;
 using System.Text.Json;
-using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Shared;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GeneratePostmanCollection;
 
@@ -14,7 +14,6 @@ public static class GeneratePostmanCollection
     /// <summary>Comando para gerar coleção Postman.</summary>
     public sealed record Command(
         Guid ContractVersionId,
-        string ContractJson,
         string CollectionName) : ICommand<Response>;
 
     /// <summary>Validação do comando.</summary>
@@ -23,27 +22,31 @@ public static class GeneratePostmanCollection
         public Validator()
         {
             RuleFor(x => x.ContractVersionId).NotEmpty();
-            RuleFor(x => x.ContractJson).NotEmpty();
             RuleFor(x => x.CollectionName).NotEmpty().MaximumLength(200);
         }
     }
 
-    /// <summary>Handler que gera a coleção Postman.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    /// <summary>Handler que gera a coleção Postman carregando a spec da base de dados.</summary>
+    public sealed class Handler(IContractVersionRepository contractVersionRepository) : ICommandHandler<Command, Response>
     {
         private static readonly JsonSerializerOptions s_options = new() { WriteIndented = true };
 
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(request);
+            var contractVersion = await contractVersionRepository.GetByIdAsync(
+                new ContractVersionId(request.ContractVersionId), cancellationToken);
 
+            if (contractVersion is null)
+                return Error.NotFound("contract.version.not_found", "Contract version not found.");
+
+            var specContent = contractVersion.SpecContent;
             var items = new List<object>();
             var endpointCount = 0;
             var baseUrl = "{{baseUrl}}";
 
             try
             {
-                using var doc = JsonDocument.Parse(request.ContractJson);
+                using var doc = JsonDocument.Parse(specContent);
                 var root = doc.RootElement;
 
                 if (root.TryGetProperty("paths", out var paths))
@@ -75,7 +78,7 @@ public static class GeneratePostmanCollection
                     }
                 }
             }
-            catch (JsonException) { /* returns empty collection */ }
+            catch (JsonException) { /* returns empty collection on unparseable spec */ }
 
             var collection = new
             {
@@ -90,11 +93,11 @@ public static class GeneratePostmanCollection
             };
 
             var collectionJson = JsonSerializer.Serialize(collection, s_options);
-            return Task.FromResult(Result<Response>.Success(new Response(
+            return Result<Response>.Success(new Response(
                 ContractVersionId: request.ContractVersionId,
                 CollectionJson: collectionJson,
                 EndpointCount: endpointCount,
-                PreviewNote: PipelinePreviewNote.Text)));
+                PreviewNote: PipelinePreviewNote.Text));
         }
     }
 

@@ -7,6 +7,7 @@ using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.ApiHost;
+using NexTraceOne.ApiHost.Options;
 using NexTraceOne.Catalog.API.Graph;
 using NexTraceOne.Catalog.API.GraphQL;
 using NexTraceOne.Governance.API;
@@ -129,6 +130,25 @@ builder.Services.AddKnowledgeModule(builder.Configuration);
 // [5] Cross-module bridges — registered after all modules to override null readers
 // Bridges OtelRuntimeComparisonReader to OperationalIntelligence for ChangeGovernance
 builder.Services.AddScoped<IRuntimeComparisonReader, OtelRuntimeComparisonReader>();
+
+// [5.1] DI-level startup contract validation — fires before app.Run(), fails fast on placeholder/missing critical config.
+// In Development: validation is skipped (placeholders are acceptable for local dev).
+// In all other environments: app refuses to start if Jwt:Secret or primary connection string is a placeholder.
+var isDevelopment = builder.Environment.IsDevelopment();
+
+builder.Services.AddOptions<JwtOptions>()
+    .BindConfiguration("Jwt")
+    .Validate(
+        o => isDevelopment || (!string.IsNullOrEmpty(o.Secret) && !o.Secret.Contains("REPLACE_VIA_ENV", StringComparison.OrdinalIgnoreCase)),
+        "Jwt:Secret must be set via environment variable — cannot be empty or placeholder. Set Jwt__Secret.")
+    .ValidateOnStart();
+
+builder.Services.AddOptions<ConnectionStringsOptions>()
+    .BindConfiguration("ConnectionStrings")
+    .Validate(
+        o => isDevelopment || string.IsNullOrEmpty(o.NexTraceOne) || !o.NexTraceOne.Contains("REPLACE_VIA_ENV", StringComparison.OrdinalIgnoreCase),
+        "ConnectionStrings:NexTraceOne must be set via environment variable — placeholder value detected. Set ConnectionStrings__NexTraceOne.")
+    .ValidateOnStart();
 
 // [5] JSON — serialização de enums como strings para Minimal API
 builder.Services.ConfigureHttpJsonOptions(options =>
