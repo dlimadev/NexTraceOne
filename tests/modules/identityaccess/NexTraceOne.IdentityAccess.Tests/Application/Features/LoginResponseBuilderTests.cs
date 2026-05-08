@@ -1,3 +1,4 @@
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Features;
 using NexTraceOne.IdentityAccess.Domain.Entities;

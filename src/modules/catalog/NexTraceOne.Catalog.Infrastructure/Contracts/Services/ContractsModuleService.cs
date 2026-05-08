@@ -106,10 +106,10 @@ internal sealed class ContractsModuleService(
         var assets = await graphDbContext.ApiAssets
             .AsNoTracking()
             .Include(a => a.OwnerService)
-            .Where(a => assetIds.Contains(a.Id))
+            .Where(a => assetIds.Contains(a.Id.Value))
             .ToListAsync(ct);
 
-        var assetMap = assets.ToDictionary(a => a.Id);
+        var assetMap = assets.ToDictionary(a => a.Id.Value);
 
         return diffs
             .Select(d =>
