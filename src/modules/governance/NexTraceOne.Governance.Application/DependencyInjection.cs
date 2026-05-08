@@ -75,6 +75,7 @@ using NexTraceOne.Governance.Application.Features.RunComplianceChecks;
 using NexTraceOne.Governance.Application.Features.UpdateDomain;
 using NexTraceOne.Governance.Application.Features.UpdateGovernancePack;
 using NexTraceOne.Governance.Application.Features.UpdateTeam;
+using NexTraceOne.Governance.Application.Features.GetDashboardAnnotations;
 using NexTraceOne.Governance.Application.Features.RunPreCommitGovernanceCheck;
 
 namespace NexTraceOne.Governance.Application;
@@ -146,6 +147,7 @@ public static class DependencyInjection
         services.AddTransient<IValidator<ListPolicies.Query>, ListPolicies.Validator>();
         services.AddTransient<IValidator<GetPolicy.Query>, GetPolicy.Validator>();
         services.AddTransient<IValidator<GetOnboardingContext.Query>, GetOnboardingContext.Validator>();
+        services.AddTransient<IValidator<GetDashboardAnnotations.Query>, GetDashboardAnnotations.Validator>();
 
         // P5.5 — Governance Policy Engine V2
         services.AddTransient<IValidator<RegisterPolicyAsCode.Command>, RegisterPolicyAsCode.Validator>();

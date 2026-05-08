@@ -52,6 +52,30 @@ internal sealed class ChangeIntelligenceModule(
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<ReleaseSummaryDto>> GetReleasesInWindowAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug("Fetching releases between {From} and {To}", from, to);
+
+        return await context.Releases
+            .AsNoTracking()
+            .Where(r => r.CreatedAt >= from && r.CreatedAt <= to)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(maxCount)
+            .Select(r => new ReleaseSummaryDto(
+                r.Id.Value,
+                r.ServiceName,
+                r.Version,
+                r.Environment,
+                r.Status.ToString(),
+                r.CreatedAt))
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<BlastRadiusDto?> GetBlastRadiusAsync(Guid releaseId, CancellationToken cancellationToken)
     {
         logger.LogDebug("Fetching blast radius report for release {ReleaseId}", releaseId);

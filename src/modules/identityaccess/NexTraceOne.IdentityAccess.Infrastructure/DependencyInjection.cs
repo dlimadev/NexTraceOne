@@ -8,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
 using NexTraceOne.IdentityAccess.Domain.Events;
@@ -86,8 +87,16 @@ public static class DependencyInjection
         services.AddScoped<IAccountActivationTokenRepository, AccountActivationTokenRepository>();
         services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
-        // Notifier — envia emails de activação e reset (Null implementation por defeito)
-        services.AddScoped<IIdentityNotifier, NullIdentityNotifier>();
+        // Notifier — usa implementação real via Notifications module quando Smtp:Host está configurado;
+        // caso contrário usa NullIdentityNotifier (que regista o token em Warning para dev local).
+        var smtpHost = configuration["Smtp:Host"];
+        if (!string.IsNullOrWhiteSpace(smtpHost))
+            services.AddScoped<IIdentityNotifier>(sp =>
+                new NotificationsIdentityNotifier(
+                    sp.GetRequiredService<INotificationModule>(),
+                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<NotificationsIdentityNotifier>>()));
+        else
+            services.AddScoped<IIdentityNotifier, NullIdentityNotifier>();
 
         // SaaS-01: Capability resolver para claims JWT
         services.AddScoped<ICapabilityResolver, DefaultCapabilityResolver>();

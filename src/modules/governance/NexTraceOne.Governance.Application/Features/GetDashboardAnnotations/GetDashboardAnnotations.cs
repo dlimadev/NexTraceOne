@@ -1,6 +1,10 @@
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
+using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
+using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Application.Features.GetDashboardAnnotations;
 
@@ -9,13 +13,13 @@ namespace NexTraceOne.Governance.Application.Features.GetDashboardAnnotations;
 /// em widgets de séries temporais de um dashboard.
 ///
 /// Fontes de anotação:
-/// — Changes (releases, rollouts)
-/// — Incidents (abertura, resolução)
-/// — Contract Breaking Changes (detection events)
-/// — Policy Violations
+/// — Changes (releases, rollouts) via IChangeIntelligenceModule
+/// — Incidents (abertura, resolução) via IIncidentModule
+/// — Policy Violations via IRulesetGovernanceModule
+/// — Contract Breaking Changes (not yet bridged — honest gap)
 ///
-/// As fontes cross-módulo que ainda não têm bridge real retornam anotações simuladas
-/// com SimulatedNote (honest gap pattern).
+/// Cada fonte é isolada com try/catch: uma falha de módulo retorna IsSimulated: true
+/// para essa fonte, sem abortar as restantes.
 ///
 /// Wave V3.2 — Query-driven Widgets &amp; Widget SDK.
 /// </summary>
@@ -63,98 +67,124 @@ public static class GetDashboardAnnotations
         }
     }
 
-    public sealed class Handler : IQueryHandler<Query, Response>
+    public sealed class Handler(
+        IIncidentModule incidentModule,
+        IChangeIntelligenceModule changeIntelligenceModule,
+        IRulesetGovernanceModule rulesetGovernanceModule,
+        ILogger<Handler> logger) : IQueryHandler<Query, Response>
     {
-        public Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            // Honest gap: cross-module annotation sources (ChangeGovernance, OperationalIntelligence,
-            // Catalog contract events) are not yet bridged into the Governance bounded context.
-            // We return representative simulated annotations so the frontend overlay is functional
-            // and design can be validated before real bridges are wired.
-            var annotations = BuildSimulatedAnnotations(request);
-            var sources = BuildSourceSummaries(annotations);
+            var annotations = new List<AnnotationDto>();
+            var sources = new List<AnnotationSourceSummary>();
 
-            return Task.FromResult(Result<Response>.Success(new Response(
-                Annotations: annotations,
+            // — Incidents source
+            try
+            {
+                var incidents = await incidentModule.GetRecentIncidentsAsync(
+                    request.TenantId, request.From, request.To, request.MaxPerSource, cancellationToken);
+
+                var incidentAnnotations = incidents
+                    .Where(i => MatchesServiceFilter(i.ServiceName, request.ServiceNames))
+                    .Select(i => new AnnotationDto(
+                        Id: $"incident-{i.Id}",
+                        Timestamp: i.DetectedAt,
+                        Type: "incident.opened",
+                        Title: i.Title,
+                        Detail: $"Severity: {i.Severity} — Status: {i.Status}",
+                        ServiceName: i.ServiceName,
+                        Severity: MapIncidentSeverity(i.Severity),
+                        IsSimulated: false))
+                    .ToList();
+
+                annotations.AddRange(incidentAnnotations);
+                sources.Add(new AnnotationSourceSummary("incidents", incidentAnnotations.Count, false, null));
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to fetch incident annotations; using simulated fallback");
+                sources.Add(new AnnotationSourceSummary("incidents", 0, true, "OperationalIntelligence module unavailable"));
+            }
+
+            // — Releases/changes source
+            try
+            {
+                var releases = await changeIntelligenceModule.GetReleasesInWindowAsync(
+                    request.From, request.To, request.MaxPerSource, cancellationToken);
+
+                var releaseAnnotations = releases
+                    .Where(r => MatchesServiceFilter(r.ServiceName, request.ServiceNames))
+                    .Select(r => new AnnotationDto(
+                        Id: $"release-{r.ReleaseId}",
+                        Timestamp: r.CreatedAt,
+                        Type: "change.release",
+                        Title: $"Release {r.ServiceName} {r.Version}",
+                        Detail: $"Environment: {r.Environment} — Status: {r.Status}",
+                        ServiceName: r.ServiceName,
+                        Severity: "info",
+                        IsSimulated: false))
+                    .ToList();
+
+                annotations.AddRange(releaseAnnotations);
+                sources.Add(new AnnotationSourceSummary("changes", releaseAnnotations.Count, false, null));
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to fetch release annotations; using simulated fallback");
+                sources.Add(new AnnotationSourceSummary("changes", 0, true, "ChangeIntelligence module unavailable"));
+            }
+
+            // — Policy violations source
+            try
+            {
+                var violations = await rulesetGovernanceModule.GetRecentViolationsAsync(
+                    request.From, request.To, request.MaxPerSource, cancellationToken);
+
+                var violationAnnotations = violations
+                    .Select(v => new AnnotationDto(
+                        Id: $"violation-{v.LintResultId}",
+                        Timestamp: v.ExecutedAt,
+                        Type: "policy.violation",
+                        Title: $"Contract violations detected ({v.TotalFindings} findings)",
+                        Detail: $"Lint score: {v.Score:F1} — Release: {v.ReleaseId}",
+                        ServiceName: null,
+                        Severity: v.Score < 50 ? "critical" : "warning",
+                        IsSimulated: false))
+                    .ToList();
+
+                annotations.AddRange(violationAnnotations);
+                sources.Add(new AnnotationSourceSummary("policies", violationAnnotations.Count, false, null));
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to fetch policy violation annotations; using simulated fallback");
+                sources.Add(new AnnotationSourceSummary("policies", 0, true, "RulesetGovernance module unavailable"));
+            }
+
+            // — Contracts source (not yet bridged — honest gap)
+            sources.Add(new AnnotationSourceSummary("contracts", 0, true, "Catalog contract events bridge pending"));
+
+            var sorted = annotations
+                .OrderByDescending(a => a.Timestamp)
+                .ToList();
+
+            return Result<Response>.Success(new Response(
+                Annotations: sorted,
                 Sources: sources,
                 From: request.From,
                 To: request.To,
-                TotalCount: annotations.Count)));
+                TotalCount: sorted.Count));
         }
 
-        private static List<AnnotationDto> BuildSimulatedAnnotations(Query req)
+        private static bool MatchesServiceFilter(string? serviceName, IReadOnlyList<string>? filter) =>
+            filter is null or { Count: 0 } ||
+            (serviceName is not null && filter.Contains(serviceName, StringComparer.OrdinalIgnoreCase));
+
+        private static string MapIncidentSeverity(string severity) => severity.ToUpperInvariant() switch
         {
-            var mid = req.From + (req.To - req.From) / 2;
-            var quarter = (req.To - req.From) / 4;
-
-            // Filter by service names if provided
-            bool Matches(string? svc) =>
-                req.ServiceNames is null or { Count: 0 } ||
-                (svc is not null && req.ServiceNames.Contains(svc, StringComparer.OrdinalIgnoreCase));
-
-            var all = new List<AnnotationDto>
-            {
-                new(
-                    Id: "ann-change-1",
-                    Timestamp: req.From + quarter,
-                    Type: "change.release",
-                    Title: "Release payment-service v2.3.1",
-                    Detail: "Deployed to production — confidence 94",
-                    ServiceName: "payment-service",
-                    Severity: "info",
-                    IsSimulated: true),
-
-                new(
-                    Id: "ann-incident-1",
-                    Timestamp: mid,
-                    Type: "incident.opened",
-                    Title: "P1 Incident — payment-service latency spike",
-                    Detail: "Resolved in 18 minutes",
-                    ServiceName: "payment-service",
-                    Severity: "critical",
-                    IsSimulated: true),
-
-                new(
-                    Id: "ann-contract-1",
-                    Timestamp: mid + quarter,
-                    Type: "contract.breaking_change",
-                    Title: "Breaking change detected — user-service REST v1.5.0",
-                    Detail: "Field 'email' removed from /users/{id} response",
-                    ServiceName: "user-service",
-                    Severity: "warning",
-                    IsSimulated: true),
-
-                new(
-                    Id: "ann-policy-1",
-                    Timestamp: req.To - (quarter / 2),
-                    Type: "policy.violation",
-                    Title: "Policy violation — analytics-service missing runbook",
-                    Detail: "Tier Standard requires runbook for every Critical SLO",
-                    ServiceName: "analytics-service",
-                    Severity: "warning",
-                    IsSimulated: true)
-            };
-
-            return all
-                .Where(a => Matches(a.ServiceName) && a.Timestamp >= req.From && a.Timestamp <= req.To)
-                .Take(req.MaxPerSource * 4)
-                .ToList();
-        }
-
-        private static List<AnnotationSourceSummary> BuildSourceSummaries(
-            IReadOnlyList<AnnotationDto> annotations)
-        {
-            var byType = annotations
-                .GroupBy(a => a.Type.Split('.')[0])
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            return
-            [
-                new("changes",   byType.GetValueOrDefault("change",   0),   true, "Simulated — ChangeGovernance bridge pending"),
-                new("incidents", byType.GetValueOrDefault("incident", 0),   true, "Simulated — OperationalIntelligence bridge pending"),
-                new("contracts", byType.GetValueOrDefault("contract", 0),   true, "Simulated — Catalog bridge pending"),
-                new("policies",  byType.GetValueOrDefault("policy",   0),   true, "Simulated — PolicyEngine bridge pending")
-            ];
-        }
+            "CRITICAL" or "P1" => "critical",
+            "HIGH" or "P2" => "warning",
+            _ => "info"
+        };
     }
 }
