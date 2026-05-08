@@ -51,7 +51,8 @@ public static class GenerateClientSdkFromContract
                 ContractVersionId: request.ContractVersionId,
                 TargetLanguage: request.TargetLanguage,
                 ClientName: request.ClientName,
-                Files: files)));
+                Files: files,
+                PreviewNote: PipelinePreviewNote.Text)));
         }
 
         private static List<GeneratedFile> GenerateDotNetClient(string clientName)
@@ -209,5 +210,6 @@ public static class GenerateClientSdkFromContract
         Guid ContractVersionId,
         string TargetLanguage,
         string ClientName,
-        IReadOnlyList<GeneratedFile> Files);
+        IReadOnlyList<GeneratedFile> Files,
+        string PreviewNote);
 }

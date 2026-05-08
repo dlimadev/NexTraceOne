@@ -1,14 +1,16 @@
+using System.Security.Cryptography;
+using System.Text;
 using FluentValidation;
-
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 namespace NexTraceOne.IdentityAccess.Application.Features.ActivateAccount;
 
 /// <summary>
-/// Feature: ActivateAccount — activa uma conta nova usando token de activação.
-/// Stub controlado: retorna erro claro até a infraestrutura de tokens de activação estar implementada.
+/// Feature: ActivateAccount — valida token de activação, activa conta e define password inicial.
 /// </summary>
 public static class ActivateAccount
 {
@@ -25,19 +27,40 @@ public static class ActivateAccount
 
     public sealed record Response(bool Activated);
 
-    internal sealed class Handler : ICommandHandler<Command, Response>
+    internal sealed class Handler(
+        IAccountActivationTokenRepository tokenRepository,
+        IUserRepository userRepository,
+        IPasswordHasher passwordHasher,
+        IIdentityAccessUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // Token de activação ainda não é gerado nem persistido.
-            // Quando implementado:
-            // 1. Validar token contra store de tokens de activação
-            // 2. Verificar expiração
-            // 3. Activar utilizador e definir password
-            // 4. Invalidar token usado
-            return Task.FromResult<Result<Response>>(
-                Error.Validation("account.activation.token_invalid",
-                    "Account activation token infrastructure not yet implemented"));
+            var now = clock.UtcNow;
+            var tokenHash = HashToken(request.Token);
+
+            var token = await tokenRepository.FindByHashAsync(tokenHash, cancellationToken);
+
+            if (token is null || !token.IsValid(now))
+                return Error.Validation("account.activation.token_invalid",
+                    "The activation token is invalid or has expired.");
+
+            var user = await userRepository.GetByIdAsync(token.UserId, cancellationToken);
+            if (user is null)
+                return Error.Validation("account.activation.token_invalid",
+                    "The activation token is invalid or has expired.");
+
+            var hashedPassword = HashedPassword.FromHash(passwordHasher.Hash(request.Password));
+            user.SetPassword(hashedPassword);
+            user.Activate();
+            token.MarkUsed(now);
+
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return new Response(true);
         }
+
+        private static string HashToken(string raw) =>
+            Convert.ToBase64String(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(raw)));
     }
 }

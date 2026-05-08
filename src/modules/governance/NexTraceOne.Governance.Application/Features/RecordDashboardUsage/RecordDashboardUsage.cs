@@ -39,6 +39,7 @@ public static class RecordDashboardUsage
     public sealed class Handler(
         IDashboardUsageRepository usageRepository,
         IGovernanceUnitOfWork unitOfWork,
+        IDashboardUsageForwarder usageForwarder,
         IDateTimeProvider clock) : ICommandHandler<Command, Unit>
     {
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
@@ -54,6 +55,9 @@ public static class RecordDashboardUsage
 
             await usageRepository.AddAsync(evt, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            // Forward to analytics store (Elastic/ClickHouse) — failures are suppressed.
+            await usageForwarder.ForwardAsync(evt, cancellationToken);
 
             return Result<Unit>.Success(Unit.Value);
         }

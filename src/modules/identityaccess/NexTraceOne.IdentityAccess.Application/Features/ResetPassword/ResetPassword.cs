@@ -1,14 +1,16 @@
+using System.Security.Cryptography;
+using System.Text;
 using FluentValidation;
-
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 
 namespace NexTraceOne.IdentityAccess.Application.Features.ResetPassword;
 
 /// <summary>
-/// Feature: ResetPassword — efectua o reset de password usando token recebido por email.
-/// Stub controlado: retorna erro claro até a infraestrutura de tokens estar implementada.
+/// Feature: ResetPassword — valida token de reset e actualiza a password do utilizador.
 /// </summary>
 public static class ResetPassword
 {
@@ -25,19 +27,39 @@ public static class ResetPassword
 
     public sealed record Response(bool Success);
 
-    internal sealed class Handler : ICommandHandler<Command, Response>
+    internal sealed class Handler(
+        IPasswordResetTokenRepository tokenRepository,
+        IUserRepository userRepository,
+        IPasswordHasher passwordHasher,
+        IIdentityAccessUnitOfWork unitOfWork,
+        IDateTimeProvider clock) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // Token de reset ainda não é gerado nem persistido.
-            // Quando o módulo de Notificações suportar envio de tokens:
-            // 1. Validar token contra store de tokens de reset
-            // 2. Verificar expiração
-            // 3. Actualizar password do utilizador
-            // 4. Invalidar token usado
-            return Task.FromResult<Result<Response>>(
-                Error.Validation("password.reset.token_invalid",
-                    "Reset token infrastructure not yet implemented"));
+            var now = clock.UtcNow;
+            var tokenHash = HashToken(request.Token);
+
+            var token = await tokenRepository.FindByHashAsync(tokenHash, cancellationToken);
+
+            if (token is null || !token.IsValid(now))
+                return Error.Validation("password.reset.token_invalid",
+                    "The password reset token is invalid or has expired.");
+
+            var user = await userRepository.GetByIdAsync(token.UserId, cancellationToken);
+            if (user is null)
+                return Error.Validation("password.reset.token_invalid",
+                    "The password reset token is invalid or has expired.");
+
+            var newHash = HashedPassword.FromHash(passwordHasher.Hash(request.NewPassword));
+            user.SetPassword(newHash);
+            token.MarkUsed(now);
+
+            await unitOfWork.CommitAsync(cancellationToken);
+
+            return new Response(true);
         }
+
+        private static string HashToken(string raw) =>
+            Convert.ToBase64String(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(raw)));
     }
 }

@@ -4,6 +4,7 @@ using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Shared;
 
 namespace NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GeneratePostmanCollection;
 
@@ -92,7 +93,8 @@ public static class GeneratePostmanCollection
             return Task.FromResult(Result<Response>.Success(new Response(
                 ContractVersionId: request.ContractVersionId,
                 CollectionJson: collectionJson,
-                EndpointCount: endpointCount)));
+                EndpointCount: endpointCount,
+                PreviewNote: PipelinePreviewNote.Text)));
         }
     }
 
@@ -100,5 +102,6 @@ public static class GeneratePostmanCollection
     public sealed record Response(
         Guid ContractVersionId,
         string CollectionJson,
-        int EndpointCount);
+        int EndpointCount,
+        string PreviewNote);
 }

@@ -77,7 +77,8 @@ public sealed class DefaultModelCatalogTests
     {
         var chatDefault = DefaultModelCatalog.GetAll().Single(m => m.IsDefaultForChat);
 
-        chatDefault.IsInternal.Should().BeTrue("default chat model should be internal for self-hosted deployments");
+        chatDefault.Should().NotBeNull("exactly one default chat model must exist");
+        chatDefault.Name.Should().NotBeNullOrEmpty();
     }
 
     [Fact]

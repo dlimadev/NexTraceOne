@@ -462,8 +462,8 @@ public sealed class SkillsSystemTests
         var result = await handler.Handle(new SeedDefaultSkills.Command(_tenantId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.SeededCount.Should().Be(12);
-        _skillRepo.Received(12).Add(Arg.Any<AiSkill>());
+        result.Value.SeededCount.Should().Be(15);
+        _skillRepo.Received(15).Add(Arg.Any<AiSkill>());
     }
 
     [Fact]
@@ -481,7 +481,7 @@ public sealed class SkillsSystemTests
         var result = await handler.Handle(new SeedDefaultSkills.Command(_tenantId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.SeededCount.Should().Be(10);
+        result.Value.SeededCount.Should().Be(13);
     }
 
     [Fact]
@@ -505,7 +505,7 @@ public sealed class SkillsSystemTests
     {
         var skills = DefaultSkillCatalog.GetAll();
 
-        skills.Should().HaveCount(12);
+        skills.Should().HaveCount(15);
     }
 
     [Fact]

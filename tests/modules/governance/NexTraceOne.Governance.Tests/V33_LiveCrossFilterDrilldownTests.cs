@@ -1,6 +1,8 @@
 using System.Linq;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.GetDashboardLiveStream;
 using NexTraceOne.Governance.Application.Features.GetWidgetDelta;
+using NexTraceOne.Governance.Domain.Entities;
 
 namespace NexTraceOne.Governance.Tests;
 
@@ -10,6 +12,38 @@ namespace NexTraceOne.Governance.Tests;
 /// </summary>
 public sealed class V33_LiveCrossFilterDrilldownTests
 {
+    private static GetWidgetDelta.Handler MakeDeltaHandler()
+    {
+        var snapshots = Substitute.For<IWidgetSnapshotRepository>();
+        snapshots.ListSinceAsync(
+            Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<WidgetSnapshot>>([]));
+        return new GetWidgetDelta.Handler(snapshots);
+    }
+
+    private static IDashboardDataBridge MakeWidgetRefreshBridge(string widgetId = "sim-widget-1")
+    {
+        var bridge = Substitute.For<IDashboardDataBridge>();
+        bridge.GetPendingEventsAsync(
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<string>?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<GetDashboardLiveStream.LiveEvent>>(
+                [new GetDashboardLiveStream.LiveEvent("widget.refresh", widgetId, DateTimeOffset.UtcNow, true, new { })]));
+        return bridge;
+    }
+
+    private static IDashboardDataBridge MakeAnnotationBridge()
+    {
+        var bridge = Substitute.For<IDashboardDataBridge>();
+        bridge.GetPendingEventsAsync(
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<string>?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<IReadOnlyList<GetDashboardLiveStream.LiveEvent>>(
+                [new GetDashboardLiveStream.LiveEvent("annotation.new", null, DateTimeOffset.UtcNow, true, new { })]));
+        return bridge;
+    }
+
     // ── GetDashboardLiveStream: GenerateEventsAsync ───────────────────────
 
     [Fact]
@@ -39,7 +73,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
             MaxEvents: 3);
 
         var events = new List<GetDashboardLiveStream.LiveEvent>();
-        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query))
+        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, bridge: MakeWidgetRefreshBridge()))
             events.Add(evt);
 
         events.Should().HaveCount(3);
@@ -65,6 +99,18 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task LiveStream_WithWidgetIds_RefreshesSpecifiedWidgets()
     {
+        var bridge = Substitute.For<IDashboardDataBridge>();
+        bridge.GetPendingEventsAsync(
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<string>?>(),
+            Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                var wIds = ci.ArgAt<IReadOnlyList<string>?>(2) ?? ["my-widget-1"];
+                var id = wIds.Count > 0 ? wIds[0] : "my-widget-1";
+                return Task.FromResult<IReadOnlyList<GetDashboardLiveStream.LiveEvent>>(
+                    [new GetDashboardLiveStream.LiveEvent("widget.refresh", id, DateTimeOffset.UtcNow, true, new { })]);
+            });
+
         var query = new GetDashboardLiveStream.Query(
             DashboardId: Guid.NewGuid(),
             TenantId: "tenant-1",
@@ -72,7 +118,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
             MaxEvents: 10);
 
         var events = new List<GetDashboardLiveStream.LiveEvent>();
-        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query))
+        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, bridge: bridge))
             events.Add(evt);
 
         var refreshEvents = events.Where(e => e.EventType == "widget.refresh").ToList();
@@ -84,14 +130,13 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task LiveStream_EventuallyEmitsAnnotationEvent()
     {
-        // Annotation events are emitted at seq % 7 == 0; with MaxEvents=20 we hit seq=7
         var query = new GetDashboardLiveStream.Query(
             DashboardId: Guid.NewGuid(),
             TenantId: "tenant-1",
-            MaxEvents: 20);
+            MaxEvents: 5);
 
         var events = new List<GetDashboardLiveStream.LiveEvent>();
-        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query))
+        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, bridge: MakeAnnotationBridge()))
             events.Add(evt);
 
         events.Any(e => e.EventType == "annotation.new").Should().BeTrue();
@@ -160,7 +205,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_ReturnsSimulatedResult()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(
             DashboardId: Guid.NewGuid(),
             WidgetId: "widget-1",
@@ -178,7 +223,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_SinceTimestampPreserved()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var since = DateTimeOffset.UtcNow.AddMinutes(-30);
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", since);
 
@@ -191,7 +236,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_EmptyTenantId_ReturnsError()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "", DateTimeOffset.UtcNow.AddMinutes(-1));
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -203,7 +248,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_EmptyWidgetId_ReturnsError()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "", "tenant-1", DateTimeOffset.UtcNow.AddMinutes(-1));
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -215,7 +260,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_CountsAreNonNegative()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", DateTimeOffset.UtcNow.AddMinutes(-10));
 
         var result = await handler.Handle(query, CancellationToken.None);
@@ -228,7 +273,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_ChangesMatchCounts()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         // Use a past timestamp far enough back to generate changes
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", DateTimeOffset.UtcNow.AddMinutes(-15));
 
@@ -241,7 +286,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     [Fact]
     public async Task WidgetDelta_AddedRows_HaveCorrectChangeType()
     {
-        var handler = new GetWidgetDelta.Handler();
+        var handler = MakeDeltaHandler();
         var since = DateTimeOffset.UtcNow.AddHours(-2);   // long elapsed → guaranteed adds
         var query = new GetWidgetDelta.Query(Guid.NewGuid(), "w1", "t1", since);
 
@@ -295,7 +340,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
     {
         var query = new GetDashboardLiveStream.Query(Guid.NewGuid(), "t1", MaxEvents: 5);
         var events = new List<GetDashboardLiveStream.LiveEvent>();
-        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query))
+        await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, bridge: MakeWidgetRefreshBridge()))
             events.Add(evt);
 
         var refresh = events.FirstOrDefault(e => e.EventType == "widget.refresh");
@@ -328,7 +373,7 @@ public sealed class V33_LiveCrossFilterDrilldownTests
         // With MaxEvents=0 (unlimited) and a cancelled token, the stream should stop after heartbeat
         try
         {
-            await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, cts.Token))
+            await foreach (var evt in GetDashboardLiveStream.GenerateEventsAsync(query, ct: cts.Token))
             {
                 events.Add(evt);
                 if (events.Count >= 2) break;  // safety cap for the test

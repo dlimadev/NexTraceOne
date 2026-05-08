@@ -55,8 +55,12 @@ public static class ActivateSpectralPackage
         {
             Guard.Against.Null(request);
 
+            if (!PackageContents.TryGetValue(request.PackageId, out var packageData))
+                return Error.Validation("PackageId",
+                    "PackageId must be one of: enterprise, security, accessibility, internal-platform.");
+
             var packageName = $"spectral-marketplace/{request.PackageId}";
-            var (content, description) = PackageContents[request.PackageId];
+            var (content, description) = packageData;
 
             var existing = await repository.FindByNameAsync(packageName, cancellationToken);
             if (existing is not null)

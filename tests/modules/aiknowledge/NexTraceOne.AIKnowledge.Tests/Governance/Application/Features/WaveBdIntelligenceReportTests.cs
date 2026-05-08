@@ -392,7 +392,7 @@ public sealed class WaveBdIntelligenceReportTests
     private static OrganizationalMemoryNode CreateMemoryNode(
         string nodeType, DateTimeOffset recordedAt, double relevance)
     {
-        return OrganizationalMemoryNode.Create(
+        var node = OrganizationalMemoryNode.Create(
             nodeType: nodeType,
             subject: "test-subject",
             title: $"Node {Guid.NewGuid():N}",
@@ -402,9 +402,10 @@ public sealed class WaveBdIntelligenceReportTests
             tags: [],
             sourceType: "manual",
             sourceId: "src-1",
-            relevanceScore: relevance,
             tenantId: TenantId,
             recordedAt: recordedAt);
+        node.UpdateRelevanceScore(relevance);
+        return node;
     }
 
     private static IOrganizationalMemoryRepository SetupMemoryRepo(

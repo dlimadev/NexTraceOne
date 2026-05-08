@@ -105,7 +105,7 @@ public static class GetOrganizationalMemoryHealthReport
             if (total == 0) return "Empty";
             if (freshRate >= 70 && connectRate >= 40 && avgRel >= 0.7) return "Thriving";
             if (freshRate >= 50 && connectRate >= 20) return "Active";
-            if (freshRate >= 30 || total >= 10) return "Building";
+            if ((freshRate >= 30 || total >= 10) && total >= 3) return "Building";
             return "Sparse";
         }
     }

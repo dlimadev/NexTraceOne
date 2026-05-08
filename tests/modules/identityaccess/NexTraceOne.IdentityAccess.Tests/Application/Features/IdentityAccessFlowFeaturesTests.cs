@@ -30,7 +30,12 @@ public sealed class IdentityAccessFlowFeaturesTests
         userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
-        var handler = new ForgotPassword.Handler(userRepo);
+        var handler = new ForgotPassword.Handler(
+            userRepo,
+            Substitute.For<IPasswordResetTokenRepository>(),
+            Substitute.For<IIdentityNotifier>(),
+            Substitute.For<IIdentityAccessUnitOfWork>(),
+            CreateClock());
         var result = await handler.Handle(
             new ForgotPassword.Command("user@example.com"), CancellationToken.None);
 
@@ -46,7 +51,12 @@ public sealed class IdentityAccessFlowFeaturesTests
         userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
-        var handler = new ForgotPassword.Handler(userRepo);
+        var handler = new ForgotPassword.Handler(
+            userRepo,
+            Substitute.For<IPasswordResetTokenRepository>(),
+            Substitute.For<IIdentityNotifier>(),
+            Substitute.For<IIdentityAccessUnitOfWork>(),
+            CreateClock());
         var result = await handler.Handle(
             new ForgotPassword.Command("unknown@example.com"), CancellationToken.None);
 
@@ -59,7 +69,16 @@ public sealed class IdentityAccessFlowFeaturesTests
     [Fact]
     public async Task ResetPassword_InfrastructureNotReady_ReturnsValidationError()
     {
-        var handler = new ResetPassword.Handler();
+        var tokenRepo = Substitute.For<IPasswordResetTokenRepository>();
+        tokenRepo.FindByHashAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns((PasswordResetToken?)null);
+
+        var handler = new ResetPassword.Handler(
+            tokenRepo,
+            Substitute.For<IUserRepository>(),
+            Substitute.For<IPasswordHasher>(),
+            Substitute.For<IIdentityAccessUnitOfWork>(),
+            CreateClock());
         var result = await handler.Handle(
             new ResetPassword.Command("some-reset-token", "NewPassword123!"),
             CancellationToken.None);

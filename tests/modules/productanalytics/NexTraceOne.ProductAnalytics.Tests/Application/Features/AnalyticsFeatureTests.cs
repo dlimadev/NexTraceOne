@@ -28,6 +28,7 @@ public sealed class AnalyticsFeatureTests
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
+    private readonly IAnalyticsEventForwarder _forwarder = Substitute.For<IAnalyticsEventForwarder>();
 
     public AnalyticsFeatureTests()
     {
@@ -49,7 +50,7 @@ public sealed class AnalyticsFeatureTests
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(1));
 
-        var handler = new RecordAnalyticsEvent.Handler(_analyticsRepository, _unitOfWork, _currentTenant, _currentUser, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_analyticsRepository, _unitOfWork, _currentTenant, _currentUser, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             EventType: AnalyticsEventType.ModuleViewed,
             Module: ProductModule.ServiceCatalog,
@@ -83,7 +84,7 @@ public sealed class AnalyticsFeatureTests
         _unitOfWork.CommitAsync(Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(1));
 
-        var handler = new RecordAnalyticsEvent.Handler(_analyticsRepository, _unitOfWork, _currentTenant, _currentUser, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_analyticsRepository, _unitOfWork, _currentTenant, _currentUser, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.SearchExecuted, ProductModule.Search, "/search",
             null, null, null, null, null, null, null, null, null);

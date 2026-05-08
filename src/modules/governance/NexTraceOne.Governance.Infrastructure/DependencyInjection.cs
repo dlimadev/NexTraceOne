@@ -94,8 +94,20 @@ public static class DependencyInjection
         // TenantSchemaManager — schema-per-tenant PostgreSQL isolation
         services.AddTenantSchemaManager(connectionString);
 
-        // OTEL Metrics — ingestão de métricas do OpenTelemetry Collector
-        services.AddScoped<IOtelMetricRepository, OtelMetricRepository>();
+        // OTEL Metrics — provider-aware: ClickHouse for analytics scale, PostgreSQL for MVP
+        var otelProvider = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
+        if (string.Equals(otelProvider, "ClickHouse", StringComparison.OrdinalIgnoreCase))
+        {
+            services.Configure<ClickHouseOtelMetricOptions>(
+                configuration.GetSection(ClickHouseOtelMetricOptions.SectionName));
+            services.AddHttpClient<ClickHouseOtelMetricRepository>();
+            services.AddScoped<IOtelMetricRepository>(
+                sp => sp.GetRequiredService<ClickHouseOtelMetricRepository>());
+        }
+        else
+        {
+            services.AddScoped<IOtelMetricRepository, OtelMetricRepository>();
+        }
 
         // Non-Prod Schedules
         services.AddScoped<INonProdScheduleRepository, NonProdScheduleRepository>();
@@ -115,6 +127,12 @@ public static class DependencyInjection
 
         // HTTP Audit Reader — consulta IObservabilityProvider para auditoria de chamadas HTTP externas
         services.AddScoped<IHttpAuditReader, ObservabilityHttpAuditReader>();
+
+        // Observability backend health — port adapter para IObservabilityProvider
+        services.AddScoped<IObservabilityBackendHealth, ObservabilityBackendHealthAdapter>();
+
+        // Dashboard Usage Forwarder — propaga DashboardUsageEvent para analytics store
+        services.AddScoped<IDashboardUsageForwarder, DashboardUsageForwarder>();
 
         // Ingestion Observability — DLQ stats da bb_dead_letter_messages para dashboard de ingestão
         services.AddScoped<IIngestionObservabilityProvider, IngestionObservabilityProvider>();

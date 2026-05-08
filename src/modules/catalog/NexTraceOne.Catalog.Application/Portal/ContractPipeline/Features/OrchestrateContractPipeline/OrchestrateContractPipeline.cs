@@ -87,7 +87,8 @@ public static class OrchestrateContractPipeline
             return Result<Response>.Success(new Response(
                 ContractVersionId: request.ContractVersionId,
                 TotalFiles: totalFiles,
-                GeneratedArtifacts: artifacts));
+                GeneratedArtifacts: artifacts,
+                PreviewNote: PipelinePreviewNote.Text));
         }
     }
 
@@ -98,5 +99,6 @@ public static class OrchestrateContractPipeline
     public sealed record Response(
         Guid ContractVersionId,
         int TotalFiles,
-        IReadOnlyList<PipelineArtifact> GeneratedArtifacts);
+        IReadOnlyList<PipelineArtifact> GeneratedArtifacts,
+        string PreviewNote);
 }

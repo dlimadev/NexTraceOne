@@ -16,6 +16,7 @@ public sealed class RecordAnalyticsEventTests
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly IAnalyticsEventForwarder _forwarder = Substitute.For<IAnalyticsEventForwarder>();
 
     private static readonly DateTimeOffset FixedNow = new(2026, 3, 1, 12, 0, 0, TimeSpan.Zero);
 
@@ -29,7 +30,7 @@ public sealed class RecordAnalyticsEventTests
     }
 
     private RecordAnalyticsEvent.Handler CreateHandler() =>
-        new(_repository, _unitOfWork, _currentTenant, _currentUser, _clock);
+        new(_repository, _unitOfWork, _currentTenant, _currentUser, _clock, _forwarder);
 
     private static RecordAnalyticsEvent.Command BuildCommand(
         AnalyticsEventType eventType = AnalyticsEventType.ModuleViewed,

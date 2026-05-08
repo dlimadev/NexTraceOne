@@ -21,6 +21,7 @@ using GetServiceOperationalTimelineFeature = NexTraceOne.Knowledge.Application.F
 
 using NexTraceOne.Knowledge.Contracts;
 using NexTraceOne.Knowledge.Domain.Enums;
+using NexTraceOne.BuildingBlocks.Security.Extensions;
 
 namespace NexTraceOne.Knowledge.API.Endpoints;
 
@@ -45,7 +46,8 @@ public sealed class KnowledgeEndpointModule
         knowledge.MapGet("/status", () =>
             Results.Ok(new { module = "Knowledge", status = "active", version = "10.3" }))
             .WithTags("Knowledge")
-            .WithSummary("Knowledge module status check");
+            .WithSummary("Knowledge module status check")
+            .AllowAnonymous();
 
         // P10.2: Endpoint de pesquisa no Knowledge Hub.
         knowledge.MapGet("/search", async (
@@ -67,7 +69,8 @@ public sealed class KnowledgeEndpointModule
             });
         })
         .WithTags("Knowledge")
-        .WithSummary("Search knowledge documents and operational notes");
+        .WithSummary("Search knowledge documents and operational notes")
+        .RequirePermission("knowledge:read");
 
         // P10.3: Criação mínima de documento para fluxo de ligação contextual.
         knowledge.MapPost("/documents", async (
@@ -80,7 +83,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToCreatedResult(id => $"/api/v1/knowledge/documents/{id.DocumentId}", localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Create knowledge document");
+        .WithSummary("Create knowledge document")
+        .RequirePermission("knowledge:write");
 
         // P10.3: Criação mínima de nota operacional contextual.
         knowledge.MapPost("/operational-notes", async (
@@ -93,7 +97,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToCreatedResult(id => $"/api/v1/knowledge/operational-notes/{id.NoteId}", localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Create operational note");
+        .WithSummary("Create operational note")
+        .RequirePermission("knowledge:write");
 
         // P10.3: Criação de relação entre objeto de conhecimento e entidade-alvo.
         knowledge.MapPost("/relations", async (
@@ -106,7 +111,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToCreatedResult(id => $"/api/v1/knowledge/relations/{id.RelationId}", localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Create knowledge relation");
+        .WithSummary("Create knowledge relation")
+        .RequirePermission("knowledge:write");
 
         // P10.3: Consulta conhecimento contextual por alvo (service/contract/change/incident).
         knowledge.MapGet("/relations/by-target/{targetType}/{targetEntityId:guid}", async (
@@ -130,7 +136,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Get knowledge linked to a target entity");
+        .WithSummary("Get knowledge linked to a target entity")
+        .RequirePermission("knowledge:read");
 
         // P10.3: Consulta de relações por origem (documento/nota) para navegação contextual mínima.
         knowledge.MapGet("/relations/by-source/{sourceEntityId:guid}", async (
@@ -145,7 +152,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Get target relations for a knowledge source entity");
+        .WithSummary("Get target relations for a knowledge source entity")
+        .RequirePermission("knowledge:read");
 
         // P10.4: Listagem paginada de documentos de conhecimento.
         knowledge.MapGet("/documents", async (
@@ -171,7 +179,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("List knowledge documents with pagination");
+        .WithSummary("List knowledge documents with pagination")
+        .RequirePermission("knowledge:read");
 
         // P10.4: Detalhe completo de um documento de conhecimento.
         knowledge.MapGet("/documents/{documentId:guid}", async (
@@ -186,7 +195,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Get knowledge document detail");
+        .WithSummary("Get knowledge document detail")
+        .RequirePermission("knowledge:read");
 
         // P10.4: Listagem paginada de notas operacionais.
         knowledge.MapGet("/operational-notes", async (
@@ -216,7 +226,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("List operational notes with pagination");
+        .WithSummary("List operational notes with pagination")
+        .RequirePermission("knowledge:read");
 
         // P10.5: Atualização de documento de conhecimento.
         knowledge.MapPut("/documents/{documentId:guid}", async (
@@ -231,7 +242,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Update knowledge document");
+        .WithSummary("Update knowledge document")
+        .RequirePermission("knowledge:write");
 
         // P10.5: Atualização de nota operacional (inclui resolve/reopen).
         knowledge.MapPut("/operational-notes/{noteId:guid}", async (
@@ -246,7 +258,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Update operational note");
+        .WithSummary("Update operational note")
+        .RequirePermission("knowledge:write");
 
         // ── GET /api/v1/knowledge/graph — Knowledge Graph Overview ──
         knowledge.MapGet("/graph", async (
@@ -263,7 +276,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Get knowledge graph overview — nodes, edges and connected components");
+        .WithSummary("Get knowledge graph overview — nodes, edges and connected components")
+        .RequirePermission("knowledge:read");
 
         // ── GET /api/v1/knowledge/auto-documentation/{serviceName} ──
         knowledge.MapGet("/auto-documentation/{serviceName}", async (
@@ -283,7 +297,8 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Generate auto documentation for a service from Knowledge Hub data");
+        .WithSummary("Generate auto documentation for a service from Knowledge Hub data")
+        .RequirePermission("knowledge:read");
 
         // ── GET /api/v1/knowledge/services/{serviceId}/operational-timeline ──
         knowledge.MapGet("/services/{serviceId:guid}/operational-timeline", async (
@@ -311,6 +326,7 @@ public sealed class KnowledgeEndpointModule
             return result.ToHttpResult(localizer);
         })
         .WithTags("Knowledge")
-        .WithSummary("Get operational notes timeline for a specific service");
+        .WithSummary("Get operational notes timeline for a specific service")
+        .RequirePermission("knowledge:read");
     }
 }

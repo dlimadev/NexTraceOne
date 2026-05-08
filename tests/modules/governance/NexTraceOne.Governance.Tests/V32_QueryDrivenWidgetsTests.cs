@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Nql;
+using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ExecuteNqlQuery;
 using NexTraceOne.Governance.Application.Features.GetDashboardAnnotations;
 using NexTraceOne.Governance.Application.Features.ValidateNqlQuery;
@@ -210,7 +211,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public void GovernanceService_Validate_RejectsEmptyTenantId()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("", null, "Engineer", "user-1");
 
         var result = svc.Validate("FROM catalog.services", ctx);
@@ -222,7 +226,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public void GovernanceService_Validate_AcceptsValidQuery()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
 
         var result = svc.Validate("FROM catalog.services WHERE tier = 'Critical'", ctx);
@@ -234,7 +241,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task GovernanceService_Execute_CrossModuleReturnsSimulated()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
         var plan = NqlParser.Parse("FROM catalog.services LIMIT 5").Plan!;
 
@@ -249,7 +259,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task GovernanceService_Execute_RespectsRowCap()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
         var plan = NqlParser.Parse("FROM finops.costs LIMIT 3").Plan!;
 
@@ -261,7 +274,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task GovernanceService_Execute_ReturnsRenderHint()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
         var plan = NqlParser.Parse("FROM operations.incidents RENDER AS bar").Plan!;
 
@@ -275,7 +291,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task ExecuteNqlQuery_Handler_ReturnsSimulatedResult()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ExecuteNqlQuery.Handler(svc);
 
         var query = new ExecuteNqlQuery.Query(
@@ -295,7 +314,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task ExecuteNqlQuery_Handler_RejectsInvalidSyntax()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ExecuteNqlQuery.Handler(svc);
 
         var query = new ExecuteNqlQuery.Query(
@@ -316,7 +338,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task ValidateNqlQuery_Handler_ReturnsValidForCorrectQuery()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ValidateNqlQuery.Handler(svc);
 
         var query = new ValidateNqlQuery.Query(
@@ -337,7 +362,10 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task ValidateNqlQuery_Handler_ReturnsInvalidForSyntaxError()
     {
-        var svc = new DefaultQueryGovernanceService(Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+        var svc = new DefaultQueryGovernanceService(
+            Substitute.For<ITeamRepository>(),
+            Substitute.For<IGovernanceDomainRepository>(),
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ValidateNqlQuery.Handler(svc);
 
         var query = new ValidateNqlQuery.Query(

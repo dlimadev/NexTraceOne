@@ -37,7 +37,6 @@ public static class GetNonProdSchedules
     public sealed class Handler(
         IEnvironmentBehaviorService behaviorService,
         INonProdScheduleRepository scheduleRepository,
-        IGovernanceUnitOfWork unitOfWork,
         IDateTimeProvider clock) : IQueryHandler<Query, NonProdSchedulesResponse>
     {
         public async Task<Result<NonProdSchedulesResponse>> Handle(Query request, CancellationToken cancellationToken)
@@ -47,56 +46,57 @@ public static class GetNonProdSchedules
 
             var dbSchedules = await scheduleRepository.ListAllAsync(cancellationToken);
 
+            List<NonProdScheduleDto> schedules;
+
             if (dbSchedules.Count == 0)
             {
-                var now = clock.UtcNow;
-                var staging = NonProdSchedule.Create(
-                    environmentId: "staging",
-                    environmentName: "Staging",
-                    enabled: true,
-                    activeDaysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                    activeFromHour: 8,
-                    activeToHour: 20,
-                    timezone: "UTC",
-                    estimatedSavingPct: 33,
-                    now: now);
-
-                var qa = NonProdSchedule.Create(
-                    environmentId: "qa",
-                    environmentName: "QA",
-                    enabled: true,
-                    activeDaysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                    activeFromHour: 9,
-                    activeToHour: 18,
-                    timezone: "UTC",
-                    estimatedSavingPct: 40,
-                    now: now);
-
-                await scheduleRepository.AddAsync(staging, cancellationToken);
-                await scheduleRepository.AddAsync(qa, cancellationToken);
-                await unitOfWork.CommitAsync(cancellationToken);
-
-                dbSchedules = await scheduleRepository.ListAllAsync(cancellationToken);
+                // No schedules persisted yet — return read-only defaults.
+                // Persistence happens when the operator calls UpdateNonProdSchedule.
+                schedules =
+                [
+                    new NonProdScheduleDto(
+                        EnvironmentId: "staging",
+                        EnvironmentName: "Staging",
+                        Enabled: true,
+                        ActiveDaysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                        ActiveFromHour: 8,
+                        ActiveToHour: 20,
+                        Timezone: "UTC",
+                        Override: null,
+                        EstimatedSavingPct: 33),
+                    new NonProdScheduleDto(
+                        EnvironmentId: "qa",
+                        EnvironmentName: "QA",
+                        Enabled: true,
+                        ActiveDaysOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                        ActiveFromHour: 9,
+                        ActiveToHour: 18,
+                        Timezone: "UTC",
+                        Override: null,
+                        EstimatedSavingPct: 40),
+                ];
             }
-
-            var schedules = dbSchedules.Select(s =>
+            else
             {
-                var days = System.Text.Json.JsonSerializer.Deserialize<IReadOnlyList<string>>(s.ActiveDaysOfWeekJson) ?? [];
-                ScheduleOverrideDto? overrideDto = s.KeepActiveUntil.HasValue
-                    ? new ScheduleOverrideDto(s.KeepActiveUntil.Value, s.OverrideReason ?? string.Empty, s.UpdatedAt)
-                    : null;
+                schedules = dbSchedules.Select(s =>
+                {
+                    var days = System.Text.Json.JsonSerializer.Deserialize<IReadOnlyList<string>>(s.ActiveDaysOfWeekJson) ?? [];
+                    ScheduleOverrideDto? overrideDto = s.KeepActiveUntil.HasValue
+                        ? new ScheduleOverrideDto(s.KeepActiveUntil.Value, s.OverrideReason ?? string.Empty, s.UpdatedAt)
+                        : null;
 
-                return new NonProdScheduleDto(
-                    EnvironmentId: s.EnvironmentId,
-                    EnvironmentName: s.EnvironmentName,
-                    Enabled: s.Enabled,
-                    ActiveDaysOfWeek: days,
-                    ActiveFromHour: s.ActiveFromHour,
-                    ActiveToHour: s.ActiveToHour,
-                    Timezone: s.Timezone,
-                    Override: overrideDto,
-                    EstimatedSavingPct: s.EstimatedSavingPct);
-            }).ToList();
+                    return new NonProdScheduleDto(
+                        EnvironmentId: s.EnvironmentId,
+                        EnvironmentName: s.EnvironmentName,
+                        Enabled: s.Enabled,
+                        ActiveDaysOfWeek: days,
+                        ActiveFromHour: s.ActiveFromHour,
+                        ActiveToHour: s.ActiveToHour,
+                        Timezone: s.Timezone,
+                        Override: overrideDto,
+                        EstimatedSavingPct: s.EstimatedSavingPct);
+                }).ToList();
+            }
 
             var totalSaving = schedules.Count > 0
                 ? schedules.Average(s => s.EstimatedSavingPct)

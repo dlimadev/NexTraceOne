@@ -5,6 +5,7 @@
     <JavaScriptTestFramework>Vitest</JavaScriptTestFramework>
     <ShouldRunBuildScript>false</ShouldRunBuildScript>
     <PublishAssetsDirectory>$(MSBuildProjectDirectory)\dist</PublishAssetsDirectory>
+    <RuntimeIdentifiers>win;linux;osx</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="scripts\" />

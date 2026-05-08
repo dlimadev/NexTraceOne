@@ -203,7 +203,8 @@ public static class DependencyInjection
 
     /// <summary>
     /// Registra a camada de escrita analítica do NexTraceOne.
-    /// Quando Analytics:Enabled = true, registra ElasticAnalyticsWriter (padrão).
+    /// Quando Analytics:Enabled = true, seleciona o writer de acordo com
+    /// Telemetry:ObservabilityProvider:Provider (ClickHouse ou Elastic).
     /// Quando false, registra NullAnalyticsWriter (graceful degradation).
     ///
     /// Módulos suportados: Product Analytics, Operational Intelligence,
@@ -216,19 +217,31 @@ public static class DependencyInjection
         var analyticsOptions = new AnalyticsOptions();
         configuration.GetSection(AnalyticsOptions.SectionName).Bind(analyticsOptions);
 
-        if (analyticsOptions.Enabled)
+        if (!analyticsOptions.Enabled)
         {
-            services.Configure<AnalyticsOptions>(
-                configuration.GetSection(AnalyticsOptions.SectionName));
+            services.AddSingleton<IAnalyticsWriter, NullAnalyticsWriter>();
+            return services;
+        }
+
+        services.Configure<AnalyticsOptions>(configuration.GetSection(AnalyticsOptions.SectionName));
+
+        var providerName = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
+
+        if (string.Equals(providerName, "ClickHouse", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddHttpClient<ClickHouseAnalyticsWriter>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
+            });
+            services.AddSingleton<IAnalyticsWriter, ClickHouseAnalyticsWriter>();
+        }
+        else
+        {
             services.AddHttpClient<ElasticAnalyticsWriter>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
             });
             services.AddSingleton<IAnalyticsWriter, ElasticAnalyticsWriter>();
-        }
-        else
-        {
-            services.AddSingleton<IAnalyticsWriter, NullAnalyticsWriter>();
         }
 
         return services;
