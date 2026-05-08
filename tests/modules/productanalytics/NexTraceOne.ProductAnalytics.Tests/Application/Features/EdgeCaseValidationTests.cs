@@ -35,6 +35,7 @@ public sealed class EdgeCaseValidationTests
     private readonly ICurrentUser _user = Substitute.For<ICurrentUser>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
+    private readonly IAnalyticsEventForwarder _forwarder = Substitute.For<IAnalyticsEventForwarder>();
 
     public EdgeCaseValidationTests()
     {
@@ -84,7 +85,7 @@ public sealed class EdgeCaseValidationTests
         _user.IsAuthenticated.Returns(false);
         _user.Id.Returns((string?)null);
 
-        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenant, _user, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenant, _user, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.ModuleViewed,
             ProductModule.ServiceCatalog,
@@ -115,7 +116,7 @@ public sealed class EdgeCaseValidationTests
         AnalyticsEvent? capturedEvent = null;
         await _repo.AddAsync(Arg.Do<AnalyticsEvent>(e => capturedEvent = e), Arg.Any<CancellationToken>());
 
-        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenant, _user, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenant, _user, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.SearchExecuted,
             ProductModule.Search,
@@ -391,7 +392,7 @@ public sealed class EdgeCaseValidationTests
     public async Task RecordAnalyticsEvent_WithNullSessionId_ShouldSucceed()
     {
         // Arrange
-        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenant, _user, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenant, _user, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.ReportGenerated,
             ProductModule.Governance,

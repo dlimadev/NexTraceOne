@@ -59,9 +59,9 @@ public static class GetWidgetDelta
         public async Task<Result<Response>> Handle(Query query, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(query.TenantId))
-                return Result.Failure<Response>(Error.Validation("WidgetDelta.TenantId", "TenantId is required."));
+                return Error.Validation("WidgetDelta.TenantId", "TenantId is required.");
             if (string.IsNullOrWhiteSpace(query.WidgetId))
-                return Result.Failure<Response>(Error.Validation("WidgetDelta.WidgetId", "WidgetId is required."));
+                return Error.Validation("WidgetDelta.WidgetId", "WidgetId is required.");
 
             var asOf = DateTimeOffset.UtcNow;
 

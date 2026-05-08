@@ -33,6 +33,7 @@ public sealed class MultiTenantIsolationTests
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
+    private readonly IAnalyticsEventForwarder _forwarder = Substitute.For<IAnalyticsEventForwarder>();
 
     private static readonly Guid TenantIdA = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000001");
     private static readonly Guid TenantIdB = Guid.Parse("bbbbbbbb-0000-0000-0000-000000000002");
@@ -82,7 +83,7 @@ public sealed class MultiTenantIsolationTests
     public async Task RecordEvent_TenantA_ShouldStampEventWithTenantAId()
     {
         // Arrange
-        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.ModuleViewed, ProductModule.ServiceCatalog,
             "/services", "list", null, null, "Engineer", null, null, "session-a", "web", null);
@@ -103,7 +104,7 @@ public sealed class MultiTenantIsolationTests
     public async Task RecordEvent_TenantB_ShouldStampEventWithTenantBId()
     {
         // Arrange
-        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantB, _currentUser, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantB, _currentUser, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.ContractPublished, ProductModule.ContractStudio,
             "/contracts", "publish", null, null, "TechLead", null, null, "session-b", "web", null);
@@ -124,8 +125,8 @@ public sealed class MultiTenantIsolationTests
     public async Task RecordEvent_TwoTenants_ShouldProduceDifferentTenantStamps()
     {
         // Arrange
-        var handlerA = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock);
-        var handlerB = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantB, _currentUser, _clock);
+        var handlerA = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock, _forwarder);
+        var handlerB = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantB, _currentUser, _clock, _forwarder);
 
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.EntityViewed, ProductModule.ServiceCatalog,
@@ -152,7 +153,7 @@ public sealed class MultiTenantIsolationTests
         _currentUser.IsAuthenticated.Returns(false);
         _currentUser.Id.Returns((string?)null);
 
-        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.ModuleViewed, ProductModule.AiAssistant,
             "/ai", null, null, null, null, null, null, "anon-session", "web", null);
@@ -317,7 +318,7 @@ public sealed class MultiTenantIsolationTests
         var specificTime = new DateTimeOffset(2026, 1, 15, 8, 30, 0, TimeSpan.Zero);
         _clock.UtcNow.Returns(specificTime);
 
-        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock);
+        var handler = new RecordAnalyticsEvent.Handler(_repo, _unitOfWork, _tenantA, _currentUser, _clock, _forwarder);
         var command = new RecordAnalyticsEvent.Command(
             AnalyticsEventType.ModuleViewed, ProductModule.Dashboard,
             "/dashboard", null, null, null, null, null, null, "sess-ts", "web", null);
