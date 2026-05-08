@@ -4,6 +4,7 @@ using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Services;
+using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,8 @@ public sealed class ContractsModuleServiceTests
             .Returns((ContractVersion?)null);
 
         await using var context = CreateDbContext();
-        var sut = new ContractsModuleService(versionRepository, context);
+        await using var graphContext = CreateGraphDbContext();
+        var sut = new ContractsModuleService(versionRepository, context, graphContext);
 
         var result = await sut.GetLatestChangeLevelAsync(apiAssetId, CancellationToken.None);
 
@@ -37,7 +39,8 @@ public sealed class ContractsModuleServiceTests
             .Returns(version);
 
         await using var context = CreateDbContext();
-        var sut = new ContractsModuleService(versionRepository, context);
+        await using var graphContext = CreateGraphDbContext();
+        var sut = new ContractsModuleService(versionRepository, context, graphContext);
 
         var result = await sut.HasContractVersionAsync(apiAssetId, CancellationToken.None);
 
@@ -58,7 +61,8 @@ public sealed class ContractsModuleServiceTests
         context.ContractScorecards.Add(CreateScorecard(version.Id, 0.82m, new DateTimeOffset(2026, 03, 28, 10, 0, 0, TimeSpan.Zero)));
         await context.SaveChangesAsync();
 
-        var sut = new ContractsModuleService(versionRepository, context);
+        await using var graphContext = CreateGraphDbContext();
+        var sut = new ContractsModuleService(versionRepository, context, graphContext);
 
         var result = await sut.GetLatestOverallScoreAsync(apiAssetId, CancellationToken.None);
 
@@ -78,7 +82,8 @@ public sealed class ContractsModuleServiceTests
         context.ContractDiffs.Add(CreateDiff(version.Id, apiAssetId, ChangeLevel.Breaking, new DateTimeOffset(2026, 03, 28, 11, 0, 0, TimeSpan.Zero)));
         await context.SaveChangesAsync();
 
-        var sut = new ContractsModuleService(versionRepository, context);
+        await using var graphContext = CreateGraphDbContext();
+        var sut = new ContractsModuleService(versionRepository, context, graphContext);
 
         var result = await sut.RequiresWorkflowApprovalAsync(apiAssetId, CancellationToken.None);
 
@@ -98,7 +103,8 @@ public sealed class ContractsModuleServiceTests
         context.ContractDiffs.Add(CreateDiff(version.Id, apiAssetId, ChangeLevel.NonBreaking, new DateTimeOffset(2026, 03, 28, 11, 0, 0, TimeSpan.Zero)));
         await context.SaveChangesAsync();
 
-        var sut = new ContractsModuleService(versionRepository, context);
+        await using var graphContext = CreateGraphDbContext();
+        var sut = new ContractsModuleService(versionRepository, context, graphContext);
 
         var result = await sut.RequiresWorkflowApprovalAsync(apiAssetId, CancellationToken.None);
 
@@ -112,6 +118,19 @@ public sealed class ContractsModuleServiceTests
             .Options;
 
         return new ContractsDbContext(
+            options,
+            new TestCurrentTenant(),
+            new TestCurrentUser(),
+            new TestDateTimeProvider());
+    }
+
+    private static CatalogGraphDbContext CreateGraphDbContext()
+    {
+        var options = new DbContextOptionsBuilder<CatalogGraphDbContext>()
+            .UseInMemoryDatabase($"catalog-graph-service-tests-{Guid.NewGuid():N}")
+            .Options;
+
+        return new CatalogGraphDbContext(
             options,
             new TestCurrentTenant(),
             new TestCurrentUser(),
