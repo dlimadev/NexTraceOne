@@ -1,10 +1,14 @@
 # Plano 01 — Ingestion Pipeline (PIP-01..06)
 
-> **Prioridade:** 🔴 Alta  
-> **Esforço total:** 6–10 semanas  
+> **✅ CONCLUÍDO — Abril 2026**  
+> Todos os PIP-01..06 implementados em PRs #301 e #302.  
+> Confirmado em [HONEST-GAPS.md](../HONEST-GAPS.md) — secção "Pipeline de Ingestão — COMPLETO".  
+> Este ficheiro mantém-se como referência técnica e histórica.
+
+> ~~**Prioridade:** 🔴 Alta~~  
+> **Esforço real:** 6 semanas  
 > **ADR de referência:** [ADR-010](../adr/010-server-side-ingestion-pipeline.md)  
-> **Spec técnica:** [INGESTION-PIPELINE-IMPLEMENTATION.md](../INGESTION-PIPELINE-IMPLEMENTATION.md)  
-> **Tracking:** [HONEST-GAPS.md](../HONEST-GAPS.md) — secção Pipeline
+> **Spec técnica:** [INGESTION-PIPELINE-IMPLEMENTATION.md](../INGESTION-PIPELINE-IMPLEMENTATION.md)
 
 ---
 

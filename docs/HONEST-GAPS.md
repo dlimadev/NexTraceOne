@@ -1,6 +1,6 @@
 # NexTraceOne — Honest Gaps
 
-> **Última atualização:** Abril 2026 — **🟢 Zero gaps abertos — pronto para v1.0.0** | Evolução pós-v1.0.0 em progresso (Wave A.1 ✅, Wave A.2 ✅, Wave A.3 ✅, Wave A.4 ✅)
+> **Última atualização:** Maio 2026 — **🟢 Zero gaps abertos — pronto para v1.0.0** | Evolução pós-v1.0.0 em progresso (Wave A.1 ✅, Wave A.2 ✅, Wave A.3 ✅, Wave A.4 ✅)
 > **Propósito:** Registo único e honesto de toda a dívida declarada, degradação graciosa (`simulatedNote`), decisões de "out-of-scope" e providers opcionais cujo enforcement fica dependente de configuração externa.
 >
 > Este ficheiro é **fonte da verdade** para responder "isto está implementado?" quando o `IMPLEMENTATION-STATUS.md` classifica algo como `READY com notas`, `PARTIAL` ou `SIM`.
@@ -34,7 +34,6 @@ Cada entrada segue o padrão:
 | ID | Feature | Porque é stub | Porque está correto assim |
 |---|---|---|---|
 | DES-01 | `ResendMfaCode` handler | TOTP (RFC 6238) não tem noção de "reenvio" — o código é derivado do tempo. | Manter o endpoint devolve `success` vazio para UI previsível; qualquer tentativa de "reenviar" para TOTP seria incorreta. |
-| DES-02 | `ResetPassword` / `ActivateAccount` | Produto é SSO-first (ver OOS-02). Senha local existe apenas como fallback. | Stubs retornam erro localizado indicando fluxo via SSO. Caminho real só será implementado se algum cliente exigir password local — até lá fica marcado como aqui. |
 
 ## 🟡 Degradação graciosa (providers opcionais)
 
@@ -113,6 +112,24 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 
 ---
 
+## ✅ ActivateAccount / ResetPassword — IMPLEMENTADO (Maio 2026)
+
+> **Nota de revisão (Maio 2026):** A entrada DES-02 foi removida. A auditoria de Maio 2026 confirmou que a infraestrutura de tokens está **completamente implementada** no código, contrariando a classificação anterior de "stub por design". A decisão SSO-first (OOS-02) mantém-se válida para provisionamento de utilizadores via IdP, mas o caminho de password local existe e funciona para tenants sem SSO configurado.
+
+| Componente | Estado | Evidência |
+|---|---|---|
+| `AccountActivationToken` entity (SHA-256 hash, 48h expiry, `MarkUsed`) | ✅ Implementado | `IdentityAccess.Domain/Entities/AccountActivationToken.cs` |
+| `PasswordResetToken` entity (SHA-256 hash, 1h expiry, `MarkUsed`) | ✅ Implementado | `IdentityAccess.Domain/Entities/PasswordResetToken.cs` |
+| `ActivateAccount.Handler` (valida token → activa conta → define password) | ✅ Implementado | `IdentityAccess.Application/Features/ActivateAccount/ActivateAccount.cs` |
+| `ForgotPassword.Handler` (gera token → armazena hash → notifica via `IIdentityNotifier`) | ✅ Implementado | `IdentityAccess.Application/Features/ForgotPassword/ForgotPassword.cs` |
+| `ResetPassword.Handler` (valida token → actualiza password hash) | ✅ Implementado | `IdentityAccess.Application/Features/ResetPassword/ResetPassword.cs` |
+| Migração `20260507120000_IAM_AddActivationAndResetTokens` | ✅ Implementado | `IdentityAccess.Infrastructure/Persistence/Migrations/` |
+| `IIdentityNotifier` + `NullIdentityNotifier` (emite warning em dev) | ✅ Implementado | `IdentityAccess.Infrastructure/Services/NullIdentityNotifier.cs` |
+
+**Item pendente:** Ligar `IIdentityNotifier` a entrega real de email via módulo Notifications quando SMTP configurado.
+
+---
+
 ## ✅ Pipeline de Ingestão — COMPLETO (Abril 2026)
 
 > Gaps identificados por análise comparativa com o Dynatrace OpenPipeline (Abril 2026).
@@ -137,7 +154,7 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 > Cada linha é rastreável a um item do plano executivo (`ACTION-PLAN.md`).
 
 ### Fase 1 — Honestidade documental (esta iteração)
-- [x] **D-01** Identity: declarar Invitation/Reset/Activation fora de escopo — ver OOS-02 e DES-02.
+- [x] **D-01** Identity: Invitation fora de escopo (OOS-02). ActivateAccount/ResetPassword **implementados** (Maio 2026) — ver secção acima.
 - [x] **D-02/D-05** Contagem de DbContexts deixa de ser citada em números fixos → `tools/count-dbcontexts.sh` como fonte da verdade.
 - [x] **D-03** `react-router-dom` confirmado como stack real — `docs/FRONTEND-ARCHITECTURE.md` já está correto.
 - [x] **D-04** Este ficheiro (`HONEST-GAPS.md`) consolida as degradações graciosas — critério de aceite 7 do plano.
@@ -173,6 +190,24 @@ Não é necessário criar `IntegrationsConfigKeys.cs` para estes casos.
 
 ---
 
+---
+
+## 🟡 Gaps identificados na auditoria de Maio 2026 (pós-v1.0.0)
+
+> Identificados durante validação da documentação em Maio 2026. Não bloqueiam v1.0.0 mas devem ser endereçados.
+> Plano de resolução: [PRODUCTION-ACTION-PLAN.md](../PRODUCTION-ACTION-PLAN.md) (tasks 2.1, 3.1, 4.2, 4.3) + PLAN-02 (CC items).
+
+| ID | Tipo | Descrição | Ficheiro | Plano |
+|---|---|---|---|---|
+| **GAP-M01** | 🟡 Degradação | `GetDashboardAnnotations` retorna 4 anotações hardcoded para serviços fictícios ("payment-service", "user-service") com `IsSimulated:true`. Não há fonte de dados real ligada. | `Governance.Application/Features/GetDashboardAnnotations/GetDashboardAnnotations.cs` | Adicionar a PLAN-02 como CC-09 |
+| **GAP-M02** | 🟡 Config | Startup configuration validation (`ValidateOnStart` para `JwtOptions` e `ConnectionStrings`) não implementado em `Program.cs`. App arranca sem secrets obrigatórios sem falha imediata. | `NexTraceOne.ApiHost/Program.cs` | PRODUCTION-ACTION-PLAN.md Task 2.1 |
+| **GAP-M03** | 🟡 Feature | Contract Pipeline: `GeneratePostmanCollection`, `GenerateMockServer`, `GenerateContractTests` ainda aceitam `ContractJson` do request em vez de carregar spec da DB via `IContractVersionRepository`. (`GenerateServerFromContract` e `GenerateClientSdkFromContract` já corrigidos.) | `Catalog.Application/Portal/ContractPipeline/Features/Generate*/` | PRODUCTION-ACTION-PLAN.md Task 3.1 |
+| **GAP-M04** | 🟢 Housekeeping | Migrações `SyncModelSnapshot` com `Up()` e `Down()` vazios em Catalog e OperationalIntelligence. Harmless no-ops mas acumulam ruído. | `Catalog.Infrastructure/Migrations/20260410202600_SyncModelSnapshot.cs` + OI equivalente | PRODUCTION-ACTION-PLAN.md Task 4.2 |
+| **GAP-M05** | 🟢 Docs | Runbook `docs/runbooks/database-migrations.md` especificado em PRODUCTION-ACTION-PLAN.md Task 4.3 não existe. Comandos EF Core para migrações multi-context não estão documentados. | `docs/runbooks/database-migrations.md` (ausente) | Criado nesta auditoria |
+| **GAP-M06** | 🟡 Feature | `IIdentityNotifier` usa `NullIdentityNotifier` (log warning) em vez de email real via módulo Notifications. Tokens de activação/reset são gerados mas não chegam ao utilizador em produção. | `IdentityAccess.Infrastructure/Services/NullIdentityNotifier.cs` | Ligar a `INotificationModule` quando SMTP configurado |
+
+---
+
 ## Critérios de aceite "100% fechado"
 
 Mantidos aqui para visibilidade (fonte única):
@@ -181,7 +216,7 @@ Mantidos aqui para visibilidade (fonte única):
 2. Frontend: `typecheck` + `lint` + `validate:i18n` **pass**.
 3. `dotnet test` em todos os módulos: **pass**.
 4. Zero `TODO/FIXME/HACK` em código de produto (exceto templates code-gen marcados).
-5. Zero `Stub controlado:` em `Application/Features/` exceto DES-01 e DES-02 (justificados).
+5. Zero `Stub controlado:` em `Application/Features/` exceto DES-01 (ResendMfaCode, justificado) e DEG-* (providers opcionais documentados).
 6. Sidebar FE sem entradas que abram páginas com `simulatedNote` sem explicação — CFG-01 resolve.
 7. D-01..D-08 resolvidas.
 8. 25 ACTs fechados (✅ Resolvido / ❌ Descartado com razão / 🔀 Movido para `FUTURE-ROADMAP.md`).
