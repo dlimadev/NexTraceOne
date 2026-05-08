@@ -90,6 +90,9 @@ public static class DependencyInjection
         // ── Wave AF.2 — Retirement Readiness Report (null reader) ────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IRetirementReadinessReader, NexTraceOne.Catalog.Application.Services.NullRetirementReadinessReader>();
 
+        // ── Wave AF.3 — Migration Progress Report (null reader) ──────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IMigrationProgressReader, NexTraceOne.Catalog.Application.Services.NullMigrationProgressReader>();
+
         // ── Wave AM — null readers ─────────────────────────────────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IUncatalogedServicesReader, NexTraceOne.Catalog.Application.Services.NullUncatalogedServicesReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDriftReader, NexTraceOne.Catalog.Application.Contracts.NullContractDriftReader>();
