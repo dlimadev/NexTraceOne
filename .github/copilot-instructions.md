@@ -1514,3 +1514,184 @@ O agente deve agir como alguém que entende simultaneamente:
 
 Não basta “fazer funcionar”.
 É necessário fazer com **intenção arquitetural, coerência de produto e capacidade real de evolução**.
+
+---
+
+# 43. Estado de implementação atual (maio 2026)
+
+Este capítulo descreve o que está efetivamente construído no código, distinguindo claramente entre o que está operacional, o que está parcialmente implementado e o que está planeado mas ainda não construído.
+
+## 43.1 Stack técnica atual (operacional)
+
+- **.NET 10 / ASP.NET Core 10** — versão alvo em todos os projetos
+- **EF Core 10 + Npgsql** — persistência primária em PostgreSQL 16
+- **MediatR** — CQRS via Commands/Queries + pipeline behaviors
+- **FluentValidation** — validação integrada no pipeline MediatR
+- **Outbox pattern** — `OutboxMessage` persistido no `SaveChanges` de cada módulo; processado por `ModuleOutboxProcessorJob<TContext>` (um por DbContext)
+- **`Result<T>/Error`** — padrão uniforme de retorno em handlers (sem exceções de controle de fluxo)
+- **Strongly typed IDs** — todos os agregados usam `record TypedIdBase(Guid Value)` (ex: `AuditEventId`, `ApiAssetId`)
+- **`ICurrentTenant`** — tenant ativo injetado via `TenantResolutionMiddleware` (JWT claims, header, subdomínio)
+- **`TenantRlsInterceptor`** — configura `set_config('app.current_tenant_id', @id)` antes de cada query PostgreSQL
+- **`AuditInterceptor`** — preenche `CreatedAt`, `CreatedBy`, `UpdatedAt`, `UpdatedBy` automaticamente
+- **`TenantIsolationBehavior`** — MediatR pipeline behavior que rejeita requests sem tenant ativo
+- **`IDateTimeProvider`** — abstração de clock (nunca usar `DateTime.Now`)
+- **Serilog** — logging estruturado
+- **OpenTelemetry** — traces e métricas; Elasticsearch como destino analítico principal
+- **ClickHouse** — desativado por padrão; ativado via `NexTrace:Analytics:Provider=ClickHouse`
+- **Kafka** — desativado por padrão; `NullKafkaEventProducer` como fallback; `ConfluentKafkaEventProducer` ativado via configuração
+- **Redis** — **não implementado** (sem `IDistributedCache`); cache atual é in-memory `IMemoryCache`
+- **Polly** — **não implementado**; sem circuit breakers ou retry policies nos HttpClients externos
+- **pg_advisory_lock** — implementado em `ModuleOutboxProcessorJob` para evitar processamento duplicado em deploys horizontais
+
+## 43.2 Módulos com código real (bounded contexts)
+
+Cada módulo segue estrutura `Domain / Application / Contracts / Infrastructure / API`:
+
+| Pasta em `src/modules/` | DbContext(s) principal(is) | Database (connection string key) |
+|---|---|---|
+| `identityaccess` | `IdentityDbContext` | `IdentityDatabase` |
+| `catalog` | `CatalogGraphDbContext`, `ContractsDbContext`, `DeveloperPortalDbContext`, `LegacyAssetsDbContext`, `TemplatesDbContext`, `DependencyGovernanceDbContext` | `CatalogDatabase`, `ContractsDatabase` |
+| `changegovernance` | `ChangeIntelligenceDbContext`, `RulesetGovernanceDbContext`, `WorkflowDbContext`, `PromotionDbContext` | `ChangeIntelligenceDatabase` |
+| `aiknowledge` | `AiGovernanceDbContext`, `ExternalAiDbContext`, `AiOrchestrationDbContext` | `AiGovernanceDatabase` |
+| `auditcompliance` | `AuditDbContext` | `AuditDatabase` |
+| `governance` | `GovernanceDbContext` | `GovernanceDatabase` |
+| `operationalintelligence` | `RuntimeIntelligenceDbContext`, `ReliabilityDbContext`, `CostIntelligenceDbContext`, `IncidentDbContext`, `AutomationDbContext` | `RuntimeIntelligenceDatabase`, `CostIntelligenceDatabase`, etc. |
+| `integrations` | `IntegrationsDbContext` | `IntegrationsDatabase` |
+| `knowledge` | `KnowledgeDbContext` | `KnowledgeDatabase` |
+| `productanalytics` | `ProductAnalyticsDbContext` | `ProductAnalyticsDatabase` |
+| `notifications` | `NotificationsDbContext` | `NotificationsDatabase` |
+| `configuration` | `ConfigurationDbContext` | `ConfigurationDatabase` |
+
+Total: 24 bases de dados PostgreSQL isoladas (uma por módulo/contexto).
+
+## 43.3 Plataforma
+
+- `src/platform/NexTraceOne.ApiHost` — host HTTP principal; monta todos os módulos; registra middleware de tenant, RLS, auditoria
+- `src/platform/NexTraceOne.BackgroundWorkers` — worker service; registra `ModuleOutboxProcessorJob<TContext>` para todos os 21+ DbContexts; jobs de manutenção
+- `src/platform/NexTraceOne.Ingestion.Api` — API dedicada para ingestão de telemetria/eventos externos
+
+## 43.4 Building Blocks
+
+- `NexTraceOne.BuildingBlocks.Core` — primitivos: `AggregateRoot<T>`, `Entity<T>`, `TypedIdBase`, `Result<T>`, `Error`, `DomainEvent`
+- `NexTraceOne.BuildingBlocks.Application` — abstrações: `ICurrentTenant`, `ICurrentUser`, `IDateTimeProvider`, `IUnitOfWork`, `IEventBus`, behaviors MediatR
+- `NexTraceOne.BuildingBlocks.Infrastructure` — EF Core base: `NexTraceDbContextBase`, interceptors (`TenantRlsInterceptor`, `AuditInterceptor`, `EncryptionInterceptor`), outbox, configurações
+- `NexTraceOne.BuildingBlocks.Security` — multi-tenancy: `CurrentTenantAccessor`, `TenantResolutionMiddleware`, JWT, Break Glass
+- `NexTraceOne.BuildingBlocks.Observability` — métricas, tracing, health checks, ingestion collectors
+
+## 43.5 Padrões críticos do código
+
+### Honest-Null pattern
+
+Interfaces de leitura analítica (`IXxxReader`) são registadas com implementações Null que retornam listas vazias — são placeholders intencionais para pipelines cross-módulo futuros. Não remover; não confundir com bugs.
+
+**Repositórios** (`IXxxRepository`) que retornam dados persistidos DEVEM ter implementações EF Core reais.
+
+### Outbox e eventos
+
+1. `AggregateRoot<T>` acumula `DomainEvent` em `DomainEvents`
+2. `NexTraceDbContextBase.SaveChangesAsync` converte domain events → `OutboxMessage` no mesmo `SaveChanges`
+3. `ModuleOutboxProcessorJob<TContext>` processa e publica via `IEventBus` a cada 5s
+4. Cada ciclo usa `pg_try_advisory_lock` para coordenação em multi-instância
+
+### SaaS / Licensing
+
+- `TenantLicense` → `TenantPlan` (Starter, Professional, Enterprise, Trial)
+- `TenantCapabilities.ForPlan(plan)` → conjunto de capabilities habilitadas
+- `ICurrentTenant.HasCapability(string)` — verificação em handlers e middleware
+- Capabilities embutidas no JWT; lidas pelo `TenantResolutionMiddleware`
+- Fallback: sem licença → `Enterprise` (all capabilities enabled)
+
+### Encriptação at-rest
+
+Campos marcados com `[EncryptedField]` são encriptados automaticamente via `EncryptedStringConverter` (AES-256-GCM) na convenção do `NexTraceDbContextBase`.
+
+---
+
+# 44. O que ainda não está implementado
+
+O agente deve conhecer estas lacunas e não assumir que estão prontas:
+
+## 44.1 Infraestrutura horizontal (P0 — crítico para produção SaaS)
+
+- **Redis** — sem cache distribuído; adição futura via `IDistributedCache` + `StackExchange.Redis`
+- **Polly** — sem retry policies ou circuit breakers nos HttpClients externos (Elasticsearch, ClickHouse, Ollama, AI providers, webhooks)
+
+## 44.2 Funcional (P1 — importante)
+
+- `LicenseRecalculationJob` — atualização real de `TenantLicense.CurrentHostUnits` a partir de uso real; atualmente não existe
+- Provisionamento automático de tenant — criação de roles default, equipa inicial, ambiente default (parcialmente manual)
+- `TenantSchemaManager` — criado mas não utilizado; suporte futuro a schema-per-tenant
+- Kafka — desativado; `ConfluentKafkaEventProducer` existe mas não registado por default
+- Payment provider integration — não implementado
+
+## 44.3 Qualidade (P2)
+
+- Dead Letter Queue — `IDeadLetterRepository` referenciado em `ModuleOutboxProcessorJob` mas implementação real pode não estar registada em todos os ambientes
+- GDPR/exportação unificada de dados por tenant — não implementado
+- Trial plan capabilities — atualmente recebe Enterprise (all); deve receber subset limitado
+
+---
+
+# 45. Convenções de código obrigatórias
+
+## 45.1 Nomenclatura e organização
+
+- **Classes finais**: sempre `sealed` (exceto entidades base)
+- **Records imutáveis**: preferir para DTOs, Value Objects, IDs
+- **Namespaces**: alinhar exatamente com pasta (sem nesting extra)
+- **Ficheiros de entidade**: uma entidade pública por ficheiro; tipos auxiliares (IDs, enums) podem acompanhar
+- **Testes**: pasta `tests/modules/<nome>` espelhando estrutura de `src/modules/`
+
+## 45.2 Async e cancelação
+
+- Todo método async deve receber e propagar `CancellationToken`
+- Nunca usar `Task.Run` sem justificativa explícita
+- Nunca usar `.Result` ou `.Wait()` em código async
+
+## 45.3 Result pattern
+
+```csharp
+// Handler retorna:
+Result<MyDto>   // sucesso com valor
+Result.Success  // sucesso sem valor
+Result.Failure(Error.Validation(“Code”, “Message”))  // falha controlada
+// Nunca lançar exceção para controle de fluxo de negócio
+```
+
+## 45.4 IDs fortemente tipados
+
+```csharp
+// ID correto:
+public sealed record MyEntityId(Guid Value) : TypedIdBase(Value)
+{
+    public static MyEntityId New() => new(Guid.NewGuid());
+    public static MyEntityId From(Guid id) => new(id);
+}
+// Ao comparar com Guid, usar .Value:
+assets.Where(a => guids.Contains(a.Id.Value))
+```
+
+## 45.5 Tenant awareness obrigatório
+
+Qualquer repositório que retorne dados de utilizador deve filtrar por `currentTenant.Id`. A exceção são jobs de plataforma (sem contexto de tenant, como retention jobs).
+
+## 45.6 Sem comentários triviais
+
+Comentários no código devem explicar **porquê**, nunca **o quê**. Se o nome do método/variável já diz o quê, não adicionar comentário.
+
+---
+
+# 46. Decisões arquiteturais registadas (ADRs implícitos)
+
+| Decisão | Escolha | Razão |
+|---|---|---|
+| Monolito modular vs microserviços | Monolito modular | Coerência, menor complexidade operacional no MVP |
+| ORM | EF Core 10 + Npgsql | Ecossistema .NET, migrations, interceptors |
+| Search | PostgreSQL FTS no MVP1 | Sem dependência adicional; Elasticsearch para analítica |
+| Cache | In-memory no MVP1 | Redis adicionado quando escala horizontal necessitar |
+| Mensageria | In-process EventBus (Outbox) | Kafka opcional/desativado por default |
+| Auth | JWT + OIDC | Claims-based, multi-tenant aware |
+| RLS | PostgreSQL set_config + interceptor | Defense-in-depth com aplicação-level filters |
+| IA interna | Ollama (self-hosted) por default | Privacidade, self-hosted compliance |
+| IA externa | OpenAI/Anthropic/Azure via policy | Governado, auditado, opt-in por tenant |
+| Outbox lock | pg_try_advisory_lock | Coordenação leve sem Redis, usando conexão existente |
