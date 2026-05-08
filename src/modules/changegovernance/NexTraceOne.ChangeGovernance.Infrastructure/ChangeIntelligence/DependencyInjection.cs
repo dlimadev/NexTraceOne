@@ -89,6 +89,9 @@ public static class DependencyInjection
 
         // Wave U.1 — Compliance Coverage Matrix Report (honest-null; bridge per-service compliance on composition root)
         services.AddScoped<IComplianceServiceCoverageReader, Services.NullComplianceServiceCoverageReader>();
+
+        // Wave AD.1 — Zero Trust Posture Report (null reader)
+        services.AddScoped<IZeroTrustServiceReader, Services.NullZeroTrustServiceReader>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();
 
