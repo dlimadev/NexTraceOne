@@ -40,9 +40,11 @@ public sealed class TenantResolutionMiddleware(
     /// </summary>
     public async Task InvokeAsync(HttpContext context, CurrentTenantAccessor currentTenant)
     {
+        var capabilities = ReadCapabilitiesFromJwt(context);
+
         if (TryResolveFromJwt(context, out var jwtTenantId))
         {
-            currentTenant.Set(jwtTenantId, slug: jwtTenantId.ToString("N"), name: "JWT Tenant", isActive: true);
+            currentTenant.Set(jwtTenantId, slug: jwtTenantId.ToString("N"), name: "JWT Tenant", isActive: true, capabilities);
             logger.LogDebug("Tenant resolved from JWT claim: {TenantId}", jwtTenantId);
         }
         else if (context.User.Identity?.IsAuthenticated == true && TryResolveFromHeader(context, out var headerTenantId))
@@ -51,16 +53,22 @@ public sealed class TenantResolutionMiddleware(
             // fallback controlado quando o JWT não contém o claim tenant_id.
             // Pedidos não autenticados com X-Tenant-Id são ignorados para prevenir
             // injeção de contexto de tenant por entidades externas não autorizadas.
-            currentTenant.Set(headerTenantId, slug: headerTenantId.ToString("N"), name: "Header Tenant", isActive: true);
+            currentTenant.Set(headerTenantId, slug: headerTenantId.ToString("N"), name: "Header Tenant", isActive: true, capabilities);
             logger.LogDebug("Tenant resolved from X-Tenant-Id header (authenticated): {TenantId}", headerTenantId);
         }
         else if (TryResolveFromSubdomain(context, out var subdomain, out var deterministicTenantId))
         {
-            currentTenant.Set(deterministicTenantId, subdomain, subdomain, isActive: true);
+            currentTenant.Set(deterministicTenantId, subdomain, subdomain, isActive: true, capabilities);
             logger.LogDebug("Tenant resolved from subdomain '{Subdomain}': {TenantId}", subdomain, deterministicTenantId);
         }
 
         await next(context);
+    }
+
+    private static IEnumerable<string>? ReadCapabilitiesFromJwt(HttpContext context)
+    {
+        var caps = context.User.FindAll("capabilities").Select(c => c.Value).ToList();
+        return caps.Count > 0 ? caps : null;
     }
 
     private static bool TryResolveFromJwt(HttpContext context, out Guid tenantId)

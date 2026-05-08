@@ -14,19 +14,15 @@ namespace NexTraceOne.IdentityAccess.Application.Features;
 /// handlers de autenticação (LocalLogin, OidcCallback, FederatedLogin, RefreshToken),
 /// eliminando duplicação sem acoplar handlers entre si.
 ///
-/// Decisão de design:
-/// - Classe injetável via DI (Scoped) — compartilha contexto do request (ICurrentTenant).
-/// - Dependências recebidas por construtor — respeita DIP, permite mock em testes.
-///
-/// Refatoração: migrado da classe estática IdentityFeatureSupport para serviço injetável,
-/// aderindo ao Dependency Inversion Principle e facilitando testes unitários.
-/// Utiliza IPermissionResolver para resolução DB-first com fallback estático.
+/// SaaS-01: popula capabilities do plano do tenant no JWT para que HasCapability()
+/// funcione correctamente em toda a plataforma.
 /// </summary>
 internal sealed class LoginResponseBuilder(
     ICurrentTenant currentTenant,
     ITenantMembershipRepository membershipRepository,
     IJwtTokenGenerator jwtTokenGenerator,
-    IPermissionResolver permissionResolver) : ILoginResponseBuilder
+    IPermissionResolver permissionResolver,
+    ITenantLicenseRepository licenseRepository) : ILoginResponseBuilder
 {
     /// <inheritdoc />
     public Guid CurrentTenantId => currentTenant.Id;
@@ -68,7 +64,14 @@ internal sealed class LoginResponseBuilder(
         var permissions = await permissionResolver.ResolvePermissionsAsync(
             role.Id, role.Name, tenantId, cancellationToken);
 
-        var accessToken = jwtTokenGenerator.GenerateAccessToken(user, membership, permissions);
+        // SaaS-01: resolve capabilities from tenant license plan.
+        // Falls back to Enterprise (all capabilities) when no license is provisioned,
+        // preserving backward-compatibility for self-hosted deployments.
+        var license = await licenseRepository.GetByTenantIdAsync(tenantId.Value, cancellationToken);
+        var capabilities = license?.GetCapabilities() ?? TenantCapabilities.ForPlan(TenantPlan.Enterprise);
+
+        var accessToken = jwtTokenGenerator.GenerateAccessToken(
+            user, tenantId, [membership.RoleId], permissions, capabilities);
 
         return new LocalLoginFeature.LoginResponse(
             accessToken,
