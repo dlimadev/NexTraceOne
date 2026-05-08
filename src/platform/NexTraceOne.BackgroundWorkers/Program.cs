@@ -111,6 +111,8 @@ builder.Services.AddConfigurationInfrastructure(builder.Configuration);
 
 builder.Services.Configure<DriftDetectionOptions>(
     builder.Configuration.GetSection(DriftDetectionOptions.SectionName));
+builder.Services.Configure<ContractConsumerIngestionOptions>(
+    builder.Configuration.GetSection(ContractConsumerIngestionOptions.SectionName));
 builder.Services.AddNexTraceHealthChecks();
 builder.Services.AddHealthChecks()
     .AddCheck<DbContextConnectivityHealthCheck<IdentityDbContext>>(
@@ -267,7 +269,12 @@ builder.Services.AddHealthChecks()
         "drift-detection-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
-        args: [DriftDetectionJob.HealthCheckName, TimeSpan.FromMinutes(10)]);
+        args: [DriftDetectionJob.HealthCheckName, TimeSpan.FromMinutes(10)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "contract-consumer-ingestion-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [ContractConsumerIngestionJob.HealthCheckName, TimeSpan.FromMinutes(30)]);
 
 // Handlers de expiração — cada um processa um único tipo de entidade expirável.
 // A ordem de registro define a ordem de execução no IdentityExpirationJob.
@@ -329,6 +336,7 @@ builder.Services.AddHostedService<IdentityExpirationJob>();
 builder.Services.AddHostedService<DriftDetectionJob>();
 builder.Services.AddHostedService<CloudBillingIngestionJob>();
 builder.Services.AddHostedService<IncidentProbabilityRefreshJob>();
+builder.Services.AddHostedService<ContractConsumerIngestionJob>();
 
 var app = builder.Build();
 

@@ -4,7 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
-using System.Text.Json;
+using NexTraceOne.Catalog.Domain.Contracts.Services;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.AnalyzeDataContractSchema;
 
@@ -46,7 +46,9 @@ public static class AnalyzeDataContractSchema
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var (columnCount, piiClassification) = ParseSchema(request.SchemaJson);
+            var spec = DataContractSpecParser.Parse(request.SchemaJson);
+            var columnCount = spec.ColumnCount;
+            var piiClassification = spec.MaxPiiClassification;
 
             var latest = await repository.GetLatestByApiAssetAsync(
                 request.ApiAssetId, request.TenantId, cancellationToken);
@@ -79,36 +81,6 @@ public static class AnalyzeDataContractSchema
                 CapturedAt: schema.CapturedAt));
         }
 
-        private static (int ColumnCount, PiiClassification MaxPii) ParseSchema(string schemaJson)
-        {
-            try
-            {
-                using var doc = JsonDocument.Parse(schemaJson);
-                if (doc.RootElement.ValueKind != JsonValueKind.Array)
-                    return (0, PiiClassification.None);
-
-                var columns = doc.RootElement.EnumerateArray().ToList();
-                var maxPii = PiiClassification.None;
-
-                foreach (var col in columns)
-                {
-                    var hasPii = col.TryGetProperty("piiClassification", out var piiProp)
-                                 || col.TryGetProperty("pii", out piiProp);
-                    if (hasPii &&
-                        Enum.TryParse<PiiClassification>(piiProp.GetString(), true, out var pii) &&
-                        pii > maxPii)
-                    {
-                        maxPii = pii;
-                    }
-                }
-
-                return (columns.Count, maxPii);
-            }
-            catch
-            {
-                return (0, PiiClassification.None);
-            }
-        }
     }
 
     public sealed record Response(
