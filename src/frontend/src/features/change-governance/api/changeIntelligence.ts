@@ -323,6 +323,23 @@ export interface ReleaseTrainEvaluationResponse {
   evaluatedAt: string;
 }
 
+// ─── Promotion Readiness Delta types ─────────────────────────────────────────
+
+export interface PromotionReadinessDeltaResponse {
+  serviceName: string;
+  environmentFrom: string;
+  environmentTo: string;
+  windowDays: number;
+  errorRateDelta: number | null;
+  latencyP95DeltaMs: number | null;
+  throughputDelta: number | null;
+  costDelta: number | null;
+  incidentsDelta: number | null;
+  dataQuality: number;
+  readiness: 'Ready' | 'Review' | 'Blocked' | 'Unknown';
+  simulatedNote: string | null;
+}
+
 // ─── Commit Pool & Work Item Association types ───────────────────────────────
 
 export interface CommitAssociationItem {
@@ -822,6 +839,19 @@ export const changeIntelligenceApi = {
   ) =>
     client
       .post<any>(`/releases/${releaseId}/rollback-assessment`, { releaseId, ...data })
+      .then((r) => r.data),
+
+  // ─── Promotion Readiness Delta ────────────────────────────────────────────
+
+  /** Obtém os deltas de runtime entre dois ambientes para decisão de promoção. */
+  getPromotionReadinessDelta: (params: {
+    service: string;
+    from: string;
+    to: string;
+    days?: number;
+  }) =>
+    client
+      .get<PromotionReadinessDeltaResponse>('/changes/promotion-readiness-delta', { params })
       .then((r) => r.data),
 
   // ─── Promotion Gates ───────────────────────────────────────────────────────

@@ -13639,6 +13639,39 @@
       "invalidReleaseId": "É necessário um ID de release válido."
     }
   },
+  "promotionReadinessDelta": {
+    "title": "Delta de Prontidão para Promoção",
+    "subtitle": "Compare métricas de comportamento runtime entre dois ambientes para avaliar a prontidão de promoção.",
+    "serviceLabel": "Nome do Serviço",
+    "servicePlaceholder": "ex: payment-service",
+    "fromEnvLabel": "Ambiente de Origem",
+    "fromEnvPlaceholder": "ex: staging",
+    "toEnvLabel": "Ambiente de Destino",
+    "toEnvPlaceholder": "ex: production",
+    "daysLabel": "Janela de Observação (dias)",
+    "checkButton": "Verificar Prontidão",
+    "readiness": {
+      "Ready": "Pronto",
+      "Review": "Revisão Necessária",
+      "Blocked": "Bloqueado",
+      "Unknown": "Dados Insuficientes"
+    },
+    "badge": {
+      "ready": "Pronto para Promover",
+      "review": "Revisão Necessária",
+      "blocked": "Bloqueado",
+      "unknown": "Sem Dados"
+    },
+    "errorRateDelta": "Delta de Taxa de Erro",
+    "latencyDelta": "Delta de Latência P95",
+    "incidentsDelta": "Delta de Incidentes",
+    "throughputDelta": "Delta de Throughput",
+    "dataQuality": "Qualidade dos Dados",
+    "simulatedNote": "Dados simulados — bridge de comparação runtime não configurada.",
+    "ms": "ms",
+    "incidents": "incidentes",
+    "noData": "—"
+  },
   "promotionReadinessDeltaGate": {
     "title": "Gate de Prontidão para Promoção",
     "subtitle": "Avalia se um serviço está pronto para promoção com base em deltas de comportamento runtime entre ambientes.",

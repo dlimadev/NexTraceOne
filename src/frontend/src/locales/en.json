@@ -12374,6 +12374,39 @@
       "invalidReleaseId": "A valid release ID is required."
     }
   },
+  "promotionReadinessDelta": {
+    "title": "Promotion Readiness Delta",
+    "subtitle": "Compare runtime behaviour metrics between two environments to assess promotion readiness.",
+    "serviceLabel": "Service Name",
+    "servicePlaceholder": "e.g. payment-service",
+    "fromEnvLabel": "Source Environment",
+    "fromEnvPlaceholder": "e.g. staging",
+    "toEnvLabel": "Target Environment",
+    "toEnvPlaceholder": "e.g. production",
+    "daysLabel": "Observation Window (days)",
+    "checkButton": "Check Readiness",
+    "readiness": {
+      "Ready": "Ready",
+      "Review": "Review Required",
+      "Blocked": "Blocked",
+      "Unknown": "Insufficient Data"
+    },
+    "badge": {
+      "ready": "Ready to Promote",
+      "review": "Review Required",
+      "blocked": "Blocked",
+      "unknown": "No Data"
+    },
+    "errorRateDelta": "Error Rate Delta",
+    "latencyDelta": "Latency P95 Delta",
+    "incidentsDelta": "Incidents Delta",
+    "throughputDelta": "Throughput Delta",
+    "dataQuality": "Data Quality",
+    "simulatedNote": "Simulated data — runtime comparison bridge not configured.",
+    "ms": "ms",
+    "incidents": "incidents",
+    "noData": "—"
+  },
   "promotionReadinessDeltaGate": {
     "title": "Promotion Readiness Delta Gate",
     "subtitle": "Evaluates whether a service is ready for promotion based on runtime behaviour deltas between environments.",
