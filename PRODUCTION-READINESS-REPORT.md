@@ -17,8 +17,8 @@ NexTraceOne is a .NET 10 modular monolith with 12 domain modules, 5 building blo
 |---|----------|------|--------|
 | 1 | 🔴 CRITICAL | Knowledge module — all endpoints unprotected | **FIXED** |
 | 2 | 🔴 CRITICAL | ActivateAccount / ResetPassword — token infrastructure not implemented | **IMPLEMENTED** |
-| 3 | 🟡 HIGH | appsettings.json — empty API keys, CORS, telemetry endpoints | Config/Ops (startup preflight checks já presentes) |
-| 4 | 🟡 P2 | Contract Pipeline — stateless design (by decision) | Documented |
+| 3 | 🟡 HIGH | appsettings.json — empty API keys, CORS, telemetry endpoints | Config/Ops — startup `ValidateOnStart` ainda pendente (GAP-M02) |
+| 4 | 🟡 P2 | Contract Pipeline — 3 features (PostmanCollection, MockServer, ContractTests) carregam spec do request em vez da DB | **Parcialmente resolvido** — GenerateServerFromContract e GenerateClientSdk corrigidos; 3 restantes pendentes (GAP-M03) |
 
 ---
 
@@ -205,12 +205,15 @@ GET  /api/v1/knowledge/status                          → AllowAnonymous
 
 **Infrastructure:** Testcontainers (real PostgreSQL), Respawn state isolation, real JWT/Cookie authentication.
 
-### 5.3 Known Fake Tests
+### 5.3 Selenium Navigation Tests
 
-**File:** `tests/modules/catalog/NexTraceOne.Catalog.Tests/AdminNavigationTests.cs` (Selenium)  
-**Issue:** 30 test methods, 0 assertions. These are Selenium navigation scaffolds with no actual validation.  
-**Impact:** Low — unit test suite is not affected; these inflate test counts without providing coverage.  
-**Action:** Either add meaningful Selenium assertions or remove/mark as `[Skip]`.
+**Files:** `tests/platform/NexTraceOne.Selenium.Tests/Modules/` (AdminNavigationTests, CatalogNavigationTests, DashboardNavigationTests, etc.)  
+**Status:** ✅ Tests have real assertions via `AssertPageLoadsSuccessfully()` helper (defined in `SeleniumTestBase`):
+- `AssertNoErrorBoundary()` — verifica ausência de React error boundary
+- `AssertNotUnauthorized()` — verifica que não redireccionou para página de auth
+- `AssertNoJavaScriptErrors()` — verifica ausência de erros JS graves
+
+**Note:** Auditoria inicial classificou incorrectamente como "0 assertions". A implementação em `SeleniumTestBase.AssertPageLoadsSuccessfully()` confirma validação real em cada teste.
 
 ---
 

@@ -1,14 +1,17 @@
 # Plano 02 — Core Product Completions
 
 > **Prioridade:** 🔴 Alta  
-> **Esforço total:** 4–6 semanas  
+> **Esforço total:** 4–6 semanas (CC-02..08 + novos GAP-M items)  
 > **Contexto:** Itens parcialmente implementados ou pendentes identificados no `FUTURE-ROADMAP.md` waves A.1, A.2, A.4 e `HONEST-GAPS.md`
 
 ---
 
 ## CC-01 — SAML DEG-11: Promover de Nível A′ para Nível A
 
-**Estado atual:** `ISamlService` / `ISamlConfigProvider` existe mas não aparece no `/admin/system-health` dashboard.  
+**✅ CONCLUÍDO (Abril 2026)**  
+`ISamlProvider.IsConfigured` exposto via `GetOptionalProviders` + `OptionalProviderNames.Saml`. Aparece em `/admin/system-health` como 5º provider opcional. Confirmado por auditoria de código (Maio 2026): `OptionalProviderNames.Saml` registado em `Program.cs` e `GetOptionalProviders.cs`.
+
+~~**Estado atual:** `ISamlService` / `ISamlConfigProvider` existe mas não aparece no `/admin/system-health` dashboard.~~  
 **Referência:** `HONEST-GAPS.md` DEG-11, secção CFG-02.
 
 **Implementação:**
@@ -168,20 +171,41 @@
 
 ---
 
+---
+
+## CC-09 — GetDashboardAnnotations: Ligar a Fontes de Dados Reais (GAP-M01)
+
+**Estado atual:** Handler retorna 4 anotações hardcoded para serviços fictícios ("payment-service", "user-service", "analytics-service") com `IsSimulated:true`. Identificado na auditoria de Maio 2026.  
+**Ficheiro:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetDashboardAnnotations/GetDashboardAnnotations.cs`
+
+**Implementação:**
+1. Injectar `IIncidentModule`, `IChangeIntelligenceModule`, `IRulesetGovernanceModule` no handler
+2. Para anotações de tipo `incident.opened`: query `IIncidentModule.GetRecentIncidents(tenantId, from, to)`
+3. Para anotações de tipo `change.release`: query `IChangeIntelligenceModule.GetReleasesInWindow(from, to)`
+4. Para anotações de tipo `contract.breaking_change`: query OTel/Catalog drift detection
+5. Para anotações de tipo `policy.violation`: query `IRulesetGovernanceModule.GetRecentViolations(from, to)`
+6. `IsSimulated: false` quando dados reais disponíveis; fallback `IsSimulated: true` apenas quando cross-module indisponível
+7. Testes: 8+ unitários (com/sem dados cross-module)
+
+**Esforço:** 4–8h
+
+---
+
 ## Ordem de Execução Recomendada
 
 ```
-Semana 1:   CC-01 (SAML Level A — 1 dia) + CC-02 (Readiness Delta — 4 dias)
-Semana 2:   CC-07 (Blast Radius v2) + CC-08 (Spectral Marketplace)
-Semanas 3–4: CC-03 (Data Contracts)
-Semana 5:   CC-04 (Consumer Tracking via OTel)
+Semana 1:   CC-01 ✅ (SAML — concluído) + CC-02 (Readiness Delta — 4 dias)
+Semana 2:   CC-09 (Dashboard Annotations — 1 dia) + CC-07 (Blast Radius v2)
+Semana 3:   CC-08 (Spectral Marketplace) + CC-03 (Data Contracts)
+Semana 4–5: CC-03 (Data Contracts — continuação) + CC-04 (Consumer Tracking)
 Semana 6:   CC-05 (AI Eval Harness) + CC-06 (Breaking Change Workflow)
 ```
 
 ## Critérios de Aceite
 
-- [ ] SAML aparece como 5º provider em `/admin/system-health` com estado configured/not-configured
+- [x] SAML aparece como 5º provider em `/admin/system-health` com estado configured/not-configured *(CC-01 ✅)*
 - [ ] `GetPromotionReadinessDelta` retorna dados reais (sem `SimulatedNote`) quando OI tem snapshots de runtime
+- [ ] `GetDashboardAnnotations` retorna anotações reais de incidentes/releases/violações (CC-09)
 - [ ] Contratos de dados (`DataContract`) criáveis via Contract Studio com classificação PII
 - [ ] Consumer inventory atualizado automaticamente a cada 15min via job
 - [ ] Avaliação de modelos IA executável via API com métricas de qualidade

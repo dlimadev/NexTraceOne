@@ -10,7 +10,7 @@
 
 ### Task 1.1 — ActivateAccount Token Infrastructure
 
-**Status:** Handler returns hardcoded error — feature non-functional  
+**Status:** ✅ IMPLEMENTADO (Maio 2026) — Confirmado por auditoria de código  
 **Files to create/modify:**
 
 ```
@@ -54,7 +54,7 @@ src/modules/identityaccess/NexTraceOne.IdentityAccess.Infrastructure/Persistence
 
 ### Task 1.2 — ResetPassword Token Infrastructure
 
-**Status:** Handler returns hardcoded error — feature non-functional  
+**Status:** ✅ IMPLEMENTADO (Maio 2026) — Confirmado por auditoria de código  
 **Files to create/modify:**
 
 ```
@@ -186,12 +186,17 @@ public sealed class Handler(IContractVersionRepository contractVersionRepository
 }
 ```
 
-**Files to modify:**
+**Status por feature (auditoria Maio 2026):**
+- `GeneratePostmanCollection` — ❌ ainda usa `ContractJson` no Command
+- `GenerateMockServer` — ❌ ainda usa `ContractJson` no Command
+- `GenerateContractTests` — ❌ ainda usa `ContractJson` no Command
+- `GenerateServerFromContract` — ✅ já carrega spec da DB
+- `GenerateClientSdkFromContract` — ✅ já carrega spec da DB
+
+**Files to modify (apenas os 3 pendentes):**
 - `GeneratePostmanCollection/GeneratePostmanCollection.cs`
 - `GenerateMockServer/GenerateMockServer.cs`
 - `GenerateContractTests/GenerateContractTests.cs`
-- `GenerateServerFromContract/GenerateServerFromContract.cs`
-- `GenerateClientSdkFromContract/GenerateClientSdkFromContract.cs` (already lacks ContractJson; verify it loads spec)
 
 **API contracts to update:**
 - Remove `contractJson` from HTTP request bodies for pipeline endpoints
@@ -203,11 +208,14 @@ public sealed class Handler(IContractVersionRepository contractVersionRepository
 
 ### Task 4.1 — Selenium Tests: Add Assertions
 
-**File:** `tests/modules/catalog/NexTraceOne.Catalog.Tests/AdminNavigationTests.cs`
+**Status:** ✅ DIAGNÓSTICO REVISTO — Os testes Selenium têm asserções reais.
 
-30 test methods navigate to pages but make no assertions. Either:
-- Add `Assert.True(driver.Url.Contains("/admin/..."), "Expected navigation to admin page")` and element visibility checks
-- Or mark tests with `[Skip("Navigation scaffold — pending UI assertion implementation")]`
+**Nota de revisão (Maio 2026):** Os testes em `tests/platform/NexTraceOne.Selenium.Tests/Modules/` (não em `tests/modules/catalog/`) usam `AssertPageLoadsSuccessfully()` definido em `SeleniumTestBase`, que verifica:
+- `AssertNoErrorBoundary()` — ausência de React error boundary
+- `AssertNotUnauthorized()` — sem redirect para página de auth
+- `AssertNoJavaScriptErrors()` — sem erros JS críticos
+
+Nenhuma acção necessária.
 
 ### Task 4.2 — SyncModelSnapshot Migration Cleanup
 
@@ -238,6 +246,8 @@ dotnet ef migrations add <MigrationName> \
 
 ### Task 4.4 — Add knowledge:read / knowledge:write to Role Definitions
 
+**Status:** ✅ IMPLEMENTADO (Maio 2026) — `RolePermissionCatalog.cs` confirma `knowledge:read` e `knowledge:write` em todos os papéis relevantes.
+
 After adding `RequirePermission` to Knowledge endpoints, ensure the default roles include the new permissions:
 
 **Files to check/update:**
@@ -251,40 +261,102 @@ Add to relevant roles:
 
 ---
 
+---
+
+## Sprint 5 — Gaps Identificados na Auditoria de Maio 2026
+
+> Novos items identificados durante validação da documentação (Maio 2026). Não bloqueiam v1.0.0 mas devem ser endereçados.
+
+### Task 5.1 — Startup Configuration Validation (GAP-M02)
+
+**Prioridade:** 🔴 Alta — app pode arrancar em produção sem secrets obrigatórios  
+**Ficheiro:** `src/platform/NexTraceOne.ApiHost/Program.cs`
+
+Adicionar após `builder.Services` e antes de `builder.Build()`:
+
+```csharp
+builder.Services.AddOptions<JwtOptions>()
+    .BindConfiguration("Jwt")
+    .Validate(o => !string.IsNullOrEmpty(o.Secret) && o.Secret != "REPLACE_VIA_ENV",
+              "Jwt:Secret must be set via environment variable — cannot be empty or placeholder")
+    .ValidateOnStart();
+
+builder.Services.AddOptions<ConnectionStringsOptions>()
+    .BindConfiguration("ConnectionStrings")
+    .Validate(o => !o.Default.Contains("REPLACE_VIA_ENV"),
+              "ConnectionStrings:Default must be set via environment variable")
+    .ValidateOnStart();
+```
+
+**Esforço:** 2–4h  
+**Critério de aceite:** App falha imediatamente no arranque se JWT_SECRET ou ConnectionString for placeholder.
+
+---
+
+### Task 5.2 — GetDashboardAnnotations: Ligar a Dados Reais (GAP-M01)
+
+**Prioridade:** 🟡 Média  
+**Ficheiro:** `src/modules/governance/NexTraceOne.Governance.Application/Features/GetDashboardAnnotations/GetDashboardAnnotations.cs`  
+**Plano detalhado:** [PLAN-02-CORE-COMPLETIONS.md CC-09](./docs/plans/PLAN-02-CORE-COMPLETIONS.md)
+
+Handler retorna 4 anotações hardcoded para serviços fictícios com `IsSimulated:true`. Ligar a `IIncidentModule`, `IChangeIntelligenceModule` e `IRulesetGovernanceModule`.
+
+**Esforço:** 4–8h
+
+---
+
+### Task 5.3 — IIdentityNotifier: Ligar a Email Real (GAP-M06)
+
+**Prioridade:** 🟡 Média  
+**Ficheiro:** `src/modules/identityaccess/NexTraceOne.IdentityAccess.Infrastructure/Services/NullIdentityNotifier.cs`
+
+`NullIdentityNotifier` emite `LogWarning` em vez de enviar email real. Tokens de activação/reset são gerados mas não chegam ao utilizador em produção.
+
+**Implementação:**
+1. Criar `NotificationsIdentityNotifier` que injeta `INotificationModule`
+2. Registar condicionalmente: quando SMTP configurado → `NotificationsIdentityNotifier`; caso contrário → `NullIdentityNotifier`
+3. Adicionar evento de integração `AccountActivationTokenRequested` no outbox
+
+**Esforço:** 1–2 dias
+
+---
+
 ## Risk Register
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|-----------|
-| Production deploy without JWT_SECRET set | Medium | Critical (auth bypass) | Startup validation (Task 2.1) |
-| Account activation never works in prod | High | High (user onboarding blocked) | Task 1.1 (P0) |
-| Knowledge data exposed before fix deployed | Low (already fixed) | High | Fix already applied in this session |
-| Contract Pipeline generates wrong artifacts | Medium | Medium | Document limitation; add preview note |
-| CORS blocks frontend in production | High (if not configured) | High | Task 2.3 (P1) |
-| Telemetry silent in production | High (if not configured) | Medium | Task 2.2 (P1) |
+| Risk | Likelihood | Impact | Mitigation | Estado |
+|------|-----------|--------|-----------|--------|
+| Production deploy without JWT_SECRET set | Medium | Critical (auth bypass) | Startup validation (Task 5.1 / GAP-M02) | 🔴 Aberto |
+| Account activation tokens never reach users in prod | High | High (onboarding blocked) | NullIdentityNotifier → ligar email real (Task 5.3 / GAP-M06) | 🔴 Aberto |
+| Knowledge data exposed | Resolved | High | RequirePermission aplicado (Task 1.1) | ✅ Resolvido |
+| Contract Pipeline generates artifacts from stale JSON | Medium | Medium | 3 features pendentes (Task 3.1 / GAP-M03) | 🟡 Parcial |
+| CORS blocks frontend in production | High (if not configured) | High | Configurar via env vars (Task 2.3) | ⚙️ Config/Ops |
+| Telemetry silent in production | High (if not configured) | Medium | Configurar OTLP endpoint (Task 2.2) | ⚙️ Config/Ops |
+| Dashboard shows fake annotations to users | Low | Low | GetDashboardAnnotations fix (Task 5.2 / GAP-M01) | 🟡 Aberto |
 
 ---
 
 ## Effort Summary
 
-| Sprint | Items | Estimated Effort |
-|--------|-------|-----------------|
-| Sprint 1 (P0) | ActivateAccount + ResetPassword tokens | 3–5 days |
-| Sprint 2 (P1) | Startup validation + secrets + CORS | 1–2 days (mostly config) |
-| Sprint 3 (P2) | Contract Pipeline DB integration | 3–5 days |
-| Sprint 4 (P3) | Housekeeping | 2–3 days |
-| **Total** | | **~10–15 days** |
+| Sprint | Items | Estimated Effort | Estado |
+|--------|-------|-----------------|--------|
+| Sprint 1 (P0) | ActivateAccount + ResetPassword tokens | 3–5 days | ✅ Concluído |
+| Sprint 2 (P1) | Startup validation + secrets + CORS | 1–2 days (mostly config) | 🔴 Startup validation pendente |
+| Sprint 3 (P2) | Contract Pipeline DB integration (3 features) | 2–3 days | 🔴 Pendente |
+| Sprint 4 (P3) | Housekeeping (migrations runbook, SyncModelSnapshot) | 1–2 days | 🟡 Runbook criado; migrations pendentes |
+| Sprint 5 (Maio 2026) | Startup validation, Dashboard Annotations, Email notifier | 3–5 days | 🔴 Novos items |
+| **Total restante** | | **~6–10 days** | |
 
 ---
 
 ## Definition of Done
 
 The system is **fully production-ready** when:
-- [ ] ActivateAccount sends email with token and validates correctly
-- [ ] ResetPassword sends email with token, validates, and updates password hash
-- [ ] All production environment variables are set and validated at startup
-- [ ] CORS is configured for production domains
-- [ ] Telemetry collector endpoint is reachable
-- [ ] Contract Pipeline features load specs from database
-- [ ] `knowledge:read` / `knowledge:write` permissions exist in role seed data
-- [ ] Integration tests pass against production-equivalent database
-- [ ] Selenium tests have assertions or are clearly marked as skipped
+- [x] ActivateAccount sends email with token and validates correctly *(token infra implementada; email via IIdentityNotifier pendente — GAP-M06)*
+- [x] ResetPassword sends email with token, validates, and updates password hash *(token infra implementada; email via IIdentityNotifier pendente — GAP-M06)*
+- [ ] All production environment variables are set and validated at startup *(ValidateOnStart não implementado — GAP-M02)*
+- [ ] CORS is configured for production domains *(ops — configurar via env vars)*
+- [ ] Telemetry collector endpoint is reachable *(ops — configurar OTLP endpoint)*
+- [ ] Contract Pipeline features load specs from database *(3 de 5 features pendentes — GAP-M03)*
+- [x] `knowledge:read` / `knowledge:write` permissions exist in role seed data *(confirmado em RolePermissionCatalog.cs)*
+- [ ] Integration tests pass against production-equivalent database *(verificar em CI)*
+- [x] Selenium tests have assertions *(AssertPageLoadsSuccessfully() confirmado em SeleniumTestBase)*
