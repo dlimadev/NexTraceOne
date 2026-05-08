@@ -130,6 +130,7 @@ public static class DependencyInjection
         // ── Agent Execution Plan & Prompt Intent (null / in-memory impls) ──
         services.AddScoped<IAgentExecutionPlanRepository, NexTraceOne.AIKnowledge.Application.Governance.Services.NullAgentExecutionPlanRepository>();
         services.AddScoped<IPromptIntentClassifier, NexTraceOne.AIKnowledge.Application.Governance.Services.PromptIntentClassifierService>();
+        services.AddScoped<IModelRoutingPolicyRepository, NexTraceOne.AIKnowledge.Application.Governance.Services.NullModelRoutingPolicyRepository>();
 
         // ── AI-5.2: Prompt Asset Registry ─────────────────────────────────
         services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();
