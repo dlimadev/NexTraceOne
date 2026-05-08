@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
@@ -71,6 +72,7 @@ public static class GetDashboardAnnotations
         IIncidentModule incidentModule,
         IChangeIntelligenceModule changeIntelligenceModule,
         IRulesetGovernanceModule rulesetGovernanceModule,
+        IContractsModule contractsModule,
         ILogger<Handler> logger) : IQueryHandler<Query, Response>
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
@@ -161,8 +163,33 @@ public static class GetDashboardAnnotations
                 sources.Add(new AnnotationSourceSummary("policies", 0, true, "RulesetGovernance module unavailable"));
             }
 
-            // — Contracts source (not yet bridged — honest gap)
-            sources.Add(new AnnotationSourceSummary("contracts", 0, true, "Catalog contract events bridge pending"));
+            // — Contracts source
+            try
+            {
+                var breakingChanges = await contractsModule.GetRecentBreakingChangesAsync(
+                    request.From, request.To, request.MaxPerSource, cancellationToken);
+
+                var contractAnnotations = breakingChanges
+                    .Where(bc => MatchesServiceFilter(bc.OwnerServiceName, request.ServiceNames))
+                    .Select(bc => new AnnotationDto(
+                        Id: $"contract-{bc.ApiAssetId}",
+                        Timestamp: bc.DetectedAt,
+                        Type: "contract.breaking_change",
+                        Title: $"Breaking change in {bc.ApiAssetName} ({bc.BreakingChangeCount} change(s))",
+                        Detail: bc.OwnerServiceName is not null ? $"Owner: {bc.OwnerServiceName}" : null,
+                        ServiceName: bc.OwnerServiceName,
+                        Severity: "warning",
+                        IsSimulated: false))
+                    .ToList();
+
+                annotations.AddRange(contractAnnotations);
+                sources.Add(new AnnotationSourceSummary("contracts", contractAnnotations.Count, false, null));
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to fetch contract breaking change annotations; using simulated fallback");
+                sources.Add(new AnnotationSourceSummary("contracts", 0, true, "Catalog contracts module unavailable"));
+            }
 
             var sorted = annotations
                 .OrderByDescending(a => a.Timestamp)

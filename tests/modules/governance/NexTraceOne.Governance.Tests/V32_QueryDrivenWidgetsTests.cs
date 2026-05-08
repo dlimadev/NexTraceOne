@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Nql;
+using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
@@ -461,7 +462,7 @@ public sealed class V32_QueryDrivenWidgetsTests
     }
 
     [Fact]
-    public async Task GetDashboardAnnotations_ContractsSource_AlwaysSimulated()
+    public async Task GetDashboardAnnotations_ContractsSource_NotSimulated_WhenModuleSucceeds()
     {
         var now = DateTimeOffset.UtcNow;
         var handler = MakeHandler();
@@ -471,7 +472,7 @@ public sealed class V32_QueryDrivenWidgetsTests
             CancellationToken.None);
 
         result.Value!.Sources.Should()
-            .ContainSingle(s => s.Source == "contracts" && s.IsSimulated);
+            .ContainSingle(s => s.Source == "contracts" && !s.IsSimulated);
     }
 
     [Fact]
@@ -610,7 +611,7 @@ public sealed class V32_QueryDrivenWidgetsTests
     }
 
     [Fact]
-    public async Task GetDashboardAnnotations_AllModulesSucceed_SourcesNotSimulatedExceptContracts()
+    public async Task GetDashboardAnnotations_AllModulesSucceed_NoSourceIsSimulated()
     {
         var now = DateTimeOffset.UtcNow;
         var handler = MakeHandler();
@@ -620,10 +621,7 @@ public sealed class V32_QueryDrivenWidgetsTests
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value!.Sources.Should().ContainSingle(s => s.Source == "incidents" && !s.IsSimulated);
-        result.Value.Sources.Should().ContainSingle(s => s.Source == "changes" && !s.IsSimulated);
-        result.Value.Sources.Should().ContainSingle(s => s.Source == "policies" && !s.IsSimulated);
-        result.Value.Sources.Should().ContainSingle(s => s.Source == "contracts" && s.IsSimulated);
+        result.Value!.Sources.Should().OnlyContain(s => !s.IsSimulated);
     }
 
     [Fact]
@@ -651,10 +649,57 @@ public sealed class V32_QueryDrivenWidgetsTests
 
     // ── Helper ────────────────────────────────────────────────────────────
 
+    [Fact]
+    public async Task GetDashboardAnnotations_WithRealBreakingChanges_ReturnsContractAnnotations()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var assetId = Guid.NewGuid();
+        var contractsModule = Substitute.For<IContractsModule>();
+        contractsModule.GetRecentBreakingChangesAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ContractBreakingChangeSummary>
+            {
+                new(assetId, "payments-api", "payment-service", 3, now.AddHours(-2))
+            });
+
+        var handler = MakeHandler(contractsModule: contractsModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-24), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Annotations.Should().ContainSingle(a =>
+            a.Id == $"contract-{assetId}" &&
+            a.Type == "contract.breaking_change" &&
+            a.ServiceName == "payment-service" &&
+            a.IsSimulated == false);
+        result.Value.Sources.Should().ContainSingle(s => s.Source == "contracts" && !s.IsSimulated && s.Count == 1);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_ContractsModuleFails_FallsBackToSimulated()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var contractsModule = Substitute.For<IContractsModule>();
+        contractsModule.GetRecentBreakingChangesAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("catalog unavailable"));
+
+        var handler = MakeHandler(contractsModule: contractsModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Sources.Should().ContainSingle(s =>
+            s.Source == "contracts" && s.IsSimulated && s.SimulatedNote != null);
+    }
+
     private static GetDashboardAnnotations.Handler MakeHandler(
         IIncidentModule? incidentModule = null,
         IChangeIntelligenceModule? changeModule = null,
-        IRulesetGovernanceModule? rulesetModule = null)
+        IRulesetGovernanceModule? rulesetModule = null,
+        IContractsModule? contractsModule = null)
     {
         if (incidentModule is null)
         {
@@ -683,10 +728,20 @@ public sealed class V32_QueryDrivenWidgetsTests
             rulesetModule = m;
         }
 
+        if (contractsModule is null)
+        {
+            var m = Substitute.For<IContractsModule>();
+            m.GetRecentBreakingChangesAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                    Arg.Any<int>(), Arg.Any<CancellationToken>())
+                .Returns(Array.Empty<ContractBreakingChangeSummary>());
+            contractsModule = m;
+        }
+
         return new GetDashboardAnnotations.Handler(
             incidentModule,
             changeModule,
             rulesetModule,
+            contractsModule,
             NullLogger<GetDashboardAnnotations.Handler>.Instance);
     }
 }
