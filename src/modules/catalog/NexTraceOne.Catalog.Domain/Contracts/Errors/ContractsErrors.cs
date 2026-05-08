@@ -317,5 +317,16 @@ public static class ContractsErrors
     /// <summary>Versões base e alvo do patch de migração são iguais.</summary>
     public static Error MigrationPatchVersionsIdentical()
         => Error.Validation("Contracts.MigrationPatch.VersionsIdentical", "Base and target versions must be different to generate a migration patch.");
+
+    // ── BreakingChangeProposal ────────────────────────────────────────
+
+    /// <summary>Proposta de breaking change não encontrada.</summary>
+    public static Error ProposalNotFound(string id)
+        => Error.NotFound("Contracts.BreakingChangeProposal.NotFound", "Breaking change proposal '{0}' was not found.", id);
+
+    /// <summary>Proposta não está em estado que aceite respostas de consumidores.</summary>
+    public static Error ProposalNotOpenForResponse(string id, string status)
+        => Error.Business("Contracts.BreakingChangeProposal.NotOpenForResponse",
+            "Breaking change proposal '{0}' is not open for consumer responses (current status: {1}).", id, status);
 }
 

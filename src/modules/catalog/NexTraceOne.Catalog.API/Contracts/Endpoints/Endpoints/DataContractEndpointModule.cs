@@ -10,6 +10,7 @@ using AnalyzeDataContractSchemaFeature = NexTraceOne.Catalog.Application.Contrac
 using GetDataContractSchemaHistoryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetDataContractSchemaHistory.GetDataContractSchemaHistory;
 using GetContractConsumerInventoryFeature = NexTraceOne.Catalog.Application.Contracts.Features.GetContractConsumerInventory.GetContractConsumerInventory;
 using ProposeBreakingChangeFeature = NexTraceOne.Catalog.Application.Contracts.Features.ProposeBreakingChange.ProposeBreakingChange;
+using RespondToBreakingChangeProposalFeature = NexTraceOne.Catalog.Application.Contracts.Features.RespondToBreakingChangeProposal.RespondToBreakingChangeProposal;
 
 namespace NexTraceOne.Catalog.API.Contracts.Endpoints.Endpoints;
 
@@ -105,6 +106,25 @@ public sealed class DataContractEndpointModule
         .RequirePermission("contracts:write")
         .WithTags("Breaking Change Proposals CC-06")
         .WithSummary("Propose a breaking change for a contract");
+
+        proposalGroup.MapPost("/{proposalId:guid}/respond", async (
+            Guid proposalId,
+            RespondToBreakingChangeProposalRequest req,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(
+                new RespondToBreakingChangeProposalFeature.Command(
+                    proposalId,
+                    req.ConsumerService,
+                    req.ResponseNote),
+                ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("contracts:write")
+        .WithTags("Breaking Change Proposals CC-06")
+        .WithSummary("Record a consumer response to a breaking change proposal");
     }
 }
 
@@ -123,3 +143,7 @@ public sealed record ProposeBreakingChangeRequest(
     int MigrationWindowDays,
     string ProposedBy,
     bool OpenConsultationImmediately = true);
+
+public sealed record RespondToBreakingChangeProposalRequest(
+    string ConsumerService,
+    string? ResponseNote = null);

@@ -4,6 +4,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.AnalyzeDataContractSche
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractConsumerInventory;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetDataContractSchemaHistory;
 using NexTraceOne.Catalog.Application.Contracts.Features.ProposeBreakingChange;
+using NexTraceOne.Catalog.Application.Contracts.Features.RespondToBreakingChangeProposal;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Tests.Contracts;
@@ -208,5 +209,93 @@ public sealed class DataContractFeaturesTests
             "[]", PiiClassification.None, "postgres", 0, 1, _now);
 
         schema.IsFreshnessViolated(schema.CapturedAt, _now).Should().BeFalse();
+    }
+
+    // ── CC-06: RespondToBreakingChangeProposal ───────────────────────────────
+
+    [Fact]
+    public async Task RespondToBreakingChangeProposal_ValidConsultationOpen_TransitionsToConsumerResponded()
+    {
+        var proposal = BreakingChangeProposal.Create("t1", Guid.NewGuid(), "[{}]", 30, "author", _now);
+        proposal.OpenConsultation(_now);
+        var proposalId = proposal.Id;
+
+        _proposalRepo.GetByIdAsync(proposalId, Arg.Any<CancellationToken>()).Returns(proposal);
+
+        var handler = new RespondToBreakingChangeProposal.Handler(_proposalRepo, _uow, _clock);
+        var result = await handler.Handle(
+            new RespondToBreakingChangeProposal.Command(proposalId.Value, "svc-consumer", "Acknowledged."),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Status.Should().Be(BreakingChangeProposalStatus.ConsumerResponded.ToString());
+        result.Value.ConsumerService.Should().Be("svc-consumer");
+        result.Value.ResponseNote.Should().Be("Acknowledged.");
+        await _proposalRepo.Received(1).UpdateAsync(Arg.Any<BreakingChangeProposal>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RespondToBreakingChangeProposal_AlreadyConsumerResponded_StillSucceeds()
+    {
+        var proposal = BreakingChangeProposal.Create("t1", Guid.NewGuid(), "[{}]", 30, "author", _now);
+        proposal.OpenConsultation(_now);
+        proposal.RecordConsumerResponse(_now);
+        var proposalId = proposal.Id;
+
+        _proposalRepo.GetByIdAsync(proposalId, Arg.Any<CancellationToken>()).Returns(proposal);
+
+        var handler = new RespondToBreakingChangeProposal.Handler(_proposalRepo, _uow, _clock);
+        var result = await handler.Handle(
+            new RespondToBreakingChangeProposal.Command(proposalId.Value, "svc-second-consumer"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Status.Should().Be(BreakingChangeProposalStatus.ConsumerResponded.ToString());
+    }
+
+    [Fact]
+    public async Task RespondToBreakingChangeProposal_ProposalNotFound_ReturnsFailure()
+    {
+        _proposalRepo.GetByIdAsync(Arg.Any<BreakingChangeProposalId>(), Arg.Any<CancellationToken>())
+            .Returns((BreakingChangeProposal?)null);
+
+        var handler = new RespondToBreakingChangeProposal.Handler(_proposalRepo, _uow, _clock);
+        var result = await handler.Handle(
+            new RespondToBreakingChangeProposal.Command(Guid.NewGuid(), "svc-consumer"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task RespondToBreakingChangeProposal_DraftStatus_ReturnsBusinessError()
+    {
+        var proposal = BreakingChangeProposal.Create("t1", Guid.NewGuid(), "[{}]", 30, "author", _now);
+        _proposalRepo.GetByIdAsync(proposal.Id, Arg.Any<CancellationToken>()).Returns(proposal);
+
+        var handler = new RespondToBreakingChangeProposal.Handler(_proposalRepo, _uow, _clock);
+        var result = await handler.Handle(
+            new RespondToBreakingChangeProposal.Command(proposal.Id.Value, "svc-consumer"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
+        await _proposalRepo.DidNotReceive().UpdateAsync(Arg.Any<BreakingChangeProposal>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RespondToBreakingChangeProposal_ApprovedStatus_ReturnsBusinessError()
+    {
+        var proposal = BreakingChangeProposal.Create("t1", Guid.NewGuid(), "[{}]", 30, "author", _now);
+        proposal.OpenConsultation(_now);
+        proposal.SubmitForApproval(_now);
+        proposal.Approve(null, _now);
+        _proposalRepo.GetByIdAsync(proposal.Id, Arg.Any<CancellationToken>()).Returns(proposal);
+
+        var handler = new RespondToBreakingChangeProposal.Handler(_proposalRepo, _uow, _clock);
+        var result = await handler.Handle(
+            new RespondToBreakingChangeProposal.Command(proposal.Id.Value, "svc-consumer"),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
     }
 }
