@@ -50,8 +50,8 @@ public sealed class GetOptionalProvidersTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.ConfiguredCount.Should().Be(0);
-        result.Value.TotalCount.Should().Be(5);
-        result.Value.Providers.Should().HaveCount(5);
+        result.Value.TotalCount.Should().Be(9);
+        result.Value.Providers.Should().HaveCount(9);
         result.Value.Providers.Should()
             .OnlyContain(p => p.Status == GetOptionalProviders.OptionalProviderStatus.NotConfigured);
     }
@@ -65,9 +65,9 @@ public sealed class GetOptionalProvidersTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.ConfiguredCount.Should().Be(5);
-        result.Value.TotalCount.Should().Be(5);
-        result.Value.Providers.Should()
-            .OnlyContain(p => p.Status == GetOptionalProviders.OptionalProviderStatus.Configured);
+        result.Value.TotalCount.Should().Be(9);
+        result.Value.Providers.Should().HaveCount(9);
+        result.Value.Providers.Count(p => p.Status == GetOptionalProviders.OptionalProviderStatus.Configured).Should().Be(5);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public sealed class GetOptionalProvidersTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.ConfiguredCount.Should().Be(2);
-        result.Value.TotalCount.Should().Be(5);
+        result.Value.TotalCount.Should().Be(9);
 
         var canary = result.Value.Providers.Single(p => p.Name == "canary");
         canary.Status.Should().Be(GetOptionalProviders.OptionalProviderStatus.Configured);
@@ -157,7 +157,7 @@ public sealed class GetOptionalProvidersTests
         var result = await handler.Handle(new GetOptionalProviders.Query(), CancellationToken.None);
 
         result.Value.ConfiguredCount.Should().Be(4);
-        result.Value.TotalCount.Should().Be(5);
+        result.Value.TotalCount.Should().Be(9);
 
         var saml = result.Value.Providers.Single(p => p.Name == OptionalProviderNames.Saml);
         saml.Status.Should().Be(GetOptionalProviders.OptionalProviderStatus.NotConfigured);

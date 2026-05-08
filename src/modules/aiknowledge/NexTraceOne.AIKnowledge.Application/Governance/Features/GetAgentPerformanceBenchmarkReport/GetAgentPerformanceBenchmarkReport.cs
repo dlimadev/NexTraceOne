@@ -41,7 +41,7 @@ public static class GetAgentPerformanceBenchmarkReport
             if (qualified.Count == 0)
                 return new Response(
                     TenantId: request.TenantId,
-                    TotalAgentsEvaluated: 0,
+                    TotalAgentsEvaluated: allMetrics.Count,
                     QualifiedAgents: 0,
                     AgentBenchmarks: [],
                     TierSummary: BuildEmptyTierSummary(),

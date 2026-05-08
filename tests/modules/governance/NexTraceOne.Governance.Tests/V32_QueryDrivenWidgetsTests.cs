@@ -214,7 +214,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("", null, "Engineer", "user-1");
 
         var result = svc.Validate("FROM catalog.services", ctx);
@@ -229,7 +229,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
 
         var result = svc.Validate("FROM catalog.services WHERE tier = 'Critical'", ctx);
@@ -244,7 +244,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
         var plan = NqlParser.Parse("FROM catalog.services LIMIT 5").Plan!;
 
@@ -262,7 +262,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
         var plan = NqlParser.Parse("FROM finops.costs LIMIT 3").Plan!;
 
@@ -277,7 +277,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var ctx = new NqlExecutionContext("tenant-1", null, "Engineer", "user-1");
         var plan = NqlParser.Parse("FROM operations.incidents RENDER AS bar").Plan!;
 
@@ -294,7 +294,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ExecuteNqlQuery.Handler(svc);
 
         var query = new ExecuteNqlQuery.Query(
@@ -317,7 +317,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ExecuteNqlQuery.Handler(svc);
 
         var query = new ExecuteNqlQuery.Query(
@@ -341,7 +341,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ValidateNqlQuery.Handler(svc);
 
         var query = new ValidateNqlQuery.Query(
@@ -365,7 +365,7 @@ public sealed class V32_QueryDrivenWidgetsTests
         var svc = new DefaultQueryGovernanceService(
             Substitute.For<ITeamRepository>(),
             Substitute.For<IGovernanceDomainRepository>(),
-            Substitute.For<ILogger<DefaultQueryGovernanceService>>());
+            NullLogger<DefaultQueryGovernanceService>.Instance);
         var handler = new ValidateNqlQuery.Handler(svc);
 
         var query = new ValidateNqlQuery.Query(

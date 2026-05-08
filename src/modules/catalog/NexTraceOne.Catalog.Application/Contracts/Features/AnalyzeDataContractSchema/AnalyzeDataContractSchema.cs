@@ -92,7 +92,9 @@ public static class AnalyzeDataContractSchema
 
                 foreach (var col in columns)
                 {
-                    if (col.TryGetProperty("piiClassification", out var piiProp) &&
+                    var hasPii = col.TryGetProperty("piiClassification", out var piiProp)
+                                 || col.TryGetProperty("pii", out piiProp);
+                    if (hasPii &&
                         Enum.TryParse<PiiClassification>(piiProp.GetString(), true, out var pii) &&
                         pii > maxPii)
                     {

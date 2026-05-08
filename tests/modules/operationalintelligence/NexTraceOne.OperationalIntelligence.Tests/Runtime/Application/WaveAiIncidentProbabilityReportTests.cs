@@ -36,7 +36,7 @@ public sealed class WaveAiIncidentProbabilityReportTests
 
     private static SloObservation MakeSloBreached(string svc)
         => SloObservation.Create(TenantId, svc, "production", "availability",
-            observedValue: 0.90m, sloTarget: 0.99m,
+            observedValue: 0.85m, sloTarget: 0.99m,
             periodStart: FixedNow.AddHours(-72), periodEnd: FixedNow.AddHours(-1),
             observedAt: FixedNow.AddHours(-1));
 
