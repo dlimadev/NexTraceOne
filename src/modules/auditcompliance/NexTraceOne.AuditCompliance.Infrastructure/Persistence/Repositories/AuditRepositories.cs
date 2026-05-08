@@ -2,15 +2,16 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AuditCompliance.Application.Abstractions;
 using NexTraceOne.AuditCompliance.Domain.Entities;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Repositories;
 
-internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEventRepository
+internal sealed class AuditEventRepository(AuditDbContext context, ICurrentTenant currentTenant) : IAuditEventRepository
 {
     public async Task<AuditEvent?> GetByIdAsync(AuditEventId id, CancellationToken cancellationToken)
         => await context.AuditEvents
             .Include(e => e.ChainLink)
-            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+            .SingleOrDefaultAsync(e => e.Id == id && e.TenantId == currentTenant.Id, cancellationToken);
 
     public async Task<IReadOnlyList<AuditEvent>> SearchAsync(
         string? sourceModule,
@@ -22,7 +23,9 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
         int pageSize,
         CancellationToken cancellationToken)
     {
-        var query = context.AuditEvents.Include(e => e.ChainLink).AsQueryable();
+        var query = context.AuditEvents
+            .Include(e => e.ChainLink)
+            .Where(e => e.TenantId == currentTenant.Id);
 
         if (!string.IsNullOrWhiteSpace(sourceModule))
             query = query.Where(e => e.SourceModule == sourceModule);
@@ -49,7 +52,7 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
     public async Task<IReadOnlyList<AuditEvent>> GetTrailByResourceAsync(string resourceType, string resourceId, CancellationToken cancellationToken)
         => await context.AuditEvents
             .Include(e => e.ChainLink)
-            .Where(e => e.ResourceType == resourceType && e.ResourceId == resourceId)
+            .Where(e => e.TenantId == currentTenant.Id && e.ResourceType == resourceType && e.ResourceId == resourceId)
             .OrderByDescending(e => e.OccurredAt)
             .ToListAsync(cancellationToken);
 
@@ -62,7 +65,9 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
         int page, int pageSize,
         CancellationToken cancellationToken)
     {
-        var query = context.AuditEvents.Include(e => e.ChainLink).AsQueryable();
+        var query = context.AuditEvents
+            .Include(e => e.ChainLink)
+            .Where(e => e.TenantId == currentTenant.Id);
 
         if (!string.IsNullOrWhiteSpace(sourceModule))
             query = query.Where(e => e.SourceModule == sourceModule);
@@ -100,7 +105,7 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
         DateTimeOffset? to,
         CancellationToken cancellationToken)
     {
-        var query = context.AuditEvents.AsQueryable();
+        var query = context.AuditEvents.Where(e => e.TenantId == currentTenant.Id);
 
         if (!string.IsNullOrWhiteSpace(sourceModule))
             query = query.Where(e => e.SourceModule == sourceModule);
@@ -130,7 +135,7 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
         DateTimeOffset? to,
         CancellationToken cancellationToken)
     {
-        var query = context.AuditEvents.AsQueryable();
+        var query = context.AuditEvents.Where(e => e.TenantId == currentTenant.Id);
 
         if (!string.IsNullOrWhiteSpace(sourceModule))
             query = query.Where(e => e.SourceModule == sourceModule);
@@ -159,6 +164,8 @@ internal sealed class AuditEventRepository(AuditDbContext context) : IAuditEvent
     public async Task<int> DeleteExpiredAsync(DateTimeOffset cutoff, CancellationToken cancellationToken)
     {
         // ExecuteDeleteAsync (EF Core 7+) performs a single SQL DELETE without loading entities into memory.
+        // Intentionally not filtered by tenant — this is a platform-level retention job
+        // that runs without a tenant context and must clean up all tenants' expired events.
         return await context.AuditEvents
             .Where(e => e.OccurredAt < cutoff)
             .ExecuteDeleteAsync(cancellationToken);

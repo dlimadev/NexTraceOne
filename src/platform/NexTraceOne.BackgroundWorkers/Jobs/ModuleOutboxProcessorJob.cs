@@ -3,7 +3,10 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Observability.Ingestion;
+using System.Data.Common;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +23,7 @@ namespace NexTraceOne.BackgroundWorkers.Jobs;
 /// Comportamento:
 /// - Processa em ciclos de 5 segundos
 /// - Cada ciclo processa até 50 mensagens pendentes
+/// - Usa pg_try_advisory_lock para garantir que apenas uma instância processa cada módulo por vez
 /// - Mensagens que esgotam as 5 tentativas são persistidas em bb_dead_letter_messages (DLQ)
 /// - Erros de um módulo não propagam para outros módulos
 /// - Cada mensagem é salva atomicamente após processamento
@@ -34,6 +38,11 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
 {
     private const int BatchSize = 50;
     private const int MaxRetryCount = 5;
+
+    // Stable 64-bit advisory lock key derived from the DbContext type's fully qualified name.
+    // SHA-256 ensures uniqueness across all module processors in multi-instance deployments.
+    private static readonly long AdvisoryLockKey = BitConverter.ToInt64(
+        SHA256.HashData(Encoding.UTF8.GetBytes(typeof(TContext).FullName ?? typeof(TContext).Name)), 0);
 
     /// <summary>
     /// Nome do health check derivado do tipo do DbContext.
@@ -76,6 +85,23 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
         // para não quebrar environments sem DLQ/métricas configurados (ex: testes).
         IDeadLetterRepository? dlqRepository = null;
         IIngestionMetricsCollector? metricsCollector = null;
+
+        // Acquire a PostgreSQL advisory lock for this module's outbox.
+        // pg_try_advisory_lock is non-blocking: if another instance holds the lock, we skip this cycle.
+        // This prevents duplicate event delivery in multi-instance (horizontal scale) deployments.
+        var connection = dbContext.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+            await connection.OpenAsync(cancellationToken);
+
+        bool lockAcquired = await TryAcquireAdvisoryLockAsync(connection, cancellationToken);
+        if (!lockAcquired)
+        {
+            logger.LogDebug("Outbox cycle skipped for {Module} — lock held by another instance", ModuleName);
+            return;
+        }
+
+        try
+        {
 
         var cycleStopwatch = Stopwatch.StartNew();
 
@@ -187,6 +213,45 @@ public sealed class ModuleOutboxProcessorJob<TContext>(
             logger.LogInformation(
                 "Outbox cycle completed for {Module}: {Processed} processed, {Failed} failed out of {Total} messages",
                 ModuleName, processedCount, failedCount, pendingMessages.Count);
+        }
+
+        } // end of advisory lock try
+        finally
+        {
+            await ReleaseAdvisoryLockAsync(connection);
+        }
+    }
+
+    private static async Task<bool> TryAcquireAdvisoryLockAsync(DbConnection connection, CancellationToken cancellationToken)
+    {
+        await using var cmd = connection.CreateCommand();
+        cmd.CommandText = "SELECT pg_try_advisory_lock(@lockKey)";
+        var param = cmd.CreateParameter();
+        param.ParameterName = "lockKey";
+        param.Value = AdvisoryLockKey;
+        param.DbType = System.Data.DbType.Int64;
+        cmd.Parameters.Add(param);
+
+        var result = await cmd.ExecuteScalarAsync(cancellationToken);
+        return result is true;
+    }
+
+    private async Task ReleaseAdvisoryLockAsync(DbConnection connection)
+    {
+        try
+        {
+            await using var cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT pg_advisory_unlock(@lockKey)";
+            var param = cmd.CreateParameter();
+            param.ParameterName = "lockKey";
+            param.Value = AdvisoryLockKey;
+            param.DbType = System.Data.DbType.Int64;
+            cmd.Parameters.Add(param);
+            await cmd.ExecuteScalarAsync(CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to release advisory lock for module {Module}", ModuleName);
         }
     }
 
