@@ -351,4 +351,7 @@ result.Value.Should().NotBeNull();
 | `LicenseRecalculationJob` | ✅ Runs every 15 min in BackgroundWorkers — sums active host units per tenant |
 | Tenant provisioning automation | ✅ `ProvisionTenant` seeds default roles + access policies after commit |
 | Trial plan capabilities | ✅ Professional + 4 Enterprise teasers (not multi_region/air_gapped) |
+| `AlertEvaluationJob` | ✅ Real evaluation: LicenseUtilization (% vs IncludedHostUnits) + AgentHeartbeatMissed (cutoff by ThresholdValue minutes) |
+| `IModelRoutingPolicyRepository` | ✅ EF Core — table `aik_model_routing_policies` (was in-memory null stub) |
+| `IAgentExecutionPlanRepository` | ✅ EF Core — table `aik_agent_execution_plans`, steps as JSONB (was ConcurrentDictionary, lost on restart) |
 | Schema-per-tenant (`TenantSchemaManager`) | ❌ Exists but unused |
