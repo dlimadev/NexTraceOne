@@ -1,24 +1,41 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Http.Resilience;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
+using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
+using NexTraceOne.IdentityAccess.Domain.Events;
 using NexTraceOne.IdentityAccess.Domain.Events;
 using NexTraceOne.IdentityAccess.Infrastructure.Authorization;
+using NexTraceOne.IdentityAccess.Infrastructure.Authorization;
+using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.IdentityAccess.Infrastructure.Context;
 using NexTraceOne.IdentityAccess.Infrastructure.EventHandlers;
+using NexTraceOne.IdentityAccess.Infrastructure.EventHandlers;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
+using NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 using NexTraceOne.IdentityAccess.Infrastructure.Services;
 
+using NexTraceOne.IdentityAccess.Infrastructure.Services;
 namespace NexTraceOne.IdentityAccess.Infrastructure;
 
 /// <summary>
@@ -123,7 +140,8 @@ public static class DependencyInjection
         services.AddScoped<IModuleAccessPermissionProvider, ModuleAccessPermissionProvider>();
 
         // Provider OIDC para fluxo federado (Authorization Code flow)
-        services.AddHttpClient("oidc");
+        services.AddHttpClient("oidc")
+            .AddStandardResilienceHandler();
         services.AddScoped<IOidcProvider, OidcProviderService>();
 
         // SAML 2.0 SSO — protocolo e provider de configuração

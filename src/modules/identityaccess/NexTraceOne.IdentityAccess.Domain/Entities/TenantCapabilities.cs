@@ -64,5 +64,13 @@ public static class TenantCapabilities
         SsoEnterprise, AuditExport, CrossTenantBenchmarks,
     ];
 
-    private static readonly IReadOnlyList<string> TrialCapabilities = EnterpriseCapabilities;
+    // Trial: todas as Professional + preview das Enterprise mais apelativas.
+    // multi_region / air_gapped são escolhas de topologia, não features a demonstrar em trial.
+    private static readonly IReadOnlyList<string> TrialCapabilities =
+    [
+        Apm, Infra, ServiceCatalog, ChangeGovernanceBasic, KnowledgeBase, BasicAnalytics,
+        AiGovernance, ContractStudio, ComplianceBasic, FinOps,
+        ChangeGovernanceAdvanced, DeveloperPortal, AdvancedAnalytics,
+        ComplianceAdvanced, CustomAgents, SsoEnterprise, AuditExport,
+    ];
 }

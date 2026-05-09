@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
@@ -55,6 +56,12 @@ public static class DependencyInjection
 
             client.BaseAddress = new Uri(normalizedBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+        }).AddStandardResilienceHandler(opts =>
+        {
+            // Inferência local pode ser lenta — aumentar timeouts por tentativa
+            opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
+            opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(300);
+            opts.Retry.MaxRetryAttempts = 2;
         });
 
         // Ollama provider — scoped because OllamaHttpClient is transient (from HttpClientFactory)
@@ -72,6 +79,11 @@ public static class DependencyInjection
             {
                 client.BaseAddress = new Uri(openAiOptions.BaseUrl);
                 client.Timeout = TimeSpan.FromSeconds(openAiOptions.TimeoutSeconds);
+            }).AddStandardResilienceHandler(opts =>
+            {
+                opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(90);
+                opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(180);
+                opts.Retry.MaxRetryAttempts = 2;
             });
 
             services.AddScoped<OpenAiProvider>();
@@ -92,6 +104,11 @@ public static class DependencyInjection
                     : $"{anthropicOptions.BaseUrl}/";
                 client.BaseAddress = new Uri(normalized);
                 client.Timeout = TimeSpan.FromSeconds(anthropicOptions.TimeoutSeconds);
+            }).AddStandardResilienceHandler(opts =>
+            {
+                opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(90);
+                opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(180);
+                opts.Retry.MaxRetryAttempts = 2;
             });
 
             services.AddScoped<AnthropicProvider>();
@@ -110,6 +127,11 @@ public static class DependencyInjection
                     : $"{lmStudioOptions.BaseUrl}/";
                 client.BaseAddress = new Uri(normalized);
                 client.Timeout = TimeSpan.FromSeconds(lmStudioOptions.TimeoutSeconds);
+            }).AddStandardResilienceHandler(opts =>
+            {
+                opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
+                opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(300);
+                opts.Retry.MaxRetryAttempts = 2;
             });
 
             services.AddScoped<LmStudioProvider>();

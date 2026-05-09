@@ -7,6 +7,7 @@ using NexTraceOne.BackgroundWorkers.Jobs;
 using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Cache;
 using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
@@ -80,6 +81,7 @@ builder.Services.AddSingleton<WorkerJobHealthRegistry>();
 
 builder.Services.AddBuildingBlocksEventBus(builder.Configuration);
 builder.Services.AddBuildingBlocksDbContext(builder.Configuration);
+builder.Services.AddDistributedCaching(builder.Configuration);
 builder.Services.AddIngestionMetrics(builder.Configuration);
 
 // ── Module infrastructure registration ──
@@ -274,7 +276,12 @@ builder.Services.AddHealthChecks()
         "contract-consumer-ingestion-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
-        args: [ContractConsumerIngestionJob.HealthCheckName, TimeSpan.FromMinutes(30)]);
+        args: [ContractConsumerIngestionJob.HealthCheckName, TimeSpan.FromMinutes(30)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "license-recalculation-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [LicenseRecalculationJob.HealthCheckName, TimeSpan.FromMinutes(30)]);
 
 // Handlers de expiração — cada um processa um único tipo de entidade expirável.
 // A ordem de registro define a ordem de execução no IdentityExpirationJob.
@@ -337,6 +344,7 @@ builder.Services.AddHostedService<DriftDetectionJob>();
 builder.Services.AddHostedService<CloudBillingIngestionJob>();
 builder.Services.AddHostedService<IncidentProbabilityRefreshJob>();
 builder.Services.AddHostedService<ContractConsumerIngestionJob>();
+builder.Services.AddHostedService<LicenseRecalculationJob>();
 
 var app = builder.Build();
 

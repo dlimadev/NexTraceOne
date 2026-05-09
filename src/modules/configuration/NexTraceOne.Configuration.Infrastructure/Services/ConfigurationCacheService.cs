@@ -1,34 +1,34 @@
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
 
+using System.Text.Json;
+
 namespace NexTraceOne.Configuration.Infrastructure.Services;
 
 /// <summary>
-/// Implementação de cache de configurações usando IMemoryCache.
+/// Implementação de cache de configurações usando IDistributedCache.
+/// Suporta Redis (multi-instância) e in-process memory (single-instância).
 /// Chaves prefixadas com "cfg:" para isolamento. Expiração padrão de 5 minutos.
-/// Invalidação global via contador de versão para evitar enumerar chaves.
-/// Protege contra cache de resultados cancelados ou falhados.
+/// Invalidação global via contador de versão armazenado no próprio cache distribuído,
+/// garantindo consistência entre múltiplas instâncias da aplicação.
 /// </summary>
-internal sealed class ConfigurationCacheService(IMemoryCache memoryCache) : IConfigurationCacheService
+internal sealed class ConfigurationCacheService(IDistributedCache distributedCache) : IConfigurationCacheService
 {
     private const string CachePrefix = "cfg:";
+    private const string VersionKey = "cfg:global:version";
     private static readonly TimeSpan DefaultExpiration = TimeSpan.FromMinutes(5);
-
-    /// <summary>
-    /// Contador de versão global para invalidação em massa.
-    /// Quando incrementado, todas as chaves compostas com a versão anterior tornam-se misses.
-    /// </summary>
-    private long _version;
 
     public async Task<T> GetOrSetAsync<T>(string cacheKey, Func<Task<T>> factory, CancellationToken cancellationToken)
     {
-        var versionedKey = BuildVersionedKey(cacheKey);
+        var version = await GetVersionAsync(cancellationToken);
+        var versionedKey = $"{CachePrefix}v{version}:{cacheKey}";
 
-        if (memoryCache.TryGetValue(versionedKey, out T? cached))
+        var bytes = await distributedCache.GetAsync(versionedKey, cancellationToken);
+        if (bytes is not null)
         {
-            return cached!;
+            return JsonSerializer.Deserialize<T>(bytes)!;
         }
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -37,28 +37,31 @@ internal sealed class ConfigurationCacheService(IMemoryCache memoryCache) : ICon
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var entry = memoryCache.CreateEntry(versionedKey);
-        entry.AbsoluteExpirationRelativeToNow = DefaultExpiration;
-        entry.Value = value;
+        var serialized = JsonSerializer.SerializeToUtf8Bytes(value);
+        await distributedCache.SetAsync(versionedKey, serialized, new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = DefaultExpiration
+        }, cancellationToken);
 
         return value;
     }
 
-    public Task InvalidateAsync(string key, ConfigurationScope? scope, CancellationToken cancellationToken)
+    public async Task InvalidateAsync(string key, ConfigurationScope? scope, CancellationToken cancellationToken)
+        => await BumpVersionAsync(cancellationToken);
+
+    public async Task InvalidateAllAsync(CancellationToken cancellationToken)
+        => await BumpVersionAsync(cancellationToken);
+
+    private async Task<long> GetVersionAsync(CancellationToken cancellationToken)
     {
-        // IMemoryCache does not support prefix/pattern-based eviction.
-        // Incrementing the version counter causes all existing versioned keys
-        // to become cache misses, effectively invalidating every cached entry.
-        Interlocked.Increment(ref _version);
-        return Task.CompletedTask;
+        var bytes = await distributedCache.GetAsync(VersionKey, cancellationToken);
+        return bytes is null ? 0L : BitConverter.ToInt64(bytes, 0);
     }
 
-    public Task InvalidateAllAsync(CancellationToken cancellationToken)
+    private async Task BumpVersionAsync(CancellationToken cancellationToken)
     {
-        Interlocked.Increment(ref _version);
-        return Task.CompletedTask;
+        var current = await GetVersionAsync(cancellationToken);
+        var next = current + 1;
+        await distributedCache.SetAsync(VersionKey, BitConverter.GetBytes(next), cancellationToken);
     }
-
-    private string BuildVersionedKey(string cacheKey)
-        => $"{CachePrefix}v{Interlocked.Read(ref _version)}:{cacheKey}";
 }

@@ -1,26 +1,46 @@
 using Microsoft.EntityFrameworkCore;
+
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Http.Resilience;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Correlation;
+using NexTraceOne.BuildingBlocks.Application.Correlation;
+using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate;
+using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.EvaluatePromotionReadinessDeltaGate;
+using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Platform.Abstractions;
+using NexTraceOne.ChangeGovernance.Application.Platform.Abstractions;
+using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
+using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using NexTraceOne.Integrations.Contracts;
 
+using NexTraceOne.Integrations.Contracts;
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 
 /// <summary>
@@ -103,7 +123,8 @@ public static class DependencyInjection
         services.AddScoped<IApprovalRequestRepository, ApprovalRequestRepository>();
         services.AddScoped<IReleaseApprovalPolicyRepository, ReleaseApprovalPolicyRepository>();
         services.AddHttpClient("ExternalApprovalWebhook")
-            .ConfigureHttpClient(c => c.Timeout = TimeSpan.FromSeconds(30));
+            .ConfigureHttpClient(c => c.Timeout = TimeSpan.FromSeconds(30))
+            .AddStandardResilienceHandler();
         services.AddScoped<IExternalApprovalWebhookSender, ExternalApprovalWebhookSender>();
 
         // Analytics writer: registrado globalmente no ApiHost via AddBuildingBlocksAnalytics.

@@ -346,7 +346,9 @@ result.Value.Should().NotBeNull();
 | Hot Chocolate GraphQL (catalog + change) | ✅ Operational |
 | Kafka | ⚠️ Optional — `NullKafkaEventProducer` by default |
 | ClickHouse | ⚠️ Optional — disabled by default |
-| Redis / distributed cache | ❌ Not implemented (`IMemoryCache` only) |
-| Polly (retry/circuit breaker on HttpClients) | ❌ Not implemented |
-| `LicenseRecalculationJob` | ❌ Not implemented |
+| Redis / distributed cache | ✅ `IDistributedCache` — Redis when `ConnectionStrings:Redis` set, else in-process fallback |
+| HTTP resilience (retry + circuit breaker) | ✅ `AddStandardResilienceHandler()` on all 14 HttpClient registrations |
+| `LicenseRecalculationJob` | ✅ Runs every 15 min in BackgroundWorkers — sums active host units per tenant |
+| Tenant provisioning automation | ✅ `ProvisionTenant` seeds default roles + access policies after commit |
+| Trial plan capabilities | ✅ Professional + 4 Enterprise teasers (not multi_region/air_gapped) |
 | Schema-per-tenant (`TenantSchemaManager`) | ❌ Exists but unused |

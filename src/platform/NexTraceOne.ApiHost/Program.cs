@@ -1,5 +1,6 @@
 using NexTraceOne.BuildingBlocks.Security.Integrity;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Cache;
 using NexTraceOne.BuildingBlocks.Observability;
 using NexTraceOne.BuildingBlocks.Observability.Logging;
 using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
@@ -70,8 +71,9 @@ builder.Services.AddBuildingBlocksAnalytics(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
 builder.Services.AddApiHostOperationalHealthChecks();
 
-// [3.0] In-process caching — required by ConfigurationCacheService and other modules
-builder.Services.AddMemoryCache();
+// [3.0] Distributed cache — Redis quando ConnectionStrings:Redis está configurado, memory cache caso contrário.
+// IMemoryCache também é registado internamente para componentes que dependem do cache em processo.
+builder.Services.AddDistributedCaching(builder.Configuration);
 
 // [3.1] Platform health provider — liga GetPlatformHealth a health checks reais
 builder.Services.AddSingleton<NexTraceOne.Governance.Application.Abstractions.IPlatformHealthProvider,

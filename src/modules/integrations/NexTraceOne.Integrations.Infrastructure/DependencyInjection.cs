@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Integrations.Domain;
@@ -79,13 +80,15 @@ public static class DependencyInjection
         {
             services.Configure<ClickHouseLegacyWriterOptions>(
                 configuration.GetSection(ClickHouseLegacyWriterOptions.SectionName));
-            services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>();
+            services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>()
+                .AddStandardResilienceHandler();
         }
         else
         {
             services.Configure<ElasticLegacyWriterOptions>(
                 configuration.GetSection(ElasticLegacyWriterOptions.SectionName));
-            services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>();
+            services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>()
+                .AddStandardResilienceHandler();
         }
 
         // Integration Context Resolver — resolves active binding descriptors by type, tenant and environment

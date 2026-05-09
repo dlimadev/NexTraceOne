@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.HandleModelFeedbackThresholdExceeded;
@@ -148,8 +149,12 @@ public static class DependencyInjection
         services.AddSingleton<IDataSourceConnector, CustomHttpConnector>();
 
         // HTTP clients for connectors that use IHttpClientFactory
-        services.AddHttpClient("BraveSearch").SetHandlerLifetime(TimeSpan.FromMinutes(5));
-        services.AddHttpClient("GitHubConnector").SetHandlerLifetime(TimeSpan.FromMinutes(5));
+        services.AddHttpClient("BraveSearch")
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddStandardResilienceHandler();
+        services.AddHttpClient("GitHubConnector")
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddStandardResilienceHandler();
 
         // Background jobs
         services.AddHostedService<FeedbackThresholdJob>();

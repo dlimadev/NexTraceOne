@@ -1,33 +1,59 @@
 using Microsoft.EntityFrameworkCore;
+
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Http.Resilience;
+using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
 using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
+using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
+using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
+using NexTraceOne.Governance.Contracts;
 using NexTraceOne.Governance.Contracts;
 using NexTraceOne.IdentityAccess.Contracts.IntegrationEvents;
+using NexTraceOne.IdentityAccess.Contracts.IntegrationEvents;
+using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
+using NexTraceOne.Notifications.Application.ExternalDelivery;
+using NexTraceOne.Notifications.Domain.Events;
 using NexTraceOne.Notifications.Domain.Events;
 using NexTraceOne.Notifications.Infrastructure.Engine;
+using NexTraceOne.Notifications.Infrastructure.Engine;
+using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.Notifications.Infrastructure.EventHandlers;
 using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
+using NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
+using NexTraceOne.Notifications.Infrastructure.Governance;
 using NexTraceOne.Notifications.Infrastructure.Governance;
 using NexTraceOne.Notifications.Infrastructure.Intelligence;
+using NexTraceOne.Notifications.Infrastructure.Intelligence;
+using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Notifications.Infrastructure.Preferences;
 using NexTraceOne.Notifications.Infrastructure.Preferences;
 using NexTraceOne.Notifications.Infrastructure.Routing;
 // P7.1 – new stores
+using NexTraceOne.Notifications.Infrastructure.Routing;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using IntegrationsContracts = NexTraceOne.Integrations.Contracts.IntegrationEvents;
 
+using IntegrationsContracts = NexTraceOne.Integrations.Contracts.IntegrationEvents;
 namespace NexTraceOne.Notifications.Infrastructure;
 
 /// <summary>
@@ -97,7 +123,8 @@ public static class DependencyInjection
         services.AddScoped<INotificationChannelDispatcher, TeamsNotificationDispatcher>();
 
         // HttpClientFactory para Teams webhook
-        services.AddHttpClient("NexTraceOneTeams");
+        services.AddHttpClient("NexTraceOneTeams")
+            .AddStandardResilienceHandler();
 
         // External delivery service (coordena roteamento + dispatch + logging)
         services.AddScoped<IExternalDeliveryService, ExternalDeliveryService>();
