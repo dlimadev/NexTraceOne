@@ -55,18 +55,18 @@ internal sealed class AlertEvaluationJob(
         using var scope = serviceScopeFactory.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
         var firingRepo = scope.ServiceProvider.GetRequiredService<IAlertFiringRecordRepository>();
+        var agentRepo = scope.ServiceProvider.GetRequiredService<IAgentRegistrationRepository>();
+        var licenseRepo = scope.ServiceProvider.GetRequiredService<ITenantLicenseRepository>();
         var uow = scope.ServiceProvider.GetRequiredService<IIdentityAccessUnitOfWork>();
         var clock = scope.ServiceProvider.GetRequiredService<NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider>();
 
-        // Read active alert rules from configuration database via raw SQL
-        // (cross-module boundary: we only read, using a raw SQL query against cfg_user_alert_rules)
         var alertRules = await ReadActiveAlertRulesAsync(context, ct);
 
         foreach (var rule in alertRules)
         {
             try
             {
-                await EvaluateRuleAsync(rule, firingRepo, uow, clock, ct);
+                await EvaluateRuleAsync(rule, firingRepo, agentRepo, licenseRepo, uow, clock, ct);
             }
             catch (Exception ex)
             {
@@ -117,20 +117,17 @@ internal sealed class AlertEvaluationJob(
     private async Task EvaluateRuleAsync(
         AlertRuleDto rule,
         IAlertFiringRecordRepository firingRepo,
+        IAgentRegistrationRepository agentRepo,
+        ITenantLicenseRepository licenseRepo,
         IIdentityAccessUnitOfWork uow,
         NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider clock,
         CancellationToken ct)
     {
-        // Simple heuristic: threshold-based alert simulation
-        // In production, this would query the actual metric source (SLO observations, error rates, etc.)
-        // For now, we check if a firing alert already exists to avoid duplicate firing
         var alreadyFiring = await firingRepo.HasFiringAlertAsync(rule.TenantId, rule.RuleId, ct);
         if (alreadyFiring)
             return;
 
-        // Simulate evaluation: only fire if threshold exceeds simulated value
-        // Real implementation would query SloObservation, DriftFinding, etc.
-        var shouldFire = ShouldFireAlert(rule);
+        var (shouldFire, message) = await EvaluateConditionAsync(rule, agentRepo, licenseRepo, clock, ct);
         if (!shouldFire)
             return;
 
@@ -139,7 +136,7 @@ internal sealed class AlertEvaluationJob(
             rule.RuleId,
             rule.Name,
             rule.Severity,
-            $"Condition '{rule.ConditionType}' exceeded threshold {rule.ThresholdValue}",
+            message,
             rule.ServiceName,
             rule.NotificationChannels,
             clock.UtcNow);
@@ -147,14 +144,69 @@ internal sealed class AlertEvaluationJob(
         firingRepo.Add(record);
         await uow.CommitAsync(ct);
 
-        logger.LogInformation("Alert fired: {RuleName} for tenant {TenantId}.", rule.Name, rule.TenantId);
+        logger.LogInformation("Alert fired: {RuleName} for tenant {TenantId}. Reason: {Message}.",
+            rule.Name, rule.TenantId, message);
     }
 
-    private static bool ShouldFireAlert(AlertRuleDto rule)
+    private async Task<(bool ShouldFire, string Message)> EvaluateConditionAsync(
+        AlertRuleDto rule,
+        IAgentRegistrationRepository agentRepo,
+        ITenantLicenseRepository licenseRepo,
+        NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider clock,
+        CancellationToken ct)
     {
-        // Placeholder: in production, evaluate against real metrics
-        // Returns false by default — alerts are fired only when real metric evaluation is wired in
-        return false;
+        return rule.ConditionType switch
+        {
+            "LicenseUtilization" => await EvaluateLicenseUtilizationAsync(rule, agentRepo, licenseRepo, ct),
+            "AgentHeartbeatMissed" => await EvaluateHeartbeatAsync(rule, agentRepo, clock, ct),
+            _ => LogUnknownAndSkip(rule.ConditionType),
+        };
+    }
+
+    private async Task<(bool, string)> EvaluateLicenseUtilizationAsync(
+        AlertRuleDto rule,
+        IAgentRegistrationRepository agentRepo,
+        ITenantLicenseRepository licenseRepo,
+        CancellationToken ct)
+    {
+        var license = await licenseRepo.GetByTenantIdAsync(rule.TenantId, ct);
+        if (license is null || license.IncludedHostUnits <= 0)
+            return (false, string.Empty);
+
+        var activeHostUnits = await agentRepo.SumActiveHostUnitsAsync(rule.TenantId, ct);
+        var utilizationPct = (double)activeHostUnits / license.IncludedHostUnits * 100.0;
+
+        if (utilizationPct < rule.ThresholdValue)
+            return (false, string.Empty);
+
+        return (true, $"License utilization {utilizationPct:F1}% exceeds threshold {rule.ThresholdValue}% " +
+                      $"({activeHostUnits:F1}/{license.IncludedHostUnits} host units)");
+    }
+
+    private async Task<(bool, string)> EvaluateHeartbeatAsync(
+        AlertRuleDto rule,
+        IAgentRegistrationRepository agentRepo,
+        NexTraceOne.BuildingBlocks.Application.Abstractions.IDateTimeProvider clock,
+        CancellationToken ct)
+    {
+        var agents = await agentRepo.ListByTenantAsync(rule.TenantId, ct);
+        var cutoff = clock.UtcNow - TimeSpan.FromMinutes(rule.ThresholdValue);
+
+        var missedAgents = agents
+            .Where(a => a.Status == Domain.Entities.AgentRegistrationStatus.Active && a.LastHeartbeatAt < cutoff)
+            .ToList();
+
+        if (missedAgents.Count == 0)
+            return (false, string.Empty);
+
+        return (true, $"{missedAgents.Count} agent(s) missed heartbeat for over {rule.ThresholdValue} minutes " +
+                      $"(oldest: {missedAgents.Min(a => a.LastHeartbeatAt):u})");
+    }
+
+    private (bool, string) LogUnknownAndSkip(string conditionType)
+    {
+        logger.LogWarning("AlertEvaluationJob: unknown condition type '{ConditionType}' — skipping.", conditionType);
+        return (false, string.Empty);
     }
 
     private sealed record AlertRuleDto(

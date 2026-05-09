@@ -2732,6 +2732,55 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.HasIndex("TenantId").HasDatabaseName("idx_aik_eval_datasets_tenant");
                     b.ToTable("aik_evaluation_datasets", (string)null);
                 });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.ModelRoutingPolicy", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<Guid>("TenantId").IsRequired().HasColumnType("uuid");
+                    b.Property<string>("Intent").IsRequired().HasMaxLength(50).HasColumnType("character varying(50)");
+                    b.Property<string>("PreferredModelName").IsRequired().HasMaxLength(300).HasColumnType("character varying(300)");
+                    b.Property<string>("FallbackModelName").HasMaxLength(300).HasColumnType("character varying(300)");
+                    b.Property<int>("MaxTokens").HasColumnType("integer");
+                    b.Property<decimal>("MaxCostPerRequestUsd").HasColumnType("numeric(10,6)");
+                    b.Property<bool>("IsActive").HasColumnType("boolean");
+                    b.Property<bool>("IsDeleted").HasColumnType("boolean");
+                    b.Property<DateTimeOffset?>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("CreatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("UpdatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.HasKey("Id");
+                    b.HasIndex("TenantId", "Intent", "IsActive").HasDatabaseName("idx_aik_mrp_tenant_intent_active");
+                    b.ToTable("aik_model_routing_policies", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.AgentExecutionPlan", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<Guid>("TenantId").IsRequired().HasColumnType("uuid");
+                    b.Property<string>("RequestedBy").IsRequired().HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<string>("Description").IsRequired().HasMaxLength(2000).HasColumnType("character varying(2000)");
+                    b.Property<string>("PlanStatus").IsRequired().HasMaxLength(50).HasColumnType("character varying(50)");
+                    b.Property<int>("MaxTokenBudget").HasColumnType("integer");
+                    b.Property<int>("ConsumedTokens").HasColumnType("integer");
+                    b.Property<bool>("RequiresApproval").HasColumnType("boolean");
+                    b.Property<int>("BlastRadiusThreshold").HasColumnType("integer");
+                    b.Property<string>("ApprovedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<DateTimeOffset?>("ApprovedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("CorrelationId").IsRequired().HasMaxLength(100).HasColumnType("character varying(100)");
+                    b.Property<DateTimeOffset?>("StartedAt").HasColumnType("timestamp with time zone");
+                    b.Property<DateTimeOffset?>("CompletedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("ErrorMessage").HasMaxLength(4000).HasColumnType("character varying(4000)");
+                    b.Property<bool>("IsDeleted").HasColumnType("boolean");
+                    b.Property<DateTimeOffset?>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("CreatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<string>("UpdatedBy").HasMaxLength(500).HasColumnType("character varying(500)");
+                    b.HasKey("Id");
+                    b.HasIndex("TenantId").HasDatabaseName("idx_aik_aep_tenant");
+                    b.HasIndex("CorrelationId").HasDatabaseName("idx_aik_aep_correlation");
+                    b.HasIndex("PlanStatus").HasDatabaseName("idx_aik_aep_status");
+                    b.ToTable("aik_agent_execution_plans", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }

@@ -128,10 +128,10 @@ public static class DependencyInjection
         // Cross-module contract — consumed by AiOrchestration for token/model attribution
         services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();
 
-        // ── Agent Execution Plan & Prompt Intent (null / in-memory impls) ──
-        services.AddScoped<IAgentExecutionPlanRepository, NexTraceOne.AIKnowledge.Application.Governance.Services.NullAgentExecutionPlanRepository>();
+        // ── Agent Execution Plan & Routing Policies ────────────────────────
+        services.AddScoped<IAgentExecutionPlanRepository, EfAgentExecutionPlanRepository>();
+        services.AddScoped<IModelRoutingPolicyRepository, EfModelRoutingPolicyRepository>();
         services.AddScoped<IPromptIntentClassifier, NexTraceOne.AIKnowledge.Application.Governance.Services.PromptIntentClassifierService>();
-        services.AddScoped<IModelRoutingPolicyRepository, NexTraceOne.AIKnowledge.Application.Governance.Services.NullModelRoutingPolicyRepository>();
 
         // ── AI-5.2: Prompt Asset Registry ─────────────────────────────────
         services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();

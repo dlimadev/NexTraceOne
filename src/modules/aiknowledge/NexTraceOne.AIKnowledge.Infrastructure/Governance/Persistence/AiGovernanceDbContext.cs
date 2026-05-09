@@ -92,6 +92,10 @@ public sealed class AiGovernanceDbContext(
     public DbSet<PromptAsset> PromptAssets => Set<PromptAsset>();
     public DbSet<PromptVersion> PromptVersions => Set<PromptVersion>();
 
+    // ── Routing Policies & Agentic Execution Plans ────────────────────────────
+    public DbSet<ModelRoutingPolicy> ModelRoutingPolicies => Set<ModelRoutingPolicy>();
+    public DbSet<AgentExecutionPlan> AgentExecutionPlans => Set<AgentExecutionPlan>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 
