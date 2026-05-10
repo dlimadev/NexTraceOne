@@ -152,9 +152,14 @@ public static class DependencyInjection
         services.AddScoped<IAiProviderHealthService, AiProviderHealthService>();
 
         // Token quota cache — singleton (shared across requests, thread-safe via MemoryCache)
+        // AI-0.2: usa DistributedTokenQuotaCache quando Redis está configurado; fallback in-memory.
         services.Configure<TokenQuotaCacheOptions>(
             configuration.GetSection(TokenQuotaCacheOptions.SectionName));
-        services.AddSingleton<ITokenQuotaCache, InMemoryTokenQuotaCache>();
+        var redisCs = configuration["ConnectionStrings:Redis"];
+        if (!string.IsNullOrWhiteSpace(redisCs))
+            services.AddSingleton<ITokenQuotaCache, DistributedTokenQuotaCache>();
+        else
+            services.AddSingleton<ITokenQuotaCache, InMemoryTokenQuotaCache>();
 
         // Token quota — scoped (depends on scoped repositories)
         services.AddScoped<IAiTokenQuotaService, AiTokenQuotaService>();
@@ -224,6 +229,27 @@ public static class DependencyInjection
         services.AddScoped<IToolRegistry, InMemoryToolRegistry>();
         services.AddScoped<IToolExecutor, AgentToolExecutor>();
         services.AddScoped<IToolPermissionValidator, AllowedToolsPermissionValidator>();
+
+        // W4-03: AI Resource Governor — wraps all IChatCompletionProvider instances with
+        // SemaphoreSlim concurrency control and circuit breaker.
+        services.AddSingleton<AiResourceGovernor>();
+        var providerDescriptors = services
+            .Where(d => d.ServiceType == typeof(IChatCompletionProvider))
+            .ToList();
+        foreach (var descriptor in providerDescriptors)
+            services.Remove(descriptor);
+        foreach (var descriptor in providerDescriptors)
+        {
+            var captured = descriptor;
+            services.Add(ServiceDescriptor.Scoped<IChatCompletionProvider>(sp =>
+            {
+                var inner = (IChatCompletionProvider)captured.ImplementationFactory!(sp);
+                return new AiResourceGovernorInterceptor(
+                    inner,
+                    sp.GetRequiredService<AiResourceGovernor>(),
+                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AiResourceGovernorInterceptor>>());
+            }));
+        }
 
         return services;
     }

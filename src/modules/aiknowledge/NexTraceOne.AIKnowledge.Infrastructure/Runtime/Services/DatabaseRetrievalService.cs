@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
@@ -22,11 +23,18 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
 {
     private const int MaxSnippetLength = 200;
 
+    // AI-0.3: timeout por reader; fail-open quando expirado.
+    private static readonly TimeSpan ReaderTimeout = TimeSpan.FromMilliseconds(500);
+
+    // AI-0.3: TTL de contexto em cache por sessão (evita chamadas repetidas dentro da mesma janela).
+    private static readonly TimeSpan ContextCacheTtl = TimeSpan.FromSeconds(30);
+
     private readonly IAiModelRepository _modelRepository;
     private readonly ICatalogGroundingReader _catalogReader;
     private readonly IChangeGroundingReader _changeReader;
     private readonly IIncidentGroundingReader _incidentReader;
     private readonly IContractGroundingReader _contractReader;
+    private readonly IMemoryCache _memoryCache;
     private readonly ILogger<DatabaseRetrievalService> _logger;
 
     public DatabaseRetrievalService(
@@ -35,6 +43,7 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
         IChangeGroundingReader changeReader,
         IIncidentGroundingReader incidentReader,
         IContractGroundingReader contractReader,
+        IMemoryCache memoryCache,
         ILogger<DatabaseRetrievalService> logger)
     {
         _modelRepository = modelRepository;
@@ -42,6 +51,7 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
         _changeReader = changeReader;
         _incidentReader = incidentReader;
         _contractReader = contractReader;
+        _memoryCache = memoryCache;
         _logger = logger;
     }
 
@@ -49,9 +59,83 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
         DatabaseSearchRequest request,
         CancellationToken ct = default)
     {
+        // AI-0.3: cache de contexto por chave composta para evitar DB calls redundantes dentro de 30s.
+        var cacheKey = $"dbretrieval:{request.Query}:{request.ServiceId}:{request.EntityType}:{request.ContractId}";
+        if (_memoryCache.TryGetValue(cacheKey, out DatabaseSearchResult? cached) && cached is not null)
+        {
+            _logger.LogDebug("Database grounding — cache hit para key='{Key}'.", cacheKey);
+            return cached;
+        }
+
         _logger.LogDebug(
             "Database grounding retrieval: query='{Query}' entityType='{EntityType}' serviceId='{ServiceId}'",
             request.Query, request.EntityType, request.ServiceId);
+
+        var hits = new List<DatabaseSearchHit>();
+
+        // AI-0.3: executa readers em paralelo com timeout individual de 500ms (fail-open).
+        var catalogTask = ReadWithTimeoutAsync(
+            FetchCatalogHitsAsync(request, ct), "Catalog", ct);
+        var changesTask = ReadWithTimeoutAsync(
+            FetchChangeHitsAsync(request, ct), "Changes", ct);
+        var incidentsTask = ReadWithTimeoutAsync(
+            FetchIncidentHitsAsync(request, ct), "Incidents", ct);
+        var contractsTask = ReadWithTimeoutAsync(
+            FetchContractHitsAsync(request, ct), "Contracts", ct);
+        var modelsTask = ReadWithTimeoutAsync(
+            FetchModelHitsAsync(request, ct), "Models", ct);
+
+        var results = await Task.WhenAll(catalogTask, changesTask, incidentsTask, contractsTask, modelsTask);
+
+        foreach (var batch in results)
+            hits.AddRange(batch);
+
+        var result = new DatabaseSearchResult(true, hits.Take(request.MaxResults).ToList());
+
+        _memoryCache.Set(cacheKey, result, new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = ContextCacheTtl,
+            Size = 1
+        });
+
+        _logger.LogDebug(
+            "Database grounding retrieval concluído: {HitCount} hits para query='{Query}'",
+            hits.Count, request.Query);
+
+        return result;
+    }
+
+    private async Task<IReadOnlyList<DatabaseSearchHit>> ReadWithTimeoutAsync(
+        Task<IReadOnlyList<DatabaseSearchHit>> task,
+        string readerName,
+        CancellationToken ct)
+    {
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(ReaderTimeout);
+
+            var completed = await Task.WhenAny(task, Task.Delay(Timeout.Infinite, cts.Token));
+
+            if (completed == task)
+                return await task;
+
+            _logger.LogDebug("Grounding reader '{Reader}' excedeu timeout de {Ms}ms — a ignorar.", readerName, (int)ReaderTimeout.TotalMilliseconds);
+            return [];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Grounding reader '{Reader}' falhou — fail-open.", readerName);
+            return [];
+        }
+    }
+
+    private async Task<IReadOnlyList<DatabaseSearchHit>> FetchCatalogHitsAsync(
+        DatabaseSearchRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.ServiceId)
+            && !string.Equals(request.EntityType, "Service", StringComparison.OrdinalIgnoreCase))
+            return [];
 
         var hits = new List<DatabaseSearchHit>();
 
@@ -92,6 +176,14 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
             }
         }
 
+        return hits;
+    }
+
+    private async Task<IReadOnlyList<DatabaseSearchHit>> FetchChangeHitsAsync(
+        DatabaseSearchRequest request, CancellationToken ct)
+    {
+        var hits = new List<DatabaseSearchHit>();
+
         // ── 2. Recent changes from ChangeIntelligence ─────────────────────────────────────────
         try
         {
@@ -130,6 +222,14 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                 request.ServiceId);
         }
 
+        return hits;
+    }
+
+    private async Task<IReadOnlyList<DatabaseSearchHit>> FetchIncidentHitsAsync(
+        DatabaseSearchRequest request, CancellationToken ct)
+    {
+        var hits = new List<DatabaseSearchHit>();
+
         // ── 3. Recent incidents from OperationalIntelligence ─────────────────────────────────
         try
         {
@@ -165,6 +265,14 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                 request.ServiceId);
         }
 
+        return hits;
+    }
+
+    private async Task<IReadOnlyList<DatabaseSearchHit>> FetchModelHitsAsync(
+        DatabaseSearchRequest request, CancellationToken ct)
+    {
+        var hits = new List<DatabaseSearchHit>();
+
         // ── 4. AI model context (for AI-related queries) ──────────────────────────────────────
         try
         {
@@ -195,6 +303,14 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                 "AI model grounding failed for query='{Query}' — continuing",
                 request.Query);
         }
+
+        return hits;
+    }
+
+    private async Task<IReadOnlyList<DatabaseSearchHit>> FetchContractHitsAsync(
+        DatabaseSearchRequest request, CancellationToken ct)
+    {
+        var hits = new List<DatabaseSearchHit>();
 
         // ── 5. Contract versions from Catalog Contracts (E-C03) ──────────────────────────────
         if (string.Equals(request.EntityType, "Contract", StringComparison.OrdinalIgnoreCase)
@@ -239,11 +355,7 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
             }
         }
 
-        _logger.LogDebug(
-            "Database grounding retrieval completed: {HitCount} hits for query='{Query}'",
-            hits.Count, request.Query);
-
-        return new DatabaseSearchResult(true, hits.Take(request.MaxResults).ToList());
+        return hits;
     }
 
     private static string Truncate(string? text, int maxLength)
