@@ -354,4 +354,11 @@ result.Value.Should().NotBeNull();
 | `AlertEvaluationJob` | ✅ Real evaluation: LicenseUtilization (% vs IncludedHostUnits) + AgentHeartbeatMissed (cutoff by ThresholdValue minutes) |
 | `IModelRoutingPolicyRepository` | ✅ EF Core — table `aik_model_routing_policies` (was in-memory null stub) |
 | `IAgentExecutionPlanRepository` | ✅ EF Core — table `aik_agent_execution_plans`, steps as JSONB (was ConcurrentDictionary, lost on restart) |
+| `IModelPredictionRepository` | ✅ EF Core — table `aik_model_prediction_samples` with jsonb InputFeatureStatsJson (was silent discard) |
+| `ISbomRepository` | ✅ EF Core — table `ctr_sbom_records` with jsonb Components (was silent discard) |
+| `IDataContractRepository` | ✅ EF Core — table `ctr_data_contract_records` (was silent discard) |
+| `IDeprecationScheduleRepository` | ✅ EF Core — table `ctr_deprecation_schedules` with upsert-by-ContractId (was silent discard) |
+| `IFeatureFlagRepository` | ✅ EF Core — table `ctr_feature_flag_records` with unique (TenantId, ServiceId, FlagKey) (was Application singleton null) |
+| `IIDEUsageRepository` | ✅ EF Core — table `dx_ide_usage_records` (was silent discard) |
+| `IEventConsumerDeadLetterRepository` | ✅ EF Core — table `int_event_consumer_dead_letters`, changed from Singleton to Scoped (was ConcurrentDictionary, lost on restart) |
 | Schema-per-tenant (`TenantSchemaManager`) | ❌ Exists but unused |
