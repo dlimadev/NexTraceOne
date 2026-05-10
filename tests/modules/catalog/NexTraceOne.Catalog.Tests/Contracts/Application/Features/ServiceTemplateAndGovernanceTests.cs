@@ -285,12 +285,14 @@ public sealed class ServiceTemplateAndGovernanceTests
     [Fact]
     public async Task GenerateContractTests_Should_ReturnTestFiles_When_CommandIsValid()
     {
-        var sut = new GenerateContractTestsFeature.Handler();
+        var version = ContractVersion.Import(Guid.NewGuid(), "1.0.0", BaseSpec, "json", "upload").Value;
+        var repo = Substitute.For<IContractVersionRepository>();
+        repo.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>()).Returns(version);
+        var sut = new GenerateContractTestsFeature.Handler(repo);
 
         var result = await sut.Handle(
             new GenerateContractTestsFeature.Command(
                 ContractVersionId: Guid.NewGuid(),
-                ContractJson: BaseSpec,
                 ServiceName: "UsersService",
                 TestFramework: "xunit"),
             CancellationToken.None);
@@ -326,12 +328,14 @@ public sealed class ServiceTemplateAndGovernanceTests
     [Fact]
     public async Task GenerateMockServer_Should_ReturnFiles_When_CommandIsValid()
     {
-        var sut = new GenerateMockServerFeature.Handler(NullLogger<GenerateMockServerFeature.Handler>.Instance);
+        var version = ContractVersion.Import(Guid.NewGuid(), "1.0.0", BaseSpec, "json", "upload").Value;
+        var repo = Substitute.For<IContractVersionRepository>();
+        repo.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>()).Returns(version);
+        var sut = new GenerateMockServerFeature.Handler(repo, NullLogger<GenerateMockServerFeature.Handler>.Instance);
 
         var result = await sut.Handle(
             new GenerateMockServerFeature.Command(
                 ContractVersionId: Guid.NewGuid(),
-                ContractJson: BaseSpec,
                 MockServerType: "wiremock"),
             CancellationToken.None);
 

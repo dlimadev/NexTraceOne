@@ -19,7 +19,6 @@ public static class OrchestrateContractPipeline
     /// <summary>Comando para orquestrar o pipeline de contrato.</summary>
     public sealed record Command(
         Guid ContractVersionId,
-        string ContractJson,
         string ServiceName,
         string TargetLanguage,
         bool GenerateServer = true,
@@ -57,21 +56,21 @@ public static class OrchestrateContractPipeline
 
             if (request.GenerateMockServer)
             {
-                var result = await sender.Send(new GenerateMockFeature.Command(request.ContractVersionId, request.ContractJson, "wiremock"), cancellationToken);
+                var result = await sender.Send(new GenerateMockFeature.Command(request.ContractVersionId, "wiremock"), cancellationToken);
                 if (result.IsSuccess)
                     artifacts.Add(new PipelineArtifact("MockServer", result.Value.Files));
             }
 
             if (request.GeneratePostman)
             {
-                var result = await sender.Send(new GeneratePostmanFeature.Command(request.ContractVersionId, request.ContractJson, request.ServiceName), cancellationToken);
+                var result = await sender.Send(new GeneratePostmanFeature.Command(request.ContractVersionId, request.ServiceName), cancellationToken);
                 if (result.IsSuccess)
                     artifacts.Add(new PipelineArtifact("PostmanCollection", [new GeneratedFile("collection.json", result.Value.CollectionJson, "json", "Postman Collection")]));
             }
 
             if (request.GenerateTests)
             {
-                var result = await sender.Send(new GenerateTestsFeature.Command(request.ContractVersionId, request.ContractJson, request.ServiceName, "xunit"), cancellationToken);
+                var result = await sender.Send(new GenerateTestsFeature.Command(request.ContractVersionId, request.ServiceName, "xunit"), cancellationToken);
                 if (result.IsSuccess)
                     artifacts.Add(new PipelineArtifact("ContractTests", result.Value.Files));
             }

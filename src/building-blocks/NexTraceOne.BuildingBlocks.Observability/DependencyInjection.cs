@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 using NexTraceOne.BuildingBlocks.Observability.Alerting;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Channels;
@@ -162,7 +163,7 @@ public static class DependencyInjection
             services.AddHttpClient<ClickHouseObservabilityProvider>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(30);
-            });
+            }).AddStandardResilienceHandler();
             services.AddSingleton<IObservabilityProvider>(sp =>
                 sp.GetRequiredService<ClickHouseObservabilityProvider>());
         }
@@ -172,7 +173,7 @@ public static class DependencyInjection
             services.AddHttpClient<ElasticObservabilityProvider>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(30);
-            });
+            }).AddStandardResilienceHandler();
             services.AddSingleton<IObservabilityProvider>(sp =>
                 sp.GetRequiredService<ElasticObservabilityProvider>());
         }
@@ -232,7 +233,7 @@ public static class DependencyInjection
             services.AddHttpClient<ClickHouseAnalyticsWriter>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
-            });
+            }).AddStandardResilienceHandler();
             services.AddSingleton<IAnalyticsWriter, ClickHouseAnalyticsWriter>();
         }
         else
@@ -240,7 +241,7 @@ public static class DependencyInjection
             services.AddHttpClient<ElasticAnalyticsWriter>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(analyticsOptions.WriteTimeoutSeconds + 5);
-            });
+            }).AddStandardResilienceHandler();
             services.AddSingleton<IAnalyticsWriter, ElasticAnalyticsWriter>();
         }
 
@@ -274,7 +275,7 @@ public static class DependencyInjection
             services.AddHttpClient(WebhookAlertChannel.HttpClientName, client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(alertingOptions.Webhook.TimeoutSeconds);
-            });
+            }).AddStandardResilienceHandler();
 
             services.AddSingleton<IAlertChannel, WebhookAlertChannel>();
         }

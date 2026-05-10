@@ -1,10 +1,11 @@
 using System.Text;
 using System.Text.Json;
-using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Shared;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateContractTests;
 
@@ -14,7 +15,6 @@ public static class GenerateContractTests
     /// <summary>Comando para gerar testes de contrato.</summary>
     public sealed record Command(
         Guid ContractVersionId,
-        string ContractJson,
         string ServiceName,
         string TestFramework = "xunit") : ICommand<Response>;
 
@@ -26,7 +26,6 @@ public static class GenerateContractTests
         public Validator()
         {
             RuleFor(x => x.ContractVersionId).NotEmpty();
-            RuleFor(x => x.ContractJson).NotEmpty();
             RuleFor(x => x.ServiceName).NotEmpty().MaximumLength(100);
             RuleFor(x => x.TestFramework)
                 .Must(f => SupportedFrameworks.Contains(f.ToLowerInvariant()))
@@ -34,14 +33,18 @@ public static class GenerateContractTests
         }
     }
 
-    /// <summary>Handler que gera ficheiros de testes de contrato.</summary>
-    public sealed class Handler : ICommandHandler<Command, Response>
+    /// <summary>Handler que gera ficheiros de testes de contrato carregando a spec da base de dados.</summary>
+    public sealed class Handler(IContractVersionRepository contractVersionRepository) : ICommandHandler<Command, Response>
     {
-        public Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            Guard.Against.Null(request);
+            var contractVersion = await contractVersionRepository.GetByIdAsync(
+                new ContractVersionId(request.ContractVersionId), cancellationToken);
 
-            var endpoints = ExtractEndpoints(request.ContractJson);
+            if (contractVersion is null)
+                return Error.NotFound("contract.version.not_found", "Contract version not found.");
+
+            var endpoints = ExtractEndpoints(contractVersion.SpecContent);
             var files = request.TestFramework.ToLowerInvariant() switch
             {
                 "xunit" => GenerateXUnitTests(request.ServiceName, endpoints),
@@ -51,20 +54,20 @@ public static class GenerateContractTests
                 _ => new List<GeneratedFile>()
             };
 
-            return Task.FromResult(Result<Response>.Success(new Response(
+            return Result<Response>.Success(new Response(
                 ContractVersionId: request.ContractVersionId,
                 TestFramework: request.TestFramework,
                 Files: files,
                 TestCount: endpoints.Count,
-                PreviewNote: PipelinePreviewNote.Text)));
+                PreviewNote: PipelinePreviewNote.Text));
         }
 
-        private static List<(string Method, string Path)> ExtractEndpoints(string contractJson)
+        private static List<(string Method, string Path)> ExtractEndpoints(string specContent)
         {
             var result = new List<(string, string)>();
             try
             {
-                using var doc = JsonDocument.Parse(contractJson);
+                using var doc = JsonDocument.Parse(specContent);
                 if (doc.RootElement.TryGetProperty("paths", out var paths))
                 {
                     foreach (var path in paths.EnumerateObject())

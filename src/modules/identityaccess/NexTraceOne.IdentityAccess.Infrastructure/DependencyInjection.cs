@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Http.Resilience;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Contracts.ServiceInterfaces;
 using NexTraceOne.IdentityAccess.Domain.Events;
@@ -17,7 +18,6 @@ using NexTraceOne.IdentityAccess.Infrastructure.EventHandlers;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence;
 using NexTraceOne.IdentityAccess.Infrastructure.Persistence.Repositories;
 using NexTraceOne.IdentityAccess.Infrastructure.Services;
-
 namespace NexTraceOne.IdentityAccess.Infrastructure;
 
 /// <summary>
@@ -86,8 +86,16 @@ public static class DependencyInjection
         services.AddScoped<IAccountActivationTokenRepository, AccountActivationTokenRepository>();
         services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
-        // Notifier — envia emails de activação e reset (Null implementation por defeito)
-        services.AddScoped<IIdentityNotifier, NullIdentityNotifier>();
+        // Notifier — usa implementação real via Notifications module quando Smtp:Host está configurado;
+        // caso contrário usa NullIdentityNotifier (que regista o token em Warning para dev local).
+        var smtpHost = configuration["Smtp:Host"];
+        if (!string.IsNullOrWhiteSpace(smtpHost))
+            services.AddScoped<IIdentityNotifier>(sp =>
+                new NotificationsIdentityNotifier(
+                    sp.GetRequiredService<INotificationModule>(),
+                    sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<NotificationsIdentityNotifier>>()));
+        else
+            services.AddScoped<IIdentityNotifier, NullIdentityNotifier>();
 
         // SaaS-01: Capability resolver para claims JWT
         services.AddScoped<ICapabilityResolver, DefaultCapabilityResolver>();
@@ -114,7 +122,8 @@ public static class DependencyInjection
         services.AddScoped<IModuleAccessPermissionProvider, ModuleAccessPermissionProvider>();
 
         // Provider OIDC para fluxo federado (Authorization Code flow)
-        services.AddHttpClient("oidc");
+        services.AddHttpClient("oidc")
+            .AddStandardResilienceHandler();
         services.AddScoped<IOidcProvider, OidcProviderService>();
 
         // SAML 2.0 SSO — protocolo e provider de configuração

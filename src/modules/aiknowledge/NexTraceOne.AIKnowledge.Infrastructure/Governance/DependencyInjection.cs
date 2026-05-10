@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Features.HandleModelFeedbackThresholdExceeded;
@@ -127,6 +128,14 @@ public static class DependencyInjection
         // Cross-module contract — consumed by AiOrchestration for token/model attribution
         services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();
 
+        // ── Agent Execution Plan & Routing Policies ────────────────────────
+        services.AddScoped<IAgentExecutionPlanRepository, EfAgentExecutionPlanRepository>();
+        services.AddScoped<IModelRoutingPolicyRepository, EfModelRoutingPolicyRepository>();
+        services.AddScoped<IPromptIntentClassifier, NexTraceOne.AIKnowledge.Application.Governance.Services.PromptIntentClassifierService>();
+
+        // ── AI Model Quality — overrides Application-layer singleton stub ──
+        services.AddScoped<IModelPredictionRepository, EfModelPredictionRepository>();
+
         // ── AI-5.2: Prompt Asset Registry ─────────────────────────────────
         services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();
 
@@ -143,8 +152,12 @@ public static class DependencyInjection
         services.AddSingleton<IDataSourceConnector, CustomHttpConnector>();
 
         // HTTP clients for connectors that use IHttpClientFactory
-        services.AddHttpClient("BraveSearch").SetHandlerLifetime(TimeSpan.FromMinutes(5));
-        services.AddHttpClient("GitHubConnector").SetHandlerLifetime(TimeSpan.FromMinutes(5));
+        services.AddHttpClient("BraveSearch")
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddStandardResilienceHandler();
+        services.AddHttpClient("GitHubConnector")
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddStandardResilienceHandler();
 
         // Background jobs
         services.AddHostedService<FeedbackThresholdJob>();

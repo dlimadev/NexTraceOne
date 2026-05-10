@@ -1,10 +1,14 @@
 using Microsoft.Extensions.Logging;
 using NexTraceOne.BuildingBlocks.Application.Nql;
+using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
+using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
+using NexTraceOne.ChangeGovernance.Contracts.RulesetGovernance.ServiceInterfaces;
 using NexTraceOne.Governance.Application.Abstractions;
 using NexTraceOne.Governance.Application.Features.ExecuteNqlQuery;
 using NexTraceOne.Governance.Application.Features.GetDashboardAnnotations;
 using NexTraceOne.Governance.Application.Features.ValidateNqlQuery;
 using NexTraceOne.Governance.Infrastructure.Persistence;
+using NexTraceOne.OperationalIntelligence.Contracts.Incidents.ServiceInterfaces;
 
 namespace NexTraceOne.Governance.Tests;
 
@@ -385,40 +389,49 @@ public sealed class V32_QueryDrivenWidgetsTests
     // ── GetDashboardAnnotations Handler ──────────────────────────────────
 
     [Fact]
-    public async Task GetDashboardAnnotations_ReturnsSimulatedAnnotations()
+    public async Task GetDashboardAnnotations_ReturnsResponse_WhenModulesReturnEmptyLists()
     {
-        var handler = new GetDashboardAnnotations.Handler();
+        var handler = MakeHandler();
         var now = DateTimeOffset.UtcNow;
 
-        var query = new GetDashboardAnnotations.Query(
-            TenantId: "tenant-1",
-            From: now.AddHours(-24),
-            To: now,
-            ServiceNames: null,
-            MaxPerSource: 50);
-
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query(
+                TenantId: "tenant-1",
+                From: now.AddHours(-24),
+                To: now,
+                ServiceNames: null,
+                MaxPerSource: 50),
+            CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value!.Annotations.Should().NotBeEmpty();
-        result.Value.Sources.Should().HaveCount(4);
-        result.Value.TotalCount.Should().BeGreaterThan(0);
+        result.Value!.Sources.Should().HaveCount(4);
+        result.Value.Annotations.Should().BeEmpty();
+        result.Value.TotalCount.Should().Be(0);
     }
 
     [Fact]
     public async Task GetDashboardAnnotations_FiltersAnnosByServiceName()
     {
-        var handler = new GetDashboardAnnotations.Handler();
         var now = DateTimeOffset.UtcNow;
+        var incidentModule = Substitute.For<IIncidentModule>();
+        incidentModule.GetRecentIncidentsAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<IncidentSummaryDto>
+            {
+                new(Guid.NewGuid(), "Latency spike", "Critical", "payment-service", now.AddHours(-1), "Open"),
+                new(Guid.NewGuid(), "DB timeout", "High", "user-service", now.AddHours(-2), "Open")
+            });
 
-        var query = new GetDashboardAnnotations.Query(
-            TenantId: "tenant-1",
-            From: now.AddHours(-24),
-            To: now,
-            ServiceNames: ["payment-service"],
-            MaxPerSource: 50);
+        var handler = MakeHandler(incidentModule: incidentModule);
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query(
+                TenantId: "tenant-1",
+                From: now.AddHours(-24),
+                To: now,
+                ServiceNames: ["payment-service"],
+                MaxPerSource: 50),
+            CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.Annotations.Should().OnlyContain(a =>
@@ -428,28 +441,307 @@ public sealed class V32_QueryDrivenWidgetsTests
     [Fact]
     public async Task GetDashboardAnnotations_AllAnnotationsWithinTimeRange()
     {
-        var handler = new GetDashboardAnnotations.Handler();
         var now = DateTimeOffset.UtcNow;
         var from = now.AddHours(-24);
         var to = now;
+        var changeModule = Substitute.For<IChangeIntelligenceModule>();
+        changeModule.GetReleasesInWindowAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ReleaseSummaryDto>
+            {
+                new(Guid.NewGuid(), "payment-service", "2.0.0", "prod", "Deployed", from.AddHours(1))
+            });
 
-        var query = new GetDashboardAnnotations.Query("tenant-1", from, to);
-        var result = await handler.Handle(query, CancellationToken.None);
+        var handler = MakeHandler(changeModule: changeModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", from, to),
+            CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value!.Annotations.Should().OnlyContain(a =>
-            a.Timestamp >= from && a.Timestamp <= to);
+        result.Value!.Annotations.Should().OnlyContain(a => a.Timestamp >= from && a.Timestamp <= to);
     }
 
     [Fact]
-    public async Task GetDashboardAnnotations_SourcesAreSimulated()
+    public async Task GetDashboardAnnotations_ContractsSource_NotSimulated_WhenModuleSucceeds()
     {
-        var handler = new GetDashboardAnnotations.Handler();
         var now = DateTimeOffset.UtcNow;
+        var handler = MakeHandler();
 
-        var query = new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now);
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now),
+            CancellationToken.None);
 
-        result.Value!.Sources.Should().AllSatisfy(s => s.IsSimulated.Should().BeTrue());
+        result.Value!.Sources.Should()
+            .ContainSingle(s => s.Source == "contracts" && !s.IsSimulated);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_WithRealIncidents_ReturnsIncidentAnnotations()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var incidentId = Guid.NewGuid();
+        var incidentModule = Substitute.For<IIncidentModule>();
+        incidentModule.GetRecentIncidentsAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<IncidentSummaryDto>
+            {
+                new(incidentId, "Payment timeout", "Critical", "payment-service", now.AddHours(-2), "Open")
+            });
+
+        var handler = MakeHandler(incidentModule: incidentModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-24), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Annotations.Should().ContainSingle(a =>
+            a.Id == $"incident-{incidentId}" &&
+            a.Type == "incident.opened" &&
+            a.ServiceName == "payment-service" &&
+            a.IsSimulated == false);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_WithRealReleases_ReturnsReleaseAnnotations()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var releaseId = Guid.NewGuid();
+        var changeModule = Substitute.For<IChangeIntelligenceModule>();
+        changeModule.GetReleasesInWindowAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ReleaseSummaryDto>
+            {
+                new(releaseId, "order-service", "3.1.0", "production", "Deployed", now.AddHours(-5))
+            });
+
+        var handler = MakeHandler(changeModule: changeModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-24), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Annotations.Should().ContainSingle(a =>
+            a.Id == $"release-{releaseId}" &&
+            a.Type == "change.release" &&
+            a.ServiceName == "order-service" &&
+            a.IsSimulated == false);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_WithRealViolations_ReturnsPolicyAnnotations()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var lintId = Guid.NewGuid();
+        var rulesetModule = Substitute.For<IRulesetGovernanceModule>();
+        rulesetModule.GetRecentViolationsAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<LintViolationSummaryDto>
+            {
+                new(lintId, Guid.NewGuid(), 45.0m, 12, now.AddHours(-3))
+            });
+
+        var handler = MakeHandler(rulesetModule: rulesetModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-24), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Annotations.Should().ContainSingle(a =>
+            a.Id == $"violation-{lintId}" &&
+            a.Type == "policy.violation" &&
+            a.Severity == "critical" &&
+            a.IsSimulated == false);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_IncidentModuleFails_FallsBackToSimulated()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var incidentModule = Substitute.For<IIncidentModule>();
+        incidentModule.GetRecentIncidentsAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("module unavailable"));
+
+        var handler = MakeHandler(incidentModule: incidentModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Sources.Should().ContainSingle(s =>
+            s.Source == "incidents" && s.IsSimulated && s.SimulatedNote != null);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_ChangeModuleFails_FallsBackToSimulated()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var changeModule = Substitute.For<IChangeIntelligenceModule>();
+        changeModule.GetReleasesInWindowAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("module unavailable"));
+
+        var handler = MakeHandler(changeModule: changeModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Sources.Should().ContainSingle(s =>
+            s.Source == "changes" && s.IsSimulated && s.SimulatedNote != null);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_RulesetModuleFails_FallsBackToSimulated()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var rulesetModule = Substitute.For<IRulesetGovernanceModule>();
+        rulesetModule.GetRecentViolationsAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("module unavailable"));
+
+        var handler = MakeHandler(rulesetModule: rulesetModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Sources.Should().ContainSingle(s =>
+            s.Source == "policies" && s.IsSimulated && s.SimulatedNote != null);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_AllModulesSucceed_NoSourceIsSimulated()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var handler = MakeHandler();
+
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Sources.Should().OnlyContain(s => !s.IsSimulated);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_AnnotationsSortedByTimestampDescending()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var incidentModule = Substitute.For<IIncidentModule>();
+        incidentModule.GetRecentIncidentsAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<IncidentSummaryDto>
+            {
+                new(Guid.NewGuid(), "Old incident", "High", "svc-a", now.AddHours(-10), "Open"),
+                new(Guid.NewGuid(), "Recent incident", "Critical", "svc-b", now.AddHours(-1), "Open")
+            });
+
+        var handler = MakeHandler(incidentModule: incidentModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-24), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        var timestamps = result.Value!.Annotations.Select(a => a.Timestamp).ToList();
+        timestamps.Should().BeInDescendingOrder();
+    }
+
+    // ── Helper ────────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetDashboardAnnotations_WithRealBreakingChanges_ReturnsContractAnnotations()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var assetId = Guid.NewGuid();
+        var contractsModule = Substitute.For<IContractsModule>();
+        contractsModule.GetRecentBreakingChangesAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(new List<ContractBreakingChangeSummary>
+            {
+                new(assetId, "payments-api", "payment-service", 3, now.AddHours(-2))
+            });
+
+        var handler = MakeHandler(contractsModule: contractsModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-24), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Annotations.Should().ContainSingle(a =>
+            a.Id == $"contract-{assetId}" &&
+            a.Type == "contract.breaking_change" &&
+            a.ServiceName == "payment-service" &&
+            a.IsSimulated == false);
+        result.Value.Sources.Should().ContainSingle(s => s.Source == "contracts" && !s.IsSimulated && s.Count == 1);
+    }
+
+    [Fact]
+    public async Task GetDashboardAnnotations_ContractsModuleFails_FallsBackToSimulated()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var contractsModule = Substitute.For<IContractsModule>();
+        contractsModule.GetRecentBreakingChangesAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("catalog unavailable"));
+
+        var handler = MakeHandler(contractsModule: contractsModule);
+        var result = await handler.Handle(
+            new GetDashboardAnnotations.Query("tenant-1", now.AddHours(-1), now),
+            CancellationToken.None);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value!.Sources.Should().ContainSingle(s =>
+            s.Source == "contracts" && s.IsSimulated && s.SimulatedNote != null);
+    }
+
+    private static GetDashboardAnnotations.Handler MakeHandler(
+        IIncidentModule? incidentModule = null,
+        IChangeIntelligenceModule? changeModule = null,
+        IRulesetGovernanceModule? rulesetModule = null,
+        IContractsModule? contractsModule = null)
+    {
+        if (incidentModule is null)
+        {
+            var m = Substitute.For<IIncidentModule>();
+            m.GetRecentIncidentsAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(),
+                    Arg.Any<DateTimeOffset>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+                .Returns(Array.Empty<IncidentSummaryDto>());
+            incidentModule = m;
+        }
+
+        if (changeModule is null)
+        {
+            var m = Substitute.For<IChangeIntelligenceModule>();
+            m.GetReleasesInWindowAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                    Arg.Any<int>(), Arg.Any<CancellationToken>())
+                .Returns(Array.Empty<ReleaseSummaryDto>());
+            changeModule = m;
+        }
+
+        if (rulesetModule is null)
+        {
+            var m = Substitute.For<IRulesetGovernanceModule>();
+            m.GetRecentViolationsAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                    Arg.Any<int>(), Arg.Any<CancellationToken>())
+                .Returns(Array.Empty<LintViolationSummaryDto>());
+            rulesetModule = m;
+        }
+
+        if (contractsModule is null)
+        {
+            var m = Substitute.For<IContractsModule>();
+            m.GetRecentBreakingChangesAsync(Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(),
+                    Arg.Any<int>(), Arg.Any<CancellationToken>())
+                .Returns(Array.Empty<ContractBreakingChangeSummary>());
+            contractsModule = m;
+        }
+
+        return new GetDashboardAnnotations.Handler(
+            incidentModule,
+            changeModule,
+            rulesetModule,
+            contractsModule,
+            NullLogger<GetDashboardAnnotations.Handler>.Instance);
     }
 }

@@ -50,6 +50,17 @@ public static class DependencyInjection
         services.AddScoped<IWasteSignalRepository, WasteSignalRepository>();
         services.AddScoped<ICostIntelligenceModule, CostIntelligenceModuleService>();
 
+        // ── FinOps Report null readers ────────────────────────────────────
+        services.AddScoped<
+            NexTraceOne.OperationalIntelligence.Application.FinOps.Features.GetFinOpsWasteAnalysisReport.GetFinOpsWasteAnalysisReport.IFinOpsWasteReader,
+            NexTraceOne.OperationalIntelligence.Application.FinOps.Features.GetFinOpsWasteAnalysisReport.GetFinOpsWasteAnalysisReport.NullFinOpsWasteReader>();
+        services.AddScoped<
+            NexTraceOne.OperationalIntelligence.Application.FinOps.Features.GetEnvironmentCostComparisonReport.GetEnvironmentCostComparisonReport.IEnvironmentCostComparisonReader,
+            NexTraceOne.OperationalIntelligence.Application.FinOps.Features.GetEnvironmentCostComparisonReport.GetEnvironmentCostComparisonReport.NullEnvironmentCostComparisonReader>();
+        services.AddScoped<
+            NexTraceOne.OperationalIntelligence.Application.FinOps.Features.GetCostPerReleaseReport.GetCostPerReleaseReport.ICostPerReleaseReader,
+            NexTraceOne.OperationalIntelligence.Application.FinOps.Features.GetCostPerReleaseReport.GetCostPerReleaseReport.NullCostPerReleaseReader>();
+
         return services;
     }
 }

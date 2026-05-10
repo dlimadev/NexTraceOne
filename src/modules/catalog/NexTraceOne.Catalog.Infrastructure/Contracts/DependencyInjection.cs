@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,10 +35,20 @@ public static class DependencyInjection
         var connectionString = configuration.GetRequiredConnectionString("ContractsDatabase", "NexTraceOne");
 
         services.AddDbContext<ContractsDbContext>((serviceProvider, options) =>
+        {
             options.UseNpgsql(connectionString)
                 .AddInterceptors(
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
+                    serviceProvider.GetRequiredService<TenantRlsInterceptor>());
+
+            if (string.Equals(
+                Environment.GetEnvironmentVariable("NEXTRACE_IGNORE_PENDING_MODEL_CHANGES"),
+                "true",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+            }
+        });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ContractsDbContext>());
         services.AddScoped<IContractsUnitOfWork>(sp => sp.GetRequiredService<ContractsDbContext>());
@@ -79,6 +90,18 @@ public static class DependencyInjection
         // CC-06: Breaking Change Proposal Workflow
         services.AddScoped<IBreakingChangeProposalRepository, BreakingChangeProposalRepository>();
 
+        // ── Wave AO.1: SBOM Supply Chain ──────────────────────────────────────
+        services.AddScoped<ISbomRepository, EfSbomRepository>();
+
+        // ── Wave AQ.1: Data Contract Records ─────────────────────────────────
+        services.AddScoped<IDataContractRepository, EfDataContractRepository>();
+
+        // ── Wave AV.3: Deprecation Schedule ──────────────────────────────────
+        services.AddScoped<IDeprecationScheduleRepository, EfDeprecationScheduleRepository>();
+
+        // ── Wave AS.1: Feature Flag Records ───────────────────────────────────
+        services.AddScoped<IFeatureFlagRepository, EfFeatureFlagRepository>();
+
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();
         services.AddScoped<IContractsModule, ContractsModuleService>();
@@ -91,6 +114,20 @@ public static class DependencyInjection
 
         // ── Wave AB.2 — Contract Lineage Report (null reader) ─────────────
         services.AddScoped<IContractVersionHistoryReader, NullContractVersionHistoryReader>();
+
+        // ── Wave AE.1 — Contract Test Coverage Report (null reader) ───────
+        services.AddScoped<IContractTestReader, NexTraceOne.Catalog.Application.Contracts.NullContractTestReader>();
+
+        // ── Wave AE.2 — Schema Breaking Change Impact Report (null reader) ─
+        services.AddScoped<IBreakingChangeImpactReader, NexTraceOne.Catalog.Application.Contracts.NullBreakingChangeImpactReader>();
+
+        // ── Wave AE.3 — API Backward Compatibility Report (null reader) ───
+        services.AddScoped<IContractCompatibilityReader, NexTraceOne.Catalog.Application.Contracts.NullContractCompatibilityReader>();
+
+        // ── Wave AS — Event Contract Analytics (null readers) ─────────────
+        services.AddScoped<IEventSchemaEvolutionReader, NexTraceOne.Catalog.Application.Contracts.Abstractions.NullEventSchemaEvolutionReader>();
+        services.AddScoped<IEventProducerConsumerReader, NexTraceOne.Catalog.Application.Contracts.Abstractions.NullEventProducerConsumerReader>();
+        services.AddScoped<IEventComplianceReader, NexTraceOne.Catalog.Application.Contracts.Abstractions.NullEventComplianceReader>();
 
         return services;
     }

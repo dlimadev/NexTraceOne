@@ -36,7 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IDeveloperExperienceUnitOfWork>(sp => sp.GetRequiredService<DeveloperExperienceDbContext>());
         services.AddScoped<IDeveloperSurveyRepository, EfDeveloperSurveyRepository>();
         services.AddScoped<IIdeContextReader, NullIdeContextReader>();
-        services.AddScoped<IIDEUsageRepository, NullIDEUsageRepository>();
+        services.AddScoped<IIDEUsageRepository, EfIdeUsageRepository>();
 
         return services;
     }

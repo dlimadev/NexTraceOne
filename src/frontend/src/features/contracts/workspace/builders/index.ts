@@ -5,6 +5,7 @@ export { VisualWorkserviceBuilder } from './VisualWorkserviceBuilder';
 export { VisualSharedSchemaBuilder } from './VisualSharedSchemaBuilder';
 export { VisualWebhookBuilder } from './VisualWebhookBuilder';
 export { VisualLegacyContractBuilder } from './VisualLegacyContractBuilder';
+export { VisualDataContractBuilder } from './VisualDataContractBuilder';
 
 // Shared builder infrastructure
 export type {
@@ -23,6 +24,8 @@ export type {
   LegacyContractBuilderState,
   LegacyContractKind,
   LegacyField,
+  DataContractBuilderState,
+  DataContractColumn,
   BuilderValidationResult,
   SyncResult,
 } from './shared/builderTypes';
@@ -35,6 +38,7 @@ export {
   sharedSchemaBuilderToJson,
   webhookBuilderToYaml,
   legacyContractBuilderToYaml,
+  dataContractBuilderToJson,
 } from './shared/builderSync';
 
 export {
@@ -45,4 +49,5 @@ export {
   validateSharedSchemaBuilder,
   validateWebhookBuilder,
   validateLegacyContractBuilder,
+  validateDataContractBuilder,
 } from './shared/builderValidation';

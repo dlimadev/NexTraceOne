@@ -90,14 +90,22 @@ public static class DependencyInjection
         // ── Wave AF.2 — Retirement Readiness Report (null reader) ────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IRetirementReadinessReader, NexTraceOne.Catalog.Application.Services.NullRetirementReadinessReader>();
 
+        // ── Wave AF.3 — Migration Progress Report (null reader) ──────────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IMigrationProgressReader, NexTraceOne.Catalog.Application.Services.NullMigrationProgressReader>();
+
+        // ── Wave AF.1 — Service Lifecycle Transition Report (null reader) ────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IServiceLifecycleReader, NexTraceOne.Catalog.Application.Services.NullServiceLifecycleReader>();
+
+        // ── Wave AD.2 — Secrets Exposure Risk Report (null reader) ───────────
+        services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ISecretsExposureReader, NexTraceOne.Catalog.Application.Services.NullSecretsExposureReader>();
+
         // ── Wave AM — null readers ─────────────────────────────────────────
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.IUncatalogedServicesReader, NexTraceOne.Catalog.Application.Services.NullUncatalogedServicesReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDriftReader, NexTraceOne.Catalog.Application.Contracts.NullContractDriftReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Services.Abstractions.ICatalogHealthMaintenanceReader, NexTraceOne.Catalog.Application.Services.NullCatalogHealthMaintenanceReader>();
 
         // ── Wave AO — Supply Chain null readers ─────────────────────────────
-        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISbomRepository,
-            NexTraceOne.Catalog.Application.Contracts.NullSbomRepository>();
+        // ISbomRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISbomCoverageReader,
             NexTraceOne.Catalog.Application.Contracts.NullSbomCoverageReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDependencyProvenanceReader,
@@ -106,8 +114,7 @@ public static class DependencyInjection
             NexTraceOne.Catalog.Application.Contracts.NullSupplyChainRiskReader>();
 
         // ── Wave AQ — Data Observability & Schema Quality null readers ───────
-        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDataContractRepository,
-            NexTraceOne.Catalog.Application.Contracts.NullDataContractRepository>();
+        // IDataContractRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaQualityReader,
             NexTraceOne.Catalog.Application.Contracts.NullSchemaQualityReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.ISchemaEvolutionSafetyReader,
@@ -126,8 +133,7 @@ public static class DependencyInjection
             NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationPipelineReader>();
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IApiVersionStrategyReader,
             NexTraceOne.Catalog.Application.Contracts.NullApiVersionStrategyReader>();
-        services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IDeprecationScheduleRepository,
-            NexTraceOne.Catalog.Application.Contracts.NullDeprecationScheduleRepository>();
+        // IDeprecationScheduleRepository — real EF Core implementation registered in Contracts/DependencyInjection.cs
         services.AddScoped<NexTraceOne.Catalog.Application.Contracts.Abstractions.IContractDeprecationForecastReader,
             NexTraceOne.Catalog.Application.Contracts.NullContractDeprecationForecastReader>();
 

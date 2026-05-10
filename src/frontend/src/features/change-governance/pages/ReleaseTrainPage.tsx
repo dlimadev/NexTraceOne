@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   Train,
   Plus,
@@ -12,6 +12,9 @@ import {
   Users,
   TrendingUp,
   Zap,
+  Activity,
+  XCircle,
+  HelpCircle,
 } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '../../../components/Card';
 import { Badge } from '../../../components/Badge';
@@ -20,7 +23,11 @@ import { PageContainer } from '../../../components/shell';
 import { PageHeader } from '../../../components/PageHeader';
 import { EmptyState } from '../../../components/EmptyState';
 import { changeIntelligenceApi } from '../api/changeIntelligence';
-import type { ReleaseTrainEvaluationResponse, TrainReleaseItem } from '../api/changeIntelligence';
+import type {
+  ReleaseTrainEvaluationResponse,
+  TrainReleaseItem,
+  PromotionReadinessDeltaResponse,
+} from '../api/changeIntelligence';
 
 const INPUT_CLS =
   'w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors';
@@ -47,6 +54,36 @@ function scoreBadge(score: number | null): 'success' | 'warning' | 'danger' | 'd
   if (score < 0.4) return 'success';
   if (score < 0.7) return 'warning';
   return 'danger';
+}
+
+function deltaReadinessBadge(
+  readiness: PromotionReadinessDeltaResponse['readiness'],
+): 'success' | 'warning' | 'danger' | 'default' {
+  if (readiness === 'Ready') return 'success';
+  if (readiness === 'Review') return 'warning';
+  if (readiness === 'Blocked') return 'danger';
+  return 'default';
+}
+
+function deltaReadinessIcon(readiness: PromotionReadinessDeltaResponse['readiness']) {
+  if (readiness === 'Ready') return <CheckCircle2 size={16} className="text-success" />;
+  if (readiness === 'Review') return <AlertTriangle size={16} className="text-warning" />;
+  if (readiness === 'Blocked') return <XCircle size={16} className="text-critical" />;
+  return <HelpCircle size={16} className="text-muted" />;
+}
+
+function formatDelta(value: number | null, suffix: string, noData: string): string {
+  if (value === null) return noData;
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(2)} ${suffix}`;
+}
+
+function deltaBadgeVariant(value: number | null, invertGood = false): 'success' | 'warning' | 'danger' | 'default' {
+  if (value === null) return 'default';
+  const isWorse = invertGood ? value < 0 : value > 0;
+  if (Math.abs(value) < 0.01) return 'success';
+  if (isWorse) return value > 0.05 || value < -0.05 ? 'danger' : 'warning';
+  return 'success';
 }
 
 function TrainReleaseRow({ item, t }: { item: TrainReleaseItem; t: (k: string) => string }) {
@@ -76,6 +113,161 @@ function TrainReleaseRow({ item, t }: { item: TrainReleaseItem; t: (k: string) =
         )}
       </td>
     </tr>
+  );
+}
+
+/** Secção de Promotion Readiness Delta — permite ao utilizador comparar dois
+ *  ambientes para um serviço antes de incluí-lo num Release Train. */
+function PromotionReadinessDeltaSection() {
+  const { t } = useTranslation();
+  const [service, setService] = useState('');
+  const [fromEnv, setFromEnv] = useState('');
+  const [toEnv, setToEnv] = useState('');
+  const [days, setDays] = useState(7);
+  const [enabled, setEnabled] = useState(false);
+
+  const { data, isFetching, isError } = useQuery({
+    queryKey: ['promotion-readiness-delta', service, fromEnv, toEnv, days],
+    queryFn: () =>
+      changeIntelligenceApi.getPromotionReadinessDelta({ service, from: fromEnv, to: toEnv, days }),
+    enabled: enabled && !!service && !!fromEnv && !!toEnv,
+    staleTime: 30_000,
+  });
+
+  function handleCheck() {
+    if (!service || !fromEnv || !toEnv) return;
+    setEnabled(true);
+  }
+
+  const noData = t('promotionReadinessDelta.noData');
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Activity size={16} className="text-accent" />
+          <h3 className="text-sm font-semibold text-heading">
+            {t('promotionReadinessDelta.title')}
+          </h3>
+        </div>
+        <p className="text-xs text-muted mt-1">{t('promotionReadinessDelta.subtitle')}</p>
+      </CardHeader>
+      <CardBody>
+        {/* Form */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          <div>
+            <label className="block text-xs font-medium text-muted mb-1">
+              {t('promotionReadinessDelta.serviceLabel')}
+            </label>
+            <input
+              className={INPUT_CLS}
+              placeholder={t('promotionReadinessDelta.servicePlaceholder')}
+              value={service}
+              onChange={(e) => { setService(e.target.value); setEnabled(false); }}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-muted mb-1">
+              {t('promotionReadinessDelta.fromEnvLabel')}
+            </label>
+            <input
+              className={INPUT_CLS}
+              placeholder={t('promotionReadinessDelta.fromEnvPlaceholder')}
+              value={fromEnv}
+              onChange={(e) => { setFromEnv(e.target.value); setEnabled(false); }}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-muted mb-1">
+              {t('promotionReadinessDelta.toEnvLabel')}
+            </label>
+            <input
+              className={INPUT_CLS}
+              placeholder={t('promotionReadinessDelta.toEnvPlaceholder')}
+              value={toEnv}
+              onChange={(e) => { setToEnv(e.target.value); setEnabled(false); }}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-muted mb-1">
+              {t('promotionReadinessDelta.daysLabel')}
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={60}
+              className={INPUT_CLS}
+              value={days}
+              onChange={(e) => { setDays(Number(e.target.value)); setEnabled(false); }}
+            />
+          </div>
+        </div>
+        <Button
+          variant="secondary"
+          onClick={handleCheck}
+          disabled={isFetching || !service || !fromEnv || !toEnv}
+        >
+          <Zap size={14} />
+          {isFetching ? t('common.loading') : t('promotionReadinessDelta.checkButton')}
+        </Button>
+
+        {/* Results */}
+        {isError && (
+          <p className="text-xs text-critical mt-3">{t('common.error')}</p>
+        )}
+        {data && (
+          <div className="mt-4 space-y-3">
+            {data.simulatedNote && (
+              <div className="flex items-start gap-2 rounded-md bg-surface border border-warning/30 px-3 py-2">
+                <AlertTriangle size={14} className="text-warning mt-0.5 shrink-0" />
+                <p className="text-xs text-muted italic">{data.simulatedNote}</p>
+              </div>
+            )}
+
+            {/* Readiness badge */}
+            <div className="flex items-center gap-2">
+              {deltaReadinessIcon(data.readiness)}
+              <Badge variant={deltaReadinessBadge(data.readiness)}>
+                {t(`promotionReadinessDelta.readiness.${data.readiness}`)}
+              </Badge>
+              <span className="text-xs text-muted">
+                {t('promotionReadinessDelta.dataQuality')}: {(data.dataQuality * 100).toFixed(0)}%
+              </span>
+            </div>
+
+            {/* Delta cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-surface rounded-md p-3">
+                <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.errorRateDelta')}</p>
+                <Badge variant={deltaBadgeVariant(data.errorRateDelta)}>
+                  {formatDelta(data.errorRateDelta, '%', noData)}
+                </Badge>
+              </div>
+              <div className="bg-surface rounded-md p-3">
+                <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.latencyDelta')}</p>
+                <Badge variant={deltaBadgeVariant(data.latencyP95DeltaMs)}>
+                  {formatDelta(data.latencyP95DeltaMs, t('promotionReadinessDelta.ms'), noData)}
+                </Badge>
+              </div>
+              <div className="bg-surface rounded-md p-3">
+                <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.incidentsDelta')}</p>
+                <Badge variant={deltaBadgeVariant(data.incidentsDelta)}>
+                  {data.incidentsDelta !== null
+                    ? `${data.incidentsDelta > 0 ? '+' : ''}${data.incidentsDelta} ${t('promotionReadinessDelta.incidents')}`
+                    : noData}
+                </Badge>
+              </div>
+              <div className="bg-surface rounded-md p-3">
+                <p className="text-xs text-muted mb-1">{t('promotionReadinessDelta.throughputDelta')}</p>
+                <Badge variant={deltaBadgeVariant(data.throughputDelta, true)}>
+                  {formatDelta(data.throughputDelta, '%', noData)}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -141,6 +333,9 @@ export function ReleaseTrainPage() {
         title={t('releaseTrain.title')}
         subtitle={t('releaseTrain.subtitle')}
       />
+
+      {/* Promotion Readiness Delta section */}
+      <PromotionReadinessDeltaSection />
 
       {/* Composer card */}
       <Card className="mb-6">

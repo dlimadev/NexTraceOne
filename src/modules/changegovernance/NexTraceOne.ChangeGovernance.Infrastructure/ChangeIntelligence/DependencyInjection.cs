@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Http.Resilience;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Correlation;
 using NexTraceOne.BuildingBlocks.Infrastructure;
@@ -13,14 +13,13 @@ using NexTraceOne.ChangeGovernance.Application.ChangeIntelligence.Features.Evalu
 using NexTraceOne.ChangeGovernance.Application.Compliance.Abstractions;
 using NexTraceOne.ChangeGovernance.Application.Platform.Abstractions;
 using NexTraceOne.ChangeGovernance.Contracts.ChangeIntelligence.ServiceInterfaces;
-using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Analytics;
+using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.EventHandlers;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Persistence.Repositories;
 using NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence.Services;
-using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using NexTraceOne.Integrations.Contracts;
-
+using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 namespace NexTraceOne.ChangeGovernance.Infrastructure.ChangeIntelligence;
 
 /// <summary>
@@ -89,6 +88,9 @@ public static class DependencyInjection
 
         // Wave U.1 — Compliance Coverage Matrix Report (honest-null; bridge per-service compliance on composition root)
         services.AddScoped<IComplianceServiceCoverageReader, Services.NullComplianceServiceCoverageReader>();
+
+        // Wave AD.1 — Zero Trust Posture Report (null reader)
+        services.AddScoped<IZeroTrustServiceReader, Services.NullZeroTrustServiceReader>();
         services.AddScoped<IIntegrationEventHandler<IncidentCreatedIntegrationEvent>, IncidentCreatedIntegrationEventHandler>();
         services.AddScoped<IIntegrationEventHandler<IntegrationEvents.IngestionPayloadProcessedIntegrationEvent>, IngestionPayloadProcessedIntegrationEventHandler>();
 
@@ -100,7 +102,8 @@ public static class DependencyInjection
         services.AddScoped<IApprovalRequestRepository, ApprovalRequestRepository>();
         services.AddScoped<IReleaseApprovalPolicyRepository, ReleaseApprovalPolicyRepository>();
         services.AddHttpClient("ExternalApprovalWebhook")
-            .ConfigureHttpClient(c => c.Timeout = TimeSpan.FromSeconds(30));
+            .ConfigureHttpClient(c => c.Timeout = TimeSpan.FromSeconds(30))
+            .AddStandardResilienceHandler();
         services.AddScoped<IExternalApprovalWebhookSender, ExternalApprovalWebhookSender>();
 
         // Analytics writer: registrado globalmente no ApiHost via AddBuildingBlocksAnalytics.

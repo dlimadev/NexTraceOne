@@ -8,6 +8,7 @@ import { VisualWorkserviceBuilder } from '../builders/VisualWorkserviceBuilder';
 import { VisualSharedSchemaBuilder } from '../builders/VisualSharedSchemaBuilder';
 import { VisualWebhookBuilder } from '../builders/VisualWebhookBuilder';
 import { VisualLegacyContractBuilder } from '../builders/VisualLegacyContractBuilder';
+import { VisualDataContractBuilder } from '../builders/VisualDataContractBuilder';
 import { ContractEditorSplitPane } from '../editor/ContractEditorSplitPane';
 import { LivePreviewRenderer } from '../editor/LivePreviewRenderer';
 import { useSpecPreview } from '../../hooks/useSpecPreview';
@@ -19,6 +20,7 @@ import {
   parseJsonSchemaToSharedSchema,
   parseWebhookYaml,
   parseLegacyContractYaml,
+  parseDataContractJson,
 } from '../builders/shared/builderParse';
 import {
   restBuilderToYaml,
@@ -28,6 +30,7 @@ import {
   sharedSchemaBuilderToJson,
   webhookBuilderToYaml,
   legacyContractBuilderToYaml,
+  dataContractBuilderToJson,
 } from '../builders/shared/builderSync';
 import type { SyncResult, LegacyContractKind } from '../builders/shared/builderTypes';
 
@@ -364,6 +367,9 @@ function VisualBuilderByProtocol({
           case 'CicsCommarea':
             result = legacyContractBuilderToYaml(state as Parameters<typeof legacyContractBuilderToYaml>[0]);
             break;
+          case 'DataContract':
+            result = dataContractBuilderToJson(state as Parameters<typeof dataContractBuilderToJson>[0]);
+            break;
           default:
             result = restBuilderToYaml(state as Parameters<typeof restBuilderToYaml>[0]);
         }
@@ -398,6 +404,8 @@ function VisualBuilderByProtocol({
         case 'FixedLayout':
         case 'CicsCommarea':
           return parseLegacyContractYaml(content, format, resolvedType as LegacyContractKind);
+        case 'DataContract':
+          return parseDataContractJson(content, format);
         default:
           return parseOpenApiToRest(content, format);
       }
@@ -426,6 +434,8 @@ function VisualBuilderByProtocol({
     case 'FixedLayout':
     case 'CicsCommarea':
       return <VisualLegacyContractBuilder key={stableKey} kind={resolvedType as LegacyContractKind} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
+    case 'DataContract':
+      return <VisualDataContractBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
     default:
       return <VisualRestBuilder key={stableKey} initialState={parsed?.state as never} isReadOnly={isReadOnly} onChange={handleBuilderChange as never} onSync={onSync} />;
   }
@@ -440,6 +450,8 @@ function resolveTypeFromProtocol(protocol: string): string {
       return 'Soap';
     case 'AsyncApi':
       return 'Event';
+    case 'DataContract':
+      return 'DataContract';
     default:
       return 'RestApi';
   }

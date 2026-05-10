@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.Integrations.Domain;
@@ -79,13 +80,15 @@ public static class DependencyInjection
         {
             services.Configure<ClickHouseLegacyWriterOptions>(
                 configuration.GetSection(ClickHouseLegacyWriterOptions.SectionName));
-            services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>();
+            services.AddHttpClient<ILegacyEventWriter, ClickHouseLegacyEventWriter>()
+                .AddStandardResilienceHandler();
         }
         else
         {
             services.Configure<ElasticLegacyWriterOptions>(
                 configuration.GetSection(ElasticLegacyWriterOptions.SectionName));
-            services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>();
+            services.AddHttpClient<ILegacyEventWriter, ElasticLegacyEventWriter>()
+                .AddStandardResilienceHandler();
         }
 
         // Integration Context Resolver — resolves active binding descriptors by type, tenant and environment
@@ -146,8 +149,8 @@ public static class DependencyInjection
         // Schema Planner — DEG-06 (NullSchemaPlanner por default; substituir por executor IaC real)
         services.AddSingleton<ISchemaPlanner, NullSchemaPlanner>();
 
-        // Event Consumer Worker — Dead Letter Repository e Status Reader (null por defeito)
-        services.AddSingleton<IEventConsumerDeadLetterRepository, NullEventConsumerDeadLetterRepository>();
+        // Event Consumer Worker — Dead Letter Repository persisted to int_event_consumer_dead_letters
+        services.AddScoped<IEventConsumerDeadLetterRepository, EfEventConsumerDeadLetterRepository>();
         services.AddSingleton<IEventConsumerStatusReader, NullEventConsumerStatusReader>();
 
         // Normalization Strategies — registadas como IEventNormalizationStrategy para injecção no worker

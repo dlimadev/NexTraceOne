@@ -359,6 +359,30 @@ export interface BuilderValidationResult {
   errors: BuilderValidationError[];
 }
 
+// ── Data Contract Builder (CC-03) ─────────────────────────────────────────────
+
+export type PiiLevel = 'None' | 'Low' | 'Medium' | 'High' | 'Critical';
+export type ColumnType = 'uuid' | 'varchar' | 'text' | 'int' | 'bigint' | 'decimal' | 'boolean' | 'timestamp' | 'date' | 'json' | 'array' | 'other';
+
+export interface DataContractColumn {
+  id: string;
+  name: string;
+  type: ColumnType;
+  nullable: boolean;
+  pii: PiiLevel;
+  description: string;
+}
+
+export interface DataContractBuilderState {
+  title: string;
+  version: string;
+  owner: string;
+  sourceSystem: string;
+  slaFreshnessHours: number;
+  description: string;
+  columns: DataContractColumn[];
+}
+
 // ── Sync ──────────────────────────────────────────────────────────────────────
 
 export type SyncDirection = 'visual-to-source' | 'source-to-visual';

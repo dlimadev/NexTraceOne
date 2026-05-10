@@ -15,6 +15,16 @@ public interface IChangeIntelligenceModule
 
     /// <summary>Obtém o relatório de blast radius de uma release.</summary>
     Task<BlastRadiusDto?> GetBlastRadiusAsync(Guid releaseId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Retorna releases criadas dentro de uma janela temporal.
+    /// Usado por anotações de dashboard para sobreposição em séries temporais.
+    /// </summary>
+    Task<IReadOnlyList<ReleaseSummaryDto>> GetReleasesInWindowAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>DTO de release para comunicação entre módulos.</summary>
@@ -26,6 +36,15 @@ public sealed record ReleaseDto(
     string Environment,
     string Status,
     string ChangeLevel,
+    DateTimeOffset CreatedAt);
+
+/// <summary>Sumário de release para consumo cross-module em dashboards e anotações.</summary>
+public sealed record ReleaseSummaryDto(
+    Guid ReleaseId,
+    string ServiceName,
+    string Version,
+    string Environment,
+    string Status,
     DateTimeOffset CreatedAt);
 
 /// <summary>DTO de blast radius para comunicação entre módulos.</summary>

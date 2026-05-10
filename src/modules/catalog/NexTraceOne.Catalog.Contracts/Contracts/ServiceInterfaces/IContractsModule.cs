@@ -20,4 +20,22 @@ public interface IContractsModule
 
     /// <summary>Verifica se a mudança mais recente de um ativo requer aprovação de workflow.</summary>
     Task<bool> RequiresWorkflowApprovalAsync(Guid apiAssetId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Retorna resumos de breaking changes detectados num intervalo de tempo.
+    /// Usado para anotações de dashboard — fonte "contracts".
+    /// </summary>
+    Task<IReadOnlyList<ContractBreakingChangeSummary>> GetRecentBreakingChangesAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken ct = default);
 }
+
+/// <summary>Resumo de um breaking change detectado por diff de contrato.</summary>
+public sealed record ContractBreakingChangeSummary(
+    Guid ApiAssetId,
+    string ApiAssetName,
+    string? OwnerServiceName,
+    int BreakingChangeCount,
+    DateTimeOffset DetectedAt);

@@ -3,6 +3,7 @@ using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Contracts.Contracts.ServiceInterfaces;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
+using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Services;
@@ -13,7 +14,8 @@ namespace NexTraceOne.Catalog.Infrastructure.Contracts.Services;
 /// </summary>
 internal sealed class ContractsModuleService(
     IContractVersionRepository contractVersionRepository,
-    ContractsDbContext contractsDbContext) : IContractsModule
+    ContractsDbContext contractsDbContext,
+    CatalogGraphDbContext graphDbContext) : IContractsModule
 {
     /// <inheritdoc />
     public async Task<ChangeLevel?> GetLatestChangeLevelAsync(Guid apiAssetId, CancellationToken ct = default)
@@ -79,5 +81,48 @@ internal sealed class ContractsModuleService(
         }
 
         return latestVersion.LifecycleState == ContractLifecycleState.InReview;
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ContractBreakingChangeSummary>> GetRecentBreakingChangesAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken ct = default)
+    {
+        var diffs = await contractsDbContext.ContractDiffs
+            .AsNoTracking()
+            .Where(d => d.ChangeLevel == ChangeLevel.Breaking
+                     && d.ComputedAt >= from
+                     && d.ComputedAt <= to)
+            .OrderByDescending(d => d.ComputedAt)
+            .Take(maxCount)
+            .ToListAsync(ct);
+
+        if (diffs.Count == 0)
+            return [];
+
+        var assetIds = diffs.Select(d => d.ApiAssetId).Distinct().ToList();
+        var assets = await graphDbContext.ApiAssets
+            .AsNoTracking()
+            .Include(a => a.OwnerService)
+            .Where(a => assetIds.Contains(a.Id.Value))
+            .ToListAsync(ct);
+
+        var assetMap = assets.ToDictionary(a => a.Id.Value);
+
+        return diffs
+            .Select(d =>
+            {
+                assetMap.TryGetValue(d.ApiAssetId, out var asset);
+                return new ContractBreakingChangeSummary(
+                    ApiAssetId: d.ApiAssetId,
+                    ApiAssetName: asset?.Name ?? d.ApiAssetId.ToString("N")[..8],
+                    OwnerServiceName: asset?.OwnerService?.Name,
+                    BreakingChangeCount: d.BreakingChanges.Count,
+                    DetectedAt: d.ComputedAt);
+            })
+            .ToList()
+            .AsReadOnly();
     }
 }

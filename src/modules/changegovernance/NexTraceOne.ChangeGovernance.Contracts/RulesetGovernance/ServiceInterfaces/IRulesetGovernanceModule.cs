@@ -12,7 +12,25 @@ public interface IRulesetGovernanceModule
 
     /// <summary>Verifica se uma release passou no linting com score acima do limiar.</summary>
     Task<bool> IsReleaseCompliantAsync(Guid releaseId, decimal minimumScore, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Retorna resultados de linting com violations (TotalFindings > 0) numa janela temporal.
+    /// Usado por anotações de dashboard para sobreposição em séries temporais.
+    /// </summary>
+    Task<IReadOnlyList<LintViolationSummaryDto>> GetRecentViolationsAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken cancellationToken = default);
 }
+
+/// <summary>Sumário de violation de linting para consumo cross-module em dashboards e anotações.</summary>
+public sealed record LintViolationSummaryDto(
+    Guid LintResultId,
+    Guid ReleaseId,
+    decimal Score,
+    int TotalFindings,
+    DateTimeOffset ExecutedAt);
 
 /// <summary>DTO de score de conformidade para comunicação entre módulos.</summary>
 public sealed record RulesetScoreDto(

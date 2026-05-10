@@ -35,6 +35,29 @@ internal sealed class RulesetGovernanceModuleService(
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<LintViolationSummaryDto>> GetRecentViolationsAsync(
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug("Fetching recent lint violations between {From} and {To}", from, to);
+
+        return await context.LintResults
+            .AsNoTracking()
+            .Where(lr => lr.ExecutedAt >= from && lr.ExecutedAt <= to && lr.TotalFindings > 0)
+            .OrderByDescending(lr => lr.ExecutedAt)
+            .Take(maxCount)
+            .Select(lr => new LintViolationSummaryDto(
+                lr.Id.Value,
+                lr.ReleaseId,
+                lr.Score,
+                lr.TotalFindings,
+                lr.ExecutedAt))
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<bool> IsReleaseCompliantAsync(
         Guid releaseId,
         decimal minimumScore,

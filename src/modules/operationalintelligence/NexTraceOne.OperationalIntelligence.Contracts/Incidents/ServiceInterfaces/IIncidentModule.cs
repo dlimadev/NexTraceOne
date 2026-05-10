@@ -36,6 +36,17 @@ public interface IIncidentModule
     /// Obtém um resumo de tendência de incidentes com dados agregados.
     /// </summary>
     Task<IncidentTrendSummary> GetTrendSummaryAsync(int days = 30, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retorna incidentes abertos ou detectados dentro de uma janela temporal.
+    /// Usado por anotações de dashboard para sobreposição em séries temporais.
+    /// </summary>
+    Task<IReadOnlyList<IncidentSummaryDto>> GetRecentIncidentsAsync(
+        string tenantId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -48,3 +59,14 @@ public sealed record IncidentTrendSummary(
     decimal AvgResolutionHours,
     decimal RecurrenceRate,
     string Trend);
+
+/// <summary>
+/// Sumário de incidente para consumo cross-module em dashboards e anotações.
+/// </summary>
+public sealed record IncidentSummaryDto(
+    Guid Id,
+    string Title,
+    string Severity,
+    string? ServiceName,
+    DateTimeOffset DetectedAt,
+    string Status);

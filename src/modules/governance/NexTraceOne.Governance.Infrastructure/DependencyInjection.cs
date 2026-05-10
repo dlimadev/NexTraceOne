@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Nql;
@@ -100,7 +101,8 @@ public static class DependencyInjection
         {
             services.Configure<ClickHouseOtelMetricOptions>(
                 configuration.GetSection(ClickHouseOtelMetricOptions.SectionName));
-            services.AddHttpClient<ClickHouseOtelMetricRepository>();
+            services.AddHttpClient<ClickHouseOtelMetricRepository>()
+                .AddStandardResilienceHandler();
             services.AddScoped<IOtelMetricRepository>(
                 sp => sp.GetRequiredService<ClickHouseOtelMetricRepository>());
         }

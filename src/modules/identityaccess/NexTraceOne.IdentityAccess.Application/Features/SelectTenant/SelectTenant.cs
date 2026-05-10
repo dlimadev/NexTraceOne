@@ -52,7 +52,8 @@ public static class SelectTenant
         ITenantRepository tenantRepository,
         IRoleRepository roleRepository,
         IJwtTokenGenerator jwtTokenGenerator,
-        IPermissionResolver permissionResolver) : ICommandHandler<Command, Response>
+        IPermissionResolver permissionResolver,
+        ITenantLicenseRepository licenseRepository) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -84,7 +85,13 @@ public static class SelectTenant
 
             var permissions = await permissionResolver.ResolvePermissionsAsync(
                 role.Id, role.Name, tenantId, cancellationToken);
-            var accessToken = jwtTokenGenerator.GenerateAccessToken(user, membership, permissions);
+
+            // SaaS-01: resolve capabilities from tenant license; Enterprise fallback for unlicensed tenants.
+            var license = await licenseRepository.GetByTenantIdAsync(tenantId.Value, cancellationToken);
+            var capabilities = license?.GetCapabilities() ?? TenantCapabilities.ForPlan(TenantPlan.Enterprise);
+
+            var accessToken = jwtTokenGenerator.GenerateAccessToken(
+                user, tenantId, [membership.RoleId], permissions, capabilities);
 
             return new Response(
                 accessToken,

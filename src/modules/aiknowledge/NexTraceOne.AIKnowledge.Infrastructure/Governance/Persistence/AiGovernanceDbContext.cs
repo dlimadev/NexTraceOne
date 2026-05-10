@@ -92,6 +92,13 @@ public sealed class AiGovernanceDbContext(
     public DbSet<PromptAsset> PromptAssets => Set<PromptAsset>();
     public DbSet<PromptVersion> PromptVersions => Set<PromptVersion>();
 
+    // ── Routing Policies & Agentic Execution Plans ────────────────────────────
+    public DbSet<ModelRoutingPolicy> ModelRoutingPolicies => Set<ModelRoutingPolicy>();
+    public DbSet<AgentExecutionPlan> AgentExecutionPlans => Set<AgentExecutionPlan>();
+
+    // ── AI Model Quality & Drift Governance (Wave AT.1) ───────────────────────
+    public DbSet<ModelPredictionSample> ModelPredictionSamples => Set<ModelPredictionSample>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 

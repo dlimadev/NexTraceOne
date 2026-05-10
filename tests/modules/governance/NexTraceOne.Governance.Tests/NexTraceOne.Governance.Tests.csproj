@@ -9,6 +9,7 @@
     <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Infrastructure\NexTraceOne.Governance.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.API\NexTraceOne.Governance.API.csproj" />
     <ProjectReference Include="..\..\..\..\src\modules\governance\NexTraceOne.Governance.Contracts\NexTraceOne.Governance.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Contracts\NexTraceOne.Catalog.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

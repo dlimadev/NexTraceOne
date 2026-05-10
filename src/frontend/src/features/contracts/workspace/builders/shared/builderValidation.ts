@@ -10,6 +10,7 @@ import type {
   SharedSchemaBuilderState,
   WebhookBuilderState,
   LegacyContractBuilderState,
+  DataContractBuilderState,
   BuilderValidationResult,
   BuilderValidationError,
   SchemaProperty,
@@ -550,6 +551,33 @@ export function validateLegacyContractBuilder(state: LegacyContractBuilderState)
   for (const f of state.fields) {
     if (!f.name.trim()) {
       errors.push({ field: `field.${f.id}.name`, messageKey: 'contracts.builder.validation.paramNameRequired', fallback: 'Field name is required' });
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+// ── Data Contract Validation ──────────────────────────────────────────────────
+
+export function validateDataContractBuilder(state: DataContractBuilderState): BuilderValidationResult {
+  const errors: BuilderValidationError[] = [];
+
+  if (!state.title.trim()) {
+    errors.push({ field: 'title', messageKey: 'contracts.builder.validation.titleRequired', fallback: 'Title is required' });
+  }
+  if (!state.owner.trim()) {
+    errors.push({ field: 'owner', messageKey: 'contracts.builder.validation.ownerRequired', fallback: 'Owner is required' });
+  }
+  if (!state.sourceSystem.trim()) {
+    errors.push({ field: 'sourceSystem', messageKey: 'contracts.builder.dataContract.sourceSystemRequired', fallback: 'Source system is required' });
+  }
+  if (state.columns.length === 0) {
+    errors.push({ field: 'columns', messageKey: 'contracts.builder.dataContract.columnsRequired', fallback: 'At least one column is required' });
+  }
+
+  for (const col of state.columns) {
+    if (!col.name.trim()) {
+      errors.push({ field: `column.${col.id}.name`, messageKey: 'contracts.builder.validation.paramNameRequired', fallback: 'Column name is required' });
     }
   }
 

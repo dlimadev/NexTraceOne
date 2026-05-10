@@ -3967,6 +3967,32 @@
           "refArrayItem": "#/components/schemas/OrderItem",
           "pattern": "^[a-z]+$"
         }
+      },
+      "dataContract": {
+        "contractInfo": "Informações do Data Contract",
+        "title": "Título",
+        "titlePlaceholder": "Data Contract de Perfil de Utilizador",
+        "version": "Versão",
+        "owner": "Responsável",
+        "ownerPlaceholder": "equipa-plataforma-dados",
+        "sourceSystem": "Sistema de Origem",
+        "sourceSystemPlaceholder": "postgres-utilizadores-db",
+        "sourceSystemRequired": "Sistema de origem é obrigatório",
+        "slaFreshnessHours": "SLA de Frescura (horas)",
+        "description": "Descrição",
+        "columns": "Colunas",
+        "addColumn": "Adicionar Coluna",
+        "noColumns": "Sem colunas. Clique em \"Adicionar Coluna\" para definir o schema.",
+        "columnsRequired": "É obrigatória pelo menos uma coluna",
+        "unnamedColumn": "Coluna sem nome",
+        "columnName": "Nome da Coluna",
+        "columnNamePlaceholder": "ex: user_id",
+        "columnType": "Tipo",
+        "piiLevel": "Classificação PII",
+        "nullable": "Nulo",
+        "columnDescription": "Descrição",
+        "validate": "Validar",
+        "generateSource": "Gerar JSON de Schema"
       }
     },
     "canonical": {
@@ -13635,6 +13661,39 @@
       "releaseNotFound": "Release não encontrada.",
       "invalidReleaseId": "É necessário um ID de release válido."
     }
+  },
+  "promotionReadinessDelta": {
+    "title": "Delta de Prontidão para Promoção",
+    "subtitle": "Compare métricas de comportamento runtime entre dois ambientes para avaliar a prontidão de promoção.",
+    "serviceLabel": "Nome do Serviço",
+    "servicePlaceholder": "ex: payment-service",
+    "fromEnvLabel": "Ambiente de Origem",
+    "fromEnvPlaceholder": "ex: staging",
+    "toEnvLabel": "Ambiente de Destino",
+    "toEnvPlaceholder": "ex: production",
+    "daysLabel": "Janela de Observação (dias)",
+    "checkButton": "Verificar Prontidão",
+    "readiness": {
+      "Ready": "Pronto",
+      "Review": "Revisão Necessária",
+      "Blocked": "Bloqueado",
+      "Unknown": "Dados Insuficientes"
+    },
+    "badge": {
+      "ready": "Pronto para Promover",
+      "review": "Revisão Necessária",
+      "blocked": "Bloqueado",
+      "unknown": "Sem Dados"
+    },
+    "errorRateDelta": "Delta de Taxa de Erro",
+    "latencyDelta": "Delta de Latência P95",
+    "incidentsDelta": "Delta de Incidentes",
+    "throughputDelta": "Delta de Throughput",
+    "dataQuality": "Qualidade dos Dados",
+    "simulatedNote": "Dados simulados — bridge de comparação runtime não configurada.",
+    "ms": "ms",
+    "incidents": "incidentes",
+    "noData": "—"
   },
   "promotionReadinessDeltaGate": {
     "title": "Gate de Prontidão para Promoção",

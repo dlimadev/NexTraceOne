@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Http.Resilience;
 using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure;
+using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.Abstractions;
+using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Contracts.IntegrationEvents;
 using NexTraceOne.ChangeGovernance.Contracts.IntegrationEvents;
 using NexTraceOne.Governance.Contracts;
@@ -20,14 +24,8 @@ using NexTraceOne.Notifications.Infrastructure.Persistence;
 using NexTraceOne.Notifications.Infrastructure.Persistence.Repositories;
 using NexTraceOne.Notifications.Infrastructure.Preferences;
 using NexTraceOne.Notifications.Infrastructure.Routing;
-// P7.1 – new stores
-using NexTraceOne.BuildingBlocks.Application.Abstractions;
-using NexTraceOne.BuildingBlocks.Infrastructure;
-using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
-using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.OperationalIntelligence.Contracts.IntegrationEvents;
 using IntegrationsContracts = NexTraceOne.Integrations.Contracts.IntegrationEvents;
-
 namespace NexTraceOne.Notifications.Infrastructure;
 
 /// <summary>
@@ -97,7 +95,8 @@ public static class DependencyInjection
         services.AddScoped<INotificationChannelDispatcher, TeamsNotificationDispatcher>();
 
         // HttpClientFactory para Teams webhook
-        services.AddHttpClient("NexTraceOneTeams");
+        services.AddHttpClient("NexTraceOneTeams")
+            .AddStandardResilienceHandler();
 
         // External delivery service (coordena roteamento + dispatch + logging)
         services.AddScoped<IExternalDeliveryService, ExternalDeliveryService>();

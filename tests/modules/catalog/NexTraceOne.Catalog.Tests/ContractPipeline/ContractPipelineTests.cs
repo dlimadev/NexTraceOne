@@ -1,10 +1,12 @@
 using Microsoft.Extensions.Logging.Abstractions;
 
+using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateClientSdkFromContract;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateContractTests;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateMockServer;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GeneratePostmanCollection;
 using NexTraceOne.Catalog.Application.Portal.ContractPipeline.Features.GenerateServerFromContract;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Tests.ContractPipeline;
 
@@ -31,6 +33,27 @@ public sealed class ContractPipelineTests
             }
         }
         """;
+
+    /// <summary>
+    /// Cria um mock de IContractVersionRepository que retorna uma ContractVersion com o spec indicado.
+    /// </summary>
+    private static IContractVersionRepository MockRepo(string specContent)
+    {
+        var version = ContractVersion.Import(Guid.NewGuid(), "1.0.0", specContent, "json", "test").Value;
+        var repo = Substitute.For<IContractVersionRepository>();
+        repo.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>())
+            .Returns(version);
+        return repo;
+    }
+
+    /// <summary>Cria um mock de repositório que retorna null (versão não encontrada).</summary>
+    private static IContractVersionRepository MockRepoNotFound()
+    {
+        var repo = Substitute.For<IContractVersionRepository>();
+        repo.GetByIdAsync(Arg.Any<ContractVersionId>(), Arg.Any<CancellationToken>())
+            .Returns((ContractVersion?)null);
+        return repo;
+    }
 
     // ── GenerateServerFromContract ────────────────────────────────────────
 
@@ -110,8 +133,9 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GenerateMockServer_WireMock_GeneratesStubFiles()
     {
-        var handler = new GenerateMockServer.Handler(NullLogger<GenerateMockServer.Handler>.Instance);
-        var command = new GenerateMockServer.Command(ContractVersionId, SampleOpenApiJson, "wiremock");
+        var repo = MockRepo(SampleOpenApiJson);
+        var handler = new GenerateMockServer.Handler(repo, NullLogger<GenerateMockServer.Handler>.Instance);
+        var command = new GenerateMockServer.Command(ContractVersionId, "wiremock");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -124,8 +148,9 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GenerateMockServer_JsonServer_GeneratesDbAndRoutes()
     {
-        var handler = new GenerateMockServer.Handler(NullLogger<GenerateMockServer.Handler>.Instance);
-        var command = new GenerateMockServer.Command(ContractVersionId, SampleOpenApiJson, "json-server");
+        var repo = MockRepo(SampleOpenApiJson);
+        var handler = new GenerateMockServer.Handler(repo, NullLogger<GenerateMockServer.Handler>.Instance);
+        var command = new GenerateMockServer.Command(ContractVersionId, "json-server");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -136,10 +161,23 @@ public sealed class ContractPipelineTests
     }
 
     [Fact]
+    public async Task GenerateMockServer_ContractNotFound_ReturnsNotFoundError()
+    {
+        var repo = MockRepoNotFound();
+        var handler = new GenerateMockServer.Handler(repo, NullLogger<GenerateMockServer.Handler>.Instance);
+        var command = new GenerateMockServer.Command(ContractVersionId, "wiremock");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("contract.version.not_found");
+    }
+
+    [Fact]
     public void GenerateMockServer_Validator_InvalidType_Fails()
     {
         var validator = new GenerateMockServer.Validator();
-        var result = validator.Validate(new GenerateMockServer.Command(ContractVersionId, "{}", "swagger-mock"));
+        var result = validator.Validate(new GenerateMockServer.Command(ContractVersionId, "swagger-mock"));
         result.IsValid.Should().BeFalse();
     }
 
@@ -148,8 +186,9 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GeneratePostmanCollection_ValidContract_GeneratesCollection()
     {
-        var handler = new GeneratePostmanCollection.Handler();
-        var command = new GeneratePostmanCollection.Command(ContractVersionId, SampleOpenApiJson, "Users API Collection");
+        var repo = MockRepo(SampleOpenApiJson);
+        var handler = new GeneratePostmanCollection.Handler(repo);
+        var command = new GeneratePostmanCollection.Command(ContractVersionId, "Users API Collection");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -161,8 +200,9 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GeneratePostmanCollection_InvalidJson_GeneratesEmptyCollection()
     {
-        var handler = new GeneratePostmanCollection.Handler();
-        var command = new GeneratePostmanCollection.Command(ContractVersionId, "invalid json", "Test");
+        var repo = MockRepo("invalid json");
+        var handler = new GeneratePostmanCollection.Handler(repo);
+        var command = new GeneratePostmanCollection.Command(ContractVersionId, "Test");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -171,10 +211,23 @@ public sealed class ContractPipelineTests
     }
 
     [Fact]
+    public async Task GeneratePostmanCollection_ContractNotFound_ReturnsNotFoundError()
+    {
+        var repo = MockRepoNotFound();
+        var handler = new GeneratePostmanCollection.Handler(repo);
+        var command = new GeneratePostmanCollection.Command(ContractVersionId, "Test");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("contract.version.not_found");
+    }
+
+    [Fact]
     public void GeneratePostmanCollection_Validator_EmptyName_Fails()
     {
         var validator = new GeneratePostmanCollection.Validator();
-        var result = validator.Validate(new GeneratePostmanCollection.Command(ContractVersionId, "{}", ""));
+        var result = validator.Validate(new GeneratePostmanCollection.Command(ContractVersionId, ""));
         result.IsValid.Should().BeFalse();
     }
 
@@ -183,8 +236,9 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GenerateContractTests_XUnit_GeneratesTestFile()
     {
-        var handler = new GenerateContractTests.Handler();
-        var command = new GenerateContractTests.Command(ContractVersionId, SampleOpenApiJson, "UsersService", "xunit");
+        var repo = MockRepo(SampleOpenApiJson);
+        var handler = new GenerateContractTests.Handler(repo);
+        var command = new GenerateContractTests.Command(ContractVersionId, "UsersService", "xunit");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -197,8 +251,9 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GenerateContractTests_Jest_GeneratesTestFile()
     {
-        var handler = new GenerateContractTests.Handler();
-        var command = new GenerateContractTests.Command(ContractVersionId, SampleOpenApiJson, "UsersService", "jest");
+        var repo = MockRepo(SampleOpenApiJson);
+        var handler = new GenerateContractTests.Handler(repo);
+        var command = new GenerateContractTests.Command(ContractVersionId, "UsersService", "jest");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -209,8 +264,9 @@ public sealed class ContractPipelineTests
     [Fact]
     public async Task GenerateContractTests_Robot_GeneratesTestFile()
     {
-        var handler = new GenerateContractTests.Handler();
-        var command = new GenerateContractTests.Command(ContractVersionId, SampleOpenApiJson, "UsersService", "robot");
+        var repo = MockRepo(SampleOpenApiJson);
+        var handler = new GenerateContractTests.Handler(repo);
+        var command = new GenerateContractTests.Command(ContractVersionId, "UsersService", "robot");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -219,10 +275,23 @@ public sealed class ContractPipelineTests
     }
 
     [Fact]
+    public async Task GenerateContractTests_ContractNotFound_ReturnsNotFoundError()
+    {
+        var repo = MockRepoNotFound();
+        var handler = new GenerateContractTests.Handler(repo);
+        var command = new GenerateContractTests.Command(ContractVersionId, "UsersService", "xunit");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Code.Should().Be("contract.version.not_found");
+    }
+
+    [Fact]
     public void GenerateContractTests_Validator_UnsupportedFramework_Fails()
     {
         var validator = new GenerateContractTests.Validator();
-        var result = validator.Validate(new GenerateContractTests.Command(ContractVersionId, "{}", "Svc", "mocha-chai"));
+        var result = validator.Validate(new GenerateContractTests.Command(ContractVersionId, "Svc", "mocha-chai"));
         result.IsValid.Should().BeFalse();
     }
 

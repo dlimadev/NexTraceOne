@@ -43,6 +43,10 @@ public sealed class IntegrationsDbContext(
     /// <summary>Regras de transformação de log em métrica por tenant (PIP-06).</summary>
     public DbSet<LogToMetricRule> LogToMetricRules => Set<LogToMetricRule>();
 
+    /// <summary>Registos de eventos que falharam o processamento no consumer worker.</summary>
+    public DbSet<EventConsumerDeadLetterRecord> EventConsumerDeadLetters
+        => Set<EventConsumerDeadLetterRecord>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IntegrationsDbContext).Assembly;
 

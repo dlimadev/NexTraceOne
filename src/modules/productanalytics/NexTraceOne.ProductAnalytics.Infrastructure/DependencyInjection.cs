@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
@@ -42,7 +43,8 @@ public static class DependencyInjection
         {
             services.Configure<ClickHouseAnalyticsOptions>(
                 configuration.GetSection(ClickHouseAnalyticsOptions.SectionName));
-            services.AddHttpClient<ClickHouseAnalyticsEventRepository>();
+            services.AddHttpClient<ClickHouseAnalyticsEventRepository>()
+                .AddStandardResilienceHandler();
             services.AddScoped<IAnalyticsEventRepository>(
                 sp => sp.GetRequiredService<ClickHouseAnalyticsEventRepository>());
         }

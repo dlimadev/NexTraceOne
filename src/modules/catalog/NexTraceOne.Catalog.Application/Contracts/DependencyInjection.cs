@@ -65,6 +65,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftContent;
 using NexTraceOne.Catalog.Application.Contracts.Features.UpdateDraftMetadata;
 using NexTraceOne.Catalog.Application.Contracts.Features.ValidateContractIntegrity;
 using NexTraceOne.Catalog.Application.Contracts.Features.PropagateCanonicalEntityChange;
+using NexTraceOne.Catalog.Application.Contracts.Features.RespondToBreakingChangeProposal;
 using NexTraceOne.Catalog.Application.Contracts.Features.RegisterConsumerExpectation;
 using NexTraceOne.Catalog.Application.Contracts.Features.SearchMarketplace;
 using NexTraceOne.Catalog.Application.Contracts.Features.SubmitContractReview;
@@ -188,6 +189,9 @@ public static class DependencyInjection
             GetHighTrafficEndpointRiskReport.Validator>();
         services.AddSingleton<ITrafficObservationReader, NullTrafficObservationReader>();
         services.AddSingleton<IHighTrafficEndpointReader, NullHighTrafficEndpointReader>();
+
+        // CC-06 — Breaking Change Proposal workflow
+        services.AddTransient<IValidator<RespondToBreakingChangeProposal.Command>, RespondToBreakingChangeProposal.Validator>();
 
         return services;
     }

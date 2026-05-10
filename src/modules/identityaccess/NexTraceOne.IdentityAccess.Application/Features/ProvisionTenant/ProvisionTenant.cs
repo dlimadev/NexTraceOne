@@ -2,10 +2,14 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using MediatR;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
+using SeedModulePolicies = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultModuleAccessPolicies.SeedDefaultModuleAccessPolicies;
+using SeedRolePerms = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions.SeedDefaultRolePermissions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 
 namespace NexTraceOne.IdentityAccess.Application.Features.ProvisionTenant;
@@ -14,7 +18,8 @@ namespace NexTraceOne.IdentityAccess.Application.Features.ProvisionTenant;
 /// SaaS-05: Provisiona um novo tenant completo:
 ///   1. Cria o tenant (slug único)
 ///   2. Provisiona TenantLicense (plano selecionado)
-///   3. Retorna IDs para linking
+///   3. Garante que roles e políticas de acesso padrão do sistema estão semeados (idempotente)
+///   4. Retorna IDs para linking
 ///
 /// Saga simples: se a licença falhar, o tenant é ainda criado mas sem licença.
 /// Frontend deve mostrar estado parcial e permitir retry da licença.
@@ -56,7 +61,8 @@ public static class ProvisionTenant
         ITenantRepository tenantRepository,
         ITenantLicenseRepository licenseRepository,
         IDateTimeProvider dateTimeProvider,
-        IIdentityAccessUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        IIdentityAccessUnitOfWork unitOfWork,
+        ISender sender) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -90,6 +96,11 @@ public static class ProvisionTenant
             licenseRepository.Add(license);
 
             await unitOfWork.CommitAsync(cancellationToken);
+
+            // Step 3: Garantir que defaults do sistema estão semeados (idempotente — adiciona delta apenas).
+            // Executado após commit para não atrasar rollback em caso de falha no provisionamento.
+            await sender.Send(new SeedRolePerms.Command(), cancellationToken);
+            await sender.Send(new SeedModulePolicies.Command(), cancellationToken);
 
             return Result<Response>.Success(new Response(
                 tenant.Id.Value,

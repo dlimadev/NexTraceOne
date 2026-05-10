@@ -95,6 +95,29 @@ internal sealed class IncidentModuleService(
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<IncidentSummaryDto>> GetRecentIncidentsAsync(
+        string tenantId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        int maxCount = 50,
+        CancellationToken cancellationToken = default)
+    {
+        logger.LogDebug("Fetching recent incidents for tenant {TenantId} between {From} and {To}", tenantId, from, to);
+
+        if (!Guid.TryParse(tenantId, out var tenantGuid))
+            return Array.Empty<IncidentSummaryDto>();
+
+        return await context.Incidents
+            .AsNoTracking()
+            .Where(i => i.TenantId == tenantGuid && i.DetectedAt >= from && i.DetectedAt <= to)
+            .OrderByDescending(i => i.DetectedAt)
+            .Take(maxCount)
+            .Select(i => new IncidentSummaryDto(
+                i.Id.Value, i.Title, i.Severity.ToString(), i.ServiceName, i.DetectedAt, i.Status.ToString()))
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<IncidentTrendSummary> GetTrendSummaryAsync(int days = 30, CancellationToken cancellationToken = default)
     {
         logger.LogDebug("Getting incident trend summary for last {Days} days", days);

@@ -190,4 +190,87 @@ public sealed class TenantResolutionMiddlewareTests
 
         nextCalled.Should().BeTrue();
     }
+
+    // SaaS-01: capability propagation tests ───────────────────────────────
+
+    [Fact]
+    public async Task InvokeAsync_WithCapabilityClaims_PopulatesHasCapability()
+    {
+        // JWT contains capabilities claims → HasCapability() must return true for them.
+        var (middleware, accessor) = CreateMiddleware();
+        var tenantId = Guid.NewGuid();
+        var context = new DefaultHttpContext();
+
+        var claims = new List<Claim>
+        {
+            new("tenant_id", tenantId.ToString()),
+            new("capabilities", "apm"),
+            new("capabilities", "contract_studio"),
+        };
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Test"));
+
+        await middleware.InvokeAsync(context, accessor);
+
+        accessor.HasCapability("apm").Should().BeTrue("'apm' was present in JWT capabilities claims");
+        accessor.HasCapability("contract_studio").Should().BeTrue("'contract_studio' was present in JWT capabilities claims");
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WithCapabilityClaims_ReturnsFalse_ForAbsentCapability()
+    {
+        // HasCapability() must return false for capabilities not included in the JWT.
+        var (middleware, accessor) = CreateMiddleware();
+        var tenantId = Guid.NewGuid();
+        var context = new DefaultHttpContext();
+
+        var claims = new List<Claim>
+        {
+            new("tenant_id", tenantId.ToString()),
+            new("capabilities", "apm"),
+        };
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Test"));
+
+        await middleware.InvokeAsync(context, accessor);
+
+        accessor.HasCapability("multi_region").Should().BeFalse("'multi_region' was not in JWT capabilities claims");
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WithNoCapabilityClaims_HasCapabilityReturnsFalse()
+    {
+        // When the JWT has no capabilities claims, HasCapability() must return false for everything.
+        var (middleware, accessor) = CreateMiddleware();
+        var tenantId = Guid.NewGuid();
+        var context = new DefaultHttpContext();
+
+        var claims = new List<Claim> { new("tenant_id", tenantId.ToString()) };
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Test"));
+
+        await middleware.InvokeAsync(context, accessor);
+
+        accessor.HasCapability("apm").Should().BeFalse("no capabilities claims were present in JWT");
+        accessor.HasCapability("contract_studio").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WithHeaderFallback_AndCapabilityClaims_PopulatesHasCapability()
+    {
+        // Header fallback path also reads capabilities from JWT (authenticated request without tenant_id claim).
+        var (middleware, accessor) = CreateMiddleware();
+        var tenantId = Guid.NewGuid();
+        var context = new DefaultHttpContext();
+        context.Request.Headers["X-Tenant-Id"] = tenantId.ToString();
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, "user"),
+            new("capabilities", "finops"),
+        };
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Test"));
+
+        await middleware.InvokeAsync(context, accessor);
+
+        accessor.Id.Should().Be(tenantId);
+        accessor.HasCapability("finops").Should().BeTrue("'finops' was present in JWT capabilities claims even when tenant resolved from header");
+    }
 }

@@ -2713,6 +2713,32 @@
           "refArrayItem": "#/components/schemas/OrderItem",
           "pattern": "^[a-z]+$"
         }
+      },
+      "dataContract": {
+        "contractInfo": "Data Contract Information",
+        "title": "Title",
+        "titlePlaceholder": "User Profile Data Contract",
+        "version": "Version",
+        "owner": "Owner",
+        "ownerPlaceholder": "team-data-platform",
+        "sourceSystem": "Source System",
+        "sourceSystemPlaceholder": "postgres-users-db",
+        "sourceSystemRequired": "Source system is required",
+        "slaFreshnessHours": "SLA Freshness (hours)",
+        "description": "Description",
+        "columns": "Columns",
+        "addColumn": "Add Column",
+        "noColumns": "No columns yet. Click \"Add Column\" to define the schema.",
+        "columnsRequired": "At least one column is required",
+        "unnamedColumn": "Unnamed Column",
+        "columnName": "Column Name",
+        "columnNamePlaceholder": "e.g. user_id",
+        "columnType": "Type",
+        "piiLevel": "PII Classification",
+        "nullable": "Nullable",
+        "columnDescription": "Description",
+        "validate": "Validate",
+        "generateSource": "Generate Schema JSON"
       }
     },
     "canonical": {
@@ -12373,6 +12399,39 @@
       "releaseNotFound": "Release not found.",
       "invalidReleaseId": "A valid release ID is required."
     }
+  },
+  "promotionReadinessDelta": {
+    "title": "Promotion Readiness Delta",
+    "subtitle": "Compare runtime behaviour metrics between two environments to assess promotion readiness.",
+    "serviceLabel": "Service Name",
+    "servicePlaceholder": "e.g. payment-service",
+    "fromEnvLabel": "Source Environment",
+    "fromEnvPlaceholder": "e.g. staging",
+    "toEnvLabel": "Target Environment",
+    "toEnvPlaceholder": "e.g. production",
+    "daysLabel": "Observation Window (days)",
+    "checkButton": "Check Readiness",
+    "readiness": {
+      "Ready": "Ready",
+      "Review": "Review Required",
+      "Blocked": "Blocked",
+      "Unknown": "Insufficient Data"
+    },
+    "badge": {
+      "ready": "Ready to Promote",
+      "review": "Review Required",
+      "blocked": "Blocked",
+      "unknown": "No Data"
+    },
+    "errorRateDelta": "Error Rate Delta",
+    "latencyDelta": "Latency P95 Delta",
+    "incidentsDelta": "Incidents Delta",
+    "throughputDelta": "Throughput Delta",
+    "dataQuality": "Data Quality",
+    "simulatedNote": "Simulated data — runtime comparison bridge not configured.",
+    "ms": "ms",
+    "incidents": "incidents",
+    "noData": "—"
   },
   "promotionReadinessDeltaGate": {
     "title": "Promotion Readiness Delta Gate",
