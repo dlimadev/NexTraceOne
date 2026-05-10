@@ -4,8 +4,8 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Features.ProvisionTenant;
-using NexTraceOne.IdentityAccess.Application.Features.SeedDefaultModuleAccessPolicies;
-using NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions;
+using SeedModulePolicies = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultModuleAccessPolicies.SeedDefaultModuleAccessPolicies;
+using SeedRolePerms = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions.SeedDefaultRolePermissions;
 using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
 namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
@@ -129,9 +129,9 @@ public sealed class ProvisionTenantTests
         var callOrder = new List<string>();
         uow.When(u => u.CommitAsync(Arg.Any<CancellationToken>()))
             .Do(_ => callOrder.Add("commit"));
-        sender.When(s => s.Send(Arg.Any<SeedDefaultRolePermissions.Command>(), Arg.Any<CancellationToken>()))
+        sender.When(s => s.Send(Arg.Any<SeedRolePerms.Command>(), Arg.Any<CancellationToken>()))
             .Do(_ => callOrder.Add("seed-roles"));
-        sender.When(s => s.Send(Arg.Any<SeedDefaultModuleAccessPolicies.Command>(), Arg.Any<CancellationToken>()))
+        sender.When(s => s.Send(Arg.Any<SeedModulePolicies.Command>(), Arg.Any<CancellationToken>()))
             .Do(_ => callOrder.Add("seed-policies"));
 
         var cmd = new ProvisionTenant.Command("Ordered Corp", "ordered-corp", "Enterprise", 10, null, null);
