@@ -1360,6 +1360,7 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 

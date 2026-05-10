@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,10 +33,20 @@ public static class DependencyInjection
         var connectionString = configuration.GetRequiredConnectionString("ConfigurationDatabase", "NexTraceOne");
 
         services.AddDbContext<ConfigurationDbContext>((serviceProvider, options) =>
+        {
             options.UseNpgsql(connectionString)
                 .AddInterceptors(
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
+                    serviceProvider.GetRequiredService<TenantRlsInterceptor>());
+
+            if (string.Equals(
+                Environment.GetEnvironmentVariable("NEXTRACE_IGNORE_PENDING_MODEL_CHANGES"),
+                "true",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            }
+        });
 
         // UnitOfWork
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ConfigurationDbContext>());
