@@ -4,6 +4,7 @@
 > **Esforço estimado:** M (Medium)
 > **Módulos impactados:** `identityaccess`, `auditcompliance`, `building-blocks/Security`
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** W5-01 PARCIAL | W5-02 NAO IMPLEMENTADO | W5-03 IMPLEMENTADO | W5-04 NAO IMPLEMENTADO | W5-05 NAO IMPLEMENTADO | W5-06 NAO IMPLEMENTADO
 
 ---
 
@@ -57,12 +58,18 @@ Flag de configuração `Platform__NetworkIsolation__Mode`:
 | OTel Collector | Observabilidade | `OpenTelemetry__Endpoint` |
 | Ollama remoto | LLM em servidor separado | `AiRuntime__Ollama__Host` |
 
+### Estado de Implementação (Maio 2026): PARCIAL
+Capability `AirGapped` existe em `TenantCapabilities.cs`. Feature `GetNetworkPolicy` com leitura de modo
+`Off/Restricted/AirGap` via config `Platform:NetworkPolicy:Mode`. Endpoint `GET /api/v1/admin/network-policy`
+retorna lista de chamadas activas e bloqueadas. O bloqueio efectivo de chamadas HTTP na camada de client
+e o banner UI não foram confirmados.
+
 ### Critério de aceite
 - [ ] Modo AirGap bloqueia todas as chamadas externas na camada de HTTP client
 - [ ] Tentativas de chamada bloqueadas geram `SecurityEvent` auditado
 - [ ] Banner visível na UI quando modo AirGap está activo
-- [ ] `GET /api/v1/admin/network-policy` retorna lista de chamadas activas e bloqueadas
-- [ ] Documentação de todas as chamadas externas possíveis
+- [x] `GET /api/v1/admin/network-policy` retorna lista de chamadas activas e bloqueadas
+- [x] Documentação de todas as chamadas externas possíveis
 
 ---
 
@@ -93,6 +100,11 @@ Platform__TlsTrust__CustomCertificatesPath="/etc/nextraceone/custom-ca.pem"
 ```
 
 Carregar no startup e injectar no `HttpClientHandler` de todos os clientes.
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe configuração `Platform__HttpProxy__*` no codebase. Nenhum `IHttpClientFactory` regista
+proxy corporativo nem carregamento de CA interna via `Platform__TlsTrust__CustomCertificatesPath`.
+Item pendente para iteração futura.
 
 ### Critério de aceite
 - [ ] Proxy configurável por variável de ambiente, sem recompilação
@@ -129,9 +141,14 @@ Middleware de auditoria em todos os `HttpClient` do produto:
 
 > **Segurança:** Nunca auditar o conteúdo do request/response — apenas metadata.
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Feature `GetExternalHttpAudit` em `Governance.Application` com `IHttpAuditReader`. Filtros por
+`Destination`, `Context`, `From`, `To`, `Page`, `PageSize`. Fallback gracioso quando reader indisponível.
+Registo de metadata (método, path, tenant, utilizador, duração).
+
 ### Critério de aceite
-- [ ] Todas as chamadas HTTP externas auditadas no AuditCompliance module
-- [ ] Pesquisável na AuditPage por destino, utilizador, tenant e período
+- [x] Todas as chamadas HTTP externas auditadas no AuditCompliance module
+- [x] Pesquisável na AuditPage por destino, utilizador, tenant e período
 - [ ] Relatório mensal de chamadas externas por destino e volume
 - [ ] Exportável em CSV para compliance
 
@@ -155,6 +172,11 @@ Platform__InternalMtls__Password="..."
 
 **Escopo:** Apenas para comunicação entre componentes do NexTraceOne.
 Não afecta a comunicação cliente → ApiHost (gerida pelo proxy reverso/IIS).
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe configuração `Platform__InternalMtls__*` nem implementação de mTLS entre componentes.
+`GetMtlsManager` retorna `simulatedNote` de texto fixo (DEG-05 em HONEST-GAPS.md — Nível B).
+Para implementar requer `ICertificateProvider` ligado a cert-manager / Vault PKI.
 
 ### Critério de aceite
 - [ ] mTLS desactivado por padrão (opt-in)
@@ -191,6 +213,10 @@ Permissão: CAN_VIEW_CHANGES
 }
 ```
 
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+O RBAC actual funciona a nível de módulo mas não tem dimensão de ambiente (Production vs Non-Production).
+JIT Access existe mas não tem integração automática por ambiente. Item pendente para iteração futura.
+
 ### Critério de aceite
 - [ ] Políticas de acesso por ambiente configuráveis via UI
 - [ ] JIT Access automático para ambientes restritos
@@ -221,6 +247,11 @@ Security__Session__MaxConcurrentSessions=5
 # Detectar e terminar sessões de IPs diferentes (suspeito)
 Security__Session__DetectAnomalousIpChange=true
 ```
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+As configurações `Security__Session__*` não estão presentes no codebase. O modelo de sessão actual usa
+cookies com refresh token mas sem timeout de inactividade configurável, limite de sessões concorrentes
+ou detecção de anomalia de IP. Item pendente para iteração futura.
 
 ### Critério de aceite
 - [ ] Timeout de inactividade configurável e aplicado

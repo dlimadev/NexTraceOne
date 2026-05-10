@@ -31,6 +31,7 @@ using GetCompliancePacksFeature = NexTraceOne.Governance.Application.Features.Ge
 using GetHardwareAssessmentFeature = NexTraceOne.Governance.Application.Features.GetHardwareAssessment.GetHardwareAssessment;
 using GetSetupWizardStatusFeature = NexTraceOne.Governance.Application.Features.GetSetupWizardStatus.GetSetupWizardStatus;
 using SaveSetupWizardStepFeature = NexTraceOne.Governance.Application.Features.SaveSetupWizardStep.SaveSetupWizardStep;
+using TestNetworkConnectivityFeature = NexTraceOne.Governance.Application.Features.TestNetworkConnectivity.TestNetworkConnectivity;
 
 namespace NexTraceOne.Governance.API.Endpoints;
 
@@ -357,6 +358,17 @@ public sealed class PlatformAdminEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new GetProxyConfigFeature.TestProxyConnectivity(), cancellationToken);
+            return result.ToHttpResult(localizer);
+        }).RequirePermission("platform:admin:write");
+
+        // ── Network Connectivity Test (W5-02) ─────────────────────────────────────
+        admin.MapPost("/network/test", async (
+            TestNetworkConnectivityFeature.Command command,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(command, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("platform:admin:write");
 

@@ -69,7 +69,19 @@ builder.Services.AddBuildingBlocksDbContext(builder.Configuration);
 builder.Services.AddBuildingBlocksObservability(builder.Configuration);
 builder.Services.AddBuildingBlocksAnalytics(builder.Configuration);
 builder.Services.AddBuildingBlocksSecurity(builder.Configuration);
+builder.Services.AddBuildingBlocksInfrastructure(builder.Configuration);
 builder.Services.AddApiHostOperationalHealthChecks();
+
+// [3.0-a] AirGap enforcement + proxy/CA corporativo — aplica-se a todos os HttpClients
+builder.Services.ConfigureHttpClientDefaults(b =>
+{
+    b.ConfigurePrimaryHttpMessageHandler(sp =>
+    {
+        var cfg = sp.GetRequiredService<NexTraceOne.BuildingBlocks.Infrastructure.Http.HttpClientConfiguration>();
+        return cfg.BuildHandler() ?? new System.Net.Http.HttpClientHandler();
+    });
+    b.AddHttpMessageHandler<NexTraceOne.BuildingBlocks.Infrastructure.Http.AirGapHttpMessageHandler>();
+});
 
 // [3.0] Distributed cache — Redis quando ConnectionStrings:Redis está configurado, memory cache caso contrário.
 // IMemoryCache também é registado internamente para componentes que dependem do cache em processo.

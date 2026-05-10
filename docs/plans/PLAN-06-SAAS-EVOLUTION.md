@@ -1,10 +1,11 @@
 # Plano 06 — SaaS Evolution
 
-> **Prioridade:** 🟠 Roadmap  
+> **Prioridade:** Roadmap  
 > **Esforço total:** 12–20 semanas  
 > **Spec técnica:** [SAAS-ROADMAP.md](../SAAS-ROADMAP.md) · [SAAS-STRATEGY.md](../SAAS-STRATEGY.md) · [SAAS-LICENSING.md](../SAAS-LICENSING.md) · [NEXTTRACE-AGENT.md](../NEXTTRACE-AGENT.md)  
 > **Posicionamento:** "A plataforma de governança operacional que o Dynatrace não é, com observabilidade que o Dynatrace tem."  
 > **Nota:** Este grupo endereça o modelo SaaS. O core produto v1.0.0 é READY; estes itens são necessários para operação comercial multi-tenant gerida.
+> **Estado (Maio 2026):** SaaS-01 IMPLEMENTADO | SaaS-02 A VERIFICAR | SaaS-03 IMPLEMENTADO | SaaS-04 IMPLEMENTADO | SaaS-05 A VERIFICAR | SaaS-06 NAO IMPLEMENTADO | SaaS-07 A VERIFICAR | SaaS-08 IMPLEMENTADO
 
 ---
 
@@ -218,10 +219,14 @@ package-agent-windows:
 | SaaS-07 | Log Search UI | P1 | 2 semanas | Fase 2 Infra (CH) |
 | SaaS-08 | Alerting Engine | P1 | 2 semanas | — |
 
-## Critérios de Aceite
+## Critérios de Aceite (estado Maio 2026)
 
-- [ ] `HasCapability("ai_governance")` retorna `false` para tenant Starter
-- [ ] NexTrace Agent instalável em Linux x86_64 com 1 comando e a enviar dados em 5min
-- [ ] Novo tenant provisionado automaticamente (0 intervenção manual) em < 2min
-- [ ] Log search retorna resultados em < 2s para queries simples
-- [ ] Alerta de SLO breach dispara em < 2min após evento
+- [x] `HasCapability("ai_governance")` retorna `false` para tenant Starter — implementado via `ICapabilityResolver` e JWT claims *(SaaS-01 implementado)*
+- [ ] NexTrace Agent instalável em Linux x86_64 com 1 comando e a enviar dados em 5min *(SaaS-02 — a verificar)*
+- [ ] Novo tenant provisionado automaticamente (0 intervenção manual) em < 2min *(SaaS-05 — a verificar)*
+- [ ] Log search retorna resultados em < 2s para queries simples *(SaaS-07 — a verificar)*
+- [x] Alerta de SLO breach dispara em < 2min após evento — `AlertEvaluationJob` implementado *(SaaS-08 implementado)*
+
+**Itens confirmados implementados:** `AgentRegistration` entity + heartbeat endpoint (SaaS-03),
+`TenantLicense` entity + `LicenseRecalculationJob` (SaaS-04), `AlertEvaluationJob` (SaaS-08).
+**Pendente:** `OnboardingWizard` SaaS-06 não implementado.

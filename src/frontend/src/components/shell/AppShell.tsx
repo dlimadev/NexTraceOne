@@ -9,6 +9,7 @@ import { AppTopbar } from './AppTopbar';
 import { AppContentFrame } from './AppContentFrame';
 import { MobileDrawer } from './MobileDrawer';
 import { EnvironmentBanner } from './EnvironmentBanner';
+import { AirGapBanner } from './AirGapBanner';
 import { AnalyticsEventTracker } from '../../features/product-analytics';
 import { AppFooter } from './AppFooter';
 import { RouteProgressBar } from '../RouteProgressBar';
@@ -124,6 +125,7 @@ export function AppShell() {
             onOpenMobileMenu={openMobile}
             sidebarCollapsed={sidebarCollapsed}
           />
+          <AirGapBanner />
           <EnvironmentBanner />
         </header>
         <div className="flex-1 min-h-0">

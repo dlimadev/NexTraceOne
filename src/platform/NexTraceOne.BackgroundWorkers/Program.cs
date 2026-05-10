@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NexTraceOne.BackgroundWorkers;
+using NexTraceOne.BackgroundWorkers.Backup;
 using NexTraceOne.BackgroundWorkers.Configuration;
+using NexTraceOne.BackgroundWorkers.Elasticsearch;
+using NexTraceOne.BackgroundWorkers.Health;
 using NexTraceOne.BackgroundWorkers.Jobs;
 using NexTraceOne.BackgroundWorkers.Jobs.ExpirationHandlers;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -74,6 +77,8 @@ using NexTraceOne.Configuration.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<IPlatformHealthReader, DefaultPlatformHealthReader>();
+builder.Services.AddSingleton<IBackupProcess, PgDumpBackupProcess>();
 builder.Services.AddSingleton<IDateTimeProvider, WorkerDateTimeProvider>();
 builder.Services.AddSingleton<ICurrentUser, WorkerCurrentUser>();
 builder.Services.AddSingleton<ICurrentTenant, WorkerCurrentTenant>();
@@ -115,6 +120,8 @@ builder.Services.Configure<DriftDetectionOptions>(
     builder.Configuration.GetSection(DriftDetectionOptions.SectionName));
 builder.Services.Configure<ContractConsumerIngestionOptions>(
     builder.Configuration.GetSection(ContractConsumerIngestionOptions.SectionName));
+builder.Services.Configure<BackupOptions>(
+    builder.Configuration.GetSection(BackupOptions.SectionName));
 builder.Services.AddNexTraceHealthChecks();
 builder.Services.AddHealthChecks()
     .AddCheck<DbContextConnectivityHealthCheck<IdentityDbContext>>(
@@ -281,7 +288,27 @@ builder.Services.AddHealthChecks()
         "license-recalculation-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
-        args: [LicenseRecalculationJob.HealthCheckName, TimeSpan.FromMinutes(30)]);
+        args: [LicenseRecalculationJob.HealthCheckName, TimeSpan.FromMinutes(30)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "platform-health-monitor-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [PlatformHealthMonitorJob.HealthCheckName, TimeSpan.FromMinutes(15)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "backup-coordinator-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [BackupCoordinatorJob.HealthCheckName, TimeSpan.FromHours(25)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "waste-detection-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [WasteDetectionJob.HealthCheckName, TimeSpan.FromHours(25)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "elasticsearch-index-maintenance-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [ElasticsearchIndexMaintenanceJob.HealthCheckName, TimeSpan.FromHours(7)]);
 
 // Handlers de expiração — cada um processa um único tipo de entidade expirável.
 // A ordem de registro define a ordem de execução no IdentityExpirationJob.
@@ -345,6 +372,20 @@ builder.Services.AddHostedService<CloudBillingIngestionJob>();
 builder.Services.AddHostedService<IncidentProbabilityRefreshJob>();
 builder.Services.AddHostedService<ContractConsumerIngestionJob>();
 builder.Services.AddHostedService<LicenseRecalculationJob>();
+builder.Services.AddHostedService<PlatformHealthMonitorJob>();
+builder.Services.AddHostedService<BackupCoordinatorJob>();
+builder.Services.AddHostedService<WasteDetectionJob>();
+builder.Services.AddHostedService<ElasticsearchIndexMaintenanceJob>();
+
+// W7-01: ES index manager — resolve via scoped scope in job
+var esUrl = builder.Configuration["Elasticsearch:Url"] ?? builder.Configuration["Elasticsearch:Uri"] ?? "http://localhost:9200";
+builder.Services.AddHttpClient<ElasticsearchIndexManagerService>(client =>
+{
+    client.BaseAddress = new Uri(esUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+});
+builder.Services.AddScoped<IElasticsearchIndexManager, ElasticsearchIndexManagerService>();
 
 var app = builder.Build();
 

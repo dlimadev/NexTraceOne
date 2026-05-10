@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.EventBus.InProcess;
+using NexTraceOne.BuildingBlocks.Infrastructure.Http;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.BuildingBlocks.Infrastructure.MultiTenancy;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
@@ -22,6 +23,8 @@ public static class DependencyInjection
     {
         services.AddScoped<AuditInterceptor>();
         services.AddScoped<TenantRlsInterceptor>();
+        services.AddTransient<AirGapHttpMessageHandler>();
+        services.AddSingleton<HttpClientConfiguration>();
 
         return services;
     }

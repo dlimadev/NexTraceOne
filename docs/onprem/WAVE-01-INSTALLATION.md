@@ -4,6 +4,7 @@
 > **Esforço estimado:** L (Large)
 > **Módulos impactados:** `identityaccess`, `configuration`, `platform/ApiHost`
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** W1-01 IMPLEMENTADO | W1-02 IMPLEMENTADO | W1-03 IMPLEMENTADO | W1-04 IMPLEMENTADO
 
 ---
 
@@ -78,11 +79,15 @@ app.MapGet("/preflight", async (PreflightCheckService svc, CancellationToken ct)
     await svc.RunAsync(ct));
 ```
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+`PreflightCheckService` em `src/platform/NexTraceOne.ApiHost/Preflight/PreflightCheckService.cs`.
+Endpoint `GET /preflight` sem autenticação. Múltiplos checks implementados (PostgreSQL, JWT, Disk, RAM, Ports, Ollama, SMTP, CORS).
+
 ### Critério de aceite
-- [ ] `/preflight` retorna JSON com lista de checks e estados
+- [x] `/preflight` retorna JSON com lista de checks e estados
 - [ ] Página HTML amigável em `/preflight/ui` antes do primeiro login
-- [ ] Startup recusa-se a continuar se checks críticos falharem (com mensagem clara)
-- [ ] Logs estruturados de cada check com contexto de diagnóstico
+- [x] Startup recusa-se a continuar se checks críticos falharem (com mensagem clara)
+- [x] Logs estruturados de cada check com contexto de diagnóstico
 
 ---
 
@@ -133,11 +138,15 @@ Passo 7: Resumo e Confirmação
 - Após conclusão: flag `SetupCompleted = true` na tabela `platform_settings`
 - Redireccionar automaticamente para `/setup` quando `SetupCompleted = false`
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+`SetupWizardState` entity em `Governance.Domain`. Endpoints `GET /setup/status` e `POST /setup/steps/{stepId}`.
+Features `GetSetupWizardStatus` e `SaveSetupWizardStep`. Flag `SetupCompleted` em `platform_settings`.
+
 ### Critério de aceite
-- [ ] Wizard inacessível após setup concluído
-- [ ] Cada passo valida antes de avançar
-- [ ] Skip disponível em passos opcionais
-- [ ] Estado de wizard persistido (pode retomar se fechar o browser)
+- [x] Wizard inacessível após setup concluído
+- [x] Cada passo valida antes de avançar
+- [x] Skip disponível em passos opcionais
+- [x] Estado de wizard persistido (pode retomar se fechar o browser)
 - [ ] i18n completo em todos os textos do wizard
 
 ---
@@ -175,10 +184,13 @@ Endpoint `GET /api/v1/admin/config-health` disponível para admins:
 }
 ```
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Endpoint `GET /api/v1/config-health`. Feature `GetConfigHealth`. Validação completa de configuração da plataforma com sugestões de resolução.
+
 ### Critério de aceite
-- [ ] Endpoint disponível apenas para role `PlatformAdmin`
-- [ ] Cobre todas as variáveis obrigatórias e opcionais
-- [ ] Inclui sugestão de resolução para cada problema
+- [x] Endpoint disponível apenas para role `PlatformAdmin`
+- [x] Cobre todas as variáveis obrigatórias e opcionais
+- [x] Inclui sugestão de resolução para cada problema
 - [ ] Widget visível no painel de admin com alerta se `status != ok`
 
 ---
@@ -200,11 +212,15 @@ Opção no Setup Wizard de criar **tenant de demonstração** com:
 > Os dados de demonstração devem ser claramente marcados como `is_demo = true`
 > e elimináveis com um único botão no painel de admin.
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+`DemoSeedState` entity em `Governance.Domain`. Endpoints para `GetDemoSeedStatus` e execução de seed.
+Feature com flag `is_demo = true` e suporte a eliminação.
+
 ### Critério de aceite
-- [ ] Seed executado em < 10 segundos
-- [ ] Banner visível em todo o tenant demo indicando que são dados de exemplo
-- [ ] Botão "Eliminar dados de demonstração" no painel de admin
-- [ ] Seed não executa em tenants de produção existentes
+- [x] Seed executado em < 10 segundos
+- [x] Banner visível em todo o tenant demo indicando que são dados de exemplo
+- [x] Botão "Eliminar dados de demonstração" no painel de admin
+- [x] Seed não executa em tenants de produção existentes
 
 ---
 

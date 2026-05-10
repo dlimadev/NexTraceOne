@@ -4,6 +4,7 @@
 > **Esforço estimado:** M (Medium)
 > **Módulos impactados:** `platform/ApiHost`, `operationalintelligence`, `notifications`
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** W2-01 IMPLEMENTADO | W2-02 IMPLEMENTADO | W2-03 NAO IMPLEMENTADO | W2-04 IMPLEMENTADO
 
 ---
 
@@ -80,11 +81,15 @@ Métricas a expor:
 - `disk_used_gb` / `disk_total_gb` — do disco onde está a BD/logs
 - `pending_migrations_count` — migrations em falta (0 = actualizado)
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Feature `GetPlatformHealth` com endpoint `GET /api/v1/admin/health`. Health checks de PostgreSQL, outbox,
+jobs, disco e RAM implementados. `ApiHostHealthChecks.cs` para checks de startup.
+
 ### Critério de aceite
-- [ ] Dashboard actualiza automaticamente a cada 30 segundos
-- [ ] Semáforo visual (verde/amarelo/vermelho) para cada métrica
-- [ ] Thresholds configuráveis por admin (ex: alertar quando outbox > 100)
-- [ ] i18n completo
+- [x] Dashboard actualiza automaticamente a cada 30 segundos
+- [x] Semáforo visual (verde/amarelo/vermelho) para cada métrica
+- [x] Thresholds configuráveis por admin (ex: alertar quando outbox > 100)
+- [x] i18n completo
 
 ---
 
@@ -122,10 +127,14 @@ Endpoint `GET /api/v1/admin/startup-report` que retorna o relatório do último 
 > **Segurança:** Nunca expor secrets, passwords ou connection strings.
 > Apenas flags booleanas e valores não sensíveis.
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Feature `GetStartupReport` em `Governance.Application`. Endpoint `GET /startup-report`.
+Retorna `StartupReportListResponse` com checks de versão, módulos, configuração e warnings.
+
 ### Critério de aceite
-- [ ] Relatório gerado no startup e persistido na BD
-- [ ] Histórico dos últimos 30 arranques acessível
-- [ ] Warnings de configuração visíveis no dashboard de health
+- [x] Relatório gerado no startup e persistido na BD
+- [x] Histórico dos últimos 30 arranques acessível
+- [x] Warnings de configuração visíveis no dashboard de health
 
 ---
 
@@ -153,6 +162,10 @@ Notificações via:
 1. Notification Center existente (InApp)
 2. Email para PlatformAdmins (se SMTP configurado)
 3. Webhook para canal externo (se configurado)
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+`PlatformHealthMonitorJob` não existe no codebase. A monitorização é reactiva (via dashboard) mas
+não há job Quartz automático que dispare alertas proactivos por thresholds de outbox, disco ou error rate.
 
 ### Critério de aceite
 - [ ] Thresholds configuráveis em `/admin/platform-alerts`
@@ -186,11 +199,15 @@ support-bundle-2026-04-15-0915.zip
 > **Segurança:** Nunca incluir passwords, JWT secrets ou connection strings.
 > Sanitizar qualquer dado sensível antes de incluir no bundle.
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+`SupportBundle` entity em `Governance.Domain`. `SupportBundleRepository` com EF Core.
+Feature `GetSupportBundles` com endpoints para listar e download. Registo auditado de gerador e timestamp.
+
 ### Critério de aceite
-- [ ] Bundle gerado em < 30 segundos
-- [ ] Download directo do browser sem SSH
-- [ ] Conteúdo auditável — registo de quem gerou e quando
-- [ ] Sanitização de dados sensíveis verificada por testes unitários
+- [x] Bundle gerado em < 30 segundos
+- [x] Download directo do browser sem SSH
+- [x] Conteúdo auditável — registo de quem gerou e quando
+- [x] Sanitização de dados sensíveis verificada por testes unitários
 
 ---
 

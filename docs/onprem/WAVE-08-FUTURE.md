@@ -3,6 +3,7 @@
 > **Prioridade:** Roadmap (médio/longo prazo)
 > **Esforço estimado:** XL
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** Todos os itens W8-01..W8-06 são ROADMAP — nenhum implementado. Dependem de decisões de arquitectura mais profundas ou de parceiros externos.
 
 ---
 

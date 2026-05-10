@@ -1,6 +1,6 @@
 # NexTraceOne — Plano de Acção On-Premises
 
-> **Data:** Abril 2026
+> **Data:** Abril 2026 | **Auditoria de implementação:** Maio 2026
 > **Contexto:** Plano de acção consolidado para melhorar a experiência de deployment, operação
 > e sustentabilidade do NexTraceOne em ambientes **on-premises / self-hosted**.
 > **Baseado em:** análise do codebase actual + pesquisa de mercado 2025/2026.
@@ -41,9 +41,9 @@ um produto que "funciona num servidor" num produto que uma equipa de infra conse
 
 ---
 
-## Estado Actual (Abril 2026)
+## Estado Actual (Maio 2026 — pós-auditoria de implementação)
 
-### O que já existe e funciona
+### O que já existe e funciona (base original)
 
 | Capacidade | Estado |
 |---|---|
@@ -59,20 +59,60 @@ um produto que "funciona num servidor" num produto que uma equipa de infra conse
 | Audit Trail com hash chain SHA-256 | READY |
 | Break Glass + JIT Access | READY |
 
-### Gaps identificados
+### Estado de implementação das Waves (Maio 2026)
 
-| Gap | Impacto | Wave |
+| Wave | Item | Estado |
 |---|---|---|
-| Sem First-Run Wizard | Barreira de adopção alta | W1 |
-| Sem Preflight Check | Falhas silenciosas na instalação | W1 |
-| Sem auto-diagnóstico da plataforma | Problemas descobertos pelos utilizadores | W2 |
-| Sem Backup Coordinator integrado | Risco de perda de dados | W3 |
-| Sem Migration Preview | Risco em actualizações de produção | W3 |
-| Sem Model Manager UI (LLM) | Gestão de IA requer SSH | W4 |
-| Sem Air-Gap Mode explícito | Dados podem sair do perímetro | W5 |
-| Sem Resource Budget por Tenant | Consumo descontrolado em shared servers | W6 |
-| Sem Elasticsearch Index Manager | Disco pode encher sem aviso | W7 |
-| Sem Offline Release Bundle | Actualização requer internet | W3 |
+| W1 | Preflight Check Engine (`/preflight`) | IMPLEMENTADO |
+| W1 | Setup Wizard (`/setup`, `SetupWizardState`) | IMPLEMENTADO |
+| W1 | Configuration Validator (`/api/v1/config-health`) | IMPLEMENTADO |
+| W1 | Seed de Demonstração (`DemoSeedState`) | IMPLEMENTADO |
+| W2 | Admin Health Dashboard (`GetPlatformHealth`) | IMPLEMENTADO |
+| W2 | Startup Report (`/startup-report`) | IMPLEMENTADO |
+| W2 | Auto-Diagnóstico Proactivo (`PlatformHealthMonitorJob`) | NAO IMPLEMENTADO |
+| W2 | Support Bundle Generator (`SupportBundle`) | IMPLEMENTADO |
+| W3 | Migration Preview (`/migrations/pending`) | IMPLEMENTADO |
+| W3 | Offline Release Bundle | NAO IMPLEMENTADO |
+| W3 | Backup Coordinator (feature de config + job) | PARCIAL |
+| W3 | Point-in-Time Recovery Wizard | NAO IMPLEMENTADO |
+| W3 | Graceful Shutdown (`GetGracefulShutdownConfig`) | IMPLEMENTADO |
+| W4 | Model Manager UI (`/admin/ai/models`) | IMPLEMENTADO |
+| W4 | LLM Hardware Advisor (`/ai/hardware-assessment`) | IMPLEMENTADO |
+| W4 | AI Resource Governor (UI + config) | PARCIAL |
+| W4 | AI Governance / Avaliação de Qualidade | NAO IMPLEMENTADO |
+| W4 | Offline Model Bundle | NAO IMPLEMENTADO |
+| W5 | Network Isolation Mode / Air-Gap | PARCIAL |
+| W5 | Proxy Corporativo & Internal CA | NAO IMPLEMENTADO |
+| W5 | Audit de Chamadas Externas (`GetExternalHttpAudit`) | IMPLEMENTADO |
+| W5 | mTLS interno | NAO IMPLEMENTADO |
+| W5 | Fine-Grained Auth por Ambiente | NAO IMPLEMENTADO |
+| W5 | Session Security Hardening | NAO IMPLEMENTADO |
+| W6 | Waste Detection Engine (`GetWasteSignals`) | PARCIAL |
+| W6 | Non-Prod Shutdown Scheduler | NAO IMPLEMENTADO |
+| W6 | Resource Budget por Tenant (`GetResourceBudget`) | IMPLEMENTADO |
+| W6 | GreenOps / Carbon Score | NAO IMPLEMENTADO |
+| W6 | Rightsizing Recommendations | NAO IMPLEMENTADO |
+| W7 | Elasticsearch Index Manager (UI + feature) | PARCIAL |
+| W7 | Elasticsearch Health Dashboard | IMPLEMENTADO (via W2-01) |
+| W7 | Lightweight Mode (ObservabilityMode) | NAO IMPLEMENTADO |
+| W7 | PostgreSQL Health Dashboard (`/admin/database-health`) | IMPLEMENTADO |
+| W7 | DORA Metrics Dashboard | IMPLEMENTADO |
+| W8 | Todos os itens (W8-01..06) | ROADMAP |
+
+### Gaps identificados (originais — maioria resolvidos)
+
+| Gap | Impacto | Wave | Estado |
+|---|---|---|---|
+| Sem First-Run Wizard | Barreira de adopção alta | W1 | RESOLVIDO |
+| Sem Preflight Check | Falhas silenciosas na instalação | W1 | RESOLVIDO |
+| Sem auto-diagnóstico da plataforma | Problemas descobertos pelos utilizadores | W2 | PARCIAL |
+| Sem Backup Coordinator integrado | Risco de perda de dados | W3 | PARCIAL |
+| Sem Migration Preview | Risco em actualizações de produção | W3 | RESOLVIDO |
+| Sem Model Manager UI (LLM) | Gestão de IA requer SSH | W4 | RESOLVIDO |
+| Sem Air-Gap Mode explícito | Dados podem sair do perímetro | W5 | PARCIAL |
+| Sem Resource Budget por Tenant | Consumo descontrolado em shared servers | W6 | RESOLVIDO |
+| Sem Elasticsearch Index Manager | Disco pode encher sem aviso | W7 | PARCIAL |
+| Sem Offline Release Bundle | Actualização requer internet | W3 | PENDENTE |
 
 ---
 

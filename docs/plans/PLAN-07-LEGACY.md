@@ -1,9 +1,10 @@
 # Plano 07 — Legacy/Mainframe Support
 
-> **Prioridade:** 🔵 Futuro  
+> **Prioridade:** Futuro  
 > **Esforço total:** 24+ semanas  
 > **Referência:** `FUTURE-ROADMAP.md` secção 12 (Legacy/Mainframe Waves 00–12)  
 > **Contexto:** Expansão do NexTraceOne para core systems legados (IBM Z, COBOL, CICS, IMS, DB2, MQ). Mercado: bancos, seguradoras, governo, utilities.
+> **Estado (Maio 2026):** ROADMAP — nenhuma Wave (00–12) implementada. Requer parceria com cliente enterprise âncora e acesso a ambiente IBM Z de desenvolvimento. Sem data prevista de início.
 
 ---
 

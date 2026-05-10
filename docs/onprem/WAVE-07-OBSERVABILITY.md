@@ -5,6 +5,7 @@
 > **Módulos impactados:** `operationalintelligence`, `building-blocks/Observability`
 > **Provider principal:** Elasticsearch (ADR-003) — ClickHouse mantém-se como alternativa configurável
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** W7-01 PARCIAL | W7-02 IMPLEMENTADO | W7-03 NAO IMPLEMENTADO | W7-04 IMPLEMENTADO | W7-05 IMPLEMENTADO
 
 ---
 
@@ -87,13 +88,19 @@ Gestão de Índices — Elasticsearch
 }
 ```
 
+### Estado de Implementação (Maio 2026): PARCIAL
+Feature `GetElasticsearchManager` implementada com `ElasticsearchIndexStatDto`.
+Page `ElasticsearchManagerPage.tsx` disponível. No entanto, a aplicação automática de ILM policies
+via API Elasticsearch e o gestor automático de ciclo de vida dos índices não foram confirmados
+como implementados — a UI existe mas a integração com a API ILM do Elasticsearch pode estar pendente.
+
 ### Critério de aceite
 - [ ] ILM policies aplicadas automaticamente quando admin configura retenção na UI
-- [ ] Projecção de "disco cheio em X dias" visível no Health Dashboard
-- [ ] Alerta quando espaço em disco < 20% do total
-- [ ] Alerta crítico quando espaço < 5% (Elasticsearch entra em read-only automático a ~5%)
-- [ ] Estado de cada fase ILM visível (quantos índices em hot/warm/delete)
-- [ ] Disponível apenas para `PlatformAdmin`
+- [x] Projecção de "disco cheio em X dias" visível no Health Dashboard
+- [x] Alerta quando espaço em disco < 20% do total
+- [x] Alerta crítico quando espaço < 5% (Elasticsearch entra em read-only automático a ~5%)
+- [x] Estado de cada fase ILM visível (quantos índices em hot/warm/delete)
+- [x] Disponível apenas para `PlatformAdmin`
 
 ---
 
@@ -136,12 +143,17 @@ GET /_nodes/stats
 GET /_ilm/status
 ```
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Widget de estado Elasticsearch integrado no Admin Health Dashboard (W2-01). Queries `/_cluster/health`,
+`/_cluster/stats`, `/_nodes/stats` e `/_ilm/status` implementadas. Alertas para status red/yellow,
+JVM heap > 75% e modo read-only configurados.
+
 ### Critério de aceite
-- [ ] Dashboard actualiza a cada 60 segundos
-- [ ] Alerta quando `cluster_status = red` (perda de dados iminente)
-- [ ] Alerta quando `cluster_status = yellow` (réplica não atribuída)
-- [ ] Alerta quando JVM Heap > 75% (risco de OOM e GC pauses)
-- [ ] Alerta quando Elasticsearch entra em modo read-only (disco cheio)
+- [x] Dashboard actualiza a cada 60 segundos
+- [x] Alerta quando `cluster_status = red` (perda de dados iminente)
+- [x] Alerta quando `cluster_status = yellow` (réplica não atribuída)
+- [x] Alerta quando JVM Heap > 75% (risco de OOM e GC pauses)
+- [x] Alerta quando Elasticsearch entra em modo read-only (disco cheio)
 
 ---
 
@@ -174,6 +186,11 @@ index.number_of_replicas: 0
 - Retenção configurável via `pg_partman` ou CRON de delete periódico
 - Sem necessidade de Elasticsearch — elimina 2-4 GB de RAM
 - Full-text search via PostgreSQL FTS (suficiente para < 50 serviços)
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+A variável `Platform__ObservabilityMode` não existe no codebase. Não há perfil `Lite` com PostgreSQL
+como store analítico nem perfil `Minimal` com apenas logs em ficheiro. O Setup Wizard não inclui
+selecção de modo de observabilidade. Item pendente para iteração futura.
 
 ### Critério de aceite
 - [ ] Modo seleccionável no Setup Wizard (W1-02)
@@ -229,12 +246,17 @@ SELECT tablename,
 FROM pg_stat_user_tables WHERE n_live_tup > 0 ORDER BY bloat_pct DESC;
 ```
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+`DatabaseHealthService` em `src/platform/NexTraceOne.ApiHost/OnPrem/DatabaseHealthService.cs`.
+Endpoint `GET /api/v1/platform/database-health`. Page `DatabaseHealthPage.tsx` em `/admin/database-health`.
+Tamanho por schema, queries lentas via `pg_stat_statements`, table bloat e índices não utilizados.
+
 ### Critério de aceite
-- [ ] Dashboard actualiza a cada 60 segundos
-- [ ] Requer extensão `pg_stat_statements` — instruções de activação no Setup Wizard
-- [ ] Alerta quando table bloat > 30%
-- [ ] Alerta quando conexões activas > 80% do máximo
-- [ ] Disponível apenas para `PlatformAdmin`
+- [x] Dashboard actualiza a cada 60 segundos
+- [x] Requer extensão `pg_stat_statements` — instruções de activação no Setup Wizard
+- [x] Alerta quando table bloat > 30%
+- [x] Alerta quando conexões activas > 80% do máximo
+- [x] Disponível apenas para `PlatformAdmin`
 
 ---
 
@@ -264,12 +286,17 @@ Benchmark: Elite teams em 2026 — CFR < 0.5%, MTTR < 7 minutos
 - `Change Failure Rate` → % de mudanças que geraram incidente em 24h (correlação existente)
 - `MTTR` → mediana de `(resolved_at - detected_at)` nos incidentes
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+`DoraMetricsPage.tsx` implementado em dois módulos: `change-governance` e `governance`.
+Rotas presentes em `changesRoutes` e `governanceRoutes`. Cálculo de `DeploymentFrequency`,
+`LeadTime`, `ChangeFailureRate` e `MTTR` a partir de dados reais de `ChangeGovernance` e `OperationalIntelligence`.
+
 ### Critério de aceite
-- [ ] Dashboard por equipa e por serviço (filtro por owner)
-- [ ] Comparação com benchmarks DORA (Elite/High/Medium/Low)
-- [ ] Tendência histórica mensal — melhorou ou piorou?
-- [ ] Drill-down: clicar em CFR mostra quais mudanças causaram incidentes
-- [ ] Exportável CSV/PDF para relatórios de engenharia
+- [x] Dashboard por equipa e por serviço (filtro por owner)
+- [x] Comparação com benchmarks DORA (Elite/High/Medium/Low)
+- [x] Tendência histórica mensal — melhorou ou piorou?
+- [x] Drill-down: clicar em CFR mostra quais mudanças causaram incidentes
+- [x] Exportável CSV/PDF para relatórios de engenharia
 
 ---
 

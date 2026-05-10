@@ -1,9 +1,10 @@
 # Plano 05 — AI Evolution (Fases 0–5)
 
-> **Prioridade:** 🟡 Média  
+> **Prioridade:** Média  
 > **Esforço total:** 20–30 semanas  
 > **Spec técnica:** [AI-EVOLUTION-ROADMAP.md](../AI-EVOLUTION-ROADMAP.md) + [AI-AGENT-LIGHTNING.md](../AI-AGENT-LIGHTNING.md)  
 > **Contexto:** O módulo AIKnowledge tem base sólida (14 agentes, multi-provider, guardrails, grounding). Este plano evolui para sistema enterprise com RL, memória organizacional e marketplace.
+> **Estado (Maio 2026):** Fase 0 PARCIAL (providers Ollama/OpenAI operacionais; Anthropic/LmStudio incompletos; grounding paralelo e Redis quota cache pendentes) | Fases 1–5 ROADMAP (não implementadas)
 
 ---
 
@@ -267,11 +268,14 @@ tools/agent-lightning/
 
 ---
 
-## Critérios de Aceite Globais
+## Critérios de Aceite Globais (estado Maio 2026)
 
 - [ ] Fase 0: todos os 4 providers operacionais + grounding 40% mais rápido
-- [ ] Fase 1: 6 built-in skills executáveis via UI e API
-- [ ] Fase 2: `incident-responder` melhora accuracy mensurável após 30 dias de RL
-- [ ] Fase 3: agente recorda decisões arquitecturais de conversações anteriores
-- [ ] Fase 4: multi-step plan com aprovação humana funcional
-- [ ] Fase 5: marketplace com 6+ skills instaláveis por tenant
+  - Ollama e OpenAI: operacionais. Anthropic e LmStudio: incompletos (AI-0.1 pendente).
+  - Grounding paralelo (Task.WhenAll): pendente (AI-0.3 pendente).
+  - Redis quota cache: pendente (AI-0.2 pendente).
+- [ ] Fase 1: 6 built-in skills executáveis via UI e API (AgentSkill framework — roadmap)
+- [ ] Fase 2: `incident-responder` melhora accuracy mensurável após 30 dias de RL (roadmap)
+- [ ] Fase 3: agente recorda decisões arquitecturais de conversações anteriores (roadmap)
+- [ ] Fase 4: multi-step plan com aprovação humana funcional (roadmap)
+- [ ] Fase 5: marketplace com 6+ skills instaláveis por tenant (roadmap)
