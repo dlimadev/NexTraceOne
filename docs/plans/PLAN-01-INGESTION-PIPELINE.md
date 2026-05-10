@@ -1,8 +1,10 @@
 # Plano 01 — Ingestion Pipeline (PIP-01..06)
 
-> **✅ CONCLUÍDO — Abril 2026**  
+> **CONCLUIDO — Abril 2026**  
 > Todos os PIP-01..06 implementados em PRs #301 e #302.  
 > Confirmado em [HONEST-GAPS.md](../HONEST-GAPS.md) — secção "Pipeline de Ingestão — COMPLETO".  
+> Auditoria de código confirmada em Maio 2026: `DeadLetterMessage`, `TenantPipelineEngine`, `StorageBucketRouter`,
+> `CatalogEnrichmentProcessor`, `LogToMetricProcessor` e `IngestionMetricsCollector` presentes no codebase.
 > Este ficheiro mantém-se como referência técnica e histórica.
 
 > ~~**Prioridade:** 🔴 Alta~~  
@@ -164,11 +166,11 @@ Sprint 3 (2 semanas):  PIP-04 + PIP-05
 Sprint 4 (2 semanas):  PIP-06 + integração end-to-end + testes
 ```
 
-## Critérios de Aceite
+## Critérios de Aceite (todos concluidos — Abril 2026)
 
-- [ ] `ModuleOutboxProcessorJob` nunca descarta silenciosamente — sempre persiste em DLQ
-- [ ] Dashboard Platform Admin mostra métricas de ingestão por tenant em tempo real
-- [ ] Tenant pode configurar regras de masking de PII via API
-- [ ] Spans enriquecidos com `nextraceone.service.*` atributos visíveis no Elasticsearch
-- [ ] Log pattern `error_code=5xx` pode gerar métrica `api.error.count` server-side
-- [ ] Todos os novos endpoints cobertos por testes (mínimo 80% statement coverage)
+- [x] `ModuleOutboxProcessorJob` nunca descarta silenciosamente — sempre persiste em DLQ
+- [x] Dashboard Platform Admin mostra métricas de ingestão por tenant em tempo real
+- [x] Tenant pode configurar regras de masking de PII via API
+- [x] Spans enriquecidos com `nextraceone.service.*` atributos visíveis no Elasticsearch
+- [x] Log pattern `error_code=5xx` pode gerar métrica `api.error.count` server-side
+- [x] Todos os novos endpoints cobertos por testes (mínimo 80% statement coverage)

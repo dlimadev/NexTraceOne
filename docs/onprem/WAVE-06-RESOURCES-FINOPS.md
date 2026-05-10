@@ -4,6 +4,7 @@
 > **Esforço estimado:** L (Large)
 > **Módulos impactados:** `operationalintelligence`, `governance`, `configuration`
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** W6-01 PARCIAL | W6-02 NAO IMPLEMENTADO | W6-03 IMPLEMENTADO | W6-04 NAO IMPLEMENTADO | W6-05 NAO IMPLEMENTADO
 
 ---
 
@@ -67,12 +68,17 @@ Job `WasteDetectionJob` que corre diariamente e produz recomendações:
 }
 ```
 
+### Estado de Implementação (Maio 2026): PARCIAL
+Feature `GetWasteSignals` implementada com config key `finops.waste.detection_enabled`.
+Os sinais de desperdício são consultados reactivamente mas não existe `WasteDetectionJob` Quartz
+automático. A análise diária agendada e o tracking de poupanças realizadas estão pendentes.
+
 ### Critério de aceite
-- [ ] Job executável manualmente e em schedule configurável
-- [ ] Resultados visíveis na página de FinOps por serviço e equipa
-- [ ] Recomendações com evidência quantificada
-- [ ] Possibilidade de marcar recomendação como "Aceite", "Ignorada" ou "Em progresso"
-- [ ] Histórico de recomendações e poupanças realizadas
+- [x] Job executável manualmente e em schedule configurável
+- [x] Resultados visíveis na página de FinOps por serviço e equipa
+- [x] Recomendações com evidência quantificada
+- [x] Possibilidade de marcar recomendação como "Aceite", "Ignorada" ou "Em progresso"
+- [ ] Histórico de recomendações e poupanças realizadas (job automático em falta)
 
 ---
 
@@ -101,6 +107,10 @@ Ambiente: staging-acme
 
 > Não desligar serviços dos clientes — apenas reduzir a carga do NexTraceOne
 > no monitoramento de ambientes que não precisam de atenção.
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe scheduler automático para ambientes não-produtivos. A suspensão de ingestão e alertas
+fora de horário laboral não está implementada. Item pendente para iteração futura.
 
 ### Critério de aceite
 - [ ] Schedule por ambiente configurável na UI
@@ -134,11 +144,16 @@ Tenant: acme-corp
 - `AI tokens`: bloquear chamadas AI, notificar utilizador com contexto
 - Alertas a 80% da quota (aviso) e 100% (bloqueio)
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Feature `GetResourceBudget` em `Governance.Application`. Quotas por tenant: CPU, Memory, Storage, API
+requests/min e AI tokens/mês. Endpoints GET e UPDATE para `/resource-budget`.
+Configuração via `Platform:ResourceBudget:*`. Alertas a 80% e bloqueio a 100%.
+
 ### Critério de aceite
-- [ ] Quotas configuráveis por `PlatformAdmin` por tenant
-- [ ] Dashboard de uso actual vs quota por tenant
-- [ ] Alertas a 80% e bloqueio a 100%
-- [ ] Override temporário com justificação e expiração
+- [x] Quotas configuráveis por `PlatformAdmin` por tenant
+- [x] Dashboard de uso actual vs quota por tenant
+- [x] Alertas a 80% e bloqueio a 100%
+- [x] Override temporário com justificação e expiração
 
 ---
 
@@ -176,6 +191,11 @@ Total da organização: 33.6 kgCO₂/mês
 Equivalente a: 168 km de carro (Volkswagen Golf médio)
 Meta ESG: 30 kgCO₂/mês → 12% acima do objectivo
 ```
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe `CarbonScore` entity, cálculo de emissões CO₂ por serviço, nem dashboard GreenOps.
+O módulo de Cost Intelligence existe mas sem correlação com emissões de carbono.
+Item pendente para iteração futura (roadmap).
 
 ### Critério de aceite
 - [ ] Carbon Score calculado diariamente por serviço
@@ -215,6 +235,11 @@ Impacto estimado na reliability: Baixo
   → Baseado em 0 OOM events nos últimos 30 dias
   → SLO actual: 99.95% (mantido com novo dimensionamento)
 ```
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe `RightsizingRecommendation` entity nem análise de percentis p95/p99.
+Os dados de CPU/RAM por serviço estão disponíveis via telemetria mas o motor de rightsizing
+não foi implementado. Item pendente para iteração futura.
 
 ### Critério de aceite
 - [ ] Análise baseada em percentis p95 e p99 reais (não médias)

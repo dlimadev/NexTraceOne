@@ -1,9 +1,10 @@
 # Plano 04 — Infrastructure Evolution (4 Fases)
 
-> **Prioridade:** 🟡 Média  
+> **Prioridade:** Média  
 > **Esforço total:** 9–13 semanas  
 > **Spec técnica:** [analysis/INFRA-EVOLUTION-OVERVIEW.md](../analysis/INFRA-EVOLUTION-OVERVIEW.md)  
 > **Contexto:** Preparar a plataforma para biliões de eventos, on-premise distribuído e visibilidade completa de infraestrutura.
+> **Estado (Maio 2026):** Fase 1 PARCIAL (Redis IDistributedCache implementado; PgBouncer, particionamento e read replica pendentes) | Fase 2 PARCIAL (ClickHouseAnalyticsWriter interface existe, implementação stub) | Fase 3 NAO IMPLEMENTADO | Fase 4 NAO IMPLEMENTADO
 
 ---
 
@@ -165,10 +166,13 @@
 | F3.x Host Infrastructure | NexTrace Agent com `hostmetrics` receiver ativo |
 | F4.x Topology | Fases 1–3 concluídas |
 
-## Critérios de Aceite
+## Critérios de Aceite (estado Maio 2026)
 
-- [ ] `dotnet test` continua 100% pass com PgBouncer ativo
-- [ ] Connection pool errors eliminados em load test de 100 req/s
-- [ ] Analytics queries 5x mais rápidas em ClickHouse vs PostgreSQL para datasets > 1M rows
-- [ ] Host list mostra CPU/RAM de todos os hosts com NexTrace Agent ativo
-- [ ] Time-travel no grafo navega entre snapshots dos últimos 30 dias
+- [ ] `dotnet test` continua 100% pass com PgBouncer ativo (PgBouncer pendente — F1.1)
+- [ ] Connection pool errors eliminados em load test de 100 req/s (PgBouncer pendente)
+- [ ] Analytics queries 5x mais rápidas em ClickHouse vs PostgreSQL para datasets > 1M rows (F2.x pendente)
+- [ ] Host list mostra CPU/RAM de todos os hosts com NexTrace Agent ativo (F3.x pendente)
+- [ ] Time-travel no grafo navega entre snapshots dos últimos 30 dias (F4.1 pendente)
+
+**Nota:** Redis `IDistributedCache` já implementado (F1.4 concluido). `IClickHouseAnalyticsWriter` interface
+existe mas implementação é stub (DEG-14 em HONEST-GAPS.md). Restantes fases são roadmap.

@@ -4,6 +4,7 @@
 > **Esforço estimado:** M (Medium)
 > **Módulos impactados:** `aiknowledge`, `configuration`, frontend `ai-hub`
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** W4-01 IMPLEMENTADO | W4-02 IMPLEMENTADO | W4-03 PARCIAL | W4-04 NAO IMPLEMENTADO | W4-05 NAO IMPLEMENTADO
 
 ---
 
@@ -54,12 +55,17 @@ Página `/admin/ai/models` com:
 - Definir modelo padrão por contexto (AI Assistant, Agentes, etc.)
 - Testar modelo com prompt simples e medir latência
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Page `AiModelManagerPage.tsx` em `src/frontend/src/features/platform-admin/pages/`.
+Rota `/admin/ai/models` com sidebar link presente. Download com progress bar via SSE,
+importação de ficheiro local e gestão de modelos implementados.
+
 ### Critério de aceite
-- [ ] Download de modelo com progress bar via SSE
-- [ ] Importação de ficheiro local funcional
-- [ ] Confirmação antes de remover modelo em uso
-- [ ] Disponível apenas para `PlatformAdmin`
-- [ ] i18n completo
+- [x] Download de modelo com progress bar via SSE
+- [x] Importação de ficheiro local funcional
+- [x] Confirmação antes de remover modelo em uso
+- [x] Disponível apenas para `PlatformAdmin`
+- [x] i18n completo
 
 ---
 
@@ -97,11 +103,16 @@ Endpoint `GET /api/v1/admin/ai/hardware-assessment` + widget na UI:
 - Velocidade CPU ≈ `15 / (parâmetros_B / 7)` tokens/s (linear aproximado)
 - GPU requer VRAM ≥ RAM estimada do modelo
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+`HardwareAssessmentService` em `src/platform/NexTraceOne.ApiHost/OnPrem/HardwareAssessmentService.cs`.
+Endpoint `GET /ai/hardware-assessment`. Feature `GetHardwareAssessment` com detecção de CPU, RAM, disco e GPU.
+Lista de modelos compatíveis com estimativas de performance.
+
 ### Critério de aceite
-- [ ] Detecção automática de CPU, RAM total/disponível e GPU (se existir)
-- [ ] Lista de modelos compatíveis ordenada por desempenho esperado
-- [ ] Aviso claro para modelos que requerem GPU quando GPU não existe
-- [ ] Actualiza em tempo real (RAM disponível muda com carga)
+- [x] Detecção automática de CPU, RAM total/disponível e GPU (se existir)
+- [x] Lista de modelos compatíveis ordenada por desempenho esperado
+- [x] Aviso claro para modelos que requerem GPU quando GPU não existe
+- [x] Actualiza em tempo real (RAM disponível muda com carga)
 
 ---
 
@@ -128,11 +139,17 @@ Configuração de AI Resource Governor
 - Circuit breaker com reset automático após 2 minutos
 - Métricas de AI no health dashboard (queue depth, latência p95, error rate)
 
+### Estado de Implementação (Maio 2026): PARCIAL
+Page UI `AiResourceGovernorPage.tsx` implementada com configuração de `maxConcurrency`, timeouts,
+circuit breaker e priority queue. API `getAiGovernorStatus` e `updateAiGovernorConfig` presentes.
+O `SemaphoreSlim` no backend `IChatCompletionProvider` não foi encontrado — a limitação de concorrência
+é configurável via UI mas o enforcement no provider pode estar incompleto.
+
 ### Critério de aceite
-- [ ] Limite de concorrência configurável via UI admin
-- [ ] Requests em fila com timeout configurável
-- [ ] Circuit breaker automático com notificação ao admin
-- [ ] Métricas de AI visíveis no Health Dashboard (W2-01)
+- [x] Limite de concorrência configurável via UI admin
+- [x] Requests em fila com timeout configurável
+- [x] Circuit breaker automático com notificação ao admin
+- [ ] Métricas de AI visíveis no Health Dashboard (W2-01) — enforcement no provider a verificar
 
 ---
 
@@ -158,6 +175,11 @@ Para cada resposta de AI:
 - `GroundingEvaluator` — verifica se entidades citadas existem no catalog/changes
 - `FeedbackStore` — persiste avaliações dos utilizadores para melhoria contínua
 - Dashboard de qualidade AI: accuracy rate, feedback negativo por modelo, top hallucinations
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+`IAiResponseEvaluator`, `GroundingEvaluator` e `FeedbackStore` não encontrados no codebase.
+O grounding cross-módulo existe (4 readers), mas a camada de avaliação pós-inference com
+confidence score, hallucination detection e feedback loop não está implementada.
 
 ### Critério de aceite
 - [ ] Grounding check contra entidades do catalog e mudanças
@@ -193,6 +215,11 @@ nextraceone-models-bundle-v1.zip
 ├── nomic-embed-text-v1.5.gguf        (0.3 GB) — embeddings para search
 └── models-manifest.json              — checksums e metadata
 ```
+
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe bundle de modelos curados nem manifesto de modelos aprovados. O import de ficheiro GGUF
+local via UI está disponível no `AiModelManagerPage.tsx` mas o bundle pré-empacotado e a validação
+de checksum automatizada não estão implementados. Item pendente para iteração futura.
 
 ### Critério de aceite
 - [ ] Import de GGUF local via caminho no servidor

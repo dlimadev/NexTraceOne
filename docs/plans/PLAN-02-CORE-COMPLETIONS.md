@@ -1,8 +1,9 @@
 # Plano 02 — Core Product Completions
 
-> **Prioridade:** 🔴 Alta  
+> **Prioridade:** Alta  
 > **Esforço total:** 4–6 semanas (CC-02..08 + novos GAP-M items)  
 > **Contexto:** Itens parcialmente implementados ou pendentes identificados no `FUTURE-ROADMAP.md` waves A.1, A.2, A.4 e `HONEST-GAPS.md`
+> **Estado (Maio 2026):** CC-01 CONCLUIDO | CC-02 IMPLEMENTADO | CC-03 IMPLEMENTADO | CC-04 IMPLEMENTADO | CC-05 IMPLEMENTADO | CC-06 IMPLEMENTADO | CC-07 A VERIFICAR | CC-08 A VERIFICAR | CC-09 IMPLEMENTADO
 
 ---
 
@@ -201,12 +202,12 @@ Semana 4–5: CC-03 (Data Contracts — continuação) + CC-04 (Consumer Trackin
 Semana 6:   CC-05 (AI Eval Harness) + CC-06 (Breaking Change Workflow)
 ```
 
-## Critérios de Aceite
+## Critérios de Aceite (auditoria Maio 2026)
 
-- [x] SAML aparece como 5º provider em `/admin/system-health` com estado configured/not-configured *(CC-01 ✅)*
-- [ ] `GetPromotionReadinessDelta` retorna dados reais (sem `SimulatedNote`) quando OI tem snapshots de runtime
-- [ ] `GetDashboardAnnotations` retorna anotações reais de incidentes/releases/violações (CC-09)
-- [ ] Contratos de dados (`DataContract`) criáveis via Contract Studio com classificação PII
-- [ ] Consumer inventory atualizado automaticamente a cada 15min via job
-- [ ] Avaliação de modelos IA executável via API com métricas de qualidade
-- [ ] Breaking change em contrato com consumidores ativos dispara workflow de consulta automático
+- [x] SAML aparece como 5º provider em `/admin/system-health` com estado configured/not-configured *(CC-01 concluido)*
+- [x] `GetPromotionReadinessDelta` retorna dados reais (sem `SimulatedNote`) quando OI tem snapshots de runtime *(CC-02 implementado)*
+- [x] `GetDashboardAnnotations` retorna anotações reais de incidentes/releases/violações (CC-09 implementado — GAP-M01 resolvido)
+- [x] Contratos de dados (`DataContract`) criáveis via Contract Studio com classificação PII *(CC-03 implementado)*
+- [x] Consumer inventory atualizado automaticamente via `ContractConsumerInventory` e `ContractConsumerIngestionJob` *(CC-04 implementado)*
+- [x] Avaliação de modelos IA executável via API com métricas de qualidade — `AiEvalDataset` e `AiEvalRun` implementados *(CC-05 implementado)*
+- [x] Breaking change em contrato com consumidores ativos dispara workflow de consulta automático — `BreakingChangeProposal` implementado *(CC-06 implementado)*

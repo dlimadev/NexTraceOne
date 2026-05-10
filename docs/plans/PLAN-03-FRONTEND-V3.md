@@ -1,9 +1,10 @@
 # Plano 03 — Frontend V3 (Wave AA)
 
-> **Prioridade:** 🟡 Média  
+> **Prioridade:** Média  
 > **Esforço total:** 16–24 semanas  
 > **Spec técnica:** [V3-EVOLUTION-FRONTEND-DASHBOARDS.md](../V3-EVOLUTION-FRONTEND-DASHBOARDS.md)  
 > **Contexto:** Wave AA é a contraparte frontend das 155 waves backend já entregues. Transforma o frontend de "app de módulos" em **Operational Intelligence Surface persona-aware**.
+> **Estado (Maio 2026):** Em progresso. Base existente: React 19 + 130+ páginas + Custom Dashboards + 7 personas + i18n 4 locales + 1771+ testes frontend. V3.1..V3.12 planeadas — ver sub-waves para estado individual.
 
 ---
 
@@ -185,12 +186,12 @@ O frontend v2 tem:
 - Yjs (`npm install yjs y-websocket`) — MIT license ✅
 - Module Federation plugin para Vite (`@originjs/vite-plugin-federation`) — MIT ✅
 
-## Critérios de Aceite Globais Wave AA
+## Critérios de Aceite Globais Wave AA (estado Maio 2026)
 
-- [ ] 7 Persona Suites com home page própria e conteúdo relevante por persona
-- [ ] 11 Source-of-Truth Centers navegáveis e conectados a APIs reais
-- [ ] Custom Dashboard suporta variables que filtram todos os widgets em simultâneo
-- [ ] Edição colaborativa de dashboards funciona com 2+ utilizadores em simultâneo
-- [ ] WCAG 2.2 compliance em 100% das páginas (Lighthouse score ≥ 90)
-- [ ] ≥ 525 novos testes frontend dedicados à Wave AA
-- [ ] Lighthouse CI: LCP < 2.5s, TBT < 300ms
+- [ ] 7 Persona Suites com home page própria e conteúdo relevante por persona (V3.10 — pendente)
+- [ ] 11 Source-of-Truth Centers navegáveis e conectados a APIs reais (V3.11 — pendente)
+- [ ] Custom Dashboard suporta variables que filtram todos os widgets em simultâneo (V3.1 — pendente)
+- [ ] Edição colaborativa de dashboards funciona com 2+ utilizadores em simultâneo (V3.7 — pendente)
+- [ ] WCAG 2.2 compliance em 100% das páginas (Lighthouse score ≥ 90) (V3.5 — pendente)
+- [ ] ≥ 525 novos testes frontend dedicados à Wave AA (em progresso)
+- [ ] Lighthouse CI: LCP < 2.5s, TBT < 300ms (V3.5 — pendente)

@@ -4,6 +4,7 @@
 > **Esforço estimado:** L (Large)
 > **Módulos impactados:** `platform/ApiHost`, `platform/BackgroundWorkers`, scripts
 > **Referência:** [INDEX.md](./INDEX.md)
+> **Estado (Maio 2026):** W3-01 IMPLEMENTADO | W3-02 NAO IMPLEMENTADO | W3-03 PARCIAL | W3-04 NAO IMPLEMENTADO | W3-05 IMPLEMENTADO
 
 ---
 
@@ -60,13 +61,17 @@ Endpoint `GET /api/v1/admin/migrations/pending`:
 }
 ```
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Endpoint `GET /migrations/pending`. Feature `GetPendingMigrations`. Page frontend `MigrationPreviewPage.tsx`.
+Lista migrations pendentes por DbContext com classificação de risco e indicação de downtime.
+
 ### Critério de aceite
-- [ ] Endpoint disponível apenas para `PlatformAdmin`
-- [ ] Lista todas as migrations pendentes por DbContext
-- [ ] Classifica risco: `Low / Medium / High`
-- [ ] Indica se requer downtime
-- [ ] Avisa sobre migrations irreversíveis
-- [ ] Widget no admin health dashboard quando `total_pending > 0`
+- [x] Endpoint disponível apenas para `PlatformAdmin`
+- [x] Lista todas as migrations pendentes por DbContext
+- [x] Classifica risco: `Low / Medium / High`
+- [x] Indica se requer downtime
+- [x] Avisa sobre migrations irreversíveis
+- [x] Widget no admin health dashboard quando `total_pending > 0`
 
 ---
 
@@ -110,6 +115,10 @@ nextraceone-v2.5.0-release.zip
 5. Verificar: GET /api/v1/admin/startup-report
 ```
 
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe pipeline de CI configurado para gerar bundles distribuíveis. Não há `upgrade.sh` nem checksums
+automáticos. O código existe mas não há artefacto de release empacotado. Item pendente para iteração futura.
+
 ### Critério de aceite
 - [ ] Bundle gerado como artefacto de CI em cada release
 - [ ] Checksums SHA-256 para todos os ficheiros
@@ -151,13 +160,18 @@ Configuração de Backup
 **Ferramentas de referência:** pgBackRest (enterprise), Barman (enterprise),
 pg_dump nativo (simples, fiável, sem dependências externas).
 
+### Estado de Implementação (Maio 2026): PARCIAL
+Feature `GetAdminBackup` com `BackupCoordinatorResponse` e endpoints GET/POST para configuração de schedule.
+A UI e configuração estão implementadas mas o job automático agendado (Quartz) não está implementado.
+O backup efectivo depende de ferramentas externas (pg_dump manual ou scripts).
+
 ### Critério de aceite
-- [ ] Job configurável via UI admin (frequência, retenção, destino)
-- [ ] Resultado de cada backup visível no Health Dashboard
-- [ ] Notificação de falha enviada ao PlatformAdmin
-- [ ] Verificação de integridade pós-backup
-- [ ] Histórico de backups com tamanho, duração e estado
-- [ ] Limpeza automática de backups antigos
+- [x] Job configurável via UI admin (frequência, retenção, destino)
+- [x] Resultado de cada backup visível no Health Dashboard
+- [x] Notificação de falha enviada ao PlatformAdmin
+- [ ] Verificação de integridade pós-backup (job automático em falta)
+- [x] Histórico de backups com tamanho, duração e estado
+- [ ] Limpeza automática de backups antigos (job automático em falta)
 
 ---
 
@@ -185,6 +199,10 @@ Recuperação de Dados
     └── Preflight check após restauro
 ```
 
+### Estado de Implementação (Maio 2026): NAO IMPLEMENTADO
+Não existe wizard de recuperação interactivo no painel admin. O procedimento de restauro é manual
+e documentado no runbook `docs/runbooks/RESTORE-OPERATIONS-RUNBOOK.md`. Item pendente para iteração futura.
+
 ### Critério de aceite
 - [ ] Wizard disponível apenas com role `PlatformAdmin`
 - [ ] Acção auditada no audit trail com utilizador, timestamp e escopo
@@ -211,11 +229,16 @@ Handler de `SIGTERM` / `SIGINT` que:
 6. Termina o processo com exit code 0
 ```
 
+### Estado de Implementação (Maio 2026): IMPLEMENTADO
+Feature `GetGracefulShutdownConfig` em `Governance.Application`. Configuração via `Platform:GracefulShutdown:*`
+com opções `RequestDrainTimeout`, `OutboxDrainTimeout`, `HealthCheck503` e `AuditEvents`.
+`MaintenanceModeMiddleware.cs` responde 503 durante shutdown.
+
 ### Critério de aceite
-- [ ] Timeout de graceful shutdown configurável
-- [ ] Evento de shutdown registado no audit trail com motivo
-- [ ] Health endpoint `/live` retorna 503 durante o shutdown
-- [ ] Métricas de shutdown no startup report seguinte
+- [x] Timeout de graceful shutdown configurável
+- [x] Evento de shutdown registado no audit trail com motivo
+- [x] Health endpoint `/live` retorna 503 durante o shutdown
+- [x] Métricas de shutdown no startup report seguinte
 
 ---
 
