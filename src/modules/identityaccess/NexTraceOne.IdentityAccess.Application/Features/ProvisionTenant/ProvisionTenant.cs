@@ -8,8 +8,8 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
-using NexTraceOne.IdentityAccess.Application.Features.SeedDefaultModuleAccessPolicies;
-using NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions;
+using SeedModulePolicies = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultModuleAccessPolicies.SeedDefaultModuleAccessPolicies;
+using SeedRolePerms = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions.SeedDefaultRolePermissions;
 using NexTraceOne.IdentityAccess.Domain.Entities;
 
 namespace NexTraceOne.IdentityAccess.Application.Features.ProvisionTenant;
@@ -99,8 +99,8 @@ public static class ProvisionTenant
 
             // Step 3: Garantir que defaults do sistema estão semeados (idempotente — adiciona delta apenas).
             // Executado após commit para não atrasar rollback em caso de falha no provisionamento.
-            await sender.Send(new SeedDefaultRolePermissions.Command(), cancellationToken);
-            await sender.Send(new SeedDefaultModuleAccessPolicies.Command(), cancellationToken);
+            await sender.Send(new SeedRolePerms.Command(), cancellationToken);
+            await sender.Send(new SeedModulePolicies.Command(), cancellationToken);
 
             return Result<Response>.Success(new Response(
                 tenant.Id.Value,
