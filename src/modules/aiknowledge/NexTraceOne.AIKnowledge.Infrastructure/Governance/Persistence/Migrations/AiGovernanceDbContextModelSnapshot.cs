@@ -2781,6 +2781,82 @@ namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Migratio
                     b.HasIndex("PlanStatus").HasDatabaseName("idx_aik_aep_status");
                     b.ToTable("aik_agent_execution_plans", (string)null);
                 });
+
+            modelBuilder.Entity("NexTraceOne.AIKnowledge.Domain.Governance.Entities.ModelPredictionSample", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ActualClass")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("DriftAcknowledged")
+                        .HasColumnType("boolean");
+
+                    b.Property<double?>("ConfidenceScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("InputFeatureStatsJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int?>("InferenceLatencyMs")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsFallback")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ModelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PredictedClass")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("PredictedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ServiceId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "PredictedAt");
+
+                    b.HasIndex("ModelId", "TenantId");
+
+                    b.ToTable("aik_model_prediction_samples");
+                });
+
 #pragma warning restore 612, 618
         }
     }

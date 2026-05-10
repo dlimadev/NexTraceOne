@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 
@@ -133,6 +134,16 @@ public sealed class ContractsDbContext(
 
     /// <summary>Propostas de breaking change com workflow de consulta de consumidores. CC-06.</summary>
     public DbSet<BreakingChangeProposal> BreakingChangeProposals => Set<BreakingChangeProposal>();
+
+    /// <summary>Registos de SBOM de serviços para análise de supply chain. Wave AO.1.</summary>
+    public DbSet<SbomRecord> SbomRecords => Set<SbomRecord>();
+
+    /// <summary>Registos de data contracts de serviços para compliance analítico. Wave AQ.1.</summary>
+    public DbSet<DataContractRecord> DataContractRecords => Set<DataContractRecord>();
+
+    /// <summary>Agendamentos de deprecação de contratos com guia de migração. Wave AV.3.</summary>
+    public DbSet<IDeprecationScheduleRepository.DeprecationScheduleRecord> DeprecationSchedules
+        => Set<IDeprecationScheduleRepository.DeprecationScheduleRecord>();
 
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly

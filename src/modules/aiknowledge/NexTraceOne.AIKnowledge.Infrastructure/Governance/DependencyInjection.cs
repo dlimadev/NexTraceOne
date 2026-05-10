@@ -133,6 +133,9 @@ public static class DependencyInjection
         services.AddScoped<IModelRoutingPolicyRepository, EfModelRoutingPolicyRepository>();
         services.AddScoped<IPromptIntentClassifier, NexTraceOne.AIKnowledge.Application.Governance.Services.PromptIntentClassifierService>();
 
+        // ── AI Model Quality — overrides Application-layer singleton stub ──
+        services.AddScoped<IModelPredictionRepository, EfModelPredictionRepository>();
+
         // ── AI-5.2: Prompt Asset Registry ─────────────────────────────────
         services.AddScoped<IPromptAssetRepository, PromptAssetRepository>();
 

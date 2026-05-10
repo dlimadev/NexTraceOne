@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,10 +35,20 @@ public static class DependencyInjection
         var connectionString = configuration.GetRequiredConnectionString("ContractsDatabase", "NexTraceOne");
 
         services.AddDbContext<ContractsDbContext>((serviceProvider, options) =>
+        {
             options.UseNpgsql(connectionString)
                 .AddInterceptors(
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
-                    serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
+                    serviceProvider.GetRequiredService<TenantRlsInterceptor>());
+
+            if (string.Equals(
+                Environment.GetEnvironmentVariable("NEXTRACE_IGNORE_PENDING_MODEL_CHANGES"),
+                "true",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+            }
+        });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ContractsDbContext>());
         services.AddScoped<IContractsUnitOfWork>(sp => sp.GetRequiredService<ContractsDbContext>());
@@ -78,6 +89,15 @@ public static class DependencyInjection
 
         // CC-06: Breaking Change Proposal Workflow
         services.AddScoped<IBreakingChangeProposalRepository, BreakingChangeProposalRepository>();
+
+        // ── Wave AO.1: SBOM Supply Chain ──────────────────────────────────────
+        services.AddScoped<ISbomRepository, EfSbomRepository>();
+
+        // ── Wave AQ.1: Data Contract Records ─────────────────────────────────
+        services.AddScoped<IDataContractRepository, EfDataContractRepository>();
+
+        // ── Wave AV.3: Deprecation Schedule ──────────────────────────────────
+        services.AddScoped<IDeprecationScheduleRepository, EfDeprecationScheduleRepository>();
 
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();
