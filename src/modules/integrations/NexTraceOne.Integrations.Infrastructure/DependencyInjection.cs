@@ -149,8 +149,8 @@ public static class DependencyInjection
         // Schema Planner — DEG-06 (NullSchemaPlanner por default; substituir por executor IaC real)
         services.AddSingleton<ISchemaPlanner, NullSchemaPlanner>();
 
-        // Event Consumer Worker — Dead Letter Repository e Status Reader (null por defeito)
-        services.AddSingleton<IEventConsumerDeadLetterRepository, NullEventConsumerDeadLetterRepository>();
+        // Event Consumer Worker — Dead Letter Repository persisted to int_event_consumer_dead_letters
+        services.AddScoped<IEventConsumerDeadLetterRepository, EfEventConsumerDeadLetterRepository>();
         services.AddSingleton<IEventConsumerStatusReader, NullEventConsumerStatusReader>();
 
         // Normalization Strategies — registadas como IEventNormalizationStrategy para injecção no worker

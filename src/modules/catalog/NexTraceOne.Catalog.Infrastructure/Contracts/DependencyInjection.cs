@@ -99,6 +99,9 @@ public static class DependencyInjection
         // ── Wave AV.3: Deprecation Schedule ──────────────────────────────────
         services.AddScoped<IDeprecationScheduleRepository, EfDeprecationScheduleRepository>();
 
+        // ── Wave AS.1: Feature Flag Records ───────────────────────────────────
+        services.AddScoped<IFeatureFlagRepository, EfFeatureFlagRepository>();
+
         // AI Draft Generator — uses IChatCompletionProvider from AIKnowledge module
         services.AddScoped<IAiDraftGenerator, AiDraftGeneratorService>();
         services.AddScoped<IContractsModule, ContractsModuleService>();

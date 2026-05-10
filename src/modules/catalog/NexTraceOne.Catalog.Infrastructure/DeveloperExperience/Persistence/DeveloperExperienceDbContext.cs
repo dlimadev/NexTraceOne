@@ -21,6 +21,10 @@ public sealed class DeveloperExperienceDbContext(
     /// <summary>Surveys de NPS e satisfação submetidos por membros de equipa.</summary>
     public DbSet<DeveloperSurvey> DeveloperSurveys => Set<DeveloperSurvey>();
 
+    /// <summary>Registos de uso da extensão IDE por utilizador e tenant. Wave AK.1.</summary>
+    public DbSet<IIDEUsageRepository.IdeUsageRecord> IdeUsageRecords
+        => Set<IIDEUsageRepository.IdeUsageRecord>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(DeveloperExperienceDbContext).Assembly;
 

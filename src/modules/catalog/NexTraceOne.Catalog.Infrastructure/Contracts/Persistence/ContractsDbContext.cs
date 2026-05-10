@@ -145,6 +145,9 @@ public sealed class ContractsDbContext(
     public DbSet<IDeprecationScheduleRepository.DeprecationScheduleRecord> DeprecationSchedules
         => Set<IDeprecationScheduleRepository.DeprecationScheduleRecord>();
 
+    /// <summary>Estado actual de feature flags por serviço e tenant. Wave AS.1.</summary>
+    public DbSet<FeatureFlagRecord> FeatureFlagRecords => Set<FeatureFlagRecord>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(ContractsDbContext).Assembly;
