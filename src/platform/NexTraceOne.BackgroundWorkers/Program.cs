@@ -308,7 +308,12 @@ builder.Services.AddHealthChecks()
         "elasticsearch-index-maintenance-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
-        args: [ElasticsearchIndexMaintenanceJob.HealthCheckName, TimeSpan.FromHours(7)]);
+        args: [ElasticsearchIndexMaintenanceJob.HealthCheckName, TimeSpan.FromHours(7)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "carbon-score-calculation-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [CarbonScoreCalculationJob.HealthCheckName, TimeSpan.FromHours(25)]);
 
 // Handlers de expiração — cada um processa um único tipo de entidade expirável.
 // A ordem de registro define a ordem de execução no IdentityExpirationJob.
@@ -376,6 +381,7 @@ builder.Services.AddHostedService<PlatformHealthMonitorJob>();
 builder.Services.AddHostedService<BackupCoordinatorJob>();
 builder.Services.AddHostedService<WasteDetectionJob>();
 builder.Services.AddHostedService<ElasticsearchIndexMaintenanceJob>();
+builder.Services.AddHostedService<CarbonScoreCalculationJob>();
 
 // W7-01: ES index manager — resolve via scoped scope in job
 var esUrl = builder.Configuration["Elasticsearch:Url"] ?? builder.Configuration["Elasticsearch:Uri"] ?? "http://localhost:9200";
