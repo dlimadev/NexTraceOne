@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
+using NexTraceOne.BuildingBlocks.Observability.Observability;
 using NexTraceOne.BuildingBlocks.Observability.Alerting;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Alerting.Channels;
@@ -286,5 +287,58 @@ public static class DependencyInjection
         }
 
         return services;
+    }
+
+    /// <summary>
+    /// Registra observabilidade adaptada ao modo configurado em Platform:ObservabilityMode.
+    /// Full: Elasticsearch + ClickHouse. Lite: apenas NullAnalyticsWriter (PostgreSQL product store).
+    /// Minimal: sem analytics writer; apenas Serilog file sink.
+    /// W7-03: Lightweight Mode.
+    /// </summary>
+    public static IServiceCollection AddBuildingBlocksObservabilityForMode(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var modeStr = configuration["Platform:ObservabilityMode"] ?? "Full";
+        var mode = Enum.TryParse<ObservabilityMode>(modeStr, ignoreCase: true, out var parsed)
+            ? parsed
+            : ObservabilityMode.Full;
+
+        // OpenTelemetry e health checks são sempre registados
+        services.AddBuildingBlocksObservability(configuration);
+        services.AddBuildingBlocksAlerting(configuration);
+
+        switch (mode)
+        {
+            case ObservabilityMode.Full:
+                // Modo completo: analytics writer configurado normalmente via AddBuildingBlocksAnalytics
+                services.AddBuildingBlocksAnalytics(configuration);
+                break;
+
+            case ObservabilityMode.Lite:
+                // Modo reduzido: analytics writer nulo; telemetria via Product Store existente
+                services.AddSingleton<IAnalyticsWriter, NullAnalyticsWriter>();
+                break;
+
+            case ObservabilityMode.Minimal:
+            default:
+                // Modo mínimo: sem analytics writer, sem dashboard
+                services.AddSingleton<IAnalyticsWriter, NullAnalyticsWriter>();
+                break;
+        }
+
+        return services;
+    }
+
+    /// <summary>
+    /// Resolve o ObservabilityMode a partir da configuração.
+    /// Utilitário para testes e setup wizard.
+    /// </summary>
+    public static ObservabilityMode ResolveObservabilityMode(IConfiguration configuration)
+    {
+        var modeStr = configuration["Platform:ObservabilityMode"] ?? "Full";
+        return Enum.TryParse<ObservabilityMode>(modeStr, ignoreCase: true, out var mode)
+            ? mode
+            : ObservabilityMode.Full;
     }
 }
