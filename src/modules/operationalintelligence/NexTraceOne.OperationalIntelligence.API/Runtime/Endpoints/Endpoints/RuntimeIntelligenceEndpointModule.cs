@@ -22,6 +22,7 @@ using ListChaosExperimentsFeature = NexTraceOne.OperationalIntelligence.Applicat
 using CorrelateServiceMetricsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.CorrelateServiceMetrics.CorrelateServiceMetrics;
 using DetectLogAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectLogAnomaly.DetectLogAnomaly;
 using GetTopologyAwareAlertsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTopologyAwareAlerts.GetTopologyAwareAlerts;
+using SearchLogsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.SearchLogs.SearchLogs;
 
 namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints.Endpoints;
 
@@ -251,6 +252,41 @@ public sealed class RuntimeIntelligenceEndpointModule
             int pageSize = 20) =>
         {
             var query = new ListChaosExperimentsFeature.Query(serviceName, environment, page, pageSize);
+            var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:runtime:read");
+
+        // ── SaaS-07: Log Search UI ────────────────────────────────────────────
+        group.MapGet("/logs/search", async (
+            string? serviceName,
+            string? severity,
+            string? environment,
+            string? searchText,
+            string? window,
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 50) =>
+        {
+            var timeWindow = Enum.TryParse<SearchLogsFeature.TimeWindow>(window, ignoreCase: true, out var w)
+                ? w
+                : SearchLogsFeature.TimeWindow.Last1Hour;
+
+            var query = new SearchLogsFeature.Query(
+                ServiceName: serviceName,
+                Severity: severity,
+                Environment: environment,
+                SearchText: searchText,
+                Window: timeWindow,
+                From: from,
+                To: to,
+                Page: page,
+                PageSize: pageSize);
+
             var result = await sender.Send(query, ct);
             return result.ToHttpResult(localizer);
         })
