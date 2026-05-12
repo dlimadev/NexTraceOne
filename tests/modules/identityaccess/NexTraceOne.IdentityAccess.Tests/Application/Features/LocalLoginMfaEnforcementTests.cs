@@ -101,3 +101,4 @@ public sealed class LocalLoginMfaEnforcementTests
         mfaChallengeService.DidNotReceive().Issue(Arg.Any<Guid>(), Arg.Any<DateTimeOffset>());
     }
 }
+

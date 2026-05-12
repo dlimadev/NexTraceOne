@@ -168,3 +168,4 @@ public sealed class VerifyMfaChallengeTests
         result.Error.Code.Should().Be("Identity.Mfa.ChallengeExpiredOrInvalid");
     }
 }
+

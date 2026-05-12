@@ -233,3 +233,4 @@ public sealed class SelectTenantTests
             "tenants without a license fall back to Enterprise capabilities for self-hosted backward compatibility");
     }
 }
+

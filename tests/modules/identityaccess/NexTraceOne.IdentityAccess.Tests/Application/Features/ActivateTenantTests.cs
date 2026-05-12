@@ -104,3 +104,4 @@ public sealed class ActivateTenantTests
         result.Value.TenantId.Should().Be(tenant.Id.Value);
     }
 }
+

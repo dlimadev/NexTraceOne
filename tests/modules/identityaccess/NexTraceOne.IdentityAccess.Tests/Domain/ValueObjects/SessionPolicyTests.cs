@@ -68,3 +68,4 @@ public sealed class SessionPolicyTests
         policy1.Should().Be(policy2);
     }
 }
+

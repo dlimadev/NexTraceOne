@@ -91,3 +91,4 @@ public sealed class ListMyTenantsTests
         result.Error.Code.Should().Be("Identity.Auth.NotAuthenticated");
     }
 }
+

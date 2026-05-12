@@ -131,3 +131,4 @@ public sealed class LocalLoginTests
             Arg.Any<TenantId>(), user.Id, Arg.Any<string?>(), Arg.Any<string?>());
     }
 }
+

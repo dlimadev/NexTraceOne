@@ -18,6 +18,7 @@
 
 INSERT INTO chg_releases (
   "Id", "ApiAssetId", "ServiceName", "Version",
+  "ReleaseName",
   "Environment", "PipelineSource", "CommitSha",
   "ChangeLevel", "Status", "ChangeScore",
   "WorkItemReference", "RolledBackFromReleaseId",
@@ -29,6 +30,7 @@ INSERT INTO chg_releases (
   'c9000001-0001-0000-0000-000000000001',
   'ca010001-0001-0000-0000-000000000001',
   'payment-service', '1.2.0',
+  'payment-service 1.2.0',
   'production', 'gitlab/payments-team/payment-service', 'abc123def456',
   1, 2, 0.8500,
   'PAY-1234', NULL,
@@ -40,6 +42,7 @@ INSERT INTO chg_releases (
   'c9000002-0001-0000-0000-000000000001',
   'ca010002-0001-0000-0000-000000000001',
   'catalog-service', '2.0.0',
+  'catalog-service 2.0.0',
   'production', 'gitlab/platform-team/catalog-service', 'def789abc012',
   3, 2, 0.6200,
   'CAT-567', NULL,
@@ -51,6 +54,7 @@ INSERT INTO chg_releases (
   'c9000003-0001-0000-0000-000000000001',
   'ca010003-0001-0000-0000-000000000001',
   'identity-service', '1.0.5',
+  'identity-service 1.0.5',
   'staging', 'gitlab/platform-team/identity-service', 'fed321cba654',
   1, 0, 0.0000,
   'PLAT-89', NULL,

@@ -63,3 +63,4 @@ public sealed class PasswordResetTokenTests
         token.UsedAt.Should().Be(usedAt);
     }
 }
+

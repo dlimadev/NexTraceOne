@@ -170,8 +170,7 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("NexTraceOne.ProductAnalytics.Domain.Entities.JourneyDefinition", b =>
                 {
-                    b.Property<NexTraceOne.ProductAnalytics.Domain.Entities.JourneyDefinitionId>("Id")
-                        .HasConversion<Guid>()
+                    b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -211,7 +210,7 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_pan_journey_definitions_TenantId_Key");
 
-                    b.ToTable("pan_journey_definitions");
+                    b.ToTable("pan_journey_definitions", (string)null);
                 });
 #pragma warning restore 612, 618
         }

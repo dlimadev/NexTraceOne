@@ -267,3 +267,4 @@ public sealed class WaveAdAccessPatternAnomalyReportTests
         result.IsValid.Should().BeFalse();
     }
 }
+

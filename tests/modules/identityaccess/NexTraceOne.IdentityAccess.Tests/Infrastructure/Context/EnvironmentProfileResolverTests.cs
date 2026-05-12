@@ -334,3 +334,5 @@ public sealed class EnvironmentProfileResolverTests
         await repository.Received(1).GetByIdAsync(Arg.Any<EnvironmentId>(), cts.Token);
     }
 }
+
+

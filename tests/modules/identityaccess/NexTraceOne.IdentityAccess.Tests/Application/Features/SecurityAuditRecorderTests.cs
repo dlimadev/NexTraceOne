@@ -112,3 +112,4 @@ public sealed class SecurityAuditRecorderTests
         result.Value.Should().Be(Guid.Empty);
     }
 }
+

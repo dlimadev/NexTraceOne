@@ -81,3 +81,4 @@ public sealed class SsoGroupMappingTests
         mapping.RoleId.Should().Be(newRoleId);
     }
 }
+

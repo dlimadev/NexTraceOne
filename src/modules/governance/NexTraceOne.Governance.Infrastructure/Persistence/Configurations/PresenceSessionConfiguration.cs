@@ -22,9 +22,9 @@ public sealed class PresenceSessionConfiguration : IEntityTypeConfiguration<Pres
         builder.Property(x => x.LastSeenAt).IsRequired();
         builder.Property(x => x.LeftAt);
 
-        builder.HasIndex(new[] { "tenant_id", "ResourceType", "ResourceId", "IsActive" })
+        builder.HasIndex(new[] { "TenantId", "ResourceType", "ResourceId", "IsActive" })
             .HasDatabaseName("ix_gov_presence_resource_active");
-        builder.HasIndex(new[] { "tenant_id", "UserId", "IsActive" })
+        builder.HasIndex(new[] { "TenantId", "UserId", "IsActive" })
             .HasDatabaseName("ix_gov_presence_user_active");
     }
 }

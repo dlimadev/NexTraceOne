@@ -192,3 +192,4 @@ public sealed class RolePermissionCatalogTests
             because: $"papel '{roleName}' deve ter ao menos uma permissão");
     }
 }
+

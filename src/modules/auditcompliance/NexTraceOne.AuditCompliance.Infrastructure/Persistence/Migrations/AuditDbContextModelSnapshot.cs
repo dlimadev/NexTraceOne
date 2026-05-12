@@ -180,6 +180,12 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId");
 
+                    b.HasIndex("ResourceType", "ResourceId")
+                        .HasDatabaseName("IX_aud_audit_events_ResourceType_ResourceId");
+
+                    b.HasIndex("TenantId", "OccurredAt")
+                        .HasDatabaseName("IX_aud_audit_events_TenantId_OccurredAt");
+
                     b.ToTable("aud_audit_events", (string)null);
                 });
 
@@ -393,6 +399,16 @@ namespace NexTraceOne.AuditCompliance.Infrastructure.Persistence.Migrations
                         .WithOne("ChainLink")
                         .HasForeignKey("NexTraceOne.AuditCompliance.Domain.Entities.AuditChainLink", "AuditEventId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NexTraceOne.AuditCompliance.Domain.Entities.ComplianceResult", b =>
+                {
+                    b.HasOne("NexTraceOne.AuditCompliance.Domain.Entities.CompliancePolicy", null)
+                        .WithMany()
+                        .HasForeignKey("PolicyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_aud_compliance_results_aud_compliance_policies_PolicyId");
                 });
 
             modelBuilder.Entity("NexTraceOne.AuditCompliance.Domain.Entities.AuditEvent", b =>

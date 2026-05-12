@@ -5,6 +5,9 @@ using Microsoft.Extensions.Options;
 
 using NexTraceOne.Notifications.Application.Abstractions;
 using NexTraceOne.Notifications.Application.ExternalDelivery;
+using NexTraceOne.Notifications.Domain.Entities;
+
+using Npgsql;
 
 namespace NexTraceOne.Notifications.Infrastructure.ExternalDelivery;
 
@@ -86,11 +89,28 @@ internal sealed class NotificationDeliveryRetryJob(
         var opts = scope.ServiceProvider.GetRequiredService<IOptions<DeliveryRetryOptions>>().Value;
 
         var now = DateTimeOffset.UtcNow;
-        var scheduled = await deliveryStore.ListScheduledForRetryAsync(
-            now,
-            opts.MaxAttempts,
-            batchSize: opts.RetryJobBatchSize,
-            cancellationToken);
+        
+        // Try to fetch scheduled retries, but handle gracefully if the table doesn't exist yet
+        // (during initial migration phase when database schema hasn't been fully applied)
+        IReadOnlyList<NotificationDelivery> scheduled;
+        try
+        {
+            scheduled = await deliveryStore.ListScheduledForRetryAsync(
+                now,
+                opts.MaxAttempts,
+                batchSize: opts.RetryJobBatchSize,
+                cancellationToken);
+        }
+        catch (Npgsql.PostgresException ex) when (ex.SqlState == "42P01")
+        {
+            // Table doesn't exist yet - log and return gracefully
+            logger.LogWarning(
+                "NotificationDeliveryRetryJob: Notifications database schema not yet initialized. " +
+                "Table 'ntf_deliveries' does not exist. Skipping retry cycle. This is normal during initial startup. " +
+                "Error: {Error}",
+                ex.Message);
+            return;
+        }
 
         if (scheduled.Count == 0)
             return;

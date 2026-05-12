@@ -562,6 +562,150 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                     b.ToTable("cfg_modules", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ContractCompliancePolicy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AutoGenerateChangelog")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CdctFailureAction")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("ChangelogFormat")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("DriftDetectionIntervalMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("DriftThresholdForAlert")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("DriftThresholdForIncident")
+                        .HasColumnType("numeric");
+
+                    b.Property<bool>("EnableRuntimeDriftDetection")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnforceCdct")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NotificationChannels")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("NotifyOnBreakingChange")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NotifyOnDriftDetected")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NotifyOnVerificationFailure")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("OnBreakingChange")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OnContractNotApproved")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OnMissingContract")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OnNewEndpoint")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OnNonBreakingChange")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OnRemovedEndpoint")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("RequireChangelogApproval")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ScopeId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("VerificationApproach")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("VerificationMode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Scope");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "Scope", "IsActive");
+
+                    b.ToTable("cfg_contract_compliance_policies", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ContractTemplate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1332,150 +1476,6 @@ namespace NexTraceOne.Configuration.Infrastructure.Persistence.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("NexTraceOne.Configuration.Domain.Entities.ContractCompliancePolicy", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("AutoGenerateChangelog")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("CdctFailureAction")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int>("ChangelogFormat")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<int>("DriftDetectionIntervalMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("DriftThresholdForAlert")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("DriftThresholdForIncident")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("EnableRuntimeDriftDetection")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnforceCdct")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("NotificationChannels")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<bool>("NotifyOnBreakingChange")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("NotifyOnDriftDetected")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("NotifyOnVerificationFailure")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("OnBreakingChange")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("OnContractNotApproved")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("OnMissingContract")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("OnNewEndpoint")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("OnNonBreakingChange")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("OnRemovedEndpoint")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<bool>("RequireChangelogApproval")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Scope")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("ScopeId")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("VerificationApproach")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("VerificationMode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("Scope");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "Scope", "IsActive");
-
-                    b.ToTable("cfg_contract_compliance_policies", (string)null);
                 });
 #pragma warning restore 612, 618
         }

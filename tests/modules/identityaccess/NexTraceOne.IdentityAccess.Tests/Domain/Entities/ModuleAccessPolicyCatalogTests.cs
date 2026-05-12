@@ -278,3 +278,4 @@ public sealed class ModuleAccessPolicyCatalogTests
         }
     }
 }
+

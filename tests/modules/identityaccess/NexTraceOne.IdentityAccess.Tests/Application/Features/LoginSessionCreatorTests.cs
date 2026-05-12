@@ -64,3 +64,4 @@ public sealed class LoginSessionCreatorTests
         session.ExpiresAt.Should().Be(now.AddDays(30));
     }
 }
+

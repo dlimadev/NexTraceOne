@@ -134,3 +134,4 @@ public sealed class ActivateAccountTests
         result.Error.Code.Should().Be("account.activation.token_invalid");
     }
 }
+

@@ -122,3 +122,4 @@ public sealed class JitAccessRequestTests
         request.IsAccessActiveAt(afterGrant).Should().BeFalse();
     }
 }
+

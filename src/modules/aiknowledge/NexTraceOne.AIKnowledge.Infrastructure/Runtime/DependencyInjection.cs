@@ -62,6 +62,8 @@ public static class DependencyInjection
             opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
             opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(300);
             opts.Retry.MaxRetryAttempts = 2;
+            // SamplingDuration must be >= 2× AttemptTimeout per Polly validation
+            opts.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(300);
         });
 
         // Ollama provider — scoped because OllamaHttpClient is transient (from HttpClientFactory)
@@ -132,6 +134,8 @@ public static class DependencyInjection
                 opts.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
                 opts.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(300);
                 opts.Retry.MaxRetryAttempts = 2;
+                // SamplingDuration must be >= 2× AttemptTimeout per Polly validation
+                opts.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(300);
             });
 
             services.AddScoped<LmStudioProvider>();

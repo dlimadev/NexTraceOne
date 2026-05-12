@@ -67,3 +67,4 @@ public sealed class AccountActivationTokenTests
         t1.Id.Should().NotBe(t2.Id);
     }
 }
+

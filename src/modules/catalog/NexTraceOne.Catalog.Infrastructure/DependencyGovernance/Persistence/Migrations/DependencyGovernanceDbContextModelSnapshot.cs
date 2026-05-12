@@ -196,23 +196,10 @@ namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence.Mi
                     b.ToTable("dep_service_dependency_profiles", (string)null);
                 });
 
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.PackageDependency", b =>
-                {
-                    b.HasOne("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.ServiceDependencyProfile", null)
-                        .WithMany("Dependencies")
-                        .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.ServiceDependencyProfile", b =>
-                {
-                    b.Navigation("Dependencies");
-                });
-
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.VulnerabilityAdvisoryRecord", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("AdvisoryId")
@@ -282,6 +269,20 @@ namespace NexTraceOne.Catalog.Infrastructure.DependencyGovernance.Persistence.Mi
                         .HasDatabaseName("uix_dep_vuln_advisory_service_advisory");
 
                     b.ToTable("dep_vulnerability_advisory_records", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.PackageDependency", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.ServiceDependencyProfile", null)
+                        .WithMany("Dependencies")
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.DependencyGovernance.Entities.ServiceDependencyProfile", b =>
+                {
+                    b.Navigation("Dependencies");
                 });
 #pragma warning restore 612, 618
         }

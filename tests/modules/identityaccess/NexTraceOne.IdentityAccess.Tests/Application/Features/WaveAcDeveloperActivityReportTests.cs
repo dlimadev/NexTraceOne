@@ -248,3 +248,4 @@ public sealed class WaveAcDeveloperActivityReportTests
         result.Errors.Should().Contain(e => e.PropertyName == nameof(GetDeveloperActivityReport.Query.LookbackDays));
     }
 }
+

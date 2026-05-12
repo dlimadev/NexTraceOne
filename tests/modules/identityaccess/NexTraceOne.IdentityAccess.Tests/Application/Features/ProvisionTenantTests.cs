@@ -4,9 +4,10 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Features.ProvisionTenant;
+using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 using SeedModulePolicies = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultModuleAccessPolicies.SeedDefaultModuleAccessPolicies;
 using SeedRolePerms = NexTraceOne.IdentityAccess.Application.Features.SeedDefaultRolePermissions.SeedDefaultRolePermissions;
-using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
 namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 
@@ -66,9 +67,9 @@ public sealed class ProvisionTenantTests
 
         await handler.Handle(cmd, CancellationToken.None);
 
-        tenants.Received(1).Add(Arg.Is<Domain.Entities.Tenant>(t =>
+        tenants.Received(1).Add(Arg.Is<Tenant>(t =>
             t.Name == "Test Inc" && t.Slug == "test-inc"));
-        licenses.Received(1).Add(Arg.Any<Domain.Entities.TenantLicense>());
+        licenses.Received(1).Add(Arg.Any<TenantLicense>());
         await uow.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
 
@@ -108,9 +109,9 @@ public sealed class ProvisionTenantTests
         var (tenants, licenses, uow, _, handler) = CreateHandler();
         tenants.SlugExistsAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(false);
 
-        Domain.Entities.TenantLicense? capturedLicense = null;
-        licenses.When(r => r.Add(Arg.Any<Domain.Entities.TenantLicense>()))
-            .Do(call => capturedLicense = call.Arg<Domain.Entities.TenantLicense>());
+        TenantLicense? capturedLicense = null;
+        licenses.When(r => r.Add(Arg.Any<TenantLicense>()))
+            .Do(call => capturedLicense = call.Arg<TenantLicense>());
 
         var cmd = new ProvisionTenant.Command("Trial Co", "trial-co", "Trial", 5, null, null);
         await handler.Handle(cmd, CancellationToken.None);
@@ -146,9 +147,9 @@ public sealed class ProvisionTenantTests
         var (tenants, _, _, _, handler) = CreateHandler();
         tenants.SlugExistsAsync("my-corp", Arg.Any<CancellationToken>()).Returns(false);
 
-        Domain.Entities.Tenant? capturedTenant = null;
-        tenants.When(r => r.Add(Arg.Any<Domain.Entities.Tenant>()))
-            .Do(call => capturedTenant = call.Arg<Domain.Entities.Tenant>());
+        Tenant? capturedTenant = null;
+        tenants.When(r => r.Add(Arg.Any<Tenant>()))
+            .Do(call => capturedTenant = call.Arg<Tenant>());
 
         var cmd = new ProvisionTenant.Command("My Corp", "My-Corp", "Starter", 0, null, null);
         await handler.Handle(cmd, CancellationToken.None);
@@ -156,3 +157,4 @@ public sealed class ProvisionTenantTests
         capturedTenant!.Slug.Should().Be("my-corp");
     }
 }
+

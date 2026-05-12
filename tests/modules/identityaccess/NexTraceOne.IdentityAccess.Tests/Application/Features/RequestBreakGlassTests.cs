@@ -3,6 +3,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Features.RequestBreakGlass;
 using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 
@@ -51,9 +52,9 @@ public sealed class RequestBreakGlassTests
 
     private static User CreateActiveUserWithMfa(bool mfaEnabled, string? mfaSecret = null)
     {
-        var email = Domain.ValueObjects.Email.Create($"user-{Guid.NewGuid():N}@test.com");
-        var fullName = Domain.ValueObjects.FullName.Create("Test", "User");
-        var hashedPwd = Domain.ValueObjects.HashedPassword.FromPlainText("Password123!");
+        var email = Email.Create($"user-{Guid.NewGuid():N}@test.com");
+        var fullName = FullName.Create("Test", "User");
+        var hashedPwd = HashedPassword.FromPlainText("Password123!");
         var user = User.CreateLocal(email, fullName, hashedPwd);
         if (mfaEnabled)
             user.EnableMfa("TOTP", mfaSecret ?? "JBSWY3DPEHPK3PXP");
@@ -66,8 +67,8 @@ public sealed class RequestBreakGlassTests
         var (bgRepo, userRepo, _, _, _, _, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUserWithMfa(mfaEnabled: false);
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
-        bgRepo.CountQuarterlyUsageAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(0);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        bgRepo.CountQuarterlyUsageAsync(Arg.Any<UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(0);
 
         var cmd = new RequestBreakGlass.Command(
             "Emergency access needed for production incident investigation.",
@@ -87,7 +88,7 @@ public sealed class RequestBreakGlassTests
         var (_, userRepo, evtRepo, _, _, _, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUserWithMfa(mfaEnabled: true);
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
 
         var cmd = new RequestBreakGlass.Command(
             "Emergency access needed for production incident.",
@@ -107,7 +108,7 @@ public sealed class RequestBreakGlassTests
         var (_, userRepo, evtRepo, _, _, totp, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUserWithMfa(mfaEnabled: true, mfaSecret: "JBSWY3DPEHPK3PXP");
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
         totp.Verify(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
         var cmd = new RequestBreakGlass.Command(
@@ -128,9 +129,9 @@ public sealed class RequestBreakGlassTests
         var (bgRepo, userRepo, _, _, _, totp, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUserWithMfa(mfaEnabled: true, mfaSecret: "JBSWY3DPEHPK3PXP");
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
         totp.Verify(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
-        bgRepo.CountQuarterlyUsageAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(1);
+        bgRepo.CountQuarterlyUsageAsync(Arg.Any<UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(1);
 
         var cmd = new RequestBreakGlass.Command(
             "MFA-verified emergency access for security incident.",
@@ -149,8 +150,8 @@ public sealed class RequestBreakGlassTests
         var (bgRepo, userRepo, _, _, _, _, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUserWithMfa(mfaEnabled: false);
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
-        bgRepo.CountQuarterlyUsageAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        bgRepo.CountQuarterlyUsageAsync(Arg.Any<UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(BreakGlassRequest.QuarterlyUsageLimit);
 
         var cmd = new RequestBreakGlass.Command("Emergency access justification text for testing.");
@@ -167,7 +168,7 @@ public sealed class RequestBreakGlassTests
     {
         var (_, userRepo, _, _, _, _, _, _, handler) = CreateHandler();
 
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>())
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
         var cmd = new RequestBreakGlass.Command("Emergency access justification text here.");
@@ -184,8 +185,8 @@ public sealed class RequestBreakGlassTests
         var (bgRepo, userRepo, _, _, notifications, _, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUserWithMfa(mfaEnabled: false);
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
-        bgRepo.CountQuarterlyUsageAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(0);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        bgRepo.CountQuarterlyUsageAsync(Arg.Any<UserId>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns(0);
 
         var cmd = new RequestBreakGlass.Command(
             "Emergency access required for critical production issue resolution.",
@@ -216,3 +217,4 @@ public sealed class RequestBreakGlassTests
         result.Error.Code.Should().Be("identity.notAuthenticated");
     }
 }
+

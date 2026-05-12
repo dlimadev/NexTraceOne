@@ -19,7 +19,7 @@ internal sealed class ServiceInterfaceRepository(CatalogGraphDbContext context)
     public async Task<IReadOnlyList<ServiceInterface>> ListByServiceAsync(Guid serviceAssetId, CancellationToken ct)
         => await _context.ServiceInterfaces
             .AsNoTracking()
-            .Where(i => i.ServiceAssetId == serviceAssetId && !i.IsDeleted)
+            .Where(i => i.ServiceAssetId == ServiceAssetId.From(serviceAssetId) && !i.IsDeleted)
             .OrderBy(i => i.Name)
             .ToListAsync(ct);
 }

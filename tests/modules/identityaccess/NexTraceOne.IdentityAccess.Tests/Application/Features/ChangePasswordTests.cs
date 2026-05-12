@@ -155,3 +155,4 @@ public sealed class ChangePasswordTests
         result.Error.Code.Should().Be("Identity.Auth.NotAuthenticated");
     }
 }
+

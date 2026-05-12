@@ -2,6 +2,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Features.ForgotPassword;
 using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
 namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
@@ -36,15 +37,15 @@ public sealed class ForgotPasswordTests
 
     private static User CreateActiveUser()
         => User.CreateLocal(
-            Domain.ValueObjects.Email.Create("user@test.com"),
-            Domain.ValueObjects.FullName.Create("Test", "User"),
-            Domain.ValueObjects.HashedPassword.FromPlainText("Password123!"));
+            Email.Create("user@test.com"),
+            FullName.Create("Test", "User"),
+            HashedPassword.FromPlainText("Password123!"));
 
     [Fact]
     public async Task Handle_Should_ReturnAccepted_WhenUserNotFound()
     {
         var (userRepo, _, notifier, _, handler) = CreateHandler();
-        userRepo.GetByEmailAsync(Arg.Any<Domain.ValueObjects.Email>(), Arg.Any<CancellationToken>())
+        userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
         var result = await handler.Handle(
@@ -63,7 +64,7 @@ public sealed class ForgotPasswordTests
     {
         var (userRepo, _, _, _, handler) = CreateHandler();
         var user = CreateActiveUser();
-        userRepo.GetByEmailAsync(Arg.Any<Domain.ValueObjects.Email>(), Arg.Any<CancellationToken>())
+        userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
         var result = await handler.Handle(
@@ -79,7 +80,7 @@ public sealed class ForgotPasswordTests
     {
         var (userRepo, tokenRepo, _, _, handler) = CreateHandler();
         var user = CreateActiveUser();
-        userRepo.GetByEmailAsync(Arg.Any<Domain.ValueObjects.Email>(), Arg.Any<CancellationToken>())
+        userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
         await handler.Handle(new ForgotPassword.Command("user@test.com"), CancellationToken.None);
@@ -92,7 +93,7 @@ public sealed class ForgotPasswordTests
     {
         var (userRepo, tokenRepo, _, _, handler) = CreateHandler();
         var user = CreateActiveUser();
-        userRepo.GetByEmailAsync(Arg.Any<Domain.ValueObjects.Email>(), Arg.Any<CancellationToken>())
+        userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
         await handler.Handle(new ForgotPassword.Command("user@test.com"), CancellationToken.None);
@@ -105,7 +106,7 @@ public sealed class ForgotPasswordTests
     {
         var (userRepo, _, notifier, _, handler) = CreateHandler();
         var user = CreateActiveUser();
-        userRepo.GetByEmailAsync(Arg.Any<Domain.ValueObjects.Email>(), Arg.Any<CancellationToken>())
+        userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
         await handler.Handle(new ForgotPassword.Command("user@test.com"), CancellationToken.None);
@@ -122,11 +123,11 @@ public sealed class ForgotPasswordTests
     {
         var (userRepo, tokenRepo, _, _, handler) = CreateHandler();
         var user = CreateActiveUser();
-        userRepo.GetByEmailAsync(Arg.Any<Domain.ValueObjects.Email>(), Arg.Any<CancellationToken>())
+        userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
         string? capturedRaw = null;
-        await tokenRepo.Add(Arg.Do<PasswordResetToken>(_ => { }));
+        tokenRepo.Add(Arg.Do<PasswordResetToken>(_ => { }));
 
         // Capture the raw token sent to notifier
         var notifier = Substitute.For<IIdentityNotifier>();
@@ -150,13 +151,13 @@ public sealed class ForgotPasswordTests
     public async Task Handle_Should_NotCallDeleteOrAdd_WhenUserNotFound()
     {
         var (userRepo, tokenRepo, _, _, handler) = CreateHandler();
-        userRepo.GetByEmailAsync(Arg.Any<Domain.ValueObjects.Email>(), Arg.Any<CancellationToken>())
+        userRepo.GetByEmailAsync(Arg.Any<Email>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
         await handler.Handle(new ForgotPassword.Command("ghost@test.com"), CancellationToken.None);
 
         await tokenRepo.DidNotReceive().DeleteByUserIdAsync(
-            Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>());
+            Arg.Any<UserId>(), Arg.Any<CancellationToken>());
         tokenRepo.DidNotReceive().Add(Arg.Any<PasswordResetToken>());
     }
 
@@ -184,3 +185,5 @@ public sealed class ForgotPasswordTests
         result.IsValid.Should().BeTrue();
     }
 }
+
+

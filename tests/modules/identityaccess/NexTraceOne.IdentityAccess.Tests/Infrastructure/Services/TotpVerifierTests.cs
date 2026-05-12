@@ -142,3 +142,4 @@ public sealed class TotpVerifierTests
         return result;
     }
 }
+

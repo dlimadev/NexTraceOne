@@ -49,3 +49,4 @@ public sealed class RevokeSessionTests
         result.Error.Code.Should().Be("Identity.Session.NotFound");
     }
 }
+

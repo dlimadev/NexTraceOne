@@ -233,3 +233,4 @@ public sealed class UserRoleAssignmentTests
             .WithMessage("ValidUntil must be after ValidFrom.");
     }
 }
+
