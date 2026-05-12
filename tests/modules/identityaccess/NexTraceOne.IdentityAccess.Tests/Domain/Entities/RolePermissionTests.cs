@@ -110,3 +110,4 @@ public sealed class RolePermissionTests
         rp.IsActive.Should().BeTrue();
     }
 }
+

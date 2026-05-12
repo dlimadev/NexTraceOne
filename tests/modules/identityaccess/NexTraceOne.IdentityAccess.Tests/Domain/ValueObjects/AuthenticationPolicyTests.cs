@@ -168,3 +168,4 @@ public sealed class AuthenticationPolicyTests
         policy.ToString().Should().Contain("30");
     }
 }
+

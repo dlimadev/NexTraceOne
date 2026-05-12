@@ -110,3 +110,4 @@ public sealed class LogoutTests
         result.Error.Code.Should().Be("Identity.Auth.NotAuthenticated");
     }
 }
+

@@ -62,12 +62,12 @@ public static class DeprecateServiceInterface
             await unitOfWork.CommitAsync(cancellationToken);
 
             var service = await serviceAssetRepository.GetByIdAsync(
-                ServiceAssetId.From(iface.ServiceAssetId),
+                iface.ServiceAssetId,
                 cancellationToken);
 
             await eventBus.PublishAsync(new ServiceInterfaceDeprecatedIntegrationEvent(
                 iface.Id.Value,
-                iface.ServiceAssetId,
+                iface.ServiceAssetId.Value,
                 service?.Name ?? string.Empty,
                 iface.Name,
                 iface.InterfaceType.ToString(),

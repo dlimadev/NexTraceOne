@@ -55,3 +55,4 @@ public sealed class UserTests
         user.LastLoginAt.Should().Be(now);
     }
 }
+

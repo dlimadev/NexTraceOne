@@ -132,6 +132,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("tenant_id");
@@ -273,6 +274,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("numeric(18,4)");
 
                     b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("tenant_id");
@@ -312,21 +314,40 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("CurrentRevisionNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTimeOffset?>("DeprecatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeprecatedByUserId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DeprecationNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<bool>("IsShared")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("IsSystem")
-                        .HasDefaultValue(false)
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Layout")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<int>("LifecycleStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -344,6 +365,14 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
+                    b.Property<string>("SharingPolicy")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("SharingPolicyJson");
+
+                    b.Property<Guid?>("SuccessorDashboardId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("TeamId")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -357,6 +386,11 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Variables")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("VariablesJson");
+
                     b.Property<string>("Widgets")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -369,12 +403,367 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Persona");
 
-                    b.HasIndex("TeamId")
-                        .HasDatabaseName("IX_gov_custom_dashboards_TeamId");
-
                     b.HasIndex("TenantId");
 
                     b.ToTable("gov_custom_dashboards", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DashboardComment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthorUserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DashboardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MentionsJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<Guid?>("ParentCommentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResolvedByUserId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("WidgetId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("ix_gov_dash_comments_created_at");
+
+                    b.HasIndex("DashboardId", "TenantId")
+                        .HasDatabaseName("ix_gov_dash_comments_dashboard_tenant");
+
+                    b.HasIndex("DashboardId", "WidgetId")
+                        .HasDatabaseName("ix_gov_dash_comments_widget");
+
+                    b.ToTable("gov_dashboard_comments", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DashboardMonitorDefinition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConditionField")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("ConditionOperator")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("ConditionThreshold")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("DashboardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("EvaluationWindowMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FiredCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTimeOffset?>("LastFiredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NotificationChannelsJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<string>("NqlQuery")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WidgetId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DashboardId", "TenantId")
+                        .HasDatabaseName("ix_gov_monitor_dashboard_tenant");
+
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("ix_gov_monitor_tenant_status");
+
+                    b.ToTable("gov_dashboard_monitors", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DashboardRevision", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthorUserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ChangeNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DashboardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Layout")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("RevisionNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("VariablesJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<string>("WidgetsJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_gov_dashboard_revisions_tenant");
+
+                    b.HasIndex("DashboardId", "RevisionNumber")
+                        .HasDatabaseName("ix_gov_dashboard_revisions_dashboard_number");
+
+                    b.HasIndex("DashboardId", "TenantId")
+                        .HasDatabaseName("ix_gov_dashboard_revisions_dashboard_tenant");
+
+                    b.ToTable("gov_dashboard_revisions", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DashboardTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DashboardSnapshotJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("{}");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("InstallCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("IsSystem")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Persona")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("RequiredVariablesJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<string>("TagsJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("1.0.0");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Persona")
+                        .HasDatabaseName("ix_gov_dash_templates_persona");
+
+                    b.HasIndex("IsSystem", "Category")
+                        .HasDatabaseName("ix_gov_dash_templates_system_category");
+
+                    b.HasIndex("TenantId", "Category")
+                        .HasDatabaseName("ix_gov_dash_templates_tenant_category");
+
+                    b.ToTable("gov_dashboard_templates", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DashboardUsageEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DashboardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("DurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("view");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Persona")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OccurredAt")
+                        .HasDatabaseName("ix_gov_dash_usage_occurred_at");
+
+                    b.HasIndex("DashboardId", "TenantId")
+                        .HasDatabaseName("ix_gov_dash_usage_dashboard_tenant");
+
+                    b.HasIndex("TenantId", "EventType")
+                        .HasDatabaseName("ix_gov_dash_usage_tenant_type");
+
+                    b.ToTable("gov_dashboard_usage_events", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DelegatedAdministration", b =>
@@ -437,6 +826,38 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("gov_delegated_administrations", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.DemoSeedState", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EntitiesCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("SeededAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_demo_seed_state", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.EvidenceItem", b =>
@@ -608,6 +1029,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("jsonb");
 
                     b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("tenant_id");
@@ -631,6 +1053,85 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("gov_executive_briefings", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.FinOpsBudgetApproval", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ActualCost")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("BaselineCost")
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<decimal>("CostDeltaPct")
+                        .HasColumnType("numeric(10,4)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Justification")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RequestedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResolvedBy")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId");
+
+                    b.HasIndex("RequestedAt");
+
+                    b.HasIndex("ServiceName");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("gov_finops_budget_approvals", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.GovernanceDomain", b =>
@@ -939,16 +1440,16 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<double>("IntensityFactorKgPerKwh")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("EsgTargetKgCo2PerMonth")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("DatacenterRegion")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<double>("EsgTargetKgCo2PerMonth")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("IntensityFactorKgPerKwh")
+                        .HasColumnType("double precision");
 
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");
@@ -960,53 +1461,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("gov_greenops_configurations");
-                });
-
-            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.SupportBundle", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTimeOffset>("RequestedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset?>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<double?>("SizeMb")
-                        .HasColumnType("double precision");
-
-                    b.Property<byte[]>("ZipContent")
-                        .HasColumnType("bytea");
-
-                    b.Property<bool>("IncludesLogs")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IncludesConfig")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IncludesDb")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid?>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Status");
-                    b.HasIndex("TenantId");
-                    b.HasIndex("RequestedAt");
-
-                    b.ToTable("gov_support_bundles");
+                    b.ToTable("gov_greenops_configurations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.LicenseComplianceReport", b =>
@@ -1061,6 +1516,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(300)");
 
                     b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("tenant_id");
@@ -1088,6 +1544,205 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("Scope", "ScopeKey", "ScannedAt");
 
                     b.ToTable("gov_license_compliance_reports", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.NonProdSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ActiveDaysOfWeekJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("ActiveFromHour")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ActiveToHour")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("EnvironmentId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("EnvironmentName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("EstimatedSavingPct")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("KeepActiveUntil")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OverrideReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("TenantId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnvironmentId", "TenantId")
+                        .IsUnique();
+
+                    b.ToTable("gov_nonprod_schedules", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.Notebook", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Cells")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("CellsJson");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("CurrentRevisionNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid?>("LinkedDashboardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Persona")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("RowVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SharingPolicy")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("SharingPolicyJson");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("TeamId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId")
+                        .HasDatabaseName("ix_gov_notebooks_created_by");
+
+                    b.HasIndex("TenantId", "Persona")
+                        .HasDatabaseName("ix_gov_notebooks_tenant_persona");
+
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("ix_gov_notebooks_tenant_status");
+
+                    b.ToTable("gov_notebooks", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.PersonaHomeConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CardLayoutJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DefaultScopeJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("{}");
+
+                    b.Property<string>("Persona")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("QuickActionsJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Persona", "TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_gov_persona_home_user_persona_tenant");
+
+                    b.ToTable("gov_persona_home_configurations", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.PolicyAsCodeDefinition", b =>
@@ -1183,6 +1838,248 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.ToTable("gov_policy_as_code", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.PresenceSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AvatarColor")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("LeftAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ResourceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ResourceType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "UserId", "IsActive")
+                        .HasDatabaseName("ix_gov_presence_user_active");
+
+                    b.HasIndex("TenantId", "ResourceType", "ResourceId", "IsActive")
+                        .HasDatabaseName("ix_gov_presence_resource_active");
+
+                    b.ToTable("gov_presence_sessions", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.RecoveryJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("DryRun")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("InitiatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("InitiatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RestorePointId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("SchemasJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InitiatedAt");
+
+                    b.ToTable("gov_recovery_jobs", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.SamlSsoConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AttributeMappingsJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("DefaultRole")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("IdpCertificate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("JitProvisioningEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SloUrl")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("SsoUrl")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_saml_sso_configurations", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.ScheduledDashboardReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByUserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CronExpression")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("DashboardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("FailureCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("pdf");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("LastFailureMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset?>("LastRunAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("NextRunAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RecipientsJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("[]");
+
+                    b.Property<int>("RetentionDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(90);
+
+                    b.Property<int>("SuccessCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tenant_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WebhookUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NextRunAt")
+                        .HasDatabaseName("ix_gov_sched_report_next_run");
+
+                    b.HasIndex("DashboardId", "TenantId")
+                        .HasDatabaseName("ix_gov_sched_report_dashboard_tenant");
+
+                    b.HasIndex("TenantId", "IsActive")
+                        .HasDatabaseName("ix_gov_sched_report_tenant_active");
+
+                    b.ToTable("gov_scheduled_dashboard_reports", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.ServiceMaturityAssessment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1255,6 +2152,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("tenant_id");
@@ -1271,6 +2169,96 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("gov_service_maturity_assessments", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.SetupWizardStep", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DataJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("{}");
+
+                    b.Property<string>("StepId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_gov_setup_wizard_tenant");
+
+                    b.HasIndex("TenantId", "StepId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_gov_setup_wizard_tenant_step");
+
+                    b.ToTable("gov_setup_wizard_steps", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.SupportBundle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IncludesConfig")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IncludesDb")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IncludesLogs")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset>("RequestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("SizeMb")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<byte[]>("ZipContent")
+                        .HasColumnType("bytea");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestedAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("gov_support_bundles", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.Team", b =>
@@ -1411,6 +2399,7 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("TenantId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("tenant_id");
@@ -1505,6 +2494,47 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_gov_technical_debt_items_severity", "\"Severity\" IN ('critical', 'high', 'medium', 'low')");
                         });
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.WidgetSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CapturedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DashboardId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DataHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("DataJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("WidgetId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "DashboardId", "WidgetId")
+                        .HasDatabaseName("ix_gov_widget_snapshot_widget");
+
+                    b.HasIndex("TenantId", "DashboardId", "WidgetId", "CapturedAt")
+                        .HasDatabaseName("ix_gov_widget_snapshot_lookup");
+
+                    b.ToTable("gov_widget_snapshots", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.SecurityGate.Entities.SecurityFinding", b =>
@@ -1623,6 +2653,53 @@ namespace NexTraceOne.Governance.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("gov_security_scan_results", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.Governance.Infrastructure.Persistence.Repositories.OtelMetricRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Environment")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("IngestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MetricAttributesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MetricName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MetricType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResourceAttributesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ServiceVersion")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OtelMetrics");
                 });
 
             modelBuilder.Entity("NexTraceOne.Governance.Domain.Entities.EvidenceItem", b =>

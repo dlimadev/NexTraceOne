@@ -124,7 +124,7 @@ public sealed class ServiceInterfaceHandlerTests
     [Fact]
     public async Task DeprecateServiceInterface_Should_Succeed_When_InterfaceActive()
     {
-        var iface = ServiceInterface.Create(ServiceId, "REST API", InterfaceType.RestApi);
+        var iface = ServiceInterface.Create(ServiceAssetId.From(ServiceId), "REST API", InterfaceType.RestApi);
         var service = BuildService();
 
         var ifaceRepo = Substitute.For<IServiceInterfaceRepository>();
@@ -195,8 +195,8 @@ public sealed class ServiceInterfaceHandlerTests
     [Fact]
     public async Task ListServiceInterfaces_Should_ReturnAll_ForService()
     {
-        var iface1 = ServiceInterface.Create(ServiceId, "REST v1", InterfaceType.RestApi);
-        var iface2 = ServiceInterface.Create(ServiceId, "gRPC v1", InterfaceType.GrpcService);
+        var iface1 = ServiceInterface.Create(ServiceAssetId.From(ServiceId), "REST v1", InterfaceType.RestApi);
+        var iface2 = ServiceInterface.Create(ServiceAssetId.From(ServiceId), "gRPC v1", InterfaceType.GrpcService);
 
         var repo = Substitute.For<IServiceInterfaceRepository>();
         repo.ListByServiceAsync(ServiceId, Arg.Any<CancellationToken>())

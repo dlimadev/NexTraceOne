@@ -51,7 +51,7 @@ public static class DeactivateContractBinding
             if (binding is null)
                 return CatalogGraphErrors.ContractBindingNotFound(request.BindingId);
 
-            var interfaceId = binding.ServiceInterfaceId;
+            var interfaceId = binding.ServiceInterfaceId.Value;
             var contractVersionId = binding.ContractVersionId;
             var bindingEnvironment = binding.BindingEnvironment;
 

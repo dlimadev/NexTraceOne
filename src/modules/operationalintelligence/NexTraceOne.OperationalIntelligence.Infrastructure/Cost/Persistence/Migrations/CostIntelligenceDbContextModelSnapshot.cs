@@ -590,6 +590,97 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
 
                     b.ToTable("ops_service_cost_profiles", (string)null);
                 });
+
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.WasteSignal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("AcknowledgedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("acknowledged_at");
+
+                    b.Property<string>("AcknowledgedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("acknowledged_by");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("currency");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTimeOffset>("DetectedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("detected_at");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("environment");
+
+                    b.Property<decimal>("EstimatedMonthlySavings")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)")
+                        .HasColumnName("estimated_monthly_savings");
+
+                    b.Property<bool>("IsAcknowledged")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_acknowledged");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("service_name");
+
+                    b.Property<string>("SignalType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("signal_type");
+
+                    b.Property<string>("TeamName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("team_name");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceName")
+                        .HasDatabaseName("ix_oi_waste_signals_service");
+
+                    b.HasIndex("TeamName", "IsAcknowledged")
+                        .HasDatabaseName("ix_oi_waste_signals_team_ack");
+
+                    b.ToTable("oi_waste_signals", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }

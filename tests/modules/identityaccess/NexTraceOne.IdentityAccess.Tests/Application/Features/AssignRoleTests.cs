@@ -103,3 +103,4 @@ public sealed class AssignRoleTests
         result.Error.Code.Should().Be("Identity.User.NotFound");
     }
 }
+

@@ -21,7 +21,9 @@ internal sealed class ContractBindingConfiguration : IEntityTypeConfiguration<Co
             .HasConversion(id => id.Value, value => ContractBindingId.From(value));
 
         // ── Referências ───────────────────────────────────────────────
-        builder.Property(x => x.ServiceInterfaceId).IsRequired();
+        builder.Property(x => x.ServiceInterfaceId)
+            .HasConversion(id => id.Value, value => ServiceInterfaceId.From(value))
+            .IsRequired();
         builder.Property(x => x.ContractVersionId).IsRequired();
 
         // ── Estado ────────────────────────────────────────────────────

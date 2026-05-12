@@ -129,3 +129,4 @@ public sealed class ResetPasswordTests
         result.Error.Code.Should().Be("password.reset.token_invalid");
     }
 }
+

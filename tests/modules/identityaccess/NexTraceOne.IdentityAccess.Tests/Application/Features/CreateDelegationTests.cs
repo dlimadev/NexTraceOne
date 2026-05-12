@@ -158,3 +158,4 @@ public sealed class CreateDelegationTests
             e.EventType == SecurityEventType.DelegationCreated));
     }
 }
+

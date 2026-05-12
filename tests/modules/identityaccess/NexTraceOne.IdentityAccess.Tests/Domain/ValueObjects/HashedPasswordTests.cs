@@ -23,3 +23,4 @@ public sealed class HashedPasswordTests
         password.Verify("P@ssw0rd123").Should().BeTrue();
     }
 }
+

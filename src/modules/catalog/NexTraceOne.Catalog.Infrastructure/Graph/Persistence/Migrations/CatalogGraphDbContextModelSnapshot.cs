@@ -295,6 +295,100 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     b.ToTable("cat_consumer_relationships", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ContractBinding", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ActivatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ActivatedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("BindingEnvironment")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasDefaultValue("");
+
+                    b.Property<Guid>("ContractVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("DeactivatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeactivatedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDefaultVersion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("MigrationNotes")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasDefaultValue("");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<Guid>("ServiceInterfaceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Active");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractVersionId");
+
+                    b.HasIndex("IsDeleted")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("ServiceInterfaceId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("ServiceInterfaceId", "Status");
+
+                    b.ToTable("cat_contract_bindings", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoveredService", b =>
                 {
                     b.Property<Guid>("Id")
@@ -802,6 +896,9 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .HasColumnType("character varying(200)")
                         .HasDefaultValue("");
 
+                    b.Property<DateTimeOffset?>("LastOwnershipReviewAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("LifecycleStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -898,6 +995,13 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasDefaultValue("");
+
+                    b.Property<string>("Tier")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasDefaultValue("Standard");
 
                     b.HasKey("Id");
 
@@ -1088,105 +1192,11 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
 
                     b.HasIndex("ServiceAssetId");
 
+                    b.HasIndex("Status");
+
                     b.HasIndex("ServiceAssetId", "Status", "InterfaceType");
 
-                    b.HasIndex("Status");
-
                     b.ToTable("cat_service_interfaces", (string)null);
-                });
-
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ContractBinding", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ActivatedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTimeOffset?>("ActivatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("BindingEnvironment")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasDefaultValue("");
-
-                    b.Property<Guid>("ContractVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("DeactivatedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTimeOffset?>("DeactivatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDefaultVersion")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("MigrationNotes")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)")
-                        .HasDefaultValue("");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<Guid>("ServiceInterfaceId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("Active");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContractVersionId");
-
-                    b.HasIndex("IsDeleted")
-                        .HasFilter("\"IsDeleted\" = false");
-
-                    b.HasIndex("ServiceInterfaceId");
-
-                    b.HasIndex("ServiceInterfaceId", "Status");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("cat_contract_bindings", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceLink", b =>
@@ -1331,12 +1341,30 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ContractBinding", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceInterface", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceInterfaceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.DiscoverySource", b =>
                 {
                     b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ApiAsset", null)
                         .WithMany("DiscoverySources")
                         .HasForeignKey("ApiAssetId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceInterface", b =>
+                {
+                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceAsset", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceAssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -1357,24 +1385,6 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
 
                     b.Navigation("DiscoverySources");
                 });
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceInterface", b =>
-                {
-                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceAsset", null)
-                        .WithMany()
-                        .HasForeignKey("ServiceAssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("NexTraceOne.Catalog.Domain.Graph.Entities.ContractBinding", b =>
-                {
-                    b.HasOne("NexTraceOne.Catalog.Domain.Graph.Entities.ServiceInterface", null)
-                        .WithMany()
-                        .HasForeignKey("ServiceInterfaceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
 #pragma warning restore 612, 618
         }
     }

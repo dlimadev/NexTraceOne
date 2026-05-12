@@ -53,3 +53,4 @@ public sealed class SessionTests
         session.RevokedAt.Should().Be(now);
     }
 }
+

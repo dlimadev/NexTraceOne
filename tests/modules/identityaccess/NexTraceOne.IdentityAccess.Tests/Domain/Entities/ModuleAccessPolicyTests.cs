@@ -177,3 +177,4 @@ public sealed class ModuleAccessPolicyTests
         act.Should().Throw<ArgumentException>();
     }
 }
+

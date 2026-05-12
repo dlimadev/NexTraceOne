@@ -54,3 +54,4 @@ public sealed class SecurityEventTests
         evt.ReviewedAt.Should().Be(Now.AddHours(2));
     }
 }
+

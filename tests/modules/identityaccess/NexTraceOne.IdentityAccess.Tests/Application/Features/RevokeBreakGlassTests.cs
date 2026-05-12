@@ -45,10 +45,10 @@ public sealed class RevokeBreakGlassTests
 
     private static BreakGlassRequest CreateActiveBreakGlassRequest(UserId? requestedBy = null)
     {
-        var userId = requestedBy ?? Domain.Entities.UserId.From(Guid.NewGuid());
+        var userId = requestedBy ?? UserId.From(Guid.NewGuid());
         return BreakGlassRequest.Create(
             requestedBy: userId,
-            tenantId: Domain.Entities.TenantId.From(TenantId),
+            tenantId: new TenantId(TenantId),
             justification: "Production incident",
             ipAddress: "10.0.0.1",
             userAgent: "TestAgent",
@@ -102,8 +102,8 @@ public sealed class RevokeBreakGlassTests
 
         // Create expired request (window of 1 minute, now is 10 min later)
         var request = BreakGlassRequest.Create(
-            requestedBy: Domain.Entities.UserId.From(Guid.NewGuid()),
-            tenantId: Domain.Entities.TenantId.From(TenantId),
+            requestedBy: UserId.From(Guid.NewGuid()),
+            tenantId: new TenantId(TenantId),
             justification: "incident",
             ipAddress: "127.0.0.1",
             userAgent: "agent",
@@ -189,3 +189,4 @@ public sealed class RevokeBreakGlassTests
             e.PropertyName == nameof(RevokeBreakGlass.Command.RequestId));
     }
 }
+

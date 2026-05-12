@@ -373,7 +373,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid?>("TenantId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -469,7 +469,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Reliability.Persist
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid?>("TenantId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("TriggerConditions")

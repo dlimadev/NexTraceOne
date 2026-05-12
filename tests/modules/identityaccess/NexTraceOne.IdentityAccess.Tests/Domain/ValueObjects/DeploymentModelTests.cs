@@ -114,3 +114,4 @@ public sealed class DeploymentModelTests
         model.ToString().Should().Be("SelfHosted");
     }
 }
+

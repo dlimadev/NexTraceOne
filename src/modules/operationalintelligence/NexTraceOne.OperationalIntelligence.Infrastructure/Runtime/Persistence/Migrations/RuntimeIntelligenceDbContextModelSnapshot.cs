@@ -70,6 +70,101 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                     b.ToTable("ops_rt_outbox_messages", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.FinOps.Entities.ServiceCostAllocationRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("AmountUsd")
+                        .HasPrecision(14, 4)
+                        .HasColumnType("numeric(14,4)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("USD");
+
+                    b.Property<string>("DomainName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal>("OriginalAmount")
+                        .HasPrecision(14, 4)
+                        .HasColumnType("numeric(14,4)");
+
+                    b.Property<DateTimeOffset>("PeriodEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("PeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TagsJson")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("TeamId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category")
+                        .HasDatabaseName("ix_ops_cost_alloc_category");
+
+                    b.HasIndex("TenantId", "Environment")
+                        .HasDatabaseName("ix_ops_cost_alloc_tenant_environment");
+
+                    b.HasIndex("TenantId", "ServiceName", "PeriodStart")
+                        .HasDatabaseName("ix_ops_cost_alloc_tenant_service_period");
+
+                    b.ToTable("ops_service_cost_allocations", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities.AnomalyNarrative", b =>
                 {
                     b.Property<Guid>("Id")
@@ -135,7 +230,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                         .HasMaxLength(10000)
                         .HasColumnType("character varying(10000)");
 
-                    b.Property<Guid?>("TenantId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("TokensUsed")
@@ -482,7 +577,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<Guid?>("TenantId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("TotalDriftItems")
@@ -752,6 +847,107 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                         .HasDatabaseName("ix_ops_playbook_executions_playbook_started");
 
                     b.ToTable("ops_playbook_executions", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities.ProfilingSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CommitSha")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("DurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Environment")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("FrameType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("HasAnomalies")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal>("PeakMemoryMb")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("PeakThreadCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RawDataHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("RawDataUri")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ReleaseVersion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TopFramesJson")
+                        .HasMaxLength(50000)
+                        .HasColumnType("character varying(50000)");
+
+                    b.Property<long>("TotalCpuSamples")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("WindowEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("WindowStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HasAnomalies")
+                        .HasDatabaseName("ix_ops_profiling_sessions_has_anomalies")
+                        .HasFilter("\"HasAnomalies\" = true");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("ix_ops_profiling_sessions_tenant_id");
+
+                    b.HasIndex("ServiceName", "Environment", "WindowStart")
+                        .HasDatabaseName("ix_ops_profiling_sessions_service_env_window");
+
+                    b.ToTable("ops_profiling_sessions", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities.ResilienceReport", b =>
@@ -1029,14 +1225,10 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                         });
                 });
 
-            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities.ProfilingSession", b =>
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Runtime.Entities.SloObservation", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("CommitSha")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1046,129 +1238,27 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("DurationSeconds")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Environment")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
-
-                    b.Property<int>("FrameType")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("HasAnomalies")
-                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
-                    b.Property<decimal>("PeakMemoryMb")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
-
-                    b.Property<int>("PeakThreadCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("RawDataHash")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("RawDataUri")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("ReleaseVersion")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("ServiceName")
+                    b.Property<string>("MetricName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("TopFramesJson")
-                        .HasMaxLength(50000)
-                        .HasColumnType("character varying(50000)");
-
-                    b.Property<long>("TotalCpuSamples")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
+                    b.Property<DateTimeOffset>("ObservedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTimeOffset>("WindowEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("WindowStart")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex(new[] { "HasAnomalies" }, "ix_ops_profiling_sessions_has_anomalies")
-                        .HasFilter("\"HasAnomalies\" = true");
-
-                    b.HasIndex(new[] { "ServiceName", "Environment", "WindowStart" }, "ix_ops_profiling_sessions_service_env_window");
-
-                    b.HasIndex(new[] { "TenantId" }, "ix_ops_profiling_sessions_tenant_id");
-
-                    b.ToTable("ops_profiling_sessions");
-                });
-
-            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.FinOps.Entities.ServiceCostAllocationRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("AmountUsd")
-                        .HasPrecision(14, 4)
-                        .HasColumnType("numeric(14,4)");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasDefaultValue("USD")
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("DomainName")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Environment")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasDefaultValue(false)
-                        .HasColumnType("boolean");
-
-                    b.Property<decimal>("OriginalAmount")
-                        .HasPrecision(14, 4)
-                        .HasColumnType("numeric(14,4)");
+                    b.Property<decimal>("ObservedValue")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)");
 
                     b.Property<DateTimeOffset>("PeriodEnd")
                         .HasColumnType("timestamp with time zone");
@@ -1181,22 +1271,22 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("Source")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<decimal>("SloTarget")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)");
 
-                    b.Property<string>("TagsJson")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("TeamId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1208,13 +1298,16 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "TenantId", "ServiceName", "PeriodStart" }, "ix_ops_cost_alloc_tenant_service_period");
+                    b.HasIndex("ObservedAt")
+                        .HasDatabaseName("ix_ops_slo_obs_observed_at");
 
-                    b.HasIndex(new[] { "TenantId", "Environment" }, "ix_ops_cost_alloc_tenant_environment");
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("ix_ops_slo_obs_tenant_status");
 
-                    b.HasIndex(new[] { "Category" }, "ix_ops_cost_alloc_category");
+                    b.HasIndex("TenantId", "ServiceName", "PeriodStart")
+                        .HasDatabaseName("ix_ops_slo_obs_tenant_service_period");
 
-                    b.ToTable("ops_service_cost_allocations");
+                    b.ToTable("ops_slo_observations", (string)null);
                 });
 #pragma warning restore 612, 618
         }

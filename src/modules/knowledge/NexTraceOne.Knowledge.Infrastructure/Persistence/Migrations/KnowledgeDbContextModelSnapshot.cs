@@ -90,11 +90,26 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("FreshnessScore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(100)
+                        .HasColumnName("freshness_score");
+
                     b.Property<Guid?>("LastEditorId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset?>("LastReviewedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_reviewed_at");
+
                     b.Property<DateTimeOffset?>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReviewedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("reviewed_by");
 
                     b.Property<uint>("RowVersion")
                         .IsConcurrencyToken()
@@ -127,20 +142,6 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("FreshnessScore")
-                        .HasDefaultValue(100)
-                        .HasColumnType("integer")
-                        .HasColumnName("freshness_score");
-
-                    b.Property<DateTimeOffset?>("LastReviewedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("last_reviewed_at");
-
-                    b.Property<string>("ReviewedBy")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("reviewed_by");
 
                     b.Property<int>("Version")
                         .HasColumnType("integer");
@@ -394,6 +395,7 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_knw_operational_notes_severity", "\"Severity\" IN ('Info','Warning','Critical')");
                         });
                 });
+
             modelBuilder.Entity("NexTraceOne.Knowledge.Domain.Entities.ProposedRunbook", b =>
                 {
                     b.Property<Guid>("Id")
@@ -449,14 +451,13 @@ namespace NexTraceOne.Knowledge.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(300)")
                         .HasColumnName("title");
 
-                    b.HasKey("Id")
-                        .HasName("pk_knw_proposed_runbooks");
+                    b.HasKey("Id");
 
                     b.HasIndex("SourceIncidentId")
                         .IsUnique()
                         .HasDatabaseName("uix_knw_proposed_runbooks_incident");
 
-                    b.ToTable("knw_proposed_runbooks");
+                    b.ToTable("knw_proposed_runbooks", (string)null);
                 });
 #pragma warning restore 612, 618
         }

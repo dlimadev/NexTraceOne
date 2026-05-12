@@ -50,16 +50,16 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
     /// <inheritdoc />
     public string GenerateAccessToken(User user, TenantMembership membership, IReadOnlyCollection<string> permissions)
     {
-        // Backward-compatible: delega para o novo overload com um único role.
+        // Backward-compatible: sem role name disponível — usa string vazia; permissions derivadas via IClaimsTransformation.
         return GenerateAccessToken(
             user,
             membership.TenantId,
             new[] { membership.RoleId },
-            permissions);
+            Array.Empty<string>());
     }
 
     /// <inheritdoc />
-    public string GenerateAccessToken(User user, TenantId tenantId, IReadOnlyCollection<RoleId> roleIds, IReadOnlyCollection<string> permissions, IReadOnlyCollection<string>? capabilities = null)
+    public string GenerateAccessToken(User user, TenantId tenantId, IReadOnlyCollection<RoleId> roleIds, IReadOnlyCollection<string> roleNames, IReadOnlyCollection<string>? capabilities = null)
     {
         var now = dateTimeProvider.UtcNow;
 
@@ -73,20 +73,12 @@ internal sealed class JwtTokenGenerator(IConfiguration configuration, IDateTimeP
 
         // Multi-valued claim: role_ids (um claim por papel atribuído).
         foreach (var roleId in roleIds)
-        {
             claims.Add(new Claim("role_ids", roleId.Value.ToString()));
-        }
 
-        // Backward-compatible: role_id com o primeiro papel (para consumers antigos).
-        if (roleIds.Count > 0)
-        {
-            claims.Add(new Claim("role_id", roleIds.First().Value.ToString()));
-        }
-
-        foreach (var permission in permissions)
-        {
-            claims.Add(new Claim("permissions", permission));
-        }
+        // role_names: nomes dos papéis para derivação server-side de permissões via IClaimsTransformation.
+        // Mantém o token pequeno (sem permissions[] em claro) para caber num cookie HttpOnly ≤ 4 KB.
+        foreach (var roleName in roleNames)
+            claims.Add(new Claim("role_names", roleName));
 
         // SaaS-01: capabilities claim — plano de licença do tenant.
         if (capabilities is not null)

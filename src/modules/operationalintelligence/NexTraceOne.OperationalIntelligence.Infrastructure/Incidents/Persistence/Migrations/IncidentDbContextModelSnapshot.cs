@@ -135,7 +135,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<Guid?>("TenantId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
 
@@ -225,7 +225,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                         .HasMaxLength(10000)
                         .HasColumnType("character varying(10000)");
 
-                    b.Property<Guid?>("TenantId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
 
@@ -398,7 +398,7 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("TenantId")
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("tenant_id");
 
@@ -802,6 +802,55 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Incidents.Persisten
                     b.HasIndex("LinkedService");
 
                     b.ToTable("ops_runbooks", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Incidents.Entities.RunbookStepExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorDetail")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("ExecutionStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ExecutorUserId")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("OutputSummary")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<Guid>("RunbookId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("StepKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RunbookId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("ops_inc_runbook_step_executions", (string)null);
                 });
 #pragma warning restore 612, 618
         }
