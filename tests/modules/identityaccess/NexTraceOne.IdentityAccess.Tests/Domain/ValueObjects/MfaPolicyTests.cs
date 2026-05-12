@@ -109,3 +109,4 @@ public sealed class MfaPolicyTests
         policy1.Should().NotBe(policy2);
     }
 }
+

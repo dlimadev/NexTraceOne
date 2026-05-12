@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -112,6 +113,7 @@ public static class DependencyInjection
         // Serviços de autenticação e segurança
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IClaimsTransformation, RolePermissionsClaimsTransformation>();
         services.AddScoped<ITotpVerifier, TotpVerifier>();
         services.AddScoped<IMfaChallengeTokenService, MfaChallengeTokenService>();
 

@@ -76,3 +76,4 @@ public sealed class ListEnvironmentsTests
         result.Error.Code.Should().Be("Identity.Tenant.ContextRequired");
     }
 }
+

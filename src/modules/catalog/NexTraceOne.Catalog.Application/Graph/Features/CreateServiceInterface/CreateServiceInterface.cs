@@ -74,7 +74,7 @@ public static class CreateServiceInterface
                 return Error.Validation("CatalogGraph.ServiceInterface.InvalidType",
                     "Interface type '{0}' is not valid.", request.InterfaceType);
 
-            var iface = ServiceInterface.Create(request.ServiceAssetId, request.Name, interfaceType);
+            var iface = ServiceInterface.Create(ServiceAssetId.From(request.ServiceAssetId), request.Name, interfaceType);
 
             var exposureScope = ParseEnumOrDefault<ExposureType>(request.ExposureScope);
             iface.UpdateDetails(
@@ -97,7 +97,7 @@ public static class CreateServiceInterface
 
             await eventBus.PublishAsync(new ServiceInterfaceCreatedIntegrationEvent(
                 iface.Id.Value,
-                iface.ServiceAssetId,
+                iface.ServiceAssetId.Value,
                 service.Name,
                 iface.Name,
                 iface.InterfaceType.ToString(),
@@ -114,7 +114,7 @@ public static class CreateServiceInterface
 
             return new Response(
                 iface.Id.Value,
-                iface.ServiceAssetId,
+                iface.ServiceAssetId.Value,
                 iface.Name,
                 iface.InterfaceType.ToString(),
                 iface.Status.ToString());

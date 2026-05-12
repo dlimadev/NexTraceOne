@@ -179,3 +179,4 @@ public sealed class RevokePlatformApiTokenTests
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(RevokePlatformApiToken.Command.Reason));
     }
 }
+

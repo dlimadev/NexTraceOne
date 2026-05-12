@@ -123,3 +123,4 @@ public sealed class AuthenticationModeTests
         mode.ToString().Should().Be("Hybrid");
     }
 }
+

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
+using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
@@ -58,7 +59,7 @@ public sealed class ContractGroundingReader(
     {
         var bindingQuery = catalogDb.ContractBindings
             .AsNoTracking()
-            .Where(cb => cb.ServiceInterfaceId == serviceInterfaceId
+            .Where(cb => cb.ServiceInterfaceId == ServiceInterfaceId.From(serviceInterfaceId)
                       && cb.Status == ContractBindingStatus.Active);
 
         if (!string.IsNullOrWhiteSpace(environment))

@@ -19,7 +19,7 @@ internal sealed class ContractBindingRepository(CatalogGraphDbContext context)
     public async Task<IReadOnlyList<ContractBinding>> ListByInterfaceAsync(Guid serviceInterfaceId, CancellationToken ct)
         => await _context.ContractBindings
             .AsNoTracking()
-            .Where(b => b.ServiceInterfaceId == serviceInterfaceId && !b.IsDeleted)
+            .Where(b => b.ServiceInterfaceId == ServiceInterfaceId.From(serviceInterfaceId) && !b.IsDeleted)
             .OrderByDescending(b => b.CreatedAt)
             .ToListAsync(ct);
 }

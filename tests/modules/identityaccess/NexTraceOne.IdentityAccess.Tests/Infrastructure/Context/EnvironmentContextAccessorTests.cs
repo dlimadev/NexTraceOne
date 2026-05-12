@@ -104,3 +104,4 @@ public sealed class EnvironmentContextAccessorTests
         accessor.IsResolved.Should().BeTrue();
     }
 }
+

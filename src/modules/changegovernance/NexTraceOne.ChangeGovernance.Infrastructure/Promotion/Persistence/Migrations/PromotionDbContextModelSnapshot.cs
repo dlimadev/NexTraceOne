@@ -232,7 +232,7 @@ namespace NexTraceOne.ChangeGovernance.Infrastructure.Promotion.Persistence.Migr
                     b.HasIndex("DeploymentEnvironmentId", "GateName")
                         .IsUnique();
 
-                    b.ToTable("chg_promotion_gates", (string)null);
+                    b.ToTable("prm_promotion_gates", (string)null);
                 });
 
             modelBuilder.Entity("NexTraceOne.ChangeGovernance.Domain.Promotion.Entities.PromotionRequest", b =>

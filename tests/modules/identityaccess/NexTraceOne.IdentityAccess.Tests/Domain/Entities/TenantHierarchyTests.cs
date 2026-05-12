@@ -208,3 +208,4 @@ public sealed class TenantHierarchyTests
         act.Should().Throw<ArgumentException>();
     }
 }
+

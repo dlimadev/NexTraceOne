@@ -70,6 +70,43 @@ namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Mig
                     b.ToTable("dx_surveys_outbox_messages", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions.IIDEUsageRepository+IdeUsageRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("EventType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResourceName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "OccurredAt");
+
+                    b.HasIndex("UserId", "OccurredAt");
+
+                    b.ToTable("dx_ide_usage_records", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.Catalog.Domain.DeveloperExperience.Entities.DeveloperSurvey", b =>
                 {
                     b.Property<Guid>("Id")
@@ -138,43 +175,6 @@ namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Mig
 
                     b.ToTable("dx_developer_surveys", (string)null);
                 });
-
-            modelBuilder.Entity("NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions.IIDEUsageRepository+IdeUsageRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("EventType")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("OccurredAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ResourceName")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("UserId", "OccurredAt");
-
-                    b.HasIndex("TenantId", "OccurredAt");
-
-                    b.ToTable("dx_ide_usage_records");
-                });
-
 #pragma warning restore 612, 618
         }
     }

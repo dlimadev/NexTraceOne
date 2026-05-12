@@ -79,3 +79,4 @@ public sealed class TenantTests
         tenant.UpdatedAt.Should().Be(later);
     }
 }
+

@@ -102,6 +102,12 @@ public sealed class AiGovernanceDbContext(
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(AiGovernanceDbContext).Assembly;
 
+    protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Ignore<AgentStep>();
+    }
+
     /// <inheritdoc />
     protected override string? ConfigurationsNamespace
         => "NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Configurations";

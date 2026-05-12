@@ -59,7 +59,7 @@ public static class BindContractToInterface
                 return CatalogGraphErrors.InterfaceAlreadyRetired(request.ServiceInterfaceId);
 
             var binding = ContractBinding.Create(
-                request.ServiceInterfaceId,
+                ServiceInterfaceId.From(request.ServiceInterfaceId),
                 request.ContractVersionId,
                 request.BindingEnvironment);
 
@@ -71,7 +71,7 @@ public static class BindContractToInterface
 
             await eventBus.PublishAsync(new ContractBoundToInterfaceIntegrationEvent(
                 binding.Id.Value,
-                binding.ServiceInterfaceId,
+                binding.ServiceInterfaceId.Value,
                 binding.ContractVersionId,
                 binding.BindingEnvironment,
                 binding.IsDefaultVersion,
@@ -86,7 +86,7 @@ public static class BindContractToInterface
 
             return new Response(
                 binding.Id.Value,
-                binding.ServiceInterfaceId,
+                binding.ServiceInterfaceId.Value,
                 binding.ContractVersionId,
                 binding.Status.ToString());
         }

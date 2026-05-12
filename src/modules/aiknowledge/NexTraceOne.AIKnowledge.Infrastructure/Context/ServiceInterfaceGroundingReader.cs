@@ -20,7 +20,7 @@ public sealed class ServiceInterfaceGroundingReader(CatalogGraphDbContext catalo
             .AsNoTracking()
             .Join(catalogDb.ServiceAssets,
                 iface => iface.ServiceAssetId,
-                asset => asset.Id.Value,
+                asset => asset.Id,
                 (iface, asset) => new { iface, asset })
             .Where(x =>
                 x.asset.Name == serviceIdentifier ||
@@ -47,7 +47,7 @@ public sealed class ServiceInterfaceGroundingReader(CatalogGraphDbContext catalo
 
         return interfaces.Select(x => new ServiceInterfaceGroundingContext(
             InterfaceId: x.Id.Value.ToString(),
-            ServiceAssetId: x.ServiceAssetId.ToString(),
+            ServiceAssetId: x.ServiceAssetId.Value.ToString(),
             ServiceName: x.ServiceName,
             Name: x.Name,
             Description: x.Description,
@@ -73,7 +73,7 @@ public sealed class ServiceInterfaceGroundingReader(CatalogGraphDbContext catalo
             .AsNoTracking()
             .Join(catalogDb.ServiceAssets,
                 iface => iface.ServiceAssetId,
-                asset => asset.Id.Value,
+                asset => asset.Id,
                 (iface, asset) => new { iface, asset })
             .Where(x => x.iface.Name.Contains(term) || x.iface.Description.Contains(term))
             .OrderBy(x => x.iface.Name)
@@ -97,7 +97,7 @@ public sealed class ServiceInterfaceGroundingReader(CatalogGraphDbContext catalo
 
         return interfaces.Select(x => new ServiceInterfaceGroundingContext(
             InterfaceId: x.Id.Value.ToString(),
-            ServiceAssetId: x.ServiceAssetId.ToString(),
+            ServiceAssetId: x.ServiceAssetId.Value.ToString(),
             ServiceName: x.ServiceName,
             Name: x.Name,
             Description: x.Description,

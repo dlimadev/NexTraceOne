@@ -17,7 +17,7 @@ public sealed class ContractBinding : AuditableEntity<ContractBindingId>
     // ── Referências ───────────────────────────────────────────────────
 
     /// <summary>Identificador da interface de serviço vinculada.</summary>
-    public Guid ServiceInterfaceId { get; private set; }
+    public ServiceInterfaceId ServiceInterfaceId { get; private set; } = default!;
 
     /// <summary>Identificador da versão do contrato vinculada.</summary>
     public Guid ContractVersionId { get; private set; }
@@ -66,7 +66,7 @@ public sealed class ContractBinding : AuditableEntity<ContractBindingId>
 
     /// <summary>Cria um novo vínculo de contrato para uma interface.</summary>
     public static ContractBinding Create(
-        Guid serviceInterfaceId,
+        ServiceInterfaceId serviceInterfaceId,
         Guid contractVersionId,
         string bindingEnvironment)
         => new()

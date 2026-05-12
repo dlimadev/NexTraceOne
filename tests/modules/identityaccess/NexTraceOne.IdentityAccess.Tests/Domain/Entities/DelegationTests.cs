@@ -102,3 +102,4 @@ public sealed class DelegationTests
         delegation.IsActiveAt(Now).Should().BeFalse();
     }
 }
+

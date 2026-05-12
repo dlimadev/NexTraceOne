@@ -29,7 +29,7 @@ public static class GetServiceInterfaceById
 
             return new Response(
                 iface.Id.Value,
-                iface.ServiceAssetId,
+                iface.ServiceAssetId.Value,
                 iface.Name,
                 iface.Description,
                 iface.InterfaceType.ToString(),

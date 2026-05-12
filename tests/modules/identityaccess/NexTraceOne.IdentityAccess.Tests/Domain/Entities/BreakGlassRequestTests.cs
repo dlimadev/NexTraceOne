@@ -96,3 +96,4 @@ public sealed class BreakGlassRequestTests
         request.ExpiresAt.Should().Be(Now.Add(customWindow));
     }
 }
+

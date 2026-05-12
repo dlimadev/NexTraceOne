@@ -29,9 +29,9 @@ public sealed class DashboardMonitorConfiguration : IEntityTypeConfiguration<Das
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.UpdatedAt).IsRequired();
 
-        builder.HasIndex(new[] { "DashboardId", "tenant_id" })
+        builder.HasIndex(new[] { "DashboardId", "TenantId" })
             .HasDatabaseName("ix_gov_monitor_dashboard_tenant");
-        builder.HasIndex(new[] { "tenant_id", "Status" })
+        builder.HasIndex(new[] { "TenantId", "Status" })
             .HasDatabaseName("ix_gov_monitor_tenant_status");
     }
 }

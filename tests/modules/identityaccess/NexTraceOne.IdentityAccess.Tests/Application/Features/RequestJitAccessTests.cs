@@ -63,7 +63,7 @@ public sealed class RequestJitAccessTests
         var (jitRepo, userRepo, _, _, _, _, handler) = CreateHandler();
 
         var user = CreateLocalUser(mfaEnabled: false);
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
 
         var cmd = new RequestJitAccess.Command(
             "deploy:production",
@@ -84,7 +84,7 @@ public sealed class RequestJitAccessTests
         var (_, userRepo, evtRepo, evtTracker, _, _, handler) = CreateHandler();
 
         var user = CreateLocalUser(mfaEnabled: false);
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
 
         var cmd = new RequestJitAccess.Command(
             "deploy:staging",
@@ -104,7 +104,7 @@ public sealed class RequestJitAccessTests
         var (_, userRepo, evtRepo, _, _, _, handler) = CreateHandler();
 
         var user = CreateLocalUser(mfaEnabled: true);
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
 
         var cmd = new RequestJitAccess.Command(
             "admin:database",
@@ -126,7 +126,7 @@ public sealed class RequestJitAccessTests
         var (_, userRepo, evtRepo, _, totp, _, handler) = CreateHandler();
 
         var user = CreateLocalUser(mfaEnabled: true, mfaSecret: "JBSWY3DPEHPK3PXP");
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
         totp.Verify(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
         var cmd = new RequestJitAccess.Command(
@@ -149,7 +149,7 @@ public sealed class RequestJitAccessTests
         var (jitRepo, userRepo, _, _, totp, _, handler) = CreateHandler();
 
         var user = CreateLocalUser(mfaEnabled: true, mfaSecret: "JBSWY3DPEHPK3PXP");
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>()).Returns(user);
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>()).Returns(user);
         totp.Verify(Arg.Any<string>(), "123456").Returns(true);
 
         var cmd = new RequestJitAccess.Command(
@@ -169,7 +169,7 @@ public sealed class RequestJitAccessTests
     {
         var (_, userRepo, _, _, _, _, handler) = CreateHandler();
 
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>())
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
         var cmd = new RequestJitAccess.Command(
@@ -200,3 +200,4 @@ public sealed class RequestJitAccessTests
         result.Error.Code.Should().Be("identity.notAuthenticated");
     }
 }
+

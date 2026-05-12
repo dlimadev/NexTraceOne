@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.IdentityAccess.Application.Abstractions;
 using NexTraceOne.IdentityAccess.Application.Features.DeactivateUser;
 using NexTraceOne.IdentityAccess.Domain.Entities;
+using NexTraceOne.IdentityAccess.Domain.ValueObjects;
 using NexTraceOne.IdentityAccess.Tests.TestDoubles;
 
 namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
@@ -40,15 +41,15 @@ public sealed class DeactivateUserTests
 
     private static User CreateActiveUser()
         => User.CreateLocal(
-            Domain.ValueObjects.Email.Create("user@test.com"),
-            Domain.ValueObjects.FullName.Create("Test", "User"),
-            Domain.ValueObjects.HashedPassword.FromPlainText("Password123!"));
+            Email.Create("user@test.com"),
+            FullName.Create("Test", "User"),
+            HashedPassword.FromPlainText("Password123!"));
 
     [Fact]
     public async Task Handle_Should_ReturnError_WhenUserNotFound()
     {
         var (userRepo, _, _, _, handler) = CreateHandler();
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>())
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
         var result = await handler.Handle(
@@ -65,12 +66,12 @@ public sealed class DeactivateUserTests
         var (userRepo, sessionRepo, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUser();
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>())
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
         var session = Session.Create(
             user.Id,
-            Domain.ValueObjects.RefreshTokenHash.Create("token-hash"),
+            RefreshTokenHash.Create("token-hash"),
             FixedNow.AddDays(30),
             "127.0.0.1",
             "TestAgent");
@@ -91,7 +92,7 @@ public sealed class DeactivateUserTests
         var (userRepo, sessionRepo, _, _, handler) = CreateHandler();
 
         var user = CreateActiveUser();
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>())
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>())
             .Returns(user);
         sessionRepo.GetActiveByUserIdAsync(user.Id, Arg.Any<CancellationToken>())
             .Returns((Session?)null);
@@ -109,7 +110,7 @@ public sealed class DeactivateUserTests
         var (userRepo, sessionRepo, evtRepo, evtTracker, handler) = CreateHandler();
 
         var user = CreateActiveUser();
-        userRepo.GetByIdAsync(Arg.Any<Domain.Entities.UserId>(), Arg.Any<CancellationToken>())
+        userRepo.GetByIdAsync(Arg.Any<UserId>(), Arg.Any<CancellationToken>())
             .Returns(user);
         sessionRepo.GetActiveByUserIdAsync(user.Id, Arg.Any<CancellationToken>())
             .Returns((Session?)null);
@@ -145,3 +146,5 @@ public sealed class DeactivateUserTests
         result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(DeactivateUser.Command.TenantId));
     }
 }
+
+

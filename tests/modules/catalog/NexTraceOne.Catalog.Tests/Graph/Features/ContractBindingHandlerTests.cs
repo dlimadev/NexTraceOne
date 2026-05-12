@@ -20,11 +20,11 @@ public sealed class ContractBindingHandlerTests
     private static readonly Guid ContractVersionId = Guid.NewGuid();
 
     private static ServiceInterface BuildActiveInterface()
-        => ServiceInterface.Create(ServiceId, "REST API v1", InterfaceType.RestApi);
+        => ServiceInterface.Create(ServiceAssetId.From(ServiceId), "REST API v1", InterfaceType.RestApi);
 
     private static ServiceInterface BuildRetiredInterface()
     {
-        var iface = ServiceInterface.Create(ServiceId, "Legacy API", InterfaceType.RestApi);
+        var iface = ServiceInterface.Create(ServiceAssetId.From(ServiceId), "Legacy API", InterfaceType.RestApi);
         iface.Retire();
         return iface;
     }
@@ -132,7 +132,7 @@ public sealed class ContractBindingHandlerTests
     [Fact]
     public async Task DeactivateContractBinding_Should_Succeed_When_BindingExists()
     {
-        var binding = ContractBinding.Create(InterfaceId, ContractVersionId, "production");
+        var binding = ContractBinding.Create(ServiceInterfaceId.From(InterfaceId), ContractVersionId, "production");
         var bindingRepo = Substitute.For<IContractBindingRepository>();
         bindingRepo.GetByIdAsync(Arg.Any<ContractBindingId>(), Arg.Any<CancellationToken>())
             .Returns(binding);
@@ -193,8 +193,8 @@ public sealed class ContractBindingHandlerTests
     [Fact]
     public async Task ListContractBindingsByInterface_Should_ReturnAll_Bindings()
     {
-        var binding1 = ContractBinding.Create(InterfaceId, Guid.NewGuid(), "production");
-        var binding2 = ContractBinding.Create(InterfaceId, Guid.NewGuid(), "staging");
+        var binding1 = ContractBinding.Create(ServiceInterfaceId.From(InterfaceId), Guid.NewGuid(), "production");
+        var binding2 = ContractBinding.Create(ServiceInterfaceId.From(InterfaceId), Guid.NewGuid(), "staging");
 
         var repo = Substitute.For<IContractBindingRepository>();
         repo.ListByInterfaceAsync(InterfaceId, Arg.Any<CancellationToken>())

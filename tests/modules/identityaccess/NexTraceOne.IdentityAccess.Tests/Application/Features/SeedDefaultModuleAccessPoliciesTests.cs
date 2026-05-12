@@ -327,3 +327,4 @@ public sealed class SeedDefaultModuleAccessPoliciesTests
         capturedEntities!.All(p => p.IsAllowed).Should().BeTrue();
     }
 }
+

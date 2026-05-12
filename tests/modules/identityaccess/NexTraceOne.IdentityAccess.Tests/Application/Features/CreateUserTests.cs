@@ -69,3 +69,4 @@ public sealed class CreateUserTests
         result.Error.Code.Should().Be("Identity.User.EmailAlreadyExists");
     }
 }
+

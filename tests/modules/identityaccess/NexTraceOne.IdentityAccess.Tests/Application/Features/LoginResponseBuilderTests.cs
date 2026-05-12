@@ -193,3 +193,4 @@ public sealed class LoginResponseBuilderTests
             "unlicensed tenants fall back to Enterprise capabilities for backward compatibility");
     }
 }
+

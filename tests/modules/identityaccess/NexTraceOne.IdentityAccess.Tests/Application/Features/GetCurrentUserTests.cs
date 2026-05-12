@@ -135,3 +135,4 @@ public sealed class GetCurrentUserTests
         result.Value.Permissions.Should().BeEmpty();
     }
 }
+

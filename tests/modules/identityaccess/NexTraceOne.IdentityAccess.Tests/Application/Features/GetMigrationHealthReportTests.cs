@@ -66,3 +66,4 @@ public sealed class GetMigrationHealthReportTests
         result.Value.TotalModules.Should().BeGreaterThan(0);
     }
 }
+

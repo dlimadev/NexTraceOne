@@ -70,7 +70,7 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
         builder.Property(x => x.Tier)
             .HasConversion<string>()
             .HasMaxLength(30)
-            .HasDefaultValue("Standard");
+            .HasDefaultValue(ServiceTierType.Standard);
 
         builder.Property(x => x.LastOwnershipReviewAt)
             .IsRequired(false);

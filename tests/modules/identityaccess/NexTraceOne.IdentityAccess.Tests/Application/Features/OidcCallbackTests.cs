@@ -18,7 +18,7 @@ namespace NexTraceOne.IdentityAccess.Tests.Application.Features;
 public sealed class OidcCallbackTests
 {
     private static readonly DateTimeOffset FixedNow = new(2026, 5, 9, 10, 0, 0, TimeSpan.Zero);
-    private static readonly Guid TenantId = Guid.NewGuid();
+    private static readonly Guid TenantIdValue = Guid.NewGuid();
     private const string Provider = "azure";
 
     private static (
@@ -39,7 +39,7 @@ public sealed class OidcCallbackTests
         var sessionCreator = Substitute.For<ILoginSessionCreator>();
         var responseBuilder = Substitute.For<ILoginResponseBuilder>();
         var clock = new TestDateTimeProvider(FixedNow);
-        var currentTenant = new TestCurrentTenant(TenantId);
+        var currentTenant = new TestCurrentTenant(TenantIdValue);
 
         var handler = new OidcCallback.Handler(
             oidcProvider, userRepo, roleRepo, membershipRepo,
@@ -64,7 +64,7 @@ public sealed class OidcCallbackTests
 
     private static TenantMembership CreateMembership(UserId userId, RoleId roleId)
     {
-        return TenantMembership.Create(userId, TenantId.From(TenantId), roleId, FixedNow);
+        return TenantMembership.Create(userId, TenantId.From(TenantIdValue), roleId, FixedNow);
     }
 
     private static LocalLoginFeature.LoginResponse CreateFakeLoginResponse(User user, Role role)
@@ -73,7 +73,7 @@ public sealed class OidcCallbackTests
             "access-token",
             "refresh-token",
             3600,
-            new LocalLoginFeature.UserResponse(user.Id.Value, user.Email.Value, user.FullName.Value, TenantId, role.Name, []));
+            new LocalLoginFeature.UserResponse(user.Id.Value, user.Email.Value, user.FullName.Value, TenantIdValue, role.Name, []));
     }
 
     private static string BuildValidState(string returnTo = "/dashboard")
@@ -103,8 +103,8 @@ public sealed class OidcCallbackTests
         var (oidcProvider, _, _, _, auditRecorder, _, _, handler) = CreateHandler();
         oidcProvider.IsConfigured(Provider).Returns(true);
         oidcProvider.ExchangeCodeAsync(Provider, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new InvalidOperationException("Exchange failed"));
-        auditRecorder.ResolveTenantIdForAudit().Returns(Domain.Entities.TenantId.From(TenantId));
+            .Returns(Task.FromException<OidcUserInfo>(new InvalidOperationException("Exchange failed")));
+        auditRecorder.ResolveTenantIdForAudit().Returns(TenantId.From(TenantIdValue));
 
         var cmd = new OidcCallback.Command(Provider, "invalid-code", BuildValidState());
 
@@ -113,7 +113,7 @@ public sealed class OidcCallbackTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Code.Should().Be("identity.oidcCallbackFailed");
         auditRecorder.Received(1).RecordOidcCallbackFailure(
-            Arg.Any<Domain.Entities.TenantId>(),
+            Arg.Any<TenantId>(),
             Provider,
             Arg.Any<string>(),
             Arg.Any<string?>(),
@@ -264,3 +264,4 @@ public sealed class OidcCallbackTests
         result.Value.ReturnTo.Should().Be("/");
     }
 }
+

@@ -102,3 +102,4 @@ public sealed class RefreshTokenTests
         result.Error.Code.Should().Be("Identity.Session.Revoked");
     }
 }
+

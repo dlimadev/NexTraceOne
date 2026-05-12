@@ -18,7 +18,7 @@ public sealed class ServiceInterface : AuditableEntity<ServiceInterfaceId>
     // ── Referência ao serviço ─────────────────────────────────────────
 
     /// <summary>Identificador do ServiceAsset dono desta interface.</summary>
-    public Guid ServiceAssetId { get; private set; }
+    public ServiceAssetId ServiceAssetId { get; private set; } = default!;
 
     // ── Identidade ────────────────────────────────────────────────────
 
@@ -105,7 +105,7 @@ public sealed class ServiceInterface : AuditableEntity<ServiceInterfaceId>
     // ── Factory ───────────────────────────────────────────────────────
 
     /// <summary>Cria uma nova interface de serviço com os campos obrigatórios.</summary>
-    public static ServiceInterface Create(Guid serviceAssetId, string name, InterfaceType type)
+    public static ServiceInterface Create(ServiceAssetId serviceAssetId, string name, InterfaceType type)
         => new()
         {
             Id = ServiceInterfaceId.New(),

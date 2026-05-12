@@ -21,7 +21,9 @@ internal sealed class ServiceInterfaceConfiguration : IEntityTypeConfiguration<S
             .HasConversion(id => id.Value, value => ServiceInterfaceId.From(value));
 
         // ── Referência ao serviço ─────────────────────────────────────
-        builder.Property(x => x.ServiceAssetId).IsRequired();
+        builder.Property(x => x.ServiceAssetId)
+            .HasConversion(id => id.Value, value => ServiceAssetId.From(value))
+            .IsRequired();
 
         // ── Identidade ────────────────────────────────────────────────
         builder.Property(x => x.Name).HasMaxLength(300).IsRequired();

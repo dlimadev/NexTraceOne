@@ -309,3 +309,4 @@ public sealed class SeedDefaultRolePermissionsTests
         capturedEntities!.All(rp => rp.RoleId == role.Id).Should().BeTrue();
     }
 }
+

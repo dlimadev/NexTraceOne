@@ -190,3 +190,4 @@ public sealed class CreatePlatformApiTokenTests
         result.IsValid.Should().BeTrue();
     }
 }
+
