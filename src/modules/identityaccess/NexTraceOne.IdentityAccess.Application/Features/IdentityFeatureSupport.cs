@@ -71,7 +71,7 @@ internal sealed class LoginResponseBuilder(
         var capabilities = license?.GetCapabilities() ?? TenantCapabilities.ForPlan(TenantPlan.Enterprise);
 
         var accessToken = jwtTokenGenerator.GenerateAccessToken(
-            user, tenantId, [membership.RoleId], permissions, capabilities);
+            user, tenantId, [membership.RoleId], [role.Name], capabilities);
 
         return new LocalLoginFeature.LoginResponse(
             accessToken,
