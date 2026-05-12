@@ -4,8 +4,12 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\src\building-blocks\NexTraceOne.BuildingBlocks.Infrastructure\NexTraceOne.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\src\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
+    <ProjectReference Include="..\..\..\src\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
     <ProjectReference Include="..\..\..\src\platform\NexTraceOne.BackgroundWorkers\NexTraceOne.BackgroundWorkers.csproj" />
   </ItemGroup>
   <ItemGroup>
