@@ -86,6 +86,12 @@ public static class DependencyInjection
         services.AddScoped<IAccountActivationTokenRepository, AccountActivationTokenRepository>();
         services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 
+        // Repositórios — W5-05 Fine-Grained Auth per Environment
+        services.AddScoped<IEnvironmentAccessPolicyRepository, EnvironmentAccessPolicyRepository>();
+
+        // Repositórios — SaaS-06 Onboarding Wizard
+        services.AddScoped<IOnboardingProgressRepository, OnboardingProgressRepository>();
+
         // Notifier — usa implementação real via Notifications module quando Smtp:Host está configurado;
         // caso contrário usa NullIdentityNotifier (que regista o token em Warning para dev local).
         var smtpHost = configuration["Smtp:Host"];

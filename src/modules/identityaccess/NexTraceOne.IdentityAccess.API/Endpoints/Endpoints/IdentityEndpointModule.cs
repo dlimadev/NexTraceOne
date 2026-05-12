@@ -40,6 +40,12 @@ public sealed class IdentityEndpointModule
         LicensingEndpoints.Map(group);
         AlertsEndpoints.Map(group);
 
+        // W5-05 — Fine-Grained Auth per Environment
+        EnvironmentPolicyEndpoints.Map(group);
+
+        // SaaS-06 — Onboarding Wizard
+        OnboardingEndpoints.Map(group);
+
         // Endpoints de sessão cookie — apenas quando feature flag ativa
         var cookieSessionOptions = app.ServiceProvider
             .GetRequiredService<IOptions<CookieSessionOptions>>().Value;
