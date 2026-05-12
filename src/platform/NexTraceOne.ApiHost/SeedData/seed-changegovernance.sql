@@ -24,6 +24,7 @@ INSERT INTO chg_releases (
   "WorkItemReference", "RolledBackFromReleaseId",
   "ChangeType", "ConfidenceStatus", "ValidationStatus",
   "TeamName", "Domain", "Description",
+  "HasBreakingChanges",
   "CreatedAt", tenant_id
 ) VALUES
 (
@@ -36,6 +37,7 @@ INSERT INTO chg_releases (
   'PAY-1234', NULL,
   0, 1, 2,
   'payments-team', 'payments', 'Minor release: adds support for new payment gateway with zero breaking changes.',
+  false,
   NOW() - INTERVAL '7 days', 'a0000000-0000-0000-0000-000000000001'
 ),
 (
@@ -48,6 +50,7 @@ INSERT INTO chg_releases (
   'CAT-567', NULL,
   2, 0, 2,
   'platform-team', 'platform', 'Major release: contract changes in service registration endpoint (breaking).',
+  true,
   NOW() - INTERVAL '14 days', 'a0000000-0000-0000-0000-000000000001'
 ),
 (
@@ -60,6 +63,7 @@ INSERT INTO chg_releases (
   'PLAT-89', NULL,
   0, 0, 0,
   'platform-team', 'security', 'Patch: dependency updates and security hardening.',
+  false,
   NOW() - INTERVAL '1 day', 'a0000000-0000-0000-0000-000000000001'
 )
 ON CONFLICT DO NOTHING;
