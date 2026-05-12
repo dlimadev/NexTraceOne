@@ -260,6 +260,135 @@ public sealed class PlatformHealthMonitorJobTests
             Arg.Any<CancellationToken>());
     }
 
+    // ── DB pool checks ────────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task DbPoolNull_NoAlertSent()
+    {
+        _healthReader.CountPendingOutboxAsync(Arg.Any<CancellationToken>()).Returns(0L);
+        _healthReader.GetPrimaryDiskUsage().Returns(DiskUsageInfo.Unknown);
+        _healthReader.GetDbPoolUsagePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _healthReader.GetErrorRatePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var job = CreateJob();
+        await InvokeRunChecksAsync(job, CancellationToken.None);
+
+        await _notificationModule.DidNotReceive().SubmitAsync(
+            Arg.Is<NotificationRequest>(r => r.EventType.Contains("dbpool")),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DbPoolAbove80Pct_SendsWarning()
+    {
+        _healthReader.CountPendingOutboxAsync(Arg.Any<CancellationToken>()).Returns(0L);
+        _healthReader.GetPrimaryDiskUsage().Returns(DiskUsageInfo.Unknown);
+        _healthReader.GetDbPoolUsagePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)85.0);
+        _healthReader.GetErrorRatePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var job = CreateJob();
+        await InvokeRunChecksAsync(job, CancellationToken.None);
+
+        await _notificationModule.Received(1).SubmitAsync(
+            Arg.Is<NotificationRequest>(r =>
+                r.Severity == "Warning" &&
+                r.EventType.Contains("dbpool-warning")),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DbPoolBelow80Pct_NoAlertSent()
+    {
+        _healthReader.CountPendingOutboxAsync(Arg.Any<CancellationToken>()).Returns(0L);
+        _healthReader.GetPrimaryDiskUsage().Returns(DiskUsageInfo.Unknown);
+        _healthReader.GetDbPoolUsagePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)50.0);
+        _healthReader.GetErrorRatePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var job = CreateJob();
+        await InvokeRunChecksAsync(job, CancellationToken.None);
+
+        await _notificationModule.DidNotReceive().SubmitAsync(
+            Arg.Is<NotificationRequest>(r => r.EventType.Contains("dbpool")),
+            Arg.Any<CancellationToken>());
+    }
+
+    // ── Error rate checks ─────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ErrorRateNull_NoAlertSent()
+    {
+        _healthReader.CountPendingOutboxAsync(Arg.Any<CancellationToken>()).Returns(0L);
+        _healthReader.GetPrimaryDiskUsage().Returns(DiskUsageInfo.Unknown);
+        _healthReader.GetDbPoolUsagePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _healthReader.GetErrorRatePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var job = CreateJob();
+        await InvokeRunChecksAsync(job, CancellationToken.None);
+
+        await _notificationModule.DidNotReceive().SubmitAsync(
+            Arg.Is<NotificationRequest>(r => r.EventType.Contains("errorrate")),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ErrorRateAbove5Pct_SendsWarning()
+    {
+        _healthReader.CountPendingOutboxAsync(Arg.Any<CancellationToken>()).Returns(0L);
+        _healthReader.GetPrimaryDiskUsage().Returns(DiskUsageInfo.Unknown);
+        _healthReader.GetDbPoolUsagePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _healthReader.GetErrorRatePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)10.0);
+        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var job = CreateJob();
+        await InvokeRunChecksAsync(job, CancellationToken.None);
+
+        await _notificationModule.Received(1).SubmitAsync(
+            Arg.Is<NotificationRequest>(r =>
+                r.Severity == "Warning" &&
+                r.EventType.Contains("errorrate-warning")),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ErrorRateAbove20Pct_SendsCritical()
+    {
+        _healthReader.CountPendingOutboxAsync(Arg.Any<CancellationToken>()).Returns(0L);
+        _healthReader.GetPrimaryDiskUsage().Returns(DiskUsageInfo.Unknown);
+        _healthReader.GetDbPoolUsagePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _healthReader.GetErrorRatePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)25.0);
+        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var job = CreateJob();
+        await InvokeRunChecksAsync(job, CancellationToken.None);
+
+        await _notificationModule.Received(1).SubmitAsync(
+            Arg.Is<NotificationRequest>(r =>
+                r.Severity == "Critical" &&
+                r.EventType.Contains("errorrate-critical")),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ErrorRateBelow5Pct_NoAlertSent()
+    {
+        _healthReader.CountPendingOutboxAsync(Arg.Any<CancellationToken>()).Returns(0L);
+        _healthReader.GetPrimaryDiskUsage().Returns(DiskUsageInfo.Unknown);
+        _healthReader.GetDbPoolUsagePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)null);
+        _healthReader.GetErrorRatePercentAsync(Arg.Any<CancellationToken>()).Returns((double?)2.0);
+        _cache.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((byte[]?)null);
+
+        var job = CreateJob();
+        await InvokeRunChecksAsync(job, CancellationToken.None);
+
+        await _notificationModule.DidNotReceive().SubmitAsync(
+            Arg.Is<NotificationRequest>(r => r.EventType.Contains("errorrate")),
+            Arg.Any<CancellationToken>());
+    }
+
     // ── Helper ────────────────────────────────────────────────────────────────
 
     // Invoca o método privado RunChecksAsync via reflexão para testes unitários.
