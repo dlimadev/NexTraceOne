@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.BuildingBlocks.Observability.Telemetry.Configuration;
 using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Automation;
@@ -84,6 +86,14 @@ public static class DependencyInjection
         // ── Wave BC.1 — Environment Behavior Comparison null reader ───────
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IEnvironmentBehaviorComparisonReader,
             NexTraceOne.OperationalIntelligence.Application.Runtime.NullEnvironmentBehaviorComparisonReader>();
+
+        // ── SaaS-07: Log Search — Elasticsearch-backed ILogSearchService ─────
+        services.Configure<TelemetryStoreOptions>(
+            configuration.GetSection(TelemetryStoreOptions.SectionName));
+        services.AddHttpClient<ILogSearchService, ElasticsearchLogSearchService>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(30);
+        }).AddStandardResilienceHandler();
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);

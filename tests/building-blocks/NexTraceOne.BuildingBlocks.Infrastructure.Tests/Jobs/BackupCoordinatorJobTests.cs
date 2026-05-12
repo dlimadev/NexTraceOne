@@ -1,5 +1,6 @@
 using System.Text.Json;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
@@ -7,6 +8,7 @@ using NexTraceOne.BackgroundWorkers;
 using NexTraceOne.BackgroundWorkers.Backup;
 using NexTraceOne.BackgroundWorkers.Configuration;
 using NexTraceOne.BackgroundWorkers.Jobs;
+using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -18,11 +20,22 @@ public sealed class BackupCoordinatorJobTests : IDisposable
     private readonly IBackupProcess _backupProcess = Substitute.For<IBackupProcess>();
     private readonly WorkerJobHealthRegistry _registry = new();
     private readonly string _tempDir;
+    private readonly IServiceScopeFactory _scopeFactory = Substitute.For<IServiceScopeFactory>();
+    private readonly INotificationModule _notificationModule = Substitute.For<INotificationModule>();
 
     public BackupCoordinatorJobTests()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), $"backup-test-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_tempDir);
+
+        var scope = Substitute.For<IServiceScope>();
+        var provider = Substitute.For<IServiceProvider>();
+        provider.GetService(typeof(INotificationModule)).Returns(_notificationModule);
+        scope.ServiceProvider.Returns(provider);
+        _scopeFactory.CreateScope().Returns(scope);
+
+        _notificationModule.SubmitAsync(Arg.Any<NotificationRequest>(), Arg.Any<CancellationToken>())
+            .Returns(new NotificationResult(true));
     }
 
     public void Dispose()
@@ -43,6 +56,7 @@ public sealed class BackupCoordinatorJobTests : IDisposable
 
         return new BackupCoordinatorJob(
             _backupProcess,
+            _scopeFactory,
             _registry,
             Options.Create(opts),
             NullLogger<BackupCoordinatorJob>.Instance);
@@ -219,5 +233,99 @@ public sealed class BackupCoordinatorJobTests : IDisposable
             var sha = entry.GetProperty("Sha256").GetString();
             sha.Should().NotBeNullOrEmpty("todos os backups bem-sucedidos devem ter hash SHA-256");
         });
+    }
+
+    // ── Notificação de falha de backup ────────────────────────────────────────
+
+    [Fact]
+    public async Task RunBackupCycle_WhenOneDatabaseFails_NotifiesPlatformAdmins()
+    {
+        _backupProcess.DumpAsync(
+            Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("pg_dump failed"));
+
+        var job = CreateJob(new BackupOptions
+        {
+            OutputDirectory = _tempDir,
+            RetentionDays = 7,
+            Databases = ["db_test"],
+            DumpTimeoutMinutes = 5,
+        });
+
+        await job.RunBackupCycleAsync(CancellationToken.None);
+
+        await _notificationModule.Received(1).SubmitAsync(
+            Arg.Is<NotificationRequest>(r =>
+                r.EventType == "Backup.PartialFailure" &&
+                r.RecipientRoles.Contains("PlatformAdmin")),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RunBackupCycle_WhenAllDatabasesSucceed_DoesNotNotify()
+    {
+        _backupProcess.DumpAsync(
+            Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        var job = CreateJob();
+        await job.RunBackupCycleAsync(CancellationToken.None);
+
+        await _notificationModule.DidNotReceive().SubmitAsync(
+            Arg.Any<NotificationRequest>(),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RunBackupCycle_WhenAllFail_SendsCriticalSeverity()
+    {
+        _backupProcess.DumpAsync(
+            Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .ThrowsAsync(new InvalidOperationException("pg_dump failed"));
+
+        var job = CreateJob(new BackupOptions
+        {
+            OutputDirectory = _tempDir,
+            RetentionDays = 7,
+            Databases = ["db_a", "db_b"],
+            DumpTimeoutMinutes = 5,
+        });
+
+        await job.RunBackupCycleAsync(CancellationToken.None);
+
+        await _notificationModule.Received(1).SubmitAsync(
+            Arg.Is<NotificationRequest>(r => r.Severity == "Critical"),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RunBackupCycle_WhenOneOfTwoFails_SendsWarningSeverity()
+    {
+        var callCount = 0;
+        _backupProcess.DumpAsync(
+            Arg.Any<string>(), Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .Returns(_ =>
+            {
+                if (callCount++ == 1) throw new InvalidOperationException("pg_dump failed");
+                return Task.CompletedTask;
+            });
+
+        var job = CreateJob(new BackupOptions
+        {
+            OutputDirectory = _tempDir,
+            RetentionDays = 7,
+            Databases = ["db_a", "db_b"],
+            DumpTimeoutMinutes = 5,
+        });
+
+        await job.RunBackupCycleAsync(CancellationToken.None);
+
+        await _notificationModule.Received(1).SubmitAsync(
+            Arg.Is<NotificationRequest>(r => r.Severity == "Warning"),
+            Arg.Any<CancellationToken>());
     }
 }

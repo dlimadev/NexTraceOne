@@ -11,6 +11,12 @@ public interface IPlatformHealthReader
 
     /// <summary>Retorna informações de uso do disco principal.</summary>
     DiskUsageInfo GetPrimaryDiskUsage();
+
+    /// <summary>Retorna a percentagem de uso do pool de conexões (0–100). Null se não disponível.</summary>
+    Task<double?> GetDbPoolUsagePercentAsync(CancellationToken cancellationToken);
+
+    /// <summary>Retorna a taxa de erro das últimas N respostas HTTP (0–100). Null se não disponível.</summary>
+    Task<double?> GetErrorRatePercentAsync(CancellationToken cancellationToken);
 }
 
 /// <summary>

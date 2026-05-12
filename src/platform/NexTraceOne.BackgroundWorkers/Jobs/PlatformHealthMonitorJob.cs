@@ -85,6 +85,8 @@ public sealed class PlatformHealthMonitorJob(
         await CheckOutboxBacklogAsync(cancellationToken);
         await CheckDiskUsageAsync(cancellationToken);
         await CheckStalledJobsAsync(cancellationToken);
+        await CheckDbPoolAsync(cancellationToken);
+        await CheckErrorRateAsync(cancellationToken);
     }
 
     private async Task CheckOutboxBacklogAsync(CancellationToken cancellationToken)
@@ -177,6 +179,55 @@ public sealed class PlatformHealthMonitorJob(
                     message: $"O job '{jobName}' {elapsed}. Limite configurado: {threshold.TotalMinutes:F0} minutos.",
                     cancellationToken);
             }
+        }
+    }
+
+    private async Task CheckDbPoolAsync(CancellationToken cancellationToken)
+    {
+        var pct = await healthReader.GetDbPoolUsagePercentAsync(cancellationToken);
+        if (pct is null) return;
+
+        if (pct >= 80)
+        {
+            await SendAlertIfCooldownExpiredAsync(
+                alertType: "dbpool-warning",
+                severity: "Warning",
+                title: "Pool de conexões à base de dados com uso elevado",
+                message: $"O pool de conexões está {pct:F1}% utilizado. Risco de throttling de pedidos.",
+                cancellationToken);
+        }
+        else
+        {
+            logger.LogDebug("Pool de conexões saudável: {Pct:F1}%.", pct);
+        }
+    }
+
+    private async Task CheckErrorRateAsync(CancellationToken cancellationToken)
+    {
+        var rate = await healthReader.GetErrorRatePercentAsync(cancellationToken);
+        if (rate is null) return;
+
+        if (rate >= 20)
+        {
+            await SendAlertIfCooldownExpiredAsync(
+                alertType: "errorrate-critical",
+                severity: "Critical",
+                title: "Taxa de erro crítica na plataforma",
+                message: $"Taxa de erro atual: {rate:F1}%. Serviços podem estar degradados.",
+                cancellationToken);
+        }
+        else if (rate >= 5)
+        {
+            await SendAlertIfCooldownExpiredAsync(
+                alertType: "errorrate-warning",
+                severity: "Warning",
+                title: "Taxa de erro elevada na plataforma",
+                message: $"Taxa de erro atual: {rate:F1}%. Monitorizar de perto.",
+                cancellationToken);
+        }
+        else
+        {
+            logger.LogDebug("Taxa de erro saudável: {Rate:F1}%.", rate);
         }
     }
 

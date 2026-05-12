@@ -21,6 +21,14 @@ internal sealed class DefaultPlatformHealthReader(IServiceScopeFactory serviceSc
             .CountAsync(m => m.ProcessedAt == null, cancellationToken);
     }
 
+    public Task<double?> GetDbPoolUsagePercentAsync(CancellationToken cancellationToken)
+        // Métricas reais requerem Prometheus/OTel — degradação graciosa por enquanto.
+        => Task.FromResult<double?>(null);
+
+    public Task<double?> GetErrorRatePercentAsync(CancellationToken cancellationToken)
+        // Métricas reais requerem Prometheus/OTel — degradação graciosa por enquanto.
+        => Task.FromResult<double?>(null);
+
     public DiskUsageInfo GetPrimaryDiskUsage()
     {
         try

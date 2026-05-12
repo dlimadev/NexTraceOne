@@ -138,6 +138,16 @@ public sealed class IdentityDbContext(
     /// <summary>Tokens de reset de password (hash SHA-256, expiry 1h).</summary>
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
+    // ── W5-05 — Fine-Grained Auth per Environment ─────────────────────────
+
+    /// <summary>Políticas de acesso granular por ambiente (W5-05).</summary>
+    public DbSet<EnvironmentAccessPolicy> EnvironmentAccessPolicies => Set<EnvironmentAccessPolicy>();
+
+    // ── SaaS-06 — Onboarding Wizard ───────────────────────────────────────
+
+    /// <summary>Progresso de onboarding dos tenants (SaaS-06).</summary>
+    public DbSet<OnboardingProgress> OnboardingProgresses => Set<OnboardingProgress>();
+
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(IdentityDbContext).Assembly;
 

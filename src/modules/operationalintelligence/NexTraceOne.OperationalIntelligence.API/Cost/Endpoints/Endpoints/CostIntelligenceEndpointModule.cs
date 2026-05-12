@@ -33,6 +33,7 @@ using GetWasteReportFeature = NexTraceOne.OperationalIntelligence.Application.Co
 using DetectWasteSignalsFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.DetectWasteSignals.DetectWasteSignals;
 using GetFocusExportFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetFocusExport.GetFocusExport;
 using EvaluateCostAwareChangeGateFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.EvaluateCostAwareChangeGate.EvaluateCostAwareChangeGate;
+using GetCarbonScoreReportFeature = NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCarbonScoreReport.GetCarbonScoreReport;
 
 namespace NexTraceOne.OperationalIntelligence.API.Cost.Endpoints.Endpoints;
 
@@ -434,6 +435,19 @@ public sealed class CostIntelligenceEndpointModule
         {
             var query = new EvaluateCostAwareChangeGateFeature.Query(serviceName, targetEnvironment, expectedCostImpact);
             var result = await sender.Send(query, ct);
+            return result.ToHttpResult(localizer);
+        })
+        .RequirePermission("operations:cost:read");
+
+        // ── W6-04: GreenOps / Carbon Score ───────────────────────────────────
+        group.MapGet("/carbon-score", async (
+            DateOnly? from,
+            DateOnly? to,
+            ISender sender,
+            IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetCarbonScoreReportFeature.Query(from, to), ct);
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:cost:read");

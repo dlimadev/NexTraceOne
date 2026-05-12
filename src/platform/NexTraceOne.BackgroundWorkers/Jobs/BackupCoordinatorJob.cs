@@ -3,11 +3,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using NexTraceOne.BackgroundWorkers.Backup;
 using NexTraceOne.BackgroundWorkers.Configuration;
+using NexTraceOne.Notifications.Contracts.ServiceInterfaces;
 
 namespace NexTraceOne.BackgroundWorkers.Jobs;
 
@@ -23,6 +25,7 @@ namespace NexTraceOne.BackgroundWorkers.Jobs;
 /// </summary>
 public sealed class BackupCoordinatorJob(
     IBackupProcess backupProcess,
+    IServiceScopeFactory serviceScopeFactory,
     WorkerJobHealthRegistry jobHealthRegistry,
     IOptions<BackupOptions> options,
     ILogger<BackupCoordinatorJob> logger) : BackgroundService
@@ -107,6 +110,40 @@ public sealed class BackupCoordinatorJob(
         logger.LogInformation(
             "Ciclo de backup concluído: {Succeeded}/{Total} bases de dados com sucesso.",
             succeeded, opts.Databases.Count);
+
+        // Notifica PlatformAdmins em caso de falha parcial ou total
+        if (succeeded < opts.Databases.Count)
+        {
+            var failedCount = opts.Databases.Count - succeeded;
+            await NotifyBackupFailureAsync(failedCount, opts.Databases.Count, cancellationToken);
+        }
+    }
+
+    private async Task NotifyBackupFailureAsync(int failedCount, int total, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+            var notificationModule = scope.ServiceProvider.GetService<INotificationModule>();
+            if (notificationModule is null) return;
+
+            await notificationModule.SubmitAsync(new NotificationRequest
+            {
+                EventType = "Backup.PartialFailure",
+                Category = "SystemAlert",
+                Severity = failedCount == total ? "Critical" : "Warning",
+                Title = "Falha no backup automatizado da plataforma",
+                Message = $"{failedCount} de {total} bases de dados não foram copiadas com sucesso. Verificar logs do BackupCoordinatorJob.",
+                SourceModule = "Platform",
+                SourceEntityType = "BackgroundJob",
+                RecipientRoles = ["PlatformAdmin"],
+                RequiresAction = true,
+            }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao enviar notificação de falha de backup.");
+        }
     }
 
     private async Task<BackupManifestEntry> BackupDatabaseAsync(

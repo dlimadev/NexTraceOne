@@ -47,6 +47,9 @@ public sealed class CostIntelligenceDbContext(
     /// <summary>Sinais de desperdício operacional detetados por serviço.</summary>
     public DbSet<WasteSignal> WasteSignals => Set<WasteSignal>();
 
+    /// <summary>Registos de carbon score calculados diariamente por serviço.</summary>
+    public DbSet<CarbonScoreRecord> CarbonScoreRecords => Set<CarbonScoreRecord>();
+
     /// <inheritdoc />
     protected override System.Reflection.Assembly ConfigurationsAssembly
         => typeof(CostIntelligenceDbContext).Assembly;

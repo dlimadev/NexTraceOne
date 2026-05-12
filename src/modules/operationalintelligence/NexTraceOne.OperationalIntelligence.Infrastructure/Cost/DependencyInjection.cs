@@ -48,6 +48,7 @@ public static class DependencyInjection
         services.AddScoped<IBudgetForecastRepository, BudgetForecastRepository>();
         services.AddScoped<IEfficiencyRecommendationRepository, EfficiencyRecommendationRepository>();
         services.AddScoped<IWasteSignalRepository, WasteSignalRepository>();
+        services.AddScoped<ICarbonScoreRepository, CarbonScoreRepository>();
         services.AddScoped<ICostIntelligenceModule, CostIntelligenceModuleService>();
 
         // ── FinOps Report null readers ────────────────────────────────────

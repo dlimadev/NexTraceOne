@@ -505,6 +505,71 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.EnvironmentAccessPolicy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AllowedRoles")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Environments")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("JitApprovalRequiredFrom")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PolicyName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("RequireJitForRoles")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_iam_environment_access_policies_tenant");
+
+                    b.HasIndex("TenantId", "PolicyName")
+                        .IsUnique()
+                        .HasDatabaseName("IX_iam_environment_access_policies_tenant_name");
+
+                    b.ToTable("iam_environment_access_policies");
+                });
+
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.Environment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2339,6 +2404,125 @@ namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.AccessReviewCampaign", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.PolicyDefinition", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("PolicyType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("RulesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ActionJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AppliesTo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("EnvironmentFilter")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("CreatedByUserId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "PolicyType")
+                        .HasDatabaseName("ix_iam_policy_definitions_tenant_type");
+
+                    b.HasIndex("IsEnabled")
+                        .HasDatabaseName("ix_iam_policy_definitions_enabled")
+                        .HasFilter("\"IsEnabled\" = true");
+
+                    b.ToTable("iam_policy_definitions", (string)null);
+                });
+
+            modelBuilder.Entity("NexTraceOne.IdentityAccess.Domain.Entities.OnboardingProgress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CompletedStepsJson")
+                        .IsRequired()
+                        .HasDefaultValue("[]")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("completed_steps_json");
+
+                    b.Property<string>("CurrentStep")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset?>("SkippedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .IsUnique();
+
+                    b.ToTable("iam_onboarding_progress");
                 });
 #pragma warning restore 612, 618
         }
