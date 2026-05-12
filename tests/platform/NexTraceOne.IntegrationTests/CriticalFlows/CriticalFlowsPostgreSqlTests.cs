@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -19,7 +19,7 @@ namespace NexTraceOne.IntegrationTests.CriticalFlows;
 [Collection(PostgreSqlIntegrationCollection.Name)]
 public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fixture) : IntegrationTestBase(fixture)
 {
-    [Fact]
+    [RequiresDockerFact]
     public async Task Migrations_Should_Be_Applied_For_All_Module_Databases()
     {
         var catalogMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.CatalogConnectionString);
@@ -39,7 +39,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
         auditMigrations.Should().BeGreaterThan(0, "audit database has AuditCompliance migrations");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Catalog_SourceOfTruth_Should_Persist_And_Query_ApiOwnerJoin()
     {
         await ResetStateAsync();
@@ -80,7 +80,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
         projection.OwnerTeam.Should().Be("team-orders");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Contracts_Should_Persist_Version_And_RuleViolation_With_RealEfQuery()
     {
         await ResetStateAsync();
@@ -123,7 +123,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
         persisted.RuleViolations.Single().RuleName.Should().Be("required-examples");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task ChangeGovernance_Should_Persist_Release_And_ExternalMarker_With_Jsonb()
     {
         await ResetStateAsync();
@@ -182,7 +182,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
         payloadColumnType.Should().Be("jsonb");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task IdentityAccess_Should_Persist_LocalUser_And_Retrieve_ByPrimaryKey()
     {
         await ResetStateAsync();
@@ -208,7 +208,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
         persisted.LastLoginAt.Should().NotBeNull();
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Incidents_Should_Persist_IncidentAndWorkflow_With_Join_And_JsonbColumns()
     {
         await ResetStateAsync();

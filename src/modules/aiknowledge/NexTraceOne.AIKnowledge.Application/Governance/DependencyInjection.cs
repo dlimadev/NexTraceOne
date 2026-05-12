@@ -98,6 +98,9 @@ public static class DependencyInjection
         services.AddScoped<IConversationPersistenceService, ConversationPersistenceService>();
         services.AddScoped<IAiGuardrailEnforcementService, AiGuardrailEnforcementService>();
 
+        // W4-04: AI Response Evaluator — avalia qualidade de grounding de respostas de IA
+        services.AddScoped<IAiResponseEvaluator, GroundingEvaluator>();
+
         // ── IDE Integrations ─────────────────────────────────────────────
         services.AddTransient<IValidator<RegisterIdeClient.Command>, RegisterIdeClient.Validator>();
 

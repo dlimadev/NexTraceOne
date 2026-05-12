@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AuditCompliance.Domain.Entities;
 using NexTraceOne.Catalog.Domain.Portal.Entities;
@@ -21,7 +21,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
 {
     // ── Migrations coverage ───────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AuditDatabase_Should_Have_AppliedMigrations()
     {
         var auditMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.AuditConnectionString);
@@ -30,7 +30,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
             "porque AuditDbContext deve ter migrations aplicadas");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task DeveloperPortal_Should_Have_Tables_After_Migrations()
     {
         var subscriptionsExist = await Fixture.TableExistsAsync(Fixture.DeveloperPortalConnectionString, "dp_subscriptions");
@@ -38,7 +38,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         subscriptionsExist.Should().BeTrue("dp_subscriptions deve ser criada pela migration DeveloperPortal");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task RuntimeIntelligence_Should_Have_Tables_After_Migrations()
     {
         var snapshotsExist = await Fixture.TableExistsAsync(Fixture.RuntimeIntelligenceConnectionString, "oi_runtime_snapshots");
@@ -46,7 +46,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         snapshotsExist.Should().BeTrue("oi_runtime_snapshots deve ser criada pela migration RuntimeIntelligence");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task CostIntelligence_Should_Have_Tables_After_Migrations()
     {
         var costSnapshotsExist = await Fixture.TableExistsAsync(Fixture.CostIntelligenceConnectionString, "oi_cost_snapshots");
@@ -56,7 +56,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── DeveloperPortalDbContext ──────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task DeveloperPortal_Should_Persist_Subscription_And_SavedSearch()
     {
         await ResetStateAsync();
@@ -108,7 +108,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         persistedSearch.Filters.Should().Contain("payment");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task DeveloperPortal_Should_Filter_Active_Subscriptions_ByEmail()
     {
         await ResetStateAsync();
@@ -146,7 +146,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── RuntimeIntelligenceDbContext ──────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task RuntimeIntelligence_Should_Persist_Snapshot_With_HealthClassification()
     {
         await ResetStateAsync();
@@ -201,7 +201,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         snapshots[1].CpuUsagePercent.Should().Be(92.0m);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task RuntimeIntelligence_Should_Query_Degraded_Services()
     {
         await ResetStateAsync();
@@ -230,7 +230,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── CostIntelligenceDbContext ─────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task CostIntelligence_Should_Persist_CostSnapshot_And_Validate_Shares()
     {
         await ResetStateAsync();
@@ -269,7 +269,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         persisted.UnattributedCost.Should().Be(0.00m, "todo custo foi atribuído");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task CostIntelligence_Should_Detect_Cost_Anomaly()
     {
         await ResetStateAsync();
@@ -304,7 +304,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── AuditDbContext ────────────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Audit_Should_Persist_AuditEvent_WithPayload()
     {
         await ResetStateAsync();
@@ -338,7 +338,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
         persistedEvent.Payload.Should().Contain("ReleasePromoted".Length > 0 ? "Staging" : "");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Audit_Should_Support_MultipleEvents_And_Filter_ByModule()
     {
         await ResetStateAsync();
@@ -376,7 +376,7 @@ public sealed class ExtendedDbContextsPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── Cross-database: OI contexts have isolated databases ───────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task OperationalIntelligence_ThreeContexts_Have_Migrations_And_Coexist()
     {
         await ResetStateAsync();

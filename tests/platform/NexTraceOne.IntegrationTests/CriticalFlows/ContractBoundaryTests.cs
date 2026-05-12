@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
@@ -52,7 +52,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     /// do ServiceAsset em Catalog. Não há FK real entre databases — o contrato é
     /// por convenção de naming.
     /// </summary>
-    [Fact]
+    [RequiresDockerFact]
     public async Task Catalog_ServiceName_Referenced_By_Reliability_Should_Be_Consistent()
     {
         await ResetStateAsync();
@@ -123,7 +123,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     /// Contrato crítico: ChangeGovernance e OI compartilham o database nextraceone_operations.
     /// As tabelas devem ter prefixos únicos que evitem qualquer conflito.
     /// </summary>
-    [Fact]
+    [RequiresDockerFact]
     public async Task ChangeGovernance_And_Incidents_Should_Coexist_In_Operations_Database()
     {
         await ResetStateAsync();
@@ -201,7 +201,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     /// Contrato crítico: AIKnowledge usa ServiceId (GUID) como referência externa
     /// ao Catalog sem FK real. O contrato é por convenção.
     /// </summary>
-    [Fact]
+    [RequiresDockerFact]
     public async Task AIKnowledge_Conversation_Can_Reference_Catalog_ServiceId()
     {
         await ResetStateAsync();
@@ -271,7 +271,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     /// Contrato crítico: ambos os módulos partilham o database identity mas
     /// usam prefixos únicos para evitar colisão de nomes de tabelas.
     /// </summary>
-    [Fact]
+    [RequiresDockerFact]
     public async Task AuditCompliance_Tables_Should_Coexist_With_Identity_Tables()
     {
         // Assert — verificar que as tabelas de ambos os módulos existem no mesmo banco
@@ -296,7 +296,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     /// Valida que um AuditEvent pode ser persistido no mesmo banco onde o IdentityAccess opera,
     /// sem conflito de transações ou constraints.
     /// </summary>
-    [Fact]
+    [RequiresDockerFact]
     public async Task AuditEvent_Can_Be_Persisted_In_Identity_Database()
     {
         await ResetStateAsync();
@@ -342,7 +342,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     /// A referência é por TeamName (string) por convenção. Este teste garante que
     /// a convenção de naming está alinhada entre os módulos.
     /// </summary>
-    [Fact]
+    [RequiresDockerFact]
     public async Task Governance_Team_Name_Matches_Catalog_TeamName_Convention()
     {
         await ResetStateAsync();
@@ -411,7 +411,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
     /// Valida que RuntimeSnapshot (OI) e IncidentRecord (OI) coexistem no mesmo
     /// database de operations sem conflito, usando prefixos distintos de tabela.
     /// </summary>
-    [Fact]
+    [RequiresDockerFact]
     public async Task RuntimeSnapshot_And_IncidentRecord_Should_Coexist_In_Operations_Database()
     {
         await ResetStateAsync();

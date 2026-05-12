@@ -18,18 +18,35 @@ namespace NexTraceOne.BackgroundWorkers.Jobs;
 /// </summary>
 internal sealed class CloudBillingIngestionJob(
     IServiceScopeFactory serviceScopeFactory,
+    WorkerJobHealthRegistry jobHealthRegistry,
     ILogger<CloudBillingIngestionJob> logger) : BackgroundService
 {
+    internal const string HealthCheckName = "cloud-billing-ingestion-job";
+
     private static readonly TimeSpan DailyInterval = TimeSpan.FromHours(24);
 
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        jobHealthRegistry.MarkStarted(HealthCheckName);
         logger.LogInformation("CloudBillingIngestionJob: Started.");
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            await RunIngestionCycleAsync(stoppingToken);
+            try
+            {
+                await RunIngestionCycleAsync(stoppingToken);
+                jobHealthRegistry.MarkSucceeded(HealthCheckName);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                jobHealthRegistry.MarkFailed(HealthCheckName, "Ciclo de ingestão de billing falhou.");
+                logger.LogError(ex, "Erro no ciclo do CloudBillingIngestionJob.");
+            }
 
             try
             {
@@ -63,24 +80,14 @@ internal sealed class CloudBillingIngestionJob(
 
         var period = DateTimeOffset.UtcNow.ToString("yyyy-MM");
 
-        try
-        {
-            logger.LogInformation(
-                "CloudBillingIngestionJob: Fetching billing records for period {Period} from provider '{ProviderName}'.",
-                period, billingProvider.ProviderName);
+        logger.LogInformation(
+            "CloudBillingIngestionJob: Fetching billing records for period {Period} from provider '{ProviderName}'.",
+            period, billingProvider.ProviderName);
 
-            var records = await billingProvider.FetchBillingRecordsAsync(period, stoppingToken);
+        var records = await billingProvider.FetchBillingRecordsAsync(period, stoppingToken);
 
-            logger.LogInformation(
-                "CloudBillingIngestionJob: Fetched {Count} billing records for period {Period}. Would import via ICostIntelligenceModule (pending integration).",
-                records.Count, period);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(
-                ex,
-                "CloudBillingIngestionJob: Failed to fetch billing records for period {Period} from provider '{ProviderName}'.",
-                period, billingProvider.ProviderName);
-        }
+        logger.LogInformation(
+            "CloudBillingIngestionJob: Fetched {Count} billing records for period {Period}. Would import via ICostIntelligenceModule (pending integration).",
+            records.Count, period);
     }
 }

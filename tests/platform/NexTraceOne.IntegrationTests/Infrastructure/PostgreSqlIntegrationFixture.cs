@@ -32,6 +32,8 @@ namespace NexTraceOne.IntegrationTests.Infrastructure;
 /// Todas as tabelas usam prefixos de módulo únicos — incluindo a tabela outbox de cada módulo
 /// (ex: wf_outbox_messages, ci_outbox_messages) — permitindo múltiplos DbContexts por database sem conflitos.
 ///
+/// Fallback: Se Docker não estiver disponível, os testes são automaticamente ignorados com Skip.
+///
 /// nextrace_it_identity   → IdentityDbContext, AuditDbContext
 /// nextrace_it_catalog    → CatalogGraphDbContext, ContractsDbContext, DeveloperPortalDbContext
 /// nextrace_it_operations → ChangeIntelligenceDbContext, WorkflowDbContext, PromotionDbContext,
@@ -41,18 +43,56 @@ namespace NexTraceOne.IntegrationTests.Infrastructure;
 /// </summary>
 public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:16-alpine")
-        .WithDatabase("postgres")
-        .WithUsername("postgres")
-        .WithPassword("postgres")
-        .Build();
-
+    private static readonly bool _dockerAvailable = IsDockerAvailable();
+    private readonly PostgreSqlContainer? _container;
     private readonly Dictionary<string, string> _connectionStrings = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Respawner> _respawners = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly ICurrentTenant _tenant = new TestCurrentTenant();
     private readonly ICurrentUser _user = new TestCurrentUser();
     private readonly IDateTimeProvider _clock = new TestDateTimeProvider();
+
+    public static bool DockerAvailable => _dockerAvailable;
+
+    public PostgreSqlIntegrationFixture()
+    {
+        if (_dockerAvailable)
+        {
+            _container = new PostgreSqlBuilder("postgres:16-alpine")
+                .WithDatabase("postgres")
+                .WithUsername("postgres")
+                .WithPassword("postgres")
+                .Build();
+        }
+    }
+
+    private static bool IsDockerAvailable()
+    {
+        try
+        {
+            // Tenta verificar se Docker daemon está acessível
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "docker",
+                    Arguments = "info",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            process.Start();
+            process.WaitForExit(5000); // 5 segundos timeout
+            return process.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     // ── 4 consolidated databases (ADR-001) ────────────────────────────────────
 
@@ -78,20 +118,32 @@ public sealed class PostgreSqlIntegrationFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _container.StartAsync();
+        if (!_dockerAvailable)
+        {
+            // Docker não disponível - fixture inicializada mas testes devem usar Skip.IfNot
+            return;
+        }
 
-        _connectionStrings["identity"] = await CreateDatabaseAsync("nextrace_it_identity");
-        _connectionStrings["catalog"] = await CreateDatabaseAsync("nextrace_it_catalog");
-        _connectionStrings["operations"] = await CreateDatabaseAsync("nextrace_it_operations");
-        _connectionStrings["ai"] = await CreateDatabaseAsync("nextrace_it_ai");
+        if (_container != null)
+        {
+            await _container.StartAsync();
 
-        await ApplyMigrationsAsync();
-        await InitializeRespawnersAsync();
+            _connectionStrings["identity"] = await CreateDatabaseAsync("nextrace_it_identity");
+            _connectionStrings["catalog"] = await CreateDatabaseAsync("nextrace_it_catalog");
+            _connectionStrings["operations"] = await CreateDatabaseAsync("nextrace_it_operations");
+            _connectionStrings["ai"] = await CreateDatabaseAsync("nextrace_it_ai");
+
+            await ApplyMigrationsAsync();
+            await InitializeRespawnersAsync();
+        }
     }
 
     public async Task DisposeAsync()
     {
-        await _container.DisposeAsync();
+        if (_container != null)
+        {
+            await _container.DisposeAsync();
+        }
     }
 
     // ── DbContext factories — Core ────────────────────────────────────────────

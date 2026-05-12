@@ -79,7 +79,7 @@ public sealed class HttpClientConfiguration
         var username = _configuration["Platform:Proxy:Username"];
         var password = _configuration["Platform:Proxy:Password"];
 
-        var proxy = new WebProxy(proxyUrl, bypassOnLocal: true)
+        var proxy = new WebProxy(proxyUrl, true)
         {
             BypassList = bypassList,
         };

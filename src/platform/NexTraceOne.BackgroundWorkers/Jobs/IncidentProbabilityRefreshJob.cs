@@ -21,22 +21,39 @@ namespace NexTraceOne.BackgroundWorkers.Jobs;
 /// </summary>
 internal sealed class IncidentProbabilityRefreshJob(
     IServiceScopeFactory serviceScopeFactory,
+    WorkerJobHealthRegistry jobHealthRegistry,
     ILogger<IncidentProbabilityRefreshJob> logger) : BackgroundService
 {
-    private static readonly TimeSpan DefaultInterval = TimeSpan.FromMinutes(30);
+    internal const string HealthCheckName = "incident-probability-refresh-job";
+
+    private static readonly TimeSpan _defaultInterval = TimeSpan.FromMinutes(30);
 
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        jobHealthRegistry.MarkStarted(HealthCheckName);
         logger.LogInformation("IncidentProbabilityRefreshJob: Started.");
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            await RunRefreshCycleAsync(stoppingToken);
+            try
+            {
+                await RunRefreshCycleAsync(stoppingToken);
+                jobHealthRegistry.MarkSucceeded(HealthCheckName);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                jobHealthRegistry.MarkFailed(HealthCheckName, "Ciclo de refresh de probabilidade de incidente falhou.");
+                logger.LogError(ex, "Erro no ciclo do IncidentProbabilityRefreshJob.");
+            }
 
             try
             {
-                await Task.Delay(DefaultInterval, stoppingToken);
+                await Task.Delay(_defaultInterval, stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -56,45 +73,31 @@ internal sealed class IncidentProbabilityRefreshJob(
         using var scope = serviceScopeFactory.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        try
+        // Query with empty tenant is not valid — this job is a warm-up trigger.
+        // In a multi-tenant deployment, tenant IDs would be resolved from a tenant registry.
+        // For now, logs a diagnostic message indicating readiness.
+        logger.LogDebug(
+            "IncidentProbabilityRefreshJob: Refresh cycle started at {Timestamp}.",
+            DateTimeOffset.UtcNow);
+
+        // Sentinel query — validate pipeline is healthy
+        var result = await mediator.Send(
+            new GetIncidentProbabilityReport.Query(
+                TenantId: "system-health-check",
+                MaxTopServices: 1),
+            stoppingToken);
+
+        if (result.IsSuccess)
         {
-            // Query with empty tenant is not valid — this job is a warm-up trigger.
-            // In a multi-tenant deployment, tenant IDs would be resolved from a tenant registry.
-            // For now, logs a diagnostic message indicating readiness.
+            logger.LogInformation(
+                "IncidentProbabilityRefreshJob: Refresh cycle completed. Services analysed: {Count}.",
+                result.Value.TotalServicesAnalyzed);
+        }
+        else
+        {
             logger.LogDebug(
-                "IncidentProbabilityRefreshJob: Refresh cycle started at {Timestamp}.",
-                DateTimeOffset.UtcNow);
-
-            // Sentinel query — validate pipeline is healthy
-            var result = await mediator.Send(
-                new GetIncidentProbabilityReport.Query(
-                    TenantId: "system-health-check",
-                    MaxTopServices: 1),
-                stoppingToken);
-
-            if (result.IsSuccess)
-            {
-                logger.LogInformation(
-                    "IncidentProbabilityRefreshJob: Refresh cycle completed. Services analysed: {Count}.",
-                    result.Value.TotalServicesAnalyzed);
-            }
-            else
-            {
-                logger.LogDebug(
-                    "IncidentProbabilityRefreshJob: Refresh cycle returned non-success: {Error}",
-                    result.Error?.Message);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // Expected during shutdown — propagate
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(
-                ex,
-                "IncidentProbabilityRefreshJob: Unhandled error during refresh cycle.");
+                "IncidentProbabilityRefreshJob: Refresh cycle returned non-success: {Error}",
+                result.Error?.Message);
         }
     }
 }

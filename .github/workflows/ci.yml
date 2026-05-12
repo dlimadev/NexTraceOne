@@ -540,6 +540,204 @@ jobs:
           fi
           echo "✅ No critical npm vulnerabilities" >> $GITHUB_STEP_SUMMARY
 
+  # ── offline-release ──────────────────────────────────────────────────────────
+  # W3-02 — Offline Release Bundle
+  # Publishes self-contained builds for linux-x64 and win-x64 of core services,
+  # generates checksums, creates upgrade script with preflight checks, and packages
+  # everything into a release zip artifact. Triggered on push to tags v*.
+  offline-release:
+    name: Offline Release Bundle
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [validate, build-backend, build-frontend]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tagged_version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Create release directory structure
+        run: |
+          mkdir -p build/release/linux-x64
+          mkdir -p build/release/win-x64
+          mkdir -p build/release/tools
+
+      - name: Publish ApiHost (linux-x64)
+        run: |
+          dotnet publish src/platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj \
+            --configuration Release \
+            --runtime linux-x64 \
+            --self-contained true \
+            --output build/release/linux-x64/apihost \
+            /p:PublishSingleFile=true \
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Publish BackgroundWorkers (linux-x64)
+        run: |
+          dotnet publish src/platform/NexTraceOne.BackgroundWorkers/NexTraceOne.BackgroundWorkers.csproj \
+            --configuration Release \
+            --runtime linux-x64 \
+            --self-contained true \
+            --output build/release/linux-x64/workers \
+            /p:PublishSingleFile=true \
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Publish Ingestion API (linux-x64)
+        run: |
+          dotnet publish src/platform/NexTraceOne.Ingestion.Api/NexTraceOne.Ingestion.Api.csproj \
+            --configuration Release \
+            --runtime linux-x64 \
+            --self-contained true \
+            --output build/release/linux-x64/ingestion \
+            /p:PublishSingleFile=true \
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Publish ApiHost (win-x64)
+        run: |
+          dotnet publish src/platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj \
+            --configuration Release \
+            --runtime win-x64 \
+            --self-contained true \
+            --output build/release/win-x64/apihost \
+            /p:PublishSingleFile=true \
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Publish BackgroundWorkers (win-x64)
+        run: |
+          dotnet publish src/platform/NexTraceOne.BackgroundWorkers/NexTraceOne.BackgroundWorkers.csproj \
+            --configuration Release \
+            --runtime win-x64 \
+            --self-contained true \
+            --output build/release/win-x64/workers \
+            /p:PublishSingleFile=true \
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Publish Ingestion API (win-x64)
+        run: |
+          dotnet publish src/platform/NexTraceOne.Ingestion.Api/NexTraceOne.Ingestion.Api.csproj \
+            --configuration Release \
+            --runtime win-x64 \
+            --self-contained true \
+            --output build/release/win-x64/ingestion \
+            /p:PublishSingleFile=true \
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Generate SHA-256 checksums
+        run: |
+          cd build/release
+          find . -type f -not -name "checksums.sha256" -exec sha256sum {} \; > checksums.sha256
+          cat checksums.sha256
+
+      - name: Copy upgrade script
+        run: |
+          cp scripts/deploy/upgrade.sh build/release/upgrade.sh
+          chmod +x build/release/upgrade.sh
+
+      - name: Copy rollback script
+        run: |
+          cp scripts/deploy/rollback.sh build/release/rollback.sh
+          chmod +x build/release/rollback.sh
+
+      - name: Copy deploy configuration
+        run: |
+          cp scripts/deploy/smoke-check.sh build/release/smoke-check.sh
+          chmod +x build/release/smoke-check.sh
+
+      - name: Create README for release bundle
+        run: |
+          cat > build/release/README.md << 'EOF'
+          # NexTraceOne Offline Release Bundle
+
+          ## Version
+          ${{ steps.version.outputs.version }}
+
+          ## Contents
+          - `linux-x64/` — Self-contained binaries for Linux x64
+          - `win-x64/` — Self-contained binaries for Windows x64
+          - `upgrade.sh` — Automated upgrade script with preflight checks
+          - `rollback.sh` — Rollback script for emergency recovery
+          - `smoke-check.sh` — Post-deployment health verification
+          - `checksums.sha256` — SHA-256 checksums for all files
+
+          ## Quick Start
+
+          ### Linux/macOS
+          ```bash
+          # Extract the release bundle
+          unzip nextraceone-v${{ steps.version.outputs.version }}-release.zip
+
+          # Run preflight checks
+          bash upgrade.sh --preflight
+
+          # Execute upgrade
+          bash upgrade.sh --version ${{ steps.version.outputs.version }}
+
+          # Verify deployment
+          bash smoke-check.sh
+          ```
+
+          ### Windows
+          Use PowerShell to extract and run the Windows binaries in `win-x64/`.
+
+          ## Requirements
+          - Linux: systemd-based distribution (Ubuntu 20.04+, RHEL 8+, etc.)
+          - Windows: Windows Server 2019+ or Windows 10/11 Pro
+          - PostgreSQL 16+
+          - Minimum 8 GB RAM (16 GB recommended)
+
+          ## Support
+          For issues, visit: https://github.com/your-org/NexTraceOne/issues
+          EOF
+
+      - name: Package release bundle
+        run: |
+          cd build
+          zip -r "nextraceone-v${{ steps.version.outputs.version }}-release.zip" release/
+          ls -lh "nextraceone-v${{ steps.version.outputs.version }}-release.zip"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextraceone-v${{ steps.version.outputs.version }}-release
+          path: build/nextraceone-v${{ steps.version.outputs.version }}-release.zip
+          retention-days: 90
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: NexTraceOne v${{ steps.version.outputs.version }}
+          body: |
+            ## NexTraceOne v${{ steps.version.outputs.version }}
+
+            ### Offline Release Bundle
+            This release includes self-contained binaries for Linux x64 and Windows x64.
+
+            #### Downloads
+            - [nextraceone-v${{ steps.version.outputs.version }}-release.zip](https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/nextraceone-v${{ steps.version.outputs.version }}-release.zip)
+
+            #### What's Changed
+            See commit history for detailed changes.
+
+            #### Installation
+            Refer to the README.md included in the release bundle for installation instructions.
+          files: build/nextraceone-v${{ steps.version.outputs.version }}-release.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # ── ci-status ─────────────────────────────────────────────────────────────
   # Single required status check that gates PR merges to main/develop.
   # Aggregates all CI jobs into one check for branch protection rules.
@@ -558,6 +756,7 @@ jobs:
       - test-frontend
       - e2e-smoke
       - security-audit
+      - offline-release
     steps:
       - name: Check job results
         run: |
@@ -571,8 +770,10 @@ jobs:
           echo "test-frontend: ${{ needs.test-frontend.result }}"
           echo "e2e-smoke: ${{ needs.e2e-smoke.result }}"
           echo "security-audit: ${{ needs.security-audit.result }}"
+          echo "offline-release: ${{ needs.offline-release.result }}"
 
           # e2e-smoke is skipped on push events — only fail CI if it actually ran and failed
+          # offline-release only runs on tag pushes (v*)
           if [[ "${{ needs.validate.result }}" == "failure" || \
                 "${{ needs.build-backend.result }}" == "failure" || \
                 "${{ needs.test-backend-unit.result }}" == "failure" || \
@@ -582,7 +783,8 @@ jobs:
                 "${{ needs.build-frontend.result }}" == "failure" || \
                 "${{ needs.test-frontend.result }}" == "failure" || \
                 "${{ needs.security-audit.result }}" == "failure" || \
-                ( "${{ github.event_name }}" == "pull_request" && "${{ needs.e2e-smoke.result }}" == "failure" ) ]]; then
+                ( "${{ github.event_name }}" == "pull_request" && "${{ needs.e2e-smoke.result }}" == "failure" ) || \
+                ( startsWith(github.ref, 'refs/tags/v') && "${{ needs.offline-release.result }}" == "failure" ) ]]; then
             echo "❌ One or more required jobs failed"
             exit 1
           fi

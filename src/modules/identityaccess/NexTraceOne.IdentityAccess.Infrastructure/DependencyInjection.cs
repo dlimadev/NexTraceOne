@@ -89,6 +89,7 @@ public static class DependencyInjection
 
         // Repositórios — W5-05 Fine-Grained Auth per Environment
         services.AddScoped<IEnvironmentAccessPolicyRepository, EnvironmentAccessPolicyRepository>();
+        services.AddScoped<IJitAccessRequestRepository, JitAccessRequestRepository>();
 
         // Repositórios — SaaS-06 Onboarding Wizard
         services.AddScoped<IOnboardingProgressRepository, OnboardingProgressRepository>();

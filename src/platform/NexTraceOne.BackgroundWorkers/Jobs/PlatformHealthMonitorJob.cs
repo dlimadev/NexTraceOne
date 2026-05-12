@@ -28,35 +28,35 @@ public sealed class PlatformHealthMonitorJob(
 {
     internal const string HealthCheckName = "platform-health-monitor-job";
 
-    private static readonly TimeSpan Interval = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan StartDelay = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan AlertCooldown = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan _startDelay = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan _alertCooldown = TimeSpan.FromMinutes(15);
 
     // Intervalo máximo esperado por job (2× o intervalo de execução configurado)
-    private static readonly Dictionary<string, TimeSpan> JobStalenessThresholds = new()
+    private static readonly Dictionary<string, TimeSpan> _jobStalenessThresholds = new()
     {
         [LicenseRecalculationJob.HealthCheckName] = TimeSpan.FromMinutes(30),
         [DriftDetectionJob.HealthCheckName] = TimeSpan.FromMinutes(20),
         [ContractConsumerIngestionJob.HealthCheckName] = TimeSpan.FromMinutes(60),
         [IncidentProbabilityRefreshJob.HealthCheckName] = TimeSpan.FromMinutes(60),
-        [CloudBillingIngestionJob.HealthCheckName] = TimeSpan.FromMinutes(60),
+        [CloudBillingIngestionJob.HealthCheckName] = TimeSpan.FromHours(48)
     };
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         jobHealthRegistry.MarkStarted(HealthCheckName);
-        logger.LogInformation("PlatformHealthMonitorJob iniciado — intervalo {Interval}.", Interval);
+        logger.LogInformation("PlatformHealthMonitorJob iniciado — intervalo {_interval}.", _interval);
 
         try
         {
-            await Task.Delay(StartDelay, stoppingToken);
+            await Task.Delay(_startDelay, stoppingToken);
         }
         catch (OperationCanceledException)
         {
             return;
         }
 
-        using var timer = new PeriodicTimer(Interval);
+        using var timer = new PeriodicTimer(_interval);
 
         while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
         {
@@ -157,7 +157,7 @@ public sealed class PlatformHealthMonitorJob(
     {
         var now = DateTimeOffset.UtcNow;
 
-        foreach (var (jobName, threshold) in JobStalenessThresholds)
+        foreach (var (jobName, threshold) in _jobStalenessThresholds)
         {
             var snapshot = jobHealthRegistry.GetSnapshot(jobName);
 
@@ -290,7 +290,7 @@ public sealed class PlatformHealthMonitorJob(
                 "1",
                 new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = AlertCooldown
+                    AbsoluteExpirationRelativeToNow = _alertCooldown
                 },
                 cancellationToken);
         }
@@ -300,3 +300,4 @@ public sealed class PlatformHealthMonitorJob(
         }
     }
 }
+

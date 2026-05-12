@@ -1,9 +1,10 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NexTraceOne.ApiHost;
 using NSubstitute;
 
 namespace NexTraceOne.IntegrationTests.Startup;
+using NexTraceOne.IntegrationTests.Infrastructure;
 
 /// <summary>
 /// OPS-03 — unit tests for <see cref="OptionalProviderStartupLogger"/>.
@@ -31,7 +32,7 @@ public sealed class OptionalProviderStartupLoggerTests
             .Count(c => c.GetMethodInfo().Name == "Log"
                         && c.GetArguments()[0] is LogLevel lvl && lvl == level);
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_ProductionAllMissing_LogsWarningPerProvider()
     {
         OptionalProviderStartupLogger.LogProviderStatuses(_logger, "Production", Statuses());
@@ -40,7 +41,7 @@ public sealed class OptionalProviderStartupLoggerTests
         CountAtLevel(LogLevel.Warning).Should().Be(5);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_DevelopmentAllMissing_EmitsNoWarnings()
     {
         OptionalProviderStartupLogger.LogProviderStatuses(_logger, "Development", Statuses());
@@ -50,7 +51,7 @@ public sealed class OptionalProviderStartupLoggerTests
         CountAtLevel(LogLevel.Information).Should().BeGreaterThanOrEqualTo(1);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_AllConfigured_EmitsNoWarnings()
     {
         OptionalProviderStartupLogger.LogProviderStatuses(
@@ -62,7 +63,7 @@ public sealed class OptionalProviderStartupLoggerTests
         CountAtLevel(LogLevel.Information).Should().BeGreaterThanOrEqualTo(1);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_StagingMixed_LogsWarningOnlyForMissing()
     {
         OptionalProviderStartupLogger.LogProviderStatuses(
@@ -74,7 +75,7 @@ public sealed class OptionalProviderStartupLoggerTests
         CountAtLevel(LogLevel.Warning).Should().Be(2);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_EnvironmentNameIsCaseInsensitiveForDevelopment()
     {
         OptionalProviderStartupLogger.LogProviderStatuses(_logger, "development", Statuses());
@@ -83,7 +84,7 @@ public sealed class OptionalProviderStartupLoggerTests
         CountAtLevel(LogLevel.Warning).Should().Be(0);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_NullLogger_Throws()
     {
         var act = () => OptionalProviderStartupLogger.LogProviderStatuses(null!, "Production", Statuses());
@@ -91,7 +92,7 @@ public sealed class OptionalProviderStartupLoggerTests
         act.Should().Throw<ArgumentNullException>();
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_NullEnvironment_Throws()
     {
         var act = () => OptionalProviderStartupLogger.LogProviderStatuses(_logger, null!, Statuses());
@@ -99,7 +100,7 @@ public sealed class OptionalProviderStartupLoggerTests
         act.Should().Throw<ArgumentNullException>();
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public void LogProviderStatuses_NullStatuses_Throws()
     {
         var act = () => OptionalProviderStartupLogger.LogProviderStatuses(_logger, "Production", null!);

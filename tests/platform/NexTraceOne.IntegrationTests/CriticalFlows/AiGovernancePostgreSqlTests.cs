@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Entities;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -18,7 +18,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
 {
     // ── Migrations coverage ──────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AiKnowledge_AllDbContexts_Should_Have_AppliedMigrations()
     {
         var aiGovernanceMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.AiKnowledgeConnectionString);
@@ -30,7 +30,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
         aiOrchMigrations.Should().BeGreaterThan(0, "AiOrchestrationDbContext deve ter migrations no banco aiorchestration");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AiKnowledge_Tables_Should_Exist_After_Migrations()
     {
         var conversationsExist = await Fixture.TableExistsAsync(Fixture.AiKnowledgeConnectionString, "ai_gov_conversations");
@@ -44,7 +44,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ── AiGovernanceDbContext ────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AiGovernance_Should_Persist_Conversation_And_Messages()
     {
         await ResetStateAsync();
@@ -115,7 +115,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
         messages[1].CompletionTokens.Should().Be(312);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AiGovernance_Should_Persist_Multiple_Conversations_And_Filter_By_CreatedBy()
     {
         await ResetStateAsync();
@@ -160,7 +160,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ── ExternalAiDbContext ──────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task ExternalAi_Should_Persist_Provider_And_Query_ActiveProviders()
     {
         await ResetStateAsync();
@@ -206,7 +206,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ── AiOrchestrationDbContext ─────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AiOrchestration_Should_Persist_Conversation_And_Query_ByServiceName()
     {
         await ResetStateAsync();
@@ -239,7 +239,7 @@ public sealed class AiGovernancePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ── Cross-context: isolated databases ────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AiKnowledge_AllThreeContexts_Have_Isolated_Databases_And_Coexist()
     {
         await ResetStateAsync();

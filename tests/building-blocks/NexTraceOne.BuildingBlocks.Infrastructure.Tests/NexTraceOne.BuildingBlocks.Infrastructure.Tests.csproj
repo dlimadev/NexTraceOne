@@ -20,4 +20,8 @@
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="Bogus" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Jobs\" />
+    <Folder Include="Observability\" />
+  </ItemGroup>
 </Project>

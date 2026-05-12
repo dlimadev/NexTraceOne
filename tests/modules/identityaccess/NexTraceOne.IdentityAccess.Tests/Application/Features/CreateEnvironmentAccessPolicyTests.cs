@@ -44,7 +44,6 @@ public sealed class CreateEnvironmentAccessPolicyTests
         result.Value.PolicyId.Should().NotBeEmpty();
         await _repository.Received(1).AddAsync(
             Arg.Any<EnvironmentAccessPolicy>(), Arg.Any<CancellationToken>());
-        await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

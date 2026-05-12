@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -26,7 +26,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
     private const string SeedAuditorEmail = "auditor@nextraceone.dev";
     private const string SeedAuditorPassword = "Admin@123";
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task IdentityAccess_Should_Login_ListTenants_And_SelectTenant_And_Use_Real_CookieSession()
     {
         var login = await fixture.LoginAsync(ApiHostPostgreSqlFixture.SeedAdminEmail, ApiHostPostgreSqlFixture.SeedAdminPassword);
@@ -79,7 +79,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         logoutResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task IdentityAccess_Should_Get_Current_User_And_List_Tenant_Users_With_Real_Backend()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -99,7 +99,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         usersPayload.Should().Contain(ApiHostPostgreSqlFixture.SeedDeveloperEmail);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task IdentityAccess_Should_Enforce_Minimal_Permissions_With_Real_Authorization()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -112,7 +112,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
             "o utilizador Developer não deve conseguir executar mutações administrativas de utilizadores");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Catalog_And_SourceOfTruth_Should_List_Services_Get_Detail_Search_And_Expose_Real_Contract_Catalog_Summary()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -172,7 +172,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         contractsPayload.Should().Contain("distinctContracts");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Contracts_Should_Create_Update_Submit_Approve_Publish_And_Reopen_With_Real_Backend()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -288,7 +288,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         (await reviewsResponse.Content.ReadAsStringAsync()).Should().Contain("Approved");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task PreviewOnly_Governance_And_DeveloperPortal_Endpoints_Should_Be_Removed_From_Final_Product_Surface()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -302,7 +302,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         playgroundResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task ChangeGovernance_And_Incidents_Should_Expose_Real_Read_Write_And_Correlation_Flows()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -352,7 +352,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         createIncidentResponse.StatusCode.Should().Be(HttpStatusCode.Created);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AI_Should_Create_Open_Send_Persist_Relist_And_Reopen_Conversation_With_Real_Backend()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -426,7 +426,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         reopenedRoot.GetProperty("messages")[1].GetProperty("groundingSources").GetArrayLength().Should().BeGreaterThan(0);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AI_Should_Not_Silently_Create_A_New_Conversation_When_Send_Targets_Unknown_Id()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -447,7 +447,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         sendMessageResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task AI_Should_Enforce_User_Scoped_Conversation_Access_For_List_Open_Messages_And_Send()
     {
         using var adminClient = await fixture.CreateAuthenticatedClientAsync(
@@ -490,7 +490,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         developerSendResponse.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Incidents_Should_Create_Persist_List_Detail_And_Report_Real_TotalCount()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -548,7 +548,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         (await reopenedResponse.Content.ReadAsStringAsync()).Should().Contain(title);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Incidents_Should_Return_Forbidden_For_ReadOnly_Profile_When_Creating()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(
@@ -571,7 +571,7 @@ public sealed class CoreApiHostIntegrationTests(ApiHostPostgreSqlFixture fixture
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Audit_Should_Record_Search_And_Verify_Real_Audit_Chain()
     {
         using var client = await fixture.CreateAuthenticatedClientAsync(

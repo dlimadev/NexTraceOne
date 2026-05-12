@@ -1,3 +1,4 @@
+using System.Net;
 using NexTraceOne.BuildingBlocks.Security.Integrity;
 using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Cache;
@@ -7,6 +8,7 @@ using NexTraceOne.BuildingBlocks.Observability.HealthChecks;
 using NexTraceOne.BuildingBlocks.Security;
 using NexTraceOne.BuildingBlocks.Security.MultiTenancy;
 using NexTraceOne.IdentityAccess.Infrastructure.Context;
+using NexTraceOne.IdentityAccess.Infrastructure.Middleware;
 using NexTraceOne.ApiHost;
 using NexTraceOne.ApiHost.Options;
 using NexTraceOne.Catalog.API.Graph;
@@ -78,9 +80,15 @@ builder.Services.ConfigureHttpClientDefaults(b =>
     b.ConfigurePrimaryHttpMessageHandler(sp =>
     {
         var cfg = sp.GetRequiredService<NexTraceOne.BuildingBlocks.Infrastructure.Http.HttpClientConfiguration>();
-        return cfg.BuildHandler() ?? new System.Net.Http.HttpClientHandler();
+        return cfg.BuildHandler() ?? new SocketsHttpHandler();
     });
     b.AddHttpMessageHandler<NexTraceOne.BuildingBlocks.Infrastructure.Http.AirGapHttpMessageHandler>();
+});
+
+// [3.0-b] HttpClient dedicado para teste de conectividade de rede (W5-02)
+builder.Services.AddHttpClient("network-test", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
 });
 
 // [3.0] Distributed cache — Redis quando ConnectionStrings:Redis está configurado, memory cache caso contrário.
@@ -358,6 +366,8 @@ app.UseCookieSessionCsrfProtection();
 app.UseAuthentication();
 app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseMiddleware<EnvironmentResolutionMiddleware>();
+app.UseMiddleware<NexTraceOne.IdentityAccess.Infrastructure.Middleware.EnvironmentAuthorizationMiddleware>();
+app.UseMiddleware<NexTraceOne.BuildingBlocks.Security.Session.SessionInactivityMiddleware>();
 app.UseMiddleware<MaintenanceModeMiddleware>();
 app.UseAuthorization();
 

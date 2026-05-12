@@ -1,3 +1,4 @@
+using System.Linq;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Abstractions;
 using NexTraceOne.OperationalIntelligence.Application.Cost.Features.GetCarbonScoreReport;

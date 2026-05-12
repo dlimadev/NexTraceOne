@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -24,7 +24,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
 {
     // ─── Catalog: Topology ──────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Catalog_Topology_Should_Persist_MultipleServices_And_QueryOwnership()
     {
         await ResetStateAsync();
@@ -83,7 +83,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         topology[1].Criticality.Should().Be(Criticality.Critical);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Catalog_Should_Persist_ConsumerRelationship_From_OtelInference()
     {
         await ResetStateAsync();
@@ -118,7 +118,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ─── Contracts: Artifact persistence ────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Contracts_Should_Persist_ContractVersion_With_Artifact_And_FilterByType()
     {
         await ResetStateAsync();
@@ -178,7 +178,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         aiGeneratedDocs[0].ContentFormat.Should().Be("markdown");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Contracts_Should_Persist_RuleViolation_With_NullRulesetId_And_WithRulesetId()
     {
         await ResetStateAsync();
@@ -240,7 +240,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ─── ChangeGovernance: BlastRadius join ─────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task ChangeGovernance_Should_Persist_Release_And_BlastRadiusReport_With_Join()
     {
         await ResetStateAsync();
@@ -291,7 +291,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         joined.TransitiveConsumers.Should().Contain("reporting-service");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task ChangeGovernance_Should_Filter_Releases_By_Environment_And_Score()
     {
         await ResetStateAsync();
@@ -321,7 +321,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ─── IdentityAccess: Role + Membership join ──────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task IdentityAccess_Should_Persist_User_Role_Membership_And_QueryJoin()
     {
         await ResetStateAsync();
@@ -367,7 +367,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         result.IsActive.Should().BeTrue();
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task IdentityAccess_Should_Query_Active_Members_Per_Tenant()
     {
         await ResetStateAsync();
@@ -400,7 +400,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
     // ─── Incidents: Runbook JSONB + Correlation query ────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Incidents_Should_Persist_Runbook_And_ValidateStepsJson_IsJsonb()
     {
         await ResetStateAsync();
@@ -440,7 +440,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         stepsColumnType.Should().Be("jsonb");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Incidents_Should_Filter_Runbooks_By_LinkedService()
     {
         await ResetStateAsync();
@@ -469,7 +469,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
         ordersRunbooks[1].Title.Should().Be("Orders Rollback");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Incidents_Should_Persist_CorrelationData_And_QueryByConfidence()
     {
         await ResetStateAsync();

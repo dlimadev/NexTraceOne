@@ -7574,6 +7574,54 @@
       "hint2Title": "Ver Grafo de Dependências",
       "hint3Desc": "Monitorize o estado de fiabilidade dos seus serviços",
       "hint3Title": "Verificar Saúde do Serviço"
+    },
+    "wizard": {
+      "title": "Bem-vindo ao NexTraceOne",
+      "subtitle": "Complete estes passos para configurar a sua plataforma"
+    },
+    "progress": {
+      "label": "Progresso do Onboarding"
+    },
+    "step": {
+      "current": "Atual",
+      "completed": "Concluído"
+    },
+    "actions": {
+      "markComplete": "Marcar como Concluído",
+      "goToStep": "Ir para Passo",
+      "skipAll": "Ignorar Tudo"
+    },
+    "steps": {
+      "install": {
+        "title": "Instalar Agente",
+        "description": "Instale o agente NexTraceOne no seu ambiente para começar a monitorizar"
+      },
+      "firstSignal": {
+        "title": "Primeiro Sinal",
+        "description": "Registe o seu primeiro serviço e comece a receber sinais de telemetria"
+      },
+      "registerService": {
+        "title": "Registar Serviço",
+        "description": "Adicione mais serviços ao catálogo e configure as suas dependências"
+      },
+      "addContract": {
+        "title": "Adicionar Contrato",
+        "description": "Crie contratos de API para definir interfaces entre serviços"
+      },
+      "setupSlo": {
+        "title": "Configurar SLOs",
+        "description": "Defina Service Level Objectives para monitorizar a fiabilidade dos serviços"
+      }
+    },
+    "messages": {
+      "stepCompleted": "Passo {{step}} concluído com sucesso!",
+      "wizardSkipped": "Wizard ignorado. Pode aceder a qualquer momento através do menu."
+    },
+    "errors": {
+      "fetchFailed": "Falha ao carregar estado do onboarding",
+      "stepFailed": "Falha ao completar passo. Tente novamente.",
+      "skipFailed": "Falha ao ignorar wizard. Tente novamente.",
+      "noStatus": "Não foi possível obter o estado do onboarding"
     }
   },
   "operationalNotes": {

@@ -1350,7 +1350,7 @@ public sealed class AiGovernanceEndpointModule
         var group = app.MapGroup("/api/v1/ai/memory");
 
         group.MapPost("/", async (
-            RecordMemoryNodeFeature.Command command,
+            SubmitEvaluationFeature.Command command,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
@@ -1359,26 +1359,38 @@ public sealed class AiGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         }).RequirePermission("ai:governance:write");
 
-        group.MapGet("/search", async (
-            string subject,
-            Guid tenantId,
-            int? limit,
-            ISender sender,
+        // W4-04: Grounding Evaluation — avalia qualidade de grounding de resposta de IA
+        group.MapPost("/grounding", async (
+            EvaluateGroundingRequest request,
+            NexTraceOne.AIKnowledge.Application.Governance.Services.IAiResponseEvaluator evaluator,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
-            var result = await sender.Send(new QueryOrganizationalMemoryFeature.Query(subject, tenantId, limit ?? 10), cancellationToken);
-            return result.ToHttpResult(localizer);
-        }).RequirePermission("ai:governance:read");
+            try
+            {
+                var aiResponse = new NexTraceOne.AIKnowledge.Application.Governance.Services.AiResponse(
+                    Content: request.Content,
+                    ExecutionId: request.ExecutionId,
+                    ModelName: request.ModelName);
 
-        group.MapGet("/{nodeId:guid}", async (
-            Guid nodeId,
-            ISender sender,
-            IErrorLocalizer localizer,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await sender.Send(new GetMemoryNodeDetailsFeature.Query(nodeId), cancellationToken);
-            return result.ToHttpResult(localizer);
+                var result = await evaluator.EvaluateAsync(aiResponse, cancellationToken);
+
+                return Results.Ok(new
+                {
+                    groundingScore = result.GroundingScore,
+                    entitiesFound = result.EntitiesFound,
+                    entitiesNotFound = result.EntitiesNotFound,
+                    hasHallucinations = result.HasHallucinations,
+                    confidenceLevel = result.ConfidenceLevel
+                });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(
+                    title: "Erro na avaliação de grounding",
+                    detail: ex.Message,
+                    statusCode: 500);
+            }
         }).RequirePermission("ai:governance:read");
     }
 
@@ -2267,3 +2279,12 @@ public sealed record RegisterPromptAssetRequest(
     string? Tags,
     Guid? TenantId,
     string CreatedBy);
+
+/// <summary>Corpo de pedido para avaliação de grounding W4-04.</summary>
+public sealed record EvaluateGroundingRequest(
+    /// <summary>Conteúdo da resposta de IA a avaliar.</summary>
+    string Content,
+    /// <summary>Identificador opcional da execução ou conversa.</summary>
+    Guid? ExecutionId = null,
+    /// <summary>Nome do modelo utilizado (opcional).</summary>
+    string? ModelName = null);

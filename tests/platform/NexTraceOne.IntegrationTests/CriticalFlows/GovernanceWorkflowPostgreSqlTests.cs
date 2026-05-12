@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NexTraceOne.ChangeGovernance.Domain.Promotion.Entities;
 using NexTraceOne.ChangeGovernance.Domain.RulesetGovernance.Entities;
@@ -20,7 +20,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
 {
     // ── Migrations coverage ───────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Governance_AllDbContexts_Should_Have_AppliedMigrations()
     {
         var governanceMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.GovernanceConnectionString);
@@ -29,7 +29,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
             "porque GovernanceDbContext deve ter migrations aplicadas");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task ChangeGovernance_Extended_Should_Have_AppliedMigrations()
     {
         var changeGovernanceMigrations = await Fixture.GetAppliedMigrationsCountAsync(Fixture.ChangeGovernanceConnectionString);
@@ -42,7 +42,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── GovernanceDbContext ───────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Governance_Should_Persist_Team_And_GovernancePack_And_Link()
     {
         await ResetStateAsync();
@@ -84,7 +84,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
         persistedPack.CurrentVersion.Should().BeNull("pack começa sem versão publicada");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Governance_Should_Persist_MultipleTeams_And_Filter_ByStatus()
     {
         await ResetStateAsync();
@@ -116,7 +116,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── WorkflowDbContext ─────────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Workflow_Should_Persist_Template_And_Instance_WithStatus()
     {
         await ResetStateAsync();
@@ -165,7 +165,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
         persistedInstance.Status.Should().Be(ChangeGovernance.Domain.Workflow.Enums.WorkflowStatus.Draft);
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Workflow_Should_Query_Templates_By_TargetEnvironment()
     {
         await ResetStateAsync();
@@ -195,7 +195,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── PromotionDbContext ────────────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Promotion_Should_Persist_DeploymentEnvironment_And_Request()
     {
         await ResetStateAsync();
@@ -255,7 +255,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
 
     // ── RulesetGovernanceDbContext ────────────────────────────────────────────
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Ruleset_Should_Persist_Custom_Ruleset_And_Deactivate()
     {
         await ResetStateAsync();
@@ -294,7 +294,7 @@ public sealed class GovernanceWorkflowPostgreSqlTests(PostgreSqlIntegrationFixtu
         archivedRuleset.IsActive.Should().BeFalse("ruleset foi arquivado");
     }
 
-    [Fact]
+    [RequiresDockerFact]
     public async Task Ruleset_Should_Filter_Active_Rulesets_For_Linting()
     {
         await ResetStateAsync();

@@ -1,3 +1,4 @@
+using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -130,7 +131,7 @@ public sealed class AiResourceGovernorTests : IDisposable
         var inner = Substitute.For<IChatCompletionProvider>();
         inner.ProviderId.Returns("test");
         inner.CompleteAsync(Arg.Any<ChatCompletionRequest>(), Arg.Any<CancellationToken>())
-            .Throws(new HttpRequestException("connection refused"));
+            .Returns(Task.FromException<ChatCompletionResult>(new HttpRequestException("connection refused")));
 
         var interceptor = new AiResourceGovernorInterceptor(
             inner, _governor, NullLogger<AiResourceGovernorInterceptor>.Instance);

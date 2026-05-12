@@ -31,25 +31,25 @@ public sealed class WasteDetectionJob(
 {
     internal const string HealthCheckName = "waste-detection-job";
 
-    private static readonly TimeSpan Interval = TimeSpan.FromHours(24);
-    private static readonly TimeSpan StartDelay = TimeSpan.FromSeconds(90);
-    private static readonly string[] DefaultEnvironments = ["production", "staging"];
+    private static readonly TimeSpan _interval = TimeSpan.FromHours(24);
+    private static readonly TimeSpan _startDelay = TimeSpan.FromSeconds(90);
+    private static readonly string[] _defaultEnvironments = ["production", "staging"];
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         jobHealthRegistry.MarkStarted(HealthCheckName);
-        logger.LogInformation("WasteDetectionJob iniciado — intervalo {Interval}.", Interval);
+        logger.LogInformation("WasteDetectionJob iniciado — intervalo {_interval}.", _interval);
 
         try
         {
-            await Task.Delay(StartDelay, stoppingToken);
+            await Task.Delay(_startDelay, stoppingToken);
         }
         catch (OperationCanceledException)
         {
             return;
         }
 
-        using var timer = new PeriodicTimer(Interval);
+        using var timer = new PeriodicTimer(_interval);
 
         while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
         {
@@ -90,7 +90,7 @@ public sealed class WasteDetectionJob(
         }
 
         logger.LogInformation("WasteDetectionJob: a analisar {Count} serviços em {EnvCount} ambientes.",
-            services.Count, DefaultEnvironments.Length);
+            services.Count, _defaultEnvironments.Length);
 
         var totalDetected = 0;
         var failedServices = 0;
@@ -100,7 +100,7 @@ public sealed class WasteDetectionJob(
             if (cancellationToken.IsCancellationRequested)
                 break;
 
-            foreach (var environment in DefaultEnvironments)
+            foreach (var environment in _defaultEnvironments)
             {
                 try
                 {
@@ -113,7 +113,7 @@ public sealed class WasteDetectionJob(
                         totalDetected += result.Value.DetectedCount;
                         logger.LogInformation(
                             "WasteDetectionJob: {Count} sinais detectados em '{Service}/{Env}'.",
-                            result.Value.SignalsCreated, service.Name, environment);
+                            result.Value.DetectedCount, service.Name, environment);
                     }
                 }
                 catch (Exception ex)
@@ -189,3 +189,4 @@ public sealed class WasteDetectionJob(
         }
     }
 }
+

@@ -313,7 +313,17 @@ builder.Services.AddHealthChecks()
         "carbon-score-calculation-job",
         failureStatus: HealthStatus.Degraded,
         tags: ["health"],
-        args: [CarbonScoreCalculationJob.HealthCheckName, TimeSpan.FromHours(25)]);
+        args: [CarbonScoreCalculationJob.HealthCheckName, TimeSpan.FromHours(25)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "incident-probability-refresh-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [IncidentProbabilityRefreshJob.HealthCheckName, TimeSpan.FromMinutes(60)])
+    .AddTypeActivatedCheck<BackgroundWorkerJobHealthCheck>(
+        "cloud-billing-ingestion-job",
+        failureStatus: HealthStatus.Degraded,
+        tags: ["health"],
+        args: [CloudBillingIngestionJob.HealthCheckName, TimeSpan.FromHours(48)]);
 
 // Handlers de expiração — cada um processa um único tipo de entidade expirável.
 // A ordem de registro define a ordem de execução no IdentityExpirationJob.

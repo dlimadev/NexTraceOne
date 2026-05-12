@@ -5,6 +5,7 @@ export { ResetPasswordPage } from './pages/ResetPasswordPage';
 export { ActivationPage } from './pages/ActivationPage';
 export { MfaPage } from './pages/MfaPage';
 export { TenantSelectionPage } from './pages/TenantSelectionPage';
+export { OnboardingWizardPage } from './pages/OnboardingWizardPage';
 export { UsersPage } from './pages/UsersPage';
 export { TenantsPage } from './pages/TenantsPage';
 export { BreakGlassPage } from './pages/BreakGlassPage';

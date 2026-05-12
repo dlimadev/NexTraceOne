@@ -6320,6 +6320,54 @@
       "hint2Title": "View Dependency Graph",
       "hint3Desc": "Monitor the reliability status of your services",
       "hint3Title": "Check Service Health"
+    },
+    "wizard": {
+      "title": "Welcome to NexTraceOne",
+      "subtitle": "Complete these steps to set up your platform"
+    },
+    "progress": {
+      "label": "Onboarding Progress"
+    },
+    "step": {
+      "current": "Current",
+      "completed": "Completed"
+    },
+    "actions": {
+      "markComplete": "Mark as Complete",
+      "goToStep": "Go to Step",
+      "skipAll": "Skip All"
+    },
+    "steps": {
+      "install": {
+        "title": "Install Agent",
+        "description": "Install the NexTraceOne agent in your environment to start monitoring"
+      },
+      "firstSignal": {
+        "title": "First Signal",
+        "description": "Register your first service and start receiving telemetry signals"
+      },
+      "registerService": {
+        "title": "Register Service",
+        "description": "Add more services to the catalog and configure their dependencies"
+      },
+      "addContract": {
+        "title": "Add Contract",
+        "description": "Create API contracts to define interfaces between services"
+      },
+      "setupSlo": {
+        "title": "Setup SLOs",
+        "description": "Define Service Level Objectives to monitor service reliability"
+      }
+    },
+    "messages": {
+      "stepCompleted": "Step {{step}} completed successfully!",
+      "wizardSkipped": "Wizard skipped. You can access it anytime from the menu."
+    },
+    "errors": {
+      "fetchFailed": "Failed to load onboarding status",
+      "stepFailed": "Failed to complete step. Please try again.",
+      "skipFailed": "Failed to skip wizard. Please try again.",
+      "noStatus": "Could not retrieve onboarding status"
     }
   },
   "operationalNotes": {

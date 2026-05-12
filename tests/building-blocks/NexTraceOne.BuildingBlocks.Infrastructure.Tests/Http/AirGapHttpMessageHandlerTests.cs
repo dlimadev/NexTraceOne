@@ -1,4 +1,6 @@
+using System.Net.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Http;
@@ -15,11 +17,24 @@ public sealed class AirGapHttpMessageHandlerTests
         return new ConfigurationBuilder().AddInMemoryCollection(dict).Build();
     }
 
+    private static IServiceScopeFactory CreateMockServiceScopeFactory()
+    {
+        var serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
+        var serviceScope = Substitute.For<IServiceScope>();
+        var serviceProvider = Substitute.For<IServiceProvider>();
+        
+        serviceScope.ServiceProvider.Returns(serviceProvider);
+        serviceScopeFactory.CreateScope().Returns(serviceScope);
+        
+        return serviceScopeFactory;
+    }
+
     private static AirGapHttpMessageHandler CreateHandler(string mode)
     {
         var handler = new AirGapHttpMessageHandler(
             BuildConfig(mode),
-            NullLogger<AirGapHttpMessageHandler>.Instance)
+            NullLogger<AirGapHttpMessageHandler>.Instance,
+            CreateMockServiceScopeFactory())
         {
             InnerHandler = new PassthroughHandler(),
         };
@@ -98,7 +113,8 @@ public sealed class AirGapHttpMessageHandlerTests
         var config = new ConfigurationBuilder().AddInMemoryCollection([]).Build();
         var handler = new AirGapHttpMessageHandler(
             config,
-            NullLogger<AirGapHttpMessageHandler>.Instance)
+            NullLogger<AirGapHttpMessageHandler>.Instance,
+            CreateMockServiceScopeFactory())
         {
             InnerHandler = new PassthroughHandler(),
         };

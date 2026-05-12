@@ -1,5 +1,6 @@
 using System.Linq;
 
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
@@ -48,6 +49,7 @@ public sealed class GroundingContextAssemblyTests
         contractReader ??= Substitute.For<IContractGroundingReader>();
         return new DatabaseRetrievalService(
             modelRepo, catalogReader, changeReader, incidentReader, contractReader,
+            Substitute.For<IMemoryCache>(),
             Substitute.For<ILogger<DatabaseRetrievalService>>());
     }
 
