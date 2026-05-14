@@ -461,7 +461,7 @@ export function IdeIntegrationsPage() {
             </h2>
             <p className="text-xs text-muted mb-4">{t('aiHub.ideQuerySessionsSubtitle')}</p>
             {querySessions.length === 0 ? (
-              <EmptyState icon={<FileText size={32} />} description={t('aiHub.ideQuerySessionsNoData')} />
+              <EmptyState icon={<FileText size={32} />} title="Nenhuma sessão" description={t('aiHub.ideQuerySessionsNoData')} />
             ) : (
               <Card>
                 <CardBody className="p-0 overflow-x-auto">

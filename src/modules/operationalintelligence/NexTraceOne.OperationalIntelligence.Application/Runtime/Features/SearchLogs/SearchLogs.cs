@@ -8,12 +8,12 @@ using NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions;
 namespace NexTraceOne.OperationalIntelligence.Application.Runtime.Features.SearchLogs;
 
 /// <summary>
-/// Feature: SearchLogs — pesquisa logs estruturados via Elasticsearch.
+/// Feature: SearchLogs — pesquisa logs estruturados via backend de telemetria (Elasticsearch ou ClickHouse).
 /// SaaS-07: Log Search UI.
 ///
 /// Suporta filtros por serviço, severidade, ambiente e janela de tempo.
 /// Devolve até PageSize entradas com atributos completos.
-/// Usa ILogSearchService como abstracção sobre Elasticsearch.
+/// Usa ITelemetrySearchService como abstracção sobre o backend escolhido pelo usuário.
 /// </summary>
 public static class SearchLogs
 {
@@ -70,7 +70,7 @@ public static class SearchLogs
         DateTimeOffset SearchTo);
 
     internal sealed class Handler(
-        ILogSearchService logSearchService,
+        ITelemetrySearchService telemetrySearchService,
         ICurrentTenant currentTenant,
         IDateTimeProvider clock) : IQueryHandler<Query, Response>
     {
@@ -91,7 +91,7 @@ public static class SearchLogs
                 Page: request.Page,
                 PageSize: request.PageSize);
 
-            var (entries, total) = await logSearchService.SearchAsync(searchRequest, cancellationToken);
+            var (entries, total) = await telemetrySearchService.SearchAsync(searchRequest, cancellationToken);
 
             return new Response(entries, total, request.Page, request.PageSize, from, to);
         }

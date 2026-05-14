@@ -51,7 +51,7 @@ public sealed class ActivateTenantTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Contain("TenantNotFound");
+        result.Error.Code.Should().Contain("Tenant.NotFound");
     }
 
     [Fact]

@@ -17,5 +17,6 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.ML" />
   </ItemGroup>
 </Project>

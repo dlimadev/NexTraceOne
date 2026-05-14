@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Infrastructure.Outbox;
 using NexTraceOne.BuildingBlocks.Security.Extensions;
@@ -22,7 +23,7 @@ public sealed class DeadLetterEndpointModule
             string? status,
             int page,
             int pageSize,
-            IDeadLetterRepository repository,
+            [FromServices] IDeadLetterRepository repository,
             CancellationToken cancellationToken) =>
         {
             page = page < 1 ? 1 : page;
@@ -49,7 +50,7 @@ public sealed class DeadLetterEndpointModule
         // ── POST /api/v1/platform/dead-letters/{id}/reprocess ─────────────────────
         group.MapPost("/{id:guid}/reprocess", async (
             Guid id,
-            IDeadLetterRepository repository,
+            [FromServices] IDeadLetterRepository repository,
             CancellationToken cancellationToken) =>
         {
             var message = await repository.FindByIdAsync(id, cancellationToken);
@@ -73,7 +74,7 @@ public sealed class DeadLetterEndpointModule
         group.MapPost("/{id:guid}/discard", async (
             Guid id,
             DiscardRequest request,
-            IDeadLetterRepository repository,
+            [FromServices] IDeadLetterRepository repository,
             CancellationToken cancellationToken) =>
         {
             var message = await repository.FindByIdAsync(id, cancellationToken);

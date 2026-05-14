@@ -16,6 +16,70 @@ incidentes, mitigação, automação, confiabilidade, runtime e custos.
 | **Runtime** | Snapshots de saúde, baselines, drift detection, observability |
 | **Cost** | Perfis de custo, snapshots, atribuição, tendências, importação |
 
+## Configuração de Backend de Telemetria
+
+O módulo suporta dois backends para armazenamento de dados de telemetria (logs, métricas, traces):
+
+### Opção 1: ClickHouse (Recomendado para Alta Performance)
+
+ClickHouse é otimizado para queries analíticas de alta volumetria (>10k eventos/segundo).
+
+**Vantagens:**
+- ✅ Performance superior para agregações temporais (p95, p99 latency)
+- ✅ Compressão eficiente (até 10x menos storage que Elasticsearch)
+- ✅ Open-source sem custos de licenciamento
+- ✅ Suporte nativo a SQL para queries complexas
+
+**Configuração (`appsettings.json`):**
+```json
+{
+  "Telemetry": {
+    "ObservabilityProvider": {
+      "Provider": "ClickHouse",
+      "ClickHouse": {
+        "ConnectionString": "Host=localhost;Port=9000;Database=nextrace_telemetry;Username=default;Password="
+      }
+    }
+  }
+}
+```
+
+### Opção 2: Elasticsearch (Padrão)
+
+Elasticsearch é ideal para pesquisa full-text e análise de logs estruturados.
+
+**Vantagens:**
+- ✅ Pesquisa full-text avançada com scoring TF-IDF/BM25
+- ✅ Kibana para visualização e dashboards
+- ✅ Ecossistema maduro com plugins e integrações
+- ✅ Indexação automática de schemas dinâmicos
+
+**Configuração (`appsettings.json`):**
+```json
+{
+  "Telemetry": {
+    "ObservabilityProvider": {
+      "Provider": "Elasticsearch",
+      "Elasticsearch": {
+        "Endpoint": "http://localhost:9200",
+        "IndexPrefix": "nextrace",
+        "ApiKey": "" // Opcional
+      }
+    }
+  }
+}
+```
+
+### Migração Entre Backends
+
+Para migrar de um backend para outro:
+
+1. **Atualizar configuração** no `appsettings.json`
+2. **Executar scripts de migração** (se necessário)
+3. **Reiniciar aplicação** - o DI registrará automaticamente o novo backend
+
+⚠️ **Importante:** Os dados históricos NÃO são migrados automaticamente. Use ferramentas de exportação/importação se necessário.
+
 ## Arquitetura
 
 ```

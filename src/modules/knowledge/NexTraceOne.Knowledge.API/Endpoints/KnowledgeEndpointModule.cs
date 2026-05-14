@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using MediatR;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
@@ -54,7 +55,7 @@ public sealed class KnowledgeEndpointModule
             string q,
             string? scope,
             int? maxResults,
-            IKnowledgeSearchProvider searchProvider,
+            [FromServices] IKnowledgeSearchProvider searchProvider,
             CancellationToken cancellationToken) =>
         {
             if (string.IsNullOrWhiteSpace(q) || q.Length > 200)

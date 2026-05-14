@@ -16,6 +16,7 @@ using NexTraceOne.OperationalIntelligence.Infrastructure.TelemetryStore;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.Repositories;
 using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Services;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.ClickHouse;
 
 namespace NexTraceOne.OperationalIntelligence.Infrastructure.Runtime;
 
@@ -87,13 +88,29 @@ public static class DependencyInjection
         services.AddScoped<NexTraceOne.OperationalIntelligence.Application.Runtime.Abstractions.IEnvironmentBehaviorComparisonReader,
             NexTraceOne.OperationalIntelligence.Application.Runtime.NullEnvironmentBehaviorComparisonReader>();
 
-        // ── SaaS-07: Log Search — Elasticsearch-backed ILogSearchService ─────
+        // ── SaaS-07: Log Search — Telemetry Backend Selection (Elasticsearch ou ClickHouse) ─────
         services.Configure<TelemetryStoreOptions>(
             configuration.GetSection(TelemetryStoreOptions.SectionName));
-        services.AddHttpClient<ILogSearchService, ElasticsearchLogSearchService>(client =>
+
+        var telemetryOptions = configuration.GetSection(TelemetryStoreOptions.SectionName).Get<TelemetryStoreOptions>();
+        var backendType = telemetryOptions?.ObservabilityProvider?.BackendType?.ToLowerInvariant() ?? "elasticsearch";
+
+        switch (backendType)
         {
-            client.Timeout = TimeSpan.FromSeconds(30);
-        }).AddStandardResilienceHandler();
+            case "clickhouse":
+                services.AddScoped<ITelemetrySearchService, ClickHouseLogSearchService>();
+                break;
+            case "elasticsearch":
+            default:
+                services.AddHttpClient<ITelemetrySearchService, ElasticsearchLogSearchService>(client =>
+                {
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                }).AddStandardResilienceHandler();
+                break;
+        }
+
+        // Mantém ILogSearchService como alias para compatibilidade retroativa
+        services.AddScoped(sp => sp.GetRequiredService<ITelemetrySearchService>());
 
         // ── Incidents (Incident Correlation & Mitigation) infrastructure ──
         services.AddIncidentsInfrastructure(configuration);
@@ -103,6 +120,11 @@ public static class DependencyInjection
 
         // ── TelemetryStore (Product Store) infrastructure ──
         services.AddTelemetryStoreInfrastructure(configuration);
+
+        // ── ClickHouse Repository for Observability Analytics ──
+        var clickHouseConnectionString = configuration.GetConnectionString("ClickHouse") 
+            ?? "http://localhost:8123/default";
+        services.AddSingleton<IClickHouseRepository>(new ClickHouseRepository(clickHouseConnectionString));
 
         return services;
     }

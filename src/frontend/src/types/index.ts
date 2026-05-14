@@ -45,6 +45,7 @@ export interface CurrentUserProfile {
   tenantName: string;
   roleName: string;
   permissions: string[];
+  persona?: string;
 }
 
 /** Informações amigáveis de um tenant para seleção. */
@@ -652,6 +653,8 @@ export interface ContractVersionDetail {
   apiAssetId: string;
   semVer: string;
   specContent: string;
+  /** Alias para specContent - usado em alguns lugares do código */
+  spec?: string;
   format: string;
   protocol: ContractProtocol;
   lifecycleState: ContractLifecycleState;

@@ -1,0 +1,97 @@
+# Values para ambiente de desenvolvimento local
+# Uso: helm install nextraceone-dev . -f values-dev.yaml
+
+replicaCount: 1
+
+image:
+  repository: nextraceone/apihost
+  tag: "latest"
+  pullPolicy: Always
+
+# Recursos reduzidos para dev
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Desabilitar autoscaling em dev
+autoscaling:
+  enabled: false
+
+# Database com senha simples para dev
+postgresql:
+  auth:
+    password: "dev-password-123"
+  primary:
+    persistence:
+      enabled: false  # Sem persistência em dev
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+# Redis simplificado
+redis:
+  auth:
+    password: "dev-redis-123"
+  master:
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+
+# Elasticsearch single node
+elasticsearch:
+  replicas: 1
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: 10Gi
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+# Desabilitar Kafka em dev
+kafka:
+  enabled: false
+
+# Configuração simplificada
+app:
+  aspnetcoreEnvironment: "Development"
+  jwt:
+    secret: "dev-jwt-secret-key-not-for-production-12345678"
+  cors:
+    allowedOrigins:
+      - "http://localhost:3000"
+      - "http://localhost:5173"
+  smtp:
+    enabled: false
+  observability:
+    elasticsearch:
+      url: "http://nextraceone-elasticsearch-master:9200"
+  features:
+    canaryDeployments: false
+    chaosEngineering: false
+    advancedAI: true
+    legacyIntegration: false
+
+# Ingress desabilitado em dev (usar port-forward)
+ingress:
+  enabled: false
+
+# Monitoring simplificado
+monitoring:
+  serviceMonitor:
+    enabled: false
+  prometheusRules:
+    enabled: false
+
+# Backup desabilitado em dev
+backup:
+  enabled: false

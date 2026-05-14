@@ -85,6 +85,22 @@ const WIDGET_MAP: Record<WidgetType, ComponentType<WidgetProps>> = {
   'team-health': TeamHealthWidget,
   'release-calendar': ReleaseCalendarWidget,
   'query-widget': QueryWidget,
+  // Extended widget types - placeholder components
+  'incident-count': StatWidget,
+  'mttr-widget': StatWidget,
+  'slo-tracker': StatWidget,
+  'change-failure-rate': StatWidget,
+  'change-score-trend': StatWidget,
+  'service-health-matrix': StatWidget,
+  'maturity-score': StatWidget,
+  'dependency-map': StatWidget,
+  'compliance-summary': StatWidget,
+  'policy-violations': StatWidget,
+  'risk-heatmap': StatWidget,
+  'cost-attribution': StatWidget,
+  'finops-summary': StatWidget,
+  'tech-debt-trend': StatWidget,
+  'executive-kpis': StatWidget,
 };
 
 // ── Types ──────────────────────────────────────────────────────────────────

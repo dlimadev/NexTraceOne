@@ -293,8 +293,8 @@ function CertRow({
           }`}
         >
           {cert.daysUntilExpiry < 0
-            ? t('daysExpiredAgo', { days: Math.abs(cert.daysUntilExpiry) })
-            : t('daysRemaining', { days: cert.daysUntilExpiry })}
+            ? `${Math.abs(cert.daysUntilExpiry)} dias atrás`
+            : `${cert.daysUntilExpiry} dias restantes`}
         </p>
       </td>
       <td className="px-4 py-3">

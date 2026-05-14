@@ -415,6 +415,7 @@ export function SetupWizardPage() {
     }
     setFormData(restored);
 
+     
     if (statusData.isFullyConfigured) {
       setCompleted(true);
       return;

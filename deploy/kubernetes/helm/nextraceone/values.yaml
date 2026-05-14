@@ -1,0 +1,278 @@
+# Default values for NexTraceOne
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Application configuration
+replicaCount: 3
+
+image:
+  repository: nextraceone/apihost
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations and labels
+podAnnotations: {}
+podLabels: {}
+
+# Security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 2000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+  annotations: {}
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: app.nextraceone.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: nextraceone-tls
+      hosts:
+        - app.nextraceone.local
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Node selection
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Database configuration (PostgreSQL)
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: ""
+    username: nextraceone
+    password: ""
+    database: nextraceone
+  primary:
+    persistence:
+      enabled: true
+      size: 50Gi
+      storageClass: ""
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+
+# Redis configuration (for caching and distributed locks)
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: ""
+  master:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+# Elasticsearch configuration (for observability)
+elasticsearch:
+  enabled: true
+  replicas: 3
+  minimumMasterNodes: 2
+  volumeClaimTemplate:
+    storageClassName: ""
+    resources:
+      requests:
+        storage: 50Gi
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+# Kafka configuration (optional)
+kafka:
+  enabled: false
+  replicas: 3
+  persistence:
+    enabled: true
+    size: 100Gi
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+# Application-specific configuration
+app:
+  # ASP.NET Core environment
+  aspnetcoreEnvironment: "Production"
+  
+  # Connection strings (use secrets in production)
+  connectionStrings:
+    identityDatabase: ""
+    catalogDatabase: ""
+    governanceDatabase: ""
+    notificationsDatabase: ""
+    integrationsDatabase: ""
+    auditDatabase: ""
+    configurationDatabase: ""
+    operationalIntelligenceDatabase: ""
+    changeGovernanceDatabase: ""
+    aiKnowledgeDatabase: ""
+    finopsDatabase: ""
+  
+  # JWT configuration
+  jwt:
+    secret: ""
+    issuer: "nextraceone.com"
+    audience: "nextraceone-api"
+    expirationMinutes: 60
+  
+  # CORS configuration
+  cors:
+    allowedOrigins:
+      - "https://app.nextraceone.com"
+  
+  # SMTP configuration (for email notifications)
+  smtp:
+    enabled: false
+    host: ""
+    port: 587
+    username: ""
+    password: ""
+    enableSsl: true
+    fromEmail: "noreply@nextraceone.com"
+    fromName: "NexTraceOne"
+  
+  # Kafka configuration
+  kafka:
+    enabled: false
+    bootstrapServers: ""
+    topics:
+      inbound: "nextraceone.events,nextraceone.commands"
+  
+  # Observability
+  observability:
+    elasticsearch:
+      url: "http://elasticsearch-master:9200"
+      indexPrefix: "nextraceone"
+    opentelemetry:
+      enabled: true
+      endpoint: "http://otel-collector:4317"
+  
+  # Feature flags
+  features:
+    canaryDeployments: false
+    chaosEngineering: false
+    advancedAI: true
+    legacyIntegration: false
+
+# Health checks
+healthCheck:
+  path: /api/v1/platform/health
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  path: /ready
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
+livenessProbe:
+  path: /live
+  initialDelaySeconds: 60
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# Logging configuration
+logging:
+  level: "Information"
+  format: "Json"
+  elasticsearch:
+    enabled: true
+    url: "http://elasticsearch-master:9200"
+    indexPattern: "nextraceone-logs-{0:yyyy.MM.dd}"
+
+# Monitoring
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+  prometheusRules:
+    enabled: true
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retentionDays: 30
+  storage:
+    size: 100Gi
+    storageClass: ""

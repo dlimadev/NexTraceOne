@@ -15,6 +15,7 @@ using NexTraceOne.BuildingBlocks.Observability.Metrics;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.ClrProfiler;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Collection.OpenTelemetryCollector;
+using NexTraceOne.BuildingBlocks.Observability.Observability.Providers;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.ClickHouse;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Providers.Elastic;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Services;
@@ -170,6 +171,16 @@ public static class DependencyInjection
         }
         else
         {
+            // Verifica se Elastic está habilitado
+            var elasticEnabled = configuration.GetValue<bool>("Telemetry:ObservabilityProvider:Elastic:Enabled", defaultValue: true);
+            
+            if (!elasticEnabled)
+            {
+                // Elastic desabilitado - usa Null provider
+                services.AddSingleton<IObservabilityProvider, NullObservabilityProvider>();
+                return;
+            }
+            
             // Default: Elastic
             services.AddHttpClient<ElasticObservabilityProvider>(client =>
             {

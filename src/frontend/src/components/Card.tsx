@@ -1,13 +1,33 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   /** Variante visual do card. */
   variant?: 'default' | 'interactive' | 'elevated' | 'flat' | 'glass' | 'gradient';
   /** Exibe skeleton de loading sobre o conteúdo. */
   loading?: boolean;
   className?: string;
+}
+
+export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+}
+
+export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
+  children: ReactNode;
+}
+
+export interface CardDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {
+  children: ReactNode;
+}
+
+export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+}
+
+export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
 }
 
 const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
@@ -49,7 +69,7 @@ export function Card({ children, variant = 'default', loading, className, ...res
   );
 }
 
-export function CardHeader({ children, className, ...rest }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
+export function CardHeader({ children, className, ...rest }: CardHeaderProps) {
   return (
     <div className={cn('px-5 py-4 border-b border-edge/60', className)} {...rest}>
       {children}
@@ -61,11 +81,35 @@ export function CardBody({ children, className, ...rest }: HTMLAttributes<HTMLDi
   return <div className={cn('px-5 py-5', className)} {...rest}>{children}</div>;
 }
 
+export function CardTitle({ children, className, ...rest }: CardTitleProps) {
+  return (
+    <h3 className={cn('text-lg font-semibold leading-none tracking-tight', className)} {...rest}>
+      {children}
+    </h3>
+  );
+}
+
+export function CardDescription({ children, className, ...rest }: CardDescriptionProps) {
+  return (
+    <p className={cn('text-sm text-muted-foreground', className)} {...rest}>
+      {children}
+    </p>
+  );
+}
+
+export function CardContent({ children, className, ...rest }: CardContentProps) {
+  return (
+    <div className={cn('px-5 py-4', className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+
 /**
  * CardFooter — rodapé semântico para legendas, ações e contexto.
  * Inspirado pelo padrão .card-footer do template NexLink.
  */
-export function CardFooter({ children, className, ...rest }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
+export function CardFooter({ children, className, ...rest }: CardFooterProps) {
   return (
     <div className={cn('px-5 py-3 border-t border-edge/60 bg-elevated/30', className)} {...rest}>
       {children}

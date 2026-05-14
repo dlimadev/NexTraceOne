@@ -1,0 +1,138 @@
+# Values para ambiente de staging
+# Uso: helm install nextraceone-staging . -f values-staging.yaml
+
+replicaCount: 2
+
+image:
+  repository: registry.example.com/nextraceone/apihost
+  tag: "1.0.0-rc1"
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: registry-credentials
+
+# Recursos moderados para staging
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+# Autoscaling habilitado
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 80
+
+# Ingress configurado
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+  hosts:
+    - host: staging.nextraceone.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: nextraceone-staging-tls
+      hosts:
+        - staging.nextraceone.example.com
+
+# Database com persistência
+postgresql:
+  auth:
+    password: "CHANGE_ME_VIA_SECRETS"
+  primary:
+    persistence:
+      enabled: true
+      size: 50Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+# Redis com persistência
+redis:
+  auth:
+    password: "CHANGE_ME_VIA_SECRETS"
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+# Elasticsearch 2 nodes
+elasticsearch:
+  replicas: 2
+  volumeClaimTemplate:
+    resources:
+      requests:
+        storage: 30Gi
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 3Gi
+
+# Kafka opcional em staging
+kafka:
+  enabled: false
+
+# Configuração de produção (com dados reais)
+app:
+  aspnetcoreEnvironment: "Staging"
+  jwt:
+    secret: ""  # Usar secrets do Kubernetes
+    issuer: "nextraceone.com"
+    audience: "nextraceone-api"
+    expirationMinutes: 60
+  cors:
+    allowedOrigins:
+      - "https://staging.nextraceone.example.com"
+  smtp:
+    enabled: true
+    host: "smtp.example.com"
+    port: 587
+    username: "noreply@example.com"
+    password: ""  # Usar secrets
+    enableSsl: true
+    fromEmail: "noreply@example.com"
+    fromName: "NexTraceOne Staging"
+  observability:
+    elasticsearch:
+      url: "http://nextraceone-elasticsearch-master:9200"
+      indexPrefix: "nextraceone-staging"
+    opentelemetry:
+      enabled: true
+      endpoint: "http://otel-collector:4317"
+  features:
+    canaryDeployments: true
+    chaosEngineering: false
+    advancedAI: true
+    legacyIntegration: false
+
+# Monitoring habilitado
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+  prometheusRules:
+    enabled: true
+
+# Backup diário
+backup:
+  enabled: true
+  schedule: "0 3 * * *"  # 3 AM daily
+  retentionDays: 14
+  storage:
+    size: 50Gi

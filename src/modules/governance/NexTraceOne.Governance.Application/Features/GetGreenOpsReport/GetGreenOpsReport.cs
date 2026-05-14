@@ -10,6 +10,8 @@ using NexTraceOne.Governance.Domain.Entities;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 
+using System.Globalization;
+
 namespace NexTraceOne.Governance.Application.Features.GetGreenOpsReport;
 
 /// <summary>
@@ -54,9 +56,9 @@ public static class GetGreenOpsReport
             // Carregar configuração persistida (com fallback para IConfiguration)
             var persistedCfg = await configRepository.GetActiveAsync(null, cancellationToken);
             var intensityFactor = persistedCfg?.IntensityFactorKgPerKwh
-                ?? (double.TryParse(fallbackConfig["Platform:GreenOps:IntensityFactorKgPerKwh"], out var ifv) ? ifv : 0.233);
+                ?? (double.TryParse(fallbackConfig["Platform:GreenOps:IntensityFactorKgPerKwh"], NumberStyles.Any, CultureInfo.InvariantCulture, out var ifv) ? ifv : 0.233);
             var esgTarget = persistedCfg?.EsgTargetKgCo2PerMonth
-                ?? (double.TryParse(fallbackConfig["Platform:GreenOps:EsgTargetKgCo2PerMonth"], out var et) ? et : 100.0);
+                ?? (double.TryParse(fallbackConfig["Platform:GreenOps:EsgTargetKgCo2PerMonth"], NumberStyles.Any, CultureInfo.InvariantCulture, out var et) ? et : 100.0);
             var region = persistedCfg?.DatacenterRegion
                 ?? (fallbackConfig["Platform:GreenOps:DatacenterRegion"] ?? "eu-west-1");
 

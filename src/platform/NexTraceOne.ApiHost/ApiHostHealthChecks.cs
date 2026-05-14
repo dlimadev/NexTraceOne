@@ -2,7 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Infrastructure.ExternalAI.Persistence;
+// Health checks do AIKnowledge são registrados no módulo AIKnowledge.Infrastructure
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.HealthChecks;
 using NexTraceOne.AIKnowledge.Infrastructure.Orchestration.Persistence;
 using NexTraceOne.AuditCompliance.Infrastructure.Persistence;
 using NexTraceOne.BuildingBlocks.Infrastructure.HealthChecks;
@@ -45,6 +47,7 @@ internal static class ApiHostHealthChecks
             .AddCheck<DbContextConnectivityHealthCheck<ExternalAiDbContext>>("external-ai-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<DbContextConnectivityHealthCheck<AiOrchestrationDbContext>>("ai-orchestration-db", HealthStatus.Unhealthy, ["health"])
             .AddCheck<AiProvidersHealthCheck>("ai-providers", HealthStatus.Degraded, ["health"]);
+        // AIKnowledge health checks são registrados no módulo AIKnowledge.Infrastructure
 
         return services;
     }

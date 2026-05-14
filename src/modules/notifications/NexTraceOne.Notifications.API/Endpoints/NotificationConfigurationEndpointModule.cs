@@ -2,6 +2,7 @@ using MediatR;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
@@ -35,8 +36,8 @@ public sealed class NotificationConfigurationEndpointModule
             string? eventType,
             string? channel,
             bool? isActive,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(
@@ -48,8 +49,8 @@ public sealed class NotificationConfigurationEndpointModule
 
         group.MapPut("/templates", async (
             UpsertTemplateFeature.Command command,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
@@ -60,8 +61,8 @@ public sealed class NotificationConfigurationEndpointModule
         // ── Channels ──────────────────────────────────────────────────────────
 
         group.MapGet("/channels", async (
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new ListChannelsFeature.Query(), cancellationToken);
@@ -71,8 +72,8 @@ public sealed class NotificationConfigurationEndpointModule
 
         group.MapPut("/channels", async (
             UpsertChannelFeature.Command command,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
@@ -83,8 +84,8 @@ public sealed class NotificationConfigurationEndpointModule
         // ── SMTP ──────────────────────────────────────────────────────────────
 
         group.MapGet("/smtp", async (
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(new GetSmtpFeature.Query(), cancellationToken);
@@ -94,8 +95,8 @@ public sealed class NotificationConfigurationEndpointModule
 
         group.MapPut("/smtp", async (
             UpsertSmtpFeature.Command command,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
@@ -107,8 +108,8 @@ public sealed class NotificationConfigurationEndpointModule
 
         group.MapGet("/analytics", async (
             int? days,
-            INotificationMetricsService metricsService,
-            ICurrentTenant currentTenant,
+            [FromServices] INotificationMetricsService metricsService,
+            [FromServices] ICurrentTenant currentTenant,
             CancellationToken cancellationToken) =>
         {
             if (currentTenant.Id == Guid.Empty || !currentTenant.IsActive)

@@ -52,7 +52,7 @@ export function GraphQLBuilderPage() {
 
   const typeCount = (sdl.match(/^type\s+\w+/gm) ?? []).length;
   const inputCount = (sdl.match(/^input\s+\w+/gm) ?? []).length;
-  const queryFields = (sdl.match(/^  \w+[^:]*:/gm) ?? []).length;
+  const queryFields = (sdl.match(/^ {2}\w+[^:]*:/gm) ?? []).length;
 
   return (
     <PageContainer>

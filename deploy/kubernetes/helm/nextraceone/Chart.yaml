@@ -1,0 +1,23 @@
+apiVersion: v2
+name: nextraceone
+description: NexTraceOne - Enterprise Platform for API Governance, Contract Management, and AI-Powered Operations
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+icon: https://nextraceone.com/logo.png
+keywords:
+  - api-governance
+  - contract-management
+  - observability
+  - ai-operations
+  - enterprise-platform
+home: https://nextraceone.com
+sources:
+  - https://github.com/nextraceone/NexTraceOne
+maintainers:
+  - name: NexTraceOne Team
+    email: support@nextraceone.com
+    url: https://nextraceone.com
+annotations:
+  category: Infrastructure
+  licenses: MIT

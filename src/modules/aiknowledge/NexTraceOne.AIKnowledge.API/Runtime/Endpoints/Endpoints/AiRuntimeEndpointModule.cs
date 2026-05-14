@@ -2,6 +2,7 @@ using MediatR;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Extensions;
@@ -54,8 +55,8 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapPost("/chat", async (
             ExecuteAiChatRequest body,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var command = new ExecuteAiChatFeature.Command(
@@ -71,8 +72,8 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapPost("/chat/stream", async (
             ExecuteAiChatStreamRequest body,
-            IAiProviderFactory providerFactory,
-            IAiModelCatalogService modelCatalogService,
+            [FromServices] IAiProviderFactory providerFactory,
+            [FromServices] IAiModelCatalogService modelCatalogService,
             HttpContext httpContext,
             CancellationToken cancellationToken) =>
         {
@@ -160,8 +161,8 @@ public sealed class AiRuntimeEndpointModule
         var group = app.MapGroup("/api/v1/ai/providers");
 
         group.MapGet("/", async (
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(
@@ -170,8 +171,8 @@ public sealed class AiRuntimeEndpointModule
         }).RequirePermission("ai:runtime:read");
 
         group.MapGet("/health", async (
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(
@@ -188,8 +189,8 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapPost("/documents", async (
             SearchDocumentsRequest body,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var command = new SearchDocumentsFeature.Command(
@@ -203,8 +204,8 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapPost("/data", async (
             SearchDataRequest body,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var command = new SearchDataFeature.Command(
@@ -218,8 +219,8 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapPost("/telemetry", async (
             SearchTelemetryRequest body,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var command = new SearchTelemetryFeature.Command(
@@ -243,8 +244,8 @@ public sealed class AiRuntimeEndpointModule
         var group = app.MapGroup("/api/v1/ai/sources");
 
         group.MapGet("/", async (
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(
@@ -270,8 +271,8 @@ public sealed class AiRuntimeEndpointModule
         var group = app.MapGroup("/api/v1/ai/models");
 
         group.MapGet("/active", async (
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(
@@ -281,8 +282,8 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapPut("/{id:guid}/activate", async (
             Guid id,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var command = new ActivateModelFeature.Command(id);
@@ -298,8 +299,8 @@ public sealed class AiRuntimeEndpointModule
         var group = app.MapGroup("/api/v1/ai");
 
         group.MapGet("/token-policies", async (
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(
@@ -310,8 +311,8 @@ public sealed class AiRuntimeEndpointModule
         group.MapGet("/token-usage", async (
             string? userId,
             Guid? tenantId,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var query = new GetTokenUsageFeature.Query(userId, tenantId);
@@ -328,8 +329,8 @@ public sealed class AiRuntimeEndpointModule
 
         group.MapPost("/external-inferences", async (
             RecordExternalInferenceRequest body,
-            ISender sender,
-            IErrorLocalizer localizer,
+            [FromServices] ISender sender,
+            [FromServices] IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var command = new RecordExternalInferenceFeature.Command(

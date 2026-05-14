@@ -35,6 +35,39 @@ export const queryKeys = {
       summary: (envId?: string | null) => [...queryKeys.catalog.services.all(), 'summary', envId] as const,
       scorecard: (serviceName: string, environment: string) =>
         [...queryKeys.catalog.services.all(), 'scorecard', serviceName, environment] as const,
+      discovery: (envId?: string | null) => [...queryKeys.catalog.services.all(), 'discovery', envId] as const,
+      maturity: (envId?: string | null) => [...queryKeys.catalog.services.all(), 'maturity', envId] as const,
+      dxScore: (envId?: string | null) => [...queryKeys.catalog.services.all(), 'dx-score', envId] as const,
+      dependencyDashboard: (envId?: string | null) => [...queryKeys.catalog.services.all(), 'dependency-dashboard', envId] as const,
+      licenseCompliance: (envId?: string | null) => [...queryKeys.catalog.services.all(), 'license-compliance', envId] as const,
+    },
+    templates: {
+      all: () => [...queryKeys.catalog.all, 'templates'] as const,
+      list: (params?: Record<string, unknown>) => [...queryKeys.catalog.templates.all(), 'list', params] as const,
+      detail: (id: string) => [...queryKeys.catalog.templates.all(), 'detail', id] as const,
+    },
+    sourceOfTruth: {
+      all: () => [...queryKeys.catalog.all, 'source-of-truth'] as const,
+      service: (serviceId: string) => [...queryKeys.catalog.sourceOfTruth.all(), 'service', serviceId] as const,
+      contract: (contractVersionId: string) => [...queryKeys.catalog.sourceOfTruth.all(), 'contract', contractVersionId] as const,
+    },
+    impact: {
+      all: () => [...queryKeys.catalog.all, 'impact'] as const,
+      propagation: (nodeId: string, depth: number, envId?: string | null) =>
+        [...queryKeys.catalog.impact.all(), 'propagation', nodeId, depth, envId] as const,
+    },
+    snapshots: {
+      all: (envId?: string | null) => [...queryKeys.catalog.all, 'snapshots', envId] as const,
+      diff: (fromSnapshot: string, toSnapshot: string, envId?: string | null) =>
+        [...queryKeys.catalog.snapshots.all(envId), 'diff', fromSnapshot, toSnapshot] as const,
+    },
+    nodeHealth: {
+      all: (category: string, envId?: string | null) =>
+        [...queryKeys.catalog.all, 'node-health', category, envId] as const,
+    },
+    contracts: {
+      pipeline: (envId?: string | null) => [...queryKeys.catalog.all, 'contracts', 'pipeline', envId] as const,
+      securityGate: (envId?: string | null) => [...queryKeys.catalog.all, 'security-gate', envId] as const,
     },
   },
 
@@ -64,6 +97,24 @@ export const queryKeys = {
       [...queryKeys.incidents.all, 'list', params, envId] as const,
     detail: (id: string) => [...queryKeys.incidents.all, 'detail', id] as const,
     summary: (envId?: string | null) => [...queryKeys.incidents.all, 'summary', envId] as const,
+  },
+  
+  // ── Operations / Runtime Intelligence ──
+  runtime: {
+    all: ['runtime'] as const,
+    requestMetrics: (params?: Record<string, unknown>, envId?: string | null) =>
+      [...queryKeys.runtime.all, 'request-metrics', params, envId] as const,
+    errorAnalytics: (params?: Record<string, unknown>, envId?: string | null) =>
+      [...queryKeys.runtime.all, 'error-analytics', params, envId] as const,
+    userActivity: (params?: Record<string, unknown>, envId?: string | null) =>
+      [...queryKeys.runtime.all, 'user-activity', params, envId] as const,
+    systemHealth: (params?: Record<string, unknown>, envId?: string | null) =>
+      [...queryKeys.runtime.all, 'system-health', params, envId] as const,
+    reliability: {
+      all: () => [...queryKeys.runtime.all, 'reliability'] as const,
+      service: (serviceId: string, envId?: string | null) =>
+        [...queryKeys.runtime.reliability.all(), 'service', serviceId, envId] as const,
+    },
   },
 
   // ── Governance ──
@@ -144,10 +195,41 @@ export const queryKeys = {
   // ── AI Hub ──
   ai: {
     all: ['ai'] as const,
-    models: () => [...queryKeys.ai.all, 'models'] as const,
-    policies: () => [...queryKeys.ai.all, 'policies'] as const,
-    conversations: () => [...queryKeys.ai.all, 'conversations'] as const,
-    agents: () => [...queryKeys.ai.all, 'agents'] as const,
+    models: {
+      all: () => [...queryKeys.ai.all, 'models'] as const,
+      list: () => [...queryKeys.ai.models.all(), 'list'] as const,
+      detail: (id: string) => [...queryKeys.ai.models.all(), 'detail', id] as const,
+    },
+    policies: {
+      all: () => [...queryKeys.ai.all, 'policies'] as const,
+      list: () => [...queryKeys.ai.policies.all(), 'list'] as const,
+    },
+    conversations: {
+      all: () => [...queryKeys.ai.all, 'conversations'] as const,
+      list: (params?: Record<string, unknown>) => [...queryKeys.ai.conversations.all(), 'list', params] as const,
+      detail: (id: string) => [...queryKeys.ai.conversations.all(), 'detail', id] as const,
+    },
+    agents: {
+      all: () => [...queryKeys.ai.all, 'agents'] as const,
+      marketplace: () => [...queryKeys.ai.agents.all(), 'marketplace'] as const,
+      detail: (id: string) => [...queryKeys.ai.agents.all(), 'detail', id] as const,
+    },
+    routing: {
+      all: () => [...queryKeys.ai.all, 'routing'] as const,
+      configuration: () => [...queryKeys.ai.routing.all(), 'configuration'] as const,
+    },
+    tokenBudget: {
+      all: () => [...queryKeys.ai.all, 'token-budget'] as const,
+      summary: () => [...queryKeys.ai.tokenBudget.all(), 'summary'] as const,
+    },
+    memory: {
+      all: () => [...queryKeys.ai.all, 'memory'] as const,
+      intelligence: () => [...queryKeys.ai.memory.all(), 'intelligence'] as const,
+    },
+    copilot: {
+      all: () => [...queryKeys.ai.all, 'copilot'] as const,
+      sessions: () => [...queryKeys.ai.copilot.all(), 'sessions'] as const,
+    },
   },
 
   // ── Identity ──
@@ -160,4 +242,71 @@ export const queryKeys = {
     },
     sessions: () => [...queryKeys.identity.all, 'sessions'] as const,
   },
+
+  // ── Audit & Compliance ──
+  audit: {
+    all: ['audit'] as const,
+    events: {
+      all: () => [...queryKeys.audit.all, 'events'] as const,
+      list: (params?: Record<string, unknown>, envId?: string | null) =>
+        [...queryKeys.audit.events.all(), 'list', params, envId] as const,
+      trail: (resourceType: string, resourceId: string, envId?: string | null) =>
+        [...queryKeys.audit.events.all(), 'trail', resourceType, resourceId, envId] as const,
+    },
+    integrity: (envId?: string | null) => [...queryKeys.audit.all, 'integrity', envId] as const,
+    compliance: {
+      all: () => [...queryKeys.audit.all, 'compliance'] as const,
+      report: (params?: Record<string, unknown>, envId?: string | null) =>
+        [...queryKeys.audit.compliance.all(), 'report', params, envId] as const,
+      policies: (envId?: string | null) => [...queryKeys.audit.compliance.all(), 'policies', envId] as const,
+      results: (params?: Record<string, unknown>, envId?: string | null) =>
+        [...queryKeys.audit.compliance.all(), 'results', params, envId] as const,
+    },
+    retention: {
+      all: () => [...queryKeys.audit.all, 'retention'] as const,
+      policies: () => [...queryKeys.audit.retention.all(), 'policies'] as const,
+    },
+    campaigns: {
+      all: () => [...queryKeys.audit.all, 'campaigns'] as const,
+      list: (params?: Record<string, unknown>) => [...queryKeys.audit.campaigns.all(), 'list', params] as const,
+      detail: (id: string) => [...queryKeys.audit.campaigns.all(), 'detail', id] as const,
+    },
+  },
+
+  // ── Configuration ──
+  configuration: {
+    all: ['configuration'] as const,
+    apiKeys: {
+      all: () => [...queryKeys.configuration.all, 'api-keys'] as const,
+      list: () => [...queryKeys.configuration.apiKeys.all(), 'list'] as const,
+    },
+    userPreferences: {
+      all: () => [...queryKeys.configuration.all, 'user-preferences'] as const,
+      get: (userId: string) => [...queryKeys.configuration.userPreferences.all(), 'get', userId] as const,
+    },
+    environment: {
+      all: () => [...queryKeys.configuration.all, 'environment'] as const,
+      list: () => [...queryKeys.configuration.environment.all(), 'list'] as const,
+      detail: (id: string) => [...queryKeys.configuration.environment.all(), 'detail', id] as const,
+    },
+  },
+
+  // ── Notifications ──
+  notifications: {
+    all: ['notifications'] as const,
+    list: (params?: Record<string, unknown>) => [...queryKeys.notifications.all, 'list', params] as const,
+    unread: () => [...queryKeys.notifications.all, 'unread'] as const,
+    preferences: {
+      all: () => [...queryKeys.notifications.all, 'preferences'] as const,
+      get: (userId: string) => [...queryKeys.notifications.preferences.all(), 'get', userId] as const,
+    },
+  },
+
+  // ── Integrations ──
+  integrations: {
+    all: ['integrations'] as const,
+    list: (params?: Record<string, unknown>) => [...queryKeys.integrations.all, 'list', params] as const,
+    providers: () => [...queryKeys.integrations.all, 'providers'] as const,
+  },
+
 } as const;

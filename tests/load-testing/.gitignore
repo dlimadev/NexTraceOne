@@ -1,0 +1,15 @@
+# Relatórios gerados pelos testes
+reports/*.json
+reports/*.html
+reports/*.csv
+
+# Logs de execução
+*.log
+
+# Arquivos temporários
+tmp/
+temp/
+
+# Configurações locais (não versionar)
+.local-config.js
+.env

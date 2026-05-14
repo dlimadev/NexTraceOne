@@ -307,7 +307,7 @@ export function PromotionPage() {
       : (environmentOptions.find((env) => env !== source) ?? source);
 
     if (source !== form.sourceEnvironment || target !== form.targetEnvironment) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setForm((current) => ({ ...current, sourceEnvironment: source ?? '', targetEnvironment: target ?? '' }));
     }
   }, [environmentOptions, form.sourceEnvironment, form.targetEnvironment]);

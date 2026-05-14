@@ -97,7 +97,7 @@ public sealed class RequestBreakGlassTests
         var result = await handler.Handle(cmd, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Code.Should().Be("identity.mfaStepUpRequired");
+        result.Error.Code.Should().Be("Identity.Mfa.StepUpRequired");
         evtRepo.Received(1).Add(Arg.Is<SecurityEvent>(e =>
             e.EventType == SecurityEventType.StepUpMfaRequired));
     }
@@ -118,7 +118,7 @@ public sealed class RequestBreakGlassTests
         var result = await handler.Handle(cmd, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Code.Should().Be("identity.mfaCodeInvalid");
+        result.Error.Code.Should().Be("Identity.Mfa.CodeInvalid");
         evtRepo.Received(1).Add(Arg.Is<SecurityEvent>(e =>
             e.EventType == SecurityEventType.MfaStepUpDenied));
     }
@@ -159,7 +159,7 @@ public sealed class RequestBreakGlassTests
         var result = await handler.Handle(cmd, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Code.Should().Be("identity.breakGlassQuotaExceeded");
+        result.Error.Code.Should().Be("Identity.BreakGlass.QuotaExceeded");
         bgRepo.DidNotReceive().Add(Arg.Any<BreakGlassRequest>());
     }
 
@@ -176,7 +176,7 @@ public sealed class RequestBreakGlassTests
         var result = await handler.Handle(cmd, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Code.Should().Be("identity.userNotFound");
+        result.Error.Code.Should().Be("Identity.User.NotFound");
     }
 
     [Fact]
@@ -214,7 +214,7 @@ public sealed class RequestBreakGlassTests
         var result = await handler.Handle(cmd, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Code.Should().Be("identity.notAuthenticated");
+        result.Error.Code.Should().Be("Identity.Auth.NotAuthenticated");
     }
 }
 

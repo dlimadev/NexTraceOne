@@ -20,7 +20,7 @@ const IS_DEV = import.meta.env.DEV;
 export function useUxTelemetry() {
   return useCallback((event: UxEvent) => {
     if (IS_DEV) {
-      // eslint-disable-next-line no-console
+       
       console.debug('[UX]', event);
       return;
     }

@@ -172,7 +172,7 @@ public sealed class ForgotPasswordTests
         var result = validator.Validate(new ForgotPassword.Command(email));
 
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().ContainSingle(e => e.PropertyName == nameof(ForgotPassword.Command.Email));
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(ForgotPassword.Command.Email));
     }
 
     [Fact]

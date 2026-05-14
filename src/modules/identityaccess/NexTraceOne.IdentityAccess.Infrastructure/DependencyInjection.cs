@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
@@ -38,6 +39,7 @@ public static class DependencyInjection
 
         services.AddDbContext<IdentityDbContext>((serviceProvider, options) =>
             options.UseNpgsql(connectionString)
+                .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
                 .AddInterceptors(
                     serviceProvider.GetRequiredService<AuditInterceptor>(),
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));

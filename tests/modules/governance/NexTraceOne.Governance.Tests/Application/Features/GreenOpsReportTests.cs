@@ -6,6 +6,8 @@ using NexTraceOne.Governance.Application.Features.GetGreenOpsReport;
 using NexTraceOne.OperationalIntelligence.Contracts.Cost.ServiceInterfaces;
 using NexTraceOne.OperationalIntelligence.Contracts.Runtime.ServiceInterfaces;
 
+using System.Globalization;
+
 namespace NexTraceOne.Governance.Tests.Application.Features;
 
 /// <summary>
@@ -136,6 +138,7 @@ public sealed class GreenOpsReportTests
     [Fact]
     public async Task Handler_ShouldApplyIntensityFactorFromConfig()
     {
+        // Configuração com fator alto
         var highIntensityConfig = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
@@ -145,26 +148,32 @@ public sealed class GreenOpsReportTests
             })
             .Build();
 
-        var lowIntensityConfig = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["Platform:GreenOps:IntensityFactorKgPerKwh"] = "0.1",
-                ["Platform:GreenOps:EsgTargetKgCo2PerMonth"] = "100",
-                ["Platform:GreenOps:DatacenterRegion"] = "eu-west-1"
-            })
-            .Build();
+        // Verificar se a configuração está sendo lida corretamente
+        var highValue = highIntensityConfig["Platform:GreenOps:IntensityFactorKgPerKwh"];
+        highValue.Should().Be("1.0", $"config should have '1.0' but was '{highValue}'");
+        
+        // Testar parsing manual com InvariantCulture
+        var parseResult = double.TryParse(highValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedValue);
+        parseResult.Should().BeTrue($"parsing '{highValue}' should succeed with InvariantCulture");
+        parsedValue.Should().Be(1.0, $"parsed value should be 1.0 but was {parsedValue}");
 
+        // Criar mocks
         var runtimeMock = CreateRuntimeMockWithData();
         var costMock = CreateCostMockWithData();
+        var configRepo = CreateEmptyConfigRepo();
 
-        var handlerHigh = new GetGreenOpsReport.Handler(runtimeMock, costMock, CreateEmptyConfigRepo(), highIntensityConfig, NullLogger<GetGreenOpsReport.Handler>.Instance);
-        var handlerLow = new GetGreenOpsReport.Handler(runtimeMock, costMock, CreateEmptyConfigRepo(), lowIntensityConfig, NullLogger<GetGreenOpsReport.Handler>.Instance);
+        var handler = new GetGreenOpsReport.Handler(runtimeMock, costMock, configRepo, highIntensityConfig, NullLogger<GetGreenOpsReport.Handler>.Instance);
 
-        var high = await handlerHigh.Handle(new GetGreenOpsReport.Query(), CancellationToken.None);
-        var low = await handlerLow.Handle(new GetGreenOpsReport.Query(), CancellationToken.None);
+        var result = await handler.Handle(new GetGreenOpsReport.Query(), CancellationToken.None);
 
-        high.Value.TotalKgCo2.Should().BeGreaterThan(low.Value.TotalKgCo2,
-            "higher intensity factor should yield more CO2 for the same workload");
+        result.IsSuccess.Should().BeTrue();
+        
+        // O problema: o handler está retornando 0.233 em vez de 1.0
+        // Isso sugere que fallbackConfig["Platform:GreenOps:IntensityFactorKgPerKwh"] está retornando null
+        // ou algo que não pode ser parseado
+        result.Value.Config.IntensityFactorKgPerKwh.Should().Be(1.0, 
+            $"intensity factor from config should be 1.0 but was {result.Value.Config.IntensityFactorKgPerKwh}. " +
+            $"Direct config read: '{highValue}', Parse result: {parseResult}, Parsed value: {parsedValue}");
     }
 
     [Fact]

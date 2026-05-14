@@ -1,5 +1,6 @@
 import client from '../../../api/client';
 import { getAccessToken, getCsrfToken, getTenantId, getEnvironmentId } from '../../../utils/tokenStorage';
+import type { AgentsResponse } from './AiAgentApiTypes';
 
 /** Payload reutilizável para envio de mensagens ao assistente de IA. */
 export type SendMessagePayload = {
@@ -161,8 +162,11 @@ export const aiGovernanceApi = {
   },
 
   /** Stub: marca onboarding como completo para o utilizador no servidor. */
-  completeOnboarding: (_sessionId: string): Promise<void> =>
-    Promise.resolve(),
+  completeOnboarding: (sessionId: string): Promise<void> => {
+    // TODO: Implementar chamada API real quando backend estiver pronto
+    void sessionId; // Suppress unused parameter warning
+    return Promise.resolve();
+  },
   listConversations: (params?: { userId?: string; pageSize?: number }) =>
     client.get('/ai/assistant/conversations', { params }).then(r => r.data),
   getConversation: (conversationId: string, params?: { messagePageSize?: number }) =>
@@ -238,8 +242,10 @@ export const aiGovernanceApi = {
     client.get('/ai/models/available').then(r => r.data),
 
   // ── AI Agents ─────────────────────────────────────────────────────
-  listAgents: (params?: { isOfficial?: boolean }) =>
-    client.get('/ai/agents', { params }).then(r => r.data),
+  listAgents: async (params?: { isOfficial?: boolean }): Promise<AgentsResponse> => {
+    const response = await client.get<AgentsResponse>('/ai/agents', { params });
+    return response.data;
+  },
   listAgentCategories: () =>
     client.get<{ items: string[] }>('/ai/agents/categories').then(r => r.data),
   listAgentsByContext: (context: string) =>

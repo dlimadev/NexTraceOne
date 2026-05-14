@@ -18,9 +18,8 @@
     "resolveJsonModule": true,
 
     /* Path aliases — evitar imports relativos profundos (../../../) */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
 
     /* Linting */

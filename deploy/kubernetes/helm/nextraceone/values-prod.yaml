@@ -1,0 +1,201 @@
+# Values para ambiente de produção
+# Uso: helm install nextraceone-prod . -f values-prod.yaml
+
+replicaCount: 5
+
+image:
+  repository: registry.example.com/nextraceone/apihost
+  tag: "1.0.0"
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: registry-credentials
+
+# Recursos enterprise para produção
+resources:
+  limits:
+    cpu: 4000m
+    memory: 8Gi
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+
+# Autoscaling agressivo
+autoscaling:
+  enabled: true
+  minReplicas: 5
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
+
+# Ingress production-grade
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+  hosts:
+    - host: app.nextraceone.com
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: api.nextraceone.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: nextraceone-prod-tls
+      hosts:
+        - app.nextraceone.com
+        - api.nextraceone.com
+
+# Database high-performance
+postgresql:
+  auth:
+    password: ""  # Usar External Secrets ou Vault
+  primary:
+    persistence:
+      enabled: true
+      size: 200Gi
+      storageClass: "fast-ssd"  # SSD premium
+    resources:
+      limits:
+        cpu: 4000m
+        memory: 8Gi
+      requests:
+        cpu: 2000m
+        memory: 4Gi
+  readReplicas:
+    enabled: true
+    replicaCount: 2
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+
+# Redis cluster
+redis:
+  auth:
+    password: ""  # Usar External Secrets
+  cluster:
+    enabled: true
+    slaveCount: 3
+  master:
+    persistence:
+      enabled: true
+      size: 20Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+# Elasticsearch production cluster
+elasticsearch:
+  replicas: 5
+  minimumMasterNodes: 3
+  volumeClaimTemplate:
+    storageClassName: "fast-ssd"
+    resources:
+      requests:
+        storage: 200Gi
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+    requests:
+      cpu: 2000m
+      memory: 4Gi
+
+# Kafka production cluster
+kafka:
+  enabled: true
+  replicas: 5
+  persistence:
+    enabled: true
+    size: 200Gi
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+# Configuração production-hardened
+app:
+  aspnetcoreEnvironment: "Production"
+  jwt:
+    secret: ""  # Usar Azure Key Vault / AWS Secrets Manager
+    issuer: "nextraceone.com"
+    audience: "nextraceone-api"
+    expirationMinutes: 30  # Menor expiração em produção
+  cors:
+    allowedOrigins:
+      - "https://app.nextraceone.com"
+      - "https://admin.nextraceone.com"
+  smtp:
+    enabled: true
+    host: "smtp.sendgrid.net"
+    port: 587
+    username: "apikey"
+    password: ""  # Usar secrets
+    enableSsl: true
+    fromEmail: "noreply@nextraceone.com"
+    fromName: "NexTraceOne"
+  kafka:
+    enabled: true
+    bootstrapServers: "nextraceone-kafka:9092"
+    topics:
+      inbound: "nextraceone.events,nextraceone.commands"
+  observability:
+    elasticsearch:
+      url: "http://nextraceone-elasticsearch-master:9200"
+      indexPrefix: "nextraceone-prod"
+    opentelemetry:
+      enabled: true
+      endpoint: "http://otel-collector.monitoring:4317"
+  features:
+    canaryDeployments: true
+    chaosEngineering: true
+    advancedAI: true
+    legacyIntegration: false
+
+# Monitoring completo
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    scrapeTimeout: 5s
+  prometheusRules:
+    enabled: true
+
+# Backup robusto
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # 2 AM daily
+  retentionDays: 30
+  storage:
+    size: 500Gi
+    storageClass: "standard"
+
+# Node affinity para performance
+nodeSelector:
+  node-type: "high-performance"
+
+tolerations:
+  - key: "dedicated"
+    operator: "Equal"
+    value: "nextraceone"
+    effect: "NoSchedule"
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - nextraceone
+        topologyKey: "kubernetes.io/hostname"

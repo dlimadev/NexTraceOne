@@ -105,6 +105,13 @@ public sealed class ProductStoreOptions
 public sealed class ObservabilityProviderOptions
 {
     /// <summary>
+    /// Tipo de backend para telemetria: "elasticsearch" ou "clickhouse".
+    /// Determina qual implementação de ITelemetrySearchService será usada.
+    /// Padrão: "elasticsearch".
+    /// </summary>
+    public string BackendType { get; set; } = "elasticsearch";
+
+    /// <summary>
     /// Provider ativo de observabilidade: "Elastic" ou "ClickHouse".
     /// Determina onde traces, logs e métricas crus são armazenados e consultados.
     /// Padrão: Elastic. ClickHouse mantém-se como opção alternativa.

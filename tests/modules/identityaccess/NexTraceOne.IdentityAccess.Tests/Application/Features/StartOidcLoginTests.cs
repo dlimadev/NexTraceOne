@@ -51,7 +51,7 @@ public sealed class StartOidcLoginTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Contain("OidcProvider");
+        result.Error.Code.Should().Contain("Oidc.ProviderNotConfigured");
     }
 
     [Fact]

@@ -1,3 +1,4 @@
+import { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -36,11 +37,10 @@ function formatHeartbeat(lastHeartbeatAt: string | null): string {
   return `${Math.floor(hours / 24)}d`;
 }
 
-function AgentRow({ agent }: { agent: AgentRegistrationDto }) {
-  const { t } = useTranslation('agentRegistrations');
-  const heartbeatAge = agent.lastHeartbeatAt
-    ? Date.now() - new Date(agent.lastHeartbeatAt).getTime()
-    : Infinity;
+function AgentRow({ agent, now }: { agent: AgentRegistrationDto; now: number }) {
+  const heartbeatAge = useMemo(() => agent.lastHeartbeatAt
+    ? now - new Date(agent.lastHeartbeatAt).getTime()
+    : Infinity, [agent.lastHeartbeatAt, now]);
   const isStale = heartbeatAge > 5 * 60_000;
 
   return (
@@ -91,6 +91,13 @@ function AgentRow({ agent }: { agent: AgentRegistrationDto }) {
 
 export function AgentRegistrationsPage() {
   const { t } = useTranslation('agentRegistrations');
+  const [now, setNow] = useState(() => Date.now()); // Inicialização lazy é aceitável
+
+  // Atualizar timestamp a cada minuto
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['saas-agents'],
@@ -165,7 +172,7 @@ export function AgentRegistrationsPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {agents.map((agent) => (
-                  <AgentRow key={agent.id} agent={agent} />
+                  <AgentRow key={agent.id} agent={agent} now={now} />
                 ))}
               </tbody>
             </table>

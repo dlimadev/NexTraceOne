@@ -417,8 +417,9 @@ export function AiCopilotPage({ fullScreen: fullScreenProp }: AiCopilotPageProps
           setSelectedModelId(defaultModel.modelId);
         }
       })
-      .catch((err: unknown) => {
-        console.warn('[AiCopilotPage] Failed to load available models:', err);
+      .catch(() => {
+        // Falha silenciosa - modelo padrão será usado ou usuário selecionará manualmente
+        // Logging estruturado deve ser feito pelo backend
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only run on mount
   }, []);

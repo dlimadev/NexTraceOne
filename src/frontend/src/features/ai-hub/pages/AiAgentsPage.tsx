@@ -37,9 +37,9 @@ export function AiAgentsPage() {
 
   const agentsQuery = useQuery({
     queryKey: ['ai-agents', isOfficial],
-    queryFn: () => aiGovernanceApi.listAgents({ isOfficial }) as Promise<AgentsResponse>,
+    queryFn: async () => aiGovernanceApi.listAgents({ isOfficial }),
     staleTime: 20_000,
-  });
+  }) as { data?: AgentsResponse; isLoading: boolean; isError: boolean; refetch: () => void };
 
   const agentCategoriesQuery = useQuery({
     queryKey: ['ai-agent-categories'],

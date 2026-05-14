@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nextraceone.fullname" . }}
+  labels:
+    {{- include "nextraceone.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "nextraceone.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "nextraceone.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "nextraceone.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-database
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z {{ include "nextraceone.fullname" . }}-postgresql 5432; do echo waiting for database; sleep 2; done;']
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: {{ .Values.app.aspnetcoreEnvironment | quote }}
+            - name: ASPNETCORE_URLS
+              value: "http://+:5000"
+            - name: ConnectionStrings__IdentityDatabase
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nextraceone.fullname" . }}-db-secrets
+                  key: identity-connection-string
+            - name: ConnectionStrings__CatalogDatabase
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nextraceone.fullname" . }}-db-secrets
+                  key: catalog-connection-string
+            - name: JWT__Secret
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nextraceone.fullname" . }}-jwt-secret
+                  key: secret
+            - name: Smtp__Host
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nextraceone.fullname" . }}-smtp-secrets
+                  key: host
+                  optional: true
+            - name: Kafka__BootstrapServers
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nextraceone.fullname" . }}-kafka-secrets
+                  key: bootstrap-servers
+                  optional: true
+          envFrom:
+            - configMapRef:
+                name: {{ include "nextraceone.fullname" . }}-config
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.readinessProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: aspnet-data-protection
+              mountPath: /app/DataProtection-Keys
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: aspnet-data-protection
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

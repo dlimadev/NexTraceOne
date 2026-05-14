@@ -135,7 +135,7 @@ export function ContractVersionDetailPanel({
   async function handleVerifySignature(versionId: string) {
     try {
       const result = await contractsApi.verifySignature(versionId);
-      setVerifyStatus({ id: versionId, valid: result.isValid, message: result.message });
+      setVerifyStatus({ id: versionId, valid: result.isValid, message: result.message ?? 'Verificação concluída' });
     } catch {
       onShowNotification('error', t('contracts.errors.verifyFailed'));
     }

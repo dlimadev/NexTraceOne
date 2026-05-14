@@ -29,7 +29,7 @@ export function ContractCatalogPage() {
   const [sort, setSort] = useState<SortConfig>({ field: 'updatedAt', direction: 'desc' });
   const [lifecycleChip, setLifecycleChip] = useState<string>('');
 
-  // ── Data fetching (Phase 2 hooks) ───────────────────────────────────────────
+  // ── Data fetching ───────────────────────────────────────────────────────────
   const listQuery = useContractList({
     searchTerm: filters.search || undefined,
     protocol: filters.protocol || undefined,

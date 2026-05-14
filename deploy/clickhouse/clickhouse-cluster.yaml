@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: clickhouse
+  namespace: nextraceone
+  labels:
+    app: clickhouse
+spec:
+  serviceName: clickhouse
+  replicas: 3
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:24.1
+          ports:
+            - containerPort: 8123
+              name: http
+            - containerPort: 9000
+              name: native
+          env:
+            - name: CLICKHOUSE_DB
+              value: "nextraceone"
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: username
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: password
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/clickhouse
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "2"
+            limits:
+              memory: "8Gi"
+              cpu: "4"
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8123
+            initialDelaySeconds: 5
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickhouse
+  namespace: nextraceone
+spec:
+  clusterIP: None
+  selector:
+    app: clickhouse
+  ports:
+    - name: http
+      port: 8123
+      targetPort: 8123
+    - name: native
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: clickhouse-secret
+  namespace: nextraceone
+type: Opaque
+data:
+  username: bmV4dHJhY2VvbmU=  # nextraceone (base64)
+  password: c2VjdXJlLXBhc3N3b3JkLTEyMw==  # secure-password-123 (base64)

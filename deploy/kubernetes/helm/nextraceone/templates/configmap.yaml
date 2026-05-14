@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "nextraceone.fullname" . }}-config
+  labels:
+    {{- include "nextraceone.labels" . | nindent 4 }}
+data:
+  # ASP.NET Core Configuration
+  ASPNETCORE_ENVIRONMENT: {{ .Values.app.aspnetcoreEnvironment | quote }}
+  
+  # CORS Configuration
+  CORS__AllowedOrigins: {{ .Values.app.cors.allowedOrigins | join "," | quote }}
+  
+  # JWT Configuration
+  JWT__Issuer: {{ .Values.app.jwt.issuer | quote }}
+  JWT__Audience: {{ .Values.app.jwt.audience | quote }}
+  JWT__ExpirationMinutes: {{ .Values.app.jwt.expirationMinutes | quote }}
+  
+  # Observability Configuration
+  OBSERVABILITY__ELASTICSEARCH__URL: {{ .Values.app.observability.elasticsearch.url | quote }}
+  OBSERVABILITY__ELASTICSEARCH__INDEX_PREFIX: {{ .Values.app.observability.elasticsearch.indexPrefix | quote }}
+  OBSERVABILITY__OPENTELEMETRY__ENABLED: {{ .Values.app.observability.opentelemetry.enabled | quote }}
+  OBSERVABILITY__OPENTELEMETRY__ENDPOINT: {{ .Values.app.observability.opentelemetry.endpoint | quote }}
+  
+  # Logging Configuration
+  LOGGING__LEVEL: {{ .Values.logging.level | quote }}
+  LOGGING__FORMAT: {{ .Values.logging.format | quote }}
+  LOGGING__ELASTICSEARCH__ENABLED: {{ .Values.logging.elasticsearch.enabled | quote }}
+  LOGGING__ELASTICSEARCH__URL: {{ .Values.logging.elasticsearch.url | quote }}
+  LOGGING__ELASTICSEARCH__INDEX_PATTERN: {{ .Values.logging.elasticsearch.indexPattern | quote }}
+  
+  # Feature Flags
+  FEATURES__CANARY_DEPLOYMENTS: {{ .Values.app.features.canaryDeployments | quote }}
+  FEATURES__CHAOS_ENGINEERING: {{ .Values.app.features.chaosEngineering | quote }}
+  FEATURES__ADVANCED_AI: {{ .Values.app.features.advancedAI | quote }}
+  FEATURES__LEGACY_INTEGRATION: {{ .Values.app.features.legacyIntegration | quote }}
+  
+  # Kafka Configuration
+  KAFKA__ENABLED: {{ .Values.app.kafka.enabled | quote }}
+  KAFKA__TOPICS__INBOUND: {{ .Values.app.kafka.topics.inbound | quote }}
+  
+  # SMTP Configuration
+  SMTP__ENABLED: {{ .Values.app.smtp.enabled | quote }}
+  SMTP__PORT: {{ .Values.app.smtp.port | quote }}
+  SMTP__ENABLE_SSL: {{ .Values.app.smtp.enableSsl | quote }}
+  SMTP__FROM_EMAIL: {{ .Values.app.smtp.fromEmail | quote }}
+  SMTP__FROM_NAME: {{ .Values.app.smtp.fromName | quote }}

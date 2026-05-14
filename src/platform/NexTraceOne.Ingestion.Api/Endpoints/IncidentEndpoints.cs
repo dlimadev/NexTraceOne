@@ -376,7 +376,7 @@ internal static class IncidentEndpoints
                 return Results.Problem("An unexpected error occurred", statusCode: StatusCodes.Status500InternalServerError);
             }
         })
-        .WithName("GetIncidentDetail")
+        .WithName("GetIncidentDetailIngestion")
         .WithSummary("Get detailed information about a specific incident")
         .WithDescription(
             "Returns the full consolidated detail of an incident including timeline, correlated changes, " +

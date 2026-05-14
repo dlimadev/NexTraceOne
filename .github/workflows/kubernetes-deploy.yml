@@ -1,0 +1,237 @@
+name: Kubernetes Deployment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'deploy/kubernetes/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'deploy/kubernetes/**'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  CHART_DIR: deploy/kubernetes/helm/nextraceone
+
+jobs:
+  # Job 1: Build e Testar Docker Image
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.kubernetes
+          push: false
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Push Docker image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.kubernetes
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Job 2: Validar Helm Chart
+  validate-helm-chart:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.13.0'
+
+      - name: Lint Helm chart
+        run: |
+          helm lint ${{ env.CHART_DIR }} --strict
+
+      - name: Render templates
+        run: |
+          helm template test-release ${{ env.CHART_DIR }} > /dev/null
+
+      - name: Validate values files
+        run: |
+          for values_file in ${{ env.CHART_DIR }}/values*.yaml; do
+            echo "Validating $values_file..."
+            helm template test-release ${{ env.CHART_DIR }} -f "$values_file" > /dev/null
+          done
+
+  # Job 3: Deploy para Staging (apenas em push para main)
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [build-and-test, validate-helm-chart]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.13.0'
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
+
+      - name: Deploy to staging
+        run: |
+          helm upgrade --install nextraceone-staging ${{ env.CHART_DIR }} \
+            --namespace nextraceone-staging \
+            --create-namespace \
+            --values ${{ env.CHART_DIR }}/values-staging.yaml \
+            --set image.tag=${{ github.sha }} \
+            --wait --timeout 10m \
+            --atomic
+
+      - name: Run smoke tests
+        run: |
+          # Aguardar deployment ficar ready
+          kubectl rollout status deployment/nextraceone-staging \
+            --namespace nextraceone-staging \
+            --timeout=300s
+          
+          # Executar health check
+          curl -f http://staging.nextraceone.example.com/api/v1/platform/health
+
+  # Job 4: Deploy para Produção (manual approval required)
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+    concurrency: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.13.0'
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_PRODUCTION }}
+
+      - name: Backup before deploy
+        run: |
+          # Trigger backup manual
+          kubectl create job manual-backup \
+            --from=cronjob/nextraceone-prod-backup \
+            --namespace nextraceone-production || true
+
+      - name: Deploy to production (rolling update)
+        run: |
+          helm upgrade --install nextraceone-prod ${{ env.CHART_DIR }} \
+            --namespace nextraceone-production \
+            --create-namespace \
+            --values ${{ env.CHART_DIR }}/values-prod.yaml \
+            --set image.tag=${{ github.sha }} \
+            --wait --timeout 15m \
+            --atomic \
+            --history-max 5
+
+      - name: Verify deployment
+        run: |
+          # Verificar rollout
+          kubectl rollout status deployment/nextraceone-prod \
+            --namespace nextraceone-production \
+            --timeout=600s
+          
+          # Verificar health
+          curl -f https://api.nextraceone.com/api/v1/platform/health
+          
+          # Verificar métricas
+          kubectl top pods -l app.kubernetes.io/name=nextraceone \
+            --namespace nextraceone-production
+
+      - name: Notify deployment success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "✅ NexTraceOne deployed to production successfully!\nVersion: ${{ github.sha }}\nCommit: ${{ github.event.head_commit.message }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Rolling back..."
+          helm rollback nextraceone-prod 1 --namespace nextraceone-production
+          
+          # Notificar falha
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"❌ NexTraceOne deployment FAILED! Rolled back to previous version."}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -1,0 +1,73 @@
+{{- if .Values.backup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "nextraceone.fullname" . }}-backup
+  labels:
+    {{- include "nextraceone.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "nextraceone.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: backup
+        spec:
+          serviceAccountName: {{ include "nextraceone.serviceAccountName" . }}
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: postgres:15-alpine
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "Starting backup..."
+                  BACKUP_FILE="/backups/nextraceone-backup-$(date +%Y%m%d_%H%M%S).sql.gz"
+                  
+                  # Backup PostgreSQL
+                  pg_dump -h {{ include "nextraceone.fullname" . }}-postgresql \
+                    -U {{ .Values.postgresql.auth.username }} \
+                    -d nextraceone | gzip > $BACKUP_FILE
+                  
+                  echo "Backup completed: $BACKUP_FILE"
+                  
+                  # Cleanup old backups (keep only last N days)
+                  find /backups -name "*.sql.gz" -mtime +{{ .Values.backup.retentionDays }} -delete
+                  
+                  echo "Cleanup completed"
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "nextraceone.fullname" . }}-db-secrets
+                      key: identity-connection-string
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: {{ include "nextraceone.fullname" . }}-backup-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "nextraceone.fullname" . }}-backup-pvc
+  labels:
+    {{- include "nextraceone.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.backup.storage.size }}
+  {{- if .Values.backup.storage.storageClass }}
+  storageClassName: {{ .Values.backup.storage.storageClass }}
+  {{- end }}
+{{- end }}

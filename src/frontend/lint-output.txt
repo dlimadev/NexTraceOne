@@ -1,0 +1,397 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\e2e\saml-sso-flows.spec.ts
+  282:9  error  'capturedIdpUrl' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\components\NotificationItem.test.tsx
+   3:26  error  'waitFor' is defined but never used  @typescript-eslint/no-unused-vars
+  15:28  error  '_' is defined but never used        @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\AiCopilotPage.test.tsx
+   3:18   error  'screen' is defined but never used        @typescript-eslint/no-unused-vars
+  59:100  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  60:88   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:87   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\AiGovernancePage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\AiResourceGovernorPage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\CapacityForecastPage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ChangeAdvisoryPage.test.tsx
+  80:81  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\CompliancePacksPage.test.tsx
+  8:45  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ContractPipelinePage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ContractPlaygroundPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ContractPortalPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ContractWorkspacePage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\CreateContractPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\DashboardViewPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\DemoSeedPage.test.tsx
+  8:45  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\DraftStudioPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\EnvironmentPoliciesPage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\EvidencePackViewerPage.test.tsx
+  75:77  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:74  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:79  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  82:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ExternalHttpAuditPage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\GreenOpsPage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\LogExplorerPage.test.tsx
+  73:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\NonProdSchedulerPage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ProfilingExplorerPage.test.tsx
+  8:35  error  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ProxyConfigPage.test.tsx
+  9:22  error  '_opts' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ReleaseGatesDashboardPage.test.tsx
+   82:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   88:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   95:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  114:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:105  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:101  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ReleaseParameterAuditPage.test.tsx
+   92:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  154:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:96  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ReleaseParameterEnvironmentOverridePage.test.tsx
+   76:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   82:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   89:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  139:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\ReleaseRollbackPage.test.tsx
+  23:5  error  '_releaseSelectorOnChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\SecurityGateDashboardPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\SloMarketplacePage.test.tsx
+  8:35  error  'fireEvent' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\TemplateDetailPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\TemplateEditorPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\TemplateLibraryPage.test.tsx
+  3:18  error  'screen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\__tests__\pages\TraceExplorerPage.test.tsx
+   75:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  191:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\components\Button.tsx
+  56:12  error  '_asChild' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\components\shell\AppSidebar.tsx
+  226:11  error  'user' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  229:16  error  'roleName' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  230:11  error  'persona' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  233:9   error  'handleLogout' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\components\ui\badge.tsx
+  39:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\components\ui\tabs.tsx
+  19:11  error  'handleTabChange' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\ai-hub\api\aiGovernance.ts
+  165:24  error  '_sessionId' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\api\changeIntelligence.ts
+  771:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  804:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  816:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  824:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  841:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  870:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\components\RiskScoreTrendPanel.tsx
+  10:15  error  'RiskScoreDataPoint' is defined but never used  @typescript-eslint/no-unused-vars
+  22:10  error  'scoreBadgeVariant' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\pages\EvidencePackViewerPage.tsx
+  80:9  error  'selectedInstance' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\pages\ExternalReleaseIngestPage.tsx
+  4:20  error  'Plus' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\pages\PostReleaseReviewPage.tsx
+   19:10  error  'PageErrorState' is defined but never used     @typescript-eslint/no-unused-vars
+   87:9   error  'inputCls' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  256:58  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\pages\PromotionPage.tsx
+  246:17  error  '_' is defined but never used     @typescript-eslint/no-unused-vars
+  246:20  error  'vars' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\pages\ReleaseApprovalPoliciesPage.tsx
+  291:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\pages\ReleaseChecklistExecutionPage.tsx
+  5:3  error  'ClipboardCheck' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\change-governance\pages\ReleaseNotesPage.tsx
+  89:9  error  'inputCls' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\configuration\pages\BrandingAdminPage.tsx
+  88:3  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  95:7  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\configuration\pages\BrandingAdminPage.tsx:95:7
+  93 |         initial[setting.key] = setting.effectiveValue ?? '';
+  94 |       }
+> 95 |       setValues(initial);
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  96 |     }
+  97 |   }, [data]);
+  98 |  react-hooks/set-state-in-effect
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\configuration\pages\UserPreferencesPage.tsx
+  10:7  error  'TIMEZONE_VALUES' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\contracts\hooks\useDraftValidation.ts
+  14:32  error  'ValidationSummary' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\contracts\pages\ContractStudioPage.tsx
+  1:10  error  'useState' is defined but never used  @typescript-eslint/no-unused-vars
+  9:10  error  'Button' is defined but never used    @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\contracts\pages\GraphQLBuilderPage.tsx
+  48:10  error  'previousSdl' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  55:34  error  Spaces are hard to count. Use {2}                 no-regex-spaces
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\contracts\studio\components\GraphQlSchemaDiffViewer.tsx
+  61:19  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\contracts\studio\components\ProtobufSchemaDiffViewer.tsx
+  73:19  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\contracts\workspace\builders\shared\builderParse.ts
+  457:9  error  'bindingEl' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  892:3  error  '_format' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\contracts\workspace\sections\DraftValidationPanel.tsx
+  64:3  error  'protocol' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\components\AiComposeDashboardModal.tsx
+  96:7  error  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\components\AnnotationsOverlay.tsx
+  44:10  error  'severityClasses' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\components\DashboardHistoryDrawer.tsx
+  101:11  error  'result' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\context\CrossFilterContext.tsx
+  51:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\DashboardBuilderPage.tsx
+  27:10  error  'useEnvironment' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\DomainFinOpsPage.tsx
+  14:15  error  'CostEfficiencyType' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\FinOpsBudgetApprovalsPage.tsx
+   4:26  error  'Clock' is defined but never used          @typescript-eslint/no-unused-vars
+  21:32  error  '_env' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\NotebookEditorPage.tsx
+  7:3  error  'Plus' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\ServiceFinOpsPage.tsx
+  14:15  error  'CostEfficiencyType' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\ServiceScorecardPage.tsx
+  5:10  error  'useEnvironment' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\TeamFinOpsPage.tsx
+  14:15  error  'CostEfficiencyType' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\WarRoomPage.tsx
+  5:73  error  'X' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\centers\BlastRadiusExplorerPage.tsx
+  4:21  error  'AlertTriangle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\pages\centers\ChangeConfidenceHubPage.tsx
+  4:88  error  'LinkIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\widgets\QueryWidget.tsx
+  25:31  error  'widgetId' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\governance\widgets\TextMarkdownWidget.tsx
+   30:36  error  Unnecessary escape character: \)                     no-useless-escape
+  105:11  error  Definition for rule 'react/no-danger' was not found  react/no-danger
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\identity-access\pages\OnboardingWizardPage.tsx
+    6:3   error    'Circle' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+   95:6   warning  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  220:27  error    'index' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\notifications\pages\NotificationDetailPage.tsx
+  98:11  error  't' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\observability\components\ErrorAnalyticsDashboard.tsx
+  14:19  error    'setFilters' is assigned a value but never used                                                                @typescript-eslint/no-unused-vars
+  20:6   warning  React Hook useEffect has a missing dependency: 'loadErrors'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\observability\components\RequestMetricsDashboard.tsx
+  18:6   warning  React Hook useEffect has a missing dependency: 'loadMetrics'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  62:88  error    Unexpected any. Specify a different type                                                                        @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\observability\components\SystemHealthDashboard.tsx
+  12:19  error    'setFilters' is assigned a value but never used                                                                @typescript-eslint/no-unused-vars
+  18:6   warning  React Hook useEffect has a missing dependency: 'loadHealth'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\observability\services\ObservabilityService.ts
+  78:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\operations\api\runtimeIntelligence.ts
+  150:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\operations\pages\LogExplorerPage.tsx
+  17:3   error  'AlertTriangle' is defined but never used      @typescript-eslint/no-unused-vars
+  19:3   error  'Info' is defined but never used               @typescript-eslint/no-unused-vars
+  95:16  error  'setFrom' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  96:17  error  'setUntil' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  97:17  error  'setLimit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\operations\pages\SloBurnRatePage.tsx
+  54:10  error  'statusVariant' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\operations\pages\SreDashboardPage.tsx
+  108:21  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+  259:66  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+  267:60  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+  332:66  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+  340:59  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\operations\pages\TraceExplorerPage.tsx
+  837:15  error  Definition for rule 'react/no-array-index-key' was not found  react/no-array-index-key
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\platform-admin\pages\AiModelManagerPage.tsx
+  143:28  error  't' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\platform-admin\pages\CanaryDashboardPage.tsx
+   8:3  error  'CheckCircle' is defined but never used    @typescript-eslint/no-unused-vars
+   9:3  error  'AlertTriangle' is defined but never used  @typescript-eslint/no-unused-vars
+  12:3  error  'Activity' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\platform-admin\pages\FeatureFlagsRuntimePage.tsx
+  14:33  error  'FeatureFlagRuntimeEntry' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\platform-admin\pages\PlatformAlertRulesPage.tsx
+    7:3  error  'CheckCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  358:3  error  't' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\platform-admin\pages\PlatformHealthDashboardPage.tsx
+  11:3  error  'HardDrive' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\platform-admin\pages\SetupWizardPage.tsx
+  416:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\platform-admin\pages\SetupWizardPage.tsx:416:5
+  414 |       }
+  415 |     }
+> 416 |     setFormData(restored);
+      |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  417 |
+  418 |     // eslint-disable-next-line react-hooks/set-state-in-effect
+  419 |     if (statusData.isFullyConfigured) {  react-hooks/set-state-in-effect
+  418:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\product-analytics\pages\JourneyConfigPage.tsx
+  5:16  error  'CardHeader' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\saas\pages\AgentRegistrationsPage.tsx
+  42:7  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\features\saas\pages\AgentRegistrationsPage.tsx:42:7
+  40 | function AgentRow({ agent }: { agent: AgentRegistrationDto }) {
+  41 |   const heartbeatAge = useMemo(() => agent.lastHeartbeatAt
+> 42 |     ? Date.now() - new Date(agent.lastHeartbeatAt).getTime()
+     |       ^^^^^^^^^^ Cannot call impure function
+  43 |     : Infinity, [agent.lastHeartbeatAt]);
+  44 |   const isStale = heartbeatAge > 5 * 60_000;
+  45 |  react-hooks/purity
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\hooks\useUxTelemetry.ts
+  23:7  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+C:\Users\dlima\Documents\GitHub\NexTraceOne\src\frontend\src\lib\environmentProfile.ts
+  21:3  error  'BookOpen' is defined but never used  @typescript-eslint/no-unused-vars
+
+Ô£û 160 problems (153 errors, 7 warnings)
+  1 error and 3 warnings potentially fixable with the `--fix` option.
+

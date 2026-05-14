@@ -79,6 +79,10 @@ public static class StartOidcLogin
             if (string.IsNullOrWhiteSpace(returnTo))
                 return true;
 
+            // Rejeita URLs com protocolo duplo (//evil.com)
+            if (returnTo.StartsWith("//", StringComparison.OrdinalIgnoreCase))
+                return false;
+
             return AllowedReturnToPrefixes.Any(prefix =>
                 returnTo.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
         }

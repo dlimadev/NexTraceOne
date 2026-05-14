@@ -34,9 +34,9 @@ export function ReleaseSelector({ value, onChange, placeholder }: ReleaseSelecto
   const releases = data?.items ?? [];
   const filtered = releases.filter(
     (r) =>
-      r.serviceName.toLowerCase().includes(search.toLowerCase()) ||
+      (r.serviceName ?? '').toLowerCase().includes(search.toLowerCase()) ||
       r.version.toLowerCase().includes(search.toLowerCase()) ||
-      r.environment.toLowerCase().includes(search.toLowerCase()),
+      (r.environment ?? '').toLowerCase().includes(search.toLowerCase()),
   );
 
   const selected = releases.find((r) => r.id === value);
@@ -95,7 +95,7 @@ export function ReleaseSelector({ value, onChange, placeholder }: ReleaseSelecto
                   type="button"
                   className="w-full text-left px-3 py-2 text-sm hover:bg-canvas transition-colors"
                   onClick={() => {
-                    onChange(r.id, r.serviceName, r.version);
+                    onChange(r.id, r.serviceName ?? 'unknown', r.version);
                     setOpen(false);
                     setSearch('');
                   }}

@@ -57,7 +57,7 @@ public sealed class DeactivateUserTests
             CancellationToken.None);
 
         result.IsFailure.Should().BeTrue();
-        result.Error.Code.Should().Contain("UserNotFound");
+        result.Error.Code.Should().Contain("User.NotFound");
     }
 
     [Fact]

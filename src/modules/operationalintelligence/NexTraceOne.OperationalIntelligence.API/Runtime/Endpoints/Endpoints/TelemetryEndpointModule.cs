@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Abstractions;
 using NexTraceOne.BuildingBlocks.Observability.Observability.Models;
@@ -46,7 +47,7 @@ public sealed class TelemetryEndpointModule
             string environment,
             DateTimeOffset from,
             DateTimeOffset until,
-            IObservabilityProvider provider,
+            [FromServices] IObservabilityProvider provider,
             CancellationToken ct,
             string? serviceName = null,
             string? level = null,
@@ -79,7 +80,7 @@ public sealed class TelemetryEndpointModule
             string environment,
             DateTimeOffset from,
             DateTimeOffset until,
-            IObservabilityProvider provider,
+            [FromServices] IObservabilityProvider provider,
             CancellationToken ct,
             string? serviceName = null,
             string? operationName = null,
@@ -112,7 +113,7 @@ public sealed class TelemetryEndpointModule
 
         group.MapGet("/traces/{traceId}", async (
             string traceId,
-            IObservabilityProvider provider,
+            [FromServices] IObservabilityProvider provider,
             CancellationToken ct) =>
         {
             var detail = await provider.GetTraceDetailAsync(traceId, ct);
@@ -129,7 +130,7 @@ public sealed class TelemetryEndpointModule
             DateTimeOffset from,
             DateTimeOffset until,
             string metricName,
-            IObservabilityProvider provider,
+            [FromServices] IObservabilityProvider provider,
             CancellationToken ct,
             string? serviceName = null) =>
         {
@@ -153,7 +154,7 @@ public sealed class TelemetryEndpointModule
             string environment,
             DateTimeOffset from,
             DateTimeOffset until,
-            ITelemetryQueryService queryService,
+            [FromServices] ITelemetryQueryService queryService,
             CancellationToken ct,
             int top = 10) =>
         {
@@ -173,7 +174,7 @@ public sealed class TelemetryEndpointModule
             string environmentB,
             DateTimeOffset from,
             DateTimeOffset until,
-            ITelemetryQueryService queryService,
+            [FromServices] ITelemetryQueryService queryService,
             CancellationToken ct) =>
         {
             var comparison = await queryService.CompareLatencyAsync(
@@ -186,7 +187,7 @@ public sealed class TelemetryEndpointModule
 
         group.MapGet("/correlate/{traceId}", async (
             string traceId,
-            ITelemetryQueryService queryService,
+            [FromServices] ITelemetryQueryService queryService,
             CancellationToken ct) =>
         {
             var signals = await queryService.CorrelateByTraceIdAsync(traceId, ct);
@@ -197,8 +198,8 @@ public sealed class TelemetryEndpointModule
         // ── Provider Health ─────────────────────────────────────────────────
 
         group.MapGet("/health", async (
-            IObservabilityProvider provider,
-            ICollectionModeStrategy collectionMode,
+            [FromServices] IObservabilityProvider provider,
+            [FromServices] ICollectionModeStrategy collectionMode,
             CancellationToken ct) =>
         {
             var providerHealthy = await provider.IsHealthyAsync(ct);

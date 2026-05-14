@@ -33,8 +33,8 @@ export function GovernanceGatesPage() {
       const resp = await fetch(`/api/v1/governance/gates/four-eyes?${params}`);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       setFourEyesResult(await resp.json());
-    } catch (err) {
-      console.error('Four Eyes gate evaluation failed:', err);
+    } catch {
+      // Erro tratado via mensagem de UI - logging estruturado deve ser feito pelo backend
       setGateError(t('governance.gates.errors.fourEyesFailed', 'Failed to evaluate Four Eyes gate'));
     }
   };
@@ -46,8 +46,8 @@ export function GovernanceGatesPage() {
       const resp = await fetch(`/api/v1/governance/gates/cab?${params}`);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       setCabResult(await resp.json());
-    } catch (err) {
-      console.error('CAB gate evaluation failed:', err);
+    } catch {
+      // Erro tratado via mensagem de UI - logging estruturado deve ser feito pelo backend
       setGateError(t('governance.gates.errors.cabFailed', 'Failed to evaluate CAB gate'));
     }
   };
@@ -59,8 +59,8 @@ export function GovernanceGatesPage() {
       const resp = await fetch(`/api/v1/governance/gates/error-budget?${params}`);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       setErrorBudgetResult(await resp.json());
-    } catch (err) {
-      console.error('Error Budget gate evaluation failed:', err);
+    } catch {
+      // Erro tratado via mensagem de UI - logging estruturado deve ser feito pelo backend
       setGateError(t('governance.gates.errors.errorBudgetFailed', 'Failed to evaluate Error Budget gate'));
     }
   };

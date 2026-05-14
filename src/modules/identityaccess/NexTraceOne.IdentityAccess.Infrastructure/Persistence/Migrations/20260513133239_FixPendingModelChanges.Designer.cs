@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NexTraceOne.IdentityAccess.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20260512171950_FixPendingModelChanges")]
+    [Migration("20260513133239_FixPendingModelChanges")]
     partial class FixPendingModelChanges
     {
         /// <inheritdoc />

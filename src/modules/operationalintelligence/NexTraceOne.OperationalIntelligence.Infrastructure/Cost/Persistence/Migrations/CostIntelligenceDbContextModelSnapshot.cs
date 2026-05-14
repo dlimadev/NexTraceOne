@@ -128,6 +128,62 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                     b.ToTable("ops_cost_budget_forecasts", (string)null);
                 });
 
+            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.CarbonScoreRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("CarbonGrams")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("CpuHours")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<double>("IntensityFactor")
+                        .HasColumnType("double precision");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<double>("MemoryGbHours")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("NetworkGb")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Date");
+
+                    b.HasIndex("TenantId", "ServiceId", "Date")
+                        .IsUnique();
+
+                    b.ToTable("oi_carbon_score_records", (string)null);
+                });
+
             modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.CostAttribution", b =>
                 {
                     b.Property<Guid>("Id")
@@ -644,6 +700,9 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                         .HasColumnType("boolean")
                         .HasColumnName("is_acknowledged");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ServiceName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -677,62 +736,6 @@ namespace NexTraceOne.OperationalIntelligence.Infrastructure.Cost.Persistence.Mi
                         .HasDatabaseName("ix_oi_waste_signals_team_ack");
 
                     b.ToTable("oi_waste_signals", (string)null);
-                });
-
-            modelBuilder.Entity("NexTraceOne.OperationalIntelligence.Domain.Cost.Entities.CarbonScoreRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<double>("CarbonGrams")
-                        .HasColumnType("double precision");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<double>("CpuHours")
-                        .HasColumnType("double precision");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<double>("IntensityFactor")
-                        .HasColumnType("double precision");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<double>("MemoryGbHours")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("NetworkGb")
-                        .HasColumnType("double precision");
-
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId", "Date");
-
-                    b.HasIndex("TenantId", "ServiceId", "Date")
-                        .IsUnique();
-
-                    b.ToTable("oi_carbon_score_records", (string)null);
                 });
 #pragma warning restore 612, 618
         }

@@ -300,7 +300,7 @@ public sealed class ExportAnalyticsDataIntegrationTests
             CancellationToken.None);
 
         var lines = result.Value.Content.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        lines[0].Should().Be("session_id,event_type,occurred_at");
+        lines[0].Trim().Should().Be("session_id,event_type,occurred_at");
         lines.Should().HaveCount(3); // header + 2 data rows
     }
 

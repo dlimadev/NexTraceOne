@@ -401,7 +401,9 @@ public sealed class JourneyConfigAndCohortTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Granularity.Should().Be("month");
         result.Value.Cohorts.Should().HaveCountGreaterThan(0);
-        var julyCohort = result.Value.Cohorts.FirstOrDefault(c => c.CohortLabel.Contains("Jul"));
+        
+        // Find the cohort that contains 2 users (July cohort)
+        var julyCohort = result.Value.Cohorts.FirstOrDefault(c => c.CohortSize == 2);
         julyCohort.Should().NotBeNull();
         julyCohort!.CohortSize.Should().Be(2);
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -80,10 +80,10 @@ export function NotificationCenterPage() {
     setPage(1);
   };
 
-  const handleSnooze1h = (id: string) => {
+  const handleSnooze1h = useCallback((id: string) => {
     const until = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     snooze.mutate({ id, snoozedUntil: until });
-  };
+  }, [snooze]);
 
   return (
     <PageContainer>

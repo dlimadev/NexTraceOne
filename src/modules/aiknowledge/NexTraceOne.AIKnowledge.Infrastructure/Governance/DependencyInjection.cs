@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
@@ -10,9 +11,12 @@ using NexTraceOne.AIKnowledge.Application.Governance.Services;
 using NexTraceOne.AIKnowledge.Contracts.Governance.ServiceInterfaces;
 using NexTraceOne.AIKnowledge.Contracts.IntegrationEvents;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.EventHandlers;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.HealthChecks;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Jobs;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Connectors;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.ClickHouse;
+using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.ElasticSearch;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 using NexTraceOne.AIKnowledge.Infrastructure.Governance.Services;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
@@ -164,6 +168,44 @@ public static class DependencyInjection
         services.AddHostedService<AiDataRetentionJob>();
         services.AddHostedService<EmbeddingIndexJob>();
         services.AddHostedService<ExternalDataSourceSyncJob>();
+
+        // ── Analytics & Search: Escolha Exclusiva ─────────────────────────
+        // O usuário deve escolher APENAS UMA opção durante a instalação:
+        // Opção A: PostgreSQL only (usará Null implementations)
+        // Opção B: PostgreSQL + ClickHouse (analytics + search)
+        // Opção C: PostgreSQL + ElasticSearch (search avançado)
+        
+        var clickHouseConnectionString = configuration.GetConnectionString("AiAnalytics");
+        var elasticSearchConnectionString = configuration.GetConnectionString("AiSearch");
+
+        if (!string.IsNullOrEmpty(clickHouseConnectionString))
+        {
+            // Opção B: ClickHouse para analytics E search
+            services.AddSingleton<IAiAnalyticsRepository>(sp => 
+                new ClickHouseAiAnalyticsRepository(clickHouseConnectionString));
+            
+            // ClickHouse também pode fazer search, então usamos Null para Elastic
+            services.AddSingleton<IAiSearchRepository, NullAiSearchRepository>();
+        }
+        else if (!string.IsNullOrEmpty(elasticSearchConnectionString))
+        {
+            // Opção C: ElasticSearch para search avançado
+            // Analytics continua no PostgreSQL (mais lento, mas funcional)
+            services.AddSingleton<IAiAnalyticsRepository, NullAiAnalyticsRepository>();
+            services.AddSingleton<IAiSearchRepository>(sp => 
+                new ElasticSearchAiRepository(elasticSearchConnectionString));
+        }
+        else
+        {
+            // Opção A: PostgreSQL only (fallback)
+            services.AddSingleton<IAiAnalyticsRepository, NullAiAnalyticsRepository>();
+            services.AddSingleton<IAiSearchRepository, NullAiSearchRepository>();
+        }
+
+        // ── Health Checks para Analytics e Search ─────────────────────────
+        services.AddHealthChecks()
+            .AddCheck<ClickHouseAiHealthCheck>("ai-clickhouse-analytics", HealthStatus.Degraded, ["health", "ready"])
+            .AddCheck<ElasticSearchAiHealthCheck>("ai-elasticsearch-search", HealthStatus.Degraded, ["health", "ready"]);
 
         return services;
     }

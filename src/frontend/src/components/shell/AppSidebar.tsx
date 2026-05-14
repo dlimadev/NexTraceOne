@@ -111,6 +111,7 @@ const navItems: NavItem[] = [
   { labelKey: 'sidebar.aiIntelligence', to: '/ai/intelligence', icon: <BrainCircuit size={18} />, permission: 'ai:governance:read', section: 'aiHub' },
   { labelKey: 'sidebar.executiveOverview', to: '/governance/executive', icon: <Briefcase size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.reports', to: '/governance/reports', icon: <BarChart3 size={18} />, permission: 'governance:reports:read', section: 'governance' },
+  { labelKey: 'sidebar.customDashboards', to: '/governance/custom-dashboards', icon: <LayoutDashboard size={18} />, permission: 'governance:reports:read', section: 'governance' },
   { labelKey: 'sidebar.compliance', to: '/governance/compliance', icon: <ClipboardCheck size={18} />, permission: 'governance:compliance:read', section: 'governance' },
   { labelKey: 'sidebar.riskCenter', to: '/governance/risk', icon: <AlertTriangle size={18} />, permission: 'governance:risk:read', section: 'governance' },
   { labelKey: 'sidebar.finops', to: '/governance/finops', icon: <TrendingUp size={18} />, permission: 'governance:finops:read', section: 'governance' },

@@ -97,7 +97,7 @@ export function ReleasesPage() {
   useEffect(() => {
     if (!environmentOptions.length) return;
     if (!form.environment || !environmentOptions.includes(form.environment)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
       setForm((current) => ({ ...current, environment: environmentOptions[0] ?? '' }));
     }
   }, [environmentOptions, form.environment]);

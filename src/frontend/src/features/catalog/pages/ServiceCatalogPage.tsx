@@ -52,28 +52,28 @@ export function ServiceCatalogPage() {
   });
 
   const { data: impactResult, isLoading: impactLoading } = useQuery({
-    queryKey: ['impact', selectedNodeId, impactDepth, activeEnvironmentId],
+    queryKey: queryKeys.catalog.impact.propagation(selectedNodeId!, impactDepth, activeEnvironmentId),
     queryFn: () => serviceCatalogApi.getImpactPropagation(selectedNodeId!, impactDepth),
     enabled: !!selectedNodeId && tab === 'impact',
     staleTime: 15_000,
   });
 
   const { data: snapshotsData } = useQuery({
-    queryKey: ['snapshots', activeEnvironmentId],
+    queryKey: queryKeys.catalog.snapshots.all(activeEnvironmentId),
     queryFn: () => serviceCatalogApi.listSnapshots(20),
     enabled: tab === 'temporal',
     staleTime: 60_000,
   });
 
   const { data: diffResult, isLoading: diffLoading } = useQuery({
-    queryKey: ['temporal-diff', selectedFromSnapshot, selectedToSnapshot, activeEnvironmentId],
+    queryKey: queryKeys.catalog.snapshots.diff(selectedFromSnapshot, selectedToSnapshot, activeEnvironmentId),
     queryFn: () => serviceCatalogApi.getTemporalDiff(selectedFromSnapshot, selectedToSnapshot),
     enabled: !!selectedFromSnapshot && !!selectedToSnapshot && selectedFromSnapshot !== selectedToSnapshot,
     staleTime: 30_000,
   });
 
   const { data: healthData } = useQuery({
-    queryKey: ['node-health', activeEnvironmentId],
+    queryKey: queryKeys.catalog.nodeHealth.all('Health', activeEnvironmentId),
     queryFn: () => serviceCatalogApi.getNodeHealth('Health'),
     staleTime: 30_000,
   });
@@ -82,7 +82,7 @@ export function ServiceCatalogPage() {
   const createSnapshot = useMutation({
     mutationFn: (label: string) => serviceCatalogApi.createSnapshot(label),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['snapshots'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.catalog.snapshots.all(activeEnvironmentId) });
     },
   });
 

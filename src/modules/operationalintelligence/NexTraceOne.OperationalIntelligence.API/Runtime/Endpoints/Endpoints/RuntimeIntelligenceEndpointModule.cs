@@ -1,6 +1,9 @@
 using MediatR;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 using NexTraceOne.BuildingBlocks.Application.Extensions;
 using NexTraceOne.BuildingBlocks.Application.Localization;
@@ -23,6 +26,7 @@ using CorrelateServiceMetricsFeature = NexTraceOne.OperationalIntelligence.Appli
 using DetectLogAnomalyFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.DetectLogAnomaly.DetectLogAnomaly;
 using GetTopologyAwareAlertsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.GetTopologyAwareAlerts.GetTopologyAwareAlerts;
 using SearchLogsFeature = NexTraceOne.OperationalIntelligence.Application.Runtime.Features.SearchLogs.SearchLogs;
+using NexTraceOne.OperationalIntelligence.Infrastructure.Runtime.Persistence.ClickHouse;
 
 namespace NexTraceOne.OperationalIntelligence.API.Runtime.Endpoints.Endpoints;
 
@@ -291,5 +295,133 @@ public sealed class RuntimeIntelligenceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("operations:runtime:read");
+
+        // ── ClickHouse Observability Analytics ────────────────────────────────
+        
+        var clickHouseGroup = app.MapGroup("/api/v1/observability").RequireRateLimiting("operations");
+
+        clickHouseGroup.MapGet("/request-metrics", async (
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string? endpoint,
+            [FromServices] IClickHouseRepository repository,
+            [FromServices] IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            try
+            {
+                var metrics = await repository.GetRequestMetricsAsync(from.UtcDateTime, to.UtcDateTime, endpoint);
+                return Results.Ok(metrics);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
+        })
+        .RequirePermission("operations:runtime:read")
+        .WithName("GetRequestMetrics")
+        .WithSummary("Obtém métricas de requisições (latência, throughput, error rate)")
+        .WithDescription("Consultas analíticas de alta performance via ClickHouse para dashboards de performance e SLO monitoring.");
+
+        clickHouseGroup.MapGet("/error-analytics", async (
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string? errorType,
+            [FromServices] IClickHouseRepository repository,
+            [FromServices] IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            try
+            {
+                var analytics = await repository.GetErrorAnalyticsAsync(from.UtcDateTime, to.UtcDateTime, errorType);
+                return Results.Ok(analytics);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
+        })
+        .RequirePermission("operations:runtime:read")
+        .WithName("GetErrorAnalytics")
+        .WithSummary("Obtém analytics de erros agrupados por tipo")
+        .WithDescription("Identificação rápida de padrões de falha com stack traces amostrais e endpoints afetados.");
+
+        clickHouseGroup.MapGet("/user-activity", async (
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string? userId,
+            [FromServices] IClickHouseRepository repository,
+            [FromServices] IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            try
+            {
+                var activity = await repository.GetUserActivityAsync(from.UtcDateTime, to.UtcDateTime, userId);
+                return Results.Ok(activity);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
+        })
+        .RequirePermission("operations:runtime:read")
+        .WithName("GetUserActivity")
+        .WithSummary("Obtém métricas de atividade de usuários")
+        .WithDescription("Análise de comportamento e otimização de UX baseada em ações reais dos usuários.");
+
+        clickHouseGroup.MapGet("/system-health", async (
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string? serviceName,
+            [FromServices] IClickHouseRepository repository,
+            [FromServices] IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            try
+            {
+                var health = await repository.GetSystemHealthAsync(from.UtcDateTime, to.UtcDateTime, serviceName);
+                return Results.Ok(health);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
+        })
+        .RequirePermission("operations:runtime:read")
+        .WithName("GetSystemHealth")
+        .WithSummary("Obtém métricas de saúde do sistema")
+        .WithDescription("Monitoramento em tempo real de CPU, memória, disco, conexões e RPS para capacity planning.");
+
+        clickHouseGroup.MapGet("/stats", async (
+            DateTimeOffset from,
+            DateTimeOffset to,
+            string? endpoint,
+            [FromServices] IClickHouseRepository repository,
+            [FromServices] IErrorLocalizer localizer,
+            CancellationToken ct) =>
+        {
+            try
+            {
+                var avgResponseTime = await repository.GetAverageResponseTimeAsync(from.UtcDateTime, to.UtcDateTime, endpoint);
+                var totalRequests = await repository.GetTotalRequestsAsync(from.UtcDateTime, to.UtcDateTime);
+                var errorRate = await repository.GetErrorRateAsync(from.UtcDateTime, to.UtcDateTime);
+
+                return Results.Ok(new
+                {
+                    AverageResponseTimeMs = avgResponseTime,
+                    TotalRequests = totalRequests,
+                    ErrorRatePercent = errorRate,
+                    Period = new { From = from, To = to }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(detail: ex.Message, statusCode: 500);
+            }
+        })
+        .RequirePermission("operations:runtime:read")
+        .WithName("GetObservabilityStats")
+        .WithSummary("Obtém estatísticas consolidadas de observabilidade")
+        .WithDescription("Métricas agregadas: tempo médio de resposta, total de requisições e taxa de erro no período.");
     }
 }

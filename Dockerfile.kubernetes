@@ -1,0 +1,69 @@
+# ============================================================================
+# NexTraceOne - Dockerfile Otimizado para Kubernetes
+# Multi-stage build com security hardening
+# ============================================================================
+
+# Stage 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copiar arquivos de projeto primeiro (cache de layers)
+COPY ["NexTraceOne.sln", "."]
+COPY ["src/**/*.csproj", "./src/"]
+RUN dotnet restore "NexTraceOne.sln"
+
+# Copiar código fonte
+COPY ["src/", "./src/"]
+
+# Build em modo Release
+WORKDIR "/src/src/platform/NexTraceOne.ApiHost"
+RUN dotnet build "NexTraceOne.ApiHost.csproj" -c Release -o /app/build
+
+# Publish
+RUN dotnet publish "NexTraceOne.ApiHost.csproj" \
+    -c Release \
+    -o /app/publish \
+    --no-restore \
+    /p:UseAppHost=false
+
+# Stage 2: Runtime (imagem mínima)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+
+# Security: Criar usuário não-root
+RUN addgroup -g 1000 -S appgroup && \
+    adduser -u 1000 -S appuser -G appgroup
+
+WORKDIR /app
+
+# Instalar dependências do sistema (se necessário)
+RUN apk add --no-cache \
+    curl \
+    tini \
+    icu-libs
+
+# Copiar published app
+COPY --from=build /app/publish .
+
+# Security: Remover permissões desnecessárias
+RUN chown -R appuser:appgroup /app && \
+    chmod -R 550 /app
+
+# Expor porta
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:5000/api/v1/platform/health || exit 1
+
+# Usar tini como init system (melhor signal handling)
+ENTRYPOINT ["tini", "--"]
+
+# Rodar como usuário não-root
+USER appuser
+
+# Variáveis de ambiente
+ENV ASPNETCORE_URLS=http://+:5000 \
+    ASPNETCORE_ENVIRONMENT=Production \
+    DOTNET_NoSymbolUpload=true
+
+CMD ["dotnet", "NexTraceOne.ApiHost.dll"]

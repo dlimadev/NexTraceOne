@@ -14,7 +14,7 @@ public sealed class SearchLogsTests
     private static readonly DateTimeOffset FixedNow = new(2026, 5, 11, 12, 0, 0, TimeSpan.Zero);
     private static readonly Guid TenantId = Guid.NewGuid();
 
-    private readonly ILogSearchService _logSearchService = Substitute.For<ILogSearchService>();
+    private readonly ITelemetrySearchService _telemetrySearchService = Substitute.For<ITelemetrySearchService>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
 
@@ -26,7 +26,7 @@ public sealed class SearchLogsTests
     }
 
     private SearchLogsFeature.Handler CreateHandler() =>
-        new(_logSearchService, _currentTenant, _clock);
+        new(_telemetrySearchService, _currentTenant, _clock);
 
     private static SearchLogsFeature.LogEntry MakeEntry(string id = "log-1") => new(
         id,
@@ -42,13 +42,13 @@ public sealed class SearchLogsTests
     [Fact]
     public async Task Handle_DefaultWindow_PassesLast1HourToService()
     {
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 0L));
 
         var query = new SearchLogsFeature.Query();
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        await _logSearchService.Received(1).SearchAsync(
+        await _telemetrySearchService.Received(1).SearchAsync(
             Arg.Is<LogSearchRequest>(r =>
                 r.From == FixedNow.AddHours(-1) &&
                 r.To == FixedNow),
@@ -58,13 +58,13 @@ public sealed class SearchLogsTests
     [Fact]
     public async Task Handle_Last6HoursWindow_PassesCorrectTimeRange()
     {
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 0L));
 
         var query = new SearchLogsFeature.Query(Window: SearchLogsFeature.TimeWindow.Last6Hours);
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        await _logSearchService.Received(1).SearchAsync(
+        await _telemetrySearchService.Received(1).SearchAsync(
             Arg.Is<LogSearchRequest>(r =>
                 r.From == FixedNow.AddHours(-6) &&
                 r.To == FixedNow),
@@ -74,13 +74,13 @@ public sealed class SearchLogsTests
     [Fact]
     public async Task Handle_Last7DaysWindow_PassesCorrectTimeRange()
     {
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 0L));
 
         var query = new SearchLogsFeature.Query(Window: SearchLogsFeature.TimeWindow.Last7Days);
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        await _logSearchService.Received(1).SearchAsync(
+        await _telemetrySearchService.Received(1).SearchAsync(
             Arg.Is<LogSearchRequest>(r =>
                 r.From == FixedNow.AddDays(-7) &&
                 r.To == FixedNow),
@@ -93,7 +93,7 @@ public sealed class SearchLogsTests
         var from = FixedNow.AddDays(-2);
         var to = FixedNow.AddDays(-1);
 
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 0L));
 
         var query = new SearchLogsFeature.Query(
@@ -103,7 +103,7 @@ public sealed class SearchLogsTests
 
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        await _logSearchService.Received(1).SearchAsync(
+        await _telemetrySearchService.Received(1).SearchAsync(
             Arg.Is<LogSearchRequest>(r => r.From == from && r.To == to),
             Arg.Any<CancellationToken>());
     }
@@ -111,7 +111,7 @@ public sealed class SearchLogsTests
     [Fact]
     public async Task Handle_WithFilters_PassesAllFiltersToService()
     {
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 0L));
 
         var query = new SearchLogsFeature.Query(
@@ -122,7 +122,7 @@ public sealed class SearchLogsTests
 
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        await _logSearchService.Received(1).SearchAsync(
+        await _telemetrySearchService.Received(1).SearchAsync(
             Arg.Is<LogSearchRequest>(r =>
                 r.ServiceName == "payment-api" &&
                 r.Severity == "error" &&
@@ -137,7 +137,7 @@ public sealed class SearchLogsTests
     {
         var entries = new List<SearchLogsFeature.LogEntry> { MakeEntry("log-42") };
 
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((entries, 1L));
 
         var result = await CreateHandler().Handle(new SearchLogsFeature.Query(), CancellationToken.None);
@@ -151,7 +151,7 @@ public sealed class SearchLogsTests
     [Fact]
     public async Task Handle_EmptyResult_ReturnsEmptyResponse()
     {
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 0L));
 
         var result = await CreateHandler().Handle(new SearchLogsFeature.Query(), CancellationToken.None);
@@ -164,7 +164,7 @@ public sealed class SearchLogsTests
     [Fact]
     public async Task Handle_ReturnsPageAndPageSizeInResponse()
     {
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 100L));
 
         var query = new SearchLogsFeature.Query(Page: 3, PageSize: 25);
@@ -179,7 +179,7 @@ public sealed class SearchLogsTests
     [Fact]
     public async Task Handle_ReturnsSearchWindowInResponse()
     {
-        _logSearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
+        _telemetrySearchService.SearchAsync(Arg.Any<LogSearchRequest>(), Arg.Any<CancellationToken>())
             .Returns((new List<SearchLogsFeature.LogEntry>(), 0L));
 
         var result = await CreateHandler().Handle(

@@ -59,7 +59,7 @@ export function AssistantPanel({ contextType, contextId, contextSummary, context
 
   // Reset when context changes
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting state on context change is intentional
+     
     setMessages([]);
     setIsOpen(false);
     setExpandedMeta(null);

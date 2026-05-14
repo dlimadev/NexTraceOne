@@ -1,0 +1,114 @@
+name: Artifact Signing & SBOM Generation
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to sign'
+        required: true
+        type: string
+
+jobs:
+  sign-artifacts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # Required for keyless signing
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.0'
+
+      - name: Install syft (SBOM generator)
+        uses: anchore/sbom-action/download-syft@v0
+        with:
+          syft-version: '0.100.0'
+
+      - name: Install grype (vulnerability scanner)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/nextraceone/apihost:${{ github.event.inputs.version || github.ref_name }} .
+
+      - name: Push Docker image
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/nextraceone/apihost:${{ github.event.inputs.version || github.ref_name }}
+
+      - name: Sign Docker image (keyless)
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: |
+          cosign sign \
+            --yes \
+            ghcr.io/nextraceone/apihost:${{ github.event.inputs.version || github.ref_name }}
+
+      - name: Generate SBOM
+        run: |
+          syft ghcr.io/nextraceone/apihost:${{ github.event.inputs.version || github.ref_name }} \
+            --output spdx-json > sbom.json
+
+      - name: Upload SBOM as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sbom-${{ github.event.inputs.version || github.ref_name }}
+          path: sbom.json
+          retention-days: 90
+
+      - name: Vulnerability scan
+        run: |
+          grype sbom:./sbom.json --fail-on high --output json > vuln-report.json || true
+
+      - name: Upload vulnerability report
+        uses: actions/upload-artifact@v3
+        with:
+          name: vuln-report-${{ github.event.inputs.version || github.ref_name }}
+          path: vuln-report.json
+          retention-days: 30
+
+      - name: Verify signature
+        run: |
+          cosign verify \
+            ghcr.io/nextraceone/apihost:${{ github.event.inputs.version || github.ref_name }} \
+            --certificate-identity-regexp "https://github.com/nextraceone" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+
+      - name: Sign binary artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          # Build and publish binaries
+          dotnet publish src/platform/NexTraceOne.ApiHost/NexTraceOne.ApiHost.csproj \
+            -c Release \
+            -o ./publish
+          
+          # Sign each binary
+          for binary in ./publish/*.dll; do
+            cosign sign-blob \
+              --yes \
+              --output-signature "${binary}.sig" \
+              --output-certificate "${binary}.pem" \
+              "$binary"
+          done
+
+      - name: Upload signed binaries
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-artifact@v3
+        with:
+          name: signed-binaries-${{ github.event.inputs.version || github.ref_name }}
+          path: |
+            ./publish/*.dll
+            ./publish/*.sig
+            ./publish/*.pem
+          retention-days: 365

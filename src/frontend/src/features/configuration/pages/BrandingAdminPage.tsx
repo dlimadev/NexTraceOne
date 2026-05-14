@@ -85,6 +85,7 @@ export function BrandingAdminPage() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [previewTheme, setPreviewTheme] = useState<'light' | 'dark'>('dark');
 
+   
   useEffect(() => {
     if (data) {
       const initial: Record<string, string> = {};

@@ -84,7 +84,7 @@ public sealed class DependencyGovernanceEndpointModule
             return result.ToHttpResult(localizer);
         })
         .RequirePermission("catalog:dependencies:write")
-        .WithName("GenerateSbom")
+        .WithName("GenerateServiceSbom")
         .WithSummary("Generate SBOM for a service in the requested format");
 
         group.MapGet("/{serviceId:guid}/policies", async (

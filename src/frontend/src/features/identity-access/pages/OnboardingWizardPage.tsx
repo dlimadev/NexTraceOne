@@ -103,8 +103,8 @@ export function OnboardingWizardPage() {
       if (response.data.isCompleted || response.data.isSkipped) {
         navigate('/');
       }
-    } catch (error) {
-      console.error('Failed to fetch onboarding status:', error);
+    } catch {
+      // Erro tratado via toast - logging estruturado deve ser feito pelo backend
       toast({
         title: t('common.error'),
         description: t('onboarding.errors.fetchFailed'),
@@ -134,8 +134,8 @@ export function OnboardingWizardPage() {
           setTimeout(() => navigate('/'), 1500);
         }
       }
-    } catch (error) {
-      console.error('Failed to complete step:', error);
+    } catch {
+      // Erro tratado via toast - logging estruturado deve ser feito pelo backend
       toast({
         title: t('common.error'),
         description: t('onboarding.errors.stepFailed'),
@@ -159,8 +159,8 @@ export function OnboardingWizardPage() {
       });
       
       navigate('/');
-    } catch (error) {
-      console.error('Failed to skip wizard:', error);
+    } catch {
+      // Erro tratado via toast - logging estruturado deve ser feito pelo backend
       toast({
         title: t('common.error'),
         description: t('onboarding.errors.skipFailed'),

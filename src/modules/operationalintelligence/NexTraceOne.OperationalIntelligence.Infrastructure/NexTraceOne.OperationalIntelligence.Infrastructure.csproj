@@ -21,6 +21,9 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ClickHouse.Client" />
+    <PackageReference Include="ClickHouse.Driver" />
+    <PackageReference Include="Dapper" />
     <PackageReference Include="Mapster" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />

@@ -27,7 +27,7 @@ function applyInlineFormatting(text: string): string {
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/`(.+?)`/g, '<code class="text-xs bg-gray-100 dark:bg-gray-800 px-0.5 rounded font-mono">$1</code>')
     .replace(
-      /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+      /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
       '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-accent underline">$1</a>',
     );
 }

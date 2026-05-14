@@ -94,7 +94,7 @@ public sealed class OidcCallbackTests
         var result = await handler.Handle(cmd, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Code.Should().Be("identity.oidcProviderNotConfigured");
+        result.Error.Code.Should().Be("Identity.Oidc.ProviderNotConfigured");
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public sealed class OidcCallbackTests
         var result = await handler.Handle(cmd, CancellationToken.None);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Code.Should().Be("identity.oidcCallbackFailed");
+        result.Error.Code.Should().Be("Identity.Oidc.CallbackFailed");
         auditRecorder.Received(1).RecordOidcCallbackFailure(
             Arg.Any<TenantId>(),
             Provider,

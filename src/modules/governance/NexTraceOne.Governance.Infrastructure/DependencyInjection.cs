@@ -16,6 +16,7 @@ using NexTraceOne.Governance.Infrastructure.Observability;
 using NexTraceOne.Governance.Infrastructure.Persistence;
 using NexTraceOne.Governance.Infrastructure.Persistence.Providers;
 using NexTraceOne.Governance.Infrastructure.Persistence.Repositories;
+using NexTraceOne.Governance.Infrastructure.Services;
 
 namespace NexTraceOne.Governance.Infrastructure;
 
@@ -178,6 +179,11 @@ public static class DependencyInjection
             new AiDashboardComposerService(
                 sp.GetService<IChatCompletionProvider>(),
                 sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AiDashboardComposerService>>()));
+
+        // Artifact Signing & SBOM Generation — Compliance & Security Governance
+        services.AddSingleton<ISignaturePolicy, DefaultSignaturePolicy>();
+        services.AddScoped<IArtifactSigner, CosignArtifactSigner>();
+        services.AddScoped<ISbomGenerator, SbomGeneratorService>();
 
         return services;
     }
