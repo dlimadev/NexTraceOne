@@ -26,7 +26,7 @@ public sealed class ServiceMaturityV2Tests
         ServiceTierType tier = ServiceTierType.Standard,
         string? docUrl = null)
     {
-        var svc = ServiceAsset.Create(name, "platform", team);
+        var svc = ServiceAsset.Create(name, "platform", team, Guid.NewGuid());
         svc.UpdateOwnership(team, techOwner, bizOwner);
         svc.SetTier(tier);
         if (docUrl is not null)
@@ -152,7 +152,7 @@ public sealed class ServiceMaturityV2Tests
     public async Task MaturityV2_Level_Nascente_When_Score_Below_40()
     {
         // No owners, no contracts, no docs, no ops, critical advisories
-        var svc = ServiceAsset.Create("ghost-svc", "platform", "lost-team");
+        var svc = ServiceAsset.Create("ghost-svc", "platform", "lost-team", Guid.NewGuid());
         svc.SetTier(ServiceTierType.Critical);
         var (svcRepo, linkRepo, apiRepo, contractRepo, vulnRepo) = SetupMocks(svc, criticalAdvisories: 5);
 

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Infrastructure.Persistence;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
@@ -6,13 +7,16 @@ using NexTraceOne.Catalog.Domain.Graph.Enums;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Repositories;
 
-internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
+internal sealed class ServiceAssetRepository(CatalogGraphDbContext context, ICurrentTenant currentTenant)
     : RepositoryBase<ServiceAsset, ServiceAssetId>(context), IServiceAssetRepository
 {
     private readonly CatalogGraphDbContext _context = context;
+    private readonly ICurrentTenant _currentTenant = currentTenant;
 
     public override async Task<ServiceAsset?> GetByIdAsync(ServiceAssetId id, CancellationToken ct = default)
-        => await _context.ServiceAssets.SingleOrDefaultAsync(svc => svc.Id == id, ct);
+        => await _context.ServiceAssets
+            .Where(svc => svc.TenantId == _currentTenant.Id)
+            .SingleOrDefaultAsync(svc => svc.Id == id, ct);
 
     /// <summary>
     /// Busca um ativo de serviço pelo Id com leitura somente (AsNoTracking).
@@ -22,15 +26,21 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
     public async Task<ServiceAsset?> GetDetailAsync(ServiceAssetId id, CancellationToken ct = default)
         => await _context.ServiceAssets
             .AsNoTracking()
+            .Where(svc => svc.TenantId == _currentTenant.Id)
             .SingleOrDefaultAsync(svc => svc.Id == id, ct);
 
     public async Task<ServiceAsset?> GetByNameAsync(string name, CancellationToken cancellationToken)
-        => await _context.ServiceAssets.SingleOrDefaultAsync(svc => svc.Name == name, cancellationToken);
+        => await _context.ServiceAssets
+            .Where(svc => svc.TenantId == _currentTenant.Id)
+            .SingleOrDefaultAsync(svc => svc.Name == name, cancellationToken);
 
     public async Task<IReadOnlyList<ServiceAsset>> ListAllAsync(CancellationToken cancellationToken)
-        => await _context.ServiceAssets.AsNoTracking().ToListAsync(cancellationToken);
+        => await _context.ServiceAssets
+            .AsNoTracking()
+            .Where(svc => svc.TenantId == _currentTenant.Id)
+            .ToListAsync(cancellationToken);
 
-    public async Task<IReadOnlyList<ServiceAsset>> ListFilteredAsync(
+    public async Task<(IReadOnlyList<ServiceAsset> Items, int TotalCount)> ListFilteredAsync(
         string? teamName,
         string? domain,
         ServiceType? serviceType,
@@ -38,9 +48,14 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
         LifecycleStatus? lifecycleStatus,
         ExposureType? exposureType,
         string? searchTerm,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken)
     {
-        var query = _context.ServiceAssets.AsNoTracking().AsQueryable();
+        var query = _context.ServiceAssets
+            .AsNoTracking()
+            .Where(svc => svc.TenantId == _currentTenant.Id)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(teamName))
             query = query.Where(s => s.TeamName == teamName);
@@ -71,7 +86,14 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
                 EF.Functions.Like(s.Description, pattern));
         }
 
-        return await query.OrderBy(s => s.Name).ToListAsync(cancellationToken);
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .OrderBy(s => s.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task<IReadOnlyList<ServiceAsset>> SearchAsync(string searchTerm, CancellationToken cancellationToken)
@@ -84,26 +106,16 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
 
         return await _context.ServiceAssets
             .AsNoTracking()
-            .Select(s => new
-            {
-                Service = s,
-                SearchVector = EF.Functions.ToTsVector(
-                    "simple",
-                    (s.Name ?? string.Empty) + " " +
-                    (s.DisplayName ?? string.Empty) + " " +
-                    (s.Domain ?? string.Empty) + " " +
-                    (s.TeamName ?? string.Empty) + " " +
-                    (s.Description ?? string.Empty))
-            })
-            .Where(x => x.SearchVector.Matches(tsQuery))
-            .OrderByDescending(x => x.SearchVector.Rank(tsQuery))
-            .Select(x => x.Service)
+            .Where(s => s.TenantId == _currentTenant.Id)
+            .Where(s => s.SearchVector.Matches(tsQuery))
+            .OrderByDescending(s => s.SearchVector.Rank(tsQuery))
             .ToListAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<ServiceAsset>> ListByTeamAsync(string teamName, CancellationToken cancellationToken)
         => await _context.ServiceAssets
             .AsNoTracking()
+            .Where(s => s.TenantId == _currentTenant.Id)
             .Where(s => s.TeamName == teamName)
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);
@@ -111,6 +123,7 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
     public async Task<IReadOnlyList<ServiceAsset>> ListByDomainAsync(string domain, CancellationToken cancellationToken)
         => await _context.ServiceAssets
             .AsNoTracking()
+            .Where(s => s.TenantId == _currentTenant.Id)
             .Where(s => s.Domain == domain)
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);
@@ -118,15 +131,18 @@ internal sealed class ServiceAssetRepository(CatalogGraphDbContext context)
     public async Task<IReadOnlyList<ServiceAsset>> ListBySubDomainAsync(string subDomain, CancellationToken cancellationToken)
         => await _context.ServiceAssets
             .AsNoTracking()
+            .Where(s => s.TenantId == _currentTenant.Id)
             .Where(s => s.SubDomain == subDomain)
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);
 
     public async Task<int> CountByTeamAsync(string teamName, CancellationToken cancellationToken)
         => await _context.ServiceAssets
+            .Where(s => s.TenantId == _currentTenant.Id)
             .CountAsync(s => s.TeamName == teamName, cancellationToken);
 
     public async Task<int> CountByDomainAsync(string domain, CancellationToken cancellationToken)
         => await _context.ServiceAssets
+            .Where(s => s.TenantId == _currentTenant.Id)
             .CountAsync(s => s.Domain == domain, cancellationToken);
 }

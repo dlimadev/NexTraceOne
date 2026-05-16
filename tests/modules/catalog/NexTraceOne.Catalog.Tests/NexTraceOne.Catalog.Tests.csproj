@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\modules\catalog\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />

@@ -20,7 +20,7 @@ public sealed class PropagateHealthStatusTests
     private static (ApiAsset Api, ServiceAsset Owner) CreateApiWithOwner(
         string serviceName, string domain = "Domain")
     {
-        var owner = ServiceAsset.Create(serviceName, domain, "Team");
+        var owner = ServiceAsset.Create(serviceName, domain, "Team", Guid.NewGuid());
         var api = ApiAsset.Register(
             $"{serviceName}-api", $"/api/{serviceName}", "1.0.0", "Internal", owner);
         return (api, owner);

@@ -262,7 +262,7 @@ public sealed class ProductAnalyticsModuleServiceTests
     }
 
     private static IProductAnalyticsModule CreateSut(ProductAnalyticsDbContext db)
-        => new ProductAnalyticsModuleService(db);
+        => new ProductAnalyticsModuleService(db, new TestCurrentTenant());
 
     private static ProductAnalyticsDbContext CreateDbContext()
     {

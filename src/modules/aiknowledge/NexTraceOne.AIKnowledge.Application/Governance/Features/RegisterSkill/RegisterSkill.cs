@@ -59,8 +59,10 @@ public static class RegisterSkill
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var ownershipType = Enum.Parse<SkillOwnershipType>(request.OwnershipType, ignoreCase: true);
-            var visibility = Enum.Parse<SkillVisibility>(request.Visibility, ignoreCase: true);
+            if (!Enum.TryParse<SkillOwnershipType>(request.OwnershipType, ignoreCase: true, out var ownershipType))
+                return Error.Validation("Skill.InvalidOwnershipType", $"'{request.OwnershipType}' is not a valid skill ownership type.");
+            if (!Enum.TryParse<SkillVisibility>(request.Visibility, ignoreCase: true, out var visibility))
+                return Error.Validation("Skill.InvalidVisibility", $"'{request.Visibility}' is not a valid skill visibility.");
 
             var exists = await skillRepository.ExistsByNameAsync(request.Name, request.TenantId, cancellationToken);
             if (exists)

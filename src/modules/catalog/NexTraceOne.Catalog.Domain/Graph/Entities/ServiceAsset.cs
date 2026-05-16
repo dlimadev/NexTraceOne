@@ -1,10 +1,12 @@
 using Ardalis.GuardClauses;
 using NexTraceOne.BuildingBlocks.Core;
+using NexTraceOne.BuildingBlocks.Core.Attributes;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
+using NpgsqlTypes;
 
 namespace NexTraceOne.Catalog.Domain.Graph.Entities;
 
@@ -14,7 +16,7 @@ namespace NexTraceOne.Catalog.Domain.Graph.Entities;
 /// É o ponto de entrada para governança de contratos, confiança em mudanças e
 /// rastreabilidade operacional no NexTraceOne.
 /// </summary>
-public sealed class ServiceAsset : Entity<ServiceAssetId>
+public sealed class ServiceAsset : AuditableEntity<ServiceAssetId>
 {
     private ServiceAsset() { }
 
@@ -43,10 +45,15 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
     /// <summary>Equipa responsável pelo serviço.</summary>
     public string TeamName { get; private set; } = string.Empty;
 
+    /// <summary>Identificador do tenant ao qual o serviço pertence.</summary>
+    public Guid TenantId { get; private set; }
+
     /// <summary>Owner técnico do serviço (pessoa ou conta).</summary>
+    [EncryptedField]
     public string TechnicalOwner { get; private set; } = string.Empty;
 
     /// <summary>Owner de negócio do serviço (quando aplicável).</summary>
+    [EncryptedField]
     public string BusinessOwner { get; private set; } = string.Empty;
 
     // ── Classificação ─────────────────────────────────────────────────
@@ -59,6 +66,9 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
 
     /// <summary>Tipo de exposição do serviço (interno, externo, partner).</summary>
     public ExposureType ExposureType { get; private set; } = ExposureType.Internal;
+
+    /// <summary>Vetor de busca full-text (PostgreSQL tsvector) para pesquisa eficiente.</summary>
+    public NpgsqlTsVector SearchVector { get; private set; } = null!;
 
     // ── Governança ────────────────────────────────────────────────────
 
@@ -110,6 +120,7 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
     public string ProductOwner { get; private set; } = string.Empty;
 
     /// <summary>Canal de contacto da equipa (Slack, lista de e-mail).</summary>
+    [EncryptedField]
     public string ContactChannel { get; private set; } = string.Empty;
 
     /// <summary>Referência à rotação de on-call do serviço.</summary>
@@ -136,14 +147,15 @@ public sealed class ServiceAsset : Entity<ServiceAssetId>
     // ── Factory method ────────────────────────────────────────────────
 
     /// <summary>Cria um novo serviço no catálogo com os campos obrigatórios.</summary>
-    public static ServiceAsset Create(string name, string domain, string teamName)
+    public static ServiceAsset Create(string name, string domain, string teamName, Guid tenantId)
         => new()
         {
             Id = ServiceAssetId.New(),
             Name = Guard.Against.NullOrWhiteSpace(name),
             DisplayName = name,
             Domain = Guard.Against.NullOrWhiteSpace(domain),
-            TeamName = Guard.Against.NullOrWhiteSpace(teamName)
+            TeamName = Guard.Against.NullOrWhiteSpace(teamName),
+            TenantId = tenantId
         };
 
     // ── Mutações controladas ──────────────────────────────────────────

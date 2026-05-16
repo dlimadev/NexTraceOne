@@ -75,7 +75,7 @@ public sealed class AiAgentExecution : AuditableEntity<AiAgentExecutionId>
     public string ContextJson { get; private set; } = string.Empty;
 
     /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     /// <summary>Cria uma nova execução de agent.</summary>
     public static AiAgentExecution Start(

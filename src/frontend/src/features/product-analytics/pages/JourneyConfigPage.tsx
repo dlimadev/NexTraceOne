@@ -309,7 +309,7 @@ export function JourneyConfigPage() {
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 text-muted">
-                          <XCircle className="w-3 h-3" /> Inactive
+                          <XCircle className="w-3 h-3" /> {t('analytics.journeyConfig.inactive')}
                         </span>
                       )}
                     </td>

@@ -1,0 +1,980 @@
+version=1
+
+# This file caches language service data to improve the performance of C# Dev Kit.
+# It is not intended for manual editing. It can safely be deleted and will be
+# regenerated automatically. For more information, see https://aka.ms/lscache
+#
+# To control where cache files are stored, use the following VS Code setting:
+#   "dotnet.projectsystem.cacheInProjectFolder": true
+
+[project]
+language=C#
+primary
+lastDtbSucceeded
+
+[properties]
+AssemblyName=NexTraceOne.Catalog.Application
+CommandLineArgsForDesignTimeEvaluation=-langversion:latest -define:TRACE -doc:"obj\Debug\net10.0\NexTraceOne.Catalog.Application.xml"
+CompilerGeneratedFilesOutputPath=
+MaxSupportedLangVersion=14.0
+ProjectAssetsFile=<PATH>obj/project.assets.json
+RootNamespace=NexTraceOne.Catalog.Application
+RunAnalyzers=
+RunAnalyzersDuringLiveAnalysis=
+SolutionPath=<PATH>../../../../NexTraceOne.sln
+TargetFrameworkIdentifier=.NETCoreApp
+TargetPath=<PATH>bin/Debug/net10.0/NexTraceOne.Catalog.Application.dll
+TargetRefPath=<PATH>obj/Debug/net10.0/ref/NexTraceOne.Catalog.Application.dll
+TemporaryDependencyNodeTargetIdentifier=net10.0
+
+[commandLineArguments]
+/noconfig
+/unsafe-
+/checked-
+/nowarn:1591,CA1848,CA1873,CS8907,CA1716,CA1720,CA1859,CA1000,CA1304,CA1305,CA1310,CA1311,CA1711,CA1805,CA2016,CA1822,CA1861,CA1862,CS9113,CS1570,CS1574,CS1587,IDE0161,CA1707,CA5350,CA1725,CA1869,CS1573,CA1825,CA1860,CA1865,MSB3277,NU1902,NU1603,1701,1702,8002
+/fullpaths
+/nostdlib+
+/errorreport:prompt
+/warn:10
+/doc:obj\Debug\net10.0\NexTraceOne.Catalog.Application.xml
+/define:TRACE;DEBUG;NET;NET10_0;NETCOREAPP;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP1_0_OR_GREATER;NETCOREAPP1_1_OR_GREATER;NETCOREAPP2_0_OR_GREATER;NETCOREAPP2_1_OR_GREATER;NETCOREAPP2_2_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER
+/highentropyva+
+/nullable:enable
+/features:"InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated"
+/debug+
+/debug:portable
+/filealign:512
+/optimize-
+/out:obj\Debug\net10.0\NexTraceOne.Catalog.Application.dll
+/refout:obj\Debug\net10.0\refint\NexTraceOne.Catalog.Application.dll
+/target:library
+/warnaserror+
+/utf8output
+/deterministic+
+/langversion:latest
+/warnaserror+:NU1605,SYSLIB0011
+/warnaserror-:NU1903
+
+[sourceFiles]
+ConfigurationKeys/CatalogConfigKeys.cs
+Contracts/Abstractions/
+ IApiVersionStrategyReader.cs
+ IBackgroundServiceContractDetailRepository.cs
+ IBackgroundServiceDraftMetadataRepository.cs
+ IBreakingChangeImpactReader.cs
+ IBreakingChangeProposalRepository.cs
+ ICanonicalEntityRepository.cs
+ ICanonicalEntityVersionRepository.cs
+ IConsumerExpectationRepository.cs
+ IContractChangelogRepository.cs
+ IContractCompatibilityReader.cs
+ IContractComplianceGateRepository.cs
+ IContractComplianceResultRepository.cs
+ IContractConsumerInventoryRepository.cs
+ IContractDeploymentRepository.cs
+ IContractDeprecationForecastReader.cs
+ IContractDeprecationPipelineReader.cs
+ IContractDraftRepository.cs
+ IContractDriftReader.cs
+ IContractHealthScoreRepository.cs
+ IContractListingRepository.cs
+ IContractNegotiationRepository.cs
+ IContractReviewRepository.cs
+ IContractsUnitOfWork.cs
+ IContractTestReader.cs
+ IContractVerificationRepository.cs
+ IContractVersionHistoryReader.cs
+ IContractVersionRepository.cs
+ ICriticalPathReader.cs
+ IDataContractRepository.cs
+ IDataContractSchemaRepository.cs
+ IDependencyProvenanceReader.cs
+ IDependencyVersionAlignmentReader.cs
+ IDeprecationScheduleRepository.cs
+ IDocumentationHealthReader.cs
+ IEventComplianceReader.cs
+ IEventContractDetailRepository.cs
+ IEventDraftMetadataRepository.cs
+ IEventProducerConsumerReader.cs
+ IEventSchemaEvolutionReader.cs
+ IExperimentGovernanceReader.cs
+ IFeatureFlagRepository.cs
+ IFeatureFlagRiskReader.cs
+ IGraphQlSchemaSnapshotRepository.cs
+ IHighTrafficEndpointReader.cs
+ IImpactSimulationRepository.cs
+ IMarketplaceReviewRepository.cs
+ INegotiationCommentRepository.cs
+ IPipelineExecutionRepository.cs
+ IProtobufSchemaSnapshotRepository.cs
+ ISbomCoverageReader.cs
+ ISbomRepository.cs
+ ISchemaEvolutionAdviceRepository.cs
+ ISchemaEvolutionSafetyReader.cs
+ ISchemaQualityReader.cs
+ ISecurityPatchComplianceReader.cs
+ ISemanticDiffResultRepository.cs
+ IServiceTopologyReader.cs
+ ISoapContractDetailRepository.cs
+ ISoapDraftMetadataRepository.cs
+ ISupplyChainRiskReader.cs
+ ITrafficObservationReader.cs
+ IVulnerabilityExposureReader.cs
+Contracts/
+ DependencyInjection.cs
+ Features/
+  AddDraftExample/AddDraftExample.cs
+  AddNegotiationComment/AddNegotiationComment.cs
+  AnalyzeDataContractSchema/AnalyzeDataContractSchema.cs
+  AnalyzeGraphQlSchema/AnalyzeGraphQlSchema.cs
+  AnalyzeProtobufSchema/AnalyzeProtobufSchema.cs
+  AnalyzeSchemaEvolution/AnalyzeSchemaEvolution.cs
+  ApproveContractChangelog/ApproveContractChangelog.cs
+  ApproveDraft/ApproveDraft.cs
+  ClassifyBreakingChange/ClassifyBreakingChange.cs
+  ComputeContractHealthDashboard/ComputeContractHealthDashboard.cs
+  ComputeSemanticDiff/ComputeSemanticDiff.cs
+  CreateBackgroundServiceDraft/CreateBackgroundServiceDraft.cs
+  CreateComplianceGate/CreateComplianceGate.cs
+  CreateContractNegotiation/CreateContractNegotiation.cs
+  CreateContractVersion/CreateContractVersion.cs
+  CreateDraft/CreateDraft.cs
+  CreateEventDraft/CreateEventDraft.cs
+  CreateSoapDraft/CreateSoapDraft.cs
+  DeprecateContractVersion/DeprecateContractVersion.cs
+  DetectContractDrift/DetectContractDrift.cs
+  DetectGraphQlBreakingChanges/DetectGraphQlBreakingChanges.cs
+  DetectProtobufBreakingChanges/DetectProtobufBreakingChanges.cs
+  DiffCanonicalEntityVersions/DiffCanonicalEntityVersions.cs
+  EvaluateContractCompliance/EvaluateContractCompliance.cs
+  EvaluateContractRules/EvaluateContractRules.cs
+  EvaluateDesignGuidelines/EvaluateDesignGuidelines.cs
+  ExecuteContractPipeline/ExecuteContractPipeline.cs
+  ExportContract/ExportContract.cs
+  ExportContractMultiFormat/ExportContractMultiFormat.cs
+  ExportDraft/ExportDraft.cs
+  GenerateContractChangelog/GenerateContractChangelog.cs
+  GenerateDraftFromAi/GenerateDraftFromAi.cs
+  GenerateEvidencePack/GenerateEvidencePack.cs
+  GenerateMigrationPatch/GenerateMigrationPatch.cs
+  GenerateMockConfiguration/GenerateMockConfiguration.cs
+  GenerateScorecard/GenerateScorecard.cs
+  GenerateSemanticChangelog/GenerateSemanticChangelog.cs
+  GenerateSemanticDiff/GenerateSemanticDiff.cs
+  GetApiBackwardCompatibilityReport/GetApiBackwardCompatibilityReport.cs
+  GetApiSchemaCoverageReport/GetApiSchemaCoverageReport.cs
+  GetApiSchemaStabilityReport/GetApiSchemaStabilityReport.cs
+  GetApiVersionStrategyReport/GetApiVersionStrategyReport.cs
+  GetBackgroundServiceContractDetail/GetBackgroundServiceContractDetail.cs
+  GetCanonicalEntityImpact/GetCanonicalEntityImpact.cs
+  GetCanonicalEntityImpactCascade/GetCanonicalEntityImpactCascade.cs
+  GetCanonicalEntityUsages/GetCanonicalEntityUsages.cs
+  GetCompatibilityAssessment/GetCompatibilityAssessment.cs
+  GetComplianceStatus/GetComplianceStatus.cs
+  GetContractAdoptionReport/GetContractAdoptionReport.cs
+  GetContractChangelog/GetContractChangelog.cs
+  GetContractConsumerExpectations/GetContractConsumerExpectations.cs
+  GetContractConsumerImpactReport/GetContractConsumerImpactReport.cs
+  GetContractConsumerInventory/GetContractConsumerInventory.cs
+  GetContractDeployments/GetContractDeployments.cs
+  GetContractDeprecationForecast/GetContractDeprecationForecast.cs
+  GetContractDeprecationPipelineReport/GetContractDeprecationPipelineReport.cs
+  GetContractDriftFromRealityReport/GetContractDriftFromRealityReport.cs
+  GetContractEnvironmentVersionDrift/GetContractEnvironmentVersionDrift.cs
+  GetContractHealthDistributionReport/GetContractHealthDistributionReport.cs
+  GetContractHealthScore/GetContractHealthScore.cs
+  GetContractHealthTimeline/GetContractHealthTimeline.cs
+  GetContractHistory/GetContractHistory.cs
+  GetContractLineageReport/GetContractLineageReport.cs
+  GetContractListing/GetContractListing.cs
+  GetContractNegotiation/GetContractNegotiation.cs
+  GetContractsSummary/GetContractsSummary.cs
+  GetContractTestCoverageReport/GetContractTestCoverageReport.cs
+  GetContractVerificationDetail/GetContractVerificationDetail.cs
+  GetContractVersionDetail/GetContractVersionDetail.cs
+  GetContractVersioningReport/GetContractVersioningReport.cs
+  GetCriticalPathReport/GetCriticalPathReport.cs
+  GetDataContractComplianceReport/GetDataContractComplianceReport.cs
+  GetDataContractSchemaHistory/GetDataContractSchemaHistory.cs
+  GetDependencyProvenanceReport/GetDependencyProvenanceReport.cs
+  GetDependencyUpdateFreshnessReport/GetDependencyUpdateFreshnessReport.cs
+  GetDependencyVersionAlignmentReport/GetDependencyVersionAlignmentReport.cs
+  GetDeprecationProgress/GetDeprecationProgress.cs
+  GetDocumentationHealthReport/GetDocumentationHealthReport.cs
+  GetDraft/GetDraft.cs
+  GetEventContractComplianceReport/GetEventContractComplianceReport.cs
+  GetEventContractDetail/GetEventContractDetail.cs
+  GetEventProducerConsumerBalanceReport/GetEventProducerConsumerBalanceReport.cs
+  GetEventSchemaEvolutionReport/GetEventSchemaEvolutionReport.cs
+  GetExperimentGovernanceReport/GetExperimentGovernanceReport.cs
+  GetFeatureFlagInventoryReport/GetFeatureFlagInventoryReport.cs
+  GetFeatureFlagRiskReport/GetFeatureFlagRiskReport.cs
+  GetGraphQlSchemaHistory/GetGraphQlSchemaHistory.cs
+  GetHighTrafficEndpointRiskReport/GetHighTrafficEndpointRiskReport.cs
+  GetImpactSimulation/GetImpactSimulation.cs
+  GetPipelineExecution/GetPipelineExecution.cs
+  GetProtobufSchemaHistory/GetProtobufSchemaHistory.cs
+  GetRuntimeTrafficContractDeviationReport/GetRuntimeTrafficContractDeviationReport.cs
+  GetSbomCoverageReport/GetSbomCoverageReport.cs
+  GetSchemaBreakingChangeImpactReport/GetSchemaBreakingChangeImpactReport.cs
+  GetSchemaEvolutionAdvice/GetSchemaEvolutionAdvice.cs
+  GetSchemaEvolutionSafetyReport/GetSchemaEvolutionSafetyReport.cs
+  GetSchemaQualityIndexReport/GetSchemaQualityIndexReport.cs
+  GetSecurityPatchComplianceReport/GetSecurityPatchComplianceReport.cs
+  GetSemanticDiff/GetSemanticDiff.cs
+  GetServiceApiGrowthReport/GetServiceApiGrowthReport.cs
+  GetServiceTopologyHealthReport/GetServiceTopologyHealthReport.cs
+  GetSoapContractDetail/GetSoapContractDetail.cs
+  GetSupplyChainRiskReport/GetSupplyChainRiskReport.cs
+  GetVulnerabilityExposureReport/GetVulnerabilityExposureReport.cs
+  ImportAsyncApiContract/ImportAsyncApiContract.cs
+  ImportContract/ImportContract.cs
+  ImportWsdlContract/ImportWsdlContract.cs
+  InferDependenciesFromContracts/InferDependenciesFromContracts.cs
+  IngestFeatureFlagState/IngestFeatureFlagState.cs
+  IngestSbomRecord/IngestSbomRecord.cs
+  InitiateContractDeprecation/InitiateContractDeprecation.cs
+  ListCanonicalEntityVersions/ListCanonicalEntityVersions.cs
+  ListComplianceViolations/ListComplianceViolations.cs
+  ListContractChangelogs/ListContractChangelogs.cs
+  ListContractNegotiations/ListContractNegotiations.cs
+  ListContracts/ListContracts.cs
+  ListContractsByService/ListContractsByService.cs
+  ListContractsWithHealthBelowThreshold/ListContractsWithHealthBelowThreshold.cs
+  ListContractVerifications/ListContractVerifications.cs
+  ListDraftReviews/ListDraftReviews.cs
+  ListDrafts/ListDrafts.cs
+  ListImpactSimulations/ListImpactSimulations.cs
+  ListPipelineExecutions/ListPipelineExecutions.cs
+  ListRuleViolations/ListRuleViolations.cs
+  ListSchemaEvolutionAdvices/ListSchemaEvolutionAdvices.cs
+  ListSemanticDiffs/ListSemanticDiffs.cs
+  LockContractVersion/LockContractVersion.cs
+  ParseSpecPreview/ParseSpecPreview.cs
+  PropagateCanonicalEntityChange/PropagateCanonicalEntityChange.cs
+  ProposeBreakingChange/ProposeBreakingChange.cs
+  PublishDraft/PublishDraft.cs
+  PublishToMarketplace/PublishToMarketplace.cs
+  RecalculateContractHealthScore/RecalculateContractHealthScore.cs
+  RegisterBackgroundServiceContract/RegisterBackgroundServiceContract.cs
+  RegisterConsumerExpectation/RegisterConsumerExpectation.cs
+  RegisterContractDeployment/RegisterContractDeployment.cs
+  RegisterDataContract/RegisterDataContract.cs
+  RejectDraft/RejectDraft.cs
+  RespondToBreakingChangeProposal/RespondToBreakingChangeProposal.cs
+  ScheduleContractDeprecation/ScheduleContractDeprecation.cs
+  SearchCanonicalEntities/SearchCanonicalEntities.cs
+  SearchContracts/SearchContracts.cs
+  SearchMarketplace/SearchMarketplace.cs
+  SignContractVersion/SignContractVersion.cs
+  SimulateContractChangeImpact/SimulateContractChangeImpact.cs
+  SimulateDependencyImpact/SimulateDependencyImpact.cs
+  SubmitContractReview/SubmitContractReview.cs
+  SubmitDraftForReview/SubmitDraftForReview.cs
+  SuggestSchemaFromContext/SuggestSchemaFromContext.cs
+  SuggestSemanticVersion/SuggestSemanticVersion.cs
+  SyncContracts/SyncContracts.cs
+  TransitionLifecycleState/TransitionLifecycleState.cs
+  UpdateDraftContent/UpdateDraftContent.cs
+  UpdateDraftMetadata/UpdateDraftMetadata.cs
+  ValidateContractIntegrity/ValidateContractIntegrity.cs
+  ValidateContractPublicationReadiness/ValidateContractPublicationReadiness.cs
+  ValidateDraftSpec/ValidateDraftSpec.cs
+  VerifyContractCompliance/VerifyContractCompliance.cs
+  VerifyProviderCompatibility/VerifyProviderCompatibility.cs
+  VerifySignature/VerifySignature.cs
+ NullApiVersionStrategyReader.cs
+ NullBreakingChangeImpactReader.cs
+ NullContractCompatibilityReader.cs
+ NullContractDeprecationForecastReader.cs
+ NullContractDeprecationPipelineReader.cs
+ NullContractDriftReader.cs
+ NullContractTestReader.cs
+ NullCriticalPathReader.cs
+ NullDataContractRepository.cs
+ NullDependencyProvenanceReader.cs
+ NullDependencyVersionAlignmentReader.cs
+ NullDeprecationScheduleRepository.cs
+ NullDocumentationHealthReader.cs
+ NullExperimentGovernanceReader.cs
+ NullFeatureFlagRepository.cs
+ NullFeatureFlagRiskReader.cs
+ NullHighTrafficEndpointReader.cs
+ NullSbomCoverageReader.cs
+ NullSbomRepository.cs
+ NullSchemaEvolutionSafetyReader.cs
+ NullSchemaQualityReader.cs
+ NullSecurityPatchComplianceReader.cs
+ NullServiceTopologyReader.cs
+ NullSupplyChainRiskReader.cs
+ NullTrafficObservationReader.cs
+ NullVulnerabilityExposureReader.cs
+DependencyGovernance/
+ Abstractions/IDependencyGovernanceUnitOfWork.cs
+ DependencyInjection.cs
+ Features/
+  CheckDependencyPolicies/CheckDependencyPolicies.cs
+  CompareDependencyVersions/CompareDependencyVersions.cs
+  DetectLicenseConflicts/DetectLicenseConflicts.cs
+  EvaluateVulnerabilityPromotionGate/
+   EvaluateVulnerabilityPromotionGate.cs
+   VulnerabilityConfigKeys.cs
+  GenerateSbom/GenerateSbom.cs
+  GetDependencyHealthDashboard/GetDependencyHealthDashboard.cs
+  GetServiceDependencyProfile/GetServiceDependencyProfile.cs
+  GetServiceVulnerabilityGateSummary/GetServiceVulnerabilityGateSummary.cs
+  GetTemplateDependencyHealth/GetTemplateDependencyHealth.cs
+  IngestAdvisoryReport/IngestAdvisoryReport.cs
+  ListVulnerableDependencies/ListVulnerableDependencies.cs
+  ScanServiceDependencies/ScanServiceDependencies.cs
+  SuggestDependencyUpgrades/SuggestDependencyUpgrades.cs
+ Ports/
+  IServiceDependencyProfileRepository.cs
+  IVulnerabilityAdvisoryRepository.cs
+DeveloperExperience/Abstractions/
+ IDeveloperExperienceUnitOfWork.cs
+ IDeveloperSurveyRepository.cs
+ IDxScoreRepository.cs
+ IIdeContextReader.cs
+ IIDEUsageRepository.cs
+ IProductivitySnapshotRepository.cs
+DeveloperExperience/
+ DependencyInjection.cs
+ Features/
+  ComputeDeveloperExperienceScore/ComputeDeveloperExperienceScore.cs
+  GetDeveloperExperienceScore/GetDeveloperExperienceScore.cs
+  GetDeveloperNpsSummary/GetDeveloperNpsSummary.cs
+  GetIdeContractContext/GetIdeContractContext.cs
+  GetIdeServiceContext/GetIdeServiceContext.cs
+  ListDeveloperExperienceScores/ListDeveloperExperienceScores.cs
+  RecordIdeUsage/RecordIdeUsage.cs
+  RecordProductivitySnapshot/RecordProductivitySnapshot.cs
+  SubmitDeveloperSurvey/SubmitDeveloperSurvey.cs
+ Services/NullIdeContextReader.cs
+Graph/Abstractions/
+ IApiAssetRepository.cs
+ ICatalogGraphUnitOfWork.cs
+ IContractBindingRepository.cs
+ IDiscoveredServiceRepository.cs
+ IDiscoveryMatchRuleRepository.cs
+ IDiscoveryRunRepository.cs
+ IFrameworkAssetDetailRepository.cs
+ IGraphSnapshotRepository.cs
+ IKnowledgeRelationReader.cs
+ INodeHealthRepository.cs
+ ISavedGraphViewRepository.cs
+ IServiceAssetRepository.cs
+ IServiceDiscoveryProvider.cs
+ IServiceInterfaceRepository.cs
+ IServiceLinkRepository.cs
+Graph/ConfigurationKeys/
+ BackstageBridgeConfigKeys.cs
+ ServiceCatalogConfigKeys.cs
+Graph/
+ DependencyInjection.cs
+ Features/
+  AddServiceLink/AddServiceLink.cs
+  BindContractToInterface/BindContractToInterface.cs
+  ComputeServiceMaturity/ComputeServiceMaturity.cs
+  CreateGraphSnapshot/CreateGraphSnapshot.cs
+  CreateSavedView/CreateSavedView.cs
+  CreateServiceInterface/CreateServiceInterface.cs
+  DeactivateContractBinding/DeactivateContractBinding.cs
+  DecommissionAsset/DecommissionAsset.cs
+  DeprecateServiceInterface/DeprecateServiceInterface.cs
+  DetectCircularDependencies/DetectCircularDependencies.cs
+  DetectOwnershipDrift/DetectOwnershipDrift.cs
+  ExportToBackstage/ExportToBackstage.cs
+  GetAssetDetail/GetAssetDetail.cs
+  GetAssetGraph/GetAssetGraph.cs
+  GetDependencyRiskReport/GetDependencyRiskReport.cs
+  GetDiscoveryDashboard/GetDiscoveryDashboard.cs
+  GetFrameworkDetail/GetFrameworkDetail.cs
+  GetImpactPropagation/GetImpactPropagation.cs
+  GetKnowledgeRelationGraph/GetKnowledgeRelationGraph.cs
+  GetLatestTopologySnapshot/GetLatestTopologySnapshot.cs
+  GetNodeHealth/GetNodeHealth.cs
+  GetOwnershipAudit/GetOwnershipAudit.cs
+  GetOwnershipDriftReport/GetOwnershipDriftReport.cs
+  GetServiceApiExposureReport/GetServiceApiExposureReport.cs
+  GetServiceCouplingIndexReport/GetServiceCouplingIndexReport.cs
+  GetServiceDetail/GetServiceDetail.cs
+  GetServiceInterfaceById/GetServiceInterfaceById.cs
+  GetServiceMaturityBenchmark/GetServiceMaturityBenchmark.cs
+  GetServiceMaturityDashboard/GetServiceMaturityDashboard.cs
+  GetServiceMaturityScoreV2/GetServiceMaturityScoreV2.cs
+  GetServiceOwnershipHealthReport/GetServiceOwnershipHealthReport.cs
+  GetServicesSummary/GetServicesSummary.cs
+  GetServiceTierPolicy/GetServiceTierPolicy.cs
+  GetSubgraph/GetSubgraph.cs
+  GetTemporalDiff/GetTemporalDiff.cs
+  IgnoreDiscoveredService/IgnoreDiscoveredService.cs
+  ImportFromBackstage/ImportFromBackstage.cs
+  ImportFromKongGateway/ImportFromKongGateway.cs
+  InferDependencyFromOtel/InferDependencyFromOtel.cs
+  ListContractBindingsByInterface/ListContractBindingsByInterface.cs
+  ListDiscoveredServices/ListDiscoveredServices.cs
+  ListFrameworkConsumers/ListFrameworkConsumers.cs
+  ListSavedViews/ListSavedViews.cs
+  ListServiceInterfaces/ListServiceInterfaces.cs
+  ListServiceLinks/ListServiceLinks.cs
+  ListServices/ListServices.cs
+  ListSnapshots/ListSnapshots.cs
+  MapConsumerRelationship/MapConsumerRelationship.cs
+  MatchDiscoveredService/MatchDiscoveredService.cs
+  PropagateHealthStatus/PropagateHealthStatus.cs
+  PublishFrameworkVersion/PublishFrameworkVersion.cs
+  RegisterApiAsset/RegisterApiAsset.cs
+  RegisterFrameworkDetail/RegisterFrameworkDetail.cs
+  RegisterFromDiscovery/RegisterFromDiscovery.cs
+  RegisterServiceAsset/RegisterServiceAsset.cs
+  RemoveServiceLink/RemoveServiceLink.cs
+  ReviewServiceOwnership/ReviewServiceOwnership.cs
+  RunServiceDiscovery/RunServiceDiscovery.cs
+  SearchAssets/SearchAssets.cs
+  SearchServices/SearchServices.cs
+  SetServiceTier/SetServiceTier.cs
+  SimulateServiceFailureImpact/SimulateServiceFailureImpact.cs
+  SyncConsumers/SyncConsumers.cs
+  TransitionServiceLifecycle/TransitionServiceLifecycle.cs
+  UpdateAssetMetadata/UpdateAssetMetadata.cs
+  UpdateFrameworkDetail/UpdateFrameworkDetail.cs
+  UpdateServiceAsset/UpdateServiceAsset.cs
+  UpdateServiceLink/UpdateServiceLink.cs
+  UpdateServiceOwnership/UpdateServiceOwnership.cs
+  ValidateDiscoveredDependency/ValidateDiscoveredDependency.cs
+ Services/NullKnowledgeRelationReader.cs
+LegacyAssets/Abstractions/
+ ICicsTransactionRepository.cs
+ ICobolProgramRepository.cs
+ ICopybookRepository.cs
+ ICopybookVersionRepository.cs
+ IDb2ArtifactRepository.cs
+ IImsTransactionRepository.cs
+ ILegacyAssetsUnitOfWork.cs
+ IMainframeSystemRepository.cs
+ IZosConnectBindingRepository.cs
+LegacyAssets/Features/
+ DiffCopybookVersions/DiffCopybookVersions.cs
+ GetLegacyAssetDetail/GetLegacyAssetDetail.cs
+ ImportCopybookLayout/ImportCopybookLayout.cs
+ ListLegacyAssets/ListLegacyAssets.cs
+ RegisterCicsTransaction/RegisterCicsTransaction.cs
+ RegisterCobolProgram/RegisterCobolProgram.cs
+ RegisterCopybook/RegisterCopybook.cs
+ RegisterDb2Artifact/RegisterDb2Artifact.cs
+ RegisterImsTransaction/RegisterImsTransaction.cs
+ RegisterMainframeSystem/RegisterMainframeSystem.cs
+ RegisterZosConnectBinding/RegisterZosConnectBinding.cs
+ SyncLegacyAssets/SyncLegacyAssets.cs
+obj/Debug/net10.0/
+ .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+ NexTraceOne.Catalog.Application.AssemblyInfo.cs
+ NexTraceOne.Catalog.Application.GlobalUsings.g.cs
+Portal/Abstractions/
+ IApiKeyRepository.cs
+ IApiRateLimitPolicyRepository.cs
+ ICodeGenerationRepository.cs
+ IContractPublicationEntryRepository.cs
+ IPlaygroundSessionRepository.cs
+ IPortalAnalyticsRepository.cs
+ IPortalUnitOfWork.cs
+ ISavedSearchRepository.cs
+ ISubscriptionRepository.cs
+Portal/ContractPipeline/Features/
+ GenerateClientSdkFromContract/GenerateClientSdkFromContract.cs
+ GenerateContractTests/GenerateContractTests.cs
+ GenerateMockServer/GenerateMockServer.cs
+ GeneratePostmanCollection/GeneratePostmanCollection.cs
+ GenerateServerFromContract/GenerateServerFromContract.cs
+ OrchestrateContractPipeline/OrchestrateContractPipeline.cs
+Portal/ContractPipeline/Shared/
+ GeneratedFile.cs
+ PipelinePreviewNote.cs
+Portal/
+ DependencyInjection.cs
+ Features/
+  ApproveSubscription/ApproveSubscription.cs
+  AutoRegisterScaffoldedService/AutoRegisterScaffoldedService.cs
+  CreateApiKey/CreateApiKey.cs
+  CreateSubscription/CreateSubscription.cs
+  DeleteSubscription/DeleteSubscription.cs
+  GenerateCode/GenerateCode.cs
+  GetApiConsumers/GetApiConsumers.cs
+  GetApiDetail/GetApiDetail.cs
+  GetApiHealth/GetApiHealth.cs
+  GetApisIConsume/GetApisIConsume.cs
+  GetApiUsageAnalytics/GetApiUsageAnalytics.cs
+  GetAssetTimeline/GetAssetTimeline.cs
+  GetContractPublicationStatus/GetContractPublicationStatus.cs
+  GetMyApis/GetMyApis.cs
+  GetPlaygroundHistory/GetPlaygroundHistory.cs
+  GetPortalAnalytics/GetPortalAnalytics.cs
+  GetPublicationCenterEntries/GetPublicationCenterEntries.cs
+  GetRateLimitPolicy/GetRateLimitPolicy.cs
+  GetSubscriptions/GetSubscriptions.cs
+  ListApiKeys/ListApiKeys.cs
+  PublishContractToPortal/PublishContractToPortal.cs
+  PushToRepository/PushToRepository.cs
+  RecordAnalyticsEvent/RecordAnalyticsEvent.cs
+  RejectSubscription/RejectSubscription.cs
+  RenderOpenApiContract/RenderOpenApiContract.cs
+  RevokeApiKey/RevokeApiKey.cs
+  SearchCatalog/SearchCatalog.cs
+  SetRateLimitPolicy/SetRateLimitPolicy.cs
+  ValidateApiKey/ValidateApiKey.cs
+  WithdrawContractFromPortal/WithdrawContractFromPortal.cs
+Services/Abstractions/
+ ICatalogHealthMaintenanceReader.cs
+ IMigrationProgressReader.cs
+ IOnboardingHealthReader.cs
+ IRetirementReadinessReader.cs
+ ISecretsExposureReader.cs
+ IServiceLifecycleReader.cs
+ IUncatalogedServicesReader.cs
+Services/
+ DependencyInjection.cs
+ Features/
+  GetCatalogHealthMaintenanceReport/GetCatalogHealthMaintenanceReport.cs
+  GetOnboardingHealthReport/GetOnboardingHealthReport.cs
+  GetSecretsExposureRiskReport/GetSecretsExposureRiskReport.cs
+  GetServiceLifecycleTransitionReport/GetServiceLifecycleTransitionReport.cs
+  GetServiceMigrationProgressReport/GetServiceMigrationProgressReport.cs
+  GetServiceRetirementReadinessReport/GetServiceRetirementReadinessReport.cs
+  GetUncatalogedServicesReport/GetUncatalogedServicesReport.cs
+ NullCatalogHealthMaintenanceReader.cs
+ NullMigrationProgressReader.cs
+ NullOnboardingHealthReader.cs
+ NullRetirementReadinessReader.cs
+ NullSecretsExposureReader.cs
+ NullServiceLifecycleReader.cs
+ NullUncatalogedServicesReader.cs
+SourceOfTruth/
+ Abstractions/ILinkedReferenceRepository.cs
+ DependencyInjection.cs
+ Features/
+  ComputeServiceScorecard/ComputeServiceScorecard.cs
+  GetContractSourceOfTruth/GetContractSourceOfTruth.cs
+  GetServiceCoverage/GetServiceCoverage.cs
+  GetServiceSourceOfTruth/GetServiceSourceOfTruth.cs
+  GlobalSearch/GlobalSearch.cs
+  SearchSourceOfTruth/SearchSourceOfTruth.cs
+Templates/Abstractions/
+ IServiceTemplateRepository.cs
+ ITemplatesUnitOfWork.cs
+Templates/
+ DependencyInjection.cs
+ Features/
+  ActivateServiceTemplate/ActivateServiceTemplate.cs
+  CreateServiceTemplate/CreateServiceTemplate.cs
+  DeactivateServiceTemplate/DeactivateServiceTemplate.cs
+  GenerateEnvironmentBlueprint/GenerateEnvironmentBlueprint.cs
+  GetServiceTemplate/GetServiceTemplate.cs
+  ListServiceTemplates/ListServiceTemplates.cs
+  ScaffoldServiceFromTemplate/ScaffoldServiceFromTemplate.cs
+  UpdateServiceTemplate/UpdateServiceTemplate.cs
+
+[metadataReferences]
+../../../building-blocks/
+ NexTraceOne.BuildingBlocks.Application/obj/Debug/net10.0/ref/NexTraceOne.BuildingBlocks.Application.dll
+ NexTraceOne.BuildingBlocks.Core/obj/Debug/net10.0/ref/NexTraceOne.BuildingBlocks.Core.dll
+ NexTraceOne.BuildingBlocks.Observability/obj/Debug/net10.0/ref/NexTraceOne.BuildingBlocks.Observability.dll
+../../
+ auditcompliance/NexTraceOne.AuditCompliance.Contracts/obj/Debug/net10.0/ref/NexTraceOne.AuditCompliance.Contracts.dll
+ configuration/
+  NexTraceOne.Configuration.Application/obj/Debug/net10.0/ref/NexTraceOne.Configuration.Application.dll
+  NexTraceOne.Configuration.Contracts/obj/Debug/net10.0/ref/NexTraceOne.Configuration.Contracts.dll
+  NexTraceOne.Configuration.Domain/obj/Debug/net10.0/ref/NexTraceOne.Configuration.Domain.dll
+ knowledge/NexTraceOne.Knowledge.Contracts/obj/Debug/net10.0/ref/NexTraceOne.Knowledge.Contracts.dll
+ operationalintelligence/NexTraceOne.OperationalIntelligence.Contracts/obj/Debug/net10.0/ref/NexTraceOne.OperationalIntelligence.Contracts.dll
+../
+ NexTraceOne.Catalog.Contracts/obj/Debug/net10.0/ref/NexTraceOne.Catalog.Contracts.dll
+ NexTraceOne.Catalog.Domain/obj/Debug/net10.0/ref/NexTraceOne.Catalog.Domain.dll
+<DOTNET>/packs/Microsoft.AspNetCore.App.Ref/10.0.8/ref/net10.0/
+ Microsoft.AspNetCore.Antiforgery.dll
+ Microsoft.AspNetCore.Authentication.Abstractions.dll
+ Microsoft.AspNetCore.Authentication.BearerToken.dll
+ Microsoft.AspNetCore.Authentication.Cookies.dll
+ Microsoft.AspNetCore.Authentication.Core.dll
+ Microsoft.AspNetCore.Authentication.dll
+ Microsoft.AspNetCore.Authentication.OAuth.dll
+ Microsoft.AspNetCore.Authorization.dll
+ Microsoft.AspNetCore.Authorization.Policy.dll
+ Microsoft.AspNetCore.Components.Authorization.dll
+ Microsoft.AspNetCore.Components.dll
+ Microsoft.AspNetCore.Components.Endpoints.dll
+ Microsoft.AspNetCore.Components.Forms.dll
+ Microsoft.AspNetCore.Components.Server.dll
+ Microsoft.AspNetCore.Components.Web.dll
+ Microsoft.AspNetCore.Connections.Abstractions.dll
+ Microsoft.AspNetCore.CookiePolicy.dll
+ Microsoft.AspNetCore.Cors.dll
+ Microsoft.AspNetCore.Cryptography.Internal.dll
+ Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+ Microsoft.AspNetCore.DataProtection.Abstractions.dll
+ Microsoft.AspNetCore.DataProtection.dll
+ Microsoft.AspNetCore.DataProtection.Extensions.dll
+ Microsoft.AspNetCore.Diagnostics.Abstractions.dll
+ Microsoft.AspNetCore.Diagnostics.dll
+ Microsoft.AspNetCore.Diagnostics.HealthChecks.dll
+ Microsoft.AspNetCore.dll
+ Microsoft.AspNetCore.HostFiltering.dll
+ Microsoft.AspNetCore.Hosting.Abstractions.dll
+ Microsoft.AspNetCore.Hosting.dll
+ Microsoft.AspNetCore.Hosting.Server.Abstractions.dll
+ Microsoft.AspNetCore.Html.Abstractions.dll
+ Microsoft.AspNetCore.Http.Abstractions.dll
+ Microsoft.AspNetCore.Http.Connections.Common.dll
+ Microsoft.AspNetCore.Http.Connections.dll
+ Microsoft.AspNetCore.Http.dll
+ Microsoft.AspNetCore.Http.Extensions.dll
+ Microsoft.AspNetCore.Http.Features.dll
+ Microsoft.AspNetCore.Http.Results.dll
+ Microsoft.AspNetCore.HttpLogging.dll
+ Microsoft.AspNetCore.HttpOverrides.dll
+ Microsoft.AspNetCore.HttpsPolicy.dll
+ Microsoft.AspNetCore.Identity.dll
+ Microsoft.AspNetCore.Localization.dll
+ Microsoft.AspNetCore.Localization.Routing.dll
+ Microsoft.AspNetCore.Metadata.dll
+ Microsoft.AspNetCore.Mvc.Abstractions.dll
+ Microsoft.AspNetCore.Mvc.ApiExplorer.dll
+ Microsoft.AspNetCore.Mvc.Core.dll
+ Microsoft.AspNetCore.Mvc.Cors.dll
+ Microsoft.AspNetCore.Mvc.DataAnnotations.dll
+ Microsoft.AspNetCore.Mvc.dll
+ Microsoft.AspNetCore.Mvc.Formatters.Json.dll
+ Microsoft.AspNetCore.Mvc.Formatters.Xml.dll
+ Microsoft.AspNetCore.Mvc.Localization.dll
+ Microsoft.AspNetCore.Mvc.Razor.dll
+ Microsoft.AspNetCore.Mvc.RazorPages.dll
+ Microsoft.AspNetCore.Mvc.TagHelpers.dll
+ Microsoft.AspNetCore.Mvc.ViewFeatures.dll
+ Microsoft.AspNetCore.OutputCaching.dll
+ Microsoft.AspNetCore.RateLimiting.dll
+ Microsoft.AspNetCore.Razor.dll
+ Microsoft.AspNetCore.Razor.Runtime.dll
+ Microsoft.AspNetCore.RequestDecompression.dll
+ Microsoft.AspNetCore.ResponseCaching.Abstractions.dll
+ Microsoft.AspNetCore.ResponseCaching.dll
+ Microsoft.AspNetCore.ResponseCompression.dll
+ Microsoft.AspNetCore.Rewrite.dll
+ Microsoft.AspNetCore.Routing.Abstractions.dll
+ Microsoft.AspNetCore.Routing.dll
+ Microsoft.AspNetCore.Server.HttpSys.dll
+ Microsoft.AspNetCore.Server.IIS.dll
+ Microsoft.AspNetCore.Server.IISIntegration.dll
+ Microsoft.AspNetCore.Server.Kestrel.Core.dll
+ Microsoft.AspNetCore.Server.Kestrel.dll
+ Microsoft.AspNetCore.Server.Kestrel.Transport.NamedPipes.dll
+ Microsoft.AspNetCore.Server.Kestrel.Transport.Quic.dll
+ Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll
+ Microsoft.AspNetCore.Session.dll
+ Microsoft.AspNetCore.SignalR.Common.dll
+ Microsoft.AspNetCore.SignalR.Core.dll
+ Microsoft.AspNetCore.SignalR.dll
+ Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+ Microsoft.AspNetCore.StaticAssets.dll
+ Microsoft.AspNetCore.StaticFiles.dll
+ Microsoft.AspNetCore.WebSockets.dll
+ Microsoft.AspNetCore.WebUtilities.dll
+ Microsoft.Extensions.Caching.Abstractions.dll
+ Microsoft.Extensions.Caching.Memory.dll
+ Microsoft.Extensions.Configuration.Abstractions.dll
+ Microsoft.Extensions.Configuration.Binder.dll
+ Microsoft.Extensions.Configuration.CommandLine.dll
+ Microsoft.Extensions.Configuration.dll
+ Microsoft.Extensions.Configuration.EnvironmentVariables.dll
+ Microsoft.Extensions.Configuration.FileExtensions.dll
+ Microsoft.Extensions.Configuration.Ini.dll
+ Microsoft.Extensions.Configuration.Json.dll
+ Microsoft.Extensions.Configuration.KeyPerFile.dll
+ Microsoft.Extensions.Configuration.UserSecrets.dll
+ Microsoft.Extensions.Configuration.Xml.dll
+ Microsoft.Extensions.DependencyInjection.Abstractions.dll
+ Microsoft.Extensions.DependencyInjection.dll
+ Microsoft.Extensions.Diagnostics.Abstractions.dll
+ Microsoft.Extensions.Diagnostics.dll
+ Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
+ Microsoft.Extensions.Diagnostics.HealthChecks.dll
+ Microsoft.Extensions.Features.dll
+ Microsoft.Extensions.FileProviders.Abstractions.dll
+ Microsoft.Extensions.FileProviders.Composite.dll
+ Microsoft.Extensions.FileProviders.Embedded.dll
+ Microsoft.Extensions.FileProviders.Physical.dll
+ Microsoft.Extensions.FileSystemGlobbing.dll
+ Microsoft.Extensions.Hosting.Abstractions.dll
+ Microsoft.Extensions.Hosting.dll
+ Microsoft.Extensions.Http.dll
+ Microsoft.Extensions.Identity.Core.dll
+ Microsoft.Extensions.Identity.Stores.dll
+ Microsoft.Extensions.Localization.Abstractions.dll
+ Microsoft.Extensions.Localization.dll
+ Microsoft.Extensions.Logging.Abstractions.dll
+ Microsoft.Extensions.Logging.Configuration.dll
+ Microsoft.Extensions.Logging.Console.dll
+ Microsoft.Extensions.Logging.Debug.dll
+ Microsoft.Extensions.Logging.dll
+ Microsoft.Extensions.Logging.EventLog.dll
+ Microsoft.Extensions.Logging.EventSource.dll
+ Microsoft.Extensions.Logging.TraceSource.dll
+ Microsoft.Extensions.ObjectPool.dll
+ Microsoft.Extensions.Options.ConfigurationExtensions.dll
+ Microsoft.Extensions.Options.DataAnnotations.dll
+ Microsoft.Extensions.Options.dll
+ Microsoft.Extensions.Primitives.dll
+ Microsoft.Extensions.Validation.dll
+ Microsoft.Extensions.WebEncoders.dll
+ Microsoft.JSInterop.dll
+ Microsoft.Net.Http.Headers.dll
+ System.Diagnostics.EventLog.dll
+ System.Formats.Cbor.dll
+ System.Security.Cryptography.Xml.dll
+ System.Threading.RateLimiting.dll
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.8/ref/net10.0/
+ Microsoft.CSharp.dll
+ Microsoft.VisualBasic.Core.dll
+ Microsoft.VisualBasic.dll
+ Microsoft.Win32.Primitives.dll
+ Microsoft.Win32.Registry.dll
+ mscorlib.dll
+ netstandard.dll
+ System.AppContext.dll
+ System.Buffers.dll
+ System.Collections.Concurrent.dll
+ System.Collections.dll
+ System.Collections.Immutable.dll
+ System.Collections.NonGeneric.dll
+ System.Collections.Specialized.dll
+ System.ComponentModel.Annotations.dll
+ System.ComponentModel.DataAnnotations.dll
+ System.ComponentModel.dll
+ System.ComponentModel.EventBasedAsync.dll
+ System.ComponentModel.Primitives.dll
+ System.ComponentModel.TypeConverter.dll
+ System.Configuration.dll
+ System.Console.dll
+ System.Core.dll
+ System.Data.Common.dll
+ System.Data.DataSetExtensions.dll
+ System.Data.dll
+ System.Diagnostics.Contracts.dll
+ System.Diagnostics.Debug.dll
+ System.Diagnostics.DiagnosticSource.dll
+ System.Diagnostics.FileVersionInfo.dll
+ System.Diagnostics.Process.dll
+ System.Diagnostics.StackTrace.dll
+ System.Diagnostics.TextWriterTraceListener.dll
+ System.Diagnostics.Tools.dll
+ System.Diagnostics.TraceSource.dll
+ System.Diagnostics.Tracing.dll
+ System.dll
+ System.Drawing.dll
+ System.Drawing.Primitives.dll
+ System.Dynamic.Runtime.dll
+ System.Formats.Asn1.dll
+ System.Formats.Tar.dll
+ System.Globalization.Calendars.dll
+ System.Globalization.dll
+ System.Globalization.Extensions.dll
+ System.IO.Compression.Brotli.dll
+ System.IO.Compression.dll
+ System.IO.Compression.FileSystem.dll
+ System.IO.Compression.ZipFile.dll
+ System.IO.dll
+ System.IO.FileSystem.AccessControl.dll
+ System.IO.FileSystem.dll
+ System.IO.FileSystem.DriveInfo.dll
+ System.IO.FileSystem.Primitives.dll
+ System.IO.FileSystem.Watcher.dll
+ System.IO.IsolatedStorage.dll
+ System.IO.MemoryMappedFiles.dll
+ System.IO.Pipelines.dll
+ System.IO.Pipes.AccessControl.dll
+ System.IO.Pipes.dll
+ System.IO.UnmanagedMemoryStream.dll
+ System.Linq.AsyncEnumerable.dll
+ System.Linq.dll
+ System.Linq.Expressions.dll
+ System.Linq.Parallel.dll
+ System.Linq.Queryable.dll
+ System.Memory.dll
+ System.Net.dll
+ System.Net.Http.dll
+ System.Net.Http.Json.dll
+ System.Net.HttpListener.dll
+ System.Net.Mail.dll
+ System.Net.NameResolution.dll
+ System.Net.NetworkInformation.dll
+ System.Net.Ping.dll
+ System.Net.Primitives.dll
+ System.Net.Quic.dll
+ System.Net.Requests.dll
+ System.Net.Security.dll
+ System.Net.ServerSentEvents.dll
+ System.Net.ServicePoint.dll
+ System.Net.Sockets.dll
+ System.Net.WebClient.dll
+ System.Net.WebHeaderCollection.dll
+ System.Net.WebProxy.dll
+ System.Net.WebSockets.Client.dll
+ System.Net.WebSockets.dll
+ System.Numerics.dll
+ System.Numerics.Vectors.dll
+ System.ObjectModel.dll
+ System.Reflection.DispatchProxy.dll
+ System.Reflection.dll
+ System.Reflection.Emit.dll
+ System.Reflection.Emit.ILGeneration.dll
+ System.Reflection.Emit.Lightweight.dll
+ System.Reflection.Extensions.dll
+ System.Reflection.Metadata.dll
+ System.Reflection.Primitives.dll
+ System.Reflection.TypeExtensions.dll
+ System.Resources.Reader.dll
+ System.Resources.ResourceManager.dll
+ System.Resources.Writer.dll
+ System.Runtime.CompilerServices.Unsafe.dll
+ System.Runtime.CompilerServices.VisualC.dll
+ System.Runtime.dll
+ System.Runtime.Extensions.dll
+ System.Runtime.Handles.dll
+ System.Runtime.InteropServices.dll
+ System.Runtime.InteropServices.JavaScript.dll
+ System.Runtime.InteropServices.RuntimeInformation.dll
+ System.Runtime.Intrinsics.dll
+ System.Runtime.Loader.dll
+ System.Runtime.Numerics.dll
+ System.Runtime.Serialization.dll
+ System.Runtime.Serialization.Formatters.dll
+ System.Runtime.Serialization.Json.dll
+ System.Runtime.Serialization.Primitives.dll
+ System.Runtime.Serialization.Xml.dll
+ System.Security.AccessControl.dll
+ System.Security.Claims.dll
+ System.Security.Cryptography.Algorithms.dll
+ System.Security.Cryptography.Cng.dll
+ System.Security.Cryptography.Csp.dll
+ System.Security.Cryptography.dll
+ System.Security.Cryptography.Encoding.dll
+ System.Security.Cryptography.OpenSsl.dll
+ System.Security.Cryptography.Primitives.dll
+ System.Security.Cryptography.X509Certificates.dll
+ System.Security.dll
+ System.Security.Principal.dll
+ System.Security.Principal.Windows.dll
+ System.Security.SecureString.dll
+ System.ServiceModel.Web.dll
+ System.ServiceProcess.dll
+ System.Text.Encoding.CodePages.dll
+ System.Text.Encoding.dll
+ System.Text.Encoding.Extensions.dll
+ System.Text.Encodings.Web.dll
+ System.Text.Json.dll
+ System.Text.RegularExpressions.dll
+ System.Threading.AccessControl.dll
+ System.Threading.Channels.dll
+ System.Threading.dll
+ System.Threading.Overlapped.dll
+ System.Threading.Tasks.Dataflow.dll
+ System.Threading.Tasks.dll
+ System.Threading.Tasks.Extensions.dll
+ System.Threading.Tasks.Parallel.dll
+ System.Threading.Thread.dll
+ System.Threading.ThreadPool.dll
+ System.Threading.Timer.dll
+ System.Transactions.dll
+ System.Transactions.Local.dll
+ System.ValueTuple.dll
+ System.Web.dll
+ System.Web.HttpUtility.dll
+ System.Windows.dll
+ System.Xml.dll
+ System.Xml.Linq.dll
+ System.Xml.ReaderWriter.dll
+ System.Xml.Serialization.dll
+ System.Xml.XDocument.dll
+ System.Xml.XmlDocument.dll
+ System.Xml.XmlSerializer.dll
+ System.Xml.XPath.dll
+ System.Xml.XPath.XDocument.dll
+ WindowsBase.dll
+<NUGET>/
+ ardalis.guardclauses/5.0.0/lib/net8.0/Ardalis.GuardClauses.dll
+ fluentvalidation/12.1.1/lib/net8.0/FluentValidation.dll
+ google.protobuf/3.26.1/lib/net5.0/Google.Protobuf.dll
+ grpc.core.api/2.62.0/lib/netstandard2.1/Grpc.Core.Api.dll
+ grpc.net.client/2.62.0/lib/net8.0/Grpc.Net.Client.dll
+ grpc.net.common/2.62.0/lib/net8.0/Grpc.Net.Common.dll
+ mediatr.contracts/2.0.1/lib/netstandard2.0/MediatR.Contracts.dll
+ mediatr/14.1.0/lib/net10.0/MediatR.dll
+ microsoft.extensions.ambientmetadata.application/9.4.0/lib/net9.0/Microsoft.Extensions.AmbientMetadata.Application.dll
+ microsoft.extensions.compliance.abstractions/9.4.0/lib/net9.0/Microsoft.Extensions.Compliance.Abstractions.dll
+ microsoft.extensions.dependencyinjection.autoactivation/9.4.0/lib/net9.0/Microsoft.Extensions.DependencyInjection.AutoActivation.dll
+ microsoft.extensions.dependencymodel/10.0.0/lib/net10.0/Microsoft.Extensions.DependencyModel.dll
+ microsoft.extensions.diagnostics.exceptionsummarization/9.4.0/lib/net9.0/Microsoft.Extensions.Diagnostics.ExceptionSummarization.dll
+ microsoft.extensions.http.diagnostics/9.4.0/lib/net9.0/Microsoft.Extensions.Http.Diagnostics.dll
+ microsoft.extensions.http.resilience/9.4.0/lib/net9.0/Microsoft.Extensions.Http.Resilience.dll
+ microsoft.extensions.resilience/9.4.0/lib/net9.0/Microsoft.Extensions.Resilience.dll
+ microsoft.extensions.telemetry.abstractions/9.4.0/lib/net9.0/Microsoft.Extensions.Telemetry.Abstractions.dll
+ microsoft.extensions.telemetry/9.4.0/lib/net9.0/Microsoft.Extensions.Telemetry.dll
+ microsoft.identitymodel.abstractions/8.14.0/lib/net9.0/Microsoft.IdentityModel.Abstractions.dll
+ microsoft.identitymodel.jsonwebtokens/8.14.0/lib/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+ microsoft.identitymodel.logging/8.14.0/lib/net9.0/Microsoft.IdentityModel.Logging.dll
+ microsoft.identitymodel.tokens/8.14.0/lib/net9.0/Microsoft.IdentityModel.Tokens.dll
+ npgsql/10.0.2/lib/net10.0/Npgsql.dll
+ opentelemetry.api.providerbuilderextensions/1.12.0/lib/net9.0/OpenTelemetry.Api.ProviderBuilderExtensions.dll
+ opentelemetry.api/1.12.0/lib/net9.0/OpenTelemetry.Api.dll
+ opentelemetry.exporter.opentelemetryprotocol/1.12.0/lib/net9.0/OpenTelemetry.Exporter.OpenTelemetryProtocol.dll
+ opentelemetry.extensions.hosting/1.12.0/lib/net9.0/OpenTelemetry.Extensions.Hosting.dll
+ opentelemetry.instrumentation.aspnetcore/1.12.0/lib/net8.0/OpenTelemetry.Instrumentation.AspNetCore.dll
+ opentelemetry.instrumentation.http/1.12.0/lib/net8.0/OpenTelemetry.Instrumentation.Http.dll
+ opentelemetry.instrumentation.runtime/1.12.0/lib/net8.0/OpenTelemetry.Instrumentation.Runtime.dll
+ opentelemetry/1.12.0/lib/net9.0/OpenTelemetry.dll
+ polly.core/8.4.2/lib/net8.0/Polly.Core.dll
+ polly.extensions/8.4.2/lib/net8.0/Polly.Extensions.dll
+ polly.ratelimiting/8.4.2/lib/net8.0/Polly.RateLimiting.dll
+ serilog.aspnetcore/10.0.0/lib/net10.0/Serilog.AspNetCore.dll
+ serilog.enrichers.environment/3.0.1/lib/net8.0/Serilog.Enrichers.Environment.dll
+ serilog.extensions.hosting/10.0.0/lib/net10.0/Serilog.Extensions.Hosting.dll
+ serilog.extensions.logging/10.0.0/lib/net10.0/Serilog.Extensions.Logging.dll
+ serilog.formatting.compact/3.0.0/lib/net8.0/Serilog.Formatting.Compact.dll
+ serilog.settings.configuration/10.0.0/lib/net10.0/Serilog.Settings.Configuration.dll
+ serilog.sinks.console/6.1.1/lib/net8.0/Serilog.Sinks.Console.dll
+ serilog.sinks.debug/3.0.0/lib/net8.0/Serilog.Sinks.Debug.dll
+ serilog.sinks.file/7.0.0/lib/net9.0/Serilog.Sinks.File.dll
+ serilog.sinks.opentelemetry/4.1.1/lib/net8.0/Serilog.Sinks.OpenTelemetry.dll
+ serilog/4.3.1/lib/net10.0/Serilog.dll
+ yamldotnet/16.3.0/lib/net8.0/YamlDotNet.dll
+
+[analyzerReferences]
+<DOTNET>/packs/Microsoft.AspNetCore.App.Ref/10.0.8/analyzers/dotnet/cs/
+ Microsoft.AspNetCore.App.Analyzers.dll
+ Microsoft.AspNetCore.App.CodeFixes.dll
+ Microsoft.AspNetCore.App.SourceGenerators.dll
+ Microsoft.AspNetCore.Components.Analyzers.dll
+ Microsoft.Extensions.Options.SourceGeneration.dll
+ Microsoft.Extensions.Validation.ValidationsGenerator.dll
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.8/analyzers/dotnet/cs/
+ Microsoft.Interop.ComInterfaceGenerator.dll
+ Microsoft.Interop.JavaScript.JSImportGenerator.dll
+ Microsoft.Interop.LibraryImportGenerator.dll
+ Microsoft.Interop.SourceGeneration.dll
+ System.Text.Json.SourceGeneration.dll
+ System.Text.RegularExpressions.Generator.dll
+<DOTNET>/sdk/10.0.204/Sdks/Microsoft.NET.Sdk/analyzers/
+ Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
+ Microsoft.CodeAnalysis.NetAnalyzers.dll
+<DOTNET>/sdk/10.0.204/Sdks/Microsoft.NET.Sdk/codestyle/cs/
+ Microsoft.CodeAnalysis.CodeStyle.dll
+ Microsoft.CodeAnalysis.CodeStyle.Fixes.dll
+ Microsoft.CodeAnalysis.CSharp.CodeStyle.dll
+ Microsoft.CodeAnalysis.CSharp.CodeStyle.Fixes.dll
+<NUGET>/microsoft.extensions.telemetry.abstractions/9.4.0/analyzers/dotnet/cs/
+ Microsoft.Gen.Logging.dll
+ Microsoft.Gen.Metrics.dll
+
+[analyzerConfigFiles]
+../../../../.editorconfig
+<DOTNET>/sdk/10.0.204/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_10_recommended.globalconfig
+obj/Debug/net10.0/NexTraceOne.Catalog.Application.GeneratedMSBuildEditorConfig.editorconfig

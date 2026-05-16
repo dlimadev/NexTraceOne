@@ -6,11 +6,11 @@ namespace NexTraceOne.ProductAnalytics.Domain.Enums;
 /// </summary>
 public enum PersonaType
 {
-    Engineer,
-    TechLead,
-    Architect,
-    Product,
-    Executive,
-    PlatformAdmin,
-    Auditor
+    Engineer = 0,
+    TechLead = 1,
+    Architect = 2,
+    Product = 3,
+    Executive = 4,
+    PlatformAdmin = 5,
+    Auditor = 6
 }

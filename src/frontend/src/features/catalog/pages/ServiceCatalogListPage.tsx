@@ -105,6 +105,8 @@ export function ServiceCatalogListPage() {
   const [filters, setFilters] = useState<ServiceFilters>(emptyFilters);
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showServiceForm, setShowServiceForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 50;
   const [serviceForm, setServiceForm] = useState({
     name: '', team: '', description: '', domain: '',
     serviceType: 'RestApi', criticality: 'Medium', exposureType: 'Internal',
@@ -140,8 +142,10 @@ export function ServiceCatalogListPage() {
     if (filters.exposureType) p.exposureType = filters.exposureType;
     if (filters.domain) p.domain = filters.domain;
     if (filters.teamName) p.teamName = filters.teamName;
+    p.page = currentPage.toString();
+    p.pageSize = PAGE_SIZE.toString();
     return p;
-  }, [debouncedSearch, filters.serviceType, filters.criticality, filters.lifecycleStatus, filters.exposureType, filters.domain, filters.teamName]);
+  }, [debouncedSearch, filters.serviceType, filters.criticality, filters.lifecycleStatus, filters.exposureType, filters.domain, filters.teamName, currentPage]);
 
   const {
     data,
@@ -163,6 +167,7 @@ export function ServiceCatalogListPage() {
   /** Atualiza um campo de filtro individual. */
   const setFilter = (key: keyof ServiceFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
   };
 
   return (
@@ -275,7 +280,7 @@ export function ServiceCatalogListPage() {
                       className="w-full rounded-md bg-canvas border border-edge px-3 py-2 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors">
                       <option value="Internal">{t('serviceCatalog.exposureInternal', 'Internal')}</option>
                       <option value="Partner">{t('serviceCatalog.exposurePartner', 'Partner')}</option>
-                      <option value="External">{t('serviceCatalog.exposureExternal', 'External / Public')}</option>
+                      <option value="External">{t('serviceCatalog.exposureExternal', 'External')}</option>
                     </select>
                   </div>
                 </div>
@@ -572,6 +577,36 @@ export function ServiceCatalogListPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {!isLoading && !isError && data && data.totalCount > PAGE_SIZE && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-edge">
+              <span className="text-xs text-muted">
+                {t('catalog.pagination.showing', {
+                  start: (currentPage - 1) * PAGE_SIZE + 1,
+                  end: Math.min(currentPage * PAGE_SIZE, data.totalCount),
+                  total: data.totalCount,
+                })}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-xs rounded-md border border-edge bg-canvas text-heading disabled:opacity-40 disabled:cursor-not-allowed hover:bg-elevated transition-colors"
+                >
+                  {t('common.previous')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  disabled={currentPage * PAGE_SIZE >= data.totalCount}
+                  className="px-3 py-1 text-xs rounded-md border border-edge bg-canvas text-heading disabled:opacity-40 disabled:cursor-not-allowed hover:bg-elevated transition-colors"
+                >
+                  {t('common.next')}
+                </button>
+              </div>
             </div>
           )}
         </CardBody>

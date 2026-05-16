@@ -33,7 +33,7 @@ public sealed class SearchCatalogTests
             .SearchAsync(null, null, null, "payment", 1, 20, Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<(IReadOnlyList<ContractVersion>, int)>(([cv], 1)));
 
-        var svc = ServiceAsset.Create("PaymentService", "billing", "payments-team");
+        var svc = ServiceAsset.Create("PaymentService", "billing", "payments-team", Guid.NewGuid());
         _serviceRepo
             .SearchAsync("payment", Arg.Any<CancellationToken>())
             .Returns(Task.FromResult<IReadOnlyList<ServiceAsset>>([svc]));
@@ -108,7 +108,7 @@ public sealed class SearchCatalogTests
     {
         var apiAssetId = Guid.NewGuid();
         var cv = ContractVersion.Import(apiAssetId, "1.0.0", "{}", "json", "test").Value!;
-        var ownerSvc = ServiceAsset.Create("PaymentService", "billing", "payments-team");
+        var ownerSvc = ServiceAsset.Create("PaymentService", "billing", "payments-team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("payments-api", "/payments/v1", "1.0", "Public", ownerSvc);
 
         _contractRepo
@@ -141,7 +141,7 @@ public sealed class SearchCatalogTests
             .ToList();
 
         var services = Enumerable.Range(0, 5)
-            .Select(i => ServiceAsset.Create($"Service{i}", "domain", "team"))
+            .Select(i => ServiceAsset.Create($"Service{i}", "domain", "team", Guid.NewGuid()))
             .ToList();
 
         _contractRepo
@@ -194,7 +194,7 @@ public sealed class SearchCatalogTests
     public async Task Handle_Should_SetRelevanceScore_Correctly()
     {
         var cv = ContractVersion.Import(Guid.NewGuid(), "1.0.0", "{}", "json", "test").Value!;
-        var svc = ServiceAsset.Create("OrderService", "commerce", "orders-team");
+        var svc = ServiceAsset.Create("OrderService", "commerce", "orders-team", Guid.NewGuid());
 
         _contractRepo
             .SearchAsync(null, null, null, "order", 1, 20, Arg.Any<CancellationToken>())

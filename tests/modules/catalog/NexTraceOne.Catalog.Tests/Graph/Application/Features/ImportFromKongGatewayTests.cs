@@ -23,7 +23,7 @@ public sealed class ImportFromKongGatewayTests
     {
         _dateTimeProvider.UtcNow.Returns(_now);
         return new ImportFromKongFeature.Handler(
-            _serviceAssetRepository, _apiAssetRepository, _dateTimeProvider, _unitOfWork);
+            _serviceAssetRepository, _apiAssetRepository, _dateTimeProvider, _unitOfWork, Substitute.For<ICurrentTenant>());
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class ImportFromKongGatewayTests
     public async Task ImportFromKong_Should_SkipApi_When_ApiAlreadyExists()
     {
         // Arrange — serviço existe, API já registada
-        var existingService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var existingService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         _serviceAssetRepository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>())
             .Returns(existingService);
 

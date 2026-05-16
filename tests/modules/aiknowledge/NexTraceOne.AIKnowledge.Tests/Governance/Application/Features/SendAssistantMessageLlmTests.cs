@@ -34,6 +34,8 @@ public sealed class SendAssistantMessageLlmTests
     private readonly IAiRoutingResolver _routingResolver = Substitute.For<IAiRoutingResolver>();
     private readonly IConversationPersistenceService _convPersistence = Substitute.For<IConversationPersistenceService>();
     private readonly IAiGuardrailEnforcementService _guardrailService = Substitute.For<IAiGuardrailEnforcementService>();
+    private readonly IContextWindowManager _contextWindow = Substitute.For<IContextWindowManager>();
+    private readonly IPromptCacheService _promptCache = Substitute.For<IPromptCacheService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly ICurrentEnvironment _currentEnvironment = Substitute.For<ICurrentEnvironment>();
@@ -154,6 +156,8 @@ public sealed class SendAssistantMessageLlmTests
         _routingResolver,
         _convPersistence,
         _guardrailService,
+        _contextWindow,
+        _promptCache,
         _currentUser,
         _currentTenant,
         _currentEnvironment,

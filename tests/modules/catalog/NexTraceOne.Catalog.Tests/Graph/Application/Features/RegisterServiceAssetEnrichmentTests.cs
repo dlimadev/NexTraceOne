@@ -33,7 +33,7 @@ public sealed class RegisterServiceAssetEnrichmentTests
                 Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((NexTraceOne.Configuration.Contracts.DTOs.EffectiveConfigurationDto?)null);
 
-        _sut = new RegisterServiceAssetFeature.Handler(_repository, _configService, _unitOfWork);
+        _sut = new RegisterServiceAssetFeature.Handler(_repository, _configService, _unitOfWork, Substitute.For<ICurrentTenant>());
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public sealed class RegisterServiceAssetEnrichmentTests
     public async Task Should_Fail_When_ServiceAlreadyExists()
     {
         // Arrange
-        var existing = ServiceAsset.Create("existing-svc", "Domain", "team");
+        var existing = ServiceAsset.Create("existing-svc", "Domain", "team", Guid.NewGuid());
         _repository.GetByNameAsync("existing-svc", Arg.Any<CancellationToken>())
             .Returns(existing);
 

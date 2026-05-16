@@ -67,7 +67,7 @@ public sealed class OnboardingSession : AuditableEntity<OnboardingSessionId>
     public Guid TenantId { get; private set; }
 
     /// <summary>Controlo de concorrência optimista.</summary>
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     /// <summary>
     /// Cria uma nova sessão de onboarding para um utilizador.

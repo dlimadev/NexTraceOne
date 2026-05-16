@@ -24,6 +24,7 @@ public sealed class PlanExecutionIntegrationTests
     private readonly IToolExecutor _toolExecutor = Substitute.For<IToolExecutor>();
     private readonly IToolPermissionValidator _toolPermissionValidator = Substitute.For<IToolPermissionValidator>();
     private readonly IAiTokenQuotaService _tokenQuotaService = Substitute.For<IAiTokenQuotaService>();
+    private readonly IContextWindowManager _contextWindow = Substitute.For<IContextWindowManager>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
@@ -50,6 +51,7 @@ public sealed class PlanExecutionIntegrationTests
         _toolExecutor,
         _toolPermissionValidator,
         _tokenQuotaService,
+        _contextWindow,
         _currentUser,
         _currentTenant,
         _dateTimeProvider);

@@ -15,7 +15,7 @@ public sealed class ServiceAssetTests
     public void Create_Should_ReturnServiceAsset_When_DataIsValid()
     {
         // Act
-        var service = ServiceAsset.Create("orders-service", "Commerce", "Orders Team");
+        var service = ServiceAsset.Create("orders-service", "Commerce", "Orders Team", Guid.NewGuid());
 
         // Assert
         service.Name.Should().Be("orders-service");
@@ -27,7 +27,7 @@ public sealed class ServiceAssetTests
     public void Create_Should_GenerateNonEmptyId_When_ServiceIsCreated()
     {
         // Act
-        var service = ServiceAsset.Create("billing-service", "Finance", "Billing Team");
+        var service = ServiceAsset.Create("billing-service", "Finance", "Billing Team", Guid.NewGuid());
 
         // Assert
         service.Id.Value.Should().NotBeEmpty();
@@ -45,7 +45,7 @@ public sealed class ServiceAssetTests
     public void Create_And_UpdateDetails_With_Framework_Type_Should_Succeed()
     {
         // Arrange
-        var service = ServiceAsset.Create("shared-framework", "Platform", "Core Team");
+        var service = ServiceAsset.Create("shared-framework", "Platform", "Core Team", Guid.NewGuid());
 
         // Act
         service.UpdateDetails(

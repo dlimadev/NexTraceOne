@@ -35,7 +35,7 @@ public sealed class SourceOfTruthApplicationTests
         var contractRepo = Substitute.For<IContractVersionRepository>();
         var refRepo = Substitute.For<ILinkedReferenceRepository>();
 
-        var service = ServiceAsset.Create("payments-api", "Finance", "Team Alpha");
+        var service = ServiceAsset.Create("payments-api", "Finance", "Team Alpha", Guid.NewGuid());
         serviceRepo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(service);
 
@@ -139,7 +139,7 @@ public sealed class SourceOfTruthApplicationTests
         var apiRepo = Substitute.For<IApiAssetRepository>();
         var refRepo = Substitute.For<ILinkedReferenceRepository>();
 
-        var service = ServiceAsset.Create("test-svc", "Domain", "Team");
+        var service = ServiceAsset.Create("test-svc", "Domain", "Team", Guid.NewGuid());
         serviceRepo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(service);
 
@@ -177,7 +177,7 @@ public sealed class SourceOfTruthApplicationTests
         var contractRepo = Substitute.For<IContractVersionRepository>();
         var refRepo = Substitute.For<ILinkedReferenceRepository>();
 
-        var service = ServiceAsset.Create("payments", "Finance", "Team A");
+        var service = ServiceAsset.Create("payments", "Finance", "Team A", Guid.NewGuid());
         serviceRepo.SearchAsync("pay", Arg.Any<CancellationToken>())
             .Returns(new List<ServiceAsset> { service });
 

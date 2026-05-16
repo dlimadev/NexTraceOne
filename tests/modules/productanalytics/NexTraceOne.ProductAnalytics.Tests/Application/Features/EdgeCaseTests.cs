@@ -24,6 +24,8 @@ public sealed class EdgeCaseTests
     private readonly IAnalyticsEventRepository _repo = Substitute.For<IAnalyticsEventRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
+    private readonly IJourneyDefinitionRepository _journeyRepo = Substitute.For<IJourneyDefinitionRepository>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
 
     public EdgeCaseTests()
     {
@@ -31,6 +33,8 @@ public sealed class EdgeCaseTests
         _configService
             .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((EffectiveConfigurationDto?)null);
+        _currentTenant.Id.Returns(Guid.NewGuid());
+        _journeyRepo.ListActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns([]);
     }
 
     [Fact]
@@ -81,7 +85,7 @@ public sealed class EdgeCaseTests
     {
         _repo.GetSessionEventTypesAsync(Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns([]);
 
-        var handler = new GetJourneys.Handler(_repo, _clock, _configService);
+        var handler = new GetJourneys.Handler(_repo, _clock, _configService, _journeyRepo, _currentTenant);
         var result = await handler.Handle(new GetJourneys.Query(null, null, null), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();

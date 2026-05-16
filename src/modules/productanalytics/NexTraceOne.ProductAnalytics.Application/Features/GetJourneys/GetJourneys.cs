@@ -8,6 +8,7 @@ using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
 using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 using System.Text.Json;
+using NexTraceOne.ProductAnalytics.Application;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetJourneys;
 
@@ -33,8 +34,8 @@ public static class GetJourneys
         IAnalyticsEventRepository repository,
         IDateTimeProvider clock,
         IConfigurationResolutionService configService,
-        IJourneyDefinitionRepository? journeyDefinitionRepository = null,
-        ICurrentTenant? tenant = null) : IQueryHandler<Query, Response>
+        IJourneyDefinitionRepository journeyDefinitionRepository,
+        ICurrentTenant tenant) : IQueryHandler<Query, Response>
     {
         /// <summary>
         /// Definições estáticas de fallback — usadas quando não existem definições no banco.
@@ -77,21 +78,13 @@ public static class GetJourneys
             var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
             var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
 
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
+            var (from, to, periodLabel) = AnalyticsQueryHelper.ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             // Load journey definitions from DB if available, otherwise use static fallback
-            JourneyDefinition[] journeyDefinitions;
-            if (journeyDefinitionRepository is not null && tenant is not null)
-            {
-                var dbDefs = await journeyDefinitionRepository.ListActiveAsync(tenant.Id, cancellationToken);
-                journeyDefinitions = dbDefs.Count > 0
-                    ? dbDefs.Select(ParseDbDefinition).Where(d => d is not null).Cast<JourneyDefinition>().ToArray()
-                    : StaticJourneyDefinitions;
-            }
-            else
-            {
-                journeyDefinitions = StaticJourneyDefinitions;
-            }
+            var dbDefs = await journeyDefinitionRepository.ListActiveAsync(tenant.Id, cancellationToken);
+            var journeyDefinitions = dbDefs.Count > 0
+                ? dbDefs.Select(ParseDbDefinition).Where(d => d is not null).Cast<JourneyDefinition>().ToArray()
+                : StaticJourneyDefinitions;
 
             var allEventTypes = journeyDefinitions
                 .SelectMany(j => j.Steps.Select(s => s.EventType))
@@ -253,19 +246,6 @@ public static class GetJourneys
             }
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
-        {
-            var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
-            var days = label switch
-            {
-                "last_7d" => 7,
-                "last_1d" => 1,
-                "last_90d" => 90,
-                _ => 30
-            };
-            if (days > maxDays) days = maxDays;
-            return (utcNow.AddDays(-days), utcNow, label);
-        }
     }
 
     private sealed record JourneyDefinition(string JourneyId, string JourneyName, JourneyStepDefinition[] Steps);

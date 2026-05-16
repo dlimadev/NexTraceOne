@@ -19,7 +19,7 @@ public sealed class ServiceInterfaceHandlerTests
     private static readonly Guid ServiceId = Guid.NewGuid();
 
     private static ServiceAsset BuildService()
-        => ServiceAsset.Create("payment-service", "payments", "core-team");
+        => ServiceAsset.Create("payment-service", "payments", "core-team", Guid.NewGuid());
 
     // ─── CreateServiceInterface ───────────────────────────────────────────
 

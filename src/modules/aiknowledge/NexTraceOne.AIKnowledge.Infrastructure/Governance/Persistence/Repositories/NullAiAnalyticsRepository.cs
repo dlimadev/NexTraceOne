@@ -13,13 +13,13 @@ internal sealed class NullAiAnalyticsRepository : IAiAnalyticsRepository
     private static readonly Task<List<AgentExecutionMetrics>> EmptyAgentMetrics = Task.FromResult(new List<AgentExecutionMetrics>());
     private static readonly Task<List<ModelPerformanceMetrics>> EmptyModelMetrics = Task.FromResult(new List<ModelPerformanceMetrics>());
 
-    public Task InsertTokenUsageAsync(TokenUsageRecord record)
+    public Task InsertTokenUsageAsync(TokenUsageRecord record, CancellationToken cancellationToken = default)
     {
         // No-op: ClickHouse não está configurado
         return Task.CompletedTask;
     }
 
-    public Task InsertTokenUsageBatchAsync(IEnumerable<TokenUsageRecord> records)
+    public Task InsertTokenUsageBatchAsync(IEnumerable<TokenUsageRecord> records, CancellationToken cancellationToken = default)
     {
         // No-op: ClickHouse não está configurado
         return Task.CompletedTask;

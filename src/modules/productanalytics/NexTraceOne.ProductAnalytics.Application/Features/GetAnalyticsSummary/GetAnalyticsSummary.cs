@@ -7,6 +7,7 @@ using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
 using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetAnalyticsSummary;
 
@@ -42,7 +43,7 @@ public static class GetAnalyticsSummary
             var trendCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.TrendThresholdPercent, ConfigurationScope.System, null, cancellationToken);
             var trendThreshold = decimal.TryParse(trendCfg?.EffectiveValue, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var tt) ? tt : AnalyticsConstants.TrendThreshold;
 
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
+            var (from, to, periodLabel) = AnalyticsQueryHelper.ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             ProductModule? moduleFilter = null;
             if (!string.IsNullOrWhiteSpace(request.Module) && Enum.TryParse<ProductModule>(request.Module, ignoreCase: true, out var moduleValue))
@@ -85,7 +86,7 @@ public static class GetAnalyticsSummary
                 top: topModulesLimit,
                 cancellationToken);
 
-            var (previousFrom, previousTo, _) = ResolveRange(from, request.Range, maxRangeDays);
+            var (previousFrom, previousTo, _) = AnalyticsQueryHelper.ResolveRange(from, request.Range, maxRangeDays);
             var previousEvents = await repository.CountAsync(
                 persona: request.Persona,
                 module: moduleFilter,
@@ -114,7 +115,7 @@ public static class GetAnalyticsSummary
                 TopModules: topModules
                     .Select(m => new ModuleUsageDto(
                         m.Module,
-                        ModuleName: ToModuleDisplayName(m.Module),
+                        ModuleName: AnalyticsQueryHelper.ToModuleDisplayName(m.Module),
                         m.EventCount,
                         m.UniqueUsers,
                         Trend: TrendDirection.Stable))
@@ -128,22 +129,6 @@ public static class GetAnalyticsSummary
                 PeriodLabel: periodLabel);
 
             return response;
-        }
-
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
-        {
-            var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
-            var days = label switch
-            {
-                "last_7d" => 7,
-                "last_1d" => 1,
-                "last_90d" => 90,
-                _ => 30
-            };
-
-            if (days > maxDays) days = maxDays;
-
-            return (utcNow.AddDays(-days), utcNow, label);
         }
 
         private static TrendDirection CompareTrend(long current, long previous, decimal threshold = AnalyticsConstants.TrendThreshold)
@@ -199,18 +184,6 @@ public static class GetAnalyticsSummary
             return (Math.Round(valueScore, 1), Math.Round(frictionScore, 1), avgTtfv, avgTtcore);
         }
 
-        private static string ToModuleDisplayName(ProductModule module)
-            => module switch
-            {
-                ProductModule.AiAssistant => "AI Assistant",
-                ProductModule.SourceOfTruth => "Source of Truth",
-                ProductModule.ChangeIntelligence => "Change Intelligence",
-                ProductModule.ContractStudio => "Contract Studio",
-                ProductModule.ServiceCatalog => "Service Catalog",
-                ProductModule.IntegrationHub => "Integration Hub",
-                ProductModule.ExecutiveViews => "Executive Views",
-                _ => module.ToString()
-            };
     }
 
     /// <summary>Resumo consolidado de product analytics.</summary>

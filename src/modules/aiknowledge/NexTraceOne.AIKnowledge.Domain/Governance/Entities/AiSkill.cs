@@ -85,7 +85,7 @@ public sealed class AiSkill : AuditableEntity<AiSkillId>
     public Guid TenantId { get; private set; }
 
     /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     /// <summary>
     /// Cria uma skill oficial da plataforma (System).

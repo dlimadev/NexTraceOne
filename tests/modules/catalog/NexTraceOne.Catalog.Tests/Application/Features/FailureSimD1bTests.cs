@@ -15,7 +15,7 @@ public sealed class FailureSimD1bTests
 
     private static ServiceAsset MakeService(string name = "order-service", string team = "TeamA", ServiceTierType tier = ServiceTierType.Standard)
     {
-        var s = ServiceAsset.Create(name, "Core", team);
+        var s = ServiceAsset.Create(name, "Core", team, Guid.NewGuid());
         s.SetTier(tier);
         return s;
     }

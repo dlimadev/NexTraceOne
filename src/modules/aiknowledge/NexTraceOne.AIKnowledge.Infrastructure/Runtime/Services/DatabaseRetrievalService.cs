@@ -34,6 +34,7 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
     private readonly IChangeGroundingReader _changeReader;
     private readonly IIncidentGroundingReader _incidentReader;
     private readonly IContractGroundingReader _contractReader;
+    private readonly IPiiRedactionService _piiRedaction;
     private readonly IMemoryCache _memoryCache;
     private readonly ILogger<DatabaseRetrievalService> _logger;
 
@@ -43,6 +44,7 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
         IChangeGroundingReader changeReader,
         IIncidentGroundingReader incidentReader,
         IContractGroundingReader contractReader,
+        IPiiRedactionService piiRedaction,
         IMemoryCache memoryCache,
         ILogger<DatabaseRetrievalService> logger)
     {
@@ -51,6 +53,7 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
         _changeReader = changeReader;
         _incidentReader = incidentReader;
         _contractReader = contractReader;
+        _piiRedaction = piiRedaction;
         _memoryCache = memoryCache;
         _logger = logger;
     }
@@ -155,6 +158,9 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                                   $"Lifecycle: {svc.Lifecycle}, Type: {svc.ServiceType}. " +
                                   Truncate(svc.Description, MaxSnippetLength);
 
+                    // SECURITY: redact PII from grounding before sending to LLM
+                    summary = _piiRedaction.Redact(summary);
+
                     hits.Add(new DatabaseSearchHit(
                         EntityType: "Service",
                         EntityId: svc.ServiceId,
@@ -202,6 +208,9 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                               $"ChangeLevel: {release.ChangeLevel}, Risk: {release.ChangeScore:F2}. " +
                               Truncate(release.Description, MaxSnippetLength);
 
+                // SECURITY: redact PII from grounding before sending to LLM
+                summary = _piiRedaction.Redact(summary);
+
                 hits.Add(new DatabaseSearchHit(
                     EntityType: "Release",
                     EntityId: release.ReleaseId,
@@ -244,6 +253,9 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                               $"on {incident.ServiceName}, Status: {incident.Status}, " +
                               $"Detected: {incident.DetectedAt:yyyy-MM-dd HH:mm} UTC. " +
                               Truncate(incident.Description, MaxSnippetLength);
+
+                // SECURITY: redact PII from grounding before sending to LLM
+                summary = _piiRedaction.Redact(summary);
 
                 hits.Add(new DatabaseSearchHit(
                     EntityType: "Incident",
@@ -333,6 +345,9 @@ public sealed class DatabaseRetrievalService : IDatabaseRetrievalService
                     var summary = $"Contract v{cv.Version} [{cv.Protocol}] — " +
                                   $"State: {cv.LifecycleState}{lockedInfo}. " +
                                   $"ApiAsset: {cv.ApiAssetId}.";
+
+                    // SECURITY: redact PII from grounding before sending to LLM
+                    summary = _piiRedaction.Redact(summary);
 
                     hits.Add(new DatabaseSearchHit(
                         EntityType: "Contract",

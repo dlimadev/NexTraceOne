@@ -34,6 +34,7 @@ public sealed class MultiTenantIsolationTests
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
     private readonly IAnalyticsEventForwarder _forwarder = Substitute.For<IAnalyticsEventForwarder>();
+    private readonly IJourneyDefinitionRepository _journeyRepo = Substitute.For<IJourneyDefinitionRepository>();
 
     private static readonly Guid TenantIdA = Guid.Parse("aaaaaaaa-0000-0000-0000-000000000001");
     private static readonly Guid TenantIdB = Guid.Parse("bbbbbbbb-0000-0000-0000-000000000002");
@@ -51,6 +52,7 @@ public sealed class MultiTenantIsolationTests
         _configService
             .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((EffectiveConfigurationDto?)null);
+        _journeyRepo.ListActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns([]);
 
         // Default empty returns for repository
         _repo.CountAsync(Arg.Any<string?>(), Arg.Any<ProductModule?>(), Arg.Any<string?>(), Arg.Any<string?>(),
@@ -280,7 +282,7 @@ public sealed class MultiTenantIsolationTests
         _repo.GetSessionEventTypesAsync(Arg.Any<AnalyticsEventType[]>(), Arg.Any<string?>(),
             Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>()).Returns([]);
 
-        var handler = new GetJourneys.Handler(_repo, _clock, _configService);
+        var handler = new GetJourneys.Handler(_repo, _clock, _configService, _journeyRepo, _tenantA);
         var query = new GetJourneys.Query(null, null, "last_30d");
 
         // Act

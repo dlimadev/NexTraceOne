@@ -31,7 +31,7 @@ public sealed class CreateSoapDraftTests
     private static readonly Guid TestServiceId = System.Guid.NewGuid();
     private static IServiceAssetRepository CreateServiceRepo()
     {
-        var service = ServiceAsset.Create("TestService", "test-domain", "test-team");
+        var service = ServiceAsset.Create("TestService", "test-domain", "test-team", Guid.NewGuid());
         service.UpdateDetails("TestService", "", ServiceType.SoapService, "", Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())

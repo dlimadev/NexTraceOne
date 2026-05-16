@@ -69,7 +69,7 @@ public sealed class IdeQuerySession : AuditableEntity<IdeQuerySessionId>
     public Guid TenantId { get; private set; }
 
     /// <summary>Controlo de concorrência optimista.</summary>
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     /// <summary>
     /// Cria uma nova sessão de consulta IDE com estado Processing.

@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using MediatR;
 
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.ValueObjects;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
@@ -124,7 +125,7 @@ public sealed class AIModel : AuditableEntity<AIModelId>
     public DateTimeOffset RegisteredAt { get; private set; }
 
     /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     /// <summary>
     /// Registra um novo modelo de IA no Model Registry com validações de invariantes.
@@ -169,7 +170,7 @@ public sealed class AIModel : AuditableEntity<AIModelId>
         {
             Id = AIModelId.New(),
             Name = name,
-            Slug = slug ?? name.ToLowerInvariant().Replace(':', '-').Replace(' ', '-'),
+            Slug = SlugHelper.Derive(name, slug),
             DisplayName = displayName,
             Provider = provider,
             ProviderId = providerId,

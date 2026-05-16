@@ -18,7 +18,7 @@ internal sealed class AnalyticsEventConfiguration : IEntityTypeConfiguration<Ana
             t.HasCheckConstraint("CK_pan_analytics_events_module",
                 "\"Module\" IN ('Dashboard','ServiceCatalog','SourceOfTruth','ContractStudio','ChangeIntelligence','Incidents','Reliability','Runbooks','AiAssistant','Governance','ExecutiveViews','FinOps','IntegrationHub','DeveloperPortal','Admin','Automation','Search')");
             t.HasCheckConstraint("CK_pan_analytics_events_event_type",
-                "\"EventType\" IN ('ModuleViewed','EntityViewed','SearchExecuted','SearchResultClicked','ZeroResultSearch','QuickActionTriggered','AssistantPromptSubmitted','AssistantResponseUsed','ContractDraftCreated','ContractPublished','ChangeViewed','IncidentInvestigated','MitigationWorkflowStarted','MitigationWorkflowCompleted','EvidencePackageExported','PolicyViewed','ExecutiveOverviewViewed','RunbookViewed','SourceOfTruthQueried','ReportGenerated','OnboardingStepCompleted','JourneyAbandoned','EmptyStateEncountered','ReliabilityDashboardViewed','AutomationWorkflowManaged')");
+                "\"EventType\" IN ('ModuleViewed','EntityViewed','SearchExecuted','SearchResultClicked','ZeroResultSearch','QuickActionTriggered','AssistantPromptSubmitted','AssistantResponseUsed','ContractDraftCreated','ContractPublished','ChangeViewed','IncidentInvestigated','MitigationWorkflowStarted','MitigationWorkflowCompleted','EvidencePackageExported','PolicyViewed','ExecutiveOverviewViewed','RunbookViewed','SourceOfTruthQueried','ReportGenerated','OnboardingStepCompleted','JourneyAbandoned','EmptyStateEncountered','ReliabilityDashboardViewed','AutomationWorkflowManaged','ServiceCreated')");
         });
 
         builder.HasKey(x => x.Id);
@@ -77,7 +77,12 @@ internal sealed class AnalyticsEventConfiguration : IEntityTypeConfiguration<Ana
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
+        builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp with time zone")
+            .IsRequired();
+
         builder.HasIndex(x => x.OccurredAt);
+        builder.HasIndex(x => x.CreatedAt);
         builder.HasIndex(x => x.Module);
         builder.HasIndex(x => x.EventType);
         builder.HasIndex(x => x.Persona);

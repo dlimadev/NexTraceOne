@@ -122,7 +122,7 @@ public sealed class ContractGovernanceApplicationTests
         var contractRepo = Substitute.For<IContractVersionRepository>();
         var sut = new ListContractsByServiceFeature.Handler(apiRepo, contractRepo);
 
-        var service = ServiceAsset.Create("test-service", "Finance", "Team A");
+        var service = ServiceAsset.Create("test-service", "Finance", "Team A", Guid.NewGuid());
         var api = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Public", service);
 
         apiRepo.ListByServiceIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())

@@ -31,11 +31,11 @@ public sealed class ServiceCatalogApplicationTests
 
         var services = new List<ServiceAsset>
         {
-            ServiceAsset.Create("svc-a", "Finance", "Team Alpha"),
-            ServiceAsset.Create("svc-b", "Sales", "Team Beta")
+            ServiceAsset.Create("svc-a", "Finance", "Team Alpha", Guid.NewGuid()),
+            ServiceAsset.Create("svc-b", "Sales", "Team Beta", Guid.NewGuid())
         };
-        repository.ListFilteredAsync(null, null, null, null, null, null, null, Arg.Any<CancellationToken>())
-            .Returns(services);
+        repository.ListFilteredAsync(null, null, null, null, null, null, null, Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((services, services.Count));
 
         var result = await sut.Handle(
             new ListServicesFeature.Query(null, null, null, null, null, null, null),
@@ -52,15 +52,15 @@ public sealed class ServiceCatalogApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var sut = new ListServicesFeature.Handler(repository);
 
-        repository.ListFilteredAsync("Team Alpha", "Finance", ServiceType.RestApi, null, null, null, null, Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceAsset>());
+        repository.ListFilteredAsync("Team Alpha", "Finance", ServiceType.RestApi, null, null, null, null, Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((new List<ServiceAsset>(), 0));
 
         var result = await sut.Handle(
             new ListServicesFeature.Query("Team Alpha", "Finance", ServiceType.RestApi, null, null, null, null),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
-        await repository.Received(1).ListFilteredAsync("Team Alpha", "Finance", ServiceType.RestApi, null, null, null, null, Arg.Any<CancellationToken>());
+        await repository.Received(1).ListFilteredAsync("Team Alpha", "Finance", ServiceType.RestApi, null, null, null, null, Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>());
     }
 
     // ── GetServiceDetail ──────────────────────────────────────────────────
@@ -72,7 +72,7 @@ public sealed class ServiceCatalogApplicationTests
         var apiRepo = Substitute.For<IApiAssetRepository>();
         var sut = new GetServiceDetailFeature.Handler(serviceRepo, apiRepo);
 
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         serviceRepo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(service);
         apiRepo.ListAllAsync(Arg.Any<CancellationToken>())
@@ -116,7 +116,7 @@ public sealed class ServiceCatalogApplicationTests
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateServiceAssetFeature.Handler(repository, unitOfWork);
 
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         repository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(service);
 
@@ -170,7 +170,7 @@ public sealed class ServiceCatalogApplicationTests
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new UpdateServiceOwnershipFeature.Handler(repository, unitOfWork);
 
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         repository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(service);
 
@@ -214,7 +214,7 @@ public sealed class ServiceCatalogApplicationTests
 
         var services = new List<ServiceAsset>
         {
-            ServiceAsset.Create("payments-service", "Finance", "Payments Team")
+            ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid())
         };
         repository.SearchAsync("payments", Arg.Any<CancellationToken>())
             .Returns(services);
@@ -236,13 +236,13 @@ public sealed class ServiceCatalogApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var sut = new GetServicesSummaryFeature.Handler(repository);
 
-        var svc1 = ServiceAsset.Create("svc-a", "Finance", "Team Alpha");
-        var svc2 = ServiceAsset.Create("svc-b", "Finance", "Team Alpha");
+        var svc1 = ServiceAsset.Create("svc-a", "Finance", "Team Alpha", Guid.NewGuid());
+        var svc2 = ServiceAsset.Create("svc-b", "Finance", "Team Alpha", Guid.NewGuid());
         svc1.UpdateDetails("SvcA", "", ServiceType.RestApi, "", Criticality.Critical, LifecycleStatus.Active, ExposureType.Internal, "", "");
         svc2.UpdateDetails("SvcB", "", ServiceType.BackgroundService, "", Criticality.Medium, LifecycleStatus.Active, ExposureType.Internal, "", "");
 
-        repository.ListFilteredAsync(null, null, null, null, null, null, null, Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceAsset> { svc1, svc2 });
+        repository.ListFilteredAsync(null, null, null, null, null, null, null, Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((new List<ServiceAsset> { svc1, svc2 }, 2));
 
         var result = await sut.Handle(
             new GetServicesSummaryFeature.Query(null, null),
@@ -260,7 +260,7 @@ public sealed class ServiceCatalogApplicationTests
     [Fact]
     public void ServiceAsset_Create_Should_SetDefaults()
     {
-        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam");
+        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam", Guid.NewGuid());
 
         service.Name.Should().Be("test-service");
         service.DisplayName.Should().Be("test-service");
@@ -278,7 +278,7 @@ public sealed class ServiceCatalogApplicationTests
     [Fact]
     public void ServiceAsset_UpdateDetails_Should_ChangeProperties()
     {
-        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam");
+        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam", Guid.NewGuid());
 
         service.UpdateDetails(
             "Test Service Display",
@@ -305,7 +305,7 @@ public sealed class ServiceCatalogApplicationTests
     [Fact]
     public void ServiceAsset_UpdateOwnership_Should_ChangeOwnerFields()
     {
-        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam");
+        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam", Guid.NewGuid());
 
         service.UpdateOwnership("New Team", "tech.owner", "biz.owner");
 
@@ -317,7 +317,7 @@ public sealed class ServiceCatalogApplicationTests
     [Fact]
     public void ServiceAsset_UpdateOwnership_Should_Reject_EmptyTeamName()
     {
-        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam");
+        var service = ServiceAsset.Create("test-service", "TestDomain", "TestTeam", Guid.NewGuid());
 
         var act = () => service.UpdateOwnership("", "tech.owner", "biz.owner");
 
@@ -332,7 +332,7 @@ public sealed class ServiceCatalogApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         repository.GetByNameAsync("new-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -362,7 +362,7 @@ public sealed class ServiceCatalogApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         repository.GetByNameAsync("full-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -403,9 +403,9 @@ public sealed class ServiceCatalogApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
-        var existing = ServiceAsset.Create("existing-service", "Finance", "Team Alpha");
+        var existing = ServiceAsset.Create("existing-service", "Finance", "Team Alpha", Guid.NewGuid());
         repository.GetByNameAsync("existing-service", Arg.Any<CancellationToken>())
             .Returns(existing);
 
@@ -424,7 +424,7 @@ public sealed class ServiceCatalogApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         repository.GetByNameAsync("safe-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);
@@ -451,7 +451,7 @@ public sealed class ServiceCatalogApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         repository.GetByNameAsync("detail-service", Arg.Any<CancellationToken>())
             .Returns((ServiceAsset?)null);

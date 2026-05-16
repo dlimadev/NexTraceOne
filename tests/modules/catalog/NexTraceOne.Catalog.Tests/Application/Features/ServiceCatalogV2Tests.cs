@@ -42,7 +42,7 @@ public sealed class ServiceCatalogV2Tests
         ServiceTierType tier = ServiceTierType.Standard,
         DateTimeOffset? lastReview = null)
     {
-        var svc = ServiceAsset.Create(name, "platform", team);
+        var svc = ServiceAsset.Create(name, "platform", team, Guid.NewGuid());
         svc.UpdateOwnership(team, techOwner, bizOwner);
         svc.UpdateExtendedMetadata(
             subDomain: null, capability: null,
@@ -266,8 +266,8 @@ public sealed class ServiceCatalogV2Tests
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.ListFilteredAsync(Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<ServiceType?>(),
             Arg.Any<Criticality?>(), Arg.Any<LifecycleStatus?>(), Arg.Any<ExposureType?>(),
-            Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceAsset>());
+            Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((new List<ServiceAsset>(), 0));
 
         var handler = new GetOwnershipDriftReportFeature.Handler(repo, CreateConfig(), CreateClock());
         var result = await handler.Handle(new GetOwnershipDriftReportFeature.Query(), CancellationToken.None);
@@ -286,8 +286,8 @@ public sealed class ServiceCatalogV2Tests
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.ListFilteredAsync(Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<ServiceType?>(),
             Arg.Any<Criticality?>(), Arg.Any<LifecycleStatus?>(), Arg.Any<ExposureType?>(),
-            Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceAsset> { svcNeverReviewed, svcRecentReview });
+            Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((new List<ServiceAsset> { svcNeverReviewed, svcRecentReview }, 2));
 
         var handler = new GetOwnershipDriftReportFeature.Handler(repo, CreateConfig(), CreateClock());
         var result = await handler.Handle(new GetOwnershipDriftReportFeature.Query(), CancellationToken.None);

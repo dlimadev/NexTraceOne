@@ -4,6 +4,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- TEMP: Suppress NU1903 for Microsoft.Bcl.Memory transitive from Microsoft.ML.Tokenizers.Data.Cl100kBase.
+         Revert when Microsoft releases patched Tokenizers.Data package. -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1903</WarningsNotAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Suppressed warnings — see docs/HONEST-GAPS.md QLT-03 for full rationale:
          1591: Missing XML comment — enforced selectively, not globally.

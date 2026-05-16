@@ -27,7 +27,7 @@ public sealed class SelfHealingAction : AuditableEntity<SelfHealingActionId>
     public string AuditTrailJson { get; private set; } = "[]";
     public Guid TenantId { get; private set; }
     public DateTimeOffset ProposedAt { get; private set; }
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     public static SelfHealingAction Propose(
         string incidentId,

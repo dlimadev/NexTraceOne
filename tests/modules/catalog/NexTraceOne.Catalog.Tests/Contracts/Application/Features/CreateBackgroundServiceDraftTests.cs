@@ -24,7 +24,7 @@ public sealed class CreateBackgroundServiceDraftTests
     private static readonly Guid TestServiceId = Guid.NewGuid();
     private static IServiceAssetRepository CreateServiceRepo()
     {
-        var service = ServiceAsset.Create("TestService", "test-domain", "test-team");
+        var service = ServiceAsset.Create("TestService", "test-domain", "test-team", Guid.NewGuid());
         service.UpdateDetails("TestService", "", ServiceType.BackgroundService, "", Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())

@@ -53,7 +53,8 @@ public static class CreateEvaluationDataset
         {
             Guard.Against.Null(request);
 
-            var sourceType = Enum.Parse<EvaluationDatasetSourceType>(request.SourceType, ignoreCase: true);
+            if (!Enum.TryParse<EvaluationDatasetSourceType>(request.SourceType, ignoreCase: true, out var sourceType))
+                return Error.Validation("EvaluationDataset.InvalidSourceType", $"'{request.SourceType}' is not a valid evaluation dataset source type.");
 
             var dataset = EvaluationDataset.Create(
                 request.Name,

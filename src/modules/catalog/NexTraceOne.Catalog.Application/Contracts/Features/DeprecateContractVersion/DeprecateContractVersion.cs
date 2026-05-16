@@ -2,9 +2,12 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using System.Diagnostics;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.BuildingBlocks.Observability.Tracing;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Errors;
@@ -43,7 +46,10 @@ public static class DeprecateContractVersion
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
+            using var activity = NexTraceActivitySources.Commands.StartActivity("DeprecateContractVersion");
             Guard.Against.Null(request);
+
+            activity?.SetTag("contractVersion.id", request.ContractVersionId.ToString());
 
             var version = await repository.GetByIdAsync(
                 ContractVersionId.From(request.ContractVersionId), cancellationToken);
@@ -60,6 +66,8 @@ public static class DeprecateContractVersion
                 return result.Error;
 
             await unitOfWork.CommitAsync(cancellationToken);
+
+            activity?.SetTag("contractVersion.lifecycleState", version.LifecycleState.ToString());
 
             return new Response(
                 version.Id.Value,

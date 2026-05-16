@@ -22,7 +22,9 @@ public static class ListServices
         Criticality? Criticality,
         LifecycleStatus? LifecycleStatus,
         ExposureType? ExposureType,
-        string? SearchTerm) : IQuery<Response>;
+        string? SearchTerm,
+        int Page = 1,
+        int PageSize = 50) : IQuery<Response>;
 
     /// <summary>Validador da query ListServices.</summary>
     public sealed class Validator : AbstractValidator<Query>
@@ -32,6 +34,8 @@ public static class ListServices
             RuleFor(x => x.TeamName).MaximumLength(200).When(x => x.TeamName is not null);
             RuleFor(x => x.Domain).MaximumLength(200).When(x => x.Domain is not null);
             RuleFor(x => x.SearchTerm).MaximumLength(200).When(x => x.SearchTerm is not null);
+            RuleFor(x => x.Page).GreaterThan(0);
+            RuleFor(x => x.PageSize).InclusiveBetween(1, 200);
         }
     }
 
@@ -43,7 +47,7 @@ public static class ListServices
         {
             Guard.Against.Null(request);
 
-            var services = await serviceAssetRepository.ListFilteredAsync(
+            var (services, totalCount) = await serviceAssetRepository.ListFilteredAsync(
                 request.TeamName,
                 request.Domain,
                 request.ServiceType,
@@ -51,6 +55,8 @@ public static class ListServices
                 request.LifecycleStatus,
                 request.ExposureType,
                 request.SearchTerm,
+                request.Page,
+                request.PageSize,
                 cancellationToken);
 
             var items = services
@@ -69,7 +75,7 @@ public static class ListServices
                     svc.ExposureType.ToString()))
                 .ToList();
 
-            return new Response(items, items.Count);
+            return new Response(items, totalCount);
         }
     }
 

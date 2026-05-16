@@ -8,9 +8,14 @@ function getOrCreateSessionId(): string {
   const existing = sessionStorage.getItem(key);
   if (existing) return existing;
 
-  const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  let id: string;
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    id = crypto.randomUUID();
+  } else {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    id = Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
+  }
 
   sessionStorage.setItem(key, id);
   return id;

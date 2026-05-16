@@ -142,8 +142,8 @@ public sealed class ContractsDbContext(
     public DbSet<DataContractRecord> DataContractRecords => Set<DataContractRecord>();
 
     /// <summary>Agendamentos de deprecação de contratos com guia de migração. Wave AV.3.</summary>
-    public DbSet<IDeprecationScheduleRepository.DeprecationScheduleRecord> DeprecationSchedules
-        => Set<IDeprecationScheduleRepository.DeprecationScheduleRecord>();
+    public DbSet<DeprecationScheduleRecord> DeprecationSchedules
+        => Set<DeprecationScheduleRecord>();
 
     /// <summary>Estado actual de feature flags por serviço e tenant. Wave AS.1.</summary>
     public DbSet<FeatureFlagRecord> FeatureFlagRecords => Set<FeatureFlagRecord>();

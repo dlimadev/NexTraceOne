@@ -10,11 +10,20 @@ namespace NexTraceOne.AIKnowledge.Tests.Runtime.Features;
 /// </summary>
 public sealed class ContextWindowManagerTests
 {
+    private static IContextWindowManager CreateManager()
+    {
+        // Use real TokenCounterService with a simple logger for accurate token counting
+        var logger = Microsoft.Extensions.Logging.Abstractions.NullLogger<NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.TokenCounterService>.Instance;
+        var tokenCounter = new NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.TokenCounterService(logger);
+        return new ContextWindowManager(tokenCounter);
+    }
+
     // ── Short conversation — should not be truncated ─────────────────────
 
     [Fact]
     public void TrimToFit_WhenMessagesAreFewAndShort_ShouldNotTruncate()
     {
+        var manager = CreateManager();
         var messages = new List<ChatMessage>
         {
             new("system", "You are a helpful assistant."),
@@ -22,7 +31,7 @@ public sealed class ContextWindowManagerTests
             new("assistant", "Service X is healthy."),
         };
 
-        var (result, wasTruncated) = ContextWindowManager.TrimToFit(messages, maxContextTokens: 4096);
+        var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 4096);
 
         result.Should().HaveCount(3);
         wasTruncated.Should().BeFalse();
@@ -33,7 +42,8 @@ public sealed class ContextWindowManagerTests
     [Fact]
     public void TrimToFit_WhenEmpty_ShouldReturnEmpty()
     {
-        var (result, wasTruncated) = ContextWindowManager.TrimToFit([], maxContextTokens: 4096);
+        var manager = CreateManager();
+        var (result, wasTruncated) = manager.TrimToFit([], maxContextTokens: 4096);
 
         result.Should().BeEmpty();
         wasTruncated.Should().BeFalse();
@@ -44,6 +54,7 @@ public sealed class ContextWindowManagerTests
     [Fact]
     public void TrimToFit_WhenHistoryExceedsWindow_ShouldTruncateOldMessages()
     {
+        var manager = CreateManager();
         var messages = new List<ChatMessage>
         {
             new("system", "You are an AI assistant."),
@@ -57,7 +68,7 @@ public sealed class ContextWindowManagerTests
         }
         messages.Add(new("user", "What is the final answer?"));
 
-        var (result, wasTruncated) = ContextWindowManager.TrimToFit(messages, maxContextTokens: 2048);
+        var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 2048);
 
         wasTruncated.Should().BeTrue();
         result.Should().Contain(m => m.Role == "system"); // system always preserved
@@ -70,6 +81,7 @@ public sealed class ContextWindowManagerTests
     [Fact]
     public void TrimToFit_ShouldAlwaysPreserveSystemPrompt()
     {
+        var manager = CreateManager();
         const string systemContent = "Critical system instructions that must be preserved.";
         var messages = new List<ChatMessage>
         {
@@ -83,7 +95,7 @@ public sealed class ContextWindowManagerTests
             messages.Add(new("assistant", new string('b', 500)));
         }
 
-        var (result, wasTruncated) = ContextWindowManager.TrimToFit(messages, maxContextTokens: 1024);
+        var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 1024);
 
         result.Should().Contain(m => m.Role == "system" && m.Content == systemContent);
     }
@@ -93,12 +105,13 @@ public sealed class ContextWindowManagerTests
     [Fact]
     public void TrimToFit_WithSingleUserMessage_ShouldNotTruncate()
     {
+        var manager = CreateManager();
         var messages = new List<ChatMessage>
         {
             new("user", "Hello"),
         };
 
-        var (result, wasTruncated) = ContextWindowManager.TrimToFit(messages, maxContextTokens: 128);
+        var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 128);
 
         result.Should().HaveCount(1);
         wasTruncated.Should().BeFalse();
@@ -109,6 +122,7 @@ public sealed class ContextWindowManagerTests
     [Fact]
     public void TrimToFit_ShouldPreserveMostRecentMessages()
     {
+        var manager = CreateManager();
         var messages = new List<ChatMessage>
         {
             new("system", "System"),
@@ -120,7 +134,7 @@ public sealed class ContextWindowManagerTests
             new("assistant", "Recent answer"),
         };
 
-        var (result, wasTruncated) = ContextWindowManager.TrimToFit(messages, maxContextTokens: 512);
+        var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 512);
 
         // Most recent messages should be preserved
         result.Should().Contain(m => m.Content == "Recent question");
@@ -132,26 +146,30 @@ public sealed class ContextWindowManagerTests
     [Fact]
     public void EstimateTokens_WithEmptyContent_ShouldReturnZero()
     {
-        ContextWindowManager.EstimateTokens("").Should().Be(0);
+        var manager = CreateManager();
+        manager.EstimateTokens("").Should().Be(0);
     }
 
     [Fact]
     public void EstimateTokens_WithShortText_ShouldReturnAtLeastOne()
     {
-        ContextWindowManager.EstimateTokens("hi").Should().BeGreaterThan(0);
+        var manager = CreateManager();
+        manager.EstimateTokens("hi").Should().BeGreaterThan(0);
     }
 
     [Fact]
     public void EstimateTokens_WithLongText_ShouldIncreaseWithLength()
     {
-        var short1 = ContextWindowManager.EstimateTokens("Hello world.");
-        var long1 = ContextWindowManager.EstimateTokens(new string('x', 400));
+        var manager = CreateManager();
+        var short1 = manager.EstimateTokens("Hello world.");
+        var long1 = manager.EstimateTokens(new string('x', 400));
         long1.Should().BeGreaterThan(short1);
     }
 
     [Fact]
     public void EstimateTotalTokens_WithMultipleMessages_ShouldSumTokens()
     {
+        var manager = CreateManager();
         var messages = new List<ChatMessage>
         {
             new("system", "System prompt."),
@@ -159,7 +177,7 @@ public sealed class ContextWindowManagerTests
             new("assistant", "Assistant response here."),
         };
 
-        var total = ContextWindowManager.EstimateTotalTokens(messages);
+        var total = manager.EstimateTotalTokens(messages);
         total.Should().BeGreaterThan(0);
     }
 
@@ -168,13 +186,14 @@ public sealed class ContextWindowManagerTests
     [Fact]
     public void TrimToFit_WhenMaxTokensVerySmall_ShouldReturnLastUserMessage()
     {
+        var manager = CreateManager();
         var messages = new List<ChatMessage>
         {
             new("system", new string('s', 10000)),
             new("user", "Final question?"),
         };
 
-        var (result, wasTruncated) = ContextWindowManager.TrimToFit(messages, maxContextTokens: 10);
+        var (result, wasTruncated) = manager.TrimToFit(messages, maxContextTokens: 10);
 
         // When system prompt itself is too large, returns last user message
         wasTruncated.Should().BeTrue();

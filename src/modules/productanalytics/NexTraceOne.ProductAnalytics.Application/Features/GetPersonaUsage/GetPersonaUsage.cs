@@ -7,6 +7,7 @@ using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
 using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetPersonaUsage;
 
@@ -37,7 +38,7 @@ public static class GetPersonaUsage
             var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
             var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
 
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
+            var (from, to, periodLabel) = AnalyticsQueryHelper.ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var personas = await repository.GetPersonaBreakdownAsync(
                 request.TeamId, domainId: null, from, to, cancellationToken);
@@ -149,20 +150,6 @@ public static class GetPersonaUsage
                 PageSize: pageSize,
                 TotalCount: totalCount,
                 TotalPages: Math.Max(1, totalPages)));
-        }
-
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
-        {
-            var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
-            var days = label switch
-            {
-                "last_7d" => 7,
-                "last_1d" => 1,
-                "last_90d" => 90,
-                _ => 30
-            };
-            if (days > maxDays) days = maxDays;
-            return (utcNow.AddDays(-days), utcNow, label);
         }
 
         private static string MapFrictionLabel(AnalyticsEventType eventType) => eventType switch

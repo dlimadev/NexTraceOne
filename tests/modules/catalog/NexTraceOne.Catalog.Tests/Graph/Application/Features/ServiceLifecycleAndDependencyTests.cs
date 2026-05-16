@@ -34,7 +34,7 @@ public sealed class ServiceLifecycleAndDependencyTests
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new DecommissionAssetFeature.Handler(apiAssetRepository, unitOfWork);
 
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("payments-api", "/api/payments", "1.0", "Public", service);
 
         apiAssetRepository.GetByIdAsync(Arg.Any<ApiAssetId>(), Arg.Any<CancellationToken>())
@@ -89,7 +89,7 @@ public sealed class ServiceLifecycleAndDependencyTests
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
         var sut = new AddServiceLinkFeature.Handler(serviceAssetRepository, serviceLinkRepository, unitOfWork);
 
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
 
         serviceAssetRepository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(service);
@@ -155,7 +155,7 @@ public sealed class ServiceLifecycleAndDependencyTests
         var sut = new ComputeServiceMaturityFeature.Handler(
             serviceAssetRepository, serviceLinkRepository, apiAssetRepository, contractVersionRepository);
 
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
 
         serviceAssetRepository.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(service);
@@ -222,7 +222,7 @@ public sealed class ServiceLifecycleAndDependencyTests
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var sut = new DetectCircularDependenciesFeature.Handler(apiAssetRepository);
 
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var api = ApiAsset.Register("payments-api", "/api/payments", "1.0", "Public", service);
 
         apiAssetRepository.ListAllAsync(Arg.Any<CancellationToken>())
@@ -261,11 +261,11 @@ public sealed class ServiceLifecycleAndDependencyTests
             serviceAssetRepository, serviceLinkRepository, apiAssetRepository, contractVersionRepository);
 
         // Serviço com equipa definida mas sem TechnicalOwner — deve gerar findings
-        var service = ServiceAsset.Create("incomplete-service", "Finance", "Team Alpha");
+        var service = ServiceAsset.Create("incomplete-service", "Finance", "Team Alpha", Guid.NewGuid());
 
         serviceAssetRepository.ListFilteredAsync(
-                null, null, null, null, null, null, null, Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceAsset> { service });
+                null, null, null, null, null, null, null, Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((new List<ServiceAsset> { service }, 1));
         serviceLinkRepository.ListByServiceAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
             .Returns(new List<ServiceLink>());
         apiAssetRepository.ListByServiceIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
@@ -291,8 +291,8 @@ public sealed class ServiceLifecycleAndDependencyTests
             serviceAssetRepository, serviceLinkRepository, apiAssetRepository, contractVersionRepository);
 
         serviceAssetRepository.ListFilteredAsync(
-                null, null, null, null, null, null, null, Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceAsset>());
+                null, null, null, null, null, null, null, Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((new List<ServiceAsset>(), 0));
 
         var result = await sut.Handle(
             new GetOwnershipAuditFeature.Query(),

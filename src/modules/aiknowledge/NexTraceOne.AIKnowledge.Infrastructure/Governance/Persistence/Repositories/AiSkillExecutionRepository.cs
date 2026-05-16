@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiSkillExecutionRepository(AiGovernanceDbContext context) : IAiSkillExecutionRepository
+internal sealed class AiSkillExecutionRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiSkillExecutionRepository
 {
     public async Task<AiSkillExecution?> GetByIdAsync(AiSkillExecutionId id, CancellationToken ct)
-        => await context.SkillExecutions.SingleOrDefaultAsync(e => e.Id == id, ct);
+        => await context.SkillExecutions.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(e => e.Id == id, ct);
 
     public async Task<IReadOnlyList<AiSkillExecution>> ListBySkillAsync(AiSkillId skillId, int limit, CancellationToken ct)
         => await context.SkillExecutions

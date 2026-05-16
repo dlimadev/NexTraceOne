@@ -53,7 +53,8 @@ public static class SubmitIdeQuery
         {
             Guard.Against.Null(request);
 
-            var queryType = Enum.Parse<IdeQueryType>(request.QueryTypeValue);
+            if (!Enum.TryParse<IdeQueryType>(request.QueryTypeValue, ignoreCase: true, out var queryType))
+                return Error.Validation("IdeQuery.InvalidQueryType", $"'{request.QueryTypeValue}' is not a valid IDE query type.");
 
             var session = IdeQuerySession.Create(
                 userId: currentUser.Id,

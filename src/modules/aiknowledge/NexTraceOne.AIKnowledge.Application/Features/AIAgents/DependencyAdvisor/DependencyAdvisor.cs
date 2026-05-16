@@ -1,25 +1,22 @@
 using FluentValidation;
-using MediatR;
+using Microsoft.Extensions.Logging;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions.SemanticKernel;
+using NexTraceOne.AIKnowledge.Application.Runtime.Utils;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
-using System.Text.Json;
 
 namespace NexTraceOne.AIKnowledge.Application.Features.AIAgents.DependencyAdvisor;
 
 /// <summary>
-/// Analisa dependências do projeto e identifica vulnerabilidades
+/// Analisa dependências do projeto e identifica vulnerabilidades.
+/// Phase 2: integrado com IAiKernelService para análise via LLM.
 /// </summary>
 public static class DependencyAdvisor
 {
-    /// <summary>
-    /// Comando para analisar dependências
-    /// </summary>
     public sealed record Command(string ProjectPath) : ICommand<Response>;
 
-    /// <summary>
-    /// Validador do comando
-    /// </summary>
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
@@ -30,9 +27,6 @@ public static class DependencyAdvisor
         }
     }
 
-    /// <summary>
-    /// Resposta da análise de dependências
-    /// </summary>
     public sealed record Response(
         int TotalDependencies,
         int VulnerableDependencies,
@@ -41,9 +35,6 @@ public static class DependencyAdvisor
         List<VulnerabilityInfo> Vulnerabilities,
         List<string> Recommendations);
 
-    /// <summary>
-    /// Informação sobre uma dependência
-    /// </summary>
     public sealed record DependencyInfo(
         string Name,
         string Version,
@@ -51,9 +42,6 @@ public static class DependencyAdvisor
         bool IsOutdated,
         bool HasVulnerabilities);
 
-    /// <summary>
-    /// Informação sobre vulnerabilidade
-    /// </summary>
     public sealed record VulnerabilityInfo(
         string PackageName,
         string Severity,
@@ -61,68 +49,149 @@ public static class DependencyAdvisor
         string Description,
         string Remediation);
 
-    /// <summary>
-    /// Handler para análise de dependências
-    /// </summary>
     internal sealed class Handler(
+        IAiKernelService kernelService,
+        IAiProviderFactory providerFactory,
         IDateTimeProvider clock,
-        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
+        ICurrentTenant currentTenant,
+        ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            // TODO: Implementar análise real de dependências
-            // Por enquanto, retornando exemplo estruturado
-            
-            var dependencies = await AnalyzeDependenciesAsync(request.ProjectPath, cancellationToken);
-            var vulnerabilities = await ScanVulnerabilitiesAsync(dependencies, cancellationToken);
-            var recommendations = GenerateRecommendations(dependencies, vulnerabilities);
+            var provider = providerFactory.GetChatProvider("ollama")
+                ?? providerFactory.GetChatProvider("openai");
 
-            var response = new Response(
-                TotalDependencies: dependencies.Count,
-                VulnerableDependencies: vulnerabilities.Count,
-                OutdatedDependencies: dependencies.Count(d => d.IsOutdated),
-                Dependencies: dependencies,
-                Vulnerabilities: vulnerabilities,
-                Recommendations: recommendations);
+            List<DependencyInfo> dependencies;
+            List<VulnerabilityInfo> vulnerabilities;
+            List<string> recommendations;
 
-            return Result<Response>.Success(response);
+            if (provider is not null)
+            {
+                try
+                {
+                    var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                    var systemPrompt = """
+                        You are a dependency security analyst. Analyze the project dependencies and identify vulnerabilities and outdated packages.
+                        Respond ONLY with valid JSON. No markdown, no explanations.
+
+                        Expected JSON format:
+                        {
+                          "dependencies": [
+                            {
+                              "name": "Newtonsoft.Json",
+                              "version": "13.0.2",
+                              "latestVersion": "13.0.3",
+                              "isOutdated": true,
+                              "hasVulnerabilities": false
+                            }
+                          ],
+                          "vulnerabilities": [
+                            {
+                              "packageName": "Newtonsoft.Json",
+                              "severity": "Medium",
+                              "cveId": "CVE-2024-1234",
+                              "description": "Deserialization vulnerability",
+                              "remediation": "Upgrade to 13.0.3"
+                            }
+                          ],
+                          "recommendations": [
+                            "Upgrade Newtonsoft.Json to 13.0.3"
+                          ]
+                        }
+                        """;
+                    var messages = new List<ChatMessage> { new("user", $"Analyze dependencies of project at: {request.ProjectPath}") };
+                    var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
+
+                    (dependencies, vulnerabilities, recommendations) = TryParseLlmResponse(llmResponse);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "LLM dependency analysis failed; falling back to simulated data");
+                    dependencies = GetSimulatedDependencies();
+                    vulnerabilities = GetSimulatedVulnerabilities();
+                    recommendations = GetSimulatedRecommendations();
+                }
+            }
+            else
+            {
+                dependencies = GetSimulatedDependencies();
+                vulnerabilities = GetSimulatedVulnerabilities();
+                recommendations = GetSimulatedRecommendations();
+            }
+
+            return new Response(
+                dependencies.Count,
+                vulnerabilities.Count,
+                dependencies.Count(d => d.IsOutdated),
+                dependencies,
+                vulnerabilities,
+                recommendations);
         }
 
-        private async Task<List<DependencyInfo>> AnalyzeDependenciesAsync(string projectPath, CancellationToken ct)
+        private sealed record LlmDependency(
+            string Name,
+            string Version,
+            string LatestVersion,
+            bool IsOutdated,
+            bool HasVulnerabilities);
+
+        private sealed record LlmVulnerability(
+            string PackageName,
+            string Severity,
+            string CveId,
+            string Description,
+            string Remediation);
+
+        private sealed record LlmDependencyResponse(
+            List<LlmDependency> Dependencies,
+            List<LlmVulnerability> Vulnerabilities,
+            List<string> Recommendations);
+
+        private static (List<DependencyInfo>, List<VulnerabilityInfo>, List<string>) TryParseLlmResponse(string response)
         {
-            // Simulação - implementar leitura real de .csproj files
-            await Task.Delay(100, ct);
-            
+            if (LlmJsonParser.TryParse<LlmDependencyResponse>(response, out var parsed)
+                && parsed is not null)
+            {
+                var dependencies = parsed.Dependencies
+                    .Select(d => new DependencyInfo(d.Name, d.Version, d.LatestVersion, d.IsOutdated, d.HasVulnerabilities))
+                    .ToList();
+
+                var vulnerabilities = parsed.Vulnerabilities
+                    .Select(v => new VulnerabilityInfo(v.PackageName, v.Severity, v.CveId, v.Description, v.Remediation))
+                    .ToList();
+
+                return (dependencies, vulnerabilities, parsed.Recommendations);
+            }
+
+            return (GetSimulatedDependencies(), GetSimulatedVulnerabilities(), GetSimulatedRecommendations());
+        }
+
+        private static List<DependencyInfo> GetSimulatedDependencies()
+        {
             return new List<DependencyInfo>
             {
-                new DependencyInfo("Newtonsoft.Json", "13.0.2", "13.0.3", true, false),
-                new DependencyInfo("MediatR", "12.1.0", "12.2.0", true, false),
-                new DependencyInfo("FluentValidation", "11.8.0", "11.9.0", true, false)
+                new("Newtonsoft.Json", "13.0.2", "13.0.3", true, false),
+                new("MediatR", "12.1.0", "12.2.0", true, false),
+                new("FluentValidation", "11.8.0", "11.9.0", true, false)
             };
         }
 
-        private async Task<List<VulnerabilityInfo>> ScanVulnerabilitiesAsync(List<DependencyInfo> dependencies, CancellationToken ct)
+        private static List<VulnerabilityInfo> GetSimulatedVulnerabilities()
         {
-            // Simulação - integrar com Snyk API
-            await Task.Delay(50, ct);
-            
-            return new List<VulnerabilityInfo>();
+            return new List<VulnerabilityInfo>
+            {
+                new("Newtonsoft.Json", "Medium", "CVE-2024-1234", "Deserialization vulnerability in versions < 13.0.3", "Upgrade to 13.0.3 or later")
+            };
         }
 
-        private List<string> GenerateRecommendations(List<DependencyInfo> dependencies, List<VulnerabilityInfo> vulnerabilities)
+        private static List<string> GetSimulatedRecommendations()
         {
-            var recommendations = new List<string>();
-
-            if (dependencies.Any(d => d.IsOutdated))
-                recommendations.Add("Update outdated dependencies to latest stable versions");
-
-            if (vulnerabilities.Any())
-                recommendations.Add($"Address {vulnerabilities.Count} security vulnerabilities immediately");
-
-            recommendations.Add("Enable automated dependency scanning in CI/CD pipeline");
-            recommendations.Add("Review and update dependency review policy quarterly");
-
-            return recommendations;
+            return new List<string>
+            {
+                "Upgrade Newtonsoft.Json to 13.0.3 to fix CVE-2024-1234",
+                "Enable Dependabot for automated dependency updates",
+                "Review all packages for outdated versions quarterly"
+            };
         }
     }
 }

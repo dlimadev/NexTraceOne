@@ -44,6 +44,8 @@ public static class ExecuteAiChat
         IAiMessageRepository messageRepository,
         IAiUsageEntryRepository usageEntryRepository,
         IAiTokenQuotaService tokenQuotaService,
+        IContextWindowManager contextWindow,
+        IPromptCacheService promptCache,
         ICurrentUser currentUser,
         ICurrentTenant currentTenant,
         IDateTimeProvider dateTimeProvider) : ICommandHandler<Command, Response>
@@ -86,8 +88,8 @@ public static class ExecuteAiChat
             }
 
             // 3. Pre-validate token quota before inference
-            var estimatedTokens = ContextWindowManager.EstimateTokens(request.Message) +
-                                  ContextWindowManager.EstimateTokens(request.SystemPrompt ?? string.Empty);
+            var estimatedTokens = contextWindow.EstimateTokens(request.Message) +
+                                  contextWindow.EstimateTokens(request.SystemPrompt ?? string.Empty);
 
             var quotaResult = await tokenQuotaService.ValidateQuotaAsync(
                 currentUser.Id,
@@ -136,24 +138,50 @@ public static class ExecuteAiChat
             await messageRepository.AddAsync(userMessage, cancellationToken);
             conversation.RecordMessage(null, startTime);
 
-            // 5. Build chat request with conversation history
-            var messages = new List<ChatMessage>();
-            if (!string.IsNullOrWhiteSpace(request.SystemPrompt))
+            // 5b. Check prompt cache before inference
+            var promptHash = promptCache.ComputePromptHash(
+                request.Message, resolvedModel.ModelName, request.Temperature, request.MaxTokens);
+            var cachedResponse = await promptCache.GetCachedResponseAsync(promptHash, resolvedModel.ModelName, cancellationToken);
+            ChatCompletionResult result;
+
+            if (!string.IsNullOrEmpty(cachedResponse))
             {
-                messages.Add(new ChatMessage("system", request.SystemPrompt));
+                result = new ChatCompletionResult(
+                    true,
+                    cachedResponse,
+                    resolvedModel.ModelName,
+                    resolvedModel.ProviderId,
+                    contextWindow.EstimateTokens(request.Message),
+                    contextWindow.EstimateTokens(cachedResponse),
+                    TimeSpan.Zero);
             }
+            else
+            {
+                // 5c. Build chat request with conversation history
+                var messages = new List<ChatMessage>();
+                if (!string.IsNullOrWhiteSpace(request.SystemPrompt))
+                {
+                    messages.Add(new ChatMessage("system", request.SystemPrompt));
+                }
 
-            messages.Add(new ChatMessage("user", request.Message));
+                messages.Add(new ChatMessage("user", request.Message));
 
-            var chatRequest = new ChatCompletionRequest(
-                resolvedModel.ModelName,
-                messages,
-                request.Temperature,
-                request.MaxTokens,
-                request.SystemPrompt);
+                var chatRequest = new ChatCompletionRequest(
+                    resolvedModel.ModelName,
+                    messages,
+                    request.Temperature,
+                    request.MaxTokens,
+                    request.SystemPrompt);
 
-            // 6. Execute real inference
-            var result = await chatProvider.CompleteAsync(chatRequest, cancellationToken);
+                // 6. Execute real inference
+                result = await chatProvider.CompleteAsync(chatRequest, cancellationToken);
+
+                // 6b. Cache successful response
+                if (result.Success && !string.IsNullOrWhiteSpace(result.Content))
+                {
+                    await promptCache.CacheResponseAsync(promptHash, resolvedModel.ModelName, result.Content, ct: cancellationToken);
+                }
+            }
             var endTime = dateTimeProvider.UtcNow;
 
             // 7. Save assistant message

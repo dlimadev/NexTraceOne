@@ -23,7 +23,7 @@ public sealed class ImportFromBackstageTests
     {
         _dateTimeProvider.UtcNow.Returns(_now);
         return new ImportFromBackstageFeature.Handler(
-            _serviceAssetRepository, _apiAssetRepository, _dateTimeProvider, _unitOfWork);
+            _serviceAssetRepository, _apiAssetRepository, _dateTimeProvider, _unitOfWork, Substitute.For<ICurrentTenant>());
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public sealed class ImportFromBackstageTests
     public async Task ImportFromBackstage_Should_SkipService_When_ComponentAlreadyExists()
     {
         // Arrange — serviço já existe
-        var existingService = ServiceAsset.Create("payments-service", "Finance", "team-payments");
+        var existingService = ServiceAsset.Create("payments-service", "Finance", "team-payments", Guid.NewGuid());
         _serviceAssetRepository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>())
             .Returns(existingService);
 
@@ -85,7 +85,7 @@ public sealed class ImportFromBackstageTests
     public async Task ImportFromBackstage_Should_CreateApi_When_ApiEntityHasValidSpec()
     {
         // Arrange — serviço proprietário existe
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "team-payments");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "team-payments", Guid.NewGuid());
         _serviceAssetRepository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>())
             .Returns(ownerService);
         _apiAssetRepository.GetByNameAndOwnerAsync(Arg.Any<string>(), Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())

@@ -2,16 +2,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
+using Microsoft.SemanticKernel.ChatCompletion;
 
 using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.ExternalAI.Ports;
 using NexTraceOne.AIKnowledge.Infrastructure.Context;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions.SemanticKernel;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions.VectorStore;
+using NexTraceOne.AIKnowledge.Application.Runtime.Plugins;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Configuration;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Anthropic;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.LmStudio;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.Ollama;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Providers.OpenAI;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.SemanticKernel;
+using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Services.VectorStore;
 using NexTraceOne.AIKnowledge.Infrastructure.Runtime.Tools;
 using NexTraceOne.Catalog.Infrastructure.Contracts.Persistence;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
@@ -199,6 +205,38 @@ public static class DependencyInjection
         services.AddScoped<IDatabaseRetrievalService, DatabaseRetrievalService>();
         services.AddScoped<ITelemetryRetrievalService, TelemetryRetrievalService>();
 
+        // SECURITY: PII redaction service for grounding sanitization
+        services.AddScoped<IPiiRedactionService, PiiRedactionService>();
+
+        // Token counting — real tokenizer via Microsoft.ML.Tokenizers
+        services.AddSingleton<ITokenCounterService, TokenCounterService>();
+
+        // Context window manager — instance-based with real token counting
+        services.AddScoped<IContextWindowManager, ContextWindowManager>();
+
+        // Prompt cache — distributed (Redis) or in-memory fallback
+        services.AddScoped<IPromptCacheService, DistributedPromptCacheService>();
+
+        // Semantic Kernel native chat completion adapter (bridges custom providers to SK IChatCompletionService)
+        services.AddScoped<IChatCompletionService, NexTraceOneChatCompletionService>();
+
+        // Semantic Kernel orchestration service
+        services.AddScoped<IAiKernelService, AiKernelService>();
+
+        // Qdrant vector store (enabled when configured)
+        services.Configure<QdrantOptions>(
+            configuration.GetSection(QdrantOptions.SectionName));
+        var qdrantOptions = configuration.GetSection(QdrantOptions.SectionName).Get<QdrantOptions>();
+        if (qdrantOptions?.Enabled == true)
+        {
+            services.AddSingleton<IVectorStoreRepository>(sp =>
+            {
+                var opts = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<QdrantOptions>>().Value;
+                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<QdrantVectorStoreRepository>>();
+                return new QdrantVectorStoreRepository(opts.Host, opts.Port, logger);
+            });
+        }
+
         // Embedding cache — singleton para partilhar cache entre requests dentro do processo.
         // Usa IServiceScopeFactory para resolver IEmbeddingProvider no momento de uso (evita captive dependency).
         services.AddSingleton<NexTraceOne.AIKnowledge.Application.Governance.Abstractions.IEmbeddingCacheService>(sp =>
@@ -210,6 +248,15 @@ public static class DependencyInjection
                 new NexTraceOne.AIKnowledge.Infrastructure.Governance.Services.ScopedEmbeddingProviderProxy(scopeFactory),
                 logger);
         });
+
+        // ── Semantic Kernel Plugins (AI Agents) ─────────────────────────
+        services.AddScoped<IAiAgentPlugin, SecurityReviewPlugin>();
+        services.AddScoped<IAiAgentPlugin, ArchitectureFitnessPlugin>();
+        services.AddScoped<IAiAgentPlugin, DocumentationQualityPlugin>();
+        services.AddScoped<IAiAgentPlugin, DependencyAdvisorPlugin>();
+        services.AddScoped<IAiAgentPlugin, DocAgentPlugin>();
+        services.AddScoped<IAiAgentPlugin, PRAgentPlugin>();
+        services.AddScoped<IAiAgentPlugin, WebSearchAgentPlugin>();
 
         // ── Tool infrastructure ──────────────────────────────────────────
         services.AddSingleton<IAgentTool, ListServicesInfoTool>();

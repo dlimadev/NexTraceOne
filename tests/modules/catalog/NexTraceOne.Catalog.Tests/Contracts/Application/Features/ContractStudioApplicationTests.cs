@@ -32,7 +32,7 @@ public sealed class ContractStudioApplicationTests
 
     private static IServiceAssetRepository CreateServiceRepo()
     {
-        var service = ServiceAsset.Create("TestService", "test-domain", "test-team");
+        var service = ServiceAsset.Create("TestService", "test-domain", "test-team", Guid.NewGuid());
         service.UpdateDetails("TestService", "", ServiceType.IntegrationComponent, "", Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
@@ -339,7 +339,7 @@ public sealed class ContractStudioApplicationTests
     [Fact]
     public async Task PublishDraft_Should_CreateContractVersion_When_DraftIsApproved()
     {
-        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var draft = ContractDraft.Create(
             "Draft", "author@test.com", ContractType.RestApi, ContractProtocol.OpenApi, service.Id.Value).Value;
         draft.UpdateContent(ValidSpec, "json", "author@test.com", FixedNow);
@@ -598,14 +598,13 @@ public sealed class ContractStudioApplicationTests
     // ── Theory: multi-protocolo ─────────────────────────────────────────
 
     [Theory]
-    [InlineData(ContractType.RestApi, ContractProtocol.OpenApi, "OpenApi", "RestApi")]
-    [InlineData(ContractType.Event, ContractProtocol.AsyncApi, "AsyncApi", "Event")]
-    [InlineData(ContractType.Soap, ContractProtocol.Wsdl, "Wsdl", "Soap")]
+    [InlineData(ContractType.RestApi, ContractProtocol.OpenApi, "OpenApi")]
+    [InlineData(ContractType.Event, ContractProtocol.AsyncApi, "AsyncApi")]
+    [InlineData(ContractType.Soap, ContractProtocol.Wsdl, "Wsdl")]
     public async Task CreateDraft_Should_ReturnCorrectProtocol_ForMultipleProtocols(
         ContractType contractType,
         ContractProtocol protocol,
-        string expectedProtocol,
-        string expectedContractType)
+        string expectedProtocol)
     {
         var draftRepo = Substitute.For<IContractDraftRepository>();
         var unitOfWork = CreateUnitOfWork();

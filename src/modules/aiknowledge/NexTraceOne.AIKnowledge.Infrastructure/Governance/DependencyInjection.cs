@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -79,7 +80,7 @@ public static class DependencyInjection
         services.AddScoped<IAiAgentExecutionRepository, AiAgentExecutionRepository>();
         services.AddScoped<IAiAgentArtifactRepository, AiAgentArtifactRepository>();
         services.AddScoped<IAiKnowledgeSourceWeightRepository, AiKnowledgeSourceWeightRepository>();
-        // Repository for persisted tool definitions (Phase 4)
+        // Repositório para definições de ferramentas persistidas (Fase 4)
         services.AddScoped<IAiToolDefinitionRepository, AiToolDefinitionRepository>();
         services.AddScoped<IPromptTemplateRepository, PromptTemplateRepository>();
         services.AddScoped<IAiGuardrailRepository, AiGuardrailRepository>();
@@ -129,7 +130,7 @@ public static class DependencyInjection
             IIntegrationEventHandler<ModelFeedbackThresholdExceededIntegrationEvent>,
             ModelFeedbackThresholdExceededEventHandlerAdapter>();
 
-        // Cross-module contract — consumed by AiOrchestration for token/model attribution
+        // Contrato cross-module — consumido por AiOrchestration para atribuição de token/modelo
         services.AddScoped<IAiGovernanceModule, AiGovernanceModuleService>();
 
         // ── Agent Execution Plan & Routing Policies ────────────────────────
@@ -148,14 +149,14 @@ public static class DependencyInjection
         services.AddScoped<IDataSourceSyncService, DataSourceSyncService>();
         services.AddSingleton<IDataSourceConnectorFactory, DataSourceConnectorFactory>();
 
-        // Connectors — registered as singletons (stateless, config resolved per-call)
+        // Connectors — registados como singletons (stateless, config resolvido por chamada)
         services.AddSingleton<IDataSourceConnector, BraveSearchConnector>();
         services.AddSingleton<IDataSourceConnector, GitHubConnector>();
         services.AddSingleton<IDataSourceConnector, GitLabConnector>();
         services.AddSingleton<IDataSourceConnector, LocalDirectoryConnector>();
         services.AddSingleton<IDataSourceConnector, CustomHttpConnector>();
 
-        // HTTP clients for connectors that use IHttpClientFactory
+        // HTTP clients para connectors e analytics externos
         services.AddHttpClient("BraveSearch")
             .SetHandlerLifetime(TimeSpan.FromMinutes(5))
             .AddStandardResilienceHandler();
@@ -163,7 +164,7 @@ public static class DependencyInjection
             .SetHandlerLifetime(TimeSpan.FromMinutes(5))
             .AddStandardResilienceHandler();
 
-        // Background jobs
+        // Jobs em background
         services.AddHostedService<FeedbackThresholdJob>();
         services.AddHostedService<AiDataRetentionJob>();
         services.AddHostedService<EmbeddingIndexJob>();
@@ -181,19 +182,44 @@ public static class DependencyInjection
         if (!string.IsNullOrEmpty(clickHouseConnectionString))
         {
             // Opção B: ClickHouse para analytics E search
-            services.AddSingleton<IAiAnalyticsRepository>(sp => 
-                new ClickHouseAiAnalyticsRepository(clickHouseConnectionString));
-            
-            // ClickHouse também pode fazer search, então usamos Null para Elastic
+            var chOptions = ClickHouseConnectionOptions.FromConnectionString(clickHouseConnectionString);
+            services.AddSingleton(chOptions);
+
+            services.AddHttpClient("ClickHouseAiAnalytics", client =>
+            {
+                client.BaseAddress = new Uri($"http://{chOptions.Host}:{chOptions.Port}/");
+                client.Timeout = TimeSpan.FromSeconds(60);
+            })
+            .AddStandardResilienceHandler();
+
+            if (!string.IsNullOrEmpty(chOptions.Username))
+            {
+                var credentials = Convert.ToBase64String(
+                    Encoding.UTF8.GetBytes($"{chOptions.Username}:{chOptions.Password ?? ""}"));
+                services.ConfigureHttpClientDefaults(builder =>
+                {
+                    // A autenticação é aplicada no repositório via header explícito
+                });
+            }
+
+            services.AddSingleton<IAiAnalyticsRepository, ClickHouseAiAnalyticsRepository>();
+
+            // ClickHouse também pode fazer search, portanto usamos Null para Elastic
             services.AddSingleton<IAiSearchRepository, NullAiSearchRepository>();
+
+            services.AddHealthChecks()
+                .AddCheck<ClickHouseAiHealthCheck>("ai-clickhouse-analytics", HealthStatus.Degraded, ["health", "ready"]);
         }
         else if (!string.IsNullOrEmpty(elasticSearchConnectionString))
         {
             // Opção C: ElasticSearch para search avançado
             // Analytics continua no PostgreSQL (mais lento, mas funcional)
             services.AddSingleton<IAiAnalyticsRepository, NullAiAnalyticsRepository>();
-            services.AddSingleton<IAiSearchRepository>(sp => 
+            services.AddSingleton<IAiSearchRepository>(sp =>
                 new ElasticSearchAiRepository(elasticSearchConnectionString));
+
+            services.AddHealthChecks()
+                .AddCheck<ElasticSearchAiHealthCheck>("ai-elasticsearch-search", HealthStatus.Degraded, ["health", "ready"]);
         }
         else
         {
@@ -201,11 +227,6 @@ public static class DependencyInjection
             services.AddSingleton<IAiAnalyticsRepository, NullAiAnalyticsRepository>();
             services.AddSingleton<IAiSearchRepository, NullAiSearchRepository>();
         }
-
-        // ── Health Checks para Analytics e Search ─────────────────────────
-        services.AddHealthChecks()
-            .AddCheck<ClickHouseAiHealthCheck>("ai-clickhouse-analytics", HealthStatus.Degraded, ["health", "ready"])
-            .AddCheck<ElasticSearchAiHealthCheck>("ai-elasticsearch-search", HealthStatus.Degraded, ["health", "ready"]);
 
         return services;
     }

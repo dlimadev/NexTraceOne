@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -6,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class IdeQuerySessionRepository(AiGovernanceDbContext context) : IIdeQuerySessionRepository
+internal sealed class IdeQuerySessionRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IIdeQuerySessionRepository
 {
     public async Task AddAsync(IdeQuerySession session, CancellationToken ct)
     {
@@ -15,12 +16,12 @@ internal sealed class IdeQuerySessionRepository(AiGovernanceDbContext context) :
     }
 
     public async Task<IdeQuerySession?> GetByIdAsync(IdeQuerySessionId id, CancellationToken ct)
-        => await context.IdeQuerySessions.SingleOrDefaultAsync(s => s.Id == id, ct);
+        => await context.IdeQuerySessions.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(s => s.Id == id, ct);
 
     public async Task<IReadOnlyList<IdeQuerySession>> ListAsync(
         string? userId, string? ideClient, IdeQuerySessionStatus? status, CancellationToken ct)
     {
-        var query = context.IdeQuerySessions.AsQueryable();
+        var query = context.IdeQuerySessions.Where(e => e.TenantId == currentTenant.Id);
 
         if (!string.IsNullOrWhiteSpace(userId))
             query = query.Where(s => s.UserId == userId);

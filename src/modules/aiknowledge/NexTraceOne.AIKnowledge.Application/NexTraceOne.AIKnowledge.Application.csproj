@@ -17,6 +17,8 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
-    <PackageReference Include="Microsoft.ML" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" />
+    <PackageReference Include="Microsoft.SemanticKernel" />
+    <PackageReference Include="Qdrant.Client" />
   </ItemGroup>
 </Project>

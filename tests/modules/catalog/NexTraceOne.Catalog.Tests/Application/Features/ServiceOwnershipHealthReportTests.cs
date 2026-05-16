@@ -22,7 +22,7 @@ public sealed class ServiceOwnershipHealthReportTests
         string? docUrl = "https://docs.example.com/api",
         DateTimeOffset? lastReviewAt = null)
     {
-        var svc = ServiceAsset.Create(name, "finance", teamName);
+        var svc = ServiceAsset.Create(name, "finance", teamName, Guid.NewGuid());
         svc.SetTier(tier);
         svc.UpdateOwnership(svc.TeamName, techOwner ?? string.Empty, bizOwner ?? string.Empty);
         svc.UpdateDetails(

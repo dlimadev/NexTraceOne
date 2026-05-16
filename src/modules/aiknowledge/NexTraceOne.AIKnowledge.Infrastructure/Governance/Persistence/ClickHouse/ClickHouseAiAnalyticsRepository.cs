@@ -1,97 +1,119 @@
 using System.Text;
 using System.Text.Json;
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.ClickHouse;
 
 /// <summary>
 /// Implementação do repositório de analytics usando ClickHouse via HTTP API.
 /// Fornece consultas analíticas de alta performance para métricas de IA.
-/// 
+///
 /// Esta implementação usa o protocolo HTTP nativo do ClickHouse (porta 8123)
 /// com formato JSONEachRow, evitando dependência do pacote ClickHouse.Client.
-/// 
+///
 /// É ativada quando a connection string "AiAnalytics" está configurada
-/// no appsettings.json durante a instalação.
+/// durante a instalação.
 /// </summary>
-internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository, IDisposable
+internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository
 {
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ClickHouseConnectionOptions _options;
+    private readonly ICurrentTenant _currentTenant;
     private readonly string _baseUrl;
-    private bool _disposed = false;
-
-    public ClickHouseAiAnalyticsRepository(string connectionString)
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
-        // Connection string format: "Host=localhost;Port=8123;Database=ai_analytics;Username=default;Password="
-        var parts = connectionString.Split(';');
-        var host = ExtractValue(parts, "Host") ?? "localhost";
-        var port = ExtractValue(parts, "Port") ?? "8123";
-        var database = ExtractValue(parts, "Database") ?? "default";
-        var username = ExtractValue(parts, "Username");
-        var password = ExtractValue(parts, "Password");
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
-        _baseUrl = $"http://{host}:{port}/?database={database}";
-        
-        _httpClient = new HttpClient();
-        if (!string.IsNullOrEmpty(username))
-        {
-            var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password ?? ""}"));
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
-        }
+    public ClickHouseAiAnalyticsRepository(
+        IHttpClientFactory httpClientFactory,
+        ClickHouseConnectionOptions options,
+        ICurrentTenant currentTenant)
+    {
+        _httpClientFactory = httpClientFactory;
+        _options = options;
+        _currentTenant = currentTenant;
+        _baseUrl = $"http://{options.Host}:{options.Port}/?database={options.Database}";
     }
 
-    private static string? ExtractValue(string[] parts, string key)
+    private HttpClient CreateClient()
     {
-        var part = parts.FirstOrDefault(p => p.Trim().StartsWith(key + "=", StringComparison.OrdinalIgnoreCase));
-        return part?.Substring(part.IndexOf('=') + 1).Trim();
+        var client = _httpClientFactory.CreateClient("ClickHouseAiAnalytics");
+        return client;
     }
 
-    private async Task ExecuteQueryAsync(string query, CancellationToken cancellationToken = default)
+    private async Task ExecuteQueryAsync(string query, Dictionary<string, string>? parameters = null, CancellationToken cancellationToken = default)
     {
+        var client = CreateClient();
+        var url = BuildUrl(parameters);
         var content = new StringContent(query, Encoding.UTF8, "text/plain");
-        var response = await _httpClient.PostAsync(_baseUrl, content, cancellationToken);
+        var response = await client.PostAsync(url, content, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 
-    private async Task<string> QueryAsync(string query, CancellationToken cancellationToken = default)
+    private async Task<string> QueryAsync(string query, Dictionary<string, string>? parameters = null, CancellationToken cancellationToken = default)
     {
+        var client = CreateClient();
+        var url = BuildUrl(parameters);
         var content = new StringContent(query, Encoding.UTF8, "text/plain");
-        var response = await _httpClient.PostAsync(_baseUrl, content, cancellationToken);
+        var response = await client.PostAsync(url, content, cancellationToken);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(cancellationToken);
     }
 
-    public async Task InsertTokenUsageAsync(TokenUsageRecord record)
+    private string BuildUrl(Dictionary<string, string>? parameters)
     {
-        var query = $@"
-            INSERT INTO ai_token_usage FORMAT JSONEachRow
-            {{""Id"":""{record.Id}"",""TenantId"":""{record.TenantId}"",""ModelId"":""{record.ModelId}"",""AgentId"":""{record.AgentId ?? Guid.Empty}"",""PromptTokens"":{record.PromptTokens},""CompletionTokens"":{record.CompletionTokens},""TotalTokens"":{record.TotalTokens},""CostUSD"":{record.CostUSD.ToString(System.Globalization.CultureInfo.InvariantCulture)},""Timestamp"":""{record.Timestamp:yyyy-MM-dd HH:mm:ss}"",""OperationType"":""{record.OperationType}"",""UserId"":""{record.UserId}""}}";
-
-        await ExecuteQueryAsync(query);
+        var builder = new StringBuilder(_baseUrl);
+        if (parameters is not null && parameters.Count > 0)
+        {
+            // ClickHouse HTTP API: query parameters are passed as query string with param_ prefix
+            foreach (var param in parameters)
+            {
+                builder.Append($"&param_{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}");
+            }
+        }
+        return builder.ToString();
     }
 
-    public async Task InsertTokenUsageBatchAsync(IEnumerable<TokenUsageRecord> records)
+    public async Task InsertTokenUsageAsync(TokenUsageRecord record, CancellationToken cancellationToken = default)
+    {
+        var jsonLine = JsonSerializer.Serialize(record, JsonOptions);
+        // ClickHouse INSERT via JSONEachRow does not use user-supplied values in the query text
+        // The JSON payload is data, not SQL syntax. No interpolation risk here.
+        var query = "INSERT INTO ai_token_usage FORMAT JSONEachRow\n" + jsonLine;
+        await ExecuteQueryAsync(query, cancellationToken: cancellationToken);
+    }
+
+    public async Task InsertTokenUsageBatchAsync(IEnumerable<TokenUsageRecord> records, CancellationToken cancellationToken = default)
     {
         var recordsList = records.ToList();
         if (recordsList.Count == 0) return;
 
-        var jsonLines = recordsList.Select(r => 
-            $@"{{""Id"":""{r.Id}"",""TenantId"":""{r.TenantId}"",""ModelId"":""{r.ModelId}"",""AgentId"":""{r.AgentId ?? Guid.Empty}"",""PromptTokens"":{r.PromptTokens},""CompletionTokens"":{r.CompletionTokens},""TotalTokens"":{r.TotalTokens},""CostUSD"":{r.CostUSD.ToString(System.Globalization.CultureInfo.InvariantCulture)},""Timestamp"":""{r.Timestamp:yyyy-MM-dd HH:mm:ss}"",""OperationType"":""{r.OperationType}"",""UserId"":""{r.UserId}""}}");
-
-        var query = $"INSERT INTO ai_token_usage FORMAT JSONEachRow\n{string.Join("\n", jsonLines)}";
-        await ExecuteQueryAsync(query);
+        var jsonLines = recordsList.Select(r => JsonSerializer.Serialize(r, JsonOptions));
+        var query = "INSERT INTO ai_token_usage FORMAT JSONEachRow\n" + string.Join("\n", jsonLines);
+        await ExecuteQueryAsync(query, cancellationToken: cancellationToken);
     }
 
     public async Task<List<TokenUsageMetrics>> GetTokenUsageMetricsAsync(DateTime from, DateTime to, Guid? modelId = null)
     {
-        var whereClause = $"WHERE Timestamp >= '{from:yyyy-MM-dd HH:mm:ss}' AND Timestamp <= '{to:yyyy-MM-dd HH:mm:ss}'";
+        var tenantId = _currentTenant.Id;
+        var parameters = new Dictionary<string, string>
+        {
+            ["tenantId"] = tenantId.ToString(),
+            ["fromDate"] = from.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
+            ["toDate"] = to.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+        };
+
+        var whereClause = "WHERE TenantId = {tenantId:String} AND Timestamp >= {fromDate:DateTime} AND Timestamp <= {toDate:DateTime}";
         if (modelId.HasValue)
         {
-            whereClause += $" AND ModelId = '{modelId.Value}'";
+            parameters["modelId"] = modelId.Value.ToString();
+            whereClause += " AND ModelId = {modelId:String}";
         }
 
         var query = $@"
-            SELECT 
+            SELECT
                 ModelId,
                 any(ModelName) as ModelName,
                 count() as TotalRequests,
@@ -108,7 +130,7 @@ internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository, 
             ORDER BY TotalTokens DESC
             FORMAT JSON";
 
-        var result = await QueryAsync(query);
+        var result = await QueryAsync(query, parameters);
         var jsonDoc = JsonDocument.Parse(result);
         var rows = jsonDoc.RootElement.GetProperty("data");
 
@@ -133,14 +155,23 @@ internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository, 
 
     public async Task<List<AgentExecutionMetrics>> GetAgentExecutionMetricsAsync(DateTime from, DateTime to, Guid? agentId = null)
     {
-        var whereClause = $"WHERE Timestamp >= '{from:yyyy-MM-dd HH:mm:ss}' AND Timestamp <= '{to:yyyy-MM-dd HH:mm:ss}'";
+        var tenantId = _currentTenant.Id;
+        var parameters = new Dictionary<string, string>
+        {
+            ["tenantId"] = tenantId.ToString(),
+            ["fromDate"] = from.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
+            ["toDate"] = to.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+        };
+
+        var whereClause = "WHERE TenantId = {tenantId:String} AND Timestamp >= {fromDate:DateTime} AND Timestamp <= {toDate:DateTime}";
         if (agentId.HasValue)
         {
-            whereClause += $" AND AgentId = '{agentId.Value}'";
+            parameters["agentId"] = agentId.Value.ToString();
+            whereClause += " AND AgentId = {agentId:String}";
         }
 
         var query = $@"
-            SELECT 
+            SELECT
                 AgentId,
                 any(AgentName) as AgentName,
                 count() as TotalExecutions,
@@ -158,7 +189,7 @@ internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository, 
             ORDER BY TotalExecutions DESC
             FORMAT JSON";
 
-        var result = await QueryAsync(query);
+        var result = await QueryAsync(query, parameters);
         var jsonDoc = JsonDocument.Parse(result);
         var rows = jsonDoc.RootElement.GetProperty("data");
 
@@ -184,14 +215,23 @@ internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository, 
 
     public async Task<List<ModelPerformanceMetrics>> GetModelPerformanceMetricsAsync(DateTime from, DateTime to, Guid? modelId = null)
     {
-        var whereClause = $"WHERE Timestamp >= '{from:yyyy-MM-dd HH:mm:ss}' AND Timestamp <= '{to:yyyy-MM-dd HH:mm:ss}'";
+        var tenantId = _currentTenant.Id;
+        var parameters = new Dictionary<string, string>
+        {
+            ["tenantId"] = tenantId.ToString(),
+            ["fromDate"] = from.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
+            ["toDate"] = to.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+        };
+
+        var whereClause = "WHERE TenantId = {tenantId:String} AND Timestamp >= {fromDate:DateTime} AND Timestamp <= {toDate:DateTime}";
         if (modelId.HasValue)
         {
-            whereClause += $" AND ModelId = '{modelId.Value}'";
+            parameters["modelId"] = modelId.Value.ToString();
+            whereClause += " AND ModelId = {modelId:String}";
         }
 
         var query = $@"
-            SELECT 
+            SELECT
                 ModelId,
                 any(ModelName) as ModelName,
                 count() as TotalRequests,
@@ -208,7 +248,7 @@ internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository, 
             ORDER BY TotalRequests DESC
             FORMAT JSON";
 
-        var result = await QueryAsync(query);
+        var result = await QueryAsync(query, parameters);
         var jsonDoc = JsonDocument.Parse(result);
         var rows = jsonDoc.RootElement.GetProperty("data");
 
@@ -233,64 +273,79 @@ internal sealed class ClickHouseAiAnalyticsRepository : IAiAnalyticsRepository, 
 
     public async Task<decimal> GetTotalTokenCostAsync(DateTime from, DateTime to)
     {
-        var query = $@"
-            SELECT sum(CostUSD) 
-            FROM ai_token_usage 
-            WHERE Timestamp >= '{from:yyyy-MM-dd HH:mm:ss}' AND Timestamp <= '{to:yyyy-MM-dd HH:mm:ss}'
+        var tenantId = _currentTenant.Id;
+        var parameters = new Dictionary<string, string>
+        {
+            ["tenantId"] = tenantId.ToString(),
+            ["fromDate"] = from.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
+            ["toDate"] = to.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+        };
+
+        var query = @"
+            SELECT sum(CostUSD)
+            FROM ai_token_usage
+            WHERE TenantId = {tenantId:String} AND Timestamp >= {fromDate:DateTime} AND Timestamp <= {toDate:DateTime}
             FORMAT JSON";
 
-        var result = await QueryAsync(query);
+        var result = await QueryAsync(query, parameters);
         var jsonDoc = JsonDocument.Parse(result);
         var rows = jsonDoc.RootElement.GetProperty("data");
-        
+
         if (rows.GetArrayLength() == 0) return 0m;
-        
+
         var value = rows[0].GetProperty("sum(CostUSD)");
         return value.ValueKind == JsonValueKind.Null ? 0m : value.GetDecimal();
     }
 
     public async Task<long> GetTotalAgentExecutionsAsync(DateTime from, DateTime to)
     {
-        var query = $@"
-            SELECT count() 
-            FROM ai_agent_executions 
-            WHERE Timestamp >= '{from:yyyy-MM-dd HH:mm:ss}' AND Timestamp <= '{to:yyyy-MM-dd HH:mm:ss}'
+        var tenantId = _currentTenant.Id;
+        var parameters = new Dictionary<string, string>
+        {
+            ["tenantId"] = tenantId.ToString(),
+            ["fromDate"] = from.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
+            ["toDate"] = to.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+        };
+
+        var query = @"
+            SELECT count()
+            FROM ai_agent_executions
+            WHERE TenantId = {tenantId:String} AND Timestamp >= {fromDate:DateTime} AND Timestamp <= {toDate:DateTime}
             FORMAT JSON";
 
-        var result = await QueryAsync(query);
+        var result = await QueryAsync(query, parameters);
         var jsonDoc = JsonDocument.Parse(result);
         var rows = jsonDoc.RootElement.GetProperty("data");
-        
+
         if (rows.GetArrayLength() == 0) return 0L;
-        
+
         return rows[0].GetProperty("count()").GetInt64();
     }
 
     public async Task<double> GetAgentSuccessRateAsync(DateTime from, DateTime to)
     {
-        var query = $@"
-            SELECT 
+        var tenantId = _currentTenant.Id;
+        var parameters = new Dictionary<string, string>
+        {
+            ["tenantId"] = tenantId.ToString(),
+            ["fromDate"] = from.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
+            ["toDate"] = to.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)
+        };
+
+        var query = @"
+            SELECT
                 (sumIf(1, Status = 'Success') / count()) * 100 as SuccessRate
             FROM ai_agent_executions
-            WHERE Timestamp >= '{from:yyyy-MM-dd HH:mm:ss}' AND Timestamp <= '{to:yyyy-MM-dd HH:mm:ss}'
+            WHERE TenantId = {tenantId:String} AND Timestamp >= {fromDate:DateTime} AND Timestamp <= {toDate:DateTime}
             FORMAT JSON";
 
-        var result = await QueryAsync(query);
+        var result = await QueryAsync(query, parameters);
         var jsonDoc = JsonDocument.Parse(result);
         var rows = jsonDoc.RootElement.GetProperty("data");
-        
+
         if (rows.GetArrayLength() == 0) return 0.0;
-        
+
         var value = rows[0].GetProperty("SuccessRate");
         return value.ValueKind == JsonValueKind.Null ? 0.0 : value.GetDouble();
-    }
-
-    public void Dispose()
-    {
-        if (!_disposed)
-        {
-            _httpClient?.Dispose();
-            _disposed = true;
-        }
     }
 }

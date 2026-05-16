@@ -21,7 +21,7 @@ public sealed class ClickHouseAiHealthCheck : IHealthCheck
         CancellationToken cancellationToken = default)
     {
         // Verifica se é a implementação Null (ClickHouse não configurado)
-        if (_repository.GetType().Name.Contains("Null"))
+        if (_repository is Persistence.Repositories.INullRepository)
         {
             return new HealthCheckResult(
                 HealthStatus.Degraded,
@@ -87,7 +87,7 @@ public sealed class ElasticSearchAiHealthCheck : IHealthCheck
         CancellationToken cancellationToken = default)
     {
         // Verifica se é a implementação Null (ElasticSearch não configurado)
-        if (_repository.GetType().Name.Contains("Null"))
+        if (_repository is Persistence.Repositories.INullRepository)
         {
             return new HealthCheckResult(
                 HealthStatus.Degraded,

@@ -31,7 +31,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
         await using var context = Fixture.CreateCatalogGraphDbContext();
 
-        var serviceA = ServiceAsset.Create("payments-service", "finance", "team-payments");
+        var serviceA = ServiceAsset.Create("payments-service", "finance", "team-payments", Guid.NewGuid());
         serviceA.UpdateDetails(
             displayName: "Payments Service",
             description: "Handles payment processing",
@@ -43,7 +43,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
             documentationUrl: null,
             repositoryUrl: null);
 
-        var serviceB = ServiceAsset.Create("notifications-service", "platform", "team-platform");
+        var serviceB = ServiceAsset.Create("notifications-service", "platform", "team-platform", Guid.NewGuid());
         serviceB.UpdateDetails(
             displayName: "Notifications Service",
             description: "Sends notifications",
@@ -90,7 +90,7 @@ public sealed class DeepCoveragePostgreSqlTests(PostgreSqlIntegrationFixture fix
 
         await using var context = Fixture.CreateCatalogGraphDbContext();
 
-        var ownerService = ServiceAsset.Create("orders-api-service", "commerce", "team-commerce");
+        var ownerService = ServiceAsset.Create("orders-api-service", "commerce", "team-commerce", Guid.NewGuid());
         var api = ApiAsset.Register("Orders API", "/api/v1/orders", "1.0.0", "internal", ownerService);
 
         var result = api.InferDependencyFromOtel(

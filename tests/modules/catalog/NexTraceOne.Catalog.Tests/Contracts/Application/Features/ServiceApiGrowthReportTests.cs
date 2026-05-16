@@ -27,7 +27,7 @@ public sealed class ServiceApiGrowthReportTests
     }
 
     private static ServiceAsset MakeSvc(string name)
-        => ServiceAsset.Create(name, "test-domain", "test-team");
+        => ServiceAsset.Create(name, "test-domain", "test-team", Guid.NewGuid());
 
     private static ContractChangelog MakeChangelog(
         string tenantId, string serviceName, string apiAssetId, DateTimeOffset createdAt)

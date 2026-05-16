@@ -14,13 +14,9 @@
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Security\NexTraceOne.BuildingBlocks.Security.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\NexTraceOne.BuildingBlocks.Observability\NexTraceOne.BuildingBlocks.Observability.csproj" />
     <ProjectReference Include="..\..\..\modules\identityaccess\NexTraceOne.IdentityAccess.Application\NexTraceOne.IdentityAccess.Application.csproj" />
-    <ProjectReference Include="..\..\..\modules\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\modules\catalog\NexTraceOne.Catalog.Domain\NexTraceOne.Catalog.Domain.csproj" />
-    <ProjectReference Include="..\..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.Infrastructure\NexTraceOne.ChangeGovernance.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\modules\changegovernance\NexTraceOne.ChangeGovernance.Domain\NexTraceOne.ChangeGovernance.Domain.csproj" />
-    <ProjectReference Include="..\..\..\modules\knowledge\NexTraceOne.Knowledge.Infrastructure\NexTraceOne.Knowledge.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\modules\knowledge\NexTraceOne.Knowledge.Domain\NexTraceOne.Knowledge.Domain.csproj" />
-    <ProjectReference Include="..\..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Infrastructure\NexTraceOne.OperationalIntelligence.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\modules\operationalintelligence\NexTraceOne.OperationalIntelligence.Domain\NexTraceOne.OperationalIntelligence.Domain.csproj" />
     <!-- Cross-module read-only references for AI grounding data retrieval (P01.10) -->
     <ProjectReference Include="..\..\catalog\NexTraceOne.Catalog.Infrastructure\NexTraceOne.Catalog.Infrastructure.csproj" />
@@ -36,6 +32,10 @@
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" />
+    <PackageReference Include="Microsoft.ML.Tokenizers.Data.Cl100kBase" />
+    <PackageReference Include="Microsoft.Bcl.Memory" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-73j8-2gch-69rq" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <!-- Optional: ElasticSearch for advanced search (user choice during installation) -->
     <PackageReference Include="NEST" />

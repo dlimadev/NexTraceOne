@@ -51,7 +51,8 @@ public static class RegisterModel
         {
             Guard.Against.Null(request);
 
-            var modelType = Enum.Parse<ModelType>(request.ModelType, ignoreCase: true);
+            if (!Enum.TryParse<ModelType>(request.ModelType, ignoreCase: true, out var modelType))
+                return Error.Validation("Model.InvalidModelType", $"'{request.ModelType}' is not a valid model type.");
 
             var model = AIModel.Register(
                 request.Name,

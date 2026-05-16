@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -6,10 +7,10 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiSkillRepository(AiGovernanceDbContext context) : IAiSkillRepository
+internal sealed class AiSkillRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiSkillRepository
 {
     public async Task<AiSkill?> GetByIdAsync(AiSkillId id, CancellationToken ct)
-        => await context.Skills.SingleOrDefaultAsync(s => s.Id == id, ct);
+        => await context.Skills.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(s => s.Id == id, ct);
 
     public async Task<AiSkill?> GetByNameAsync(string name, Guid tenantId, CancellationToken ct)
         => await context.Skills.SingleOrDefaultAsync(
@@ -21,7 +22,7 @@ internal sealed class AiSkillRepository(AiGovernanceDbContext context) : IAiSkil
         Guid? tenantId,
         CancellationToken ct)
     {
-        var query = context.Skills.AsQueryable();
+        var query = context.Skills.Where(e => e.TenantId == currentTenant.Id);
 
         if (status.HasValue)
             query = query.Where(s => s.Status == status.Value);
@@ -43,5 +44,5 @@ internal sealed class AiSkillRepository(AiGovernanceDbContext context) : IAiSkil
         => context.Skills.Add(skill);
 
     public async Task<int> CountBySkillIdAsync(AiSkillId id, CancellationToken ct)
-        => await context.SkillExecutions.CountAsync(e => e.SkillId == id, ct);
+        => await context.SkillExecutions.Where(e => e.TenantId == currentTenant.Id).CountAsync(e => e.SkillId == id, ct);
 }

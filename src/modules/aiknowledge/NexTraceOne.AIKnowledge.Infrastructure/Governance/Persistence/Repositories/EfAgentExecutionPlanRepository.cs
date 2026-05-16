@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -6,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class EfAgentExecutionPlanRepository(AiGovernanceDbContext context) : IAgentExecutionPlanRepository
+internal sealed class EfAgentExecutionPlanRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAgentExecutionPlanRepository
 {
     public async Task<AgentExecutionPlan?> GetByIdAsync(AgentExecutionPlanId id, CancellationToken ct)
         => await context.AgentExecutionPlans

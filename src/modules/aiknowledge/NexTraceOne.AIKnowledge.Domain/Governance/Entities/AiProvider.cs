@@ -89,7 +89,7 @@ public sealed class AiProvider : AuditableEntity<AiProviderId>
     public DateTimeOffset RegisteredAt { get; private set; }
 
     /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     /// <summary>
     /// Regista um novo provedor de IA com validações de invariantes.

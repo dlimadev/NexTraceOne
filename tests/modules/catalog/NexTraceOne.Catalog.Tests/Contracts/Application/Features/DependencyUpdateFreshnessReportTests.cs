@@ -28,7 +28,7 @@ public sealed class DependencyUpdateFreshnessReportTests
     }
 
     private static ServiceAsset MakeSvc(string name)
-        => ServiceAsset.Create(name, "test-domain", "test-team");
+        => ServiceAsset.Create(name, "test-domain", "test-team", Guid.NewGuid());
 
     private static ContractChangelog MakeChangelog(string tenantId, string serviceName, DateTimeOffset createdAt)
         => ContractChangelog.Create(

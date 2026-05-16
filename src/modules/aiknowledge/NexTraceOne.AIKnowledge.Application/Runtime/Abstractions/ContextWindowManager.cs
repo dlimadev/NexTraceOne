@@ -1,27 +1,27 @@
 namespace NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
 
 /// <summary>
-/// Utilitário de gestão da context window de modelos de IA.
-/// Aplica sliding window quando o histórico de mensagens excede o limite do modelo,
-/// preservando sempre o system prompt e as mensagens mais recentes.
-///
-/// Estimativa de tokens: 4 chars ≈ 1 token (heurística BPE para texto em inglês/português).
-/// Para produção, integrar com tokenizer real do provider quando disponível.
+/// Implementação de gestão da context window de modelos de IA.
+/// Usa ITokenCounterService para estimativa precisa de tokens (em vez de heurística 4 chars/token).
+/// Aplica sliding window quando o histórico excede o limite, preservando system prompt e mensagens mais recentes.
 /// </summary>
-public static class ContextWindowManager
+public sealed class ContextWindowManager : IContextWindowManager
 {
-    /// <summary>Número de chars estimados por token (heurística conservadora).</summary>
-    private const int CharsPerToken = 4;
+    private readonly ITokenCounterService _tokenCounter;
+
+    /// <summary>Overhead estimado de tokens por mensagem (role + formato JSON).</summary>
+    private const int MessageOverheadTokens = 4;
+
+    public ContextWindowManager(ITokenCounterService tokenCounter)
+    {
+        _tokenCounter = tokenCounter;
+    }
 
     /// <summary>
     /// Reduz a lista de mensagens para caber no context window do modelo.
     /// Aplica sliding window: mantém system prompt e as mensagens mais recentes.
     /// </summary>
-    /// <param name="messages">Lista completa de mensagens (incluindo system).</param>
-    /// <param name="maxContextTokens">Limite de tokens do modelo (ex: 4096).</param>
-    /// <param name="reserveForCompletion">Tokens reservados para a resposta do modelo (default: 1024).</param>
-    /// <returns>Lista de mensagens que cabe no context window disponível.</returns>
-    public static (IReadOnlyList<ChatMessage> Messages, bool WasTruncated) TrimToFit(
+    public (IReadOnlyList<ChatMessage> Messages, bool WasTruncated) TrimToFit(
         IReadOnlyList<ChatMessage> messages,
         int maxContextTokens,
         int reserveForCompletion = 1024)
@@ -81,25 +81,20 @@ public static class ContextWindowManager
     }
 
     /// <summary>
-    /// Estima o número de tokens de uma mensagem usando heurística de 4 chars/token.
+    /// Conta tokens de uma mensagem usando tokenizer real + overhead de formato.
     /// </summary>
-    public static int EstimateTokens(ChatMessage message)
-        => EstimateTokens(message.Content) + 4; // +4 for role/format overhead
+    public int EstimateTokens(ChatMessage message)
+        => _tokenCounter.CountTokens(message.Content) + MessageOverheadTokens;
 
     /// <summary>
-    /// Estima o número de tokens de um texto.
+    /// Conta tokens de um texto usando tokenizer real.
     /// </summary>
-    public static int EstimateTokens(string text)
-    {
-        if (string.IsNullOrEmpty(text))
-            return 0;
-
-        return Math.Max(1, (text.Length + CharsPerToken - 1) / CharsPerToken);
-    }
+    public int EstimateTokens(string text)
+        => string.IsNullOrEmpty(text) ? 0 : _tokenCounter.CountTokens(text);
 
     /// <summary>
     /// Estima o total de tokens de uma lista de mensagens.
     /// </summary>
-    public static int EstimateTotalTokens(IReadOnlyList<ChatMessage> messages)
+    public int EstimateTotalTokens(IReadOnlyList<ChatMessage> messages)
         => messages.Sum(EstimateTokens);
 }

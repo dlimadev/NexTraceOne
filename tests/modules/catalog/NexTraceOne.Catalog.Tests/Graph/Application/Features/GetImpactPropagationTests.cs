@@ -27,7 +27,7 @@ public sealed class GetImpactPropagationTests
     public async Task Handle_Should_ReturnImpactedNodes_When_ApiHasDirectConsumers()
     {
         // Arrange — API com um consumidor direto mapeado
-        var ownerService = ServiceAsset.Create("orders-service", "Commerce", "Orders Team");
+        var ownerService = ServiceAsset.Create("orders-service", "Commerce", "Orders Team", Guid.NewGuid());
         var api = ApiAsset.Register("Orders API", "/api/orders", "1.0.0", "Internal", ownerService);
         var consumer = ConsumerAsset.Create("billing-service", "Service", "Production");
         var source = DiscoverySource.Create("CatalogImport", "catalog/billing.csv",
@@ -55,8 +55,8 @@ public sealed class GetImpactPropagationTests
     public async Task Handle_Should_ReturnTransitiveConsumers_When_ConsumersAlsoExposeApis()
     {
         // Arrange — cadeia transitiva: ApiA → ServiceB → ApiB → ServiceC
-        var serviceA = ServiceAsset.Create("service-a", "DomainA", "TeamA");
-        var serviceB = ServiceAsset.Create("service-b", "DomainB", "TeamB");
+        var serviceA = ServiceAsset.Create("service-a", "DomainA", "TeamA", Guid.NewGuid());
+        var serviceB = ServiceAsset.Create("service-b", "DomainB", "TeamB", Guid.NewGuid());
 
         var apiA = ApiAsset.Register("API-A", "/api/a", "1.0.0", "Internal", serviceA);
         var apiB = ApiAsset.Register("API-B", "/api/b", "1.0.0", "Internal", serviceB);
@@ -115,8 +115,8 @@ public sealed class GetImpactPropagationTests
     public async Task Handle_Should_RespectMaxDepth_When_TransitiveChainsExceedLimit()
     {
         // Arrange — mesma cadeia transitiva, mas maxDepth=1 deve limitar a profundidade
-        var serviceA = ServiceAsset.Create("service-a", "DomainA", "TeamA");
-        var serviceB = ServiceAsset.Create("service-b", "DomainB", "TeamB");
+        var serviceA = ServiceAsset.Create("service-a", "DomainA", "TeamA", Guid.NewGuid());
+        var serviceB = ServiceAsset.Create("service-b", "DomainB", "TeamB", Guid.NewGuid());
 
         var apiA = ApiAsset.Register("API-A", "/api/a", "1.0.0", "Internal", serviceA);
         var apiB = ApiAsset.Register("API-B", "/api/b", "1.0.0", "Internal", serviceB);

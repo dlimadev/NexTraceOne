@@ -77,7 +77,8 @@ public static class UpdateModel
 
             if (request.NewStatus is not null)
             {
-                var targetStatus = Enum.Parse<ModelStatus>(request.NewStatus, ignoreCase: true);
+                if (!Enum.TryParse<ModelStatus>(request.NewStatus, ignoreCase: true, out var targetStatus))
+                    return Error.Validation("Model.InvalidStatus", $"'{request.NewStatus}' is not a valid model status.");
                 var statusResult = targetStatus switch
                 {
                     ModelStatus.Active => model.Activate(),

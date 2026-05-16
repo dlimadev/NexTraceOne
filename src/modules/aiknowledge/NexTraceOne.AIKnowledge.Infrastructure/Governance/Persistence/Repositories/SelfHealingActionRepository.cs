@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class SelfHealingActionRepository(AiGovernanceDbContext context) : ISelfHealingActionRepository
+internal sealed class SelfHealingActionRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : ISelfHealingActionRepository
 {
     public async Task<SelfHealingAction?> GetByIdAsync(SelfHealingActionId id, CancellationToken ct)
-        => await context.SelfHealingActions.SingleOrDefaultAsync(a => a.Id == id, ct);
+        => await context.SelfHealingActions.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(a => a.Id == id, ct);
 
     public async Task<IReadOnlyList<SelfHealingAction>> ListByIncidentAsync(string incidentId, Guid tenantId, CancellationToken ct)
         => await context.SelfHealingActions

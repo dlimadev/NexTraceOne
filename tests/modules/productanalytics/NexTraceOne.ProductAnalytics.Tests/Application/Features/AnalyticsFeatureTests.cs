@@ -29,6 +29,7 @@ public sealed class AnalyticsFeatureTests
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
     private readonly IAnalyticsEventForwarder _forwarder = Substitute.For<IAnalyticsEventForwarder>();
+    private readonly IJourneyDefinitionRepository _journeyRepo = Substitute.For<IJourneyDefinitionRepository>();
 
     public AnalyticsFeatureTests()
     {
@@ -39,6 +40,7 @@ public sealed class AnalyticsFeatureTests
         _configService
             .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((EffectiveConfigurationDto?)null);
+        _journeyRepo.ListActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns([]);
     }
 
     // ── RecordAnalyticsEvent ──
@@ -296,7 +298,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(50);
 
-        var handler = new GetJourneys.Handler(_analyticsRepository, _clock, _configService);
+        var handler = new GetJourneys.Handler(_analyticsRepository, _clock, _configService, _journeyRepo, _currentTenant);
         var query = new GetJourneys.Query(null, null, null);
 
         // Act
@@ -320,7 +322,7 @@ public sealed class AnalyticsFeatureTests
             Arg.Any<string?>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns(0);
 
-        var handler = new GetJourneys.Handler(_analyticsRepository, _clock, _configService);
+        var handler = new GetJourneys.Handler(_analyticsRepository, _clock, _configService, _journeyRepo, _currentTenant);
 
         // Act
         var result = await handler.Handle(new GetJourneys.Query(null, null, null), CancellationToken.None);

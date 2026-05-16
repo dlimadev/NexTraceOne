@@ -10,6 +10,7 @@ using NexTraceOne.Catalog.Domain.Graph.Enums;
 using NexTraceOne.Catalog.Domain.Graph.Errors;
 using NexTraceOne.Configuration.Application.Abstractions;
 using NexTraceOne.Configuration.Domain.Enums;
+using System.Globalization;
 
 namespace NexTraceOne.Catalog.Application.Graph.Features.GetServiceTierPolicy;
 
@@ -71,7 +72,7 @@ public static class GetServiceTierPolicy
             }
 
             var sloConformant = !string.IsNullOrWhiteSpace(service.SloTarget)
-                && decimal.TryParse(service.SloTarget.TrimEnd('%'), out var actualSlo)
+                && decimal.TryParse(service.SloTarget.TrimEnd('%'), NumberStyles.Any, CultureInfo.InvariantCulture, out var actualSlo)
                 && actualSlo >= sloMin;
 
             return new Response(
@@ -90,8 +91,13 @@ public static class GetServiceTierPolicy
                     HasContactChannel: !string.IsNullOrWhiteSpace(service.ContactChannel)));
         }
 
-        private static decimal ParseDecimal(string? raw, decimal fallback) =>
-            decimal.TryParse(raw, out var v) ? v : fallback;
+        private static decimal ParseDecimal(string? raw, decimal fallback)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return fallback;
+            if (decimal.TryParse(raw, NumberStyles.Any, CultureInfo.CurrentCulture, out var v)) return v;
+            if (decimal.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out v)) return v;
+            return fallback;
+        }
 
         private static decimal DefaultSloMin(ServiceTierType tier) => tier switch
         {

@@ -24,8 +24,8 @@ public interface IServiceAssetRepository
     /// <summary>Lista todos os ativos de serviço registrados.</summary>
     Task<IReadOnlyList<ServiceAsset>> ListAllAsync(CancellationToken cancellationToken);
 
-    /// <summary>Lista serviços com filtros opcionais para o catálogo.</summary>
-    Task<IReadOnlyList<ServiceAsset>> ListFilteredAsync(
+    /// <summary>Lista serviços com filtros opcionais e paginação para o catálogo.</summary>
+    Task<(IReadOnlyList<ServiceAsset> Items, int TotalCount)> ListFilteredAsync(
         string? teamName,
         string? domain,
         ServiceType? serviceType,
@@ -33,6 +33,8 @@ public interface IServiceAssetRepository
         LifecycleStatus? lifecycleStatus,
         ExposureType? exposureType,
         string? searchTerm,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken);
 
     /// <summary>Pesquisa serviços por termo textual (nome, domínio, equipa, descrição).</summary>

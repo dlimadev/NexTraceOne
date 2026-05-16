@@ -15,11 +15,13 @@ public sealed class WaveBaPortalIntelligenceTests
     private readonly IPortalAdoptionReader _adoptionReader = Substitute.For<IPortalAdoptionReader>();
     private readonly ISelfServiceWorkflowReader _workflowReader = Substitute.For<ISelfServiceWorkflowReader>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private static readonly DateTimeOffset Now = new(2025, 10, 1, 10, 0, 0, TimeSpan.Zero);
 
     public WaveBaPortalIntelligenceTests()
     {
         _clock.UtcNow.Returns(Now);
+        _currentTenant.Id.Returns(Guid.NewGuid());
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -36,8 +38,8 @@ public sealed class WaveBaPortalIntelligenceTests
         _adoptionReader.GetAdoptionTrendAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1"), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.ByTeam.Should().BeEmpty();
@@ -62,8 +64,8 @@ public sealed class WaveBaPortalIntelligenceTests
         _adoptionReader.GetAdoptionTrendAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1"), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         var team = result.Value!.ByTeam.Single();
@@ -88,8 +90,8 @@ public sealed class WaveBaPortalIntelligenceTests
         _adoptionReader.GetAdoptionTrendAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1"), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         var team = result.Value!.ByTeam.Single();
@@ -112,8 +114,8 @@ public sealed class WaveBaPortalIntelligenceTests
         _adoptionReader.GetAdoptionTrendAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1"), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         var funnelEntry = result.Value!.ByTeam.Single().FeatureFunnel.Single();
@@ -133,8 +135,8 @@ public sealed class WaveBaPortalIntelligenceTests
         _adoptionReader.GetAdoptionTrendAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1"), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.InactiveUsers.Should().HaveCount(2);
@@ -159,8 +161,8 @@ public sealed class WaveBaPortalIntelligenceTests
         _adoptionReader.GetAdoptionTrendAsync(Arg.Any<string>(), Arg.Any<DateTimeOffset>(), Arg.Any<DateTimeOffset>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1", TopEnablementOpportunities: 5), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(TopEnablementOpportunities: 5), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.EnablementOpportunityList.Count.Should().BeLessThanOrEqualTo(5);
@@ -180,8 +182,8 @@ public sealed class WaveBaPortalIntelligenceTests
                 new IPortalAdoptionReader.DailyAdoptionSnapshot(0, 40, 100)
             ]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1"), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.HistoricalAdoptionTrend.Should().Be(GetPortalAdoptionFunnelReport.AdoptionTrendDirection.Growing);
@@ -201,8 +203,8 @@ public sealed class WaveBaPortalIntelligenceTests
                 new IPortalAdoptionReader.DailyAdoptionSnapshot(0, 30, 100)
             ]);
 
-        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock);
-        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query("t1"), CancellationToken.None);
+        var handler = new GetPortalAdoptionFunnelReport.Handler(_adoptionReader, _clock, _currentTenant);
+        var result = await handler.Handle(new GetPortalAdoptionFunnelReport.Query(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value!.HistoricalAdoptionTrend.Should().Be(GetPortalAdoptionFunnelReport.AdoptionTrendDirection.Declining);

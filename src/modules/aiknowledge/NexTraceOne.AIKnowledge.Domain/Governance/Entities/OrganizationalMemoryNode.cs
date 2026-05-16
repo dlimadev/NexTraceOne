@@ -26,7 +26,7 @@ public sealed class OrganizationalMemoryNode : AuditableEntity<OrganizationalMem
     public double RelevanceScore { get; private set; } = 1.0;
     public Guid TenantId { get; private set; }
     public DateTimeOffset RecordedAt { get; private set; }
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     public IReadOnlyList<string> Tags =>
         JsonSerializer.Deserialize<List<string>>(TagsJson) ?? [];

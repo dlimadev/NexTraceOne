@@ -29,7 +29,7 @@ public sealed class ContractDraftCrudTests
     {
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.GetByIdAsync(Arg.Any<ServiceAssetId>(), Arg.Any<CancellationToken>())
-            .Returns(ServiceAsset.Create("TestService", "test-domain", "test-team"));
+            .Returns(ServiceAsset.Create("TestService", "test-domain", "test-team", Guid.NewGuid()));
         return repo;
     }
 
@@ -54,10 +54,6 @@ public sealed class ContractDraftCrudTests
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
         var sut = new CreateDraftFeature.Handler(repository, CreateServiceRepo(), unitOfWork, dateTimeProvider);
 
-        repository.ListAsync(
-                Arg.Any<DraftStatus?>(), Arg.Any<Guid?>(), Arg.Any<string?>(),
-                Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
-            .Returns(new List<ContractDraft>());
         dateTimeProvider.UtcNow.Returns(FixedNow);
 
         var result = await sut.Handle(
@@ -65,8 +61,10 @@ public sealed class ContractDraftCrudTests
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
+        result.Value.DraftId.Should().NotBeEmpty();
         result.Value.Title.Should().Be("My API");
         result.Value.Status.Should().Be(DraftStatus.Editing.ToString());
+        result.Value.CreatedAt.Should().Be(FixedNow);
         repository.Received(1).Add(Arg.Any<ContractDraft>());
         await unitOfWork.Received(1).CommitAsync(Arg.Any<CancellationToken>());
     }
@@ -224,7 +222,7 @@ public sealed class ContractDraftCrudTests
 
     private static IServiceAssetRepository CreateSoapServiceRepo()
     {
-        var service = ServiceAsset.Create("TestSoapService", "test-domain", "test-team");
+        var service = ServiceAsset.Create("TestSoapService", "test-domain", "test-team", Guid.NewGuid());
         service.UpdateDetails("TestSoapService", "", ServiceType.SoapService, "",
             Criticality.Low, LifecycleStatus.Planning, ExposureType.Internal, "", "");
         var repo = Substitute.For<IServiceAssetRepository>();

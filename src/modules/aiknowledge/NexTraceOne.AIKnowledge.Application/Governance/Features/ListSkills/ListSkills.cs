@@ -23,13 +23,21 @@ public static class ListSkills
     {
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var status = request.Status is not null
-                ? Enum.Parse<SkillStatus>(request.Status, ignoreCase: true)
-                : (SkillStatus?)null;
+            SkillStatus? status = null;
+            if (request.Status is not null)
+            {
+                if (!Enum.TryParse<SkillStatus>(request.Status, ignoreCase: true, out var parsedStatus))
+                    return Error.Validation("Skill.InvalidStatus", $"'{request.Status}' is not a valid skill status.");
+                status = parsedStatus;
+            }
 
-            var ownershipType = request.OwnershipType is not null
-                ? Enum.Parse<SkillOwnershipType>(request.OwnershipType, ignoreCase: true)
-                : (SkillOwnershipType?)null;
+            SkillOwnershipType? ownershipType = null;
+            if (request.OwnershipType is not null)
+            {
+                if (!Enum.TryParse<SkillOwnershipType>(request.OwnershipType, ignoreCase: true, out var parsedOwnershipType))
+                    return Error.Validation("Skill.InvalidOwnershipType", $"'{request.OwnershipType}' is not a valid skill ownership type.");
+                ownershipType = parsedOwnershipType;
+            }
 
             var skills = await skillRepository.ListAsync(status, ownershipType, request.TenantId, cancellationToken);
 

@@ -94,7 +94,8 @@ public static class ImportFromKongGateway
         IServiceAssetRepository serviceAssetRepository,
         IApiAssetRepository apiAssetRepository,
         IDateTimeProvider dateTimeProvider,
-        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork,
+        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -113,7 +114,7 @@ public static class ImportFromKongGateway
                 var existingService = await serviceAssetRepository.GetByNameAsync(svc.ServiceName, cancellationToken);
                 if (existingService is null)
                 {
-                    existingService = ServiceAsset.Create(svc.ServiceName, svc.Domain, svc.TeamName);
+                    existingService = ServiceAsset.Create(svc.ServiceName, svc.Domain, svc.TeamName, currentTenant.Id);
                     serviceAssetRepository.Add(existingService);
                     servicesCreated++;
                 }

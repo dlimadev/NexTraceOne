@@ -1,17 +1,18 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class EvaluationSuiteRepository(AiGovernanceDbContext context) : IEvaluationSuiteRepository
+internal sealed class EvaluationSuiteRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IEvaluationSuiteRepository
 {
     public void Add(EvaluationSuite suite)
         => context.EvaluationSuites.Add(suite);
 
     public async Task<EvaluationSuite?> GetByIdAsync(EvaluationSuiteId id, CancellationToken ct)
-        => await context.EvaluationSuites.SingleOrDefaultAsync(s => s.Id == id, ct);
+        => await context.EvaluationSuites.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(s => s.Id == id, ct);
 
     public async Task<IReadOnlyList<EvaluationSuite>> ListByTenantAsync(
         Guid tenantId, string? useCase, int page, int pageSize, CancellationToken ct)

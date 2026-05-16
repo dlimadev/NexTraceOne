@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
@@ -14,13 +15,14 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// ClickHouse-backed implementation of IAnalyticsEventRepository.
 /// Reads from nextraceone_analytics.pan_events (written by IAnalyticsWriter.WriteProductEventAsync).
-/// Writes (AddAsync) still go to PostgreSQL — ClickHouse is the read-optimised analytics backend.
+/// Writes (AddAsync) still go to PostgreSQL via IAnalyticsEventRepository delegation.
 /// Activated when Telemetry:ObservabilityProvider:Provider = "ClickHouse".
 /// </summary>
 internal sealed class ClickHouseAnalyticsEventRepository(
     HttpClient httpClient,
     IOptions<ClickHouseAnalyticsOptions> options,
-    ProductAnalyticsDbContext context,
+    IAnalyticsEventRepository fallbackRepository,
+    ICurrentTenant currentTenant,
     ILogger<ClickHouseAnalyticsEventRepository> logger) : IAnalyticsEventRepository
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -32,9 +34,9 @@ internal sealed class ClickHouseAnalyticsEventRepository(
 
     private string Endpoint => options.Value.Endpoint;
 
-    // AddAsync always goes to PostgreSQL — ClickHouse is append-only via IAnalyticsWriter.
+    // AddAsync delegates to the PostgreSQL fallback repository.
     public async Task AddAsync(AnalyticsEvent analyticsEvent, CancellationToken ct)
-        => await context.AnalyticsEvents.AddAsync(analyticsEvent, ct);
+        => await fallbackRepository.AddAsync(analyticsEvent, ct);
 
     public async Task<long> CountAsync(
         string? persona, ProductModule? module, string? teamId, string? domainId,
@@ -42,14 +44,16 @@ internal sealed class ClickHouseAnalyticsEventRepository(
     {
         var where = BuildWhereClause(persona: persona, module: module, teamId: teamId,
             domainId: domainId, from: from, to: to);
-        return await ExecuteScalarAsync<long>($"SELECT count() FROM pan_events {where}", ct);
+        return await ExecuteScalarAsync<long>($"SELECT count() FROM pan_events {where}", ct,
+            persona: persona, teamId: teamId, domainId: domainId, from: from, to: to);
     }
 
     public async Task<long> CountByEventTypeAsync(
         AnalyticsEventType eventType, string? persona, DateTimeOffset from, DateTimeOffset to, CancellationToken ct)
     {
         var where = BuildWhereClause(persona: persona, eventType: (int)eventType, from: from, to: to);
-        return await ExecuteScalarAsync<long>($"SELECT count() FROM pan_events {where}", ct);
+        return await ExecuteScalarAsync<long>($"SELECT count() FROM pan_events {where}", ct,
+            persona: persona, from: from, to: to);
     }
 
     public async Task<int> CountUniqueUsersAsync(
@@ -58,7 +62,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
     {
         var where = BuildWhereClause(persona: persona, module: module, teamId: teamId,
             domainId: domainId, from: from, to: to);
-        return await ExecuteScalarAsync<int>($"SELECT count(DISTINCT user_id) FROM pan_events {where}", ct);
+        return await ExecuteScalarAsync<int>($"SELECT count(DISTINCT user_id) FROM pan_events {where}", ct,
+            persona: persona, teamId: teamId, domainId: domainId, from: from, to: to);
     }
 
     public async Task<int> CountActivePersonasAsync(
@@ -66,7 +71,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
         DateTimeOffset from, DateTimeOffset to, CancellationToken ct)
     {
         var where = BuildWhereClause(module: ParseModule(module), teamId: teamId, domainId: domainId, from: from, to: to);
-        return await ExecuteScalarAsync<int>($"SELECT count(DISTINCT persona) FROM pan_events {where}", ct);
+        return await ExecuteScalarAsync<int>($"SELECT count(DISTINCT persona) FROM pan_events {where}", ct,
+            teamId: teamId, domainId: domainId, from: from, to: to);
     }
 
     public async Task<IReadOnlyList<ModuleUsageRow>> GetTopModulesAsync(
@@ -80,7 +86,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY module ORDER BY event_count DESC LIMIT {top}
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<ModuleRow>(sql, ct);
+        var rows = await ExecuteQueryAsync<ModuleRow>(sql, ct,
+            persona: persona, teamId: teamId, domainId: domainId, from: from, to: to);
         return rows.Select(r => new ModuleUsageRow(
             Module: (ProductModule)r.Module,
             EventCount: r.EventCount,
@@ -97,7 +104,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY module ORDER BY total_actions DESC
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<ModuleRow>(sql, ct);
+        var rows = await ExecuteQueryAsync<ModuleRow>(sql, ct,
+            persona: persona, teamId: teamId, from: from, to: to);
         return rows.Select(r => new ModuleAdoptionRow(
             Module: (ProductModule)r.Module,
             TotalActions: r.EventCount,
@@ -114,7 +122,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY module, feature ORDER BY cnt DESC
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<FeatureCountRow>(sql, ct);
+        var rows = await ExecuteQueryAsync<FeatureCountRow>(sql, ct,
+            persona: persona, teamId: teamId, from: from, to: to);
         return rows.Select(r => new ModuleFeatureCountRow(
             Module: (ProductModule)r.Module,
             Feature: r.Feature,
@@ -131,7 +140,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             ORDER BY occurred_at
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<SessionEventRecord>(sql, ct);
+        var rows = await ExecuteQueryAsync<SessionEventRecord>(sql, ct,
+            persona: persona, teamId: teamId, from: from, to: to);
         return rows.Select(r => new SessionEventRow(
             SessionId: r.SessionId,
             EventType: (AnalyticsEventType)r.EventType,
@@ -148,7 +158,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY persona ORDER BY event_count DESC
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<PersonaRow>(sql, ct);
+        var rows = await ExecuteQueryAsync<PersonaRow>(sql, ct,
+            teamId: teamId, domainId: domainId, from: from, to: to);
         return rows.Select(r => new PersonaBreakdownRow(
             Persona: r.Persona,
             EventCount: r.EventCount,
@@ -165,7 +176,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY event_type ORDER BY cnt DESC LIMIT {top}
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<EventTypeCountRecord>(sql, ct);
+        var rows = await ExecuteQueryAsync<EventTypeCountRecord>(sql, ct,
+            persona: persona, from: from, to: to);
         return rows.Select(r => new EventTypeCountRow(
             EventType: (AnalyticsEventType)r.EventType,
             Count: r.Cnt)).ToList();
@@ -179,7 +191,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             SELECT DISTINCT event_type FROM pan_events {where}
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<DistinctEventTypeRow>(sql, ct);
+        var rows = await ExecuteQueryAsync<DistinctEventTypeRow>(sql, ct,
+            persona: persona, from: from, to: to);
         return rows.Select(r => (AnalyticsEventType)r.EventType).ToList();
     }
 
@@ -197,7 +210,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY event_type
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<EventTypeUserRow>(sql, ct);
+        var rows = await ExecuteQueryAsync<EventTypeUserRow>(sql, ct,
+            persona: persona, teamId: teamId, from: from, to: to);
         return rows.Select(r => new EventTypeUserCountRow(
             EventType: (AnalyticsEventType)r.EventType,
             UniqueUsers: r.UniqueUsers)).ToList();
@@ -216,7 +230,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY session_id, event_type
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<SessionEventTypeRecord>(sql, ct);
+        var rows = await ExecuteQueryAsync<SessionEventTypeRecord>(sql, ct,
+            persona: persona, from: from, to: to);
         return rows.Select(r => new SessionEventTypeRow(
             SessionId: r.SessionId,
             EventType: (AnalyticsEventType)r.EventType,
@@ -228,7 +243,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
     {
         var where = BuildWhereClause(persona: persona, from: from, to: to);
         return await ExecuteScalarAsync<int>(
-            $"SELECT count(DISTINCT session_id) FROM pan_events {where}", ct);
+            $"SELECT count(DISTINCT session_id) FROM pan_events {where}", ct,
+            persona: persona, from: from, to: to);
     }
 
     public async Task<IReadOnlyList<UserFirstEventRow>> GetUserFirstEventTimesAsync(
@@ -245,7 +261,8 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             GROUP BY user_id, event_type
             FORMAT JSONEachRow
             """;
-        var rows = await ExecuteQueryAsync<UserFirstRecord>(sql, ct);
+        var rows = await ExecuteQueryAsync<UserFirstRecord>(sql, ct,
+            persona: persona, teamId: teamId, from: from, to: to);
         return rows.Select(r => new UserFirstEventRow(
             UserId: r.UserId,
             EventType: (AnalyticsEventType)r.EventType,
@@ -254,7 +271,7 @@ internal sealed class ClickHouseAnalyticsEventRepository(
 
     // ── Helpers ──────────────────────────────────────────────────────────────────
 
-    private static string BuildWhereClause(
+    private string BuildWhereClause(
         string? persona = null,
         ProductModule? module = null,
         string? teamId = null,
@@ -266,18 +283,21 @@ internal sealed class ClickHouseAnalyticsEventRepository(
     {
         var conditions = new List<string>();
 
+        // Defense-in-depth: always filter by tenant
+        conditions.Add($"tenant_id = {currentTenant.Id}");
+
         if (!string.IsNullOrWhiteSpace(persona))
-            conditions.Add($"persona = '{Escape(persona)}'");
+            conditions.Add($"persona = {{p_persona:String}}");
         if (module.HasValue)
             conditions.Add($"module = {(int)module.Value}");
         if (!string.IsNullOrWhiteSpace(teamId))
-            conditions.Add($"team_id = '{Escape(teamId)}'");
+            conditions.Add($"team_id = {{p_team_id:String}}");
         if (!string.IsNullOrWhiteSpace(domainId))
-            conditions.Add($"domain_id = '{Escape(domainId)}'");
+            conditions.Add($"domain_id = {{p_domain_id:String}}");
         if (from.HasValue)
-            conditions.Add($"occurred_at >= '{from.Value.UtcDateTime:yyyy-MM-dd HH:mm:ss}'");
+            conditions.Add($"occurred_at >= '{{p_from:DateTime}}'");
         if (to.HasValue)
-            conditions.Add($"occurred_at <= '{to.Value.UtcDateTime:yyyy-MM-dd HH:mm:ss}'");
+            conditions.Add($"occurred_at <= '{{p_to:DateTime}}'");
         if (eventType.HasValue)
             conditions.Add($"event_type = {eventType.Value}");
         if (!string.IsNullOrWhiteSpace(extra))
@@ -288,16 +308,47 @@ internal sealed class ClickHouseAnalyticsEventRepository(
             : string.Empty;
     }
 
-    private static string Escape(string value) => value.Replace("'", "\\'");
+    private static string BuildQueryParameters(
+        string? persona = null,
+        string? teamId = null,
+        string? domainId = null,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null)
+    {
+        var parameters = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(persona))
+            parameters.Add($"param_p_persona={Uri.EscapeDataString(persona)}");
+        if (!string.IsNullOrWhiteSpace(teamId))
+            parameters.Add($"param_p_team_id={Uri.EscapeDataString(teamId)}");
+        if (!string.IsNullOrWhiteSpace(domainId))
+            parameters.Add($"param_p_domain_id={Uri.EscapeDataString(domainId)}");
+        if (from.HasValue)
+            parameters.Add($"param_p_from={Uri.EscapeDataString(from.Value.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"))}");
+        if (to.HasValue)
+            parameters.Add($"param_p_to={Uri.EscapeDataString(to.Value.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"))}");
+
+        return parameters.Count > 0
+            ? "&" + string.Join("&", parameters)
+            : string.Empty;
+    }
 
     private static ProductModule? ParseModule(string? module)
         => module is not null && Enum.TryParse<ProductModule>(module, true, out var m) ? m : null;
 
-    private async Task<T> ExecuteScalarAsync<T>(string sql, CancellationToken ct) where T : struct
+    private async Task<T> ExecuteScalarAsync<T>(
+        string sql,
+        CancellationToken ct,
+        string? persona = null,
+        string? teamId = null,
+        string? domainId = null,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null) where T : struct
     {
         try
         {
-            var url = $"{Endpoint}/?database=nextraceone_analytics&query={Uri.EscapeDataString(sql + " FORMAT JSONEachRow")}";
+            var queryParams = BuildQueryParameters(persona, teamId, domainId, from, to);
+            var url = $"{Endpoint}/?database=nextraceone_analytics&query={Uri.EscapeDataString(sql + " FORMAT JSONEachRow")}{queryParams}";
             var responseText = await httpClient.GetStringAsync(url, ct);
             var line = responseText.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
             if (line is null) return default;
@@ -314,11 +365,19 @@ internal sealed class ClickHouseAnalyticsEventRepository(
         }
     }
 
-    private async Task<IReadOnlyList<T>> ExecuteQueryAsync<T>(string sql, CancellationToken ct)
+    private async Task<IReadOnlyList<T>> ExecuteQueryAsync<T>(
+        string sql,
+        CancellationToken ct,
+        string? persona = null,
+        string? teamId = null,
+        string? domainId = null,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null)
     {
         try
         {
-            var url = $"{Endpoint}/?database=nextraceone_analytics&query={Uri.EscapeDataString(sql)}";
+            var queryParams = BuildQueryParameters(persona, teamId, domainId, from, to);
+            var url = $"{Endpoint}/?database=nextraceone_analytics&query={Uri.EscapeDataString(sql)}{queryParams}";
             var responseText = await httpClient.GetStringAsync(url, ct);
             var results = new List<T>();
             foreach (var line in responseText.Split('\n', StringSplitOptions.RemoveEmptyEntries))
@@ -351,6 +410,6 @@ internal sealed class ClickHouseAnalyticsEventRepository(
 /// <summary>Configuration for ClickHouse analytics reads.</summary>
 public sealed class ClickHouseAnalyticsOptions
 {
-    public const string SectionName = "ClickHouse:LegacyTelemetry";
+    public const string SectionName = "ClickHouse:Analytics";
     public string Endpoint { get; set; } = "http://localhost:8123";
 }

@@ -43,7 +43,7 @@ public sealed class RegisterServiceAssetApprovalTests
                 false,
                 1));
 
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         // Act
         var result = await sut.Handle(
@@ -84,7 +84,7 @@ public sealed class RegisterServiceAssetApprovalTests
                 false,
                 1));
 
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         // Act
         var result = await sut.Handle(
@@ -115,7 +115,7 @@ public sealed class RegisterServiceAssetApprovalTests
                 Arg.Any<CancellationToken>())
             .Returns((EffectiveConfigurationDto?)null);
 
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         // Act
         var result = await sut.Handle(

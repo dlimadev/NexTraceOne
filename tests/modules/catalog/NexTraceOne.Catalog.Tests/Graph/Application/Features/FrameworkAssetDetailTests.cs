@@ -21,7 +21,7 @@ public sealed class FrameworkAssetDetailTests
 
     private static ServiceAsset CreateFrameworkService()
     {
-        var service = ServiceAsset.Create("auth-sdk", "Platform", "SDK Team");
+        var service = ServiceAsset.Create("auth-sdk", "Platform", "SDK Team", Guid.NewGuid());
         service.UpdateDetails(
             "Auth SDK",
             "Authentication SDK",
@@ -37,7 +37,7 @@ public sealed class FrameworkAssetDetailTests
 
     private static ServiceAsset CreateNonFrameworkService()
     {
-        var service = ServiceAsset.Create("payments-api", "Finance", "Payments Team");
+        var service = ServiceAsset.Create("payments-api", "Finance", "Payments Team", Guid.NewGuid());
         // default ServiceType is RestApi
         return service;
     }

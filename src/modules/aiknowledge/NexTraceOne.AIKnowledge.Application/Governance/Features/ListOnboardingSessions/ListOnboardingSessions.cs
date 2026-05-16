@@ -37,9 +37,13 @@ public static class ListOnboardingSessions
         {
             Guard.Against.Null(request);
 
-            OnboardingSessionStatus? status = request.StatusValue is not null
-                ? Enum.Parse<OnboardingSessionStatus>(request.StatusValue)
-                : null;
+            OnboardingSessionStatus? status = null;
+            if (request.StatusValue is not null)
+            {
+                if (!Enum.TryParse<OnboardingSessionStatus>(request.StatusValue, ignoreCase: true, out var parsedStatus))
+                    return Error.Validation("OnboardingSession.InvalidStatus", $"'{request.StatusValue}' is not a valid onboarding session status.");
+                status = parsedStatus;
+            }
 
             var sessions = await sessionRepository.ListAsync(
                 request.TeamId, status, cancellationToken);

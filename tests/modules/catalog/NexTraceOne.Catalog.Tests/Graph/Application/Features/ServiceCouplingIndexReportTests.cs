@@ -25,7 +25,7 @@ public sealed class ServiceCouplingIndexReportTests
 
     private static ServiceAsset MakeService(string name, ServiceTierType tier = ServiceTierType.Standard)
     {
-        var svc = ServiceAsset.Create(name, "domain", "team-a");
+        var svc = ServiceAsset.Create(name, "domain", "team-a", Guid.NewGuid());
         svc.SetTier(tier);
         return svc;
     }

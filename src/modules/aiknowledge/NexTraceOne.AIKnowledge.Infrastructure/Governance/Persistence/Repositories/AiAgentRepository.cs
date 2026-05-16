@@ -48,4 +48,7 @@ internal sealed class AiAgentRepository(AiGovernanceDbContext context) : IAiAgen
 
     public async Task<AiAgent?> GetBySlugAsync(string slug, CancellationToken ct)
         => await context.Agents.SingleOrDefaultAsync(a => a.Slug == slug, ct);
+
+    public async Task<bool> ExistsByNameAsync(string name, CancellationToken ct)
+        => await context.Agents.AnyAsync(a => a.Name == name, ct);
 }

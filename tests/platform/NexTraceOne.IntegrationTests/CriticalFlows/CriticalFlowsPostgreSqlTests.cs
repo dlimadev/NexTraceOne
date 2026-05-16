@@ -46,7 +46,7 @@ public sealed class CriticalFlowsPostgreSqlTests(PostgreSqlIntegrationFixture fi
 
         await using var context = Fixture.CreateCatalogGraphDbContext();
 
-        var service = ServiceAsset.Create("orders-service", "sales", "team-orders");
+        var service = ServiceAsset.Create("orders-service", "sales", "team-orders", Guid.NewGuid());
         service.UpdateDetails(
             displayName: "Orders Service",
             description: "Source of Truth owner for Orders API",

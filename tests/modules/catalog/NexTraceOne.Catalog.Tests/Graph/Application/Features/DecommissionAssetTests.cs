@@ -28,7 +28,7 @@ public sealed class DecommissionAssetTests
     public async Task Handle_Should_DecommissionApiAsset_When_AssetIsActive()
     {
         // Arrange — API ativa pronta para descomissionamento
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var api = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
 
         _apiAssetRepository.GetByIdAsync(
@@ -50,7 +50,7 @@ public sealed class DecommissionAssetTests
     public async Task Handle_Should_ReturnFailure_When_ApiAlreadyDecommissioned()
     {
         // Arrange — API já descomissionada (Decommission chamado previamente)
-        var ownerService = ServiceAsset.Create("legacy-service", "Legacy", "Legacy Team");
+        var ownerService = ServiceAsset.Create("legacy-service", "Legacy", "Legacy Team", Guid.NewGuid());
         var api = ApiAsset.Register("Legacy API", "/api/legacy", "0.9.0", "Internal", ownerService);
         api.Decommission();
 

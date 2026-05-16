@@ -27,7 +27,7 @@ public sealed class WarRoomSession : AuditableEntity<WarRoomSessionId>
     public DateTimeOffset OpenedAt { get; private set; }
     public DateTimeOffset? ResolvedAt { get; private set; }
     public string SkillUsed { get; private set; } = string.Empty;
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     public IReadOnlyList<string> ParticipantUserIds =>
         JsonSerializer.Deserialize<List<string>>(ParticipantsJson) ?? [];

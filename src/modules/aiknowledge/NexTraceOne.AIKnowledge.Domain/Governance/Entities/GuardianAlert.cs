@@ -25,7 +25,7 @@ public sealed class GuardianAlert : AuditableEntity<GuardianAlertId>
     public bool WasActualIssue { get; private set; }
     public Guid TenantId { get; private set; }
     public DateTimeOffset DetectedAt { get; private set; }
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     public static GuardianAlert Emit(
         string serviceName,

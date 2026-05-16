@@ -67,9 +67,16 @@ public static class CreateAgent
         {
             Guard.Against.Null(request);
 
-            var category = Enum.Parse<AgentCategory>(request.Category, ignoreCase: true);
-            var ownershipType = Enum.Parse<AgentOwnershipType>(request.OwnershipType, ignoreCase: true);
-            var visibility = Enum.Parse<AgentVisibility>(request.Visibility, ignoreCase: true);
+            if (!Enum.TryParse<AgentCategory>(request.Category, ignoreCase: true, out var category))
+                return Error.Validation("Agent.InvalidCategory", $"'{request.Category}' is not a valid agent category.");
+            if (!Enum.TryParse<AgentOwnershipType>(request.OwnershipType, ignoreCase: true, out var ownershipType))
+                return Error.Validation("Agent.InvalidOwnershipType", $"'{request.OwnershipType}' is not a valid agent ownership type.");
+            if (!Enum.TryParse<AgentVisibility>(request.Visibility, ignoreCase: true, out var visibility))
+                return Error.Validation("Agent.InvalidVisibility", $"'{request.Visibility}' is not a valid agent visibility.");
+
+            var exists = await agentRepository.ExistsByNameAsync(request.Name, cancellationToken);
+            if (exists)
+                return Error.Conflict("Agent.NameAlreadyExists", $"An agent with name '{request.Name}' already exists.");
 
             var agent = AiAgent.CreateCustom(
                 request.Name,

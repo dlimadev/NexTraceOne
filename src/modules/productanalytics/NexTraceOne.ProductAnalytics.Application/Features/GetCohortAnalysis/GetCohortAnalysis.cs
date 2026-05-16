@@ -7,6 +7,7 @@ using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
 using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetCohortAnalysis;
 
@@ -37,7 +38,7 @@ public static class GetCohortAnalysis
                 AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
             var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
 
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
+            var (from, to, periodLabel) = AnalyticsQueryHelper.ResolveRange(clock.UtcNow, request.Range, maxRangeDays, defaultRange: "last_90d");
 
             var granularity = NormalizeGranularity(request.Granularity);
             var periods = Math.Clamp(request.Periods ?? AnalyticsConstants.DefaultCohortPeriods, 1, AnalyticsConstants.MaxCohortPeriods);
@@ -188,19 +189,6 @@ public static class GetCohortAnalysis
             return (thursday.DayOfYear - 1) / 7 + 1;
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
-        {
-            var label = string.IsNullOrWhiteSpace(range) ? "last_90d" : range;
-            var days = label switch
-            {
-                "last_7d" => 7,
-                "last_30d" => 30,
-                "last_1d" => 1,
-                _ => 90
-            };
-            if (days > maxDays) days = maxDays;
-            return (utcNow.AddDays(-days), utcNow, label);
-        }
     }
 
     /// <summary>Resposta com análise de cohorts.</summary>

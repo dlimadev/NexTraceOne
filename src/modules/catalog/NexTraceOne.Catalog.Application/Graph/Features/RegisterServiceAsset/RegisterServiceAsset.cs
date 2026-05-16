@@ -1,8 +1,11 @@
+using System.Diagnostics;
+
 using Ardalis.GuardClauses;
 using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.BuildingBlocks.Observability.Tracing;
 using NexTraceOne.Catalog.Application.ConfigurationKeys;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
@@ -65,8 +68,16 @@ public static class RegisterServiceAsset
             RuleFor(x => x.ExposureType).MaximumLength(100).When(x => x.ExposureType is not null);
             RuleFor(x => x.TechnicalOwner).MaximumLength(200).When(x => x.TechnicalOwner is not null);
             RuleFor(x => x.BusinessOwner).MaximumLength(200).When(x => x.BusinessOwner is not null);
-            RuleFor(x => x.DocumentationUrl).MaximumLength(500).When(x => x.DocumentationUrl is not null);
-            RuleFor(x => x.RepositoryUrl).MaximumLength(500).When(x => x.RepositoryUrl is not null);
+            RuleFor(x => x.DocumentationUrl)
+                .MaximumLength(500)
+                .Must(url => string.IsNullOrEmpty(url) || Uri.TryCreate(url, UriKind.Absolute, out _))
+                .When(x => x.DocumentationUrl is not null)
+                .WithMessage("DocumentationUrl must be a valid absolute URL.");
+            RuleFor(x => x.RepositoryUrl)
+                .MaximumLength(500)
+                .Must(url => string.IsNullOrEmpty(url) || Uri.TryCreate(url, UriKind.Absolute, out _))
+                .When(x => x.RepositoryUrl is not null)
+                .WithMessage("RepositoryUrl must be a valid absolute URL.");
             RuleFor(x => x.SubDomain).MaximumLength(200).When(x => x.SubDomain is not null);
             RuleFor(x => x.Capability).MaximumLength(300).When(x => x.Capability is not null);
             RuleFor(x => x.GitRepository).MaximumLength(1000).When(x => x.GitRepository is not null);
@@ -89,11 +100,16 @@ public static class RegisterServiceAsset
     public sealed class Handler(
         IServiceAssetRepository serviceAssetRepository,
         IConfigurationResolutionService configurationService,
-        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork,
+        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
+            using var activity = NexTraceActivitySources.Commands.StartActivity("RegisterServiceAsset");
             Guard.Against.Null(request);
+
+            activity?.SetTag("service.name", request.Name);
+            activity?.SetTag("service.domain", request.Domain);
 
             var existing = await serviceAssetRepository.GetByNameAsync(request.Name, cancellationToken);
             if (existing is not null)
@@ -101,7 +117,7 @@ public static class RegisterServiceAsset
                 return CatalogGraphErrors.ServiceAssetAlreadyExists(request.Name);
             }
 
-            var serviceAsset = ServiceAsset.Create(request.Name, request.Domain, request.TeamName);
+            var serviceAsset = ServiceAsset.Create(request.Name, request.Domain, request.TeamName, currentTenant.Id);
 
             var hasDetails = request.Description is not null
                 || request.ServiceType is not null
@@ -193,6 +209,8 @@ public static class RegisterServiceAsset
             serviceAssetRepository.Add(serviceAsset);
 
             await unitOfWork.CommitAsync(cancellationToken);
+
+            activity?.SetTag("service.id", serviceAsset.Id.Value.ToString());
 
             return new Response(
                 serviceAsset.Id.Value,

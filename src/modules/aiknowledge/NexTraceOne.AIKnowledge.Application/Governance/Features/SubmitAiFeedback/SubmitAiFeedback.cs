@@ -54,7 +54,8 @@ public static class SubmitAiFeedback
         {
             Guard.Against.Null(request);
 
-            var rating = Enum.Parse<FeedbackRating>(request.RatingValue);
+            if (!Enum.TryParse<FeedbackRating>(request.RatingValue, ignoreCase: true, out var rating))
+                return Error.Validation("AiFeedback.InvalidRating", $"'{request.RatingValue}' is not a valid feedback rating.");
 
             var feedback = AiFeedback.Create(
                 conversationId: request.ConversationId,

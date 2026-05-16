@@ -15,7 +15,7 @@ public sealed class DependencyRiskReportTests
 
     private static ServiceAsset MakeService(string name, ServiceTierType tier, string teamName = "team-alpha")
     {
-        var svc = ServiceAsset.Create(name, "finance", teamName);
+        var svc = ServiceAsset.Create(name, "finance", teamName, Guid.NewGuid());
         svc.SetTier(tier);
         return svc;
     }

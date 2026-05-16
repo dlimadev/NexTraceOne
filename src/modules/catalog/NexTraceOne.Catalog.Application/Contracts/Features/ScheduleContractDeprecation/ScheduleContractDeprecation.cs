@@ -4,6 +4,7 @@ using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts.Features.ScheduleContractDeprecation;
 
@@ -67,7 +68,7 @@ public static class ScheduleContractDeprecation
 
             var id = existing?.Id ?? Guid.NewGuid();
 
-            var record = new IDeprecationScheduleRepository.DeprecationScheduleRecord(
+            var record = new DeprecationScheduleRecord(
                 id,
                 request.ContractId,
                 request.TenantId,

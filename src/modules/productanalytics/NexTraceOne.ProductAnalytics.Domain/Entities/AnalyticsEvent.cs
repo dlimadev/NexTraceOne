@@ -42,6 +42,7 @@ public sealed class AnalyticsEvent : Entity<AnalyticsEventId>
     public string? MetadataJson { get; private init; }
 
     public DateTimeOffset OccurredAt { get; private init; }
+    public DateTimeOffset CreatedAt { get; private init; }
 
     public static AnalyticsEvent Create(
         Guid tenantId,
@@ -111,7 +112,8 @@ public sealed class AnalyticsEvent : Entity<AnalyticsEventId>
             SessionId = string.IsNullOrWhiteSpace(sessionId) ? null : sessionId,
             ClientType = string.IsNullOrWhiteSpace(clientType) ? null : clientType,
             MetadataJson = string.IsNullOrWhiteSpace(metadataJson) ? null : metadataJson,
-            OccurredAt = occurredAt
+            OccurredAt = occurredAt,
+            CreatedAt = DateTimeOffset.UtcNow
         };
     }
 }

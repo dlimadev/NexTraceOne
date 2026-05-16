@@ -5,6 +5,7 @@ using Microsoft.Extensions.Http.Resilience;
 
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
+using NexTraceOne.BuildingBlocks.Observability.Analytics.Configuration;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Contracts;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
@@ -37,7 +38,9 @@ public static class DependencyInjection
                     serviceProvider.GetRequiredService<TenantRlsInterceptor>()));
 
         // Repositories — P2.3
-        // Provider-aware: ClickHouse for high-cardinality analytic reads, PostgreSQL as default.
+        // Provider-aware: ClickHouse for high-cardinality analytic reads, PostgreSQL as default, Elastic as primary.
+        services.AddScoped<AnalyticsEventRepository>();
+
         var analyticsProvider = configuration["Telemetry:ObservabilityProvider:Provider"] ?? "Elastic";
         if (string.Equals(analyticsProvider, "ClickHouse", StringComparison.OrdinalIgnoreCase))
         {
@@ -47,6 +50,15 @@ public static class DependencyInjection
                 .AddStandardResilienceHandler();
             services.AddScoped<IAnalyticsEventRepository>(
                 sp => sp.GetRequiredService<ClickHouseAnalyticsEventRepository>());
+        }
+        else if (string.Equals(analyticsProvider, "Elastic", StringComparison.OrdinalIgnoreCase))
+        {
+            services.Configure<AnalyticsOptions>(
+                configuration.GetSection(AnalyticsOptions.SectionName));
+            services.AddHttpClient<ElasticsearchAnalyticsEventRepository>()
+                .AddStandardResilienceHandler();
+            services.AddScoped<IAnalyticsEventRepository>(
+                sp => sp.GetRequiredService<ElasticsearchAnalyticsEventRepository>());
         }
         else
         {

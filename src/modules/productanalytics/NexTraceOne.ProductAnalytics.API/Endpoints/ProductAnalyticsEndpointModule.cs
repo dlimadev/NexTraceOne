@@ -47,7 +47,8 @@ public sealed class ProductAnalyticsEndpointModule
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(command, cancellationToken);
-            return result.ToHttpResult(localizer);
+            if (result.IsFailure) return result.ToHttpResult(localizer);
+            return Results.Created($"/api/v1/product-analytics/events/{result.Value.EventId}", result.Value);
         })
         .RequirePermission("analytics:write")
         .RequireRateLimiting("data-intensive")
@@ -256,6 +257,7 @@ public sealed class ProductAnalyticsEndpointModule
                 r.FileName);
         })
         .RequirePermission("analytics:read")
+        .RequireRateLimiting("data-intensive")
         .WithSummary("Export analytics events")
         .WithDescription("Exports raw session events in CSV or JSON format. Use ?format=csv or ?format=json. Max 10,000 rows; IsTruncated header indicates overflow.");
 
@@ -288,6 +290,7 @@ public sealed class ProductAnalyticsEndpointModule
                 r.FileName);
         })
         .RequirePermission("analytics:read")
+        .RequireRateLimiting("data-intensive")
         .WithSummary("Export analytics summary")
         .WithDescription("Exports a consolidated analytics summary (total events, unique users, value/friction scores, top modules) in CSV or JSON format.");
 

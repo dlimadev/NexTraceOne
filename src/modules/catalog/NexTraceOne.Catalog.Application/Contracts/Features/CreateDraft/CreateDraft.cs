@@ -5,6 +5,9 @@ using FluentValidation;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using System.Diagnostics;
+
+using NexTraceOne.BuildingBlocks.Observability.Tracing;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Application.Graph.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
@@ -55,7 +58,11 @@ public static class CreateDraft
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
+            using var activity = NexTraceActivitySources.Commands.StartActivity("CreateDraft");
             Guard.Against.Null(request);
+
+            activity?.SetTag("draft.serviceId", request.ServiceId.ToString());
+            activity?.SetTag("draft.protocol", request.Protocol.ToString());
 
             // Valida existência do serviço
             var service = await serviceAssetRepository.GetByIdAsync(
@@ -90,22 +97,13 @@ public static class CreateDraft
             repository.Add(draft);
             await unitOfWork.CommitAsync(cancellationToken);
 
-            var persistedDraft = (await repository.ListAsync(
-                    DraftStatus.Editing,
-                    request.ServiceId,
-                    request.Author,
-                    1,
-                    20,
-                    cancellationToken))
-                .OrderByDescending(item => item.CreatedAt)
-                .FirstOrDefault(item => item.Title == request.Title && item.Protocol == request.Protocol)
-                ?? draft;
+            activity?.SetTag("draft.id", draft.Id.Value.ToString());
 
             return new Response(
-                persistedDraft.Id.Value,
-                persistedDraft.Title,
-                persistedDraft.Status.ToString(),
-                persistedDraft.CreatedAt == default ? dateTimeProvider.UtcNow : persistedDraft.CreatedAt);
+                draft.Id.Value,
+                draft.Title,
+                draft.Status.ToString(),
+                dateTimeProvider.UtcNow);
         }
     }
 

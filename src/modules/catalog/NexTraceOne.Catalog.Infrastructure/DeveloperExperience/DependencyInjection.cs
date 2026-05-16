@@ -6,9 +6,9 @@ using NexTraceOne.BuildingBlocks.Infrastructure;
 using NexTraceOne.BuildingBlocks.Infrastructure.Configuration;
 using NexTraceOne.BuildingBlocks.Infrastructure.Interceptors;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
+using NexTraceOne.Catalog.Application.DeveloperExperience.Services;
 using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence;
 using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Persistence.Repositories;
-using NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Services;
 
 namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience;
 

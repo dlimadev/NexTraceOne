@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
-
-using static NexTraceOne.Catalog.Application.Contracts.Abstractions.IDeprecationScheduleRepository;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Infrastructure.Contracts.Persistence.Repositories;
 

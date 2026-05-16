@@ -158,13 +158,16 @@ public sealed class ServiceCatalogEndpointModule
             LifecycleStatus? lifecycleStatus,
             ExposureType? exposureType,
             string? search,
+            int? page,
+            int? pageSize,
             ISender sender,
             IErrorLocalizer localizer,
             CancellationToken cancellationToken) =>
         {
             var query = new ListServicesFeature.Query(
                 teamName, domain, serviceType, criticality,
-                lifecycleStatus, exposureType, search);
+                lifecycleStatus, exposureType, search,
+                page ?? 1, pageSize ?? 50);
             var result = await sender.Send(query, cancellationToken);
             return result.ToHttpResult(localizer);
         }).RequirePermission("catalog:assets:read");

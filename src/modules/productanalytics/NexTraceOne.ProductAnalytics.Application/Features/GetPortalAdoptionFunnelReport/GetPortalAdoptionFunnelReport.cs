@@ -37,7 +37,6 @@ public static class GetPortalAdoptionFunnelReport
     /// <summary>
     /// Parâmetros de consulta do funil de adopção.
     /// </summary>
-    /// <param name="TenantId">Identificador do tenant.</param>
     /// <param name="LookbackDays">Dias de lookback para análise do funil. Padrão: 30.</param>
     /// <param name="InactiveUserDays">Dias sem login para considerar utilizador inactivo. Padrão: 30.</param>
     /// <param name="ActiveSessionsMin">Sessões mínimas para classificar utilizador como Active. Padrão: 3.</param>
@@ -46,7 +45,6 @@ public static class GetPortalAdoptionFunnelReport
     /// <param name="LaggingThreshold">Score mínimo para AdoptionTier Lagging. Padrão: 20.</param>
     /// <param name="TopEnablementOpportunities">Número máximo de oportunidades de enablement a retornar. Padrão: 5.</param>
     public sealed record Query(
-        string TenantId,
         int LookbackDays = 30,
         int InactiveUserDays = 30,
         int ActiveSessionsMin = 3,
@@ -122,7 +120,6 @@ public static class GetPortalAdoptionFunnelReport
         /// <summary>Inicializa regras de validação.</summary>
         public Validator()
         {
-            RuleFor(x => x.TenantId).NotEmpty();
             RuleFor(x => x.LookbackDays).GreaterThan(0);
             RuleFor(x => x.InactiveUserDays).GreaterThan(0);
             RuleFor(x => x.ActiveSessionsMin).GreaterThan(0);
@@ -138,7 +135,8 @@ public static class GetPortalAdoptionFunnelReport
     /// <summary>Handler que calcula o funil de adopção do portal por equipa e feature.</summary>
     public sealed class Handler(
         IPortalAdoptionReader reader,
-        IDateTimeProvider clock) : IQueryHandler<Query, Response>
+        IDateTimeProvider clock,
+        ICurrentTenant currentTenant) : IQueryHandler<Query, Response>
     {
         /// <inheritdoc/>
         public async Task<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
@@ -147,9 +145,10 @@ public static class GetPortalAdoptionFunnelReport
             var from = now.AddDays(-request.LookbackDays);
             var inactiveSince = now.AddDays(-request.InactiveUserDays);
 
-            var teamTask = reader.ListTeamAdoptionAsync(request.TenantId, from, now, cancellationToken);
-            var inactiveTask = reader.ListInactiveUsersAsync(request.TenantId, inactiveSince, cancellationToken);
-            var trendTask = reader.GetAdoptionTrendAsync(request.TenantId, now.AddDays(-90), now, cancellationToken);
+            var tenantId = currentTenant.Id.ToString();
+            var teamTask = reader.ListTeamAdoptionAsync(tenantId, from, now, cancellationToken);
+            var inactiveTask = reader.ListInactiveUsersAsync(tenantId, inactiveSince, cancellationToken);
+            var trendTask = reader.GetAdoptionTrendAsync(tenantId, now.AddDays(-90), now, cancellationToken);
             await Task.WhenAll(teamTask, inactiveTask, trendTask);
             var teamEntries = teamTask.Result;
             var inactiveUsers = inactiveTask.Result;

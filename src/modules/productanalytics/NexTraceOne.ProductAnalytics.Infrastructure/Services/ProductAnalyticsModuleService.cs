@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Contracts;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
 using NexTraceOne.ProductAnalytics.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Services;
 /// Expõe métricas de uso do produto para outros bounded contexts
 /// (ex: Governance para métricas de adoção, AIOps para correlação de uso).
 /// Acede ao <see cref="ProductAnalyticsDbContext"/> em modo read-only.
+/// Aplica filtro de TenantId em defense-in-depth.
 /// </summary>
 internal sealed class ProductAnalyticsModuleService(
-    ProductAnalyticsDbContext context) : IProductAnalyticsModule
+    ProductAnalyticsDbContext context,
+    ICurrentTenant currentTenant) : IProductAnalyticsModule
 {
     public async Task<long> GetModuleEventCountAsync(
         string moduleName,
@@ -29,7 +32,7 @@ internal sealed class ProductAnalyticsModuleService(
 
         return await context.AnalyticsEvents
             .AsNoTracking()
-            .Where(e => e.Module == module && e.OccurredAt >= from && e.OccurredAt <= until)
+            .Where(e => e.TenantId == currentTenant.Id && e.Module == module && e.OccurredAt >= from && e.OccurredAt <= until)
             .LongCountAsync(cancellationToken);
     }
 
@@ -40,7 +43,7 @@ internal sealed class ProductAnalyticsModuleService(
     {
         return await context.AnalyticsEvents
             .AsNoTracking()
-            .Where(e => e.OccurredAt >= from && e.OccurredAt <= until && e.Persona != null)
+            .Where(e => e.TenantId == currentTenant.Id && e.OccurredAt >= from && e.OccurredAt <= until && e.Persona != null)
             .Select(e => e.Persona!)
             .Distinct()
             .OrderBy(p => p)
@@ -61,7 +64,7 @@ internal sealed class ProductAnalyticsModuleService(
 
         var query = context.AnalyticsEvents
             .AsNoTracking()
-            .Where(e => e.Module == module && e.OccurredAt >= from && e.OccurredAt <= until);
+            .Where(e => e.TenantId == currentTenant.Id && e.Module == module && e.OccurredAt >= from && e.OccurredAt <= until);
 
         var totalEvents = await query.LongCountAsync(cancellationToken);
 

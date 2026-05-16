@@ -26,7 +26,7 @@ public sealed class GetSubgraphTests
     public async Task Handle_Should_ReturnSubgraph_When_RootIsValidApiNode()
     {
         // Arrange — API com serviço proprietário
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var api = ApiAsset.Register("Payments API", "/api/payments", "2.0.0", "Internal", ownerService);
 
         _apiAssetRepository.ListAllAsync(Arg.Any<CancellationToken>())
@@ -50,7 +50,7 @@ public sealed class GetSubgraphTests
     public async Task Handle_Should_ReturnSubgraph_When_RootIsValidServiceNode()
     {
         // Arrange — serviço com API associada
-        var service = ServiceAsset.Create("orders-service", "Commerce", "Orders Team");
+        var service = ServiceAsset.Create("orders-service", "Commerce", "Orders Team", Guid.NewGuid());
         var api = ApiAsset.Register("Orders API", "/api/orders", "1.0.0", "Public", service);
 
         _apiAssetRepository.ListAllAsync(Arg.Any<CancellationToken>())
@@ -93,7 +93,7 @@ public sealed class GetSubgraphTests
     public async Task Handle_Should_TruncateAndSetFlag_When_MaxNodesExceeded()
     {
         // Arrange — grafo com nós suficientes para exceder maxNodes=2
-        var service = ServiceAsset.Create("platform-service", "Platform", "Platform Team");
+        var service = ServiceAsset.Create("platform-service", "Platform", "Platform Team", Guid.NewGuid());
         var api1 = ApiAsset.Register("API-1", "/api/1", "1.0.0", "Internal", service);
         var api2 = ApiAsset.Register("API-2", "/api/2", "1.0.0", "Internal", service);
         var api3 = ApiAsset.Register("API-3", "/api/3", "1.0.0", "Internal", service);

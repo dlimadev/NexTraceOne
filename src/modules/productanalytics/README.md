@@ -96,6 +96,12 @@ Os eventos são categorizados por impacto no valor do produto:
 | `GetValueMilestones` | Query | Milestones de valor atingidos (TTFV, TTCV, first contract, etc.) |
 | `GetJourneys` | Query | Análise de jornadas — taxa de conclusão, abandono, tempo médio |
 | `GetAdoptionFunnel` | Query | Funil de adopção por etapa do produto |
+| `GetCohortAnalysis` | Query | Análise de cohorts (retenção/activação) |
+| `ExportAnalyticsData` | Query | Exportação de eventos ou resumo em CSV/JSON |
+| `ListJourneyDefinitions` | Query | Listar definições de jornada (global + tenant) |
+| `CreateJourneyDefinition` | Command | Criar definição de jornada customizada |
+| `UpdateJourneyDefinition` | Command | Actualizar definição de jornada |
+| `DeleteJourneyDefinition` | Command | Remover definição de jornada do tenant |
 
 ---
 
@@ -127,13 +133,16 @@ Os eventos são categorizados por impacto no valor do produto:
 O frontend envia eventos via `POST /api/v1/product-analytics/events` com o seguinte payload:
 
 ```typescript
-// src/frontend/src/features/product-analytics/api/analytics.ts
-export const analyticsApi = {
+// src/frontend/src/features/product-analytics/api/productAnalyticsApi.ts
+export const productAnalyticsApi = {
   recordEvent: (event: {
-    sessionId: string;
     eventType: string;
     module: string;
-    metadata?: Record<string, unknown>;
+    route: string;
+    feature?: string;
+    personaHint?: string;
+    sessionCorrelationId?: string;
+    clientType?: string;
   }) => apiClient.post('/api/v1/product-analytics/events', event),
 };
 ```
@@ -144,42 +153,55 @@ O backend processa via `RecordAnalyticsEvent` Command:
 public static class RecordAnalyticsEvent
 {
     public sealed record Command(
-        string SessionId,
-        string EventType,
-        string Module,
+        AnalyticsEventType EventType,
+        ProductModule Module,
+        string Route,
+        string? Feature,
+        string? EntityType,
+        string? Outcome,
+        string? PersonaHint,
         string? TeamId,
         string? DomainId,
-        JsonDocument? Metadata) : ICommand;
+        string? SessionCorrelationId,
+        string? ClientType,
+        string? MetadataJson) : ICommand<Response>;
 
     public sealed class Handler(
         IAnalyticsEventRepository repository,
+        IUnitOfWork unitOfWork,
         ICurrentTenant tenant,
         ICurrentUser user,
-        IDateTimeProvider clock) : ICommandHandler<Command>
+        IDateTimeProvider clock,
+        IAnalyticsEventForwarder analyticsForwarder) : ICommandHandler<Command, Response>
     {
-        public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            if (!Enum.TryParse<AnalyticsEventType>(request.EventType, true, out var eventType))
-                return Error.Validation("analytics.unknown_event_type", "Unknown event type.");
-
-            if (!Enum.TryParse<ProductModule>(request.Module, true, out var module))
-                return Error.Validation("analytics.unknown_module", "Unknown module.");
-
-            var analyticsEvent = new AnalyticsEvent(
-                id: Guid.NewGuid(),
+            var analyticsEvent = AnalyticsEvent.Create(
                 tenantId: tenant.Id,
-                sessionId: request.SessionId,
                 userId: user.IsAuthenticated ? user.Id : null,
-                persona: user.RoleName,
-                eventType: eventType,
-                module: module,
+                persona: request.PersonaHint,
+                module: request.Module,
+                eventType: request.EventType,
+                feature: request.Feature,
+                entityType: request.EntityType,
+                outcome: request.Outcome,
+                route: request.Route,
                 teamId: request.TeamId,
                 domainId: request.DomainId,
-                occurredAt: clock.UtcNow,
-                metadata: request.Metadata);
+                sessionId: request.SessionCorrelationId,
+                clientType: request.ClientType,
+                metadataJson: request.MetadataJson,
+                occurredAt: clock.UtcNow);
 
             await repository.AddAsync(analyticsEvent, cancellationToken);
-            return Unit.Value;
+            await unitOfWork.CommitAsync(cancellationToken);
+            await analyticsForwarder.ForwardAsync(analyticsEvent, cancellationToken);
+
+            return new Response(
+                EventId: analyticsEvent.Id.Value.ToString("N")[..12],
+                RecordedAt: analyticsEvent.OccurredAt,
+                EventType: request.EventType,
+                Module: request.Module);
         }
     }
 }
@@ -200,6 +222,13 @@ public static class RecordAnalyticsEvent
 | `GET` | `/api/v1/product-analytics/value-milestones` | Value milestones |
 | `GET` | `/api/v1/product-analytics/journeys` | Análise de jornadas |
 | `GET` | `/api/v1/product-analytics/adoption/funnel` | Funil de adopção |
+| `GET` | `/api/v1/product-analytics/cohorts` | Análise de cohorts |
+| `GET` | `/api/v1/product-analytics/export/events` | Exportar eventos (CSV/JSON) |
+| `GET` | `/api/v1/product-analytics/export/summary` | Exportar resumo (CSV/JSON) |
+| `GET` | `/api/v1/product-analytics/config/journeys` | Listar definições de jornada |
+| `POST` | `/api/v1/product-analytics/config/journeys` | Criar definição de jornada |
+| `PUT` | `/api/v1/product-analytics/config/journeys/{id}` | Actualizar definição de jornada |
+| `DELETE` | `/api/v1/product-analytics/config/journeys/{id}` | Remover definição de jornada |
 
 ### Filtros disponíveis na maioria dos endpoints
 
@@ -242,6 +271,7 @@ Os dados de analytics alimentam as **Executive Views** no módulo Governance:
 | `ServiceCatalog` | Service Catalog |
 | `IntegrationHub` | Integration Hub |
 | `ExecutiveViews` | Executive Views |
+| `DeveloperPortal` | Developer Portal |
 
 ---
 

@@ -31,7 +31,7 @@ public sealed class BackstageBridgeTests
 
     private static ServiceAsset CreateService(string name = "my-service", string team = "platform-team", string description = "A test service")
     {
-        var svc = ServiceAsset.Create(name, "platform", team);
+        var svc = ServiceAsset.Create(name, "platform", team, Guid.NewGuid());
         svc.UpdateDetails(
             name, description, Domain.Graph.Enums.ServiceType.RestApi, string.Empty,
             Domain.Graph.Enums.Criticality.Medium, Domain.Graph.Enums.LifecycleStatus.Active,
@@ -176,7 +176,7 @@ public sealed class BackstageBridgeTests
     [Fact]
     public async Task ExportToBackstage_NullDescription_MapsToEmptyString()
     {
-        var svc = ServiceAsset.Create("no-desc", "platform", "team-x");
+        var svc = ServiceAsset.Create("no-desc", "platform", "team-x", Guid.NewGuid());
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.ListAllAsync(Arg.Any<CancellationToken>()).Returns([svc]);
 
@@ -205,7 +205,7 @@ public sealed class BackstageBridgeTests
     {
         // When TeamName is minimal (whitespace would fail guard), use a valid minimal value
         // and test that the owner fallback works correctly when the team is not empty but has no special value
-        var svc = ServiceAsset.Create("svc-no-team", "platform", "a");
+        var svc = ServiceAsset.Create("svc-no-team", "platform", "a", Guid.NewGuid());
         var repo = Substitute.For<IServiceAssetRepository>();
         repo.ListAllAsync(Arg.Any<CancellationToken>()).Returns([svc]);
 

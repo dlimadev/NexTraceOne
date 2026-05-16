@@ -60,7 +60,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         // Arrange — criar serviço no Catalog
         await using var catalogContext = Fixture.CreateCatalogGraphDbContext();
 
-        var service = ServiceAsset.Create("reliability-boundary-svc", "platform", "team-platform");
+        var service = ServiceAsset.Create("reliability-boundary-svc", "platform", "team-platform", Guid.NewGuid());
         service.UpdateDetails(
             displayName: "Reliability Boundary Service",
             description: "Serviço de teste para validação de fronteira Reliability↔Catalog",
@@ -209,7 +209,7 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         // Arrange — criar serviço no Catalog
         await using var catalogContext = Fixture.CreateCatalogGraphDbContext();
 
-        var service = ServiceAsset.Create("ai-boundary-svc", "platform", "team-platform");
+        var service = ServiceAsset.Create("ai-boundary-svc", "platform", "team-platform", Guid.NewGuid());
         service.UpdateDetails(
             displayName: "AI Boundary Service",
             description: "Serviço para teste de fronteira AIKnowledge↔Catalog",
@@ -367,7 +367,8 @@ public sealed class ContractBoundaryTests(PostgreSqlIntegrationFixture fixture) 
         var service = ServiceAsset.Create(
             name: "payments-api-v3",
             domain: "finance",
-            teamName: teamName);
+            teamName: teamName,
+            tenantId: Guid.NewGuid());
 
         service.UpdateDetails(
             displayName: "Payments API v3",

@@ -82,16 +82,27 @@ public static class CreateGuardrail
             if (await guardrailRepository.ExistsByNameAsync(request.Name, cancellationToken))
                 return AiGovernanceErrors.GuardrailDuplicateName(request.Name);
 
+            if (!Enum.TryParse<GuardrailCategory>(request.Category, ignoreCase: true, out var category))
+                return Error.Validation("Guardrail.InvalidCategory", $"'{request.Category}' is not a valid guardrail category.");
+            if (!Enum.TryParse<GuardrailType>(request.GuardType, ignoreCase: true, out var guardType))
+                return Error.Validation("Guardrail.InvalidGuardType", $"'{request.GuardType}' is not a valid guardrail type.");
+            if (!Enum.TryParse<GuardrailPatternType>(request.PatternType, ignoreCase: true, out var patternType))
+                return Error.Validation("Guardrail.InvalidPatternType", $"'{request.PatternType}' is not a valid guardrail pattern type.");
+            if (!Enum.TryParse<GuardrailSeverity>(request.Severity, ignoreCase: true, out var severity))
+                return Error.Validation("Guardrail.InvalidSeverity", $"'{request.Severity}' is not a valid guardrail severity.");
+            if (!Enum.TryParse<GuardrailAction>(request.Action, ignoreCase: true, out var action))
+                return Error.Validation("Guardrail.InvalidAction", $"'{request.Action}' is not a valid guardrail action.");
+
             var guardrail = AiGuardrail.Create(
                 name: request.Name,
                 displayName: request.DisplayName,
                 description: request.Description,
-                category: Enum.Parse<GuardrailCategory>(request.Category, ignoreCase: true),
-                guardType: Enum.Parse<GuardrailType>(request.GuardType, ignoreCase: true),
+                category: category,
+                guardType: guardType,
                 pattern: request.Pattern,
-                patternType: Enum.Parse<GuardrailPatternType>(request.PatternType, ignoreCase: true),
-                severity: Enum.Parse<GuardrailSeverity>(request.Severity, ignoreCase: true),
-                action: Enum.Parse<GuardrailAction>(request.Action, ignoreCase: true),
+                patternType: patternType,
+                severity: severity,
+                action: action,
                 userMessage: request.UserMessage,
                 isActive: true,
                 isOfficial: false,

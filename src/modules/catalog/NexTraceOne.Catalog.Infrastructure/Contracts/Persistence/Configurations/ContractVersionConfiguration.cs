@@ -101,6 +101,8 @@ internal sealed class ContractVersionConfiguration : IEntityTypeConfiguration<Co
         builder.Property(x => x.LastOverallScore).HasColumnType("numeric(5,4)");
 
         builder.HasIndex(x => new { x.ApiAssetId, x.SemVer }).IsUnique();
+        builder.HasIndex(x => x.ApiAssetId)
+            .HasDatabaseName("IX_ctr_contract_versions_ApiAssetId");
         builder.HasIndex(x => x.Protocol);
         builder.HasIndex(x => x.LifecycleState);
         builder.HasIndex(x => x.IsDeleted).HasFilter("\"IsDeleted\" = false");

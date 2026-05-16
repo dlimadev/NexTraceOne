@@ -28,7 +28,7 @@ public sealed class CatalogGraphModuleServiceTests
     public async Task ApiAssetExistsAsync_KnownId_ShouldReturnTrue()
     {
         var apiAssetId = Guid.NewGuid();
-        var service = ServiceAsset.Create("svc-test", "Payments", "team-alpha");
+        var service = ServiceAsset.Create("svc-test", "Payments", "team-alpha", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("test-api", "/api/test", "1.0.0", "Internal", service);
         _apiAssetRepository.GetByIdAsync(Arg.Any<ApiAssetId>(), Arg.Any<CancellationToken>())
             .Returns(apiAsset);
@@ -54,7 +54,7 @@ public sealed class CatalogGraphModuleServiceTests
     [Fact]
     public async Task ServiceAssetExistsAsync_KnownName_ShouldReturnTrue()
     {
-        var service = ServiceAsset.Create("svc-payments", "Payments", "team-alpha");
+        var service = ServiceAsset.Create("svc-payments", "Payments", "team-alpha", Guid.NewGuid());
         _serviceAssetRepository.GetByNameAsync("svc-payments", Arg.Any<CancellationToken>())
             .Returns(service);
 
@@ -81,8 +81,8 @@ public sealed class CatalogGraphModuleServiceTests
     [Fact]
     public async Task ListServicesByTeamAsync_ShouldReturnMappedServices()
     {
-        var svcPayments = ServiceAsset.Create("svc-payments", "Payments", "team-alpha");
-        var svcOrders = ServiceAsset.Create("svc-orders", "Orders", "team-alpha");
+        var svcPayments = ServiceAsset.Create("svc-payments", "Payments", "team-alpha", Guid.NewGuid());
+        var svcOrders = ServiceAsset.Create("svc-orders", "Orders", "team-alpha", Guid.NewGuid());
         svcOrders.UpdateDetails("svc-orders", "", ServiceType.RestApi, "", Criticality.Medium, LifecycleStatus.Active, ExposureType.External, "", "");
         var services = new List<ServiceAsset> { svcPayments, svcOrders };
         _serviceAssetRepository.ListByTeamAsync("team-alpha", Arg.Any<CancellationToken>())
@@ -114,7 +114,7 @@ public sealed class CatalogGraphModuleServiceTests
     [Fact]
     public async Task ListContractsByTeamAsync_TeamWithContracts_ShouldReturnMappedContracts()
     {
-        var service = ServiceAsset.Create("svc-payments", "Payments", "team-alpha");
+        var service = ServiceAsset.Create("svc-payments", "Payments", "team-alpha", Guid.NewGuid());
         _serviceAssetRepository.ListByTeamAsync("team-alpha", Arg.Any<CancellationToken>())
             .Returns(new List<ServiceAsset> { service });
 
@@ -150,7 +150,7 @@ public sealed class CatalogGraphModuleServiceTests
     [Fact]
     public async Task ListContractsByTeamAsync_NoApis_ShouldReturnEmptyList()
     {
-        var service = ServiceAsset.Create("svc-empty", "Infra", "team-beta");
+        var service = ServiceAsset.Create("svc-empty", "Infra", "team-beta", Guid.NewGuid());
         _serviceAssetRepository.ListByTeamAsync("team-beta", Arg.Any<CancellationToken>())
             .Returns(new List<ServiceAsset> { service });
         _apiAssetRepository.ListByServiceIdAsync(service.Id, Arg.Any<CancellationToken>())

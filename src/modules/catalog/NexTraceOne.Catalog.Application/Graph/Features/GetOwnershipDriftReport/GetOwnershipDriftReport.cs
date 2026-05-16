@@ -55,7 +55,7 @@ public static class GetOwnershipDriftReport
                 && Enum.TryParse<ServiceTierType>(request.Tier, ignoreCase: true, out var t)
                 ? t : (ServiceTierType?)null;
 
-            var services = await serviceAssetRepository.ListFilteredAsync(
+            var (services, _) = await serviceAssetRepository.ListFilteredAsync(
                 request.TeamName,
                 request.Domain,
                 serviceType: null,
@@ -63,6 +63,8 @@ public static class GetOwnershipDriftReport
                 lifecycleStatus: null,
                 exposureType: null,
                 searchTerm: null,
+                page: 1,
+                pageSize: 10_000,
                 cancellationToken);
 
             var now = clock.UtcNow;

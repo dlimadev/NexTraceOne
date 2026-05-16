@@ -68,5 +68,5 @@ public sealed class ApiAssetTests
             "/api/orders",
             "1.0.0",
             "Internal",
-            ServiceAsset.Create("orders-service", "Commerce", "Core APIs"));
+            ServiceAsset.Create("orders-service", "Commerce", "Core APIs", Guid.NewGuid()));
 }

@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiSkillFeedbackRepository(AiGovernanceDbContext context) : IAiSkillFeedbackRepository
+internal sealed class AiSkillFeedbackRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiSkillFeedbackRepository
 {
     public async Task<IReadOnlyList<AiSkillFeedback>> ListByExecutionAsync(
         AiSkillExecutionId executionId, CancellationToken ct)

@@ -39,7 +39,8 @@ public static class RegisterFromDiscovery
         IDiscoveredServiceRepository discoveredServiceRepository,
         IServiceAssetRepository serviceAssetRepository,
         IDateTimeProvider dateTimeProvider,
-        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork,
+        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -64,7 +65,7 @@ public static class RegisterFromDiscovery
                 return CatalogGraphErrors.ServiceAssetAlreadyExists(discovered.ServiceName);
             }
 
-            var serviceAsset = ServiceAsset.Create(discovered.ServiceName, request.Domain, request.TeamName);
+            var serviceAsset = ServiceAsset.Create(discovered.ServiceName, request.Domain, request.TeamName, currentTenant.Id);
             serviceAssetRepository.Add(serviceAsset);
 
             discovered.MarkAsRegistered(serviceAsset.Id.Value);

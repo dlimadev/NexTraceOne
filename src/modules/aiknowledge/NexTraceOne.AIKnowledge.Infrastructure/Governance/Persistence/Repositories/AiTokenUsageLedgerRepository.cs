@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiTokenUsageLedgerRepository(AiGovernanceDbContext context) : IAiTokenUsageLedgerRepository
+internal sealed class AiTokenUsageLedgerRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiTokenUsageLedgerRepository
 {
     public async Task AddAsync(AiTokenUsageLedger entity, CancellationToken ct)
         => await context.TokenUsageLedger.AddAsync(entity, ct);

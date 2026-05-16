@@ -7,6 +7,7 @@ using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
 using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.GetFeatureHeatmap;
 
@@ -37,7 +38,7 @@ public static class GetFeatureHeatmap
             var topFeaturesCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.TopFeaturesLimit, ConfigurationScope.System, null, cancellationToken);
             var topFeaturesLimit = int.TryParse(topFeaturesCfg?.EffectiveValue, out var tfl) ? tfl : AnalyticsConstants.TopFeaturesLimit;
 
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
+            var (from, to, periodLabel) = AnalyticsQueryHelper.ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var adoption = await repository.GetModuleAdoptionAsync(
                 persona: request.Persona, teamId: request.TeamId, from, to, cancellationToken);
@@ -78,7 +79,7 @@ public static class GetFeatureHeatmap
 
                 return new HeatmapCellDto(
                     a.Module,
-                    ModuleName: ToModuleDisplayName(a.Module),
+                    ModuleName: AnalyticsQueryHelper.ToModuleDisplayName(a.Module),
                     AdoptionPercent: adoptionPercent,
                     TotalActions: a.TotalActions,
                     UniqueUsers: a.UniqueUsers,
@@ -99,32 +100,6 @@ public static class GetFeatureHeatmap
                 PeriodLabel: periodLabel));
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
-        {
-            var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
-            var days = label switch
-            {
-                "last_7d" => 7,
-                "last_1d" => 1,
-                "last_90d" => 90,
-                _ => 30
-            };
-            if (days > maxDays) days = maxDays;
-            return (utcNow.AddDays(-days), utcNow, label);
-        }
-
-        private static string ToModuleDisplayName(ProductModule module) => module switch
-        {
-            ProductModule.AiAssistant => "AI Assistant",
-            ProductModule.SourceOfTruth => "Source of Truth",
-            ProductModule.ChangeIntelligence => "Change Intelligence",
-            ProductModule.ContractStudio => "Contract Studio",
-            ProductModule.ServiceCatalog => "Service Catalog",
-            ProductModule.IntegrationHub => "Integration Hub",
-            ProductModule.ExecutiveViews => "Executive Views",
-            ProductModule.DeveloperPortal => "Developer Portal",
-            _ => module.ToString()
-        };
     }
 
     /// <summary>Resposta com mapa de calor de adoção.</summary>

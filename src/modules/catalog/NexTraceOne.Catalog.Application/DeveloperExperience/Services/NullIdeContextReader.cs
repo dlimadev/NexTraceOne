@@ -2,7 +2,7 @@ using NexTraceOne.Catalog.Application.DeveloperExperience.Abstractions;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.GetIdeContractContext;
 using NexTraceOne.Catalog.Application.DeveloperExperience.Features.GetIdeServiceContext;
 
-namespace NexTraceOne.Catalog.Infrastructure.DeveloperExperience.Services;
+namespace NexTraceOne.Catalog.Application.DeveloperExperience.Services;
 
 /// <summary>
 /// Implementação null (honest-null) de IIdeContextReader.

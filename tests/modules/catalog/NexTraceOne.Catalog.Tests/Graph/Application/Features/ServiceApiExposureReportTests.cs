@@ -27,7 +27,7 @@ public sealed class ServiceApiExposureReportTests
         string name,
         ExposureType exposureType = ExposureType.Internal)
     {
-        var svc = ServiceAsset.Create(name, "Domain", "Team-A");
+        var svc = ServiceAsset.Create(name, "Domain", "Team-A", Guid.NewGuid());
         svc.UpdateDetails(
             displayName: name,
             description: string.Empty,

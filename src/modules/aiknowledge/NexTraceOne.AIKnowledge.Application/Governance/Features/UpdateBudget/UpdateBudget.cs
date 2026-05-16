@@ -59,9 +59,13 @@ public static class UpdateBudget
 
             var maxTokens = request.MaxTokens ?? budget.MaxTokens;
             var maxRequests = request.MaxRequests ?? budget.MaxRequests;
-            var period = request.Period is not null
-                ? Enum.Parse<BudgetPeriod>(request.Period, ignoreCase: true)
-                : budget.Period;
+            var period = budget.Period;
+            if (request.Period is not null)
+            {
+                if (!Enum.TryParse<BudgetPeriod>(request.Period, ignoreCase: true, out var parsedPeriod))
+                    return Error.Validation("Budget.InvalidPeriod", $"'{request.Period}' is not a valid budget period.");
+                period = parsedPeriod;
+            }
 
             var result = budget.Update(maxTokens, maxRequests, period);
             if (result.IsFailure)

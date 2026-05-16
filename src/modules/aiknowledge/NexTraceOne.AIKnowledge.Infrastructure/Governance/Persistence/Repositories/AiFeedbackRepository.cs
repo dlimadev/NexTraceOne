@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
@@ -6,7 +7,7 @@ using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiFeedbackRepository(AiGovernanceDbContext context) : IAiFeedbackRepository
+internal sealed class AiFeedbackRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiFeedbackRepository
 {
     public async Task AddAsync(AiFeedback feedback, CancellationToken ct)
     {
@@ -15,7 +16,7 @@ internal sealed class AiFeedbackRepository(AiGovernanceDbContext context) : IAiF
     }
 
     public async Task<AiFeedback?> GetByIdAsync(AiFeedbackId id, CancellationToken ct)
-        => await context.Feedbacks.SingleOrDefaultAsync(f => f.Id == id, ct);
+        => await context.Feedbacks.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(f => f.Id == id, ct);
 
     public async Task<IReadOnlyList<AiFeedback>> ListByConversationIdAsync(Guid conversationId, CancellationToken ct)
         => await context.Feedbacks.Where(f => f.ConversationId == conversationId).OrderByDescending(f => f.SubmittedAt).ToListAsync(ct);
@@ -24,7 +25,7 @@ internal sealed class AiFeedbackRepository(AiGovernanceDbContext context) : IAiF
         => await context.Feedbacks.Where(f => f.Rating == rating).OrderByDescending(f => f.SubmittedAt).Take(limit).ToListAsync(ct);
 
     public async Task<int> CountByRatingAsync(FeedbackRating rating, CancellationToken ct)
-        => await context.Feedbacks.CountAsync(f => f.Rating == rating, ct);
+        => await context.Feedbacks.Where(e => e.TenantId == currentTenant.Id).CountAsync(f => f.Rating == rating, ct);
 
     public async Task<IReadOnlyList<AiFeedback>> ListByAgentNameAsync(string agentName, int limit, CancellationToken ct)
         => await context.Feedbacks.Where(f => f.AgentName == agentName).OrderByDescending(f => f.SubmittedAt).Take(limit).ToListAsync(ct);

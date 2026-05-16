@@ -19,6 +19,8 @@ public sealed class GetJourneysRicherTests
     private readonly IAnalyticsEventRepository _repo = Substitute.For<IAnalyticsEventRepository>();
     private readonly IDateTimeProvider _clock = Substitute.For<IDateTimeProvider>();
     private readonly IConfigurationResolutionService _configService = Substitute.For<IConfigurationResolutionService>();
+    private readonly IJourneyDefinitionRepository _journeyRepo = Substitute.For<IJourneyDefinitionRepository>();
+    private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
 
     public GetJourneysRicherTests()
     {
@@ -26,9 +28,11 @@ public sealed class GetJourneysRicherTests
         _configService
             .ResolveEffectiveValueAsync(Arg.Any<string>(), Arg.Any<ConfigurationScope>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns((EffectiveConfigurationDto?)null);
+        _currentTenant.Id.Returns(Guid.NewGuid());
+        _journeyRepo.ListActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns([]);
     }
 
-    private GetJourneys.Handler CreateHandler() => new(_repo, _clock, _configService);
+    private GetJourneys.Handler CreateHandler() => new(_repo, _clock, _configService, _journeyRepo, _currentTenant);
 
     private void SetupNoSessionData()
     {

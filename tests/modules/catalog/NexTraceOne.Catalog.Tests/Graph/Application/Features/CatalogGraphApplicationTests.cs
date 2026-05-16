@@ -24,7 +24,7 @@ public sealed class CatalogGraphApplicationTests
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         repository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>()).Returns((ServiceAsset?)null);
 
@@ -42,11 +42,11 @@ public sealed class CatalogGraphApplicationTests
     [Fact]
     public async Task RegisterServiceAsset_Should_ReturnConflict_When_ServiceAlreadyExists()
     {
-        var existing = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var existing = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var repository = Substitute.For<IServiceAssetRepository>();
         var configService = Substitute.For<IConfigurationResolutionService>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
-        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork);
+        var sut = new RegisterServiceAssetFeature.Handler(repository, configService, unitOfWork, Substitute.For<ICurrentTenant>());
 
         repository.GetByNameAsync("payments-service", Arg.Any<CancellationToken>()).Returns(existing);
 
@@ -64,7 +64,7 @@ public sealed class CatalogGraphApplicationTests
     [Fact]
     public async Task RegisterApiAsset_Should_ReturnResponse_When_InputIsValid()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var serviceAssetRepository = Substitute.For<IServiceAssetRepository>();
         var unitOfWork = Substitute.For<ICatalogGraphUnitOfWork>();
@@ -106,7 +106,7 @@ public sealed class CatalogGraphApplicationTests
     [Fact]
     public async Task RegisterApiAsset_Should_ReturnConflict_When_ApiAlreadyExists()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var existing = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var serviceAssetRepository = Substitute.For<IServiceAssetRepository>();
@@ -129,7 +129,7 @@ public sealed class CatalogGraphApplicationTests
     [Fact]
     public async Task MapConsumerRelationship_Should_ReturnResponse_When_ApiAssetExists()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var dateTimeProvider = Substitute.For<IDateTimeProvider>();
@@ -187,7 +187,7 @@ public sealed class CatalogGraphApplicationTests
     [Fact]
     public async Task GetAssetGraph_Should_ReturnGraphResponse_With_ServicesAndApis()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         var apiAssetRepository = Substitute.For<IApiAssetRepository>();
         var serviceAssetRepository = Substitute.For<IServiceAssetRepository>();

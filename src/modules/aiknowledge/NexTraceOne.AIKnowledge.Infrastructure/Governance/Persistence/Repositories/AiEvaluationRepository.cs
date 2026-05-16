@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 
 using NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 using NexTraceOne.AIKnowledge.Domain.Governance.Entities;
 
 namespace NexTraceOne.AIKnowledge.Infrastructure.Governance.Persistence.Repositories;
 
-internal sealed class AiEvaluationRepository(AiGovernanceDbContext context) : IAiEvaluationRepository
+internal sealed class AiEvaluationRepository(AiGovernanceDbContext context, ICurrentTenant currentTenant) : IAiEvaluationRepository
 {
     public async Task<AiEvaluation?> GetByIdAsync(AiEvaluationId id, CancellationToken ct)
-        => await context.Evaluations.SingleOrDefaultAsync(e => e.Id == id, ct);
+        => await context.Evaluations.Where(e => e.TenantId == currentTenant.Id).SingleOrDefaultAsync(e => e.Id == id, ct);
 
     public async Task<IReadOnlyList<AiEvaluation>> GetByConversationAsync(Guid conversationId, CancellationToken ct)
         => await context.Evaluations.Where(e => e.ConversationId == conversationId).OrderByDescending(e => e.CreatedAt).ToListAsync(ct);

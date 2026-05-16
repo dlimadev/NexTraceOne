@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NexTraceOne.Catalog.Domain.Graph.Entities;
 using NexTraceOne.Catalog.Domain.Graph.Enums;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Configurations;
 
@@ -22,7 +23,7 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
                 "\"LifecycleStatus\" IN ('Planning', 'Development', 'Staging', 'Active', 'Deprecating', 'Deprecated', 'Retired')");
             t.HasCheckConstraint(
                 "CK_cat_service_assets_exposure_type",
-                "\"ExposureType\" IN ('Internal', 'Partner', 'Public')");
+                "\"ExposureType\" IN ('Internal', 'External', 'Partner')");
         });
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -87,5 +88,13 @@ internal sealed class ServiceAssetConfiguration : IEntityTypeConfiguration<Servi
         // Concorrência otimista via PostgreSQL xmin
         builder.Property(x => x.RowVersion)
             .IsRowVersion();
+
+        // Full-text search — coluna gerada + índice GIN
+        builder.HasGeneratedTsVectorColumn(
+            x => x.SearchVector,
+            "simple",
+            x => new { x.Name, x.DisplayName, x.Domain, x.TeamName, x.Description })
+            .HasIndex(x => x.SearchVector)
+            .HasMethod("GIN");
     }
 }

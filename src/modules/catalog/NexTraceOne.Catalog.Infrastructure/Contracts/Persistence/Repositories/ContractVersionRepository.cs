@@ -130,36 +130,31 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var latestVersions = (await context.ContractVersions
-                .AsNoTracking()
-                .ToListAsync(cancellationToken))
+        var latestQuery = context.ContractVersions
+            .AsNoTracking()
             .GroupBy(v => v.ApiAssetId)
-            .Select(g => g.OrderByDescending(v => v.CreatedAt).First())
-            .AsEnumerable();
+            .Select(g => g.OrderByDescending(v => v.CreatedAt).First());
 
         if (protocol.HasValue)
-            latestVersions = latestVersions.Where(v => v.Protocol == protocol.Value);
+            latestQuery = latestQuery.Where(v => v.Protocol == protocol.Value);
 
         if (lifecycleState.HasValue)
-            latestVersions = latestVersions.Where(v => v.LifecycleState == lifecycleState.Value);
+            latestQuery = latestQuery.Where(v => v.LifecycleState == lifecycleState.Value);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            latestVersions = latestVersions.Where(v =>
-                v.SemVer.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                || v.ImportedFrom.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            var term = searchTerm.Trim();
+            latestQuery = latestQuery.Where(v =>
+                EF.Functions.ILike(v.SemVer, $"%{term}%")
+                || EF.Functions.ILike(v.ImportedFrom, $"%{term}%"));
         }
 
-        var orderedVersions = latestVersions
+        var totalCount = await latestQuery.CountAsync(cancellationToken);
+        var items = await latestQuery
             .OrderByDescending(v => v.CreatedAt)
-            .ToList();
-
-        var totalCount = orderedVersions.Count;
-
-        var items = orderedVersions
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .ToListAsync(cancellationToken);
 
         return (items, totalCount);
     }
@@ -193,23 +188,30 @@ internal sealed class ContractVersionRepository(ContractsDbContext context)
     /// </summary>
     public async Task<ContractSummaryData> GetSummaryAsync(CancellationToken cancellationToken = default)
     {
-        var allVersions = await context.ContractVersions
+        var totalVersions = await context.ContractVersions.CountAsync(cancellationToken);
+        var distinctContracts = await context.ContractVersions
+            .Select(v => v.ApiAssetId)
+            .Distinct()
+            .CountAsync(cancellationToken);
+
+        var byCombination = await context.ContractVersions
             .AsNoTracking()
-            .Select(v => new { v.ApiAssetId, v.Protocol, v.LifecycleState })
+            .GroupBy(v => new { v.Protocol, v.LifecycleState })
+            .Select(g => new { g.Key.Protocol, g.Key.LifecycleState, Count = g.Count() })
             .ToListAsync(cancellationToken);
 
-        var totalVersions = allVersions.Count;
-        var distinctContracts = allVersions.Select(v => v.ApiAssetId).Distinct().Count();
-        var draftCount = allVersions.Count(v => v.LifecycleState == ContractLifecycleState.Draft);
-        var inReviewCount = allVersions.Count(v => v.LifecycleState == ContractLifecycleState.InReview);
-        var approvedCount = allVersions.Count(v => v.LifecycleState == ContractLifecycleState.Approved);
-        var lockedCount = allVersions.Count(v => v.LifecycleState == ContractLifecycleState.Locked);
-        var deprecatedCount = allVersions.Count(v =>
-            v.LifecycleState is ContractLifecycleState.Deprecated or ContractLifecycleState.Sunset or ContractLifecycleState.Retired);
+        var draftCount = byCombination.Where(x => x.LifecycleState == ContractLifecycleState.Draft).Sum(x => x.Count);
+        var inReviewCount = byCombination.Where(x => x.LifecycleState == ContractLifecycleState.InReview).Sum(x => x.Count);
+        var approvedCount = byCombination.Where(x => x.LifecycleState == ContractLifecycleState.Approved).Sum(x => x.Count);
+        var lockedCount = byCombination.Where(x => x.LifecycleState == ContractLifecycleState.Locked).Sum(x => x.Count);
+        var deprecatedCount = byCombination.Where(x =>
+            x.LifecycleState is ContractLifecycleState.Deprecated
+                or ContractLifecycleState.Sunset
+                or ContractLifecycleState.Retired).Sum(x => x.Count);
 
-        var byProtocol = allVersions
-            .GroupBy(v => v.Protocol.ToString())
-            .Select(g => new ProtocolCount(g.Key, g.Count()))
+        var byProtocol = byCombination
+            .GroupBy(x => x.Protocol.ToString())
+            .Select(g => new ProtocolCount(g.Key, g.Sum(x => x.Count)))
             .OrderByDescending(p => p.Count)
             .ToList();
 

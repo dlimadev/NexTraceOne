@@ -53,7 +53,8 @@ public static class StartOnboardingSession
         {
             Guard.Against.Null(request);
 
-            var experienceLevel = Enum.Parse<OnboardingExperienceLevel>(request.ExperienceLevelValue);
+            if (!Enum.TryParse<OnboardingExperienceLevel>(request.ExperienceLevelValue, ignoreCase: true, out var experienceLevel))
+                return Error.Validation("OnboardingSession.InvalidExperienceLevel", $"'{request.ExperienceLevelValue}' is not a valid onboarding experience level.");
 
             var session = OnboardingSession.Create(
                 userId: currentUser.Id,

@@ -29,4 +29,10 @@ public interface IAiAgentRepository
 
     /// <summary>Atualiza um agent existente.</summary>
     Task UpdateAsync(AiAgent agent, CancellationToken ct);
+
+    /// <summary>Obtém um agent pelo slug.</summary>
+    Task<AiAgent?> GetBySlugAsync(string slug, CancellationToken ct);
+
+    /// <summary>Verifica se já existe um agent com o nome fornecido.</summary>
+    Task<bool> ExistsByNameAsync(string name, CancellationToken ct);
 }

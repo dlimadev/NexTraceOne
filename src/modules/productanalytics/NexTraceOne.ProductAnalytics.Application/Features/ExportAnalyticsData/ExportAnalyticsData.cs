@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -8,6 +9,7 @@ using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.ConfigurationKeys;
 using NexTraceOne.ProductAnalytics.Application.Constants;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
+using NexTraceOne.ProductAnalytics.Application;
 
 namespace NexTraceOne.ProductAnalytics.Application.Features.ExportAnalyticsData;
 
@@ -58,7 +60,7 @@ public static class ExportAnalyticsData
             var maxRangeCfg = await configService.ResolveEffectiveValueAsync(AnalyticsConfigKeys.MaxRangeDays, ConfigurationScope.System, null, cancellationToken);
             var maxRangeDays = int.TryParse(maxRangeCfg?.EffectiveValue, out var mrd) ? mrd : AnalyticsConstants.MaxRangeDays;
 
-            var (from, to, periodLabel) = ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
+            var (from, to, periodLabel) = AnalyticsQueryHelper.ResolveRange(clock.UtcNow, request.Range, maxRangeDays);
 
             var moduleFilter = request.Module is not null &&
                 Enum.TryParse<ProductModule>(request.Module, true, out var parsedModule)
@@ -154,7 +156,10 @@ public static class ExportAnalyticsData
             var sb = new StringBuilder();
             sb.AppendLine("session_id,event_type,occurred_at");
             foreach (var r in rows)
-                sb.AppendLine($"{EscapeCsvField(r.SessionId)},{r.EventType},{r.OccurredAt:O}");
+            {
+                var sessionId = EscapeCsvField(r.SessionId);
+                sb.AppendLine($"{sessionId},{r.EventType},{r.OccurredAt:O}");
+            }
 
             return (sb.ToString(), "text/csv", $"analytics_events_{periodLabel}_{DateTimeOffset.UtcNow:yyyyMMdd}.csv");
         }
@@ -162,16 +167,20 @@ public static class ExportAnalyticsData
         private static (string Content, string ContentType, string FileName) BuildEventsJson(
             IReadOnlyList<SessionEventRow> rows, string periodLabel)
         {
-            var sb = new StringBuilder();
-            sb.Append('[');
-            for (var i = 0; i < rows.Count; i++)
+            var events = rows.Select(r => new
             {
-                if (i > 0) sb.Append(',');
-                var r = rows[i];
-                sb.Append($"{{\"sessionId\":\"{r.SessionId}\",\"eventType\":\"{r.EventType}\",\"occurredAt\":\"{r.OccurredAt:O}\"}}");
-            }
-            sb.Append(']');
-            return (sb.ToString(), "application/json", $"analytics_events_{periodLabel}_{DateTimeOffset.UtcNow:yyyyMMdd}.json");
+                sessionId = r.SessionId,
+                eventType = r.EventType.ToString(),
+                occurredAt = r.OccurredAt
+            });
+
+            var json = JsonSerializer.Serialize(events, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false
+            });
+
+            return (json, "application/json", $"analytics_events_{periodLabel}_{DateTimeOffset.UtcNow:yyyyMMdd}.json");
         }
 
         private static (string Content, string ContentType, string FileName) BuildSummaryCsv(
@@ -195,41 +204,41 @@ public static class ExportAnalyticsData
             long totalEvents, int uniqueUsers, decimal valueScore, decimal frictionScore,
             IReadOnlyList<ModuleUsageRow> topModules, string periodLabel)
         {
-            var topModulesJson = string.Join(",", topModules.Select(m =>
-                $"{{\"module\":\"{m.Module}\",\"eventCount\":{m.EventCount},\"uniqueUsers\":{m.UniqueUsers}}}"));
+            var summary = new
+            {
+                totalEvents,
+                uniqueUsers,
+                valueScorePercent = valueScore,
+                frictionScorePercent = frictionScore,
+                periodLabel,
+                topModules = topModules.Select(m => new
+                {
+                    module = m.Module.ToString(),
+                    eventCount = m.EventCount,
+                    uniqueUsers = m.UniqueUsers
+                })
+            };
 
-            var content = $"{{" +
-                $"\"totalEvents\":{totalEvents}," +
-                $"\"uniqueUsers\":{uniqueUsers}," +
-                $"\"valueScorePercent\":{valueScore}," +
-                $"\"frictionScorePercent\":{frictionScore}," +
-                $"\"periodLabel\":\"{periodLabel}\"," +
-                $"\"topModules\":[{topModulesJson}]" +
-                $"}}";
+            var json = JsonSerializer.Serialize(summary, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false
+            });
 
-            return (content, "application/json", $"analytics_summary_{periodLabel}_{DateTimeOffset.UtcNow:yyyyMMdd}.json");
+            return (json, "application/json", $"analytics_summary_{periodLabel}_{DateTimeOffset.UtcNow:yyyyMMdd}.json");
         }
 
         private static string EscapeCsvField(string value)
         {
-            if (value.Contains(',') || value.Contains('"') || value.Contains('\n'))
-                return $"\"{value.Replace("\"", "\"\"")}\"";
-            return value;
+            if (string.IsNullOrEmpty(value))
+                return string.Empty;
+
+            var requiresQuoting = value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r');
+            var escaped = value.Replace("\"", "\"\"");
+
+            return requiresQuoting ? $"\"{escaped}\"" : escaped;
         }
 
-        private static (DateTimeOffset From, DateTimeOffset To, string Label) ResolveRange(DateTimeOffset utcNow, string? range, int maxDays = AnalyticsConstants.MaxRangeDays)
-        {
-            var label = string.IsNullOrWhiteSpace(range) ? "last_30d" : range;
-            var days = label switch
-            {
-                "last_7d" => 7,
-                "last_1d" => 1,
-                "last_90d" => 90,
-                _ => 30
-            };
-            if (days > maxDays) days = maxDays;
-            return (utcNow.AddDays(-days), utcNow, label);
-        }
     }
 
     /// <summary>Resposta da exportação de dados de analytics.</summary>

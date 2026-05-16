@@ -10,10 +10,10 @@ namespace NexTraceOne.AIKnowledge.Application.Governance.Abstractions;
 public interface IAiAnalyticsRepository
 {
     /// <summary>Insere registro de uso de token no ClickHouse.</summary>
-    Task InsertTokenUsageAsync(TokenUsageRecord record);
+    Task InsertTokenUsageAsync(TokenUsageRecord record, CancellationToken cancellationToken = default);
 
     /// <summary>Insere batch de registros de uso para melhor performance.</summary>
-    Task InsertTokenUsageBatchAsync(IEnumerable<TokenUsageRecord> records);
+    Task InsertTokenUsageBatchAsync(IEnumerable<TokenUsageRecord> records, CancellationToken cancellationToken = default);
 
     /// <summary>Obtém métricas de uso de tokens agrupadas por modelo e período.</summary>
     Task<List<TokenUsageMetrics>> GetTokenUsageMetricsAsync(DateTime from, DateTime to, Guid? modelId = null);

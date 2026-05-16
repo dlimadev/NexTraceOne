@@ -2,9 +2,12 @@ using Ardalis.GuardClauses;
 
 using FluentValidation;
 
+using System.Diagnostics;
+
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
+using NexTraceOne.BuildingBlocks.Observability.Tracing;
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
 using NexTraceOne.Catalog.Domain.Contracts.Entities;
 using NexTraceOne.Catalog.Domain.Contracts.Enums;
@@ -49,7 +52,11 @@ public static class ApproveDraft
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
+            using var activity = NexTraceActivitySources.Commands.StartActivity("ApproveDraft");
             Guard.Against.Null(request);
+
+            activity?.SetTag("draft.id", request.DraftId.ToString());
+            activity?.SetTag("draft.approvedBy", request.ApprovedBy);
 
             var draft = await draftRepository.GetByIdAsync(
                 ContractDraftId.From(request.DraftId), cancellationToken);
@@ -72,6 +79,8 @@ public static class ApproveDraft
 
             reviewRepository.Add(review);
             await unitOfWork.CommitAsync(cancellationToken);
+
+            activity?.SetTag("draft.status", draft.Status.ToString());
 
             return new Response(draft.Id.Value);
         }

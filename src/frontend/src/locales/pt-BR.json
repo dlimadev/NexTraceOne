@@ -764,6 +764,7 @@
       "journeyName": "Nome da Jornada",
       "steps": "Etapas (JSON)",
       "isActive": "Ativa",
+      "inactive": "Inativa",
       "global": "Global",
       "tenant": "Tenant",
       "deleteConfirm": "Tem certeza que deseja excluir esta definição de jornada?",

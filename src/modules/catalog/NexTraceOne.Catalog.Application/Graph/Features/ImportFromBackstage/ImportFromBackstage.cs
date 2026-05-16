@@ -101,7 +101,8 @@ public static class ImportFromBackstage
         IServiceAssetRepository serviceAssetRepository,
         IApiAssetRepository apiAssetRepository,
         IDateTimeProvider dateTimeProvider,
-        ICatalogGraphUnitOfWork unitOfWork) : ICommandHandler<Command, Response>
+        ICatalogGraphUnitOfWork unitOfWork,
+        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
@@ -127,7 +128,7 @@ public static class ImportFromBackstage
                     continue;
                 }
 
-                var service = ServiceAsset.Create(entity.Name, entity.Domain, entity.Owner);
+                var service = ServiceAsset.Create(entity.Name, entity.Domain, entity.Owner, currentTenant.Id);
                 serviceAssetRepository.Add(service);
                 servicesCreated++;
                 results.Add(new ImportItemResult(
@@ -155,7 +156,7 @@ public static class ImportFromBackstage
                 if (ownerService is null)
                 {
                     // Cria serviço implicitamente caso não exista
-                    ownerService = ServiceAsset.Create(entity.ApiSpec.OwnerServiceName, entity.Domain, entity.Owner);
+                    ownerService = ServiceAsset.Create(entity.ApiSpec.OwnerServiceName, entity.Domain, entity.Owner, currentTenant.Id);
                     serviceAssetRepository.Add(ownerService);
                     servicesCreated++;
                 }

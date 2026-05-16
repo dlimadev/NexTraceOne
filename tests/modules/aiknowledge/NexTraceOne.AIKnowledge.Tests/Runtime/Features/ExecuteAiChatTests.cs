@@ -17,6 +17,8 @@ public sealed class ExecuteAiChatTests
     private readonly IAiMessageRepository _messageRepo = Substitute.For<IAiMessageRepository>();
     private readonly IAiUsageEntryRepository _usageRepo = Substitute.For<IAiUsageEntryRepository>();
     private readonly IAiTokenQuotaService _quotaService = Substitute.For<IAiTokenQuotaService>();
+    private readonly IContextWindowManager _contextWindow = Substitute.For<IContextWindowManager>();
+    private readonly IPromptCacheService _promptCache = Substitute.For<IPromptCacheService>();
     private readonly ICurrentUser _currentUser = Substitute.For<ICurrentUser>();
     private readonly ICurrentTenant _currentTenant = Substitute.For<ICurrentTenant>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
@@ -43,6 +45,8 @@ public sealed class ExecuteAiChatTests
         _messageRepo,
         _usageRepo,
         _quotaService,
+        _contextWindow,
+        _promptCache,
         _currentUser,
         _currentTenant,
         _dateTimeProvider);

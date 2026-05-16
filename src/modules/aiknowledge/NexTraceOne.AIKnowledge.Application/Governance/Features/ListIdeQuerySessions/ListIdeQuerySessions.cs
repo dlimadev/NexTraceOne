@@ -40,9 +40,13 @@ public static class ListIdeQuerySessions
         {
             Guard.Against.Null(request);
 
-            IdeQuerySessionStatus? status = request.StatusValue is not null
-                ? Enum.Parse<IdeQuerySessionStatus>(request.StatusValue)
-                : null;
+            IdeQuerySessionStatus? status = null;
+            if (request.StatusValue is not null)
+            {
+                if (!Enum.TryParse<IdeQuerySessionStatus>(request.StatusValue, ignoreCase: true, out var parsedStatus))
+                    return Error.Validation("IdeQuerySession.InvalidStatus", $"'{request.StatusValue}' is not a valid IDE query session status.");
+                status = parsedStatus;
+            }
 
             var sessions = await sessionRepository.ListAsync(
                 request.UserId, request.IdeClient, status, cancellationToken);

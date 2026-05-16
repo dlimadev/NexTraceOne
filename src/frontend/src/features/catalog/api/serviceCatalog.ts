@@ -173,7 +173,7 @@ export const serviceCatalogApi = {
       .post('/catalog/integration/v1/consumers/sync', data)
       .then((r) => r.data),
 
-  /** Lista serviços do catálogo com filtros opcionais. */
+  /** Lista serviços do catálogo com filtros opcionais e paginação. */
   listServices: (params?: {
     teamName?: string;
     domain?: string;
@@ -182,6 +182,8 @@ export const serviceCatalogApi = {
     lifecycleStatus?: string;
     exposureType?: string;
     search?: string;
+    page?: number;
+    pageSize?: number;
   }) =>
     client
       .get<ServiceListResponse>('/catalog/services', { params })

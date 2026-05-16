@@ -67,9 +67,13 @@ public static class UpdateAgent
             if (agent is null)
                 return AiGovernanceErrors.AgentNotFound(request.AgentId.ToString());
 
-            AgentVisibility? visibility = request.Visibility is not null
-                ? Enum.Parse<AgentVisibility>(request.Visibility, ignoreCase: true)
-                : null;
+            AgentVisibility? visibility = null;
+            if (request.Visibility is not null)
+            {
+                if (!Enum.TryParse<AgentVisibility>(request.Visibility, ignoreCase: true, out var parsedVisibility))
+                    return Error.Validation("Agent.InvalidVisibility", $"'{request.Visibility}' is not a valid agent visibility.");
+                visibility = parsedVisibility;
+            }
 
             var updateResult = agent.UpdateDefinition(
                 request.DisplayName,

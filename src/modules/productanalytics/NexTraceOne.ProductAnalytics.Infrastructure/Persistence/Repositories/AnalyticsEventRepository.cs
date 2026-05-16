@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Application.Abstractions;
 using NexTraceOne.ProductAnalytics.Domain.Entities;
 using NexTraceOne.ProductAnalytics.Domain.Enums;
@@ -9,8 +10,11 @@ namespace NexTraceOne.ProductAnalytics.Infrastructure.Persistence.Repositories;
 /// <summary>
 /// Implementação EF Core do repositório de AnalyticsEvents para o módulo Product Analytics.
 /// Extraído de GovernanceDbContext em P2.3.
+/// Aplica filtro de TenantId em defense-in-depth (além do RLS do PostgreSQL).
 /// </summary>
-internal sealed class AnalyticsEventRepository(ProductAnalyticsDbContext context) : IAnalyticsEventRepository
+internal sealed class AnalyticsEventRepository(
+    ProductAnalyticsDbContext context,
+    ICurrentTenant currentTenant) : IAnalyticsEventRepository
 {
     public async Task AddAsync(AnalyticsEvent analyticsEvent, CancellationToken ct)
         => await context.AnalyticsEvents.AddAsync(analyticsEvent, ct);
@@ -220,13 +224,15 @@ internal sealed class AnalyticsEventRepository(ProductAnalyticsDbContext context
             .Select(g => new UserFirstEventRow(g.Key.UserId, g.Key.EventType, g.Min(x => x.OccurredAt)))
             .ToListAsync(ct);
 
-    private static IQueryable<AnalyticsEvent> ApplyFilters(
+    private IQueryable<AnalyticsEvent> ApplyFilters(
         IQueryable<AnalyticsEvent> query,
         string? persona,
         ProductModule? module,
         string? teamId,
         string? domainId)
     {
+        query = query.Where(e => e.TenantId == currentTenant.Id);
+
         if (!string.IsNullOrWhiteSpace(persona))
             query = query.Where(e => e.Persona == persona);
 

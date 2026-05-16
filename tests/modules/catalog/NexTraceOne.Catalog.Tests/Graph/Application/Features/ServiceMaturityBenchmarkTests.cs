@@ -21,7 +21,7 @@ public sealed class ServiceMaturityBenchmarkTests
         string? documentationUrl = null,
         string? description = null)
     {
-        var service = ServiceAsset.Create(name, domain, teamName);
+        var service = ServiceAsset.Create(name, domain, teamName, Guid.NewGuid());
 
         if (technicalOwner is not null || repositoryUrl is not null
             || documentationUrl is not null || description is not null)
@@ -60,8 +60,8 @@ public sealed class ServiceMaturityBenchmarkTests
         repository.ListFilteredAsync(
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<ServiceType?>(),
             Arg.Any<Criticality?>(), Arg.Any<LifecycleStatus?>(), Arg.Any<ExposureType?>(),
-            Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(services);
+            Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((services, services.Count));
 
         var sut = new GetServiceMaturityBenchmarkFeature.Handler(repository);
         var result = await sut.Handle(
@@ -94,8 +94,8 @@ public sealed class ServiceMaturityBenchmarkTests
         repository.ListFilteredAsync(
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<ServiceType?>(),
             Arg.Any<Criticality?>(), Arg.Any<LifecycleStatus?>(), Arg.Any<ExposureType?>(),
-            Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(services);
+            Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((services, services.Count));
 
         var sut = new GetServiceMaturityBenchmarkFeature.Handler(repository);
         var result = await sut.Handle(
@@ -121,8 +121,8 @@ public sealed class ServiceMaturityBenchmarkTests
         repository.ListFilteredAsync(
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<ServiceType?>(),
             Arg.Any<Criticality?>(), Arg.Any<LifecycleStatus?>(), Arg.Any<ExposureType?>(),
-            Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(services);
+            Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((services, services.Count));
 
         var sut = new GetServiceMaturityBenchmarkFeature.Handler(repository);
         var result = await sut.Handle(
@@ -153,8 +153,10 @@ public sealed class ServiceMaturityBenchmarkTests
             lifecycleStatus: null,
             exposureType: null,
             searchTerm: null,
+            Arg.Any<int>(),
+            Arg.Any<int>(),
             Arg.Any<CancellationToken>())
-            .Returns(services);
+            .Returns((services, services.Count));
 
         var sut = new GetServiceMaturityBenchmarkFeature.Handler(repository);
         var result = await sut.Handle(
@@ -170,6 +172,8 @@ public sealed class ServiceMaturityBenchmarkTests
             lifecycleStatus: null,
             exposureType: null,
             searchTerm: null,
+            Arg.Any<int>(),
+            Arg.Any<int>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -192,8 +196,10 @@ public sealed class ServiceMaturityBenchmarkTests
             lifecycleStatus: null,
             exposureType: null,
             searchTerm: null,
+            Arg.Any<int>(),
+            Arg.Any<int>(),
             Arg.Any<CancellationToken>())
-            .Returns(services);
+            .Returns((services, services.Count));
 
         var sut = new GetServiceMaturityBenchmarkFeature.Handler(repository);
         var result = await sut.Handle(
@@ -209,6 +215,8 @@ public sealed class ServiceMaturityBenchmarkTests
             lifecycleStatus: null,
             exposureType: null,
             searchTerm: null,
+            Arg.Any<int>(),
+            Arg.Any<int>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -221,8 +229,8 @@ public sealed class ServiceMaturityBenchmarkTests
         repository.ListFilteredAsync(
             Arg.Any<string?>(), Arg.Any<string?>(), Arg.Any<ServiceType?>(),
             Arg.Any<Criticality?>(), Arg.Any<LifecycleStatus?>(), Arg.Any<ExposureType?>(),
-            Arg.Any<string?>(), Arg.Any<CancellationToken>())
-            .Returns(new List<ServiceAsset>());
+            Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns((new List<ServiceAsset>(), 0));
 
         var sut = new GetServiceMaturityBenchmarkFeature.Handler(repository);
         var result = await sut.Handle(

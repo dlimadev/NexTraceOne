@@ -41,7 +41,7 @@ public static class GetOwnershipAudit
         {
             Guard.Against.Null(request);
 
-            var services = await serviceAssetRepository.ListFilteredAsync(
+            var (services, _) = await serviceAssetRepository.ListFilteredAsync(
                 request.TeamName,
                 request.Domain,
                 serviceType: null,
@@ -49,6 +49,8 @@ public static class GetOwnershipAudit
                 lifecycleStatus: null,
                 exposureType: null,
                 searchTerm: null,
+                page: 1,
+                pageSize: 10_000,
                 cancellationToken);
 
             var findings = new List<AuditFindingDto>();

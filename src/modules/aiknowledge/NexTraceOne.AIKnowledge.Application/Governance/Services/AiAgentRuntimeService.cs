@@ -43,6 +43,7 @@ public sealed class AiAgentRuntimeService(
     IToolExecutor toolExecutor,
     IToolPermissionValidator toolPermissionValidator,
     IAiTokenQuotaService tokenQuotaService,
+    IContextWindowManager contextWindow,
     ICurrentUser currentUser,
     ICurrentTenant currentTenant,
     IDateTimeProvider dateTimeProvider) : IAiAgentRuntimeService
@@ -205,7 +206,7 @@ public sealed class AiAgentRuntimeService(
         try
         {
             // Apply context window trimming before first inference
-            var (trimmedMessages, wasTruncated) = ContextWindowManager.TrimToFit(
+            var (trimmedMessages, wasTruncated) = contextWindow.TrimToFit(
                 chatMessages, contextWindowTokens, ReservedCompletionTokens);
             if (wasTruncated)
             {
@@ -254,7 +255,7 @@ public sealed class AiAgentRuntimeService(
                             $"[Tool Result for {nativeCall.FunctionName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
                     }
 
-                    var (trimmedNative, nativeTruncated) = ContextWindowManager.TrimToFit(
+                    var (trimmedNative, nativeTruncated) = contextWindow.TrimToFit(
                         chatMessages, contextWindowTokens, ReservedCompletionTokens);
                     if (nativeTruncated)
                         chatMessages = trimmedNative.ToList();
@@ -292,7 +293,7 @@ public sealed class AiAgentRuntimeService(
                         chatMessages.Add(new ChatMessage("user",
                             $"[Tool Result for {toolCall.ToolName}]: {(toolResult.Success ? toolResult.Output : $"Error: {toolResult.ErrorMessage}")}"));
 
-                        var (trimmedLoop, _) = ContextWindowManager.TrimToFit(
+                        var (trimmedLoop, _) = contextWindow.TrimToFit(
                             chatMessages, contextWindowTokens, ReservedCompletionTokens);
 
                         chatResult = await chatProvider.CompleteAsync(

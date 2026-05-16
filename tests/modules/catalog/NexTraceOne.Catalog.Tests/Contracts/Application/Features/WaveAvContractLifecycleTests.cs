@@ -4,6 +4,7 @@ using NexTraceOne.Catalog.Application.Contracts.Features.GetApiVersionStrategyRe
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractDeprecationForecast;
 using NexTraceOne.Catalog.Application.Contracts.Features.GetContractDeprecationPipelineReport;
 using NexTraceOne.Catalog.Application.Contracts.Features.ScheduleContractDeprecation;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Tests.Contracts.Application.Features;
 
@@ -370,14 +371,14 @@ public sealed class WaveAvContractLifecycleTests
     {
         var repo = Substitute.For<IDeprecationScheduleRepository>();
         repo.GetByContractIdAsync(Arg.Any<Guid>(), TenantId, Arg.Any<CancellationToken>())
-            .Returns((IDeprecationScheduleRepository.DeprecationScheduleRecord?)null);
+            .Returns((DeprecationScheduleRecord?)null);
         var handler = CreateScheduleHandler(repo);
 
         var result = await handler.Handle(ValidScheduleCommand(), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBe(Guid.Empty);
-        await repo.Received(1).UpsertAsync(Arg.Any<IDeprecationScheduleRepository.DeprecationScheduleRecord>(), Arg.Any<CancellationToken>());
+        await repo.Received(1).UpsertAsync(Arg.Any<DeprecationScheduleRecord>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -385,7 +386,7 @@ public sealed class WaveAvContractLifecycleTests
     {
         var existingId = Guid.NewGuid();
         var contractId = Guid.NewGuid();
-        var existing = new IDeprecationScheduleRepository.DeprecationScheduleRecord(
+        var existing = new DeprecationScheduleRecord(
             existingId, contractId, TenantId,
             FixedNow.AddDays(20), null, null, null, null, "user-prev", null, FixedNow.AddDays(-5));
 
@@ -393,9 +394,9 @@ public sealed class WaveAvContractLifecycleTests
         repo.GetByContractIdAsync(contractId, TenantId, Arg.Any<CancellationToken>())
             .Returns(existing);
 
-        IDeprecationScheduleRepository.DeprecationScheduleRecord? captured = null;
-        repo.When(r => r.UpsertAsync(Arg.Any<IDeprecationScheduleRepository.DeprecationScheduleRecord>(), Arg.Any<CancellationToken>()))
-            .Do(ci => captured = ci.Arg<IDeprecationScheduleRepository.DeprecationScheduleRecord>());
+        DeprecationScheduleRecord? captured = null;
+        repo.When(r => r.UpsertAsync(Arg.Any<DeprecationScheduleRecord>(), Arg.Any<CancellationToken>()))
+            .Do(ci => captured = ci.Arg<DeprecationScheduleRecord>());
 
         var handler = CreateScheduleHandler(repo);
         var result = await handler.Handle(ValidScheduleCommand(contractId), CancellationToken.None);
@@ -628,7 +629,7 @@ public sealed class WaveAvContractLifecycleTests
     public async Task NullDeprecationScheduleRepository_UpsertCompletes()
     {
         var repo = new NexTraceOne.Catalog.Application.Contracts.NullDeprecationScheduleRepository();
-        var record = new IDeprecationScheduleRepository.DeprecationScheduleRecord(
+        var record = new DeprecationScheduleRecord(
             Guid.NewGuid(), Guid.NewGuid(), "t1", FixedNow.AddDays(30), null, null, null, null, "user", null, FixedNow);
         var act = async () => await repo.UpsertAsync(record, CancellationToken.None);
         await act.Should().NotThrowAsync();

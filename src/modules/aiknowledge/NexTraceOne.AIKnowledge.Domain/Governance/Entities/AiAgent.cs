@@ -3,6 +3,7 @@ using Ardalis.GuardClauses;
 using MediatR;
 
 using NexTraceOne.AIKnowledge.Domain.Governance.Enums;
+using NexTraceOne.AIKnowledge.Domain.Governance.ValueObjects;
 using NexTraceOne.BuildingBlocks.Core.Primitives;
 using NexTraceOne.BuildingBlocks.Core.Results;
 using NexTraceOne.BuildingBlocks.Core.StronglyTypedIds;
@@ -114,7 +115,7 @@ public sealed class AiAgent : AuditableEntity<AiAgentId>
     public long ExecutionCount { get; private set; }
 
     /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
-    public uint RowVersion { get; set; }
+    public uint RowVersion { get; private set; }
 
     /// <summary>
     /// Regista um agent oficial da plataforma (System).
@@ -137,7 +138,7 @@ public sealed class AiAgent : AuditableEntity<AiAgentId>
         Guard.Against.NullOrWhiteSpace(name);
         Guard.Against.NullOrWhiteSpace(displayName);
 
-        var derivedSlug = slug ?? name.ToLowerInvariant().Replace(' ', '-').Replace(':', '-');
+        var derivedSlug = SlugHelper.Derive(name, slug);
 
         return new AiAgent
         {
@@ -198,7 +199,7 @@ public sealed class AiAgent : AuditableEntity<AiAgentId>
         if (ownershipType == AgentOwnershipType.System)
             throw new ArgumentException("Use Register() for System agents.", nameof(ownershipType));
 
-        var derivedSlug = slug ?? name.ToLowerInvariant().Replace(' ', '-').Replace(':', '-');
+        var derivedSlug = SlugHelper.Derive(name, slug);
 
         return new AiAgent
         {

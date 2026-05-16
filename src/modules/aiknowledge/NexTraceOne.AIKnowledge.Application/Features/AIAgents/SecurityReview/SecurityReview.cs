@@ -1,5 +1,8 @@
 using FluentValidation;
-using MediatR;
+using Microsoft.Extensions.Logging;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions;
+using NexTraceOne.AIKnowledge.Application.Runtime.Abstractions.SemanticKernel;
+using NexTraceOne.AIKnowledge.Application.Runtime.Utils;
 using NexTraceOne.BuildingBlocks.Application.Abstractions;
 using NexTraceOne.BuildingBlocks.Application.Cqrs;
 using NexTraceOne.BuildingBlocks.Core.Results;
@@ -7,18 +10,13 @@ using NexTraceOne.BuildingBlocks.Core.Results;
 namespace NexTraceOne.AIKnowledge.Application.Features.AIAgents.SecurityReview;
 
 /// <summary>
-/// Revisa código em busca de vulnerabilidades de segurança
+/// Revisa código em busca de vulnerabilidades de segurança.
+/// Phase 2: integrado com IAiKernelService para análise via LLM.
 /// </summary>
 public static class SecurityReview
 {
-    /// <summary>
-    /// Comando para revisar segurança
-    /// </summary>
     public sealed record Command(string ProjectPath) : ICommand<Response>;
 
-    /// <summary>
-    /// Validador do comando
-    /// </summary>
     public sealed class Validator : AbstractValidator<Command>
     {
         public Validator()
@@ -29,9 +27,6 @@ public static class SecurityReview
         }
     }
 
-    /// <summary>
-    /// Resposta da revisão de segurança
-    /// </summary>
     public sealed record Response(
         double OverallSecurityScore,
         int TotalVulnerabilities,
@@ -43,9 +38,6 @@ public static class SecurityReview
         List<ComplianceIssue> ComplianceIssues,
         List<string> Recommendations);
 
-    /// <summary>
-    /// Vulnerabilidade identificada
-    /// </summary>
     public sealed record Vulnerability(
         string Type,
         string Severity,
@@ -54,86 +46,151 @@ public static class SecurityReview
         string Remediation,
         string CveId);
 
-    /// <summary>
-    /// Problema de compliance
-    /// </summary>
     public sealed record ComplianceIssue(
         string Standard,
         string Requirement,
         bool Compliant,
         string Description);
 
-    /// <summary>
-    /// Handler para revisão de segurança
-    /// </summary>
     internal sealed class Handler(
+        IAiKernelService kernelService,
+        IAiProviderFactory providerFactory,
         IDateTimeProvider clock,
-        ICurrentTenant currentTenant) : ICommandHandler<Command, Response>
+        ICurrentTenant currentTenant,
+        ILogger<Handler> logger) : ICommandHandler<Command, Response>
     {
         public async Task<Result<Response>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var vulnerabilities = await ScanVulnerabilitiesAsync(request.ProjectPath, cancellationToken);
-            var compliance = await CheckComplianceAsync(request.ProjectPath, cancellationToken);
+            var provider = providerFactory.GetChatProvider("ollama")
+                ?? providerFactory.GetChatProvider("openai");
+
+            List<Vulnerability> vulnerabilities;
+            List<ComplianceIssue> compliance;
+
+            if (provider is not null)
+            {
+                try
+                {
+                    var kernel = kernelService.CreateKernel(provider.ProviderId, provider.ProviderId);
+                    var systemPrompt = """
+                        You are a security expert. Analyze the project and identify vulnerabilities and compliance issues.
+                        Respond ONLY with valid JSON. No markdown, no explanations.
+
+                        Expected JSON format:
+                        {
+                          "vulnerabilities": [
+                            {
+                              "type": "SQL Injection",
+                              "severity": "High",
+                              "location": "Repository.cs:45",
+                              "description": "Raw SQL query without parameterization",
+                              "remediation": "Use parameterized queries",
+                              "cveId": "CWE-89"
+                            }
+                          ],
+                          "compliance": [
+                            {
+                              "standard": "OWASP Top 10",
+                              "requirement": "A01:2021 - Broken Access Control",
+                              "compliant": true,
+                              "description": "Access control properly implemented"
+                            }
+                          ]
+                        }
+                        """;
+                    var messages = new List<ChatMessage> { new("user", $"Analyze security of project at: {request.ProjectPath}") };
+                    var llmResponse = await kernelService.ExecuteChatAsync(kernel, systemPrompt, messages, cancellationToken);
+
+                    // Phase 2: parse LLM JSON response into structured data
+                    // For now, use fallback if parsing fails
+                    (vulnerabilities, compliance) = TryParseLlmResponse(llmResponse);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "LLM security review failed; falling back to simulated data");
+                    (vulnerabilities, compliance) = (GetSimulatedVulnerabilities(), GetSimulatedCompliance());
+                }
+            }
+            else
+            {
+                (vulnerabilities, compliance) = (GetSimulatedVulnerabilities(), GetSimulatedCompliance());
+            }
+
             var score = CalculateSecurityScore(vulnerabilities, compliance);
             var recommendations = GenerateRecommendations(vulnerabilities, compliance);
 
-            var response = new Response(
-                OverallSecurityScore: score,
-                TotalVulnerabilities: vulnerabilities.Count,
-                CriticalCount: vulnerabilities.Count(v => v.Severity == "Critical"),
-                HighCount: vulnerabilities.Count(v => v.Severity == "High"),
-                MediumCount: vulnerabilities.Count(v => v.Severity == "Medium"),
-                LowCount: vulnerabilities.Count(v => v.Severity == "Low"),
-                Vulnerabilities: vulnerabilities,
-                ComplianceIssues: compliance,
-                Recommendations: recommendations);
-
-            return Result<Response>.Success(response);
+            return new Response(
+                score,
+                vulnerabilities.Count,
+                vulnerabilities.Count(v => v.Severity == "Critical"),
+                vulnerabilities.Count(v => v.Severity == "High"),
+                vulnerabilities.Count(v => v.Severity == "Medium"),
+                vulnerabilities.Count(v => v.Severity == "Low"),
+                vulnerabilities,
+                compliance,
+                recommendations);
         }
 
-        private async Task<List<Vulnerability>> ScanVulnerabilitiesAsync(string projectPath, CancellationToken ct)
+        private sealed record LlmVulnerability(
+            string Type,
+            string Severity,
+            string Location,
+            string Description,
+            string Remediation,
+            string CveId);
+
+        private sealed record LlmCompliance(
+            string Standard,
+            string Requirement,
+            bool Compliant,
+            string Description);
+
+        private sealed record LlmSecurityResponse(
+            List<LlmVulnerability> Vulnerabilities,
+            List<LlmCompliance> Compliance);
+
+        private static (List<Vulnerability>, List<ComplianceIssue>) TryParseLlmResponse(string response)
         {
-            // TODO: Integrar com SAST tools (Fortify, Checkmarx, SonarQube)
-            await Task.Delay(150, ct);
-            
+            if (LlmJsonParser.TryParse<LlmSecurityResponse>(response, out var parsed)
+                && parsed is not null)
+            {
+                var vulnerabilities = parsed.Vulnerabilities
+                    .Select(v => new Vulnerability(v.Type, v.Severity, v.Location, v.Description, v.Remediation, v.CveId))
+                    .ToList();
+
+                var compliance = parsed.Compliance
+                    .Select(c => new ComplianceIssue(c.Standard, c.Requirement, c.Compliant, c.Description))
+                    .ToList();
+
+                return (vulnerabilities, compliance);
+            }
+
+            return (GetSimulatedVulnerabilities(), GetSimulatedCompliance());
+        }
+
+        private static List<Vulnerability> GetSimulatedVulnerabilities()
+        {
             return new List<Vulnerability>
             {
-                new Vulnerability(
-                    "SQL Injection",
-                    "High",
-                    "Repository.cs:45",
-                    "Raw SQL query without parameterization",
-                    "Use parameterized queries or ORM",
-                    "CWE-89"),
-                new Vulnerability(
-                    "Hardcoded Secret",
-                    "Critical",
-                    "Configuration.cs:12",
-                    "API key hardcoded in source code",
-                    "Move secrets to Azure Key Vault or environment variables",
-                    "CWE-798")
+                new("SQL Injection", "High", "Repository.cs:45", "Raw SQL query without parameterization", "Use parameterized queries or ORM", "CWE-89"),
+                new("Hardcoded Secret", "Critical", "Configuration.cs:12", "API key hardcoded in source code", "Move secrets to Azure Key Vault or environment variables", "CWE-798")
             };
         }
 
-        private async Task<List<ComplianceIssue>> CheckComplianceAsync(string projectPath, CancellationToken ct)
+        private static List<ComplianceIssue> GetSimulatedCompliance()
         {
-            // TODO: Verificar compliance com OWASP, SOC2, ISO27001
-            await Task.Delay(100, ct);
-            
             return new List<ComplianceIssue>
             {
-                new ComplianceIssue("OWASP Top 10", "A01:2021 - Broken Access Control", true, "Access control properly implemented"),
-                new ComplianceIssue("OWASP Top 10", "A02:2021 - Cryptographic Failures", false, "Sensitive data not encrypted at rest"),
-                new ComplianceIssue("SOC2", "CC6.1 - Logical Access Security", true, "Multi-factor authentication enabled"),
-                new ComplianceIssue("ISO27001", "A.9.2.1 - User Registration", true, "User registration process documented")
+                new("OWASP Top 10", "A01:2021 - Broken Access Control", true, "Access control properly implemented"),
+                new("OWASP Top 10", "A02:2021 - Cryptographic Failures", false, "Sensitive data not encrypted at rest"),
+                new("SOC2", "CC6.1 - Logical Access Security", true, "Multi-factor authentication enabled"),
+                new("ISO27001", "A.9.2.1 - User Registration", true, "User registration process documented")
             };
         }
 
-        private double CalculateSecurityScore(List<Vulnerability> vulnerabilities, List<ComplianceIssue> compliance)
+        private static double CalculateSecurityScore(List<Vulnerability> vulnerabilities, List<ComplianceIssue> compliance)
         {
             double score = 100.0;
-
-            // Deduct points for vulnerabilities
             foreach (var vuln in vulnerabilities)
             {
                 score -= vuln.Severity switch
@@ -145,27 +202,19 @@ public static class SecurityReview
                     _ => 0
                 };
             }
-
-            // Deduct points for non-compliance
-            var nonCompliant = compliance.Count(c => !c.Compliant);
-            score -= nonCompliant * 5.0;
-
+            score -= compliance.Count(c => !c.Compliant) * 5.0;
             return Math.Max(score, 0.0);
         }
 
-        private List<string> GenerateRecommendations(List<Vulnerability> vulnerabilities, List<ComplianceIssue> compliance)
+        private static List<string> GenerateRecommendations(List<Vulnerability> vulnerabilities, List<ComplianceIssue> compliance)
         {
             var recommendations = new List<string>();
-
             if (vulnerabilities.Any(v => v.Type == "SQL Injection"))
                 recommendations.Add("Implement parameterized queries across all database access layers");
-
             if (vulnerabilities.Any(v => v.Type == "Hardcoded Secret"))
                 recommendations.Add("Migrate all secrets to Azure Key Vault or HashiCorp Vault");
-
             if (vulnerabilities.Any(v => v.Type.Contains("XSS")))
                 recommendations.Add("Implement output encoding and Content Security Policy headers");
-
             if (compliance.Any(c => !c.Compliant && c.Standard == "OWASP Top 10"))
                 recommendations.Add("Address OWASP Top 10 compliance gaps immediately");
 

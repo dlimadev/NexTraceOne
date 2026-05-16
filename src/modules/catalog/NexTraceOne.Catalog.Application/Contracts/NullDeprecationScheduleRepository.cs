@@ -1,4 +1,5 @@
 using NexTraceOne.Catalog.Application.Contracts.Abstractions;
+using NexTraceOne.Catalog.Domain.Contracts.Entities;
 
 namespace NexTraceOne.Catalog.Application.Contracts;
 
@@ -9,11 +10,11 @@ namespace NexTraceOne.Catalog.Application.Contracts;
 /// </summary>
 public sealed class NullDeprecationScheduleRepository : IDeprecationScheduleRepository
 {
-    public Task<IDeprecationScheduleRepository.DeprecationScheduleRecord?> GetByContractIdAsync(
+    public Task<DeprecationScheduleRecord?> GetByContractIdAsync(
         Guid contractId, string tenantId, CancellationToken ct)
-        => Task.FromResult<IDeprecationScheduleRepository.DeprecationScheduleRecord?>(null);
+        => Task.FromResult<DeprecationScheduleRecord?>(null);
 
     public Task UpsertAsync(
-        IDeprecationScheduleRepository.DeprecationScheduleRecord record, CancellationToken ct)
+        DeprecationScheduleRecord record, CancellationToken ct)
         => Task.CompletedTask;
 }

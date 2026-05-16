@@ -27,7 +27,7 @@ public sealed class SyncConsumersTests
     [Fact]
     public async Task SyncConsumers_Should_CreateRelationship_When_ConsumerIsNew()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         _apiAssetRepository.GetByIdAsync(Arg.Any<ApiAssetId>(), Arg.Any<CancellationToken>()).Returns(apiAsset);
 
@@ -59,7 +59,7 @@ public sealed class SyncConsumersTests
     [Fact]
     public async Task SyncConsumers_Should_UpdateRelationship_When_ConsumerAlreadyExists()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
 
         // Primeira chamada cria a relação
@@ -120,7 +120,7 @@ public sealed class SyncConsumersTests
     [Fact]
     public async Task SyncConsumers_Should_ReportFailure_When_ApiAssetDecommissioned()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         apiAsset.Decommission();
 
@@ -150,7 +150,7 @@ public sealed class SyncConsumersTests
     [Fact]
     public async Task SyncConsumers_Should_ProcessMixedBatch_With_SuccessesAndFailures()
     {
-        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team");
+        var ownerService = ServiceAsset.Create("payments-service", "Finance", "Payments Team", Guid.NewGuid());
         var apiAsset = ApiAsset.Register("Payments API", "/api/payments", "1.0.0", "Internal", ownerService);
         var missingId = Guid.NewGuid();
 

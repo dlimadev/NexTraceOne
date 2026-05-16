@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NexTraceOne.Catalog.Infrastructure.Graph.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 
 #nullable disable
 
@@ -828,6 +829,13 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .HasColumnType("character varying(500)")
                         .HasDefaultValue("");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Criticality")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -896,6 +904,9 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .HasColumnType("character varying(200)")
                         .HasDefaultValue("");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTimeOffset?>("LastOwnershipReviewAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -959,6 +970,13 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasDefaultValue("");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "simple")
+                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Name", "DisplayName", "Domain", "TeamName", "Description" });
+
                     b.Property<string>("ServiceType")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -996,12 +1014,22 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         .HasColumnType("character varying(200)")
                         .HasDefaultValue("");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Tier")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)")
                         .HasDefaultValue("Standard");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -1014,6 +1042,10 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
+
                     b.HasIndex("ServiceType");
 
                     b.HasIndex("SubDomain");
@@ -1024,7 +1056,7 @@ namespace NexTraceOne.Catalog.Infrastructure.Graph.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_cat_service_assets_criticality", "\"Criticality\" IN ('Critical', 'High', 'Medium', 'Low')");
 
-                            t.HasCheckConstraint("CK_cat_service_assets_exposure_type", "\"ExposureType\" IN ('Internal', 'Partner', 'Public')");
+                            t.HasCheckConstraint("CK_cat_service_assets_exposure_type", "\"ExposureType\" IN ('Internal', 'External', 'Partner')");
 
                             t.HasCheckConstraint("CK_cat_service_assets_lifecycle_status", "\"LifecycleStatus\" IN ('Planning', 'Development', 'Staging', 'Active', 'Deprecating', 'Deprecated', 'Retired')");
 

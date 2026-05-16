@@ -105,6 +105,8 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
     /// Suporta múltiplos protocolos (OpenAPI, Swagger, WSDL, AsyncAPI).
     /// Retorna falha se a versão semântica for inválida ou o conteúdo estiver vazio.
     /// </summary>
+    private const int MaxSpecContentSizeBytes = 1 * 1024 * 1024; // 1MB
+
     public static Result<ContractVersion> Import(
         Guid apiAssetId,
         string semVer,
@@ -122,6 +124,9 @@ public sealed class ContractVersion : AuditableEntity<ContractVersionId>
 
         if (string.IsNullOrWhiteSpace(specContent))
             return ContractsErrors.EmptySpecContent();
+
+        if (System.Text.Encoding.UTF8.GetByteCount(specContent) > MaxSpecContentSizeBytes)
+            return ContractsErrors.SpecContentTooLarge(MaxSpecContentSizeBytes / (1024 * 1024));
 
         return new ContractVersion
         {
